@@ -12,14 +12,15 @@ without reading their contents.
 
 The pattern exists because of mutation.
 An object that changes in place overwrites its earlier state,
-so you must copy that state before the change and keep the copy from changing.
+so you must copy that state before the change and freeze the copy.
 Python has the classic form when you need it,
 and immutable state removes the need.
 
 ## A Snapshot Is Not a Reference
 
-Aliasing and copying return from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks),
-because a memento works only when it is a copy and fails when it is an alias.
+[Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
+covers aliasing and copying, and a memento depends on the difference.
+A memento works when it is a copy and fails when it is an alias.
 The beginner's memento is an assignment, and an assignment aliases:
 
 ```python
@@ -83,7 +84,7 @@ Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable while the originator stays mutable.
 `restore()` copies in the other direction,
-rebuilding a fresh list so the sketch and the memento share nothing:
+rebuilding a fresh list so the sketch's list and the memento's tuple are separate objects:
 
 ```python
 # sketch.py
@@ -130,25 +131,26 @@ print(sketch)
 ```
 
 `copy.copy(sketch)` looks like a shortcut for `save()`,
-but it copies only the `Sketch`.
+but it copies the `Sketch` and leaves its list shared.
 The copy's `strokes` is the same list as `sketch.strokes`,
 the alias from `aliased_snapshot.py` one level down.
+
 `save()`'s one-level copy is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
 and each save then [rebuilds the whole nested structure](#a-snapshot-is-not-a-reference).
 
 The caretaker's side of the contract is to store `checkpoint` and return it,
-without reading or assigning its `strokes`.
+leaving `checkpoint.strokes` alone.
 Languages with access control enforce that rule.
-In Python it is a convention,
-though freezing the memento turns an accidental edit into an exception.
+In Python the rule is a convention,
+though a frozen memento raises an exception on an accidental edit.
 Assigning different strokes to the snapshot raises a `FrozenInstanceError`.
 
 ### Why `Memento` Is a Class
 
 You could replace the class with `type Memento = tuple[str, ...]`.
 Every call site still type-checks.
-But an alias creates no new type.
+But an alias is a second name for an existing type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
 `NewType("Memento", tuple[str, ...])` exists only for the type checker.
@@ -162,16 +164,16 @@ whatever built it.
 A parameter typed `Memento` accepts only a `Memento`,
 so the type checker reports a caretaker that passes some other tuple by mistake.
 Building a `Memento` takes an import of the class and a call to it,
-so no caretaker makes one by accident.
+so every `Memento` a caretaker builds is deliberate.
 `Memento` is a [record](18_Techniques--Performance.md#record),
 so reassigning `checkpoint.strokes` raises `FrozenInstanceError` at runtime.
 
-Neither the checker's report nor the frozen field stops code holding a `Memento` from reading `.strokes`,
-unpacking that tuple, or building a `Memento` by hand.
+The checker and the frozen field both let code holding a `Memento` read `.strokes`,
+unpack that tuple, or build a `Memento` by hand.
 The caretaker's side of the contract remains a convention,
 the one on which the classic pattern relies.
-What changes is the accidental case,
-a caretaker that mixes up a `Memento` with some other tuple:
+The type checker catches the accidental case instead:
+a caretaker that mixes up a `Memento` with some other tuple.
 
 ```python
 # memento_type_safety.py
@@ -302,7 +304,8 @@ Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
 Here that assignment is safe,
 because the object bound to `before` keeps its value for as long as it exists.
-The `Memento` class, `save()`, `restore()`, and the copying all disappear.
+The frozen version drops the `Memento` class, `save()`, `restore()`,
+and the copying.
 
 ![](_images/memento_story)
 
@@ -329,12 +332,13 @@ print(after.strokes is before.strokes, len(after.strokes))
 
 The two objects share the stroke strings, not the tuple holding them.
 On a drawing with `n` strokes,
-`draw()` builds a new `Drawing` around a fresh tuple of `n + 1` pointers and copies none of the strings.
+`draw()` builds a new `Drawing` around a fresh tuple of `n + 1` pointers and reuses every existing string.
 
 Each `draw()` builds one such tuple.
-A caretaker that keeps every past state, the `History` class in `history.py`,
+A caretaker that keeps every past state,
+such as the `History` class in `history.py`,
 keeps every one of those tuples alive.
-Once a field grows by one element per edit, the way `strokes` does,
+When a field grows by one element per edit, the way `strokes` does,
 the `n`-th edit builds a tuple of `n` pointers,
 so `k` edits held in the history cost `O(k^2)` pointers in total, not `O(k)`.
 `growth_cost.py` keeps every state in a list, as a `History` does:
@@ -353,6 +357,7 @@ print(sum(len(s.strokes) for s in states),
 
 Two thousand edits held in a `History` cost about two million pointers.
 The final `Drawing` alone costs two thousand.
+
 A field that stays small, or that each edit replaces instead of extends,
 keeps the total proportional to `k`.
 For a field that grows with every edit, bound the history's depth
@@ -364,17 +369,17 @@ or switch to *Command*-based undo, which stores an edit instead of a state.
 argues that freezing removes what encapsulation protected.
 That section also explains why `strokes` is a tuple rather than a list.
 Freezing blocks assignment to the field,
-not changes to the object the field holds,
-so a record holding a list lets that list change,
-as `frozen_leaky.py` shows there.
+not changes to the object the field holds.
+A record holding a list therefore lets that list change,
+as `frozen_leaky.py` in that chapter shows.
 
 [*Flyweight*](35_Patterns--Flyweight.md)
 shares immutable values among objects that exist at once,
 and *Memento* shares them among successive states.
 
-Two kinds of state keep the classic form.
-Freezing rebuilds the changed field on every edit,
-so a state too large to copy per keystroke needs a mutable originator and an explicit `save()`.
+Two kinds of state still need the classic form.
+Because freezing rebuilds the changed field on every edit,
+a state too large to copy per keystroke needs a mutable originator and an explicit `save()`.
 So does a state whose class belongs to someone else: a widget tree,
 a database row, or any object whose class is theirs to design.
 Everywhere else, prefer the frozen value.
@@ -399,7 +404,7 @@ def test_draw_keeps_title() -> None:
 
 The caretaker reads no field of the states it holds,
 since opacity is the pattern's whole point.
-A caretaker that reads no field can hold any type of state,
+That opacity lets a caretaker hold any type of state,
 so `History` is [generic](08_Foundations--Static_Types.md#type-parameters)
 over the state type.
 Undo and redo are two stacks of past and future states:
@@ -468,8 +473,8 @@ print(history.redo())
 ```
 
 `do()` pushes the present onto the past and clears the future,
-so an edit after an undo discards the undone states.
-Redo can no longer restore them, and editors behave the same way.
+so an edit after an undo discards the undone states for good,
+as it does in editors.
 `undo()` and `redo()` each pop one stack, push the present onto the other,
 and make the popped state the present.
 
@@ -478,33 +483,34 @@ and make the popped state the present.
 so every call site must build that state from `history.present` and then pass the result to `do()`.
 If a call site builds the new state and forgets to pass it to `do()`,
 the history stays as it was.
-Nothing mutates, so every other state stays valid,
-and the program runs on with the history one state short.
+Each state keeps its value, so every other state stays valid.
+The program runs on with the history one state short.
+
 `apply()` takes the edit instead of its result.
 It reads `present` for the caller and passes whatever the edit returns to `do()`,
-so no call site can build a state and forget to record it.
-`do()` stays public for a state built some other way than by editing the present,
+so `apply()` records every state an edit returns.
+`do()` stays public for a state built outside an edit of the present,
 such as the `Sketch` mementos that `history_classic.py` passes to it below.
 
-`undo()` and `redo()` trust the caller.
+`undo()` and `redo()` leave the empty-stack check to the caller.
 Undoing an empty past raises `IndexError` from `pop()`.
 That `pop()` comes first, so a failed undo leaves the history as it was.
-`can_undo()` and `can_redo()` exist so a caller checks first.
+`can_undo()` and `can_redo()` let a caller check first.
 An editor calls them to gray out the menu item.
 
 `History` stores whole states and moves them between stacks,
-so it works for any state type, from `int` to a full `Drawing`,
-with one condition: states must be immutable.
+so it works for any state type, from `int` to a full `Drawing`.
+The one condition is that states must be immutable.
 `History` keeps a reference, not a copy,
 so a list mutated in place changes in the past too.
 A `History` of lists is a stack of aliases, the bug in `aliased_snapshot.py`.
 
 `History` holds the classic form as well.
-The classic `Memento` from `sketch.py` is immutable,
-so the same generic caretaker holds snapshots of the mutable `Sketch`.
-The surrounding code calls `save()` and `restore()`,
-two calls a frozen state makes unnecessary,
-since `History` holds each frozen `Drawing` as it is:
+Because the classic `Memento` from `sketch.py` is immutable,
+the same generic caretaker holds snapshots of the mutable `Sketch`.
+Where `History` holds each frozen `Drawing` as it is,
+a `Sketch` needs `save()` before each `do()` and `restore()` after each `undo()`,
+so the code around the `History` calls both:
 
 ```python
 # history_classic.py
@@ -574,17 +580,16 @@ but needs an inverse written and tested for every action.
 Try snapshot-based undo first,
 since immutable states share every value an edit carries over,
 as `sharing.py` shows.
-Switch to *Command* once the `O(k^2)` pointers `growth_cost.py` counts grow too large to hold.
+Switch to *Command* once the `O(k^2)` pointer total that `growth_cost.py` counts grows too large to hold.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}
 
-A whole-state snapshot answers one question: what was every field's value then?
+A whole-state snapshot records every field's value at one moment.
 An editor's undo is often narrower.
 Undo the strokes, but keep the rename.
-`History` cannot express that,
-because it stores and returns whole states and reads no field of them.
-The state must supply the answer,
-and a state that defines `__replace__()` supplies it through `copy.replace()`:
+Because `History` stores and returns whole states and treats each one as opaque,
+the state must supply the partial restore.
+A state that defines `__replace__()` supplies it through `copy.replace()`:
 
 ```python
 # partial_restore.py
@@ -615,7 +620,7 @@ producing a state new to the history.
 The restore goes through `apply()` like any other action,
 so `history.undo()` takes it back.
 The edit that `apply()` receives is a lambda here because a partial restore combines two states,
-and every method on `Drawing` works from one.
+and each `Drawing` method reads one state, `self`.
 
 `copy.replace()` is the [general version](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 of `dataclasses.replace()`.
@@ -641,10 +646,12 @@ print(restored == drawing, restored is drawing)
 #: True False
 ```
 
-You can write the bytes from `pickle.dumps()` to a file and load them in a different process,
+The round trip produces a different object with the same value.
+A record compares by value,
+so `restored == drawing` is `True` while `restored is drawing` is `False`.
+A different object with the same value is all a memento needs,
+so you can write the bytes from `pickle.dumps()` to a file and load them in a different process,
 days later.
-The round trip produces a different object with the same value,
-which is all a memento needs, since a record compares by value.
 
 Only unpickle data you trust, because the format can execute code.
 For untrusted storage or other languages,
@@ -706,7 +713,7 @@ with a field added between the save and the load.
 
 `ty` and mypy report that reassignment as unsound,
 so it carries a `# type: ignore`.
-Pyright lets the reassignment pass.
+Pyright accepts the reassignment.
 No practical annotation declares that `SketchV1` can become a different class.
 
 `pickle.loads()` looks up the class by the name pickle recorded,
@@ -714,27 +721,31 @@ No practical annotation declares that `SketchV1` can become a different class.
 That name is now bound to `SketchV2`.
 `pickle.loads()` builds a bare `SketchV2` with `__new__()`,
 skipping `__init__()`, and copies in the fields the old bytes had.
-The fields go straight into the object's `__dict__`, past the frozen check.
+
+Pickle writes the fields into the object's `__dict__`,
+bypassing the frozen check.
 A record's generated `__setattr__()` raises `FrozenInstanceError`,
 and pickle updates `__dict__` without calling `__setattr__()`.
-The same shortcut skips `__post_init__()`,
-so a memento saved before a field gained its validation loads a value that bypassed the validation.
+Skipping `__init__()` also skips `__post_init__()`,
+so a memento saved before you add validation to a field loads with that field unchecked.
 
-`title` is absent, since the old bytes lack one.
+The loaded object carries the one field the old bytes held.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` raises `AttributeError` when anything reads it,
 often far from the line that called `pickle.loads()`.
-Pickle's convenience comes from leaving this contract unstated.
-Matching the class on load to the class on save is your job.
+Pickle's convenience comes from leaving one job to you:
+matching the class on load to the class on save.
 
 ### A Deleted Field Leaves a Ghost
 
 Deleting a field raises no exception.
 The old bytes load, and every later read succeeds.
 `pickle.loads()` writes the dropped name into the object's `__dict__` as a ghost attribute.
-The class declares no such field, so `repr()` omits it and `==` ignores it,
+The ghost sits outside the class's declared fields,
+so `repr()` omits it and `==` ignores it,
 while `getattr()` still finds it in `__dict__`.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
+
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
 The deleted-field drift raises nothing, and the data is wrong.
 Running the same reassignment backwards shows the deleted field:
@@ -757,11 +768,6 @@ print(restored == SketchV1(("circle",)))
 #: True
 ```
 
-The `repr()` shows a one-field object.
-The `__dict__` shows two entries.
-The loaded object is `==` to a `SketchV1` built with strokes alone,
-so every later comparison treats them as the same.
-
 Renaming a field is a delete and an add at once, with both effects.
 The old name becomes a ghost, and the new one is missing,
 so the generated `repr()` raises `AttributeError`.
@@ -770,17 +776,17 @@ These listings use `@record(slots=False)` so the loaded object has a `__dict__` 
 A slotted record pickles its field values as a list in field order,
 and the load assigns that list to the current class's fields by position.
 When the deleted field is the last one, the load drops its value.
-A field deleted from the middle shifts every later value into the wrong field,
-so a `title`, `strokes`,
+A field deleted from the middle shifts every later value into the wrong field.
+A `title`, `strokes`,
 `color` record that loses `strokes` loads the old strokes tuple as its `color`,
-and the load still raises nothing.
+and the load still succeeds.
 
 ### Schema Migrations and Safer Formats
 
 Databases have the same drift, and its remedy there has a name.
 A *schema migration* makes the drift deliberate:
 a versioned step that changes the table shape and its data together,
-instead of letting a query discover the mismatch.
+instead of leaving a query to fail on the mismatch.
 
 When drift or the security risk is too much to accept,
 other libraries address both.
@@ -791,7 +797,7 @@ Protocol Buffers goes further.
 A schema shared across languages gives every field an explicit number.
 Old and new versions can then read each other's messages by design.
 All three read the bytes as data and run no code from them,
-so they avoid pickle's security risk.
+which removes pickle's security risk.
 
 ## Snapshots in the Wild
 

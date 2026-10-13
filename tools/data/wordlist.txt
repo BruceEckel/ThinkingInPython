@@ -365,3 +365,7 @@ wildcard
 workaround
 workarounds
 worklist
+decodings
+instantiable
+misdescribe
+unexecuted

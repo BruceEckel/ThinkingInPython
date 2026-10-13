@@ -6,7 +6,7 @@
 > and extend the `bind()` chain in `composing_with_bind.py` to include it.
 > Put it in the middle of the chain rather than at the end,
 > so an `Err` from it has a later step to skip,
-> and confirm that the step does not run.
+> and confirm that the later step does not run.
 
 <details>
 <summary>Where to look</summary>
@@ -116,7 +116,7 @@ chain stops.
 ## 2. `Err.map_error()`
 
 > Give `Err` a `map_error()` method that transforms the error it holds,
-> leaving an `Ok` untouched
+> leaving an `Ok` as it is
 > (for chains to keep working, `Ok` needs its own `map_error()` that returns `self`).
 > Use it to add a prefix to every error.
 
@@ -374,7 +374,7 @@ to restate it.
 > Change `@safe` so it takes the exception types it should catch,
 > as in `@safe(ValueError)`, and lets anything else propagate.
 > Show that a `TypeError` raised inside the wrapped function now propagates,
-> and `@safe` no longer returns it as an `Err`.
+> where the original `@safe` returned it as an `Err`.
 
 <details>
 <summary>Where to look</summary>

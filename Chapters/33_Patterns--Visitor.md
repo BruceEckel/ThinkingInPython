@@ -15,23 +15,21 @@ How do you add them from outside the base class?
 ## The Classic Visitor
 
 *Visitor*, the final pattern in *GoF Design Patterns*,
-solves the problem of a hierarchy you cannot change.
-It lets you extend the interface of the primary class hierarchy.
-It requires one method on the primary class hierarchy,
-typically called `accept()`,
+requires one method on the primary class hierarchy, typically called `accept()`,
 which takes an object from a secondary hierarchy called `Visitor`.
-That one method limits where *Visitor* applies.
-The hierarchy's author must write `accept()` in advance,
-because you cannot add it to a vendor's classes yourself.
 `accept()` calls the visitor's `visit()`, passing `self`.
 The visitor's type chooses which `visit()` runs.
+
+The `accept()` requirement limits where *Visitor* applies.
+The hierarchy's author must write `accept()` in advance,
+because you cannot add it to a vendor's classes yourself.
 
 A new `Visitor` subclass such as `Fly` reuses an existing operation,
 so it leaves the primary hierarchy as it is.
 In this Python form of the pattern,
 a new operation whose behavior varies by flower type also needs a new method on `Flower`.
 [The Price of the Empty Base](#the-price-of-the-empty-base) explains why.
-In the listing, bugs visit flowers:
+Here, bugs visit flowers:
 
 ```python
 # flower_visitors.py
@@ -131,10 +129,9 @@ In `flower_visitors.py` one inherited `accept()` passes the concrete flower to t
 `visit()` resolves the visitor's type,
 and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's type a step later.
 
-In the last line of output, both dispatches change the result,
+In the last line of `bug_visits.py`'s output, both dispatches change the result,
 because `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide).
-That line depends on both unknown types at once.
 The worm's type chooses `eat()`,
 and the flower's type chooses which `eat()` runs.
 If you delete the override, every flower resolves to the same `Flower.eat()`,
@@ -162,8 +159,6 @@ The first dispatch resolves to `Predator.visit` rather than `Worm.visit`,
 because `Worm` inherits the operation from the class that defines it.
 For `Chrysanthemum` the second dispatch resolves to the override,
 and for `Gladiolus` to the inherited `Flower.eat`.
-The trace shows that flower-side choice,
-which `bug_visits.py`'s output leaves implicit.
 
 ## The Price of the Empty Base
 
@@ -174,7 +169,8 @@ If you declare that parameter as `Visitor` instead,
 the type checker reports `visitor.visit` as an unresolved attribute.
 The classic pattern declares `visit()` abstract on the visitor base,
 so `visitor.visit` resolves.
-A `Protocol` that declares `visit()` removes the `Any`:
+A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
+that declares `visit()` removes the `Any`:
 
     class Visits(Protocol):
         def visit(self, flower: Flower) -> None: ...
@@ -194,14 +190,14 @@ where a bag of attributes named at runtime leaves no precise type to write.
 
 Notice which hierarchy holds the behavior.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
-so `accept()` is the one method it adds to the primary hierarchy.
+so `accept()` is the one method the pattern adds to the primary hierarchy.
 Python has no method overloading,
 since a second `def visit()` replaces the first.
 [`@overload`](14_Techniques--Decorators.md#decorators-with-optional-parentheses)
 declares extra signatures for the type checker and leaves the runtime with one implementation,
 which must branch on the argument's type.
 `flower_visitors.py` therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
-and the visitors choose between them.
+and the visitors choose between those two methods.
 So `flower_visitors.py`'s primary hierarchy holds the operations the pattern exists to keep out of it.
 
 A Python visitor can keep the operations instead by building the method name from the element's class,
@@ -216,7 +212,7 @@ The type checker cannot resolve a method name built from a string at runtime.
 as *Visitor* does, but without the `accept()` method or the `Visitor` class hierarchy.
 `singledispatch` turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
-The flowers below are the same three as in `flower_visitors.py`.
+Here, the flowers are the same three as in `flower_visitors.py`.
 The two operations, `nectar()` and `fragrance()`, are new,
 each added independently of the other:
 
@@ -425,11 +421,11 @@ if __name__ == "__main__":
 ```
 
 The recursion works because `Corsage` and `Flower` both define `accept()`.
+The loop in `Corsage.accept()` calls `accept()` on each element the same way,
+whether the element is a flower or another corsage.
 The `Accepts` protocol names that shared method,
 so the type checker reports an element that lacks `accept()`,
 such as `Corsage("rose")`, before the program runs.
-The loop in `Corsage.accept()` calls `accept()` on each element the same way,
-whether the element is a flower or another corsage.
 
 In `bug_visits.py` the loop that calls `accept()` sits outside the hierarchy,
 at module level, and takes one flower at a time from `flower_gen()`.

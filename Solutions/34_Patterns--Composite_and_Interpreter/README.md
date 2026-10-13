@@ -896,9 +896,9 @@ exercise.
 
 > At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
 > an ill-typed tree the type checker rejects in source it can see.
-> Rewrite all four operator methods to return `NotImplemented` for an operand they cannot use
-> ([*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
-> and confirm that `"a" + x` and `x + "a"` both now raise a `TypeError`.
+> Using the idiom from [*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice),
+> rewrite all four operator methods to return `NotImplemented` for an operand they cannot use.
+> Confirm that `"a" + x` and `x + "a"` both now raise a `TypeError`.
 
 <details>
 <summary>Where to look</summary>
@@ -1391,10 +1391,8 @@ other code can see.
 
 > A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
 > Sketch what breaks, then write the version of `disk_usage()` that supports the plugin's entry types.
-> Which of the two designs,
-> a `match` over a union or a method on a base class,
-> would you use for a file system,
-> and which for the expression language in `expr.py`?
+> For a file system, would you use a `match` over a union or a method on a base class?
+> Which would you use for the expression language in `expr.py`?
 
 <details>
 <summary>Where to look</summary>

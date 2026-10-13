@@ -131,7 +131,7 @@ Each observer reads what it needs by calling back into the subject,
 here `subject.celsius`.
 With pull, each observer decides what it needs.
 
-Each observer depends on the subject's interface.
+Reading from the subject makes each observer depend on the subject's interface.
 To read `celsius`, an observer depends on `Thermometer`,
 the class that defines `celsius`.
 The type checker enforces that dependency.
@@ -182,7 +182,7 @@ and shows which responder the loop skips without the copy.
 The traditional names are easy to confuse.
 Both `java.util.Observable` and the reactive libraries call the subject an `Observable`.
 `Observer` and `Observable` share a stem and name opposite roles,
-so in every listing you must work out which role each name refers to.
+so in every listing you must work out which role each name denotes.
 
 GoF's method names are a second obstacle.
 When the subject changes, it calls its own `notify()`,
@@ -209,9 +209,9 @@ The last row has no method name on the right.
 A responder is a callable, so the receiving end is the call.
 Broadcasting a change takes one method name, `announce()`, where GoF uses two.
 
+The table translates this chapter's names into the ones the literature uses.
 GoF calls the pattern *Observer*,
 and Java and the reactive libraries use the older nouns.
-The table translates this chapter's names into the ones that literature uses.
 Java and JavaScript call a responder a *listener*,
 as in `ActionListener` and `addEventListener()`.
 
@@ -252,7 +252,7 @@ class Broadcaster[T]:
             responder(data)
 ```
 
-`Broadcaster` is `classic_observer.py`'s `Subject` with its three methods renamed:
+`Broadcaster` is `classic_observer.py`'s `Subject` with its three methods renamed.
 GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
 and `announce()`.
 The call inside `announce()`'s `for` loop changes as well.
@@ -376,12 +376,13 @@ The responders here are lambdas, but any function or bound method works.
 `Thermometer` is a `Broadcaster[float]`,
 so the type of each responder in its list is `Responder[float]`,
 a `Callable[[float], None]`.
+
 This figure shows one notification,
 naming the two lambdas `display` and `alarm`:
 
 ![](_images/observer_story)
 
-The shaded side holds the responders as the program wrote them;
+The shaded side holds the responders as the program wrote them.
 `Thermometer` keeps each one as a callable in its list.
 Two kinds of arrow cross the boundary, in opposite directions:
 `connect()` carries a responder into the list,
@@ -486,9 +487,9 @@ A bound method is different.
 Each reference to `received.append` builds a new bound-method object,
 so `received.append is received.append` is `False`.
 Two bound methods compare equal when they wrap the same instance and the same function.
-`disconnect()` relies on equality:
-the bound method it receives equals the one `connect()` stored,
-so it finds that entry and removes it.
+`disconnect()` relies on equality.
+The bound method it receives equals the one `connect()` stored,
+so `disconnect()` finds that entry and removes it.
 `test_bound_methods_compare_equal()` checks both facts about bound methods.
 
 `test_connecting_twice_notifies_twice()` and `test_disconnect_without_connect_raises()` follow from the `list` methods that `connect()` and `disconnect()` call:
@@ -536,13 +537,13 @@ print(trace(Skipping()))
 `trace()` connects the same pair of responders to the broadcaster it receives,
 announces twice, and returns what the responders recorded.
 `once` receives the first change and disconnects itself.
-That call removes `once` from the broadcaster's list,
+The `disconnect()` call removes `once` from the broadcaster's list,
 while `announce()`'s loop goes on reading the copy,
 so `always` still receives this first notification.
 The second `announce()` copies the shortened list,
 so `always` receives both changes and `once` receives one.
 
-`Skipping` overrides `announce()` with a loop that reads `_responders` directly,
+`Skipping` overrides `announce()` with a loop that reads `_responders`,
 the list that `disconnect()` changes.
 `once` is at index 0 and `always` at index 1.
 Removing `once` moves `always` to index 0, which the loop has visited,
@@ -570,8 +571,7 @@ so a method such as `readings.append()`, which returns `None`, needs a wrapper
 Connections are strong references.
 A bound method holds the object it came from,
 so connecting `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the connection.
-When the program finishes with `plot`,
-it drops its other references to the object.
+When the program finishes with `plot`, it drops its other references to `plot`.
 A `plot.redraw` that is still connected keeps `plot` in memory,
 and `redraw()` runs on every announcement.
 A responder the program stops using but leaves connected is a *lapsed listener*.
@@ -743,7 +743,6 @@ A program can choose its responders at any of four points:
 4.  **Construction time.**
     The broadcaster receives its responders when you create it,
     and the set stays the same for as long as the broadcaster lives.
-    The rest of this section builds that broadcaster.
 
 `Broadcaster`'s `connect()` and `disconnect()` make it dynamic.
 Its list of responders can change at any moment,
@@ -787,7 +786,7 @@ print(log)
 The `@record` freezes the field,
 and a tuple keeps the items it holds at creation,
 so the set of responders stays the same.
-`announce()` iterates over the tuple directly,
+`announce()` needs no `list()` copy of the tuple,
 since nothing can change it mid-loop.
 The broadcaster still holds strong references to its responders,
 so each responder stays alive as long as the broadcaster does.
@@ -796,7 +795,7 @@ so each responder stays alive as long as the broadcaster does.
 
 `Thermometer` writes a getter and a setter for each attribute it publishes,
 and inherits `connect()` and `announce()` from `Broadcaster`.
-We can simplify this using `__setattr__()`.
+We can simplify both using `__setattr__()`.
 Python calls it for every attribute assignment,
 so one `__setattr__()` covers every attribute of the class:
 
@@ -935,14 +934,15 @@ def published(name: str) -> property:
 ```
 
 `property` is the class behind [`@property`](07_Foundations--Classes.md#properties).
-Called directly (`[3]`), it returns a property object.
+Called as a function (`[3]`), it returns a property object.
 Installed as a class attribute,
 the property intercepts every read and write of that attribute on an instance,
 routing a read through `read()` and a write through `write()`.
 The two function names are arbitrary.
+
 The `@property` form needs a method written in the class body for each attribute.
 `published()` writes the pair once, as nested functions,
-and builds it for any field name.
+and builds the property for any field name.
 
 `published()` takes a field name and builds the two functions a `property` needs.
 `read()` returns `self.__dict__[name]`, the value stored under that name.
@@ -951,11 +951,12 @@ and builds it for any field name.
 `[3]` returns the pair as a `property()`.
 
 `announce()` comes from outside this file.
-It is a method of `Broadcasting`, the class that will own the property.
-`published()` reaches it through `self`, whose annotation is `Any`,
+It is a method of `Broadcasting`, the class that will own the property,
+so when `write()` runs, Python finds `announce()` on the instance.
+
+`published()` reaches `announce()` through `self`, whose annotation is `Any`,
 so the type checker accepts the call.
-When `write()` runs, Python finds `announce()` on the instance.
-`value` is `Any` for the same reason:
+`value` is `Any` for the same reason.
 `published()` receives the field's name alone,
 and the type checker types each field from the subclass's annotation,
 not from this property.
@@ -1000,9 +1001,8 @@ class Broadcasting[T]:
 
 `__init_subclass__()` runs once, at the moment Python creates the subclass.
 After the body of `class Thermometer(Broadcasting[float]):` runs,
-Python builds the class object and then calls `__init_subclass__()` on its base,
-passing the new class as `cls`
-([Self-Registration of Subclasses](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)).
+Python builds the class object and then calls [`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
+on its base, passing the new class as `cls`.
 `__init_subclass__()` is implicitly a class method.
 At this point `Thermometer` has its annotation, no `__init__()`,
 and no class attribute named `celsius`.
@@ -1026,16 +1026,18 @@ and `[1]` binds that result to `built`.
 
 `[2]` calls `fields()` to get the dataclass fields, one `Field` per annotation,
 each carrying its name.
-It passes `built` rather than `cls` to satisfy the type checker.
+`[2]` passes `built` rather than `cls` to satisfy the type checker.
 The checker still types `cls` as the class the `class` statement declared,
 and rejects `fields(cls)`.
 
 `[3]` builds the property for the field's name,
 and `[4]` installs it on the class under that name,
 so `Thermometer.celsius` is now a property.
-Python looks up a data descriptor on the class before it looks in the instance `__dict__`,
+Python looks up a [data descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-learns-its-name)
+on the class before it looks in the instance `__dict__`,
 so every `thermometer.celsius` read or write reaches the property,
 which reads or writes the `__dict__` entry of the same name behind it.
+
 The `__init__()` generated at `[1]` takes any default the field declares as its parameter default,
 so replacing the class attribute at `[4]` leaves construction as it was.
 Now the subclass behaves like `thermometer.py`'s constructor and property pair,
@@ -1044,8 +1046,8 @@ The generated `__init__()` assigns through the property,
 so construction calls `announce()`,
 which finds the list of responders still empty.
 
-`@dataclass_transform` on the base class is the type checker's side of `[1]`
-([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)).
+[`@dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
+on the base class is the type checker's side of `[1]`.
 It declares every subclass dataclass-like,
 so the checker synthesizes the same `__init__(self, celsius: float)` that `dataclass()` builds at runtime.
 The checker accepts `Thermometer(100)` because `100` fits that parameter.
@@ -1174,8 +1176,8 @@ Although `alarm` connects before `log_reading`,
 at 150 degrees the log prints first.
 Concurrency means each responder finishes as soon as its own wait ends,
 so the faster responder prints first.
-The results from `gather()` stay in argument order;
-only the side effects interleave.
+The results from `gather()` stay in argument order.
+Only the side effects interleave.
 
 ### Disconnecting During an Async Notification
 
@@ -1249,7 +1251,8 @@ asyncio.run(main())
 
 `announce()` raises the `ValueError` from `gather()` the moment `failing()` raises it.
 `slow` is still sleeping at that point.
-The event loop keeps running its task, but the `gather()` call has returned,
+The event loop keeps running `slow`'s task,
+but the `gather()` call has returned,
 so no `await` remains to collect the task's result.
 `main()` sleeps for 0.25 seconds afterward, long enough for `slow` to finish,
 but a real caller rarely adds that wait.
@@ -1268,14 +1271,16 @@ so a single broken responder cancels the others mid-notification.
 This example emphasizes the model-view split.
 The *model*, `grid_observer.py`,
 is a grid of colored boxes and the rule that decides what changes for a selection event.
-It manipulates `Grid` values, and `grid_view.py` displays them separately,
+The model manipulates `Grid` values,
+and `grid_view.py` displays them separately,
 using `tkinter` from the standard library.
+
 Clicking a box advances it to the next color, along with the boxes above, below,
 left, and right of it.
-
 One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
-Only `palegreen` works; on the 8x8 grid that `grid_view.py` opens,
+Only `palegreen` works.
+On the 8x8 grid that `grid_view.py` opens,
 no sequence of clicks turns every box `skyblue` or `khaki`.
 The grid's size determines that, and a 3x3 grid reaches all three colors
 (see exercise 9).
@@ -1332,6 +1337,7 @@ an [`Enum`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 whose members are also strings.
 `Color.KHAKI` compares equal to `"khaki"` and works anywhere a `str` does,
 so the view can pass a `Color` to `tkinter` as a color name.
+
 `list(Color)` is the cycle of colors,
 because iterating over an enum produces its members in definition order.
 `Color.at(n)` counts `n` places around that cycle,
@@ -1492,24 +1498,25 @@ A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
 The responder calls the model, and `draw()` does the painting.
 
-The view handles the mouse as well as the screen,
-so the view also does the controller's job.
+Because the view handles the mouse as well as the screen,
+the view also does the controller's job.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
 or a test call drives the model the way a click does.
 
 The model calls a view through the view's responder alone,
 so you can connect a second view to the same model and keep both views in step
 (see exercise 8).
-The view alone uses the model's names: `grid_view.py` imports `GridModel`,
-reads `size` and `grid`, and calls `select()`.
+The view alone uses the model's names.
+`grid_view.py` imports `GridModel`, reads `size` and `grid`,
+and calls `select()`.
 
 ## Document-View and MVC
 
 This chapter opened by saying Document-View combines the controller with the view.
-We'll look at two approaches that differ only in where the input handling lives:
-with Document-View, `View` has a `key()` method as a controller,
+We'll look at two approaches that differ only in where the input handling lives.
+With Document-View, `View` has a `key()` method as a controller,
 while MVC gives `key()` to a `Controller` class.
-They share two models.
+Both approaches share two models.
 The first is a counter:
 
 ```python
@@ -1603,15 +1610,15 @@ for char in "++-x":
 #: keys: ++-x
 ```
 
-`key()` is the controller, contained within `View` as a method.
 `__post_init__()` connects a display method to each model,
 so each `View` connects itself to both models when you create it.
+`key()` is the controller, contained within `View` as a method.
 `key()` records the character in the history model and sends a request to the counter model,
 and each model pushes its new state to its display method.
 In the wildcard case matched by `x`, `key()` leaves the counter alone,
 so the four characters of `"++-x"` display four histories and three counts.
 
-`key()` writes to both models, so `View` holds a field for each.
+Because `key()` writes to both models, `View` holds a field for each.
 `View` is also the one class that displays,
 so each model's display method sits in `View` beside `key()`.
 
@@ -1691,13 +1698,13 @@ each model announces its new state,
 and the view connected to that model displays it.
 No view holds a reference to the controller, and the controller holds no view.
 The controller holds both models because it writes to both,
-while each view holds the one model it displays:
+while each view holds the one model it displays.
 `CountView` refers to `Counter` alone, and `HistoryView` to `History` alone.
 Each model announces to whatever responders it holds.
 
 That one-way flow is the benefit.
 Because each view receives announcements from its model alone,
-you can replace the controller and the views keep working.
+replacing the controller leaves the views working as before.
 `vim` reads `k` and `j` where `controller` reads `+` and `-`.
 `vim` takes the same two models.
 The views built earlier go on displaying,
@@ -1710,12 +1717,13 @@ not in the controller that recorded them.
 `Controller` takes its keys as two fields, `up` and `down`.
 `key()` compares the character with them through [value patterns](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares),
 since `self.up` is a dotted name.
+
 The controller alone defines what the keys mean.
 A new key scheme is two constructor arguments.
 A new kind of key, say one that resets the count, is an edit to `Controller`.
 
-The same flexibility works in the other direction:
-a second view connects to a model, both views display,
+The same flexibility works in the other direction.
+A second view connects to a model, both views display,
 and both controllers stay as they are (see exercise 13).
 A third model is a new view class and one more field in the controller,
 with `CountView` and `HistoryView` untouched.
@@ -1776,7 +1784,7 @@ and the responders hold stale data until the client does.
 With pull, a broadcast sends the thermometer.
 Each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
 Pull leaves the decision of which changes to announce with the thermometer.
-A responder's choice covers what it reads and which announcements it acts on.
+A responder's choice covers what it reads and which announcements prompt it to act.
 `weather_station.py` pushes a pair and leaves that choice to its responders.
 `celsius` and `humidity` share one channel,
 so every responder receives both kinds of change, along with the attribute name.
@@ -1829,8 +1837,8 @@ print(log)
 
 `_delta` is the thermometer's field,
 but the half degree is a judgment about what `display` needs.
-For `log`, which exists to record every reading, the same half degree is wrong:
-the thermometer announces two of the four readings,
+For `log`, which exists to record every reading, the same half degree is wrong.
+The thermometer announces two of the four readings,
 and `log` misses the other two.
 `ThresholdThermometer` applies `_delta` to every responder alike,
 and nothing in its code shows that the threshold serves `display`.
@@ -1848,9 +1856,10 @@ It is a poor fit when they filter by which kind of change arrived.
 In `weather_station.py` every attribute's changes arrive on one channel,
 so each responder that acts on one attribute filters by name,
 and all of them write the same filter.
+
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-removes that repetition with a dictionary of responder lists keyed by event type:
-an announcement carries its type,
+removes the repeated name filter with a dictionary of responder lists keyed by event type.
+An announcement carries its type,
 and each responder connects to the type it handles.
 Instead of deciding which responders need an announcement,
 the broadcaster then labels each announcement with its event type,

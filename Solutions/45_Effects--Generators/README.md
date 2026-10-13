@@ -375,7 +375,7 @@ down to whichever `yield` is currently suspended, two frames below.
 > leaving `profile: Result = interview()`.
 > Run `ty check` and the script, and explain both results.
 > Which one told you more,
-> and what does the type checker say if `profile` carries no annotation?
+> and what does the type checker say once you remove `profile`'s annotation?
 
 <details>
 <summary>Where to look</summary>
@@ -610,8 +610,8 @@ carry a value comes from the one function that cannot pass one.
 > It collects money, takes two digits, then dispenses or refuses.
 > It yields its current state and receives each event with `send()`,
 > so the position in the generator's body carries the state.
-> This generator's `yield` reports the state the machine reached rather than requesting something the machine needs,
-> the opposite direction from `interview()`.
+> This generator's `yield` runs the opposite direction from `interview()`'s:
+> it reports the state the machine reached instead of requesting something the machine needs.
 > Say which of the two versions you would rather extend with another state,
 > and why.
 

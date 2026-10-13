@@ -149,8 +149,9 @@ because `@cache` keys on the symbol alone.
 
 ## 2. `tracemalloc`, shared vs. unshared tiles
 
-> Use `tracemalloc` to compare the memory `parse_map()` uses on a large map when every cell shares its `Tile` against when each cell gets a new one,
-> by removing `@cache` from `tile()`.
+> Use `tracemalloc` to measure the memory `parse_map()` uses on a large map,
+> first with every cell sharing its `Tile`,
+> then with `@cache` removed from `tile()` so each cell gets a new one.
 > How does the ratio change as the map grows?
 
 <details>

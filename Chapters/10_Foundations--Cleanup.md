@@ -75,7 +75,7 @@ could destroy the objects in a different order, or skip the finalizers at exit.
 So `__del__()` is fragile.
 The language specifies neither when it runs nor whether it runs.
 At interpreter shutdown,
-Python may already have deleted the globals a `__del__()` method uses,
+Python may have deleted the globals a `__del__()` method uses,
 or set them to `None`.
 The Python documentation warns:
 
@@ -549,7 +549,7 @@ The weak registry runs none of your code when Python destroys an object.
 ## The Rule
 
 Never release a resource in `__del__()`.
-The standard library's file and socket types release a resource in `__del__()` anyway,
+The standard library's file and socket types do release a resource in `__del__()`,
 as a diagnostic backstop.
 `io.IOBase` gives every file object a `__del__()` that closes it.
 A file from `open()` or a `socket.socket` also reports a `ResourceWarning` when Python reclaims it still open:

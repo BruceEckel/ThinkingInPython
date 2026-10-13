@@ -443,8 +443,8 @@ for finder in (coarse, fine):
 Each `partial` object satisfies `RootFinder`,
 so `solve()` runs a `partial` object as it runs a closure.
 
-A caller must pass a positional-only parameter by position,
-so binding one with `partial()` means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
+A caller must pass a [positional-only parameter](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
+by position, so binding one with `partial()` means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
 in each position the caller fills.
 
 Save the strategy class for an algorithm that carries several related methods or mutable state.
@@ -509,7 +509,8 @@ Adding, removing, or reordering the handlers means editing the `chain` list.
 The test in `first_root()` is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero.
 Because `0.0` is falsy,
-a truthiness test discards that correct answer and calls the next finder.
+a [truthiness](02_Foundations--Tour.md#booleans-none-and-truthiness)
+test discards that correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
 Whichever value marks failure, compare the result against it with `is`.
 
@@ -519,7 +520,6 @@ When `None` is a possible result, it cannot double as the failure mark,
 and a [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
 takes that role.
 
-The chain accepts each handler's verdict as it stands.
 Each handler decides for itself whether it succeeded,
 and reports that decision as its return value.
 `secant()` and `newton()` report success when their latest step shrinks below the tolerance.

@@ -1,12 +1,12 @@
 # Pattern Catalog
 
-> Most patterns you will encounter first as a name someone uses in a design review,
+> You will encounter most patterns first as a name someone uses in a design review,
 > not as code.
 > This catalog gives each name a one-line intent,
 > so you can place it and look it up.
 
-This chapter gathers patterns that the literature documents widely,
-not only the original *Design Patterns* (GoF) set.
+This chapter gathers the original *Design Patterns* (GoF) set,
+along with other patterns that the literature documents widely.
 It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
 *Patterns of Enterprise Application Architecture* (Fowler),
 *Enterprise Integration Patterns* (Hohpe and Woolf),
@@ -17,8 +17,8 @@ Many overlap, some solve the same problem in different ways,
 and several exist only to work around limits of a particular language.
 The body of this book argues that those workarounds often [dissolve in Python](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves).
 
-[*State*](26_Patterns--Surrogate.md#state)
-and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
+One overlapping pair is [*State*](26_Patterns--Surrogate.md#state)
+and [*State Machine*](31_Patterns--State_Machines.md).
 *State* changes an object's behavior when its internal state changes,
 and the client chooses each new state.
 *State Machine* builds on *State* and drives an object through a known set of states in response to inputs.
@@ -29,8 +29,9 @@ so each name sits where its source puts it.
 One of those groupings is GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
 which [Design Patterns](21_Patterns--Design_Patterns.md)
 accepts for *Creational* and questions for *Structural* and *Behavioral*.
-A few idioms below belong to no single source and sit instead in three groups by what they share:
-language idioms (most of them tied to C++ or Java's limits), functional idioms,
+A few idioms below belong to no single source.
+They sit instead in three groups by what they share: language idioms
+(most of them tied to C++ or Java's limits), functional idioms,
 and the patterns that supply a collaborator from outside.
 Everything else sits in [Other Patterns and Idioms](#other-patterns-and-idioms),
 whose rows share no trait.
@@ -120,7 +121,7 @@ so use this section's table when you know the problem but not the name.
 | Pattern | Intent |
 |---------|--------|
 | *Active Object* | Decouple a method call from its execution by giving the object its own thread. |
-| *Balking* | Refuse an action when the object is in an unsuitable state. |
+| *Balking* | Refuse an action when the object is in the wrong state. |
 | [*Double-Checked Locking*](24_Patterns--Singleton.md#double-checked-locking-and-eager-creation) | Skip the lock once a lazily initialized shared resource exists. |
 | [*Future/Promise*](19_Techniques--Concurrency.md#one-await-any-backend) | Represent a result that becomes available later. |
 | *Guarded Suspension* | Block a call until a precondition becomes true. |
@@ -133,13 +134,13 @@ so use this section's table when you know the problem but not the name.
 | *Read-Write Lock* | Allow concurrent readers but exclusive writers. |
 | [*Structured Concurrency*](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) | Tie concurrent tasks to a scope that exits only after every task finishes, cancelling the rest when one fails. |
 | [*Thread Pool*](19_Techniques--Concurrency.md#one-executor-interface-three-pools) | Reuse a set number of worker threads across many tasks. |
-| [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does; `ContextVar` scopes the value to the context instead. |
+| [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does. `ContextVar` scopes the value to the context instead. |
 
-*Reactor* is a name that hides its job.
+The name *Reactor* says little about what the pattern does.
 The pattern is a dispatcher.
-One loop waits on many event sources and hands each event to the handler registered for it.
+One loop waits on many event sources and calls the handler registered for each event.
 The original description of *Reactor* lists *Dispatcher* as another name for the pattern.
-"Reactor" survives because the literature and the libraries use it.
+This catalog keeps "Reactor" because the literature and the libraries use it.
 Both asyncio's `SelectorEventLoop` and Twisted's `reactor` implement *Reactor*.
 
 *Proactor* is the counterpart of *Reactor* for completed operations.
@@ -225,7 +226,7 @@ built on the operating system's I/O completion ports.
 | *Curiously Recurring Template Pattern* (CRTP) | Parameterize a base class by the subclass that inherits from it. |
 | *Marker Interface* | Tag a class with an empty interface to signal a capability. |
 | *Mixin* | Add reusable behavior through multiple inheritance. |
-| *Pointer to Implementation* (Pimpl) | Store a class's implementation in a separate object reached through a pointer, so changing the implementation does not force clients to recompile. |
+| *Pointer to Implementation* (Pimpl) | Store a class's implementation in a separate object reached through a pointer, so the implementation can change while clients keep their compiled code. |
 | [*Resource Acquisition Is Initialization* (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the matching destructor. |
 
 ## Functional Idioms
@@ -242,7 +243,7 @@ built on the operating system's I/O completion ports.
 | Pattern | Intent |
 |---------|--------|
 | [*Dependency Injection*](11_Techniques--Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
-| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* applies *Inversion of Control* to an object's collaborators. *Service Locator*, the usual alternative to *Dependency Injection*, keeps control in your code, which asks a registry for each collaborator. |
+| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* applies *Inversion of Control* to an object's collaborators. The usual alternative to *Dependency Injection* is *Service Locator*. *Service Locator* keeps control in your code, which asks a registry for each collaborator. |
 | [*Service Locator*](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 
 ## Other Patterns and Idioms
@@ -260,7 +261,7 @@ built on the operating system's I/O completion ports.
 | [*Object Pool*](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | *Specification* | Encapsulate a rule as a predicate that combines with others. |
 | [*State Machine*](31_Patterns--State_Machines.md) | Drive an object through a known set of states in response to inputs. |
-| [*Surrogate*](26_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work; *Proxy* and *State* are both forms of *Surrogate*. |
+| [*Surrogate*](26_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work. *Proxy* and *State* are both forms of *Surrogate*. |
 | *Type Object* | Represent a "kind of" thing as data rather than a subclass. |
 
 ## Patterns Python Absorbed
@@ -281,7 +282,8 @@ Python includes the piece their inventors set out to supply.
 | [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch`, or a `match` over a union of types |
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
-Python supplies each pattern's structure, and the pattern's intent remains.
+Each link leads to the section that shows the Python form of its pattern.
+
+Python supplies each pattern's structure, but the pattern's intent remains.
 You still choose which algorithm to pass, which action to save for later,
 or which values to share.
-Each link leads to the section that shows the Python form of its pattern.

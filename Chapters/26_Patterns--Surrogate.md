@@ -529,7 +529,7 @@ Neither section needs `weakref.proxy()`.
 
 ### Virtual Proxy
 
-A *virtual proxy* delays building an expensive object until the first attribute access on the proxy:
+A *virtual proxy* delays building a slow-to-build object until the first attribute access on the proxy:
 
 ```python
 # virtual_proxy.py

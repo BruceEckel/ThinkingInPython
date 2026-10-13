@@ -79,6 +79,7 @@ The two call sites fail in different ways.
 with no error to signal the gap.
 `export_svg()` has a wildcard case that raises an exception,
 so it reports the gap at runtime, the first time someone asks it for a triangle.
+
 No tool reports the missing case at edit time,
 and `kind: str` gives the type checker no list of the strings `export_svg()` should handle.
 An `Enum` for `kind` and an `assert_never()` wildcard [move that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching).
@@ -175,8 +176,8 @@ Normally the initialization data comes from outside the system rather than from 
 
 Inside `shape_name()`,
 `Shape.__subclasses__()` produces a list of `Shape`'s direct subclasses.
-`__subclasses__()` stops at the first level of inheritance,
-so a class inheriting from `_Circle` is not in the list.
+Because `__subclasses__()` stops at the first level of inheritance,
+a class inheriting from `_Circle` is not in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`
 (see exercise 9).
 
@@ -886,10 +887,6 @@ g1.play()
 g2.play()
 #: Warrior battles a Weapon
 ```
-
-`Character` objects interact with `Obstacle` objects,
-but the types of characters and obstacles depend on the game you're playing.
-Choosing a particular `GameElementFactory` determines the game.
 
 The `GameEnvironment` controls the setup and play of the game.
 Setup and play are simple here,

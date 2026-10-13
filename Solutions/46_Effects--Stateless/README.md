@@ -670,8 +670,9 @@ nothing to stop it.
 > Break `audit_log.py` by removing the `yield from` in front of `greet(name)` in `greet_logged()`.
 > Run `ty check`, `ruff check`, and the script,
 > and record what each reports and what the program prints.
-> Explain where the greetings went and why no tool objects.
-> Then restore it, and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
+> Explain where the greetings went and why no tool reports an error.
+> Then restore that `yield from`,
+> and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
 > This time `ty` produces two diagnostics.
 > Explain what each one catches,
 > and why the type checker catches assigning a dropped request but not discarding one.
@@ -900,7 +901,8 @@ function, and apply the arguments where you need the Effect.
 > which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
 > Importing that module runs its own unguarded `print(run(...))`,
 > so expect one line of its output before yours.
-> Work out what its annotation must be, and confirm it with the type checker.
+> Work out what `report_all()`'s annotation must be,
+> and confirm it with the type checker.
 > Then call it from inside an `async def`,
 > once with `run()` and once with `await run_async()`,
 > and record what each one does.
@@ -1010,7 +1012,7 @@ type-based: `run()` at the outermost edge of a synchronous program,
 > Follow the type checker until the program builds,
 > add a negative score to `scores.py`'s `SCORES` so the new failure can occur,
 > then run it on a name that produces each failure and on one that succeeds,
-> and say where each failure surfaced.
+> and say where the program reported each failure.
 > Then delete `ValueError` from `announce()`'s annotation and record what the type checker reports and at which line.
 
 <details>

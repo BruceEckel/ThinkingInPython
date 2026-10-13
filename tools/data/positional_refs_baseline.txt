@@ -8,66 +8,74 @@
 # `tip positional-accept`; read the delta with `tip positional`
 # before accepting.
 # See tools/positional_refs.py.
+Chapters/02_Foundations--Tour.md	The `for` loop	The `for` loop over `message.interpolations` prints those three attributes: `expression`, `value`, and `format_spec`.
 Chapters/04_Foundations--Control_Flow.md	The first `case`	The first `case` destructures the split command.
 Chapters/04_Foundations--Control_Flow.md	the `for` clause	Every form has the same order: the expression that produces each item, the `for` clause that supplies the values, and an optional `if` that filters them.
-Chapters/04_Foundations--Control_Flow.md	the `try` block	The optional `else` runs when the `try` block raises no exception, the same shape as the loop `else` that runs when the loop hits no `break`.
+Chapters/04_Foundations--Control_Flow.md	the `try` block	An exception from the follow-up work in the `else` propagates to the caller, past the handlers written for the `try` block's failure.
+Chapters/04_Foundations--Control_Flow.md	the `try` block	The `except` clauses catch exceptions raised in the `try` block alone.
+Chapters/04_Foundations--Control_Flow.md	the `try` block	The optional `else` runs when the `try` block raises no exception.
+Chapters/04_Foundations--Control_Flow.md	the first `case`	Python runs the first `case` that matches and then leaves the `match`.
 Chapters/04_Foundations--Control_Flow.md	the inner loop	Put `continue` in the inner loop's `else`, and a `break` after the inner loop, at the outer loop's level.
 Chapters/04_Foundations--Control_Flow.md	the inner loop	When the inner loop `break`s, Python skips its `else` and the outer `break` runs.
-Chapters/04_Foundations--Control_Flow.md	the inner loop	When the inner loop runs to the end, the `continue` moves the outer loop along instead:
+Chapters/04_Foundations--Control_Flow.md	the inner loop	When the inner loop runs to the end, the `continue` starts the outer loop's next iteration instead:
 Chapters/04_Foundations--Control_Flow.md	the outer `break`	When the inner loop `break`s, Python skips its `else` and the outer `break` runs.
 Chapters/04_Foundations--Control_Flow.md	the outer loop	Put `continue` in the inner loop's `else`, and a `break` after the inner loop, at the outer loop's level.
-Chapters/04_Foundations--Control_Flow.md	the outer loop	When the inner loop runs to the end, the `continue` moves the outer loop along instead:
-Chapters/05_Foundations--Functions.md	The third call	The third call matches neither test, so the function runs off its end, and a function that runs off its end returns `None`.
+Chapters/04_Foundations--Control_Flow.md	the outer loop	When the inner loop runs to the end, the `continue` starts the outer loop's next iteration instead:
+Chapters/05_Foundations--Functions.md	The third call	The third call matches neither test, so execution reaches the end of the body and the function returns `None`.
 Chapters/05_Foundations--Functions.md	the first statement	A string literal that is the first statement under `def` becomes the function's *docstring*, stored on `__doc__`:
-Chapters/05_Foundations--Functions.md	the last call	`host` has none, and the last call still names it.
-Chapters/05_Foundations--Functions.md	the next call	`bad_append()` combines that binding with a default Python builds once, so each call mutates the object the next call uses.
-Chapters/06_Foundations--Modules_and_Packages.md	The first `import`	The first `import` creates the module object, stores it in `sys.modules`, a dict keyed by dotted module name, and then runs the file's body to fill it.
-Chapters/07_Foundations--Classes.md	the first read	The attribute is *lazily initialized*, created on first use, so the method runs at the first read rather than when the constructor runs.
+Chapters/05_Foundations--Functions.md	the last call	A caller can pass any parameter by name, including a required one such as `host`, which the last call names.
+Chapters/05_Foundations--Functions.md	the next call	Because `bad_append()` combines that binding with a default Python builds once, each call mutates the object the next call uses.
+Chapters/06_Foundations--Modules_and_Packages.md	The first `import`	The first `import` creates the module object, stores it in `sys.modules`, and then runs the file's body to fill it.
+Chapters/07_Foundations--Classes.md	The first read	The first read of a `cached_property` then raises a `TypeError` ([Performance](18_Techniques--Performance.md#when-slots-does-not-fit) shows the failure).
+Chapters/07_Foundations--Classes.md	the first read	`total` is *lazily initialized*, created on first use, so the method runs at the first read rather than when the constructor runs.
 Chapters/08_Foundations--Static_Types.md	the line that	The wrong value causes a failure later, often far from the line that produced it.
-Chapters/09_Foundations--Class_Attributes.md	the first read	`count: ClassVar[int]` records that a count belongs to `Registry`, and no attribute exists until something assigns one, so the first read raises an `AttributeError`.
-Chapters/10_Foundations--Cleanup.md	the `with` block	So `close()` runs at the end of the `with` block, at a line you can identify, and the `Socket("B")` block shows `close()` running when the body raises an exception.
-Chapters/10_Foundations--Cleanup.md	the `with` block	The explicit `sock.close()` after the `with` block prints nothing, because `self.closed` blocks the repeat.
-Chapters/13_Techniques--Pattern_Matching.md	the last `case`	When the capture is the last `case`, as here, Python compiles it without a warning, and `ty` accepts it.
-Chapters/13_Techniques--Pattern_Matching.md	the next `case`	When a guard is false, `match` moves on to the next `case`, but the names stay bound.
-Chapters/14_Techniques--Decorators.md	The first call	The first call constructs one instance, and every later call returns that same instance.
-Chapters/14_Techniques--Decorators.md	the first call	Its `wrapper()` makes the first call before the loop, so `result` has a value whether or not the loop runs, where `repeat.py` relies on the `times >= 1` check for that.
-Chapters/14_Techniques--Decorators.md	the next call	The failure surfaces at the next call to `cheese()`, as a `TypeError` reporting that a `NoneType` object is not callable, not at the decoration that caused it.
-Chapters/15_Techniques--Context_Managers.md	The second `with`	The second `with` block crashes, and the `finally` in `lease()` still returns the connection, so the count is back to two.
-Chapters/15_Techniques--Context_Managers.md	the `for` loop	The banner opens when the `for` loop asks for the first value.
-Chapters/15_Techniques--Context_Managers.md	the `with` statement	The `1 / 0` raises an exception, `__exit__()` prints the exception it caught, then returns `True`, and the `with` statement suppresses the error so `survived` still prints.
-Chapters/15_Techniques--Context_Managers.md	the earlier `if exc_type is None or exc is None: return False`	`self.types is not ALL` [narrows](08_Foundations--Static_Types.md#narrowing) `self.types` from `Types | ALL` down to `Types`, and the earlier `if exc_type is None or exc is None: return False` narrows `exc_type` to a class and `exc` to an exception, so `issubclass(exc_type, self.types)` type-checks.
-Chapters/15_Techniques--Context_Managers.md	the first `next()`	On 3.15 the context opens at the first `next()` and closes when the generator finishes or its `close()` method runs.
+Chapters/09_Foundations--Class_Attributes.md	the first read	No attribute exists until something assigns one, so the first read raises an `AttributeError`.
+Chapters/10_Foundations--Cleanup.md	the `with` block	The explicit `sock.close()` after the `with` block prints nothing, because `close()` returns at once when `self.closed` is `True`.
+Chapters/10_Foundations--Cleanup.md	the `with` block	`__exit__()` calls `close()`, so `close()` runs at the end of the `with` block, at a line you can identify.
+Chapters/13_Techniques--Pattern_Matching.md	the last `case`	When the capture is the last `case`, as here, Python compiles the `match` silently, and `ty` accepts it.
+Chapters/13_Techniques--Pattern_Matching.md	the next `case`	When a guard is false, `match` tries the next `case`, but the names stay bound.
+Chapters/13_Techniques--Pattern_Matching.md	the next `case`	`case [a, b]` matches a two-element `range`, but for a generator or a `set`, `match` moves on to the next `case`.
+Chapters/13_Techniques--Pattern_Matching.md	the next `case`	`survey([Point(0, 5)])` matches, and for a list of two points `match` moves on to the next `case`.
+Chapters/14_Techniques--Decorators.md	the first call	Its `wrapper()` makes the first call before the loop, so `result` holds a value before the loop starts.
+Chapters/14_Techniques--Decorators.md	the next call	Python reports the failure at the next call to `cheese()`, not at the decoration that caused it.
+Chapters/15_Techniques--Context_Managers.md	The second `with`	The second `with` block raises a `RuntimeError`, and the `finally` in `lease()` still returns the connection, so the count is back to two.
+Chapters/15_Techniques--Context_Managers.md	the `for` loop	The banner opens when the `for` loop calls `next()` for the first value.
+Chapters/15_Techniques--Context_Managers.md	the `with` statement	`__exit__()` prints the exception it caught and returns `True`, so the `with` statement suppresses the error and `survived` prints.
+Chapters/15_Techniques--Context_Managers.md	the first `next()`	On 3.15 the wrapper enters the context at the first `next()` and exits it when the generator finishes or its `close()` method runs.
 Chapters/15_Techniques--Context_Managers.md	the first `with`	Calling `stale.query()` after the first `with` block ended works as if `second` had called it, because they are the same object.
-Chapters/16_Techniques--Comprehensions.md	The `for` loop	The `for` loop runs after the directory disappears, and by then nothing needs the files.
+Chapters/16_Techniques--Comprehensions.md	The `for` loop	The `for` loop runs after the context manager deletes the directory, and it reads the strings in `py_paths`, which outlive the directory.
+Chapters/16_Techniques--Comprehensions.md	The first clause	The first clause then iterates over that stale `row`, and the comprehension silently produces a wrong list.
 Chapters/16_Techniques--Comprehensions.md	The inner `for col`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
-Chapters/16_Techniques--Comprehensions.md	the first `for`	If you get that order backward, `row` is not bound yet when Python evaluates the first `for` clause:
 Chapters/16_Techniques--Comprehensions.md	the first `for`	In the `py_paths` comprehension, the first `for` walks the directories and the second `for` walks the files in each, flattening the tree into one list of paths.
-Chapters/16_Techniques--Comprehensions.md	the first clause	When an earlier statement binds one, as the `for row in matrix:` loop in `identity_matrix.py` does, the first clause iterates over that stale `row`, and the comprehension produces a wrong list with no exception.
-Chapters/16_Techniques--Comprehensions.md	the outer `e`	The `e` inside the brackets is a different name from the `e` outside them, so the outer `e` survives untouched.
+Chapters/16_Techniques--Comprehensions.md	the next statement	It evaluates its output expression for every element before the next statement runs.
+Chapters/16_Techniques--Comprehensions.md	the outer `e`	The `e` inside the brackets is a different name from the `e` outside them, so the outer `e` keeps its value.
 Chapters/16_Techniques--Comprehensions.md	the outer `for row`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
 Chapters/16_Techniques--Comprehensions.md	the second `for`	In the `py_paths` comprehension, the first `for` walks the directories and the second `for` walks the files in each, flattening the tree into one list of paths.
 Chapters/17_Techniques--Metaprogramming.md	The last call	The last call drops that row, for the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes) passes `exclude=("__hash__",)`.
-Chapters/17_Techniques--Metaprogramming.md	The last line	The last line performs by hand what `p.greet()` does automatically.
-Chapters/17_Techniques--Metaprogramming.md	The last line	The last line shows its instance dictionary still empty.
-Chapters/17_Techniques--Metaprogramming.md	The next lookup	The next lookup of that name finds the stored class directly.
+Chapters/17_Techniques--Metaprogramming.md	The next lookup	The next lookup of that name finds the stored class, so `__missing__()` builds each class once.
+Chapters/17_Techniques--Metaprogramming.md	the first call	`__new__()` and `__init__()` run once per class, on the first call.
+Chapters/17_Techniques--Metaprogramming.md	the first lookup	On the first lookup of an event type, `EventMakers` builds the class and registers it under its name.
+Chapters/17_Techniques--Metaprogramming.md	the lines that	The type checker never runs the metaclass, so it reports the lines that use those changes as errors.
+Chapters/18_Techniques--Performance.md	The first call	The first call stops to compile.
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
 Chapters/19_Techniques--Concurrency.md	The last line	The last line shows the other direction.
-Chapters/20_Patterns--Rethinking_Objects.md	the second call	Without the `# type: ignore`, the type checker rejects the second call.
+Chapters/20_Patterns--Rethinking_Objects.md	the final `def`	Each `@overload` line is a declaration for the type checker, and the final `def` is the function that runs.
 Chapters/23_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together instead, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 Chapters/24_Patterns--Singleton.md	the first assignment	If you drop the inner test, every thread that passed the outer test before the first assignment builds its own object, one after another.
-Chapters/24_Patterns--Singleton.md	the first call	Its metaclass overrides `__call__()`, and that override skips `__new__()` and `__init__()` on every later construction, so the first call's arguments win.
+Chapters/24_Patterns--Singleton.md	the first call	Its metaclass overrides `__call__()`, and that override skips `__new__()` and `__init__()` on every later construction, so only the first call's arguments reach the constructor.
 Chapters/24_Patterns--Singleton.md	the first call	Only the first call constructs a `Registry`.
-Chapters/24_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list instead of being discarded.
-Chapters/25_Patterns--Template_Method.md	The second `Say no more, say no more!`	The second `Say no more, say no more!` has no `Nudge, nudge, wink, wink!` before it.
+Chapters/24_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list, where the metaclass form would discard it.
 Chapters/25_Patterns--Template_Method.md	the closing `run_framework()`	In `template_function.py`, `customize2` defaults to the do-nothing `lambda: None`, so the closing `run_framework()` call passes one step and the loop prints `one` twice.
-Chapters/26_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup succeeds without calling `__getattr__()`.
-Chapters/26_Patterns--Surrogate.md	the first call	Because `Partial` omits `g()`, constructing a `Partial` raises a `TypeError` before the first call.
+Chapters/26_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup finds the proxy's `level`, so Python skips `__getattr__()`.
+Chapters/26_Patterns--Surrogate.md	the first call	Because `Partial` defines `f()` and leaves `g()` abstract, constructing a `Partial` raises a `TypeError` before the first call.
 Chapters/26_Patterns--Surrogate.md	the second call	With the guard, the second call to `__getattr__()` reports the typo by name.
-Chapters/27_Patterns--Factory.md	the first `draw()`	The call fails with a `TypeError`, where a base class whose `draw()` raises a `NotImplementedError` waits for the first `draw()` call.
+Chapters/27_Patterns--Factory.md	the first `build()`	Every `.topping()` call after the first `build()` adds to that same list, so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
+Chapters/27_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` raises a `NotImplementedError` would report the omission later, at the first `draw()` call.
 Chapters/27_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/29_Patterns--Changing_the_Interface.md	the first line	The approaches differ in where the adaptation lives, and the first line of each trace names that place: `ProxyAdapter.f()` for the object adapter and Approach 2, `WhatIHave2.f()` for Approach 3.
+Chapters/30_Patterns--Observer.md	The second `announce()`	The second `announce()` copies the shortened list, so `always` receives both changes and `once` receives one.
 Chapters/32_Patterns--Multiple_Dispatching.md	The last case	The last case shows why the sentinel exists.
-Chapters/33_Patterns--Visitor.md	The last line	The last line of output is the one where both dispatches change the result, because `Chrysanthemum` overrides `eat()` (chrysanthemums really do produce a natural insecticide).
+Chapters/33_Patterns--Visitor.md	the last line	In the last line of `bug_visits.py`'s output, both dispatches change the result, because `Chrysanthemum` overrides `eat()` (chrysanthemums really do produce a natural insecticide).
 Chapters/33_Patterns--Visitor.md	the next `def _`	`@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name, so every implementation stays in the table.
 Chapters/35_Patterns--Flyweight.md	the first call	`@cache` stores each result under its argument, so every call with the same symbol returns the object the first call built.
 Chapters/36_Patterns--Memento.md	The final `Drawing`	The final `Drawing` alone costs two thousand.
@@ -75,34 +83,35 @@ Chapters/36_Patterns--Memento.md	The later `todo[0].append("jam")`	The later `to
 Chapters/36_Patterns--Memento.md	the line that	`restored.title` raises `AttributeError` when anything reads it, often far from the line that called `pickle.loads()`.
 Chapters/37_Patterns--Pattern_Refactoring.md	The earlier `sum_value()`	The earlier `sum_value()` does the same thing for every type, so it stays an ordinary function.
 Chapters/37_Patterns--Pattern_Refactoring.md	several lines before	A `type` statement's right side evaluates lazily, so the alias can name `Trash` several lines before the `class` statement that defines it.
-Chapters/37_Patterns--Pattern_Refactoring.md	the first `Plastic:`	`__init_subclass__()` registers `Plastic` the moment its `class` statement runs, and without that `class` statement `create()` raises a `KeyError` at the first `Plastic:` line, loudly, at parse time.
+Chapters/37_Patterns--Pattern_Refactoring.md	the first `Plastic:`	Without that `class` statement, `create()` raises a `KeyError` at the first `Plastic:` line, loudly, at parse time.
 Chapters/37_Patterns--Pattern_Refactoring.md	the first call	When the default answer would be wrong for an unregistered material, the *Visitor* chapter advises making the base function raise `NotImplementedError`, so a forgotten registration fails at the first call (see exercise 5).
 Chapters/38_Patterns--Simulation.md	the next line	If you remove the check, the build still stops, at `room1, room2 = pair` on the next line.
 Chapters/40_Functional--Foundations.md	the first call	`total` is still 5 from the first call, so the second call returns 10.
-Chapters/40_Functional--Foundations.md	the next call	`withdraw()` does not, because each call changes `balance` and the next call reads the new value.
+Chapters/40_Functional--Foundations.md	the next call	`withdraw()` returns a different answer each time, because each call changes `balance` and the next call reads the new value.
 Chapters/40_Functional--Foundations.md	the second call	`total` is still 5 from the first call, so the second call returns 10.
 Chapters/41_Functional--Toolkits.md	The last case	The last case asks for groups of five from a roster of two:
-Chapters/41_Functional--Toolkits.md	The third `computing square`	The third `computing square` line is the last, because `islice()` asks for three.
-Chapters/41_Functional--Toolkits.md	the final `1`	`dropwhile()` stops testing once the predicate fails, so it yields the final `1`, where `filterfalse()` tests every element and returns `[3, 4]`.
+Chapters/41_Functional--Toolkits.md	the final `1`	`dropwhile()` stops testing once the predicate fails, so it yields the final `1`.
 Chapters/41_Functional--Toolkits.md	the first `got`	An eager function would print every `computing square` line before the first `got`.
-Chapters/41_Functional--Toolkits.md	the later `"a": 3`	On two dictionaries `|` is a union in which the right operand's values win, so the later `"a": 3` replaces `"a": 1`.
+Chapters/41_Functional--Toolkits.md	the later `"a": 3`	On two dictionaries `|` is a union that keeps the right operand's value for a key both hold, so the later `"a": 3` replaces `"a": 1`.
 Chapters/41_Functional--Toolkits.md	the outer `list()`	`list(groupby(data))` therefore returns three keys paired with three empty iterators, because the outer `list()` walks all the way to the end before anything reads a group.
-Chapters/42_Functional--Error_Handling.md	the `except` clause	The exception inside still holds its `__traceback__`, but the `except` clause that caught it returned it as a value, so the exception reaches no handler.
-Chapters/42_Functional--Error_Handling.md	the first `Err`	`func_a()`, `func_b()`, and `func_c()` in `combining.py` take their inputs from `i` and `j` rather than from an earlier step's answer, so stopping at the first `Err` discards whatever the later steps would have found.
+Chapters/41_Functional--Toolkits.md	the third `computing square`	`squares()` yields squares forever, yet the program terminates because `islice()` requests three values, so the third `computing square` line is the last.
+Chapters/42_Functional--Error_Handling.md	The `except` clause	The `except` clause that caught the exception returns it as a value, so every caller above that clause receives an `Err`, an ordinary return value.
+Chapters/42_Functional--Error_Handling.md	the first `Err`	In `combining.py`, the three steps take their inputs from `i` and `j` rather than from an earlier step's answer, so stopping at the first `Err` discards whatever the later steps would have found.
 Chapters/42_Functional--Error_Handling.md	the first call	`add_note()` appends each note to a list, `__notes__`, which the first call creates.
 Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdraw(30)` evaluates to `70`, so substituting `70` for it ought to change nothing.
-Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `withdraw()` runs once, subtracts one `30`, and hands back the stored `70` the second time.
+Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
+Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 Chapters/45_Effects--Generators.md	The `for` loop	The `for` loop then resumes `collect()` with `next()`, so both of `collect()`'s `yield` expressions produce `None`.
-Chapters/45_Effects--Generators.md	The first call	The first call therefore cannot send a value.
+Chapters/45_Effects--Generators.md	The first call	The first call must therefore be `next()` or `send(None)`.
 Chapters/45_Effects--Generators.md	The first line	The first line of output shows the state of the generator `interview()` returned.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes the body, which reaches `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	the `yield` expression	As the `SendType` it is the value the driver sends in, which arrives as the value of the `yield` expression and binds to `answer`.
 Chapters/45_Effects--Generators.md	the first `Question`	`drive()` uses all three type parameters: `next()` produces the first `Question`, `send()`'s argument supplies the `Answer`, and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
-Chapters/45_Effects--Generators.md	the first call	The type checker rejects the priming `send()` although the interpreter accepts it, because the annotation has no way to make an exception for the first call.
-Chapters/46_Effects--Stateless.md	the inner `except`	The error escapes before the inner `except` runs:
-Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop obtains a source, the inner one draws from it hour after hour, and `connected()` brackets the pair.
+Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
+Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop obtains a source, the inner one draws from it hour after hour, and `connected()` wraps the inner loop.
 Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop then calls `plug()` again for a replacement.
 Chapters/47_Effects--Stateless_in_Practice.md	The second call	The second call's answer comes from `db1`'s cache entry, because `memoize()` keys on `"Morty"` alone.
+Chapters/47_Effects--Stateless_in_Practice.md	the inner loop	The outer loop obtains a source, the inner one draws from it hour after hour, and `connected()` wraps the inner loop.
 Chapters/47_Effects--Stateless_in_Practice.md	the inner loop	`draw()` returns `None` on success, so anything else in `failure` is the `Drained` that ends the inner loop.
 Chapters/47_Effects--Stateless_in_Practice.md	the last handler	`handle()` is `drive()` with a type lookup in place of the dictionary, `run()` is that loop applied after the last handler, and `supply()` is `handle()` prepackaged for `Need`: a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
 Chapters/47_Effects--Stateless_in_Practice.md	the next line	The stop comes before the `need(Encyclopedia)` on the next line, and so before any call to `Library.article()`.

@@ -19,11 +19,12 @@ A case study then puts several of the pieces to work on one problem.
 The standard library provides the building blocks of functional Python under `functools`,
 from a single `reduce()` call to an alternate dispatch mechanism.
 Each one replaces code you would otherwise write and debug yourself.
-Caching logic, an eviction policy, a dispatch table:
-each has an edge case that's easy to miss on the first attempt.
+Caching logic, an eviction policy,
+and a dispatch table each have an edge case that's easy to get wrong on the first attempt.
 The library's versions handle those edge cases correctly.
-CPython implements in C the ones where speed matters most: `reduce()`,
+CPython implements in C the tools where speed matters most: `reduce()`,
 `partial()`, and the two caches.
+
 What follows starts with the simplest tools and works up to `singledispatch` and `singledispatchmethod`,
 which take one registered function per type.
 
@@ -41,7 +42,7 @@ print(reduce(or_, [{"a": 1}, {"b": 2}, {"a": 3}], {}))
 ```
 
 `operator.or_()` is `|` as a function.
-On two dictionaries `|` is a union in which the right operand's values win,
+On two dictionaries `|` is a union that keeps the right operand's value for a key both hold,
 so the later `"a": 3` replaces `"a": 1`.
 The `operator` module supplies a named function for each operator,
 ready to pass to a fold in place of `lambda a, b: a | b`.
@@ -52,13 +53,13 @@ and `math.prod()` covers multiplication.
 
 On an empty iterable `reduce()` raises `TypeError: reduce() of empty iterable with no initial value`,
 because it has nothing to return.
-The third argument, `{}` in the listing, supplies that starting value,
+The third argument, `{}` in the listing, supplies a starting value,
 so `reduce(or_, [], {})` returns `{}`.
 
 ### `cache`
 
-Remembers every result forever,
-so a repeated call with the same arguments returns the stored result without running the body.
+Stores every result for as long as the function exists,
+so a repeated call with the same arguments returns the stored result straight from the cache.
 `@cache` works correctly only for pure functions.
 A cached function with side effects runs those effects on the first call with each set of arguments,
 and skips them on every repeat.
@@ -83,7 +84,6 @@ print(fib.cache_info())
 
 Because `fib()` is recursive,
 the cache now holds every value up to and including 30.
-The counts show what caching saved.
 The 31 misses are the 31 distinct arguments, `0` through `30`.
 The 28 hits are the calls that found a stored answer.
 That is fifty-nine calls in all, against 2,692,537 for the undecorated version,
@@ -103,8 +103,8 @@ That is *Observer*'s [*lapsed listener* leak](30_Patterns--Observer.md#lapsed-li
 in cache form.
 For the usual case, one slow computation per instance,
 use [`@cached_property`](#cached_property).
-It stores the result in the instance's `__dict__`,
-so the result goes away with the instance.
+`@cached_property` stores the result in the instance's `__dict__`,
+so the garbage collector frees the result along with the instance.
 
 ### `lru_cache`
 
@@ -128,9 +128,8 @@ print(square.cache_info())
 ```
 
 The single hit is the second `square(2)` (`[1]`), which is still in the cache.
-The second `square(1)` (`[2]`) is a fourth miss,
-although `1` was the first value computed,
-and that miss proves the cache evicted `1`.
+The second `square(1)` (`[2]`) is the fourth miss.
+`1` was the first value computed, so that miss proves the cache evicted it.
 The cache discards the least recently used entry before it stores a new one,
 so `currsize` stays at or below `maxsize`.
 
@@ -228,17 +227,17 @@ print(x.squared)
 
 The stored result stays when an input changes.
 `x.n = 10` leaves `squared` at `25`.
-`del x.squared` at `[1]` resets it.
-Deleting the cached attribute discards the stored value,
-and the next access recomputes it from the current state,
+`del x.squared` at `[1]` discards the stored value.
+The next access recomputes it from the current state,
 so the last access prints `computing` again and then `100`.
 
 A first access from two threads at once is a race.
 `cached_property` takes no lock,
-so both threads can find no stored value and both run the property's code.
+so both threads can arrive before either stores a value,
+and both run the property's code.
 
 The stored value goes in the instance's `__dict__`, so each instance needs one.
-A record is slotted, so its instances have none.
+A record uses `__slots__`, which replaces each instance's `__dict__`.
 The first access to a `cached_property` on a `@record` raises a `TypeError`,
 as `slots_limits.py` in [When Slots Does Not Fit](18_Techniques--Performance.md#when-slots-does-not-fit)
 shows.
@@ -248,8 +247,8 @@ shows.
 
 Copies a wrapped function's name and docstring onto its wrapper,
 so a tool that reads those attributes reports the original.
-`@wraps(func)` runs [`update_wrapper()`](14_Techniques--Decorators.md#decorators-as-classes),
-which a decorator written as a class calls directly to copy the same metadata onto its instance.
+`@wraps(func)` runs [`update_wrapper()`](14_Techniques--Decorators.md#decorators-as-classes).
+A decorator written as a class calls `update_wrapper()` in its `__init__()` to copy the same metadata onto its instance.
 
 ```python
 # functools_wraps.py
@@ -290,12 +289,13 @@ Both decorators return the function they define as `wrapper`,
 so `greet` and `greet_bare` each name a wrapper.
 In `passthrough()`, `wraps()` copies the original's name and docstring onto `wrapper`,
 so `greet` reports the original's name and docstring.
-`greet_bare` reports `wrapper - None`,
-and every tool that reports a function by its name or docstring,
-`help()` among them, reports the wrapper too.
+`greet_bare` reports `wrapper - None`.
+`help()` shows the wrapper too,
+as does every tool that reads a function's name or docstring.
 
 `wraps()` also sets `greet.__wrapped__` to the original function,
-so a tool that needs the original, such as `inspect.signature()`, can reach it.
+so a tool that needs the original, such as `inspect.signature()`,
+can follow that attribute to it.
 
 ### `cmp_to_key`
 
@@ -315,7 +315,7 @@ print("".join(ordered))
 #: 9534330
 ```
 
-`larger_first()` puts first whichever of two strings forms the larger number when the two are concatenated.
+`larger_first()` puts `a` before `b` when `a + b` forms a larger number than `b + a`.
 `"3"` goes before `"30"` because `"330"` is larger than `"303"`.
 Subtracting one comparison from the other turns the two booleans into the negative,
 zero, or positive result a comparator returns.
@@ -323,10 +323,10 @@ Joined, the sorted strings form the largest number the five pieces can make.
 
 The rule compares two strings at a time,
 so where `"3"` belongs depends on the string beside it.
-A per-element key for this order is far from obvious,
-and the comparator states the rule directly.
-When a key function exists, it is the better choice:
-`sorted(words, key=len, reverse=True)` orders words by length with no comparator.
+A per-element key for this order is hard to find,
+and the comparator states the rule.
+When a key function exists, it is the better choice,
+as in `sorted(words, key=len, reverse=True)`, which orders words by length.
 `cmp_to_key()` is for a comparator that arrives from older code,
 and for an ordering like this one,
 where the rule is a comparison between two elements.
@@ -395,15 +395,16 @@ print(describe("hi"), "|", describe(5))
 #: a str | the number 5
 ```
 
-Because `singledispatch()` dispatches on the first argument alone,
-a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
-The caller must pass that argument by position.
+`singledispatch()` reads the type of the first positional argument,
+so the caller must pass that argument by position.
 `describe(value=5)` raises `TypeError: describe requires at least 1 positional argument`.
+Because dispatch looks at that one argument alone,
+a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
 
 ### `singledispatchmethod`
 
 The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
-The registered method below again takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
+Here, the registered method again takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
 
 ```python
 # functools_singledispatchmethod.py
@@ -433,13 +434,15 @@ in place of loops you write and test again.
 
 ## The `itertools` Toolkit
 
-Each `itertools` function produces values on demand instead of building a list up front,
-the property [Lazy Evaluation](#lazy-evaluation) revisits below.
+Each `itertools` function produces values on demand instead of building a list up front.
+[Lazy Evaluation](#lazy-evaluation) revisits that property below.
 Each is also a loop you would otherwise write by hand.
-The `itertools` version is written in C and correct on the edge cases a hand-written version can miss:
+The `itertools` version of that loop runs as C code in CPython,
+and it handles the edge cases a hand-written version can get wrong:
 the empty iterable, the single element,
 and the point where two sequences run out at different lengths.
-Combine them the way you combine any small function,
+
+Combine `itertools` functions the way you combine any small function,
 by passing one's output to the next.
 [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
 introduces several of these as stages in lazy pipelines.
@@ -479,8 +482,8 @@ print(list(islice(range(10), 2, 8, 2)))
 #: [2, 4, 6]
 ```
 
-Two differences from a list slice.
-`islice()` rejects negative indices with a `ValueError`,
+`islice()` differs from a list slice in two ways.
+It rejects negative indices with a `ValueError`,
 since a negative index counts back from the end,
 and an iterator may have no end.
 And it consumes every element it passes.
@@ -536,7 +539,7 @@ print(list(chain.from_iterable([[1, 2], [3, 4]])))
 ### `pairwise`
 
 Yields consecutive overlapping pairs from an iterable,
-without indexing by hand and risking an off-by-one at the ends.
+in place of hand indexing and the off-by-one errors it invites at the ends.
 
 ```python
 # itertools_pairwise.py
@@ -614,7 +617,7 @@ print(list(filter(small, data)))
 #: [1, 2, 1]
 ```
 
-The input carries a trailing `1` to separate `takewhile()` from `filter()`.
+The input ends with a `1` to show how `takewhile()` differs from `filter()`.
 `filter()` returns `[1, 2, 1]`,
 because it skips a failing element and tests the next.
 `takewhile()` stops at the first failure, before it reaches the last element.
@@ -641,10 +644,10 @@ print(list(filterfalse(small, data)))
 #: [3, 4]
 ```
 
-The same trailing `1` marks the same distinction from the other direction.
+The same trailing `1` shows how `dropwhile()` differs from `filterfalse()`.
 `dropwhile()` stops testing once the predicate fails,
-so it yields the final `1`,
-where `filterfalse()` tests every element and returns `[3, 4]`.
+so it yields the final `1`.
+`filterfalse()` tests every element, drops that `1`, and returns `[3, 4]`.
 
 ### `filterfalse`
 
@@ -698,7 +701,7 @@ print(list(zip_longest([1, 2, 3], [4, 5],
 ```
 
 Python offers three ways to zip inputs of different lengths,
-and the choice says what a mismatch means.
+and the one you choose records what a mismatch means.
 Plain `zip()` stops at the shortest and raises no error,
 the right choice when the extra elements are genuinely surplus.
 `zip(a, b, strict=True)` raises a `ValueError`,
@@ -730,7 +733,7 @@ print([(k, list(g))
 ```
 
 The `print()` at `[1]` shows what unsorted input does.
-`"b"` comes back as two separate groups, and no error reports it.
+`"b"` comes back as two separate groups, and `groupby()` raises no exception.
 Sorting first is the fix,
 and at `[2]` the two `"b"` elements come back as one group.
 With a key function, pass the same one to both calls,
@@ -738,13 +741,13 @@ as in `groupby(sorted(data, key=keyfunc), key=keyfunc)`.
 `sorted()` returns a new list and leaves `data` as it was,
 so `groupby()` must receive what `sorted()` returns.
 
-The comprehension's `list(g)` is necessary.
+Each comprehension's `list(g)` is necessary.
 Each group is a view onto the one underlying iterator,
 so advancing to the next group empties the previous group's view.
 `list(groupby(data))` therefore returns three keys paired with three empty iterators,
 because the outer `list()` walks all the way to the end before anything reads a group.
 Consume each group before asking for the next one,
-as the comprehension above does.
+as each comprehension in `itertools_groupby.py` does.
 
 ### `tee`
 
@@ -760,17 +763,18 @@ print(list(a), list(b))
 #: [1, 2, 3] [1, 2, 3]
 ```
 
-Two cautions.
-After `tee()`, use only the returned iterators.
+Two cautions apply.
+After `tee()`, use the returned iterators and leave the source alone.
 Advancing the original source consumes values that the copies then miss.
-And `tee()` buffers every value one copy has consumed and the other still awaits.
+And `tee()` buffers every value one copy has consumed and the other has yet to read.
 This demo drains `a` completely before touching `b`,
 so `tee()` stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and uses the same memory.
 `tee()` saves memory when the consumers stay roughly in step.
+
 [Iterators](23_Patterns--Iterators.md#what-tee-buffers)
-measures that buffering and adds a third caution.
+measures `tee()`'s buffering and adds a third caution.
 `tee()` shares one unlocked buffer between its branches,
 so two threads advancing them at the same time can raise a `RuntimeError`.
 
@@ -791,7 +795,7 @@ Unlike the tools above,
 `product()` reads its inputs completely before yielding its first tuple,
 so every input must be finite.
 `product(count(1), "AB")` runs forever,
-because the call tries to read all of `count(1)`, an input with no end.
+because the call tries to read all of `count(1)`, an infinite input.
 
 ### `permutations` and `combinations` {#permutations-and-combinations}
 
@@ -816,10 +820,10 @@ print(list(product("AB", repeat=2)))
 ```
 
 `permutations()` counts orderings, so `AB` and `BA` are two results.
-`combinations()` treats those as the same draw and keeps one,
-and keeping one is right when you want each pair of distinct elements once.
-`combinations_with_replacement()` also ignores order,
-but draws from the full input each time, and that repeated draw produces `AA`.
+`combinations()` treats those as the same draw and keeps one.
+Keeping one is right when you want each pair of distinct elements once.
+`combinations_with_replacement()` also counts `AB` and `BA` as one draw.
+It draws from the full input each time, so `AA` and `BB` appear too.
 `product()` with `repeat=` is the fourth combination of answers.
 Order matters and elements repeat, so it yields all four pairs.
 
@@ -842,11 +846,11 @@ print(list(islice(squares, 3)))  # [1]
 ```
 
 The pipeline stacks four stages on an infinite source,
-and none of them runs until `list()` pulls.
-The `print()` at `[1]` shows the source resuming at `n` = 16 rather than 13,
-because `takewhile()` pulls one more total,
-the 590 from the batch `(169, 196, 225)`, finds it over the limit,
-and discards it.
+and every stage waits for `list()` to pull.
+To stop, `takewhile()` pulls one more total,
+the 590 from the batch `(169, 196, 225)`, and discards it as over the limit.
+That pull consumes squares 13 through 15,
+so the `print()` at `[1]` shows the source resuming at `n` = 16.
 A pull-based pipeline reads one value further than it keeps,
 and here that one value is a batch of three squares.
 
@@ -879,20 +883,19 @@ for sq in islice(squares(), 3):
 #: got 9
 ```
 
-`squares()` yields squares without end,
-yet the program terminates because `islice()` requests three values.
+`squares()` yields squares forever,
+yet the program terminates because `islice()` requests three values,
+so the third `computing square` line is the last.
 The output alternates.
 Each `computing square N` line appears the moment the loop over `islice()` pulls that value,
 and the loop body prints `got` before the generator computes the next square.
 An eager function would print every `computing square` line before the first `got`.
-The third `computing square` line is the last,
-because `islice()` asks for three.
 
 `list(squares())[:3]` looks equivalent and is a different program.
 It builds the whole list before slicing, so it asks `squares()` for every value.
-`squares()` has no last value, so `list()` keeps asking for more,
+Because `squares()` has no last value, `list()` keeps asking for more,
 printing `computing square` lines and growing its list until memory runs out.
-The slice waits on `list()` the whole time.
+The slice never runs, because `list()` never returns.
 Slicing lazily lets the source be infinite.
 Slicing a list requires a source that ends.
 [Lazy Evaluation with Generators](18_Techniques--Performance.md#lazy-evaluation-with-generators)
@@ -975,12 +978,13 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 To write `deep_sum()` as a loop,
 you build your own stack to track which sublists are still open,
 and you must get the push and pop right at every depth.
-The recursive version hands that bookkeeping to the call stack.
+In the recursive version the call stack does that bookkeeping.
+Each open sublist is a frame waiting for its `deep_sum()` call to return.
 
 ## Case Study: Pairing Rotations
 
 Pair up participants for an activity across several rounds,
-and avoid repeating a pairing until every possible pairing has occurred once.
+and repeat a pairing only after every possible pairing has occurred once.
 A small program solves this scheduling problem by combining several of the chapter's tools:
 an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
@@ -993,8 +997,8 @@ Each round, it pairs players sitting across from each other,
 then rotates everyone but the stationary player by one seat.
 For an even number of players `n`,
 the circle method produces `n - 1` rounds with no repeated pair.
-No schedule can do better,
-because those rounds use every one of the `n * (n - 1) / 2` possible pairs exactly once.
+Those `n - 1` rounds are the longest possible run,
+because they use every one of the `n * (n - 1) / 2` possible pairs exactly once.
 
 The classical fix for an odd roster is a phantom player.
 Whoever draws the phantom sits out that round.
@@ -1011,8 +1015,9 @@ fifteen students walking in threes on seven days.
 A perfect trio schedule exists only when the roster size leaves a remainder of 3 when divided by 6,
 so seven students have none.
 
-A given `students` and `size` may have no exact answer,
-so the general version below trades rotation for a greedy search and settles for a good schedule.
+A given `students` and `size` may have no exact answer.
+Here, the general version therefore replaces rotation with a greedy search,
+which produces a good schedule rather than a perfect one.
 The greedy search builds each group one member at a time,
 adding whoever the current members have met the fewest times.
 Those meeting counts come from a running history,
@@ -1093,15 +1098,16 @@ print(len(meetings) - len(distinct), "repeat meetings")
 ```
 
 Called with `size=2`,
-`group_rounds()` covers all `21` possible pairs across the seven rounds,
-with no rotation and no stationary player: a shuffle,
-then a greedy choice repeated until the pool is empty.
-The seven rounds also hold `14` repeat meetings.
+`group_rounds()` covers all `21` possible pairs across the seven rounds.
+Each round is a shuffle, then a greedy choice repeated until the pool is empty,
+in place of the circle method's rotation around a stationary player.
+
+The same seven rounds hold `14` repeat meetings.
 An odd roster leaves one player over,
 so each round adds that player to an existing pair.
 A triple holds three meetings where a pair holds one,
-and those two additional meetings a round, over seven rounds,
-are the `14` repeats.
+so the leftover player adds two meetings a round.
+Over seven rounds, those additional meetings are the `14` repeats.
 
 Trios come from the same seven students:
 
@@ -1134,13 +1140,15 @@ print(next(group_rounds(["Ana", "Bo"], 5)))
 ```
 
 A roster smaller than one full group is the extreme case of joining instead of sitting out.
+Two students and a requested size of five produce one group of two,
+because the alternative is a round in which everyone sits out.
+
 In `group_rounds()`,
 the `while len(pool) >= size` loop exits at once and leaves `groups` empty.
-The `if pool and not groups` line then creates the one group into which the leftovers fold.
-If you delete that line,
+The `if pool and not groups` line then creates one empty group,
+and the `for extra in pool` loop adds each leftover student to it.
+If you delete that `if` line,
 `min()` receives an empty sequence and raises a `ValueError`.
-Two students and a requested size of five produce one group of two,
-because the alternative is a round in which nobody meets anyone.
 
 ### `history` Is Mutable State
 
@@ -1153,7 +1161,7 @@ The seven rounds `pair_rounds.py` schedules then cover 20 of the 21 pairs instea
 `met()` reads `history`, which changes at the end of every round.
 An answer cached in round 0 therefore comes back unchanged in a later round,
 after the counts it summed have grown.
-The `cache` entry's rule, pure functions only, is the reason.
+The reason is the `cache` entry's rule: pure functions only.
 A function that reads mutable state is impure, however simple its body looks.
 
 The general version needs memory, where the circle method needs a round number.
@@ -1163,8 +1171,9 @@ because no formula takes a round number and returns the grouping of arbitrary si
 To reach round `100`,
 `group_rounds()` therefore generates rounds `0` through `99` first.
 The circle method computes round `100` from its arithmetic alone.
-[Recursion](#recursion) makes the same choice, memory for generality,
-when the problem outgrows a loop's counter and needs a stack.
+[Recursion](#recursion) makes the same choice.
+When a problem outgrows a loop's counter,
+the recursive version keeps its state on the call stack.
 
 `group_rounds()` remains deterministic in the sense that matters for testing.
 The same `students`, `size`,
@@ -1181,7 +1190,8 @@ and a memoized pure function is `@cache`.
 Each of those replaces a small piece of code that works on the first input you try and fails on the empty input,
 the single element, or the last partial batch.
 
-The second rule is that the pieces exist to stack.
+The second rule is to stack the pieces,
+since most of them take an iterable and return an iterator.
 `islice(count(10, 2), 5)` in this chapter is two stages.
 A real pipeline is five or six, and it holds only the few items in flight,
 however long its source.
