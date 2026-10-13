@@ -348,7 +348,7 @@ send that supplies a collector's second value produces two: the
 completed collector's `print()`, then the first prompt of the next
 collector. The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
 so the output alternates between one-line and two-line responses all
-the way down. The second line of `send(6)`'s pair is the exception. No
+the way down. `send(6)`'s second line breaks the pattern. No
 collector remains to prompt, so `gamma` finishes, `both()` raises
 `StopIteration`, and the `except` prints `both() is exhausted`.
 
@@ -420,7 +420,11 @@ the defect. The runtime output shows a consequence three steps
 downstream, at the one place the f-string formats the object. A reader
 must work backward from a `<generator object ...>` in a report to the
 missing `yield from`. Worse, the failure is quiet: no exception, an
-exit code of zero, and output that a log scraper would happily accept.
+exit code of zero, and output that a log scraper would accept. A
+coroutine that nothing awaits at least draws a `RuntimeWarning` when
+Python reclaims it, as
+[Concurrency](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics)
+shows. A generator that nothing drives disappears silently.
 
 Without the annotation, the type checker says nothing. For
 `profile = interview()` it infers the expression's own type,
@@ -503,9 +507,9 @@ print(list(summarize(["red", "green", "blue"])))
 
 **Declare the return channel.** `report()`'s annotation changes from `Iterator[str]` to
 `Generator[str, None, int]`, because a generator that returns something
-needs the long form. `Iterator` sets the `ReturnType` to `None`, so
-`ty` rejects `report()`'s own `return size` with expected `None`, found
-`int`.
+needs the long form. Under `Iterator[str]` a generator may return
+only `None`, so `ty` rejects `report()`'s own `return size` with
+expected `None`, found `int`.
 
 **Keep the strings and the count apart.** The strings and the count travel by different channels, and the listing
 shows both at once. Every string that `emit()` or `report()` yields
@@ -564,7 +568,7 @@ error[invalid-argument-type]: Argument to bound method
 
 `next()` takes no such argument. It asks for the generator's next
 yielded value and ignores the `SendType`, so priming
-with it type-checks for any generator whatsoever.
+with it type-checks for any generator.
 
 The mismatch is real rather than a type checker limitation. A
 generator's `SendType` describes what a suspended `yield` expression
@@ -577,9 +581,11 @@ directions, and `None` is the only value it accepts.
 
 An annotation cannot express "`None` for the first call, `Answer`
 afterward," because a single `SendType` covers every call. Widening the
-`SendType` to `Answer | None` states the exception in the type, and
-every `yield` expression whose value the generator uses as an `Answer`
-must then handle a `None` that arrives only once. `interview()` puts
+`SendType` to `Answer | None` states the exception in the type, but
+the type checker then applies it to every `yield` expression. Each one
+whose value the generator uses as an `Answer` must handle a `None`
+that exists only in the type: the priming `None` arrives before the
+generator reaches its first `yield`. `interview()` puts
 what it receives into an f-string, which formats a `None` as readily
 as an `Answer`, so `interview()` passes the check either way. Priming
 with `next()` sidesteps the whole question. The one call that cannot
@@ -732,8 +738,8 @@ the same `Generator` annotation.
 For another state, take the table. The generator's compactness comes
 from the states forming a line, so control flow can express the
 sequence. The two states here that break the line need extra control
-flow. An `if` chain reaches `UNAVAILABLE` and `NEED_MONEY`, and each
-one returns by looping back to the top, a `goto` written as a
+flow. An `if` chain reaches `UNAVAILABLE` and `NEED_MONEY`, and from
+each one the machine loops back to the top, a `goto` written as a
 `while True`. If you add a state reachable from three others, the way the
 table handles `Quit` from every state but `QUIESCENT`, no position in
 the body corresponds to it. The new state becomes a flag, or a check

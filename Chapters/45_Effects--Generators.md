@@ -18,15 +18,17 @@ Used that way, a generator is not a sequence but a conversation.
 It yields a request, suspends, and continues when a caller sends the answer.
 
 This chapter covers the full three-channel annotation,
-the loop that carries such a conversation, and `yield from`,
+the loop that runs such a conversation, called a *driver*, and `yield from`,
 which composes generators that do not name their driver.
 [Stateless](46_Effects--Stateless.md) builds an Effect system on the annotation,
 the loop, and `yield from`, but generators are useful without it.
 
 ## Annotating a Generator
 
-Earlier examples annotate every generator with the short `Iterator` form.
-That form fits a generator that yields values and receives `None`.
+Earlier chapters annotate their generators with a short form:
+`Iterator[int]` in [Iterators](23_Patterns--Iterators.md#generators),
+and `Generator[str]` in [Context Managers](15_Techniques--Context_Managers.md#a-basic-context-manager).
+A short form fits a generator that yields values and receives `None`.
 
 A generator that also receives values needs the full annotation:
 
@@ -94,7 +96,7 @@ so the annotation states the arrangement and a type checker enforces it.
 `Question` fills the `YieldType` position, `Answer` the `SendType`,
 and `Result` the `ReturnType`.
 The distinction exists only for the type checker.
-`Question("name")` produces the plain `str`.
+At runtime, `Question("name")` returns its argument unchanged, a `str`.
 
 Driving the generator by hand sends one `Answer` at a time:
 
@@ -145,8 +147,8 @@ because `for` catches the `StopIteration` and discards it along with its `value`
 To read the `ReturnType`, catch the exception yourself,
 as `drive_by_hand.py` does.
 
-Python raises that `StopIteration` for the generator.
-The body finishes with `return`.
+The body finishes with `return`,
+and Python raises the `StopIteration` on the generator's behalf.
 A `StopIteration` that escapes the body,
 such as one from calling `next()` on an exhausted iterator,
 becomes a `RuntimeError` ([PEP 479](https://peps.python.org/pep-0479/)),
@@ -288,7 +290,7 @@ which serializes the conversation.
 
 ## `yield from` Composes Descriptions
 
-Generators can carry an EMS because they nest.
+Generators can support an EMS because they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
 Each of the three channels crosses a `yield from` differently.
@@ -329,10 +331,12 @@ print(list(top()))
 Each `yield from` runs its target until that generator finishes,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
 The target decides how many values each delegation contributes.
-Without `from`, a bare `yield one()` yields the generator object as a single value.
 "Exhausted" describes where the delegation ends.
 In between, the inner generator yields each value one at a time,
 as the driver requests it.
+
+Without `from`, a bare `yield one()` yields the generator object as a single value,
+so `list(outer())` would show `<generator object one at ...>` in place of `'only'`.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
@@ -507,8 +511,9 @@ if __name__ == "__main__":
 #: Alice of Wonderland, friend Rabbit
 ```
 
-`drive()` is the same function as in `two_way_generator.py` and does not reference `ask()`.
-Only the generator portion changed.
+The listing imports `drive()` unchanged from `two_way_generator.py`,
+and nothing in `drive()` refers to `ask()`.
+The new code is all on the generator side.
 
 `ask()` uses `Answer` in two of the three positions, for two different reasons.
 As the `SendType` it is the value the driver sends in,
@@ -600,12 +605,10 @@ and `yield from` relays both.
 `throw()` raises its exception inside the innermost generator rather than in the delegating one,
 and `close()` unwinds every frame in the chain.
 
-[A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
-shows an exception raised at a generator's `yield`,
-described from the `with` block's side:
-"Python resumes the generator by raising the block's exception at the `yield`."
-`throw()` is that same resumption,
-called by your own code instead of by a `with` block:
+In [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager),
+`@contextmanager`'s `__exit__()` calls the generator's `throw()` method,
+"which resumes the generator by raising the block's exception at the `yield`."
+A driver can make the same call from its own code:
 
 ```python
 # throw_and_close.py
@@ -635,13 +638,16 @@ g.close()
 inside `worker()`'s frame, the same way the `with` block's exception does.
 `worker()` catches it, prints, and yields again,
 so the generator keeps running when its `except` clause handles the thrown exception.
+Like `send()`, `throw()` returns the next value the generator yields,
+here `"recovered"`.
+An exception the generator leaves unhandled ends the generator and propagates out of `throw()` into the driver.
 
 `g.close()` raises `GeneratorExit` at the `yield` on which the generator now waits,
 `yield "recovered"`.
 `worker()` has no matching `except`, so `GeneratorExit` propagates,
 the `finally` block runs, and the generator ends.
-Nothing prints the `GeneratorExit` itself,
-because `close()` catches it and returns `None` once the generator finishes.
+`close()` catches the `GeneratorExit` and returns `None` once the generator finishes,
+so no traceback appears.
 
 Through a `yield from`, the same two calls reach the innermost generator:
 
@@ -708,7 +714,11 @@ expect(RuntimeError, s.close)
 `stubborn()` instead answers `GeneratorExit` with another `yield`,
 so `close()` raises `RuntimeError: generator ignored GeneratorExit` rather than returning quietly.
 A driver that abandons a live generator shuts it down with `close()`,
+and Python calls `close()` on an unfinished generator when it reclaims the generator's memory,
 so a generator written for others to drive must let `GeneratorExit` end it.
+When Python reclaims a generator like `stubborn()`,
+the `RuntimeError` has no caller to reach,
+so Python prints it as an "Exception ignored" message and continues.
 
 ## The Driver You Already Use
 
