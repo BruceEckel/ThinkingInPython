@@ -2,4 +2,4 @@
 import time
 
 def elapsed(start: float) -> float:
-    return time.time() - start
+    return time.monotonic() - start

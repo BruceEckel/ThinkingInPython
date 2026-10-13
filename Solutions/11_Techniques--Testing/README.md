@@ -483,11 +483,9 @@ def test_stub_not_called(balance: float) -> None:
     assert sent == []
 ```
 
-**Test the boundary with a mock.**
-Zero is the boundary.
-`notify_negative_balance()` tests `balance < 0`,
-so a mistaken `<=` would send at zero and fail the zero case.
-`assert_not_called()` passes only if `send` received no call.
+**Check the silence with a mock.**
+`assert_not_called()` passes only if `send` received no call,
+so it fails the zero case if a mistaken `<=` sends there.
 
 **Record the calls by hand.**
 A stub like exercise 5's `fake_fetch()` cannot make this check.

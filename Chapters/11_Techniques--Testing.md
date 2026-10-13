@@ -251,6 +251,12 @@ def test_overdraft_names_amount_keeps_balance() -> None:
     assert account.balance == 100
 ```
 
+`pytest` applies the pattern with `re.search()`,
+so it can match any part of the message:
+the full message here is `balance 100 is less than 250`.
+A pattern copied from a message that holds `.`, `(`,
+or another regular-expression metacharacter needs `re.escape()` to match it literally.
+
 The assertion after the block belongs outside it.
 A failed withdrawal must leave the balance alone,
 and that check has nothing to do with the exception.
@@ -349,7 +355,9 @@ so tests cannot leak state into each other.
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
 A function containing `yield` is a [generator](23_Patterns--Iterators.md#generators),
-and a fixture needs only its shape.
+a construct a later chapter covers.
+A fixture needs no more of generators than the `yield` statement,
+which divides the fixture into the code before it and the code after it:
 
 ```python
 # test_teardown.py
@@ -376,7 +384,8 @@ whether the test passes or fails.
 Close files, release locks, or check a final invariant after the `yield`.
 Do the cleanup first, as the listing withdraws before it asserts,
 so a failing check cannot skip it.
-A failing check there surfaces as an error, not as a test failure.
+
+A failing check after the `yield` surfaces as an error, not as a test failure.
 `pytest` prints `1 passed, 1 error`,
 so read the error to see which invariant broke.
 
@@ -389,18 +398,20 @@ Autouse runs the fixture, and only a parameter delivers its value.
 If you mark `funded` autouse and leave it out of the parameter list,
 `funded.withdraw(40)` raises an `AttributeError`.
 The bare name finds the fixture object the decorator left behind,
-not the `Account` it returns.
+not the `Account` the function returns.
 
 Fixtures eliminate duplicated setup.
 A test that names `funded` states what it needs and nothing about how to build it.
 
 ## Sharing Fixtures with conftest.py
 
-Any test in `conftest.py`'s directory, or below it,
-can use a fixture defined there, with no import.
-Place shared setup in `conftest.py`.
+When several test files need the same fixture,
+put it in a file named `conftest.py`.
+`pytest` loads that file on its own, and any test in `conftest.py`'s directory,
+or below it, can use a fixture defined there, with no import.
 
-A directory has one `conftest.py`, so its fixtures accumulate in that file.
+A directory has at most one `conftest.py`,
+so all of that directory's shared fixtures go in the one file.
 This one holds a session-scoped fixture and a parametrized one:
 
 ```python
@@ -573,8 +584,9 @@ so the tests leave real data untouched and cannot collide with each other.
 A fixture requests other fixtures the way a test does,
 by naming them as parameters,
 and `app_data()` names the built-in `tmp_path` and `monkeypatch`.
-Its value is a side effect,
-so it is marked `autouse=True` and both tests run with it unnamed.
+The fixture's value is a side effect,
+so `@pytest.fixture(autouse=True)` applies it to both tests,
+which leave it unnamed.
 `test_round_trip()` loads back what it saved,
 and `test_missing_file_raises()` confirms that loading an absent file raises a `FileNotFoundError`:
 
@@ -677,17 +689,21 @@ As with any seed, you record the value it gives you rather than pick one.
 
 ### The Clock
 
-Code that reads `time.time()` gives a different answer every run:
+Code that reads `time.monotonic()` gives a different answer every run:
 
 ```python
 # stopwatch.py
 import time
 
 def elapsed(start: float) -> float:
-    return time.time() - start
+    return time.monotonic() - start
 ```
 
-`monkeypatch` pins `time.time()` to a known value the same way it does for `randint()`:
+`time.monotonic()` is the clock for measuring an interval.
+It keeps counting forward when someone resets the system clock,
+while `time.time()` jumps with the reset.
+
+`monkeypatch` pins `time.monotonic()` to a known value the same way it does for `randint()`:
 
 ```python
 # test_stopwatch.py
@@ -695,7 +711,7 @@ import pytest
 import stopwatch
 
 def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(stopwatch.time, "time",
+    monkeypatch.setattr(stopwatch.time, "monotonic",
                         lambda: 100.0)
     assert stopwatch.elapsed(40.0) == 60.0
 ```
@@ -738,8 +754,9 @@ and the patch applies process-wide until teardown restores the name.
 Choose injection when the parameter sits near the boundary.
 Choose `monkeypatch` when threading it through touches more code than the test is worth.
 
-`datetime.now()` is harder to patch.
-`datetime` is an immutable C type that rejects attribute assignment.
+`datetime.now()` resists patching.
+`monkeypatch.setattr(datetime, "now", ...)` raises a `TypeError`,
+because `datetime` is an immutable C type that rejects attribute assignment.
 That justifies the effort of injection.
 
 If you cannot change the code,
@@ -769,9 +786,11 @@ def test_current_year_is_frozen() -> None:
 
 `travel` sets the clock to the given moment for the test,
 and `tick=False` holds it there so every reading is equal,
-as the test's second assertion shows.
+as `datetime.now() == datetime.now()` shows.
 `time.monotonic()` and `time.perf_counter()` keep running,
 because they measure elapsed intervals rather than dates.
+`stopwatch.elapsed()` therefore keeps changing under `time-machine`,
+and patching or injection still pins it.
 Unlike `monkeypatch`, which comes with `pytest`,
 `time-machine` is a separate dependency,
 but it is the standard answer for code built around `datetime`.
@@ -859,7 +878,7 @@ def test_negative_balance_sends_message() -> None:
 recording every call as it goes.
 `assert_called_once_with()` checks two things at once:
 that `send` ran exactly once, and that it ran with this argument.
-A plain stub cannot make that check.
+A stub cannot make that check.
 `fake_urlopen()` remembers nothing about the calls it receives.
 
 A `Mock` accepts a call the real function would reject,
