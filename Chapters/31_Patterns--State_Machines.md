@@ -176,25 +176,11 @@ class MouseTrap(StateMachine):
         super().__init__(MouseTrap.waiting)
 ```
 
-`MouseTrap` holds all the possible states as class attributes and sets up the initial state.
-Each of the four classes consists of its two methods,
-so one instance of each is enough.
-Every `MouseTrap` shares that one `Waiting`,
-and a trap that returns to `Waiting` returns to the same object.
-
+`MouseTrap` holds all possible states as class attributes and sets up the initial state.
 Each `next()` performs a `match` on the input,
-providing a `case` for every input the state recognizes,
-and a `case _` that returns the machine's current state.
-Each `case` names its member through the class, as in `MouseAction.APPEARS`.
-A dotted name compares the input with that member,
-while a bare `APPEARS` would be a [capture pattern](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)
-that matches every input.
-
-`Waiting.next()` returns `MouseTrap.luring` although the `class MouseTrap` statement comes further down the file.
-Python looks up a name inside a function when the function runs,
-not when its `def` executes.
-By the time anything calls `next()`,
-the whole module has run and `MouseTrap` exists.
+providing a `case` for every input the state recognizes.
+The default `case _` returns the machine's current state,
+which means that the state doesn't change.
 
 `StateMachine`'s constructor runs the initial state,
 so constructing the machine starts the engine.
@@ -202,30 +188,12 @@ so constructing the machine starts the engine.
 Two facts make that choice safe here:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
-A later edit can undo either fact.
-If you give a `State` a `run()` that reads a machine attribute,
-that warning applies again.
 
 None of the four state classes inherits from `State`.
-Each satisfies the Protocol by defining `run()` and `next()`.
-A base class could also give the annotations a type to name:
-
-    class State: pass
-
-With that base, the type checker rejects the engine,
-since `State` declares neither the `run()` nor the `next()` the engine calls.
-At runtime, Python accepts a derived class that defines `run()` alone,
-and the machine runs an instance of it.
-The program fails when `run_all()` calls the missing `next()` and Python raises an `AttributeError`.
-A base whose methods `raise NotImplementedError` satisfies the checker.
-The call to the missing method then raises that `NotImplementedError` from the base,
-with whatever message you write there.
-[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option.
-If you make `State` an `ABC` with `@abstractmethod` on both methods,
-creating an instance of a subclass that defines `run()` alone raises a `TypeError`.
-The type checker reports that construction too,
-so the `ABC` and the Protocol both report the missing method before the program runs.
-The empty base and the `NotImplementedError` base report it at the call.
+Each satisfies the Protocol by defining `run()` and `next()`,
+and a class that leaves one out fails the type checker where the program uses it as a `State`.
+An `ABC` with both methods abstract reports the omission when you construct an instance.
+An empty base class lets the program run until `run_all()` calls the missing method and Python raises an `AttributeError`.
 
 `mouse_trap_states_demo.py` builds a `MouseTrap` and runs it through every move in `MOVES`:
 
