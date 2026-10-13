@@ -9,9 +9,10 @@ with tempfile.TemporaryDirectory() as tmp:
     for name in ("main.py", "pkg/util.py", "pkg/notes.txt"):
         (root / name).write_text("")
     py_paths = [
-        (dirpath / f).relative_to(root).as_posix()
-        for dirpath, _, files in root.walk()
-        for f in files if f.endswith(".py")
+        (dirpath / filename).relative_to(root).as_posix()
+        for dirpath, _, filenames in root.walk()
+        for filename in filenames
+        if filename.endswith(".py")
     ]
 
 for path in sorted(py_paths):  # Sorted for stable output

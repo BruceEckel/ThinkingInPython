@@ -1,5 +1,5 @@
 # comprehension_steps.py
-from dense_comprehension import warehouses
+from warehouses import warehouses
 
 in_stock = [
     (wh, name, price)

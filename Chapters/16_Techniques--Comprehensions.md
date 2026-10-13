@@ -348,15 +348,13 @@ operations = [
     ("doubled", lambda v: v * 2),
     ("squared", lambda v: v ** 2),
 ]
-values = [10, 3, 42]
+values = [10, 3]
 print([
     f"{name}({v}) = {f(v)}"
     for (name, f), v in zip(operations, values)
 ])
 #: ['doubled(10) = 20', 'squared(3) = 9']
 ```
-
-`values` has a third element, and `zip()` drops it, as in `zip_pairs.py`.
 
 `Path.walk()` produces a `(dirpath, dirnames, filenames)` tuple for each directory in a tree,
 and a second `for` clause walks the names in `filenames`:
@@ -373,9 +371,10 @@ with tempfile.TemporaryDirectory() as tmp:
     for name in ("main.py", "pkg/util.py", "pkg/notes.txt"):
         (root / name).write_text("")
     py_paths = [
-        (dirpath / f).relative_to(root).as_posix()
-        for dirpath, _, files in root.walk()
-        for f in files if f.endswith(".py")
+        (dirpath / filename).relative_to(root).as_posix()
+        for dirpath, _, filenames in root.walk()
+        for filename in filenames
+        if filename.endswith(".py")
     ]
 
 for path in sorted(py_paths):  # Sorted for stable output
@@ -393,7 +392,7 @@ and leaves the file system as the example found it.
 In the `py_paths` comprehension,
 the first `for` walks the directories and the second `for` walks the files in each,
 flattening the tree into one list of paths.
-The filter tests `f.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`.
+The filter tests `filename.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`.
 Testing the bare filename avoids constructing a `Path` for every file in the tree,
 including the ones the filter skips.
 
@@ -429,8 +428,11 @@ You can nest more `for` and `if` clauses,
 or wrap the whole comprehension in another call,
 but each one you add makes the expression harder to read.
 
+`dense_comprehension.py` and `comprehension_steps.py` share one inventory,
+a list of `(name, qty, price)` tuples for each warehouse:
+
 ```python
-# dense_comprehension.py
+# warehouses.py
 warehouses = {
     "East": [
         ("wrench", 12, 4.50),
@@ -442,6 +444,13 @@ warehouses = {
         ("sander", 8, 15.00),
     ],
 }
+```
+
+`dense_comprehension.py` builds a report from it in one comprehension:
+
+```python
+# dense_comprehension.py
+from warehouses import warehouses
 
 report = [
     f"{wh}: {name} (${price:.2f})"
@@ -452,10 +461,8 @@ report = [
          if qty > 0 and price < 10],
         key=lambda t: t[2])
 ]
-
-if __name__ == "__main__":
-    for line in report:
-        print(line)
+for line in report:
+    print(line)
 #: East: hammer ($2.25)
 #: East: wrench ($4.50)
 #: West: wrench ($4.75)
@@ -470,7 +477,7 @@ Giving each stage a name gives each question its own statement:
 
 ```python
 # comprehension_steps.py
-from dense_comprehension import warehouses
+from warehouses import warehouses
 
 in_stock = [
     (wh, name, price)
@@ -698,23 +705,18 @@ The new form replaces many uses of two-`for` comprehensions,
 rows = [[1, 2], [3, 4], [5]]
 dicts = [{"a": 1}, {"b": 2}, {"a": 3}]
 
-# *
 print([*row for row in rows])
 #: [1, 2, 3, 4, 5]
 
-# **
 print({**d for d in dicts})
 #: {'a': 3, 'b': 2}
 
-# In a generator expression
 flat = (*row for row in rows)
 print(list(flat))
 #: [1, 2, 3, 4, 5]
 
-# Shallow: one level
 print([*row for row in [[1, [2, 3]], [4]]])
 #: [1, [2, 3], 4]
-# Braces plus * build a set
 print({*s for s in [{1, 2}, {3}]})
 #: {1, 2, 3}
 ```
