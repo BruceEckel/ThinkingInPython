@@ -252,6 +252,7 @@ The listing holds one gap of each kind:
 
 ```python
 # totality_gap.py
+from exceptions import expected
 from result import Result
 from returning_result import func_a
 
@@ -259,13 +260,16 @@ func_a(1)  # Result discarded; nothing complains
 
 def lies(i: int) -> Result[int, str]:
     raise RuntimeError("not total after all")
-    # ty accepts this: a function that always
-    # raises satisfies any declared return type.
+
+with expected(RuntimeError):
+    lies(1)
+#: [RuntimeError] not total after all
 ```
 
 `func_a(1)` returns a `Result` that the listing discards,
 and `lies()` raises an exception instead of returning the `Result` its signature declares.
-The type checker accepts both.
+The type checker accepts both,
+because a function that always raises an exception satisfies any declared return type.
 
 ## Composing by Hand
 
@@ -510,16 +514,17 @@ def combined(i: int, j: int) -> Result[str, str]:
                 lambda c: Ok(add(a, b, c)))))
 
 if __name__ == "__main__":
-    for args in [(1, 5), (7, 2), (2, 1), (7, 5)]:
+    for args in [(1, 5), (7, 2), (2, 1), (1, 2), (7, 5)]:
         print(args, combined(*args))
 #: (1, 5) Err(error='func_a(1)')
 #: (7, 2) Err(error='func_b(2)')
 #: (2, 1) Err(error='func_c(3): division by zero')
+#: (1, 2) Err(error='func_a(1)')
 #: (7, 5) Ok(answer='add(7 + 5 + 12): 24')
 ```
 
 An `Err` anywhere short-circuits to the end.
-`(7, 5)` is the one input of the four that passes all three steps,
+`(7, 5)` is the one input of the five that passes all three steps,
 so `add()` runs for that input alone.
 
 Short-circuiting is right for a dependent chain,
@@ -527,8 +532,9 @@ where each step needs the previous step's answer,
 as in `composing_with_bind.py` above.
 `func_a()`, `func_b()`,
 and `func_c()` in `combining.py` take their inputs from `i` and `j` rather than from an earlier step's answer,
-so stopping at the first `Err` discards whatever the later steps would have found
-(see exercise 3).
+so stopping at the first `Err` discards whatever the later steps would have found.
+For `(1, 2)`, `func_b(2)` and `func_c(3)` would fail too,
+and the result reports `func_a(1)` alone (see exercise 3).
 The exception in `exceptions_lose_data.py` does the same:
 it ends the comprehension at `func_a(3)`, before `func_a(4)` runs.
 
@@ -681,25 +687,22 @@ def reciprocal(n: int) -> float:
 def compute(text: str) -> Result[float, Exception]:
     return parse(text).bind(reciprocal)
 
-def describe(
-    text: str, result: Result[float, Exception]
-) -> str:
+def describe(result: Result[float, Exception]) -> str:
     match result:
         case Ok(answer):
-            return f"{text}: {answer}"
+            return str(answer)
         case Err(ValueError()):
-            return f"{text}: Not a number"
+            return "Not a number"
         case Err(ZeroDivisionError()):
-            return f"{text}: Cannot divide by zero"
+            return "Cannot divide by zero"
         case Err(error):
-            return f"{text}: {type(error).__name__}"
+            return type(error).__name__
 
 if __name__ == "__main__":
-    texts = ("4", "0", "OOPS")
-    # Every Result computed first, matched after:
-    results = [compute(text) for text in texts]
-    for text, result in zip(texts, results):
-        print(describe(text, result))
+    results = {text: compute(text)
+               for text in ("4", "0", "OOPS")}
+    for text, result in results.items():
+        print(f"{text}: {describe(result)}")
 #: 4: 0.25
 #: 0: Cannot divide by zero
 #: OOPS: Not a number
@@ -708,7 +711,7 @@ if __name__ == "__main__":
 `@safe` wraps both `parse()` and `reciprocal()`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero each become the `error` field of an ordinary `Err`.
 `compute()` returns a `Result`, a value the caller keeps after the call returns,
-so the comprehension computes all three results before `describe()` matches any of them.
+so the dict comprehension computes all three results before `describe()` matches any of them.
 A raised exception would have ended the comprehension at the first failure.
 
 The parentheses in `Err(ValueError())` do the type test.
@@ -794,12 +797,12 @@ def parse_field(name: str,
         e.add_note(f"field {name!r} received {text!r}")
         return Err(e)
 
-for field, value in (("age", "42"), ("size", "oops")):
-    match parse_field(field, value):
+for name, text in (("age", "42"), ("size", "oops")):
+    match parse_field(name, text):
         case Ok(answer):
-            print(f"{field} = {answer}")
+            print(f"{name} = {answer}")
         case Err(error):
-            print(f"{field}: {type(error).__name__}")
+            print(f"{name}: {type(error).__name__}")
             for note in error.__notes__:
                 print(f"  {note}")
 #: age = 42

@@ -13,9 +13,10 @@ def combined(i: int, j: int) -> Result[str, str]:
                 lambda c: Ok(add(a, b, c)))))
 
 if __name__ == "__main__":
-    for args in [(1, 5), (7, 2), (2, 1), (7, 5)]:
+    for args in [(1, 5), (7, 2), (2, 1), (1, 2), (7, 5)]:
         print(args, combined(*args))
 #: (1, 5) Err(error='func_a(1)')
 #: (7, 2) Err(error='func_b(2)')
 #: (2, 1) Err(error='func_c(3): division by zero')
+#: (1, 2) Err(error='func_a(1)')
 #: (7, 5) Ok(answer='add(7 + 5 + 12): 24')

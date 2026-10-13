@@ -13,25 +13,22 @@ def reciprocal(n: int) -> float:
 def compute(text: str) -> Result[float, Exception]:
     return parse(text).bind(reciprocal)
 
-def describe(
-    text: str, result: Result[float, Exception]
-) -> str:
+def describe(result: Result[float, Exception]) -> str:
     match result:
         case Ok(answer):
-            return f"{text}: {answer}"
+            return str(answer)
         case Err(ValueError()):
-            return f"{text}: Not a number"
+            return "Not a number"
         case Err(ZeroDivisionError()):
-            return f"{text}: Cannot divide by zero"
+            return "Cannot divide by zero"
         case Err(error):
-            return f"{text}: {type(error).__name__}"
+            return type(error).__name__
 
 if __name__ == "__main__":
-    texts = ("4", "0", "OOPS")
-    # Every Result computed first, matched after:
-    results = [compute(text) for text in texts]
-    for text, result in zip(texts, results):
-        print(describe(text, result))
+    results = {text: compute(text)
+               for text in ("4", "0", "OOPS")}
+    for text, result in results.items():
+        print(f"{text}: {describe(result)}")
 #: 4: 0.25
 #: 0: Cannot divide by zero
 #: OOPS: Not a number

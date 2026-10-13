@@ -9,12 +9,12 @@ def parse_field(name: str,
         e.add_note(f"field {name!r} received {text!r}")
         return Err(e)
 
-for field, value in (("age", "42"), ("size", "oops")):
-    match parse_field(field, value):
+for name, text in (("age", "42"), ("size", "oops")):
+    match parse_field(name, text):
         case Ok(answer):
-            print(f"{field} = {answer}")
+            print(f"{name} = {answer}")
         case Err(error):
-            print(f"{field}: {type(error).__name__}")
+            print(f"{name}: {type(error).__name__}")
             for note in error.__notes__:
                 print(f"  {note}")
 #: age = 42
