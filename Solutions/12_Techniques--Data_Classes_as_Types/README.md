@@ -11,20 +11,22 @@
 
 [Enums Are Types Too](../../Chapters/12_Techniques--Data_Classes_as_Types.md#enums-are-types-too) shows `Month` checking a day against its own cap.
 The cap now depends on a second value, so `check_day()` needs the `Year` as well, and `Year` needs a method that applies the leap rule.
-Write the `pytest` tests first, covering a leap year, a year that is not leap, the leap century 2000, and a day that fails in every year.
-`Year` accepts 1901 through the current year, so it rejects 1900 and 2100, the century years that are not leap.
+Write the `pytest` tests first, covering a leap year, a common year, the leap century 2000, and a day that fails in every year.
+`Year` accepts 1901 through the current year, so it rejects 1900 and 2100, the common century years.
 
 <details>
 <summary>Solution</summary>
 
 If you drop the `% 400` clause from `is_leap()`,
-every century year counts as common,
-and `test_feb_29_allowed_in_2000` fails when `check_day()` raises a `TypeFailure` for `Day(29)`.
+every century year counts as common.
+`check_day()` then raises a `TypeFailure` for `Day(29)` in 2000,
+and `test_feb_29_allowed_in_2000` fails.
 An `is_leap()` that tests divisibility by 4 alone passes all four tests,
 because 2000 is the one century year `Year` accepts.
 The solution still writes the full rule,
-because `Year`'s upper bound follows `date.today()`,
-and 2100 is not a leap year.
+because `Year`'s upper bound follows `date.today()`.
+Once 2100 arrives, `Year` will accept it,
+and 2100 is a common year.
 
 `Year` gains an `is_leap()` method using the standard rule (divisible
 by 4, and not by 100 unless also by 400). `Month.check_day()` takes
@@ -132,13 +134,14 @@ def test_feb_30_always_rejected() -> None:
 
 **Accept both kinds of leap year.**
 `BirthDate(Month.of(2), Day(29), Year(2020))` succeeds because 2020 is
-divisible by 4 and not by 100. 2000 is divisible by 100 and also by
-400, so it is a leap year too, and it is the one century year `Year`
-accepts.
+divisible by 4 and not by 100.
+2000 is divisible by 100 and also by 400,
+so it is a leap year too,
+and it is the one century year that `Year` accepts.
 
-**Reject a day past the cap.** `Year(2021)` is not leap, so
+**Reject a day past the cap.** `Year(2021)` is a common year, so
 `check_day()` rejects February 29. February 30 fails in every year,
-because a leap year lifts `max_days` to 29 and no further.
+because February's cap is 29 at most.
 
 </details>
 </details>
@@ -189,10 +192,10 @@ class EmailAddress:
 
 If you keep only the `partition()` check, `"b@@x.com"` passes.
 `partition()` splits at the first `@`,
-and the domain half, `"@x.com"`, is not empty.
+and the domain half, `"@x.com"`, holds text.
 The demo loop stops there with an `AssertionError`,
-because `expect()` finds no exception to report.
-Counting the `@` characters closes that gap,
+which `expect()` raises when the call it makes returns normally.
+Counting the `@` characters rejects `"b@@x.com"`,
 so the solution makes two calls to `check()`.
 
 ```python
@@ -241,11 +244,11 @@ print(EmailAddress("grace@example.com"))
 ```
 
 **Require a single `@`.**
-The original check, `"@" in self.text`, confirms only that an `@`
-appears somewhere. `count("@") == 1` additionally rejects two-`@`
+The original check, `"@" in self.text`, confirms that an `@`
+appears somewhere and accepts any number of them. `count("@") == 1` also rejects two-`@`
 strings like `"b@@x.com"`.
 
-**Require text on both halves.** The second check splits on `@` and requires text on both
+**Require text on both halves.** The `partition()` check splits on `@` and requires text on both
 sides, so it rejects `"@x.com"` and `"b@"`.
 
 </details>
@@ -265,7 +268,7 @@ sides, so it rejects `"@x.com"` and `"b@"`.
 
 [A `NamedTuple` Cannot Validate Itself](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate) explains why the class body of a `NamedTuple` refuses a `__new__()`.
 A subclass is free to define one, so put the check there and call `super().__new__()` afterward.
-For the hole, find which method `copy.replace()` calls on a `NamedTuple` and whether it passes through your `__new__()`.
+Then find which method `copy.replace()` calls on a `NamedTuple`, and whether that method calls your `__new__()`.
 
 <details>
 <summary>The shape</summary>
@@ -301,11 +304,11 @@ class Stars(_Stars):
 <summary>Solution</summary>
 
 If you define `__new__()` in the `NamedTuple` class body,
-the `class` statement raises an `AttributeError`
-(`Cannot overwrite NamedTuple attribute __new__`),
+the `class` statement raises an `AttributeError`,
 and `Stars` stays undefined.
+The message is `Cannot overwrite NamedTuple attribute __new__`.
 [A `NamedTuple` Cannot Validate Itself](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate) shows the same failure in its third test.
-The prohibition covers only the body that `NamedTuple` processes,
+The prohibition covers the body that `NamedTuple` processes and leaves its subclasses free,
 so the solution defines `__new__()` in a subclass.
 
 ```python
@@ -353,15 +356,15 @@ accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
 The chapter's `make_stars()` checks the callers that use it, while
 a `__new__()` in the subclass runs on every call to `Stars`.
 
-**Test the replacement path.** The guarantee still leaks. `_replace()` builds the new tuple through
-`tuple.__new__()` rather than through `cls.__new__()`, so it skips
-the check. `copy.replace()` calls `_replace()` and inherits the hole.
+**Test the replacement path.** `_replace()` builds the new tuple through
+`tuple.__new__()`, which skips `Stars.__new__()` and its check.
+`copy.replace()` calls `_replace()`, so it skips them too.
 A validated `Stars` therefore produces an unvalidated one.
-That leak is worse than no check.
-The type now looks like it guarantees its values.
+That gap is worse than no check,
+because the type now looks like it guarantees its values.
 
-A frozen data class has no equivalent hole because its replacement
-goes through the constructor. `copy.replace()` calls the constructor,
+A frozen data class checks every replacement.
+On a frozen data class, `copy.replace()` calls the constructor,
 the constructor calls `__post_init__()`, and the check runs.
 
 </details>
@@ -488,12 +491,11 @@ expect(TypeFailure, from_json, bad_json)
 ```
 
 **Let the field types validate.**
-`from_json()` does not validate the email string. It hands the raw
-JSON value straight to `EmailAddress(...)`, and `EmailAddress`'s own
+`from_json()` leaves the email check to `EmailAddress`. It passes the raw
+JSON value to `EmailAddress(...)`, and `EmailAddress`'s own
 `__post_init__()` runs the same check it runs for any other caller.
 One check, inside `EmailAddress`, protects every path that constructs
-a `Person`. The path from untrusted JSON input is one of those, with
-no additional code in `from_json()`.
+a `Person`, and the path from untrusted JSON input is one of those.
 
 </details>
 </details>
@@ -594,11 +596,11 @@ keyword changes. This implementation recovers the constructor
 arguments (`{"number": self.number}`), uses `|` to override the
 arguments the changes name, and rebuilds through `type(self)(...)`.
 
-**Validate the replacement.** The validation runs
-because the rebuild goes through `__init__()`. A frozen data class
-stays validated across a replacement for the same reason. Any
-`__replace__()` that copies `__dict__` into a new object, the way
-`copy.copy()` does, skips the check.
+**Validate the replacement.**
+The rebuild goes through `__init__()`, so the validation runs.
+A frozen data class stays validated across a replacement for the same reason.
+A `__replace__()` skips the check if it copies `__dict__` into a new
+object, the way `copy.copy()` does.
 
 </details>
 </details>
@@ -617,8 +619,8 @@ stays validated across a replacement for the same reason. Any
 <summary>Where to look</summary>
 
 [A Real `ClassVar`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar) shows how `@dataclass` treats an annotation marked `ClassVar`.
-It skips that name when it builds the fields and the `__init__()` parameters, so check `fields()` and `inspect.signature()`.
-For the frozen question, compare the target of `Stars.built += 1` with the target of `self.built += 1`, and ask which of the two [`frozen=True`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#immutability) guards.
+`@dataclass` skips that name when it builds the fields and the `__init__()` parameters, so check `fields()` and `inspect.signature()`.
+For the frozen question, compare the target of `Stars.built += 1` with the target of `self.built += 1`, and ask which of the two targets [`frozen=True`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#immutability) guards.
 
 <details>
 <summary>The shape</summary>
@@ -725,14 +727,14 @@ reports and the one parameter that the generated signature takes.
 an instance. `Stars.built += 1` assigns to the class instead, so it
 works.
 
-**Show the instance store failing.** `Wrong` writes the same intent a
-different way, and fails. `self.built += 1` reads the class attribute,
+**Show the instance store failing.** `Wrong` tries the same increment
+through `self` and fails. `self.built += 1` reads the class attribute,
 adds one, and then tries to store the result on the instance. That
 store is the assignment `frozen=True` refuses.
 
-The type checker rejects `self.built += 1` before the program runs,
-reporting `built` as read-only on a frozen instance, so the listing
-carries a `# type: ignore` to demonstrate the runtime failure.
+The type checker rejects `self.built += 1` before the program runs
+and reports `built` as read-only on a frozen instance.
+The listing carries a `# type: ignore` so it can demonstrate the runtime failure.
 
 </details>
 </details>
@@ -832,18 +834,22 @@ print(Bare().index, Subscripted().index)
 unhashable object, and raises a `ValueError` naming the fix.
 
 **Fix it with a bare factory.**
-`Bare` and `Subscripted` both work, and they differ in what `ty`
-sees. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
-that satisfies any annotation, so `ty` does not compare the factory
-against the field. Checkers differ here. Pyright compares the
-bare factory and rejects a mismatched one.
+`Bare` and `Subscripted` both work.
+They differ in what `ty` verifies.
+`ty` infers `Unknown` for `field(default_factory=dict)`.
+`Unknown` satisfies any annotation,
+so `ty` accepts the bare factory whatever the field's annotation says.
+Pyright, by contrast, checks the bare factory against the annotation
+and rejects a mismatched one.
 
 **Give the checker a return type.**
-`dict[str, Month]` is callable too, and its return type is concrete, so
-`field(default_factory=dict[int, int])` on this field draws a type
-error before the program runs. The bare form is fine where a reader
-can see that the factory and the annotation agree. Subscript the
-factory when you want the checker to confirm the agreement.
+`dict[str, Month]` is callable too, and its return type is concrete.
+The type checker therefore reports `field(default_factory=dict[int, int])` on
+this field as an error before the program runs.
+
+The bare form is fine where a reader
+can see that the factory and the annotation agree.
+Subscript the factory when you want the checker to confirm the agreement.
 
 </details>
 </details>
@@ -860,7 +866,7 @@ factory when you want the checker to confirm the agreement.
 <details>
 <summary>Where to look</summary>
 
-[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows `Stars(5.5)` passing because Python does not enforce the annotation at runtime.
+[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows `Stars(5.5)` passing because Python ignores the annotation at runtime.
 Add a type test as the first call to `check()` in `__post_init__()`, before the range comparison.
 For `True`, consider how `bool` relates to `int`,
 and compare the class of the value with `int`
@@ -897,12 +903,12 @@ class Stars:
 <details>
 <summary>Solution</summary>
 
-If you write the type test as `isinstance(self.number, int)`,
-the test [The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows for a type built at a JSON boundary,
+[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) tests `isinstance(self.number, int)` for a type built at a JSON boundary.
+If you write the type test that way,
 `Stars(5.5)` and `Stars("five")` raise a `TypeFailure`,
 but `Stars(True)` builds `Stars(number=True)`.
 The demo loop then stops with an `AssertionError`,
-because `expect()` finds no exception to report.
+which `expect()` raises when the call it makes returns normally.
 The solution compares the class of the value with `int`,
 a test that a `bool` fails.
 
@@ -948,21 +954,22 @@ print(issubclass(bool, int), isinstance(True, int))
 
 **Test the exact class.**
 `bool` is a subclass of `int`, so `isinstance(True, int)` is `True`
-and an `isinstance()` test admits `True` as the rating 1.
+and an `isinstance()` test accepts `True` as the rating 1.
 `type(self.number) is int` compares the class of the value with `int`
 and rejects a `bool` along with a `float` and a `str`.
 
 **Test the type before the range.** The type test runs first. Comparing `"five"` with `1` raises a
-`TypeError`, so with the range check first a `str` ends in that
+`TypeError`, so if the range check ran first, a `str` would end in that
 `TypeError` instead of a `TypeFailure`.
 
 **Feed values the checker refuses.** The type checker rejects `5.5`
-and `"five"` as arguments before the program runs, and the
-`# type: ignore` silences that report so the listing can show what the
-constructor does with each value at runtime. The type checker accepts
-`Stars(True)`. A `bool` is an `int` to the checker for the same
-subclass reason, so the runtime test is the one check that rejects
-`True`.
+and `"five"` as arguments before the program runs.
+The `# type: ignore` silences that report so the listing can show what the
+constructor does with each value at runtime.
+
+The type checker accepts `Stars(True)`,
+because a `bool` is an `int` to the checker for the same subclass reason.
+The runtime test is therefore the one check that rejects `True`.
 
 </details>
 </details>
