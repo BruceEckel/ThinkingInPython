@@ -652,8 +652,8 @@ supplied by `gather()` in the async one.
 > Each responder returns a [`Result`](../../Chapters/42_Functional--Error_Handling.md#a-result-type)
 > from `utils/result.py`,
 > and `announce()` returns the `Err` values it collects.
-> Write an adapter that lets a responder returning `None`,
-> such as `received.append`, be connected.
+> Write an adapter that lets you connect a responder returning `None`,
+> such as `received.append`.
 > Write a test in which the first responder fails and the second still records its notification.
 
 <details>

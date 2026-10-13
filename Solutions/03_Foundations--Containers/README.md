@@ -396,7 +396,7 @@ set version commutes.
 > Using one unpacking assignment each, and no indexing,
 > pull the first element, the last element,
 > and everything in between out of `row = [1, 2, 3, 4, 5]`.
-> Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` does not.
+> Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` succeeds.
 
 <details>
 <summary>Where to look</summary>

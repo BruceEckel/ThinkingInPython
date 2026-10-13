@@ -204,7 +204,7 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 > Create a simple copy-on-write list.
 > Its `share()` returns a second list over the same data and increments a reference count.
 > The first `append()` through a shared list copies the data before changing it.
-> Confirm that the two lists share their data before the write and not after it.
+> Confirm that the two lists share their data before the write and hold separate copies after it.
 
 <details>
 <summary>Where to look</summary>
@@ -578,7 +578,7 @@ each loan of the connection.
 
 ## 6. Forwarding `__len__()` explicitly
 
-> `dunder_bypass.py`'s `Proxy` cannot answer `len(p)`.
+> `len(p)` raises a `TypeError` on `dunder_bypass.py`'s `Proxy`.
 > Give that `Proxy` a `__len__()` that forwards to the implementation,
 > and confirm `len(p)` returns 2.
 > Then explain why `__getattr__()` could not have supplied it.

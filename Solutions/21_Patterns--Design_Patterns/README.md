@@ -154,7 +154,7 @@ what keep changing.
 
 > Take a pattern you know from another language and list its parts:
 > the classes, the interfaces, and the methods its usual form requires.
-> Cross out every part Python supplies without your writing it.
+> Cross out every part Python supplies for you.
 > Describe what remains in one sentence.
 
 <details>

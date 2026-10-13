@@ -3,7 +3,7 @@
 ## 1. A fourth module, imported three ways
 
 > Add a fourth module, `a_package/module5.py`,
-> with its own `function5()` and a top-level `print()` so the module announces itself when it loads.
+> with its own `function5()` and a top-level `print()` so the module prints a message when it loads.
 > Import it three ways, using `import a_package.module5`,
 > `from a_package import module5`,
 > and `from a_package.module5 import function5`,
@@ -316,8 +316,7 @@ an import and its file cannot differ in case.
 ## 5. Absolute imports and running a package module as a script
 
 > Change `a_package/module4.py` to the absolute import `from a_package.module1 import function1` and confirm `use_module4.py` still works.
-> Then run `python a_package/module4.py` directly,
-> both before and after the change.
+> Then run `python a_package/module4.py`, both before and after the change.
 > Both fail, with different errors: explain each,
 > and say why `python -m a_package.module4` works either way.
 

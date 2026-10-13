@@ -153,7 +153,7 @@ down different paths. Here they cannot.
 ## 4. An exception that escapes the handler
 
 > In `demonstrate_exceptions.py`, add a call `divide_and_report(1, "x")`
-> (a `TypeError` that `except ValueError` does not catch).
+> (the division raises a `TypeError`, which `except ValueError` lets through).
 > Run it and read the traceback that escapes.
 
 <details>

@@ -258,7 +258,7 @@ sides, so it rejects `"@x.com"` and `"b@"`.
 > a `_Stars(NamedTuple)` holding the field,
 > and a `Stars(_Stars)` whose `__new__()` runs the check.
 > Show that `Stars(11)` now raises a `TypeFailure` while `copy.replace(Stars(5), number=99)` does not,
-> and explain why a frozen data class has no equivalent hole.
+> and explain why `copy.replace()` on a frozen data class runs the check.
 
 <details>
 <summary>Where to look</summary>
@@ -607,7 +607,7 @@ stays validated across a replacement for the same reason. Any
 ## 6. A `ClassVar` counter on a frozen `Stars`
 
 > Add a `ClassVar[int]` counter to `Stars` that counts every `Stars` created.
-> Predict whether it appears in the generated `__init__()`'s parameter list before you run it,
+> Predict whether the counter appears in the generated `__init__()`'s parameter list,
 > then check by printing `inspect.signature(Stars.__init__)`.
 > Incrementing the counter as `Stars.built += 1` from `__post_init__()` works on a frozen class,
 > while `self.built += 1` does not.

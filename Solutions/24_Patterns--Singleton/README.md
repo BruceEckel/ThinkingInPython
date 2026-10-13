@@ -232,7 +232,7 @@ yields one `ConnectionPool` object (`p1 is p2`), the same technique
 
 ## 3. A class-based singleton rewritten as a module
 
-> Rewrite one of the class-based singletons above as a module,
+> Rewrite one of this chapter's class-based singletons as a module,
 > and argue which you would use in real code.
 
 <details>

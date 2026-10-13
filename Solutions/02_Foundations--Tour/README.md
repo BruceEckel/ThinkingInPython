@@ -4,7 +4,7 @@
 
 > In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
 > Print `a` and `c` and confirm that `c` changed and `a` still holds `[1, 2, 3, 4]`,
-> then explain why `b.append(4)` earlier did change what `a` sees,
+> then explain why `b.append(4)` earlier changed the list bound to `a`,
 > but appending to `c` does not.
 
 <details>
@@ -45,7 +45,7 @@ Assignment does not.
 ## 2. Truthiness of empty and non-empty containers
 
 > In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
-> Predict what `bool()` reports for each before running it,
+> Predict what `bool()` reports for each before running `truthiness.py`,
 > then check your prediction.
 
 <details>
@@ -122,7 +122,7 @@ and its value, so a quick debugging print needs no separate
 > Every version runs.
 > Using [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions),
 > say what each form signals to a reader who did not write the code,
-> and which of the three a linter flags.
+> and which of the three a linter reports.
 
 <details>
 <summary>Where to look</summary>

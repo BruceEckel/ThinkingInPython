@@ -8,7 +8,7 @@ The classic form is a class that refuses a second instance.
 Before writing one, ask whether the language solves the problem for you,
 the question [When a Pattern Dissolves](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 poses for every pattern.
-For *Singleton*, the language already has an answer.
+For *Singleton*, the language has an answer.
 
 ## A Module Is Already a Singleton
 
@@ -21,8 +21,8 @@ and every importer shares it.
 
 One interpreter, not one machine.
 A process pool or an [`InterpreterPoolExecutor`](19_Techniques--Concurrency.md#subinterpreters)
-gives each worker its own `sys.modules`,
-so each builds its own copy and a write in one is invisible to the rest.
+gives each worker its own `sys.modules`, so each worker builds its own copy.
+A write in one copy leaves the other copies unchanged.
 A singleton is single within the interpreter that holds it,
 and every form in this chapter, the module included, has that limit.
 
@@ -47,17 +47,18 @@ print(config is again is sys.modules["config"])
 
 Two imports of `config`, but `config body runs` prints once.
 The first import of `config` (`[1]`)
-creates a new module object and files it in `sys.modules` under the name `config`.
+creates a new module object and stores it in `sys.modules` under the name `config`.
 Then Python runs `config.py` top to bottom,
 defining each module-level name in that module object.
 The second import (`[2]`) finds the entry and runs nothing,
 so the body runs once and builds one `settings` dict.
 The printed `True` shows that both names and the `sys.modules` entry are one object.
-That is the singleton: not a rule a class enforces,
+The singleton here is not a rule a class enforces,
 but a lookup the import system performs.
 
-Every import of `settings`, from anywhere, hands back that same `dict`.
-Mutating it through one import is visible through every other:
+Every import of `settings`, from anywhere,
+binds the importer's name to that same `dict`.
+Mutating that `dict` through one import is visible through every other:
 
 ```python
 # shared_config.py
@@ -87,16 +88,17 @@ Rebinding is the mistake that quietly ends it.
 `from config import settings` gives your module its own name for the same `dict` object named by `config.settings`.
 Mutating through your name, `settings["theme"] = "dark"`,
 changes that shared object, so every module sees it.
-But `settings = {}` in your module rebinds only your module's name,
-and the two modules silently diverge.
+But `settings = {}` in your module rebinds your module's name,
+and your module and `config` silently diverge.
 `config.settings` still holds the old dict,
-while your code now talks to a private one.
+while your module's name now refers to a new, unshared dict.
 
 To replace the whole value, go through the module: `import config`,
 then `config.settings = {...}`.
-That rebinding reaches the code that reads `config.settings`.
-A module that ran `from config import settings` earlier keeps its name on the old dict,
-so when such modules exist,
+Code that reads `config.settings` then gets the new dict.
+In a module that ran `from config import settings` earlier,
+that module's `settings` still refers to the old dict.
+When such modules exist,
 replace the contents in place with `settings.clear()` and `settings.update()`.
 Mutate through any name.
 Rebind only through the module.
@@ -114,17 +116,18 @@ A module's state is a set of loose names.
 When the shared state has fields and methods that belong together,
 or other code needs a type to name in an annotation, you need a class.
 Every construction should then return the same object.
-The simplest approach hides construction behind a cached factory:
-`functools.cache` applied to a *constructor function*,
-an ordinary function that builds and returns an instance of a class.
-The constructor function stands in for a direct call to the class constructor.
+
+The simplest approach hides construction behind a cached factory,
+which applies `functools.cache` to a *constructor function*.
+A constructor function is an ordinary function that builds and returns an instance of a class,
+and it stands in for a direct call to the class constructor.
 
 [`functools.cache`](18_Techniques--Performance.md#caching)
 *memoizes* a function.
 The first call with a given set of arguments runs the function and stores the result.
 Every repeat call with those arguments returns the stored result.
-A constructor function with no arguments has only one possible call,
-so caching it constructs the instance once and returns that same object forever:
+A constructor function with no parameters has only one possible call,
+so caching it constructs the instance once and returns that same object on every later call:
 
 ```python
 # singleton_cached_factory.py
@@ -147,7 +150,7 @@ print(b)
 #: Settings(data={'theme': 'dark'})
 ```
 
-Giving the constructor function a parameter breaks the guarantee.
+A constructor function with a parameter can return more than one instance.
 `functools.cache` keys its cache on the arguments,
 so each distinct set of arguments gets its own entry and its own instance:
 
@@ -171,23 +174,24 @@ print(len({id(settings()), id(settings("prod")),
 
 One parameter turns "one singleton" into one singleton per argument value.
 A default does not help.
-The cache keys on the arguments as the call writes them and does not fill in a default,
-so the three calls in the listing build three objects for one environment.
+The cache keys on the arguments as the call writes them,
+before Python fills in any default.
+The three calls in the listing therefore build three objects for one environment.
 Keep the constructor function's signature empty,
 or accept that you built a cache, not a singleton.
 
 ### Nothing Keeps the Class Private
 
-Nothing stops a caller from writing `Settings()` and getting a second instance.
-Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
-and that marking is as far as Python goes.
+A caller can write `Settings()` and get a second instance.
+Naming the class `_Settings` marks it internal and keeps it out of `from module import *`.
+Python enforces nothing more.
 
-A second underscore adds no strength.
+A second underscore adds no protection.
 The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 names only inside a class body,
-so at module level `__Settings` keeps its name unmangled,
+so at module level `__Settings` keeps its name as written,
 as reachable as any other.
-The second underscore's one effect is a trap.
+The second underscore has one effect, and that effect is a failure.
 In code inside a class body,
 the compiler rewrites a reference to `m.__Settings` into a lookup for `m._TheClass__Settings`,
 and that lookup fails.
@@ -197,20 +201,20 @@ because the name is public.
 `settings()` returns a `Settings`,
 so the class appears in the module's public signature.
 A caller who annotates the result must write that name,
-and a type outsiders must name is not private, whatever its first character.
+and a type outsiders must name is public, whatever its first character.
 `_Settings` fits a type that stays inside the module.
 
 Two stronger-looking moves fail the same way.
 Deleting the name after building the instance leaves the class reachable.
-`type(settings())` hands the class back.
-Defining the class inside `settings()` leaves the module no name for it,
-since `@cache` runs that body once and the class lives in the function's locals.
+`type(settings())` returns the class.
+Defining the class inside `settings()` puts its name in the function's locals,
+and `@cache` runs that body once.
 `type(settings())` still recovers the class.
 
 Nesting also breaks the return annotation.
 `def settings() -> Settings` still parses and runs,
-because an annotation evaluates only when something reads it,
-so a clean run proves nothing about the name.
+because an annotation evaluates only when something reads it.
+A clean run therefore proves nothing about the name.
 Whatever reads the annotation searches the scope containing the function,
 while the class lives in the function's own locals.
 A type checker reports an unresolved reference,
@@ -219,11 +223,11 @@ The signature must name something reachable,
 so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to name in its place.
 
 Privacy in Python is advice, not enforcement.
-An underscore asks callers to stay out, and nothing makes them.
+An underscore marks a name as internal, and Python lets any caller use it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
 makes the same case about hidden data.
-The reachable class is also useful when a test needs a fresh,
-uncached `Settings`.
+The reachable class is also useful when a test needs a fresh `Settings`,
+built outside the cache.
 
 ### Tests, Threads, and Locks
 
@@ -231,29 +235,31 @@ uncached `Settings`.
    The cached factory offers a reset the classic forms lack.
    `settings.cache_clear()` discards the instance, so each test can start fresh.
 
-2. Every lazy singleton faces a first-call race under threads.
+2. Every lazy singleton has a first-call race under threads.
    Concurrent first calls can each run the constructor,
    and each caller can end up holding a different object.
    The cache keeps one of those objects.
    With a constructor slow enough to widen that race,
-   eight threads calling `settings()` at once usually run the constructor eight times and hand back eight different objects.
+   eight threads calling `settings()` at once usually run the constructor eight times and return eight different objects.
    When threads can arrive before the singleton exists,
    create it eagerly instead.
    Call `settings()` once at import time, or use the module form,
-   which the import system builds exactly once.
+   which the import system builds once.
 
 3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
-   is the other fix for that race, but not in the obvious place.
+   is the other fix for that race.
+   Where the lock goes matters.
    A `threading.Lock` around the cached function's body changes nothing,
    because every thread misses the cache before reaching the lock.
-   They serialize, each still builds an object,
+   The threads serialize, but each still builds an object,
    and the cache keeps whichever finished last.
    The check must run inside the lock, as `singleton_locked_settings.py` shows.
 
 ### The First-Call Race
 
 The first-call race is easy to see with a wide enough window.
-The three race listings in this chapter share a slow `Settings` and a `distinct_objects()` helper that calls a factory from eight threads at once and counts the distinct objects they get back:
+The three race listings in this chapter share a slow `Settings` and a `distinct_objects()` helper.
+The helper calls a factory from eight threads at once and counts the distinct objects they get back:
 
 ```python
 # race_settings.py
@@ -277,8 +283,8 @@ def distinct_objects(factory: Callable[[], object]) -> int:
 
 The sleep stands in for a constructor that does real work,
 such as opening a file or a connection.
-Without the sleep, the cached version below showed no duplicates across twenty trials,
-and that silence is the more dangerous case.
+Without the sleep, the cached version below returned one object in each of twenty trials.
+A race that testing misses is the more dangerous case.
 A window too narrow to reproduce is still a window.
 
 ```python
@@ -296,17 +302,18 @@ print(distinct_objects(settings) > 1)
 
 Eight threads, more than one object.
 Every thread checks the cache before any of them has filled it,
-so each runs the constructor and hands its caller a different object.
-Only the object from the last thread to finish stays in the cache.
-The other seven are already in the hands of their callers.
+so each runs the constructor and returns a different object to its caller.
+The object from the last thread to finish stays in the cache.
+The other seven stay with the callers that received them.
 
 The listing prints a comparison instead of the count because the count depends on timing.
 The count is eight when every thread misses the cache,
-and the sleep makes that the usual result without guaranteeing it.
+and the sleep makes that result likely.
 
 The fix puts the check inside a lock.
-`@cache` keeps its check out of reach,
-so the version below drops `@cache` and writes the check by hand:
+`@cache` runs its check inside its own wrapper,
+where your code cannot put a lock around it.
+Here, the locked version drops `@cache` and writes the check by hand:
 
 ```python
 # singleton_locked_settings.py
@@ -344,8 +351,8 @@ although acquiring and releasing changes that lock's state,
 from unlocked to locked and back.
 Changing an object is not rebinding a name.
 `_instance` differs because the function assigns to it.
-Python decides at compile time that a name a function assigns anywhere is local everywhere in that function,
-so without the `global` declaration,
+Python decides at compile time that a name a function assigns anywhere is local everywhere in that function.
+Without the `global` declaration,
 `if _instance is None` reads an unassigned local and raises an `UnboundLocalError`.
 Mutate through any name.
 Declare only what you rebind.
@@ -380,16 +387,19 @@ print(distinct_objects(settings))
 #: 1
 ```
 
-The inner test (`[2]`) is the one note 3 requires.
+The inner test (`[2]`)
+is the check inside the lock from `singleton_locked_settings.py`.
 The outer test (`[1]`) exists to skip the lock once the object is there.
+
 Double-checked locking works, but it depends on two details.
 If you drop the inner test,
 every thread that passed the outer test before the first assignment builds its own object,
 one after another.
 And the assignment to `_instance` must be the last step of construction.
-The outer test runs without the lock,
+The outer test runs outside the lock,
 so a thread can read `_instance` while another thread is still inside the `with` block.
-A version that assigns `_instance = Settings()` and then fills in `data` hands that reader a half-built object.
+In a version that assigns `_instance = Settings()` and then fills in `data`,
+that reader's `settings()` returns a half-built object.
 Skipping one lock acquisition per call rarely justifies two details that must both stay right.
 
 Eager creation is a better answer when you can build the object at import time:
@@ -432,17 +442,17 @@ Its class blocks direct construction and hands out the sole instance through a c
 The cached factory's `settings()` is that operation written as a function.
 Python [cannot block construction](#nothing-keeps-the-class-private),
 so the class-based forms here keep the constructor public and route every construction to the same shared state.
-Each does more work than the module or the cached factory above.
+Each does more work than a module or a cached factory.
 
 The first form wraps a single instance of a private nested class.
 The second form keeps the instance in a class variable.
-*Borg* trades one object for one shared set of state,
-and the last form is a class decorator.
+*Borg* replaces the one object with many objects that share one set of state.
+The last form is a class decorator.
 
 ### Lazy Creation
 
 The classic approach is *lazy*: it builds the inner object on the first call,
-and that is why it needs the `None` sentinel and the `if` guard.
+so it needs the `None` sentinel and the `if` guard.
 
 ```python
 # singleton_pattern.py
@@ -480,19 +490,23 @@ print(x is y, x.instance is y.instance is z.instance)
 
 Because the inner class's name starts with a double underscore,
 the compiler mangles it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body.
-`OnlyOne.__OnlyOne`, written from outside the class,
-asks for an attribute that does not exist under that name,
-so it fails at runtime with an `AttributeError`, not at type-checking time.
+Code outside the class that writes `OnlyOne.__OnlyOne` asks for `__OnlyOne`,
+while the class stores the attribute as `_OnlyOne__OnlyOne`.
+That lookup fails at runtime with an `AttributeError`,
+not at type-checking time.
 
 The outer class controls creation through its constructor.
 The first construction of an `OnlyOne` initializes `instance`.
-Every later one reuses that inner object,
-and each construction appends its argument to that object's shared list.
+Every later construction reuses that inner object.
+Each construction, the first included,
+appends its argument to that object's shared list.
+
 `__getattr__()` delegates access.
 Python calls it only when ordinary attribute lookup fails,
 so a name the wrapper does not have, such as `val`,
 falls through to the inner object.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
+
 The proxying covers reads.
 An assignment such as `x.val = []` goes into the wrapper's own `__dict__`.
 The shared list stays as it was,
@@ -501,10 +515,11 @@ and later reads of `x.val` find the wrapper's copy.
 adds the `__setattr__()` that forwards assignments.
 
 `__getattr__()` returns `Any`, and that `Any` stays.
-`instance` is one declared field and can say `__OnlyOne | None`,
-while `__getattr__()` answers for every name Python fails to find on the wrapper,
-so its return type is whatever the inner object holds under that name,
-an open set no annotation can list.
+`instance` is one declared field, so its annotation can say `__OnlyOne | None`.
+Python calls `__getattr__()` for every name it fails to find on the wrapper,
+an open set of names.
+The method's return type is whatever the inner object holds under each name,
+so `Any` is the one annotation that fits.
 Delegation gives up static knowledge to forward every name,
 as it does throughout [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr).
 
@@ -513,8 +528,9 @@ When the inner object needs nothing from that first call,
 you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Eager creation removes the sentinel, the guard,
-and the first-call race the cached factory meets under threads,
-and builds the object whether or not anything uses it (see exercise 1).
+and the first-call race that the cached factory has under threads.
+The class then builds the object whether or not anything uses it
+(see exercise 1).
 (The bare `__OnlyOne()` works because the nested class exists at that point in the body.
 The qualified `OnlyOne.__OnlyOne()` fails,
 since the name `OnlyOne` stays unbound until its own class body finishes running.)
@@ -524,9 +540,9 @@ Either way, `OnlyOne` is a lot of code for what a module does on its own.
 ### One Instance in a Class Variable
 
 The nested private class is optional.
-Here the class keeps the single instance in a class variable.
-`__new__()`, the method that creates an instance,
-builds it when needed and returns it as the result of every construction:
+`SingletonClassVar` keeps the single instance in a class variable instead.
+`__new__()` is the method that creates an instance.
+Here it builds the single instance on the first construction and returns that instance from every construction:
 
 ```python
 # singleton_class_variable.py
@@ -551,16 +567,17 @@ print(x.val, x is y is z, isinstance(x, SingletonClassVar))
 #: ['sausage', 'eggs', 'spam'] True True
 ```
 
-`object.__new__(cls)` builds a `SingletonClassVar`,
-so every construction hands back that same instance and `isinstance()` reports `True`.
-Python honors whatever object `__new__()` returns,
-and that return value decides whether `__init__()` runs.
+`object.__new__(cls)` builds a real `SingletonClassVar`,
+so `isinstance()` reports `True` for the instance every construction hands back.
+Python uses whatever object `__new__()` returns as the result of the construction.
+The type of that object determines whether `__init__()` runs.
 When `__new__()` returns an instance of the class under construction,
-Python runs `__init__()` on it,
-so a singleton `__new__()` triggers `__init__()` on the shared instance after *every* construction
+Python runs `__init__()` on it.
+A `__new__()` that returns some other object skips `__init__()` and fails `isinstance()` as well.
+A singleton `__new__()` returns an instance of the class on every construction,
+so Python runs `__init__()` on the shared instance after *every* construction
 (see exercise 7).
 `SingletonClassVar` defines no `__init__()`, so `__new__()` does all the work.
-A `__new__()` that returns some other object skips `__init__()` and fails `isinstance()` as well.
 
 ### Borg: Singleton by Inheritance
 
@@ -607,31 +624,32 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 ```
 
 `Singleton` writes its `__init__()` by hand, and it cannot be a `@dataclass`.
-The sharing depends on `super().__init__()` rebinding `self.__dict__` to `_shared_state`,
-and a dataclass generates its own `__init__()` that assigns the fields and [skips the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
+The sharing depends on `super().__init__()` rebinding `self.__dict__` to `_shared_state`.
+A dataclass generates its own `__init__()`,
+which assigns the fields and [skips the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.
 The dataclass version still runs,
 but the class has quietly stopped being a `Borg`.
 A `__post_init__()` that does the rebinding fails differently.
 It runs after `__init__()` has assigned the fields,
 so the rebinding discards them, and reading `val` raises an `AttributeError`.
-The hand-written `__init__()` makes the sharing work,
-and silently losing the sharing is worse than failing outright.
+Silently losing the sharing is worse than failing outright.
+The hand-written `__init__()` keeps the sharing.
 
-The sharing also reaches further than it looks.
-`_shared_state` is one dict on `Borg`, so every subclass shares it,
-not merely every instance of a single subclass.
+The sharing also spans subclasses.
+`_shared_state` is one dict on `Borg`,
+so every instance of every subclass shares it.
 A second subclass alongside `Singleton` writes into the same dict,
 so constructing one of each leaves both objects reading the value set last.
 A subclass that needs storage of its own declares it:
 `class Singleton(Borg): _shared_state: ClassVar[dict[str, Any]] = {}`.
-The lookup through `self` finds the subclass's dict first,
-and Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
+The lookup through `self` finds the subclass's dict first.
+Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
 
-`test_borg_shares_state_but_not_identity` confirms that the objects differ but share one set of state.
 *Borg* has no `cache_clear()`,
-so whatever one test leaves in `_shared_state` is still there for the next.
-A pytest fixture closes that gap by clearing the dict before each test.
+so whatever one test leaves in `_shared_state` stays there for the next.
+A pytest fixture that clears the dict before each test gives every test empty shared state.
+`test_borg_shares_state_but_not_identity` confirms that the objects differ but share one set of state.
 `test_leaves_an_attribute_behind` writes an attribute into the shared dict,
 and `test_fixture_clears_shared_state` confirms that the next test finds it gone:
 
@@ -705,7 +723,7 @@ and the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
 After decoration, `type(Registry)` is `singleton`,
 so the same parentheses run `singleton.__call__()` instead,
-and the wrapped class's constructor runs only when that method decides to call it.
+and the wrapped class's constructor runs only when that method calls it.
 `__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
 so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 
@@ -728,9 +746,10 @@ print(first is second, second.name,
 ```
 
 Only the first call constructs a `Registry`.
-Every later constructor call returns the cached instance and discards the constructor arguments,
-which appear once in the trace, on the `singleton.__call__()` line.
-`Registry("secondary", limit=99)` creates no new object.
+Every later constructor call returns the cached instance,
+so `Registry("secondary", limit=99)` creates no new object.
+Its arguments appear once in the trace, on the `singleton.__call__()` line,
+and `__call__()` discards them.
 A caller who believes those arguments took effect holds an object configured by someone else.
 
 `isinstance()` requires a class, a tuple of classes,
@@ -758,12 +777,13 @@ def test_subclassing_the_decorated_name_raises() -> None:
 
 `ty` and Pyright reject `Sub` statically.
 Its base has type `singleton`, not a class.
-Under mypy, which does not apply a class decorator's return type,
+Under mypy, which ignores a class decorator's return type,
 `Registry` is still a class and `Sub` passes.
 
 At runtime the `class` statement raises a `TypeError`.
-`singleton.__init__()` takes two positional arguments and receives four,
-because a class statement hands the name, bases, and namespace to its metaclass,
+`singleton.__init__()` takes two positional arguments and receives four.
+A class statement hands the name, bases,
+and namespace to its [metaclass](17_Techniques--Metaprogramming.md#writing-a-metaclass),
 and Python takes that metaclass from the type of the base, which is `singleton`.
 Nothing in `class Sub(Registry)` mentions `singleton`,
 so the error names a class that does not appear in the failing line.
@@ -783,18 +803,18 @@ A metaclass can also intercept construction.
 shows that singleton.
 Its metaclass overrides `__call__()`,
 and that override skips `__new__()` and `__init__()` on every later construction,
-so the first call's arguments win.
+so only the first call's arguments reach the constructor.
 In a class that overrides `__new__()` instead,
-as `singleton_class_variable.py` does, `__new__()` still runs on every call,
-unlike the metaclass form.
+as `singleton_class_variable.py` does, `__new__()` still runs on every call.
 That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call,
-so each later argument joins the shared list instead of being discarded.
+so each later argument joins the shared list,
+where the metaclass form would discard it.
 
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
 the simpler methods that replace most metaclasses.
 A singleton needs none of this machinery,
-since a module or a cached factory gives you one instance without intercepting construction.
+since a module or a cached factory gives you one instance and leaves construction alone.
 
 ## Which Should You Use?
 
@@ -806,7 +826,7 @@ Use the lightest tool that fits:
   or override `__new__()` as `singleton_class_variable.py` does.
   Both create the instance on the first call,
   so under threads build it once at import time or use the module form.
-- If you really want many handles sharing one set of state, use *Borg*,
+- If you want many handles sharing one set of state, use *Borg*,
   but only when something needs those handles to be objects:
   an existing class-based interface, an `isinstance()` check, or subclassing.
   A module shares that state with every importer and needs no class,
@@ -816,7 +836,8 @@ Use the lightest tool that fits:
 
 The elaborate *GoF Design Patterns* singleton is largely a workaround for languages where a module is not a first-class,
 single-instance namespace.
-In Python, a module is that single instance, so most of the ceremony falls away.
+In Python, a module is that single instance,
+so most of that ceremony is unnecessary.
 
 ## Exercises
 
@@ -833,7 +854,7 @@ Try each exercise before opening its [solution](../Solutions/24_Patterns--Single
     create a factory that manages a pool holding a set number of objects
     (say, database connections) and hands them out,
     rather than a single instance.
-3.  Rewrite one of the class-based singletons above as a module,
+3.  Rewrite one of this chapter's class-based singletons as a module,
     and argue which you would use in real code.
 4.  In `shared_config.py`, replace the mutation with a rebinding,
     `settings = {"theme": "dark"}`,

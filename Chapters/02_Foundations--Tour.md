@@ -24,7 +24,7 @@ shell scripts, and simple programs with Python scripts.
 
 ## How to Read the Examples
 
-The `#` denotes a comment that goes until the end of the line,
+The `#` starts a comment that runs to the end of the line,
 just like C++ and Java `//` comments.
 [The Examples](01_Introduction.md#the-examples)
 explains the filename comment on a listing's first line and the `#:` output markers.
@@ -33,8 +33,9 @@ explains the filename comment on a listing's first line and the `#:` output mark
 
 Python is clean to write.
 Your own code stays easy to read long after you've written it.
-Indentation determines how statements group into blocks.
-This script runs with `python if.py`:
+Part of that readability comes from indentation,
+which determines how statements group into blocks.
+Here, the script runs with `python if.py`:
 
 ```python
 # if.py
@@ -58,17 +59,17 @@ A group of indented statements follows: the "then" part of the `if` statement.
 The `print()` function sends its arguments to standard output,
 separated by spaces and followed by a newline.
 The line at `[1]` assigns to a variable named `val`.
-The statement at `[2]` returns to the left margin,
-and that return ends the `if`.
+The statement at `[2]` starts at the left margin again,
+and that change in indentation ends the `if`.
 
-An indented block groups statements without creating a scope, so `val`,
-assigned inside the `if`, stays visible afterward,
-unlike a variable declared inside braces in C++ or Java.
-New scopes come from functions, classes, modules, and comprehensions,
-not from an `if` or a `for` block.
+An indented block groups statements inside the enclosing scope, so `val`,
+assigned inside the `if`, stays visible afterward.
+In C++ or Java, a variable declared inside braces goes out of scope at the closing brace.
+In Python, an `if` or a `for` block shares the scope around it.
+New scopes come from functions, classes, modules, and comprehensions.
 
 Python binds a name only when the assignment runs.
-With any answer other than `"yes"`, the `if` skips `val = 1`,
+With `response` set to `"no"`, the `if` skips `val = 1`,
 and `print(val)` raises a `NameError`.
 
 ```python
@@ -84,29 +85,29 @@ except NameError as e:
 #: name 'val' is not defined
 ```
 
-Python skips the body of the `if`, so `val` stays unbound.
+Because Python skips the body of the `if`, `val` stays unbound.
 Indentation shows where the assignment sits, not whether it runs.
 
-The type checker sees that `val = 1` cannot run and reports an error on `print(val)`,
-so `# type: ignore` tells it the mistake is deliberate.
+The type checker infers that `val = 1` cannot run and reports an error on `print(val)`.
+The `# type: ignore` tells it the mistake is deliberate.
 The [`try` and `except`](04_Foundations--Control_Flow.md#errors-and-exceptions)
 catch the exception so the script can print the exception's message and finish.
 
 Blocks can nest, each one indented further than the block that contains it.
-Four spaces per level is the convention,
-and mixing tabs and spaces inconsistently inside one block raises a `TabError`.
+Four spaces per level is the convention.
+Mixing tabs and spaces inconsistently inside one block raises a `TabError`.
 
 C++ and Java programmers debate where braces go.
 In Python the indentation is the structure,
-so the language settles the question and taste plays no part.
-Python code from any two authors therefore lines up the same way,
-and that sameness is one of the main reasons for Python's consistent readability.
+so the language settles the question.
+Python code from any two authors therefore lines up the same way.
+That sameness is one of the main reasons for Python's consistent readability.
 
 A statement ends with its line, so it needs no terminating semicolon.
 A semicolon's one job is to separate two statements that share a line.
 An open parenthesis, bracket,
-or brace keeps the statement going across lines until it closes,
-and the indentation of those continued lines is yours to choose.
+or brace continues the statement across lines until it closes.
+You choose the indentation of those continued lines.
 The longer calls in `tstrings.py` wrap that way.
 
 ## Variables and References
@@ -148,17 +149,18 @@ Use `==` to ask whether two objects have equal values.
 Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
 
-`a[:]` is a *shallow* copy:
-it duplicates the outer list but not the objects inside it.
-`nested` and `shallow` still share the same inner list,
-so `shallow[1].append(99)` changes what `nested` sees too.
+`a[:]` is a *shallow* copy.
+It duplicates the outer list,
+and the copy shares the outer list's inner objects.
+Because `nested` and `shallow` still share the same inner list,
+`shallow[1].append(99)` also changes `nested[1]`.
 The standard library's `copy.deepcopy()` duplicates the inner objects as well.
 
-Numbers, strings, and tuples are *immutable*:
-operations produce new objects rather than changing the original.
+Numbers, strings, and tuples are *immutable*.
+Operations on them produce new objects and leave the original as it was.
 Lists, dictionaries, and sets are *mutable*.
-Mutability decides whether another name sees a change,
-as `a` sees the `4` appended through `b` in `references.py`.
+Mutability decides whether a change made through one name is visible through another,
+as the `4` appended through `b` is visible through `a` in `references.py`.
 
 You can assign several names at once, so a swap needs no temporary:
 
@@ -218,19 +220,20 @@ print(True + True, True == 1)  # A bool is an int
 ```
 
 `round()` breaks a tie to the nearest even value,
-so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`,
-rather than rounding half away from zero as C's `round()` does.
+so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`.
+C's `round()` rounds half away from zero instead.
 The format spec of an [f-string](#f-strings), later in this chapter,
 rounds ties the same way.
 
-A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`,
-and `True + True` is `2`.
+A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
+Arithmetic treats them as numbers too, so `True + True` is `2`.
 
 Python has no `++` or `--`.
 Use `+= 1` and `-= 1`.
-The prefix form still parses, which makes it a trap:
-`++count` applies unary plus twice and leaves `count` unchanged.
+The prefix form parses and runs.
+`++count` applies unary plus twice and leaves `count` at its old value.
 The postfix `count++` is a syntax error.
+
 Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 
@@ -252,7 +255,7 @@ print(alias, items)
 ```
 
 Augmented assignment on a mutable object changes it in place,
-so every other name for it sees the change.
+so every other name bound to that object refers to the changed object.
 For a list, `+=` does what `extend()` does.
 `items = items + [4]` instead builds a new list and rebinds `items` to it,
 which leaves `alias` bound to the old one.
@@ -299,8 +302,8 @@ Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
 The built-in numeric types do not implement it,
 but array libraries such as NumPy do.
-The same character in front of a `def` or a `class` means something else.
-That is [decorator syntax](14_Techniques--Decorators.md).
+In front of a `def` or a `class`,
+the same character marks a [decorator](14_Techniques--Decorators.md).
 
 ## Booleans, None, and Truthiness
 
@@ -310,12 +313,12 @@ It is the default return value of a function that returns nothing.
 You can test any object in a boolean context.
 Numbers are false when zero, containers are false when empty,
 and `None` is always false.
-Everything else is true, unless an object's type says otherwise.
+Everything else is true, unless the object's type defines its own test.
 That rule is *truthiness*,
 and it lets you write `if items:` instead of `if len(items) != 0:`.
-A type says otherwise by defining `__bool__()`.
-Without one, Python falls back to `__len__()`,
-and that fallback is why an empty container is false.
+
+A type defines that test with `__bool__()`.
+Without one, Python falls back to `__len__()`, so an empty container is false.
 
 ```python
 # truthiness.py
@@ -347,18 +350,19 @@ if not items:
 ```
 
 `repr()` returns a value's unambiguous representation,
-so the empty string shows as `''` and not as blank.
+so the empty string appears as a visible `''`.
 `Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`.
 `Bucket(0)` is false and `Bucket(3)` is true.
 
 `Bucket` is a small [class](07_Foundations--Classes.md).
 Its `count: int` and `-> int` are [type hints](08_Foundations--Static_Types.md#type-hints).
-They state the types for the reader and the type checker and change nothing about how the code runs.
+They state the types for the reader and the type checker.
+They change nothing about how the code runs.
 
 Python's logical operators are the words `and`, `or`, and `not`,
 where C and Java write `&&`, `||`, and `!`.
-The bitwise `&` and `|` from `bitwise.py` also accept `bool` values,
-but they bind more tightly than a comparison,
+The bitwise `&` and `|` from `bitwise.py` also accept `bool` values.
+Unlike `and` and `or`, `&` and `|` bind more tightly than a comparison,
 so `x > 0 & y > 0` means `x > (0 & y) > 0`.
 
 `not` always produces a `bool`.
@@ -386,8 +390,9 @@ print(10 if count is None else count)  # Keeps the 0
 so Python skips `items[0]` on the empty list.
 When every operand is truthy, `and` returns the last one,
 so the same expression on a nonempty list yields `items[0]`.
+
 `x or default` is a common way to supply a fallback,
-and it replaces every falsy `x`.
+but it replaces every falsy `x`.
 A legitimate `0` or `""` gets the fallback the same as a missing value does.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
@@ -435,19 +440,19 @@ Examples often include Python-esque references.
 A triple-quoted string can span lines, and it keeps every newline it contains.
 That suits any block of literal text, such as an embedded template, a SQL query,
 or a chunk of HTML.
-You can write it out in full without escaping line breaks.
+You write the text out in full, line breaks and all.
 
-The newline right after the opening quotes and the one before the closing quotes belong to the string too.
+The string also holds the newline right after the opening quotes and the one before the closing quotes.
 So each triple-quoted output in `strings.py` begins and ends with an empty `#:` line.
 
 In an ordinary string, a backslash starts an escape sequence, as in C and Java.
 `\n` is a newline and `\t` is a tab.
-The `r` right before a string means "raw":
-Python takes each backslash literally, as a single character.
+The `r` right before a string means "raw."
+Python takes each backslash in a raw string literally, as a single character.
 Without the `r`, the last literal in `strings.py` is a syntax error.
 `\u` starts a Unicode escape, and `tils` is not the four hex digits it requires.
 A raw string has one limit: it cannot end with a single backslash,
-because a backslash in a raw string still keeps the quote after it from closing the string.
+because a backslash in a raw string still makes the quote after it part of the string's text.
 
 ### Common String Operations
 
@@ -481,12 +486,12 @@ print("notes.txt".removesuffix(".txt"))
 #: notes
 ```
 
-String methods return new values rather than changing the original.
-`replace()` replaces every occurrence, as `XbXbXb` shows;
-an optional third argument caps how many it replaces.
+String methods return new values and leave the original string intact.
+`replace()` replaces every occurrence, as `XbXbXb` shows.
+An optional third argument limits how many it replaces.
 
 `strip()` and its one-sided forms `lstrip()` and `rstrip()` take an optional argument,
-but it is a set of characters, not a prefix or suffix.
+but that argument is a set of characters, not a prefix or suffix.
 `"test_setup".lstrip("test_")` removes every leading `t`, `e`, `s`, and `_`,
 leaving `"up"`.
 To remove one exact piece from an end, use `removeprefix()` or `removesuffix()`.
@@ -541,11 +546,11 @@ A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
 An `=` after the expression, as in `{name = }`, prints the expression's text,
 the `=` with any spaces you put around it, and then the value.
-With no format spec the value appears as its `repr()`,
+By default the value appears as its `repr()`,
 so the output shows `'Alice'` in quotes.
 Use `=` to label values in your own exploring and debugging code.
 
-Existing code also carries two older styles: the `%` operator,
+Existing code also uses two older styles: the `%` operator,
 as in `"val: %d" % val`, and the `str.format()` method,
 as in `"val: {}".format(val)`.
 Both still work.
@@ -556,13 +561,13 @@ F-strings replaced them.
 ### t-Strings {#t-strings}
 
 An f-string produces a finished `str`,
-deciding how each value becomes text before anything else sees it.
-A *t-string* (Python 3.14, [PEP 750](https://peps.python.org/pep-0750/))
-produces a `Template` instead,
-which keeps the literal pieces and the interpolated values apart for a consumer to assemble.
+converting each value to text before any other code receives the `str`.
+A *t-string* produces a `Template` instead.
+The `Template` keeps the literal pieces and the interpolated values apart for a consumer to assemble.
+Python 3.14 added t-strings ([PEP 750](https://peps.python.org/pep-0750/)).
 
 The reason to care is safety.
-A consumer that receives the parts separately knows which text came from the program and which came from a value,
+A consumer receives the literal text and the values as separate pieces,
 so it can quote, escape,
 or reject the values before they become part of the result.
 
@@ -619,35 +624,37 @@ except ValueError as e:
 
 A `Template` stores its two kinds of piece separately.
 `message.strings` holds the literal text,
-with one entry more than `message.interpolations`,
-so a template that opens with a value opens with an empty string,
+with one entry more than `message.interpolations`.
+A template that opens with a value therefore opens with an empty string,
 which prints as `''`.
 `message.interpolations` holds one `Interpolation` per value.
 Each `Interpolation` keeps the value,
-the source text of the expression that produced it, and its format spec,
-and the loop prints those three attributes: `expression`, `value`,
-and `format_spec`.
+the source text of the expression that produced it, and its format spec.
+The `for` loop over `message.interpolations` prints those three attributes:
+`expression`, `value`, and `format_spec`.
 
 Iterating over a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation`.
 Iteration skips empty literal strings,
-so the leading `''` does not reach a loop over the template.
-That skipping is why a consumer cannot assume that literals and interpolations alternate:
-two interpolations side by side, as in `t"{first}{last}"`,
-arrive as two `Interpolation`s in a row.
+so a loop over `message` starts with the `Interpolation` for `name`.
+Because of that skipping,
+a consumer cannot assume that literals and interpolations alternate.
+Iterating over `t"{first}{last}"`, with two interpolations side by side,
+produces two `Interpolation`s in a row.
 
 `shout()` uppercases the literal text and leaves the interpolated values in their original case.
-No amount of work on a finished f-string could do that reliably,
-because the finished string no longer says which characters came from where.
-`shout()` turns each value into text with the built-in `format()` and the format spec the `Interpolation` carries,
+`shout()` turns each value into text with the built-in `format()` and the format spec stored in the `Interpolation`,
 so `score` still prints as `92`.
+A finished f-string is a single `str` in which the values have merged into the literal text,
+so code that processes it afterward must guess which characters came from a value.
 
-`safe()` puts the same separation to work.
-It passes the literal text through unchanged and raises a `ValueError` for an interpolated value that contains a single quote.
-`trouble` holds one,
+`safe()` uses the same separation to check each value.
+It copies the literal text into the result as written and raises a `ValueError` for an interpolated value that contains a single quote.
+`trouble` holds a single quote,
 so `safe(t"Hello, {trouble}")` raises the exception before any result exists.
 An f-string finishes assembling the result, quote and all,
-before any code can object.
+before any code can inspect the values.
+
 Uppercasing and rejecting are small demonstrations.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
 builds a full query from the parts the same way.
@@ -664,20 +671,21 @@ lower case with words separated by underscores, as in `this_is_snake_case`.
 
 For a constant, use all uppercase letters, as in `THIS_IS_A_CONSTANT`.
 
-Class names are `CapWords` (Pascal cased): every word, including the first,
-begins with a capital letter, and no underscores separate them.
+Class names are `CapWords` (Pascal cased).
+Every word, including the first, begins with a capital letter,
+and the words run together.
 For example: `ThisIsMyClass`.
 
 When users call a class the way they call a function,
 that class may use `snake_case` instead,
-so the name reads as the action the call performs and the caller treats it as a function.
+so its name reads as the action the call performs.
 The standard library names `contextlib.suppress`, `contextlib.redirect_stdout`,
 and `functools.partial` that way.
 Name every other class `CapWords`.
 
 [PEP 8](https://peps.python.org/pep-0008/#naming-conventions)
 covers style issues.
-Tools such as ruff point out violations and fix many of them automatically.
+Tools such as ruff report violations and fix many of them automatically.
 
 ## Exercises
 
@@ -685,10 +693,10 @@ Try each exercise before opening its [solution](../Solutions/02_Foundations--Tou
 
 1.  In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
     Print `a` and `c` and confirm that `c` changed and `a` still holds `[1, 2, 3, 4]`,
-    then explain why `b.append(4)` earlier did change what `a` sees,
+    then explain why `b.append(4)` earlier changed the list bound to `a`,
     but appending to `c` does not.
 2.  In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
-    Predict what `bool()` reports for each before running it,
+    Predict what `bool()` reports for each before running `truthiness.py`,
     then check your prediction.
 3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero,
     using `{score:.2f}` in place of `{score:.0f}%`,
@@ -699,7 +707,7 @@ Try each exercise before opening its [solution](../Solutions/02_Foundations--Tou
     Every version runs.
     Using [Naming Conventions](#naming-conventions),
     say what each form signals to a reader who did not write the code,
-    and which of the three a linter flags.
+    and which of the three a linter reports.
 5.  In `tstrings.py`, write a third consumer, `quoted(template)`,
     that wraps every interpolated value in single quotes and leaves the literal text alone,
     then print `quoted(message)`.

@@ -7,7 +7,8 @@
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
-The call site names the signature it calls and says nothing about the callable's source.
+The call site names the signature it calls,
+and the callable can come from anywhere.
 [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 states that principle as "design the communication, not the parts."
 
@@ -29,7 +30,7 @@ and the pattern [dissolves into the language](21_Patterns--Design_Patterns.md#wh
 
 A *Command* wraps an action so you can pass it around and run it later.
 In Python the action is a function.
-In this example, a "macro" is a list of actions:
+Here, a "macro" is a list of actions:
 
 ```python
 # command.py
@@ -106,8 +107,9 @@ The class version takes four classes and a wrapper to say what one list of funct
 Because in Python a callback is a function, the replacement is unnecessary.
 
 A `Command` base class is worthwhile when the commands share implementation.
-A second operation alone does not call for one.
-The [undo discussion](#a-callable-object-as-a-command) needs only a type.
+A second operation calls for a type instead.
+The [undo discussion](#a-callable-object-as-a-command)
+describes that type with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 
 ### A Bound Method as a Command
 
@@ -115,7 +117,7 @@ Halfway between the function form and the class form,
 a *bound method* is a ready-made command.
 `account.deposit` names a function with its instance attached,
 so a command list can hold it alongside plain functions.
-The method keeps its state without any `Command` class:
+The bound instance carries the state that a `Command` subclass would hold:
 
 ```python
 # bound_method.py
@@ -145,10 +147,8 @@ for command in macro:
 #: balance: 200
 ```
 
-`account.deposit` sits in the same list as `alert`, a plain function,
-with no `Command` class.
-Each call still reads and updates `account.balance`,
-the state the bound method carries with it.
+Each call to `account.deposit` reads and updates `account.balance` through `account`,
+the instance the bound method stores as its `__self__`.
 
 The entry is `account.deposit`, without parentheses.
 `account.deposit()` calls the method while Python builds the list,
@@ -162,7 +162,7 @@ When a class defines `__call__()`,
 its instances [carry state](14_Techniques--Decorators.md#a-class-form-decorator-with-state)
 and still satisfy `Command`.
 Here, `Repeat` is a [record](18_Techniques--Performance.md#record),
-so its configuration cannot change after construction:
+so its configuration stays the same after construction:
 
 ```python
 # callable_command.py
@@ -200,10 +200,10 @@ Printing `macro[1]` shows the `repr` that `@record` generates,
 so you can read the command's configuration from outside the object.
 A closure's `repr` shows its function's name and a memory address.
 
-A callable alone cannot express a second operation, `undo()`.
-`Command` describes one call,
-so an undoable list of commands needs a type with two members,
-`__call__()` and `undo()`, and that type is a `Protocol` (see exercise 1).
+`Command` describes one call.
+An undoable list of commands needs a second operation on each command, `undo()`.
+A command's type then has two members, `__call__()` and `undo()`,
+and a `Protocol` describes that type (see exercise 1).
 [*Memento*](36_Patterns--Memento.md#the-caretaker-a-generic-history)
 undoes the other way, by saving snapshots of the state,
 so no action needs an inverse.
@@ -240,15 +240,15 @@ for command in bound:
 ```
 
 The two comprehensions differ in when they read `n`.
-A lambda's body runs when you call the command, not when you create it,
-and all three lambdas close over the same loop variable,
+A lambda's body runs when you call the command, not when you create it.
+All three lambdas close over the same loop variable,
 which holds 2 by the time anything calls them.
 The argument to [`functools.partial()`](40_Functional--Foundations.md#partial-application)
 is an ordinary expression that Python evaluates where you write it,
-so each command stores the string built from its own iteration's `n` and has nothing left to look up later.
-The older fix, `lambda n=n: print(f"step {n}")`,
-does the same job with a default argument, which Python evaluates once,
-when it creates the lambda.
+so each command stores the finished string built from its own iteration's `n`.
+The older remedy binds the value through a default argument,
+`lambda n=n: print(f"step {n}")`.
+Python evaluates a default once, when it creates the lambda.
 When commands built in a loop all behave like the last one,
 the shared loop variable is the cause.
 
@@ -259,14 +259,16 @@ Three algorithms below find a *root* of a function `f`,
 a value where `f(x)` is zero.
 Each takes the function and two hints and returns the root,
 or `None` when it cannot find one.
+
 Bisection reads the two hints as a bracket,
-an interval whose ends straddle the root.
+an interval whose ends lie on opposite sides of the root.
 The secant method reads them as two starting points,
 and Newton's method averages them into one.
 The secant and Newton methods are *open*: they need somewhere to start,
 not a bracket.
 `chain_demo.py`, under *Chain of Responsibility*,
-falls back on them when bisection has no bracket.
+falls back on them when the two hints lie on the same side of the root.
+
 All three share one signature, so they are interchangeable,
 and `solve()` runs whichever one the caller passes:
 
@@ -365,14 +367,14 @@ In the classic form,
 each algorithm becomes a class derived from a `FindRoot` interface,
 with a `find()` method.
 A "Context" class holds the chosen algorithm.
-A parameter carries a strategy into one call and is gone when the call returns,
-so you need a Context when the algorithm must outlast the call.
+A parameter holds a strategy for the length of one call,
+so you need a Context when the program must keep the algorithm after the call returns.
 
-A view holding a controller is that Context in Smalltalk's MVC,
-and *GoF Design Patterns* names the pair as an example of *Strategy*.
+In Smalltalk's MVC, a view is that Context and its controller is the strategy.
+*GoF Design Patterns* names the pair as an example of *Strategy*.
 The controller decides how the view responds to input.
-Replacing the controller changes the response and leaves the display as it was,
-and a controller that ignores input events disables the view.
+Replacing the controller changes the response and leaves the display as it was.
+A controller that ignores input events disables the view.
 [*Observer*](30_Patterns--Observer.md) covers MVC's other half,
 where a model notifies its views.
 
@@ -385,9 +387,10 @@ When a strategy needs configuration,
 use a [*closure*](40_Functional--Foundations.md#closures).
 An outer function takes the settings and returns the strategy,
 and those settings stay available to the strategy after the outer function returns.
+
 `algorithms.py` also defines `bisection_tol()`,
 a bisection that stops once the bracket is narrower than `tolerance`.
-Its fourth parameter keeps it from matching `RootFinder`,
+`RootFinder` describes three parameters and `bisection_tol()` has four,
 so a closure supplies the tolerance:
 
 ```python
@@ -413,8 +416,8 @@ for finder in (coarse, fine):
 Each call to `bisection_within()` returns a new finder whose closure holds that call's tolerance.
 The coarse strategy stops within a tenth and reports 1.406250.
 The fine one agrees with the true root to six places.
-Because both satisfy `RootFinder`, `solve()` accepts either unchanged,
-and so does `chain.py`'s `first_root()`, which the next section introduces.
+Because both satisfy `RootFinder`, `solve()` accepts either unchanged.
+So does `first_root()`, which the next section defines in `chain.py`.
 
 Because `bisection_tol()` takes the setting as an ordinary parameter,
 `functools.partial()` can replace the closure.
@@ -437,12 +440,11 @@ for finder in (coarse, fine):
 #: 1.414214
 ```
 
-`partial()` binds `tolerance` by keyword, once per strategy,
-in place of `bisection_within()`'s closure.
 Each `partial` object satisfies `RootFinder`,
-so `solve()` runs it as it runs the closures.
-A positional-only parameter must arrive by position,
-so binding one means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
+so `solve()` runs a `partial` object as it runs a closure.
+
+A caller must pass a positional-only parameter by position,
+so binding one with `partial()` means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
 in each position the caller fills.
 
 Save the strategy class for an algorithm that carries several related methods or mutable state.
@@ -451,8 +453,8 @@ Configuration alone is a closure's job.
 ## Chain of Responsibility: Choosing the Handler at Runtime
 
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
-*GoF Design Patterns* implements the chain as a linked structure,
-each handler holding a reference to the next and deciding whether to pass the request along.
+*GoF Design Patterns* implements the chain as a linked structure.
+Each handler holds a reference to the next and decides whether to pass the request along.
 In Python that chain is a list of functions,
 and `first_root()` returns the first root a finder in the list reports:
 
@@ -470,12 +472,12 @@ def first_root(f: Fn, a: float, b: float,
 ```
 
 Each handler is a *Strategy* function, `chain` is the list of strategies,
-and success is a non-`None` return.
+and a returned `float` signals success.
 An exhausted chain returns `None` rather than raising an exception,
 and the caller decides what an empty result means.
 
 Bisection needs the interval to bracket a root.
-The open methods do not.
+The open methods need only a place to start.
 `chain_demo.py` runs bisection alone and then the chain on two intervals:
 
 ```python
@@ -499,28 +501,30 @@ for a, b in ((0.0, 2.0), (1.0, 1.3)):
 ```
 
 The `[1.0, 1.3]` line shows the fall-through.
-Because that interval does not straddle the root,
-bisection fails by returning `None`.
-The loop in `first_root()` continues to a method that needs no bracket.
+Both ends of that interval lie below the root, so bisection returns `None`.
+The loop in `first_root()` then calls `secant()`,
+which needs no bracket and finds the root.
 Adding, removing, or reordering the handlers means editing the `chain` list.
 
 The test in `first_root()` is `root is not None`, not `if root`.
-A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
-so a truthiness test discards a correct answer and calls the next finder.
+A finder returns `0.0` for a function whose root is at zero.
+Because `0.0` is falsy,
+a truthiness test discards that correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
 Whichever value marks failure, compare the result against it with `is`.
 
 `None` is the right failure value here because a root is always a `float`,
 so `float | None` says which result is which.
-A [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
-is for the case where `None` is a possible result and cannot double as the failure mark.
+When `None` is a possible result, it cannot double as the failure mark,
+and a [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
+takes that role.
 
-The chain has no check of its own.
-Each handler decides for itself whether it failed,
+The chain accepts each handler's verdict as it stands.
+Each handler decides for itself whether it succeeded,
 and reports that decision as its return value.
 `secant()` and `newton()` report success when their latest step shrinks below the tolerance.
 A step below the tolerance is not quite the same as reaching a root,
-so a chain is no more reliable than its handlers.
+so a chain's answer is as trustworthy as the handler that gave it.
 
 The test file confirms that:
 
@@ -576,8 +580,8 @@ def test_all_fail_returns_none() -> None:
     assert first_root(g, 0.0, 2.0, chain) is None
 ```
 
-`test_first_successful_finder_wins()` and `test_chain_falls_through_to_a_later_method()` wrap each finder in `watched()`,
-which records the finder's name as it runs,
+`watched()` wraps a finder and records the finder's name each time the wrapper runs.
+`test_first_successful_finder_wins()` and `test_chain_falls_through_to_a_later_method()` wrap every finder this way,
 so they assert which finders ran as well as the root.
 
 `watched()` carries a `# type: ignore` because `RootFinder` is a `Callable`,
@@ -585,7 +589,8 @@ and a `Callable` declares no `__name__`.
 The type checker is right about the type.
 A `partial` object is a `RootFinder`, and it has no `__name__`.
 The three finders here are functions, and every function has one.
-A `Protocol` that declares `__name__` beside `__call__()` states that requirement in the type and needs no comment.
+A `Protocol` that declares `__name__` beside `__call__()` states that requirement in the type,
+in place of the `# type: ignore`.
 
 All three patterns share one shape:
 
@@ -606,10 +611,11 @@ you have an *event bus*.
 The bus is a `dict` keyed by event type.
 Each key maps to a list of handlers,
 and `subscribe()` appends a handler to the list under the event type it handles.
-The events are values, written as records.
 Publishing an event looks up its type and calls every handler registered for that type.
 Calling every handler is the second difference from the chain,
 which stops at the first handler that succeeds.
+
+The events are values, written as records.
 The handlers are ordinary functions, so they need no base class.
 Registering one is a single `subscribe()` call.
 Here, `Handler` names their signature, not an interface:
@@ -658,8 +664,8 @@ so the type checker reports a type error.
 The check runs once, at registration.
 The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.
-Its lists cannot name a single event class,
-so their element type is `Handler[Any]`.
+One annotation covers every list.
+No single event class fits all of them, so the element type is `Handler[Any]`.
 
 The demo subscribes two handlers for `Deposit` and one for `Withdraw`,
 then publishes one event of each of the three types:
@@ -699,9 +705,9 @@ because indexing a `defaultdict` inserts an empty list as a side effect.
 Indexing would leave a stray entry behind for every published event type with no handler,
 such as `Closed`.
 
-The lookup uses `type(event)`, which matches the class and no ancestor.
-A subclass of `Deposit` published to this bus matches no handler,
-so `publish()` calls nothing, as it does for `Closed`.
+The lookup uses `type(event)`, which matches the event's exact class.
+A subclass of `Deposit` published to this bus gets the empty default list from `.get()`,
+as `Closed` does.
 Walking `type(event).__mro__` and calling every handler along it gives a subclass event its parent's handlers.
 An event then runs the handlers registered for its own type and for every ancestor
 (see exercise 5).
@@ -754,15 +760,18 @@ and the bus is a `dict`.
 Each `subscribe()` call repeats the event type that the handler's annotation names.
 A second version reads the annotation, so a handler names its event once.
 
-The second version gives each side a decorator, both producing records.
+The second version gives each side a decorator,
+and both decorators produce records.
 `@event` registers its class in `EVENTS`.
 `@handler` makes a class whose instances are function objects,
-with fields that hold their configuration,
-and stores in `HANDLES` the event its `__call__()` accepts.
+with fields that hold their configuration.
+It also records in `HANDLES` the event type that the class's `__call__()` accepts.
+
 `Handler` keeps its `Callable` definition,
 which accepts a callable object as `Command` accepts `Repeat` in `callable_command.py`.
-`subscribe()` then takes one argument, since the handler says what it handles,
-and `publish()` refuses an object that no `@event` class produced:
+`subscribe()` then takes one argument, a handler,
+and looks up the handler's event type in `HANDLES`.
+`publish()` checks that each event's class is in `EVENTS`:
 
 ```python
 # tagged_bus.py
@@ -826,9 +835,10 @@ Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
 Python sets a class's slots when it creates the class,
 so `slots=True` makes `dataclass()` build a new class and return it.
-Registering `cls` puts a class in `EVENTS` of which no event is an instance.
-`publish()` then refuses every event,
-and `@handler` refuses every handler class,
+Registering `cls` puts the original class in `EVENTS`,
+and every event is an instance of `built` instead.
+`publish()` then refuses every event.
+`@handler` refuses every handler class,
 because the annotation it reads names the class that `dataclass()` returned
 (see exercise 7).
 
@@ -870,12 +880,14 @@ class OnWithdraw:
 ```
 
 [`dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
-tells the type checker that a class passing through either decorator comes out a frozen data class.
+tells the type checker that a class decorated with either decorator is a frozen data class.
 `Audit(threshold=50)` therefore has its generated `__init__()`,
 and the type checker rejects `Audit(50).threshold = 1` as an assignment to a read-only property,
 as it does for a class decorated with `@dataclass(frozen=True)`.
-The two decorators fill `EVENTS` and `HANDLES` at run time,
-where the type checker cannot see them.
+
+The two decorators fill `EVENTS` and `HANDLES` at run time.
+The type checker reads the source and never runs it,
+so it cannot check what those two collections hold.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
 the same annotation the type checker checks, so a handler names its event once.
 
@@ -906,19 +918,24 @@ expect(TypeError, bus.publish, "Deposit")
 ```
 
 `publish()` keeps its `object` parameter,
-because no static type means "an instance of a class decorated with `@event`",
-so a stray string reaches the bus and `EVENTS` rejects it there.
+because no static type means "an instance of a class decorated with `@event`".
+The type checker therefore accepts a stray string as the argument.
+`publish()` rejects the string at run time,
+when it finds `str` missing from `EVENTS`.
 
 The tagged bus gives up the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
-One argument leaves no pair to compare,
-so an instance of a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
+The tagged `subscribe()` takes one argument, typed `Handler[Any]`,
+so the type checker accepts any callable of that shape.
+An instance of an undecorated class with the right `__call__()` therefore passes the type checker,
+and `subscribe()` rejects it at run time,
+when it looks up the class in `HANDLES`.
 
 The test file confirms that:
 
 - A handler receives the events of its own type.
 - `publish()` refuses an object that is not an event.
-- `subscribe()` refuses an instance of a class that skipped `@handler`.
+- `subscribe()` refuses an instance of a class without `@handler`.
 - `@handler` refuses a class with no `__call__()`,
   and one whose `__call__()` annotates `int` instead of an `@event` class.
 
@@ -965,13 +982,16 @@ The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer)
 with one shared subject.
 Instead of every subject holding its own list,
 one bus holds every list and the event type selects the handlers.
-Here a type may have many handlers.
+
+On the bus, a type may have many handlers.
 When each type needs exactly one,
 and a new type must add its own without editing a central function,
-`functools.singledispatch` is the solution.
+use `functools.singledispatch`.
+The dispatcher calls the function registered for the type of its first argument,
+and each new type adds its own function with `register()`.
 [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)
-both use it.
+both use `singledispatch`.
 
 ## Choosing the Lightest Callable
 
@@ -987,7 +1007,7 @@ Stop at the first form that supports what you need:
     (`configured_strategy.py`, `partial_bisection.py`).
 4.  A callable object, when that configuration needs a name and a `repr`
     (`callable_command.py`).
-5.  A class, when one call is not enough: a second operation such as `undo()`,
+5.  A class, when the behavior needs a second operation such as `undo()`,
     or the several related methods and mutable state the *Strategy* section describes.
 
 A function that carries data in its `__dict__` would sit between entries 1 and 3,
@@ -997,11 +1017,10 @@ so configuration goes in a closure or a callable object instead.
 
 The *GoF Design Patterns* forms of *Command*, *Strategy*,
 and *Chain of Responsibility* all start at number 5.
-The C++ of that book had no lighter form that could carry state.
-A function pointer carried none, and closures did not exist yet,
-so a class was the only form available.
+In the C++ of that book, a class was the lightest form that could carry state.
+A function pointer carried none, and closures did not exist yet.
 The GoF form then gives that class a named operation, `execute()`,
-rather than a call.
+where a callable object has `__call__()`.
 The named operation puts the GoF form at entry 5 rather than entry 4.
 
 ## Exercises

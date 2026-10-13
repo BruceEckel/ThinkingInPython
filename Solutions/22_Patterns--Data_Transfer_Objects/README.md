@@ -3,7 +3,7 @@
 ## 1. Two `Messenger`s do not share attributes
 
 > In `messenger_idiom.py`,
-> create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes
+> create a second `Messenger` with different keyword arguments and confirm each instance keeps its own attributes
 > (unlike a [class attribute](../../Chapters/09_Foundations--Class_Attributes.md)).
 
 <details>
@@ -230,7 +230,7 @@ so do the namespaces, since dict equality ignores order.
 
 > In `summarize_stats.py`,
 > change `summarize()` to return a bare `tuple[float, int]`,
-> and repair the one line that stops working.
+> and repair the one line that breaks.
 > What do the call sites lose,
 > and which mistakes does the type checker still catch?
 
@@ -388,7 +388,7 @@ you want your three numbers to travel as data or to mean something.
 
 > For each scenario, name the type from "Which Should You Use?" that fits,
 > and say why the others do not:
-> a configuration bag whose keys arrive at runtime and are not known in advance;
+> a configuration bag whose keys first appear at runtime;
 > a 2D grid coordinate that must work as a `dict` key;
 > a record decoded from a JSON API response whose fields you also validate.
 

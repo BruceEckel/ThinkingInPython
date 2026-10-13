@@ -8,13 +8,13 @@ Sometimes the problem you're solving is as simple as "I don't have the interface
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes.
-The caller sees one entry point,
-not how the façade builds those classes and wires them together,
-so the wiring can change without affecting the caller.
-*Adapter* and *Façade* both wrap existing code,
-which puts them adjacent to *Proxy* and *Decorator*.
+The caller sees one entry point.
+Behind it, the façade creates the objects and connects them to each other,
+so the façade's construction code can change while the caller's code stays the same.
+*Adapter* and *Façade* both wrap existing code, as *Proxy* and *Decorator* do.
 
-Adding an interface leaves the existing one in place, so nothing breaks.
+Adding an interface leaves the existing one in place,
+so existing callers keep working.
 When the new interface replaces one you own,
 callers keep using the old one until a deprecation mark tells them to switch.
 
@@ -24,7 +24,7 @@ An adapter's only job is to produce the interface you need from the one you have
 In a common real case, a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
-An adapter sits between them and turns each `f()` call into calls to `g()` and `h()`.
+An adapter implements `f()` by calling `g()` and `h()`.
 The first version puts the adaptation in a class:
 
 ```python
@@ -65,10 +65,10 @@ if __name__ == "__main__":
 ```
 
 Because `WhatIUse` calls `f()` and `WhatIHave` has no `f()`,
-`ProxyAdapter` supplies one and builds it out of the methods the adaptee does have.
-`WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
-because this listing is about where the adaptation lives,
-not how you declare the target interface.
+`ProxyAdapter` supplies one and implements it with the methods the adaptee does have.
+`WhatIWant` is a bare placeholder,
+because this listing is about where the adaptation lives.
+For declaring the target interface,
 [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies)
 compares an ABC with a `Protocol`.
 The empty `__slots__` on `WhatIWant` keeps `ProxyAdapter` a slotted [record](18_Techniques--Performance.md#record),
@@ -132,12 +132,13 @@ and the first line of each trace names that place:
 `WhatIHave2.f()` for Approach 3.
 
 *GoF Design Patterns* names two families of adapter.
-`ProxyAdapter` is an *object adapter*:
-it holds the adaptee and can wrap any instance passed to it at runtime.
+`ProxyAdapter` is an *object adapter*.
+It holds the adaptee and can wrap any instance passed to it at runtime.
 Approach 2 uses the same object adapter and moves the wrapping into `op()`.
-`WhatIHave2` is a *class adapter*: it inherits from the adaptee.
-That inheritance settles the adapted class at definition time,
-and every client of the adapter can call every method of the adaptee,
+`WhatIHave2` is a *class adapter*.
+It inherits from the adaptee.
+The base-class list names the adapted class at definition time.
+Every client of `WhatIHave2` can call every method of the adaptee,
 `g()` and `h()` included.
 Composition keeps the two interfaces separate.
 Inheritance merges them.
@@ -152,23 +153,24 @@ so it works wherever either type does.
 
 The `/` in `WhatIUse.op()` makes its parameter positional-only.
 `WhatIUse2.op()` renames that parameter to `item`.
-The rename is legal because no caller can pass a positional-only parameter by name.
-Renaming a keyword-capable parameter breaks any caller passing it by keyword,
-so `ty` and Pyright reject a renamed keyword-capable parameter in an override
-(see exercise 5).
-A checker that accepts the rename, as mypy does,
-compares the types in an override and skips the name of any parameter a caller can also pass by position.
+The rename is legal because callers must pass a positional-only parameter by position,
+which makes its name private to the method.
+If an override renames a keyword-capable parameter,
+a call that passes the old name by keyword raises a `TypeError`.
+`ty` and Pyright therefore reject that rename in an override
+(see exercise 5). mypy accepts it,
+because mypy compares the types in an override and ignores the name of any parameter a caller can also pass by position.
 
 The rename is the smaller of the two changes.
 `WhatIUse2.op()` also changes the parameter's type,
 from `what_i_want: WhatIWant` to `item: WhatIWant | WhatIHave`.
 The base version accepts a `WhatIWant`,
 and the override accepts a `WhatIWant` or a `WhatIHave`.
+Both `case` branches call the inherited `op()`,
+with a `WhatIWant` as it is and a `WhatIHave` wrapped in a `ProxyAdapter`.
 An override may widen what it accepts.
 Every call that is legal on a `WhatIUse` is still legal on a `WhatIUse2`,
 so code holding a `WhatIUse` can safely receive a `WhatIUse2`.
-The `match` sends both cases to the inherited `op()`,
-a `WhatIWant` as it is and a `WhatIHave` wrapped in a `ProxyAdapter`.
 
 An override cannot narrow what it accepts.
 The commented-out signature in `adapter_variations.py`,
@@ -197,7 +199,7 @@ Building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatI
 
 ### Adapter in Python
 
-All three approaches carry one Java habit.
+All three approaches follow one Java habit.
 The adapter inherits from `WhatIWant` so that `op()` accepts it.
 Because `f()` is the one method `WhatIUse.op()` calls at runtime,
 any object with an `f()` works, whatever its base classes.
@@ -206,7 +208,7 @@ so name the requirement with a [`Protocol`](08_Foundations--Static_Types.md#stru
 that lists `f()`, not with a base class to inherit.
 [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies)
 makes the same substitution for a proxy's implementation.
-Here `WhatIWant` is a `Protocol`, and the adapter inherits from nothing:
+Here, `WhatIWant` is a `Protocol`, and the adapter inherits from nothing:
 
 ```python
 # protocol_adapter.py
@@ -274,30 +276,30 @@ if __name__ == "__main__":
 #: ggggg
 ```
 
-Because `__getattr__()` runs only for attributes Python does not find normally,
-`f()` uses the adapter's own version while everything else falls through to the adaptee.
+Python calls `__getattr__()` as a fallback, after normal attribute lookup fails,
+so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 `getattr_adapter.py` shows the idiomatic Python adapter: a thin wrapper,
 not a hierarchy.
 With no base class above it, `Adapter` is a record.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
-has a real adapter.
-`PairCoord` adapts a `Pair` to the `Coord` protocol.
+has a real adapter, `PairCoord`, which adapts a `Pair` to the `Coord` protocol.
 `PairCoord` is a [record](18_Techniques--Performance.md#record)
 with two properties,
 written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.
 
 The limits [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
 lists for `__getattr__()` apply to this forwarding too.
-[Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr),
+[Special methods bypass `__getattr__()`](26_Patterns--Surrogate.md#special-methods-bypass-getattr),
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders
 (see exercise 1).
 
 [The recursion trap](26_Patterns--Surrogate.md#the-recursion-trap)
-catches an adapter that stores its adaptee in a hand-written `__init__()`.
+applies to an adapter that stores its adaptee in a hand-written `__init__()`.
 `copy.copy()` and `pickle` build the new instance without running `__init__()`,
 then look up `__setstate__()` on it.
-That lookup fails and calls `__getattr__()`, which reads `self.adaptee`.
+When that lookup fails, Python calls `__getattr__()`,
+which reads `self.adaptee`.
 No `adaptee` exists yet,
 so `__getattr__()` calls itself until Python raises a `RecursionError`.
 
@@ -353,8 +355,8 @@ create an interface that presents only what the client programmer needs.
 A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md)
 that also creates the subsystem's objects.
 GoF supplies both halves of that combination.
-One *Façade* object is usually enough, which makes it a *Singleton*,
-and an [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories)
+One *Façade* object is usually enough, which makes it a *Singleton*.
+An [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories)
 can work with a *Façade* to create the subsystem's objects without naming their concrete classes.
 When one set of concrete classes is enough,
 a class containing static factory methods covers both halves:
@@ -399,11 +401,14 @@ print(Facade.start_car())
 ```
 
 Turning the key primes the pump, and priming starts the engine.
-The fields `pump: FuelPump` in `Ignition` and `engine: Engine` in `FuelPump` make a caller build the three from the inside out,
+An `Ignition` holds a `FuelPump` and a `FuelPump` holds an `Engine`,
+so a caller builds the three from the inside out,
 as `Ignition(FuelPump(Engine()))`.
 These three classes are the "confusing collection of classes and interactions,"
-small enough to read in one glance here.
-In real code, constructing three or thirty classes in the right order is knowledge no caller should need.
+small enough here to read at a glance.
+
+In real code, the construction order of three or thirty classes belongs inside the subsystem,
+and a façade keeps it there.
 `Facade.start_car()` is the static factory method.
 One call runs the constructors in the right order, starts the car,
 and returns the assembled `Ignition`, which the last output line shows.
@@ -414,9 +419,9 @@ The figure shows each pattern as a before-and-after pair:
 
 In both pairs, the code you have on the right stays the same,
 and the difference sits in the middle column.
-*Adapter* puts a class there that turns one call into others,
+*Adapter* puts a class there whose `f()` calls `g()` and `h()`,
 so the caller keeps calling `f()`.
-*Façade* puts a class there that takes over construction,
+*Façade* puts a class there that builds the three objects,
 so the caller names `Facade` in place of `Ignition`, `FuelPump`, and `Engine`.
 
 The cleaner Python façade is a module.
@@ -466,22 +471,22 @@ The three classes carry leading underscores,
 and their required assembly order appears only inside `total()`.
 The façade can rearrange both while every caller's code stays the same.
 
-The underscore is a convention.
-Python does not enforce it.
-`checkout._PriceEngine` still resolves for anyone who types it.
-Mechanically, the underscore keeps the name out of `from checkout import *`,
+The underscore is a convention,
+and `checkout._PriceEngine` resolves for anyone who types it.
+Mechanically, `from checkout import *` skips a name with a leading underscore,
 and an [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
 list of the public names states the same boundary explicitly.
 A façade is an agreement about which names to call,
 not a restriction on the rest.
 
 A `Facade` class full of static methods reproduces what a module gives you,
-with more ceremony.
+plus a class statement and a `@staticmethod` on every function.
+
 `checkout.py` is one file.
-A façade that outgrows one file scales the same way, one level up.
-A package's `__init__.py` re-exports a curated set of names from private submodules,
+A façade too large for one file becomes a package.
+The package's `__init__.py` re-exports a curated set of names from private submodules,
 the same underscore convention, applied to modules instead of classes.
-That `__init__.py` is the idiomatic place for a façade that fronts a whole subsystem several modules deep,
+That `__init__.py` is the idiomatic place for a façade to a subsystem of several modules,
 GoF's usual case for the pattern.
 
 *Façade* has a failure mode.
@@ -493,12 +498,10 @@ It relays every name the subsystem has.
 
 ## Distinguishing the Wrappers
 
-*Adapter* and *Façade* complete a family of wrappers that share one structure,
-a front object forwarding to something behind it,
+*Adapter* and *Façade* complete a family of wrappers with one shared structure:
+a front object forwards to something behind it,
 often through the same few lines of `__getattr__()`.
-Intent separates them.
-[Design Patterns](21_Patterns--Design_Patterns.md) makes the general point:
-when two patterns share a structure, the difference that remains is intent.
+[Intent](21_Patterns--Design_Patterns.md#pattern-taxonomy) separates them.
 When you cannot decide what to call your wrapper,
 ask what breaks if you remove it:
 
@@ -513,7 +516,7 @@ ask what breaks if you remove it:
 takes the looser view of the first row:
 a surrogate forwarding to its implementation is a *Proxy* whether or not the interfaces match.
 Under that reading the same-interface rule no longer separates a *Proxy* from an *Adapter*,
-so the `ProxyAdapter` in `adapter.py` answers to both names.
+so both names describe the `ProxyAdapter` in `adapter.py`.
 That leaves the last two columns to separate them:
 a *Proxy* controls access to one implementation,
 an *Adapter* makes one type fit a caller that expects another.
@@ -523,10 +526,10 @@ Name a wrapper for why it is there, not for its shape.
 
 Replacing an interface you own takes two steps,
 and writing the new interface is the first.
-Once the better interface exists, the old one is still there,
-and callers keep using it until something tells them to stop.
-Deleting it breaks them.
-Leaving it unmarked means nobody notices.
+Once the better interface exists,
+callers keep using the old one until something tells them to switch.
+Deleting the old interface breaks those callers.
+The second step marks it, which keeps it working and tells each caller to move.
 
 `warnings.deprecated()` marks a function, method,
 or class as scheduled for removal
@@ -557,7 +560,8 @@ print(caught[0].message)
 #: Report.to_string() is replaced by render()
 ```
 
-`to_string()` keeps working, so existing callers get a warning, not a break.
+`to_string()` keeps working,
+so existing callers get a warning in place of an `AttributeError`.
 The mark works in two halves.
 The static half is a `ty` diagnostic on the deprecated call,
 and the caller sees it before running anything.
@@ -566,14 +570,14 @@ since this listing calls the deprecated method on purpose.
 
 The runtime half is a `DeprecationWarning`.
 Python ignores those by default outside `__main__` and test runners,
-and that default is the trap.
-The caller who most needs the warning is the least likely to see it.
+so the caller who most needs the warning is the least likely to see it.
 Run with `-W default::DeprecationWarning` to see them all,
 or `-W error::DeprecationWarning` in continuous integration to fail on one.
 A warning meant for the end users of an application takes `category=FutureWarning`,
 which Python shows by default.
-A warning also goes to standard error, where a `#:` marker cannot capture it,
-so the listing records the warnings and prints the record.
+
+A warning goes to standard error, but a `#:` marker captures standard output.
+`deprecating.py` therefore records the warnings and prints the record.
 
 Much existing code marks a deprecation with a `warnings.warn()` call inside the function body,
 with `DeprecationWarning` as the category.
@@ -590,19 +594,12 @@ where it warns on construction and on subclassing.
 Applied to a single `@overload`,
 the mark deprecates one call signature while the rest stay current.
 A function that now takes a `Path` in place of a string can then warn only the callers still passing a string.
-That form is static only.
+The mark on an overload is static only.
 At runtime every call runs the implementation,
 so Python issues no `DeprecationWarning`.
 `ty`, Pyright, and mypy all report a deprecated overload.
-Pyright and mypy need their deprecation rule switched on,
+Pyright and mypy need their deprecation rule enabled,
 as they do for the whole-function form.
-
-An *Adapter* and a *Façade* both add an interface and leave the existing one in place,
-which is why they are safe moves.
-Replacing an interface you own is the unsafe move,
-because every caller depends on the old one.
-Marking the old interface deprecated keeps it working and tells each caller what to use instead.
-Without the mark, nothing tells them.
 
 ## Exercises
 

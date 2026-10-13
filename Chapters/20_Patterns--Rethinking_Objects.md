@@ -9,7 +9,7 @@ I wrote *Thinking in C++* and *Thinking in Java*,
 served on the C++ Standards Committee for its first eight years,
 and toured the world giving object-oriented programming (OOP) presentations.
 When I say I have come to doubt that objects should be the default,
-it is not an outsider's complaint.
+I say it as an insider.
 
 This part of the book is about design patterns,
 most of which assume objects and inheritance.
@@ -27,8 +27,7 @@ Consider the origin of OOP.
 
 *Simula* introduced objects in the 1960s to model simulations.
 In a simulation, a system is a set of things that interact.
-Not everything in Simula was an object.
-The language still had standalone functions.
+Simula kept standalone functions alongside its objects.
 It was a compiled, statically typed language,
 so the discipline later named the Liskov Substitution Principle (LSP)
 fit naturally.
@@ -47,19 +46,19 @@ and C++ brought object-oriented programming and exceptions into the mainstream.
 *Java* drew from Smalltalk.
 Everything lives inside a class,
 including code that would work as a standalone function.
-Java is statically compiled, so substitutability matters,
-yet it encouraged reusing code by inheriting implementation,
-and that reuse pulls in the other direction.
+Java is statically compiled, so substitutability matters.
+Yet Java encouraged reusing code by inheriting implementation,
+and that reuse works against substitutability.
 
 Newer languages backed away from inheritance.
-Rust, Swift, Go, and Kotlin lean on data structures over deep class hierarchies.
-They favor immutability.
+Rust, Swift, Go, and Kotlin build programs from data structures rather than deep class hierarchies,
+and they compose those data structures instead of inheriting implementation.
+They let code live outside classes,
+so one function can serve many types instead of becoming a method on each.
+They favor immutability as well.
 Rust makes bindings immutable by default.
 Swift and Kotlin encourage immutability through `let` and `val`
 (Go has no general immutability).
-The newer languages compose data structures instead of inheriting implementation.
-They let code live outside classes,
-so one function can serve many types instead of becoming a method on each.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
 
 ## The Liskov Substitution Principle {#liskov-substitution}
@@ -68,26 +67,25 @@ The *Liskov Substitution Principle* (LSP)
 says that an object of a subtype must work anywhere code expects an object of its base type.
 A subclass may add behavior, but it must honor the base class contract.
 An override may accept more than the base does but never less.
-It returns a result that works wherever the caller expects the base's result,
+The override returns a result that works wherever the caller expects the base's result,
 and raises no surprising exceptions.
 When subclasses obey the principle,
 code you write against the base class works unchanged on any of them.
-That obedience makes polymorphism,
-and patterns like the [*Template Method*](25_Patterns--Template_Method.md),
-safe.
+That obedience makes polymorphism safe,
+and with it patterns like the [*Template Method*](25_Patterns--Template_Method.md).
 
+Code written against the base class calls a method and depends on every subclass standing in for the base.
 A statically typed compiler can check that an override's signature stays compatible.
 It cannot check whether the override behaves the way the base class declares.
-Code written against the base class calls a method and trusts every subclass to stand in for the base.
 
 Python has no such compiler,
-but the line between what a tool checks and what it cannot falls in the same place.
+but its type checker stops at the same place that compiler does.
 A type checker reads an override's signature and reports one that no longer fits,
 especially when [`@override`](07_Foundations--Classes.md#marking-overrides-with-override)
 marks the intent.
 No tool reads the behavior behind the signature,
-so a subclass can break the base class contract while matching its signature perfectly.
-The interpreter runs such code without objection,
+so a subclass can break the base class contract while matching that signature perfectly.
+The interpreter runs such code unchecked,
 and the code may or may not fail at runtime:
 
 ```python
@@ -129,17 +127,15 @@ expect(OverflowError, fill, BoundedStack(), 5)
 so the signatures match,
 and `@override` finds a `push()` in `Stack` to override.
 The type checker reports nothing.
-`fill()` takes a `Stack`, whose `push()` always succeeds,
-so a `BoundedStack` handed to it raises an exception on the third item.
+`fill()` takes a `Stack` and relies on its `push()` always succeeding.
+A `BoundedStack` handed to `fill()` raises an `OverflowError` on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
-No tool catches this, but a test can.
-Two later tests check runtime guarantees:
+No tool catches the broken contract, but a test can.
+A test written against `Stack`'s contract catches `fill()` failing on the third item when the test runs against `BoundedStack` too.
+Two later tests use the same pattern to check other runtime guarantees:
 `test_plugged.py` confirms that a getter's copy holds,
 and `test_immutable.py` confirms that a frozen field refuses assignment.
-The same pattern covers substitutability.
-A test written against `Stack`'s contract, run against `BoundedStack` too,
-catches `fill()` failing on the third item.
 
 Substitutability is one thing OOP promised that no tool can check.
 OOP made four promises: encapsulation,
@@ -193,13 +189,13 @@ The getter returns a reference to the same list the underscore hides,
 not a view or a snapshot of it.
 Python's `return` hands out references, not copies.
 The property blocks reassigning `numbers`,
-but cannot stop the caller from mutating the list it returns.
+but the caller can mutate the list the property returns.
 
 ## Plugging Leaks Is Tedious
 
-Copying everything a getter returns stops the leak.
-Copying works, but every getter must remember to copy,
-and so must every getter in every subclass, forever:
+Copying everything a getter returns stops the leak,
+but every getter must make a copy, and so must every getter in every subclass,
+forever:
 
 ```python
 # plugged.py
@@ -234,27 +230,29 @@ if __name__ == "__main__":
 
 Now the internals are safe, but the class needs private fields, getters,
 and defensive copies, all to stop other code from changing your data.
-And these copies plug only the outbound leak.
+
+These copies plug the outbound leak but leave the inbound one open.
 The constructor stores the caller's own list,
-so the caller can still mutate the internals through that reference.
+so the caller can mutate the internals through that reference.
 A fully defensive class must copy on the way in as well.
 
 A `@dataclass` version of `Plugged` trims the constructor,
 but its generated `__repr__()` prints `_numbers` and `_bob`,
 leaking the internals yet again.
 
-The two getters also copy differently, and the difference is its own trap.
+The `numbers` and `bob` getters also copy differently,
+and the wrong kind of copy reopens the leak.
 `list.copy()` is *shallow*: it duplicates the container but shares the elements.
 That sharing is safe here because the elements are immutable `int`s.
 `Bob` gets `deepcopy()`,
-which recursively copies everything the object references,
-the conservative choice when a field's own fields might be mutable.
-A shallow copy of a list of `Bob`s protects the list and not the `Bob`s.
+which recursively copies everything the object references.
+A deep copy is the conservative choice when a field's own fields might be mutable.
+A shallow copy of a list of `Bob`s protects the list and leaves the `Bob`s shared.
 The caller's copy holds the same `Bob` objects yours does,
-and can change each one.
+so the caller can change each one.
 
 A test confirms that the defensive copy holds.
-Mutating the returned list leaves the original untouched:
+Mutating the returned list leaves the original as it was:
 
 ```python
 # test_plugged.py
@@ -271,8 +269,8 @@ def test_defensive_copy_prevents_the_leak() -> None:
 
 Encapsulation exists mainly because of mutability.
 If the data cannot change, you have nothing to protect.
-If you freeze it, the whole apparatus disappears.
-The fields are public, with no getters and no copies:
+If you freeze it, the private fields, the getters, and the copies all go away.
+The fields are public:
 
 ```python
 # immutable.py
@@ -299,9 +297,9 @@ if __name__ == "__main__":
 
 Assigning to a field of the frozen `Bob` raises a `FrozenInstanceError`.
 The demo goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
-`frozen=True` is the defense that holds at runtime,
-against code outside the type checker's view.
-A test pins down the same guarantee:
+`frozen=True` enforces the rule at runtime,
+including in code that skips the type checker.
+A test confirms the same guarantee:
 
 ```python
 # test_immutable.py
@@ -315,11 +313,11 @@ def test_frozen_field_refuses_assignment() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
-Two quiet changes in `immutable.py` do as much work as `frozen=True`:
+Two smaller choices in `immutable.py` matter as much as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
 `frozen=True` is shallow.
-It stops assignment to the fields of `Immutable`,
-but it cannot stop mutation inside a field whose value is mutable.
+It blocks assignment to the fields of `Immutable`,
+and a field whose value is mutable stays mutable.
 If you declare the field as a `list` instead, the leak reopens:
 
 ```python
@@ -346,16 +344,18 @@ expect(TypeError, hash, fl)
 Frozen guards the binding, not the object.
 `fl.numbers` must keep pointing at the same list,
 and attempting to rebind it raises an exception.
-But that list can still change, the identical leak `Leaky` has.
-The same list field breaks hashing.
+But the list stays mutable, so `FrozenLeaky` leaks the same way `Leaky` does.
+
+The same list field makes the instance unhashable.
 A frozen data class is hashable only when every field it compares is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
-Immutability lets you share an object safely and use it as a dict key only when it goes all the way down.
+Immutability lets you share an object safely and use it as a dict key,
+but only when the immutability goes all the way down.
 
 Freezing answers the mutation reason for encapsulation.
 A second reason survives freezing: representation hiding,
-so the internal type can change later without breaking callers.
+which lets the internal type change later while callers keep working.
 A public frozen field gives up that protection.
 If you later swap `numbers` from a `tuple` to some other sequence,
 every caller that named `tuple` breaks.
@@ -409,8 +409,7 @@ The dot fills in `self`.
 `distance()` reads the same and computes the same, and it has one advantage.
 It can live outside `Point`, so it can serve any type that has an `x` and a `y`.
 The method keeps one advantage of its own.
-`p1.` shows every operation `Point` supports,
-a discoverability the free function does not offer.
+`p1.` shows every operation `Point` supports, so the method is discoverable.
 
 ## Protocols Generalize, Composition Adapts
 
@@ -418,8 +417,8 @@ A function outside any class can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with matching attributes satisfies it, without inheritance.
 That matching is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
-When someone hands you a type that does not fit, you adapt it by composition,
-not inheritance:
+When someone hands you a type with a different shape,
+you adapt it by composition, not inheritance:
 
 ```python
 # distance_protocol.py
@@ -472,7 +471,7 @@ Both have `x` and `y`, and those two attributes are all `distance()` requires.
 `Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
 A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
-Neither class here allows it.
+Both classes here keep `x` and `y` read-only.
 `PairCoord` computes `x` from its `Pair`,
 and the frozen `Point` rejects assignment to every field.
 Both satisfy the property form, and both fail the annotation form.
@@ -504,11 +503,11 @@ print(f"{len(counted)=}, {counted.appends=}")
 #: len(counted)=3, counted.appends=1
 ```
 
-`list.extend()` appends its items without calling `append()`,
+`list.extend()` adds its items and bypasses `append()`,
 so the count is wrong the moment anyone adds items through another of the base class's methods.
 The subclass is correct line by line.
-It inherits an implementation and now depends on that implementation's details,
-a dependence no signature records and no type checker reports.
+It inherits an implementation and now depends on that implementation's details.
+No signature records that dependence, and no type checker reports it.
 That dependence is the *fragile base class* problem:
 a base class cannot change its own internals without risking every subclass that came to depend on them.
 
@@ -539,17 +538,17 @@ print(f"{len(box.items)=}, {box.appends=}")
 #: len(box.items)=3, box.appends=3
 ```
 
-Nothing arrives from a base class,
-so no inherited method slips past the counter.
-`CountingBox` forwards each operation it offers by hand.
-`CountingList` inherits dozens it didn't write,
-and more than one of them skips the counter.
+`CountingBox` inherits nothing from `list`,
+so every method that adds items is one it defines.
+It forwards each operation it offers by hand.
+`CountingList` inherits dozens of methods from `list`,
+and more than one of them adds items and bypasses `append()`.
 
 Composition still allows the counting bug.
 If you write `extend()` as `self.items.extend(more)` instead of going through `append()`,
-the count is still wrong.
-What changes is where the bug lives: in the class you read,
-not in `list` internals hidden behind `CountingList`.
+the count goes wrong the same way.
+What changes is which code holds the bug: the class you read,
+not the `list` internals hidden behind `CountingList`.
 
 Composition does more than repair a broken subclass.
 A type holds other types as fields,
@@ -594,14 +593,15 @@ print({c: "found"}[twin])
 #: found
 ```
 
-`Contact` inherits nothing, and gains only the methods it requests.
+`Contact` inherits nothing and gains only the methods `@record` generates for it.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
-Changing one city means rebuilding the `Address` and then the `Contact`.
-[The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
-makes that rebuild routine.
 Two contacts built from equal parts are equal and hash alike,
 so `twin` finds the entry stored under `c`.
 Value equality and hashing follow from the fields rather than from a base class.
+
+Changing one city means rebuilding the `Address` and then the `Contact`.
+[The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
+makes that rebuild routine.
 
 ## Polymorphism Without Inheritance
 
@@ -610,7 +610,7 @@ The fourth OOP promise is polymorphism.
 ### What Is Polymorphism?
 
 Polymorphism means that a function parameter accepts more than one type.
-Inheritance is only one way to get there.
+Inheritance is one of several ways to get there.
 The questions are which types the parameter accepts and what the function may do with them.
 
 Type theory defines three kinds of polymorphism.
@@ -627,7 +627,7 @@ a method an `Any` parameter calls at runtime,
 a `Protocol` the type matches structurally,
 or a union the `match` statement covers.
 You write one function.
-The type varies underneath it.
+The argument's type varies from call to call.
 
 *Parametric polymorphism* is a single implementation for multiple types.
 [Static Types](08_Foundations--Static_Types.md#type-parameters)'s `first[T]` and `Box[T]` show this.
@@ -637,8 +637,9 @@ The type checker infers the concrete type behind `T` at each call site.
 With *ad-hoc polymorphism* (typically *function overloading*),
 a different implementation handles each type,
 and the argument's type selects which one runs.
-Python's form of function overloading is `@overload`,
-which lets one function name have multiple typed signatures over a single implementation that branches at runtime:
+Python's form of function overloading is `@overload`.
+It gives one function name several typed signatures,
+all served by a single implementation that branches at runtime:
 
 ```python
 # overload_example.py
@@ -662,8 +663,7 @@ print(stringify([1, 2, 3]))
 ```
 
 Each `@overload` line is a declaration for the type checker,
-not a function that runs.
-Only the last, unmarked definition executes.
+and the final `def` is the function that runs.
 `stringify(42)` checks as returning `str`,
 and `stringify([1, 2, 3])` checks as returning `list[str]`,
 although both calls run the same branching body.
@@ -714,10 +714,10 @@ for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
 ```
 
 Inheriting from `ABC` and marking `area()` with `@abstractmethod` makes `Shape` abstract.
-You cannot instantiate it,
-and you cannot instantiate a subclass until that subclass defines `area()`.
+Calling `Shape()` raises a `TypeError`,
+and a subclass becomes instantiable once it defines `area()`.
 
-The empty `__slots__` on `Shape` is there for the records below it.
+The empty `__slots__` on `Shape` is there for the records that inherit from it.
 A base class with no `__slots__` gives every instance of its subclasses a `__dict__`,
 the [per-instance dictionary](18_Techniques--Performance.md#when-slots-does-not-fit)
 that `@record` exists to remove.
@@ -727,14 +727,14 @@ The bases in [Changing the Interface](29_Patterns--Changing_the_Interface.md)
 and [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 carry the same empty `__slots__` for the same reason.
 When a base comes from a library and declares no `__slots__`,
-its records use `@record(slots=False)`,
-which gives up slots visibly instead of letting the base take them back.
+its records use `@record(slots=False)`, which drops slots visibly.
+A bare `@record` there would declare slots and still get the base's `__dict__`.
 
 ### Dynamic Typing
 
 With dynamic typing, any type works as long as it has the necessary methods.
-No shared base class or declared set of types constrains the parameter,
-and the only validity check comes at runtime, when the call runs:
+The parameter accepts any argument, and the one validity check comes at runtime,
+when the call runs:
 
 ```python
 # dynamic_typing.py
@@ -768,14 +768,15 @@ if __name__ == "__main__":
 #: [AttributeError] 'int' object has no attribute 'display'
 ```
 
-`show()` accepts anything because `t`'s type is `Any`,
-a different thing from `object`.
-The `expect()` call passes `show()` an `int`, which has no `display()` method,
-so the call raises an `AttributeError` when the line runs.
+`show()` accepts anything because `t`'s type is `Any`.
+`Any` switches the type checker off for `t`, so any type passes.
+Each `Any` parameter is dynamically typed.
+`Any` is a different thing from `object`.
 If you use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
-`Any` switches the type checker off for `t`, so any type passes.
-Each `Any` parameter moves you back into dynamic typing.
+
+The `expect()` call passes `show()` an `int`, which has no `display()` method,
+so the call raises an `AttributeError` when the line runs.
 
 ### Protocols
 
@@ -811,7 +812,7 @@ A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-Protocols connect pieces without requiring any piece to change.
+Protocols connect pieces and leave each piece as its author wrote it.
 
 The same independence hides membership.
 Nothing in a class's own source names the protocols it satisfies,
@@ -824,13 +825,13 @@ Because protocol membership is structural,
 one class can satisfy any number of protocols at once,
 with no inheritance graph connecting them.
 Each protocol names only the shape it needs.
-Nothing forces `Invoice` below to acknowledge `Priced`, `Serializable`,
-or `Describable`.
+`Invoice` below names none of `Priced`, `Serializable`, or `Describable`.
 
 Classic multiple inheritance has the *diamond problem*.
 If two base classes trace back to a common ancestor,
 Python resolves which version to call with C3 linearization,
-its method resolution order (MRO).
+its [method resolution order](07_Foundations--Classes.md#method-resolution-order)
+(MRO).
 The choice is deterministic,
 but a deep hierarchy still makes it easy to lose track of which method runs.
 Protocols avoid the question.
@@ -891,9 +892,9 @@ because each function's parameter names the one method it needs.
 
 #### What the Shape Does Not Say
 
-That same structural check has a blind spot.
+That same structural check compares method names and signatures alone.
 Two unrelated protocols can share a method name and signature by coincidence,
-and nothing distinguishes them:
+and the checker treats them as interchangeable:
 
 ```python
 # protocol_collision.py
@@ -921,12 +922,12 @@ print(charge(package))  # Silently treated as a price
 #: 4.5
 ```
 
-The type checker accepts `package` as a `Priced` argument without complaint,
+The type checker accepts `package` as a `Priced` argument,
 and `charge()` returns `4.5`, silently treating a weight as a price.
 The checker matches the shape correctly.
-The mismatch lives in what the number means, and no type checker sees that.
+The mismatch is in what the number means, and no type checker checks meaning.
 
-A distinct type per concept could close this gap.
+A distinct type per concept would make the type checker report this mismatch.
 `typing.NewType` looks like the natural fix:
 
 ```python
@@ -946,13 +947,14 @@ if __name__ == "__main__":
 #: user-42
 ```
 
-Without the `# type: ignore`, the type checker rejects the second call.
+Without the `# type: ignore`, the type checker rejects `lookup(42)`.
 `UserId` and `int` are different types to the checker.
-The same distinction separates `Priced` from `Weighted` in `protocol_collision.py` if `total()` returns a `Price` or a `Weight` instead of a bare `float`.
+If `total()` in `protocol_collision.py` returns a `Price` or a `Weight` instead of a bare `float`,
+the same distinction separates `Priced` from `Weighted`.
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.
-At runtime, calling `UserId` returns its argument unchanged,
+At runtime, calling `UserId` returns its argument,
 so `UserId(42)` equals `42` and is an `int`:
 
 ```python
@@ -964,7 +966,7 @@ def test_newtype_has_no_runtime_effect() -> None:
     assert type(UserId(42)) is int
 ```
 
-Nothing in that test can fail.
+Both assertions in that test always pass.
 Passing a raw `int` where a signature says `UserId` raises no exception either.
 In `newtype_boundary.py`,
 the `# type: ignore` silences the type checker's diagnostic,
@@ -975,17 +977,17 @@ takes the other route.
 A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too,
 and each value then needs a constructor call instead of a bare literal.
 
-A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
+A protocol also clarifies what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not guarantee.
 Satisfying a protocol is a shape claim: the methods exist,
-with the correct signatures,
-and the type checker verifies that half of the contract.
+with the correct signatures.
+The type checker verifies that half of the contract.
 The other half is semantic.
-A method must also behave the way callers expect.
-For example, return a description rather than raise an exception,
-finish rather than block, describe the object rather than change it.
-No type checker sees that half.
-Substitution is safe only when both halves work,
+A method must also behave the way callers expect:
+return a description rather than raise an exception, finish rather than block,
+describe the object rather than change it.
+No type checker verifies that half.
+Substitution is safe only when both halves hold,
 whether membership comes from inheriting a base class or matching a protocol.
 
 ### Pattern Matching on a Union
@@ -1033,7 +1035,7 @@ Adding a new shape is easier in the OOP version because you write one class.
 Adding a new operation over all shapes is easier in the pattern matching
 (functional) version,
 where the operation is one new function rather than a new method on every class.
-The exhaustiveness check covers the other direction.
+In the functional version, the exhaustiveness check covers adding a shape.
 Adding a member to the `Shape` union leaves every existing `match` incomplete,
 and `assert_never()` turns each one into a type checker error naming the shape you missed.
 
@@ -1120,15 +1122,17 @@ print(logger.lines)
 #: ['added 1.5, total 1.5', 'added 2.5, total 4.0']
 ```
 
-`total()` decides nothing about logging.
+`total()` leaves every logging decision to its logger.
 `NullLogger` defines silence once, instead of every call site defining it.
-The parameter's type also improves.
-`Logs` is a protocol, so any logger fits, and no caller sees a `| None`.
 Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,
 and it is safe as a default argument value.
-The standard library includes this idea as `logging.NullHandler`,
-and the maze in [Simulation](38_Patterns--Simulation.md)
+
+The parameter's type also improves.
+`Logs` is a protocol, so any logger fits, and no caller sees a `| None`.
+
+The standard library includes this idea as `logging.NullHandler`.
+The maze in [Simulation](38_Patterns--Simulation.md)
 points every doorless direction at one shared `EDGE` room,
 so movement code needs no `None` check.
 
@@ -1137,7 +1141,7 @@ Sometimes a caller must notice absence,
 like a lookup that can fail or a required value that may be missing.
 In these cases, use `T | None`,
 or return [`Result`](42_Functional--Error_Handling.md#a-result-type),
-so the type forces callers to face the missing case.
+so the type checker requires callers to handle the missing case.
 
 If every caller handles absence with the same neutral behavior,
 centralize that behavior in a null object.
@@ -1155,12 +1159,11 @@ and hashing when frozen.
 OOP also normalized the idea of types,
 which [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 takes further.
-If you avoid implementation inheritance,
-the payoff for using types is tremendous.
+If you compose instead of inheriting implementation,
+the benefit of using types is tremendous.
 
 Start with functions and data.
-When a program truly needs an object, it tells you.
-You find yourself passing the same data into every function,
+A program truly needs an object when you find yourself passing the same data into every function,
 or bundling behavior with state.
 Compare functions and an object on a running balance:
 
@@ -1186,7 +1189,7 @@ Every call threads `balance` through,
 and every call site must remember to capture the return value.
 The call at `[1]` drops its result,
 so `balance` keeps its value and prints `120.0` again.
-An object closes that gap:
+An object stores the balance, so no call site has a result to drop:
 
 ```python
 # balance_object.py
@@ -1209,11 +1212,11 @@ print(account.balance)
 #: 120.0
 ```
 
-`deposit()` and `withdraw()` know where the state lives,
-so no call site can forget to thread it through.
+`deposit()` and `withdraw()` update `self.balance`,
+so every call keeps its change.
+"Bundling behavior with state" gives you this: one object holds the state,
+and the same class defines every method that changes it.
 `account.` also lists every operation the object supports through dot-completion.
-"Bundling behavior with state" gives you this: one place holds the state,
-and every method that changes it lives next to it.
 OOP is useful, sometimes.
 But not everywhere, all the time.
 
@@ -1226,7 +1229,7 @@ But not everywhere, all the time.
 - Prioritize simplicity, clarity, and maintainability, to produce reliability.
 
 Many of the design patterns in this part of the book arose to work around limitations of older object-oriented languages.
-Read them through the lens of this chapter.
+Read those patterns with this chapter's questions in mind.
 For each pattern, ask whether you need the objects and the inheritance,
 or whether immutable data, a function, and a protocol solve the problem.
 

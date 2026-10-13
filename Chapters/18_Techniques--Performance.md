@@ -22,34 +22,32 @@ They then build elaborate designs that solve nonexistent problems.
 Python can be surprising.
 A program coded in the most straightforward way,
 without concern for performance, can often run fast enough for your needs.
-Do not automatically assume that a simply written program will be too slow.
-Try it out first.
+Before assuming that a simply written program will be too slow, try it out.
 It might be fine.
 
 The opposite assumption fails just as often.
-A program that works in the small may not scale.
+A program that is fast in the small can be slow at scale.
 A run over a hundred records says nothing about a million,
 because costs grow at different rates.
-An algorithm that revisits its data looks instant at one size and takes hours at another,
-and every layer of abstraction hides work
-(a copy per call, a query behind an attribute)
-that only a realistic load reveals.
+An algorithm that revisits its data looks instant at one size and takes hours at another.
+Every layer of abstraction also hides work that only a realistic load reveals,
+such as a copy per call or a query behind an attribute.
 So "try it out" means try it at the size you expect in production,
 not at the size that is convenient to type.
 
 ## Profilers
 
-A *profiler* looks for the slow spots, so you know where to focus.
+A *profiler* measures where a program spends its time,
+so you know where to focus.
 You may think you "have a pretty good idea where the slowdown is,"
 but programmers turn out to be bad at guessing.
-A profiler tells you for sure, preventing wasted time.
+A profiler tells you for sure.
 
-The standard library includes two.
-The first is the classic `cProfile`,
-a deterministic tracing profiler that arrived in 2006 and records every function call and return.
+The standard library includes two profilers,
+the classic `cProfile` and a sampling profiler new in Python 3.15.
+`cProfile` is a deterministic tracing profiler that arrived in 2006 and records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
 sometimes enough to distort the behavior you are measuring.
-The second, new in Python 3.15, is a sampling profiler.
 You run `cProfile` on a script from the command line:
 
     uv run python -m cProfile -s cumulative my_program.py
@@ -57,8 +55,9 @@ You run `cProfile` on a script from the command line:
 ### Reading a `cProfile` Report
 
 `cProfile`'s report is a table, one row per function.
-This section's report profiles a small script, `prof_demo.py`,
-built with one obvious hot spot and one generator expression that `cProfile` counts as a call per element:
+This section's report profiles a small script, `prof_demo.py`.
+The script has one obvious hot spot,
+and one generator expression that `cProfile` counts as a call per element:
 
 ```python
 # prof_demo.py
@@ -92,9 +91,10 @@ Running it under the profiler prints a table like this one
 Sorting by `cumtime` puts `exec` and `<module>` on top, which tells you nothing.
 They call everything, so they contain everything.
 Scan down to the first row where `tottime` is large: here, `slow()`.
-That is the function to attack, since its own loop, not anything it calls,
-burns most of the time.
-`ncalls` decides how to attack it.
+That is the function to speed up, since its own loop, not anything it calls,
+takes most of the time.
+
+`ncalls` tells you what kind of change a function needs.
 `slow()` spends most of the total in a single call,
 so it needs a better algorithm.
 `<genexpr>`'s ten thousand calls show `helper()` spending its time on per-element overhead,
@@ -126,8 +126,8 @@ Its rows are source lines, where `cProfile`'s are functions,
 so a hot loop shows up as the line inside it.
 The table has `tottime` and `cumtime` columns, estimated from the samples,
 and no `ncalls` column.
-A sampler sees where the program is at each snapshot,
-not how many times it arrived there.
+A sampler records which line is running at each snapshot,
+and the snapshots cannot count the calls made between them.
 When the call count is the question, use the tracing profiler.
 
 Beyond the standard library, [Scalene](https://github.com/plasma-umass/scalene)
@@ -148,8 +148,8 @@ the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
 and name the code to which the event applies.
 
-The interpreter specializes the bytecode that has no callback attached,
-so unmonitored code runs at full speed.
+The interpreter instruments only the code that has an event attached,
+and everything else keeps its specialized bytecode and runs at full speed.
 `sys.settrace()`, by contrast, slows every Python function its thread runs,
 since its trace function runs on each call,
 and the local trace function it returns runs on each line:
@@ -188,15 +188,15 @@ print(counts)
 ```
 
 `fib()` and `square()` stay untouched.
-The counting lives outside them, in `on_start()`,
-which the interpreter calls each time a monitored Python function begins.
+`on_start()` does the counting outside them,
+and the interpreter calls it each time a monitored Python function begins.
 `set_local_events()` is the narrow instrument.
 It attaches the event to one code object,
 and that is why `square()` is absent from the count although it ran.
-The event does not spread to whatever that code calls,
+The event stays on that one code object,
 so a helper that `fib()` invokes goes uncounted as well.
 The global form is `set_events()`,
-which fires for every Python function in the process.
+which turns the event on for every Python function in the process.
 When one function is the question,
 `set_events()` collects data you discard and slows the run you are measuring.
 
@@ -206,7 +206,7 @@ The identifiers are a shared resource.
 `PROFILER_ID`, `DEBUGGER_ID`,
 and `COVERAGE_ID` carry the names of their intended users.
 Claiming one that another tool holds raises a `ValueError`,
-so a second tool fails loudly instead of silently replacing the first tool's callbacks.
+so a second tool gets an exception instead of silently replacing the first tool's callbacks.
 
 For an answer you need once rather than continuously,
 the callback can turn its own event off:
@@ -246,21 +246,22 @@ print(len(results), calls["used"], calls["unused"])
 
 Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location until someone calls `restart_events()`.
 `used()` ran a thousand times and the callback ran for it once.
+
 `DISABLE` keeps coverage measurement fast.
 The question is "was this reached,"
 so a second report from the same location adds nothing,
-and after the first hit the monitored code returns to full speed.
+and after the first hit the monitored code runs at full speed again.
 
 A profiler gives you a ranked table with no code to write.
-`sys.monitoring` gives you one number about one function,
-and that is the better tool when you know which function matters and the profiler's overhead changes the answer.
+`sys.monitoring` gives you one number about one function.
+It is the better tool when you know which function matters and the profiler's overhead changes the answer.
 
 ## Benchmark Alternatives with `timeit`
 
 A profiler tells you where the time goes.
-Once you discover a hot spot, `timeit` tells you which rewrite wins.
+Once you discover a hot spot, `timeit` tells you which rewrite runs faster.
 It runs a small snippet many times and reports the total,
-insulating the measurement from startup cost and clock granularity.
+so one-time setup and the clock's granularity become a small share of the measurement.
 
 Timings differ from machine to machine,
 so the following example prints a comparison instead of raw numbers.
@@ -272,9 +273,9 @@ A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
 comparing each element until it finds a match or reaches the end.
 A `set` tests membership through hashing.
-`target in as_set` computes a hash of `target` and jumps to the bucket that value occupies.
+`target in as_set` computes a hash of `target` and checks the one bucket that hash selects.
 Scanning gets slower as the list grows.
-Hashing stays fast no matter how many elements the set holds:
+Hashing stays fast however many elements the set holds:
 
 ```python
 # membership.py
@@ -300,22 +301,22 @@ print(f"set at least 100x faster: {t_set * 100 < t_list}")
 not the time for one call.
 That first argument is a `lambda` here rather than a string of code,
 since a `lambda` can close over `target`, `as_list`, and `as_set`,
-with no separate `setup` argument needed to build them.
+while a string needs a `setup` argument or `globals` to reach them.
 `number` sets how many times `timeit` calls the lambda, 100 in this case.
-Leaving `number` out defaults to a million calls,
-which suits a microsecond snippet and is a long wait for anything slower,
-so always set it for a function you have not timed before.
+`number` defaults to a million calls.
+A million suits a microsecond snippet and is a long wait for anything slower,
+so always set `number` for a function you are timing for the first time.
 
 Each timing includes the cost of calling the lambda.
 A set lookup takes nanoseconds, so that call is a sizable share of `t_set`,
-and the ratio understates the set's lead.
+and the ratio understates how much faster the set is.
 When a snippet is that small and the ratio matters,
 pass `timeit` a string of code with `globals=globals()`.
 `timeit` compiles the string into the body of its timing loop,
-so each pass runs the snippet directly.
+so each pass runs the snippet inline.
 
 One machine measured the `set` at about 14,000 times faster than the list scan.
-A single lookup costs little either way.
+A single lookup takes little time either way.
 A million lookups is the difference between instant and minutes.
 
 ### Trusting a Measurement
@@ -324,15 +325,15 @@ A single measurement includes whatever else the machine is doing.
 `timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
 and the smallest of them is the run with the least interference.
 Report `min(...)`, not the mean.
-A slow run means something stole the CPU,
-so averaging folds that theft into your answer,
-while the fastest run is the closest you get to measuring your code alone.
+A slow run means another process held the CPU for part of the run,
+so averaging adds that interruption to your answer.
+The fastest run is the closest you get to measuring your code alone.
 
 The timer most readers write first is a hand-rolled one:
 `start = time.time()` before one call and a subtraction after it.
 `time.time()` reads the wall clock,
-which can jump when the system corrects its time,
-and one call is one sample with all of its interference.
+which can jump when the system corrects its time.
+One call is also one sample, with all of its interference.
 `timeit` times with `time.perf_counter()`,
 a high-resolution clock that moves forward steadily.
 When you time code by hand, use that clock and repeat the run.
@@ -341,15 +342,15 @@ When you time code by hand, use that clock and repeat the run.
 
     uv run python -m timeit -s "s = set(range(100_000))" "99_999 in s"
 
-Benchmark with data shaped like production data.
-A `list` of ten elements can beat a `set`,
-and an optimization tuned to toy input can behave badly in production.
-
 `timeit` also turns the garbage collector off while it measures,
 so its runs stay repeatable.
 For a benchmark that allocates heavily,
-that hides the collection pauses a production run includes,
-so pass `setup="gc.enable()"` when collection pauses are part of what you compare.
+the measurement then leaves out the collection pauses a production run includes.
+Pass `setup="gc.enable()"` when collection pauses are part of what you compare.
+
+Benchmark with data shaped like production data.
+A `list` of ten elements can beat a `set`,
+and an optimization tuned to toy input can behave badly in production.
 
 ### Numbers on Your Machine {#numbers-on-your-machine}
 
@@ -390,7 +391,6 @@ adds the measurements above that line:
 The names are the keyword arguments at the call site,
 so each listing labels its own measurements.
 Your ratio differs from the one above.
-Seeing your own number is the point of running it.
 
 ## Try a Faster Platform
 
@@ -399,10 +399,10 @@ That might be enough, and if it is, you save time and money.
 
 The simplest platform change is a newer CPython.
 3.11 alone measured 1.25x faster than 3.10 across the `pyperformance` suite,
-a range of 10-60% depending on the workload,
-and later releases have continued that work.
+with gains from 10% to 60% depending on the workload.
+Later releases have continued that work.
 
-Two more speedups need no new code: the tail-calling interpreter,
+Two more speedups work on the code you have: the tail-calling interpreter,
 and the experimental just-in-time compiler inside CPython.
 
 Alternative interpreters for Python exist, notably PyPy,
@@ -417,14 +417,15 @@ is the largest platform-level speedup available in 3.15,
 since it removes the lock that otherwise serializes Python bytecode across threads.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
-If it's noticeably less, buying new hardware might be a quick win.
+If it's noticeably less,
+buying new hardware might solve the problem sooner and for less money.
 
 ## The Tail-Calling Interpreter
 
 The tail-calling interpreter is a build-time choice,
 and nothing at run time turns it on or off.
-Since 3.14, a CPython build can make each bytecode instruction a small C function that ends by calling the function for the next instruction,
-in place of one large C `switch` that dispatches every instruction.
+A standard build dispatches every bytecode instruction through one large C `switch`.
+Since 3.14, a CPython build can instead make each instruction a small C function that ends by calling the function for the next instruction.
 The C compiler turns each of those calls into a jump,
 and the loop that runs Python bytecode gets faster.
 The tail call is in C, inside the interpreter.
@@ -440,7 +441,7 @@ including the interpreter that runs this book's listings.
 A source build needs `--with-tail-call-interp` and a compiler with the `preserve_none` calling convention:
 Clang 19 or newer, or Visual Studio 2026.
 
-The payoff is a percentage, not a multiple.
+The speedup is a percentage, not a multiple.
 On Windows x86-64, 3.15 measures 15-20% faster on the `pyperformance` geometric mean than the same source built with the `switch`,
 with individual programs from 14% to 40%.
 The 3.14 figure, with Clang 19,
@@ -452,22 +453,23 @@ so the comparison was against a compiler regression rather than a fast interpret
 With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
 The advice under [Numbers on Your Machine](#numbers-on-your-machine)
 applies to CPython's own developers too.]
-The JIT in the next section stacks on top of this speedup.
+
+The JIT in the next section adds its speedup to the tail-calling interpreter's.
 The JIT compiles the hot paths,
-the tail-calling interpreter runs everything else faster,
-and the macOS figure in that section uses a tail-calling build as its baseline.
+and the tail-calling interpreter runs everything else faster.
+The macOS figure in that section uses a tail-calling build as its baseline.
 
 ## The CPython JIT
 
 CPython includes an experimental just-in-time compiler.
 [PEP 744](https://peps.python.org/pep-0744/) added it in 3.13,
 and 3.15 rebuilt much of it.
-The JIT watches the bytecode a program executes,
+The JIT counts how often each path through a program's bytecode runs,
 and once a path runs often enough, it compiles that path to machine code.
 You change nothing.
-The same file runs, and the interpreter stops re-interpreting its busiest paths.
+The same file runs, and the interpreter runs its busiest paths as machine code.
 
-Three switches stand between your program and that machine code:
+Your program runs that machine code only when three conditions hold:
 
 1. The interpreter must be *built* with the JIT,
    through the `--enable-experimental-jit` configuration option.
@@ -478,8 +480,8 @@ Three switches stand between your program and that machine code:
    A script that runs briefly exits before it reaches the threshold,
    so the JIT compiles none of its code.
 
-Since 3.14, the official python.org Windows and macOS binaries use `--enable-experimental-jit=yes-off`,
-which compiles the JIT in and leaves it switched off,
+Since 3.14, the official python.org Windows and macOS binaries use `--enable-experimental-jit=yes-off`.
+That option compiles the JIT in and leaves it switched off,
 so `PYTHON_JIT=1` turns it on.
 Plain `yes` builds start with the JIT running,
 and there `PYTHON_JIT=0` turns it off.
@@ -520,29 +522,29 @@ reports whether the frame that called it is running compiled code.
 The documentation warns against branching on its result,
 since a tracing compiler can give different answers to the same call.
 
-The payoff is again a percentage,
+The speedup is again a percentage,
 and a smaller one than the tail-calling interpreter's on Windows.
 On the `pyperformance` suite,
 3.15 measures 7-8% faster on x86-64 Linux against the standard optimized build,
 and 11-12% faster on AArch64 macOS against the tail-calling interpreter.
 Those geometric means, from the 3.15 What's New, cover dozens of benchmarks.
-That report sets aside one microbenchmark, `unpack_sequence`,
-and the rest range from roughly 15% slower to more than twice as fast,
+That report sets aside one microbenchmark, `unpack_sequence`.
+The rest range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
 To measure your own program,
 time the workload with `PYTHON_JIT` set to `1` and to `0`,
-and change nothing else.
+and hold everything else the same.
 
 Numba's [`@njit`](#jit-compilation-with-numba) is also a just-in-time compiler,
-and the two make opposite trades.
-The CPython JIT asks nothing of you,
+and the two take opposite approaches.
+The CPython JIT works on your code as written,
 applies to whatever code turns out to be hot, and speeds it up by percentages.
 `@njit` applies only to numeric functions, requires a decorator,
 pauses to compile on the first call, and speeds code up by multiples.
-Neither one rescues a quadratic algorithm.
+Neither one changes a quadratic algorithm's growth rate.
 
-[PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
-5% over the interpreter alone for 3.16,
+[PEP 836](https://peps.python.org/pep-0836/)
+sets the speedups the JIT must reach: 5% over the interpreter alone for 3.16,
 then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#free-threading)
 by 3.17.
 The PEP calls that the minimum for continuing to develop the JIT inside CPython.
@@ -552,8 +554,8 @@ That step needs separate approval from the release manager.
 ## Write Idiomatic Python
 
 The interpreter is a C program.
-A built-in like `sum()` runs its loop in C,
-so the more of your loop you hand to C, the less bytecode runs per element.
+A built-in like `sum()` runs its loop in C, so the more of your loop runs in C,
+the less bytecode runs per element.
 The idiomatic version of a loop is usually also the fast one:
 
 ```python
@@ -581,7 +583,8 @@ One machine measured `sum()` at about five times faster than the hand-written lo
 
 Other examples:
 
-- String concatenation: `"".join(parts)` is faster than `+=` in a loop
+- String concatenation.
+  `"".join(parts)` is faster than `+=` in a loop
   (one linear pass instead of repeated reallocation).
 - A comprehension is faster than an `append()` loop,
   though the margin is now small
@@ -635,7 +638,7 @@ Measure it on your own machine before believing either direction.
 The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
 so a claim about a small difference is a claim about the noise.
-A hoist worth writing beats that margin without argument.
+A hoist worth writing speeds the loop up by more than that margin.
 The measurement proves the point because it catches a "classic" optimization that no longer works,
 just as readily as it catches one that does.
 
@@ -685,21 +688,23 @@ print([grade(s) for s in (55, 65, 85, 95)])
 #: ['F', 'D', 'B', 'A']
 ```
 
-Because `scores` stays sorted, `bisect` locates a position in O(log n)
-instead of the O(n) scan a `list` needs.
 `bisect()` is an alias for `bisect_right()`,
-which returns the position after any elements equal to the target,
-while `bisect_left()` returns the position before them
-(`insort()` is likewise an alias for `insort_right()`).
+and `insort()` is likewise an alias for `insort_right()`.
 `bisect_left()` and `bisect_right()` both answer "where does this go,"
-but when the list holds the target, only `bisect_left()` returns its index,
-so a membership test must use it, as `search_comparison.py` does below.
+and their answers differ when the list holds the target.
+`bisect_left()` returns the position before any elements equal to the target,
+which is the target's index.
+`bisect_right()` returns the position after them.
+A membership test must therefore use `bisect_left()`,
+as `search_comparison.py` does below.
 
 `grade()` uses `bisect()` for a range lookup.
 The insertion point of a score in `CUTOFFS` counts the cutoffs that score reaches,
-and that count indexes `LETTERS`,
-so a score of 80 falls after the 80 cutoff and gets a B.
+and that count indexes `LETTERS`.
+A score of 80 falls after the 80 cutoff, so it gets a B.
 
+Because `scores` stays sorted, `bisect` locates a position in O(log n)
+instead of the O(n) scan a `list` needs.
 The speed is in the search alone.
 `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic, when the smallest item is all you read,
@@ -707,9 +712,9 @@ consider a [heap](#heap) instead.
 
 ### Scan, Bisect, or Hash
 
-That leaves three ways to answer the same membership question: scan a `list`,
+You now have three ways to answer the same membership question: scan a `list`,
 binary-search a sorted `list` with `bisect`,
-or hash straight to the answer with a `set`.
+or hash the value and check one bucket of a `set`.
 
 ```python
 # search_comparison.py
@@ -745,13 +750,14 @@ print(f"hashing at least 3x faster than binary search: "
 #: hashing at least 3x faster than binary search: True
 ```
 
-The scan loses badly,
+The scan is by far the slowest,
 since it walks roughly half the `list` before reaching `target`.
 `bisect` narrows that to a handful of comparisons,
-one per halving of the remaining range, and that is why the move from O(n)
-to O(log n) shows up here as orders of magnitude rather than a modest improvement.
-Hashing wins again over `bisect`,
-since it needs only one hash and one equality check no matter how large `as_set` grows.
+one per halving of the remaining range.
+Here that means about 17 comparisons against about 50,000, so the move from O(n)
+to O(log n) shows up as orders of magnitude rather than a modest improvement.
+Hashing is faster than `bisect` too,
+since it needs one hash and one equality check however large `as_set` grows.
 One machine measured `bisect` at about 2,000 times faster than the scan,
 and hashing at about five times faster than `bisect`.
 
@@ -789,14 +795,13 @@ print(values)  # Neither call reorders its argument
 ```
 
 After `heapify()` the smallest element sits at index 0.
-`nsmallest()` and `nlargest()` answer top-N questions without heapifying the list first.
+`nsmallest()` and `nlargest()` answer top-N questions on any list and leave its order as it was.
 
-Through Python 3.13, `heapq` built only a min-heap.
+Through Python 3.13, `heapq` built min-heaps.
 Getting a max-heap meant negating every value going in and out.
-Python 3.14 added `_max` variants
-(`heapify_max()`, `heappush_max()`, `heappop_max()`, and others)
-that keep the largest item at index 0,
-so a max-heap now stores its values as they are:
+Python 3.14 added `_max` variants that keep the largest item at index 0:
+`heapify_max()`, `heappush_max()`, `heappop_max()`, and others.
+A max-heap now stores its values as they are:
 
 ```python
 # max_heap_queue.py
@@ -821,12 +826,13 @@ print(max_nums)  # Heap ordering is maintained
 
 Every operation mirrors its min-heap partner,
 with `heapify_max()` putting the largest element at index 0.
-
 The output shows the list in the order the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
 keeps it, which is not sorted order.
+
 Use the heap version of every operation.
 The list's own `pop(0)` returns the smallest value the first time,
-but it also destroys the heap ordering,
+but it also shifts every remaining element down one index.
+That shift breaks the heap ordering,
 so `heap[0]` holds 6 while 4 is still in the list:
 
 ```python
@@ -846,21 +852,18 @@ print(heap[0], min(heap))
 ```
 
 For a priority queue shared across threads,
-`queue.PriorityQueue` wraps the same heap in a lock.
-[Concurrency](19_Techniques--Concurrency.md#coordinating-threads-with-queues)
-shows it in use.
+[`queue.PriorityQueue`](19_Techniques--Concurrency.md#coordinating-threads-with-queues)
+wraps the same heap in a lock.
 
 ### Heap Versus Sort
 
 A heap answers a different question than a hash-based container.
-A `set` tells you whether a value is present in O(1),
-but it knows nothing about order,
+A `set` tells you whether a value is present in O(1), but it stores no order,
 so finding the smallest values still means scanning or sorting every item.
-A heap keeps the smallest item at hand as you push and pop,
-so pulling it costs only O(log n) each time,
-no matter how many times you repeat it.
-The natural competitor for "give me the 100 smallest" is not a scan,
-but `sorted(data)[:100]`, so that is what the heap needs to beat:
+A heap keeps the smallest item at index 0 as you push and pop,
+so removing it takes O(log n) each time, however many times you repeat it.
+For "give me the 100 smallest," the heap's competitor is `sorted(data)[:100]`,
+not a scan, so the listing times the heap against `sorted()`:
 
 ```python
 # heap_vs_sort.py
@@ -897,20 +900,22 @@ print(f"heap beats sorted() by 1.5x+ on shuffled "
 ```
 
 `sorted(data)` orders every element up front, costing O(n log n)
-no matter how few items you then take.
-`heapify()` pays O(n) once, then each `heappop()` costs only O(log n),
-so the same 100 extractions cost roughly O(n + 100 log n),
-smaller than sorting whenever the fraction you extract stays small.
+however few items you then take.
+`heapify()` takes O(n) once, then each `heappop()` takes O(log n),
+so the same 100 extractions cost roughly O(n + 100 log n).
+That total stays below sorting's O(n log n)
+whenever you extract a small fraction of the data.
 One machine measured the heap at about 3 times faster here.
+
 The comparison holds only when the input order gives neither side an advantage.
 On descending data, the kind `heap_corruption.py` uses,
-Timsort detects the existing run and `sorted()` wins outright.
-A heap is not automatically the right choice.
-Measure with data shaped like production data.
+Timsort detects the existing run and `sorted()` is the faster of the two.
+Which one wins depends on the data,
+so measure with data shaped like production data.
 
-`heapq.nsmallest(100, data)`, introduced in `heap_queue.py`,
-answers this top-N question in one call,
-and is the tool to use before hand-rolling either comparison here.
+`heapq.nsmallest(100, data)` answers this top-N question in one call.
+`heap_queue.py` introduced `nsmallest()`,
+and `nsmallest()` is the tool to use before hand-rolling either version here.
 The heap fits a different shape of problem:
 pushes and pops interleaved over time, with nothing to presort in advance.
 Re-sorting after every insertion costs far more than one incremental `heappush()`/`heappop()` pair.
@@ -919,9 +924,9 @@ Re-sorting after every insertion costs far more than one incremental `heappush()
 
 A list-building pipeline materializes every intermediate result.
 A [generator pipeline](16_Techniques--Comprehensions.md#generator-expressions)
-computes one item at a time, on demand,
-so memory use stays flat as the source grows,
-and the pipeline does no work past the point where the consumer stops.
+computes one item at a time, on demand.
+Its memory use stays flat as the source grows,
+and its work ends where the consumer stops.
 `tracemalloc` measures the difference:
 
 ```python
@@ -965,10 +970,12 @@ print(f"lazy peak under 1% of eager: "
 the current allocation and the peak since `start()`,
 and the listing keeps the peak.
 Each function runs inside its own `start()`/`stop()` pair,
-so the lazy peak does not include the eager lists.
-Both versions produce the same five numbers,
-but the eager one builds a million-element list and a half-million-element list to get them,
-while the lazy one computes only the handful of values that `islice()` extracts.
+so the lazy peak measures the lazy pipeline alone.
+
+Both versions produce the same five numbers.
+The eager one builds a million-element list and a half-million-element list to get them.
+The lazy one computes nine squares,
+enough for `islice()` to collect the first five evens.
 `islice()` replaces the eager version's `evens[:5]`.
 A generator has no `__getitem__()`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
@@ -982,17 +989,17 @@ Random access, sorting,
 and the `bisect` searches in `bisect_search.py` all need an indexable structure,
 not a stream of values that arrive once and disappear.
 NumPy's [vectorized arithmetic](#vectorize-with-numpy) needs the same thing:
-a whole array in memory, not values arriving one at a time.
+a whole array in memory.
 
-The risk is the cliff at the edge of that memory.
+The risk is at the limit of that memory.
 Performance holds steady as the data approaches available RAM,
-then collapses at the boundary.
+then drops sharply once the data exceeds it.
 A data set that fits runs at full speed.
-One that no longer fits forces the operating system to swap pages to disk,
+A data set that outgrows memory forces the operating system to swap pages to disk,
 turning microseconds into milliseconds, a thousandfold slowdown.
 Past that point the process fails outright, with `MemoryError` or an OS kill.
 
-The cliff is the argument for laziness.
+That sudden drop is the argument for laziness.
 If a data set can outgrow memory, stream it from the start,
 like `lazy_first_evens()`.
 
@@ -1001,7 +1008,7 @@ like `lazy_first_evens()`.
 If you call a [pure function](40_Functional--Foundations.md#pure-functions)
 repeatedly with the same arguments,
 the fastest way to get the answer is to reuse the result of an earlier call.
-`functools.cache` stores each result the first time and replays it after that.
+`functools.cache` stores each result the first time and returns the stored result after that.
 The classic demonstration is the naive recursive Fibonacci,
 which recomputes the same subproblems exponentially many times:
 
@@ -1033,7 +1040,7 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 `cache_info().misses` counts the calls that found nothing stored and ran the body,
 one for each `n` from 0 through 25.
 `fib_plain()` ran 242,785 times for the same answer.
-Each step up in `n` multiplies that count by about 1.6 and adds one to the cached count,
+Each step up in `n` multiplies `fib_plain()`'s count by about 1.6 and adds one to the cached count,
 so the gap widens as `n` grows.
 
 `cache` holds every result forever,
@@ -1042,27 +1049,27 @@ The arguments must be hashable,
 which is another reason to prefer immutable containers.
 
 Caching is correct only when the function is pure.
-Caching a function with side effects replays the answer but skips the effects,
-and caching a function that reads outside state can replay a stale answer.
+Caching a function with side effects returns the stored answer but skips the effects.
+Caching a function that reads outside state can return a stale answer.
 
 A method is the usual trap.
 `@cache` keys on every argument including `self`,
-so the cache holds a reference to each instance it has seen,
-and the collector can reclaim none of them.
+so the cache holds a reference to each instance it has seen and keeps every one of them alive.
 For a value computed once per object,
 use [`functools.cached_property`](07_Foundations--Classes.md#cached-property),
-which stores the result on the instance, so the result dies with the instance.
+which stores the result on the instance,
+so the collector reclaims the result along with the instance.
 A class whose `__slots__` leaves out `__dict__` [cannot use `cached_property`](#when-slots-does-not-fit).
 
 ## Reduce Memory Overhead
 
 With millions of objects, per-object overhead can dominate performance.
-Three tools reduce that overhead.
 A smaller instance means fewer bytes for the allocator and garbage collector to manage,
 more instances fitting in the CPU cache at once, and,
 for `__slots__` specifically,
 attribute access through a known offset instead of a `__dict__` lookup.
-The byte counts below show what each tool saves.
+Three tools reduce per-object overhead,
+and the byte counts below show what each tool saves.
 Multiply by a population in the millions to see why it matters.
 
 ### Slots
@@ -1121,17 +1128,17 @@ with expected(AttributeError):
 If a class can be a data class,
 prefer `slots=True` over a hand-written class with `__slots__`.
 `@dataclass(slots=True)` both shrinks the instances and writes the methods.
-The tradeoff is that instances can no longer grow attributes outside the declared set.
+The slotted class's instances then accept only the declared attributes.
 
 `frozen=True` and `slots=True` are independent.
 Frozen blocks every attribute assignment, new fields included,
-so a frozen instance already cannot grow,
+so a frozen instance cannot gain attributes,
 the same restriction `slots` gives you.
 But frozen enforces that restriction by overriding `__setattr__()`,
 and the instance keeps its `__dict__` underneath.
 `slots=True` removes that `__dict__`,
-so pairing it with `frozen=True` is the natural default,
-giving you the same immutability in a fraction of the space:
+so pairing it with `frozen=True` gives you the same immutability in a fraction of the space.
+That makes the pair the natural default:
 
 ```python
 # frozen_vs_slotted.py
@@ -1175,9 +1182,8 @@ so the listing prints a comparison that holds anywhere rather than numbers that 
 
 ### A Decorator for the Default {#record}
 
-`@dataclass(frozen=True, slots=True)` is a long line to repeat on every value class,
-and `slots=True` is the half that gets dropped,
-because the class works without it.
+`@dataclass(frozen=True, slots=True)` is a long line to repeat on every value class.
+`slots=True` is the half that gets dropped, because the class works either way.
 A decorator of your own can apply both.
 [`@dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
 tells the type checker that the result is a frozen data class:
@@ -1203,18 +1209,19 @@ def record[T](
     return apply if cls is None else apply(cls)
 ```
 
-Written bare, `@record` is `model()` from `kept_transform.py` with `slots=True` added.
 The name follows Java and C#,
 where a *record* is an immutable class defined by its fields.
+Written bare, `@record` is `model()` from `kept_transform.py` with `slots=True` added.
 The called form, `@record(slots=False)`,
-is for the class that must keep a `__dict__`,
-and dropping the slots takes a visible flag rather than a missing option.
+is for the class that must keep a `__dict__`.
+Dropping the slots then takes a visible flag rather than a missing option.
 
 The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decorators.md#decorators-with-optional-parentheses).
-`cls` is `None` when you call the decorator with arguments,
-and the two `@overload` declarations tell the checker which form it reads.
+`cls` is `None` when you call the decorator with arguments.
+The two `@overload` declarations tell the checker which form it reads.
 The test is `cls is None` rather than `callable(cls)`,
 since a class is callable.
+
 A class decorated with `@record` behaves like any frozen data class,
 and its instances carry no `__dict__`:
 
@@ -1239,28 +1246,30 @@ with expected(AttributeError):
 ```
 
 `frozen_default=True` is the reason the assignment carries a `# type: ignore`.
-The checker knows `Point` is frozen and reports `p.x = 3` before the program runs.
+The checker treats `Point` as frozen and reports `p.x = 3` before the program runs.
 `@dataclass_transform` has no parameter that describes slots,
-so the checker does not know `Point` is slotted.
-On a frozen class that gap has no effect,
+so the checker cannot tell that `Point` has slots.
+On a frozen class that missing information changes nothing,
 because the checker rejects every assignment to an instance.
 
 A class whose base declares no `__slots__` writes `@record(slots=False)`.
 The base gives every instance its `__dict__` back,
-so slots on the subclass would remove nothing,
-and the flag says so at the class.
-That form is for a base that is not yours to change, such as a library's,
+so slots on the subclass would remove nothing.
+The flag states that at the class.
+That form is for a base someone else owns, such as a library's,
 and for the rare class whose code reads the instance dict on purpose.
 When the base is yours,
 an empty `__slots__ = ()` on it keeps the records under it slotted,
 as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 does.
-A class that needs an option `record()` lacks keeps `@dataclass` written out:
-`order=True`, or `weakref_slot=True` for a weak reference.
+
+When a class needs an option that `record()` lacks,
+it keeps `@dataclass` written out: `order=True`,
+or `weakref_slot=True` for a weak reference.
 
 ### When Slots Does Not Fit {#when-slots-does-not-fit}
 
-`__slots__` changes more than where the fields live.
+`__slots__` changes more than where an instance keeps its fields.
 A slotted instance has no `__dict__`, no `__weakref__` slot,
 and a set memory layout, and each of the three breaks a feature:
 
@@ -1314,12 +1323,14 @@ That entry gives back the per-instance dict that `slots=True` exists to remove.
 The same is true of weak references.
 Add `"__weakref__"` to `__slots__` if some other object needs to hold one
 (`weakref_slot=True` adds it to a data class).
-Multiple inheritance is the sharpest edge.
-Python lays out a slotted instance as a block of storage with a set layout,
-and two unrelated classes that both declare non-empty `__slots__` each claim their own incompatible layout,
-so a class cannot inherit from both.
+
+Multiple inheritance is more restrictive than `cached_property` or weak references.
+Python lays out a slotted instance as a block of storage with a set layout.
+When two unrelated classes both declare non-empty `__slots__`,
+each claims its own layout, the two layouts conflict,
+and a class cannot inherit from both.
 A class can inherit from one slotted base as long as its other bases declare no slots of their own.
-A subclass that declares no `__slots__` of its own quietly grows a `__dict__` back,
+A subclass that declares no `__slots__` of its own silently gets a `__dict__` back,
 undoing the saving for every instance of that subclass (see exercise 6).
 
 ### Array Instead of List
@@ -1361,7 +1372,7 @@ The type code sets one type for every element,
 so `array` stores them compactly and rejects values of the wrong type.
 The size comparison shows the cost of boxing.
 The `list` holds an 8-byte pointer to a 24-byte `float` object per element,
-while the `array` spends 8 bytes per element total,
+while the `array` uses 8 bytes per element total,
 roughly a four-to-one difference
 (one machine measured 325,176 bytes against 80,080).
 
@@ -1387,6 +1398,7 @@ print(view.nbytes)
 The view shares storage with `data`, so writing through it changes the original.
 `bytes(chunk)` copies, but only to print the slice.
 The view copies nothing.
+
 A view can also read fields out of a buffer without copying it,
 the way a real protocol parser reads a header:
 
@@ -1416,15 +1428,15 @@ with expected(TypeError):
 
 `payload` is a second `memoryview`, not a copy of `data`.
 `payload.obj` names the buffer from which it reads, and that buffer is `data`.
-That sharing is also the trap.
-`memoryview(data)` keeps an export open on `data` for as long as `view`
-(or `payload`, sliced from it) stays alive.
+
+Sharing the buffer is also the trap.
+`memoryview(data)` keeps an export open on `data` for as long as `view` stays alive.
+A slice of `view`, such as `payload`, holds the export open too.
 `bytearray.append()` needs to resize the buffer,
-so it refuses while an export is open.
-That is why `data.append(1)` fails here.
-`view` and `payload` are both still alive at that point.
-The fix is to release every view first, explicitly (`view.release()`)
-or by letting them go out of scope, before resizing the buffer they read.
+so it raises a `BufferError` while an export is open.
+`data.append(1)` fails here because `view` and `payload` are both still alive.
+Release every view before resizing the buffer it reads, either explicitly
+(`view.release()`) or by letting the views go out of scope.
 
 The second trap is about direction, not lifetime.
 A `memoryview` over immutable `bytes` supports reading and slicing,
@@ -1494,18 +1506,19 @@ print(f"NumPy at least 3x faster: {t_numpy * 3 < t_loop}")
 Both build the same sequence of `n` numbers (it's `arange`, not `arrange`).
 `list(range(n))` boxes each one as a Python `int`.
 `np.arange()` packs them into one contiguous block of C doubles,
-the same layout `array` uses in `compact_array.py`,
-with `dtype=np.float64` choosing the element type the way `array`'s `"d"` type code does.
+the same layout `array` uses in `compact_array.py`.
+`dtype=np.float64` chooses the element type, as `array`'s `"d"` type code does.
 
 `vectorized()` computes the same `3x + 1` as `pure_python()`,
 and the `assert` confirms the two results match before the timing starts.
 NumPy runs that expression as one compiled pass over contiguous memory instead of a million individual Python-level steps.
+That whole-array expression is the declarative style [Confidence](43_Functional--Confidence.md#a-confidence-spectrum)
+examines: describe the whole-array result and let the engine arrange the steps.
+
 NumPy is a fast library you call, not a compiled extension you write.
-You keep that speedup only while the data stays inside NumPy.
+You keep NumPy's speedup only while the data stays inside NumPy.
 Calling a Python function on each element,
 or converting arrays to lists and back, reintroduces the overhead.
-That is the declarative trade [Confidence](43_Functional--Confidence.md#a-confidence-spectrum)
-examines: describe the whole-array result and let the engine arrange the steps.
 
 One machine measured the vectorized pass at about 11x faster than the loop.
 The 3x threshold sits far below any multiple you should see.
@@ -1547,16 +1560,18 @@ print(f"Numba at least 3x faster: {t_numba * 3 < t_python}")
 ```
 
 `njit(count_primes)` is the call that `@njit` above the `def` would make.
-Calling it directly keeps the original `count_primes()` as the Python baseline,
-and Numba compiles the `fast_count_primes` it returns at its first call.
+The explicit call keeps the original `count_primes()` as the Python baseline.
+`njit()` returns `fast_count_primes`,
+and Numba compiles that function at its first call.
 The `assert` makes that first call on a small input, before the timing starts.
 That call compiles `fast_count_primes()` and checks its answer against the Python version's,
 so the timed calls measure steady-state speed.
 
 On numeric code over simple types and NumPy arrays,
 Numba often runs nearly as fast as C.
-The first call stops to compile, and code that uses general Python objects,
-such as custom classes, does not compile.
+The first call stops to compile.
+Numba also rejects code that uses general Python objects,
+such as custom classes.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 
@@ -1568,11 +1583,11 @@ The 3x threshold sits far below any multiple you should see.
 NumPy and Numba solve different halves of the same problem,
 and a single function often uses both.
 NumPy gives you a compact array.
-`@njit` compiles a loop that walks it,
-for the case where the work per element depends on the element's value and no single vectorized expression fits.
+When the work per element depends on the element's value and no single vectorized expression fits,
+`@njit` compiles a loop that walks the array.
 The [Collatz conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture)
-is such a case: from `n`,
-halve an even value or triple-and-increment an odd one,
+is such a case.
+From `n`, halve an even value or triple-and-increment an odd one,
 and repeat until you reach 1.
 The number of steps differs for every starting value,
 so no single array expression produces it:
@@ -1617,9 +1632,10 @@ the `assert` compiles `fast_collatz_lengths()` on the first hundred values and c
 so it composes with vectorized NumPy code on either side.
 Compiling changes the loop's interior alone.
 The same Python source runs as machine code instead of as bytecode over boxed `int` objects.
-That division is the pattern in practice.
+
+In practice, NumPy and Numba divide the work.
 Use a vectorized NumPy expression wherever the shape of the computation allows it,
-and drop to a `@njit` loop for the steps that resist vectorizing,
+and write a `@njit` loop for the steps that need one,
 keeping the array as the shared data structure throughout.
 
 The same machine measured the compiled `collatz_lengths()` at about 38x faster than the loop,
@@ -1628,7 +1644,8 @@ so the 3x threshold leaves a wide margin here too.
 ## Converting a Slow Function to Rust
 
 Moving the hot function into a compiled language works well.
-Rust fits because its tooling makes the bridge nearly painless.
+Rust fits because two tools, described below,
+generate the binding code and build the package for you.
 If you ask your AI to convert the hot Python function,
 it can walk you through the rest of the process.
 Once you're done, you import a module that looks from the outside like any other Python module,
@@ -1637,8 +1654,8 @@ except that it runs faster.
 [PyO3](https://pyo3.rs) generates the Python bindings,
 and [maturin](https://www.maturin.rs)
 builds and installs the result as an ordinary Python package.
-`maturin new --bindings pyo3 fastcount` scaffolds the project,
-and one attribute turns a Rust function into a Python function.
+`maturin new --bindings pyo3 fastcount` scaffolds the project.
+In the crate, the `#[pyfunction]` attribute turns a Rust function into a Python function.
 
 ```rust
 // fastcount/src/lib.rs
@@ -1689,10 +1706,10 @@ fn fastcount(m: &Bound<'_, PyModule>) -> PyResult<()> {
 ```
 
 `maturin develop --release` compiles and installs `fastcount`.
-The `--release` flag selects Cargo's optimized profile;
+The `--release` flag selects Cargo's optimized profile.
 `maturin develop` alone builds the unoptimized debug profile,
 the wrong build to time.
-Python sees a normal module with both functions attached:
+Python imports `fastcount` as a normal module with both functions attached:
 
 ```python
 # rust/fastcount/demo.py
@@ -1738,31 +1755,34 @@ speedup("collatz_lengths", collatz_lengths,
 # Sample run: collatz_lengths Rust speedup: 36.0x
 ```
 
-That is one baseline and three ways past it,
-but not a ladder where each step outruns the last.
+Adding Rust makes one baseline and three faster alternatives,
+listed by how much work each takes rather than by speed.
 The plain Python loop, timed in the Numba listings and in `demo.py`,
 is the baseline.
 NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
-`@njit` compiles the untranslatable loop on its first call, from inside Python.
+`@njit` compiles a loop that no array expression can replace,
+at its first call and from inside Python.
 Rust compiles that loop ahead of time,
-removing both the warm-up and the runtime Numba dependency,
 and requires a second language and a build step.
+
 In one machine's runs, measured 2026-10-13,
-Numba and Rust run at nearly the same speed
-(12.2x against 12.3x on `count_primes`, 38.4x against 36.0x on `collatz_lengths`),
-so Rust is not the faster option here.
+Numba and Rust ran at nearly the same speed:
+12.2x against 12.3x on `count_primes`,
+and 38.4x against 36.0x on `collatz_lengths`.
 Rust offers something else: no warm-up call, no Numba dependency at runtime,
-and compiled code for functions Numba refuses,
+and compiled code for functions Numba cannot compile,
 such as those over general Python objects.
 
 Keep the interface coarse.
-A single call that does significant work wins.
-A million calls that each do a little spend the gain on boundary-crossing overhead.
-Passing millions of small Python objects across the boundary loses it too.
+A single call that does significant work keeps the overhead of crossing between Python and Rust small beside that work.
+A million calls that each do a little lose the speedup to that crossing overhead.
+Passing millions of small Python objects across the boundary has the same effect,
+since PyO3 converts each object as it crosses.
 Numbers, strings, bytes, and NumPy arrays cross with little overhead.
 
-The list `collatz_lengths()` takes and returns carries 50,000 integers across the boundary each way,
-which sounds like the thing to avoid.
+`collatz_lengths()` takes a list of nearly 50,000 integers and returns a list of the same length,
+so that many integers cross the boundary each way.
+That traffic sounds like the thing to avoid.
 But a hundred-odd loop iterations of real work follow each integer,
 so the conversion cost is small beside that work.
 The question is not the object count on its own but the work done per object crossed.
@@ -1791,14 +1811,15 @@ That is a design decision with its own chapter,
 ## Choosing a Strategy
 
 Measure first.
-A profiler finds the slow spots without guessing,
-and it also answers a question whose answer the rest of this list assumes:
-is the program spending its time computing, or waiting?
+A profiler finds the slow spots without guessing.
+It also tells you whether the program spends its time computing or waiting,
+and the rest of this list depends on that answer.
 A program mostly waiting on a database, a socket, or a subprocess is I/O-bound,
-and steps 2 through 9 below do not help it much.
+and steps 2 through 9 below help it little.
 Skip to step 10 and restructure around `asyncio` instead.
 A program mostly consuming CPU is compute-bound,
 and the list below targets that case, simplest change first.
+
 Every performance optimization adds effort, complexity, or dependencies.
 Work down this list from the simplest change to the most involved,
 stopping when the program is fast enough:
@@ -1823,7 +1844,7 @@ and yesterday's hot spot may be irrelevant today.
 The goal is not the fastest possible program.
 It is a program that is fast enough and gives up as little clarity as possible.
 
-Step 4 on that list, fixing the algorithm, is usually the biggest win,
+Step 4 on that list, fixing the algorithm, usually gives the biggest speedup,
 because it changes which curve your program follows,
 not just where it sits on that curve:
 

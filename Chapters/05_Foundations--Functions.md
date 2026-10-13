@@ -51,10 +51,10 @@ not for the interpreter, which stores the text and otherwise ignores it.
 [Metaprogramming](17_Techniques--Metaprogramming.md#the-core-functions)
 reads it back with `inspect.getdoc()`.
 
-The signatures so far give only the function name and the parameter names,
+The signatures so far give the function name and the parameter names,
 with no [argument types or return types](08_Foundations--Static_Types.md#type-hints).
 Python is dynamically typed,
-so type errors surface at runtime rather than at compile time:
+so Python reports a type error at runtime rather than at compile time:
 
 ```python
 # add.py
@@ -75,7 +75,7 @@ expect(TypeError, add, 42, "spam")
 A function argument works as long as the function can apply its operations to it.
 The failure comes from `+` inside the function body,
 not from the call that passed the arguments.
-Nothing checks the arguments on the way in.
+The call binds each argument to its parameter and accepts any type.
 
 [`expect()`](15_Techniques--Context_Managers.md#the-expect-function)
 is a helper that many of this book's listings import.
@@ -102,9 +102,10 @@ print(flexible_args_and_returns(2))
 ```
 
 Every Python function returns a value.
-The third call matches neither test, so the function runs off its end,
-and a function that runs off its end returns `None`.
-A bare `return` returns `None` too.
+A function that finishes without a `return` returns `None`,
+and so does a bare `return`.
+The third call matches neither test,
+so execution reaches the end of the body and the function returns `None`.
 
 A `return` with several expressions produces a tuple,
 which the caller usually unpacks:
@@ -114,13 +115,12 @@ which the caller usually unpacks:
 
     low, high = minmax([3, 1, 4])
 
-The commas build the tuple.
-The function still returns one object.
+The commas build the tuple, so the function returns one object.
 
 ## Default Arguments
 
-Parameters can have default values,
-and keyword arguments let callers pass arguments by name, in any order.
+Parameters can have default values.
+Keyword arguments let callers pass arguments by name, in any order.
 A call that names its arguments documents itself:
 
 ```python
@@ -139,8 +139,8 @@ print(connect(port=80, host="web.example.com"))
 #: web.example.com:80 (timeout 30s)
 ```
 
-Passing by name does not require a default.
-`host` has none, and the last call still names it.
+A caller can pass any parameter by name,
+including a required one such as `host`, which the last call names.
 
 At the call site, write every keyword argument after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
@@ -148,17 +148,19 @@ At the call site, write every keyword argument after the positional ones.
 The grammar allows a few rarer arrangements that this chapter leaves alone,
 and keeping the keyword arguments last avoids every one of them.
 
-A parameter with a default cannot come before one with no default.
+Every required parameter must come before the first parameter with a default.
 `def f(a=1, b):` is a `SyntaxError`:
 `parameter without a default follows parameter with a default`.
 [Keyword-only parameters](#positional-only-and-keyword-only-parameters)
-are exempt: `def f(*, a=1, b):` is legal, because the caller names `b`.
+are exempt.
+`def f(*, a=1, b):` is legal, because the caller names `b`.
 
 ### The Mutable Default Trap
 
 Python evaluates a default value once, when it executes the `def`,
 so every call shares that one object.
-A mutable default therefore carries changes from one call to the next:
+A mutable default therefore keeps the changes one call makes,
+and the next call sees them:
 
 ```python
 # mutable_default.py
@@ -186,10 +188,9 @@ print(good_append(2))
 #: [2]
 ```
 
-A mutable default persists because it lives on the function object.
-No call rebuilds it.
-`__defaults__` holds the tuple of default values,
-and both calls append to the same list inside it.
+A mutable default persists because the function object holds it and every call reuses it.
+The function object keeps its default values in the tuple `__defaults__`,
+and both calls append to the same list inside that tuple.
 The default looks like an expression each call evaluates,
 but Python evaluates it once, at the `def`.
 
@@ -197,8 +198,8 @@ The trap follows from how Python passes arguments.
 A parameter is another name bound to the caller's object,
 the binding that [Variables and References](02_Foundations--Tour.md#variables-and-references)
 describes.
-`bad_append()` combines that binding with a default Python builds once,
-so each call mutates the object the next call uses.
+Because `bad_append()` combines that binding with a default Python builds once,
+each call mutates the object the next call uses.
 A caller that passes a mutable object sees the changes the function makes:
 
 ```python
@@ -226,17 +227,15 @@ print(mine)
 so the caller sees the change.
 `rebind()` assigns to the parameter,
 so the local name points at a new list and the caller's list stays as it was.
-Mutating an argument reaches outside the function.
-Rebinding one does not.
 
 ### Safe Defaults
 
-`good_append()` builds a fresh list on every call that omits `target`,
-and any function that mutates a parameter with a default must do the same.
+`good_append()` builds a fresh list on every call that uses the default.
+Any function that mutates a parameter with a default must do the same.
 If the function reads the parameter and leaves it as it was,
 use an immutable default such as an empty tuple.
-Calls still share that tuple,
-and the sharing is harmless because a tuple cannot change:
+Every call shares that tuple,
+and the sharing is safe because a tuple is immutable:
 
 ```python
 # immutable_default.py
@@ -266,7 +265,7 @@ a value chosen to mean "the caller passed nothing" rather than to serve as data.
 Test the parameter with `is None` rather than truthiness.
 `if not target:` also discards an empty list the caller passed on purpose.
 
-`None` works there because no caller would pass `None` as a real `target`.
+`None` works there because every real `target` is a list.
 When `None` is a valid argument, you need a distinct marker.
 Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
 adds a `sentinel` built-in that creates a unique self-describing value for this purpose:
@@ -297,8 +296,8 @@ print(get(prefs, "theme", "dark"))
 
 `prefs` stores `mute` as `None`,
 so a `None` from `get()` cannot also mean "no such key."
-The `MISSING` sentinel keeps the two cases apart.
-A stored `None` comes back untouched,
+With the `MISSING` sentinel, `get()` tells the two cases apart.
+A stored `None` comes back as `None`,
 and a missing key with no default comes back as `MISSING`
 (a real `get()` re-raises the `KeyError` there, as the comment says).
 Because `get()` tests `default` against `MISSING`,
@@ -308,16 +307,17 @@ Create a sentinel once and share that name.
 Two `sentinel()` calls with the same name build two different objects,
 so `default is sentinel("MISSING")` compares against a second object and is always false.
 
-Code written before 3.15 builds the same marker as `MISSING = object()`:
-a bare `object()` is unique, so `is` tells it apart from every other value,
-but it prints as `<object object at 0x...>` where `sentinel()`'s value prints its name.
+Code written before 3.15 builds the same marker as `MISSING = object()`.
+A bare `object()` is unique, so `is` tells it apart from every other value.
+It prints as `<object object at 0x...>`, though,
+where a `sentinel()` value prints its name.
 
 ## Names Inside a Function
 
 A function can read a module-level name,
 but assigning to that name anywhere in the function makes it local for the whole function.
 Python decides which names are local when it compiles the function body,
-so where the assignment sits makes no difference.
+so an assignment on the last line of the body has the same effect as one on the first.
 `global` tells Python to rebind the module-level name instead:
 
 ```python
@@ -348,20 +348,23 @@ print(count)
 #: 1
 ```
 
-`rebinds()` leaves the module-level `count` alone,
-as the `0` after its `99` shows, because its `count = 99` binds a local.
-`+=` is an assignment too, so if you drop the `global` from `writes_global()`,
-the compiler marks `count` local for the whole function,
-and the read half of `count += 1` looks up a local that has no value yet.
-The call raises an `UnboundLocalError`.
+The `count = 99` in `rebinds()` binds a local and leaves the module-level `count` alone,
+as the `0` printed after `99` shows.
+
+`+=` is an assignment too.
+If you drop the `global` from `writes_global()`,
+the compiler marks `count` local for the whole function.
+The read half of `count += 1` then looks up a local that has no value yet.
+A call to `writes_global()` raises an `UnboundLocalError`.
 `global` governs rebinding, not reading, so `read_only()` needs no declaration.
+
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
 
 A function that rebinds a global couples every caller to that shared,
 mutable state.
-To understand one call, you must trace every call before it,
-as [Pure Functions](40_Functional--Foundations.md#pure-functions) shows.
+As [Pure Functions](40_Functional--Foundations.md#pure-functions) shows,
+to understand one call you must trace every call before it.
 [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
 classifies rebinding a global as a side effect and reading one as a side cause.
 
@@ -425,18 +428,18 @@ trace(report, "point", *nums, **opts)
 ```
 
 Because collecting and unpacking are inverses,
-a function can gather arguments it knows nothing about and pass them on unchanged.
-`trace()` accepts any call and forwards it,
-and that is the standard shape of a wrapper.
+a function can collect arguments beyond its named parameters and pass them on as they arrived.
+`trace()` has the standard shape of a wrapper.
+It accepts any call and forwards it.
 `expect()` has the same shape.
 It receives a function and the arguments for it, and makes the call.
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
 A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
-so you can pass `report` to `trace()` as an argument,
-and `func.__name__` reads the name of whatever function arrived.
+so you can pass `report` to `trace()` as an argument.
+Inside `trace()`, `func.__name__` reads the name of whatever function the caller passed.
 
-A forwarded `**kwargs` can collide with an argument the wrapped function receives another way.
+A forwarded `**kwargs` can name a parameter that the wrapped function also receives another way.
 When a key in the unpacked dictionary names a parameter that a positional argument fills,
 Python raises a `TypeError`:
 
@@ -462,11 +465,10 @@ expect(TypeError, trace, report, *nums, **opts)
 `opts` carries a `"label"` key, and `trace()` forwards it as `label=`.
 The same `func(*args, **kwargs)` call passes the items of `nums` positionally,
 so `report()`'s first parameter, `label`, also receives `1`.
-No parameter can take two values.
-`trace()` knows nothing about the signature of the function it calls,
-so it cannot detect the clash.
-The error arrives one level down, when `trace()` calls `report()`,
-which is why `calling report` prints before the `TypeError`.
+Each parameter takes one value.
+`trace()` never reads the signature of the function it calls,
+so the clash first appears when `trace()` calls `report()`.
+Because Python raises the `TypeError` there, `calling report` prints first.
 
 ## Positional-Only and Keyword-Only Parameters
 
@@ -476,11 +478,11 @@ A parameter's name is part of the contract when a caller can write it,
 and stays outside the contract when the caller must pass by position.
 
 A `/` ends the *positional-only* parameters.
-You must pass every parameter before it by position, not by name.
+You must pass every parameter before it by position.
 A `*` begins the *keyword-only* parameters.
 You must pass every parameter after it by name.
-A `*args` parameter also begins the keyword-only parameters:
-it absorbs every remaining positional argument,
+A `*args` parameter also begins the keyword-only parameters.
+It collects every remaining positional argument,
 so a parameter declared after it can arrive by name alone.
 
 ```python
@@ -519,11 +521,11 @@ tally("nums", 1, 2, total=True)
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
-The type checker catches both mistakes before the code runs,
+The type checker reports both mistakes before the code runs,
 so each line carries a `# type: ignore` saying the misuse is deliberate.
 
 The `True` in the `tally()` call at `[1]` joins `values` like any other positional argument.
-Only the named form, `total=True`, reaches `total`.
+Only the named form, `total=True`, binds `total`.
 
 A signature can use every form at once, in one set order: positional-only,
 positional-or-keyword, `*args`, keyword-only, `**kwargs`:
@@ -544,13 +546,14 @@ and `b` can arrive either way.
 In the standard library,
 many built-in functions and methods take positional-only parameters,
 such as `dict.get(key, default=None, /)`.
-Marking a parameter positional-only also keeps its name out of the method's contract.
-That matters when a subclass overrides a method.
-The subclass can rename the parameter, and the type checker accepts the rename.
+Because a positional-only parameter's name stays outside the method's contract,
+a subclass that overrides the method can rename the parameter.
+The type checker accepts the rename.
 
-The `/` marker also frees the parameter's name for `**kwargs`.
+The `/` marker also lets `**kwargs` collect a keyword argument that shares a positional-only parameter's name.
 With `def trace(func, /, *args, **kwargs)`,
-a caller's `func=` keyword goes into `kwargs` and reaches the wrapped function.
+`kwargs` collects a caller's `func=` keyword,
+and `trace()` passes it on to the wrapped function.
 Without the `/`, the same keyword gives `trace()`'s own `func` a second value,
 and the call raises a `TypeError`.
 
@@ -560,9 +563,9 @@ A `lambda` is a small anonymous function you write as a single expression.
 Use one to pass behavior to functions such as `sorted()`,
 which accepts a `key` function, calls it on each element,
 and orders by the results.
-When an existing function computes the key, pass that function.
-`key=len` needs no lambda.
-Write a lambda when no existing function computes the key you want,
+When an existing function computes the key, pass that function,
+as `key=len` does.
+Write a lambda when the key is an expression of your own,
 such as ordering by a word's last letter:
 
 ```python
@@ -584,15 +587,15 @@ so a traceback shows `<lambda>` where a `def` shows `square`.
 
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
-For anything more complicated, write a separate function.
+For anything more complicated, write a `def`.
 
 For a key that reads an index or an attribute,
-`operator.itemgetter()` and `operator.attrgetter()` name the same operation without a lambda.
+`operator.itemgetter()` and `operator.attrgetter()` name the same operation.
 `sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` in `lambdas.py`.
 For a key that calls a method on each element,
 `operator.methodcaller("lower")` replaces `lambda w: w.lower()`,
 and when every element is a `str`, so does `str.lower`.
-Write a lambda when the key needs an expression that none of the three builds.
+Write a lambda for any other key expression.
 
 ## Exercises
 
@@ -626,7 +629,7 @@ Try each exercise before opening its [solution](../Solutions/05_Foundations--Fun
 8.  In `function_scope.py`,
     delete the `global count` line from `writes_global()` and predict what a call raises before running it.
     Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
-    Explain why that also raises an `UnboundLocalError`,
+    Explain why a call to `rebinds()` also raises an `UnboundLocalError`,
     although the assignment to `count` comes after the `print`.
 9.  Write `clear_by_assignment(target)`, which assigns `target = []`,
     and `clear_by_method(target)`, which calls `target.clear()`.

@@ -26,24 +26,24 @@ if __name__ == "__main__":
 #: I'm being useful!
 ```
 
-Importing a module makes its *namespace*, the set of names the module defines,
-reachable in the importing file under the module's name.
-Reaching those names through the module's name keeps them from clashing with the local ones.
+A module's *namespace* is the set of names the module defines.
+Importing the module makes that namespace accessible in the importing file under the module's name.
+Accessing those names through the module's name keeps them separate from the importing file's own names.
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
 The code at the end of `use_module.py` starts with an `if` clause that checks whether the standard variable `__name__` equals the string `"__main__"`.
 Any identifier that begins and ends with double underscores
 (commonly called a "dunder") is special in some way.
-Dunder methods, for example,
-connect your class to the language's operators and built-in functions.
+Python calls a class's dunder methods, for example,
+to apply the language's operators and built-in functions to its objects.
 [Classes](07_Foundations--Classes.md)
-shows how `print()` and `str()` reach a class's `__str__()`.
+shows how `print()` and `str()` call a class's `__str__()`.
 
+Python programmers call this `__name__` check the *main guard*.
 When another program imports this file as a library module,
-the `if` skips the code at the bottom of the file,
+the guard skips the code at the bottom of the file,
 the part meant for a command-line run.
-Python programmers call this check the *main guard*.
 The condition is true only when you run this file as a script.
 That is, `__name__` is `"__main__"` when you use the command line:
 
@@ -52,8 +52,8 @@ python use_module.py
 ```
 
 However, if another program imports `use_module.py` as a module,
-`__name__` is `"use_module"` instead, so the `"__main__"` block does not run.
-The next program consists of one statement, `import use_module`:
+`__name__` is `"use_module"` instead, so Python skips the `"__main__"` block.
+Here, `import_module.py` consists of one statement, `import use_module`:
 
 ```python
 # import_module.py
@@ -63,7 +63,8 @@ import use_module
 
 Importing `use_module` runs its top-level code, including the `print()`,
 but not its `"__main__"` block.
-Python runs that code once, however many times the program imports the module:
+Python runs a module's top-level code once,
+however many times the program imports the module:
 
 ```python
 # import_once.py
@@ -80,13 +81,17 @@ print(sys.modules["use_module"] is use_module)
 
 `use_module`'s body runs once, although two `import` statements name it.
 The first `import` creates the module object, stores it in `sys.modules`,
-a dict keyed by dotted module name, and then runs the file's body to fill it.
+and then runs the file's body to fill it.
+`sys.modules` is a dict keyed by dotted module name.
 Every later `import` of that name, from any file in the program,
-finds it there and binds the same object instead of re-running the file.
+finds the module there and binds the same object.
 The `as second` clause binds that object under a second name
 ([covered next](#importing-names-with-from-and-as)),
 so `use_module` and `second` are one object.
-One consequence: editing a module's file changes nothing in a running program that has imported it.
+
+Because every later `import` finds the cached object in `sys.modules`,
+a running program keeps the module it loaded,
+however you edit the module's file afterward.
 Restart the program, or call `importlib.reload(use_module)`,
 which re-runs the body into the existing module object.
 Reloading leaves every name bound by a `from ... import` pointing at the old objects,
@@ -130,10 +135,9 @@ app_settings.show()
 #: app_settings.debug is True
 ```
 
-`app_settings.debug` is now `True`,
-and `show()` sees the new value because it looks the name up in its own module every time it runs.
-The local `debug` is a separate binding that `from` set once, at import,
-so it still holds `False`.
+`show()` prints the new value because it looks the name up in its own module every time it runs.
+Because the local `debug` is a separate binding that `from` set once, at import,
+it still holds `False`.
 
 Import the module and write `app_settings.debug` when the value can change.
 Use `from ... import` for names that keep the same value,
@@ -154,7 +158,6 @@ print(m.useful_function())
 A module's namespace is an ordinary dict you can read and write.
 `globals()` returns it,
 the same dict Python searches when it looks up a top-level name.
-A dotted name reads that same dict.
 `module.__dict__` from outside is the same object `globals()` returns inside `module`,
 so `module.useful_function()` and a top-level lookup inside `module.py` find the same function.
 Assigning into that dict works like writing the assignment as a statement:
@@ -170,11 +173,13 @@ print(y)  # type: ignore  # noqa: F821
 #: 42
 ```
 
-The two directives on the `print(y)` line silence the type checker and the linter,
-neither of which can see a name that appears only as a dict key.
+The type checker and the linter both report `y` as undefined,
+because the source creates `y` only as a dict key.
+The two directives on the `print(y)` line silence those reports.
 Creating names this way loses both checks on that name,
-which is a reason to keep it rare.
-Assigning into `globals()` matters whenever code needs to define a module-level name known only at runtime,
+so keep the technique rare.
+
+Assigning into `globals()` is useful when code must define a module-level name known only at runtime,
 such as a class built dynamically under a computed name.
 [Metaprogramming](17_Techniques--Metaprogramming.md) builds classes that way,
 though it collects them in a dictionary instead of in the module's namespace.
@@ -182,8 +187,8 @@ though it collects them in a dictionary instead of in the module's namespace.
 ## Packages
 
 As your programs get larger, you further organize your code into *packages*.
-A package is a directory that contains multiple modules,
-and it forms its own namespace with the name of that directory.
+A package is a directory that contains multiple modules.
+It forms its own namespace, named after the directory.
 
 To make a directory a package, you put a special file named `__init__.py` in it.
 `__init__.py` runs once,
@@ -192,13 +197,15 @@ An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 An `__init__.py` with content usually re-exports the package's public names.
 If `a_package/__init__.py` re-exports `function1`,
-`from a_package import function1` works without callers naming the submodule that defines `function1`.
-You can still import a directory without `__init__.py` as a *namespace package*,
-but an explicit `__init__.py` makes the package's identity and boundary clear,
-so this book uses one by default.
+callers write `from a_package import function1`,
+and the submodule that defines `function1` stays a detail inside the package.
+
+You can also import a directory without `__init__.py` as a *namespace package*.
+This book uses an explicit `__init__.py` by default,
+because it makes the package's identity and boundary clear.
 
 To explore packages,
-create a directory called `a_package` whose `__init__.py` announces itself,
+create a directory called `a_package` whose `__init__.py` prints a message,
 so the markers below show when it runs:
 
 ```python
@@ -250,12 +257,12 @@ and the filter drops the dunder names every module carries.
 The list shows that `import a_package.module1` binds the one name `a_package` in this file.
 Loading `module1` also stores that submodule as an attribute of `a_package`,
 so `a_package.module1.function1()` resolves.
-The shorter `module1.function1()` fails here,
-since `module1` is missing from the list.
+The shorter `module1.function1()` raises a `NameError` here,
+since `a_package` is the one name in the list.
 `module1.function1()` works in `from_packages.py`, below,
 where `from` binds `module1` in that file.
 
-Importing the package alone does not import what is inside it:
+Importing the package alone leaves its submodules unloaded:
 
 ```python
 # package_only.py
@@ -266,7 +273,6 @@ print(hasattr(a_package, "module1"))
 #: False
 ```
 
-No submodule loads, and no message prints beyond the package's own.
 `a_package.module1.function1()` here raises `AttributeError: module 'a_package' has no attribute 'module1'`.
 The submodule becomes an attribute of the package only when something imports it by name.
 
@@ -287,7 +293,7 @@ print(module2.function2())
 #: function2 in module2 in a_package
 ```
 
-Here you no longer need to qualify the module with the package name.
+Here the module name alone qualifies each function.
 
 You can bring specific functions into the namespace by naming both the package and the module:
 
@@ -311,8 +317,8 @@ print(function2())
 and `using_packages.py` print the same loading messages,
 because `from` loads what `import` loads.
 The whole module runs either way.
-The statement decides which names this file binds,
-so the `dir()` list differs in each of the three listings.
+Each listing's import statement decides which names that listing binds,
+so the `dir()` list differs in each of the three.
 
 ### Nested Packages
 
@@ -349,8 +355,8 @@ print(module3.function3())
 ### Imports Within a Package
 
 The listings so far import a package's modules from outside the package.
-A package's own modules also import each other,
-and there the leading dot of a *relative import* means "the package containing this module":
+A package's own modules also import each other.
+Inside the package, the leading dot of a *relative import* means "the package containing this module":
 
 ```python
 # a_package/module4.py
@@ -370,14 +376,14 @@ print(function4())
 #: function4 calls function1 in module1 in a_package
 ```
 
-`module4` finds its sibling without naming `a_package`,
-so renaming the package breaks nothing inside it.
+`module4` finds its sibling relative to its own package,
+so the package's internal imports keep working after you rename the package.
 A dotless `from module1 import function1` looks for a top-level module named `module1` on the [search path](#pythonpath),
 the way `use_module.py` looks for `module`.
-`module1.py` sits inside `a_package`,
-so `use_module4.py` then stops with `ModuleNotFoundError: No module named 'module1'`.
+`module1.py` sits inside `a_package`, so with the dotless import,
+`use_module4.py` stops with `ModuleNotFoundError: No module named 'module1'`.
 
-Two dots reach the parent package,
+Two dots refer to the parent package,
 so `a_package/b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
 The absolute form `from a_package.module1 import function1` works from inside the package too,
 and is a better choice when the import crosses a package boundary.
@@ -390,35 +396,39 @@ Run it as `python -m a_package.module4` instead.
 ### Circular Imports
 
 Two modules in a package can end up importing each other.
-Python places the first one to load in `sys.modules` before its body finishes,
-so a `from` import in the second finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
+Python places the first one to load in `sys.modules` before its body finishes.
+A `from` import in the second module then finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
 A plain `import` of that same module succeeds at this point,
 since it needs the module to exist in `sys.modules`,
 not to have finished running.
-The failure then surfaces later, as an `AttributeError`,
-wherever the second module first uses a name the first module has not defined yet.
+The first module's body has stopped at its `import` of the second,
+so the names it defines below that line are still missing.
+If the second module's top-level code uses one of them,
+Python raises an `AttributeError` there.
 
-The "circular import" wording appears when the module's file comes from anywhere but the directory of the script you ran,
-which includes every module inside a package.
-When the file sits in that directory
-(the first entry of [`sys.path`](#pythonpath)),
-the usual case for two modules beside your script,
-Python suspects a name collision with a library instead of a cycle:
+The "circular import" wording appears when the module's file lives outside the directory of the script you ran,
+as every module inside a package does.
+In the usual case, two modules sit beside your script,
+in the directory that is the first entry of [`sys.path`](#pythonpath).
+For a file there, Python's message names a possible collision with a library instead of a cycle:
 `ImportError: cannot import name 'f' from 'modx' (consider renaming '.../modx.py' if it has the same name as a library you intended to import)`.
 Python names the offending file by its full path, abbreviated here as `...`.
 
-A cycle is a design signal.
+A cycle usually means the two modules share a piece of code.
 Move the shared piece into a third module both can import.
 
 When the cycle exists only in [annotations](08_Foundations--Static_Types.md#type-hints),
 an `if TYPE_CHECKING:` import breaks it.
 `typing.TYPE_CHECKING` is `False` at runtime,
-so the import under it runs for the type checker alone.
-The module still imports,
+so Python skips the import under it,
+while the type checker reads the import as if the condition were true.
+Importing the module succeeds,
 because Python evaluates an annotation only when something reads it.
-Reading one of these at runtime,
-through `__annotations__` or `typing.get_type_hints()`, raises a `NameError`,
-so the guard suits names that appear in annotations alone.
+
+If code reads an annotation at runtime,
+through `__annotations__` or `typing.get_type_hints()`,
+and the annotation names a guarded import, Python raises a `NameError`.
+The guard therefore suits names that appear in annotations alone.
 [A robot in a maze](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
 imports `Room` that way, and every use of the name is an annotation.
 
@@ -429,19 +439,20 @@ because Python has no `private` keyword.
 A module states its boundary by convention and by one optional list.
 
 A leading underscore marks a name as internal.
-It is a signal to a reader rather than a barrier.
-For a module `accounting` that defines `_Engine`,
-`accounting._Engine` still resolves,
-and `from accounting import _Engine` still works.
+The mark informs a reader,
+and Python grants access to an underscored name like any other.
+For a module `accounting` that defines `_Engine`, `accounting._Engine` resolves,
+and `from accounting import _Engine` works.
 The underscore changes one mechanical thing:
 `from accounting import *` skips every name that begins with one.
 
 `__all__` states the export list explicitly.
 You assign it at module level as a list of strings naming the public names,
-and `from module import *` then imports those names and no others.
-A name listed in `__all__` arrives even when it begins with an underscore.
+and `from module import *` then imports the names on that list.
+A star import binds every name listed in `__all__`,
+including one that begins with an underscore.
 An `__all__` also gathers the public names into one readable place,
-and documentation tools read it to report what a module offers.
+and documentation tools read it to report a module's public names.
 
 ```python
 # exporting.py
@@ -469,20 +480,18 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 #: ['helper', 'public']
 ```
 
-Without `__all__`, the star import binds `public`, `helper`, and `undeclared`:
-everything not underscored.
-With it, only the listed names arrive,
-and the star import skips `_internal` either way.
+Without `__all__`, the star import binds every name that starts with a letter:
+`public`, `helper`, and `undeclared`.
+With `__all__`, it binds the two listed names,
+and `undeclared` stays in `exporting` with `_internal`.
 
-The `# noqa: F403` silences the linter's objection to the star import.
+The `# noqa: F403` silences the linter's warning about the star import.
 A star import hides the source of each name from a reader and from the tools.
 Name what you import,
 and keep the star for experiments at the interactive prompt.
 
-Code outside the module can still read `module._name`,
-whatever the underscore or `__all__` says.
-Both say which names a caller should use,
-and that agreement lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade)
+The underscore and `__all__` both say which names a caller should use,
+and that stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade)
 over its internals or as a shared single instance
 ([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).
 
@@ -491,9 +500,12 @@ over its internals or as a shared single instance
 To be the target of an `import` statement,
 a module's file name must be a valid Python identifier and not a keyword.
 `import my-mod` is a syntax error.
-(`importlib.import_module("my-mod")` still loads the file, and plugin loaders reach oddly named files that way, but give your own modules importable names.)
+`importlib.import_module("my-mod")` loads the file,
+and plugin loaders open oddly named files that way.
+Give your own modules importable names.
 
-**Modules** (`.py` files): short, all-lowercase,
+**Modules** (`.py` files).
+A module name is short and all-lowercase,
 with underscores between words if that improves readability,
 the style called `snake_case`.
 
@@ -501,7 +513,8 @@ the style called `snake_case`.
 - Avoid: `Result.py` (CapWords is for classes), `cacheSingleton.py` (camelCase),
   `cache-singleton.py` (hyphens aren't importable)
 
-**Packages** (directories with `__init__.py`): also short and all-lowercase,
+**Packages** (directories with `__init__.py`).
+A package name is also short and all-lowercase,
 but convention discourages underscores.
 Prefer a single run-together word when you can.
 
@@ -511,38 +524,39 @@ Prefer a single run-together word when you can.
 **Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`).
 This book uses `test_*.py`, e.g. `test_result.py`.
 
-Don't shadow standard-library modules.
+Give your modules names that differ from the standard library's.
 A file named `random.py`, `string.py`,
-or `weakref.py` can hide the stdlib one and break imports,
+or `weakref.py` can shadow the stdlib one and break imports,
 because Python [searches the script's directory before the standard library](#pythonpath).
-Give a shared module a distinctive name too.
+
+Give a shared module a distinctive name.
 Python caches modules by name in `sys.modules`,
-so the first `config.py` imported anywhere in the process is the one every later `import config` gets.
+so the first `config.py` imported anywhere in the process is the module every later `import config` binds.
 
 Windows and macOS default to case-insensitive filesystems,
 so `module.py` and `Module.py` name the same file there.
 Python's import system still matches names case-sensitively by default,
-so `import module` fails to find a file saved as `Module.py`,
+so `import module` raises a `ModuleNotFoundError` for a file saved as `Module.py`,
 even on a filesystem that treats the two names as one.
 `PYTHONCASEOK` turns that case check off,
-so `import module` finds `Module.py` again,
-bringing back the confusion the check exists to prevent.
-Keep a module's file name and its import spelled with the same case,
-rather than relying on either behavior.
+so `import module` finds `Module.py` again.
+Turning the check off brings back the confusion it exists to prevent.
+Write a module's file name and its import in the same case,
+so the import behaves the same on every filesystem.
 
 ## `PYTHONPATH`
 
 Python searches `sys.path`, a list of directories it builds at startup.
 `print(sys.path)` shows it.
 Its first entry is the directory of the script you ran
-(the current directory when you use `-m` or the REPL),
-and that entry is why `use_module.py` can `import module` with no setup.
+(the current directory when you use `-m` or the REPL).
+That entry lets `use_module.py` run `import module` with no setup.
 The entries from `PYTHONPATH` come next, then the standard library,
 and installed packages sit further down.
 Running with `-P` drops that first entry,
-so a local `random.py` no longer shadows the standard library.
+so `import random` finds the standard library's module ahead of a local `random.py`.
 
-What if your module or package isn't in the same directory as the Python file that imports it?
+What if your module or package lives in a different directory from the Python file that imports it?
 The original solution was the `PYTHONPATH` environment variable,
 which tells Python where to look for modules and packages.
 `PYTHONPATH` takes multiple paths,
@@ -550,34 +564,31 @@ which Python adds to `sys.path` in the order given.
 Python searches `sys.path` from the front and uses the first directory that holds your module or package.
 It raises a `ModuleNotFoundError` when no directory does.
 
-`PYTHONPATH` still works,
-but today you install your package into the environment you use,
-and the install puts it on the search path with no environment variable.
+`PYTHONPATH` works, but today you install your package into the environment you use.
+The install puts the package on the search path with no environment variable.
 With `uv` (this book's tool of choice), you run `uv sync`,
 or `uv pip install -e .` for an editable install.
 The package resolves by name from anywhere,
-and edits to its source take effect the next time you run a program that imports it,
-without reinstalling.
+and edits to its source take effect the next time you run a program that imports it.
 
 ## Lazy Imports
 
 Every `import` so far runs the target module's top-level code immediately,
-and that is why importing `a_package.module1` prints its message as it loads.
-For a large program that imports many modules but uses only some of them on any given run,
-that eager work slows startup.
+so importing `a_package.module1` prints its message as it loads.
+That eager work slows the startup of a large program that imports many modules but uses only some of them on any given run.
 
 Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
 adds the `lazy` soft keyword: a keyword only inside an `import` statement,
 the way `match` is a keyword only inside a [`match` statement](04_Foundations--Control_Flow.md#pattern-matching).
-A `lazy import` defers loading the module until the first time you use the imported name,
-so a run loads only the modules it uses,
+A `lazy import` looks like an ordinary one with `lazy` in front.
+It defers loading the module until the first time you use the imported name.
+A run then loads only the modules it uses,
 while all imports stay at the top of the file.
-A `lazy import` looks like an ordinary one, with `lazy` in front,
-and once loaded the names behave like eagerly imported ones.
+Once the module loads, its names behave like eagerly imported ones.
 
 ### Watching the Deferral
 
-You can watch `lazy` defer the load by importing a module whose body prints when it runs:
+Here, importing a module whose body prints when it runs shows when `lazy` loads it:
 
 ```python
 # noisy.py
@@ -605,13 +616,14 @@ Nothing loads at the `lazy import` line.
 The body of `noisy` runs at `noisy.announce()`, the first access,
 so `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
-the error surfaces at that first use rather than at the import line.
+Python raises the exception at that first use rather than at the import line.
 
 The `from` form takes `lazy` too.
 `lazy from noisy import announce` defers loading `noisy` until the first use of `announce`.
 
-`sys.lazy_modules` holds the names still waiting to load,
-but the standard-library modules CPython loads at startup put lazy imports of their own into that set before your code runs:
+`sys.lazy_modules` holds the names still waiting to load.
+Before your code runs, CPython loads standard-library modules at startup,
+and some of them add lazy imports of their own to that set:
 
 ```python
 # lazy_modules_check.py
@@ -629,30 +641,31 @@ print("noisy" in sys.lazy_modules)
 #: False
 ```
 
-This script marks one import lazy and the set holds more than one name,
-so `sys.lazy_modules` is not a clean "what my program deferred" list.
+This script marks one import lazy, yet the set holds more than one name.
+`sys.lazy_modules` mixes the standard library's deferred imports with your program's.
 `noisy` leaves the set once `announce()` loads it,
 so the set tracks names still waiting, not names your program ever deferred.
-Check it for a specific name you marked lazy, rather than reading the whole set.
+Check it for a specific name you marked lazy.
 
 ### Deferring an Import Before 3.15
 
 Before 3.15, deferring a slow import meant moving it inside the function that needed it.
-That works, but it hides the dependency:
-nothing at the top of the file mentions the module,
-tools that read imports miss it,
-and the `import` statement re-runs its `sys.modules` lookup on every call.
-`lazy import` keeps the declaration at the top where a reader and a tool can see it,
-and loads the module once, at first use.
+That works, but it hides the dependency.
+Nothing at the top of the file mentions the module,
+and tools that read imports miss it.
+The `import` statement also re-runs its `sys.modules` lookup on every call.
+`lazy import` keeps the declaration at the top,
+where a reader and a tool look for imports, and loads the module once,
+at first use.
 
-Packages deferred submodule loading before `lazy import` existed,
-by giving `__init__.py` a module-level `__getattr__()`
-([PEP 562](https://peps.python.org/pep-0562/))
-that imports and returns a submodule the first time a caller asks for it by name.
+Before `lazy import` existed,
+packages deferred submodule loading with a module-level `__getattr__()` in `__init__.py`
+([PEP 562](https://peps.python.org/pep-0562/)).
+That `__getattr__()` imports and returns a submodule the first time a caller asks for it by name.
 NumPy and SciPy use that technique to keep import time low.
-`lazy import` needs no hand-written `__getattr__()`,
-and defers any imported name, not only a package's submodules.
-The `__getattr__()` pattern still matters for code that must run on a Python older than 3.15.
+`lazy import` replaces the hand-written `__getattr__()` with one keyword and defers every imported name,
+a package's submodules among them.
+The `__getattr__()` pattern serves code that must run on a Python older than 3.15.
 
 ### Limits of `lazy`
 
@@ -660,32 +673,32 @@ The `__getattr__()` pattern still matters for code that must run on a Python old
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and Python likewise rejects `lazy from module import *` and a `lazy from __future__` import.
 
-To change which imports are lazy for a whole run without editing source,
+To change which imports are lazy for a whole run from outside the source,
 run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
 Both accept one of two values.
 `normal`, the default, defers only the imports you marked `lazy`.
-`all` defers every module-level import the keyword can mark,
-so the imports the keyword cannot mark, such as one inside a `try` block,
-stay eager.
-The PEP also describes a third value, `none`, a global off switch.
+`all` defers every module-level import the keyword can mark.
+The rest stay eager, such as an import inside a `try` block.
+The PEP also describes a third value, `none`, which makes every import eager,
+including the ones marked `lazy`.
 CPython removed it before the 3.15 release.
 
-Don't make an import lazy when you import a module for what its body does rather than for a name it defines.
+Keep an import eager when you import a module for what its body does rather than for a name it defines.
 A module that registers a [plugin class](27_Patterns--Factory.md#hazards-of-self-registration),
 installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
-the module stays unloaded and its registration is missing.
+the module's body and its registration wait for the rest of the run.
 The failure is silent: no error, just a table with a row missing.
-That silent failure is also why `all` is an experiment to run rather than a setting to leave on,
-since it defers ordinary `import` statements too,
-including the ones whose only purpose is to run the module.
+The same silent failure makes `all` an experiment to run rather than a setting to leave on.
+`all` defers ordinary `import` statements too,
+including the ones that exist to run a module's body.
 
 ## Exercises
 
 Try each exercise before opening its [solution](../Solutions/06_Foundations--Modules_and_Packages/).
 
 1.  Add a fourth module, `a_package/module5.py`,
-    with its own `function5()` and a top-level `print()` so the module announces itself when it loads.
+    with its own `function5()` and a top-level `print()` so the module prints a message when it loads.
     Import it three ways, using `import a_package.module5`,
     `from a_package import module5`,
     and `from a_package.module5 import function5`,
@@ -712,8 +725,7 @@ Try each exercise before opening its [solution](../Solutions/06_Foundations--Mod
     given that Windows and macOS open `module.py` and `Module.py` as the same file.
     Look up `PYTHONCASEOK` to confirm your explanation.
 5.  Change `a_package/module4.py` to the absolute import `from a_package.module1 import function1` and confirm `use_module4.py` still works.
-    Then run `python a_package/module4.py` directly,
-    both before and after the change.
+    Then run `python a_package/module4.py`, both before and after the change.
     Both fail, with different errors: explain each,
     and say why `python -m a_package.module4` works either way.
 6.  Remove the `__all__` line from `exporting.py`.

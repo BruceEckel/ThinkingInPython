@@ -3,11 +3,12 @@
 > Conditionals and loops read the same in Python as in the language you know.
 > Recovery from failure is the part that reads differently.
 
-In C++ and Java the careful move is to test before you act:
+In C++ and Java the careful practice is to test before you act:
 check that the string parses, that the file is there, that the key exists.
-Python goes the other way.
+Python style reverses that order.
 Run the operation and catch the exception when it fails.
-The test and the operation can disagree, and the world can change between them.
+The test and the operation can disagree.
+The files or other state that the test checks can also change between them.
 Exceptions are ordinary control flow here, not a last resort.
 This chapter covers them along with conditionals, placeholders, loops,
 pattern matching, the `with` statement, and comprehensions.
@@ -36,8 +37,9 @@ Java rejects the expression at compile time.
 The example also shows a *conditional expression*:
 a one-line `if`/`else` that produces a value.
 It does the job of the `?:` operator in C++ and Java,
-with the condition in the middle: first the value when the test is true,
-then `if` and the test, then `else` and the value when the test is false.
+but it puts the condition in the middle.
+The value for a true test comes first, then `if` and the test,
+then `else` and the value for a false test.
 
 Adding `elif` to an `if` statement tests several conditions in order:
 
@@ -59,7 +61,7 @@ print(classify(-3), classify(0), classify(7))
 ## Placeholders: `pass` and `...` {#placeholders}
 
 The `pass` statement does nothing.
-Use it where Python's syntax requires a statement but you have none to run yet.
+Use it where Python's syntax requires a statement before you have written the real one.
 
 `...` (the *Ellipsis* literal) is a second placeholder.
 On its own as a statement it does nothing, the same as `pass`:
@@ -77,15 +79,15 @@ print(not_implemented(), not_implemented_yet())
 #: None None
 ```
 
-`pass` marks an indented block with nothing in it yet.
-`...` is the conventional body for a stub whose implementation lives elsewhere.
+`pass` holds the place of an indented block you will fill in later.
+`...` is the conventional body for a stub that another class or module implements.
 You normally write it on the same line as the signature it stubs,
 as in a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 method.
 
 ## Loops
 
-A `while` loop runs until its condition is false:
+A `while` loop runs as long as its condition is true:
 
 ```python
 # while_loop.py
@@ -128,7 +130,7 @@ then stops at `6` with `break`, so `6` through `9` never print.
 
 `print()` ends with a newline by default.
 `end=" "` replaces that newline with a space, so the numbers print on one line,
-and a bare `print()` emits the missing newline afterward.
+and a bare `print()` ends the line afterward.
 
 `break` and `continue` both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
@@ -159,8 +161,8 @@ so the test sits between the `pop()` and the addition.
 ### The Loop `else` Clause
 
 A loop may have an `else` clause.
-It runs when the loop finishes with no `break`,
-and that makes it natural for search loops:
+It runs when the loop runs to the end, and a `break` skips it.
+That makes the `else` clause natural for search loops:
 
 ```python
 # loop_else.py
@@ -189,7 +191,7 @@ at the outer loop's level.
 When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
 When the inner loop runs to the end,
-the `continue` moves the outer loop along instead:
+the `continue` starts the outer loop's next iteration instead:
 
 ```python
 # nested_break.py
@@ -221,14 +223,15 @@ locate(9)
 runs its `continue` and the outer loop moves on to the second row.
 There the `3` matches, the inner `break` (`[1]`) skips the `else`,
 and the outer `break` (`[3]`) runs right after.
-`locate(9)` breaks neither loop,
+`locate(9)` runs both loops to the end,
 so the inner `else` continues on each row and the outer `else` (`[4]`)
 prints `"not found"`.
 
 Each call ends at `[5]`, after both loops, whichever way the search went.
 A `return` at the match would leave both loops in one step and skip `[5]` along with them.
-The `else` form keeps the function running past the search,
-and it also serves loops at the top level of a module, outside any function.
+The `else` form keeps the function running past the search.
+It also works in loops at the top level of a module,
+where a `return` is a syntax error.
 
 ### `range()`, `enumerate()`, and `zip()`
 
@@ -256,12 +259,13 @@ print(list(enumerate(names, start=1)))
 
 `enumerate()` yields `(index, item)` pairs counting from zero,
 and the loop here unpacks each pair into `index` and `name`.
-`for i in range(len(names)):` with `names[i]` inside does the same job,
-but that form names the index and not the item,
-so every line that needs the item repeats the `names[i]` lookup.
-`enumerate()` hands you both.
-For output that people read, which usually counts from one,
-`start=1` begins the index at one, so a loop body can print it as it comes.
+A `for i in range(len(names)):` loop with `names[i]` inside does the same job.
+That loop binds the index and leaves the item to a lookup,
+so every line that needs the item repeats `names[i]`.
+`enumerate()` supplies both the index and the item.
+
+`start=1` begins the index at one, the usual count in output that people read,
+so a loop body can print the index as it comes.
 `list()` collects the pairs that the `start=1` form yields,
 each index one higher than in the loop.
 
@@ -287,13 +291,14 @@ except ValueError as e:
 
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so it drops the extra score.
-Stopping without an error is convenient when the lengths differ on purpose and a bug when you expect them to match.
-`strict=True` raises a `ValueError` instead,
-at the point where iteration finds one argument exhausted and another not,
-which is why the listing consumes the `zip()` with `list()`.
+Stopping silently is convenient when the lengths differ on purpose and a bug when you expect them to match.
+`strict=True` raises a `ValueError` instead.
+`zip()` checks the lengths during iteration,
+when one argument runs out while another still has items,
+so the listing consumes the `zip()` with `list()`.
 
 When you need the index as well, wrap the `zip()` in `enumerate()`.
-The nesting shows up in the loop header, where the inner pair needs parentheses:
+The nesting appears in the loop header, where the inner pair needs parentheses:
 `for i, (name, score) in enumerate(zip(names, scores)):`.
 
 ### The Walrus Operator
@@ -326,10 +331,10 @@ Each walrus expression here needs its parentheses.
 so `if n := len(text) > 3:` gives `n` the result of the comparison, `True`,
 and not the length.
 
-The `while` loop is where the walrus helps most.
+The walrus helps most in a `while` loop.
 The header checks that the stack has an item, pops it, names it, and tests it,
-so the body starts with that value in hand.
-The walrus also collapses `while_true.py` into its loop header:
+so `item` holds the popped value when the body starts.
+The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 A comprehension can use `:=` the same way,
 and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
@@ -337,14 +342,14 @@ and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 ### Mutating a Container While Looping
 
 Changing a container while a `for` loop walks it is the classic control-flow bug.
+Lists and dictionaries are the two containers you are most likely to mutate this way,
+and each one fails differently.
 [Containers](03_Foundations--Containers.md#two-list-traps)
 shows a `list` skipping items as the loop removes them,
 and [a `dict` raising a `RuntimeError`](03_Foundations--Containers.md#dictionaries)
-under the same treatment.
-Lists and dictionaries are the two containers you are most likely to mutate this way,
-and each one fails differently.
+when the loop deletes its keys.
 A [list comprehension](#comprehensions) fixes the list case by building a new,
-filtered list instead of mutating the original in place:
+filtered list and leaving the original as it was:
 
 ```python
 # mutating_while_looping.py
@@ -368,11 +373,12 @@ except RuntimeError as e:
 
 The list loop walks by position.
 Removing an item shifts the next one down into the slot the loop has passed,
-so the loop skips it and one of the two `2`s survives,
-with no exception to tell you.
-Adding the key changes the dictionary's size,
+so the loop skips that item.
+One of the two `2`s survives, and no exception reports the skip.
+Adding a key while the loop walks `ages` changes the dictionary's size,
 and the dictionary raises a `RuntimeError` instead of skipping silently.
-The same three fixes work for both.
+
+The same three fixes work for both containers.
 Build a new container with a comprehension,
 loop over a snapshot such as `list(ages)` while changing the original,
 or collect the changes first and apply them after the loop.
@@ -381,7 +387,7 @@ or collect the changes first and apply them after the loop.
 
 The `match` statement compares a value against structural patterns.
 It resembles a C `switch`,
-but a pattern can look inside a value and pull out its parts:
+but a pattern can test a value's structure and bind its parts to names:
 
 ```python
 # pattern_matching.py
@@ -403,8 +409,9 @@ print(run("dance"))
 #: unknown command
 ```
 
-Only the first matching `case` runs.
-Unlike C, a `case` does not fall through, so it needs no `break`.
+Python runs the first `case` that matches and then leaves the `match`.
+A C `switch` falls through from one `case` into the next until a `break` stops it.
+A Python `case` ends on its own.
 
 The first `case` destructures the split command.
 It matches a two-item list starting with `"go"` and binds the second item to `direction`.
@@ -423,9 +430,10 @@ Avoid the name, though, because a reader must work out which meaning applies.
 
 Python signals an error by *raising* an exception.
 As in C++ and Java, an exception propagates up the call stack until it finds a handler.
-An exception that finds no handler stops the program and prints the traceback.
+If the exception reaches the top of the stack,
+Python prints the traceback and stops the program.
 In Python, a handler is `except` followed by the exception type it handles.
-You can give only the type, or add an `as` to capture the exception object,
+You can name the type, or add an `as` to capture the exception object,
 as in `except ValueError as e`:
 
 ```python
@@ -465,13 +473,15 @@ divide_and_report(1, 1)
 #: finally always runs
 ```
 
-`checked_divide()` raises a `ValueError` rather than letting Python's own `ZeroDivisionError` through.
-Choose the exception that way when the caller should hear about the bad argument rather than the failed arithmetic.
+`checked_divide()` raises a `ValueError` before the division can raise Python's own `ZeroDivisionError`.
+Choose the exception that way when the report should name the bad argument rather than the failed arithmetic.
 
-The optional `else` runs when the `try` block raises no exception,
-the same shape as the loop `else` that runs when the loop hits no `break`.
-Code in the `else` is outside the reach of the `except` clauses,
-so no `except` clause mistakes an exception from the follow-up work for the failure it expects.
+The optional `else` runs when the `try` block raises no exception.
+The loop `else` has the same shape.
+It runs when the loop hits no `break`.
+The `except` clauses catch exceptions raised in the `try` block alone.
+An exception from the follow-up work in the `else` propagates to the caller,
+past the handlers written for the `try` block's failure.
 
 The optional `finally` always runs, and that makes it the place for cleanup.
 A `return`, `break`,
@@ -492,33 +502,35 @@ print(risky())
 ```
 
 `risky()` raises a `ValueError`,
-but the `return` in `finally` discards it before it reaches the caller,
-so the caller sees `"swallowed"` and no trace of the exception.
+but the `return` in `finally` discards the exception before it reaches the caller.
+The caller receives `"swallowed"` and no exception.
 Python also flags the `return` in `finally` at compile time.
 Running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
 Catch an exception only when you can do something about it.
-A broad catch takes a bug in the `try` block along with the failure you expected,
-and makes the bug look like that failure.
+A broad `except` clause catches the exception from a bug in the `try` block along with the failure you expected.
+The clause runs the same handler for both,
+so the bug looks like the expected failure.
 A bare `except:` with no type is the broadest of all.
 It catches everything,
 including the `KeyboardInterrupt` you press to stop a runaway program.
 When you do need a broad catch, write `except Exception:`.
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
-so they propagate past that clause and still stop the program.
+so they propagate past that clause and stop the program.
 
 To handle several types the same way, give a tuple:
 `except (ValueError, TypeError) as e:`.
 Python tries the `except` clauses in order and runs the first whose type matches,
-so a broad clause above a narrow one makes the narrow one unreachable.
+so a broad clause above a narrow one takes every exception the narrow one exists to catch.
 Order them most specific first.
 
-To log an exception and still let it propagate, re-raise it with a bare `raise`.
+To log an exception and then let it propagate, re-raise it with a bare `raise`.
 
 ### Exception Chaining
 
-Raising an exception while handling another attaches the handled exception to the new one.
-Python reports both, and `from` decides how the two connect:
+When you raise an exception while handling another,
+Python attaches the handled exception to the new one.
+`from` controls whether Python reports both and how it connects them:
 
 | Form | What Python prints above the new exception |
 |---|---|
@@ -528,7 +540,7 @@ Python reports both, and `from` decides how the two connect:
 
 All three raise the same exception.
 They differ in three attributes of that exception,
-which Python reads to build the report:
+and Python reads those attributes to build the report:
 
 ```python
 # exception_chaining.py
@@ -569,18 +581,18 @@ for parse in (implicit, explicit, suppressed):
 ```
 
 `BadNumber` is a custom exception type: a class derived from `Exception`.
-Its body is `pass` because it needs no behavior of its own.
-The handler matches on the class.
+Its body is `pass` because it inherits all its behavior from `Exception`.
+The `except BadNumber` handler matches on the class.
 [Classes](07_Foundations--Classes.md) covers class definitions in full.
 
-Each output line names a function, then shows the `__cause__`, `__context__`,
-and `__suppress_context__` of the `BadNumber` it raised.
+Each output line starts with a function's name, then shows the `__cause__`,
+`__context__`, and `__suppress_context__` of the `BadNumber` it raised.
 `name()` gives an attribute's exception class,
 or `None` when the attribute is empty.
 
 In all three functions,
 Python records the handled `ValueError` in `__context__`.
-With no `from`, that is the only link,
+In `implicit()`, that is the one link,
 and Python prints it with the "During handling" line.
 `from` with any argument sets `__suppress_context__` to `True`,
 which hides `__context__` from the report.
@@ -589,7 +601,7 @@ and Python prints the cause with the "direct cause" line.
 `from None` leaves `__cause__` as `None`,
 so nothing appears above the new exception.
 
-Use `from e` when the earlier exception explains this one,
+Use `from e` when the earlier exception explains the new exception,
 and `from None` when the earlier exception distracts from your own message.
 
 ### Ask Forgiveness, Not Permission
@@ -598,8 +610,8 @@ Python style favors "easier to ask forgiveness than permission,"
 abbreviated EAFP.
 Try the operation and handle the exception,
 rather than checking every precondition first.
-The opposite style, "look before you leap" (LBYL), tests first,
-and it breaks whenever the test and the operation disagree:
+The opposite style is "look before you leap" (LBYL).
+It tests first, and it fails whenever the test and the operation disagree:
 
 ```python
 # eafp.py
@@ -622,19 +634,22 @@ except ValueError as e:
 `isdigit()` rejects `"-5"`, which `int()` converts fine,
 and `isdigit()` accepts `"²"`, which `int()` refuses with a `ValueError`.
 `parse_int()` in `demonstrate_exceptions.py` is the EAFP version of `look_first()`.
-Its `try` block asks the only question that matters: does this conversion work?
-It returns `-5` for `"-5"` and `None` for `"²"`,
+Its `try` block runs the conversion and catches the failure,
+so the test and the operation are one call and cannot disagree.
+`parse_int()` returns `-5` for `"-5"` and `None` for `"²"`,
 the two answers `look_first()` gets wrong.
-The world can also change between the test and the operation.
-A file that exists at the `if` can disappear before the `open()`,
-and only the EAFP form is safe against that.
+
+The file system can also change between the test and the operation.
+A file that exists at the `if` can disappear before the `open()`.
+The EAFP form handles that case, because its `open()` is the test.
 
 ## Context Managers
 
 A `with` block guarantees that setup and cleanup run as a pair,
 even if the body raises an exception.
 It does the work of a `try`/`finally` whose `finally` holds the cleanup.
-The object that `with` manages supplies the cleanup, so you cannot leave it out.
+The object that `with` manages supplies the cleanup,
+and that cleanup runs every time the block exits.
 Opening a file is the canonical case.
 The `with` block always closes the file on exit:
 
@@ -664,19 +679,19 @@ print("closed:", f.closed)
 path.unlink()  # Delete the file
 ```
 
-The exception propagates, but the `with` closes the file first.
-A `with` statement creates a guarantee about the exit, not a scope,
-so `f` is still in scope afterward and the listing can print `f.closed`.
+The `RuntimeError` propagates, but `with` closes the file first.
+A `with` block shares the enclosing scope,
+so `f` stays bound after the block exits and the listing can print `f.closed`.
 
-Closing the file is cleanup that runs whether or not the block succeeds.
 [Cleanup](10_Foundations--Cleanup.md)
-contrasts that guarantee with leaving the close to Python's garbage collector.
+contrasts the close that `with` guarantees with leaving the close to Python's garbage collector.
 
 Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
-An object becomes one by defining two methods, `__enter__()` and `__exit__()`:
-`with` calls `__enter__()` at the top of the block and `__exit__()` as control leaves it,
-and the cleanup lives in `__exit__()`.
+An object becomes one by defining two methods, `__enter__()` and `__exit__()`.
+`with` calls `__enter__()` at the top of the block.
+As control leaves the block, `with` calls `__exit__()`,
+which performs the cleanup.
 [Context Managers](15_Techniques--Context_Managers.md)
 shows how to write your own.
 
@@ -712,7 +727,7 @@ print(parities)
 Every form has the same order: the expression that produces each item,
 the `for` clause that supplies the values,
 and an optional `if` that filters them.
-The delimiters choose the container.
+The delimiters determine the container type.
 Brackets build a list, braces build a set,
 and braces around a `key: value` expression build a dictionary.
 [Comprehensions](16_Techniques--Comprehensions.md) covers nesting,
@@ -732,7 +747,7 @@ Try each exercise before opening its [solution](../Solutions/04_Foundations--Con
     Predict whether the output changes before running it,
     then explain what you find.
 4.  In `demonstrate_exceptions.py`, add a call `divide_and_report(1, "x")`
-    (a `TypeError` that `except ValueError` does not catch).
+    (the division raises a `TypeError`, which `except ValueError` lets through).
     Run it and read the traceback that escapes.
 5.  In `pattern_matching.py`,
     add a `case ["go", direction, distance]` that reports both parts,

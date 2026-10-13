@@ -494,7 +494,7 @@ reports sixteen cases per module where it reported nine.
 
 > In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter,
 > and have it update that counter in place with a tally of every item type it chooses.
-> It still yields `(item1, item2)` pairs, so existing calls need no change.
+> It still yields `(item1, item2)` pairs, so existing calls keep working.
 > The counter fills only as you consume the generator,
 > so pass in your own `Counter`,
 > iterate over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
@@ -781,8 +781,8 @@ Python's account of which pair of types has no defined subtraction.
 > Subclass `Paper` as `Origami` and duel it against `Rock` in the table version,
 > as `exact_match.py` does.
 > Explain the `KeyError` in terms of how the lookup matches.
-> Then make the table match subclasses by walking both operands' `__mro__` for the first pair that has a row,
-> and say what becomes of each of the two properties the lookup shares with the table-driven state machine:
+> Then make the table match subclasses by walking both operands' `__mro__` for the first pair that has a row.
+> Say what becomes of each of the two properties the lookup shares with the table-driven state machine:
 > exact matching, and failure at the first duel that needs a missing pair.
 
 <details>

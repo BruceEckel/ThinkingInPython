@@ -6,8 +6,7 @@
 
 An application framework lets you build a new application by reusing its existing classes and overriding methods to customize behavior.
 At the heart of a framework is the *Template Method* of *GoF Design Patterns*:
-a method, defined in the base class,
-that drives the application by calling other base-class methods,
+a base-class method that drives the application by calling other base-class methods,
 some of which you override.
 
 Python's own `unittest` is this kind of application framework.
@@ -23,9 +22,9 @@ The test runner calls `run()` on the finished object.
 A *Template Method* anchors the shape of the algorithm in the base class.
 Subclasses provide the individual steps.
 
-The `typing.final` decorator,
-used on a class in [Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final),
-also works on a single method.
+[Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final)
+puts the `typing.final` decorator on a class.
+The decorator also works on a single method.
 On a method, it declares that no subclass may override that method.
 In `framework.py`, `run()` is the template method,
 and `@final` on `run()` makes the type checker reject any subclass that overrides it:
@@ -69,12 +68,12 @@ MyApp().run()
 #: Say no more, say no more!
 ```
 
-`MyApp` defines no `run()` of its own.
-The inherited `run()` holds the loop and calls the steps `MyApp` supplies,
+`MyApp` inherits `run()` from the base class.
+That inherited `run()` holds the loop and calls the steps `MyApp` supplies,
 so `MyApp().run()` starts the engine that drives the application.
 
 A test supplies steps that record their calls,
-confirms that constructing the subclass calls none of them,
+confirms that the record stays empty after construction,
 then checks the order in which `run()` makes them:
 
 ```python
@@ -111,36 +110,35 @@ Only the type checker enforces `@final`.
 At runtime the decorator sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
 Your own code can read it.
-If you want the interpreter to refuse an override,
+If you want an override to fail at runtime,
 the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
 also works with methods.
 `near_miss.py` in the next section includes that check.
-It raises an exception when a subclass replaces a function that carries `__final__`.
+The check raises a `TypeError` when a subclass replaces a function that carries `__final__`.
 
 ### Hooks and the Misspelled Override
 
 The step methods default to `...`,
-so a subclass overrides only the steps that matter to it,
-and a forgotten step silently does nothing.
+so a subclass overrides only the steps that matter to it.
 This kind of optional step is a *hook*.
 The `setUp()` and `tearDown()` in the opening example are hooks.
-`TestCase` supplies do-nothing versions,
-so a test class that needs no setup skips them.
+`TestCase` supplies empty versions,
+so a test class overrides `setUp()` only when it has setup work to do.
 
+A forgotten step silently does nothing.
 The do-nothing default also hides a misspelling.
 `def customise1()` ('s' instead of 'z')
 adds a new method and leaves the base's do-nothing version in place.
-That is why every step override in these listings carries `@override`.
+That is why every step override in these listings carries [`@override`](07_Foundations--Classes.md#marking-overrides-with-override).
 The type checker then rejects a method that overrides nothing.
 
 That check depends on the decorator.
 If you leave `@override` off the misspelled method,
-the checker accepts it as a new method.
-The typing rules let a subclass add any method,
-so this case is beyond what the checker can catch.
-The interpreter can.
+the checker accepts it as a new method,
+because the typing rules let a subclass add any method.
+A runtime check can reject the misspelled method.
 The base class's `__init_subclass__()` runs at each subclass's `class` statement,
-and the standard library's `difflib` finds names that nearly match:
+and it can use the standard library's `difflib` to find names that nearly match:
 
 ```python
 # near_miss.py
@@ -217,57 +215,61 @@ If that attribute carries `__final__`,
 `__init_subclass__()` raises a `TypeError`.
 `class Hijack` fails that check,
 because the `run()` it replaces carries `__final__`.
-The check exists because a subclass that replaces the anchor moves the algorithm out of the base class,
+
+The `__final__` check exists because a subclass that replaces the anchor moves the algorithm out of the base class,
 and `@final` stops that replacement only when the type checker runs.
-The `__final__` check names no method,
-so a second `@final` instance method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
+
+The `__final__` check reads a flag rather than a method name.
+A second `@final` instance method in `ApplicationFramework` therefore gets the same protection from the same `__init_subclass__()`.
 The check misses a `@final` on a `@property`,
 and a `@final` written above `@classmethod` or `@staticmethod`.
 For those, `getattr()` on the class returns the property object, a bound method,
 or the bare function, and none of them carries `__final__`.
 Written below `@classmethod` or `@staticmethod`, `@final` marks the function,
-which `getattr()` returns directly or through a bound method,
+which `getattr()` returns as the bare function or through a bound method,
 and the check catches the override.
 
-Reading the attribute through `getattr()` also keeps the type checker quiet.
+Reading the attribute through `getattr()` also passes the type checker,
+because `getattr()` with a default accepts any name.
 A function's type declares no `__final__`,
-so `ty` reports `ApplicationFramework.run.__final__` as an unresolved attribute,
-while `getattr()` with a default accepts any name.
+so `ty` reports a direct read such as `ApplicationFramework.run.__final__` as an unresolved attribute.
 
-A name that matches a step, `customize1` or `customize2`,
-is an ordinary override, and a name that resembles none of them,
-like `report()`, is an ordinary new method.
-Both of those pass.
-A name that comes close to an inherited name without matching it produces a `TypeError`,
+A name that matches a step, such as `customize1`, is an ordinary override.
+A name far from every inherited name, such as `report()`,
+is an ordinary new method.
+Both pass the check.
+A name that nearly matches an inherited name produces a `TypeError`,
 and the message names the method the author probably meant.
 `customise1` comes close to `customize1`,
 so the `class Typo` statement raises a `TypeError`.
 The misspelling fails at import time,
-not later when the framework runs and the step silently does nothing.
+before the framework runs and calls the empty default in place of the step.
 
-Rejecting every new method catches the typo too, but it also forbids `report()`,
-and a framework that bans helper methods in its subclasses is too restrictive.
+Rejecting every new method also catches the typo, but it forbids `report()` too.
+A framework that bans helper methods in its subclasses is too restrictive.
+
 The close-match check also rejects legitimate names.
-`class Weird` fails too, although `customer()` is not a typo.
+`class Weird` fails, although its author meant `customer()`.
 `customer` and `customize2` share the six letters `custom` and an `e`,
-a similarity of 0.78,
-and `get_close_matches()` flags any name that scores 0.6 or higher.
-A team that adopts this check should expect to catch typos and also to rename an occasional legitimate method.
+a similarity of 0.78.
+`get_close_matches()` flags any name that scores 0.6 or higher.
+A team that adopts this check should expect to catch typos and to rename an occasional legitimate method.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with [`@abstractmethod`](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
-The interpreter then refuses to instantiate a subclass that forgot it,
+Instantiating a subclass that leaves the step abstract then raises a `TypeError`,
 and the type checker reports the attempt.
-Under the older convention, a step whose body raises `NotImplementedError`,
-the same subclass constructs and type-checks,
-and the omission surfaces when `run()` reaches that step,
+The older convention gives the step a body that raises `NotImplementedError`.
+Under that convention,
+Python instantiates the same subclass and the type checker accepts it.
+The step raises `NotImplementedError` when `run()` calls it,
 after any earlier steps have run.
 
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
 The client starts the engine, not `ApplicationFramework`.
 A framework can call `run()` from its own constructor,
-but then a subclass with its own `__init__()` falls into a trap.
+but that constrains any subclass with its own `__init__()`.
 Because `run()` calls methods the subclass supplies,
 the subclass must finish its own setup before it calls `super().__init__()`.
 Calling `super().__init__()` first, in the usual style,
@@ -303,13 +305,13 @@ expect(AttributeError, Greeter, "Robin")
 ```
 
 `Greeter("Robin")` fails with an `AttributeError`.
-`super().__init__()` starts the engine, the engine calls `step()`,
+`super().__init__()` calls `run()`, `run()` calls `step()`,
 and `step()` reads `self.name` before the constructor assigns it.
 
 The quick repair is reordering.
 Assign `self.name` first, then call `super().__init__()`.
 That works, but it inverts the convention Python programmers expect,
-and the next subclass author might restore the usual order without thinking.
+and the next subclass author might restore the usual order out of habit.
 The reliable repair changes the framework.
 Separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
@@ -321,9 +323,9 @@ The *Template Method* depends on the [Liskov Substitution Principle](20_Patterns
 when code expects a base-class instance,
 an instance of a subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`,
-trusting that what the subclass supplies fits the algorithm's shape.
-A subclass breaks that trust, and still type-checks,
-when it raises an exception where the base does not,
+and the algorithm works only if each step the subclass supplies does its part on every call.
+A subclass can break that requirement in three ways and still pass the type checker:
+it raises an exception where the base does not,
 leaves a step empty when the flow depends on it,
 or performs the step on one pass and skips the next.
 `faithless_step.py` shows the third failure:
@@ -353,16 +355,16 @@ OnlyOnce().run()
 #: Say no more, say no more!
 ```
 
-The second `Say no more, say no more!` has no `Nudge, nudge, wink, wink!` before it.
 `run()` calls `customize1()` twice, and `OnlyOnce` performs the step once.
 The name, the parameters, and the return type all match the base,
 so the type checker accepts `@override` and reports nothing.
 The base states its algorithm in the loop, not in any type.
 Each pass calls the step, so each pass must perform it.
+
 An unexpected exception, an empty step the flow needs,
-and a skipped pass each corrupt the anchored algorithm.
-The `...` defaults make a step optional,
-and nothing distinguishes "deliberately empty" from "forgotten."
+and a skipped pass each change what the anchored algorithm does.
+Because the `...` defaults make a step optional,
+a step left empty on purpose looks identical to a forgotten one.
 The *Template Method* works only when every subclass is a faithful substitute for its base.
 
 ## Passing the Steps as Functions
@@ -403,20 +405,21 @@ starting from the base class with its empty hooks:
 ![](_images/template_method_story)
 
 The loop and its two step slots stay the same in all three frames.
-The box beneath them changes,
-along with the name of the function that holds the loop,
-`run_framework()` in frame 3.
+The box beneath them changes from empty hooks to `MyApp` to two lambdas.
+In frame 3 a function, `run_framework()`,
+holds the loop in place of `ApplicationFramework`.
 In the first two frames each arrow is a call through `self`,
-and in the second those calls reach the subclass's methods.
-In the third the arrows lose `self`.
-`run_framework()` calls its own parameters,
-and the output column shows that the lambdas print the same four lines as `MyApp`.
+and in frame 2 those calls reach the subclass's methods.
+In frame 3 the arrow labels read `customize1()` and `customize2()`,
+with no `self`.
+`run_framework()` calls its own parameters.
+The output column shows that the lambdas print the same four lines as `MyApp`.
 
 Both the *Template Method* and the function version have an anchored algorithm and varying steps.
 If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
-passing functions is lighter and avoids a class hierarchy.
+passing functions takes fewer lines and needs no class hierarchy.
 
 The subclass form also makes each step optional,
 since the base supplies the `...` default.
@@ -424,24 +427,25 @@ The function form makes a step optional by giving its parameter a default.
 In `template_function.py`,
 `customize2` defaults to the do-nothing `lambda: None`,
 so the closing `run_framework()` call passes one step and the loop prints `one` twice.
-The do-nothing default keeps the loop free of `None` tests.
-`customize1` has no default, so the type checker reports a call that omits it.
+With a do-nothing default, the loop calls both steps on every pass.
+`customize1` is a required parameter,
+so the type checker reports a call that omits it.
 
 The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.
-Here no subclass exists,
-so a caller supplies the steps but cannot touch the loop.
+Here a caller passes the steps in as arguments,
+and the loop stays in the body of `run_framework()`, out of the caller's reach.
 Structure anchors the algorithm,
-with no help from a decorator the runtime ignores.
+and that anchor holds at runtime as well as under the type checker.
 
 Passing functions is not the *Strategy* pattern,
 although the two look alike at the call site.
 A *Strategy* swaps out a whole algorithm behind a single interface.
 In `template_function.py` the algorithm stays in `run_framework()`,
 and the caller supplies the steps.
-The choice between a class and a function is the same trade-off a [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
-faces.
+
 A stateless hook is usually better as a function than as an overridden method.
+You make the same choice between a class and a function when you write a [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 
 ## What Anchors the Algorithm
 
@@ -449,16 +453,17 @@ An anchored algorithm is only as secure as its anchor.
 Each of this chapter's four anchors guards against a different way of breaking the flow:
 
 - Structure, in `template_function.py`.
-  No subclass exists, so nothing can replace the loop.
-  This works only when you can pass functions instead of subclassing.
+  The loop lives in a function body, out of every caller's reach.
+  This anchor works only when you can pass functions instead of subclassing.
 - The type checker, via `@final`.
-  It discovers an overridden `run()` before the program executes.
+  It reports an overridden `run()` before the program runs.
 - The interpreter, via `__init_subclass__()`.
-  It refuses an offending subclass at its `class` statement,
+  It raises a `TypeError` at an offending subclass's `class` statement,
   whether the subclass overrides `run()` or misspells a hook.
-  This holds at runtime, whereas the type checker alone enforces `@final`.
+  This anchor holds at runtime,
+  whereas the type checker alone enforces `@final`.
 - Discipline, via the Liskov Substitution Principle.
-  This governs whether each step is a faithful substitute.
+  The principle governs whether each step is a faithful substitute.
   `@abstractmethod` checks that a required step exists,
   and no tool checks what the step does.
 

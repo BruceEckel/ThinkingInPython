@@ -74,17 +74,19 @@ After `a.x = 1`, the instance's own entry shadows the class entry,
 and `a.x` reads `1` while `vars(A)["x"]` still holds `100`.
 
 The listing subscripts `vars(A)` instead of printing it whole,
-because a class's dictionary is a read-only `mappingproxy` that carries the compiler's own bookkeeping alongside `x`.
+because a class's dictionary carries the compiler's own bookkeeping alongside `x`.
+That dictionary is a read-only `mappingproxy`,
+and writing to it raises a `TypeError`.
 Assigning through the class name changes the entry, as `Stars.rating = 9` does,
-and `setattr(A, "x", 5)` does the same when the name arrives as a string;
-writing to the proxy raises a `TypeError`.
+and `setattr(A, "x", 5)` does the same when the name arrives as a string.
 The instance dictionary is a plain `dict` holding what the code assigned,
 and that alone.
 
-That instance dictionary is not guaranteed.
-A class that declares [`__slots__`](18_Techniques--Performance.md#slots),
-or a data class built with `slots=True`, has no instance `__dict__`,
-provided every base class is slotted too.
+Slots can replace that instance dictionary.
+A class gets them by declaring [`__slots__`](18_Techniques--Performance.md#slots),
+and a data class gets them from `slots=True`.
+Each instance then holds one slot per declared name in place of a `__dict__`,
+provided every base class declares slots too.
 An instance of such a class cannot shadow a class attribute.
 Assigning to that name on the instance raises an `AttributeError`,
 because the instance has no dictionary to hold the new attribute.
@@ -93,25 +95,25 @@ A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
 and `a.show()` finds it by the same fallback that finds `a.x`:
 nothing on the instance, so look at the class.
-`display_object()`, the inspection helper first used in [Classes](07_Foundations--Classes.md),
-reports attributes and methods separately,
-but both live in the same class dictionary.
-Because the method lives in the class dictionary,
+Because the class dictionary holds the method,
 assigning `a.show = something` shadows the method for `a` alone.
+The inspection helper `display_object()` from [Classes](07_Foundations--Classes.md)
+reports attributes and methods separately,
+but the same class dictionary holds both.
 
 One kind of class attribute follows a different rule.
 A [`@property`](07_Foundations--Classes.md#properties)
-owns its name on the class,
-so for that name reading calls its getter and assigning calls its setter in place of the instance dictionary.
-Whatever the setter stores, such as the `_radius` behind `Circle`'s `radius`,
-goes into that dictionary under its own name.
+stored on the class takes precedence over the instance dictionary for its name,
+so reading that name calls its getter and assigning to it calls its setter.
+The setter stores its value in the instance dictionary under a different name,
+as `Circle`'s `radius` setter stores `_radius`.
 
 ### The Bug Surfaces Far from Its Cause
 
-A class attribute reads like a default right up until someone assigns to an attribute of the same name on one instance.
-After that, a change to the class attribute reaches every other object,
+A class attribute behaves like a default until someone assigns to an attribute of the same name on one instance.
+After that, every other object reads the new value when the class attribute changes,
 while the object that assigned keeps its own value.
-The bug surfaces far from the line that caused it,
+The program reads the wrong value far from the line that caused it,
 often in a different function that does not mention the assignment:
 
 ```python
@@ -140,11 +142,11 @@ show(b)
 
 `rerate(9)` changes the rating for every `Stars`,
 and `show(a)` still prints `1`.
-Someone debugging that stale `1` finds nothing wrong in `rerate()` or in `show()`.
+Someone debugging that stale `1` finds `rerate()` and `show()` both correct.
 The cause is the assignment inside `sell()`,
 which gave `a` its own `rating` before the class attribute changed.
 Neither `rerate()` nor `show()` calls `sell()`,
-so finding the assignment means tracing every earlier call that touched a `Stars` instance.
+so finding the assignment means tracing every earlier call that used a `Stars` instance.
 
 ### A Shared Mutable Value
 
@@ -168,21 +170,20 @@ print(a.items, b.items)
 #: ['plum'] ['apple', 'pear']
 ```
 
-`a.items.append("apple")` does not assign to `a.items`.
-It reads `items`, finds nothing on `a`, falls back to the class,
-and mutates the one list stored there.
-The mutation creates no instance attribute, so `b` sees the apple too.
-Because shadowing starts with an assignment and `.append()` makes none,
-a read followed by a mutation slips past the rule.
+`a.items.append("apple")` reads `items`, finds nothing on `a`,
+falls back to the class, and mutates the one list stored there.
+Shadowing starts with an assignment,
+and `.append()` leaves `a`'s dictionary empty,
+so `b.items` reads the same list and holds the apple too.
 The type checker accepts the line too,
 since `a.items.append("apple")` is a correct call on a `list[str]`.
 
-An augmented assignment does both.
+An augmented assignment both mutates and assigns.
 `a.items += ["pear"]` mutates the shared list through `__iadd__()`,
-so `b` sees the pear too.
-It then assigns that same list to `a.items`,
-which creates an instance attribute that shadows the class list.
-Both attributes refer to one list, so the two printed values match.
+so `b.items` holds the pear too.
+The augmented assignment then stores that same list on `a`,
+creating an instance attribute that shadows the class list.
+Because both attributes refer to one list, the two printed values match.
 The plain assignment shows the split:
 `a.items = ["plum"]` rebinds `a`'s own attribute to a new list,
 and `b` still reads the shared one.
@@ -230,14 +231,12 @@ print(Tally.total)
 
 `display_object(Tally)` shows what the class holds: `total`,
 and nothing called `label`.
-The `[CV]` tag, for *class variable*, marks an attribute the class stores.
 An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` shows.
 `total: ClassVar[int] = 0` has the `= 0`,
 so it exists on `Tally` before any instance exists.
-`label: str` has no `=`, so the class stores nothing under that name.
-The annotation records, in `Tally.__annotations__` beside `total`'s,
-that a `Tally` will carry a `label`.
+`label: str` has no `=`, so it stays a declaration.
+The annotation goes into `Tally.__annotations__` beside `total`'s and records that a `Tally` will carry a `label`.
 `display_object()` reports attributes that exist,
 so the declaration stays out of its report.
 
@@ -248,8 +247,9 @@ which creates a real `label` attribute on `a`, not on `Tally`.
 `total` shows up too, by fallback.
 Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrates in `class_attribute_confusion.py`.
-`a` holds no copy of its own.
-The tags agree.
+The `total` that `a` reports is `Tally`'s.
+The `[CV]` tag, for *class variable*, marks an attribute the class stores,
+and the tags agree.
 `label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,
 keeps it.
 
@@ -257,19 +257,20 @@ keeps it.
 
 A *bare annotation*, one with no assigned value,
 is a declaration rather than a placeholder.
-It states that instances of this class carry a `label` attribute of type `str`,
+In `class_var.py`, `label: str` states that every `Tally` carries a `label` attribute of type `str`,
 set somewhere.
 If no method assigns `self.label`, no attribute exists,
 on the instance or the class.
-The type checker trusts the annotation rather than checking that some method sets the attribute,
-so the check passes.
+The type checker takes the annotation as the attribute's declaration.
+It never checks whether some method sets the attribute, so the check passes.
 The first code that reads `label` raises an `AttributeError`.
 
 The annotation on `label` is optional here.
 If you delete it, the type checker still infers `label: str` correctly from `self.label = label`,
-because the parameter's own type carries through to the attribute it initializes.
+because the checker gives the attribute the type of the parameter assigned to it.
 The annotation stays for symmetry with `total`,
-so both names read together at the top instead of one hiding inside the constructor.
+so both names appear at the top of the class,
+instead of `label` appearing first inside the constructor.
 [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
 shows the case that requires the annotation.
 There, code outside the class sets the attribute,
@@ -277,9 +278,10 @@ and the bare annotation is the type checker's one source for its type.
 
 ### A `ClassVar` With No Value Declares Too
 
-`ClassVar` says where an attribute lives, not that it exists.
-Without a value the class stores nothing,
-the same as for `label` in `class_var.py`:
+`ClassVar` declares that the class holds an attribute,
+and leaves creating it to an assignment.
+A `ClassVar` with no value stays a declaration,
+the same as `label` in `class_var.py`:
 
 ```python
 # declared_classvar.py
@@ -301,20 +303,21 @@ print(Registry().count)  # Found by fallback
 #: 0
 ```
 
-`count: ClassVar[int]` records that a count belongs to `Registry`,
-and no attribute exists until something assigns one,
+`count: ClassVar[int]` records that a count belongs to `Registry`.
+No attribute exists until something assigns one,
 so the first read raises an `AttributeError`.
-The type checker (`ty`) reports nothing here,
-for the reason it reports nothing for `label`.
-It trusts the declaration rather than tracking which code runs first.
-Pyright agrees: its optional `reportUninitializedInstanceVariable` rule checks instance variables,
-not a `ClassVar`, so neither checker catches this read.
 `Registry.count = 0` creates the attribute on the class,
 and an instance finds it by fallback.
 
-In every case the value creates the attribute.
-An annotation states the type, and `ClassVar` adds where the attribute belongs,
-while an assigned value brings it into existence.
+The type checker (`ty`) accepts that first read,
+for the reason it accepts a read of `label`.
+It checks the declaration's type and ignores which code runs first.
+Pyright accepts the read too.
+Its optional `reportUninitializedInstanceVariable` rule checks instance variables,
+not a `ClassVar`.
+
+An annotation states the type, and `ClassVar` adds where the attribute belongs.
+The assigned value brings the attribute into existence.
 That holds for `label: str`,
 which `self.label = label` creates on each instance,
 for `total: ClassVar[int] = 0`,
@@ -322,7 +325,7 @@ and for the `count` that `Registry.count = 0` creates in `declared_classvar.py`.
 
 ### A Base Class Declares, a Subclass Supplies
 
-The common reason to declare a `ClassVar` and leave its value elsewhere is a base class that names what its subclasses must supply:
+A base class usually declares a `ClassVar` with no value to name what its subclasses must supply:
 
 ```python
 # required_classvar.py
@@ -347,34 +350,38 @@ with expected(AttributeError):
 ```
 
 `Shape` states that every shape carries a `sides`, `Square` supplies one,
-and `Blob` forgets.
+and `Blob` supplies none.
 A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 declares its attributes in the same form, an annotation with no value,
 since it describes what a class must have and leaves the value to the class.
 
 `ty` 0.0.86 enforces most of what the declaration states.
-A subclass `Bad` that writes `sides = "four"` draws `invalid-assignment` where it sits,
-since the checker compares the value with the declared `ClassVar[int]`,
-and one that redeclares the attribute as `sides: ClassVar[str] = "four"` draws `invalid-attribute-override`.
+A subclass that writes `sides = "four"` draws `invalid-assignment` on that line,
+since the checker compares the value with the declared `ClassVar[int]`.
+A subclass that redeclares the attribute as `sides: ClassVar[str] = "four"` draws `invalid-attribute-override`.
 
-Two gaps remain.
-Nothing requires `Blob` to supply a `sides`:
-the declaration says the attribute exists, and the checker takes it at its word.
-And a subclass that narrows the type, `sides: ClassVar[bool] = True`, passes,
-where Pyright rejects it.
-A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
-so a subclass may neither widen nor narrow it;
-`ty` tracks that half under "Enforce the Liskov Substitution Principle for non-methods"
-(`astral-sh/ty` issue 2158).
+Two mistakes pass the checker.
+Nothing requires `Blob` to supply a `sides`.
+The declaration says the attribute exists,
+and the checker accepts that statement.
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
+
+The second mistake is a subclass that narrows the type,
+as `sides: ClassVar[bool] = True` does.
+`ty` accepts it, where Pyright rejects it.
+A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
+so a subclass must keep the type it inherits.
+`ty` tracks the narrowing case as an open issue,
+"Enforce the Liskov Substitution Principle for non-methods"
+(`astral-sh/ty` issue 2158).
 
 ### What `ClassVar` Catches
 
 `ClassVar` is a hint for the type checker.
 It records that `total` belongs to the class,
-and turns the accidental shadowing from `class_attribute_confusion.py` into a check-time error.
-Python's own attribute lookup ignores the hint.
+and makes the type checker report the accidental shadowing from `class_attribute_confusion.py` as an error.
+Python's attribute lookup ignores the hint.
 `@dataclass` does read it at runtime,
 and leaves a `ClassVar` out of the fields it generates.
 
@@ -398,36 +405,39 @@ print(a.total, b.total, Tally.total)
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
-Every `Tally` counts itself once and the shared counter stays at `0`.
+Every `Tally` counts itself once, and the shared counter stays at `0`.
 The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 
-`ClassVar` does catch this mistake, at check time.
-`ty` rejects the augmented form as it rejects a direct `self.total = 5`,
-reporting "Cannot assign to ClassVar `total` from an instance of type `Tally`" for a write like `a.total = 99`,
-and naming the type of `self` where the write sits inside `__init__()`.
+With `ClassVar`, the type checker reports this mistake before the program runs.
+`ty` rejects the augmented form as it rejects a direct `self.total = 5`.
+For a write like `a.total = 99` it reports "Cannot assign to ClassVar `total` from an instance of type `Tally`".
+Inside `__init__()` the message names the type of `self` in place of `Tally`.
 The `# type: ignore` suppresses that report so the listing can show what the line does when it runs.
 
 Shared storage is right when you intend the sharing.
-A count of every object created, a registry mapping names to classes,
-and a constant that all instances read but none change are all class attributes,
-and each reads better when you declare the sharing.
-`Tally.total` is the first of these.
-For the third, a class-level constant,
-[`Final[int]`](08_Foundations--Static_Types.md#constants-with-final)
-says more than `ClassVar[int]`.
-`Final[int]` declares the value both shared and not reassignable.
-Use `ClassVar` when you intend the shared value to change,
-as `Tally.total` does.
 The bug is not the class attribute.
 It is writing one where you meant a per-object default.
+Three kinds of value belong in class attributes:
+a count of every object created, a registry mapping names to classes,
+and a constant that all instances read but none change.
+Each reads better when you declare the sharing.
+`Tally.total` is the first of these.
+
+For the third kind, a class-level constant,
+[`Final[int]`](08_Foundations--Static_Types.md#constants-with-final)
+says more than `ClassVar[int]`.
+`Final[int]` declares the value both shared and constant.
+Use `ClassVar` when you intend the shared value to change,
+as `Tally.total` does.
 
 ## ClassVar and Inheritance
 
 Subclasses inherit a `ClassVar` declared on a base class like any other class attribute.
-A subclass that doesn't declare its own copy reads through to the base's value,
-via the normal [method resolution order](07_Foundations--Classes.md#method-resolution-order).
-A subclass that assigns its own value creates a separate class attribute,
+A subclass reads through to the base's value,
+via the normal [method resolution order](07_Foundations--Classes.md#method-resolution-order),
+until it assigns its own.
+That assignment creates a separate class attribute,
 independent of the base and of sibling subclasses:
 
 ```python
@@ -454,31 +464,31 @@ print(Base.shared, Left.shared, Right.shared)
 ```
 
 Each line prints `Base`, `Left`, and `Right` in that order.
-`Left` has no `shared` of its own,
+`Left` inherits `shared`,
 so its column follows `Base.shared` until `Left.shared = 5` creates `Left`'s own attribute,
 which leaves `Base.shared` at `9`.
 `Right` overrides `shared` at class-definition time,
 so it keeps `100` when `Base.shared` changes.
-`ClassVar` leaves all of that alone.
-It tells the type checker that `shared` belongs to the class,
-and says nothing about whether subclasses share storage.
+
 Attribute lookup on a subclass is the shadowing rule from `class_attribute_confusion.py`,
 one level up.
 `Left` reads through to `Base` until an assignment gives `Left` its own copy,
 the way `a` reads through to `Stars` until `a.rating = 1`.
 
-`Right` writes `shared = 100` without repeating the annotation,
-and the override is still a `ClassVar`.
-The type checker carries the base's declaration down to the override,
-so it rejects `Right().shared = 5` as it rejects `Left().shared = 5`.
+`ClassVar` leaves that lookup alone.
+It tells the type checker that `shared` belongs to the class,
+and says nothing about whether subclasses share storage.
+`Right` writes `shared = 100` and leaves the annotation to `Base`.
+The override is still a `ClassVar`.
+The type checker applies the base's declaration to it,
+so the checker rejects `Right().shared = 5` as it rejects `Left().shared = 5`.
 
 ### `type(self)` Forks the Counter
 
 The mistake in `self_increment.py` has a subclass form.
 `class_var.py` increments `Tally.total` through the literal class name.
-Writing that same increment through `type(self)`,
-a common idiom for naming the instance's class from a method,
-forks the counter once the base class has subclasses,
+Methods often write `type(self)` to name the instance's class.
+Writing the same increment through `type(self)` forks the counter once the base class has subclasses,
 the same way `Right` forks `shared`:
 
 ```python
@@ -507,7 +517,9 @@ The first `Sub()` (`[2]`) reads through to that `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
 The second `Sub()` (`[3]`) increments that separate copy to `3`.
-`Base.total` stays at `1`, and the type checker reports no diagnostic.
+`Base.total` stays at `1`.
+
+The type checker accepts every line.
 The augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.
 
@@ -516,9 +528,9 @@ whenever a `ClassVar` must count across every subclass rather than fork one coun
 A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
 that writes `cls.total += 1` forks the same way,
 because `cls` is the class that received the call.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps the fork by mutating the shared dictionary in place:
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry keeps one dictionary for every subclass by mutating it in place.
 `Trash.registry[cls.__name__] = cls` assigns into the dictionary,
-not to an attribute of `cls`, so no subclass acquires a registry of its own.
+not to an attribute of `cls`, so every subclass shares the one registry.
 
 ## Real Per-Object Defaults
 
@@ -551,21 +563,23 @@ print(vars(B)["x"], vars(B())["x"])
 
 `real_defaults.py`'s `A` and `inside_objects.py`'s `A` both start `x` at `100`,
 and the two behave in opposite ways.
-In `inside_objects.py` the `100` lives on the class and every instance reads it.
-In `real_defaults.py` it is a default argument,
-`__init__(self, x: int = 100) -> None`,
-and `self.x = x` runs on every construction,
+In `inside_objects.py` the class holds the `100` and every instance reads it.
+In `real_defaults.py` the `100` is a default argument,
+`__init__(self, x: int = 100) -> None`.
+`self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 
 Python still builds the [default value](05_Foundations--Functions.md#the-mutable-default-trap)
-once, at definition time, so a mutable default argument brings the sharing back.
+once, at definition time,
+so every construction that relies on a mutable default argument shares one object.
 `100` is immutable, so this default is safe.
 
 A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.
-The annotation marks a field.
 Without the decorator,
-the same annotated assignment stays a shared class attribute, as `Cart` shows.
-If you write `x = 100` with no `x: int`, `@dataclass` sees no field:
+an annotated assignment such as `B`'s `x: int = 100` stays a shared class attribute,
+as `Cart` shows.
+The annotation marks a field.
+If you write `x = 100` with no `x: int`, `@dataclass` creates no field:
 
 ```python
 # dataclass_no_annotation.py
@@ -586,17 +600,17 @@ print(vars(b), B().x)  # The same shadowing as Stars
 ```
 
 The name stays an ordinary shared class attribute,
-the generated `__init__()` is `__init__(self)`,
-and neither the runtime nor the type checker complains.
-`b.x = -1` shadows the class attribute for that one instance,
-and an assignment through the class still changes every instance that has not shadowed it,
+and the generated `__init__()` is `__init__(self)`.
+Neither Python nor the type checker reports an error.
+`b.x = -1` shadows the class attribute for that one instance.
+An assignment through the class changes every instance that falls back to the class,
 the hazard `Stars` demonstrates.
 
 The annotated field in `real_defaults.py` also leaves a class attribute behind.
 As its last line shows, `vars(B)` still holds `x = 100`.
 The difference is the generated `__init__()`,
-which runs `self.x = x` on every construction,
-so each object shadows the class attribute immediately and never reads the shared one.
+which runs `self.x = x` on every construction.
+Each object therefore shadows the class attribute immediately and always reads its own value.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
 covers the details.
 

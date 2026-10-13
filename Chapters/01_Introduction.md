@@ -4,7 +4,7 @@ This book is about developing the judgment to choose the smallest thing that wor
 You build that judgment through insights, idioms, and patterns.
 The book also questions design patterns.
 Most arose to work around the limits of static, inheritance-heavy languages,
-and in Python many of them diminish or dissolve.
+so in Python many of them diminish or dissolve.
 If an idiom or pattern is still useful, it stays.
 
 Every language has habits worth learning and habits worth dropping.
@@ -59,14 +59,13 @@ With Claude and my directing and rewriting, I can build my ideal book.
 
 Using Claude greatly simplified and sped the writing process.
 Claude did not make that process trivial.
-Once Claude had translated and integrated my own work into the book,
-and once it had generated the first versions of new material,
-I went through line by line and concept by concept,
+Claude first translated and integrated my own work into the book,
+and generated the first versions of new material.
+Then I went through line by line and concept by concept,
 inevitably rewriting and asking for clarification,
 often creating more examples to answer further questions.
 One pass would often change the book enough that it needed another pass.
-The process was much faster than without Claude,
-but it still took time and effort.
+The process was much faster with Claude, but it still took time and effort.
 Claude provided excellent support, but did not replace my own work.
 
 I can't predict the future of books.
@@ -94,11 +93,12 @@ The goal is to move from writing Python that works to writing Python that is cle
 idiomatic, and a pleasure to maintain.
 
 This is an intermediate-to-advanced book,
-which removes two constraints that introductory books carry:
+which removes two constraints that introductory books follow:
 
 1.  An introductory book must describe everything in lockstep,
     never using an idea before formally introducing it.
-    This one does not.
+    This one uses an idea wherever it helps,
+    sometimes before the chapter that covers it.
 2.  An introductory book chooses topics by where they fall in a beginner's path.
     This one chooses them by whether they are interesting and useful.
 
@@ -123,11 +123,10 @@ Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
 control flow, functions, modules, classes, static typing, class attributes,
 and object cleanup.
 This part is for programmers coming to Python from another language.
-If you know Python, you can skim for topics you don't know,
-or skip it altogether.
+If you know Python, you can skim for topics new to you, or skip it altogether.
 If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md).
-Every chapter after it annotates its examples,
-and Static Types is the one chapter in Part I that the rest of the book assumes you have read.
+Every chapter after Static Types annotates its examples,
+so Static Types is the one chapter in Part I that the rest of the book assumes you have read.
 
 Part II, *Techniques*,
 covers the idioms and tools that give Python its character: testing,
@@ -166,9 +165,10 @@ The last two build on the chapters before them.
 
 Two appendices follow.
 [Effect Tracking](A_Effect_Tracking.md)
-asks how far Python's `Annotated` type could carry Effect tracking without a library,
+asks how much Effect tracking Python's `Annotated` type could express without a library,
 and [An Effect Checker](B_An_Effect_Checker.md)
-builds the part of a checker for those annotations that needs no type inference.
+builds a checker for those annotations,
+limited to the part that needs no type inference.
 
 ## The Examples
 
@@ -195,19 +195,20 @@ A listing imports such a helper by its bare module name,
 `from result import Err, Ok`,
 because the example tooling puts `Examples/utils/` on the import path.
 
-A file run straight from the repository root lacks `Examples/utils/` on its import path,
-so `tip`, the task runner that comes with the repository,
-has a command for running one example.
+A file run straight from the repository root lacks `Examples/utils/` on its import path.
+The repository comes with a task runner, `tip`,
+that has a command for running one example.
 `tip run-one <name>` (`tools/run_one_example.py`)
 supplies the working directory and import path the book assumes,
 and prints the equivalent by-hand commands first.
-The short form is the listing's name alone.
-`tip membership` runs `membership.py`,
-and words after the name go to the program,
-so `tip membership --numbers` passes it the `--numbers` flag.
+
+The short form, `tip <name>`, gives the listing's name alone.
+`tip membership` runs `membership.py`.
+Words after the name go to the program,
+so `tip membership --numbers` passes the `--numbers` flag to `membership.py`.
+For a `test_*.py` file the short form runs [`pytest`](11_Techniques--Testing.md#pytest)
+on it.
 When the book says to run a listing, use the short form.
-For a `test_*.py` file the short form runs `pytest` on it,
-as [Testing](11_Techniques--Testing.md#pytest) shows.
 
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
@@ -223,8 +224,8 @@ The book's build system extracts the examples, then type-checks
 The code you read is the code that runs,
 and the output you see is the output it produces.
 
-A few early listings carry a `# type: ignore` comment,
-which tells a type checker that the error it would report on that line is deliberate.
+A few early listings make a type error on purpose and carry a `# type: ignore` comment on that line.
+The comment tells a type checker to suppress the error it would report there.
 [Static Types](08_Foundations--Static_Types.md) covers type checking in full,
 along with the `# ty:` comments that appear from that chapter on.
 
@@ -250,27 +251,30 @@ See `CONTRIBUTING.md` in the source repository.
 ## The Exercises
 
 Most chapters end with a short "Exercises" section.
-These come from workshops, where pairs work through them at a keyboard.
+The exercises come from workshops, where pairs work through them at a keyboard.
 They are short enough to do on your own, and they are worth doing that way.
-They usually ask you to copy a small, working example from that chapter,
+They usually ask you to copy a small, working example from their chapter,
 change it, and observe the result: add a class, break an invariant on purpose,
 extend a table, rewrite one function two ways.
-The point is to touch the code, predict what it does, then run it and check.
+The point is to edit the code, predict what it does, then run it and check.
 A few chapters in the Patterns part keep larger exercises,
 because a pattern shows its value only in a program you build yourself.
 
 Solutions live in the `Solutions/` directory of the source repository.
-Each solution opens in steps: a hint, then, for most,
-the shape of the code with its function bodies left out, then the full answer,
-so you can take as little help as you need.
+Each solution opens in steps, so you can take as little help as you need:
+a hint first, then the full answer.
+Most solutions add a step between them,
+the shape of the code with its function bodies left out.
 `tip hint CH=30 N=3` prints the same steps one per run,
 `CH` naming the chapter and `N` the exercise.
+
 Try the exercise yourself before reading the solution.
 The value is in the prediction and the surprise when you are wrong,
 not in the code you produce.
+
 If you keep an AI assistant open while you work,
-the repository's `AGENTS.md` asks it to coach you toward your own answer while a solution is closed,
-and to review your answer against the book's criteria once you open it.
+the repository's `AGENTS.md` asks it to coach you toward your own answer until you open the solution,
+then to review your answer against the book's criteria.
 
 ## Resources
 
@@ -284,7 +288,7 @@ Other resources:
 - [What's New in Python 3.15](https://docs.python.org/3.15/whatsnew/3.15.html),
   the release notes for the version this book targets
 - [The Python type system specification](https://typing.python.org/en/latest/spec/),
-  the reference behind the annotations the book uses throughout
+  the reference that defines the annotations the book uses throughout
 - [pytest](https://docs.pytest.org/), the test framework the book uses
 - [Python Bytes](https://pythonbytes.fm/), podcast and newsletter
 - [Planet Python](https://planetpython.org/),

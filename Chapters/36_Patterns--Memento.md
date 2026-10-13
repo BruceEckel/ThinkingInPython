@@ -77,8 +77,8 @@ however small the change.
 
 ## The Classic Memento
 
-As *GoF Design Patterns* presents the pattern,
-every classic memento copies the state before it changes.
+In the pattern as *GoF Design Patterns* presents it,
+the originator copies its state into a memento before the state changes.
 Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable while the originator stays mutable.
@@ -165,6 +165,7 @@ Building a `Memento` takes an import of the class and a call to it,
 so no caretaker makes one by accident.
 `Memento` is a [record](18_Techniques--Performance.md#record),
 so reassigning `checkpoint.strokes` raises `FrozenInstanceError` at runtime.
+
 Neither the checker's report nor the frozen field stops code holding a `Memento` from reading `.strokes`,
 unpacking that tuple, or building a `Memento` by hand.
 The caretaker's side of the contract remains a convention,
@@ -299,8 +300,9 @@ print(before)
 
 Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
-Here that assignment is safe because the object bound to `before` keeps its value as long as it exists,
-so the `Memento` class, `save()`, `restore()`, and the copying are all gone.
+Here that assignment is safe,
+because the object bound to `before` keeps its value for as long as it exists.
+The `Memento` class, `save()`, `restore()`, and the copying all disappear.
 
 ![](_images/memento_story)
 
@@ -365,6 +367,7 @@ Freezing blocks assignment to the field,
 not changes to the object the field holds,
 so a record holding a list lets that list change,
 as `frozen_leaky.py` shows there.
+
 [*Flyweight*](35_Patterns--Flyweight.md)
 shares immutable values among objects that exist at once,
 and *Memento* shares them among successive states.
@@ -376,7 +379,7 @@ So does a state whose class belongs to someone else: a widget tree,
 a database row, or any object whose class is theirs to design.
 Everywhere else, prefer the frozen value.
 
-Two tests check that `draw()` leaves the old `Drawing` as it was and that `draw()` keeps the title:
+Two tests check that `draw()` leaves the old `Drawing` as it was and keeps the title:
 
 ```python
 # test_frozen_sketch.py
@@ -734,9 +737,6 @@ while `getattr()` still finds it in `__dict__`.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
 The deleted-field drift raises nothing, and the data is wrong.
-Renaming a field is a delete and an add at once, with both effects.
-The old name becomes a ghost, and the new one is missing,
-so the generated `repr()` raises `AttributeError`.
 Running the same reassignment backwards shows the deleted field:
 
 ```python
@@ -761,6 +761,10 @@ The `repr()` shows a one-field object.
 The `__dict__` shows two entries.
 The loaded object is `==` to a `SketchV1` built with strokes alone,
 so every later comparison treats them as the same.
+
+Renaming a field is a delete and an add at once, with both effects.
+The old name becomes a ghost, and the new one is missing,
+so the generated `repr()` raises `AttributeError`.
 
 These listings use `@record(slots=False)` so the loaded object has a `__dict__` to hold the ghost.
 A slotted record pickles its field values as a list in field order,
@@ -787,7 +791,7 @@ Protocol Buffers goes further.
 A schema shared across languages gives every field an explicit number.
 Old and new versions can then read each other's messages by design.
 All three read the bytes as data and run no code from them,
-so pickle's security risk does not apply.
+so they avoid pickle's security risk.
 
 ## Snapshots in the Wild
 

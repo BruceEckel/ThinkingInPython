@@ -78,12 +78,11 @@ The two call sites fail in different ways.
 `render()` accepts `"Triangle"` and draws nothing,
 with no error to signal the gap.
 `export_svg()` has a wildcard case that raises an exception,
-so it does report the gap, but only at runtime,
-when someone first asks it for a triangle.
-Nothing at edit time points at the missing case,
-and the type checker cannot know which strings `export_svg()` should handle.
-An `Enum` for `kind` and an `assert_never()` wildcard [move that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching),
-though an if-chain like `render()` still slips past the check.
+so it reports the gap at runtime, the first time someone asks it for a triangle.
+No tool reports the missing case at edit time,
+and `kind: str` gives the type checker no list of the strings `export_svg()` should handle.
+An `Enum` for `kind` and an `assert_never()` wildcard [move that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching).
+An if-chain like `render()` has no wildcard, so it still gets no report.
 Either way, adding a type means editing every call site.
 
 The solution is to encapsulate object creation.
@@ -172,61 +171,63 @@ because it holds the algorithm that decides what comes next.
 
 `shape_name(n: int) -> Iterator[str]` returns a generator object that produces `n` names on demand.
 Those names are the arguments to `Shape.factory()`.
-Normally the initialization data comes from outside the system rather than through random generation.
+Normally the initialization data comes from outside the system rather than from a random number generator.
 
 Inside `shape_name()`,
 `Shape.__subclasses__()` produces a list of `Shape`'s direct subclasses.
-`__subclasses__()` covers only the first level of inheritance,
+`__subclasses__()` stops at the first level of inheritance,
 so a class inheriting from `_Circle` is not in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`
 (see exercise 9).
 
 ### Hiding the Concrete Classes
 
-The concrete shapes carry a leading underscore because no caller needs their names.
-`factory()` returns `Shape`,
-so a caller works with `Shape`s and has no need to name `_Circle`.
+The concrete shapes carry a leading underscore because callers get them through `factory()`.
+`factory()` returns `Shape`, so a caller works with `Shape`s,
+and `_Circle` stays a name inside the module.
+`shape_name()` strips the underscore,
+so the name a caller passes to `factory()` is `"Circle"`, not `_Circle`.
 The underscore discourages direct construction,
 but it is a convention rather than concealment.
 [*Singleton*](24_Patterns--Singleton.md#nothing-keeps-the-class-private)
 makes the same case.
-`shape_name()` strips the underscore,
-so the name a caller passes to `factory()` is `"Circle"`, not `_Circle`.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.
 Because a `class` statement is executable code,
 every `factory()` call defines fresh `Circle` and `Square` classes.
-Two shapes from different calls then share behavior but not a class,
+Two shapes from different calls then share behavior but belong to different classes,
 failing `type(a) is type(b)` and `isinstance()` alike.
 `Shape.__subclasses__()` is empty until the first call,
 then gains a duplicate `Circle` and `Square` on every call after that.
-Each duplicate stays in the list until the garbage collector finds that no object uses it.
+Each duplicate stays in the list until the garbage collector reclaims it,
+after the program drops its last instance.
 
 ### Alternative Constructors Are Factories
 
 [`Month.of()`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 is an alternative constructor,
 a method on the type that builds an instance from data the constructor rejects.
-There, `Month(7)` raises a `ValueError` because no member has the value `7`,
+There, `Month(7)` raises a `ValueError` because each member's value is a pair such as `(7, 31)`,
 while `Month.of(7)` returns `JULY`.
+
 `Month.of()` is also a factory, of the same form as `factory()`.
 Both are static methods within the type.
 Each takes data and returns an instance,
 and each raises an exception for data it does not recognize.
 For `Month`, that is a number outside one through twelve.
-`of()` needs no `match`.
-The method indexes `list(Month)` instead of naming a class,
+Where `factory()` has a `match` that names each class,
+`of()` indexes `list(Month)`,
 because the `Enum` holds every member `of()` could return.
 A factory over a closed set of products reduces to a lookup.
 
 [`from_fahrenheit()`](07_Foundations--Classes.md#static-and-class-methods)
 is the usual form of alternative constructor:
 a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`.
-That form is the most common factory,
-and `dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
+That form is the most common factory.
+The standard library's `dict.fromkeys()` and `datetime.fromisoformat()` are two examples.
 The `@classmethod` form chooses arguments rather than a class,
-so a subclass that calls it gets an instance of the subclass with no override.
+so a subclass that calls the inherited method gets an instance of the subclass.
 
 ## The Pythonic Factory: a Dictionary
 
@@ -239,8 +240,7 @@ and [`field(default_factory=list)`](12_Techniques--Data_Classes_as_Types.md#defa
 Both take a class where a function would do,
 and call it whenever they need a fresh value.
 
-Thus, the simplest factory is a dictionary that maps names to classes,
-without a factory method or factory class:
+Thus, the simplest factory is a dictionary that maps names to classes:
 
 ```python
 # shape_table.py
@@ -285,20 +285,20 @@ and every caller would share one `Circle`.
 [*Prototype*](#prototype)
 keeps a table of instances on purpose and copies one for each caller.
 
-Adding a `Triangle` means one new class and one new line in `SHAPES`,
+Adding a `Triangle` means one new class, one new line in `SHAPES`,
 and one new member in `Kind`.
+`Kind` names the two keys in `SHAPES`.
+The checker rejects any other key,
+so a new shape name goes into the `Literal` before it can go into `SHAPES`.
 Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a runtime `KeyError` to a check-time error,
-the same trade [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
-makes for a class that forgets `draw()`.
-`Kind` names the two keys in `SHAPES`,
-and the checker rejects a key that `Kind` does not list,
-so adding a shape name to `SHAPES` requires adding it to the `Literal` first.
+as [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
+does for a class that lacks `draw()`.
 
 ### Self Registration
 
 Better still, a new `Shape` subclass can register itself with no edit to existing code.
-That rules out a closed `Literal`, which needs an edit for every new subclass,
-so `make()` here takes a `str`.
+Self registration rules out a closed `Literal`,
+which needs an edit for every new subclass, so `make()` here takes a `str`.
 
 ```python
 # registry.py
@@ -333,16 +333,17 @@ Nothing in the listing calls a register function.
 The two `class` statements fill `Shape.registry` on their own.
 
 `Shape` is an abstract base class rather than a `Protocol` because it registers subclasses through `__init_subclass__()`.
-`__init_subclass__()` runs only for classes that inherit from `Shape`,
-so a class that satisfies a Protocol structurally,
-without inheriting from `Shape`, stays out of the registry.
+`__init_subclass__()` runs for each class that inherits from `Shape`,
+so a class that satisfies a Protocol by structure alone stays out of the registry.
 Inheritance is the mechanism, and `ABC` adds one guard on top of that.
 
 A subclass registers as its `class` statement executes,
-so a subclass that forgets `draw()` still registers.
+so a subclass that lacks `draw()` still registers.
 The guard acts when `make()` constructs that class.
-The call fails with a `TypeError`,
-where a base class whose `draw()` raises a `NotImplementedError` waits for the first `draw()` call.
+The call fails with a `TypeError`.
+A base class whose `draw()` raises a `NotImplementedError` would report the omission later,
+at the first `draw()` call.
+
 The type checker reports a line that constructs such a class by name,
 but `make()` contains no such line.
 `Shape.registry[name]()` calls a `type[Shape]`,
@@ -352,11 +353,11 @@ moves that report to the check.
 
 Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
+uses this same self-registration.
 `Shape.__subclasses__()` can build the table instead,
 but it stops at direct subclasses,
 while `__init_subclass__()` runs for every class anywhere below `Shape`.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
-uses this same self-registration.
 
 Importing `registry` runs its two `class` statements,
 and the key list shows the table they left behind:
@@ -380,8 +381,8 @@ expect(KeyError, make, "Triangle")
 `make("Triangle")` fails with a `KeyError` naming the missing key,
 because no class has registered under that name.
 The closed `Literal` in `shape_table.py` rejects `"Hexagon"` before the program runs.
-An open registry cannot do that,
-since a name becomes valid the moment some module defines the class,
+An open registry cannot do that.
+A name becomes valid the moment some module defines its class,
 so the check moves to runtime.
 
 The figure sets the opening problem from `shapes_naive.py` beside the registry,
@@ -399,8 +400,8 @@ Each class points at the table, and the callers point at `make()` alone.
 
 `__init_subclass__()` runs as the subclass's `class` statement executes.
 When the subclasses sit in the same file as `make()`, as in `registry.py`,
-the registration runs before anything calls `make()`,
-but a subclass defined in another module registers itself only when something imports that module.
+the registration runs before anything calls `make()`.
+A subclass defined in another module registers itself only when something imports that module.
 The classic failure is a plugin that "never registered."
 The class is fine, the registry is fine,
 and nothing imported the module that defines the class.
@@ -408,14 +409,15 @@ and nothing imported the module that defines the class.
 A [lazy import](06_Foundations--Modules_and_Packages.md#lazy-imports)
 produces the same failure even when the import statement is in the file.
 The module body, and with it the registration,
-waits for the first use of the imported name.
+runs at the first use of the imported name.
 An import written only to trigger registration never uses that name.
 Running with `-X lazy_imports=all` makes ordinary imports lazy too,
 so the same failure can appear in a program with no `lazy` keyword in it.
 Import a plugin module eagerly when the import exists for its side effect.
 
-The registry keys on `cls.__name__` alone, so two classes that share a name,
-from different modules, silently overwrite each other.
+The registry keys on `cls.__name__` alone,
+so when two classes from different modules share a name,
+the second to register silently replaces the first.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
 
 The registry also keeps every entry it receives.
@@ -428,8 +430,9 @@ so a subclass that defines its own `registry` creates a second table beside the 
 with no error to signal it.
 
 `make()` stays a module-level function for three reasons.
-A `@classmethod` looks up `cls.registry`,
-so a subclass with its own `registry` sends `Triangle.make()` to that second table,
+A `@classmethod` looks up `cls.registry`.
+When a subclass such as `Triangle` defines its own `registry`,
+`Triangle.make()` reads that second table,
 the one `__init_subclass__()` avoids by naming `Shape.registry`.
 And `Circle.make("Square")` is legal as well as misleading,
 since the key decides what `make()` builds,
@@ -476,14 +479,13 @@ because the `Triangle` that `test_new_subclass_registers_itself()` defined is st
 
 ### Explicit Registration with a Protocol
 
-`registry.py` needs a base class because Python calls the base class's `__init_subclass__()` each time a subclass is defined.
+`registry.py` needs a base class because Python calls the base class's `__init_subclass__()` for each new subclass.
 If registration is explicit instead, `Shape` can be a Protocol,
 with a class decorator doing the registering.
-The table then needs no class on which to live,
-and its natural owner is the factory that reads it.
+The table then moves out of the base class and into the factory that reads it.
 Python lets you [set an attribute on a function](17_Techniques--Metaprogramming.md#attributes-on-a-function),
-but the type checker reports every dotted access to such an attribute,
-so the factory becomes a small callable object that holds the table:
+but the type checker reports every dotted access to such an attribute.
+Instead, the factory becomes a small callable object that holds the table:
 
 ```python
 # shape_registry.py
@@ -544,24 +546,25 @@ and `make()` receives a name.
 
 The type parameter of `register()` has `Shape` as its bound,
 and the bound turns the decorator into a check.
-A decorated class must satisfy the Protocol, so a class without `draw()`,
-or with a `draw()` that takes an extra parameter,
-gets an `invalid-argument-type` diagnostic at its `@make.register` line before the program runs.
-That is the case [Self Registration](#self-registration) left to runtime,
-where a subclass that forgets `draw()` registers, fails at construction,
-and no checker sees it.
-`register()` returns `type[S]`, the decorated class's own type,
-so after the decorator runs the checker still knows `Circle` as `Circle`,
-not as `Shape`.
+A decorated class must satisfy the Protocol.
+If a class lacks `draw()`, or its `draw()` takes an extra parameter,
+the checker reports `invalid-argument-type` at the class's `@make.register` line before the program runs.
+[Self Registration](#self-registration) left the same omission to runtime,
+where a subclass that lacks `draw()` registers, fails at construction,
+and gets no report from the checker.
 
 The bound is also why the factory names `Shape` instead of taking a type parameter.
 A generic factory would need `register()`'s bound to name the factory's own type parameter,
 and the type checker rejects a bound that contains another type parameter.
 
+`register()` returns `type[S]`, the decorated class's own type,
+so the checker types the decorated name `Circle` as `type[Circle]`,
+not `type[Shape]`.
+
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
-No `cls.registry` lookup walks the MRO,
-and no shape class carries a `make()` that a call like `Circle.make("Square")` could misuse,
-since the table belongs to `make` rather than to a class in the hierarchy.
+The table belongs to `make` rather than to a class in the hierarchy,
+so no `cls.registry` lookup walks the MRO.
+No shape class carries a `make()` that a call like `Circle.make("Square")` could misuse.
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,
 an abstract `Polygon` between `Shape` and `Triangle` registers as well,
@@ -569,14 +572,17 @@ and `make("Polygon")` fails with a `TypeError`.
 
 Explicit registration fails the opposite way.
 Registration is opt-in,
-so a class that satisfies `Shape` but lacks `@make.register` is absent from the table,
-and `make()` fails with a `KeyError` that names the key,
+so a class that satisfies `Shape` but lacks `@make.register` is absent from the table.
+`make()` then fails with a `KeyError` that names the key,
 not the class that lacks the decorator (see exercise 10).
-A subclass of the ABC cannot skip registration that way,
+A subclass of the ABC always registers,
 because the subclass line is the registration.
+
 The runtime guard is weaker too.
-A class that ignores the checker's report still registers,
-and fails with an `AttributeError` at its first `draw()` call rather than a `TypeError` at construction.
+If you run the program despite the checker's report,
+a class that lacks `draw()` still registers,
+and its first `draw()` call fails with an `AttributeError` rather than its construction failing with a `TypeError`.
+
 Choose the failure you prefer.
 The ABC registers every subclass and catches an incomplete one at construction.
 The Protocol catches an incomplete class at check time and leaves registration to you.
@@ -611,9 +617,9 @@ def test_each_factory_starts_empty() -> None:
 
 `test_each_factory_starts_empty()` passes although `test_make_builds_a_registered_class()` registered `Triangle`,
 because each test registers with a `ShapeFactory` of its own.
-`test_registry.py` cannot do that.
-`Shape.registry` is one table for the whole process,
-so `test_unknown_name_raises_key_error()` in `test_registry.py` asks for `"Hexagon"`.
+Every test in `test_registry.py` shares `Shape.registry`,
+one table for the whole process,
+so `test_unknown_name_raises_key_error()` there asks for `"Hexagon"`.
 
 The ordinary Python factory is a dictionary of classes,
 whether you fill it by hand, the classes fill it themselves,
@@ -696,8 +702,8 @@ if __name__ == "__main__":
 Each type of shape defines its own nested `Factory` class whose `create()` method builds an object of that type.
 `ShapeMaker` is the interface those factories share.
 Here it is a `Protocol`,
-so the two nested `Factory` classes conform without naming it.
-`FACTORIES` maps each kind's name to an instance of its factory,
+so the two nested `Factory` classes conform by defining a matching `create()`.
+`FACTORIES` maps each shape's name to an instance of its factory,
 and `create_shape()` looks up that factory and calls its `create()`.
 
 Python does not need a `Factory` class nested in every shape.
@@ -709,13 +715,14 @@ such as a pool, a cache, or loaded configuration,
 or when the caller keeps the factory to construct objects later.
 
 You could eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
-Dispatching through `eval()` is unnecessary, and it makes things worse.
+Dispatching through `eval()` is unnecessary,
+and it makes `create_shape()` worse.
 `create_shape()` then compiles and runs any string it receives,
 so a configuration file, a request,
 or a command line can hand it arbitrary code instead of a shape name.
 The dictionary lookup runs no code from the string.
-You get either a factory or a `KeyError`,
-and the type checker knows the factory as a `ShapeMaker`,
+You get either a factory or a `KeyError`.
+The factory has the type `ShapeMaker` that `FACTORIES` declares,
 where `eval()` returns `Any`.
 
 ## Subclasses Choose the Type
@@ -723,7 +730,7 @@ where `eval()` returns `Any`.
 Every factory so far keeps the choice in one place: a `match` in `factory()`,
 a key in `SHAPES`, a lookup in `FACTORIES`.
 *Factory Method* moves the choice into the type of the object you hold.
-A base class calls a creation method it does not implement,
+A base class calls an abstract creation method,
 and each subclass overrides that method to name a concrete product:
 
 ```python
@@ -767,13 +774,13 @@ for sketch in (CircleSketch(), SquareSketch()):
 #: Square.draw
 ```
 
-`render()` uses a `Shape` without naming one.
+`render()` draws whichever `Shape` `new_shape()` returns.
 `new_shape()` is the factory method,
 and the only method `CircleSketch` and `SquareSketch` override.
 Adding a `Triangle` means one new `Shape` subclass and one new `Sketch` subclass,
 with no edit to existing code.
 Overriding a creation method in a subclass is the form *GoF Design Patterns* describes,
-and the reason the pattern is named for a method rather than for a class.
+and the reason the pattern takes its name from a method rather than a class.
 
 *Factory Method* adds a second hierarchy.
 Each product needs a creator that produces it,
@@ -781,21 +788,23 @@ so the two hierarchies grow together.
 The second hierarchy is worth having only when the creator does work of its own,
 as `render()` does here.
 When choosing the class is the creator's only job,
-a dictionary of classes says the same thing with no second hierarchy:
+a dictionary of classes says the same thing in one table:
 `shape_table.py` when the set of shapes is closed,
 `protocol_registry.py` when it is open.
 
 ## Abstract Factories
 
 The *Abstract Factory* pattern has the same structure as `Sketch`,
-with not one but several factory methods, each overridden in a concrete factory.
+with several factory methods where `Sketch` has one,
+each overridden in a concrete factory.
 Each factory method creates a different kind of object.
 Creating the factory object chooses the concrete version of every object that factory creates.
+
 The example in *GoF Design Patterns* makes one program work across several graphical user interfaces
 (GUIs).
-You create a factory object for the GUI you use,
-and from then on when you ask that factory for a menu, button, or slider,
-the factory creates the version of that item suited to that GUI.
+You create a factory object for the GUI you use.
+From then on, when you ask that factory for a menu, button, or slider,
+it creates the version of that item suited to that GUI.
 Switching from one GUI to another then changes one place in the code,
 most likely via startup configuration.
 
@@ -806,8 +815,8 @@ As another example, suppose you are creating a general-purpose gaming environmen
 `Character` and `Obstacle` are parallel hierarchies,
 and each concrete factory declares one method per hierarchy.
 `KittiesAndPuzzles` always pairs a `Kitty` with a `Puzzle`,
-`WarriorsAndWeapons` always pairs a `Warrior` with a `Weapon`,
-and `GameEnvironment.play()` depends on getting such a matched pair.
+and `WarriorsAndWeapons` always pairs a `Warrior` with a `Weapon`.
+`GameEnvironment.play()` depends on getting such a matched pair.
 Choosing the factory chooses both halves at once:
 
 ```python
@@ -885,28 +894,30 @@ Choosing a particular `GameElementFactory` determines the game.
 The `GameEnvironment` controls the setup and play of the game.
 Setup and play are simple here,
 but the initial conditions and the way the state changes can determine much of a game's outcome.
-`GameEnvironment` has no place to vary the rules of play,
-so a real game adds one: a subclass overriding `play()`,
+`GameEnvironment` writes the rules of play into `play()`,
+so a real game adds a place to vary them: a subclass overriding `play()`,
 or a rules object passed alongside the factory.
 
-`interact_with()` dispatches on the character's type and `obstacle.description()` dispatches again on the obstacle's.
+`interact_with()` dispatches on the character's type,
+and `obstacle.description()` dispatches again on the obstacle's.
 Thus, the pair of calls chooses behavior from both types.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
 `Obstacle`, `Character`, and `GameElementFactory` are abstract base classes.
 Each one lists the methods its subclasses must supply,
-as `@abstractmethod`s with no body.
+as `@abstractmethod`s whose body is `...`.
 Suppose you write a factory subclass and forget `make_obstacle()`.
-Python defines the class,
-and the `TypeError` appears when you create an instance,
-before `GameEnvironment.__init__()` calls anything,
-the same way `make()` fails on a `Shape` subclass that forgets `draw()`,
-and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md#proxy).
+Python defines the class and raises a `TypeError` when you create an instance,
+before `GameEnvironment.__init__()` calls anything.
 The type checker reports that construction before the program runs.
+At runtime, `make()` in `registry.py` raises the same `TypeError` on a `Shape` subclass that forgets `draw()`,
+and so does `Partial()` in [*Surrogate*](26_Patterns--Surrogate.md#proxy).
 
-A Protocol names the required methods and needs no base class,
-so a Protocol simplifies the *Abstract Factory*:
+A Protocol simplifies the *Abstract Factory*.
+The Protocol names the required methods,
+and a concrete class satisfies it by defining them.
+Here, the concrete classes have no base class:
 
 ```python
 # abstract_factory_protocol.py
@@ -978,13 +989,15 @@ With the abstract base classes in `abstract_factory_abc.py`,
 the checker reports the line that constructs the incomplete factory.
 With the Protocol, constructing a `BrokenFactory` is legal,
 and the checker reports `[1]`, which passes it to `GameEnvironment`.
-The two differ more at runtime.
-The abstract base class refuses to construct the factory,
+
+The two versions differ more at runtime.
+Constructing the incomplete subclass of the abstract base class raises a `TypeError`,
 while the Protocol has no runtime guard.
-A program that ignores the report fails with an `AttributeError` when `GameEnvironment.__init__()` calls `make_obstacle()`.
+If you run the program despite the report,
+it fails with an `AttributeError` when `GameEnvironment.__init__()` calls `make_obstacle()`.
+
 Checking against a Protocol is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
-Structural typing preserves the purpose of the interfaces,
-without the coupling a shared base class imposes.
+Structural typing preserves the purpose of the interfaces and drops the coupling a shared base class imposes.
 
 ## Prototype
 
@@ -995,7 +1008,7 @@ or when construction is slow and the instances share most of the setup.
 
 The `copy` module does the cloning.
 `copy.deepcopy()` follows every reference,
-so the clone shares no mutable state with the original:
+so the clone gets its own copy of every mutable object the original holds:
 
 ```python
 # prototype.py
@@ -1040,12 +1053,12 @@ and appending to it leaves `goblin.powers` unchanged.
 `deepcopy()` restores the clone's state without running the constructor,
 so a clone [skips the `__post_init__()` check](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor).
 A prototype of a validated type is safe because the prototype is valid,
-not because the clone is checked.
+not because anything checks the clone.
 When the variant differs only in field values,
 `copy.replace()` builds it through the constructor, as `knight` shows,
 so a `__post_init__()` check runs on the result.
 
-`copy.replace()` passes every field you do not name by reference,
+`copy.replace()` passes every field besides `name` and `hp` by reference,
 so `knight` shares `goblin`'s `powers` list.
 Pass a fresh list for that field when the variant must own one.
 
@@ -1055,9 +1068,9 @@ as `copy.replace()` does for `knight`.
 Changing that list through one object changes it for the other,
 with no error to signal the sharing.
 
-`deepcopy()` copies everything it can reach,
-and it has no way to copy an open file, a socket, or a lock,
-so a prototype holding one makes `deepcopy()` raise a `TypeError`.
+`deepcopy()` copies everything it can reach, but it cannot copy an open file,
+a socket, or a lock.
+A prototype holding one makes `deepcopy()` raise a `TypeError`.
 For a lock the message is `cannot pickle '_thread.lock' object`.
 The message names pickling because `deepcopy()` copies a type it has no rule for through the pickle protocol.
 Give such a class a `__deepcopy__()` that says what the copy holds instead:
@@ -1102,6 +1115,7 @@ if __name__ == "__main__":
 
 Because `spawn()` returns an independent object every time,
 callers can modify their copy while the prototype stays as it was.
+
 Compare `spawn()` with `make()` in `registry.py`.
 There the table holds classes and `make()` calls one.
 Here the table holds instances and `spawn()` copies one.
@@ -1145,7 +1159,7 @@ the one Joshua Bloch's *Effective Java* recommends.
 In Java and C++, a class with many optional settings needs a constructor for every useful combination,
 because those languages have no keyword arguments.
 That pile of constructors is the *telescoping constructor*.
-This builder, translated into Python, is the workaround,
+Translated into Python, this builder is the workaround:
 a companion class that collects settings one method call at a time.
 
 ```python
@@ -1195,11 +1209,11 @@ You can chain the calls because each setter returns `self`.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
 
 A `PizzaBuilder` keeps its settings after `build()` returns.
-`build()` reads `self._toppings` without clearing it,
-so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings,
-and every `.topping()` call in between adds to that same list.
+`build()` reads `self._toppings` and leaves the list in place.
+Every `.topping()` call after the first `build()` adds to that same list,
+so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
 The chained call in `__main__` hides the problem,
-because it keeps no reference to the builder after `build()` returns.
+because it discards the builder once `build()` returns.
 Making the builder reusable means resetting the fields in `build()`,
 and that reset removes the other reasonable use:
 configuring a builder once and building from it twice.
@@ -1228,11 +1242,12 @@ if __name__ == "__main__":
 ```
 
 Every combination of settings is a single call.
-The call site names each option just as the chain does, and the fields,
-not a second class, declare the defaults.
+The call site names each option just as the chain does.
+The fields declare the defaults, where the builder needed a second class.
 
 A second use for builder chains is to vary an existing configuration.
-For a record, `replace()` is *Prototype* and *Builder* in one function,
+For a [record](18_Techniques--Performance.md#record),
+`replace()` is *Prototype* and *Builder* in one function,
 copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the [general form of the operation](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace),
 and works on any object that defines `__replace__()`.

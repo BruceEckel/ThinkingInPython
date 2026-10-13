@@ -453,7 +453,7 @@ in output a user reads.
 > then run the type checker
 > ([Static Types](../../Chapters/08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
 > and read what it says.
-> Remove `@override` and confirm the type checker goes quiet while the program's behavior stays the same.
+> Remove `@override` and confirm the type checker reports no error while the program's behavior stays the same.
 
 <details>
 <summary>Where to look</summary>

@@ -516,7 +516,7 @@ facts, and not worth it when each guard asks a different question.
 > Give `value_patterns.py`'s `Signal` a third member,
 > and write `act()` so that it compares against a module-level `FALLBACK: Final[Signal]`.
 > Run it and confirm that the constant captures instead of comparing.
-> Then fix it two ways, with a dotted name and with a guard.
+> Then fix `act()` two ways, with a dotted name and with a guard.
 
 <details>
 <summary>Where to look</summary>

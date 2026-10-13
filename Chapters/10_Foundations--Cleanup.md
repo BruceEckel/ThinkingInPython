@@ -43,15 +43,16 @@ print("End of delete loop")
 `del c` inside the loop does not delete the object.
 It unbinds the name `c` and drops the one reference that name held.
 The `counters` list still references each `Counter`,
-so no `Counter`'s reference count reaches zero during the loop.
+so every `Counter`'s reference count stays above zero during the loop.
 That is why no `deleted` lines appear while the loop runs,
 why `Counter.count` still reads `3` after the loop,
 and why `End of delete loop` prints before any deletion.
 
 Python destroys the objects later, at interpreter shutdown,
 when it tears down the global `counters` list.
-That list holds the only remaining references, so when it goes,
-the objects it holds go with it.
+That list holds the only remaining references,
+so destroying the list drops each `Counter`'s reference count to zero,
+and Python destroys each `Counter` in turn.
 The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints afterward.
 If you run `cleanup.py` as a standalone program,
@@ -62,9 +63,8 @@ three more lines follow `End of delete loop`:
     First deleted, 0 left
 
 That was one run on one machine.
-This book's output checker,
-which executes all of a chapter's listings in one process,
-finalizes the same three objects in the opposite order.
+This book's output checker executes all of a chapter's listings in one process.
+There, Python finalizes the same three objects in the opposite order.
 
 The order in which the three `__del__()` methods run is an implementation detail.
 It depends on how the interpreter tears down the `counters` list at shutdown,
@@ -75,7 +75,8 @@ could destroy the objects in a different order, or skip the finalizers at exit.
 So `__del__()` is fragile.
 The language specifies neither when it runs nor whether it runs.
 At interpreter shutdown,
-the globals a `__del__()` method uses may have vanished.
+Python may already have deleted the globals a `__del__()` method uses,
+or set them to `None`.
 The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`
@@ -104,11 +105,12 @@ The Python documentation warns:
 
 In the direct run, shutdown destroys the objects,
 and shutdown is the precarious moment the warning describes.
-`Counter` and `print()` were still available, so the output came out cleanly,
-but nothing guarantees the teardown order that allowed it.
+`Counter` and `print()` were still available,
+so each `__del__()` printed its line.
+Nothing guarantees the teardown order that kept them available.
 Make `__del__()` do as little as possible, and do not depend on it.
 
-The swallowed exception is the failure most likely to go unnoticed in production:
+The ignored exception the warning describes is the failure most likely to go unnoticed in production:
 
 ```python
 # del_swallows.py
@@ -126,9 +128,9 @@ print("still running")
 #: still running
 ```
 
-The release fails, and stdout says nothing about it.
-A traceback goes to `sys.stderr` labeled `Exception ignored`,
-but nothing propagates.
+The release fails, and nothing printed to stdout reports the failure.
+Python prints a traceback to `sys.stderr`, labeled `Exception ignored`,
+and discards the exception.
 No caller can catch the `RuntimeError`, the exit status is still `0`,
 and a test asserting on stdout passes.
 In a `with` block, an exception from `close()` propagates to the caller instead.
@@ -137,7 +139,7 @@ In a `with` block, an exception from `close()` propagates to the caller instead.
 
 A reference cycle postpones `__del__()` too.
 An object that refers to itself, directly or through another object,
-outlives the moment it becomes unreachable:
+stays alive after it becomes unreachable:
 
 ```python
 # cycle.py
@@ -170,34 +172,34 @@ print("after collect")
 ```
 
 CPython frees most objects by counting references.
-When the last reference to an object goes away, the object goes with it.
-A reference cycle defeats that count.
-`self_link()` returns and its local `node` disappears,
-but the object still refers to itself, so its count stays above zero.
+When an object's reference count drops to zero, CPython destroys the object.
+A reference cycle keeps that count above zero.
+When `self_link()` returns, Python deletes its local name `node`,
+but the object still refers to itself through `peer`,
+so its count stays above zero.
 
 Inside `self_link()`,
-`gc.get_referrers(node)` returns the objects that refer directly to `node`,
-and the call destroys nothing.
-The only referrer is `node`, which confirms the self-reference.
-When a real object won't disappear and you don't know why,
-`gc.get_referrers()` is how you find what still holds it,
-the same way this listing uses it to show its own cycle.
+`gc.get_referrers(node)` searches the objects the collector tracks and returns those that refer directly to `node`.
+The only referrer is `node`, so `node` refers to itself.
+When an object in a real program stays alive and you don't know why,
+`gc.get_referrers()` shows what still holds the object,
+as it shows the cycle in this listing.
 
-Freeing the node takes the cyclic garbage collector,
-a separate mechanism that runs on allocation counts rather than when the object becomes unreachable.
-`gc.disable()` above keeps that collector from running on its own,
+The cyclic garbage collector frees the node.
+The collector is a separate mechanism that runs on allocation counts rather than when the object becomes unreachable,
+so in a real program nothing tells you when the collector runs.
+`gc.disable()` above turns off that collector's automatic runs,
 and `gc.collect()` then forces a run,
 so the `a finalized` line marks the moment of destruction.
-In a real program nothing tells you when the collector runs.
-Before Python 3.4 the collector refused to finalize a cycle containing a `__del__()`,
-leaving the objects in `gc.garbage` as *uncollectable* garbage,
-the term older documentation uses for them.
+
+Before Python 3.4 the collector put a cycle containing a `__del__()` in `gc.garbage` instead of finalizing it.
+Older documentation calls such cycles *uncollectable* garbage.
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
 so a cycle now delays finalization until the collector runs.
 
 Cycles are one more reason to keep cleanup out of `__del__()`.
-One back-reference between two objects is enough to postpone `__del__()`,
-and the code that creates the cycle often lives far from the code that owns the resource.
+One back-reference between two objects is enough to postpone `__del__()`.
+The code that creates the cycle often belongs to a different class or module than the code that owns the resource.
 
 ## Reliable Alternatives
 
@@ -248,30 +250,30 @@ except RuntimeError as e:
 #: caught boom
 ```
 
-`with` calls `__enter__()` at the top of the block and `__exit__()` as control leaves the block,
-and `__exit__()` calls `close()`.
-So `close()` runs at the end of the `with` block, at a line you can identify,
-and the `Socket("B")` block shows `close()` running when the body raises an exception.
+`with` calls `__enter__()` at the top of the block and `__exit__()` as control leaves the block.
+`__exit__()` calls `close()`, so `close()` runs at the end of the `with` block,
+at a line you can identify.
 Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
+The `Socket("B")` block shows `close()` running when the body raises an exception.
 [Context Managers](15_Techniques--Context_Managers.md) covers the protocol,
 the `@contextmanager` shorthand, and what `__exit__()`'s arguments mean.
 
 `close()` also guards against a second call.
 The explicit `sock.close()` after the `with` block prints nothing,
-because `self.closed` blocks the repeat.
+because `close()` returns at once when `self.closed` is `True`.
 `__exit__()` calls `close()` for you once.
-Your own code can still call it again,
-so a real `close()` must do nothing on a repeat call,
-the way a file object's `close()` does.
+Your own code can call `close()` a second time,
+so a real `close()` must accept a repeat call and return at once,
+as a file object's `close()` does.
 
 ### An `__init__()` That Fails Leaks the Resource {#raising-init-leaks}
 
 `Socket.__init__()` prints "opened" before `__enter__()` runs.
-That ordering hides a trap.
+That ordering matters when `__init__()` fails.
 If `__init__()` raises an exception after acquiring the resource,
-the `with` statement receives no context manager,
-so neither `__enter__()` nor `__exit__()` runs, and the resource leaks silently:
+the `with` statement receives no context manager.
+Neither `__enter__()` nor `__exit__()` runs, and the resource leaks silently:
 
 ```python
 # faulty_init.py
@@ -302,8 +304,8 @@ Nothing releases what `__init__()` acquired before it failed.
 
 One fix keeps `__init__()` free of resources and acquires them in `__enter__()`,
 so a failed construction has nothing to leak.
-`__enter__()` has the same exposure, though.
-`__exit__()` runs only after `__enter__()` returns (see exercise 7).
+A failure in `__enter__()` leaks the same way, though,
+because `__exit__()` runs only after `__enter__()` returns (see exercise 7).
 Whichever method acquires the resource,
 a step that can fail after the acquisition needs its own `try`/`except`,
 which releases the resource before re-raising the exception.
@@ -344,20 +346,20 @@ print("End of program")
 ```
 
 `finalize()` registers `print(name, "closed")` to run when Python destroys the `Connection`.
-To learn when that happens,
 `finalize()` refers to the `Connection` through a *weak reference*,
-which lets the object be destroyed.
+which lets Python destroy the object.
+After the destruction, `finalize()` calls the callback.
 A variable, a list slot, or an attribute holds a *strong reference*,
 which keeps its object alive.
 
 The callback receives `name`, not the `Connection`,
-so registering the cleanup does not keep the object alive.
-`finalize(self, self.close)` looks tidier and defeats that separation.
+so registering the cleanup leaves the `Connection`'s lifetime as it was.
+`finalize(self, self.close)` looks tidier, but it gives the callback the object.
 The bound method holds a strong reference to the object,
 so the object survives until the program ends.
 
 The `close()` at `[1]` runs the callback immediately.
-The second `close()`, at `[2]`, does nothing.
+The second `close()`, at `[2]`, finds the finalizer dead and returns `None`.
 A finalizer runs at most once, and `alive` reports whether it still can.
 
 `b` holds the only strong reference to its `Connection`,
@@ -401,23 +403,20 @@ print("Safe alive:", safe() is not None)
 ```
 
 `ref()` creates a weak reference of your own.
-Calling the weak reference returns the object while the object lives,
-and `None` once the object is gone.
+Calling the weak reference returns the object while it lives,
+and `None` once Python destroys it.
 `Safe` prints `S closed` at the `ref()` line.
 Reference counting reclaims it there, before `gc.collect()` runs.
 
-`gc.collect()` cannot reclaim `Leaky`,
-because `Leaky` is not part of an unreachable cycle.
-`finalize()` keeps every callback in a registry,
-and the callback `self.close` holds the object,
-so the registry keeps `Leaky` reachable.
+`gc.collect()` cannot reclaim `Leaky`, because `Leaky` is still reachable.
+`finalize()` keeps every callback in a registry, `self.close` among them.
 A bound method is a small object that stores its instance in its `__self__` attribute,
 so whatever holds `self.close` holds `Leaky` through it.
 A lambda that uses `self`, such as `lambda: print(self.name, "closed")`,
 holds the object the same way.
 
-`Leaky` prints nothing, since its callback has not run,
-and no error reports the leak.
+`Leaky` prints nothing, since its callback is waiting in the registry.
+No error reports the leak.
 With `atexit` left on, the callback runs as the program exits,
 and a late `L closed` is the one sign of the leak.
 The listing turns `atexit` off on `Leaky`'s finalizer,
@@ -429,8 +428,8 @@ so its output ends at `Safe alive: False`.
 and so does the `WeakValueDictionary` in the next section.
 A class that declares [`__slots__`](18_Techniques--Performance.md#slots)
 lists its instance attributes ahead of time,
-and its instances store those attributes without a per-instance `__dict__`.
-A class with `__slots__` that omits `__weakref__` cannot be weakly referenced:
+and its instances store those attributes in slots instead of a per-instance `__dict__`.
+`finalize()` rejects an instance of a class whose `__slots__` omits `__weakref__`:
 
 ```python
 # slotted_no_weakref.py
@@ -458,20 +457,21 @@ finalize(WeakSlot("y"), print, "y", "closed")
 
 `__slots__` removes the instance `__dict__` and, by default,
 the `__weakref__` slot along with it,
-so `finalize()` has nowhere to attach a reference.
+so a `Slot` instance has no slot in which to list its weak references.
 `ref()`, `weakref.proxy()`,
 and `WeakValueDictionary` raise the same `TypeError` on a `Slot`,
-since every weak reference attaches to the `__weakref__` slot.
+since CPython lists every weak reference to an object in that object's `__weakref__` slot.
 
-`WeakSlot` lists `__weakref__` among its slots and opts back in.
-`finalize()` accepts the `WeakSlot` instance,
-and since nothing else refers to that temporary,
-the callback prints `y closed` as soon as the statement ends.
+`WeakSlot` lists `__weakref__` among its slots,
+so its instances accept weak references.
+`finalize()` accepts the `WeakSlot` instance.
+The instance is a temporary that Python destroys as soon as the statement ends,
+so the callback prints `y closed` at that moment.
 
 ## Watching Objects Without Holding Them
 
 The weak-reference machinery behind `finalize()` also solves a different problem:
-observing which objects are alive without being the reason they are.
+tracking which objects are alive without keeping them alive.
 Here, a `WeakValueDictionary` counts live instances,
 using `id(self)` as each object's key:
 
@@ -513,42 +513,46 @@ print(Counter.live_count())
 A `WeakSet` would do for counting alone.
 You need the dictionary as soon as you look instances up rather than count them,
 as [*Flyweight*](35_Patterns--Flyweight.md) does.
+
 `id(self)` is the key here because the registry needs one entry per object,
 not per name.
 Keyed by name, two `Counter` objects that share a name collide,
-and the second displaces the first.
+and the second replaces the first.
 Reused `id()` values are harmless,
-since the dictionary holds only live objects and no two live objects share an id.
+since the dictionary holds only live objects and each live object has a distinct id.
 
 `live_count()` returns the size of that registry,
 so it reports how many `Counter` objects currently exist.
-When an instance loses its last strong reference,
-in this case when `pop()` or `clear()` removes it from the `counters` list,
-the interpreter collects it at once,
-and the dictionary drops that instance's entry on its own.
+Here `pop()` or `clear()` removes an instance from the `counters` list,
+which drops the instance's last strong reference.
+The interpreter collects the instance at once,
+and the weak reference's callback removes the instance's entry from the dictionary.
 The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 
 A `dict` or `list` as the registry keeps every instance alive forever,
-so the count never falls.
-The weak reference lets the registry prune itself.
+so the count stays at its peak.
+Because the `WeakValueDictionary` holds weak references,
+it removes each entry when Python destroys the entry's object.
 
 CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
-the entries disappear when its collector runs, so the counts fall late.
+the dictionary removes the entries when that collector runs,
+so the counts fall later.
 
 `cleanup.py` keeps its count inside `__del__()`,
-so that count is correct only if `__del__()` runs and succeeds,
-and [Why `__del__()` Is Not Cleanup](#why-del-is-not-cleanup)
-lists the ways it can fail.
-The weak registry runs none of your code when an object goes away.
+so that count is correct only if `__del__()` runs and succeeds.
+[Why `__del__()` Is Not Cleanup](#why-del-is-not-cleanup)
+lists the ways `__del__()` can fail.
+The weak registry runs none of your code when Python destroys an object.
 
 ## The Rule
 
 Never release a resource in `__del__()`.
-The standard library's file and socket types bend that rule as a diagnostic backstop.
-`io.IOBase` gives every file object a `__del__()` that closes it,
-and a file from `open()` or a `socket.socket` also reports a `ResourceWarning` when it is reclaimed still open:
+The standard library's file and socket types release a resource in `__del__()` anyway,
+as a diagnostic backstop.
+`io.IOBase` gives every file object a `__del__()` that closes it.
+A file from `open()` or a `socket.socket` also reports a `ResourceWarning` when Python reclaims it still open:
 
 ```python
 # resource_warning.py
@@ -565,16 +569,16 @@ with warnings.catch_warnings(record=True) as caught:
 #: ResourceWarning
 ```
 
-Losing the last reference to an open file finalizes it,
-and its `__del__()` closes the file and reports the leak,
+When an open file loses its last reference, Python finalizes the file.
+The file's `__del__()` closes it and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
 On CPython `del f` is that moment.
 The `gc.collect()` call covers an implementation that waits for its collector.
 
 The diagnostic backstop exists to catch the mistake, not to be the plan.
-It still depends on the collector reclaiming the object,
-and a reference cycle defers that collection until the cyclic collector runs,
-or until interpreter shutdown if `gc.disable()` has stopped it.
+It depends on the collector reclaiming the object.
+A reference cycle defers that collection until the cyclic collector runs,
+or until interpreter shutdown if `gc.disable()` has stopped the collector.
 
 Give a class that owns a resource a `close()` method and an `__exit__()` that calls it,
 so the cleanup runs as a `with` block ends,

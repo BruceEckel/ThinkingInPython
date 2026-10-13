@@ -37,8 +37,8 @@ Both `int("256")` calls return the same cached object.
 Each `int("100000")` call builds a fresh one.
 The cache covers a set range of values chosen at CPython build time.
 The range usually quoted is `-5` through `256`, but each build picks its own.
-This build caches up to 1024,
-so the example that needs a fresh object uses `100000` rather than `257`.
+The CPython build this book uses caches up to 1024,
+so the listing uses `100000` rather than `257` for the fresh object.
 
 The listing parses each value from a string because the compiler pools equal constants within one code object.
 With literals, `high, high2 = 100000, 100000` makes `high is high2` print `True`.
@@ -208,7 +208,7 @@ with the asker supplying the coordinates.
 ### Typing the Symbol Set
 
 `Symbol` names the closed set of valid map characters,
-so `Tile.symbol` and every key of `SPECS` is one of those characters.
+so `Tile.symbol` and every key of `SPECS` must be one of those characters.
 If you add a kind to `SPECS` and leave `Symbol` as it is,
 the type checker rejects the mismatch.
 `tile()` declares its parameter a `Symbol`,
@@ -282,9 +282,9 @@ Every field here is immutable, so the sharing is safe.
 
 `@cache` is a caching decorator, but `tile()` uses it for a different job.
 A cache saves recomputation.
-It returns a stored result instead of computing that result again,
-and it can forget any entry while the program's results stay the same,
-because the next call rebuilds an equal result, which takes a little time.
+It returns a stored result instead of computing that result again.
+Forgetting an entry leaves the program's results the same,
+because the next call rebuilds an equal result, a little more slowly.
 Building a `Tile` is fast, so `tile()` has little time to save.
 What `tile()` gets from `@cache` is identity.
 Every call for a symbol returns the same object.
@@ -297,16 +297,16 @@ Steps 1 and 2 show the sameness as two requests arriving at one object,
 and step 3 shows why one object can serve every water cell.
 The position travels with the call, not with the tile.
 Step 4 marks where the guarantee ends.
-A `Tile` built without `tile()` equals the shared tile but is a separate object.
+A `Tile` built by a direct call equals the shared tile but is a separate object.
 
 The memory saving and every `is` comparison depend on that sameness,
 so a factory that forgets an entry and builds a replacement breaks the pattern,
-where a cache that forgets an entry runs slower and stays correct.
+whereas a cache that forgets an entry runs slower and stays correct.
 
 ## Interning in the Constructor
 
 A factory function like `tile()` has a visibly different name and call syntax,
-so a caller can see that construction goes through something other than the class.
+so a caller can see that construction goes through the factory rather than the class.
 If you want callers to construct objects with an ordinary class call such as `Color(...)`,
 hide the pool inside `__new__()` instead.
 [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
@@ -346,8 +346,8 @@ print(len(Color._pool))
 
 The construction syntax stays the same,
 so a caller sees an ordinary constructor call and receives a shared object.
-`int("256")` works the same way.
-An ordinary constructor call returns a cached object.
+`int("256")` works the same way:
+an ordinary constructor call returns a cached object.
 
 You write the bookkeeping yourself, and `__new__()` brings a rule of its own.
 When `__new__()` returns an instance of the class, as it does here,
@@ -358,7 +358,7 @@ including the ones that return a pooled instance.
 On a pooled instance the re-run assigns the same three components again,
 through the `object.__setattr__()` calls a frozen record's `__init__()` makes,
 so the object stays as it was.
-Once a field has a `default_factory` or `__post_init__()` has a side effect,
+If a field has a `default_factory` or `__post_init__()` has a side effect,
 the re-run repeats that factory call or that side effect on a finished object.
 
 Every caller that asks for the same components receives the same `Color`,
@@ -409,8 +409,8 @@ Both pools so far hold their objects forever.
 and `Color._pool` grows with every new color.
 A map has a handful of tile kinds and a program usually draws from a small palette,
 so holding them forever uses little memory.
-When the set of values keeps growing, such as symbols in a long-running parser,
-the pool becomes a memory leak.
+When the set of values keeps growing,
+as the symbols in a long-running parser do, the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
 the [live-instance registry](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 fixes the leak.
@@ -457,8 +457,7 @@ the same design as `sys.intern()`.
 
 *Flyweight* cuts the number of objects,
 and [`slots=True`](18_Techniques--Performance.md#slots)
-cuts the size of each one,
-so the two are worth combining once memory is the point.
+cuts the size of each one, so the two are worth combining when memory matters.
 `Tile` combines them by being a record.
 
 The combination has one catch.

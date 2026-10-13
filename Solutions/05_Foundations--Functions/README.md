@@ -452,7 +452,7 @@ without the `/` the same call fails with two values for `name`.
 > In `function_scope.py`,
 > delete the `global count` line from `writes_global()` and predict what a call raises before running it.
 > Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
-> Explain why that also raises an `UnboundLocalError`,
+> Explain why a call to `rebinds()` also raises an `UnboundLocalError`,
 > although the assignment to `count` comes after the `print`.
 
 <details>

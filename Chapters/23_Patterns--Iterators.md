@@ -1,13 +1,13 @@
 # Iterators
 
-> A loop needs the next item and has no reason to care where that item is stored.
-> An *Iterator* supplies the item and keeps the storage out of sight.
+> A loop needs the next item, wherever that item is stored.
+> An *Iterator* supplies the item and hides the storage.
 
 Code written against an iterator works the same whether the data comes from a list,
 a file, a database cursor, or a computation.
 It asks only for the next item.
-That is the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
-recommends.
+[Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
+calls this approach designing the communication, not the parts.
 The caller states what it needs and leaves the container's type unnamed.
 
 Python builds iterators into the language.
@@ -45,16 +45,16 @@ except StopIteration:
 #: StopIteration ends the loop
 ```
 
+The `is` at `[1]` shows that calling `iter()` on a list creates a new iterator each time.
+The `is` at `[2]` shows that calling `iter()` on an iterator returns that iterator.
+The tempting call is `next(nums)`, and it fails.
+`next()` requires an iterator, and a list has no `__next__()`,
+so `next(nums)` raises a `TypeError` at runtime.
+The type checker rejects `next(nums)` before the program runs.
+
 A `for` loop makes one `iter()` call,
 then calls `next()` until the iterator raises `StopIteration`.
 A loop absorbs `StopIteration` as the normal end rather than an error.
-
-The `is` at `[1]` shows that calling `iter()` on a list creates a new iterator each time.
-The `is` at `[2]` shows that calling `iter()` on an iterator returns that iterator.
-The tempting call is `next(nums)`, but `next()` accepts only an iterator,
-and a list has no `__next__()`, so that call raises a `TypeError` at runtime.
-The type checker rejects `next(nums)` before the program runs.
-
 Written out, `for x in nums:` is this loop:
 
 ```
@@ -68,13 +68,13 @@ while True:
 ```
 
 One legacy path bypasses `__iter__()`.
-A class that defines `__getitem__()` in place of `__iter__()`,
-taking integers from zero, is still iterable.
+A class is still iterable if it defines `__getitem__()` in place of `__iter__()`,
+with `__getitem__()` taking integers from zero.
 `iter()` builds an iterator that calls `__getitem__()` with 0, 1, 2, and so on,
 until `IndexError`.
 Such a class works with `for`,
 yet `isinstance(obj, Iterable)` returns `False` and a parameter annotated `Iterable[T]` rejects it.
-That is the one case where an object a `for` loop accepts fails an `Iterable` annotation.
+This legacy path is the one case where a `for` loop accepts an object that fails an `Iterable` annotation.
 Write `__iter__()` in new code.
 
 ## Generators {#generators}
@@ -143,9 +143,10 @@ then puts `total()` in the loop's place:
 
 ![](_images/iterator_story)
 
-The shaded region in each frame holds what the caller cannot see.
+The shaded region in each frame holds what the iterator hides from its caller.
 Inside `total()`, `sum()` makes the same `iter()` and `next()` calls as the written-out `for` loop,
 so a new source needs no change to `total()`.
+
 The third frame shows a limit of the protocol.
 A caller learns that the items have run out by asking for one more.
 
@@ -194,13 +195,13 @@ def test_total_over_any_iterable() -> None:
 
 Generators are lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate over it,
-and produces one value at a time,
+then produces one value at a time,
 so a generator works on streams too large to hold in memory.
 Iterating over a generator keeps one value alive at a time,
 while collecting the same million values into a list keeps all of them alive at once.
 In [Performance](18_Techniques--Performance.md#lazy-evaluation-with-generators),
-`lazy_pipeline.py` measures the difference with `tracemalloc`,
-and the generator pipeline's peak stays under one percent of the list version's.
+`lazy_pipeline.py` measures the difference with `tracemalloc`.
+The generator pipeline's peak stays under one percent of the list version's.
 
 A [generator expression](16_Techniques--Comprehensions.md#generator-expressions)
 such as `(i * i for i in range(n))` is the one-line form of a generator,
@@ -209,8 +210,7 @@ and it is lazy in the same way.
 A generator can be *infinite*.
 A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
-You take as many as you need
-([`itertools.islice()`](#reusable-algorithms) does the taking),
+You take as many as you need with [`itertools.islice()`](#reusable-algorithms),
 while a list must hold every value first.
 
 ## What Laziness Hides
@@ -241,17 +241,17 @@ print(list(sq))  # Exhausted: empty, and no error
 ### The Body Waits for the First `next()`
 
 Calling `squares(6)` runs none of its body.
-The `print()` at the top runs only when something demands the first value.
-It runs once, not on every value.
+The `print()` at the top runs once,
+when the first `next()` call requests a value.
 Each later `next()` resumes the body just after the `yield` instead of restarting it.
 
-Any validation at the top of a generator inherits this delay.
+Any validation at the top of a generator also waits for the first `next()`.
 A check meant to reject a bad argument raises its exception at the first `next()`,
 far from the call that caused the problem.
 
-Here, `lazy_squares()` shows the delay.
-`squares()` removes the delay by being a plain function: it checks its argument,
-then returns an inner generator.
+In `eager_validation.py`, `lazy_squares()` shows the delay.
+`squares()` removes the delay by being a plain function.
+It checks its argument, then returns an inner generator.
 
 ```python
 # eager_validation.py
@@ -292,8 +292,8 @@ Only `produce()` waits.
 
 The second surprise in `generator_lifecycle.py` is its second call to `list(sq)`.
 An exhausted generator answers every `next()` with `StopIteration`,
-which `list()` absorbs as the normal end,
-so the empty `list(sq)` leaves no error to point at the bug.
+which `list()` absorbs as the normal end.
+The second `list(sq)` therefore returns `[]`, and no exception reports the bug.
 
 When you must walk data twice, collect it into a list once,
 or hand out an iterable like `Countdown` in `iterators.py`,
@@ -301,7 +301,7 @@ whose `__iter__()` builds a fresh generator for every pass.
 
 Laziness and single use are separate properties.
 `Countdown` is as lazy as the generator its `__iter__()` builds,
-yet it survives repeated passes, because each pass gets a fresh iterator.
+yet it supports repeated passes, because each pass gets a fresh iterator.
 `range()` works the same way.
 One `range` object can drive loop after loop.
 The iterator runs out, not the iterable that made it.
@@ -336,23 +336,24 @@ print(twice_collection([0, 1, 2]))
 When a function iterates over its argument more than once,
 say so in the signature.
 `Collection[T]` and `Sequence[T]` also require `__len__()`,
-which no generator has,
-so the type checker rejects the generator at the call instead of letting it run wrong.
-`twice_collection(gen(3))` is the call the checker refuses,
-and that is why the listing leaves it out.
-Every chapter listing must type-check.
+which no generator has.
+The type checker therefore flags the generator at the call,
+before the function runs and returns a wrong answer.
+The listing calls `twice_collection()` with a list,
+because the checker reports an error on `twice_collection(gen(3))` and every chapter listing must type-check.
 `total()` in `iterators.py` stays `Iterable[int]` because it sums once.
 
-`Collection[T]` also rejects `Countdown`, which survives any number of passes.
-`Countdown` defines `__iter__()` and lacks the `__len__()` and `__contains__()` a `Collection` requires.
+`Collection[T]` also rejects `Countdown`, which supports any number of passes.
+`Countdown` defines `__iter__()`,
+while a `Collection` also requires `__len__()` and `__contains__()`.
+A reiterable class passes `Collection[T]` by adding those two methods.
 `collections.abc` has no protocol for "iterable more than once,"
-so `Collection[T]` is the closest annotation,
-and a reiterable class passes it by adding those two methods.
+so `Collection[T]` is the closest annotation.
 
 ### What `tee()` Buffers
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones.
-That looks like a third way to walk data twice,
+`tee()` looks like a third way to walk data twice,
 but it saves memory over a list only when the two branches advance together:
 
 ```python
@@ -399,13 +400,16 @@ print(f"lockstep buffered far less: "
 
 Both branches see all five squares,
 so `tee()` delivers the second pass the generator could not.
-`tee()` buffers every item the leading branch consumes until the trailing one catches up,
-so when `first` drains while `second` waits, the buffer holds the whole stream.
-That is the memory a list uses, and the comparison confirms it
+`tee()` buffers every item the leading branch consumes until the trailing branch catches up.
+When `first` drains while `second` waits,
+the buffer therefore holds the whole stream.
+That buffer uses as much memory as a list,
+and the `buffered > listed * 0.9` comparison confirms it
 (one machine measured 4,096,992 bytes buffered against 3,999,904 for the list).
 The last block advances `first2` and `second2` together instead,
 one `zip()` step at a time, so `tee()` buffers at most the gap between them.
-That gap stays near zero, and the measurement confirms it.
+That gap stays near zero,
+and the `lockstep < listed * 0.1` comparison confirms it.
 Use `tee()` when two consumers advance together,
 not when one finishes before the other starts.
 
@@ -465,10 +469,10 @@ Both functions call themselves on each nested sequence,
 and both pass each value from the recursive call out to the caller.
 `flatten_loop()` passes the values out by hand.
 It starts the recursive call, then re-yields each value that call produces.
-`flatten()` replaces those two lines with `yield from`,
-and the `True` in `yield_from_demo.py` shows that both produce the same values.
+`flatten()` replaces those two lines with `yield from`.
 
-`flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop whose body is a lone `yield` of the loop variable,
+`flatten_loop()` carries a `# noqa` because of ruff's `UP028` rule.
+That rule reports a `for` loop whose body is a lone `yield` of the loop variable,
 and tells you to write `yield from` instead.
 
 The two forms agree for a generator that yields values and returns `None`,
@@ -530,26 +534,28 @@ print(list(takewhile(lambda s: s < 50,
 #: [1, 4, 9, 16, 25, 36, 49]
 ```
 
-Nothing runs until `list()` pulls the values.
+Each stage runs when `list()` pulls a value.
 `islice()` and `takewhile()` decide when to stop,
-so the infinite `count(1)` produces no more than they pull.
+so the infinite `count(1)` produces as many values as they pull.
 
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
 so the list habit `odd_squares[:5]` raises a `TypeError` instead.
+
 [Functional Toolkits](41_Functional--Toolkits.md#the-itertools-toolkit)
 covers `chain()` and `groupby()` in full,
 including why `groupby()` needs sorted input.
 
-Choose `takewhile()` deliberately,
-because its lookalike is the `if` clause of a generator expression
-(or `filter()`), and these behave differently with an infinite source.
+Choose `takewhile()` deliberately.
+Its lookalike is the `if` clause of a generator expression (or `filter()`),
+and the two behave differently with an infinite source.
 The `if` version skips nonmatching values but keeps looking,
 so once values stop matching, a `list()` around it runs forever.
 `takewhile()` stops at the first failure.
 On finite data whose values stop matching for good, as the rising squares do,
 skipping and stopping give the same result.
-On infinite data they behave nothing alike.
+On infinite data of that kind,
+`takewhile()` finishes and the `if` clause runs forever.
 
 A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
@@ -598,19 +604,20 @@ def test_islice_stops_after_its_count() -> None:
 In `test_the_if_clause_skips_but_never_stops()`,
 nothing after `2` satisfies `n < 3`,
 yet the generator expression keeps pulling from `counter()` to find another match,
-and trips the same wire.
+until `counter()` raises the same `Tripwire`.
 The `takewhile()` and `islice()` tests stop on their own,
-before reaching the tripwire.
+before `counter()` reaches its limit.
 
 Failing at 1,000 values stands in for how a real program fails.
-A real program stops responding, or it dies when it exhausts memory.
+A real program hangs, or it dies when it exhausts memory.
 
-The toolchain lets `list(count(1))` through.
+No tool in the toolchain reports `list(count(1))`.
 The type checker accepts it,
-and so does `ruff` with every one of its rules enabled.
-No type checker can read the code and decide whether an iterator ever ends.
-A generator built from `while True` looks the same as a finite one until it runs.
-The one rule that touches this code is `C416`, a comprehension check.
+because no type checker can read the code and decide whether an iterator ever ends.
+A generator built from `while True` has the same type as a finite one,
+`Iterator[T]`.
+`ruff` accepts it too, with every one of its rules enabled.
+The one rule that applies here is `C416`, a comprehension check.
 It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
 the same problem with fewer characters.
 
@@ -619,7 +626,7 @@ the same problem with fewer characters.
 Applied to an iterator,
 the [*Decorator* Pattern](14_Techniques--Decorators.md#the-decorator-pattern)
 wraps the existing iterator and produces a new one with the same interface and added behavior.
-Here, the wrapper forces every item to match an expected type:
+Here, the wrapper checks every item against an expected type and raises a `TypeError` on a mismatch:
 
 ```python
 # typed_iterator.py
@@ -653,9 +660,10 @@ so the wrapper can no longer go in a set or serve as a dict key,
 as every other iterator can.
 Field-by-field comparison is also the wrong question to ask about a cursor.
 Two wrappers over one source compare equal as soon as their counts agree,
-though each has delivered different items,
-and two wrappers over separate iterators of the same list compare unequal.
-Turning equality off restores the identity comparison an iterator should have.
+though each has delivered different items.
+Two wrappers over separate iterators of the same list compare unequal.
+With `eq=False`, the wrapper keeps `object`'s identity-based `__eq__()` and `__hash__()`,
+as other iterators do.
 
 A generator wraps an iterator just as well, and in fewer lines:
 
@@ -695,12 +703,11 @@ expect(TypeError, list, typed([1, "two"], int))
 ```
 
 Use the class when the wrapper needs its own state or extra methods,
-such as `accepted` in `typed_iterator.py`.
+such as `accepted` in `typed_iterator.py`, and use the generator otherwise.
 `typed_demo.py` reads `accepted` mid-stream,
-while a generator's local variables have no name a caller can use.
-Otherwise, use the generator.
-Either way, the wrapper plugs into every place that accepts an iterator,
-because every such place uses the same protocol.
+while a generator's local variables stay hidden from its caller.
+Either way, the wrapper works with every function that takes an iterator,
+because every such function calls the same protocol methods.
 
 The two wrappers' inputs differ, though.
 `typed()` takes an `Iterable[object]`, so a list is fine.
@@ -710,7 +717,7 @@ Write `TypedIterator(iter(items), int)`, not `TypedIterator(items, int)`.
 The type checker rejects the second form.
 
 Both take `expected: type[T]`,
-so the type checker carries the element type through.
+so the type checker infers the element type from the `expected` argument.
 `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 `expected` must be a class such as `list`.
@@ -752,14 +759,13 @@ The language calls both on your behalf.
 
 ### `first()` and `current_item()` Rebuild the List
 
-Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` ask of a source.
+Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` require from a source.
 The listing renames GoF's `Next()` to `advance()`,
-so a reader cannot confuse `advance()` with Python's `next()`.
+to keep the name distinct from Python's `next()`.
 Over a list the four are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
-and `current_item()` reads without consuming.
-Over a generator, you can still write all four,
-but only by keeping everything the traversal has seen:
+and `current_item()` reads at the index and leaves the index where it is.
+Over a generator, writing all four means keeping everything the traversal has seen:
 
 ```python
 # gof_iterator.py
@@ -816,46 +822,47 @@ print(stream.seen)
 #: [2, 4, 6]
 ```
 
-`traverse()` is the loop a GoF caller writes,
-and it drives any type with those four methods,
+`traverse()` is the loop a GoF caller writes.
+It drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Patterns--Rethinking_Objects.md#protocols)
 rather than a base class.
 The first pass spends the generator,
 yet `first()` rewinds and `traverse()` produces the same three values.
 
 The `seen` list makes that rewind possible.
-`is_done()` pulls from the source when the cache falls short of the current index,
+`is_done()` pulls from the source when the current index lies past the end of `seen`,
 and keeps every item it reads.
 It pulls with `next(self.source, DONE)`.
 Given a second argument,
 `next()` returns that argument when the source runs out,
 in place of raising `StopIteration`.
-`current_item()` then indexes the cache instead of touching the source,
-so it reports a value without advancing.
-`print(stream.seen)` shows that `seen` holds the entire stream.
-Supporting the four methods takes more than a small lookahead buffer:
+`current_item()` then indexes `seen` instead of calling `next()` on the source,
+so reading a value leaves the position where it was.
+`print(stream.seen)` shows that `seen` holds every item the source produced.
+Supporting the four methods takes more than a small lookahead buffer.
 `OverStream` rebuilds the list.
 
 The GoF interface hides that rebuild.
-`first()` and `current_item()` assume a collection you can re-read and inspect in place,
-so honoring them over a stream means recreating one, item by item.
+`first()` and `current_item()` require a collection you can re-read and inspect in place,
+so implementing them over a stream means recreating one, item by item.
 The chapter has now reached that conclusion three times: here,
 in `tee()`'s buffering,
 and in the advice to collect into a list when you must walk data twice.
-Python dropped both methods rather than make every iterator buffer its stream.
-Without them, `advance()` must return the value it reached.
+Python dropped `first()` and `current_item()` rather than make every iterator buffer its stream.
+That leaves `advance()` to return the value it reached.
 That method is `__next__()`.
 
 ### Asking Consumes an Item
 
-A GoF iterator answers whether it has finished as often as you ask,
-without advancing.
-Python makes that question part of `__next__()`,
-so the only way to ask is to take.
-The answer arrives as a `StopIteration` exception that the `for` loop absorbs on your behalf.
+A GoF iterator's `is_done()` reports whether the traversal has finished and leaves the position where it was,
+however often you call it.
+Python puts that test inside `__next__()`,
+so finding out whether the iterator has finished means requesting the next item.
+`__next__()` reports the end by raising `StopIteration`,
+which the `for` loop absorbs on your behalf.
 You can catch that exception yourself,
-or hand `next()` a default to return at the end,
-but either way the question consumes an item,
+or hand `next()` a default to return at the end.
+Either way, the call that tests for the end consumes an item,
 where the GoF *Iterator*'s `is_done()` consumes nothing:
 
 ```python
@@ -872,23 +879,23 @@ print("c" in letters, list(letters))
 #: True ['d']
 ```
 
-Each question consumes an item.
-Every way the protocol offers to look ahead also advances.
+A membership test consumes items the same way.
+`"c" in letters` pulls items until it finds a match,
+and consumes the match along with every item before it.
+
+Every protocol operation that looks ahead also advances the iterator.
 That is why a peekable iterator must buffer,
 and why `tee()` buffers the whole stream in `tee.py` when one branch drains first.
 
-A membership test consumes items the same way.
-`"c" in letters` pulls items until it finds a match,
-and every item it pulled is gone, the match included.
-
 `DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values),
-because the answer must differ from every value the source could yield.
-`None` collapses an exhausted source and a source that yields `None` into the same reply.
+because the default must differ from every value the source could yield.
+With `None` as the default,
+an exhausted source and a source that yields `None` produce the same return value.
 The built-in `iter()` uses a sentinel the same way in its two-argument form.
-`iter(callable, DONE)` calls `callable` until it hands back `DONE`.
+`iter(callable, DONE)` calls `callable` until `callable` returns `DONE`.
 
 `escaped_stop.py` doubles the items of a stream in two ways,
-once asking with a bare `next()` and once letting a `for` loop ask:
+once calling a bare `next()` and once letting a `for` loop call it:
 
 ```python
 # escaped_stop.py
@@ -913,8 +920,8 @@ print(list(doubled_ok(iter([1, 2]))))
 
 A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),
-so an ordinary end of stream reads like a bug somewhere else.
-Only a bare `next()` hands you a `StopIteration`.
+so the ordinary end of the source propagates out of `list()` as an error.
+Only a bare `next()` raises `StopIteration` into your code.
 With a default, `next()` returns the default,
 and every other construct here absorbs the exception.
 
@@ -924,19 +931,19 @@ so per-item work such as doubling needs a loop.
 That is why `doubled_ok()` uses `for`,
 and the loop absorbs the exception as every `for` loop in this chapter does.
 The fix is rarely a `try`.
-Let the loop do the asking.
+Let a `for` loop call `next()`.
 
 ## The Protocol Answers Nothing
 
 Both surprises in [What Laziness Hides](#what-laziness-hides)
 come from the same rule.
-The only way to find out whether the body accepts its arguments is to pull a value and let it run,
-and the only way to find out whether the source has run out is to pull and get nothing back.
+The only way to find out whether the body accepts its arguments is to pull a value and let the body run.
+The only way to find out whether the source has run out is to pull and receive `StopIteration`.
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
-The protocol buffers nothing and tells you nothing in advance.
-Every tool in this chapter that does answer in advance, `tee()`, `OverStream`,
-or a peekable wrapper, holds a buffer to give that answer.
+The protocol buffers nothing and reports nothing in advance.
+Each tool in this chapter that answers in advance holds a buffer to give that answer:
+`tee()`, `OverStream`, and a peekable wrapper.
 
 ## Exercises
 

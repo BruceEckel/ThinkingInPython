@@ -1,13 +1,13 @@
 # Static Types
 
 > A value has a type whether or not you write it down,
-> and a mistake about it surfaces when the operation runs.
-> Static types let a tool find that mistake before the program does.
+> and Python reports a mistake about it when the operation runs.
+> Static types let a tool report that mistake before the program runs.
 
 C++ and Java require type declarations,
 and they check those types during compilation.
 The Python runtime checks types only when an operation runs.
-The examples so far have used almost no type declarations,
+The examples so far have used few type declarations,
 and on a small program you may not miss them.
 
 Python 3.5 (2015) introduced *type hints*,
@@ -21,8 +21,9 @@ Mypy is the original and most widely deployed one,
 and Pyright is the one most editors run.
 This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
 from the same group that makes `uv` and `ruff`.
+
 Pyright checks the same listings as a second opinion,
-and the book's build does not depend on its verdict.
+and the book's build relies on `ty`'s verdict alone.
 Where Pyright or mypy disagrees with `ty` on a listing,
 the text says so and names the checker,
 because a verdict on a hard case is a fact about one checker, not about Python.
@@ -38,16 +39,16 @@ and that coexistence is *gradual typing*.
 You can slowly add hints where they help most: the public interfaces,
 the tricky data, the code on which other people depend.
 
-An explicit `Any` indicates that a value is truly dynamic.
+An explicit `Any` marks a value as dynamic.
 `ty` reports the `Any` that comes from a missing annotation as `Unknown`,
 to distinguish it from an `Any` you wrote yourself.
-They behave the same.
-Both are compatible with everything.
+The two behave the same.
+Each is compatible with everything.
 
 `Any` and `object` differ, though both accept every value.
 `object` is the base of every class,
-so an `object` value carries the methods every class shares,
-and the type checker rejects every operation beyond `object`'s own.
+so an `object` value carries the methods every class shares.
+The type checker rejects every operation beyond `object`'s own.
 `Any` permits every operation instead,
 so it switches the checker off for that value rather than describing a wide set of values.
 Choose `object` for a value you store or pass along untouched,
@@ -81,6 +82,7 @@ and `str | None` for "a string or nothing."
 A tuple annotation names one type per position,
 so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
 The `...` in `tuple[int, ...]` means zero or more `int`s.
+
 A function that returns nothing declares `-> None`,
 and that is why every `__init__()` in this chapter's listings carries that annotation.
 
@@ -91,11 +93,11 @@ You need a tool to check them:
 
     ty check
 
-`uvx ty check` runs it without installing anything,
+`uvx ty check` runs it in a temporary, isolated environment,
 and `uv tool install ty@latest` puts it on your path.
 
-`ty` complains where the hints and the code disagree,
-and stays quiet when they agree.
+`ty` reports an error where the hints and the code disagree,
+and stays silent when they agree.
 The build runs `ty` on every change,
 so the code you read here checks as well as runs.
 
@@ -113,11 +115,11 @@ print(area("3", 4))  # type: ignore
 #: 3333
 ```
 
-At runtime `area("3", 4)` runs without error.
+At runtime `area("3", 4)` succeeds.
 It returns `"3333"`, because `"3" * 4` repeats the string four times.
 The wrong value causes a failure later,
 often far from the line that produced it.
-The type checker discovers the problem immediately.
+The type checker reports the problem before the program runs.
 
 The `# type: ignore` comment tells the type checker to skip this line,
 so this book's build passes.
@@ -141,25 +143,26 @@ pairs what the annotation expected with what the call supplied,
 and then points at the declaration that set the expectation.
 
 Listings in this book use a shorthand for a diagnostic.
-A neighboring `# ty:` comment summarizes what the type checker reports for a line:
-the diagnostic for a line that would fail the check,
-whether commented out or suppressed with `# type: ignore`,
-or the type a `reveal_type()` call produces.
+A neighboring `# ty:` comment summarizes what the type checker reports for a line.
+For a line that would fail the check,
+commented out or suppressed with `# type: ignore`,
+the comment gives the diagnostic.
+For a `reveal_type()` call, the comment gives the type the call produces.
 `reveal_type()`, imported from `typing`,
-asks the type checker which type it inferred for an expression,
-and `ty check` prints the answer as a diagnostic.
+marks an expression whose inferred type you want to see,
+and `ty check` prints that type as a diagnostic.
 
 The `# ty:` summary is for you, not for the tool.
-`ty` acts on a comment that has the form `# type: ignore`,
-which silences every diagnostic on its line,
-or `# ty: ignore[invalid-argument-type]`, which silences the one rule it names.
+`ty` acts on two comment forms.
+`# type: ignore` silences every diagnostic on its line,
+and `# ty: ignore[invalid-argument-type]` silences the one rule it names.
 `# type: ignore` is the form every type checker honors.
 
 ## Narrowing {#narrowing}
 
 A union type covers every case until you rule some out.
 Testing `is not None` on an `X | None` value proves to the type checker,
-and not just to you, that the value is an `X`:
+as well as to you, that the value is an `X`:
 
 ```python
 # narrowing.py
@@ -177,13 +180,16 @@ print(shout(None))
 
 Inside the `if`, the type checker *narrows* `text` from `str | None` to `str`,
 so `.upper()` needs no cast.
-After the `if`, `text` is `None`, since the branch returned for every `str`;
-without that `return`, it would be the full `str | None` again.
-A truthiness test, `if text:`, narrows the same way, since `None` is falsy,
-but it sends the empty string to the other branch along with `None`,
-so test `is not None` when an empty value counts as supplied (see exercise 8).
+After the `if`, `text` is `None`, since the branch returned for every `str`.
+Had the branch fallen through, `text` would be the full `str | None` again.
+
 The same narrowing follows an `isinstance()` check, an equality test,
 or an identity test against a specific value such as `is not SOME_SENTINEL`.
+A truthiness test, `if text:`, also narrows `text` to `str`,
+since `None` is falsy.
+But the empty string is falsy too,
+so `if text:` sends `""` to the other branch along with `None`.
+Test `is not None` when an empty value counts as supplied (see exercise 8).
 
 Narrowing also makes an `object` parameter usable.
 [Gradual Typing](#gradual-typing)
@@ -239,20 +245,21 @@ expect(AttributeError, show, Box("hi"))
 
 `ty check` passes this file.
 The `if` narrows `b.val` to `str`,
-and nothing in the checker's model connects `reset()` to that narrowing,
-so the checker keeps `b.val` narrowed to `str`.
-The `AttributeError` shows the narrowing was stale by the time `upper()` ran.
+and the checker keeps that narrowing through the `return`,
+because its model has no link between `reset()` and `b.val`.
+The `AttributeError` shows that `b.val` was `None` by the time `upper()` ran,
+while the checker still treated it as a `str`.
 
 A narrowing on a local variable holds.
-A narrowing on an attribute can go stale,
-so recheck the attribute after any call that might touch the object.
-Copying the attribute into a local variable before the test avoids the recheck,
+A narrowing on an attribute becomes false when a call rebinds the attribute,
+so recheck the attribute after any call that might change the object.
+Copying the attribute into a local variable before the test keeps the narrowing valid,
 because a function defined elsewhere cannot rebind its caller's local variable
 (see exercise 9).
 
 ## Constants with Final
 
-`Final` on a name makes the type checker catch an accidental reassignment.
+`Final` on a name makes the type checker report an accidental reassignment.
 
 The naming convention in [Tour](02_Foundations--Tour.md#naming-conventions)
 uses ALL_CAPS to signal a constant, but that is only a hint to human readers.
@@ -278,9 +285,8 @@ print(MAX_RETRIES, GREETING, HISTORY)
 `Final` invites a misconception.
 The word suggests immutability, but `Final` blocks rebinding the name,
 not mutation of the object the name holds.
-`HISTORY.append("first")` checks and runs,
-the same as it does on a non-`Final` list.
-The type checker refuses only an assignment to the name `HISTORY`.
+`HISTORY.append("first")` checks and runs, the same as it does on any list.
+The type checker refuses an assignment to the name `HISTORY` and accepts every call that changes the list.
 For a collection that must stay as it is,
 hold a tuple or a `frozenset` under the `Final` name,
 since neither type has a method that changes its contents (see exercise 10).
@@ -289,9 +295,9 @@ You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
 The two forms differ when the initializer says less than you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
-so the type checker ignores whatever goes into the list.
+so the type checker accepts any value you put into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
-and the type checker enforces it.
+and the type checker enforces `list[str]`.
 Every other listing in this book writes the type out on `Final`.
 
 ## Structural Typing with Protocols
@@ -304,16 +310,15 @@ Programmers often call dynamic typing *duck typing*.
 If it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
-Instead of waiting until the program runs,
-a type checker verifies ahead of time that an object has the required *shape*.
+A type checker verifies ahead of time that an object has the required *shape*.
 "Shape" means the methods and attributes that the code using the object requires.
 Dynamic typing and structural typing are the same idea checked at different moments.
-Dynamic typing trusts the object once the code is running,
-while structural typing proves the shape beforehand.
+Dynamic typing finds a missing method when the call runs,
+while structural typing reports it before the program runs.
 
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
 A *Protocol* instead describes a required shape.
-Any object with that shape qualifies, without inheriting from a base class:
+Any object with that shape qualifies, whatever its base classes:
 
 ```python
 # protocols.py
@@ -349,8 +354,9 @@ Neither `Circle` nor `Square` mentions `Drawable`.
 The type checker accepts both because each has a `draw(self) -> str`,
 so each matches `Drawable`'s shape.
 The signature is part of that shape.
-A `draw()` whose signature differs from `draw(self) -> str`,
-by returning an `int` or by requiring an argument, does not match.
+A `draw()` that returns an `int`, or that requires an argument,
+gives its class a different shape.
+The type checker rejects that class where an annotation names `Drawable`.
 
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
@@ -358,13 +364,14 @@ the type checker rejects the call.
 `Blob` is the case worth watching.
 It draws, in the everyday sense, but the method's name is `paint()`,
 and a protocol matches on names and signatures rather than on intent.
-Protocols preserve the flexibility of dynamic typing but add the early warning of static type checking.
+A protocol accepts any class with the right methods, as dynamic typing does,
+and reports a mismatch before the program runs, as static type checking does.
 
 A `Protocol` is a checking-time construct,
-so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
+so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of returning `True` or `False`.
 Decorating the Protocol with `@runtime_checkable` allows the call,
-but `isinstance()` then makes a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies):
-it confirms that each method exists and ignores its signature.
+but `isinstance()` then makes a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies).
+It confirms that each method exists and ignores its signature.
 
 ## Classes as Values: `type[C]` {#classes-as-values-type}
 
@@ -405,7 +412,7 @@ while the built-in call `type(shape)` in the demo retrieves an object's class at
 
 An annotation can grow to the point of obscurity.
 `dict[tuple[int, int], str]` is precise,
-but it does not say what those pairs and strings represent.
+but it leaves the reader to guess what those pairs and strings represent.
 The *type statement* gives the annotation a name:
 
 ```python
@@ -436,8 +443,9 @@ A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the type checker accepts any pair of ints as a `Coord`.
 (For a type the type checker keeps separate from its base, use [`NewType`](#aliases-and-distinct-types).)
-Because an alias creates no new type,
-save it for a compound shape instead of using it to rename a built-in.
+
+Because an alias is the same type under another name,
+save it for a compound shape and let a built-in keep its own name.
 `type UserId = int` looks like a new type in a signature while behaving like `int`.
 
 `Color` names a union of literal values instead of a union of types.
@@ -462,8 +470,7 @@ uses `type Shape = Circle | Square` to define a closed set of alternatives that 
 
 ### Type Parameters
 
-Consider a function that returns the first element of a list.
-This function works on a list holding any type.
+Consider a function that returns the first element of a list holding any type.
 A useful annotation makes the return type match the list's element type,
 whatever that type is.
 
@@ -485,7 +492,7 @@ with expected(AttributeError):
 #: [AttributeError] 'int' object has no attribute 'upper'
 ```
 
-`ty check` passes this file with no complaint.
+`ty check` passes this file.
 `n` is `Any`, so every attribute access on it type-checks,
 including one that runs and fails.
 
@@ -509,10 +516,10 @@ print(s.upper())
 ```
 
 `T` is a placeholder, filled in separately at each call.
-The type checker infers `T` from the argument and then knows the return type.
+The type checker infers `T` from the argument and substitutes it into the return type.
 Both `n + 1` and `s.upper()` pass the type checker,
-while the commented-out `n.upper()` fails,
-the same call that `first_any.py` lets through to fail at runtime.
+while the commented-out `n.upper()` fails.
+In `first_any.py` the same call type-checks and then fails at runtime.
 
 A class declares type parameters the same way:
 
@@ -534,12 +541,13 @@ print(box.get().upper())
 Constructing `Box("gift")` binds `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
 
-A *bound* limits the parameter to one hierarchy:
+A *bound* limits the parameter to one hierarchy.
 `class Box[T: Shape]` accepts `Shape` and its subclasses,
-and `T` keeps the subclass it was given.
-A *constraint* lists unrelated choices: with `[T: (int, str)]`,
-`T` is `int` or `str`,
-and an argument of a subclass of `int` binds `T` to `int`.
+and `T` keeps the subclass the caller passes.
+A *constraint* lists unrelated choices.
+With `[T: (int, str)]`, `T` is `int` or `str`.
+An argument whose class subclasses `int` binds `T` to `int`,
+where a bound would keep the subclass.
 
 ### Variance {#variance}
 
@@ -574,12 +582,12 @@ print(count(circles))
 
 A `list` accepts writes.
 If you pass `circles`,
-`add_square()` appends a `Square` to a list its caller believes holds only circles.
-The type checker refuses the call to prevent that.
-A read-only container has no such problem,
+`add_square()` appends a `Square` to a list declared as `list[Circle]`.
+The type checker refuses the call, so the declaration `list[Circle]` stays true.
+A read-only container is safe to pass this way,
 so `Sequence[Shape]` accepts a `list[Circle]`.
-Annotating a parameter `Sequence[Shape]` instead of `list[Shape]` declares that the function reads its argument and leaves it as it was,
-so the function accepts arguments that a `list[Shape]` parameter rejects.
+A `Sequence[Shape]` parameter declares that the function reads its argument and leaves it as it was.
+That declaration lets the function accept arguments that a `list[Shape]` parameter rejects.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 
 ### Type Parameter Defaults {#type-parameter-defaults}
@@ -618,7 +626,7 @@ A default matters most for a class whose type parameter is usually the same type
 Callers who use that type omit the brackets, and the annotation stays precise.
 
 `BareStack` is the same class without the default,
-so a `BareStack` annotation without brackets leaves `T` unsolved:
+so the annotation `pile: BareStack` leaves `T` unsolved:
 
 ```python
 # type_defaults_bare.py
@@ -659,8 +667,7 @@ print(is_origin((0, 0)))
 
 Defaulted parameters go last, the way defaulted function parameters do,
 so `class Table[K = str, V]` is a syntax error.
-Type parameter defaults arrived in Python 3.13,
-one release after the bracket syntax.
+Python 3.13 added type parameter defaults, one release after the bracket syntax.
 
 ### `**P` and the Older `TypeVar` Syntax {#paramspec-and-typevar}
 
@@ -686,8 +693,8 @@ class Box(Generic[T]):
 ```
 
 These `first()` and `Box` mean the same as the bracket versions in `generics.py` and `generic_box.py`.
-The bracket form needs no separate declaration,
-and its `T` belongs to the function or class that declares it.
+The bracket form declares `T` in the function or class header,
+so `T` exists only inside that function or class.
 
 ## The `Self` Return Type {#the-self-type}
 
@@ -695,7 +702,7 @@ A method that returns its own instance allows call chaining.
 What should the type annotation be?
 Naming the enclosing class works until someone inherits from it.
 `Self` means "an instance of the class on which you called this method,"
-so it automatically adapts to subclassing:
+so in a subclass it means the subclass:
 
 ```python
 # self_type.py
@@ -734,7 +741,7 @@ so a call on a subclass has the subclass's type, not the base's.
 
 A `**kwargs` parameter collects keyword arguments into a dictionary.
 Annotating it as `**kwargs: int` says that every value is an `int`,
-but it says nothing about which keywords a caller may pass.
+but it leaves open which keywords a caller may pass.
 A `TypedDict` describes a dictionary with specific keys,
 each with its own value type.
 Since Python 3.12 (PEP 692),
@@ -760,40 +767,41 @@ print(label("ok", width=6, fill="*"))
 ```
 
 Inside `label()`, `style` is a `Style` dictionary.
-`width` is required, so `style['width']` needs no guard.
+`width` is required, so `label()` reads `style['width']`.
 `NotRequired` makes `fill` optional,
 so `label()` reads it with `.get()` and a default.
 
 The type checker checks the keywords at each call.
 A call that passes `width="6"` draws `invalid-argument-type` from `ty`,
-reporting "Expected `int`, found `Literal["6"]`",
 the same diagnostic a wrongly typed ordinary parameter draws.
+The diagnostic's message reads "Expected `int`, found `Literal["6"]`".
 A call that leaves out `width` draws `missing-argument`.
 
-A misspelled keyword is where the checkers disagree.
+The checkers disagree about a misspelled keyword.
 Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
-but `ty` 0.0.86 accepts that call without a diagnostic.
-At runtime `fil` becomes an extra key in `style`,
-and `label()` ignores that key, so the fill quietly stays a space.
+but `ty` 0.0.86 accepts that call silently.
+At runtime `fil` becomes an extra key in `style`.
+`label()` ignores that key, so the fill stays a space.
 
-The payoff grows when several functions accept the same options.
+A `TypedDict` helps most when several functions accept the same options.
 One `TypedDict` declares them once,
-and every signature that unpacks it stays in step.
+and every signature that unpacks it accepts the same keywords.
 
 ## Hints Are Not Enforced at Run Time
 
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
-A wrong type that slips past the type checker behaves as it does without hints.
+A wrongly typed value that gets past the type checker runs as it would in a program with no hints.
 Checking is a separate step you run, the same way you run tests.
+The hints are for the tools and for the reader.
+
 If you need a runtime guarantee,
 use `isinstance()` or a library that validates data.
 The [typeguard](https://typeguard.readthedocs.io)
 library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev)
-validates and parses data against typed models,
-and that suits the edges of a program, where untrusted input enters.
-The hints are for the tools and for the reader.
+validates and parses data against typed models.
+Pydantic suits the edges of a program, where untrusted input enters.
 
 From here on, this book assumes the type checker runs on everything.
 When a listing says the type checker rejects a line,
@@ -806,14 +814,14 @@ so the question is when a hint is worth the words.
 Annotate what crosses a boundary: function signatures, public attributes,
 anything another file imports.
 Those are the places where the code's reader and writer are different people,
-and where a wrong assumption travels farthest before it fails.
+and where the most code separates a wrong assumption from the failure it causes.
 
 Let the type checker infer the rest.
-A local variable whose type is obvious from its initializer gains nothing from an annotation,
-and `count: int = 0` says no more than `count = 0` does, at greater length.
+A local variable whose type is obvious from its initializer gains nothing from an annotation.
+`count: int = 0` says the same as `count = 0`, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
 A hint helps in proportion to the distance between a value's creation and its use.
-A value born and consumed three lines later needs no help.
+A value created and used within three lines needs no annotation.
 A value that arrives from another module, inside a container,
 is worth annotating precisely.
 
@@ -889,7 +897,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `Final`, `Final[T]` | A name the type checker does not let you reassign, see [Constants with Final](#constants-with-final) |
+| `Final`, `Final[T]` | A name the type checker protects from reassignment, see [Constants with Final](#constants-with-final) |
 | `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Foundations--Class_Attributes.md#declaring-shared-state-with-classvar) |
 
 ### Generics
@@ -955,14 +963,14 @@ The abstract container types come from `collections.abc`.
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Type-checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) |
 | `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) |
 
-These exist for the type checker and the reader,
+These decorators and directives exist for the type checker and the reader,
 and at runtime most of them do nothing.
 Two act when a call reaches them: `assert_never()` raises an `AssertionError`,
 and `reveal_type()` prints its argument's runtime type.
 
-Older code writes some of them differently: `Optional[X]` for `X | None`,
-`Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`,
-`Tuple` from `typing` for the lowercase built-ins.
+Older code writes some of the constructs in these tables differently:
+`Optional[X]` for `X | None`, `Union[X, Y]` for `X | Y`, and `List`, `Dict`,
+`Set`, `Tuple` from `typing` for the lowercase built-ins.
 The forms above are the modern ones.
 
 ## Exercises

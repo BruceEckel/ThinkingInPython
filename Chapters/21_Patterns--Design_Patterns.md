@@ -22,8 +22,8 @@ and the chapters that follow supply the rest of the code.
 
 ## What Is a Pattern?
 
-Initially, you can think of a pattern as an especially clever and insightful way of solving a particular class of problems.
-Many people have worked out all the angles of a problem and have come up with the most general,
+At first, think of a pattern as an especially clever and insightful way to solve a particular class of problems.
+Many people have worked out all the angles of a problem and arrived at the most general,
 flexible solution.
 You may have seen and solved something like it before,
 but your solution probably lacks the completeness a pattern embodies.
@@ -33,15 +33,15 @@ Once you know a catalog of patterns,
 that catalog tempts you to treat it as a checklist,
 and to install patterns as proof of sophistication.
 A pattern belongs in your program only when you have the problem it solves.
-If nothing varies, you do not need machinery for isolating variation.
+Machinery for isolating variation needs a variation to isolate.
 
-Although they're called "design patterns," they apply beyond design.
+Despite the name "design patterns," patterns apply beyond design.
 Because a pattern translates into code,
-you might expect it to appear no earlier than low-level design.
+you might expect it to appear first in low-level design.
 But a pattern embodies a complete idea within a program,
 so it can appear at the analysis phase or high-level design phase,
 where you are still describing what the system does rather than how to build it.
-It appears at every level,
+A pattern appears at every level,
 and often you first discover that you need one when you reach the code.
 
 The basic concept of a pattern is also the basic concept of program design:
@@ -49,26 +49,26 @@ adding a layer of abstraction.
 Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations for abstraction is to *separate things that change from things that stay the same*.
 Once you find a part of your program that's likely to change,
-patterns can prevent those changes from causing secondary effects throughout your code.
+patterns can keep those changes from reaching the rest of your code.
 That isolation confines each change to one place,
 which makes the code easier to maintain and usually simpler to understand.
 
 ### What an Abstraction Erases
 
 Isolating what changes discards information.
-An abstraction is a bet about which details no caller will need,
+An abstraction is a guess about which details no caller will need,
 and a good abstraction does more than hide those details.
 It erases them.
 Code outside the boundary cannot recover information the boundary discards,
 so a caller that turns out to need an erased detail cannot work around the interface.
-Someone must reopen the interface.
+Someone must change the interface.
 The art of design lies in guessing well about which details you can hide and which you must expose.
 
 Erased details are also the source of scaling limits.
-Every abstraction hides some work (a copy, a sort, a lookup behind an attribute)
-that takes no noticeable time at the size you built it.
-A growing system eventually reaches the size where one piece of hidden work dominates the running time,
-and the layer that made the code simple now stands between you and the fix.
+Every abstraction hides some work that takes negligible time at the size you built it:
+a copy, a sort, a lookup behind an attribute.
+A growing system eventually reaches the size where one piece of hidden work dominates the running time.
+The layer that made the code simple now hides the work you need to change.
 That hidden work is one reason [Performance](18_Techniques--Performance.md)
 tells you to measure at a realistic size rather than trust a small trial.
 
@@ -84,7 +84,7 @@ you have the focal point around which to structure your design.
 You discover a vector of change.
 You do not predict it.
 Guessing at it up front often adds complexity to allow flexibility in a direction nobody uses.
-The second time a requirement shifts the same part of the design,
+The second time a requirement changes the same part of the design,
 you have evidence.
 
 ### Patterns You Have Already Seen
@@ -92,29 +92,31 @@ you have evidence.
 You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Foundations--Classes.md)
 as a design pattern (albeit one built into the language).
-Inheritance lets you express differences in behavior
-(that's the thing that changes) in objects that all have the same interface
-(that's what stays the same).
+Inheritance lets you express differences in behavior in objects that all have the same interface.
+The behavior is the thing that changes,
+and the interface is what stays the same.
 [Composition](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
-also qualifies as a pattern, since it lets you change,
-dynamically or statically, the objects to which your class delegates,
-and thus the way that class works.
+also qualifies as a pattern,
+since it lets you change the objects to which your class delegates,
+and with them the way that class works.
+You can make that change dynamically or statically.
 
 Another pattern that appears in *GoF Design Patterns* is the [*Iterator*](23_Patterns--Iterators.md).
 An iterator lets you hide the particular implementation of the container as you step through it.
-You can write generic code that operates on all the elements in a sequence without regard to how that sequence stores them.
+You can write generic code that operates on all the elements in a sequence,
+however that sequence stores them.
 The code works with any object that produces an iterator.
 
 ## Pattern Evolution
 
-A pattern arrives in stages, each more general than the last:
+A pattern develops in stages, each more general than the last:
 
 1.  **Idiom**: how you write code in a particular language to do this particular type of thing.
-    This could be something as common as the way you step through an array in C
-    (without running off the end).
+    This could be as common as the way you step through an array in C
+    (stopping at its last element).
 2.  **Specific Design**:
     the solution that arose to solve this particular problem.
-    This might be a clever design, but it doesn't try to be general.
+    This might be a clever design, but it stays specific to that problem.
 3.  **Standard Design**: a specific design made general through reuse,
     so it solves this kind of problem wherever it appears in your own programs.
 4.  **Design Pattern**: the shape several standard designs share,
@@ -123,13 +125,13 @@ A pattern arrives in stages, each more general than the last:
     and then see a common pattern across those uses.
 
 In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
-meaningless outside a language that provides `with`.
+tied to a language that provides `with`.
 A dictionary mapping one program's shape names to its shape classes is a specific design,
 stage two.
-The same dictionary is a standard design, stage three,
-once each subclass registers itself as its `class` statement runs,
-so adding a type leaves the factory untouched
-([Factory](27_Patterns--Factory.md) builds both).
+The same dictionary becomes a standard design, stage three,
+once each subclass registers itself as its `class` statement runs.
+Adding a type then needs no edit to the dictionary.
+[Factory](27_Patterns--Factory.md) builds both designs.
 [*Template Method*](25_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.
 
@@ -137,19 +139,20 @@ The stages are a history, not a ranking.
 Patterns are subtle and appear over time,
 so leave a solution at the stage it has reached rather than forcing it toward a design pattern.
 
-The progression runs downward too.
-A pattern a language builds in drops back to stage one,
-and the programmers who arrive next learn it as syntax rather than as a design.
+The progression also runs in reverse.
+A pattern that a language builds in becomes an idiom again, stage one.
+The programmers who arrive next learn it as syntax rather than as a design.
 Stepping through a container is stage one in Python and was stage four in the *GoF Design Patterns* examples.
 
 ## When a Pattern Dissolves
 
 A pattern is often a sign of something missing in a language.
-Programmers wrote the same scaffolding often enough that it acquired a name,
-and the pattern exists because the language leaves that scaffolding for them to write.
+Programmers wrote the same supporting code often enough that it acquired a name.
+The pattern exists because the language leaves that code for them to write.
 
 A language can supply that missing piece in two ways.
-Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. *Singleton* is one of the seven he leaves standing, but [*Singleton*](24_Patterns--Singleton.md)
+Sometimes a language adds the feature,
+and the feature replaces the pattern^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and a count for Python comes out differently. *Singleton* is one of the seven he leaves unchanged, but [*Singleton*](24_Patterns--Singleton.md)
 shows that a Python module already is one.].
 [*Iterator*](23_Patterns--Iterators.md#the-pattern-that-disappeared)
 is the clear case.
@@ -157,9 +160,9 @@ It was implicit in the `for` loop from the start,
 and Python 2.2 made it a protocol the language calls on your behalf.
 More often the language had the piece all along,
 and the pattern came from a language that didn't.
-*Strategy* and *Command* shrink to passing a function,
-because a Python function is an object
-([Function Objects](28_Patterns--Function_Objects.md) shows both).
+[*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
+and [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime)
+shrink to passing a function, because a Python function is an object.
 A [Factory](27_Patterns--Factory.md) becomes a dictionary,
 because a class is an object too.
 [*Singleton*](24_Patterns--Singleton.md) becomes a module,
@@ -194,9 +197,9 @@ Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.
 [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through a case with a real motivation.
 
-Because a function with a `Callable` parameter can replace a pattern's interface and classes,
-the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
-poses: how much of each pattern's machinery does Python still need,
+A function with a `Callable` parameter can replace a pattern's interface and classes.
+That replacement is why the chapters ahead keep asking a question from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines):
+how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
 
 ## Pattern Taxonomy
@@ -213,12 +216,11 @@ each named for what its patterns do:
     *Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
 2.  **Structural**: how objects connect to other objects,
     arranged so that changes leave those connections alone.
-    [*Surrogate*](26_Patterns--Surrogate.md),
+    The structural patterns in this book appear in [*Surrogate*](26_Patterns--Surrogate.md),
     [Changing the Interface](29_Patterns--Changing_the_Interface.md),
     [*Flyweight*](35_Patterns--Flyweight.md),
     [Decorators](14_Techniques--Decorators.md#the-decorator-pattern),
-    and the *Composite* half of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
-    cover the structural patterns in this book.
+    and the *Composite* half of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md).
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language,
     fulfilling a request, moving through a sequence (as in an iterator),
@@ -230,8 +232,8 @@ each named for what its patterns do:
     (*Command*, *Strategy*, and *Chain of Responsibility*),
     [*Observer*](30_Patterns--Observer.md),
     [*Visitor*](33_Patterns--Visitor.md), [*Memento*](36_Patterns--Memento.md),
-    [*State*](26_Patterns--Surrogate.md#state), and *Interpreter*,
-    though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
+    [*State*](26_Patterns--Surrogate.md#state), and *Interpreter*.
+    *State* appears beside *Proxy*, and *Interpreter* beside *Composite*,
     for the reason that closes this section.
 
 The catalog above is GoF's.
@@ -247,7 +249,7 @@ and not always helpful.
 Certainly, the *Creational* patterns are straightforward.
 How will you create objects?
 This is a normal question,
-and the name brings you right to that group of patterns.
+and the name tells you which group of patterns answers it.
 But I find *Structural* and *Behavioral* far less useful distinctions.
 I have not been able to look at a problem and say "clearly,
 you need a structural pattern here,"
@@ -274,11 +276,11 @@ GoF's first chapter lists eight "common causes of redesign" and names the patter
 Six of the eight are a dependence of one part on another: on a class name,
 on a specific operation, on a platform, on an object's representation,
 on an algorithm, or on each other, which the list calls *tight coupling*.
-The other two, extending by subclassing and being unable to alter a class,
-are about what a dependence makes hard once it exists.
+The other two are about what a dependence makes hard once it exists:
+extending by subclassing, and being unable to alter a class.
 
-The glossary defines coupling as "the degree to which software components depend on each other,"
-and that first chapter's two design principles are both instructions to loosen one particular dependence.
+The glossary defines coupling as "the degree to which software components depend on each other."
+Both of that first chapter's design principles tell you to loosen one particular dependence.
 "Program to an interface,
 not an implementation" says stop naming concrete classes.
 "Favor object composition over class inheritance" says stop inheriting implementations.
@@ -290,8 +292,8 @@ Read this way, the catalog is one idea applied twenty-three times.
 GoF's own discussion of the behavioral patterns compares four of them by their coupling.
 *Command*, *Observer*, *Mediator*,
 and *Chain of Responsibility* each decouple a sender from a receiver,
-"but with different trade-offs,"
-and *Observer* "defines a looser sender-receiver binding than *Command*."
+"but with different trade-offs."
+*Observer* "defines a looser sender-receiver binding than *Command*."
 
 A diagram makes coupling visible.
 Once you can see coupling,
@@ -321,19 +323,20 @@ The type checker matches shapes.
 A caller that takes a `Callable` knows one signature.
 A caller that takes a value knows the value's type and nothing about who produced it.
 
-The rung a dependence sits on decides how far a change travels.
+The rung a dependence sits on decides how many parts a change can reach.
 If you rename a method on a class that other code subclasses,
 the subclasses break.
 If you rename it on a class that other code reaches through a `Protocol`,
-no caller's source changes, because each caller names the protocol's method.
+every caller's source stays as it was,
+because each caller names the protocol's method.
 The renamed class stops matching the protocol,
 and the type checker reports each place that passes it to a caller.
 
-The `Protocol` and `Callable` rungs come free in Python.
+In Python, the `Protocol` and `Callable` rungs require nothing from an implementer.
 An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and no implementer inherits,
 and a `Callable` annotation is not a class.
-Those two free rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
+Those two rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
 In a language where every implementer must name its interface,
 a pattern exists to build a declared interface.
 In a language that supplies the `Protocol` and `Callable` rungs,
@@ -351,11 +354,12 @@ With those three edges alone, six GoF patterns look like this:
 ![Six GoF patterns drawn only as coupling](_images/coupling_gallery)
 
 The red box in each panel marks the part the pattern protects from change.
-Read the heavy edges first, because they are where a change reaches.
+Read the heavy edges first,
+because a change to the class at the head of a heavy edge can force an edit in the part at its tail.
 
 *Strategy* has none.
 The context names an interface and each algorithm satisfies it,
-so adding an algorithm changes nothing that exists.
+so adding an algorithm leaves every existing part as it was.
 
 *Observer* has one, and it points from the observer to the subject.
 An observer names its subject's class in `update()`,
@@ -368,30 +372,32 @@ which is where a heavy edge belongs.
 
 *Factory Method* keeps a heavy edge too.
 Something must name a class to construct it.
-The pattern moves that name out of the client and into a creator,
-a part whose whole job is to hold the name and on which nothing else depends.
+The pattern moves that name out of the client and into a creator.
+Holding the name is the creator's whole job,
+and no other part depends on the creator.
 
 *Adapter* moves the heavy edge inside the adapter.
-The client sees the target interface,
-and the one class that knows the adaptee's real name is the adapter,
+The client names the target interface.
+The adapter alone knows the adaptee's real name,
 so a change to the adaptee reaches one file.
 
 *Decorator*, like *Strategy*, has no heavy edge.
 A topping satisfies the component interface and also holds a component,
-so it can wrap a pizza or another topping without naming either.
+so it can wrap a pizza or another topping,
+knowing each one through that interface.
 
 *Visitor* is the reverse of the others.
 The visitor names every concrete element.
 The pattern concentrates the heavy edges in one place on purpose.
 Adding an operation means writing one new visitor and changing nothing else,
 while adding an element type means changing every visitor.
-[*Visitor*](33_Patterns--Visitor.md) is that trade,
-and the diagram shows what you are trading.
+That choice defines [*Visitor*](33_Patterns--Visitor.md),
+and the diagram shows where the choice puts the heavy edges.
 
 Seen this way, the patterns differ less in how much coupling they carry than in where they put it and which way it points.
 A heavy edge is acceptable when it sits in a part that is easy to change,
 or points at a part that rarely changes.
-That is the content of the *Managed Coupling* principle in [Design Principles](#design-principles):
+The [*Managed Coupling*](#design-principles) principle asks for this:
 coupling you can see and have placed on purpose.
 
 ### The Reach of a Change
@@ -400,23 +406,25 @@ Coupling matters because of what it does when something changes.
 A `Report` renders itself through a writer, and `main` assembles the pieces.
 On the left, `Report` names each writer class and chooses between them.
 On the right, `Report` names a `Writer` protocol.
-Then a Markdown writer arrives.
+Then you add a Markdown writer.
 
 ![What adding a Markdown writer changes in two designs of Report](_images/coupling_reach)
 
 The dashed box is the new class.
-The shaded parts are the existing ones whose source changes when `MdWriter` arrives,
-and each heavy edge into the dashed box is a new place that names `MdWriter`.
+The shaded parts are the existing ones whose source changes when you add `MdWriter`.
+Each heavy edge into the dashed box is a new place that names `MdWriter`.
 As in the gallery, the red box marks the part the change leaves alone.
+
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
 because the new writer satisfies the protocol and `Report` names no writer.
 `main` still changes, since something must construct the new class.
 A [registry factory](27_Patterns--Factory.md#self-registration)
-takes that last change out too,
+removes that last change too,
 by letting the new class register itself as its `class` statement runs.
 
-A change travels along a design's heavy edges, and a pattern moves those edges:
+A change to a part can force an edit in every part with a heavy edge pointing at it.
+A pattern moves those edges,
 usually out of the parts that change often and into one part you can find.
 
 ### The Edge Python Deletes
@@ -431,21 +439,21 @@ With an abstract base class, two edges exist in source:
 the caller names `Shape`, and `Circle` names `Shape` in its `class` line.
 With a `Protocol`, one edge exists in source.
 `Circle` does not mention `Shape`.
-A dotted edge in the figure exists only at check time,
+The type checker connects the two when it compares `Circle`'s members with the protocol's,
+and the figure draws that connection as a dotted edge.
+A dotted edge exists only at check time,
 and neither of its ends names the other.
-Here the type checker draws that edge when it compares `Circle`'s members with the protocol's.
 With a `Callable`, the interface has no name and no file of its own.
-It lives in the caller's signature,
+The caller's signature declares it,
 and any function whose parameters and return type match satisfies it.
 
 The edge a `Protocol` deletes is the one that a C++ base class or a Java interface makes mandatory.
 The implementer must name the interface.
 That edge makes every implementer depend on the interface,
-so renaming or moving the interface touches every file that names it.
+so renaming or moving the interface means editing every file that names it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols)
-makes the same point about types "in libraries you cannot edit,"
-and this is its general form: the fewer edges in source,
-the fewer files a change can reach.
+makes the same point about types "in libraries you cannot edit."
+In general, the fewer edges in source, the fewer files a change can reach.
 
 One question serves for every pattern chapter.
 Which edge does this pattern move, and where does it put it?
@@ -457,10 +465,11 @@ but they do a different job.
 A pattern is a shape of solution.
 A principle is a test you apply to whatever shape you chose:
 a claim the design either satisfies or violates.
-Most hold for any code,
+
+Most of the principles below hold for any code,
 but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 The list is a reference.
-Later chapters name a few of these principles when a design turns on them,
+Later chapters name a few of these principles when a design depends on them,
 and the rest are here for your own designs.
 
 <!-- Several principles below quote their sources word for word (Saint-Exupery
@@ -473,8 +482,7 @@ and the rest are here for your own designs.
 -   *Make common things easy, and rare things possible*.
 -   *Consistency*.
     Every inconsistency in a design is one more arbitrary rule to remember.
-    The more random rules you pile onto the programmer,
-    rules that have nothing to do with solving the problem at hand,
+    The more rules you impose that have nothing to do with solving the problem at hand,
     the slower the programmer works.
     The slowdown grows faster than the rule count, because the rules interact.
 -   [*Liskov Substitution Principle*](20_Patterns--Rethinking_Objects.md#liskov-substitution)
@@ -499,7 +507,7 @@ and the rest are here for your own designs.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
     argues for composition on those grounds.
 -   *Managed Coupling*.
-    Simply declaring that a design should have "low coupling" is usually too vague.
+    Declaring that a design should have "low coupling" is usually too vague.
     Every design has coupling, so acknowledge it and control it.
     Say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
 -   *Design the communication, not the parts*.
@@ -509,7 +517,8 @@ and the rest are here for your own designs.
     It names what a caller needs from the object on the other side of a call,
     and says nothing about what that object is.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
-    builds on this, and [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
+    builds on this.
+    [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
     moves the same declaration into a function's signature,
     where `Need` names what the function requires of its surroundings.
     Designing the communication gives Managed Coupling its target:
@@ -531,8 +540,8 @@ and the rest are here for your own designs.
     One abstraction per class, one class per abstraction.
     Also goes by Isomorphism.
 -   *Once and once only*.
-    Avoid duplication of logic and structure where the duplication is not accidental,
-    i.e., where both pieces of code express the same intent for the same reason.
+    When two pieces of code express the same intent for the same reason,
+    write that logic and structure once.
 -   *Make things as [immutable](12_Techniques--Data_Classes_as_Types.md#immutability)
     as possible*.
 -   *Make functions [pure](40_Functional--Foundations.md#pure-functions)
@@ -558,9 +567,9 @@ and it is usually the intent rather than the structure.
 A pattern that subtracts to nothing is not a mistake.
 It is the right answer for a language missing the piece Python has.
 
-Each pattern chapter from [*Iterator*](23_Patterns--Iterators.md)
-through [*Memento*](36_Patterns--Memento.md)
-includes a figure of its pattern at work,
+From [*Iterator*](23_Patterns--Iterators.md)
+through [*Memento*](36_Patterns--Memento.md),
+each pattern chapter includes a figure of its pattern at work,
 drawn from that chapter's own listings.
 The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
 shows which way each dependency points.
@@ -581,7 +590,7 @@ Try each exercise before opening its [solution](../Solutions/21_Patterns--Design
     and which parts you edited by hand.
 2.  Take a pattern you know from another language and list its parts:
     the classes, the interfaces, and the methods its usual form requires.
-    Cross out every part Python supplies without your writing it.
+    Cross out every part Python supplies for you.
     Describe what remains in one sentence.
 3.  Apply *Subtraction* to a design of your own.
     Remove one class, one interface, or one level of inheritance,

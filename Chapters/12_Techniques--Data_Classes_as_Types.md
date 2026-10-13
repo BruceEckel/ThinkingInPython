@@ -50,13 +50,12 @@ such as `needs an @`.
 A handler can read `e.subject` and `e.reason` rather than parsing them from the exception text.
 
 `check()` uses an explicit `raise` instead of `assert 1 <= stars <= 10`.
-Python strips every `assert` when you run with `-O` or `-OO`,
-which silently disables every validation this chapter builds,
-the failure this chapter exists to prevent.
-No flag removes a `raise`.
+Python strips every `assert` when you run with `-O` or `-OO`.
 `assert` is a debugging aid for an invariant the program's own logic guarantees,
-which is why the optimizer may remove it;
-a value that arrives from outside the program needs a check that stays.
+so the optimizer may remove it.
+Under those flags, validation written with `assert` disappears silently and lets in the illegal values this chapter exists to keep out.
+A value that arrives from outside the program needs a check that stays,
+and no flag removes a `raise`.
 
 `eq=False` turns off the generated `__eq__()`, for two reasons.
 A mutable data class that defines `__eq__()` [sets `__hash__` to `None`](#data-classes),
@@ -99,20 +98,22 @@ print(f3(11))
 
 Each function duplicates the check, the check is easy to forget,
 and the type system is no help.
-The `int` annotation says "any integer," which is not what you mean.
-Checking the argument also says nothing about the result.
-`f1(6)` returns 11, which no rating may be.
+The `int` annotation says "any integer,"
+a far larger set than the ratings you mean.
 `f3()` shows a forgotten check.
-`11` is not a legal rating, and nothing objects: not the annotation,
+`11` lies outside the legal range, and nothing objects: not the annotation,
 not the type checker, not the running program.
-`f3(11)` returns 1100, a number that no rating can produce,
-passed along as if it were fine.
+`f3(11)` returns 1100, beyond anything a legal rating produces,
+and the caller receives it as if it were fine.
+
+A check that is present still stops at the argument.
+`f1(6)` returns 11, outside the range of a rating.
 
 ## A Class Is Not a Type
 
 The object-oriented answer is to wrap the value in a class and validate it in the constructor.
-That is better, but it does not finish the job.
-The value is still mutable, so every method that changes it must re-validate,
+That is better, but the value is still mutable.
+Every method that changes it must re-validate,
 and a method can leave the object in an illegal state between steps:
 
 ```python
@@ -151,19 +152,19 @@ print(damaged)
 #: Stars(13)
 ```
 
-A read-only `@property` keeps users from assigning to `number`,
-but the object still mutates `_number`,
+A read-only `@property` keeps users from assigning to `number`.
+The object's own methods still mutate `_number`,
 so `f1()` must re-check the result before returning it.
 That check runs after the mutation,
-so it reports the damage instead of preventing it.
+so it reports the illegal value instead of preventing it.
 `Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`,
 and the object goes on holding that illegal value.
-Catching the exception does not undo the damage.
+Catching the exception leaves `_number` at 13.
 
 The order is a choice, not something mutation forces.
 `f1()` could check the sum before assigning it,
 and then `damaged` stays `Stars(8)` instead of holding a corrupted `13`.
-What mutation forces is that every method must choose that order correctly,
+Mutation forces every method to choose that order correctly,
 every time it changes the value.
 `f1()` here gets that order wrong.
 
@@ -173,21 +174,23 @@ with a class invariant that must hold between calls.
 `f1()` takes no argument, so only the postcondition appears here.
 A method that accepts a second rating needs a precondition for it as well.
 
-The problem with DbC is that the contract spreads across every method that touches the value.
+DbC spreads the contract across every method that touches the value.
 The invariant is the part this chapter replaces.
 `_validate()` states it, and every mutating method must remember to call it.
-That is the same scattering of checks as before, but moved inside the class.
+Those calls are the same scattering of checks as before,
+but moved inside the class.
 The class encapsulates the value, but `_number` can still hold any `int`,
 legal or not.
 
 Some values must change in place over their lifetime: a counter,
 a connection's open-or-closed state, a running total.
 You cannot always replace one with a fresh instance on every change.
-The accepted answer for those is a validating setter that checks before assigning,
-the fix that `stars_class.py`'s `f1()` skips.
-Accept DbC's scattered checks, because the value must stay mutable.
-[Immutability](#immutability) covers the case the rest of this chapter prefers,
-where a fresh, validated instance can replace the old one.
+For those, accept DbC's scattered checks, because the value must stay mutable.
+The accepted answer is a validating setter that checks before it assigns,
+whereas `stars_class.py`'s `f1()` assigns first.
+The rest of this chapter prefers the other case, where a fresh,
+validated instance can replace the old one.
+[Immutability](#immutability) begins that approach.
 
 ## Data Classes
 
@@ -229,8 +232,9 @@ and the constructor arguments cover all the fields in `Messenger`.
 The trailing `...` is `display_object()` trimming that line to its report width.
 
 `__hash__` is `None`.
-A `@dataclass` compares by value with `__eq__()`,
-so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
+A mutable `@dataclass` compares by value with `__eq__()`,
+so it makes its instances unhashable.
+An unhashable instance cannot go in a `set` or serve as a `dict` key.
 
 As [Class Attributes](09_Foundations--Class_Attributes.md) explains,
 `depth` is the one field of the three that appears as an attribute,
@@ -270,7 +274,7 @@ which produces the class name followed by each field as `name=value`.
 Copying instead of mutating reduces errors.
 [`copy.replace()`](#the-general-form-of-replace)
 does the same for any object that defines `__replace__()`,
-not only for data classes.
+data classes included.
 
 `display_object()` shows the attributes with their declared types:
 
@@ -288,13 +292,15 @@ display_object(Messenger("iris", 12, 3.14))
 #:   None
 ```
 
-Called without a list of dunders, `display_object()` leaves out every dunder,
+With its default, an empty `dunder` list,
+`display_object()` leaves out every dunder,
 including the generated `__init__()`, `__repr__()`, and `__eq__()`.
 
 ## Comparing Ordinary Classes and Data Classes
 
 `Messenger` shows what `@dataclass` produces,
 but not what adding the decorator changes.
+Four small classes isolate that change, one step at a time:
 
 - `A` is an ordinary class with bare annotations.
 - `B` adds default values but no constructor.
@@ -313,7 +319,7 @@ def show(obj: object) -> None:
 ```
 
 `show()` calls `display_object()` with `REDEFINED_DUNDERS`,
-so each report lists only the dunders a class customizes,
+so each report lists the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
 For clarity, `show()` also excludes [`__hash__`](#data-classes)
 from these reports.
@@ -348,12 +354,11 @@ so `show(A())` reports none of them as redefined.
 `x` and `s` in `A` are *bare annotations*: declared, but not assigned a value.
 A [bare annotation](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
 is a declaration rather than a placeholder.
-It records, in `A.__annotations__`,
-that some future `A` will carry an `x` and an `s`,
-but stores nothing until code assigns a value.
-`A` has no `__init__()` to assign them, so the declaration goes unfulfilled.
-That is why `show(A())` finds nothing.
-No `x` and no `s` exist to report, on the class or on the instance.
+The two annotations record in `A.__annotations__` that some future `A` will carry an `x` and an `s`.
+Python allocates the storage when code assigns a value.
+`A` has no `__init__()` to assign them,
+so neither the class nor the instance holds an `x` or an `s`.
+`show(A())` reports `None` under both headings.
 
 ### `B`: Class-Level Defaults
 
@@ -413,17 +418,17 @@ Neither `x` nor `s` carries `[CV]` this time.
 Because `C` is a `@dataclass`,
 its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment of construction.
-With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
+`B` has no `__init__()`, so `show(B())` finds `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
 
 `C` starts from the same bare annotations as `A`.
 `@dataclass` reads them, in order, and writes one parameter (`x: int`)
 and one assignment (`self.x = x`) per field.
 `dataclasses.fields()` reports the field list `@dataclass` recorded.
-`@dataclass` stores no value for a field on the class.
-`x` is still absent from `C.__dict__` after decoration, as it was before.
-That is the difference from `A`: not that `@dataclass` changes the annotations,
-but that it builds an `__init__()` to act on them.
+`@dataclass` leaves a field with no default off the class,
+so `x` is still absent from `C.__dict__` after decoration, as it was before.
+The difference from `A` lies in what the decorator adds:
+`@dataclass` leaves the annotations as they were and builds an `__init__()` that acts on them.
 
 ### `D`: A Real `ClassVar`
 
@@ -469,24 +474,22 @@ expect(AttributeError, getattr, D, "f")
 #: [AttributeError] type object 'D' has no attribute 'f'
 ```
 
-`show(D)` tags both attributes `[CV]`,
-since no instance owns either of them yet.
-`show(D())` tags only one,
-and what `@dataclass` generates for each field decides which one keeps the tag.
+`show(D)` tags both attributes `[CV]`, since it inspects the class,
+where both live.
+`show(D())` tags only one.
+The `__init__()` that `@dataclass` generates decides which one keeps the tag.
 
 `x` is an ordinary field,
 so the generated `__init__()` assigns it to each instance.
 `show(D())` finds `x: int = 99` in that instance's own `__dict__` and gives it no tag.
 
 `s`, declared `ClassVar[str]`, behaves differently.
-`__init__(self, x: int = 99) -> None` has no `s` parameter,
-so no constructor call can assign one.
-`s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
+`__init__(self, x: int = 99) -> None` takes `x` and leaves `s` out,
+so `s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
 
 `f: ClassVar[float]` appears in neither report.
-It has no initializer, so it is a bare annotation,
-as `x` and `s` are back in `A`: a declaration recorded in `D.__annotations__`,
-with no value stored anywhere to report.
+It has no initializer, so it is a bare annotation, like `x` and `s` in `A`.
+The declaration lives in `D.__annotations__` alone.
 `expect()` shows that `D.f` raises an `AttributeError`,
 for the same reason `A().x` does.
 Assigning a value creates the attribute.
@@ -497,7 +500,7 @@ Declaring it `ClassVar` does not.
 Passing `frozen=True` makes the data class immutable.
 Assigning to a field raises `FrozenInstanceError`.
 A frozen instance is also hashable,
-so you can use it as a dictionary key or put it in a set.
+so it can serve as a dictionary key or go in a set.
 `frozen=True` removes the mutability that left `Messenger`'s `__hash__` as `None`,
 so `@dataclass` generates one from the fields:
 
@@ -525,19 +528,20 @@ print(cache[m])
 ```
 
 Two defenses guard a frozen field.
-The type checker rejects `m.name = "hermes"` before the program runs,
-which is why the listing goes through `setattr()` to reach the runtime defense.
-`frozen=True` holds at runtime, against code the type checker did not see.
+The type checker rejects `m.name = "hermes"` before the program runs.
+`frozen=True` rejects the assignment at runtime,
+including in code that bypasses the type checker,
+as the listing does by going through `setattr()`.
 
 `frozen=True` guards the binding, not the object behind it.
-You can still mutate a field's `list` in place,
-and a frozen instance is hashable only when every field it holds is.
+You can still mutate a field's `list` in place.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates that leak.
+A frozen instance is hashable only when every field it holds is.
 The types this chapter validates hold `int`s and `str`s,
 so for them the guarantee is total.
 `Months` and `Line`, both later in this chapter, each hold a `list`.
-Neither is hashable, and neither is safe from a change made through that list.
+Both are unhashable, and code can change either one through that list.
 
 A frozen data class still carries a per-instance `__dict__`.
 Adding `slots=True` drops it, for less memory and faster attribute access.
@@ -552,7 +556,7 @@ A frozen data class equals another instance of its own class,
 while a `NamedTuple` [equals any tuple holding the same values](22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple).
 They also [differ in validation](#namedtuple-cannot-validate).
 
-If nothing about an object can change after construction,
+If every part of an object stays as construction left it,
 then validating it at construction makes it valid for its lifetime.
 
 ## A Type Is a Set of Values
@@ -585,19 +589,20 @@ def f2(s: Stars) -> Stars:
 the integers one through ten.
 Your code makes a `Stars` by calling the constructor,
 and the constructor refuses anything outside that set.
-(Copying and unpickling [skip the constructor](#copy-skips-the-constructor), a gap a later section examines.)
+(Copying and unpickling [skip the constructor](#copy-skips-the-constructor).)
 If you hold a `Stars`, it is legal.
 You know it without checking.
 
 That guarantee changes how you write the functions.
-`f1()` and `f2()` both declare `(s: Stars) -> Stars`.
-They do not check their argument, because every `Stars` is legal.
-They do not test their result,
-because building the returned `Stars` runs the check.
+`f1()` and `f2()` both declare `(s: Stars) -> Stars`,
+and their bodies hold the arithmetic alone.
+Every `Stars` argument is legal,
+and building the returned `Stars` runs the check on the result.
 
 The validation lives in one place, the constructor, so it is easy to change.
-Immutability guarantees no one can rebind the fields after construction,
-and when the fields are immutable too, no one can damage the value.
+Immutability keeps the fields bound to their constructed values.
+When the objects in those fields are immutable too,
+the whole value stays as the constructor checked it.
 
 ### The Annotation and the Check
 
@@ -605,8 +610,8 @@ Two checks define the set, and they run at different times.
 The annotation `number: int` belongs to the type checker,
 which rejects `Stars(5.5)` and `Stars("five")` before the program runs.
 `__post_init__()` holds the range and runs at construction.
-`@dataclass` uses an annotation to find a field and does not enforce it at runtime,
-so a `float` the type checker did not see meets the range check alone:
+`@dataclass` uses an annotation to find a field and leaves enforcement to the type checker.
+At runtime the range check alone tests a `float`, and `5.5` passes it:
 
 ```python
 # stars_float.py
@@ -617,20 +622,20 @@ print(Stars(5.5))  # type: ignore
 ```
 
 The `# type: ignore` silences the type checker so the listing can reach the runtime result.
-Inside annotated code the type checker closes this gap,
-and `__post_init__()` need not repeat the annotation.
+Because the type checker rejects a `float` argument in annotated code before the program runs,
+`__post_init__()` need not repeat the annotation.
 A value from outside the program is different.
 Parsed JSON arrives as `Any`,
-which the type checker accepts for every parameter,
-so a type built at that boundary tests the field's type in the check as well:
+which the type checker accepts for every parameter.
+A type built at that boundary therefore tests the field's type in the check as well:
 `check(isinstance(self.number, int) and 1 <= self.number <= 10, ...)`.
 
 ### Normalizing a Frozen Field
 
 `__post_init__()` can check a field but cannot change one.
 `frozen=True` works by installing a `__setattr__()` that rejects every assignment,
-including the ones arriving from inside the class,
-so normalizing a field in `__post_init__()` raises `FrozenInstanceError`:
+including assignments in the class's own methods.
+Normalizing a field in `__post_init__()` therefore raises `FrozenInstanceError`:
 
 ```python
 # post_init_normalize.py
@@ -658,7 +663,7 @@ print(Normalized("Grace@Example.com"))
 #: Normalized(text='grace@example.com')
 ```
 
-Both defenses fire here, as they do for `frozen_messenger.py`.
+Both defenses reject the assignment here, as they do for `frozen_messenger.py`.
 The type checker reports the assignment,
 and the `# type: ignore` silences it so the listing can reach the runtime failure.
 
@@ -672,7 +677,8 @@ The alternative is to refuse the unnormalized value and normalize before constru
 Which to choose depends on the type.
 Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
 which is usually what an email address should mean.
-Refusing instead keeps the constructor a gate and leaves the cleanup to the caller.
+Refusing instead means the constructor stores what it receives or raises an exception,
+and the caller does the cleanup.
 
 ### Parse, Don't Validate
 
@@ -690,8 +696,8 @@ you transform one legal value into a new legal value.
 A parameter [annotated](08_Foundations--Static_Types.md#how-much-to-annotate)
 `Stars` states more than a type: the value passed the check.
 
-`test_stars.py` demonstrates that illegal values cannot exist.
-The test file confirms that:
+`test_stars.py` shows that illegal values cannot exist.
+Its tests confirm that:
 
 - `Stars(1)` and `Stars(10)`, the ends of the range, are legal.
 - The constructor rejects values outside the set.
@@ -759,11 +765,12 @@ class Person:
 
 `Person` declares no checks of its own.
 Its annotations require a `FullName` and an `EmailAddress`,
-which the type checker enforces, and neither can exist holding an illegal value.
+which the type checker enforces,
+and every `FullName` and `EmailAddress` is legal from construction.
 
 `test_person_composes_validated_parts()` builds a `Person` from legal parts and reads them back.
-`test_full_name_needs_first_and_last()` and `test_email_needs_at_sign()` show that an illegal name or email cannot exist,
-so no `Person` can hold one:
+`test_full_name_needs_first_and_last()` and `test_email_needs_at_sign()` show that the constructors reject an illegal name or email,
+so every `Person` holds legal parts:
 
 ```python
 # test_person.py
@@ -789,11 +796,12 @@ def test_email_needs_at_sign(bad: str) -> None:
         EmailAddress(bad)
 ```
 
-When validation grows complicated, libraries make it lighter.
-The [attrs](https://www.attrs.org)
-library predates and inspired data classes and offers richer validators and converters.
+When validation grows complicated,
+libraries supply checks you would otherwise write.
+The [attrs](https://www.attrs.org) library predates and inspired data classes.
+It offers richer validators and converters.
 [Pydantic](https://docs.pydantic.dev)
-builds validation and parsing into the type,
+validates and parses each field according to its annotation,
 which is especially useful at the edges of a program where untrusted data can enter.
 The principle is the same.
 Make the type guarantee its own values.
@@ -803,9 +811,10 @@ Make the type guarantee its own values.
 When the set of values is small and known, the clearest type is an `Enum`.
 An *enumeration* lists its members by name in the class body,
 and those members are the only values the type has.
+
 As an example, a `BirthDate` contains a month, day, and year.
 `Month` is an `Enum`, because a year has a known set of twelve months.
-Each month carries its length and knows how to check a `Day` against it.
+Each month carries its length and has a method that checks a `Day` against that length.
 A `BirthDate` then validates across its fields.
 The day must fit the month.
 
@@ -880,13 +889,12 @@ The `Enum` creates the constrained set of `Month`s.
 No thirteenth month can exist, because `Month` defines no such value.
 
 Each member is a pair rather than a bare day count because `Enum` treats members with equal values as aliases of one another.
-Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`,
-and only three day counts are distinct,
-so `list(Month)` returns three members instead of twelve.
+Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`.
+The twelve months share three distinct day counts,
+so `list(Month)` would return three members instead of twelve.
 Pairing each month with its number keeps all twelve values distinct,
 which `of()` relies on when it indexes `list(Month)`.
-The member's value is no longer the month number,
-so `Month(7)` raises a `ValueError`.
+The member's value is now the pair, so `Month(7)` raises a `ValueError`.
 `of()` is the replacement lookup.
 
 The tests confirm that `Month.of(7)` finds `JULY` in a legal date,
@@ -922,8 +930,8 @@ def test_month_number_outside_twelve(bad: int) -> None:
 ## When an `Enum` Beats a Data Class
 
 You can build `Month` as a data class instead of an `Enum`.
-It works, but it is more code for less safety.
-You must construct the twelve months yourself and carry them around,
+A data-class `Month` works, but it is more code for less safety.
+You must construct the twelve months yourself and store them in a container,
 whereas the `Enum` is that set:
 
 ```python
@@ -998,16 +1006,17 @@ and each new `Months` calls it and gets its own fresh list.
 That rejection is narrower than it looks.
 `@dataclass` refuses a default it recognizes as shared storage,
 which covers `list`, `dict`, and `set`.
-The test is hashability, not mutability,
-so a mutable object of an ordinary class you wrote passes as a default and every instance shares it.
-That is the same bug the check exists to prevent.
+The test is hashability, not mutability.
+An instance of an ordinary class you wrote is hashable by default,
+so it passes as a default, and every data class instance shares it.
+That sharing is the same bug the check exists to prevent.
 Use `default_factory` for any mutable default.
 
 `field()` types its parameter as `default_factory: Callable[[], _T]`,
 so it accepts any callable that takes no arguments.
 A named function like `make_months()` is one.
 A type is another, which is why `field(default_factory=list)` appears throughout this book.
-Calling `list` builds an empty one.
+Calling `list` builds an empty list.
 A subscripted generic is callable too,
 so `field(default_factory=dict[str, str])` is legal and produces an empty dict.
 That form seems redundant, because the annotation on the left names the type,
@@ -1041,12 +1050,14 @@ print(Checked().data)
 Nothing objects to `Unchecked`.
 `ty` accepts it, the linter (`ruff`) accepts it,
 and the declaration says `dict[str, str]`, so every reader expects a dict.
-What arrives is a `set`, and the mistake surfaces at the first item assignment,
+What arrives is a `set`,
+and Python reports the mistake at the first item assignment,
 which can be far from the declaration that caused it.
+
 For a bare `list`, `dict`, or `set` factory,
-`ty` infers `Unknown` for the `field()` call,
-a type that satisfies any annotation,
-so `ty` does not compare the factory with the field.
+`ty` infers `Unknown` for the `field()` call.
+`Unknown` satisfies any annotation,
+so `ty` accepts any bare factory for the field.
 Checkers differ here.
 Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
 
@@ -1061,8 +1072,8 @@ Subscript the factory when you want that agreement checked.
 A `NamedTuple` is the other immutable record,
 and it is tempting for a small type like `Stars`.
 `typing.NamedTuple` forbids overriding the methods that build an instance,
-so validation must live in a factory function beside the type,
-where a caller can go around it:
+so validation must live in a factory function beside the type.
+A caller can skip the check by calling the type instead of the factory:
 
 ```python
 # test_namedtuple_no_hook.py
@@ -1100,20 +1111,21 @@ def test_the_check_cannot_move_inside() -> None:
 `test_the_factory_rejects_illegal_values()` and `test_calling_the_type_skips_the_check()` are `test_stars.py` inverted.
 There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
-because a factory function is advice rather than a gate,
-a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes)
-shares.
+because a caller can call `Stars()` instead of the factory function.
+Every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes)
+shares that limit.
 
 `test_the_check_cannot_move_inside()` shows why the check cannot move inside the type.
-`NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
-and no class comes into existence.
-The error arrives while Python is still executing the `class` statement.
+`NamedTuple` refuses `__new__()` and refuses `__init__()` the same way.
+Python raises the `AttributeError` while it is still executing the `class` statement,
+before the class exists.
+
 `ty` reports the `__new__()` override as `invalid-named-tuple`,
 which the `# type: ignore` silences.
 Pyright accepts the `__new__()` without comment.
 
 A subclass of the `NamedTuple` may define `__new__()`.
-That gets past the prohibition and moves the hole rather than closing it.
+That avoids the prohibition, but one path still bypasses the check.
 `_replace()` rebuilds through `tuple.__new__()`, not through your `__new__()`,
 so `copy.replace()` on a validated instance quietly produces an unvalidated one.
 
@@ -1121,15 +1133,16 @@ A frozen data class runs `__post_init__()` on every construction,
 including the ones you did not anticipate.
 [`copy.replace()`](#the-general-form-of-replace) is one of them,
 because it builds the copy through the constructor.
-That is the deciding difference whenever a type must guarantee its own values.
-When it need not, a `NamedTuple` is a fine [immutable record](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).
+Running the check on every construction is the deciding difference whenever a type must guarantee its own values.
+When every value of the field types is legal,
+a `NamedTuple` is a fine [immutable record](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).
 
 ## Inheritance and the Generated `__init__()` {#dataclass-inheritance}
 
 A data class generates an `__init__()` with one parameter per field,
 and its body assigns each one (`self.name = name`).
-It does not call the base class `__init__()`,
-because it cannot know what arguments that constructor expects.
+The generated `__init__()` does not call the base class `__init__()`,
+because `@dataclass` cannot know what arguments that constructor expects.
 If you inherit from an ordinary class that sets up state in its own constructor,
 the data class silently skips that setup:
 
@@ -1214,10 +1227,9 @@ print(c.host, c.name)
 
 A default in the base class is the one snag.
 If `host` had a default, `name` would follow it with none,
-and `@dataclass` refuses that order
-([More Data Class Tools](#more-data-class-tools) has the rule).
-`kw_only=True` on `NamedConnection` makes `name` keyword-only,
-and the rule stops applying.
+and `@dataclass` refuses that order under its [field-ordering rule](#more-data-class-tools).
+The rule governs positional fields alone,
+so `kw_only=True` on `NamedConnection` avoids it by making `name` keyword-only.
 
 ## Frozen and Plain Data Classes Do Not Mix
 
@@ -1252,7 +1264,7 @@ with expected(TypeError):
 #: frozen one
 ```
 
-Both defenses fire again.
+Both defenses reject these classes.
 The type checker reports each class as an invalid frozen-dataclass subclass,
 which the `# type: ignore` silences so the listing can reach the runtime failure.
 
@@ -1261,8 +1273,9 @@ and a subclass inherits that method.
 A plain subclass of a frozen class is half writable,
 its own fields assignable and the inherited ones not.
 A frozen subclass of a plain base is the opposite,
-freezing every attribute the mutable base expects to set.
-So `@dataclass` refuses at class-definition time rather than at the first surprising assignment.
+freezing every attribute that the mutable base's methods assign.
+So `@dataclass` refuses the combination at class-definition time,
+before the first surprising assignment.
 Every validated type in this chapter carries `frozen=True`,
 so anything you derive from one must carry it too.
 
@@ -1297,7 +1310,7 @@ print(asdict(line))  # Recurses into the list of Points
 
 `asdict()` and `astuple()` copy as they go,
 so every list and dict in the result is a new object rather than the one inside the instance.
-Changing the result leaves the original untouched.
+Changing the result leaves the original as it was.
 
 `KW_ONLY` forces callers to pass the fields after it by keyword:
 
@@ -1321,12 +1334,11 @@ Passing `kw_only=True` to `@dataclass` makes every field keyword-only.
 The `_: KW_ONLY` marker limits that to the fields after it,
 leaving `source` positional.
 
-`KW_ONLY` also lifts the ordering rule.
+`KW_ONLY` also exempts the fields after it from the ordering rule.
 A field with no default normally cannot follow one that has a default,
 because the generated `__init__()` then needs a required parameter after an optional one.
 `@dataclass` refuses that with `TypeError: non-default argument 'b' follows default argument 'a'`.
-Because fields after `_: KW_ONLY` are keyword-only,
-their order no longer matters and the rule stops applying.
+Because fields after `_: KW_ONLY` are keyword-only, they can come in any order.
 
 ## The General Form of `replace()` {#the-general-form-of-replace}
 
@@ -1396,18 +1408,18 @@ print(copy.deepcopy(s))
 
 `copy.copy()` and `copy.deepcopy()` create the copy with `__new__()` and write the saved state into its `__dict__`,
 and so does `pickle`.
-None of the three runs `__init__()` or `__post_init__()`,
-so each can produce a `Stars` holding a number that no check saw.
-That is harmless while the copy comes from a legal original,
-and dangerous when the state comes from a file written by an older version of the class,
-the case [*Memento*](36_Patterns--Memento.md) revisits.
-`copy.replace()` is the one that keeps the guarantee,
-because rebuilding through the constructor is the only way to get the check back.
+Because none of the three runs `__init__()` or `__post_init__()`,
+each can produce a `Stars` holding a number that no check saw.
+That is harmless while the copy comes from a legal original.
+It is dangerous when the state comes from a file that an older version of the class wrote,
+and [*Memento*](36_Patterns--Memento.md) revisits that case.
+`copy.replace()` alone keeps the guarantee,
+because rebuilding through the constructor is the only way to run the check again.
 
 ### Defining `__replace__()` {#defining-replace}
 
 `__replace__()` is a dunder like any other,
-so a class that is not a data class can join by defining it:
+so an ordinary class can support `copy.replace()` by defining it:
 
 ```python
 # copy_replace_protocol.py
@@ -1448,8 +1460,7 @@ Calling `type(self)(...)` rather than `Color(...)` gives a subclass a copy of it
 and the `Self` return annotation tells the type checker so.
 
 Define `__replace__()` when your type is immutable and callers need variants of it.
-Skip it when the type is mutable,
-because the caller can assign to the attribute.
+For a mutable type, the caller assigns to the attribute instead.
 
 ## Serializing to JSON
 
@@ -1458,10 +1469,10 @@ Handed a data class instance,
 `json.dumps()` raises `TypeError: Object of type Person is not JSON serializable`.
 
 `asdict()` turns the object into a nested dictionary,
-and `json.dumps()` knows how to serialize dictionaries.
+and `json.dumps()` serializes dictionaries.
 Decoding goes the other way.
 `from_json()` parses the JSON into a dictionary,
-then hands its parts to the constructors.
+then passes its parts to the constructors.
 
 ```python
 # json_round_trip.py
@@ -1499,10 +1510,10 @@ print(from_json(text) == original)  # Round-trip
 JSON data typically arrives from outside the program, untrusted.
 Rebuilding the value through `Person`, `FullName`,
 and `EmailAddress` runs each constructor's validation,
-so the boundary rejects an illegal value instead of leaking it into the rest of the code.
+so the boundary rejects an illegal value instead of passing it to the rest of the code.
 
-A custom `JSONEncoder` serializes any data class it meets,
-including one nested inside other structures, by converting each one to a dict:
+A custom `JSONEncoder` converts each data class that `json.dumps()` hands it into a dict,
+including one nested inside other structures:
 
 ```python
 # json_encoder.py
@@ -1537,12 +1548,13 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 The encoder converts each data class to a dictionary,
 and the base encoder handles the dictionary from there,
 recursing through lists and nested objects.
-`is_dataclass()` answers `True` for the class object as well as for an instance,
-and `asdict()` accepts only instances,
-so `not isinstance(o, type)` keeps a bare class object from reaching `asdict()`.
 
-Encoding is mechanical, but decoding must know which type to rebuild,
-and that part the standard library leaves to you.
+`is_dataclass()` answers `True` for the class object as well as for an instance,
+but `asdict()` requires an instance.
+The `not isinstance(o, type)` test passes a class object on to the base encoder instead of `asdict()`.
+
+Encoding is mechanical, but a decoder must name the type to rebuild.
+The standard library leaves that code to you.
 For deep or evolving structures, [Pydantic](https://docs.pydantic.dev)
 and [dataclasses-json](https://github.com/lidatong/dataclasses-json)
 automate the decode side,
@@ -1559,14 +1571,15 @@ Checking in the constructor moves work to the edges of the program.
 Every place data enters your program now needs a constructor call:
 the parsed JSON, the database row, the form field, the command-line argument.
 `from_json()` is that boundary written out.
-It reads untrusted text and hands the pieces to `FullName` and `EmailAddress`,
-and that boundary is the last point where you can reject a bad value before the rest of the program sees it.
-Past that line your code holds types rather than raw data,
-and a function receiving one does its work without asking whether the value makes sense.
+It reads untrusted text and hands the pieces to `FullName` and `EmailAddress`.
+That boundary is the last point where you can reject a bad value before the rest of the program receives it.
+After those constructor calls your code holds types rather than raw data,
+and a function receiving a `FullName` or an `EmailAddress` does its work and trusts the value.
 
 Away from the boundaries, the types also use more memory and time.
-Every value is now an object:
-a constructor call and attribute access where a bare `int` or `str` needs neither.
+Every value is now an object.
+Creating one calls a constructor and reading it goes through attribute access,
+where a bare `int` or `str` needs neither.
 `copy.replace()` re-runs every check in `__post_init__()` on every change,
 including the checks on fields it copied unchanged.
 For a hot path, or a structure nesting many values
@@ -1588,7 +1601,7 @@ Try each exercise before opening its [solution](../Solutions/12_Techniques--Data
     a `_Stars(NamedTuple)` holding the field,
     and a `Stars(_Stars)` whose `__new__()` runs the check.
     Show that `Stars(11)` now raises a `TypeFailure` while `copy.replace(Stars(5), number=99)` does not,
-    and explain why a frozen data class has no equivalent hole.
+    and explain why `copy.replace()` on a frozen data class runs the check.
 4.  Feed `from_json()` a JSON string whose email has no `@`,
     and confirm that it raises `TypeFailure`.
     The validation you wrote once, in `EmailAddress`,
@@ -1598,7 +1611,7 @@ Try each exercise before opening its [solution](../Solutions/12_Techniques--Data
     define `__replace__()`,
     and confirm that `copy.replace()` still runs your validation.
 6.  Add a `ClassVar[int]` counter to `Stars` that counts every `Stars` created.
-    Predict whether it appears in the generated `__init__()`'s parameter list before you run it,
+    Predict whether the counter appears in the generated `__init__()`'s parameter list,
     then check by printing `inspect.signature(Stars.__init__)`.
     Incrementing the counter as `Stars.built += 1` from `__post_init__()` works on a frozen class,
     while `self.built += 1` does not.

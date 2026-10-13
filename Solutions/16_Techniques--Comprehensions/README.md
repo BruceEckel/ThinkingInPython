@@ -5,7 +5,7 @@
 > Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
 > write a list comprehension that finds the string elements made only of digits
 > (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
-> The filter must reject `"a"` before `int()` sees it.
+> The filter must reject `"a"` before `int()` receives it.
 > `isdigit()` is a `str` method, and `a_list` also holds integers,
 > so the filter must test `isinstance(e, str)` before calling it.
 

@@ -5,9 +5,8 @@
 
 In C++ and Java a container is a library class you name and construct.
 Python builds its containers into the grammar.
-`[1, 2]`, `{"a": 1}`, and `{1, 2}` are literals,
-`in` and `len()` work on all of them, and slicing works on the sequences,
-without importing anything.
+`[1, 2]`, `{"a": 1}`, and `{1, 2}` are literals that need no import.
+`in` and `len()` work on all of them, and slicing works on the sequences.
 Lists, tuples, dictionaries, and sets are fundamental data types.
 
 ## Lists
@@ -69,7 +68,8 @@ Slicing works on the built-in sequences, including strings and tuples.
 
 ### Growing, Shrinking, and Sorting
 
-Lists grow, shrink, and answer questions about themselves:
+Lists grow and shrink in place,
+and `len()` and `in` report their size and contents:
 
 ```python
 # list_ops.py
@@ -109,13 +109,13 @@ print(sorted(words, reverse=True))
 #: ['pear', 'apple', 'Fig']
 ```
 
-`sorted(x)` returns the new list while `x.sort()` returns `None`,
-so `x = x.sort()` binds `None` and loses the list.
+Because `x.sort()` returns `None` where `sorted(x)` returns the new list,
+`x = x.sort()` binds `None` and loses the list.
 
 Uppercase sorts before lowercase because Python compares strings by code point.
-[Functions](05_Foundations--Functions.md#lambdas)
-shows how a `key=` function changes the ordering.
-`sorted(words, key=str.lower)` folds the case and puts `apple` first.
+A `key=` function changes the ordering.
+`sorted(words, key=str.lower)` compares lowercase copies of the words and puts `apple` first.
+[Functions](05_Foundations--Functions.md#lambdas) covers `key=` functions.
 
 ### Mixed Element Types
 
@@ -138,9 +138,9 @@ for item in mixed:
 
 Mixing types is convenient but easy to overuse.
 A `list` of mixed types usually means each element needs different handling.
-A `tuple`, a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes),
-or distinct lists, each holding a single type,
-express those differing roles better.
+A `tuple` or a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes)
+expresses those differing roles better,
+and so do separate lists that each hold a single type.
 
 ### Two List Traps
 
@@ -162,9 +162,9 @@ print(grid)
 #: [[1], [0], [0]]
 ```
 
-The grid at `[1]` is [Variables and References](02_Foundations--Tour.md#variables-and-references)
-again.
-`*` binds the same object into every slot.
+The grid at `[1]` repeats the lesson of [Variables and References](02_Foundations--Tour.md#variables-and-references).
+Assignment binds a name and copies nothing,
+so `*` binds the same object into every slot.
 
 The second `grid` (`[2]`) comes from a *comprehension*:
 a single expression that produces a new list,
@@ -191,7 +191,7 @@ print(xs)
 #: [2, 4]
 ```
 
-Each `remove()` slides the following elements one place to the left,
+Each `remove()` shifts the following elements one place to the left,
 and the loop then advances its index,
 so it steps over the element that moved into the vacated slot.
 The loop prints `1` and `3`, the values it visits, and skips `2` and `4`.
@@ -238,8 +238,9 @@ so `number` is an `int`.
 The empty tuple `()` is the exception to the comma rule,
 because it has nothing to separate.
 
-One name per element is the simplest unpacking, and two extensions relax it.
-A starred name absorbs whatever remains,
+One name per element is the simplest unpacking,
+and two extensions handle other shapes.
+A starred name collects the remaining elements,
 and a target can nest to match the shape of the value:
 
 ```python
@@ -262,13 +263,13 @@ except ValueError as e:
 #: too many values to unpack (expected 2, got 3)
 ```
 
-At most one target at each level can carry the star,
-and the starred target always receives a `list`, whether the source is a list,
+At most one target at each level can carry the star.
+The starred target always receives a `list`, whether the source is a list,
 a tuple, or a string.
+By convention, a value you discard gets the name `_`,
+so `*_` discards a run of elements.
 Without a star the number of names must equal the number of elements,
 or the assignment raises a `ValueError`.
-By convention, an unused value gets the name `_`,
-so `*_` discards a run of elements.
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 matches `case` patterns against the same shapes.
 
@@ -302,8 +303,8 @@ and they mix freely with ordinary elements.
 
 `first, *rest = evens` and the display after it use both directions.
 `*rest` collects on the left of the assignment and spreads inside the display,
-so the pair builds a new list holding `evens` rotated by one place,
-and `evens` stays as it was.
+so the pair builds a new list holding `evens` rotated by one place.
+`evens` stays as it was.
 `+` joins two lists as well, but both operands must be lists,
 and `[0, 2] + (1, 3)` raises a `TypeError`.
 [Functions](05_Foundations--Functions.md#unpacking-arguments)
@@ -333,14 +334,14 @@ A dictionary (`dict`) maps keys to values, with fast lookup.
 Lookup computes a *hash* from each key:
 an integer derived from the key's contents.
 Python reduces that integer to the slot where the entry lives.
-A key whose hash changed after insertion would send the next lookup to a different slot,
-and the lookup would miss the entry.
+If a key's hash changed after insertion,
+the next lookup would compute a different slot and miss the entry.
 So keys must be *hashable*: able to produce a hash that stays the same,
-and comparable with `==`,
-since lookup checks that the key stored in the slot equals the one it was given.
+and comparable with `==`.
+Lookup needs `==` because it checks that the key stored in the slot equals the key you looked up.
 Strings, numbers, and tuples of hashable values are hashable.
-The mutable built-in containers (`list`, `dict`, `set`) are not,
-because their contents can change, so they cannot be keys.
+A `list`, a `dict`, and a `set` can change their contents,
+so these mutable built-in containers are unhashable and cannot be keys.
 
 ```python
 # dictionaries.py
@@ -367,29 +368,32 @@ for name, age in ages.items():
 #: Carol 41
 ```
 
-Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
+When a key might be missing, use `dict.get()`,
+which returns a default where `[]` raises a `KeyError`.
 
 Iterating over a `dict` follows insertion order,
 and the language guarantees that order.
 
 `keys()`, `values()`, and `items()` each return a *view*:
 an object that reads the `dict`'s current contents each time you use it,
-rather than a copy, so a view also shows the entries added after you made it.
+rather than a copy.
+A view therefore also shows the entries added after you made it.
 
 Iterating over the `dict` iterates over `keys()`,
 so `for name in ages` walks the names.
-`items()` alone yields `(key, value)` pairs,
-and leaving it off is a common slip.
+`items()` alone yields `(key, value)` pairs.
+
+Leaving off `items()` is a common slip.
 `for name, age in ages` iterates over the keys and tries to unpack each one.
 Unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
-A two-character key such as `"Bo"` unpacks into its letters with no error,
-so a dictionary whose keys are all that length hides the slip.
+A two-character key such as `"Bo"` unpacks into its two letters,
+so when every key has two characters,
+the loop runs to the end with a letter in `name` and a letter in `age`.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable.
-Each supports `&`, `|`, `-`,
+Each supports the [set operators](#sets) `&`, `|`, `-`,
 and `^` against another dict's view or against any set.
-[Sets](#sets) covers those operators.
 
 ```python
 # dict_views.py
@@ -400,7 +404,8 @@ print(ages.keys() & other.keys())  # Set algebra on a view
 #: {'Bob'}
 ```
 
-Entries come out as easily as they go in, and two dictionaries combine:
+`|` merges two dictionaries, `pop()` and `del` remove entries,
+and `dict()` builds a dictionary from pairs:
 
 ```python
 # dict_ops.py
@@ -420,24 +425,24 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 #: {'a': 1, 'b': 2, 'c': 3}
 ```
 
-`|` builds a merged `dict` and `|=` updates in place,
-the same job `update()` does.
-For sets, `|` means union, and the order of the operands makes no difference.
+`|` builds a merged `dict`, and `|=` updates the left `dict` in place,
+as `update()` does.
+For sets, `|` means union, and the operands can come in either order.
 For dictionaries the order matters.
-When both dictionaries hold the same key, the right operand's value wins,
-so `"y"` comes out as `20`.
-`{**a, **b}` builds the same merged `dict`,
-with `**` spreading each dictionary's entries the way `*` spreads a list's elements,
-and the later entry wins a collision.
+When both dictionaries hold the same key,
+the merged `dict` keeps the right operand's value, so `"y"` comes out as `20`.
+
+`{**a, **b}` builds the same merged `dict`.
+`**` spreads each dictionary's entries the way `*` spreads a list's elements,
+and a later entry replaces an earlier one with the same key.
 Like a list display,
 a `dict` display accepts any number of double-starred operands,
 with ordinary `key: value` entries among them.
 
-`zip()` pairs up two sequences element by element,
+[`zip()`](04_Foundations--Control_Flow.md#range-enumerate-and-zip)
+pairs up two sequences element by element,
 so `zip("abc", [1, 2, 3])` yields `("a", 1)`, `("b", 2)`, and `("c", 3)`.
 `dict()` accepts any iterable of `(key, value)` pairs and builds a `dict` from them.
-[Control Flow](04_Foundations--Control_Flow.md#range-enumerate-and-zip)
-covers `zip()` with the other loop tools.
 
 The `list` in `remove_while_iterating.py` skips elements and reports nothing.
 Changing the size of a `dict` or a `set` while iterating over it raises a `RuntimeError`:
@@ -461,9 +466,7 @@ except RuntimeError as e:
 #: Set changed size during iteration
 ```
 
-`discard()` removes an element from a `set`; [Sets](#sets)
-covers it with the other set methods.
-The `list` hides the mistake, while the `dict` and the `set` both report it.
+[`discard()`](#sets) removes an element from a `set`.
 
 Assigning a new value to an existing key leaves the size the same,
 so a loop can update a `dict`'s values safely.
@@ -503,9 +506,11 @@ print(2 in a)
 #: True
 ```
 
-`dict` claimed the `{}` literal first, so an empty set is `set()`.
-The order these sets print comes from CPython's hashing, not from any guarantee,
-so do not write code, or a test, that depends on it.
+`{}` was the empty `dict` before sets had a literal, so an empty set is `set()`.
+
+CPython's hashing decides the order in which these sets print.
+That order is an implementation detail, so write code, and tests,
+that accept the elements in any order.
 
 Every set-algebra operator in `sets.py` has a named method:
 `intersection()` for `&`, `union()` for `|`, `difference()` for `-`,
@@ -537,14 +542,15 @@ They behave like `<=` and `>=` but also require the two sets to differ.
 The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
-Single elements move in and out with `add()`, `remove()`, and `discard()`.
+
+`add()` inserts a single element, and `remove()` and `discard()` delete one.
 `remove()` raises a `KeyError` on a missing element,
 where a `list`'s `remove()` raises a `ValueError`.
-`discard()` stays silent.
+`discard()` ignores a missing element.
 
 Repeated lookups run faster against a `set` than against a `list`.
 A `list` compares the item you look for against every element in turn.
-A `set` computes one hash and looks in one place.
+A `set` computes one hash and looks in one slot.
 
 `timeit()` runs a callable `number` times and returns the total elapsed seconds.
 The [`lambda:`](05_Foundations--Functions.md#lambdas)
@@ -574,21 +580,22 @@ O(n) (read "order n") describes work that grows in proportion to `n`,
 the number of elements.
 O(1) describes work that stays the same however large `n` gets.
 Searching the `list` is O(n) and searching the `set` is O(1),
-so the gap widens without limit as `n` grows.
+so the gap keeps widening as `n` grows.
 At ten times the size the `list` search takes roughly ten times as long,
 while the `set` search takes about the same time,
 so `large_gap` comes out bigger than `small_gap`.
 
-The probe value is missing on purpose.
+`missing` holds a value absent from both containers, on purpose.
 Searching for an absent item is the `list`'s worst case,
 since the scan compares all `n` elements before reporting `False`.
 
 A timing depends on the machine that took it,
 so nearly every measured listing in this book prints a comparison rather than a number.
-`report()` comes from a small helper the book supplies.
+The measurements behind the comparison go to `report()`,
+a small helper the book supplies.
 By default a measured listing prints the comparison alone.
 Running one with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
-also prints the measurements behind the comparison.
+makes `report()` print the measurements as well.
 
 ## Specialized Containers
 
@@ -621,14 +628,14 @@ print(Counter("aab") - Counter("ab"))  # Multiset diff
 
 A missing key counts as zero rather than raising a `KeyError`,
 and `most_common()` returns the highest counts first.
-`-`, `&`, and `|` work between two counters as well,
-the same operators the Sets section just used,
-now reading as multiset difference, minimum, and maximum.
+`-`, `&`, and `|` also work between two counters.
+They are the operators from [Sets](#sets), here meaning multiset difference,
+minimum, and maximum.
 A fourth operator, `+`, sums the counts of both counters.
 
 ### `defaultdict`
 
-A `defaultdict` supplies a value the first time you touch a missing key,
+A `defaultdict` supplies a value the first time you look up a missing key,
 and so removes the setup-on-first-use boilerplate:
 
 ```python
@@ -667,9 +674,11 @@ For a lookup that leaves the dictionary as it was, use `in` or `dict.get()`.
 A plain `dict` has a second option, `setdefault()`.
 In `plain.setdefault(kind, []).append(name)`,
 `setdefault()` returns the list already stored under `kind`.
-When `kind` is missing, it stores the new `[]` and returns that instead.
-The `[]` argument builds an empty list on every call, used or not.
-Every place that touches the dictionary must also repeat the whole expression.
+When `kind` is missing,
+`setdefault()` stores the new `[]` and returns that instead.
+The `[]` argument builds an empty list on every call,
+and a call that finds `kind` discards it.
+Every line that looks up a key must also repeat the whole expression.
 A `defaultdict` states the default once, where you create the dictionary.
 
 ### `deque`
@@ -752,19 +761,19 @@ print(deque_time * 20 < list_time)  # Not close
 #: True
 ```
 
-The comparison holds with room to spare:
-the `deque` finishes more than twenty times faster.
+`True` means the `deque` finishes more than twenty times faster.
 Use a `deque` for a queue.
 Indexing its middle is O(n), though,
 so keep a `list` wherever you index by position.
 When one thread must wait for another to supply the next item,
 use [`queue.Queue`](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
-whose `get()` blocks until an item arrives, and for a priority queue, `heapq`.
+whose `get()` blocks until an item arrives.
+For a priority queue, use `heapq`.
 
 The `window` in `deque.py` shows `maxlen`.
 A `deque(maxlen=n)` caps its length,
 discarding from the opposite end when an append overflows it.
-That is a sliding window, and a `list` has no equivalent.
+A `deque` with a `maxlen` is a sliding window, and a `list` has no equivalent.
 
 ### `namedtuple`
 
@@ -789,10 +798,10 @@ print(height)
 
 A `namedtuple` is a fixed-length record like the tuple in `heterogeneous.py`,
 but its fields are self-documenting.
-`typing.NamedTuple` is the class form of the same idea:
-you write `class Person(NamedTuple):` and annotate each field in the body,
-`name: str`, instead of listing bare names,
-so a type checker knows what each one holds.
+`typing.NamedTuple` is the class form of the same idea.
+You write `class Person(NamedTuple):` and annotate each field in the body,
+as in `name: str`, instead of listing bare names.
+A type checker then checks each field against its annotation.
 For a record that must be mutable,
 use a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes).
 [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions)
@@ -834,13 +843,13 @@ except AttributeError as e:
 ```
 
 The type checker reports an attempt to modify an immutable container before the program runs,
-so each line that attempts it carries a `# type: ignore` comment,
-which silences the type checker for that line.
+so each line that attempts it carries a `# type: ignore` comment.
+That comment silences the type checker for its line.
 
 Use the immutable form whenever a container should stay the same after you build it.
-Neither you nor the code that receives it can add, remove,
-or replace an element by accident,
-so a container of immutable elements needs no defensive copy before you share it.
+The container then keeps the same elements, whichever code holds it,
+so you can share a container of immutable elements,
+where a mutable one calls for a defensive copy.
 An immutable container is safe as a default argument,
 unlike the [mutable default](05_Foundations--Functions.md#the-mutable-default-trap).
 
@@ -868,8 +877,8 @@ except TypeError as e:
 #: 'mappingproxy' object does not support item assignment
 ```
 
-The view is live, not a copy,
-so writing to `settings` changes what `config` reports.
+Because the view is live rather than a copy,
+writing to `settings` changes what `config` reports.
 Writing through `config` raises a `TypeError`.
 
 ### `frozendict`
@@ -897,7 +906,8 @@ except TypeError as e:
 #: 'frozendict' object does not support item assignment
 ```
 
-Because a `frozendict` cannot change, it is hashable when its values are.
+Because a `frozendict` keeps its entries for its whole life,
+it is hashable when its values are.
 Like a `tuple` or a `frozenset`,
 it can then be a dictionary key or a set member.
 A dictionary key must be hashable, though it need not be immutable.
@@ -931,8 +941,9 @@ except TypeError as e:
 The `tuple` holds the same `list` for its whole life,
 and that `list` stays free to change.
 An immutable container holding an unhashable object is unhashable too.
-Immutability is beneficial when it goes all the way down,
-because then you can share or hash a value and trust that everything inside it stays the same.
+
+Immutability is beneficial when every nested object is immutable too,
+because then you can share or hash the container and trust that everything inside it stays the same.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 shows the same shallow immutability inside a frozen data class.
 
@@ -940,7 +951,7 @@ shows the same shallow immutability inside a frozen data class.
 
 Choosing a container comes down to one question: what do you do with it most?
 Ordered items you walk through are a `list`.
-A record of set length whose positions mean different things is a `tuple` or a `namedtuple`.
+A fixed-length record whose positions mean different things is a `tuple` or a `namedtuple`.
 Lookup by key is a `dict`.
 Uniqueness and membership are a `set`.
 Go past those four only when a measurement or a specific job calls for it,
@@ -981,7 +992,7 @@ Try each exercise before opening its [solution](../Solutions/03_Foundations--Con
 9.  Using one unpacking assignment each, and no indexing,
     pull the first element, the last element,
     and everything in between out of `row = [1, 2, 3, 4, 5]`.
-    Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` does not.
+    Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` succeeds.
 10. Build a `frozendict` from the pairs `[("host", "localhost"), ("port", 8080)]`,
     then use it as a key in a `dict` that maps a configuration to a connection name.
     Look the connection name up again with a separately built,
