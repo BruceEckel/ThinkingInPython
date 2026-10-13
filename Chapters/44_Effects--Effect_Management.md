@@ -126,7 +126,8 @@ Does the exception break purity?
     A [*Total Function*](42_Functional--Error_Handling.md#total-functions)
     returns errors as data in explicit wrapper types instead of raising them.
 
-The argument over purity leaves this chapter's question open.
+This chapter asks a different question:
+does the exception pass from callee to caller?
 If you write a function `a()` that calls a function `b()` that raises an exception,
 then `a()` raises that exception too, unless `a()` catches it.
 `a()`'s signature says nothing about the exception.
@@ -227,7 +228,7 @@ C++ reduced its version to a single bit: whether a function can throw.
 
 ### Make the Bad Value Impossible
 
-The third approach removes the failure instead of handling it.
+The third approach removes the failure from `slope()` instead of handling it there.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes illegal values impossible to construct.
 If you give `run` a type that excludes zero,
@@ -492,7 +493,7 @@ Every technique in [Converting Effectful to Pure](#converting-effectful-to-pure)
 manually manages one Effect, the exception.
 A `Result` tracks failure in the return type.
 A `try` binds the failure to a handler.
-A restrictive type removes the failure at construction.
+A restrictive type moves the failure to construction.
 Each is a hand-built version of something an EMS automates.
 
 Side effects and side causes also have a by-hand technique:
@@ -638,6 +639,8 @@ a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
 
 ```koka
+import std/os/readline
+
 // Effect declarations: the interface, not the implementation
 effect ask
   fun ask(prompt : string) : string
@@ -666,6 +669,7 @@ The row is the second channel.
 `ask` and `tell` are part of the type without adding a parameter.
 The compiler infers the row from what the body calls,
 so you rarely write one by hand.
+The listing writes both rows out so you can read them.
 You annotate explicitly when you want a constraint,
 such as declaring that a function must remain Effect-free.
 If another function calls `greet()`,
@@ -793,11 +797,11 @@ The TypeScript [Effect](https://effect.website/) library works the same way:
 ```typescript
 import { Context, Effect, Layer } from "effect"
 
-// The Effect's interface, as a service tag
-class Tell extends Context.Tag("Tell")<
+// The Effect's interface, as a service
+class Tell extends Context.Service<
   Tell,
   { tell: (message: string) => Effect.Effect<void> }
->() {}
+>()("Tell") {}
 
 // Core logic: still just a description
 const hello = Effect.gen(function* () {
@@ -850,7 +854,10 @@ Most of these languages are tracking systems,
 in the sense [Tracking and Management](#tracking-and-management) gives the term.
 They provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
-are liabilities, because a host that supplies every implementation can guarantee what generated code can do.
+are liabilities.
+When the host supplies every implementation,
+it can guarantee what the generated code does,
+and generated code that rebinds an implementation would break that guarantee.
 
 Two go further.
 In [Pact](https://github.com/KikotVit/pact-lang),
@@ -1056,5 +1063,5 @@ Try each exercise before opening its [solution](../Solutions/44_Effects--Effect_
     Write a synchronous `total_price()` that calls a helper,
     then make the helper `async` and follow what the type checker and the interpreter force you to change,
     all the way up to `asyncio.run()`.
-    Name the two properties of a full EMS that `async` does *not* have,
+    Name the two properties of a full EMS that `async` lacks,
     using the three-item list in [Tracking and Management](#tracking-and-management).

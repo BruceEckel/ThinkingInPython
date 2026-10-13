@@ -256,8 +256,8 @@ The alternative most codebases pick, a module-level logger,
 removes the parameter by removing the choice. The function no longer
 says it logs, and a test can no longer bind the logger differently.
 
-An Effect Management System collapses the parameter lists and the call
-sites, not the signatures. `format_greeting()` declares in its return
+A library EMS collapses the parameter lists and the call sites, not
+the signatures. `format_greeting()` declares in its return
 type that it needs a `Log`, and so does every function on the path to
 it, but none of them gains an unused parameter, no call site changes,
 and the type checker names each declaration you miss. You still supply
@@ -267,6 +267,12 @@ what a `Log` means.
 with a real library. In its `audit_log.py`, `greet_logged()` and its
 caller `greet_all()` both carry a `Need[Log]` in the `Depend` return
 type, while `greet()` stays unchanged.
+
+A native EMS removes the signature edits as well. Koka infers the
+Effect row of a function you leave unannotated, so adding a `log`
+Effect leaves `greet()`, `session()`, `menu()`, and `main()` as they
+were, and the compiler adds `log` to each of their rows. You write
+the new helper and the one handler that binds `log`.
 
 </details>
 </details>
@@ -460,7 +466,7 @@ function accepts, instead of leaving that to a docstring.
 > Write a synchronous `total_price()` that calls a helper,
 > then make the helper `async` and follow what the type checker and the interpreter force you to change,
 > all the way up to `asyncio.run()`.
-> Name the two properties of a full EMS that `async` does *not* have,
+> Name the two properties of a full EMS that `async` lacks,
 > using the three-item list in [Tracking and Management](../../Chapters/44_Effects--Effect_Management.md#tracking-and-management).
 
 <details>
