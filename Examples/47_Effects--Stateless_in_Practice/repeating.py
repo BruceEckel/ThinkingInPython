@@ -9,7 +9,7 @@ three = recurs(3, spaced(timedelta(milliseconds=1)))
 repeated = repeat(three)(save_user)
 env = supply(Database(failures=0), Time())
 print(run(env(repeated)("Morty")))
-#: attempt 1: saving Morty
-#: attempt 2: saving Morty
-#: attempt 3: saving Morty
+#: attempt 1
+#: attempt 2
+#: attempt 3
 #: ('Morty saved', 'Morty saved', 'Morty saved')

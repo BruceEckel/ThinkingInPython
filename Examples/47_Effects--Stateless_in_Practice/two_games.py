@@ -23,5 +23,5 @@ play(Loud(), Kitty(), Weapon())
 #: and bats at the nasty weapon
 script = Script()
 kitties_and_puzzles(script)
-print(len(script.lines), script.lines[1])
-#: 2 and bats at the puzzle
+print(script.lines)
+#: ['Kitty arrives', 'and bats at the puzzle']

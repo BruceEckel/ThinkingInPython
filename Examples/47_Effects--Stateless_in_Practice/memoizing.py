@@ -5,7 +5,7 @@ from stateless import memoize, run, supply
 db = Database(failures=0)
 bound = supply(db)(memoize(save_user))
 print(run(bound("Morty")))
-#: attempt 1: saving Morty
+#: attempt 1
 #: Morty saved
 print(run(bound("Morty")))
 #: Morty saved

@@ -1,6 +1,6 @@
 # scenarios.py
-from typing import Final, assert_never
-from newswire import DeadWire, Library, Wire
+from typing import assert_never
+from newswire import EMPTY, SHELF, STOCKS, WEATHER, DeadWire
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable, research)
 from stateless import Depend, Need, catch, run, supply
@@ -22,12 +22,6 @@ def report() -> Depend[
             return found
         case _:
             assert_never(found)
-
-STOCKS: Final[Wire] = Wire("stock market rising")
-WEATHER: Final[Wire] = Wire("mild and cloudy")
-SHELF: Final[Library] = Library(
-    {"stock market": "a history"})
-EMPTY: Final[Library] = Library({})
 
 def outcome(feed: Feed, book: Encyclopedia) -> str:
     return run(supply(feed, book)(report)())

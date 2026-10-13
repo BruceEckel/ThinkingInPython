@@ -8,21 +8,23 @@ from stateless.time import Time
 
 once = catch(Crashed)(save_user)
 print(run(supply(Database(failures=2))(once)("Morty")))
-#: attempt 1: saving Morty
+#: attempt 1
 #: database crashed
 three = recurs(3, spaced(timedelta(milliseconds=1)))
 retried = retry(three)(save_user)
 print(run(
     supply(Database(failures=2), Time())(retried)("Morty")))
-#: attempt 1: saving Morty
-#: attempt 2: saving Morty
-#: attempt 3: saving Morty
+#: attempt 1
+#: attempt 2
+#: attempt 3
 #: Morty saved
 caught = catch(RetryError)(retried)
 outcome = run(
     supply(Database(failures=9), Time())(caught)("Morty"))
-#: attempt 1: saving Morty
-#: attempt 2: saving Morty
-#: attempt 3: saving Morty
-print(type(outcome).__name__)
-#: RetryError
+#: attempt 1
+#: attempt 2
+#: attempt 3
+match outcome:
+    case RetryError():
+        print(type(outcome).__name__, len(outcome.args[0]))
+#: RetryError 3

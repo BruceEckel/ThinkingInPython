@@ -11,7 +11,7 @@ class Database:
     attempts: int = 0
     def save(self, user: str) -> str:
         self.attempts += 1
-        print(f"attempt {self.attempts}: saving {user}")
+        print(f"attempt {self.attempts}")
         if self.attempts <= self.failures:
             raise Crashed("database crashed")
         return f"{user} saved"

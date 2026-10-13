@@ -1,5 +1,6 @@
 # newswire.py
 from dataclasses import dataclass
+from typing import Final
 from research import NoArticle, Unavailable
 
 @dataclass
@@ -21,3 +22,9 @@ class Library:
         if topic not in self.articles:
             raise NoArticle(topic)
         return self.articles[topic]
+
+STOCKS: Final[Wire] = Wire("stock market rising")
+WEATHER: Final[Wire] = Wire("mild and cloudy")
+SHELF: Final[Library] = Library(
+    {"stock market": "a history"})
+EMPTY: Final[Library] = Library({})

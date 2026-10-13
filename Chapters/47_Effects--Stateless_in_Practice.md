@@ -46,7 +46,7 @@ Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Ef
 ```python
 # ask_tell_stateless.py
 from record import record
-from stateless import Ability, Depend, handle, run
+from stateless import Ability, Depend
 
 @record(slots=False)
 class Ask(Ability[str]):
@@ -66,6 +66,14 @@ def tell(message: str) -> Depend[Tell, None]:
 def greet() -> Depend[Ask | Tell, None]:
     name = yield from ask("What is your name? ")
     yield from tell(f"Hello, {name}!")
+```
+
+A demo answers both requests and runs `greet()`:
+
+```python
+# ask_tell_demo.py
+from ask_tell_stateless import Ask, Tell, greet
+from stateless import handle, run
 
 messages: list[str] = []
 
@@ -142,7 +150,7 @@ Naming the two stages also gives the type checker a place to report what remains
 as [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
 shows.
 
-Now compare this listing to `ask_tell.py` again.
+Now compare these two listings to `ask_tell.py` again.
 The by-hand version puts two objects in every signature.
 The Stateless version threads nothing.
 `greet()` takes no arguments,
@@ -425,7 +433,7 @@ each reporting one moment however often you ask.
 
 ### A Source Named in the Type
 
-Compare these handlers to `student_pairs.py` in [Functional Toolkits](41_Functional--Toolkits.md#groups-of-any-size),
+Compare these handlers to `student_groups.py` in [Functional Toolkits](41_Functional--Toolkits.md#groups-of-any-size),
 which makes randomness repeatable a different way, by taking a `seed` parameter.
 A `seed` parameter works,
 but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
@@ -902,11 +910,13 @@ because a function that receives everything it uses as arguments is easier to te
 and because the split keeps the Ability requests in one place.
 Either shape type-checks and either propagates correctly.
 
-`newswire.py` defines two feeds and an encyclopedia to supply:
+`newswire.py` defines two feeds and an encyclopedia to supply,
+and names four instances for the scenarios that follow:
 
 ```python
 # newswire.py
 from dataclasses import dataclass
+from typing import Final
 from research import NoArticle, Unavailable
 
 @dataclass
@@ -928,6 +938,12 @@ class Library:
         if topic not in self.articles:
             raise NoArticle(topic)
         return self.articles[topic]
+
+STOCKS: Final[Wire] = Wire("stock market rising")
+WEATHER: Final[Wire] = Wire("mild and cloudy")
+SHELF: Final[Library] = Library(
+    {"stock market": "a history"})
+EMPTY: Final[Library] = Library({})
 ```
 
 `Wire` and `Library` are structural implementations,
@@ -939,8 +955,8 @@ Now supply `research()`'s environment:
 
 ```python
 # scenarios.py
-from typing import Final, assert_never
-from newswire import DeadWire, Library, Wire
+from typing import assert_never
+from newswire import EMPTY, SHELF, STOCKS, WEATHER, DeadWire
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable, research)
 from stateless import Depend, Need, catch, run, supply
@@ -962,12 +978,6 @@ def report() -> Depend[
             return found
         case _:
             assert_never(found)
-
-STOCKS: Final[Wire] = Wire("stock market rising")
-WEATHER: Final[Wire] = Wire("mild and cloudy")
-SHELF: Final[Library] = Library(
-    {"stock market": "a history"})
-EMPTY: Final[Library] = Library({})
 
 def outcome(feed: Feed, book: Encyclopedia) -> str:
     return run(supply(feed, book)(report)())
@@ -1479,8 +1489,8 @@ play(Loud(), Kitty(), Weapon())
 #: and bats at the nasty weapon
 script = Script()
 kitties_and_puzzles(script)
-print(len(script.lines), script.lines[1])
-#: 2 and bats at the puzzle
+print(script.lines)
+#: ['Kitty arrives', 'and bats at the puzzle']
 ```
 
 The fourth run swaps one cast member and captures the output.
@@ -1551,7 +1561,7 @@ class Database:
     attempts: int = 0
     def save(self, user: str) -> str:
         self.attempts += 1
-        print(f"attempt {self.attempts}: saving {user}")
+        print(f"attempt {self.attempts}")
         if self.attempts <= self.failures:
             raise Crashed("database crashed")
         return f"{user} saved"
@@ -1581,24 +1591,26 @@ from stateless.time import Time
 
 once = catch(Crashed)(save_user)
 print(run(supply(Database(failures=2))(once)("Morty")))
-#: attempt 1: saving Morty
+#: attempt 1
 #: database crashed
 three = recurs(3, spaced(timedelta(milliseconds=1)))
 retried = retry(three)(save_user)
 print(run(
     supply(Database(failures=2), Time())(retried)("Morty")))
-#: attempt 1: saving Morty
-#: attempt 2: saving Morty
-#: attempt 3: saving Morty
+#: attempt 1
+#: attempt 2
+#: attempt 3
 #: Morty saved
 caught = catch(RetryError)(retried)
 outcome = run(
     supply(Database(failures=9), Time())(caught)("Morty"))
-#: attempt 1: saving Morty
-#: attempt 2: saving Morty
-#: attempt 3: saving Morty
-print(type(outcome).__name__)
-#: RetryError
+#: attempt 1
+#: attempt 2
+#: attempt 3
+match outcome:
+    case RetryError():
+        print(type(outcome).__name__, len(outcome.args[0]))
+#: RetryError 3
 ```
 
 The first run is the baseline: one attempt, no retry, and it fails.
@@ -1606,7 +1618,7 @@ The first run is the baseline: one attempt, no retry, and it fails.
 `spaced()` yields the same interval forever,
 and `recurs()` stops it after `n` yields.
 Three attempts against a database that fails twice succeed on the third,
-and three attempts against one that always fails produce a `RetryError` holding every failure.
+and three attempts against one that always fails produce a `RetryError` holding all three failures.
 `save_user()` stays unchanged through all of it.
 
 `retry()` decorates the function `save_user`,
@@ -1678,6 +1690,8 @@ One library omission: `RetryError` declares an `errors` attribute,
 and `retry()` builds one as `RetryError(tuple(errors))`.
 The collected failures therefore live in `outcome.args[0]`,
 and `outcome.errors` raises `AttributeError`.
+The third run counts them there,
+after the `match` narrows `outcome` from `str | RetryError` to the error.
 
 ### `repeat()` and `memoize()`
 
@@ -1695,9 +1709,9 @@ three = recurs(3, spaced(timedelta(milliseconds=1)))
 repeated = repeat(three)(save_user)
 env = supply(Database(failures=0), Time())
 print(run(env(repeated)("Morty")))
-#: attempt 1: saving Morty
-#: attempt 2: saving Morty
-#: attempt 3: saving Morty
+#: attempt 1
+#: attempt 2
+#: attempt 3
 #: ('Morty saved', 'Morty saved', 'Morty saved')
 ```
 
@@ -1717,7 +1731,7 @@ from stateless import memoize, run, supply
 db = Database(failures=0)
 bound = supply(db)(memoize(save_user))
 print(run(bound("Morty")))
-#: attempt 1: saving Morty
+#: attempt 1
 #: Morty saved
 print(run(bound("Morty")))
 #: Morty saved
@@ -1743,7 +1757,7 @@ db1 = Database(failures=0)
 db2 = Database(failures=0)
 memoized = memoize(save_user)
 print(run(supply(db1)(memoized)("Morty")))
-#: attempt 1: saving Morty
+#: attempt 1
 #: Morty saved
 print(run(supply(db2)(memoized)("Morty")))
 #: Morty saved
@@ -2044,8 +2058,14 @@ one form nesting them and the other naming the intermediate:
 ```python
 # nested_handle.py
 from typing import reveal_type
-from ask_tell_stateless import capture, greet, scripted
+from ask_tell_stateless import Ask, Tell, greet
 from stateless import handle
+
+def capture(request: Tell) -> None:
+    print(request.message)
+
+def scripted(request: Ask) -> str:
+    return "Alice"
 
 nested = handle(scripted)(handle(capture)(greet))
 half = handle(capture)(greet)
@@ -2061,27 +2081,27 @@ Under `ty` 0.0.86, `ty check nested_handle.py` reads the two forms the same way:
 
 ```text
 info[revealed-type]: Revealed type
-  --> nested_handle.py:11:17
+  --> nested_handle.py:17:17
    |
-11 |     reveal_type(nested)
+17 |     reveal_type(nested)
    |                 ^^^^^^ `() -> Generator[Never, Any, None]`
 
 info[revealed-type]: Revealed type
-  --> nested_handle.py:12:17
+  --> nested_handle.py:18:17
    |
-12 |     reveal_type(half)
+18 |     reveal_type(half)
    |                 ^^^^ `() -> Generator[Ask, Any, None]`
 
 info[revealed-type]: Revealed type
-  --> nested_handle.py:13:17
+  --> nested_handle.py:19:17
    |
-13 |     reveal_type(full)
+19 |     reveal_type(full)
    |                 ^^^^ `() -> Generator[Never, Any, None]`
 ```
 
 `half` still needs an `Ask`, and `full` and `nested` need nothing,
 so `run()` reports a handler left out of either form.
-`ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls,
+`ask_tell_demo.py` binds `half` and `full` instead of nesting the calls,
 because a named intermediate is where you read the Ability that remains.
 That is the information this library exists to give you.
 
