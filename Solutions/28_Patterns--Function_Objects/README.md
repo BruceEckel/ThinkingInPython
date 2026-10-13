@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[A Callable Object as a *Command*](../../Chapters/28_Patterns--Function_Objects.md#a-callable-object-as-a-command) shows a command that carries its own state, which the macro still calls with `()`.
+[A Callable Object as a *Command*](../../Chapters/28_Patterns--Function_Objects.md#a-callable-object-as-a-command) shows a command that carries its own state and that the macro still calls with `()`.
 A command that must answer two requests, running and reversing, needs a type with two members.
 Describe that type with a `Protocol`, and make each command remember what it did so it can reverse it.
 A `Macro` then undoes its list in `reversed()` order.
@@ -55,8 +55,9 @@ class Macro:
 <summary>Solution</summary>
 
 `command.py`'s commands print a line, and a printed line has nothing
-to undo, so the solution swaps in a command that changes state,
-`Deposit`, and borrows `command_pattern.py`'s `Macro` to hold the list.
+to undo.
+The solution therefore swaps in `Deposit`, a command that changes state,
+and borrows `command_pattern.py`'s `Macro` to hold the list.
 
 If you keep `command.py`'s `Command` alias as the type of the macro's list,
 the script still prints `15` and `0`,
@@ -112,33 +113,33 @@ print(account["balance"])
 #: 0
 ```
 
-A bare function is no longer enough, though not because of state.
+A bare function is no longer enough, and the reason is undo, not state.
 `callable_command.py`'s `Repeat` carries its configuration, and
-the macro still calls it with `()`, so state alone does not force more
-than a callable. Undo does, because a command now answers two requests,
-`__call__()` and `undo()`, and a callable has only one call.
+the macro still calls it with `()`, so a callable handles state.
+Undo needs more, because a command now answers two requests,
+`__call__()` and `undo()`, and a callable answers one.
 
-**Name both requests in one type.** `Command`, the chapter's
-`Callable[[], None]`, has room for one call, so a list of undoable
-commands needs a type with two members, `__call__()` and `undo()`, and
-in Python that type is a `Protocol`. `UndoableCommand` above is that
-`Protocol`. `Macro` annotates `self.commands` against it, `Deposit`
-inherits nothing, and `run()` still calls each `Deposit` with `()`, so
-the function form's habit survives.
+**Name both requests in one type.** Because `Command`, the chapter's
+`Callable[[], None]`, describes one call, a list of undoable
+commands needs a type with two members, `__call__()` and `undo()`.
+In Python that type is a `Protocol`, here `UndoableCommand`.
+`Macro` annotates `self.commands` with `UndoableCommand`,
+and `Deposit` matches `UndoableCommand` with no base class.
+`run()` still calls each command with `()`, as it would
+call a function.
 
 The *GoF Design Patterns* shape is a base class with two
-`raise NotImplementedError` bodies. A base class is justified when
+`raise NotImplementedError` bodies. A base class makes sense when
 the commands share implementation, and these commands share none.
 
 **Remember what to reverse.** `Deposit` must also remember what it
-did, here the account and the amount, so it can reverse that action
-later. A fresh call to the same function cannot know what a previous
-call changed.
+did, here the account and the amount, so it can reverse the deposit
+later. Between calls, a function forgets what each call changed.
 
-`Deposit` is a record, like `Repeat`, because neither field changes
-after construction. The record is frozen and the dictionary it
-references is not, so `__call__()` and `undo()` can still update the
-balance.
+`Deposit` is a record, like `Repeat`, because its fields, `account` and `amount`, keep the
+values they receive at construction. The record freezes its fields and leaves the
+dictionary in `account` mutable, so `__call__()` and `undo()` can
+still update the balance.
 
 </details>
 </details>
@@ -155,7 +156,7 @@ balance.
 [*Chain of Responsibility*: Choosing the Handler at Runtime](../../Chapters/28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) uses `None` to mean that a handler failed.
 `None` carries no reason, so give each handler a failure value that does, and return `float | Failed`.
 In `first_root()`, tell a root from a failure with `match`, print each attempt, and read the handler's name from `__name__`.
-Because `Callable` has no name, the type of the chain needs a `Protocol` that declares `__name__`.
+Because `Callable` declares no `__name__`, the type of the chain needs a `Protocol` that declares `__name__`.
 
 <details>
 <summary>The shape</summary>
@@ -208,7 +209,7 @@ def g(x: float) -> float:
 If you annotate `chain` with a `Callable` type, as the chapter's `RootFinder` is,
 the script runs and prints the same report,
 but `ty` reports `unresolved-attribute` on both reads of `finder.__name__`.
-A `Callable` describes a call and says nothing about a name,
+A `Callable` describes a call and declares no `__name__`,
 so the solution types `chain` with the `Finder` protocol, which declares `__name__`.
 
 ```python
@@ -298,34 +299,37 @@ first_root(g, 0.0, 2.0, [bisection])
 #: every finder failed
 ```
 
-**Give failure a reason.** `None` says that a handler failed and cannot say why, so a handler
-that reports its reason needs a failure value with room for the reason.
-`Failed` is that value, a record with one field, and each finder now
-returns `float | Failed`.
+**Give failure a reason.** `None` signals that a handler failed and carries no reason,
+so a handler that reports why it failed needs a failure value that holds the reason.
+`Failed` is that value, a record with one field.
+Each finder now returns `float | Failed`.
 
-**Report each way to fail.** A finder has more than one way to fail.
-`bisection()` gives up at once when `f` has the same sign at both ends
-of the interval, and it can also run out of iterations, so each
-failing `return` states its own reason.
+**Report each way to fail.** A finder has more than one way to fail,
+and each failing `return` states its own reason.
+`bisection()` returns a `Failed` at once when `f` has the same sign at
+both ends of the interval.
+When its loop finishes `MAX_ITER` iterations, it returns `NO_CONVERGENCE`.
 
 **Tell a root from a failure.** `first_root()` tells a root from a `Failed`
 with `match`. `case Failed(reason)` prints the reason and lets the
-loop continue, and any other value is the root.
+loop continue.
+Any other value matches `case root`, which prints the root and returns it.
 
-The chapter's advice about the failure value still holds. A `Failed`
-is never a root, so `float | Failed` says which result is which, and
+The chapter's advice about the failure value still holds.
 `first_root()` checks the result's type, not its truthiness.
+A `Failed` is never a root, so `float | Failed` says which result is which.
 
-**Name each attempt.** `finder.__name__` reads the function's own name, since every function
-carries its name as an attribute, so the report needs no extra
-bookkeeping to say which handler ran.
+**Name each attempt.** Python stores each function's name in its `__name__` attribute,
+so the report reads `finder.__name__` to name the handler that ran,
+with no extra bookkeeping.
 
 Reading `finder.__name__` is why `chain` needs a `Protocol` here
 instead of an alias like the chapter's `RootFinder`.
 `Callable[...]` describes what a handler accepts and returns, and
-says nothing about a name, so `ty` rejects `finder.__name__` on a
-handler annotated that way (Pyright allows it, inferring the
-attributes of a function object). `Finder` declares `__name__`
+declares no `__name__`.
+`ty` therefore rejects `finder.__name__` on a handler annotated that way.
+Pyright allows it, inferring the attributes of a function object.
+`Finder` declares `__name__`
 alongside `__call__()`, and a function satisfies both.
 
 The listing copies the finders from `algorithms.py` rather than
@@ -368,7 +372,8 @@ and among equal scores (`Bob` and `Cid`, both `85`) it compares names.
 `key` is a *Strategy*. `sorted()` provides the algorithm (some
 comparison-based sort), and the caller supplies the interchangeable
 policy that decides what "in order" means for this call. `sorted()`
-knows nothing about tuples, scores, or names. Passing a different
+compares whatever `key` returns, and its code mentions no tuples,
+scores, or names. Passing a different
 `key` swaps the ordering strategy the same way the chapter's classic
 *Strategy* form swaps the algorithm its Context holds. Here the
 Context holding the current strategy is the call to `sorted()`.
@@ -390,7 +395,7 @@ Context holding the current strategy is the call to `sorted()`.
 [*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) builds a configured *Strategy* from `bisection_within()` and again with `functools.partial`.
 Give `newton()` a `tolerance` parameter with a default so existing calls keep working.
 Then write a factory that returns an inner function calling `newton()` with the tolerance, and build a second finder with `partial()` and a keyword argument.
-Both match the `RootFinder` type, which is why `first_root()` needs no change.
+Both finders match the `RootFinder` type, so `first_root()` needs no change.
 
 <details>
 <summary>The shape</summary>
@@ -424,9 +429,9 @@ def f(x: float) -> float:
 <details>
 <summary>Solution</summary>
 
-If you leave out the keyword and write `partial(newton, 0.6)`,
+If you pass the tolerance positionally, as `partial(newton, 0.6)`,
 `partial()` binds `0.6` to `f`, the first positional parameter.
-`ty` reports `invalid-argument-type` on the `0.6`, which is not an `Fn`,
+`ty` reports `invalid-argument-type` on the `0.6`, a float where `newton()` expects an `Fn`,
 and `invalid-assignment` on the assignment to `RootFinder`.
 At run time, calling the finder raises a `TypeError` when `newton()` adds the function in `a` to a float.
 The solution binds `tolerance` by keyword, as `partial_bisection.py` does.
@@ -489,25 +494,26 @@ for finder in (coarse_closure, coarse_partial,
 **Keep existing calls working.** `tolerance` becomes a parameter with a default, so every existing call
 to `newton(f, a, b)` keeps working.
 
-**Configure the finder two ways.** The closure and the `partial` then
-reach the same configured strategy from two directions. `newton_within()`
-writes a new function whose body supplies the argument.
+**Configure the finder two ways.** The closure and the `partial`
+build the same configured strategy in different ways. `newton_within()`
+defines a new function whose body supplies the argument.
 `partial(newton, tolerance=0.6)` stores the argument and supplies it at
 the call. Both produce a finder matching `RootFinder`, so `first_root()`
 accepts either with no change.
 
 The two coarse finders print the same wrong-looking answer, `1.500000`,
 and that answer shows the tolerance took effect.
-Newton's method starting at `1.0` moves by `0.5` on its first step, to
-`1.5`, and a tolerance of `0.6` accepts a step that size, so the loop
-stops there. The fine finder runs the same code to `1e-12` and agrees
-with the true root to six places.
+Newton's method starts at `1.0` and moves by `0.5` on its first step,
+to `1.5`.
+A tolerance of `0.6` accepts a step that size, so the loop stops there.
+The fine finder runs the same code with a tolerance of
+`1e-12` and matches the true root to six places.
 
 `partial` is the shorter of the two ways to configure the finder, and
 it works here because the caller can supply `tolerance` by keyword.
-You need a closure when the setting is not a parameter of the
-function, since `partial()` binds arguments and has no argument to
-bind there.
+You need a closure when the function has no parameter for the setting.
+`partial()` binds arguments, and a closure's body can use the setting
+in any expression.
 
 </details>
 </details>
@@ -526,8 +532,8 @@ bind there.
 <summary>Where to look</summary>
 
 [An *Event Bus*: Handlers Keyed by Type](../../Chapters/28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) looks handlers up by `type(event)` in a `defaultdict`.
-Iterate over `type(event).__mro__` instead, and read each class's handlers with `.get()` so a lookup does not insert keys.
-`unsubscribe()` removes a handler from that list, so decide what it should do with a handler that is not in the list.
+Iterate over `type(event).__mro__` instead, and read each class's handlers with `.get()` so a lookup leaves the keys as they were.
+`unsubscribe()` removes a handler from its event type's list, so decide what it should do with a handler that is not in the list.
 For the last question, compare which change alters what an existing caller receives.
 
 <details>
@@ -577,9 +583,10 @@ def on_big(event: BigDeposit) -> None:
 
 If you index `self._handlers[cls]` inside the MRO walk, the program
 prints the same four lines, but each read of a missing class inserts an
-empty list. After the demo, `bus._handlers` holds three keys,
-`Deposit`, `BigDeposit`, and `object`, where the solution's bus holds
-two. The solution reads with `.get(cls, [])`, which returns an empty
+empty list.
+After the demo, `bus._handlers` holds a third key, `object`,
+beside the `Deposit` and `BigDeposit` keys the solution's bus holds.
+The solution reads with `.get(cls, [])`, which returns an empty
 list and leaves `_handlers` as it was.
 
 ```python
@@ -641,15 +648,16 @@ bus.publish(BigDeposit(500))
 #: big deposit 500
 ```
 
-**Ignore a handler that is not subscribed.** `unsubscribe()` guards
-with `if handler in handlers` rather than calling `remove()` outright,
+**Ignore a handler that is not subscribed.** `unsubscribe()` checks
+`if handler in handlers` before it calls `remove()`,
 since `remove()` raises a `ValueError` for a handler not in the list.
 Whether that case should be silent or loud is a design decision. A
-silent `unsubscribe()` matches the bus's habit of letting an unmatched
-event pass without complaint.
+silent `unsubscribe()` matches what `publish()` does with an event
+that has no handler.
+For that event, `publish()` iterates over empty lists and returns.
 
-**Walk the ancestry, most specific first.** `type(event).__mro__`
-runs from the class outward to `object`, so iterating over it
+**Walk the MRO, most specific first.** `type(event).__mro__`
+lists the event's class first and `object` last, so iterating over it
 in order calls the most specific handlers first and the inherited ones
 after. That order meets the "parents last" requirement.
 
@@ -658,15 +666,15 @@ the same reason the chapter gives. Indexing a `defaultdict` on a read
 inserts an empty list for every class in every published event's MRO,
 `object` included.
 
-Adding `unsubscribe()` cannot break an existing caller, which does not
-call it and so behaves as before. The MRO walk can.
-A handler subscribed to `Deposit` starts receiving every subclass of
-`Deposit`, including subclasses written after the handler, so a
-`BigDeposit` that reached `on_big` before the change now reaches
-`on_deposit` too. That wider reach is the intended feature, and it
+Adding `unsubscribe()` cannot break an existing caller, since no
+existing caller calls it. The MRO walk can.
+A handler subscribed to `Deposit` starts receiving events of every
+subclass of `Deposit`, including subclasses written after the handler.
+`on_deposit` now receives every `BigDeposit` that `on_big` receives.
+Delivering subclass events is the intended feature, and it
 still changes how existing code behaves. Any handler that assumes
-`type(event) is Deposit`, or that counts events, now sees more than it
-did before.
+`type(event) is Deposit`, or that counts events, now receives more
+events than before.
 
 </details>
 </details>
@@ -685,7 +693,7 @@ did before.
 <details>
 <summary>Where to look</summary>
 
-[The Late-Binding Trap](../../Chapters/28_Patterns--Function_Objects.md#the-late-binding-trap) explains that a closure reads a variable when the closure runs, not when Python creates it.
+[The Late-Binding Trap](../../Chapters/28_Patterns--Function_Objects.md#the-late-binding-trap) explains that a closure reads a variable when the closure runs, not when Python creates the closure.
 Each fix evaluates `n` while the loop runs: a default argument, `partial()`, and a factory function with its own scope.
 For the closing question, find a value the command must still read at call time and ask which fix freezes it.
 
@@ -764,7 +772,7 @@ report()
 #: high
 ```
 
-**Reproduce the late-binding trap.** A `for` loop does not create a scope, so `n` is one variable that the
+**Reproduce the late-binding trap.** A `for` loop runs in its enclosing scope, so `n` is one variable that the
 loop rebinds three times. All three lambdas close over that one
 variable rather than over its value. By the time anything calls them,
 the loop has finished and `n` holds 2. Nothing is wrong with the
@@ -777,7 +785,8 @@ definition. `partial(print, n)` evaluates the argument where it appears.
 `make(n)` gives each lambda its own `n` in its own function scope.
 
 Only `make(n)` keeps the value private. `lambda n=n:` exposes the value
-as a parameter a caller can override, and `partial(print, n)` stores it
+as a parameter a caller can override.
+`partial(print, n)` stores the value
 in the `partial` object's public `args` attribute, where
 `by_partial[0].args` is `(0,)`.
 
@@ -790,14 +799,16 @@ evaluates the product while the loop builds the command.
 **Read the variable at call time.** None of the three preserves late
 lookup of `n`, and that is the point of the exercise's closing
 question. If the command must read `n` when it runs, all three fixes
-are wrong. Each one freezes the value when the loop builds the
-command. You then want the original behavior, aimed at something
-that outlives the loop, as `report()` does by reading `settings` at
-call time.
+are wrong, because each one freezes the value when the loop builds
+the command.
+That command needs the original late lookup, applied to a name that outlives the loop.
+`report()` shows that lookup.
+It reads `settings` when it runs,
+so it prints `high`, the level the script assigns after defining `report()`.
 
 The late-binding trap and late binding as a feature are the same
 mechanism. Which one you have depends on whether the name you close
-over still means what you wanted when the command finally runs.
+over still refers to the value you wanted when the command finally runs.
 
 </details>
 </details>
@@ -891,25 +902,25 @@ expect(TypeError, handler, Announce)
 #: [TypeError] Announce: not an @event
 ```
 
-The listing copies the two decorators, makes the change, leaves out
-the checks the question does not reach, and applies `handler()` as a
+The listing copies `event()` and `handler()` with the change made, trims them
+to the lines the question reaches, and applies `handler()` as a
 call so that `expect()` can report the failure.
 
-**Register the wrong class.** Python creates the three `@event` classes in `bank_events.py` without
-complaint, which makes the mistake easy to miss. `EVENTS` holds one
-class for each, and none of them is the class the module's names
-reference. `dataclass()` with `slots=True` builds a new class, `event()`
+**Register the wrong class.** The import runs cleanly through the three `@event` classes in `bank_events.py`,
+and that clean run hides the mistake. `EVENTS` holds one
+class for each, and each is the wrong one. `dataclass()` with `slots=True` builds a new class, `event()`
 returns that new class, and the `class` statement binds `Deposit` to
-what `event()` returns. The set holds the class from which `dataclass()`
-started, which no name references and of which no event is an instance.
+what `event()` returns. The set holds the original class.
+No name references that class, and no event is an instance of it.
 
 **Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
-`handler()` reads the annotation on `event`, which is `Deposit`, the
-class `dataclass()` returned, and does not find it in `EVENTS`.
-`handler()` then raises `TypeError: Announce: not an @event`, although `Deposit` went
+`handler()` reads the annotation on `event` and gets `Deposit`,
+the class `dataclass()` returned.
+`EVENTS` holds the original class instead,
+so `handler()` raises `TypeError: Announce: not an @event`, although `Deposit` went
 through `@event` a few lines earlier. If something else created
-the handlers, `publish()` would refuse every event for the same
-reason, since `type(event)` is the returned class too.
+the handlers, `publish()` would raise a `TypeError` on every event,
+since `type(event)` is the returned class too.
 
 </details>
 </details>
