@@ -133,12 +133,9 @@ same form the `ZeroDivisionError` block printed before the change.
 **Check that the original type still matches.** The second block shows that the tuple still covers the original
 exception.
 
-Note the double parentheses. `expected((ZeroDivisionError, TypeError))`
-passes one argument, a tuple. `expected(ZeroDivisionError, TypeError)`
-passes two, and Python raises a `TypeError` at the call, since
-`expected` declares a single parameter. A version taking `*types`
-accepts the second form, and that is the design
-`contextlib.suppress` chose.
+A version of `expected` taking `*types` would accept
+`expected(ZeroDivisionError, TypeError)` with no inner parentheses,
+and that is the design `contextlib.suppress` chose.
 
 </details>
 </details>

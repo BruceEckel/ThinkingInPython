@@ -72,8 +72,8 @@ When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 
 The manager object `trace()` returns is single-use.
 Its generator runs once,
-so the `with manager:` at `[1]` raises an `AttributeError`,
-and the message it prints names nothing useful.
+so the `with manager:` at `[1]` raises an `AttributeError`, and its message,
+about a missing `args` attribute, gives no hint of the real cause.
 Construct a fresh manager for each `with` statement.
 Nor does a loop around the `yield` make the manager reusable.
 `@contextmanager` allows one `yield`,
@@ -121,8 +121,8 @@ A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` manufactures such an object from a generator function.
 
-Every hand-written context manager class in this chapter keeps `__init__()` in longhand rather than becoming a `@dataclass`,
-so every line between the class statement and the two protocol methods reads as ordinary Python:
+Every hand-written context manager class in this chapter writes `__init__()` out rather than using `@dataclass`,
+so the constructor sits in the listing beside the two protocol methods:
 
 ```python
 # trace_cm.py
@@ -231,7 +231,8 @@ is the standard tool for that.
 When a later entry fails, `ExitStack` unwinds the managers it entered earlier.
 A `with` naming several managers applies the same rule per manager.
 The ones that entered still exit, the failing one gets no `__exit__()` call,
-and the statement stops there, so the managers listed after it are left alone.
+and the statement stops there,
+before Python evaluates the managers listed after it.
 
 `Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method ignores,
 the shorter form for a cleanup that ignores why the block ended.
@@ -265,8 +266,8 @@ except ValueError as error:
 `KeyError('original')` never reaches the `except`.
 `BrokenCleanup.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
 so the caller sees the cleanup's failure instead of the block's.
-Python keeps `original`.
-It becomes `error.__context__`, the same chaining a nested `except` produces.
+Python keeps the `KeyError` as `error.__context__`,
+the same chaining it applies when an `except` block raises an exception.
 A broken cleanup path that hides the real failure is one of the most common context-manager bugs in practice,
 so write `__exit__()` methods that fail only for reasons worse than the original exception.
 
@@ -396,7 +397,7 @@ An `as` clause still works, but it binds `None`.
 `expected` is a fuller version of `expected_one`.
 It takes several types at once, and with no argument it catches everything.
 Its name says how the book uses it.
-The block is expected to raise an exception,
+The block under it should raise an exception,
 and the manager shows what the block raised.
 It is useful enough to reuse elsewhere in the book, so it lives in `utils/`,
 where any chapter can import it:
@@ -609,6 +610,10 @@ if __name__ == "__main__":
 `banner` works both as a decorator for `report()` and in a `with` in `__main__`.
 The parentheses in `@banner("report")` matter.
 The call constructs the manager, which then decorates the function.
+Without them, `@banner` passes the function `report` as `title`,
+so the name `report` holds a manager object rather than a function.
+Calling `report()` then raises a `TypeError`,
+and the type checker flags the decorator line.
 Each call of the decorated function builds a fresh manager,
 so `report()` can run any number of times, each with its own enter and exit.
 The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
@@ -675,7 +680,7 @@ The wrapper treats a generator function differently.
 Before Python 3.15, it wrapped only the call that creates the generator object,
 so the context entered and exited before the generator's body ran,
 and the manager closed any resource it opened before the body could use it.
-On 3.15 the context opens at the first `next()` and closes after the generator's last `yield`.
+On 3.15 the context opens at the first `next()` and closes when the generator finishes or its `close()` method runs.
 `decorated_generator.py` imports `banner` from `context_decorator.py` and decorates a generator with it:
 
 ```python
@@ -708,8 +713,9 @@ print("done")
 
 `created` prints before the opening banner,
 because calling `rows()` builds the generator object.
-The banner opens when the `for` loop asks for the first value,
-and it stays open each time the body resumes after a `yield`.
+The banner opens when the `for` loop asks for the first value.
+It stays open while the generator waits at each `yield`,
+so the loop's own `got` lines print inside the banner.
 Before 3.15, both banner lines printed before `created`.
 Code written for those versions leaves the decorator off and puts a `with` inside the generator around its body,
 which works on every version.
