@@ -16,6 +16,5 @@ print(abs(-5), round(3.14159, 2))
 #: 5 3.14
 print(round(0.5), round(1.5), round(2.5))  # Ties go to even
 #: 0 2 2
-scores = [90, 0, 71, 0, 55]
-print(sum(s > 60 for s in scores))  # True counts as 1
-#: 2
+print(True + True, True == 1)  # A bool is an int
+#: 2 True

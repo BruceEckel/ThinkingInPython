@@ -20,6 +20,7 @@ class Bucket:
 print(bool(Bucket(0)), bool(Bucket(3)))
 #: False True
 
-if not []:
+items = []
+if not items:
     print("empty")  # An empty list is falsy
 #: empty

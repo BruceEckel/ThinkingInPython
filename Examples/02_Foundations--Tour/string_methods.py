@@ -15,3 +15,9 @@ print("ababab".replace("a", "X"))
 #: XbXbXb
 print(s.strip()[0:5])
 #: Hello
+print("test_setup".lstrip("test_"))
+#: up
+print("test_setup".removeprefix("test_"))
+#: setup
+print("notes.txt".removesuffix(".txt"))
+#: notes

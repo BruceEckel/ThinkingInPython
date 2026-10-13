@@ -123,7 +123,11 @@ That freedom is *dynamic typing*.
 # references.py
 
 x = 10  # x names an int
+print(type(x).__name__)
+#: int
 x = "ten"  # The same name now binds to a str
+print(type(x).__name__)
+#: str
 a = [1, 2, 3]
 b = a  # b binds to the same list, not a copy
 b.append(4)
@@ -210,9 +214,8 @@ print(abs(-5), round(3.14159, 2))
 #: 5 3.14
 print(round(0.5), round(1.5), round(2.5))  # Ties go to even
 #: 0 2 2
-scores = [90, 0, 71, 0, 55]
-print(sum(s > 60 for s in scores))  # True counts as 1
-#: 2
+print(True + True, True == 1)  # A bool is an int
+#: 2 True
 ```
 
 `round()` breaks a tie to the nearest even value,
@@ -220,11 +223,8 @@ so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`,
 rather than rounding half away from zero as C's `round()` does.
 An f-string's format spec rounds the same way.
 
-A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
-Summing a sequence of comparisons therefore counts how many are true.
-
-The argument to `sum()` is a [*generator expression*](16_Techniques--Comprehensions.md#generator-expressions),
-which hands over one value at a time instead of building a list first.
+A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`,
+and `True + True` is `2`.
 
 Python has no `++` or `--`.
 Use `+= 1` and `-= 1`.
@@ -337,7 +337,8 @@ class Bucket:
 print(bool(Bucket(0)), bool(Bucket(3)))
 #: False True
 
-if not []:
+items = []
+if not items:
     print("empty")  # An empty list is falsy
 #: empty
 ```
@@ -460,6 +461,12 @@ print("ababab".replace("a", "X"))
 #: XbXbXb
 print(s.strip()[0:5])
 #: Hello
+print("test_setup".lstrip("test_"))
+#: up
+print("test_setup".removeprefix("test_"))
+#: setup
+print("notes.txt".removesuffix(".txt"))
+#: notes
 ```
 
 String methods return new values rather than changing the original.
@@ -510,9 +517,8 @@ print(f"{name} scored {score:.0f}%")
 #: Alice scored 92%
 print(f"{name!r} has {len(name)} letters")
 #: 'Alice' has 5 letters
-total = 7
-print(f"{total = }")  # Useful for debugging
-#: total = 7
+print(f"{name = }")  # Useful for debugging
+#: name = 'Alice'
 print(f"|{name:>10}|{score:<8.1f}|")
 #: |     Alice|91.5    |
 ```
@@ -521,10 +527,10 @@ The format spec after a colon controls width, precision, and alignment.
 `>` right-aligns and `<` left-aligns within the given width.
 A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
-An `=` after the expression, as in `{total = }`, prints the expression's text,
+An `=` after the expression, as in `{name = }`, prints the expression's text,
 the `=` with any spaces you put around it, and then the value.
 With no format spec the value appears as its `repr()`,
-so `f"{name=}"` produces `name='Alice'`.
+so the output shows `'Alice'` in quotes.
 Use `=` to label values in your own exploring and debugging code.
 
 Existing code also carries two older styles: C's `printf()` syntax,
@@ -557,9 +563,11 @@ score = 91.5
 message: Template = t"{name} scored {score:.0f}%"
 print(message.strings)
 #: ('', ' scored ', '%')
-print([piece.expression
-       for piece in message.interpolations])
-#: ['name', 'score']
+for piece in message.interpolations:
+    print(piece.expression, piece.value,
+          repr(piece.format_spec))
+#: name Alice ''
+#: score 91.5 '.0f'
 
 def shout(template: Template) -> str:
     parts: list[str] = []
@@ -599,12 +607,11 @@ except ValueError as e:
 
 Iterating over a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation` carrying a value.
-An `Interpolation` also remembers the source text of the expression that produced it,
-and `piece.expression` reports that text.
-Collecting every `piece.expression` above uses a [list comprehension](16_Techniques--Comprehensions.md#list-comprehensions),
-which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list.
+An `Interpolation` also keeps its format spec and the source text of the expression that produced it.
+The loop over `message.interpolations` prints the three parts of each one:
+`expression`, `value`, and `format_spec`.
 Iteration skips empty literal strings,
-so the leading `''` in `message.strings` does not reach the loop.
+so the leading `''` in `message.strings` does not reach a loop over the template.
 That skipping is why a consumer cannot assume that literals and interpolations alternate:
 two interpolations side by side, as in `t"{first}{last}"`,
 arrive as two `Interpolation`s in a row.

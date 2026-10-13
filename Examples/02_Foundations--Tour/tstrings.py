@@ -6,9 +6,11 @@ score = 91.5
 message: Template = t"{name} scored {score:.0f}%"
 print(message.strings)
 #: ('', ' scored ', '%')
-print([piece.expression
-       for piece in message.interpolations])
-#: ['name', 'score']
+for piece in message.interpolations:
+    print(piece.expression, piece.value,
+          repr(piece.format_spec))
+#: name Alice ''
+#: score 91.5 '.0f'
 
 def shout(template: Template) -> str:
     parts: list[str] = []

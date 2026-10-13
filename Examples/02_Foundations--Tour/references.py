@@ -1,7 +1,11 @@
 # references.py
 
 x = 10  # x names an int
+print(type(x).__name__)
+#: int
 x = "ten"  # The same name now binds to a str
+print(type(x).__name__)
+#: str
 a = [1, 2, 3]
 b = a  # b binds to the same list, not a copy
 b.append(4)
