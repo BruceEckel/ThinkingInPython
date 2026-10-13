@@ -120,7 +120,7 @@ The function still returns one object.
 ## Default Arguments
 
 Parameters can have default values,
-and keyword arguments let callers pass them by name, in any order.
+and keyword arguments let callers pass arguments by name, in any order.
 A call that names its arguments documents itself:
 
 ```python
@@ -193,12 +193,13 @@ and both calls append to the same list inside it.
 The default looks like an expression each call evaluates,
 but Python evaluates it once, at the `def`.
 
-Underneath, a parameter is another name bound to the caller's object,
+The trap follows from how Python passes arguments.
+A parameter is another name bound to the caller's object,
 the binding that [Variables and References](02_Foundations--Tour.md#variables-and-references)
 describes.
-When that object is mutable, the caller sees the changes the function makes.
 `bad_append()` combines that binding with a default Python builds once,
 so each call mutates the object the next call uses.
+A caller that passes a mutable object sees the changes the function makes:
 
 ```python
 # mutating_arguments.py
@@ -294,11 +295,14 @@ print(get(prefs, "theme", "dark"))
 #: dark
 ```
 
-Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied,"
-and the `MISSING` sentinel keeps the two cases apart.
+`prefs` stores `mute` as `None`,
+so a `None` from `get()` cannot also mean "no such key."
+The `MISSING` sentinel keeps the two cases apart.
 A stored `None` comes back untouched,
 and a missing key with no default comes back as `MISSING`
 (a real `get()` re-raises the `KeyError` there, as the comment says).
+Because `get()` tests `default` against `MISSING`,
+a caller can also pass `None` as a real default.
 
 Create a sentinel once and share that name.
 Two `sentinel()` calls with the same name build two different objects,
@@ -424,12 +428,13 @@ Because collecting and unpacking are inverses,
 a function can gather arguments it knows nothing about and pass them on unchanged.
 `trace()` accepts any call and forwards it,
 and that is the standard shape of a wrapper.
-A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
-so you can pass `report` to `trace()` as an argument,
-and `func.__name__` reads the name of whatever function arrived.
 `expect()` has the same shape.
 It receives a function and the arguments for it, and makes the call.
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
+
+A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
+so you can pass `report` to `trace()` as an argument,
+and `func.__name__` reads the name of whatever function arrived.
 
 A forwarded `**kwargs` can collide with an argument the wrapped function receives another way.
 When a key in the unpacked dictionary names a parameter that a positional argument fills,
@@ -455,12 +460,13 @@ expect(TypeError, trace, report, *nums, **opts)
 ```
 
 `opts` carries a `"label"` key, and `trace()` forwards it as `label=`.
-The same `func(*args, **kwargs)` call spreads `args`,
-which holds the items of `nums`, positionally, so `report()`'s first parameter,
-`label`, also receives `1`, and no parameter can take two values.
+The same `func(*args, **kwargs)` call passes the items of `nums` positionally,
+so `report()`'s first parameter, `label`, also receives `1`.
+No parameter can take two values.
 `trace()` knows nothing about the signature of the function it calls,
 so it cannot detect the clash.
-The error arrives one level down, when `trace()` calls `report()`.
+The error arrives one level down, when `trace()` calls `report()`,
+which is why `calling report` prints before the `TypeError`.
 
 ## Positional-Only and Keyword-Only Parameters
 
@@ -541,9 +547,12 @@ such as `dict.get(key, default=None, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method.
 The subclass can rename the parameter, and the type checker accepts the rename.
-The marker also frees the name for `**kwargs`:
-with `def trace(func, /, *args, **kwargs)`,
-a caller's `func=` keyword goes into `kwargs` instead of clashing with the parameter.
+
+The `/` marker also frees the parameter's name for `**kwargs`.
+With `def trace(func, /, *args, **kwargs)`,
+a caller's `func=` keyword goes into `kwargs` and reaches the wrapped function.
+Without the `/`, the same keyword gives `trace()`'s own `func` a second value,
+and the call raises a `TypeError`.
 
 ## Lambdas
 
@@ -572,6 +581,7 @@ print(square.__name__)
 `square = lambda n: n * n` gives up the anonymity that is a lambda's point.
 The assignment binds the name `square` and leaves the function's `__name__` as `<lambda>`,
 so a traceback shows `<lambda>` where a `def` shows `square`.
+
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.
@@ -622,3 +632,7 @@ Try each exercise before opening its [solution](../Solutions/05_Foundations--Fun
     and `clear_by_method(target)`, which calls `target.clear()`.
     Pass the same list to each,
     and predict which call empties the caller's list before running them.
+10. Using `report()` and `trace()` from `unpacking_arguments.py`,
+    predict what `trace(report, "point", func="f")` does, then run it.
+    Add a `/` after `func` in `trace()`'s parameter list and run the call again.
+    Explain where `func="f"` goes each time.

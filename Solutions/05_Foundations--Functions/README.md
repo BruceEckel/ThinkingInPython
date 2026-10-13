@@ -411,7 +411,7 @@ expect(TypeError, describe, name="Bob")  # type: ignore
 **Reject a keyword for `name`.** The `/` causes the `TypeError`. `name` is positional-only, so
 `name="Bob"` cannot reach it. `**facts` accepts any keyword the
 parameters do not claim, and after the `/` no parameter claims `name`.
-So `"Bob"` goes into `facts`, and the positional `name` stays unfilled.
+So `facts` collects `name="Bob"`, and the positional `name` stays unfilled.
 The message is therefore
 `describe() missing 1 required positional argument: 'name'`,
 which points at the parameter the caller thought they were filling.
@@ -585,6 +585,84 @@ both names share, so the caller sees the list empty.
 `clear_by_assignment()` and `clear_by_method()` are `rebind()` and
 `append_all()` from `mutating_arguments.py` with the same operation,
 emptying a list, written both ways.
+
+</details>
+</details>
+</details>
+
+## 10. A positional-only `func` in `trace()`
+
+> Using `report()` and `trace()` from `unpacking_arguments.py`,
+> predict what `trace(report, "point", func="f")` does, then run it.
+> Add a `/` after `func` in `trace()`'s parameter list and run the call again.
+> Explain where `func="f"` goes each time.
+
+<details>
+<summary>Where to look</summary>
+
+[Positional-Only and Keyword-Only Parameters](../../Chapters/05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) explains what a `/` does to the names of the parameters before it.
+Ask which parameter receives the keyword `func="f"` without the `/`, and which one collects it with the `/`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+from exceptions import expect
+
+def report(label, *values, **options):
+    ...
+
+def trace(func, *args, **kwargs):
+    ...
+
+def positional_trace(func, /, *args, **kwargs):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
+If you predicted a `calling report` line before the error, compare
+`forwarding_collision.py`. There `trace()` runs and the clash comes
+one level down, in `report()`. Here the clash is in `trace()`'s own
+arguments, so Python raises the `TypeError` before the body runs.
+
+```python
+# exercise_10.py
+from exceptions import expect
+
+def report(label, *values, **options):
+    print(label, values, options)
+
+def trace(func, *args, **kwargs):
+    print("calling", func.__name__)
+    return func(*args, **kwargs)
+
+expect(TypeError, trace, report, "point", func="f")  # type: ignore
+#: [TypeError] trace() got multiple values for argument
+#: 'func'
+
+def positional_trace(func, /, *args, **kwargs):
+    print("calling", func.__name__)
+    return func(*args, **kwargs)
+
+positional_trace(report, "point", func="f")
+#: calling report
+#: point () {'func': 'f'}
+```
+
+**Call the original `trace()`.** `report` fills `func` by position,
+and the keyword `func="f"` names the same parameter, so `func` gets
+two values. The listing calls through `expect()` and marks the line
+with `# type: ignore`, since the type checker reports the clash
+before the code runs.
+
+**Make `func` positional-only.** After the `/`, a caller can fill
+`func` by position alone, so no parameter accepts the keyword `func`.
+`**kwargs` collects it, `trace()` forwards it, and `report()`'s
+`**options` collects it again. The listing names the second version
+`positional_trace()` so that both versions run in one file.
 
 </details>
 </details>
