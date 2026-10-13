@@ -9,7 +9,7 @@ object to object. The right column is what each new state's `run()`
 prints. Below the trace, one unexpected input (`mouse escapes` in
 `Waiting`) meets the two versions' policies side by side: the `match`
 version's `case _` keeps the state and runs it again, and the table
-version's `next()` raises a `RuntimeError`.
+version's `next()` raises a `NoTransition`.
 
 This complements the chapter's other figure, `vending_story.svg`, which
 draws the vending machine's states and transitions as a static graph.
@@ -54,7 +54,7 @@ TITLE = ("The mousetrap's nine inputs as a trace: in each row the current "
          "state's next(input_) picks the next of four state objects, whose "
          "run() prints a line; below, an input Waiting does not name keeps "
          "the match version in Waiting and makes the table version raise "
-         "a RuntimeError")
+         "a NoTransition")
 
 
 def dot(p: Point) -> str:
@@ -115,7 +115,7 @@ def policy(x0: float, y0: float, name: str, file: str,
         cx = tx + 10
         b += line((bx + BW, mid), (cx - 10, mid), RED, 1.5)
         b += cross(cx, mid)
-        b += text(bx, by + BH + 22, "RuntimeError: Waiting:", 10, RED)
+        b += text(bx, by + BH + 22, "NoTransition: Waiting:", 10, RED)
         b += text(bx, by + BH + 36, "no transition on mouse escapes", 10,
                   RED)
     else:

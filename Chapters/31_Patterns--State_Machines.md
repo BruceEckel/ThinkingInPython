@@ -245,6 +245,12 @@ and each state supplies its own table and its own `run()`:
 from abc import ABC, abstractmethod
 from state import State
 
+class NoTransition(RuntimeError):
+    "This state's table has no entry for the input."
+
+class EmptyTable(NoTransition):
+    "This state's table was never filled."
+
 class TableState(ABC):
     def __init__(self) -> None:
         self.transitions: dict[object, State] = {}
@@ -253,12 +259,15 @@ class TableState(ABC):
     def run(self) -> None: ...
 
     def next(self, input_: object) -> State:
+        name = type(self).__name__
+        if not self.transitions:
+            raise EmptyTable(f"{name}: table never filled")
         try:
             return self.transitions[input_]
         except KeyError:
-            raise RuntimeError(
-                f"{type(self).__name__}: no transition "
-                f"on {input_}") from None
+            raise NoTransition(
+                f"{name}: no transition on {input_}"
+            ) from None
 ```
 
 `TableState` is an `ABC` rather than a Protocol because the base has code to share.
@@ -266,11 +275,19 @@ Both `next()` and `run()` have the signatures the `State` Protocol names,
 so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
 
 The constructor starts each state with an empty dict,
-so a state whose table you forget to fill reports `Waiting: no transition on ...` rather than an `AttributeError` for a missing attribute. [[Can we detect this somehow and throw a custom exception?]]
+so a state whose table you forget to fill has a table rather than a missing attribute.
+`next()` checks for that empty table before the lookup and raises `EmptyTable`,
+whose message names the state,
+so the state reports the mistake at its first input.
+An input that a filled table lacks is the other failure,
+and the `except` clause reports it as `NoTransition`.
+Both derive from `RuntimeError`, `EmptyTable` through `NoTransition`,
+so a caller can catch one failure, both,
+or every `RuntimeError` an action might raise.
 The `KeyError` that `next()` catches carries the input as its key,
-and the `RuntimeError` message names that input.
-So `next()` raises its `RuntimeError` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
-which drops the chained `KeyError` and its repeat of the input. [[would a custom exception be a better choice here?]]
+and the `NoTransition` message names that input.
+So `next()` raises `NoTransition` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
+which drops the chained `KeyError` and its repeat of the input.
 
 The state classes and the `MouseTrap` that instantiates them must be defined before the state tables,
 so that the table entries can name the other states.
@@ -330,14 +347,17 @@ MouseTrap.holding.transitions = {
 ```
 
 The demo uses the same nine `MOVES` as the prior example.
-The second call shows what a table does with an input it lacks:
+The two `expect()` calls show what a table does with an input it lacks,
+and what a table nobody filled does with any input:
 
 ```python
 # mouse_trap_tables_demo.py
+from typing import override
 from exceptions import expect
 from mouse_action import MouseAction
 from mouse_moves import MOVES
 from mouse_trap_tables import MouseTrap
+from table_state import EmptyTable, NoTransition, TableState
 
 MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
@@ -363,8 +383,16 @@ MouseTrap().run_all(MOVES)
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-expect(RuntimeError, trap.run_all, [MouseAction.ESCAPES])
-#: [RuntimeError] Waiting: no transition on mouse escapes
+expect(NoTransition, trap.run_all, [MouseAction.ESCAPES])
+#: [NoTransition] Waiting: no transition on mouse escapes
+
+# A table nobody filled fails on its first input:
+class Lost(TableState):
+    @override
+    def run(self) -> None: ...
+
+expect(EmptyTable, Lost().next, MouseAction.APPEARS)
+#: [EmptyTable] Lost: table never filled
 ```
 
 With many `State` classes to maintain,
@@ -377,7 +405,7 @@ Both demo files end with one more call,
 which feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
 Neither `Waiting`'s `match` nor its table names that input.
 Version 1 prints `Broadcasting cheese smell` a second time.
-Version 2 raises `RuntimeError: Waiting: no transition on mouse escapes`.
+Version 2 raises `NoTransition: Waiting: no transition on mouse escapes`.
 The figure traces the run both versions share, then this one input:
 
 ![](_images/state_story)
@@ -507,7 +535,7 @@ so it belongs last in its group, as the `else` for the rows above it.
 
 When every condition in a group returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
-`NoTransition` derives from `RuntimeError`,
+Like `table_state.py`'s, this `NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
 ### A Vending Machine

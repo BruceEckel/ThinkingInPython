@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 515"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>The mousetrap's nine inputs as a trace: in each row the current state's next(input_) picks the next of four state objects, whose run() prints a line; below, an input Waiting does not name keeps the match version in Waiting and makes the table version raise a RuntimeError</title>
+  <title>The mousetrap's nine inputs as a trace: in each row the current state's next(input_) picks the next of four state objects, whose run() prints a line; below, an input Waiting does not name keeps the match version in Waiting and makes the table version raise a NoTransition</title>
   <defs>
     <marker id="ss-red" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
@@ -81,6 +81,6 @@
   <text x="527" y="440" font-size="10" fill="#1a1612" text-anchor="middle">mouse escapes</text>
   <line x1="462" y1="446" x2="592" y2="446" stroke="#8b1a1a" stroke-width="1.5"/>
   <path d="M596,440 L608,452 M596,452 L608,440" stroke="#8b1a1a" stroke-width="2" fill="none"/>
-  <text x="390" y="481" font-size="10" fill="#8b1a1a" text-anchor="start">RuntimeError: Waiting:</text>
+  <text x="390" y="481" font-size="10" fill="#8b1a1a" text-anchor="start">NoTransition: Waiting:</text>
   <text x="390" y="495" font-size="10" fill="#8b1a1a" text-anchor="start">no transition on mouse escapes</text>
 </svg>

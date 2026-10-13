@@ -1,8 +1,10 @@
 # mouse_trap_tables_demo.py
+from typing import override
 from exceptions import expect
 from mouse_action import MouseAction
 from mouse_moves import MOVES
 from mouse_trap_tables import MouseTrap
+from table_state import EmptyTable, NoTransition, TableState
 
 MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
@@ -28,5 +30,13 @@ MouseTrap().run_all(MOVES)
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-expect(RuntimeError, trap.run_all, [MouseAction.ESCAPES])
-#: [RuntimeError] Waiting: no transition on mouse escapes
+expect(NoTransition, trap.run_all, [MouseAction.ESCAPES])
+#: [NoTransition] Waiting: no transition on mouse escapes
+
+# A table nobody filled fails on its first input:
+class Lost(TableState):
+    @override
+    def run(self) -> None: ...
+
+expect(EmptyTable, Lost().next, MouseAction.APPEARS)
+#: [EmptyTable] Lost: table never filled
