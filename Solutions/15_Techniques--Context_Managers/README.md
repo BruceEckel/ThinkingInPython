@@ -65,8 +65,8 @@ with Trace("A") as t:
 
 Entering is outside-in (`A` then `B`), and exiting is inside-out (`B`
 then `A`). `B`'s whole lifetime, enter and exit, sits nested inside
-`A`'s, the same last-in-first-out order [Combining Context
-Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows for `tag("ul")` and
+`A`'s. [Combining Context
+Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows the same last-in-first-out order for `tag("ul")` and
 `tag("li")` written on one `with` line. The order is the same whether
 you write the nesting as two separate `with` statements or as one
 comma-separated line.
@@ -96,11 +96,11 @@ If you write `expected(ZeroDivisionError, TypeError)` without the
 inner parentheses, the script stops before printing `before`, with a
 `TypeError` saying that `expected.__init__()` takes from 1 to 2
 positional arguments but 3 were given. Python makes that call before
-the `with` statement enters the manager, so no `__exit__()` runs to
-suppress the error, and `ty` flags the call as
+the `with` statement enters the manager, so the `TypeError` propagates
+straight out of the script. `ty` flags the call as
 `too-many-positional-arguments`. The solution wraps the two classes
-in a tuple, so `expected` receives one `types` argument, a shape that
-`issubclass()` accepts.
+in a tuple, so `expected` receives one `types` argument,
+and `issubclass()` accepts a tuple as its second argument.
 
 ```python
 # ch15_expected_types.py
@@ -123,19 +123,20 @@ print("survived")
 #: survived
 ```
 
-**Widen what the manager catches.** You make every change the exercise asks for at the call site. `expected`
+**Widen what the manager catches.** Every change the exercise requires sits at the call site. `expected`
 takes one `types` argument that is either an exception class or a
 tuple of them, and `issubclass(exc_type, self.types)` accepts either
 shape. Passing `(ZeroDivisionError, TypeError)` therefore suppresses
-both, and the `TypeError` block prints a `[Type] message` line in the
+both. The `TypeError` block prints a `[Type] message` line in the
 same form the `ZeroDivisionError` block printed before the change.
 
 **Check that the original type still matches.** The second block shows that the tuple still covers the original
 exception.
 
+`contextlib.suppress` takes its exception classes as `*exceptions`,
+so it accepts them as separate arguments.
 A version of `expected` taking `*types` would accept
-`expected(ZeroDivisionError, TypeError)` with no inner parentheses,
-and that is the design `contextlib.suppress` chose.
+`expected(ZeroDivisionError, TypeError)` the same way.
 
 </details>
 </details>
@@ -151,7 +152,7 @@ and that is the design `contextlib.suppress` chose.
 
 [Combining Context Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows several managers on one `with` statement, entered left to right.
 Add another `tag("li")` with its own `as` name to the managers on the `with` line, grouping them in parentheses once they outgrow one line.
-Predict the closing tags before you run it, using the same last-in-first-out rule.
+Predict the closing tags before you run `multiple.py`, using the same last-in-first-out rule.
 
 <details>
 <summary>The shape</summary>
@@ -195,8 +196,8 @@ with (tag("ul") as outer, tag("li") as inner1,
 ```
 
 All three managers enter left to right (`ul`, then `li`, then `li`
-again) and exit in reverse order, regardless of how many managers
-appear on the line.
+again) and exit in reverse order, for any number of managers on the
+line.
 
 </details>
 </details>
@@ -261,12 +262,10 @@ chapter's `test_object_pool.py` you add the test function alone.
 
 **Hold both connections at once.** The `lease()` at `[1]` takes one connection out of the queue, and the
 nested `lease()` at `[2]` takes the other, so `pool.available()` is `0`
-inside the inner `with`. The `0` confirms the pool has no
-built-in limit of "one lease at a time." The pool holds the items you
-gave its constructor, and it hands out as many concurrent leases as
-it has items. A third nested `lease()` would block forever in
-`get()`, since this one thread holds both connections and nothing can
-return one.
+inside the inner `with`. The `0` confirms that the pool hands out one
+concurrent lease for each item you gave its constructor. A third nested `lease()` would block forever in
+`get()`, since the one thread that could return a connection is the
+thread waiting for it.
 
 **Check that both connections come back.** Exiting the inner `with` (`[2]`) puts `second`
 back, then exiting the outer `with` (`[1]`) puts `first` back,
@@ -333,20 +332,21 @@ report()
 #: === outer ends ===
 ```
 
-**Apply the decorators bottom-up.** The prediction is the same one stacking produces anywhere. Python reads
+**Apply the decorators bottom-up.** Stacked context-manager decorators apply in the same order as any other stacked decorators. Python evaluates
 the stack as `report = banner("outer")(banner("inner")(report))`.
 `@banner("inner")` is nearest the `def`, so it wraps `report()` first,
 and `@banner("outer")` then wraps the inner wrapper. Calling `report()`
-therefore enters the outer manager, which calls the inner wrapper,
-which enters the inner manager before running the body. Unwinding
+therefore enters the outer manager first. Inside the outer manager, the outer wrapper
+calls the inner wrapper, which enters the inner manager and then runs
+the body. Unwinding
 reverses that order, so the four bracketing lines nest rather than
 interleave.
 
-**Enter a fresh manager on each call.** Each `@banner(...)` line builds one manager object, when Python
-defines `report()`. A generator manager is single-use, so the wrapper
-that `ContextDecorator` supplies does not enter that object. On each
-call of `report()` the wrapper builds a fresh manager from the same generator
-function and arguments, and enters that one. A hand-written
+**Enter a fresh manager on each call.** When Python defines `report()`,
+each `@banner(...)` line builds one manager object. A generator manager is single-use, so the wrapper
+that `ContextDecorator` supplies reads that object's generator function
+and arguments. On each call of `report()` the wrapper builds a fresh
+manager from them and enters the fresh one. A hand-written
 class-based manager decorating a function re-enters the same instance
 on every call instead, so every call shares any state the instance
 holds.
@@ -367,7 +367,7 @@ holds.
 [The `__exit__()` Arguments](../../Chapters/15_Techniques--Context_Managers.md#the-__exit__-arguments) shows that a true return value from `__exit__()` suppresses the exception and a false one lets it continue.
 Write a class whose `__exit__()` returns the result of testing `exc_type` against `KeyError`.
 `exc_type` is `None` when the block finishes cleanly.
-Test the `ValueError` case inside the chapter's `expected()` so it catches and prints the exception.
+Test the `ValueError` case inside the chapter's `expected()` so `expected()` catches and prints the exception.
 
 <details>
 <summary>The shape</summary>
@@ -398,7 +398,7 @@ the demo prints the same two lines, because both of its blocks raise an exceptio
 A block that finishes cleanly then fails.
 `__exit__()` receives `None`, and `issubclass()` raises a `TypeError`.
 `ty` reports an `invalid-argument-type` at the `issubclass()` call,
-so the type checker catches the mistake the demo misses.
+so the type checker catches the mistake that the demo's output hides.
 The solution tests `exc_type is not None` first.
 
 ```python
@@ -433,19 +433,19 @@ with expected(ValueError):
 #: [ValueError] not a lookup problem
 ```
 
-**Suppress one exception type.** `__exit__()` decides an exception's fate through its return value:
-truthy suppresses, falsy lets the exception continue. Returning
+**Suppress one exception type.** The return value of `__exit__()` determines whether the exception continues.
+A truthy value suppresses the exception, and a falsy value lets it continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
 propagates everything else.
 
-**Check that other exceptions propagate.** The second block confirms the
-propagation. The `ValueError` passes through `ignore_missing` and
-reaches the chapter's `expected`, which prints it.
+**Check that other exceptions propagate.** The `ValueError` block confirms the
+propagation. `ignore_missing`'s `__exit__()` returns `False` for the `ValueError`,
+so the exception propagates to the chapter's `expected`, which prints it.
 
 **Handle a clean exit.** The `exc_type is not None` test keeps the normal path working. When a
-block finishes without an exception, Python still calls `__exit__()`,
-passing `None` for all three arguments, and
-`issubclass(None, KeyError)` raises a `TypeError`. Checking for `None`
+block finishes cleanly, Python still calls `__exit__()`
+and passes `None` for all three arguments.
+Without the test, `issubclass(None, KeyError)` would raise a `TypeError`. Checking for `None`
 first also lets the type checker narrow `exc_type` to
 `type[BaseException]`, the type `issubclass()` requires.
 
@@ -467,7 +467,7 @@ The class uses a lowercase name because you use it like a function.
 
 [Combining Context Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows `ExitStack` entering a number of managers that the code decides at runtime.
 Build the list of names from `sys.argv[1:]` and pass it to the function that calls `enter_context()` for each one.
-Run it with no names and with three, and compare the close order with the open order.
+Run `exit_stack.py` with no names and with three, and compare the close order with the open order.
 
 <details>
 <summary>The shape</summary>
@@ -488,8 +488,8 @@ def wrap(names: list[str]) -> None:
 <details>
 <summary>Solution</summary>
 
-Both calls to `wrap()` go, replaced by one call that reads the names
-from the command line:
+One call that reads the names from the command line replaces both
+calls to `wrap()`:
 
 ```python
 import sys
@@ -516,24 +516,24 @@ using []
 ```
 
 **Close in reverse order of opening.** `enter_context()` pushes each manager onto the stack as the
-comprehension walks the list left to right. Leaving the `with` unwinds
-that stack, so the closes come out in reverse. The reversal holds for
-any number of names, including zero, the property the exercise asks
-you to confirm.
+comprehension iterates over the list left to right. Leaving the `with` unwinds
+that stack, so the `close` lines print in reverse. The exercise asks
+you to confirm that the reversal holds for any number of names,
+and it does, zero included.
 
 The empty run is the more interesting one. Nothing opens, so nothing
-closes, and `with ExitStack() as stack:` still enters and exits
-correctly around a body whose stack stays empty. That degenerate case
-shows why `ExitStack` exists. A written-out `with a, b, c:` line settles its
-count in the source. `ExitStack` accepts a count settled only at
-runtime, zero included, and a command line is one source of
-such a count.
+closes. `with ExitStack() as stack:` still enters and exits
+around a body whose stack stays empty. That degenerate case
+shows why `ExitStack` exists.
+A written-out `with a, b, c:` line settles its count in the source.
+`ExitStack` instead accepts a count settled at runtime,
+such as the number of names on a command line, zero included.
 
-The `sys.argv` rewrite stays out of the extracted listings, because
-the book's output checker runs each listing with `exec()` inside a
-checker process, and a script reading `sys.argv` sees the checker's
-arguments instead. The listing below passes the names to `wrap()`
-as list literals, so the checker can run it, and it shows both cases:
+The `sys.argv` rewrite stays out of the extracted listings.
+The book's output checker runs each listing with `exec()` inside the
+checker's own process, so a script reading `sys.argv` gets the checker's
+arguments instead. Here, `exercise_7.py` passes the names to `wrap()`
+as list literals, so the checker can run both cases:
 
 ```python
 # exercise_7.py
@@ -624,16 +624,16 @@ except ValueError as error:
 
 **Clean up before the exception propagates.** `exit A` now prints, and it prints before `caught: boom`. Python
 raises the block's `ValueError` inside the generator, at the `yield`.
-The `finally` runs as the exception leaves the generator, and only
-then does the exception leave the `with` statement and reach the
+The `finally` runs as the exception propagates out of the generator, and only
+then does the exception propagate out of the `with` statement to the
 `except`.
 That is the order `exit_on_error.py` shows for the class form: cleanup
 first, then propagation.
 
-In `no_finally.py` the same exception leaves the generator from the
-bare `yield`, so the `print()` after it does not run. The `finally` is
-the only difference between the two listings, apart from the
-function's name.
+In `no_finally.py` the same exception propagates out of the generator at a
+`yield` with no `try` around it, so the `print()` after the `yield` does not run. Apart from the
+function's name, the `finally` is the one difference between the two
+listings.
 
 </details>
 </details>
