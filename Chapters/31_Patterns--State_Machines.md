@@ -238,12 +238,8 @@ but a machine with many states means many `match` statements,
 spread across many classes.
 A second approach puts a table inside each `State` object,
 mapping the input object to the next state.
-
-A state's class body cannot build that state's table,
-because the entries name the other states,
-and those states exist only after every class definition has run.
-So the classes come first,
-and module-level code fills in the tables once every state object exists:
+One base class holds the lookup,
+and each state supplies its own table and its own `run()`:
 
 ```python
 # table_state.py
@@ -266,25 +262,27 @@ class TableState(ABC):
                 f"on {input_}") from None
 ```
 
-`TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
-and leaves `run()` abstract for its subclasses.
-It is an `ABC`, the alternative the first version sets aside,
-because here the base has code to share.
-Every subclass inherits `next()`.
-`TableState`'s `run()` and `next()` have the signatures the `State` Protocol names,
-so the unchanged `StateMachine` class from `state_machine.py` drives every `TableState`.
+`TableState` is an `ABC` rather than a Protocol because the base has code to share.
+Its `next()` looks the input up in the `transitions` dict,
+and every subclass inherits it.
+`run()` stays abstract, since each state's behavior is its own.
+Both methods have the signatures the `State` Protocol names,
+so the unchanged `StateMachine` from `state_machine.py` drives every `TableState`.
 
-`TableState.__init__()` starts every state with an empty dict.
-If you forget to fill `Waiting`'s table,
-the machine reports `Waiting: no transition on ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
-
+The constructor starts each state with an empty dict,
+so a state whose table you forget to fill reports `Waiting: no transition on ...` rather than an `AttributeError` for a missing attribute.
 The `KeyError` that `next()` catches carries the input as its key,
 and the `RuntimeError` message already names that input.
 So `next()` raises its `RuntimeError` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
 which drops the chained `KeyError` and its repeat of the input.
 
-Each subclass now defines `run()` and inherits `next()`.
-The tables filled in at the bottom of the file hold the transitions:
+Each mousetrap state class now defines `run()` alone,
+and its transitions are data.
+A state's class body cannot build that state's table,
+because the entries name the other states,
+and those states exist only after every class definition has run.
+So the state classes and the `MouseTrap` that instantiates them come first,
+and module-level code fills in the tables once every state object exists:
 
 ```python
 # mouse_trap_tables.py
@@ -340,7 +338,8 @@ MouseTrap.holding.transitions = {
 }
 ```
 
-The demo file differs in how it treats the unexpected input:
+The demo feeds the same nine moves and prints the same trace.
+Its second call shows what a table does with an input it lacks:
 
 ```python
 # mouse_trap_tables_demo.py
