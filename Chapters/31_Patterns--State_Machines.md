@@ -238,7 +238,7 @@ but a machine with many states means many `match` statements,
 spread across many classes.
 A second approach puts a table inside each `State` object,
 mapping the input object to the next state.
-One base class holds the lookup,
+The base class holds the lookup,
 and each state supplies its own table and its own `run()`:
 
 ```python
@@ -320,8 +320,7 @@ class MouseTrap(StateMachine):
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
 
-# Every state object now exists, so each table can name
-# its next states directly:
+# Each table can name its next states directly:
 MouseTrap.waiting.transitions = {
     MouseAction.APPEARS: MouseTrap.luring,
 }
@@ -826,100 +825,6 @@ def test_no_transition_raises() -> None:
     with pytest.raises(NoTransition):
         vm.handle(Quit())
 ```
-
-### A View for the Vending Machine
-
-Because the actions set `vm.message`,
-`VendingMachine` leaves all output to its caller.
-The same machine can therefore drive more than one view.
-The text demo in `vending_demo.py` reads `message` and prints it.
-Contrast `run_all()` in the first design,
-which prints each transition from inside the framework.
-Printing there is convenient for a book listing and wrong for a reusable machine,
-because the `print()` call sits in the engine,
-where every user of `run_all()` gets its output.
-
-A `tkinter` GUI is a second view of the same vending machine.
-The GUI reads `amount`, the stock, and `message` and shows them on screen.
-Its coin, refund, and item buttons turn presses into inputs for `handle()`.
-Because this listing requires user interaction, the harness skips it
-(`tools/data/norun.txt`):
-
-```python
-# tabledriven/vending_view.py
-import tkinter as tk
-from functools import partial
-from table_machine import NoTransition
-from vending_machine import (FirstDigit, Money, Quit,
-                             SecondDigit, VendingMachine)
-
-def show() -> None:
-    vm = VendingMachine()
-    root = tk.Tk()
-    root.title("Vending Machine")
-    display = tk.Label(root, width=34, anchor="w")
-    display.grid(row=0, column=0, columnspan=4, sticky="we")
-    buttons: list[list[tk.Button]] = []
-
-    def render() -> None:
-        display.config(
-            text=f"Inserted {vm.amount}c   {vm.message}")
-        for r, row in enumerate(vm.items):
-            for c, slot in enumerate(row):
-                out = slot.quantity == 0
-                qty = "OUT" if out else f"x{slot.quantity}"
-                buttons[r][c].config(
-                    text=f"{r}{c}\n{slot.price}c\n{qty}",
-                    state="disabled" if out else "normal")
-
-    def send(input_: object) -> None:
-        try:
-            vm.handle(input_)
-        except NoTransition:
-            vm.message = "not allowed yet"
-        render()
-
-    def select(r: int, c: int) -> None:
-        send(FirstDigit("ABCD"[r], r))
-        send(SecondDigit(f"col {c}", c))
-
-    tk.Button(root, text="+25c",
-              command=lambda: send(Money("quarter", 25))
-              ).grid(row=1, column=0, sticky="we")
-    tk.Button(root, text="+$1",
-              command=lambda: send(Money("dollar", 100))
-              ).grid(row=1, column=1, sticky="we")
-    tk.Button(root, text="Refund",
-              command=lambda: send(Quit())
-              ).grid(row=1, column=2, columnspan=2,
-                     sticky="we")
-
-    for r in range(4):
-        button_row: list[tk.Button] = []
-        for c in range(4):
-            b = tk.Button(root, width=6, height=3,
-                          command=partial(select, r, c))
-            b.grid(row=2 + r, column=c)
-            button_row.append(b)
-        buttons.append(button_row)
-
-    render()
-    root.mainloop()
-
-if __name__ == "__main__":
-    show()
-```
-
-`send()` passes each input to `handle()` and catches the `NoTransition` that `handle()` raises for a rejected click,
-such as a selection before any money.
-The GUI then shows a message instead of the traceback `tkinter` would otherwise print.
-
-The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
-Sixteen lambdas closing over `r` and `c` would all read the loop's final values,
-the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
-The three coin and refund buttons use lambdas safely,
-because each lambda captures one name, `send`,
-and `send` keeps one value for the life of the window.
 
 ## Which Design Should You Use?
 
