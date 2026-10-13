@@ -153,7 +153,7 @@ produces a generator on demand. The container keeps the value
 <details>
 <summary>Where to look</summary>
 
-[The Costs of Laziness](../../Chapters/23_Patterns--Iterators.md#the-costs-of-laziness) explains that creating a generator runs none of its body.
+[What Laziness Hides](../../Chapters/23_Patterns--Iterators.md#what-laziness-hides) explains that creating a generator runs none of its body.
 Wrap the generator in `itertools.islice()` with a stop of 10.
 `islice()` pulls only as many values as you request, so the rest stay uncomputed.
 
@@ -196,7 +196,7 @@ print(list(islice(fibonacci(1_000_000), 10)))
 `fibonacci(1_000_000)` builds a generator ready to yield a million
 values, but building it computes nothing. A generator's body runs only
 as far as the next `yield`, each time something asks it for a value.
-`islice(..., 10)` asks for exactly ten, so `fibonacci()`'s loop runs
+`islice(..., 10)` asks for ten, so `fibonacci()`'s loop runs
 ten iterations and leaves the other 999,990 uncomputed, the same
 laziness on which
 [Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#generator-expressions) and
@@ -380,7 +380,7 @@ Each step takes one item from each branch, so the buffer keeps its
 size through the rest of the run.
 
 **Compare two gap widths.** One machine measured about
-9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
+9,800 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
 hundredfold wider gap costs roughly forty times the memory rather than
 a hundred, because the smaller figure carries a cost that stays
 the same at every `k`, and a short gap uses more bytes per item than a long one.
@@ -444,7 +444,7 @@ The test should resemble
 `test_the_if_clause_skips_but_never_stops()`, because `filter()` and
 the generator expression's `if` clause are the same operation written
 two ways. Both skip what does not match and both keep asking forever,
-so both trip the wire. Only `takewhile()` stops.
+so both trip the wire. `takewhile()` stops at the first failure.
 
 Writing this test confirms the pairing the prose asserts. A
 reader might reasonably guess that `filter()`, being a function rather
@@ -680,7 +680,7 @@ If you write `peek(it)` as `return next(it, DONE)`
 and call it on the demo's `(x * 2 for x in [1, 2, 3])`,
 it reports the `2` and consumes it.
 The following `next(it)` returns `4`.
-The type checker passes that version, so the loss shows only when the program runs.
+The type checker accepts that version, so the loss shows only when the program runs.
 `Peekable` keeps the pulled item in a field,
 where `peek()` can read it any number of times and `__next__()` can still hand it out.
 
@@ -734,9 +734,10 @@ because it reads a field rather than the source.
 **Fill the buffer at construction.** `Peekable` pulls from the source
 before any caller asks for a value, so the constructor computes the
 first item, however slow, whether or not anything uses it. A source
-that blocks on its first read blocks at construction. `tee()`,
-`OverStream`, and this chapter's other lookahead pull early the same
-way. Answering a question about the future means fetching the future.
+that blocks on its first read blocks at construction. `OverStream`
+pulls early the same way: its `is_done()` reads the next item before
+`current_item()` asks for it. Answering a question about the future
+means fetching the future.
 
 </details>
 </details>
@@ -823,7 +824,7 @@ and gets `"a"`. That `"a"` is also not an `int`, so `flatten("ab")`
 recurses into `flatten("a")`, which iterates over `"a"` and gets
 `"a"`. The string has stopped getting shorter. Every other sequence bottoms out because
 indexing it eventually yields a non-sequence, and `str` is the one
-built-in exception. A one-character string is still a `Sequence`
+built-in sequence whose items are again strings. A one-character string is still a `Sequence`
 of one-character strings. The recursion has no base case, so it runs
 until Python raises a `RecursionError`.
 
@@ -955,9 +956,10 @@ print(list(SkippingIterator(iter(items), int)))
 
 **Skip a mismatch and keep going.** `typed()` and `typed_skipping()` ask the same `isinstance()` question
 and act differently on a no, and that difference decides what
-happens after a bad item. `typed()` ends the stream. The consumer
-receives the `1` before `"two"` and nothing after it. The caller gets
-an exception instead of a list. `typed_skipping()` delivers
+happens after a bad item. `typed()` ends the stream. A consumer
+that iterates item by item receives the `1` before `"two"` and
+nothing after it, and a caller that wraps it in `list()` gets an
+exception instead of a list. `typed_skipping()` delivers
 `[1, 3, 4]` and says nothing about `"two"` or the `None`.
 
 For a parsed log file, take the skipping version. A log is an

@@ -29,8 +29,7 @@ print(f"tee held as much as the list: "
 # Same N, but both branches advance together:
 first2, second2 = tee(i * i for i in range(N))
 tracemalloc.start()
-for x, y in zip(first2, second2,
-                strict=True):
+for _ in zip(first2, second2, strict=True):
     pass
 _, lockstep = tracemalloc.get_traced_memory()
 tracemalloc.stop()

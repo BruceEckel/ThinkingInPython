@@ -1,4 +1,4 @@
-# asking_costs.py
+# asking_consumes.py
 DONE = sentinel("DONE")
 
 numbers = iter([1, 2])

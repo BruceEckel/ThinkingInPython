@@ -10,6 +10,7 @@ Chapters/Changing_the_Interface	Changing_the_Interface	5	Renaming a keyword-capa
 Chapters/Cleanup	Cleanup	7	An `__enter__()` that fails, unguarded and guarded
 Chapters/Composite_and_Interpreter	Composite_and_Interpreter	2	A `Symlink` node
 Chapters/Composite_and_Interpreter	Composite_and_Interpreter	6	Declining with `NotImplemented`
+Chapters/Composite_and_Interpreter	Composite_and_Interpreter	8	An iterative walk over a deep tree
 Chapters/Comprehensions	Comprehensions	9	Counting the calls the walrus saves
 Chapters/Confidence	Confidence	1	Which process ran each call
 Chapters/Effect_Management	Effect_Management	2	Threading a `Log` Effect through by hand
