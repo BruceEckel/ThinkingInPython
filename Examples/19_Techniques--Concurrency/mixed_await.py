@@ -2,6 +2,7 @@
 import asyncio
 import time
 from concurrent.futures import ProcessPoolExecutor
+from pricing import cpu_price
 
 async def io_price(order: int) -> int:
     await asyncio.sleep(0.05)  # Native coroutine
@@ -9,12 +10,6 @@ async def io_price(order: int) -> int:
 
 def blocking_price(order: int) -> int:
     time.sleep(0.05)  # Blocking call, needs a thread
-    return order * 10
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Needs its own process
-        total += 1
     return order * 10
 
 async def process_price(

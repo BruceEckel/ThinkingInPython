@@ -1,11 +1,6 @@
 # parallel_cpu.py
 from concurrent.futures import ProcessPoolExecutor
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    return order * 10
+from pricing import cpu_price
 
 if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]

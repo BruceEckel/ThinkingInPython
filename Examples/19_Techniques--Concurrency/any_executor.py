@@ -5,12 +5,7 @@ from concurrent.futures import (
     ProcessPoolExecutor,
     ThreadPoolExecutor,
 )
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    return order * 10
+from pricing import cpu_price
 
 def run_on(
     executor: Executor, orders: list[int]

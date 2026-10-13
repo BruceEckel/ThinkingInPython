@@ -247,12 +247,11 @@ writing the same price lookup twice.
 A `Meter` records the peak number of tasks in flight at once.
 `Meter` is a [context manager](15_Techniques--Context_Managers.md).
 `__enter__()` counts the task in flight, `__exit__()` counts it done,
-and `__exit__()` runs whether or not the body raises an exception:
+and `__exit__()` runs whether or not the body raises an exception.
+`Meter` lives in a shared module because [Semaphores](#semaphores) uses it too:
 
 ```python
-# peak_concurrency.py
-import asyncio
-from collections.abc import Awaitable, Callable
+# utils/meter.py
 from dataclasses import dataclass
 
 @dataclass
@@ -267,6 +266,15 @@ class Meter:
     def __exit__(self, exc_type: object, exc: object,
                  tb: object) -> None:
         self.active -= 1
+```
+
+`peak_concurrency.py` gives each run of a price function its own `Meter`:
+
+```python
+# peak_concurrency.py
+import asyncio
+from collections.abc import Awaitable, Callable
+from meter import Meter
 
 async def io_price(order: int, meter: Meter) -> int:
     with meter:
@@ -832,32 +840,30 @@ Where a lock admits one task,
 ```python
 # async_semaphore.py
 import asyncio
+from meter import Meter
 
-active = 0
-peak = 0
+meter = Meter()
 semaphore = asyncio.Semaphore(2)
 
 async def worker() -> None:
-    global active, peak
     async with semaphore:
-        active += 1
-        peak = max(peak, active)
-        await asyncio.sleep(0.05)
-        active -= 1
+        with meter:
+            await asyncio.sleep(0.05)
 
 async def main() -> None:
     await asyncio.gather(*(worker() for _ in range(5)))
-    print(f"peak concurrent workers: {peak}")
+    print(f"peak concurrent workers: {meter.peak}")
 
 asyncio.run(main())
 #: peak concurrent workers: 2
 ```
 
 Five tasks start together, but `semaphore` admits only two at a time.
-`peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
-A threaded equivalent of this worker needs its own lock around `active += 1` and `peak = max(peak, active)`,
+`meter` is the `Meter` from [Overlapping the Waits](#overlapping-the-waits),
+which reports a peak of 5 for the unbounded I/O tasks there and 2 here.
+A threaded equivalent of this worker needs a lock around the two updates in `Meter.__enter__()`,
 since a preemptive switch could fall between them.
-Here, the first `await` comes after both updates,
+Here, `__enter__()` finishes both updates before the task reaches its `await`,
 so the task keeps control through them and needs no lock.
 
 A semaphore initialized to one behaves like a lock, with one difference.
@@ -991,17 +997,28 @@ With several cores, it can.
 each with its own interpreter and its own [*Global Interpreter Lock*](#the-gil-and-free-threading)
 (GIL), the interpreter-wide lock that lets one thread at a time run Python bytecode.
 Here, each interpreter has its own,
-so the operating system can place these processes on different cores and run them at the same time:
+so the operating system can place these processes on different cores and run them at the same time.
+
+The rest of the chapter runs one CPU-bound workload on several backends,
+so a shared module holds it.
+`cpu_price()` is the counting loop from `peak_concurrency.py`,
+as an ordinary function with no `Meter`:
 
 ```python
-# parallel_cpu.py
-from concurrent.futures import ProcessPoolExecutor
-
+# utils/pricing.py
 def cpu_price(order: int) -> int:
     total = 0
     for _ in range(1_000_000):  # Processor work
         total += 1
     return order * 10
+```
+
+`parallel_cpu.py` hands `cpu_price()` to a pool of worker processes:
+
+```python
+# parallel_cpu.py
+from concurrent.futures import ProcessPoolExecutor
+from pricing import cpu_price
 
 if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
@@ -1012,7 +1029,6 @@ if __name__ == "__main__":
 
 `pool.map()` sends each order to a worker process and gathers the results in order,
 printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
-The computation is the same loop as `cpu_price()` in `peak_concurrency.py`.
 The work now spreads across multiple interpreters, each on its own core,
 instead of one interpreter on one core.
 With enough cores the wall-clock time falls toward the time of a single task.
@@ -1024,7 +1040,8 @@ and all three surface in `parallel_cpu.py`:
 
 1. The `if __name__ == "__main__"` guard keeps each worker from building a pool of its own.
    To create a worker, the operating system starts a fresh Python interpreter,
-   and that interpreter *imports* this module to find `cpu_price()`.
+   and that interpreter *imports* this module, the program's main module,
+   before it runs any work.
    During the import the module's name is not `"__main__"`,
    so the guarded block stays skipped.
    If you leave out the guard, each worker re-runs the block,
@@ -1043,7 +1060,7 @@ and all three surface in `parallel_cpu.py`:
    One process serializes each argument and each return value,
    and the other rebuilds it.
    The function travels by name,
-   so it must be importable from the top level of the module.
+   so it must be importable from the top level of a module.
    Passing a `lambda` to `pool.map()` fails with a pickling error.
    That boundary crossing echoes [Performance](18_Techniques--Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule.
    A million tiny results can cost more to pickle than the parallelism saves.
@@ -1160,10 +1177,10 @@ if __name__ == "__main__":
     with ProcessPoolExecutor() as pool:
         # Start every worker, not timed
         list(pool.map(time.sleep, [1] * cores))
-        baseline: float | None = None
-        for tasks in task_counts:
+        baseline = timed_split(pool, TOTAL, 1)
+        print(f"  1 tasks: {baseline:6.3f}s (1.00x)")
+        for tasks in task_counts[1:]:
             elapsed = timed_split(pool, TOTAL, tasks)
-            baseline = baseline or elapsed
             print(
                 f"{tasks:>3} tasks: {elapsed:6.3f}s "
                 f"({baseline / elapsed:4.2f}x)"
@@ -1331,13 +1348,8 @@ In contrast, a thread that is computing gains nothing when the GIL changes hands
 ```python
 # gil_threads.py
 from benchmark import report
+from pricing import cpu_price
 from thread_compare import compare
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    return order * 10
 
 orders = [1, 2, 3, 4, 5]
 seq, thr = compare(cpu_price, orders, number=5)
@@ -1565,12 +1577,7 @@ import os
 import timeit
 from concurrent.futures import InterpreterPoolExecutor
 from benchmark import report
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    return order * 10
+from pricing import cpu_price
 
 def sequential(orders: list[int]) -> list[int]:
     return [cpu_price(o) for o in orders]
@@ -1937,12 +1944,7 @@ from concurrent.futures import (
     ProcessPoolExecutor,
     ThreadPoolExecutor,
 )
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    return order * 10
+from pricing import cpu_price
 
 def run_on(
     executor: Executor, orders: list[int]
@@ -1985,6 +1987,7 @@ and a `run_in_executor()` call all produce an *awaitable*.
 import asyncio
 import time
 from concurrent.futures import ProcessPoolExecutor
+from pricing import cpu_price
 
 async def io_price(order: int) -> int:
     await asyncio.sleep(0.05)  # Native coroutine
@@ -1992,12 +1995,6 @@ async def io_price(order: int) -> int:
 
 def blocking_price(order: int) -> int:
     time.sleep(0.05)  # Blocking call, needs a thread
-    return order * 10
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Needs its own process
-        total += 1
     return order * 10
 
 async def process_price(

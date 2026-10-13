@@ -33,10 +33,10 @@ if __name__ == "__main__":
     with ProcessPoolExecutor() as pool:
         # Start every worker, not timed
         list(pool.map(time.sleep, [1] * cores))
-        baseline: float | None = None
-        for tasks in task_counts:
+        baseline = timed_split(pool, TOTAL, 1)
+        print(f"  1 tasks: {baseline:6.3f}s (1.00x)")
+        for tasks in task_counts[1:]:
             elapsed = timed_split(pool, TOTAL, tasks)
-            baseline = baseline or elapsed
             print(
                 f"{tasks:>3} tasks: {elapsed:6.3f}s "
                 f"({baseline / elapsed:4.2f}x)"

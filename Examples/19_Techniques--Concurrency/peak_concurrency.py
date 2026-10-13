@@ -1,20 +1,7 @@
 # peak_concurrency.py
 import asyncio
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
-
-@dataclass
-class Meter:
-    active: int = 0
-    peak: int = 0
-
-    def __enter__(self) -> None:
-        self.active += 1
-        self.peak = max(self.peak, self.active)
-
-    def __exit__(self, exc_type: object, exc: object,
-                 tb: object) -> None:
-        self.active -= 1
+from meter import Meter
 
 async def io_price(order: int, meter: Meter) -> int:
     with meter:

@@ -182,19 +182,7 @@ Look at where the `await` falls relative to that block, and whether the other fo
 # The shape of exercise_3.py
 import asyncio
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
-
-@dataclass
-class Meter:
-    active: int = 0
-    peak: int = 0
-
-    def __enter__(self) -> None:
-        ...
-
-    def __exit__(self, exc_type: object, exc: object,
-                 tb: object) -> None:
-        ...
+from meter import Meter
 
 async def mixed_price(order: int, meter: Meter) -> int:
     ...
@@ -216,20 +204,7 @@ async def main() -> None:
 # exercise_3.py
 import asyncio
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
-
-@dataclass
-class Meter:
-    active: int = 0
-    peak: int = 0
-
-    def __enter__(self) -> None:
-        self.active += 1
-        self.peak = max(self.peak, self.active)
-
-    def __exit__(self, exc_type: object, exc: object,
-                 tb: object) -> None:
-        self.active -= 1
+from meter import Meter
 
 async def mixed_price(order: int, meter: Meter) -> int:
     with meter:
@@ -296,19 +271,7 @@ Think about whether any task can start while another one sleeps, and what that d
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
-
-@dataclass
-class Meter:
-    active: int = 0
-    peak: int = 0
-
-    def __enter__(self) -> None:
-        ...
-
-    def __exit__(self, exc_type: object, exc: object,
-                 tb: object) -> None:
-        ...
+from meter import Meter
 
 async def io_price(order: int, meter: Meter) -> int:
     ...
@@ -331,20 +294,7 @@ async def main() -> None:
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
-
-@dataclass
-class Meter:
-    active: int = 0
-    peak: int = 0
-
-    def __enter__(self) -> None:
-        self.active += 1
-        self.peak = max(self.peak, self.active)
-
-    def __exit__(self, exc_type: object, exc: object,
-                 tb: object) -> None:
-        self.active -= 1
+from meter import Meter
 
 async def io_price(order: int, meter: Meter) -> int:
     with meter:
@@ -531,12 +481,7 @@ With the guard gone, `parallel_cpu.py` builds its pool at import time:
 
 ```python
 from concurrent.futures import ProcessPoolExecutor
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    return order * 10
+from pricing import cpu_price
 
 orders = [1, 2, 3, 4, 5]
 with ProcessPoolExecutor() as pool:  # No longer guarded
@@ -555,9 +500,9 @@ bottom:
     child processes and you have forgotten to use the proper idiom
     in the main module
 
-**Build the pool at import time.** Each worker does what the chapter describes. To find `cpu_price()`, a
-fresh interpreter imports this module, and importing it runs every
-top-level statement, including the `with ProcessPoolExecutor()` line
+**Build the pool at import time.** Each worker does what the chapter describes. A fresh interpreter
+imports this module, the program's main module, before it runs any
+work, and importing it runs every top-level statement, including the `with ProcessPoolExecutor()` line
 that creates workers. Each worker therefore tries to build a pool of
 its own, whose workers would import the module again.
 
@@ -1096,9 +1041,7 @@ import os
 import timeit
 from concurrent.futures import ThreadPoolExecutor
 from benchmark import report
-
-def cpu_price(order: int) -> int:
-    ...
+from pricing import cpu_price
 
 def sequential(orders: list[int]) -> list[int]:
     ...
@@ -1113,12 +1056,7 @@ import os
 import timeit
 from concurrent.futures import ThreadPoolExecutor
 from benchmark import report
-
-def cpu_price(order: int) -> int:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    return order * 10
+from pricing import cpu_price
 
 def sequential(orders: list[int]) -> list[int]:
     return [cpu_price(o) for o in orders]
