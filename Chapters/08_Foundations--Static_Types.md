@@ -423,12 +423,14 @@ grid: Grid = {}
 paint(grid, (2, 3), "red")
 print(grid)
 #: {(2, 3): 'red'}
+print(type(grid).__name__)
+#: dict
 ```
 
 Like `match`, `type` is a [soft keyword](04_Foundations--Control_Flow.md#pattern-matching).
 It is a keyword only at the start of this statement.
 Everywhere else, `type` is still the built-in `type()` function,
-so `type(grid)` in the same file returns `dict` as it always has.
+so the listing's `type(grid)` call returns `dict` as it always has.
 
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
@@ -479,9 +481,8 @@ def first_any(items: list) -> Any:
 
 n = first_any([10, 20, 30])
 with expected(AttributeError):
-    n.nonexistent_method()
-#: [AttributeError] 'int' object has no attribute
-#: 'nonexistent_method'
+    n.upper()
+#: [AttributeError] 'int' object has no attribute 'upper'
 ```
 
 `ty check` passes this file with no complaint.
@@ -500,6 +501,8 @@ def first[T](items: list[T]) -> T:
 n = first([10, 20, 30])  # T is int
 print(n + 1)
 #: 11
+# ty: "int" has no attribute "upper":
+# n.upper()
 s = first(["a", "b"])  # T is str
 print(s.upper())
 #: A
@@ -507,7 +510,9 @@ print(s.upper())
 
 `T` is a placeholder, filled in separately at each call.
 The type checker infers `T` from the argument and then knows the return type.
-Both `n + 1` and `s.upper()` pass the type checker, while `n.upper()` fails.
+Both `n + 1` and `s.upper()` pass the type checker,
+while the commented-out `n.upper()` fails,
+the same call that `first_any.py` lets through to fail at runtime.
 
 A class declares type parameters the same way:
 

@@ -12,3 +12,5 @@ grid: Grid = {}
 paint(grid, (2, 3), "red")
 print(grid)
 #: {(2, 3): 'red'}
+print(type(grid).__name__)
+#: dict
