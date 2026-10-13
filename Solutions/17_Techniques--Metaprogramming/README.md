@@ -81,15 +81,15 @@ print(sorted(c.__name__ for c in Color.registry))
 ```
 
 **Register a new leaf.** Creating `Yellow` adds it to the registry and
-removes its only base, `Color`, which is not in the registry, so that
-removal changes nothing. `Yellow` stays until a subclass of its own
-arrives.
+subtracts its one base, `Color`. The registry holds no `Color`, so the
+subtraction leaves the set as it was. `Yellow` stays until Python
+creates a subclass of it.
 
-**Drop a base that gains a child.** Creating `Gold` adds it and removes its base, `Yellow`, the
-same pruning `PhthaloBlue` and `CeruleanBlue` do to `Blue` earlier.
+**Drop a base that gains a child.** Creating `Gold` adds it and removes its base, `Yellow`.
+Creating `PhthaloBlue` removes `Blue` the same way.
 `__init_subclass__()` runs for every new subclass, so each new
-generation adds itself and prunes its parent automatically, with no
-edit to `Color`.
+generation adds itself and prunes its parent automatically.
+The `Color` class stays as written.
 
 </details>
 </details>
@@ -167,11 +167,12 @@ print(p.__dict__)
 #: {'_x': 3, '_y': 4, '_z': 9}
 ```
 
-`z = Field()` leaves the `Field` class as it was.
-`__set_name__()` runs once per descriptor, at class-creation time.
-Python calls it separately for each of `x`, `y`, and `z`, passing each
-one its own attribute name, so `z`'s `Field` instance learns the name
-`"z"` and stores under `"_z"`, independently of the other two.
+`z = Field()` leaves the `Field` class as it was,
+because `__set_name__()` runs once per descriptor, at class-creation time.
+Python calls `__set_name__()` separately for `x`, `y`, and `z`, passing each
+descriptor its own attribute name. The `Field` instance bound to `z`
+receives the name `"z"` and stores the value of `p.z` under `"_z"`, apart from
+`"_x"` and `"_y"`.
 
 </details>
 </details>
@@ -213,11 +214,11 @@ class CSingleton(metaclass=Singleton):
 <details>
 <summary>Solution</summary>
 
-If you write `super().__call__(*args, **kwargs)`, the usual form in a
-metaclass, the script still prints `True` and `False`, but `ty`
-reports `invalid-super-argument`. The annotation `cls: type[T]` hides
-the fact that `cls` is a `Singleton`, so the type checker cannot
-accept `cls` as the second argument of `super()`. The solution calls
+The usual form in a metaclass is `super().__call__(*args, **kwargs)`.
+If you write it, the script still prints `True` and `False`, but `ty`
+reports `invalid-super-argument`. Under the annotation `cls: type[T]`,
+the type checker treats `cls` as some class `T`, not as a `Singleton`,
+so it rejects `cls` as the second argument of `super()`. The solution calls
 `type.__call__(cls, *args, **kwargs)` and keeps the `type[T]`
 annotation that types `CSingleton()` as a `CSingleton`.
 
@@ -250,22 +251,21 @@ print(c1 is a)
 ```
 
 **Type the result as the calling class.** The `__call__[T]` signature is the chapter's, and this solution keeps it
-rather than simplifying to `-> Any`. It ties the return type to
-`cls`, so `CSingleton()` type-checks as a `CSingleton`, and the type
-checker still flags a misspelled attribute on the result. Two details follow from
-that annotation. `cls: type[T]` hides the fact that `cls` is a
-`Singleton`, so the body writes `type.__call__(cls, ...)`, where
-`ty` rejects a zero-argument `super()`. For the same reason
-the body reads the cache through the class name,
-`Singleton._instances`, rather than through `cls`.
+rather than simplifying to `-> Any`. The signature declares the return type as
+the class `cls` names, so `CSingleton()` type-checks as a `CSingleton`.
+The type checker then catches a misspelled attribute on the result.
+
+The `cls: type[T]` annotation also decides how the body reaches the cache.
+`ty` sees `cls` as some class `T` and reports `unresolved-attribute`
+for `cls._instances`, so the body reads the cache through the class name,
+`Singleton._instances`.
 
 **Keep one instance per class.** `Singleton._instances` is a dictionary keyed by the class, so
-each class using the `Singleton` metaclass gets its own independent
-slot: `ASingleton`'s single instance, `BSingleton`'s single instance
-(omitted here, but present in the chapter's `singleton.py`), and now
-`CSingleton`'s.
+each class using the `Singleton` metaclass gets its own entry.
+The chapter's `singleton.py` stores one entry for `ASingleton` and one for `BSingleton`.
+This solution keeps `ASingleton` and adds an entry for `CSingleton`.
 Calling `CSingleton()` twice returns the same object both times.
-`ASingleton` occupies its own key in that dictionary, so its instance
+`ASingleton` is a separate key in that dictionary, so its instance
 is a separate object.
 
 </details>
@@ -284,7 +284,7 @@ is a separate object.
 
 [Making a Class Final](../../Chapters/17_Techniques--Metaprogramming.md#making-a-class-final) shows `__init_subclass__()` refusing a subclass at runtime.
 Python passes the keyword arguments in a class header to `__init_subclass__()`, so give that method a `final` parameter with a default.
-Record each final class in a set on the base, and check `cls.__mro__` when a new subclass appears.
+Record each final class in a set on the base, and check `cls.__mro__` when Python creates a new subclass.
 
 <details>
 <summary>The shape</summary>
@@ -319,7 +319,7 @@ If you declare `final` without a default,
 but `class Open(A):` fails with
 `TypeError: A.__init_subclass__() missing 1 required positional argument: 'final'`.
 The solution gives `final` the default `False`,
-so a subclass that is not final can leave the keyword out of its header.
+so `class Open(A):` gets `final=False` from the default.
 
 ```python
 # exercise_4.py
@@ -357,11 +357,11 @@ with expected(TypeError):
 #: [TypeError] B is final; you cannot subclass it
 ```
 
-**Accept the header keyword.** The keywords in a class header travel to
-`__init_subclass__()`, so `final=True` in `class B(A, final=True):`
-arrives as a parameter of the method Python calls when it creates `B`.
-Declaring `final` with a default, `final: bool = False`, lets every
-other subclass omit it.
+**Accept the header keyword.** Python passes the keywords in a class header to
+`__init_subclass__()`, so creating `B` calls `A.__init_subclass__()`
+with `final=True` from the header `class B(A, final=True):`.
+Declaring `final` with a default, `final: bool = False`, gives every
+other subclass `False` and keeps its header short.
 
 **Pass the other keywords up.** The
 remaining `**kwargs` go on to `super().__init_subclass__()`, which
@@ -371,11 +371,15 @@ no-op.
 **Refuse any descendant of a final class.** The chapter's
 `final_runtime.py` hard-codes the refusal into `B`'s own
 `__init_subclass__()`. This version moves the decision into a set that
-`A` owns, and `A.__init_subclass__()` walks `cls.__mro__` to ask whether
-any ancestor declared itself final. A check of the direct bases in
-`cls.__bases__` would also refuse every descendant.
+`A` owns.
+`A.__init_subclass__()` walks `cls.__mro__` to check whether
+any ancestor declared itself final.
+
 `A.__init_subclass__()` refuses the first subclass of a final class as
-Python creates that subclass, so no deeper descendant exists. The walk
+Python creates that subclass, so a deeper descendant has no parent to
+extend.
+A check of the direct bases in `cls.__bases__` would therefore also
+refuse every descendant. The `__mro__` walk
 stays because it states the rule as written, "no final class anywhere
 above," in one line.
 
@@ -453,11 +457,8 @@ describe(lambda x: x * 2)
 #:   (no docstring)
 ```
 
-`inspect.getdoc()` returns `None` when a callable has no docstring, so
-`doc or "(no docstring)"` supplies a fallback message instead of
-printing `None`. A `lambda` always has a name, `"<lambda>"`, so
-`func.__name__` works uniformly on both a `def`-based function and a
-`lambda`, with no special case needed to tell them apart.
+Every `lambda` carries the name `"<lambda>"`, so `func.__name__` works
+the same way on a `def` function and on a `lambda`.
 
 </details>
 </details>
@@ -479,8 +480,8 @@ Read both the summary line and the `info` block of the diagnostic, and compare t
 <details>
 <summary>Solution</summary>
 
-Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
-the class header unsuppressed, inside the listing's
+Removing the `# type: ignore` from `metaclass_layout_conflict.py` exposes
+the class header to `ty`, inside the listing's
 `with expected(TypeError):` block:
 
 ```python
@@ -519,18 +520,19 @@ Running the same file prints
 
 The diagnostic and the exception describe one collision. `ty`'s summary
 line names the consequence, "Class will raise `TypeError` at runtime."
-Its `info` block explains the rule the interpreter enforces without
-explaining: `type` and `dict` are both implemented in C, each with its
+The diagnostic's `info` block states the rule, which the interpreter enforces
+silently.
+`type` and `dict` are both implemented in C, each with its
 own instance layout, so no single object can be both. CPython discovers
 that conflict while executing the `class` statement and reports it as
-the terse "instance lay-out conflict." `ty` reaches the same conclusion
-from the class header alone, before anything runs, and points at both
-bases to say which pair is at fault.
+the terse "instance lay-out conflict." `ty` reports the same conflict
+from the class header alone, before anything runs, and marks both
+bases to show which pair conflicts.
 
-The runtime message tells you something collided. The static one tells
+The runtime message tells you something collided. The static diagnostic tells
 you which two bases collided and why, at the moment you type the
-header rather than the moment Python first imports the module. The
-chapter's `metaclass_layout_conflict.py` carries the `# type: ignore`
+header rather than the moment Python first imports the module.
+The chapter's `metaclass_layout_conflict.py` still carries the `# type: ignore`,
 because that listing exists to show the `TypeError`.
 
 </details>
@@ -565,7 +567,7 @@ def describe(self: Any) -> str:
 <summary>Solution</summary>
 
 If you write the bases as `(float)`, without the trailing comma,
-the parentheses group an expression and build no tuple,
+the parentheses group an expression that evaluates to the class `float`,
 so `type()` raises a `TypeError`:
 `type.__new__() argument 2 must be tuple, not type`.
 The solution writes `(float,)`, a one-element tuple,
@@ -590,25 +592,24 @@ print(c + 0.5, isinstance(c, float))
 #: 22.0 True
 ```
 
-**Define the method as a function.** `describe()` annotates `self` as
-`Any` because the type checker cannot know that this loose function
-ends up on a class carrying a `unit` attribute.
+**Define the method as a function.** `describe()` is a module-level function,
+and the class that carries `unit` comes into existence later, when `type()` runs.
+The annotation on `self` therefore names `Any`, so the type checker accepts `self.unit`.
 
 **Assemble the class from data.** The three arguments are the name,
 the bases, and the namespace, the same three a `class` statement
-assembles for you. A function defined at module level becomes a method
-when you put it in that namespace dict. It needs no decoration, because
-a function is a descriptor. The attribute lookup binds it to the
-instance.
+assembles for you. A module-level function becomes a method once it
+sits in that namespace dict. Because a function is a descriptor, the
+attribute lookup binds it to the instance.
 
 **Confirm the metaclass.** `type(Celsius)` is `type` because this listing calls `type()` as a
-constructor rather than subclassing it. Nothing here involves a
-metaclass of your own.
+constructor rather than subclassing it. `Celsius` gets the default
+metaclass, the same one a `class` statement uses.
 
 **Inherit the base's arithmetic.** `Celsius` inherits `float`'s
 arithmetic, so `c + 0.5` works. Because `float.__add__()` builds its
-result from `float`, the sum is a `float` rather than a `Celsius`. That
-is why a numeric subclass usually overrides every operator whose result
+result from `float`, the sum is a `float` rather than a `Celsius`.
+A numeric subclass therefore usually overrides every operator whose result
 should keep the subclass's type.
 
 </details>
@@ -651,8 +652,8 @@ class Demo(metaclass=Meta):
 <details>
 <summary>Solution</summary>
 
-The prediction: the move changes nothing. `Tag` stays out of
-`Demo.__bases__`, and Python raises no error.
+The prediction: `Demo` builds cleanly, and `Demo.__bases__` holds
+`object` alone, so `Tag` stays out.
 
 ```python
 # exercise_8.py
@@ -677,17 +678,18 @@ print(Tag in Demo.__bases__)
 #: False
 ```
 
-By the time `__init__()` runs, the class object is complete. `type`
-built it inside `__new__()`, using the bases the class header supplied
-there, and laid out its `__mro__` from them. The `bases` parameter of
+By the time `__init__()` runs, the class object is complete.
+`type.__new__()` builds it first, from the bases in the class header,
+and computes its `__mro__` from those bases. The `bases` parameter of
 `__init__()` holds the same tuple `__new__()` received, so
-`bases += (Tag,)` rebinds a local name, and `Demo.__bases__` stays the
-same. Passing the longer tuple on to `type.__init__()` changes
-nothing either, since `type.__init__()` checks its arguments and then
+`bases += (Tag,)` rebinds a local name.
+`Demo.__bases__` stays the same. Passing the longer tuple on to `type.__init__()` leaves the
+class as it was too, since `type.__init__()` checks its arguments and then
 ignores them.
 
-`new_vs_init.py` makes the same point from the other side, with its
-`added_in_init` key. `__new__()` must make every decision about what
+`new_vs_init.py` shows the same limit for the namespace: its
+`__init__()` writes an `added_in_init` key into `namespace`, and
+`hasattr()` reports `False` for that attribute on the class. `__new__()` must make every decision about what
 the class is: its name, its bases, and the namespace from which `type`
 builds it. `__init__()` receives the completed class object and can change
 it in place, which is why `setattr(cls, ...)` still works there.
@@ -712,7 +714,7 @@ it in place, which is why `setattr(cls, ...)` still works there.
 
 [The Injection Risk](../../Chapters/17_Techniques--Metaprogramming.md#the-injection-risk) explains why `exec()` on text built from a caller's string is dangerous.
 `make_class()` inserts the name into the source twice, so build a payload that stays valid Python at both places.
-Open a triple-quoted string in the payload's last line so it absorbs the second insertion, and catch the `KeyError` the final lookup raises.
+Open a triple-quoted string in the payload's last line so the text up to the second insertion becomes string content, and catch the `KeyError` the final lookup raises.
 
 <details>
 <summary>The shape</summary>
@@ -741,15 +743,14 @@ class Command:
 <details>
 <summary>Solution</summary>
 
-If you end the payload after `print("injected code ran")
-` and leave
+If you end the payload after `print("injected code ran")` and leave
 out the triple-quoted line, the script prints nothing and stops with a
-`SyntaxError`, `unterminated string literal`. `exec()` compiles the
-whole spliced source before running any of it, and the second splice
-puts a newline inside the `super().__init__("...")` literal, so the
-injected `print()` does not run. The solution's payload ends with
-`Y = """  #`, which opens a string that swallows the second splice,
-so the spliced source compiles.
+`SyntaxError`, `unterminated string literal`.
+The second splice puts a newline inside the `super().__init__("...")` literal.
+`exec()` compiles the whole spliced source before running any of it,
+so the `SyntaxError` arrives before the injected `print()` can run. The solution's payload ends with
+`Y = """  #`, which opens a string that the second splice's `"""`
+closes, so the spliced source compiles.
 
 ```python
 # ch17_exec_injection.py
@@ -793,29 +794,30 @@ except KeyError:
 #: lookup failed, after the injection ran
 ```
 
-**Break out of the class block.** `print("injected code ran")` sits outside every class body. It runs at
-module level inside `exec()`, and that is the danger. A name that
+**End the class block.** The payload's `pass` fills the body of a class `X`,
+and the dedented `print("injected code ran")` after it sits at module
+level, so it runs inside `exec()`. That is the danger. A name that
 reaches `make_class()` unchecked becomes source code, and source code
 can do anything the program can do.
 
-**Absorb the second splice.** The payload needs a little care, because `make_class()` splices
+**Close the second splice's string.** The payload must compile at both splice points, because `make_class()` splices
 `class_name` in twice. The first splice supplies the attack lines. The
 second puts them inside the `super().__init__("...")` string literal, where
 a bare newline is a `SyntaxError` before anything runs. So the
 payload's last line opens a triple-quoted string, `Y = """`. That
-string swallows the second splice, and the trailing `#` comments out
-the `")` left over after the string closes. The spliced source
-compiles, and the
-injected `print()` runs at module level inside `exec()`, after the
-class body has finished.
+string runs to the `"""` in the second splice, so the template text
+between the two splices becomes string content.
+The trailing `#` then comments out the `")` left over after the string closes. The spliced source
+compiles, and the injected `print()` runs once the class body finishes.
 
-**Catch the failed lookup.** The `KeyError` afterward is incidental damage, not protection.
+**Catch the failed lookup.** The `KeyError` afterward is a side effect of the payload, not a defense.
 `namespace[class_name]` looks for a class named after the whole
-payload, which the spliced source does not define. The injected
-statement ran before that lookup, so failing the lookup rescues nothing.
-Restoring the `if class_name not in cls.KNOWN_COMMANDS` check closes
-the hole at the only point that works: before `make_class()` builds
-the string.
+payload, while the spliced source defines a class named `X`. The
+injected statement ran before that lookup, so the lookup fails too late
+to stop it.
+Restoring the `if class_name not in cls.KNOWN_COMMANDS` check rejects
+the payload at the one point where a check stops the injection:
+before `make_class()` builds the string.
 
 </details>
 </details>
@@ -864,7 +866,7 @@ class Handlers(metaclass=First):
 <summary>Solution</summary>
 
 If you leave `@classmethod` off `__prepare__()`,
-Python's call fills `self` with the class name and `name` with the bases.
+Python's call fills `cls` with the class name and `name` with the bases.
 The `class Handlers` statement then fails with
 `TypeError: First.__prepare__() missing 1 required positional argument: 'bases'`,
 a message that says nothing about the missing decorator.
@@ -897,21 +899,22 @@ Handlers().on_open()
 #: first on_open
 ```
 
-**Discard a repeated name.** `NoDuplicates` raises an exception on a repeated key. `KeepFirst`
-returns instead, so Python builds the second `on_open` function, hands
-it to `__setitem__()`, and the mapping discards it. The name still
-refers to the first function when the body finishes, as
-`Handlers().on_open()` proves.
+**Discard a repeated name.** `NoDuplicates` raises an exception on a repeated key,
+and `KeepFirst.__setitem__()` returns early instead.
+Python still builds the second `on_open` function and passes it to `__setitem__()`,
+and the early return discards it.
+The name `on_open` still refers to the first function when the body finishes,
+as `Handlers().on_open()` proves.
 
 No class decorator can keep the first definition, and neither can
 `__init_subclass__()` or `__set_name__()`. All three receive the class
 after its body has finished executing, and by then the body has run
 `on_open = <second function>` as an ordinary assignment into the
-namespace mapping. The first function has no name pointing at it and no
-reference anywhere, so none of the three has anything to restore. Among
-the class-creation steps, `__prepare__()` alone sees the assignments one
-at a time, as the body makes them, and that is why the chapter calls it
-the one with no simpler substitute.
+namespace mapping. That assignment dropped the last reference to the
+first function, so that function has disappeared before any of the three runs. Among
+the class-creation steps, `__prepare__()` alone supplies the mapping
+that receives the assignments one at a time, as the body makes them.
+That is why the chapter says `__prepare__()` has no simpler substitute.
 
 </details>
 </details>
