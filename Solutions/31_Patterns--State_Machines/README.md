@@ -1290,3 +1290,152 @@ separate value.
 </details>
 </details>
 </details>
+
+## 10. The mood machine, as `Enum` members
+
+> Rewrite exercise 1's `UnpredictablePerson` in the shape of `enum_states.py`:
+> a `Mood` enum whose members each carry their `hello()` greeting and the transition to the next `Mood`,
+> driven by an `Input` enum of `ANNOY`, `CALM`, and `TAKE_PILL`.
+> Say what a mood gains and loses as an enum member rather than a class.
+
+<details>
+<summary>Where to look</summary>
+
+[States as `Enum` Members](../../Chapters/31_Patterns--State_Machines.md#states-as-enum-members) shows the shape: a record of two callables mixed into an `Enum`.
+Make the inputs an `Enum` too, so each transition function can `match` on them.
+Let `hello()` run the current mood's behavior and then its transition, the way `StateMachine.output()` does.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+from collections.abc import Callable
+from enum import Enum, auto
+from typing import Final
+from record import record
+
+class Input(Enum):
+    ANNOY = auto()
+    CALM = auto()
+    TAKE_PILL = auto()
+
+type Behavior = Callable[[Input], str]
+type Transition = Callable[[Input], Mood]
+
+@record
+class State:
+    behavior: Behavior
+    transition: Transition
+
+def happy_next(input_: Input) -> Mood:
+    ...
+
+def grumpy_next(input_: Input) -> Mood:
+    ...
+
+class Mood(State, Enum):
+    HAPPY = (lambda _: "Great to see you!", happy_next)
+    GRUMPY = (lambda _: "What do you want?", grumpy_next)
+    PROZAC = (lambda _: "Everything is wonderful.",
+              lambda _: Mood.PROZAC)
+
+class UnpredictablePerson:
+    def __init__(self, mood: Mood) -> None:
+        ...
+
+    def hello(self, input_: Input) -> str:
+        ...
+
+INPUTS: Final[list[Input]] = [
+    Input.ANNOY, Input.CALM, Input.TAKE_PILL, Input.ANNOY,
+]
+```
+
+<details>
+<summary>Solution</summary>
+
+```python
+# exercise_10.py
+from collections.abc import Callable
+from enum import Enum, auto
+from typing import Final
+from record import record
+
+class Input(Enum):
+    ANNOY = auto()
+    CALM = auto()
+    TAKE_PILL = auto()
+
+type Behavior = Callable[[Input], str]
+type Transition = Callable[[Input], Mood]
+
+@record
+class State:
+    behavior: Behavior
+    transition: Transition
+
+def happy_next(input_: Input) -> Mood:
+    match input_:
+        case Input.ANNOY:
+            return Mood.GRUMPY
+        case Input.TAKE_PILL:
+            return Mood.PROZAC
+        case _:
+            return Mood.HAPPY
+
+def grumpy_next(input_: Input) -> Mood:
+    match input_:
+        case Input.CALM:
+            return Mood.HAPPY
+        case Input.TAKE_PILL:
+            return Mood.PROZAC
+        case _:
+            return Mood.GRUMPY
+
+class Mood(State, Enum):
+    HAPPY = (lambda _: "Great to see you!", happy_next)
+    GRUMPY = (lambda _: "What do you want?", grumpy_next)
+    PROZAC = (lambda _: "Everything is wonderful.",
+              lambda _: Mood.PROZAC)
+
+class UnpredictablePerson:
+    def __init__(self, mood: Mood) -> None:
+        self.mood = mood
+
+    def hello(self, input_: Input) -> str:
+        greeting = self.mood.behavior(input_)
+        self.mood = self.mood.transition(input_)
+        return greeting
+
+INPUTS: Final[list[Input]] = [
+    Input.ANNOY, Input.CALM, Input.TAKE_PILL, Input.ANNOY,
+]
+person = UnpredictablePerson(Mood.HAPPY)
+for input_ in INPUTS:
+    before = person.mood
+    greeting = person.hello(input_)
+    print(f"{before.name} {input_.name}: {greeting}"
+          f" -> {person.mood.name}")
+#: HAPPY ANNOY: Great to see you! -> GRUMPY
+#: GRUMPY CALM: What do you want? -> HAPPY
+#: HAPPY TAKE_PILL: Great to see you! -> PROZAC
+#: PROZAC ANNOY: Everything is wonderful. -> PROZAC
+print([mood.name for mood in Mood])
+#: ['HAPPY', 'GRUMPY', 'PROZAC']
+```
+
+**Each mood is one row.** `Mood.HAPPY` holds its greeting and `happy_next()`, the function that names its successors, so reading the member tells you what the mood says and where it can go.
+`PROZAC` needs no function of its own: its transition is a lambda that answers every input with `Mood.PROZAC`, the same "stays put" that exercise 2's `Prozac.next()` wrote as `return self`.
+`UnpredictablePerson` is the chapter's `StateMachine` under its old name, with `hello()` playing `output()`: it returns the current mood's greeting and then moves to the next mood, so what you did to the person changes the greeting you get next time.
+
+**What a mood gains as a member.** The moods are a closed set the program and the type checker both know.
+`list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`, and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 passed to `change_to()`.
+Exercise 1's `UnpredictablePerson` accepts any object with a `hello()` method, so the set of moods is open and nothing lists it.
+
+**What a mood loses.** A member is one frozen record shared by every person in the program, so a mood that keeps data of its own, such as a count of the `ANNOY` inputs it has received, has nowhere to put it.
+Exercise 1's classes can carry that state per instance, and a mood whose behavior needs more than one callable is a class in either design.
+
+</details>
+</details>
+</details>

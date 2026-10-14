@@ -842,57 +842,6 @@ def test_no_transition_raises() -> None:
         vm.handle(Quit())
 ```
 
-## Which Design Should You Use?
-
-The two designs answer the same question, which state comes next,
-and put the answer in different places.
-
-Each-state-decides suits a machine whose states do something and have few transitions apiece.
-The state class holds both the action and the transitions,
-so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and which states can follow it.
-Adding a state is one class.
-The design reads best when the transitions are obvious from the state's own name.
-
-An action that must run on every entry into one state belongs in that state's `run()`,
-written once.
-Sounding a chime whenever the trap reaches `Holding` is such an action.
-
-Inside the each-state-decides design,
-`match` statements and per-state tables differ in which code handles an unrecognized input.
-With `match`, each state's `case _` sets its own policy, in the method you read.
-With tables, `TableState.next()` sets one policy for every state,
-and each class defines `run()` and inherits `next()`.
-The tables read better as the states multiply,
-because every state's transitions have the same shape and appear together at the bottom of the file.
-
-One-table suits a machine you build from a diagram, whose inputs carry data,
-or whose transitions need conditions.
-Everything is in one place, in the same order as the diagram.
-Adding a state or an input is a rule in the list and a method or two.
-
-In the one-table design the states are `Enum` members, bare names,
-so an action that runs on every entry into one state must go in the table.
-You repeat the action on every rule that leads to that state,
-or write a helper that those rules call.
-
-The first design's constructor calls the initial state's `run()`,
-but the constructor in `table_machine.py` stores `initial` and returns.
-In the one-table design,
-an action the machine needs at startup is a call you make before the first input.
-
-The deciding question is which you would rather read: one state's transitions,
-gathered in that state, or the whole machine's, gathered in one table.
-A machine with a few states works in either design,
-and a machine you drew as a diagram first belongs in the table.
-
-With either design you write for yourself what a library supplies.
-Mature libraries such as `transitions` and `python-statemachine` supply guards,
-callbacks, and hierarchical states.
-Using a library adds a dependency.
-Choose one of the two designs here when you cannot take that dependency,
-or want the mechanism visible in your own code.
-Choose a library once the machine needs more than a page of code.
-
 ## States as `Enum` Members
 
 The one-table design keeps its states as bare `Enum` members and puts every action in the table.
@@ -1034,12 +983,72 @@ a tuple holding one callable, or the two in the wrong order,
 passes `ty` and fails at import or at run time.
 Pyright reports all three.
 
-The action travels with the state rather than with every rule that leads to it,
-which is the one-table design's weakness from the previous section.
+The action travels with the state rather than with every rule that leads to it.
 In exchange, the transitions sit in four functions above the enum rather than in one table.
-Which shape reads best is again a question of which you would rather read:
-the whole machine as one table,
-or each state as one row holding its own action and its own successors.
+
+## Which Design Should You Use?
+
+The three designs answer the same question, which state comes next,
+and put the answer in different places.
+
+Each-state-decides suits a machine whose states do something and have few transitions apiece.
+The state class holds both the action and the transitions,
+so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and which states can follow it.
+Adding a state is one class.
+The design reads best when the transitions are obvious from the state's own name.
+
+An action that must run on every entry into one state belongs in that state's `run()`,
+written once.
+Sounding a chime whenever the trap reaches `Holding` is such an action.
+
+Inside the each-state-decides design,
+`match` statements and per-state tables differ in which code handles an unrecognized input.
+With `match`, each state's `case _` sets its own policy, in the method you read.
+With tables, `TableState.next()` sets one policy for every state,
+and each class defines `run()` and inherits `next()`.
+The tables read better as the states multiply,
+because every state's transitions have the same shape and appear together at the bottom of the file.
+
+One-table suits a machine you build from a diagram, whose inputs carry data,
+or whose transitions need conditions.
+Everything is in one place, in the same order as the diagram.
+Adding a state or an input is a rule in the list and a method or two.
+
+In the one-table design the states are `Enum` members, bare names,
+so an action that runs on every entry into one state must go in the table.
+You repeat the action on every rule that leads to that state,
+or write a helper that those rules call.
+
+States as `Enum` members is the first design with records in place of classes.
+Each member names its own successors, as `Luring` does,
+and carries its action as data, so the action runs once per input,
+from a single definition.
+The enum supplies what four loose classes cannot:
+`list(Trap)` enumerates every state,
+and a parameter typed `Trap` accepts a member and rejects anything else.
+The shape suits a machine whose states each do one thing and whose transitions are a `match` apiece.
+A state that keeps data of its own has nowhere to put it,
+since a member is one frozen record shared by every machine that uses it,
+and such a state is a class.
+
+The first design's constructor calls the initial state's `run()`,
+but the constructor in `table_machine.py` stores `initial` and returns.
+In the one-table design,
+an action the machine needs at startup is a call you make before the first input.
+
+The deciding question is which you would rather read: one state's transitions,
+gathered in that state, the whole machine's, gathered in one table,
+or each state as one enum row holding its action and its successors.
+A machine with a few states works in any of the three,
+and a machine you drew as a diagram first belongs in the table.
+
+With any of these designs you write for yourself what a library supplies.
+Mature libraries such as `transitions` and `python-statemachine` supply guards,
+callbacks, and hierarchical states.
+Using a library adds a dependency.
+Choose one of the designs here when you cannot take that dependency,
+or want the mechanism visible in your own code.
+Choose a library once the machine needs more than a page of code.
 
 ## Exercises
 
@@ -1083,3 +1092,7 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     Explain the exception, then make it work two ways: by adding a rule,
     and by making `Nickel` an instance of `Money` rather than a subclass.
     Say which you would keep.
+10. Rewrite exercise 1's `UnpredictablePerson` in the shape of `enum_states.py`:
+    a `Mood` enum whose members each carry their `hello()` greeting and the transition to the next `Mood`,
+    driven by an `Input` enum of `ANNOY`, `CALM`, and `TAKE_PILL`.
+    Say what a mood gains and loses as an enum member rather than a class.
