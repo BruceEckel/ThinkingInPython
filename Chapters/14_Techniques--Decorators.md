@@ -159,9 +159,10 @@ def call_text(name: str, args: tuple[object, ...],
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        print("->", call_text(func.__name__, args, kwargs))  # type: ignore
+        name = wrapper.__name__
+        print("->", call_text(name, args, kwargs))
         result = func(*args, **kwargs)
-        print(f"<- {func.__name__} = {result!r}")  # type: ignore
+        print(f"<- {name} = {result!r}")
         return result
     return wrapper
 
@@ -186,6 +187,11 @@ Without `wraps`, the decorated `add` reports its name as `wrapper` and loses its
 so debuggers, `help()`,
 and documentation tools show the wrapper's metadata instead of the function's.
 `wraps` is optional, and nearly every wrapper should use it.
+
+`tracer.py` relies on that copy.
+Inside `wrapper()`, the name `wrapper` refers to the decorated function object,
+and `wraps` has set its `__name__` to `add`.
+The trace lines read `wrapper.__name__` and print `add`.
 
 `wraps` also sets `__wrapped__` on the wrapper, pointing at the original.
 A call to `add.__wrapped__(2, 3)` runs the original `add` and bypasses the tracing.
@@ -240,11 +246,6 @@ discarding the signature the decorator should preserve.
 `R` checks the wrapper's result the same way.
 A wrapper that calls `func(*args, **kwargs)` and drops the result makes every decorated function return `None`.
 The `-> R` annotation lets the type checker report the missing `return`.
-
-The `# type: ignore` comments silence a diagnostic from `ty`,
-which rejects `func.__name__`.
-A `Callable` need not have a `__name__` attribute, though every function does.
-Pyright and mypy both accept the attribute here.
 
 ### A Coroutine Function Needs an `async` Wrapper {#coroutine-needs-async-wrapper}
 
@@ -418,7 +419,7 @@ def label[**P, R](
         def wrapper(
                 *args: P.args, **kwargs: P.kwargs
         ) -> R:
-            print(f"[{prefix}] {f.__name__}")  # type: ignore
+            print(f"[{prefix}] {wrapper.__name__}")
             return f(*args, **kwargs)
         return wrapper
     return decorate if func is None else decorate(func)
@@ -458,10 +459,10 @@ but it asks what kind of value arrived rather than whether one arrived.
 The `callable()` test then fails silently when a caller passes a prefix positionally.
 With `callable(func)`,
 `@label("TAG")` decorates the function with the default `LOG` prefix and drops `"TAG"`.
-With `func is None`, the same call raises an `AttributeError` at decoration.
+With `func is None`, the same call raises a `TypeError` at decoration.
 `decorate("TAG")` wraps the string,
 and when Python applies that wrapper to the function,
-the wrapper reads `"TAG".__name__`.
+the wrapper calls `"TAG"` as if the string were the decorated function.
 A decorator whose own argument could be callable, such as a `key` function,
 has the same problem with either test.
 For that reason `label` makes its arguments keyword-only,
@@ -621,7 +622,9 @@ In the class form, the object that stands in for the function is `self`,
 so `__init__()` calls `update_wrapper(self, func)`.
 
 The `__name__: str` declaration tells the type checker about the attribute `update_wrapper()` sets,
-so `__call__()` prints `self.__name__` with no `# type: ignore`.
+so `__call__()` can print `self.__name__`.
+`tracer.py` needs no declaration,
+because `wrapper` is a function and a function's type includes `__name__`.
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
 
@@ -1033,6 +1036,14 @@ Calling the result is another matter.
 which a `partial` and a callable instance lack.
 Calling the wrapper around either of those two raises an `AttributeError`,
 while the wrappers around a function and a bound method run.
+
+The `# type: ignore` in `report` silences `ty`'s diagnostic for the same hazard.
+`ty` rejects `func.__name__`,
+since a `Callable` need not have a `__name__` attribute,
+though every function does.
+Pyright and mypy both accept the attribute here.
+`report` has no `wraps`, so `wrapper.__name__` is `wrapper`,
+and the name the trace prints must come from `func`.
 
 The return side is equally unconstrained.
 A decorator "returns a result, which Python binds to the original name,"

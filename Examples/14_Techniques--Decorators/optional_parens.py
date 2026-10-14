@@ -26,7 +26,7 @@ def label[**P, R](
         def wrapper(
                 *args: P.args, **kwargs: P.kwargs
         ) -> R:
-            print(f"[{prefix}] {f.__name__}")  # type: ignore
+            print(f"[{prefix}] {wrapper.__name__}")
             return f(*args, **kwargs)
         return wrapper
     return decorate if func is None else decorate(func)

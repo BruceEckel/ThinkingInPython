@@ -11,9 +11,10 @@ def call_text(name: str, args: tuple[object, ...],
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        print("->", call_text(func.__name__, args, kwargs))  # type: ignore
+        name = wrapper.__name__
+        print("->", call_text(name, args, kwargs))
         result = func(*args, **kwargs)
-        print(f"<- {func.__name__} = {result!r}")  # type: ignore
+        print(f"<- {name} = {result!r}")
         return result
     return wrapper
 
