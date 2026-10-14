@@ -11,13 +11,17 @@ class StateMachine:
     def __init__(self, initial_state: State) -> None:
         self.current_state = initial_state
         self.current_state.run()
-    def run_all(self, inputs: Iterable[object]) -> None:
-        for input_ in inputs:
-            state = self.current_state
-            self.current_state = state.next(input_)
-            print(type(state).__name__, input_, "->",
-                  type(self.current_state).__name__)
-            self.current_state.run()
+    def step(self, input_: object) -> None:
+        state = self.current_state
+        self.current_state = state.next(input_)
+        print(type(state).__name__, input_, "->",
+              type(self.current_state).__name__)
+        self.current_state.run()
+
+def run_all(machine: StateMachine,
+            inputs: Iterable[object]) -> None:
+    for input_ in inputs:
+        machine.step(input_)
 
 class TakePill:
     def __repr__(self) -> str:
@@ -57,8 +61,8 @@ class Prozac:
     def next(self, input_: object) -> State:
         return self
 
-StateMachine(Happy()).run_all(
-    [Annoy(), Calm(), TakePill(), Annoy()])
+run_all(StateMachine(Happy()),
+        [Annoy(), Calm(), TakePill(), Annoy()])
 #: Great to see you!
 #: Happy Annoy -> Grumpy
 #: What do you want?

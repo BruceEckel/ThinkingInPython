@@ -174,8 +174,12 @@ class State(Protocol):
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
         ...
-    def run_all(self, inputs: Iterable[object]) -> None:
+    def step(self, input_: object) -> None:
         ...
+
+def run_all(machine: StateMachine,
+            inputs: Iterable[object]) -> None:
+    ...
 
 class TakePill:
     def __repr__(self) -> str:
@@ -216,7 +220,7 @@ If you leave out the final `return self` in `Happy.next()`,
 because the method can fall off its end and return `None`.
 The demo still prints the same lines, since every input that reaches `Happy` has a branch there,
 but if a second `Calm` in a row reaches `Happy`, its `next()` returns `None`,
-and `run_all()`'s call to `run()` raises an `AttributeError`.
+and `step()`'s call to `run()` raises an `AttributeError`.
 Each `next()` in the solution ends with `return self`,
 so an input a state ignores keeps the machine where it is.
 
@@ -234,13 +238,17 @@ class StateMachine:
     def __init__(self, initial_state: State) -> None:
         self.current_state = initial_state
         self.current_state.run()
-    def run_all(self, inputs: Iterable[object]) -> None:
-        for input_ in inputs:
-            state = self.current_state
-            self.current_state = state.next(input_)
-            print(type(state).__name__, input_, "->",
-                  type(self.current_state).__name__)
-            self.current_state.run()
+    def step(self, input_: object) -> None:
+        state = self.current_state
+        self.current_state = state.next(input_)
+        print(type(state).__name__, input_, "->",
+              type(self.current_state).__name__)
+        self.current_state.run()
+
+def run_all(machine: StateMachine,
+            inputs: Iterable[object]) -> None:
+    for input_ in inputs:
+        machine.step(input_)
 
 class TakePill:
     def __repr__(self) -> str:
@@ -280,8 +288,8 @@ class Prozac:
     def next(self, input_: object) -> State:
         return self
 
-StateMachine(Happy()).run_all(
-    [Annoy(), Calm(), TakePill(), Annoy()])
+run_all(StateMachine(Happy()),
+        [Annoy(), Calm(), TakePill(), Annoy()])
 #: Great to see you!
 #: Happy Annoy -> Grumpy
 #: What do you want?
@@ -412,7 +420,7 @@ print(" ".join(history))
 ```
 
 **Delegate to the current state.** `Controller` asks the current state object what comes next, as
-`state_machine.py`'s `run_all()` does when it calls `next()`.
+`state_machine.py`'s `step()` does when it calls `next()`.
 
 **Look up the next state.** `next_state()` looks the word up in its class's table with
 `.get(word, ...["*"])`, so `Controller` has no branch on the current

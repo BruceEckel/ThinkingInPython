@@ -47,25 +47,31 @@ class StateMachine:
     def __init__(self, initial_state: State) -> None:
         self.current_state = initial_state
         self.current_state.run()
-    def run_all(self, inputs: Iterable[object]) -> None:
-        for input_ in inputs:
-            state = self.current_state
-            self.current_state = state.next(input_)
-            print(type(state).__name__, input_, "->",
-                  type(self.current_state).__name__)
-            self.current_state.run()
+    def step(self, input_: object) -> None:
+        state = self.current_state
+        self.current_state = state.next(input_)
+        print(type(state).__name__, input_, "->",
+              type(self.current_state).__name__)
+        self.current_state.run()
+
+def run_all(machine: StateMachine,
+            inputs: Iterable[object]) -> None:
+    for input_ in inputs:
+        machine.step(input_)
 ```
 
 The constructor sets the initial state and runs it.
-`run_all(self, inputs: Iterable[object]) -> None` takes the inputs as any iterable.
-For each one it asks the state for its successor and moves there.
+`step()` takes one input, asks the current state for its successor,
+and moves there.
 It then prints the transition (the old state, the input, and the new state)
 and calls `run()` for the new state.
+`run_all()` is a convenience outside the class:
+it feeds any iterable of inputs to `step()`, one at a time.
 This is the *State* pattern combined with automated transitions,
 producing *State Machine*.
 
 The behavior of `run()` depends on the current state.
-`run_all()` defines the flow,
+`step()` defines the flow,
 while each `State`'s `run()` and `next()` supply the varying behavior.
 
 In this style of *State Machine*, each state decides the next state.
@@ -88,7 +94,7 @@ class MouseAction(StrEnum):
 Each mouse move is a `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
 Because `MouseAction` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
 each member is a `str`.
-`run_all()` prints `mouse appears` rather than `MouseAction.APPEARS`.
+`step()` prints `mouse appears` rather than `MouseAction.APPEARS`.
 
 `mouse_moves.py` holds the sequence of mouse inputs.
 Its nine moves exercise every transition in the trap,
@@ -199,8 +205,9 @@ and a class that leaves one out fails the type checker where the program uses it
 from mouse_action import MouseAction
 from mouse_moves import MOVES
 from mouse_trap_states import MouseTrap
+from state_machine import run_all
 
-MouseTrap().run_all(MOVES)
+run_all(MouseTrap(), MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open
@@ -225,7 +232,7 @@ MouseTrap().run_all(MOVES)
 # fires and the machine stays at Waiting:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-trap.run_all([MouseAction.ESCAPES])
+trap.step(MouseAction.ESCAPES)
 #: Waiting mouse escapes -> Waiting
 #: Broadcasting cheese smell
 ```
@@ -348,7 +355,7 @@ from table_state import NoTransition
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-expect(NoTransition, trap.run_all, [MouseAction.ESCAPES])
+expect(NoTransition, trap.step, MouseAction.ESCAPES)
 #: [NoTransition] Waiting: no transition on mouse escapes
 ```
 
@@ -364,12 +371,13 @@ import mouse_trap_states
 import mouse_trap_tables
 import pytest
 from mouse_moves import MOVES
+from state_machine import run_all
 
 def test_both_versions_print_the_same_trace(
         capsys: pytest.CaptureFixture[str]) -> None:
-    mouse_trap_states.MouseTrap().run_all(MOVES)
+    run_all(mouse_trap_states.MouseTrap(), MOVES)
     by_match = capsys.readouterr().out
-    mouse_trap_tables.MouseTrap().run_all(MOVES)
+    run_all(mouse_trap_tables.MouseTrap(), MOVES)
     by_table = capsys.readouterr().out
     assert by_match == by_table
 ```
@@ -394,7 +402,7 @@ once under each policy.
 Version 1's `case _` arms return the current state,
 so an unrecognized input keeps the machine in its current state.
 Staying in the same state has a visible effect.
-`run_all()` calls `run()` on whatever state `next()` returns,
+`step()` calls `run()` on whatever state `next()` returns,
 so returning the current state runs that state's action a second time.
 Version 2's table holds the explicit transitions alone,
 and its `next()` raises an exception on every other input.
@@ -934,7 +942,7 @@ since the trap announces the same thing whatever the mouse does.
 A machine whose output depends on the input as well as the state is the one that uses that parameter.
 `StateMachine.step()` asks the current state for its successor, stores it,
 and then runs the new state's behavior,
-the order `run_all()` follows in `state_machine.py`.
+the order `step()` follows in `state_machine.py`.
 
 `enum_states_demo.py` runs the trap through `MOVES` and prints each transition above the action of the state it entered.
 The trace is `mouse_trap_states_demo.py`'s,

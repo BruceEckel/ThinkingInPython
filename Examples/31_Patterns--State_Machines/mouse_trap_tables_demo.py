@@ -7,5 +7,5 @@ from table_state import NoTransition
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-expect(NoTransition, trap.run_all, [MouseAction.ESCAPES])
+expect(NoTransition, trap.step, MouseAction.ESCAPES)
 #: [NoTransition] Waiting: no transition on mouse escapes

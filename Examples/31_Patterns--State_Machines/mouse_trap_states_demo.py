@@ -2,8 +2,9 @@
 from mouse_action import MouseAction
 from mouse_moves import MOVES
 from mouse_trap_states import MouseTrap
+from state_machine import run_all
 
-MouseTrap().run_all(MOVES)
+run_all(MouseTrap(), MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open
@@ -28,6 +29,6 @@ MouseTrap().run_all(MOVES)
 # fires and the machine stays at Waiting:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-trap.run_all([MouseAction.ESCAPES])
+trap.step(MouseAction.ESCAPES)
 #: Waiting mouse escapes -> Waiting
 #: Broadcasting cheese smell
