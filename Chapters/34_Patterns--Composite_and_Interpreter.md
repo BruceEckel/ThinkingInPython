@@ -382,6 +382,21 @@ so `expr == by_hand` compares the two trees by value.
 Printing the root's type and then `expr.left` shows the nesting.
 The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 
+`build_tree.py` puts the integer on the left of `*` and on the right of `+`.
+The test checks the integer on either side of `+`,
+and a product with no integer at all:
+
+```python
+# test_expr.py
+from expr import Add, Mul, Num, Var
+
+def test_operators_build_the_tree() -> None:
+    x = Var("x")
+    assert 2 * x + 1 == Add(Mul(Num(2), x), Num(1))
+    assert 1 + x == Add(Num(1), x)
+    assert x * x == Mul(x, x)
+```
+
 The reflected methods depend on the operator dispatch from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice).
 `2 * x` works because `int.__mul__()` returns `NotImplemented` and Python calls `x.__rmul__(2)`.
 Unlike that chapter's `Meters`, though,
@@ -476,8 +491,6 @@ An unbound variable raises a `KeyError`, naming the variable.
 The test file confirms that:
 
 - A `Num` evaluates to its value and a `Var` to its binding.
-- The operators build the tree you write by hand,
-  with the integer on either side.
 - One tree evaluates under different bindings.
 - An unbound variable raises a `KeyError` that names the variable.
 
@@ -485,17 +498,11 @@ The test file confirms that:
 # test_evaluate.py
 import pytest
 from evaluate import evaluate
-from expr import Add, Mul, Num, Var
+from expr import Num, Var
 
 def test_literal_and_variable() -> None:
     assert evaluate(Num(42), {}) == 42
     assert evaluate(Var("x"), {"x": 3}) == 3
-
-def test_operators_build_the_tree() -> None:
-    x = Var("x")
-    assert 2 * x + 1 == Add(Mul(Num(2), x), Num(1))
-    assert 1 + x == Add(Num(1), x)
-    assert x * x == Mul(x, x)
 
 def test_one_tree_many_environments() -> None:
     area = Var("w") * Var("h")
