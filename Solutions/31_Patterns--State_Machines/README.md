@@ -1303,7 +1303,7 @@ separate value.
 
 [States as `Enum` Members](../../Chapters/31_Patterns--State_Machines.md#states-as-enum-members) shows the shape: a record of two callables mixed into an `Enum`.
 Make the inputs an `Enum` too, so each transition function can `match` on them.
-Let `hello()` run the current mood's behavior and then its transition, the way `StateMachine.output()` does.
+Let `hello()` run the current mood's behavior and then its transition, the way `StateMachine.step()` does.
 
 <details>
 <summary>The shape</summary>
@@ -1427,7 +1427,7 @@ print([mood.name for mood in Mood])
 
 **Each mood is one row.** `Mood.HAPPY` holds its greeting and `happy()`, the function that names its successors, so reading the member tells you what the mood says and where it can go.
 `PROZAC` needs no function of its own: its transition is a lambda that answers every input with `Mood.PROZAC`, the same "stays put" that exercise 2's `Prozac.next()` wrote as `return self`.
-`UnpredictablePerson` is the chapter's `StateMachine` under its old name, with `hello()` playing `output()`: it returns the current mood's greeting and then moves to the next mood, so what you did to the person changes the greeting you get next time.
+`UnpredictablePerson` is the chapter's `StateMachine` under its old name, with `hello()` playing `step()`: it returns the current mood's greeting and then moves to the next mood, so what you did to the person changes the greeting you get next time.
 
 **What a mood gains as a member.** The moods are a closed set the program and the type checker both know.
 `list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`, and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 passed to `change_to()`.

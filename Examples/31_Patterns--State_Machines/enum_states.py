@@ -56,7 +56,7 @@ class StateMachine:
     def __init__(self, start: TrapState) -> None:
         self.state = start
 
-    def output(self, input_: M) -> str:
+    def step(self, input_: M) -> str:
         result = self.state.behavior(input_)
         self.state = self.state.transition(input_)
         return result

@@ -5,7 +5,7 @@ from mouse_moves import MOVES
 machine = StateMachine(TrapState.WAITING)
 for move in MOVES:
     before = machine.state
-    result = machine.output(move)
+    result = machine.step(move)
     print(before.name, move, "->", machine.state.name)
     print("   ", result)
 #: WAITING mouse appears -> LURING

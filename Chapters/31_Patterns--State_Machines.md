@@ -909,7 +909,7 @@ class StateMachine:
     def __init__(self, start: TrapState) -> None:
         self.state = start
 
-    def output(self, input_: M) -> str:
+    def step(self, input_: M) -> str:
         result = self.state.behavior(input_)
         self.state = self.state.transition(input_)
         return result
@@ -934,7 +934,7 @@ with `behavior` and `transition` as attributes.
 The behaviors here are lambdas that ignore their input,
 since the trap announces the same thing whatever the mouse does.
 A machine whose output depends on the input as well as the state is the one that uses that parameter.
-`StateMachine.output()` asks the current state for the output,
+`StateMachine.step()` asks the current state for the output,
 then for the next state, and stores it.
 
 `enum_states_demo.py` runs the trap through `MOVES` and prints each transition above the output it produced:
@@ -947,7 +947,7 @@ from mouse_moves import MOVES
 machine = StateMachine(TrapState.WAITING)
 for move in MOVES:
     before = machine.state
-    result = machine.output(move)
+    result = machine.step(move)
     print(before.name, move, "->", machine.state.name)
     print("   ", result)
 #: WAITING mouse appears -> LURING
