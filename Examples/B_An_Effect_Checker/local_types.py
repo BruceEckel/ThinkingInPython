@@ -48,6 +48,7 @@ def parameters(
         types[positional[0].arg] = owner
     return types
 
+# local_types.py (continued)
 def is_function(node: ast.stmt) -> TypeIs[Def]:
     kinds = ast.FunctionDef | ast.AsyncFunctionDef
     return isinstance(node, kinds)

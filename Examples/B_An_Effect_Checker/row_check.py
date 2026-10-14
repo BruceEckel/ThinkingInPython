@@ -49,6 +49,7 @@ def check(
         findings += undeclared(facts, rows, table)
     return Report(rows, findings)
 
+# row_check.py (continued)
 def describe(finding: Finding) -> str:
     match finding:
         case Undeclared(where, effect):

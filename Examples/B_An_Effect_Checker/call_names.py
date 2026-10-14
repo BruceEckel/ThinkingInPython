@@ -46,6 +46,7 @@ def dotted(node: ast.expr) -> list[str]:
         case _:
             return []
 
+# call_names.py (continued)
 @record
 class Scope:
     module: str

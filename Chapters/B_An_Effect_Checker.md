@@ -240,7 +240,24 @@ def dotted(node: ast.expr) -> list[str]:
             return [*head, attr] if head else []
         case _:
             return []
+```
 
+`imports_of()` and `dotted()` match [class patterns](13_Techniques--Pattern_Matching.md#class-patterns)
+against `ast` nodes.
+[*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
+notes that the standard library walks these trees with `ast.NodeVisitor`,
+in the style of [*Visitor*](33_Patterns--Visitor.md).
+The node types are a closed set,
+so `match` does the same work with no class to subclass.
+
+`dotted()` is the smallest of these matches.
+It is recursive, as the tree is.
+`os.path.join` is an `Attribute` whose value is an `Attribute` whose value is a `Name`.
+
+`callee()` is a method of `Scope`, in the same file:
+
+```python
+# call_names.py (continued)
 @record
 class Scope:
     module: str
@@ -299,18 +316,6 @@ class Scope:
             case _:
                 return UNRESOLVED
 ```
-
-`imports_of()` and `dotted()` match [class patterns](13_Techniques--Pattern_Matching.md#class-patterns)
-against `ast` nodes.
-[*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
-notes that the standard library walks these trees with `ast.NodeVisitor`,
-in the style of [*Visitor*](33_Patterns--Visitor.md).
-The node types are a closed set,
-so `match` does the same work with no class to subclass.
-
-`dotted()` is the smallest of these matches.
-It is recursive, as the tree is.
-`os.path.join` is an `Attribute` whose value is an `Attribute` whose value is a `Name`.
 
 A `Scope` holds the names the checker has collected at one point in a file.
 `names` maps a local name to its full one, so `rm` becomes `os.remove`.
@@ -464,7 +469,24 @@ def marked(
                             if isinstance(a, ast.Name)
                         )
     return None
+```
 
+`marked()` is two nested patterns,
+the second inside a loop over the first one's `extras`.
+It matches a return annotation of the form `Annotated[T, ...]`,
+binds everything after `T` to `extras`,
+and returns the argument names of the first call to `marker`.
+The guard, `if found == marker`, compares a captured name with a parameter,
+which a pattern alone cannot do.
+
+For a function that declares no row, `marked(func, "performs")` returns `None`,
+which means "inferred."
+An empty row means "pure," so `None` and the empty row must differ.
+`Row | None` is an ordinary optional,
+and each reader tests for `None` instead of asserting that the row is present.
+
+```python
+# function_facts.py (continued)
 def calls_in(
     body: list[ast.stmt], scope: Scope
 ) -> tuple[str, ...]:
@@ -518,30 +540,7 @@ def facts_of(module: str, tree: ast.Module) -> list[Facts]:
     name = f"{module}.<module>"
     calls = calls_in(top, base)
     return [*found, Facts(name, None, PURE, calls)]
-
-def read_module(
-    module: str, source: str
-) -> Result[list[Facts], str]:
-    try:
-        tree = ast.parse(source)
-    except SyntaxError as e:
-        return Err(f"{module}: line {e.lineno}: {e.msg}")
-    return Ok(facts_of(module, tree))
 ```
-
-`marked()` is two nested patterns,
-the second inside a loop over the first one's `extras`.
-It matches a return annotation of the form `Annotated[T, ...]`,
-binds everything after `T` to `extras`,
-and returns the argument names of the first call to `marker`.
-The guard, `if found == marker`, compares a captured name with a parameter,
-which a pattern alone cannot do.
-
-For a function that declares no row, `marked(func, "performs")` returns `None`,
-which means "inferred."
-An empty row means "pure," so `None` and the empty row must differ.
-`Row | None` is an ordinary optional,
-and each reader tests for `None` instead of asserting that the row is present.
 
 `calls_in()` collects the third fact.
 `ast.walk()` yields a statement and every node beneath it,
@@ -557,6 +556,18 @@ so `Log()` performs what `Log.__init__()` performs.
 The module's top-level statements become a function named `module.<module>`.
 That function is the program's edge.
 The checker always infers its row, which says what running the file performs.
+
+```python
+# function_facts.py (continued)
+def read_module(
+    module: str, source: str
+) -> Result[list[Facts], str]:
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as e:
+        return Err(f"{module}: line {e.lineno}: {e.msg}")
+    return Ok(facts_of(module, tree))
+```
 
 `read_module()` is the one operation here that can fail.
 It returns a [`Result`](42_Functional--Error_Handling.md#a-result-type),
@@ -614,7 +625,26 @@ def parameters(
     if owner and positional:
         types[positional[0].arg] = owner
     return types
+```
 
+`parameters()` and `assigned()` fill a scope's `types`: an annotated parameter,
+the first parameter of a method (the class), an annotated assignment,
+and a plain assignment whose right side has an evident type.
+`assigned()` also records every other name a body binds: a loop variable,
+a `with` or `except` target, a walrus target, a name inside a tuple target,
+a name a pattern captures, and a parameter of a nested function or a `lambda`.
+A name bound in any of those ways gets `UNRESOLVED`,
+and so does a name that two assignments give different types.
+An annotation overrides `UNRESOLVED` in both cases.
+
+The or-pattern in `assigned()` handles every one of those binding nodes.
+Each alternative binds `name`, as an or-pattern requires,
+and `values` supplies the type.
+`ast.walk()` visits an assignment before its target,
+so `values` holds the type of the right side when the walk reaches the target's `Name`.
+
+```python
+# local_types.py (continued)
 def is_function(node: ast.stmt) -> TypeIs[Def]:
     kinds = ast.FunctionDef | ast.AsyncFunctionDef
     return isinstance(node, kinds)
@@ -646,22 +676,6 @@ def module_scope(module: str, tree: ast.Module) -> Scope:
     types = assigned(top, named)
     return Scope(module, named.names, defined, types)
 ```
-
-`parameters()` and `assigned()` fill a scope's `types`: an annotated parameter,
-the first parameter of a method (the class), an annotated assignment,
-and a plain assignment whose right side has an evident type.
-`assigned()` also records every other name a body binds: a loop variable,
-a `with` or `except` target, a walrus target, a name inside a tuple target,
-a name a pattern captures, and a parameter of a nested function or a `lambda`.
-A name bound in any of those ways gets `UNRESOLVED`,
-and so does a name that two assignments give different types.
-An annotation overrides `UNRESOLVED` in both cases.
-
-The or-pattern in `assigned()` handles every one of those binding nodes.
-Each alternative binds `name`, as an or-pattern requires,
-and `values` supplies the type.
-`ast.walk()` visits an assignment before its target,
-so `values` holds the type of the right side when the walk reaches the target's `Name`.
 
 `module_scope()` fills `types` the same way for a module's top level.
 It reads each `type` statement separately,
@@ -950,7 +964,17 @@ def check(
     for facts in known.values():
         findings += undeclared(facts, rows, table)
     return Report(rows, findings)
+```
 
+`check()` receives each module's source text keyed by module name, plus a table,
+and returns a `Report`.
+It reads no file and prints nothing,
+so a test passes it a string and checks the returned value.
+
+The last two functions turn findings and rows into text:
+
+```python
+# row_check.py (continued)
 def describe(finding: Finding) -> str:
     match finding:
         case Undeclared(where, effect):
@@ -966,11 +990,6 @@ def lines(report: Report) -> list[str]:
     ]
     return rows + [describe(f) for f in report.findings]
 ```
-
-`check()` receives each module's source text keyed by module name, plus a table,
-and returns a `Report`.
-It reads no file and prints nothing,
-so a test passes it a string and checks the returned value.
 
 The `match` on `read_module()`'s result turns a parse failure into an `Unparsed` finding,
 and `undeclared()` reports each Effect a row omits as an `Undeclared` finding.

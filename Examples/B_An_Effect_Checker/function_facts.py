@@ -35,6 +35,7 @@ def marked(
                         )
     return None
 
+# function_facts.py (continued)
 def calls_in(
     body: list[ast.stmt], scope: Scope
 ) -> tuple[str, ...]:
@@ -89,6 +90,7 @@ def facts_of(module: str, tree: ast.Module) -> list[Facts]:
     calls = calls_in(top, base)
     return [*found, Facts(name, None, PURE, calls)]
 
+# function_facts.py (continued)
 def read_module(
     module: str, source: str
 ) -> Result[list[Facts], str]:
