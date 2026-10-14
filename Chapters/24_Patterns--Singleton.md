@@ -62,13 +62,20 @@ Mutating that `dict` through one import is visible through every other:
 
 ```python
 # shared_config.py
+import config
 from config import settings
 
 #: config body runs
 settings["theme"] = "dark"
 print(settings)
 #: {'theme': 'dark'}
+print(config.settings)
+#: {'theme': 'dark'}
 ```
+
+The write goes through the name `settings`,
+and the read through `config.settings` finds it,
+because both names refer to one `dict`.
 
 No class, no ceremony.
 For most singleton needs, a module solves the problem.
@@ -475,13 +482,9 @@ class OnlyOne:
         return getattr(self.instance, name)
 
 x = OnlyOne("sausage")
-print(x.val)
-#: ['sausage']
 y = OnlyOne("eggs")
-print(y.val)
-#: ['sausage', 'eggs']
 z = OnlyOne("spam")
-print(z.val)
+print(x.val)
 #: ['sausage', 'eggs', 'spam']
 # Distinct wrappers (x is not y), one shared inner instance:
 print(x is y, x.instance is y.instance is z.instance)
@@ -857,8 +860,7 @@ Try each exercise before opening its [solution](../Solutions/24_Patterns--Single
 3.  Rewrite one of this chapter's class-based singletons as a module,
     and argue which you would use in real code.
 4.  In `shared_config.py`, replace the mutation with a rebinding,
-    `settings = {"theme": "dark"}`,
-    and add `import config` plus `print(config.settings)` at the end.
+    `settings = {"theme": "dark"}`.
     Predict both printed values before running it,
     and explain the difference using the [mutate-versus-rebind distinction](#a-module-is-already-a-singleton).
 5.  Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,

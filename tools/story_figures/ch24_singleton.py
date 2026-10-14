@@ -14,7 +14,8 @@ in time, one layout per frame: the importing file on the left, the
 2. `import config as again` finds the entry; the body does not run, and
    both names and the entry are one module (`True`).
 3. `shared_config.py` mutates the one `settings` dict through its own
-   name (`{'theme': 'dark'}`).
+   name, and reading it back through `config.settings` shows the change
+   (`{'theme': 'dark'}` twice).
 4. Rebinding that name, `settings = {}`, points it at a new dict and
    leaves `config.settings` as it was: the prose's "Mutate through any
    name. Rebind only through the module." No listing contains this step,
@@ -30,7 +31,7 @@ from tools.story_figures import (BOX, INK, MUTED, RED, arrow, line, markers,
 
 STEM = "singleton_story"
 W = 730
-FH = 160  # One frame's height
+FH = 172  # One frame's height
 IX, IW = 140, 210  # The importing file
 SLX, SLW, SLH = 268, 72, 24  # The names it binds
 SLOT_Y = (84, 112)
@@ -96,10 +97,10 @@ def settings(y0: float, value: str, fill: str = INK,
             + text(DX + DW / 2, y0 + DY + 18, value, 10.5, fill, "middle"))
 
 
-def prints(y0: float, outputs: tuple[str, ...]) -> str:
-    out = text(IX + 10, y0 + 92, "prints", 10, MUTED)
+def prints(y0: float, outputs: tuple[str, ...], top: float = 92) -> str:
+    out = text(IX + 10, y0 + top, "prints", 10, MUTED)
     for j, s in enumerate(outputs):
-        out += text(IX + 10, y0 + 108 + j * 16, s, 10.5, RED)
+        out += text(IX + 10, y0 + top + 16 + j * 16, s, 10.5, RED)
     return out
 
 
@@ -134,11 +135,15 @@ def render() -> str:
     b += frame(2, y0, "mutate", ("a change through", "your own name", "reaches every",
                                  "importer"),
                "shared_config.py",
-               (("from config import settings", INK),
+               (("import config", INK),
+                ("from config import settings", INK),
                 ('settings["theme"] = "dark"', RED)))
-    b += prints(y0, ("config body runs", "{'theme': 'dark'}"))
+    b += prints(y0, ("config body runs", "{'theme': 'dark'}",
+                     "{'theme': 'dark'}"), top=100)
     b += settings(y0, "{'theme': 'dark'}", RED)
+    b += slot(y0, 0, "config")
     b += slot(y0, 1, "settings")
+    b += arrow(slot_mid(y0, 0), (OX, y0 + 74), INK, "ss-ink")
     b += arrow(slot_mid(y0, 1), (DX, y0 + DY + DH / 2), INK, "ss-ink")
 
     y0 = y[3]

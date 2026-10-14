@@ -300,8 +300,7 @@ Everywhere else, the module is the simpler tool.
 ## 4. Rebinding instead of mutating
 
 > In `shared_config.py`, replace the mutation with a rebinding,
-> `settings = {"theme": "dark"}`,
-> and add `import config` plus `print(config.settings)` at the end.
+> `settings = {"theme": "dark"}`.
 > Predict both printed values before running it,
 > and explain the difference using the [mutate-versus-rebind distinction](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton).
 
