@@ -16,5 +16,5 @@ def twice_collection(
 print(twice_iterable(gen(3)))
 #: (3, 0)
 # The same values, in a list
-print(twice_collection([0, 1, 2]))
+print(twice_iterable([0, 1, 2]))
 #: (3, 3)

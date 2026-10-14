@@ -1,13 +1,14 @@
 # typed_iterator.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import override
 
 @dataclass(eq=False)
 class TypedIterator[T](Iterator[T]):
     source: Iterator[object]
     expected: type[T]
-    accepted: int = 0  # State a generator cannot expose
+    # State a generator cannot expose
+    accepted: int = field(default=0, init=False)
 
     @override
     def __next__(self) -> T:

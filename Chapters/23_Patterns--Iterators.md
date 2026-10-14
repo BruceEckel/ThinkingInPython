@@ -329,18 +329,22 @@ def twice_collection(
 print(twice_iterable(gen(3)))
 #: (3, 0)
 # The same values, in a list
-print(twice_collection([0, 1, 2]))
+print(twice_iterable([0, 1, 2]))
 #: (3, 3)
 ```
 
+The two calls differ in the argument alone,
+so the `(3, 0)` comes from the spent generator.
+
 When a function iterates over its argument more than once,
 say so in the signature.
-`Collection[T]` and `Sequence[T]` also require `__len__()`,
+`Collection[T]` and `Sequence[T]` also require `__len__()` and `__contains__()`,
 which no generator has.
 The type checker therefore flags the generator at the call,
 before the function runs and returns a wrong answer.
-The listing calls `twice_collection()` with a list,
-because the checker reports an error on `twice_collection(gen(3))` and every chapter listing must type-check.
+On `twice_collection(gen(3))` it reports an `invalid-argument-type`:
+expected `Collection[int]`, found `Iterator[int]`.
+The listing leaves that call out, because every chapter listing must type-check.
 `total()` in `iterators.py` stays `Iterable[int]` because it sums once.
 
 `Collection[T]` also rejects `Countdown`, which supports any number of passes.
@@ -628,14 +632,15 @@ Here, the wrapper checks every item against an expected type and raises a `TypeE
 ```python
 # typed_iterator.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import override
 
 @dataclass(eq=False)
 class TypedIterator[T](Iterator[T]):
     source: Iterator[object]
     expected: type[T]
-    accepted: int = 0  # State a generator cannot expose
+    # State a generator cannot expose
+    accepted: int = field(default=0, init=False)
 
     @override
     def __next__(self) -> T:
