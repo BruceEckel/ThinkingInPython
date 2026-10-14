@@ -32,7 +32,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
+    def compete(self, opponent: Item) -> Outcome:
         ...
 
     def __str__(self) -> str:
@@ -91,8 +91,8 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)]
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)]
 
     def __str__(self) -> str:
         return type(self).__name__
@@ -180,67 +180,67 @@ class Item:
         ...
 
 class Paper(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, opponent: Any) -> Outcome:
         ...
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         ...
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         ...
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         ...
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         ...
 
 class Scissors(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, opponent: Any) -> Outcome:
         ...
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         ...
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         ...
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         ...
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         ...
 
 class Rock(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, opponent: Any) -> Outcome:
         ...
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         ...
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         ...
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         ...
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         ...
 
 class Lizard(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, opponent: Any) -> Outcome:
         ...
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         ...
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         ...
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         ...
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         ...
 ```
 
@@ -248,7 +248,7 @@ class Lizard(Item):
 <summary>Solution</summary>
 
 If you forget `eval_lizard()` on one existing class, say `Rock`,
-the type checker reports nothing, because every `item` parameter takes `Any`.
+the type checker reports nothing, because every `opponent` and `caller` parameter takes `Any`.
 The demo then raises an `AttributeError` at `Lizard().compete(Rock())`,
 the first duel that calls the missing method.
 That `AttributeError` is the first sign of the mistake,
@@ -269,67 +269,67 @@ class Item:
         return type(self).__name__
 
 class Paper(Item):
-    def compete(self, item: Any) -> Outcome:
-        return item.eval_paper(self)
+    def compete(self, opponent: Any) -> Outcome:
+        return opponent.eval_paper(self)
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         return Outcome.DRAW
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         return Outcome.WIN
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         return Outcome.LOSE
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         return Outcome.WIN
 
 class Scissors(Item):
-    def compete(self, item: Any) -> Outcome:
-        return item.eval_scissors(self)
+    def compete(self, opponent: Any) -> Outcome:
+        return opponent.eval_scissors(self)
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         return Outcome.LOSE
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         return Outcome.DRAW
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         return Outcome.WIN
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         return Outcome.WIN
 
 class Rock(Item):
-    def compete(self, item: Any) -> Outcome:
-        return item.eval_rock(self)
+    def compete(self, opponent: Any) -> Outcome:
+        return opponent.eval_rock(self)
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         return Outcome.WIN
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         return Outcome.LOSE
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         return Outcome.DRAW
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         return Outcome.LOSE
 
 class Lizard(Item):
-    def compete(self, item: Any) -> Outcome:
-        return item.eval_lizard(self)
+    def compete(self, opponent: Any) -> Outcome:
+        return opponent.eval_lizard(self)
 
-    def eval_paper(self, item: Any) -> Outcome:
+    def eval_paper(self, caller: Any) -> Outcome:
         return Outcome.LOSE
 
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         return Outcome.LOSE
 
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         return Outcome.WIN
 
-    def eval_lizard(self, item: Any) -> Outcome:
+    def eval_lizard(self, caller: Any) -> Outcome:
         return Outcome.DRAW
 
 if __name__ == "__main__":
@@ -496,18 +496,21 @@ reports sixteen cases per module where it reported nine.
 
 ## 4. Counting how often each item type appears
 
-> In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter,
+> `all_pairs()` yields each pair of types once.
+> A tournament of random duels needs a second generator.
+> In `arena.py`, write `random_pairs(base, n, counts)`,
+> which draws `n` random pairs from `base.__subclasses__()` and yields each as a `(player, opponent)` tuple.
+> Give it an optional `counts: Counter[str] | None = None` parameter,
 > and have it update that counter in place with a tally of every item type it chooses.
-> It still yields `(item1, item2)` pairs, so existing calls keep working.
 > The counter fills only as you consume the generator,
 > so pass in your own `Counter`,
-> iterate over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
+> iterate over all 100 pairs from `random_pairs(Item, 100, counts)`,
 > and then print how many times `Lizard` appeared.
 
 <details>
 <summary>Where to look</summary>
 
-In the chapter's `arena.py`, `item_pair_gen()` is a generator, so its body runs only as you iterate over it.
+Write `random_pairs()` as a generator, like the chapter's `all_pairs()` in `arena.py`, so its body runs only as you iterate over it.
 When the caller passes no `Counter`, create a fresh one so the body has a single path.
 Increment the count for each item inside the loop, before the `yield`, so the caller's own `Counter` fills as the loop consumes the pairs.
 
@@ -528,7 +531,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
+    def compete(self, opponent: Item) -> Outcome:
         ...
 
     def __str__(self) -> str:
@@ -564,19 +567,19 @@ OUTCOME: Final[Table] = {
   (Lizard, Lizard): Outcome.DRAW,
 }
 
-def duel(item1: Any, item2: Any) -> None:
+def duel(player: Any, opponent: Any) -> None:
     ...
 
-def item_pair_gen[T](base: type[T], n: int,
-                     counts: Counter[str] | None = None
-                     ) -> Iterator[tuple[T, T]]:
+def random_pairs[T](base: type[T], n: int,
+                    counts: Counter[str] | None = None
+                    ) -> Iterator[tuple[T, T]]:
     ...
 ```
 
 <details>
 <summary>Solution</summary>
 
-If you print `counts["Lizard"]` right after calling `item_pair_gen(Item, 100, counts)`,
+If you print `counts["Lizard"]` right after calling `random_pairs(Item, 100, counts)`,
 before iterating over the generator, the `print()` shows `0`.
 Calling a generator function returns a generator object,
 and the body starts at the first `next()`.
@@ -597,8 +600,8 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)]
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)]
 
     def __str__(self) -> str:
         return type(self).__name__
@@ -633,12 +636,13 @@ OUTCOME: Final[Table] = {
   (Lizard, Lizard): Outcome.DRAW,
 }
 
-def duel(item1: Any, item2: Any) -> None:
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
+def duel(player: Any, opponent: Any) -> None:
+    result = player.compete(opponent)
+    print(f"{player} <--> {opponent} : {result}")
 
-def item_pair_gen[T](base: type[T], n: int,
-                     counts: Counter[str] | None = None
-                     ) -> Iterator[tuple[T, T]]:
+def random_pairs[T](base: type[T], n: int,
+                    counts: Counter[str] | None = None
+                    ) -> Iterator[tuple[T, T]]:
     if counts is None:
         counts = Counter()
     items = base.__subclasses__()
@@ -651,22 +655,21 @@ def item_pair_gen[T](base: type[T], n: int,
 
 random.seed(47)
 counts: Counter[str] = Counter()
-for item1, item2 in item_pair_gen(Item, 100, counts):
-    pass  # duel(item1, item2) in the real version
+for player, opponent in random_pairs(Item, 100, counts):
+    pass  # duel(player, opponent) in the real version
 print(counts["Lizard"])
 #: 53
 ```
 
-**Keep existing calls working.** `counts` is an optional parameter with a default of `None`, so every
-existing call such as `item_pair_gen(Item, 10)` still works as
-before.
-The generator yields an `(item1, item2)` pair each time.
+**Make the tally optional.** `counts` is an optional parameter with a default of `None`,
+so a caller that wants only the pairs writes `random_pairs(Item, 10)`.
+The generator yields a `(player, opponent)` pair each time.
 
 **Tally into the caller's counter.** A caller that wants the tally
 passes its own `Counter`. The generator updates that counter in place
 for every pair it produces, one increment per item, so the caller can
 read `counts["Lizard"]` during or after the loop. With the same seed,
-`item_pair_gen()` yields the same pairs whether or not it counts them.
+`random_pairs()` yields the same pairs whether or not it counts them.
 
 </details>
 </details>
@@ -815,7 +818,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
+    def compete(self, opponent: Item) -> Outcome:
         ...
     def __str__(self) -> str:
         ...
@@ -836,7 +839,7 @@ class Origami(Paper):
     pass
 
 class TolerantItem(Item):
-    def compete(self, item: Item) -> Outcome:
+    def compete(self, opponent: Item) -> Outcome:
         ...
 
 class TolerantPaper(TolerantItem):
@@ -850,7 +853,7 @@ class TolerantOrigami(TolerantPaper):
 <details>
 <summary>Solution</summary>
 
-If you walk the left operand's MRO and key the right on `type(item)` as it is,
+If you walk the left operand's MRO and key the right on `type(opponent)` as it is,
 `TolerantOrigami().compete(TolerantRock())` still prints `win`,
 but `TolerantRock().compete(TolerantOrigami())` raises a `KeyError` for `(TolerantRock, TolerantOrigami)`.
 A subclass can sit on either side of a duel,
@@ -867,8 +870,8 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)]
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)]
     def __str__(self) -> str:
         return type(self).__name__
 
@@ -894,15 +897,15 @@ except KeyError as e:
 #: KeyError ['Origami', 'Rock']
 
 class TolerantItem(Item):
-    def compete(self, item: Item) -> Outcome:
+    def compete(self, opponent: Item) -> Outcome:
         for left in type(self).__mro__:
-            for right in type(item).__mro__:
+            for right in type(opponent).__mro__:
                 if not (issubclass(left, Item)
                         and issubclass(right, Item)):
                     continue  # object is not an Item
                 if (left, right) in OUTCOME:
                     return OUTCOME[left, right]
-        raise KeyError((type(self), type(item)))
+        raise KeyError((type(self), type(opponent)))
 
 class TolerantPaper(TolerantItem):
     pass
@@ -1514,8 +1517,8 @@ as it does in a real rock-paper-scissors tournament.
 > In `paper_scissors_rock_table.py`,
 > give every `OUTCOME` cell a `Callable[[Item, Item], Outcome]` in place of its `Outcome`,
 > and have `compete()` call the cell it finds:
-> `OUTCOME[type(self), type(item)](self, item)`.
-> The call site stays `item1.compete(item2)`.
+> `OUTCOME[type(self), type(opponent)](self, opponent)`.
+> The call site stays `player.compete(opponent)`.
 > Write a helper that wraps a constant `Outcome` in a callable,
 > so the seven unchanged cells stay one line each.
 > Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.
@@ -1547,7 +1550,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
+    def compete(self, opponent: Item) -> Outcome:
         ...
     def __str__(self) -> str:
         ...
@@ -1568,10 +1571,10 @@ type Cell = Callable[[Item, Item], Outcome]
 def always(outcome: Outcome) -> Cell:
     ...
 
-def paper_vs_rock(item1: Item, item2: Item) -> Outcome:
+def paper_vs_rock(player: Item, opponent: Item) -> Outcome:
     ...
 
-def rock_vs_paper(item1: Item, item2: Item) -> Outcome:
+def rock_vs_paper(player: Item, opponent: Item) -> Outcome:
     ...
 
 OUTCOME: Final[
@@ -1611,8 +1614,9 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)](self, item)
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)](
+            self, opponent)
     def __str__(self) -> str:
         return type(self).__name__
 
@@ -1630,15 +1634,15 @@ class Rock(Item):
 type Cell = Callable[[Item, Item], Outcome]
 
 def always(outcome: Outcome) -> Cell:
-    return lambda item1, item2: outcome
+    return lambda player, opponent: outcome
 
-def paper_vs_rock(item1: Item, item2: Item) -> Outcome:
-    if isinstance(item1, Paper) and item1.wet:
+def paper_vs_rock(player: Item, opponent: Item) -> Outcome:
+    if isinstance(player, Paper) and player.wet:
         return Outcome.DRAW  # Too soggy to wrap a rock
     return Outcome.WIN
 
-def rock_vs_paper(item1: Item, item2: Item) -> Outcome:
-    if isinstance(item2, Paper) and item2.wet:
+def rock_vs_paper(player: Item, opponent: Item) -> Outcome:
+    if isinstance(opponent, Paper) and opponent.wet:
         return Outcome.DRAW  # The same soggy draw
     return Outcome.LOSE
 
@@ -1655,14 +1659,15 @@ OUTCOME: Final[
     (Rock, Rock): always(Outcome.DRAW),
 }
 
-for item1, item2 in [
+for player, opponent in [
     (Paper(), Rock()),
     (Paper(wet=True), Rock()),
     (Rock(), Paper(wet=True)),
     (Scissors(), Paper()),
     (Rock(), Rock()),
 ]:
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
+    result = player.compete(opponent)
+    print(f"{player} <--> {opponent} : {result}")
 #: Paper <--> Rock : win
 #: WetPaper <--> Rock : draw
 #: Rock <--> WetPaper : draw
@@ -1673,7 +1678,7 @@ for item1, item2 in [
 **Call what the lookup returns.** `compete()` changes by one pair of parentheses. It still finds the
 cell with a single probe keyed on both types, and now calls what it
 finds instead of returning it. The call site stays the same:
-`item1.compete(item2)` reads as it does in
+`player.compete(opponent)` reads as it does in
 `paper_scissors_rock.py`, where four method definitions per class
 stand behind it. A table of callables keeps the method-call syntax.
 
@@ -1683,9 +1688,9 @@ combinations with a constant answer stay one line each and still read as
 a table of answers. Only the cells that need code look like code.
 
 **Read the state in both orders.** The `(Paper, Rock)` cell receives both items, so it can consult
-`item1.wet`. The `(Rock, Paper)` cell consults `item2.wet`, because
+`player.wet`. The `(Rock, Paper)` cell consults `opponent.wet`, because
 one duel has two orders and each order has its own cell. If the
-`(Rock, Paper)` cell ignored `item2.wet`, a rock that calls
+`(Rock, Paper)` cell ignored `opponent.wet`, a rock that calls
 `compete()` would still lose to wet paper.
 
 The chapter gives two reasons for preferring the double-dispatch version,

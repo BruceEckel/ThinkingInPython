@@ -4,11 +4,11 @@ from outcome import Outcome
 from paper_scissors_rock import Paper, Rock, Scissors
 
 class DampPaper(Paper):
-    def compete(self, item: Any) -> Outcome:
-        if isinstance(item, Rock):
+    def compete(self, opponent: Any) -> Outcome:
+        if isinstance(opponent, Rock):
             return Outcome.DRAW  # Too soggy to wrap
-        return super().compete(item)
-    def eval_rock(self, item: Any) -> Outcome:
+        return super().compete(opponent)
+    def eval_rock(self, caller: Any) -> Outcome:
         return Outcome.DRAW  # Rock's side of the same draw
 
 print(DampPaper().compete(Rock()))

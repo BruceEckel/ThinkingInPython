@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 475"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 475"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>One duel's two calls: scissors.compete(paper) knows only Scissors, so it calls paper.eval_scissors(scissors) with self and item swapped, which knows both types and returns WIN, the result for scissors</title>
+  <title>One duel's two calls: scissors.compete(paper) knows only Scissors, so it calls paper.eval_scissors(scissors) with self and opponent swapped, which knows both types and returns WIN, the result for scissors</title>
   <defs>
     <marker id="dd-ink" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
@@ -21,22 +21,22 @@
   <text x="52" y="147" font-size="11" fill="#7a6e62" text-anchor="start">self</text>
   <text x="185" y="147" font-size="12.5" fill="#1a1612" text-anchor="middle">scissors</text>
   <rect x="40" y="175" width="250" height="34" fill="none" stroke="#1a1612" stroke-width="1.1" rx="4"/>
-  <text x="52" y="197" font-size="11" fill="#7a6e62" text-anchor="start">item</text>
+  <text x="52" y="197" font-size="11" fill="#7a6e62" text-anchor="start">opponent</text>
   <text x="185" y="197" font-size="12.5" fill="#1a1612" text-anchor="middle">paper</text>
   <text x="40" y="238" font-size="10.5" fill="#7a6e62" text-anchor="start">self's type picks the method:</text>
   <text x="40" y="256" font-size="11" fill="#8b1a1a" text-anchor="start">Scissors known</text>
-  <text x="40" y="272" font-size="10.5" fill="#7a6e62" text-anchor="start">item's type still unknown</text>
+  <text x="40" y="272" font-size="10.5" fill="#7a6e62" text-anchor="start">opponent's type still unknown</text>
   <text x="410" y="34" font-size="26" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
   <text x="434" y="32" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">second dispatch</text>
   <text x="410" y="64" font-size="12" fill="#7a6e62" text-anchor="start">compete() calls</text>
-  <text x="525.2" y="64" font-size="12" fill="#1a1612" text-anchor="start">item.eval_scissors(self)</text>
+  <text x="525.2" y="64" font-size="12" fill="#1a1612" text-anchor="start">opponent.eval_scissors(self)</text>
   <path d="M414,80 H706 Q710,80 710,84 V276 Q710,280 706,280 H414 Q410,280 410,276 V84 Q410,80 414,80 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
   <text x="430" y="107" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Paper.eval_scissors()</text>
   <rect x="430" y="125" width="250" height="34" fill="none" stroke="#1a1612" stroke-width="1.1" rx="4"/>
   <text x="442" y="147" font-size="11" fill="#7a6e62" text-anchor="start">self</text>
   <text x="575" y="147" font-size="12.5" fill="#1a1612" text-anchor="middle">paper</text>
   <rect x="430" y="175" width="250" height="34" fill="none" stroke="#1a1612" stroke-width="1.1" rx="4"/>
-  <text x="442" y="197" font-size="11" fill="#7a6e62" text-anchor="start">item</text>
+  <text x="442" y="197" font-size="11" fill="#7a6e62" text-anchor="start">caller</text>
   <text x="575" y="197" font-size="12.5" fill="#1a1612" text-anchor="middle">scissors</text>
   <text x="430" y="238" font-size="10.5" fill="#7a6e62" text-anchor="start">self's type picks the method:</text>
   <text x="430" y="256" font-size="11" fill="#8b1a1a" text-anchor="start">Paper known</text>

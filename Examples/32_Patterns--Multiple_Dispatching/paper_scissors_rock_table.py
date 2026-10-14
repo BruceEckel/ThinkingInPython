@@ -3,8 +3,8 @@ from typing import Final
 from outcome import Outcome
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)]
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)]
     def __str__(self) -> str:
         return type(self).__name__
 

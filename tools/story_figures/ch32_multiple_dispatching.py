@@ -9,7 +9,7 @@ column is one class, each row one `eval_*()` method, and the two
 dispatches of `scissors.compete(paper)` pick the row and then the
 column. On the right, `paper_scissors_rock_table.py` keeps the grid in
 one dict, `OUTCOME`, and one lookup picks the same cell. Both listings
-print `Scissors <--> Paper : win` first. A dashed fourth item shows the
+print `Scissors <--> Paper : win`. A dashed fourth item shows the
 cost of growth: on the left its row adds a method to every existing
 class, on the right it adds rows to `OUTCOME` alone.
 
@@ -108,7 +108,7 @@ def render() -> str:
     # Right: the table version, one dict
     b += text(RX, 20, "one lookup", 13, bold=True)
     b += text(RX, 36, "paper_scissors_rock_table.py", 10.5, MUTED)
-    b += text(col_x(RX, 0), HEAD_Y - 8, "keys (type(self), type(item))",
+    b += text(col_x(RX, 0), HEAD_Y - 8, "keys (type(self), type(opponent))",
               10, MUTED)
     b += text(RX + RL - 6, HEAD_Y + 17, "OUTCOME", 11, bold=True,
               anchor="end")
@@ -116,7 +116,7 @@ def render() -> str:
                 4 * CH + 4, stroke=INK, width=1.2)
     b += grid(RX, NAMES, MUTED)
     b += text(RX, y, "1", 13, RED, bold=True)
-    b += text(RX + 16, y, "OUTCOME[type(self), type(item)]", 10.5)
+    b += text(RX + 16, y, "OUTCOME[type(self), type(opponent)]", 10.5)
     b += text(RX + 16, y + 14, "picks the row and the column", 10.5, MUTED)
     b += text(RX + 16, y + 28, "in one step", 10.5, MUTED)
     b += text(RX, y + 76, "a new item adds 7 rows to", 10.5, RED)

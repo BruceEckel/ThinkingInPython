@@ -3,7 +3,8 @@
 Chapter 32's second figure, after `paper_scissors_rock.py`, follows the
 duel the prose follows, `scissors.compete(paper)`. It replaced a UML
 sequence diagram on 2026-09-29. The two calls sit side by side, each
-with its `self` and `item`; two crossing arrows between them show the
+with its `self` and its argument (`opponent` in `compete()`,
+`caller` in `eval_scissors()`); two crossing arrows between them show the
 arguments trading places, the detail the sequence diagram left to an
 italic note. Under each call, the figure says which types are known:
 after the first dispatch, `Scissors` alone; after the second, `Paper`
@@ -17,25 +18,26 @@ from tools.story_figures import (INK, MUTED, RED, Point, arrow, markers,
                                  rect, region, svg, text)
 
 STEM = "double_dispatch"
-W = 730
+W = 740
 LX, RX = 20, 410  # The two calls' regions
 RW = 300
-BOX_W, BOX_H = 250, 34  # The self and item boxes
+BOX_W, BOX_H = 250, 34  # The self and argument boxes
 SELF_Y, ITEM_Y = 125, 175
 TITLE = ("One duel's two calls: scissors.compete(paper) knows only "
          "Scissors, so it calls paper.eval_scissors(scissors) with self "
-         "and item swapped, which knows both types and returns WIN, the "
-         "result for scissors")
+         "and opponent swapped, which knows both types and returns WIN, "
+         "the result for scissors")
 
 
-def slots(x: float, self_name: str, item_name: str) -> str:
-    """The `self` and `item` boxes of one call, left edge `x`."""
+def slots(x: float, self_name: str, arg: str,
+          item_name: str) -> str:
+    """The `self` and `arg` boxes of one call, left edge `x`."""
     return (rect(x, SELF_Y, BOX_W, BOX_H, stroke=INK, width=1.1)
             + text(x + 12, SELF_Y + 22, "self", 11, MUTED)
             + text(x + BOX_W / 2 + 20, SELF_Y + 22, self_name, 12.5,
                    INK, "middle")
             + rect(x, ITEM_Y, BOX_W, BOX_H, stroke=INK, width=1.1)
-            + text(x + 12, ITEM_Y + 22, "item", 11, MUTED)
+            + text(x + 12, ITEM_Y + 22, arg, 11, MUTED)
             + text(x + BOX_W / 2 + 20, ITEM_Y + 22, item_name, 12.5,
                    INK, "middle"))
 
@@ -58,14 +60,14 @@ def render() -> str:
 
     b += call(LX, 1, "first dispatch", "duel() calls",
               "scissors.compete(paper)", "Scissors.compete()")
-    b += slots(lb, "scissors", "paper")
+    b += slots(lb, "scissors", "opponent", "paper")
     b += text(lb, 238, "self's type picks the method:", 10.5, MUTED)
     b += text(lb, 256, "Scissors known", 11, RED)
-    b += text(lb, 272, "item's type still unknown", 10.5, MUTED)
+    b += text(lb, 272, "opponent's type still unknown", 10.5, MUTED)
 
     b += call(RX, 2, "second dispatch", "compete() calls",
-              "item.eval_scissors(self)", "Paper.eval_scissors()")
-    b += slots(rb, "paper", "scissors")
+              "opponent.eval_scissors(self)", "Paper.eval_scissors()")
+    b += slots(rb, "paper", "caller", "scissors")
     b += text(rb, 238, "self's type picks the method:", 10.5, MUTED)
     b += text(rb, 256, "Paper known", 11, RED)
     b += text(rb, 272, "Scissors known from the name", 10.5, INK)

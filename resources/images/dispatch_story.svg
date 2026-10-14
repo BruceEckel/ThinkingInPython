@@ -52,7 +52,7 @@
   <line x1="364" y1="10" x2="364" y2="308" stroke="#c8bfb0" stroke-width="0.8"/>
   <text x="386" y="20" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">one lookup</text>
   <text x="386" y="36" font-size="10.5" fill="#7a6e62" text-anchor="start">paper_scissors_rock_table.py</text>
-  <text x="486" y="52" font-size="10" fill="#7a6e62" text-anchor="start">keys (type(self), type(item))</text>
+  <text x="486" y="52" font-size="10" fill="#7a6e62" text-anchor="start">keys (type(self), type(opponent))</text>
   <text x="480" y="77" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="end">OUTCOME</text>
   <path d="M488,84 H724 Q728,84 728,88 V188 Q728,192 724,192 H488 Q484,192 484,188 V88 Q484,84 488,84 Z" fill="none" stroke="#1a1612" stroke-width="1.2"/>
   <text x="516" y="77" font-size="10.5" fill="#8b1a1a" font-weight="bold" text-anchor="middle">Paper</text>
@@ -89,7 +89,7 @@
   <rect x="549" y="167" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
   <rect x="609" y="167" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
   <text x="386" y="212" font-size="13" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
-  <text x="402" y="212" font-size="10.5" fill="#1a1612" text-anchor="start">OUTCOME[type(self), type(item)]</text>
+  <text x="402" y="212" font-size="10.5" fill="#1a1612" text-anchor="start">OUTCOME[type(self), type(opponent)]</text>
   <text x="402" y="226" font-size="10.5" fill="#7a6e62" text-anchor="start">picks the row and the column</text>
   <text x="402" y="240" font-size="10.5" fill="#7a6e62" text-anchor="start">in one step</text>
   <text x="386" y="288" font-size="10.5" fill="#8b1a1a" text-anchor="start">a new item adds 7 rows to</text>

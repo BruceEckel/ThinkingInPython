@@ -11,8 +11,8 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)]
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)]
 
     def __str__(self) -> str:
         return type(self).__name__
@@ -47,12 +47,13 @@ OUTCOME: Final[Table] = {
   (Lizard, Lizard): Outcome.DRAW,
 }
 
-def duel(item1: Any, item2: Any) -> None:
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
+def duel(player: Any, opponent: Any) -> None:
+    result = player.compete(opponent)
+    print(f"{player} <--> {opponent} : {result}")
 
-def item_pair_gen[T](base: type[T], n: int,
-                     counts: Counter[str] | None = None
-                     ) -> Iterator[tuple[T, T]]:
+def random_pairs[T](base: type[T], n: int,
+                    counts: Counter[str] | None = None
+                    ) -> Iterator[tuple[T, T]]:
     if counts is None:
         counts = Counter()
     items = base.__subclasses__()
@@ -65,7 +66,7 @@ def item_pair_gen[T](base: type[T], n: int,
 
 random.seed(47)
 counts: Counter[str] = Counter()
-for item1, item2 in item_pair_gen(Item, 100, counts):
-    pass  # duel(item1, item2) in the real version
+for player, opponent in random_pairs(Item, 100, counts):
+    pass  # duel(player, opponent) in the real version
 print(counts["Lizard"])
 #: 53

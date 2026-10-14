@@ -64,28 +64,30 @@ class Outcome(StrEnum):
     DRAW = "draw"
 ```
 
-You also need two small helper functions, one to generate random pairs of items,
+You also need two small helper functions, one to generate every pair of items,
 and one to play a pair off and print the result:
 
 ```python
 # arena.py
-import random
 from collections.abc import Iterator
+from itertools import product
 from typing import Any
 
-def item_pair_gen[T](base: type[T],
-                     n: int) -> Iterator[tuple[T, T]]:
-    items = base.__subclasses__()
-    for _ in range(n):
-        yield random.choice(items)(), random.choice(items)()
+def all_pairs[T](base: type[T]) -> Iterator[tuple[T, T]]:
+    kinds = base.__subclasses__()
+    for a, b in product(kinds, kinds):
+        yield a(), b()
 
-def duel(item1: Any, item2: Any) -> None:
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
+def duel(player: Any, opponent: Any) -> None:
+    result = player.compete(opponent)
+    print(f"{player} <--> {opponent} : {result}")
 ```
 
-`item_pair_gen()` is generic over whichever base class it receives.
+`all_pairs()` is generic over whichever base class it receives.
 `__subclasses__()` lists that base's direct subclasses,
 as [`shape_name()`](27_Patterns--Factory.md#simple-factory-method) does.
+`itertools.product()` pairs each subclass with every subclass, itself included,
+so a demo prints each of the nine answers once.
 `duel()` annotates both parameters `Any` because `paper_scissors_rock.py` and `paper_scissors_rock_table.py` define separate `Item` hierarchies,
 and this file must serve both.
 
@@ -93,9 +95,8 @@ and this file must serve both.
 
 ```python
 # paper_scissors_rock.py
-import random
 from typing import Any
-from arena import duel, item_pair_gen
+from arena import all_pairs, duel
 from outcome import Outcome
 
 class Item:
@@ -103,61 +104,59 @@ class Item:
         return type(self).__name__
 
 class Paper(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, opponent: Any) -> Outcome:
         # First dispatch: self was Paper
-        return item.eval_paper(self)
-    def eval_paper(self, item: Any) -> Outcome:
+        return opponent.eval_paper(self)
+    def eval_paper(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Paper, and it draws
         return Outcome.DRAW
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Scissors, and it wins
         return Outcome.WIN
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Rock, and it loses
         return Outcome.LOSE
 
 class Scissors(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, opponent: Any) -> Outcome:
         # First dispatch: self was Scissors
-        return item.eval_scissors(self)
-    def eval_paper(self, item: Any) -> Outcome:
+        return opponent.eval_scissors(self)
+    def eval_paper(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Paper, and it loses
         return Outcome.LOSE
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Scissors, and it draws
         return Outcome.DRAW
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Rock, and it wins
         return Outcome.WIN
 
 class Rock(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, opponent: Any) -> Outcome:
         # First dispatch: self was Rock
-        return item.eval_rock(self)
-    def eval_paper(self, item: Any) -> Outcome:
+        return opponent.eval_rock(self)
+    def eval_paper(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Paper, and it wins
         return Outcome.WIN
-    def eval_scissors(self, item: Any) -> Outcome:
+    def eval_scissors(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Scissors, and it loses
         return Outcome.LOSE
-    def eval_rock(self, item: Any) -> Outcome:
+    def eval_rock(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Rock, and it draws
         return Outcome.DRAW
 
 if __name__ == "__main__":
-    random.seed(47)  # Reproducible pairs
-    for item1, item2 in item_pair_gen(Item, 10):
-        duel(item1, item2)
-#: Scissors <--> Paper : win
-#: Scissors <--> Rock : lose
-#: Scissors <--> Rock : lose
-#: Scissors <--> Scissors : draw
-#: Rock <--> Scissors : win
-#: Scissors <--> Rock : lose
-#: Paper <--> Scissors : lose
-#: Rock <--> Paper : lose
+    for player, opponent in all_pairs(Item):
+        duel(player, opponent)
 #: Paper <--> Paper : draw
+#: Paper <--> Scissors : lose
+#: Paper <--> Rock : win
+#: Scissors <--> Paper : win
 #: Scissors <--> Scissors : draw
+#: Scissors <--> Rock : lose
+#: Rock <--> Paper : lose
+#: Rock <--> Scissors : win
+#: Rock <--> Rock : draw
 ```
 
 ![](_images/double_dispatch)
@@ -173,23 +172,22 @@ Which competitor does that method's result describe?
 `Paper.eval_scissors()` returns `WIN`.
 Scissors cut paper, so that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running.
-The listing's first line of output, `Scissors <--> Paper : win`,
-reports it that way.
+The listing's output reports it that way: `Scissors <--> Paper : win`.
 Every `eval_*()` method returns the outcome for the original caller,
 the type named in the method's own name.
 If you read that convention the other way,
 every `eval_*()` result appears reversed.
 
-Each `eval_*()` method receives that original caller as its `item` argument:
-the same object `compete()` held as `self` before passing it along.
-A game whose outcome depends on the caller's state reads that state through `item`.
+The `caller` argument of each `eval_*()` method is the same object `compete()` held as `self` before passing it along.
+A game whose outcome depends on the caller's state reads that state through `caller`.
 This game ignores the argument,
 since the outcome depends on the two types alone.
 
 Those `Any` annotations turn off static checking.
 Classes that supply eight of the nine answers then pass the type checker,
 and Python raises an `AttributeError` at the first duel that calls the ninth.
-`Item` declares `__str__()` alone, so each `item` parameter takes `Any`.
+`Item` declares `__str__()` alone,
+so each `opponent` and `caller` parameter takes `Any`.
 A precise type needs a declaration of all four methods,
 either on `Item` as abstract methods or in a `Protocol`.
 Declaring the four methods restores the checking,
@@ -198,7 +196,7 @@ but the declaration repeats every class's method names.
 The table version keeps the checking and declares each name once.
 Its `Item` declares the one method the dispatch needs,
 so `compete()` takes its opponent as an `Item`:
-`compete(self, item: Item) -> Outcome`.
+`compete(self, opponent: Item) -> Outcome`.
 Its answers are rows in one dictionary,
 so a new class inherits `compete()` and adds rows instead of methods.
 The type checker accepts a table that lacks a row, though,
@@ -219,8 +217,8 @@ from typing import Final
 from outcome import Outcome
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)]
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)]
     def __str__(self) -> str:
         return type(self).__name__
 
@@ -248,7 +246,7 @@ OUTCOME: Final[Table] = {
 
 A tuple works as a dictionary key, the same as a single object,
 so each key in `OUTCOME` is a pair of classes.
-The same seeded loop over these classes prints the same ten duels that `paper_scissors_rock.py` prints.
+The same `all_pairs()` loop over these classes prints the same nine duels that `paper_scissors_rock.py` prints.
 
 Both versions now hold the same nine answers, one for each pair of types:
 
@@ -445,11 +443,11 @@ from outcome import Outcome
 from paper_scissors_rock import Paper, Rock, Scissors
 
 class DampPaper(Paper):
-    def compete(self, item: Any) -> Outcome:
-        if isinstance(item, Rock):
+    def compete(self, opponent: Any) -> Outcome:
+        if isinstance(opponent, Rock):
             return Outcome.DRAW  # Too soggy to wrap
-        return super().compete(item)
-    def eval_rock(self, item: Any) -> Outcome:
+        return super().compete(opponent)
+    def eval_rock(self, caller: Any) -> Outcome:
         return Outcome.DRAW  # Rock's side of the same draw
 
 print(DampPaper().compete(Rock()))
@@ -473,7 +471,7 @@ With the `compete()` override alone,
 the inherited `Paper.eval_rock()` reports that the rock loses,
 and the two orders of one duel disagree.
 Every other combination comes from `Paper`,
-through `super().compete(item)` and the inherited `eval_*()` methods.
+through `super().compete(opponent)` and the inherited `eval_*()` methods.
 
 The table version has no comparable override.
 The lookup matches classes exactly,
@@ -657,7 +655,7 @@ The `eval_*()` family and `__add__()` with `__radd__()` answer it with a second 
 a second method call that resolves the type by running a method lookup.
 The `OUTCOME` table answers it differently.
 `Item` defines `compete()` once, and every subclass inherits it.
-The body of `compete()`, `OUTCOME[type(self), type(item)]`,
+The body of `compete()`, `OUTCOME[type(self), type(opponent)]`,
 is one dictionary lookup keyed on both types at once,
 not a second method resolution.
 
@@ -681,12 +679,15 @@ Try each exercise before opening its [solution](../Solutions/32_Patterns--Multip
 3.  In `test_paper_scissors.py`, add `Lizard`'s seven matchups to `EXPECTED`,
     taking it from nine entries to sixteen,
     and confirm both versions still agree with each other and with `EXPECTED`.
-4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter,
+4.  `all_pairs()` yields each pair of types once.
+    A tournament of random duels needs a second generator.
+    In `arena.py`, write `random_pairs(base, n, counts)`,
+    which draws `n` random pairs from `base.__subclasses__()` and yields each as a `(player, opponent)` tuple.
+    Give it an optional `counts: Counter[str] | None = None` parameter,
     and have it update that counter in place with a tally of every item type it chooses.
-    It still yields `(item1, item2)` pairs, so existing calls keep working.
     The counter fills only as you consume the generator,
     so pass in your own `Counter`,
-    iterate over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
+    iterate over all 100 pairs from `random_pairs(Item, 100, counts)`,
     and then print how many times `Lizard` appeared.
 5.  Give `Meters` a `__sub__()` and a `__rsub__()`.
     `__sub__()` handles a `Meters`, an `int`, or a `float`,
@@ -724,8 +725,8 @@ Try each exercise before opening its [solution](../Solutions/32_Patterns--Multip
     In `paper_scissors_rock_table.py`,
     give every `OUTCOME` cell a `Callable[[Item, Item], Outcome]` in place of its `Outcome`,
     and have `compete()` call the cell it finds:
-    `OUTCOME[type(self), type(item)](self, item)`.
-    The call site stays `item1.compete(item2)`.
+    `OUTCOME[type(self), type(opponent)](self, opponent)`.
+    The call site stays `player.compete(opponent)`.
     Write a helper that wraps a constant `Outcome` in a callable,
     so the seven unchanged cells stay one line each.
     Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.

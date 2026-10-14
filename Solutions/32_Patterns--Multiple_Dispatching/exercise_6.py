@@ -8,8 +8,8 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Item) -> Outcome:
-        return OUTCOME[type(self), type(item)]
+    def compete(self, opponent: Item) -> Outcome:
+        return OUTCOME[type(self), type(opponent)]
     def __str__(self) -> str:
         return type(self).__name__
 
@@ -35,15 +35,15 @@ except KeyError as e:
 #: KeyError ['Origami', 'Rock']
 
 class TolerantItem(Item):
-    def compete(self, item: Item) -> Outcome:
+    def compete(self, opponent: Item) -> Outcome:
         for left in type(self).__mro__:
-            for right in type(item).__mro__:
+            for right in type(opponent).__mro__:
                 if not (issubclass(left, Item)
                         and issubclass(right, Item)):
                     continue  # object is not an Item
                 if (left, right) in OUTCOME:
                     return OUTCOME[left, right]
-        raise KeyError((type(self), type(item)))
+        raise KeyError((type(self), type(opponent)))
 
 class TolerantPaper(TolerantItem):
     pass

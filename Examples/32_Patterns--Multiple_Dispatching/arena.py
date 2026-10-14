@@ -1,13 +1,13 @@
 # arena.py
-import random
 from collections.abc import Iterator
+from itertools import product
 from typing import Any
 
-def item_pair_gen[T](base: type[T],
-                     n: int) -> Iterator[tuple[T, T]]:
-    items = base.__subclasses__()
-    for _ in range(n):
-        yield random.choice(items)(), random.choice(items)()
+def all_pairs[T](base: type[T]) -> Iterator[tuple[T, T]]:
+    kinds = base.__subclasses__()
+    for a, b in product(kinds, kinds):
+        yield a(), b()
 
-def duel(item1: Any, item2: Any) -> None:
-    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
+def duel(player: Any, opponent: Any) -> None:
+    result = player.compete(opponent)
+    print(f"{player} <--> {opponent} : {result}")
