@@ -697,11 +697,11 @@ because `consume()` starts after all three producers finish.
 ## 9. A task that finishes before the failures arrive
 
 > In `utils/fetch_demo.py`,
-> change `("e", 0.2)` in `PAIRS` to `("e", 0.005)` so `e` finishes before `c` and `d` fail,
+> change `Fetch("e", 0.2)` in `FETCHES` to `Fetch("e", 0.005)` so `e` finishes before `c` and `d` fail,
 > then run `task_group.py`.
 > Predict which of the six report `cancelled` and which report a result,
 > then run it and explain what a `TaskGroup` can and cannot undo.
-> Change `PAIRS` back afterward,
+> Change `FETCHES` back afterward,
 > since `gather_with_exceptions.py` uses it too.
 
 <details>
@@ -718,20 +718,27 @@ The group cancels the tasks still running, so consider what becomes of a task th
 # The shape of exercise_9.py
 import asyncio
 from typing import Final
+from record import record
 
-PAIRS: Final[list[tuple[str, float]]] = [
-    ("a", 0.01),
-    ("b", 0.02),
-    ("c", 0.03),
-    ("d", 0.03),
-    ("e", 0.005),  # Was 0.2, so e now finishes first
-    ("f", 0.3),
+@record
+class Fetch:
+    item: str
+    delay: float
+    fails: bool = False
+
+FETCHES: Final[list[Fetch]] = [
+    Fetch("a", 0.01),
+    Fetch("b", 0.02),
+    Fetch("c", 0.03, fails=True),
+    Fetch("d", 0.03, fails=True),
+    Fetch("e", 0.005),  # Was 0.2, so e now finishes first
+    Fetch("f", 0.3),
 ]
 
 async def sleep_until(when: float) -> None:
     ...
 
-async def fetch(item: str, delay: float, t0: float) -> str:
+async def fetch(job: Fetch, t0: float) -> str:
     ...
 
 async def main() -> None:
@@ -745,14 +752,21 @@ async def main() -> None:
 # exercise_9.py
 import asyncio
 from typing import Final
+from record import record
 
-PAIRS: Final[list[tuple[str, float]]] = [
-    ("a", 0.01),
-    ("b", 0.02),
-    ("c", 0.03),
-    ("d", 0.03),
-    ("e", 0.005),  # Was 0.2, so e now finishes first
-    ("f", 0.3),
+@record
+class Fetch:
+    item: str
+    delay: float
+    fails: bool = False
+
+FETCHES: Final[list[Fetch]] = [
+    Fetch("a", 0.01),
+    Fetch("b", 0.02),
+    Fetch("c", 0.03, fails=True),
+    Fetch("d", 0.03, fails=True),
+    Fetch("e", 0.005),  # Was 0.2, so e now finishes first
+    Fetch("f", 0.3),
 ]
 
 async def sleep_until(when: float) -> None:
@@ -764,21 +778,20 @@ async def sleep_until(when: float) -> None:
     finally:
         timer.cancel()
 
-async def fetch(item: str, delay: float, t0: float) -> str:
-    print(f"{item}: started")
-    await sleep_until(t0 + delay)
-    if item in ("c", "d"):
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
+async def fetch(job: Fetch, t0: float) -> str:
+    await sleep_until(t0 + job.delay)
+    if job.fails:
+        raise ValueError(f"fetch({job.item!r}) failed")
+    print(f"{job.item}: fetched")
+    return job.item.upper()
 
 async def main() -> None:
     t0 = asyncio.get_running_loop().time()
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
-                item: tg.create_task(fetch(item, delay, t0))
-                for item, delay in PAIRS
+                job.item: tg.create_task(fetch(job, t0))
+                for job in FETCHES
             }
     except* ValueError as group:
         for exc in group.exceptions:
@@ -792,12 +805,6 @@ async def main() -> None:
             print(f"{item}: {task.result()}")
 
 asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
 #: e: fetched
 #: a: fetched
 #: b: fetched
@@ -820,7 +827,7 @@ during that sleep and its task ends cancelled.
 **Cancel what is still running.** The difference between `e` and `f` shows what a
 `TaskGroup` can and cannot undo. A
 `TaskGroup` cancels what is still running, which is why the original
-`PAIRS` has both `e` and `f` cancelled. The group cannot cancel a task
+`FETCHES` has both `e` and `f` cancelled. The group cannot cancel a task
 that has returned, and it cannot unprint `e: fetched` or undo
 whatever a real `fetch()` wrote to a database before it returned.
 Structured concurrency guarantees that every task has ended when the block exits.
@@ -857,7 +864,7 @@ For the remaining tasks, compare with a `TaskGroup` and ask who cancels them, an
 ```python
 # The shape of exercise_10.py
 import asyncio
-from fetch_demo import PAIRS, fetch
+from fetch_demo import FETCHES, fetch
 
 async def main() -> None:
     ...
@@ -869,26 +876,19 @@ async def main() -> None:
 ```python
 # exercise_10.py
 import asyncio
-from fetch_demo import PAIRS, fetch
+from fetch_demo import FETCHES, fetch
 
 async def main() -> None:
     t0 = asyncio.get_running_loop().time()
     try:
         results = await asyncio.gather(*(
-            fetch(item, delay, t0)
-            for item, delay in PAIRS))
+            fetch(job, t0) for job in FETCHES))
     except ValueError as e:
         print(f"gather raised {e!r}")
         return
     print(results)
 
 asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
 #: a: fetched
 #: b: fetched
 #: gather raised ValueError("fetch('c') failed")

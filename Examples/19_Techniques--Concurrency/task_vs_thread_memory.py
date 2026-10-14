@@ -1,6 +1,5 @@
 # task_vs_thread_memory.py
 import asyncio
-import threading
 import tracemalloc
 from typing import Final
 from benchmark import report
@@ -33,18 +32,10 @@ async def bytes_per_task() -> float:
     tracemalloc.stop()
     return grown / TASKS
 
-default_stack = threading.stack_size()
-threading.stack_size(STACK_SIZE)  # A real, settable cost
-configured_stack = threading.stack_size()
-threading.stack_size(default_stack)
-
 task_cost = asyncio.run(bytes_per_task())
-tasks_per_stack = configured_stack / task_cost
+tasks_per_stack = STACK_SIZE / task_cost
 report(bytes_per_task=task_cost,
        tasks_per_stack=tasks_per_stack)
-print(f"one thread's stack reservation: "
-      f"{configured_stack:,} bytes")
-#: one thread's stack reservation: 1,048,576 bytes
 print(f"bytes per task under 4 KiB: {task_cost < 4096}")
 #: bytes per task under 4 KiB: True
 print(f"holds over 200 tasks: {tasks_per_stack > 200}")

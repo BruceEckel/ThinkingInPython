@@ -493,14 +493,21 @@ The next two listings run the same six fetches, which a shared module defines:
 # utils/fetch_demo.py
 import asyncio
 from typing import Final
+from record import record
 
-PAIRS: Final[list[tuple[str, float]]] = [
-    ("a", 0.01),
-    ("b", 0.02),
-    ("c", 0.03),
-    ("d", 0.03),
-    ("e", 0.2),
-    ("f", 0.3),
+@record
+class Fetch:
+    item: str
+    delay: float
+    fails: bool = False
+
+FETCHES: Final[list[Fetch]] = [
+    Fetch("a", 0.01),
+    Fetch("b", 0.02),
+    Fetch("c", 0.03, fails=True),
+    Fetch("d", 0.03, fails=True),
+    Fetch("e", 0.2),
+    Fetch("f", 0.3),
 ]
 
 async def sleep_until(when: float) -> None:
@@ -512,21 +519,21 @@ async def sleep_until(when: float) -> None:
     finally:
         timer.cancel()
 
-async def fetch(item: str, delay: float, t0: float) -> str:
-    print(f"{item}: started")
-    await sleep_until(t0 + delay)
-    if item in ("c", "d"):
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
+async def fetch(job: Fetch, t0: float) -> str:
+    await sleep_until(t0 + job.delay)
+    if job.fails:
+        raise ValueError(f"fetch({job.item!r}) failed")
+    print(f"{job.item}: fetched")
+    return job.item.upper()
 ```
 
+Each `Fetch` record in `FETCHES` names an item, its delay, and whether it fails.
 Each delay is an offset from `t0`,
 one reading of the event loop's clock that the caller takes before it starts any task.
 `fetch()` adds the two,
 and `sleep_until()` hands that absolute time to `loop.call_at()`.
 `a` and `b` have the shortest delays and succeed.
-`c` and `d` share one deadline, so they fail together.
+`c` and `d` share one deadline and carry `fails=True`, so they fail together.
 `e` and `f` are still sleeping when `c` and `d` fail,
 with a wide gap to their own deadlines.
 The gap lets a cancellation of `e` and `f` take effect before those deadlines on any platform's timer,
@@ -538,15 +545,15 @@ An `async with` block owns every task started inside it and exits only after eve
 ```python
 # task_group.py
 import asyncio
-from fetch_demo import PAIRS, fetch
+from fetch_demo import FETCHES, fetch
 
 async def main() -> None:
     t0 = asyncio.get_running_loop().time()
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
-                item: tg.create_task(fetch(item, delay, t0))
-                for item, delay in PAIRS
+                job.item: tg.create_task(fetch(job, t0))
+                for job in FETCHES
             }
     except* ValueError as group:
         for exc in group.exceptions:
@@ -560,12 +567,6 @@ async def main() -> None:
             print(f"{item}: {task.result()}")
 
 asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
 #: a: fetched
 #: b: fetched
 #: caught: fetch('c') failed
@@ -648,30 +649,24 @@ When the others should keep running after one task fails,
 # gather_with_exceptions.py
 import asyncio
 from typing import assert_never
-from fetch_demo import PAIRS, fetch
+from fetch_demo import FETCHES, fetch
 
 async def main() -> None:
     t0 = asyncio.get_running_loop().time()
     results = await asyncio.gather(
-        *(fetch(item, delay, t0) for item, delay in PAIRS),
+        *(fetch(job, t0) for job in FETCHES),
         return_exceptions=True,
     )
-    for (item, _), result in zip(PAIRS, results):
+    for job, result in zip(FETCHES, results):
         match result:
             case BaseException():
-                print(f"{item}: raised {result!r}")
+                print(f"{job.item}: raised {result!r}")
             case str():
-                print(f"{item}: {result}")
+                print(f"{job.item}: {result}")
             case _:
                 assert_never(result)
 
 asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
 #: a: fetched
 #: b: fetched
 #: e: fetched
@@ -1981,15 +1976,12 @@ def numbers(limit: int) -> Iterator[int]:
 guarded = threading.synchronized_iterator(numbers)
 
 def outcome(source: Iterator[int]) -> str:
-    def take(_: int) -> int | None:
-        try:
-            return len(list(source))
-        except ValueError:
-            return None
     with ThreadPoolExecutor(max_workers=8) as pool:
-        results = list(pool.map(take, range(8)))
-    taken = sum(r for r in results if r is not None)
-    failed = sum(r is None for r in results)
+        futures = [pool.submit(list, source)
+                   for _ in range(8)]
+    failed = sum(f.exception() is not None for f in futures)
+    taken = sum(len(f.result()) for f in futures
+                if f.exception() is None)
     return f"{taken} taken, any thread failed: {failed > 0}"
 
 print("plain:      ", outcome(numbers(LIMIT)))
@@ -2003,6 +1995,11 @@ so the second thread through gets `ValueError: generator already executing`.
 A typical run loses seven of the eight workers to that `ValueError` while the first drains the whole sequence.
 That is better than silent duplication,
 but only in the way a crash is better than corruption.
+
+`outcome()` uses the same harness as `shared_iterator.py`.
+`Future.exception()` returns a worker's exception instead of raising it,
+the way `task.exception()` does in `task_group.py`,
+so `outcome()` counts the failed workers and sums the lists the others returned.
 
 `threading.synchronized_iterator()` takes the generator *function*,
 not a generator, and returns a function that serializes every generator it creates.
@@ -2260,8 +2257,9 @@ It leaves `asyncio`'s as it was.
 ### Measuring the Memory
 
 Two numbers support the claim that a thread uses far more memory than a task.
-`threading.stack_size()` sets the stack CPython reserves for each new thread and reports the size last set,
-or `0` while the platform's default is in effect.
+The first is the stack each new thread reserves.
+The platform sets its size,
+and `threading.stack_size()` changes it for threads created afterward.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint,
 since a task consists of ordinary Python objects.
@@ -2270,7 +2268,6 @@ since a task consists of ordinary Python objects.
 ```python
 # task_vs_thread_memory.py
 import asyncio
-import threading
 import tracemalloc
 from typing import Final
 from benchmark import report
@@ -2303,18 +2300,10 @@ async def bytes_per_task() -> float:
     tracemalloc.stop()
     return grown / TASKS
 
-default_stack = threading.stack_size()
-threading.stack_size(STACK_SIZE)  # A real, settable cost
-configured_stack = threading.stack_size()
-threading.stack_size(default_stack)
-
 task_cost = asyncio.run(bytes_per_task())
-tasks_per_stack = configured_stack / task_cost
+tasks_per_stack = STACK_SIZE / task_cost
 report(bytes_per_task=task_cost,
        tasks_per_stack=tasks_per_stack)
-print(f"one thread's stack reservation: "
-      f"{configured_stack:,} bytes")
-#: one thread's stack reservation: 1,048,576 bytes
 print(f"bytes per task under 4 KiB: {task_cost < 4096}")
 #: bytes per task under 4 KiB: True
 print(f"holds over 200 tasks: {tasks_per_stack > 200}")
@@ -2325,12 +2314,7 @@ print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 so they stay alive and idle.
 The two `tracemalloc` snapshots capture the heap they add.
 
-The listing reads `threading.stack_size()`, sets it, reads it again,
-then restores it, so the measurement leaves the rest of the program untouched.
-The listing stipulates that stack figure instead of measuring it.
-`STACK_SIZE` is a constant the code sets and reads back,
-standing for a common one-mebibyte default,
-not a number the OS reports for a thread that ran.
+`STACK_SIZE` stipulates the stack figure as a common one-mebibyte default instead of measuring a thread that ran.
 
 Before a thread runs one line of its target function,
 its stack reservation could hold hundreds of suspended tasks.
@@ -2560,11 +2544,11 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
     add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
     then the description as a tiebreaker.
 9.  In `utils/fetch_demo.py`,
-    change `("e", 0.2)` in `PAIRS` to `("e", 0.005)` so `e` finishes before `c` and `d` fail,
+    change `Fetch("e", 0.2)` in `FETCHES` to `Fetch("e", 0.005)` so `e` finishes before `c` and `d` fail,
     then run `task_group.py`.
     Predict which of the six report `cancelled` and which report a result,
     then run it and explain what a `TaskGroup` can and cannot undo.
-    Change `PAIRS` back afterward,
+    Change `FETCHES` back afterward,
     since `gather_with_exceptions.py` uses it too.
 10. In `gather_with_exceptions.py`,
     delete `return_exceptions=True` and wrap the `await` in `try`/`except ValueError`.

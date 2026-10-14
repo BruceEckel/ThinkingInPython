@@ -1,14 +1,21 @@
 # exercise_9.py
 import asyncio
 from typing import Final
+from record import record
 
-PAIRS: Final[list[tuple[str, float]]] = [
-    ("a", 0.01),
-    ("b", 0.02),
-    ("c", 0.03),
-    ("d", 0.03),
-    ("e", 0.005),  # Was 0.2, so e now finishes first
-    ("f", 0.3),
+@record
+class Fetch:
+    item: str
+    delay: float
+    fails: bool = False
+
+FETCHES: Final[list[Fetch]] = [
+    Fetch("a", 0.01),
+    Fetch("b", 0.02),
+    Fetch("c", 0.03, fails=True),
+    Fetch("d", 0.03, fails=True),
+    Fetch("e", 0.005),  # Was 0.2, so e now finishes first
+    Fetch("f", 0.3),
 ]
 
 async def sleep_until(when: float) -> None:
@@ -20,21 +27,20 @@ async def sleep_until(when: float) -> None:
     finally:
         timer.cancel()
 
-async def fetch(item: str, delay: float, t0: float) -> str:
-    print(f"{item}: started")
-    await sleep_until(t0 + delay)
-    if item in ("c", "d"):
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
+async def fetch(job: Fetch, t0: float) -> str:
+    await sleep_until(t0 + job.delay)
+    if job.fails:
+        raise ValueError(f"fetch({job.item!r}) failed")
+    print(f"{job.item}: fetched")
+    return job.item.upper()
 
 async def main() -> None:
     t0 = asyncio.get_running_loop().time()
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
-                item: tg.create_task(fetch(item, delay, t0))
-                for item, delay in PAIRS
+                job.item: tg.create_task(fetch(job, t0))
+                for job in FETCHES
             }
     except* ValueError as group:
         for exc in group.exceptions:
@@ -48,12 +54,6 @@ async def main() -> None:
             print(f"{item}: {task.result()}")
 
 asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
 #: e: fetched
 #: a: fetched
 #: b: fetched

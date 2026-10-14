@@ -15,15 +15,12 @@ def numbers(limit: int) -> Iterator[int]:
 guarded = threading.synchronized_iterator(numbers)
 
 def outcome(source: Iterator[int]) -> str:
-    def take(_: int) -> int | None:
-        try:
-            return len(list(source))
-        except ValueError:
-            return None
     with ThreadPoolExecutor(max_workers=8) as pool:
-        results = list(pool.map(take, range(8)))
-    taken = sum(r for r in results if r is not None)
-    failed = sum(r is None for r in results)
+        futures = [pool.submit(list, source)
+                   for _ in range(8)]
+    failed = sum(f.exception() is not None for f in futures)
+    taken = sum(len(f.result()) for f in futures
+                if f.exception() is None)
     return f"{taken} taken, any thread failed: {failed > 0}"
 
 print("plain:      ", outcome(numbers(LIMIT)))

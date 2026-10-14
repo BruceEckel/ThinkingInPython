@@ -1,14 +1,14 @@
 # task_group.py
 import asyncio
-from fetch_demo import PAIRS, fetch
+from fetch_demo import FETCHES, fetch
 
 async def main() -> None:
     t0 = asyncio.get_running_loop().time()
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
-                item: tg.create_task(fetch(item, delay, t0))
-                for item, delay in PAIRS
+                job.item: tg.create_task(fetch(job, t0))
+                for job in FETCHES
             }
     except* ValueError as group:
         for exc in group.exceptions:
@@ -22,12 +22,6 @@ async def main() -> None:
             print(f"{item}: {task.result()}")
 
 asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
 #: a: fetched
 #: b: fetched
 #: caught: fetch('c') failed
