@@ -1,5 +1,5 @@
 # catch_everything.py
-from newswire import Library, Wire
+from newswire import EMPTY, SHELF, STOCKS, WEATHER
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable, research)
 from stateless import run, supply
@@ -11,12 +11,12 @@ def outcome(
     bound = supply(feed, book)(research)
     return run(catch_all(bound)())
 
-dull = outcome(Wire("mild and cloudy"), Library({}))
+dull = outcome(WEATHER, SHELF)
 #: feed: fetching
 print(type(dull).__name__)
 #: NotInteresting
-missing = outcome(Wire("genome mapped"), Library({}))
+missing = outcome(STOCKS, EMPTY)
 #: feed: fetching
-#: library: looking up genome
+#: library: looking up stock market
 print(type(missing).__name__)
 #: NoArticle

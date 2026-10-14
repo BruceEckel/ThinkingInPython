@@ -1188,7 +1188,7 @@ A failure that enters through `throw()` is in the type system from the moment it
 
 ```python
 # catch_everything.py
-from newswire import Library, Wire
+from newswire import EMPTY, SHELF, STOCKS, WEATHER
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable, research)
 from stateless import run, supply
@@ -1200,13 +1200,13 @@ def outcome(
     bound = supply(feed, book)(research)
     return run(catch_all(bound)())
 
-dull = outcome(Wire("mild and cloudy"), Library({}))
+dull = outcome(WEATHER, SHELF)
 #: feed: fetching
 print(type(dull).__name__)
 #: NotInteresting
-missing = outcome(Wire("genome mapped"), Library({}))
+missing = outcome(STOCKS, EMPTY)
 #: feed: fetching
-#: library: looking up genome
+#: library: looking up stock market
 print(type(missing).__name__)
 #: NoArticle
 ```
@@ -1215,7 +1215,9 @@ print(type(missing).__name__)
 with the same upcasting annotations.
 Its result type is the union `report()` builds by naming all three errors,
 and this listing names none of them at the catch.
-Two failures from two different sources come back as values through the one `catch_all()`.
+The two calls repeat the `NotInteresting` and `NoArticle` runs of `scenarios.py`.
+Where `report()` turned those failures into messages,
+the one `catch_all()` returns them as values.
 
 `outcome()` supplies first and catches second, the reverse of `scenarios.py`,
 and both the runtime and the type checker accept either order.
@@ -1952,6 +1954,7 @@ If you call it from inside a running loop (the shape of any async web handler),
 # run_cost.py
 import asyncio
 import time
+from typing import Final
 from benchmark import report
 from exceptions import expected
 from stateless import Success, run, run_async, success
@@ -1967,7 +1970,7 @@ asyncio.run(inside_loop())
 #: [RuntimeError] asyncio.run() cannot be called from a
 #: running event loop
 
-ROUNDS = 2000
+ROUNDS: Final[int] = 2000
 
 def time_run() -> float:
     start = time.perf_counter()

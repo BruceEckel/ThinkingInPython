@@ -1,6 +1,7 @@
 # run_cost.py
 import asyncio
 import time
+from typing import Final
 from benchmark import report
 from exceptions import expected
 from stateless import Success, run, run_async, success
@@ -16,7 +17,7 @@ asyncio.run(inside_loop())
 #: [RuntimeError] asyncio.run() cannot be called from a
 #: running event loop
 
-ROUNDS = 2000
+ROUNDS: Final[int] = 2000
 
 def time_run() -> float:
     start = time.perf_counter()
