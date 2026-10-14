@@ -5,7 +5,7 @@ from vending_machine import (Column, Money, Quit, Row,
 inputs = [
     Money("quarter", 25), Money("quarter", 25),
     Money("dollar", 100),
-    # Buy [0][1]
+    # Buy A, col 1
     Row.A, Column(1),
     # Buy it again
     Row.A, Column(1),
@@ -14,9 +14,6 @@ inputs = [
     # Sold out
     Row.D, Column(0),
     Quit(),  # Refund and reset
-    # Row D, col 0 is both too expensive (a dime
-    # isn't 25 cents) and sold out (quantity 0);
-    # too_expensive is listed first, so it wins:
     Money("dime", 10),
     Row.D, Column(0),
 ]

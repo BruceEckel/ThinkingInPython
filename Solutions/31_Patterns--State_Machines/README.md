@@ -42,7 +42,7 @@ class StateMachine:
                 self.state = rule.next_state
                 return
         raise NoTransition(
-            f"no rule from {self.state!r} "
+            f"no rule from {self.state} "
             f"on {type(input_).__name__}")
 ```
 
@@ -801,8 +801,7 @@ print(light.log)
 busy = WashingMachine()
 busy.handle(Start(3))
 expect(NoTransition, busy.handle, Start(5))
-#: [NoTransition] no rule from <WashState.FILLING: 2> on
-#: Start
+#: [NoTransition] no rule from WashState.FILLING on Start
 print(busy.state.name, busy.load_kg)
 #: FILLING 3
 ```
@@ -904,7 +903,7 @@ class Elevator(StateMachine):
 
 If you leave out the unconditional rule to `ElevatorState.DOORS_OPEN` under `(IDLE, CallButton)`,
 a call for the floor the car is on fails both `above()` and `below()`,
-and `handle()` raises `NoTransition`: `no rule from <ElevatorState.IDLE: 1> on CallButton`.
+and `handle()` raises `NoTransition`: `no rule from ElevatorState.IDLE on CallButton`.
 The demo makes no such call, so its output does not change.
 The solution keeps that rule last, as the group's `else`.
 
@@ -1238,8 +1237,7 @@ m.handle(Money("quarter", 25))
 print(m.state, m.amount)
 #: State.COLLECTING 25
 expect(NoTransition, m.handle, Nickel("nickel", 5))
-#: [NoTransition] no rule from <State.COLLECTING: 2> on
-#: Nickel
+#: [NoTransition] no rule from State.COLLECTING on Nickel
 
 # Fix 1: the table names Nickel too
 m1 = Machine(accept_nickels=True)

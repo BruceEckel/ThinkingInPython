@@ -36,5 +36,5 @@ class StateMachine:
                 self.state = rule.next_state
                 return
         raise NoTransition(
-            f"no rule from {self.state!r} "
+            f"no rule from {self.state} "
             f"on {type(input_).__name__}")

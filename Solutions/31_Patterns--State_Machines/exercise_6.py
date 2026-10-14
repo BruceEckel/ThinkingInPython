@@ -78,7 +78,6 @@ print(light.log)
 busy = WashingMachine()
 busy.handle(Start(3))
 expect(NoTransition, busy.handle, Start(5))
-#: [NoTransition] no rule from <WashState.FILLING: 2> on
-#: Start
+#: [NoTransition] no rule from WashState.FILLING on Start
 print(busy.state.name, busy.load_kg)
 #: FILLING 3

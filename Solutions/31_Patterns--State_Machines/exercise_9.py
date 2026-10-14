@@ -40,8 +40,7 @@ m.handle(Money("quarter", 25))
 print(m.state, m.amount)
 #: State.COLLECTING 25
 expect(NoTransition, m.handle, Nickel("nickel", 5))
-#: [NoTransition] no rule from <State.COLLECTING: 2> on
-#: Nickel
+#: [NoTransition] no rule from State.COLLECTING on Nickel
 
 # Fix 1: the table names Nickel too
 m1 = Machine(accept_nickels=True)

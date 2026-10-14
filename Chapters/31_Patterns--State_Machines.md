@@ -421,29 +421,14 @@ and what state comes next:
 
     Rule(state, InputType, next_state, action, condition)
 
-The original Java version of this example needed two extra class hierarchies,
-`Condition` and `Transition`,
-because the Java of the time had no way to store a method as a value.
-Python functions are first-class, so the Python version needs neither hierarchy.
 A condition is any callable returning a `bool`, an action is any callable,
 and the rules are a list the engine groups into an ordinary `dict`.
 
-The inputs change shape too.
 The mousetrap's inputs are `MouseAction` members, bare names.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
-So each input becomes an object of its own class,
+Each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
-A coin is the wrong shape for an enum for two reasons.
-You set an enum's members when you write it,
-so a `Money` enum would hold the denominations you knew about then.
-Every member of one enum also shares that enum's class,
-so `type(input_)` would be the same key for every coin.
-A row is the right shape: the grid has four rows,
-so `Row` is an `Enum` whose one class is the one key the table needs,
-and whose member says which row.
-`Column` carries its index as a value,
-since columns have numbers rather than names.
 
 This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
@@ -502,7 +487,7 @@ class StateMachine:
                 self.state = rule.next_state
                 return
         raise NoTransition(
-            f"no rule from {self.state!r} "
+            f"no rule from {self.state} "
             f"on {type(input_).__name__}")
 ```
 
@@ -739,7 +724,7 @@ from vending_machine import (Column, Money, Quit, Row,
 inputs = [
     Money("quarter", 25), Money("quarter", 25),
     Money("dollar", 100),
-    # Buy [0][1]
+    # Buy A, col 1
     Row.A, Column(1),
     # Buy it again
     Row.A, Column(1),
@@ -748,9 +733,6 @@ inputs = [
     # Sold out
     Row.D, Column(0),
     Quit(),  # Refund and reset
-    # Row D, col 0 is both too expensive (a dime
-    # isn't 25 cents) and sold out (quantity 0);
-    # too_expensive is listed first, so it wins:
     Money("dime", 10),
     Row.D, Column(0),
 ]
