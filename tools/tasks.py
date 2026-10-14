@@ -1701,6 +1701,21 @@ def tools_status(v: Vars) -> None:
         invoke("tools-upgrade", v)
 
 
+@task("List the prose pins of an older `ty` version (ARGS=--write bumps "
+      "them)")
+def version_pins(v: Vars) -> None:
+    """Finds every "`ty` 0.0.N" pin in the chapters, the Solutions,
+    CLAUDE.md, and the coding-style skill's two copies, and lists the
+    ones that differ from the installed `ty`. Historical lines are listed
+    in tools/data/version_pins_keep.txt and never rewritten. `ARGS=--write`
+    rewrites the stale pins; run it after the probes in the tool-upgrade
+    skill pass, since a bumped pin asserts the claim was re-checked on
+    that version. `ARGS=--all` also lists current and kept pins. Reports
+    only: it exits 0 with stale pins and 2 on an error.
+    """
+    py("tools.version_pins", *v.words("ARGS"))
+
+
 @task("Update uv, the uv-managed dev tools, and (best-effort) global "
       "ty/pandoc/typst/vale")
 def tools_upgrade(v: Vars) -> None:
@@ -1717,11 +1732,14 @@ def tools_upgrade(v: Vars) -> None:
     `sweep`, which reports every check the new tools broke rather than
     stopping at the first. A failing sweep here means the upgrade landed
     and the book needs fixing, not that the upgrade failed; the stamp is
-    written first for that reason.
+    written first for that reason. The task then prints the prose pins
+    that name an older `ty` version; once the probes in the tool-upgrade
+    skill pass, `tip version-pins ARGS=--write` bumps them.
     """
     py("tools.upgrade_tools")
     invoke("tools-check-full", v)
     py("tools.tool_stamp", "--write")
+    py("tools.version_pins")
     invoke("sweep", v)
 
 

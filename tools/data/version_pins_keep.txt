@@ -1,0 +1,7 @@
+# Lines that mention a tool version as history, not as a claim to keep
+# current. `tip version-pins` reports a matching line as KEEP and never
+# rewrites it. One entry per line: `path:substring`, with the path
+# relative to the repo root (forward slashes) and the substring taken
+# from the line. An entry that matches no line is an error.
+# See tools/version_pins.py.
+CLAUDE.md:`ty` 0.0.78);

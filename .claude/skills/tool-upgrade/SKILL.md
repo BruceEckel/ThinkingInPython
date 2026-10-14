@@ -155,6 +155,12 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   quote with no spec entry also fails, so you add its edit when you add
   the quote. The probe is report-only like `tip pyright-review`, and
   joins no gate.
+  `tip version-pins` (`tools/version_pins.py`, 2026-10-14) lists every
+  pin behind the installed `ty`: the chapters, Solutions, CLAUDE.md, and
+  the coding-style skill's two copies. `tools-upgrade` prints that list
+  at the end of its run. `tip version-pins ARGS=--write` rewrites the
+  stale pins; run it after the probes pass and never before, since a
+  bumped pin asserts that someone re-checked the claim on that version.
   Chapters 46-47 and Solutions 43 pin five behavior claims to a
   ty version ("under `ty` 0.0.82"; `grep -rn '0\.0\.[0-9]' Chapters
   Solutions` finds them): the `type`-alias probe (46), the
