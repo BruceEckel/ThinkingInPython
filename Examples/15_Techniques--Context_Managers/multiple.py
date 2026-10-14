@@ -10,8 +10,9 @@ def tag(name: str) -> Generator[str]:
     finally:
         print(f"</{name}>")
 
-with tag("ul") as outer, tag("li") as inner:
-    print(f"  {outer} then {inner}")
+if __name__ == "__main__":
+    with tag("ul") as outer, tag("li") as inner:
+        print(f"  {outer} then {inner}")
 #: <ul>
 #: <li>
 #:   ul then li

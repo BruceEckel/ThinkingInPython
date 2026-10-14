@@ -4,11 +4,11 @@ from contextlib import ExitStack, contextmanager
 
 @contextmanager
 def tag(name: str) -> Generator[str]:
-    print(f"open {name}")
+    print(f"<{name}>")
     try:
         yield name
     finally:
-        print(f"close {name}")
+        print(f"</{name}>")
 
 def wrap(names: list[str]) -> None:
     with ExitStack() as stack:
@@ -19,10 +19,10 @@ def wrap(names: list[str]) -> None:
 wrap([])
 #: using []
 wrap(["x", "y", "z"])
-#: open x
-#: open y
-#: open z
+#: <x>
+#: <y>
+#: <z>
 #: using ['x', 'y', 'z']
-#: close z
-#: close y
-#: close x
+#: </z>
+#: </y>
+#: </x>

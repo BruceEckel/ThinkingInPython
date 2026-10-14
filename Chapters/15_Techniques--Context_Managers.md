@@ -144,9 +144,18 @@ class Trace:
 if __name__ == "__main__":
     with Trace("A") as t:
         print(f"inside {t.name}")
+    manager = Trace("B")
+    with manager:
+        pass
+    with manager:
+        pass
 #: enter A
 #: inside A
 #: exit A
+#: enter B
+#: exit B
+#: enter B
+#: exit B
 ```
 
 Python runs `with Trace("A") as t:` in five steps:
@@ -163,15 +172,16 @@ declares an instance of the class on which you call the method,
 so on a subclass the return type is the subclass.
 
 The three parameters of `__exit__()` describe the exception that ended the block.
-The block in `trace_cm.py` ends normally, so all three are `None`.
+Every block in `trace_cm.py` ends normally, so all three are `None`.
 
 In generator terms, `__enter__()` is the portion before the `yield`.
 `__exit__()` is the portion after it.
 
 `Trace` is also reusable.
-The same instance can appear in a second `with`,
-because `__enter__()` just runs again.
-A generator manager, as `trace_gen.py` shows, is single-use.
+The demo enters the same `manager` in two `with` statements,
+and both print `enter B` and `exit B`, because `__enter__()` just runs again.
+In `trace_gen.py` the second of those statements raises an `AttributeError`,
+because a generator manager is single-use.
 A class manager that stores per-`with` state stays reusable only if `__enter__()` resets that state.
 
 The generator form is usually the clearest choice.
@@ -596,35 +606,35 @@ def banner(title: str) -> Generator[None]:
     finally:
         print(f"=== {title} ends ===")
 
-@banner("report")
-def report() -> None:
+@banner("quarterly")
+def quarterly() -> None:
     print("quarterly numbers")
 
 if __name__ == "__main__":
-    report()
+    quarterly()
     with banner("meeting"):
         print("agenda")
-#: === report ===
+#: === quarterly ===
 #: quarterly numbers
-#: === report ends ===
+#: === quarterly ends ===
 #: === meeting ===
 #: agenda
 #: === meeting ends ===
 ```
 
-`banner` works both as a decorator for `report()` and in a `with` in `__main__`.
+`banner` works both as a decorator for `quarterly()` and in a `with` in `__main__`.
 `ContextDecorator` applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
-so `report()` keeps its name and docstring.
+so `quarterly()` keeps its name and docstring.
 
-The parentheses in `@banner("report")` matter.
+The parentheses in `@banner("quarterly")` matter.
 The call constructs the manager, which then decorates the function.
-Written bare, `@banner` passes the function `report` as `title`,
-so the name `report` holds a manager object rather than a function.
-Calling `report()` then raises a `TypeError`,
+Written bare, `@banner` passes the function `quarterly` as `title`,
+so the name `quarterly` holds a manager object rather than a function.
+Calling `quarterly()` then raises a `TypeError`,
 and the type checker flags the decorator line.
 
 Each call of the decorated function builds a fresh manager,
-so `report()` can run any number of times, each with its own enter and exit.
+so `quarterly()` can run any number of times, each with its own enter and exit.
 The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
 
 ```python
@@ -641,17 +651,17 @@ class banner(ContextDecorator):
     def __exit__(self, *exc: object) -> None:
         print(f"=== {self.title} ends ===")
 
-@banner("report")
-def report() -> None:
+@banner("quarterly")
+def quarterly() -> None:
     print("quarterly numbers")
 
 if __name__ == "__main__":
-    report()
+    quarterly()
     with banner("meeting"):
         print("agenda")
-#: === report ===
+#: === quarterly ===
 #: quarterly numbers
-#: === report ends ===
+#: === quarterly ends ===
 #: === meeting ===
 #: agenda
 #: === meeting ends ===
@@ -661,17 +671,17 @@ Like `suppress` and `expected`,
 the class version of `banner` uses a lowercase name because you use it like a function.
 Its `__exit__()` runs the same way however the block ended,
 so it takes the `*exc: object` form and returns `None`,
-which lets an exception from `report()` propagate.
+which lets an exception from `quarterly()` propagate.
 
 Unlike the generator form,
-the class form re-enters the same instance on every call to `report()`,
+the class form re-enters the same instance on every call to `quarterly()`,
 so every call shares any state the instance holds.
 
 `banner`'s wrapper comes from `ContextDecorator`,
 as the base class in `banner_cm.py` or by way of `@contextmanager` in `context_decorator.py`.
 That wrapper always calls the function once, unchanged,
 with setup before it and cleanup after.
-So `banner` receives neither the arguments nor the return value of `report()`,
+So `banner` receives neither the arguments nor the return value of `quarterly()`,
 and it cannot skip the call.
 A hand-written decorator can do all three,
 because it defines its own wrapper function.
@@ -747,8 +757,9 @@ def tag(name: str) -> Generator[str]:
     finally:
         print(f"</{name}>")
 
-with tag("ul") as outer, tag("li") as inner:
-    print(f"  {outer} then {inner}")
+if __name__ == "__main__":
+    with tag("ul") as outer, tag("li") as inner:
+        print(f"  {outer} then {inner}")
 #: <ul>
 #: <li>
 #:   ul then li
@@ -768,16 +779,8 @@ When the number of managers depends on data available at runtime,
 
 ```python
 # exit_stack.py
-from collections.abc import Generator
-from contextlib import ExitStack, contextmanager
-
-@contextmanager
-def tag(name: str) -> Generator[str]:
-    print(f"open {name}")
-    try:
-        yield name
-    finally:
-        print(f"close {name}")
+from contextlib import ExitStack
+from multiple import tag
 
 def wrap(names: list[str]) -> None:
     with ExitStack() as stack:
@@ -788,19 +791,22 @@ def wrap(names: list[str]) -> None:
 if __name__ == "__main__":
     wrap(["a", "b"])
     wrap(["a", "b", "c"])
-#: open a
-#: open b
+#: <a>
+#: <b>
 #: using ['a', 'b']
-#: close b
-#: close a
-#: open a
-#: open b
-#: open c
+#: </b>
+#: </a>
+#: <a>
+#: <b>
+#: <c>
 #: using ['a', 'b', 'c']
-#: close c
-#: close b
-#: close a
+#: </c>
+#: </b>
+#: </a>
 ```
+
+`exit_stack.py` imports `tag()` from `multiple.py`.
+The main guard in `multiple.py` keeps that listing's demo from running on import.
 
 `wrap()` enters one manager per name in `names`,
 so it learns the count at runtime.
@@ -809,7 +815,7 @@ A comma-separated `with` sets its count when you write it.
 `wrap()` shows the case where every entry succeeds.
 `ExitStack` makes a second guarantee, for a later entry that fails:
 the stack unwinds the managers that entered earlier.
-`exit_stack_fails.py` enters two `tag()` managers from `exit_stack.py`,
+`exit_stack_fails.py` enters two `tag()` managers from `multiple.py`,
 then a third manager, `broken()`,
 which raises a `RuntimeError` before its `yield` and so fails to enter.
 The first two unwind, and `ExitStack` registers nothing for the third:
@@ -819,11 +825,11 @@ The first two unwind, and `ExitStack` registers nothing for the third:
 from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 from exceptions import expected
-from exit_stack import tag
+from multiple import tag
 
 @contextmanager
 def broken(name: str) -> Generator[str]:
-    print(f"open {name}")
+    print(f"<{name}>")
     raise RuntimeError(f"{name} failed to open")
     yield name
 
@@ -832,11 +838,11 @@ with expected(RuntimeError):
         stack.enter_context(tag("a"))
         stack.enter_context(tag("b"))
         stack.enter_context(broken("c"))
-#: open a
-#: open b
-#: open c
-#: close b
-#: close a
+#: <a>
+#: <b>
+#: <c>
+#: </b>
+#: </a>
 #: [RuntimeError] c failed to open
 ```
 
@@ -1217,7 +1223,7 @@ and every change you make later goes inside the manager.
 
 Try each exercise before opening its [solution](../Solutions/15_Techniques--Context_Managers/).
 
-1.  In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
+1.  In `trace_cm.py`, nest a second `with Trace("C") as u:` block inside the body of the first `with Trace("A") as t:` block,
     with its own `print(f"inside {u.name}")`.
     Before running it, predict the order in which the six "enter"/"inside"/"exit" lines appear.
 2.  In `demo_exceptions.py`,

@@ -11,17 +11,17 @@ class banner(ContextDecorator):
     def __exit__(self, *exc: object) -> None:
         print(f"=== {self.title} ends ===")
 
-@banner("report")
-def report() -> None:
+@banner("quarterly")
+def quarterly() -> None:
     print("quarterly numbers")
 
 if __name__ == "__main__":
-    report()
+    quarterly()
     with banner("meeting"):
         print("agenda")
-#: === report ===
+#: === quarterly ===
 #: quarterly numbers
-#: === report ends ===
+#: === quarterly ends ===
 #: === meeting ===
 #: agenda
 #: === meeting ends ===

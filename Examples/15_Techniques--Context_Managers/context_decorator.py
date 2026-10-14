@@ -10,17 +10,17 @@ def banner(title: str) -> Generator[None]:
     finally:
         print(f"=== {title} ends ===")
 
-@banner("report")
-def report() -> None:
+@banner("quarterly")
+def quarterly() -> None:
     print("quarterly numbers")
 
 if __name__ == "__main__":
-    report()
+    quarterly()
     with banner("meeting"):
         print("agenda")
-#: === report ===
+#: === quarterly ===
 #: quarterly numbers
-#: === report ends ===
+#: === quarterly ends ===
 #: === meeting ===
 #: agenda
 #: === meeting ends ===

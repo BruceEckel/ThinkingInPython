@@ -12,10 +12,10 @@ def banner(title: str) -> Generator[None]:
 
 @banner("outer")
 @banner("inner")
-def report() -> None:
+def quarterly() -> None:
     print("quarterly numbers")
 
-report()
+quarterly()
 #: === outer ===
 #: === inner ===
 #: quarterly numbers

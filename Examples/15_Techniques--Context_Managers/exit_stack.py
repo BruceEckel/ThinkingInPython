@@ -1,14 +1,6 @@
 # exit_stack.py
-from collections.abc import Generator
-from contextlib import ExitStack, contextmanager
-
-@contextmanager
-def tag(name: str) -> Generator[str]:
-    print(f"open {name}")
-    try:
-        yield name
-    finally:
-        print(f"close {name}")
+from contextlib import ExitStack
+from multiple import tag
 
 def wrap(names: list[str]) -> None:
     with ExitStack() as stack:
@@ -19,15 +11,15 @@ def wrap(names: list[str]) -> None:
 if __name__ == "__main__":
     wrap(["a", "b"])
     wrap(["a", "b", "c"])
-#: open a
-#: open b
+#: <a>
+#: <b>
 #: using ['a', 'b']
-#: close b
-#: close a
-#: open a
-#: open b
-#: open c
+#: </b>
+#: </a>
+#: <a>
+#: <b>
+#: <c>
 #: using ['a', 'b', 'c']
-#: close c
-#: close b
-#: close a
+#: </c>
+#: </b>
+#: </a>

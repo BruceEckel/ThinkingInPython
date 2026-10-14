@@ -2,7 +2,7 @@
 
 ## 1. Nesting a second `Trace` inside the first
 
-> In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
+> In `trace_cm.py`, nest a second `with Trace("C") as u:` block inside the body of the first `with Trace("A") as t:` block,
 > with its own `print(f"inside {u.name}")`.
 > Before running it, predict the order in which the six "enter"/"inside"/"exit" lines appear.
 
@@ -53,18 +53,18 @@ class Trace:
 
 with Trace("A") as t:
     print(f"inside {t.name}")
-    with Trace("B") as u:
+    with Trace("C") as u:
         print(f"inside {u.name}")
 #: enter A
 #: inside A
-#: enter B
-#: inside B
-#: exit B
+#: enter C
+#: inside C
+#: exit C
 #: exit A
 ```
 
-Entering is outside-in (`A` then `B`), and exiting is inside-out (`B`
-then `A`). `B`'s whole lifetime, enter and exit, sits nested inside
+Entering is outside-in (`A` then `C`), and exiting is inside-out (`C`
+then `A`). `C`'s whole lifetime, enter and exit, sits nested inside
 `A`'s. [Combining Context
 Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows the same last-in-first-out order for `tag("ul")` and
 `tag("li")` written on one `with` line. The order is the same whether
@@ -299,7 +299,7 @@ def banner(title: str) -> Generator[None]:
 
 @banner("outer")
 @banner("inner")
-def report() -> None:
+def quarterly() -> None:
     ...
 ```
 
@@ -321,10 +321,10 @@ def banner(title: str) -> Generator[None]:
 
 @banner("outer")
 @banner("inner")
-def report() -> None:
+def quarterly() -> None:
     print("quarterly numbers")
 
-report()
+quarterly()
 #: === outer ===
 #: === inner ===
 #: quarterly numbers
@@ -333,19 +333,19 @@ report()
 ```
 
 **Apply the decorators bottom-up.** Stacked context-manager decorators apply in the same order as any other stacked decorators. Python evaluates
-the stack as `report = banner("outer")(banner("inner")(report))`.
-`@banner("inner")` is nearest the `def`, so it wraps `report()` first,
-and `@banner("outer")` then wraps the inner wrapper. Calling `report()`
+the stack as `quarterly = banner("outer")(banner("inner")(quarterly))`.
+`@banner("inner")` is nearest the `def`, so it wraps `quarterly()` first,
+and `@banner("outer")` then wraps the inner wrapper. Calling `quarterly()`
 therefore enters the outer manager first. Inside the outer manager, the outer wrapper
 calls the inner wrapper, which enters the inner manager and then runs
 the body. Unwinding
 reverses that order, so the four bracketing lines nest rather than
 interleave.
 
-**Enter a fresh manager on each call.** When Python defines `report()`,
+**Enter a fresh manager on each call.** When Python defines `quarterly()`,
 each `@banner(...)` line builds one manager object. A generator manager is single-use, so the wrapper
 that `ContextDecorator` supplies reads that object's generator function
-and arguments. On each call of `report()` the wrapper builds a fresh
+and arguments. On each call of `quarterly()` the wrapper builds a fresh
 manager from them and enters the fresh one. A hand-written
 class-based manager decorating a function re-enters the same instance
 on every call instead, so every call shares any state the instance
@@ -500,13 +500,13 @@ wrap(sys.argv[1:])
 Run with three names, `uv run python exit_stack.py x y z`:
 
 ```text
-open x
-open y
-open z
+<x>
+<y>
+<z>
 using ['x', 'y', 'z']
-close z
-close y
-close x
+</z>
+</y>
+</x>
 ```
 
 Run with none, `uv run python exit_stack.py`:
@@ -542,11 +542,11 @@ from contextlib import ExitStack, contextmanager
 
 @contextmanager
 def tag(name: str) -> Generator[str]:
-    print(f"open {name}")
+    print(f"<{name}>")
     try:
         yield name
     finally:
-        print(f"close {name}")
+        print(f"</{name}>")
 
 def wrap(names: list[str]) -> None:
     with ExitStack() as stack:
@@ -557,13 +557,13 @@ def wrap(names: list[str]) -> None:
 wrap([])
 #: using []
 wrap(["x", "y", "z"])
-#: open x
-#: open y
-#: open z
+#: <x>
+#: <y>
+#: <z>
 #: using ['x', 'y', 'z']
-#: close z
-#: close y
-#: close x
+#: </z>
+#: </y>
+#: </x>
 ```
 
 </details>

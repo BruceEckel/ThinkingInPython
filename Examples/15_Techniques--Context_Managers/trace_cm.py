@@ -16,6 +16,15 @@ class Trace:
 if __name__ == "__main__":
     with Trace("A") as t:
         print(f"inside {t.name}")
+    manager = Trace("B")
+    with manager:
+        pass
+    with manager:
+        pass
 #: enter A
 #: inside A
 #: exit A
+#: enter B
+#: exit B
+#: enter B
+#: exit B

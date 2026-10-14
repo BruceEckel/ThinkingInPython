@@ -15,11 +15,11 @@ class Trace:
 
 with Trace("A") as t:
     print(f"inside {t.name}")
-    with Trace("B") as u:
+    with Trace("C") as u:
         print(f"inside {u.name}")
 #: enter A
 #: inside A
-#: enter B
-#: inside B
-#: exit B
+#: enter C
+#: inside C
+#: exit C
 #: exit A
