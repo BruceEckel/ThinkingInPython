@@ -58,7 +58,8 @@ from tools.skip_stamps import (
     PLACEMENT_STAMP, forced_full, marker_context, markers_current,
     record_markers)
 from tools.validate_output import (
-    collect_files, collect_now, encode_output, is_marker, run_location,
+    collect_files, collect_now, encode_output, is_marker, purge_modules,
+    run_location,
     run_watched)
 
 
@@ -257,7 +258,7 @@ def check_block(
     }
     try:
         with run_location(filepath.parent if filepath else None,
-                          utils_dir(tree)):
+                          utils_dir(tree), purge=shared_namespace is None):
             results, error = run_statements(code, str(filepath), namespace)
     except SyntaxError as exc:
         results, error = [], f"SyntaxError: {exc}"
@@ -313,6 +314,7 @@ def process(
     moved = stuck = marked = False
     split = continued_files(lines, chapter, tree.resolve())
     namespaces: dict[str, dict] = {}
+    modules_before = set(sys.modules)
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         for ev in walk_fenced(
@@ -344,6 +346,7 @@ def process(
                 out.append(lines[ev.end])
     if namespaces:
         namespaces.clear()
+        purge_modules(modules_before)
         collect_now()
     if moved and write:
         write_text_lf(path, "".join(out))

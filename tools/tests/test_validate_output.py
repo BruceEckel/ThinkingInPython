@@ -894,3 +894,21 @@ def test_markdown_unmarked_first_part_that_fails_fails_the_file(
     )
     p = write(tmp_path, "ch.md", src)
     assert process_markdown(p, update=False) is False
+
+def test_markdown_continued_block_keeps_the_first_parts_imports(
+    tmp_path: Path,
+) -> None:
+    # A stdlib module whose entry in sys.modules has been removed fails
+    # on use: dataclass() looks its own module up there. The parts of a
+    # split file run from the extracted directory, so one must exist.
+    (tmp_path / "ch").mkdir()
+    src = (
+        "```python\n# split.py\nfrom dataclasses import dataclass\n```\n\n"
+        "```python\n# split.py (continued)\n"
+        "@dataclass(frozen=True, slots=True)\n"
+        "class P:\n    x: int\n"
+        "print(P(1))\n#: 0\n```\n"
+    )
+    p = write(tmp_path, "ch.md", src)
+    assert process_markdown(p, update=True, tree=tmp_path) is True
+    assert p.read_text(encoding="utf-8") == src.replace("#: 0", "#: P(x=1)")

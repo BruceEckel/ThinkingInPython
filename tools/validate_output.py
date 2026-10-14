@@ -347,18 +347,33 @@ def process_file(
     return ok
 
 
+def purge_modules(saved: set[str]) -> None:
+    """Drop every module imported since `saved` was taken from sys.modules.
+
+    Installed packages (anything under site-packages) stay loaded: NumPy's
+    extension modules refuse a second load in one process, so purging
+    them would break every later block that imports NumPy or Numba.
+    """
+    for name in set(sys.modules) - saved:
+        origin = getattr(sys.modules[name], "__file__", None)
+        if "site-packages" not in str(origin):
+            del sys.modules[name]
+
+
 @contextlib.contextmanager
-def run_location(rundir: Path | None, root: Path | None = None):
+def run_location(rundir: Path | None, root: Path | None = None,
+                 *, purge: bool = True):
     """Run a block from ``rundir`` (cwd + sys.path), leaving no trace.
 
     Imports of sibling extracted files and relative data paths resolve as they
     do under run_examples. The tree's utils/ directory is also placed on
     sys.path so a block can import shared helpers (such as display.py) kept
     there. sys.path and any modules imported by the block are restored
-    afterward so one block cannot leak into the next. Installed packages
-    (anything under site-packages) stay loaded: NumPy's extension
-    modules refuse a second load in one process, so purging them would
-    break every later block that imports NumPy or Numba.
+    afterward so one block cannot leak into the next (see `purge_modules()`
+    for what stays). With ``purge=False`` the modules stay: one part of a
+    file split across blocks must leave its imports for the next part,
+    since even a stdlib module such as `dataclasses` fails when its entry
+    in sys.modules is gone, and the caller purges after the last part.
     """
     if rundir is None or not rundir.exists():
         yield
@@ -375,10 +390,8 @@ def run_location(rundir: Path | None, root: Path | None = None):
     finally:
         os.chdir(old_cwd)
         sys.path[:] = saved_path
-        for name in set(sys.modules) - saved_modules:
-            origin = getattr(sys.modules[name], "__file__", None)
-            if "site-packages" not in str(origin):
-                del sys.modules[name]
+        if purge:
+            purge_modules(saved_modules)
 
 
 def process_markdown(
@@ -409,6 +422,7 @@ def process_markdown(
     # namespace, so a later part sees what the earlier ones defined.
     split = continued_files(lines, chapter, tree)
     namespaces: dict[str, dict] = {}
+    modules_before = set(sys.modules)
 
     for ev in walk_fenced(
         lines, wanted=lambda m: (m.group(1) or '') in ('python', 'py'),
@@ -446,6 +460,7 @@ def process_markdown(
 
     if namespaces:
         namespaces.clear()
+        purge_modules(modules_before)
         collect_now()
     if not any_markers:
         return None
@@ -530,7 +545,8 @@ def process_md_block(
             '__name__': '__main__',
             '__file__': str(filepath) if filepath else str(path),
         }
-        with run_location(rundir, utils_dir(tree)):
+        with run_location(rundir, utils_dir(tree),
+                          purge=shared_namespace is None):
             new_lines, ok, changed = process_block(
                 block, label,
                 update=update and attempts == 1,
