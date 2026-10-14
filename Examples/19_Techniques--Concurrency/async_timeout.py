@@ -1,7 +1,7 @@
 # async_timeout.py
 import asyncio
 
-async def slow(delay: float) -> str:
+async def wait(delay: float) -> str:
     await asyncio.sleep(delay)
     return "done"
 
@@ -9,10 +9,14 @@ async def main() -> None:
     try:
         async with asyncio.timeout(0.05):
             async with asyncio.TaskGroup() as tg:
-                tg.create_task(slow(0.01))
-                tg.create_task(slow(0.5))
+                fast = tg.create_task(wait(0.01))
+                slow = tg.create_task(wait(0.5))
     except TimeoutError:
         print("timed out")
+    print(f"fast: {fast.result()}")
+    print(f"slow cancelled: {slow.cancelled()}")
 
 asyncio.run(main())
 #: timed out
+#: fast: done
+#: slow cancelled: True

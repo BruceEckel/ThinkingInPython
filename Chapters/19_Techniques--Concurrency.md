@@ -707,7 +707,7 @@ and it composes with `TaskGroup` the way a `with` block composes with anything i
 # async_timeout.py
 import asyncio
 
-async def slow(delay: float) -> str:
+async def wait(delay: float) -> str:
     await asyncio.sleep(delay)
     return "done"
 
@@ -715,13 +715,17 @@ async def main() -> None:
     try:
         async with asyncio.timeout(0.05):
             async with asyncio.TaskGroup() as tg:
-                tg.create_task(slow(0.01))
-                tg.create_task(slow(0.5))
+                fast = tg.create_task(wait(0.01))
+                slow = tg.create_task(wait(0.5))
     except TimeoutError:
         print("timed out")
+    print(f"fast: {fast.result()}")
+    print(f"slow cancelled: {slow.cancelled()}")
 
 asyncio.run(main())
 #: timed out
+#: fast: done
+#: slow cancelled: True
 ```
 
 The group holds a fast task and a slow one.
@@ -733,6 +737,9 @@ and re-raises the cancellation as it exits.
 `asyncio.timeout()` recognizes the cancellation as coming from its own deadline,
 so it converts that `CancelledError` into a `TimeoutError` as it exits.
 The caller therefore sees an ordinary exception instead of a bare cancellation.
+The last two lines show the deadline's reach.
+`fast` finished before the deadline and keeps its result,
+and `slow` reports `cancelled() == True`.
 
 `asyncio.wait_for()` bounds one awaitable the same way.
 [`async_deadlock.py`](#deadlock)
@@ -908,20 +915,21 @@ lock_a = asyncio.Lock()
 lock_b = asyncio.Lock()
 
 async def worker(
-    first: asyncio.Lock, second: asyncio.Lock
+    name: str, first: asyncio.Lock, second: asyncio.Lock
 ) -> None:
     async with first:
+        print(f"{name}: holds its first lock")
         # Let the other task grab its lock
         await asyncio.sleep(0.01)
         async with second:
-            pass  # Never reached
+            print(f"{name}: holds both")
 
 async def main() -> None:
     try:
         await asyncio.wait_for(
             asyncio.gather(
-                worker(lock_a, lock_b),
-                worker(lock_b, lock_a),
+                worker("task 1", lock_a, lock_b),
+                worker("task 2", lock_b, lock_a),
             ),
             timeout=0.5,
         )
@@ -929,6 +937,8 @@ async def main() -> None:
         print("deadlock detected")
 
 asyncio.run(main())
+#: task 1: holds its first lock
+#: task 2: holds its first lock
 #: deadlock detected
 ```
 
@@ -939,8 +949,10 @@ The deadlock depends on that `await`.
 Tasks run one at a time and switch only at an `await`,
 and a task that acquires a free lock keeps running.
 Without the sleep, the first task takes both locks and releases them before the second task starts,
-and the program prints nothing.
+and each task prints `holds both` in turn.
 
+The trace shows both tasks holding their first lock before `deadlock detected`,
+and no `holds both` line.
 Once both hold their first lock,
 each task's `async with second:` suspends on a lock the other task keeps holding.
 A real deadlock has no `timeout`.
@@ -1216,22 +1228,18 @@ since a process cannot return a value the way a function call does:
 ```python
 # multiprocessing_raw.py
 import multiprocessing as mp
+from pricing import cpu_price
 
 type Priced = tuple[int, int]  # (order, price)
 
-def cpu_price(
-    order: int, results: mp.Queue[Priced]
-) -> None:
-    total = 0
-    for _ in range(1_000_000):  # Processor work
-        total += 1
-    results.put((order, order * 10))
+def worker(order: int, results: mp.Queue[Priced]) -> None:
+    results.put((order, cpu_price(order)))
 
 if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
     results: mp.Queue[Priced] = mp.Queue()
     workers = [
-        mp.Process(target=cpu_price, args=(order, results))
+        mp.Process(target=worker, args=(order, results))
         for order in orders
     ]
     for w in workers:
@@ -1242,6 +1250,8 @@ if __name__ == "__main__":
     print([price for _, price in pairs])
 ```
 
+`worker()` adapts `cpu_price()` from `utils/pricing.py` to that shape.
+It puts the order and its price on the queue instead of returning the price.
 Everything `pool.map()` does is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result carries its `order`).
@@ -1619,14 +1629,13 @@ def increment(count: int) -> None:
 
 with ThreadPoolExecutor(max_workers=8) as pool:
     list(pool.map(increment, [50] * 8))
-print(f"lock preserves every update: "
-      f"{counter == 8 * 50}")
-#: lock preserves every update: True
+print(f"counter: {counter} of {8 * 50}")
+#: counter: 400 of 400
 ```
 
 The change from `gil_race.py` is the `with lock:` block wrapped around the read-modify-write,
 plus the `threading` import, the module-level `lock`,
-and a final line that reports every update preserved rather than updates lost.
+and a final line that prints the count, the same line `async_locks.py` prints.
 Eight threads still take turns,
 but now each one reads `counter` after the previous lock holder has written it.
 `counter` reaches 400 every time,
@@ -2570,7 +2579,7 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
     Predict whether `duplicates` becomes `False` before running it,
     and explain which call the lock does and does not cover.
 14. In `async_deadlock.py`,
-    change the second `worker()` call to `worker(lock_a, lock_b)` so both tasks acquire in the same order,
+    change the second `worker()` call to `worker("task 2", lock_a, lock_b)` so both tasks acquire in the same order,
     and add a line that prints when both finish.
     Predict what the program prints before running it, then explain,
     in terms of who waits for whom,

@@ -1233,7 +1233,7 @@ it encloses, and a `for` loop calls `next()` in its header, outside them.
 ## 14. Both tasks acquiring in the same order
 
 > In `async_deadlock.py`,
-> change the second `worker()` call to `worker(lock_a, lock_b)` so both tasks acquire in the same order,
+> change the second `worker()` call to `worker("task 2", lock_a, lock_b)` so both tasks acquire in the same order,
 > and add a line that prints when both finish.
 > Predict what the program prints before running it, then explain,
 > in terms of who waits for whom,
@@ -1254,7 +1254,7 @@ Draw an arrow from each waiting task to the task it waits on and check whether t
 import asyncio
 
 async def worker(
-    first: asyncio.Lock, second: asyncio.Lock
+    name: str, first: asyncio.Lock, second: asyncio.Lock
 ) -> None:
     ...
 
@@ -1273,19 +1273,21 @@ lock_a = asyncio.Lock()
 lock_b = asyncio.Lock()
 
 async def worker(
-    first: asyncio.Lock, second: asyncio.Lock
+    name: str, first: asyncio.Lock, second: asyncio.Lock
 ) -> None:
     async with first:
+        print(f"{name}: holds its first lock")
         await asyncio.sleep(0.01)  # Let the other task run
         async with second:
-            pass
+            print(f"{name}: holds both")
 
 async def main() -> None:
     try:
         await asyncio.wait_for(
             asyncio.gather(
-                worker(lock_a, lock_b),
-                worker(lock_a, lock_b),  # The same order
+                worker("task 1", lock_a, lock_b),
+                # The same order as task 1
+                worker("task 2", lock_a, lock_b),
             ),
             timeout=0.5,
         )
@@ -1294,6 +1296,10 @@ async def main() -> None:
         print("deadlock detected")
 
 asyncio.run(main())
+#: task 1: holds its first lock
+#: task 1: holds both
+#: task 2: holds its first lock
+#: task 2: holds both
 #: both workers finished
 ```
 
