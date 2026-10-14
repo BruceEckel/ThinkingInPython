@@ -249,6 +249,7 @@ def gate(v: Vars) -> None:
     py("tools.reflow_prose", "--write")
     py("tools.exercise_statements", "--write")
     py("tools.check_unique_slugs")
+    py("tools.skill_copies")
     py("tools.extract_examples")
     py("tools.check_skip_lists")
     py("tools.extract_examples", "--write")
@@ -1221,6 +1222,17 @@ def unique_slugs(v: Vars) -> None:
     way to ask the same question while editing.
     """
     py("tools.check_unique_slugs")
+
+
+@task("Fail if the two copies of the coding-style skill differ")
+def skill_copies(v: Vars) -> None:
+    """Fail if thinking-in-python-skill.md and
+    .claude/skills/thinking-in-python/SKILL.md differ. The repo sets
+    core.symlinks = false, so they are duplicate copies, and an edit to
+    one leaves the other stale unless someone copies it over. `gate` runs
+    it too; this target is the standalone way to ask while editing.
+    """
+    py("tools.skill_copies")
 
 
 @task("Fail if a norun.txt or timing.txt pattern matches no listing")

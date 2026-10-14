@@ -795,4 +795,5 @@ and how it was measured.
   `.claude/skills/thinking-in-python/SKILL.md` are duplicate copies of the
   same Python coding-style skill, not a symlink (this repo has
   `core.symlinks = false`). Edit one, then copy the change into the other;
-  nothing enforces sync automatically.
+  `tip skill-copies` (in the gate since 2026-10-14, `tools/skill_copies.py`)
+  fails when they differ.
