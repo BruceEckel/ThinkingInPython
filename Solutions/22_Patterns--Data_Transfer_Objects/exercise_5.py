@@ -7,9 +7,9 @@ print(result)
 #: (4.0, 3)
 print(result[0], result[1])
 #: 4.0 3
-mean, count = summarize([1.0, 3.0])
-print(mean, count)
-#: 2.0 2
-count, mean = summarize([1.0, 3.0])
+mean, count = summarize([1.0, 5.0])
 print(f"{mean=} {count=}")
-#: mean=2 count=2.0
+#: mean=3.0 count=2
+count, mean = summarize([1.0, 5.0])
+print(f"{mean=} {count=}")
+#: mean=2 count=3.0

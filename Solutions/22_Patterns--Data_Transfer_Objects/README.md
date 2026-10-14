@@ -265,12 +265,12 @@ print(result)
 #: (4.0, 3)
 print(result[0], result[1])
 #: 4.0 3
-mean, count = summarize([1.0, 3.0])
-print(mean, count)
-#: 2.0 2
-count, mean = summarize([1.0, 3.0])
+mean, count = summarize([1.0, 5.0])
 print(f"{mean=} {count=}")
-#: mean=2 count=2.0
+#: mean=3.0 count=2
+count, mean = summarize([1.0, 5.0])
+print(f"{mean=} {count=}")
+#: mean=2 count=3.0
 ```
 
 **Read the fields by position.** Printing and unpacking still run,
@@ -302,7 +302,7 @@ The checker cannot catch the mistake this exercise examines:
 swapping `mean` and `count`. `mean, count = summarize(data)` and
 `count, mean = summarize(data)` destructure the same
 `tuple[float, int]` into two names. The swapped unpacking type-checks cleanly and
-misnames both values, as the listing's `mean=2 count=2.0` output shows.
+misnames both values, as the listing's `mean=2 count=3.0` output shows.
 With `Stats` you write `result.count`,
 which reads the field by name, whatever its position. A parameter annotated `Stats` also
 rejects a hand-built tuple in either order, because a

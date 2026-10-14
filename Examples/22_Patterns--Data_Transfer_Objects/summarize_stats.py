@@ -13,9 +13,9 @@ print(result)
 #: Stats(mean=4.0, count=3)
 print(result.mean, result.count)
 #: 4.0 3
-mean, count = summarize([1.0, 3.0])  # Unpacks like a tuple
-print(mean, count)
-#: 2.0 2
-count, mean = summarize([1.0, 3.0])
+mean, count = summarize([1.0, 5.0])  # Unpacks like a tuple
 print(f"{mean=} {count=}")
-#: mean=2 count=2.0
+#: mean=3.0 count=2
+count, mean = summarize([1.0, 5.0])
+print(f"{mean=} {count=}")
+#: mean=2 count=3.0

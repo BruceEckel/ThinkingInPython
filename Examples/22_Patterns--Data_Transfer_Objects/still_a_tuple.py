@@ -14,6 +14,8 @@ class Dimensions(NamedTuple):
 
 print(Color(1, 2, 3) == Dimensions(1, 2, 3))
 #: True
+print(Dimensions(1, 2, 3) in {Color(1, 2, 3)})
+#: True
 print(Color(1, 2, 3) == (1, 2, 3))
 #: True
 

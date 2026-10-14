@@ -229,12 +229,12 @@ print(result)
 #: Stats(mean=4.0, count=3)
 print(result.mean, result.count)
 #: 4.0 3
-mean, count = summarize([1.0, 3.0])  # Unpacks like a tuple
-print(mean, count)
-#: 2.0 2
-count, mean = summarize([1.0, 3.0])
+mean, count = summarize([1.0, 5.0])  # Unpacks like a tuple
 print(f"{mean=} {count=}")
-#: mean=2 count=2.0
+#: mean=3.0 count=2
+count, mean = summarize([1.0, 5.0])
+print(f"{mean=} {count=}")
+#: mean=2 count=3.0
 ```
 
 A tuple version of `summarize()` annotates its return as `tuple[float, int]` and returns a bare tuple.
@@ -246,9 +246,9 @@ so a call site reads `result.mean` instead of `result[0]`.
 Because a `NamedTuple` is a tuple, you can also unpack it.
 Unpacking assigns by position,
 so a caller can again swap the mean and the count.
-`count, mean = summarize([1.0, 3.0])` runs, passes the type checker,
+`count, mean = summarize([1.0, 5.0])` runs, passes the type checker,
 and binds each name to the other's value,
-as `mean=2 count=2.0` in the output shows.
+as `mean=2 count=3.0` in the output shows.
 Reading `result.mean` picks the field by name, whatever its position.
 
 Unpacking sets a `NamedTuple` apart from a data class.
@@ -283,6 +283,8 @@ class Dimensions(NamedTuple):
 
 print(Color(1, 2, 3) == Dimensions(1, 2, 3))
 #: True
+print(Dimensions(1, 2, 3) in {Color(1, 2, 3)})
+#: True
 print(Color(1, 2, 3) == (1, 2, 3))
 #: True
 
@@ -304,7 +306,9 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 
 `Color` and `Dimensions` mean different things,
 yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
-Equal tuples hash alike, so the two are also the same `dict` key.
+Equal tuples hash alike,
+so the two are also the same `set` element or `dict` key:
+the `in` test finds a `Dimensions` in a `set` that holds a `Color`.
 The frozen data classes compare unequal,
 because a data class's generated `__eq__()` tests `other.__class__ is self.__class__` before it compares the fields.
 
