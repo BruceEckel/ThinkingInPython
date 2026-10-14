@@ -117,11 +117,15 @@ from functools import lru_cache
 
 @lru_cache(maxsize=3)
 def square(n: int) -> int:
+    print(f"computing {n}")
     return n * n
 
 square(1)
+#: computing 1
 square(2)
+#: computing 2
 square(3)
+#: computing 3
 square(2)
 square(1)
 print(square.cache_info())
@@ -132,7 +136,8 @@ The prediction: `hits=2, misses=3, maxsize=3, currsize=3`. Three
 distinct arguments arrive, so the cache misses three times and keeps
 all three results.
 The repeat calls to
-`square(2)` and `square(1)` both find their stored answers.
+`square(2)` and `square(1)` both find their stored answers,
+so neither prints a `computing` line.
 
 The difference from the chapter's `maxsize=2` run is the second
 `square(1)`. Under `maxsize=2` that call is a fourth miss, because

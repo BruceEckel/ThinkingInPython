@@ -116,19 +116,28 @@ from functools import lru_cache
 
 @lru_cache(maxsize=2)
 def square(n: int) -> int:
+    print(f"computing {n}")
     return n * n
 
 square(1)
+#: computing 1
 square(2)
+#: computing 2
 square(3)  # Evicts 1, the least recently used
+#: computing 3
 square(2)  # [1]
 square(1)  # [2]
+#: computing 1
 print(square.cache_info())
 #: CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)
 ```
 
-The single hit is the second `square(2)` (`[1]`), which is still in the cache.
-The second `square(1)` (`[2]`) is the fourth miss.
+Each miss runs the body and prints a `computing` line.
+A hit returns the stored result and skips the `print()`,
+the skipped side effect the `cache` section describes.
+The single hit is the second `square(2)` (`[1]`),
+which prints nothing because `2` is still in the cache.
+The second `square(1)` (`[2]`) prints `computing 1` again, the fourth miss.
 `1` was the first value computed, so that miss proves the cache evicted it.
 The cache discards the least recently used entry before it stores a new one,
 so `currsize` stays at or below `maxsize`.
@@ -690,6 +699,7 @@ as the `fillvalue` keyword argument:
 ```python
 # itertools_zip_longest.py
 from itertools import zip_longest
+from exceptions import expect
 
 print(list(zip_longest([1, 2, 3], [4, 5])))
 #: [(1, 4), (2, 5), (3, None)]
@@ -698,14 +708,20 @@ MISSING = sentinel("MISSING")
 print(list(zip_longest([1, 2, 3], [4, 5],
                        fillvalue=MISSING)))
 #: [(1, 4), (2, 5), (3, MISSING)]
+print(list(zip([1, 2, 3], [4, 5])))  # [1]
+#: [(1, 4), (2, 5)]
+expect(ValueError, list,  # [2]
+       zip([1, 2, 3], [4, 5], strict=True))
+#: [ValueError] zip() argument 2 is shorter than argument 1
 ```
 
 Python offers three ways to zip inputs of different lengths,
 and the one you choose records what a mismatch means.
-Plain `zip()` stops at the shortest and raises no error,
+Plain `zip()` (`[1]`) stops at the shortest, drops the `3`,
+and raises no exception,
 the right choice when the extra elements are genuinely surplus.
-`zip(a, b, strict=True)` raises a `ValueError`,
-which for the two lists above reads `zip() argument 2 is shorter than argument 1`.
+`zip(a, b, strict=True)` (`[2]`) raises a `ValueError`,
+which for the same two lists reads `zip() argument 2 is shorter than argument 1`.
 `strict=True` is the right choice when equal lengths are an invariant you want checked.
 `zip_longest()` pads,
 the right choice when the missing elements are data in their own right.
