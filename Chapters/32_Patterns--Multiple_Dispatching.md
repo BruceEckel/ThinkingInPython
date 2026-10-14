@@ -51,7 +51,7 @@ The chapter builds the game twice,
 once dispatching through methods and once looking up a table.
 Both versions share one result type, `Outcome`,
 an enumeration whose members are `WIN`, `LOSE`, and `DRAW`.
-`Outcome` is a `StrEnum`,
+`Outcome` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
 so each member is its string value and prints as `win`, `lose`, or `draw`:
 
 ```python

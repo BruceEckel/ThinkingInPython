@@ -165,7 +165,8 @@ class Maze:
 ```
 
 `Cell` nests inside `Maze` because it names concepts that `Maze` alone uses.
-`Cell` is a `StrEnum` rather than an `Enum`, so each member is also a `str`.
+`Cell` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins)
+rather than an `Enum`, so each member is also a `str`.
 `ljust()` therefore accepts `WALL` as its fill character,
 and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell.
 

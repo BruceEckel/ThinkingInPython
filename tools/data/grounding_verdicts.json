@@ -1,7 +1,7 @@
 {
  "6476eb4778e6007d": {
   "file": "02_Foundations--Tour.md",
-  "line": 350,
+  "line": 357,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "Bucket"
@@ -10,32 +10,20 @@
   "p_terms": 0.02,
   "asked": "2026-10-06"
  },
- "6b9909bf303359bf": {
-  "file": "02_Foundations--Tour.md",
-  "line": 604,
-  "target": "16_Techniques--Comprehensions.md",
+ "13b2b6ac69779a36": {
+  "file": "06_Foundations--Modules_and_Packages.md",
+  "line": 493,
+  "target": "24_Patterns--Singleton.md",
   "terms": [
-   "piece",
-   "arithmetic.py"
+   "__all__"
   ],
-  "sentence": "Collecting every `piece.expression` above uses a [list comprehension](16_Techniques--Comprehensions.md#list-comprehensions), which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list.",
+  "sentence": "The underscore and `__all__` both say which names a caller should use, and that stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade) over its internals or as a shared single instance ([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).",
   "p_terms": 0.0,
-  "asked": "2026-10-06"
- },
- "22f505464eac3911": {
-  "file": "09_Foundations--Class_Attributes.md",
-  "line": 355,
-  "target": "08_Foundations--Static_Types.md",
-  "terms": [
-   "astral-sh/ty"
-  ],
-  "sentence": "A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance), so a subclass may neither widen nor narrow it; `ty` tracks that half under \"Enforce the Liskov Substitution Principle for non-methods\" (`astral-sh/ty` issue 2158).",
-  "p_terms": 0.01,
-  "asked": "2026-10-11"
+  "asked": "2026-10-13"
  },
  "6105b531c2441ebb": {
   "file": "11_Techniques--Testing.md",
-  "line": 106,
+  "line": 107,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Account"
@@ -46,7 +34,7 @@
  },
  "58b756be3c8da8fa": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 236,
+  "line": 239,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "depth"
@@ -57,7 +45,7 @@
  },
  "92d572806e136770": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 699,
+  "line": 696,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Stars"
@@ -68,7 +56,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1006,
+  "line": 1061,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -77,20 +65,42 @@
   "p_terms": 0.0,
   "asked": "2026-10-05"
  },
- "6cb9321f81198731": {
+ "7c9a753f95d1c66a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1207,
+  "line": 1243,
   "target": "07_Foundations--Classes.md",
   "terms": [
-   "trace"
+   "trace_class"
   ],
-  "sentence": "[`@property`](07_Foundations--Classes.md#properties), `@cached_property`, [`@staticmethod`](07_Foundations--Classes.md#static-and-class-methods), and [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods) each wrap a function the same way `trace` does, but return a descriptor instead of a plain wrapper.",
-  "p_terms": 0.08,
-  "asked": "2026-10-05"
+  "sentence": "[`@property`](07_Foundations--Classes.md#properties), `@cached_property`, [`@staticmethod`](07_Foundations--Classes.md#static-and-class-methods), and [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods) are class-form decorators like `trace_class.trace`.",
+  "p_terms": 0.14,
+  "asked": "2026-10-13"
+ },
+ "9d74798f33eb179b": {
+  "file": "15_Techniques--Context_Managers.md",
+  "line": 476,
+  "target": "08_Foundations--Static_Types.md",
+  "terms": [
+   "exc_type"
+  ],
+  "sentence": "`if exc_type is None or exc is None: return False` [narrows](08_Foundations--Static_Types.md#narrowing) `exc_type` to a class and `exc` to an exception.",
+  "p_terms": 0.01,
+  "asked": "2026-10-13"
+ },
+ "a6f80d7775b0cbcd": {
+  "file": "16_Techniques--Comprehensions.md",
+  "line": 309,
+  "target": "03_Foundations--Containers.md",
+  "terms": [
+   "SIZE"
+  ],
+  "sentence": "Multiplying the outer list, however, [repeats one row object `SIZE` times](03_Foundations--Containers.md#two-list-traps), so setting one diagonal element sets it in every row.",
+  "p_terms": 0.03,
+  "asked": "2026-10-13"
  },
  "0c738529ede5867a": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 248,
+  "line": 249,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
@@ -101,7 +111,7 @@
  },
  "0bfdf37ac6c6f194": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1291,
+  "line": 1446,
   "target": "22_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -110,54 +120,21 @@
   "p_terms": 0.04,
   "asked": "2026-10-05"
  },
- "b83bb8f4243cf73d": {
-  "file": "21_Patterns--Design_Patterns.md",
-  "line": 194,
-  "target": "20_Patterns--Rethinking_Objects.md",
-  "terms": [
-   "Callable"
-  ],
-  "sentence": "Because a function with a `Callable` parameter can replace a pattern's interface and classes, the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines) poses: how much of each pattern's machinery does Python still need, and how much of it becomes functions, data, and protocols?",
-  "p_terms": 0.0,
-  "asked": "2026-10-09"
- },
- "734b3d881649c1ef": {
-  "file": "21_Patterns--Design_Patterns.md",
-  "line": 507,
-  "target": "20_Patterns--Rethinking_Objects.md",
-  "terms": [
-   "Need"
-  ],
-  "sentence": "[Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts) builds on this, and [Stateless](46_Effects--Stateless.md#declaring-a-dependency) moves the same declaration into a function's signature, where `Need` names what the function requires of its surroundings.",
-  "p_terms": 0.05,
-  "asked": "2026-09-27"
- },
- "3d7c06bedd459686": {
+ "19283748bd6927e4": {
   "file": "22_Patterns--Data_Transfer_Objects.md",
-  "line": 136,
-  "target": "18_Techniques--Performance.md",
-  "terms": [
-   "NamedTuple"
-  ],
-  "sentence": "[A NamedTuple Is Still a Tuple](#a-namedtuple-is-still-a-tuple) compares the frozen form, which this book's listings write as [`@record`](18_Techniques--Performance.md#record), with a `NamedTuple`.",
-  "p_terms": 0.06,
-  "asked": "2026-09-29"
- },
- "4925ead030b960dc": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
-  "line": 365,
+  "line": 393,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "messenger_idiom.py",
    "Messenger"
   ],
-  "sentence": "1.  In `messenger_idiom.py`, create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes (unlike a [class attribute](09_Foundations--Class_Attributes.md)).",
+  "sentence": "1.  In `messenger_idiom.py`, create a second `Messenger` with different keyword arguments and confirm each instance keeps its own attributes (unlike a [class attribute](09_Foundations--Class_Attributes.md)).",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-13"
  },
  "04acbadd1165eaba": {
   "file": "23_Patterns--Iterators.md",
-  "line": 742,
+  "line": 756,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
    "__iter__",
@@ -167,43 +144,42 @@
   "p_terms": 0.03,
   "asked": "2026-10-05"
  },
- "ebf2d05c88d18b4b": {
+ "1121029ae76447a0": {
   "file": "23_Patterns--Iterators.md",
-  "line": 812,
+  "line": 826,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
-   "traverse",
    "GoFIterator"
   ],
-  "sentence": "`traverse()` is the loop a GoF caller writes, and it drives any type with those four methods, because `GoFIterator` is a [protocol](20_Patterns--Rethinking_Objects.md#protocols) rather than a base class.",
+  "sentence": "It drives any type with those four methods, because `GoFIterator` is a [protocol](20_Patterns--Rethinking_Objects.md#protocols) rather than a base class.",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-13"
  },
- "92ea1b2aa8c0d548": {
+ "674efb071da3872a": {
   "file": "23_Patterns--Iterators.md",
-  "line": 892,
+  "line": 890,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
   ],
-  "sentence": "`DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values), because the answer must differ from every value the source could yield.",
+  "sentence": "`DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values), because the default must differ from every value the source could yield.",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-10-13"
  },
- "ded4015137e431d6": {
+ "f149830ef146ed79": {
   "file": "24_Patterns--Singleton.md",
-  "line": 181,
+  "line": 190,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
   ],
-  "sentence": "The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) names only inside a class body, so at module level `__Settings` keeps its name unmangled, as reachable as any other.",
-  "p_terms": 0.01,
-  "asked": "2026-10-05"
+  "sentence": "The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) names only inside a class body, so at module level `__Settings` keeps its name as written, as reachable as any other.",
+  "p_terms": 0.0,
+  "asked": "2026-10-13"
  },
  "a51f08d6349a2b99": {
   "file": "24_Patterns--Singleton.md",
-  "line": 706,
+  "line": 719,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -214,7 +190,7 @@
  },
  "c358c8813c054976": {
   "file": "25_Patterns--Template_Method.md",
-  "line": 212,
+  "line": 211,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "getattr"
@@ -223,20 +199,20 @@
   "p_terms": 0.01,
   "asked": "2026-10-05"
  },
- "da48e8605a5ffdf8": {
+ "3b4e905cd9d9bcb5": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 200,
+  "line": 203,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "_Proxy__implementation"
   ],
-  "sentence": "The name [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) to `_Proxy__implementation`, so it cannot collide with an attribute the implementation defines.",
-  "p_terms": 0.01,
-  "asked": "2026-10-05"
+  "sentence": "The name [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) to `_Proxy__implementation`, so it stays distinct from any attribute the implementation defines.",
+  "p_terms": 0.0,
+  "asked": "2026-10-13"
  },
  "2e71dc56c76b481b": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 775,
+  "line": 802,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -247,7 +223,7 @@
  },
  "3711bb4c386a5bfa": {
   "file": "27_Patterns--Factory.md",
-  "line": 179,
+  "line": 168,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "shape_name"
@@ -256,20 +232,32 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
- "8ef838d56d0840f4": {
+ "b61d0d217d395284": {
   "file": "28_Patterns--Function_Objects.md",
-  "line": 163,
+  "line": 164,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "Repeat"
   ],
-  "sentence": "Here, `Repeat` is a [record](18_Techniques--Performance.md#record), so its configuration cannot change after construction:",
+  "sentence": "Here, `Repeat` is a [record](18_Techniques--Performance.md#record), so its configuration stays the same after construction:",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-10-13"
+ },
+ "0f1b2d7a09ebf4e9": {
+  "file": "28_Patterns--Function_Objects.md",
+  "line": 446,
+  "target": "05_Foundations--Functions.md",
+  "terms": [
+   "partial",
+   "Placeholder"
+  ],
+  "sentence": "A caller must pass a [positional-only parameter](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) by position, so binding one with `partial()` means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder) in each position the caller fills.",
+  "p_terms": 0.01,
+  "asked": "2026-10-13"
  },
  "69e6c2b3e73ff7e7": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 76,
+  "line": 78,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "ProxyAdapter"
@@ -280,7 +268,7 @@
  },
  "f132a66521cef1cb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 170,
+  "line": 181,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "WhatIUse2",
@@ -293,7 +281,7 @@
  },
  "c8b45c3e67ecadbb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 278,
+  "line": 287,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "PairCoord",
@@ -304,31 +292,20 @@
   "p_terms": 0.01,
   "asked": "2026-10-02"
  },
- "82bb6893784c05ff": {
-  "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 284,
-  "target": "26_Patterns--Surrogate.md",
-  "terms": [
-   "adapter"
-  ],
-  "sentence": "[Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr), so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders (see exercise 1).",
-  "p_terms": 0.0,
-  "asked": "2026-09-27"
- },
- "efad5ab6dc412cd9": {
+ "4910c32d94273207": {
   "file": "30_Patterns--Observer.md",
-  "line": 545,
+  "line": 581,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "disconnect"
   ],
-  "sentence": "Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them), which do not keep the responder alive.",
+  "sentence": "Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them), which let Python collect the object a responder calls.",
   "p_terms": 0.0,
-  "asked": "2026-10-05"
+  "asked": "2026-10-13"
  },
  "fa774505d1fd8381": {
   "file": "30_Patterns--Observer.md",
-  "line": 610,
+  "line": 643,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "announce"
@@ -337,9 +314,21 @@
   "p_terms": 0.01,
   "asked": "2026-10-08"
  },
+ "a4f132fd61a9bf31": {
+  "file": "30_Patterns--Observer.md",
+  "line": 1110,
+  "target": "05_Foundations--Functions.md",
+  "terms": [
+   "gather",
+   "announce"
+  ],
+  "sentence": "`gather()` takes one awaitable per argument rather than an iterable of them, so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments) that generator with `*`, turning each coroutine into its own argument.",
+  "p_terms": 0.0,
+  "asked": "2026-10-13"
+ },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1884,
+  "line": 1928,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -349,42 +338,20 @@
   "p_terms": 0.02,
   "asked": "2026-09-27"
  },
- "78a636500356cee9": {
+ "2c2aacae87fc2524": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 93,
+  "line": 88,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "MouseAction"
   ],
-  "sentence": "Each possible move by a mouse is a member of the `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).",
-  "p_terms": 0.08,
-  "asked": "2026-10-06"
- },
- "18b544f02f389e81": {
-  "file": "31_Patterns--State_Machines.md",
-  "line": 231,
-  "target": "13_Techniques--Pattern_Matching.md",
-  "terms": [
-   "APPEARS"
-  ],
-  "sentence": "A dotted name compares the event with that member, while a bare `APPEARS` would be a [capture pattern](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares) that matches every event.",
-  "p_terms": 0.01,
-  "asked": "2026-10-06"
- },
- "205dd25052aa15f3": {
-  "file": "31_Patterns--State_Machines.md",
-  "line": 241,
-  "target": "25_Patterns--Template_Method.md",
-  "terms": [
-   "StateMachine"
-  ],
-  "sentence": "`StateMachine`'s constructor runs the initial state, the construction-starts-the-engine choice that [*Template Method* discourages](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).",
-  "p_terms": 0.0,
-  "asked": "2026-10-05"
+  "sentence": "Each mouse move is a `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).",
+  "p_terms": 0.03,
+  "asked": "2026-10-13"
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 495,
+  "line": 455,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -395,7 +362,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 1005,
+  "line": 918,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -408,7 +375,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 1017,
+  "line": 930,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -420,7 +387,7 @@
  },
  "806a7dc7e24cfdff": {
   "file": "33_Patterns--Visitor.md",
-  "line": 118,
+  "line": 93,
   "target": "27_Patterns--Factory.md",
   "terms": [
    "flower_gen",
@@ -432,7 +399,7 @@
  },
  "6e7bf0b5ce335367": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 170,
+  "line": 158,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Directory",
@@ -442,53 +409,53 @@
   "p_terms": 0.23,
   "asked": "2026-10-02"
  },
- "3b88b8b75b629801": {
-  "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 565,
-  "target": "33_Patterns--Visitor.md",
+ "78d9ea293b963dca": {
+  "file": "36_Patterns--Memento.md",
+  "line": 407,
+  "target": "08_Foundations--Static_Types.md",
   "terms": [
-   "to_infix"
+   "History"
   ],
-  "sentence": "Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md) exists to provide: new operations over an existing hierarchy, defined outside it.",
+  "sentence": "That opacity lets a caretaker hold any type of state, so `History` is [generic](08_Foundations--Static_Types.md#type-parameters) over the state type.",
   "p_terms": 0.0,
-  "asked": "2026-10-08"
+  "asked": "2026-10-13"
  },
- "346bd608b70887ba": {
-  "file": "35_Patterns--Flyweight.md",
-  "line": 269,
-  "target": "20_Patterns--Rethinking_Objects.md",
-  "terms": [
-   "Tile"
-  ],
-  "sentence": "A record blocks assignment to a field, not mutation inside one, so a `Tile` holding a `list` hands the same mutable list to every cell that shares the tile, the [shallow-freezing trap](20_Patterns--Rethinking_Objects.md#the-immutability-solution).",
-  "p_terms": 0.01,
-  "asked": "2026-10-05"
- },
- "1e7bdfa6c4734885": {
+ "9605b1d03cb08ac2": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 373,
+  "line": 115,
+  "target": "09_Foundations--Class_Attributes.md",
+  "terms": [
+   "Aluminum"
+  ],
+  "sentence": "The checker [applies the base's declaration to an override](09_Foundations--Class_Attributes.md#classvar-and-inheritance), so it rejects `Aluminum(1.0).value = 2.0` with or without the restatement.",
+  "p_terms": 0.02,
+  "asked": "2026-10-13"
+ },
+ "a286d6447dd0fc95": {
+  "file": "37_Patterns--Pattern_Refactoring.md",
+  "line": 370,
   "target": "32_Patterns--Multiple_Dispatching.md",
   "terms": [
    "bins"
   ],
-  "sentence": "`bins[type(t)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine) and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).",
+  "sentence": "`bins[type(piece)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine) and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-10-13"
  },
- "fc74baefc0b1e835": {
+ "d10d959abb81c3c4": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 373,
+  "line": 370,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "bins"
   ],
-  "sentence": "`bins[type(t)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine) and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).",
+  "sentence": "`bins[type(piece)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine) and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-10-13"
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 639,
+  "line": 628,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -499,20 +466,9 @@
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
- "5a1e947901d88713": {
-  "file": "40_Functional--Foundations.md",
-  "line": 584,
-  "target": "05_Foundations--Functions.md",
-  "terms": [
-   "partial"
-  ],
-  "sentence": "For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters), position is the only way to bind an argument, and `partial()` fills positional arguments from the left, so before 3.14, presetting the third argument meant presetting the first two as well.",
-  "p_terms": 0.01,
-  "asked": "2026-09-30"
- },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 629,
+  "line": 686,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -523,7 +479,7 @@
  },
  "b0dc91a7cce04574": {
   "file": "42_Functional--Error_Handling.md",
-  "line": 227,
+  "line": 226,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Result"
@@ -534,7 +490,7 @@
  },
  "73da2fe803454604": {
   "file": "44_Effects--Effect_Management.md",
-  "line": 891,
+  "line": 902,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "greet"
@@ -545,7 +501,7 @@
  },
  "709ba98f5b49d11a": {
   "file": "46_Effects--Stateless.md",
-  "line": 1333,
+  "line": 1342,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Need"
@@ -556,7 +512,7 @@
  },
  "66259d22eeb4fc05": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 434,
+  "line": 448,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Flip"
@@ -567,7 +523,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1337,
+  "line": 1346,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",

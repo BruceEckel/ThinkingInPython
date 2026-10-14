@@ -86,7 +86,8 @@ class MouseAction(StrEnum):
 ```
 
 Each mouse move is a `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
-Because `MouseAction` is a `StrEnum`, each member is a `str`.
+Because `MouseAction` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
+each member is a `str`.
 `run_all()` prints `mouse appears` rather than `MouseAction.APPEARS`.
 
 `mouse_moves.py` holds the sequence of mouse inputs.
@@ -334,7 +335,7 @@ MouseTrap.holding.transitions = {
 }
 ```
 
-The demo feeds a fresh trap the one input `Waiting` has no entry for,
+The demo feeds a fresh trap the one input for which `Waiting` has no entry,
 and `expect()` shows the exception:
 
 ```python
@@ -416,8 +417,7 @@ then the vending machine's table.
 
 For a given current state and input, a rule records three things:
 whether a condition must pass, what action runs during the transition,
-and what state comes next.
-As a record:
+and what state comes next:
 
     Rule(state, InputType, next_state, action, condition)
 

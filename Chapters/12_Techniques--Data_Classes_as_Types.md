@@ -927,6 +927,67 @@ def test_month_number_outside_twelve(bad: int) -> None:
         Month.of(bad)
 ```
 
+### Mixing a Type into an Enum {#enum-mix-ins}
+
+A `Month` member carries a pair as its value, and the pair is not the month.
+Sometimes the member is a value of some type: a direction is a pair of offsets,
+a log level is a string.
+A class listed before `Enum` in the bases is a *mix-in*,
+and every member becomes an instance of it.
+`Enum` builds each member by calling the mix-in's constructor with the assigned value,
+so `UP = (0, 1)` makes `Direction.UP` the tuple `(0, 1)` as well as an enum member:
+
+```python
+# enum_mixins.py
+from enum import Enum, StrEnum
+
+class Direction(tuple, Enum):
+    UP = (0, 1)
+    DOWN = (0, -1)
+    LEFT = (-1, 0)
+    RIGHT = (1, 0)
+
+    def step(self, x: int, y: int) -> tuple[int, int]:
+        dx, dy = self
+        return x + dx, y + dy
+
+print(Direction.UP.step(3, 3))
+#: (3, 4)
+print(Direction((0, -1)), Direction.LEFT.value)
+#: Direction.DOWN (-1, 0)
+print(isinstance(Direction.RIGHT, tuple), len(Direction))
+#: True 4
+
+class Level(StrEnum):
+    INFO = "info"
+    WARNING = "warning"
+
+print(f"{Level.INFO}: ready", Level.WARNING.upper())
+#: info: ready WARNING
+```
+
+`step()` unpacks `self`, because a `Direction` is a tuple.
+The member keeps everything an enum member has:
+`Direction((0, -1))` looks `DOWN` up by value, `.value` holds the tuple,
+and `len(Direction)` counts four members.
+A member passes wherever the mix-in type is expected,
+and carries its name with it.
+
+`StrEnum` is `str` mixed in by the standard library, with one addition:
+its `__str__()` is the string's,
+so an f-string shows `info` rather than `Level.INFO`,
+and a member answers every `str` method.
+A class written as `(str, Enum)` by hand keeps `Enum`'s `__str__()` and prints `Level.INFO`;
+ruff's `UP042` rewrites that form to `StrEnum`.
+`IntEnum` is the same arrangement for `int`.
+
+Mix in a type when the member is one of that type.
+`Month` stays a bare `Enum`: a month is not a pair, it carries one,
+and `max_days` reads the pair through `.value`.
+A class of your own can be the mix-in too.
+`Enum` passes the assigned value to its `__init__()`,
+so each member is built the way an ordinary instance of that class would be.
+
 ## When an `Enum` Beats a Data Class
 
 You can build `Month` as a data class instead of an `Enum`.

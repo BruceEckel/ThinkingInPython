@@ -1332,7 +1332,7 @@ class GridModel(Broadcaster[Grid]):
         self.announce(self.grid)
 ```
 
-`Color` is a `StrEnum`,
+`Color` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
 an [`Enum`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 whose members are also strings.
 `Color.KHAKI` compares equal to `"khaki"` and works anywhere a `str` does,
