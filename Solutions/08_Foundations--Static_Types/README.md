@@ -285,7 +285,7 @@ because Python starts method lookup at the object's own class.
 
 ## 5. What a missing type parameter default costs
 
-> Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
+> Run `ty check` on `type_defaults.py` and read what it reports for `reveal_type(words.top())`.
 > Remove the `= str` default and run it again.
 > The type checker reports no error either way.
 > Say what that means for a bare `Stack` annotation.

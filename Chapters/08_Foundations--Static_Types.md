@@ -597,6 +597,7 @@ and the type checker uses it when an annotation names the class without its brac
 
 ```python
 # type_defaults.py
+from typing import reveal_type
 
 class Stack[T = str]:
     def __init__(self) -> None:
@@ -610,6 +611,7 @@ class Stack[T = str]:
 
 words: Stack = Stack()  # No brackets, so T is str
 words.push("beta")
+reveal_type(words.top())  # ty: str
 print(words.top().upper())
 #: BETA
 counts: Stack[int] = Stack()
@@ -621,34 +623,12 @@ print(counts.top() + 1)
 `words: Stack` names the class without its brackets,
 and the default makes that annotation mean `Stack[str]`,
 so `words.top()` is a `str` and `upper()` checks.
+`reveal_type()` shows that inferred type, and the type checker reports `str`.
 
 A default matters most for a class whose type parameter is usually the same type.
 Callers who use that type omit the brackets, and the annotation stays precise.
 
-`BareStack` is the same class without the default,
-so the annotation `pile: BareStack` leaves `T` unsolved:
-
-```python
-# type_defaults_bare.py
-from typing import reveal_type
-
-class BareStack[T]:
-    def __init__(self) -> None:
-        self.items: list[T] = []
-
-    def push(self, item: T) -> None:
-        self.items.append(item)
-
-    def top(self) -> T:
-        return self.items[-1]
-
-pile: BareStack = BareStack()  # No brackets, T unsolved
-pile.push("first")
-reveal_type(pile.top())  # ty: Unknown
-```
-
-`ty` reports `Unknown`, not an error,
-so `pile.top()` and everything built on it go unchecked from here
+Without the default, the annotation `words: Stack` leaves `T` unsolved
 (see exercise 5).
 
 A `type` alias takes a default the same way, as `Pair` shows:
@@ -987,7 +967,7 @@ Try each exercise before opening its [solution](../Solutions/08_Foundations--Sta
 4.  In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
     calling `super().report()` first.
     Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
-5.  Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
+5.  Run `ty check` on `type_defaults.py` and read what it reports for `reveal_type(words.top())`.
     Remove the `= str` default and run it again.
     The type checker reports no error either way.
     Say what that means for a bare `Stack` annotation.

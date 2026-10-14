@@ -1,4 +1,5 @@
 # type_defaults.py
+from typing import reveal_type
 
 class Stack[T = str]:
     def __init__(self) -> None:
@@ -12,6 +13,7 @@ class Stack[T = str]:
 
 words: Stack = Stack()  # No brackets, so T is str
 words.push("beta")
+reveal_type(words.top())  # ty: str
 print(words.top().upper())
 #: BETA
 counts: Stack[int] = Stack()
