@@ -384,12 +384,28 @@ so `for name in ages` walks the names.
 `items()` alone yields `(key, value)` pairs.
 
 Leaving off `items()` is a common slip.
-`for name, age in ages` iterates over the keys and tries to unpack each one.
-Unpacking `"Alice"` into two names raises a `ValueError`,
+`for name, age in ages` iterates over the keys and tries to unpack each one:
+
+```python
+# forgot_items.py
+
+ages = {"Alice": 30, "Bob": 25}
+try:
+    for name, age in ages:  # [1]
+        print(name, age)
+except ValueError as e:
+    print(e)
+#: too many values to unpack (expected 2)
+for name, age in {"Bo": 1, "Al": 2}:  # [2]
+    print(name, age)
+#: B o
+#: A l
+```
+
+At `[1]`, unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
-A two-character key such as `"Bo"` unpacks into its two letters,
-so when every key has two characters,
-the loop runs to the end with a letter in `name` and a letter in `age`.
+At `[2]`, every key has two characters,
+so each key unpacks into its two letters and the loop runs to the end with a letter in `name` and a letter in `age`.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable.
 Each supports the [set operators](#sets) `&`, `|`, `-`,
@@ -399,10 +415,17 @@ and `^` against another dict's view or against any set.
 # dict_views.py
 
 ages = {"Alice": 30, "Bob": 25, "Carol": 41}
-other = {"Bob": 0, "Dan": 0}
-print(ages.keys() & other.keys())  # Set algebra on a view
+names = ages.keys()
+ages["Dan"] = 19
+print(names)  # The view sees the new key
+#: dict_keys(['Alice', 'Bob', 'Carol', 'Dan'])
+other = {"Bob": 0, "Eve": 0}
+print(names & other.keys())  # Set algebra on a view
 #: {'Bob'}
 ```
+
+`names` comes from `ages.keys()` before `"Dan"` joins `ages`,
+and printing `names` shows `Dan` too.
 
 `|` merges two dictionaries, `pop()` and `del` remove entries,
 and `dict()` builds a dictionary from pairs:
@@ -701,11 +724,6 @@ print(dq.pop())  # Remove from the right
 #: 4
 print(dq)
 #: deque([1, 2, 3])
-window = deque(maxlen=3)  # A bounded sliding window
-for i in range(5):
-    window.append(i)
-print(window)
-#: deque([2, 3, 4], maxlen=3)
 ```
 
 A `list` can also add and remove at either end:
@@ -770,9 +788,21 @@ use [`queue.Queue`](19_Techniques--Concurrency.md#coordinating-threads-with-queu
 whose `get()` blocks until an item arrives.
 For a priority queue, use `heapq`.
 
-The `window` in `deque.py` shows `maxlen`.
 A `deque(maxlen=n)` caps its length,
-discarding from the opposite end when an append overflows it.
+discarding from the opposite end when an append overflows it:
+
+```python
+# sliding_window.py
+from collections import deque
+
+window = deque(maxlen=3)  # A bounded sliding window
+for i in range(5):
+    window.append(i)
+print(window)
+#: deque([2, 3, 4], maxlen=3)
+```
+
+Appending five values to a window of three keeps the last three.
 A `deque` with a `maxlen` is a sliding window, and a `list` has no equivalent.
 
 ### `namedtuple`
