@@ -1,6 +1,7 @@
 # State Machines
 
-> Many systems are in one of a known set of states at any moment.
+> A *State Machine* transitions through a known set of states,
+> and behaves differently depending on the state it's in.
 > The current state together with an input decides the next state.
 > A *State Machine* names the states and defines their transitions.
 
@@ -74,8 +75,7 @@ Because `Mouse` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mi
 each member is a `str`.
 `step()` prints `mouse appears` rather than `Mouse.APPEARS`.
 
-Here are nine moves that exercise every transition in the trap.
-The type checker rejects a misspelled member before the program runs:
+A sequence of nine moves covers every transition in the trap:
 
 ```python
 # mouse_moves.py
@@ -93,7 +93,7 @@ MOVES: Final[list[Mouse]] = [
 
 Each state of the trap is a `State` record:
 the message its `run()` prints and the function that names its successor.
-The transition functions come first:
+Here are the transition functions:
 
 ```python
 # trap_states.py
@@ -134,13 +134,12 @@ def holding(input_: object) -> TrapState:
             return TrapState.HOLDING
 ```
 
-Each transition function performs a `match` on the input,
-with a `case` for every input its state recognizes,
-and names the member the trap enters next.
-The default `case _` returns the function's own member,
-so the state stays the same.
-A function body runs after the whole module has loaded,
-so a `TrapState` named inside one resolves too.
+Each transition function contains a `case` for every input its state recognizes,
+and produces the state the trap enters next.
+The default `case _` returns the current state, so the state stays the same.
+Each function names `TrapState`, which the file defines below them.
+A function body runs at each call, not at the `def`,
+and by the first call the whole module has loaded and `TrapState` exists.
 
 `TrapState` is an `Enum` whose members are the records, in the same file:
 
