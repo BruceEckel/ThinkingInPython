@@ -384,6 +384,7 @@ The form `type[SomeType]` means the class object, or any subclass of it:
 
 ```python
 # class_values.py
+from typing import reveal_type
 
 class Shape:
     pass
@@ -395,6 +396,7 @@ def make(kind: type[Shape]) -> Shape:
     return kind()
 
 shape = make(Circle)
+reveal_type(shape)  # ty: Shape
 print(type(shape).__name__)
 #: Circle
 ```
@@ -407,6 +409,10 @@ Calling `kind()` then produces an instance.
 The word `type` plays two roles in this listing:
 the annotation `type[Shape]` names the class to the type checker,
 while the built-in call `type(shape)` in the demo retrieves an object's class at runtime.
+The type checker and the runtime give different answers for `shape`.
+`reveal_type(shape)` reports `Shape`,
+because the type checker reads `make()`'s `-> Shape` return annotation,
+while `type(shape)` finds the `Circle` that `kind()` built.
 
 ## Naming Types: The `type` Statement {#the-type-statement}
 
