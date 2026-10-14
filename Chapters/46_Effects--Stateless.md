@@ -1242,7 +1242,8 @@ def report(url: str) -> Depend[Async, str]:
     body = yield from wait(fetch(url))
     return f"{body = }"
 
-print(run(report("http://example.com")))
+if __name__ == "__main__":
+    print(run(report("http://example.com")))
 #: body = 'fetched http://example.com'
 ```
 
@@ -1941,8 +1942,6 @@ Try each exercise before opening its [solution](../Solutions/46_Effects--Statele
     rather than being an operation on an Effect.
 9.  Write `report_all()`,
     which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
-    Importing that module runs its own unguarded `print(run(...))`,
-    so expect one line of its output before yours.
     Work out what `report_all()`'s annotation must be,
     and confirm it with the type checker.
     Then call it from inside an `async def`,

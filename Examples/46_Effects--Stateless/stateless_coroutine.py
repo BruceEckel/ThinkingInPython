@@ -10,5 +10,6 @@ def report(url: str) -> Depend[Async, str]:
     body = yield from wait(fetch(url))
     return f"{body = }"
 
-print(run(report("http://example.com")))
+if __name__ == "__main__":
+    print(run(report("http://example.com")))
 #: body = 'fetched http://example.com'

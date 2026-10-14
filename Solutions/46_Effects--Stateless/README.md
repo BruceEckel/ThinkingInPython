@@ -899,8 +899,6 @@ function, and apply the arguments where you need the Effect.
 
 > Write `report_all()`,
 > which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
-> Importing that module runs its own unguarded `print(run(...))`,
-> so expect one line of its output before yours.
 > Work out what `report_all()`'s annotation must be,
 > and confirm it with the type checker.
 > Then call it from inside an `async def`,
