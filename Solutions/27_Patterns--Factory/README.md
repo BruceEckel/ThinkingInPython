@@ -1529,9 +1529,9 @@ print(sorted(PROTOTYPES))
 #: ['goblin', 'troll']
 a = spawn("goblin")
 b = spawn("goblin")
-b.hp = 5
-print(a.hp, b.hp)
-#: 10 5
+b.powers.append("curse")
+print(a.powers, b.powers)
+#: ['bite'] ['bite', 'curse']
 print(spawn("troll"))
 #: Monster(name='Troll', hp=40, powers=['smash', 'regen'])
 ```
