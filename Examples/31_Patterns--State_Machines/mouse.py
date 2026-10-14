@@ -1,7 +1,7 @@
-# mouse_action.py
+# mouse.py
 from enum import StrEnum
 
-class MouseAction(StrEnum):
+class Mouse(StrEnum):
     APPEARS = "mouse appears"
     RUNS_AWAY = "mouse runs away"
     ENTERS = "mouse enters trap"

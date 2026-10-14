@@ -1,6 +1,6 @@
 # mouse_trap_tables.py
 from typing import ClassVar, override
-from mouse_action import MouseAction
+from mouse import Mouse
 from state_machine import StateMachine
 from table_state import TableState
 
@@ -34,16 +34,16 @@ class MouseTrap(StateMachine):
         super().__init__(MouseTrap.waiting)
 
 MouseTrap.waiting.transitions = {
-    MouseAction.APPEARS: MouseTrap.luring,
+    Mouse.APPEARS: MouseTrap.luring,
 }
 MouseTrap.luring.transitions = {
-    MouseAction.RUNS_AWAY: MouseTrap.waiting,
-    MouseAction.ENTERS: MouseTrap.trapping,
+    Mouse.RUNS_AWAY: MouseTrap.waiting,
+    Mouse.ENTERS: MouseTrap.trapping,
 }
 MouseTrap.trapping.transitions = {
-    MouseAction.ESCAPES: MouseTrap.waiting,
-    MouseAction.TRAPPED: MouseTrap.holding,
+    Mouse.ESCAPES: MouseTrap.waiting,
+    Mouse.TRAPPED: MouseTrap.holding,
 }
 MouseTrap.holding.transitions = {
-    MouseAction.REMOVED: MouseTrap.waiting,
+    Mouse.REMOVED: MouseTrap.waiting,
 }

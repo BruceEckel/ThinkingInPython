@@ -34,8 +34,8 @@ class State(Protocol):
 ```
 
 The parameter is `input_`, with a trailing underscore,
-because a bare `input` would shadow the builtin `input()`.
-The `/` after it makes the parameter positional-only.
+because a bare `input` shadows the builtin `input()`.
+The `/` makes the parameter positional-only.
 A function stored in an attribute takes its argument by position alone,
 and the chapter's last design stores `next` that way,
 so the Protocol asks for no more than a stored function gives.
@@ -83,10 +83,10 @@ As an example, consider a mousetrap that can move through several states while t
 The possible moves a mouse can make are the inputs to the state machine:
 
 ```python
-# mouse_action.py
+# mouse.py
 from enum import StrEnum
 
-class MouseAction(StrEnum):
+class Mouse(StrEnum):
     APPEARS = "mouse appears"
     RUNS_AWAY = "mouse runs away"
     ENTERS = "mouse enters trap"
@@ -95,10 +95,10 @@ class MouseAction(StrEnum):
     REMOVED = "mouse removed"
 ```
 
-Each mouse move is a `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
-Because `MouseAction` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
+Each mouse move is a member of the `Mouse` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
+Because `Mouse` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
 each member is a `str`.
-`step()` prints `mouse appears` rather than `MouseAction.APPEARS`.
+`step()` prints `mouse appears` rather than `Mouse.APPEARS`.
 
 `mouse_moves.py` holds the sequence of mouse inputs.
 Its nine moves exercise every transition in the trap,
@@ -107,12 +107,12 @@ and the type checker rejects a misspelled member before the program runs:
 ```python
 # mouse_moves.py
 from typing import Final
-from mouse_action import MouseAction as M
+from mouse import Mouse
 
-MOVES: Final[list[M]] = [
-    M.APPEARS, M.RUNS_AWAY, M.APPEARS, M.ENTERS,
-    M.ESCAPES, M.APPEARS, M.ENTERS, M.TRAPPED,
-    M.REMOVED,
+MOVES: Final[list[Mouse]] = [
+    Mouse.APPEARS, Mouse.RUNS_AWAY, Mouse.APPEARS,
+    Mouse.ENTERS, Mouse.ESCAPES, Mouse.APPEARS,
+    Mouse.ENTERS, Mouse.TRAPPED, Mouse.REMOVED,
 ]
 ```
 
@@ -124,7 +124,7 @@ each state class defines its `run()` behavior and decides its next state with a 
 ```python
 # mouse_trap_states.py
 from typing import ClassVar
-from mouse_action import MouseAction
+from mouse import Mouse
 from state import State
 from state_machine import StateMachine
 
@@ -137,7 +137,7 @@ class Waiting:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.APPEARS:
+            case Mouse.APPEARS:
                 return MouseTrap.luring
             case _:
                 return self
@@ -151,9 +151,9 @@ class Luring:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.RUNS_AWAY:
+            case Mouse.RUNS_AWAY:
                 return MouseTrap.waiting
-            case MouseAction.ENTERS:
+            case Mouse.ENTERS:
                 return MouseTrap.trapping
             case _:
                 return self
@@ -167,9 +167,9 @@ class Trapping:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.ESCAPES:
+            case Mouse.ESCAPES:
                 return MouseTrap.waiting
-            case MouseAction.TRAPPED:
+            case Mouse.TRAPPED:
                 return MouseTrap.holding
             case _:
                 return self
@@ -183,7 +183,7 @@ class Holding:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.REMOVED:
+            case Mouse.REMOVED:
                 return MouseTrap.waiting
             case _:
                 return self
@@ -219,7 +219,7 @@ and a class that leaves one out fails the type checker where the program uses it
 
 ```python
 # mouse_trap_states_demo.py
-from mouse_action import MouseAction
+from mouse import Mouse
 from mouse_moves import MOVES
 from mouse_trap_states import MouseTrap
 from state_machine import run_all
@@ -249,7 +249,7 @@ run_all(MouseTrap(), MOVES)
 # fires and the machine stays at Waiting:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-trap.step(MouseAction.ESCAPES)
+trap.step(Mouse.ESCAPES)
 #: Waiting mouse escapes -> Waiting
 #: Broadcasting cheese smell
 ```
@@ -315,7 +315,7 @@ Module-level code fills in the tables after every state object exists:
 ```python
 # mouse_trap_tables.py
 from typing import ClassVar, override
-from mouse_action import MouseAction
+from mouse import Mouse
 from state_machine import StateMachine
 from table_state import TableState
 
@@ -349,18 +349,18 @@ class MouseTrap(StateMachine):
         super().__init__(MouseTrap.waiting)
 
 MouseTrap.waiting.transitions = {
-    MouseAction.APPEARS: MouseTrap.luring,
+    Mouse.APPEARS: MouseTrap.luring,
 }
 MouseTrap.luring.transitions = {
-    MouseAction.RUNS_AWAY: MouseTrap.waiting,
-    MouseAction.ENTERS: MouseTrap.trapping,
+    Mouse.RUNS_AWAY: MouseTrap.waiting,
+    Mouse.ENTERS: MouseTrap.trapping,
 }
 MouseTrap.trapping.transitions = {
-    MouseAction.ESCAPES: MouseTrap.waiting,
-    MouseAction.TRAPPED: MouseTrap.holding,
+    Mouse.ESCAPES: MouseTrap.waiting,
+    Mouse.TRAPPED: MouseTrap.holding,
 }
 MouseTrap.holding.transitions = {
-    MouseAction.REMOVED: MouseTrap.waiting,
+    Mouse.REMOVED: MouseTrap.waiting,
 }
 ```
 
@@ -370,14 +370,14 @@ and `expect()` shows the exception:
 ```python
 # mouse_trap_tables_demo.py
 from exceptions import expect
-from mouse_action import MouseAction
+from mouse import Mouse
 from mouse_trap_tables import MouseTrap
 from table_state import NoTransition
 
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()
 #: Broadcasting cheese smell
-expect(NoTransition, trap.step, MouseAction.ESCAPES)
+expect(NoTransition, trap.step, Mouse.ESCAPES)
 #: [NoTransition] Waiting: no transition on mouse escapes
 ```
 
@@ -407,7 +407,7 @@ def test_both_versions_print_the_same_trace(
 ### An Unexpected Input
 
 Every one of the nine moves in `MOVES` matches a transition out of the current state.
-Each demo file feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
+Each demo file feeds `Mouse.ESCAPES` to a fresh trap in `Waiting`.
 Neither `Waiting`'s `match` nor its table names that input.
 Version 1 prints `Broadcasting cheese smell` a second time.
 Version 2 raises `NoTransition: Waiting: no transition on mouse escapes`.
@@ -454,7 +454,7 @@ and what state comes next:
 A condition is any callable returning a `bool`, an action is any callable,
 and the rules are a list the engine groups into an ordinary `dict`.
 
-The mousetrap's inputs are `MouseAction` members, bare names.
+The mousetrap's inputs are `Mouse` members, bare names.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
 Each input becomes an object of its own class,
@@ -573,7 +573,7 @@ The states are an `Enum`,
 so the type checker reports a misspelled state name before the program runs.
 A misspelled string would pass every check,
 and the engine would raise a `NoTransition` at runtime.
-`MouseAction` is a `StrEnum` so that the trace prints each input as its value,
+`Mouse` is a `StrEnum` so that the trace prints each input as its value,
 `mouse appears`.
 The vending machine's states need no value,
 since the demo prints a state by its `name`,
@@ -885,7 +885,7 @@ and its `next` is a stored function rather than a method.
 # enum_states.py
 from collections.abc import Callable
 from enum import Enum
-from mouse_action import MouseAction as M
+from mouse import Mouse
 from record import record
 from state import State
 
@@ -899,32 +899,32 @@ class StateRow:
 
 def waiting(input_: object) -> TrapState:
     match input_:
-        case M.APPEARS:
+        case Mouse.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
 def luring(input_: object) -> TrapState:
     match input_:
-        case M.RUNS_AWAY:
+        case Mouse.RUNS_AWAY:
             return TrapState.WAITING
-        case M.ENTERS:
+        case Mouse.ENTERS:
             return TrapState.TRAPPING
         case _:
             return TrapState.LURING
 
 def trapping(input_: object) -> TrapState:
     match input_:
-        case M.ESCAPES:
+        case Mouse.ESCAPES:
             return TrapState.WAITING
-        case M.TRAPPED:
+        case Mouse.TRAPPED:
             return TrapState.HOLDING
         case _:
             return TrapState.TRAPPING
 
 def holding(input_: object) -> TrapState:
     match input_:
-        case M.REMOVED:
+        case Mouse.REMOVED:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
@@ -1108,7 +1108,7 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
 4.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
 5.  Write a `mouse_move_generator()`,
     a [generator](23_Patterns--Iterators.md#generators)
-    that yields valid `MouseAction` moves in sequence,
+    that yields valid `Mouse` moves in sequence,
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.

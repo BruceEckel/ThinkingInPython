@@ -544,7 +544,7 @@ makes the same trade-off over the per-state `mouse_trap_states.py`.
 
 > Write a `mouse_move_generator()`,
 > a [generator](../../Chapters/23_Patterns--Iterators.md#generators)
-> that yields valid `MouseAction` moves in sequence,
+> that yields valid `Mouse` moves in sequence,
 > where each possible move depends on the previous one
 > (it is another state machine).
 > Have it accept an `int` for the number of moves to produce, then stop.
@@ -552,7 +552,7 @@ makes the same trade-off over the per-state `mouse_trap_states.py`.
 <details>
 <summary>Where to look</summary>
 
-In [One State Class per Behavior](../../Chapters/31_Patterns--State_Machines.md#one-state-class-per-behavior), each state's `match` names the `MouseAction` moves that make sense after it.
+In [One State Class per Behavior](../../Chapters/31_Patterns--State_Machines.md#one-state-class-per-behavior), each state's `match` names the `Mouse` moves that make sense after it.
 Write those legal successors as a `dict` from the previous action to a list of allowed next actions, with a starting key for "nothing yet."
 Loop `count` times, pick from the list with `random.choice()`, and `yield` the pick, which becomes the previous action.
 
@@ -565,7 +565,7 @@ import random
 from collections.abc import Iterator
 from enum import StrEnum
 
-class MouseAction(StrEnum):
+class Mouse(StrEnum):
     APPEARS = "mouse appears"
     RUNS_AWAY = "mouse runs away"
     ENTERS = "mouse enters trap"
@@ -573,33 +573,33 @@ class MouseAction(StrEnum):
     TRAPPED = "mouse trapped"
     REMOVED = "mouse removed"
 
-NEXT_ACTIONS: dict[MouseAction | None,
-                   list[MouseAction]] = {
-    None: [MouseAction.APPEARS],
-    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
-                          MouseAction.ENTERS],
-    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
-    MouseAction.ENTERS: [MouseAction.ESCAPES,
-                         MouseAction.TRAPPED],
-    MouseAction.ESCAPES: [MouseAction.APPEARS],
-    MouseAction.TRAPPED: [MouseAction.REMOVED],
-    MouseAction.REMOVED: [MouseAction.APPEARS],
+NEXT_ACTIONS: dict[Mouse | None,
+                   list[Mouse]] = {
+    None: [Mouse.APPEARS],
+    Mouse.APPEARS: [Mouse.RUNS_AWAY,
+                          Mouse.ENTERS],
+    Mouse.RUNS_AWAY: [Mouse.APPEARS],
+    Mouse.ENTERS: [Mouse.ESCAPES,
+                         Mouse.TRAPPED],
+    Mouse.ESCAPES: [Mouse.APPEARS],
+    Mouse.TRAPPED: [Mouse.REMOVED],
+    Mouse.REMOVED: [Mouse.APPEARS],
 }
 
 def mouse_move_generator(
     count: int, seed: int = 0
-) -> Iterator[MouseAction]:
+) -> Iterator[Mouse]:
     ...
 ```
 
 <details>
 <summary>Solution</summary>
 
-If you pick from every `MouseAction` and ignore `previous`, the seeded
+If you pick from every `Mouse` member and ignore `previous`, the seeded
 run prints `RUNS_AWAY TRAPPED APPEARS ENTERS` and
 `APPEARS ESCAPES ESCAPES ESCAPES`. The mouse runs away before it
 appears and escapes three times in a row, and the type checker passes
-the variant, since each move is a valid `MouseAction`. The solution
+the variant, since each move is a valid `Mouse` member. The solution
 looks up the legal successors of `previous` in `NEXT_ACTIONS`, so each
 pick depends on the move before it.
 
@@ -609,7 +609,7 @@ import random
 from collections.abc import Iterator
 from enum import StrEnum
 
-class MouseAction(StrEnum):
+class Mouse(StrEnum):
     APPEARS = "mouse appears"
     RUNS_AWAY = "mouse runs away"
     ENTERS = "mouse enters trap"
@@ -617,24 +617,24 @@ class MouseAction(StrEnum):
     TRAPPED = "mouse trapped"
     REMOVED = "mouse removed"
 
-NEXT_ACTIONS: dict[MouseAction | None,
-                   list[MouseAction]] = {
-    None: [MouseAction.APPEARS],
-    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
-                          MouseAction.ENTERS],
-    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
-    MouseAction.ENTERS: [MouseAction.ESCAPES,
-                         MouseAction.TRAPPED],
-    MouseAction.ESCAPES: [MouseAction.APPEARS],
-    MouseAction.TRAPPED: [MouseAction.REMOVED],
-    MouseAction.REMOVED: [MouseAction.APPEARS],
+NEXT_ACTIONS: dict[Mouse | None,
+                   list[Mouse]] = {
+    None: [Mouse.APPEARS],
+    Mouse.APPEARS: [Mouse.RUNS_AWAY,
+                          Mouse.ENTERS],
+    Mouse.RUNS_AWAY: [Mouse.APPEARS],
+    Mouse.ENTERS: [Mouse.ESCAPES,
+                         Mouse.TRAPPED],
+    Mouse.ESCAPES: [Mouse.APPEARS],
+    Mouse.TRAPPED: [Mouse.REMOVED],
+    Mouse.REMOVED: [Mouse.APPEARS],
 }
 
 def mouse_move_generator(
     count: int, seed: int = 0
-) -> Iterator[MouseAction]:
+) -> Iterator[Mouse]:
     rng = random.Random(seed)
-    previous: MouseAction | None = None
+    previous: Mouse | None = None
     for _ in range(count):
         previous = rng.choice(NEXT_ACTIONS[previous])
         yield previous

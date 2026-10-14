@@ -13,7 +13,7 @@ version's `next()` raises a `NoTransition`.
 
 This complements the chapter's other figure, `vending_story.svg`, which
 draws the vending machine's states and transitions as a static graph.
-The names, inputs, and printed lines come from `mouse_action.py`,
+The names, inputs, and printed lines come from `mouse.py`,
 `mouse_moves.py`, `mouse_trap_states.py`, `mouse_trap_tables.py`,
 `mouse_trap_states_demo.py`, and `mouse_trap_tables_demo.py`
 and their `#:` markers.

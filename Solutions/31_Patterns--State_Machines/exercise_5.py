@@ -3,7 +3,7 @@ import random
 from collections.abc import Iterator
 from enum import StrEnum
 
-class MouseAction(StrEnum):
+class Mouse(StrEnum):
     APPEARS = "mouse appears"
     RUNS_AWAY = "mouse runs away"
     ENTERS = "mouse enters trap"
@@ -11,24 +11,24 @@ class MouseAction(StrEnum):
     TRAPPED = "mouse trapped"
     REMOVED = "mouse removed"
 
-NEXT_ACTIONS: dict[MouseAction | None,
-                   list[MouseAction]] = {
-    None: [MouseAction.APPEARS],
-    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
-                          MouseAction.ENTERS],
-    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
-    MouseAction.ENTERS: [MouseAction.ESCAPES,
-                         MouseAction.TRAPPED],
-    MouseAction.ESCAPES: [MouseAction.APPEARS],
-    MouseAction.TRAPPED: [MouseAction.REMOVED],
-    MouseAction.REMOVED: [MouseAction.APPEARS],
+NEXT_ACTIONS: dict[Mouse | None,
+                   list[Mouse]] = {
+    None: [Mouse.APPEARS],
+    Mouse.APPEARS: [Mouse.RUNS_AWAY,
+                          Mouse.ENTERS],
+    Mouse.RUNS_AWAY: [Mouse.APPEARS],
+    Mouse.ENTERS: [Mouse.ESCAPES,
+                         Mouse.TRAPPED],
+    Mouse.ESCAPES: [Mouse.APPEARS],
+    Mouse.TRAPPED: [Mouse.REMOVED],
+    Mouse.REMOVED: [Mouse.APPEARS],
 }
 
 def mouse_move_generator(
     count: int, seed: int = 0
-) -> Iterator[MouseAction]:
+) -> Iterator[Mouse]:
     rng = random.Random(seed)
-    previous: MouseAction | None = None
+    previous: Mouse | None = None
     for _ in range(count):
         previous = rng.choice(NEXT_ACTIONS[previous])
         yield previous

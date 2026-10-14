@@ -1,6 +1,6 @@
 # mouse_trap_states.py
 from typing import ClassVar
-from mouse_action import MouseAction
+from mouse import Mouse
 from state import State
 from state_machine import StateMachine
 
@@ -13,7 +13,7 @@ class Waiting:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.APPEARS:
+            case Mouse.APPEARS:
                 return MouseTrap.luring
             case _:
                 return self
@@ -27,9 +27,9 @@ class Luring:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.RUNS_AWAY:
+            case Mouse.RUNS_AWAY:
                 return MouseTrap.waiting
-            case MouseAction.ENTERS:
+            case Mouse.ENTERS:
                 return MouseTrap.trapping
             case _:
                 return self
@@ -43,9 +43,9 @@ class Trapping:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.ESCAPES:
+            case Mouse.ESCAPES:
                 return MouseTrap.waiting
-            case MouseAction.TRAPPED:
+            case Mouse.TRAPPED:
                 return MouseTrap.holding
             case _:
                 return self
@@ -59,7 +59,7 @@ class Holding:
 
     def next(self, input_: object) -> State:
         match input_:
-            case MouseAction.REMOVED:
+            case Mouse.REMOVED:
                 return MouseTrap.waiting
             case _:
                 return self

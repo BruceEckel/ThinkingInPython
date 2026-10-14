@@ -1,9 +1,9 @@
 # mouse_moves.py
 from typing import Final
-from mouse_action import MouseAction as M
+from mouse import Mouse
 
-MOVES: Final[list[M]] = [
-    M.APPEARS, M.RUNS_AWAY, M.APPEARS, M.ENTERS,
-    M.ESCAPES, M.APPEARS, M.ENTERS, M.TRAPPED,
-    M.REMOVED,
+MOVES: Final[list[Mouse]] = [
+    Mouse.APPEARS, Mouse.RUNS_AWAY, Mouse.APPEARS,
+    Mouse.ENTERS, Mouse.ESCAPES, Mouse.APPEARS,
+    Mouse.ENTERS, Mouse.TRAPPED, Mouse.REMOVED,
 ]

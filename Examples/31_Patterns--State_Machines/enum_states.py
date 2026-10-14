@@ -1,7 +1,7 @@
 # enum_states.py
 from collections.abc import Callable
 from enum import Enum
-from mouse_action import MouseAction as M
+from mouse import Mouse
 from record import record
 from state import State
 
@@ -15,32 +15,32 @@ class StateRow:
 
 def waiting(input_: object) -> TrapState:
     match input_:
-        case M.APPEARS:
+        case Mouse.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
 def luring(input_: object) -> TrapState:
     match input_:
-        case M.RUNS_AWAY:
+        case Mouse.RUNS_AWAY:
             return TrapState.WAITING
-        case M.ENTERS:
+        case Mouse.ENTERS:
             return TrapState.TRAPPING
         case _:
             return TrapState.LURING
 
 def trapping(input_: object) -> TrapState:
     match input_:
-        case M.ESCAPES:
+        case Mouse.ESCAPES:
             return TrapState.WAITING
-        case M.TRAPPED:
+        case Mouse.TRAPPED:
             return TrapState.HOLDING
         case _:
             return TrapState.TRAPPING
 
 def holding(input_: object) -> TrapState:
     match input_:
-        case M.REMOVED:
+        case Mouse.REMOVED:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
