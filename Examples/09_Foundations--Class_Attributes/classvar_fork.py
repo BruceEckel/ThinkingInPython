@@ -11,7 +11,11 @@ class Sub(Base):
     pass
 
 Base()  # [1]
+print(Base.total, Sub.total)
+#: 1 1
 Sub()  # [2]
+print(Base.total, Sub.total)
+#: 1 2
 Sub()  # [3]
 print(Base.total, Sub.total)
 #: 1 3

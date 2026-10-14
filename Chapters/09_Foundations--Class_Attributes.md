@@ -500,15 +500,20 @@ class Sub(Base):
     pass
 
 Base()  # [1]
+print(Base.total, Sub.total)
+#: 1 1
 Sub()  # [2]
+print(Base.total, Sub.total)
+#: 1 2
 Sub()  # [3]
 print(Base.total, Sub.total)
 #: 1 3
 ```
 
 `type(self)` is `Base` for the one `Base()` call and `Sub` for both `Sub()` calls.
-`Base()` (`[1]`) increments `Base.total` to `1`.
-The first `Sub()` (`[2]`) reads through to that `1`, adds one,
+`Base()` (`[1]`) increments `Base.total` to `1`,
+and `Sub.total` reads through to that `1`.
+The first `Sub()` (`[2]`) reads the same `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
 The second `Sub()` (`[3]`) increments that separate copy to `3`.
@@ -667,5 +672,5 @@ Try each exercise before opening its [solution](../Solutions/09_Foundations--Cla
     Assign `seat` from outside the class and print `vars()` of the instance before and after.
 10. In `classvar_fork.py`,
     print `vars(Sub).get("total")` before the first `Sub()` call and after each one,
-    and use the three values to explain the `1 3` output.
+    and use the three values to say which class's dictionary supplies each `Sub.total` the listing prints.
     Then change the increment to `Base.total += 1` and predict all four lines before running.
