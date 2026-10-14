@@ -848,7 +848,7 @@ The one-table design keeps its states as bare `Enum` members and puts every acti
 A third shape gives each member its own action and its own transition function,
 so the enum is the table.
 `State` is a record of two callables,
-and `MouseTrap` is an `Enum` whose members are `State`s:
+and `TrapState` is an `Enum` whose members are `State`s:
 
 ```python
 # enum_states.py
@@ -858,46 +858,46 @@ from mouse_action import MouseAction as M
 from record import record
 
 type Behavior = Callable[[M], str]
-type Transition = Callable[[M], MouseTrap]
+type Transition = Callable[[M], TrapState]
 
 @record
 class State:
     behavior: Behavior
     transition: Transition
 
-def waiting_next(input_: M) -> MouseTrap:
+def waiting_next(input_: M) -> TrapState:
     match input_:
         case M.APPEARS:
-            return MouseTrap.LURING
+            return TrapState.LURING
         case _:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
 
-def luring_next(input_: M) -> MouseTrap:
+def luring_next(input_: M) -> TrapState:
     match input_:
         case M.RUNS_AWAY:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
         case M.ENTERS:
-            return MouseTrap.TRAPPING
+            return TrapState.TRAPPING
         case _:
-            return MouseTrap.LURING
+            return TrapState.LURING
 
-def trapping_next(input_: M) -> MouseTrap:
+def trapping_next(input_: M) -> TrapState:
     match input_:
         case M.ESCAPES:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
         case M.TRAPPED:
-            return MouseTrap.HOLDING
+            return TrapState.HOLDING
         case _:
-            return MouseTrap.TRAPPING
+            return TrapState.TRAPPING
 
-def holding_next(input_: M) -> MouseTrap:
+def holding_next(input_: M) -> TrapState:
     match input_:
         case M.REMOVED:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
         case _:
-            return MouseTrap.HOLDING
+            return TrapState.HOLDING
 
-class MouseTrap(State, Enum):
+class TrapState(State, Enum):
     WAITING = (lambda _: "Broadcasting cheese smell",
                waiting_next)
     LURING = (lambda _: "Presenting Cheese, door open",
@@ -906,7 +906,7 @@ class MouseTrap(State, Enum):
     HOLDING = (lambda _: "Mouse caught", holding_next)
 
 class StateMachine:
-    def __init__(self, start: MouseTrap) -> None:
+    def __init__(self, start: TrapState) -> None:
         self.state = start
 
     def output(self, input_: M) -> str:
@@ -917,18 +917,18 @@ class StateMachine:
 
 A `State` holds a behavior, which turns the input into the machine's output,
 and a transition, which turns the input into the next state.
-Both aliases name `MouseTrap` above the class statement that creates it.
+Both aliases name `TrapState` above the class statement that creates it.
 A `type` alias evaluates its right side lazily,
 so the forward reference resolves when the checker or the program reads the alias.
 The four transition functions `match` on the input the way the states in `mouse_trap_states.py` do,
-and each names the `MouseTrap` members that follow it.
+and each names the `TrapState` members that follow it.
 A function body runs after the whole module has loaded,
-so a `MouseTrap` named inside one resolves too.
+so a `TrapState` named inside one resolves too.
 
-`MouseTrap` mixes `State` into `Enum`.
+`TrapState` mixes `State` into `Enum`.
 Each member's value is a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
-so `MouseTrap.WAITING` is a `MouseTrap` member and a `State` at once,
+so `TrapState.WAITING` is a `TrapState` member and a `State` at once,
 with `behavior` and `transition` as attributes.
 The behaviors here are lambdas that ignore their input,
 since the trap announces the same thing whatever the mouse does.
@@ -940,10 +940,10 @@ then for the next state, and stores it.
 
 ```python
 # enum_states_demo.py
-from enum_states import MouseTrap, StateMachine
+from enum_states import StateMachine, TrapState
 from mouse_moves import MOVES
 
-machine = StateMachine(MouseTrap.WAITING)
+machine = StateMachine(TrapState.WAITING)
 for move in MOVES:
     before = machine.state
     result = machine.output(move)
@@ -1024,8 +1024,8 @@ Each member names its own successors, as `Luring` does,
 and carries its action as data, so the action runs once per input,
 from a single definition.
 The enum supplies what four loose classes cannot:
-`list(MouseTrap)` enumerates every state,
-and a parameter typed `MouseTrap` accepts a member and rejects anything else.
+`list(TrapState)` enumerates every state,
+and a parameter typed `TrapState` accepts a member and rejects anything else.
 The shape suits a machine whose states each do one thing and whose transitions are a `match` apiece.
 A state that keeps data of its own has nowhere to put it,
 since a member is one frozen record shared by every machine that uses it,

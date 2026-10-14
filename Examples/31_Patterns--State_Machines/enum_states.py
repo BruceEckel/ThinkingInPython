@@ -5,46 +5,46 @@ from mouse_action import MouseAction as M
 from record import record
 
 type Behavior = Callable[[M], str]
-type Transition = Callable[[M], MouseTrap]
+type Transition = Callable[[M], TrapState]
 
 @record
 class State:
     behavior: Behavior
     transition: Transition
 
-def waiting_next(input_: M) -> MouseTrap:
+def waiting_next(input_: M) -> TrapState:
     match input_:
         case M.APPEARS:
-            return MouseTrap.LURING
+            return TrapState.LURING
         case _:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
 
-def luring_next(input_: M) -> MouseTrap:
+def luring_next(input_: M) -> TrapState:
     match input_:
         case M.RUNS_AWAY:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
         case M.ENTERS:
-            return MouseTrap.TRAPPING
+            return TrapState.TRAPPING
         case _:
-            return MouseTrap.LURING
+            return TrapState.LURING
 
-def trapping_next(input_: M) -> MouseTrap:
+def trapping_next(input_: M) -> TrapState:
     match input_:
         case M.ESCAPES:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
         case M.TRAPPED:
-            return MouseTrap.HOLDING
+            return TrapState.HOLDING
         case _:
-            return MouseTrap.TRAPPING
+            return TrapState.TRAPPING
 
-def holding_next(input_: M) -> MouseTrap:
+def holding_next(input_: M) -> TrapState:
     match input_:
         case M.REMOVED:
-            return MouseTrap.WAITING
+            return TrapState.WAITING
         case _:
-            return MouseTrap.HOLDING
+            return TrapState.HOLDING
 
-class MouseTrap(State, Enum):
+class TrapState(State, Enum):
     WAITING = (lambda _: "Broadcasting cheese smell",
                waiting_next)
     LURING = (lambda _: "Presenting Cheese, door open",
@@ -53,7 +53,7 @@ class MouseTrap(State, Enum):
     HOLDING = (lambda _: "Mouse caught", holding_next)
 
 class StateMachine:
-    def __init__(self, start: MouseTrap) -> None:
+    def __init__(self, start: TrapState) -> None:
         self.state = start
 
     def output(self, input_: M) -> str:
