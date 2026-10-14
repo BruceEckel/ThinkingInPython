@@ -699,9 +699,12 @@ class CountingList(list[int]):
 
 @dataclass
 class CountingBox:
-    items: list[int] = field(default_factory=list)
+    _items: list[int] = field(default_factory=list)
     appends: int = 0
     sets: int = 0
+
+    def __len__(self) -> int:
+        ...
 
     def append(self, item: int) -> None:
         ...
@@ -716,7 +719,7 @@ class CountingBox:
 <details>
 <summary>Solution</summary>
 
-If you write `CountingBox.extend()` as `self.items.extend(more)`, the box prints `3 1 1`.
+If you write `CountingBox.extend()` as `self._items.extend(more)`, the box prints `3 1 1`.
 The held list's own `extend()` adds the two elements, and `appends` stays at 1.
 As [Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) notes,
 composition still allows the bug and moves it into a class you can read.
@@ -753,13 +756,16 @@ print(len(counted), counted.appends, counted.sets)
 
 @dataclass
 class CountingBox:
-    items: list[int] = field(default_factory=list)
+    _items: list[int] = field(default_factory=list)
     appends: int = 0
     sets: int = 0
 
+    def __len__(self) -> int:
+        return len(self._items)
+
     def append(self, item: int) -> None:
         self.appends += 1
-        self.items.append(item)
+        self._items.append(item)
 
     def extend(self, more: list[int]) -> None:
         for item in more:
@@ -767,13 +773,13 @@ class CountingBox:
 
     def __setitem__(self, index: int, value: int) -> None:
         self.sets += 1
-        self.items[index] = value
+        self._items[index] = value
 
 box = CountingBox()
 box.append(1)
 box.extend([2, 3])
 box[0] = 99
-print(len(box.items), box.appends, box.sets)
+print(len(box), box.appends, box.sets)
 #: 3 3 1
 ```
 

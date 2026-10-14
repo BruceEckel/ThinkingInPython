@@ -520,12 +520,15 @@ from dataclasses import dataclass, field
 
 @dataclass
 class CountingBox:
-    items: list[int] = field(default_factory=list)
+    _items: list[int] = field(default_factory=list)
     appends: int = 0
+
+    def __len__(self) -> int:
+        return len(self._items)
 
     def append(self, item: int) -> None:
         self.appends += 1
-        self.items.append(item)
+        self._items.append(item)
 
     def extend(self, more: list[int]) -> None:
         for item in more:
@@ -534,8 +537,8 @@ class CountingBox:
 box = CountingBox()
 box.append(1)
 box.extend([2, 3])
-print(f"{len(box.items)=}, {box.appends=}")
-#: len(box.items)=3, box.appends=3
+print(f"{len(box)=}, {box.appends=}")
+#: len(box)=3, box.appends=3
 ```
 
 `CountingBox` inherits nothing from `list`,
@@ -545,7 +548,7 @@ It forwards each operation it offers by hand.
 and more than one of them adds items and bypasses `append()`.
 
 Composition still allows the counting bug.
-If you write `extend()` as `self.items.extend(more)` instead of going through `append()`,
+If you write `extend()` as `self._items.extend(more)` instead of going through `append()`,
 the count goes wrong the same way.
 What changes is which code holds the bug: the class you read,
 not the `list` internals hidden behind `CountingList`.
