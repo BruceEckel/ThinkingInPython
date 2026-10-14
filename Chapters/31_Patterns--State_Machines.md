@@ -23,7 +23,7 @@ In the second, a single table holds all transitions.
 ## Each State Decides
 
 A `State` is a record holding the message its `run()` prints and the function that,
-given an input, names the next `State`:
+given an input, produces the next `State`:
 
 ```python
 # state.py
@@ -47,11 +47,10 @@ The input is typed `object`,
 so a function can accept any input and `match` on it.
 
 In this design each state decides the next state.
-The action belongs to the state and takes no input:
+The action belongs to the state and takes no input.
 `run()` prints the state's message, and the input goes to `next`,
 which chooses the successor.
-A machine built that way is a *Moore machine*:
-what a state does depends on the state alone.
+This is a *Moore machine*, where what a state does depends on the state alone.
 
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
@@ -69,14 +68,14 @@ class Mouse(StrEnum):
     REMOVED = "mouse removed"
 ```
 
-Each mouse move is a member of the `Mouse` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
+We use an [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
+to define a restricted set of objects.
 Because `Mouse` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
 each member is a `str`.
 `step()` prints `mouse appears` rather than `Mouse.APPEARS`.
 
-`mouse_moves.py` holds the sequence of mouse inputs.
-Its nine moves exercise every transition in the trap,
-and the type checker rejects a misspelled member before the program runs:
+Here are nine moves that exercise every transition in the trap.
+The type checker rejects a misspelled member before the program runs:
 
 ```python
 # mouse_moves.py
@@ -90,7 +89,7 @@ MOVES: Final[list[Mouse]] = [
 ]
 ```
 
-### The Mousetrap
+### Mousetrap States
 
 Each state of the trap is a `State` record:
 the message its `run()` prints and the function that names its successor.

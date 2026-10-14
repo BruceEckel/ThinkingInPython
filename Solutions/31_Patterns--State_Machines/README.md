@@ -158,7 +158,7 @@ applied to a new domain.
 <details>
 <summary>Where to look</summary>
 
-[The Mousetrap](../../Chapters/31_Patterns--State_Machines.md#the-mousetrap) shows the shape: a `State` record with a message and a stored `next`, mixed into an `Enum` and driven by the chapter's engine.
+[Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states) shows the shape: a `State` record with a message and a stored `next`, mixed into an `Enum` and driven by the chapter's engine.
 Make the inputs a `StrEnum`, so each transition function can `match` on them and the trace prints them as words.
 Inline `state.py` and `state_machine.py`, since a solution imports nothing from the chapter.
 
@@ -330,7 +330,7 @@ Both model a thing that changes behavior over time.
 <details>
 <summary>Where to look</summary>
 
-[The Mousetrap](../../Chapters/31_Patterns--State_Machines.md#the-mousetrap) stores each state's transition function in its row.
+[Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states) stores each state's transition function in its row.
 Here a factory builds that function around the state's own table, a `dict` from word to the name of the next state, with a wildcard entry for words the state ignores.
 The enum turns the name into the member, so no controller holds a `dict` of name to state object.
 
@@ -531,7 +531,7 @@ makes the same trade-off over the per-state `trap_states.py`.
 <details>
 <summary>Where to look</summary>
 
-In [The Mousetrap](../../Chapters/31_Patterns--State_Machines.md#the-mousetrap), each transition function's `match` names the `Mouse` moves that make sense after its state.
+In [Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states), each transition function's `match` names the `Mouse` moves that make sense after its state.
 Write those legal successors as a `dict` from the previous action to a list of allowed next actions, with a starting key for "nothing yet."
 Loop `count` times, pick from the list with `random.choice()`, and `yield` the pick, which becomes the previous action.
 
