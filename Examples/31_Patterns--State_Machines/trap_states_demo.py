@@ -1,8 +1,8 @@
-# mouse_trap_states_demo.py
+# trap_states_demo.py
 from mouse import Mouse
 from mouse_moves import MOVES
-from mouse_trap_states import MouseTrap
 from state_machine import run_all
+from trap_states import MouseTrap
 
 run_all(MouseTrap(), MOVES)
 #: Broadcasting cheese smell

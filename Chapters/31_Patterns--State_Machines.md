@@ -122,7 +122,7 @@ In this first version of the mousetrap program,
 each state class defines its `run()` behavior and decides its next state with a `match` statement:
 
 ```python
-# mouse_trap_states.py
+# trap_states.py
 from typing import ClassVar
 from mouse import Mouse
 from state import State
@@ -215,14 +215,14 @@ None of the four state classes inherits from `State`.
 Each satisfies the Protocol by defining `run()` and `next()`,
 and a class that leaves one out fails the type checker where the program uses it as a `State`.
 
-`mouse_trap_states_demo.py` runs a `MouseTrap` through every move in `MOVES`:
+`trap_states_demo.py` runs a `MouseTrap` through every move in `MOVES`:
 
 ```python
-# mouse_trap_states_demo.py
+# trap_states_demo.py
 from mouse import Mouse
 from mouse_moves import MOVES
-from mouse_trap_states import MouseTrap
 from state_machine import run_all
+from trap_states import MouseTrap
 
 run_all(MouseTrap(), MOVES)
 #: Broadcasting cheese smell
@@ -389,15 +389,15 @@ and `test_mouse_traps.py` holds them to it:
 
 ```python
 # test_mouse_traps.py
-import mouse_trap_states
 import mouse_trap_tables
 import pytest
+import trap_states
 from mouse_moves import MOVES
 from state_machine import run_all
 
 def test_both_versions_print_the_same_trace(
         capsys: pytest.CaptureFixture[str]) -> None:
-    run_all(mouse_trap_states.MouseTrap(), MOVES)
+    run_all(trap_states.MouseTrap(), MOVES)
     by_match = capsys.readouterr().out
     run_all(mouse_trap_tables.MouseTrap(), MOVES)
     by_table = capsys.readouterr().out
@@ -943,7 +943,7 @@ A `StateRow` holds the message its `run()` prints and the function its `next` na
 The function returns a `State`, which is all the engine asks of it,
 so a `StateRow` serves any enum of states.
 The four transition functions are the first design's `next()` methods pulled out of their classes:
-`waiting()` matches on the input the way `Waiting.next()` in `mouse_trap_states.py` does,
+`waiting()` matches on the input the way `Waiting.next()` in `trap_states.py` does,
 and names the member the trap enters next.
 A function body runs after the whole module has loaded,
 so a `TrapState` named inside one resolves too.
@@ -961,7 +961,7 @@ where a method's parameter would also accept the keyword form `input_=`.
 so `WAITING` prints as `Waiting`.
 
 `enum_states_demo.py` runs the rows through the first design's engine,
-and the trace is `mouse_trap_states_demo.py`'s, line for line:
+and the trace is `trap_states_demo.py`'s, line for line:
 
 ```python
 # enum_states_demo.py
@@ -995,15 +995,15 @@ run_all(StateMachine(TrapState.WAITING), MOVES)
 
 ```python
 # test_enum_states.py
-import mouse_trap_states
 import pytest
+import trap_states
 from enum_states import TrapState
 from mouse_moves import MOVES
 from state_machine import StateMachine, run_all
 
 def test_rows_print_the_class_trace(
         capsys: pytest.CaptureFixture[str]) -> None:
-    run_all(mouse_trap_states.MouseTrap(), MOVES)
+    run_all(trap_states.MouseTrap(), MOVES)
     by_class = capsys.readouterr().out
     run_all(StateMachine(TrapState.WAITING), MOVES)
     by_row = capsys.readouterr().out
@@ -1022,7 +1022,7 @@ a tuple holding the message alone, or the two in the wrong order,
 passes `ty` and fails at import or at run time.
 Pyright reports both.
 
-Against `mouse_trap_states.py`, what changes is where a state lives.
+Against `trap_states.py`, what changes is where a state lives.
 A class with two methods becomes a row holding a message and a function,
 and the `ClassVar` holder on `MouseTrap` becomes the enum.
 The Protocol, the engine, and the trace stay the same.
@@ -1034,7 +1034,7 @@ and put the answer in different places.
 
 Each-state-decides suits a machine whose states do something and have few transitions apiece.
 The state class holds both the action and the transitions,
-so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and which states can follow it.
+so reading `trap_states.py`'s `Luring` tells you what luring does and which states can follow it.
 Adding a state is one class.
 The design reads best when the transitions are obvious from the state's own name.
 

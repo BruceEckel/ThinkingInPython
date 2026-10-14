@@ -534,7 +534,7 @@ state does more than look a word up. The single-table design puts
 every rule for the whole machine in one dictionary, and is easier to
 audit and edit as a unit. The chapter's own
 [table-driven state machine](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
-makes the same trade-off over the per-state `mouse_trap_states.py`.
+makes the same trade-off over the per-state `trap_states.py`.
 
 </details>
 </details>
@@ -657,7 +657,7 @@ generator, the generator picks a legal successor and remembers it
 for the following call. `NEXT_ACTIONS` constrains every choice, so every
 sequence this generator produces is legal by construction.
 
-`mouse_trap_states.py` accepts any move in any state and lets each
+`trap_states.py` accepts any move in any state and lets each
 `case _` absorb the moves that make no sense there, so the generator's
 table is the stricter of the two.
 

@@ -1,4 +1,4 @@
-# mouse_trap_states.py
+# trap_states.py
 from typing import ClassVar
 from mouse import Mouse
 from state import State
