@@ -136,9 +136,9 @@ Running `ty check` reports:
 
 ```
 error[type-assertion-failure]: Argument does not have asserted type `Never`
-  --> exhaustive.py:28:13
+  --> exhaustive.py:29:13
    |
-28 |             assert_never(shape)
+29 |             assert_never(shape)
    |             ^^^^^^^^^^^^^-----^
    |                          |
    |                          Inferred type of argument is `Rectangle & ~Circle & ~Square`

@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from math import pi
 from typing import assert_never
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Circle:
@@ -26,3 +27,6 @@ print(round(area(Circle(1.0)), 4))
 #: 3.1416
 print(area(Square(2.0)))
 #: 4.0
+expect(AssertionError, area, "x")  # type: ignore
+#: [AssertionError] Expected code to be unreachable, but
+#: got: 'x'

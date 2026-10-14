@@ -134,7 +134,6 @@ def broken(s: Signal) -> str:
     match s:
         case DEFAULT:
             return f"DEFAULT is now {DEFAULT}"
-    return "unreachable"
 
 print(act(Signal.GO), act(Signal.STOP))
 #: accelerate brake
@@ -154,6 +153,8 @@ When a later `case` follows a bare-name capture,
 Python refuses to compile the `match` and reports `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here,
 Python compiles the `match` silently, and `ty` accepts it.
+`ty` treats the capture as matching every value,
+so `broken()` needs no `return` after its `match`.
 `ruff` flags the line only when you enable its pep8-naming rules.
 Then N806 reports `DEFAULT` as an uppercase variable inside a function.
 That message is about naming style rather than the capture,
@@ -572,6 +573,7 @@ instead of as an `AssertionError` when the unhandled value arrives at runtime.
 from dataclasses import dataclass
 from math import pi
 from typing import assert_never
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Circle:
@@ -596,13 +598,16 @@ print(round(area(Circle(1.0)), 4))
 #: 3.1416
 print(area(Square(2.0)))
 #: 4.0
+expect(AssertionError, area, "x")  # type: ignore
+#: [AssertionError] Expected code to be unreachable, but
+#: got: 'x'
 ```
 
 `assert_never()` acts at runtime as well as at check time.
-If a caller ignores the annotation and passes the string `"x"`,
-that value reaches `assert_never()`,
-which raises `AssertionError: Expected code to be unreachable, but got: 'x'`,
-naming the value it received.
+The string `"x"` is no `Shape`,
+so the `expect()` line carries `# type: ignore` to get past the type checker.
+At runtime the string reaches `assert_never()`,
+which raises an `AssertionError` naming the value it received.
 
 `act()` in `value_patterns.py` gets its coverage check from the return type instead of from `assert_never()`.
 If one `Signal` member lacked a `case`,
@@ -636,23 +641,15 @@ A `match` makes the form of the dispatch explicit.
 `Shape` turns the classic OOP "shapes" example into a closed type union instead of a class hierarchy.
 
 `test_area_of_each_shape()` checks the area of one `Circle` and one `Square`,
-so every member of the `Shape` union reaches its own `case`.
-The string `"x"` is no `Shape`,
-so `test_assert_never_rejects_a_non_shape()` marks its `area("x")` call with `# type: ignore`.
-At runtime `assert_never()` raises an `AssertionError` for the string:
+so every member of the `Shape` union reaches its own `case`:
 
 ```python
 # test_exhaustive.py
-import pytest
 from exhaustive import Circle, Square, area
 
 def test_area_of_each_shape() -> None:
     assert round(area(Circle(1.0)), 4) == 3.1416
     assert area(Square(2.0)) == 4.0
-
-def test_assert_never_rejects_a_non_shape() -> None:
-    with pytest.raises(AssertionError):
-        area("x")  # type: ignore
 ```
 
 ## When Not to Match

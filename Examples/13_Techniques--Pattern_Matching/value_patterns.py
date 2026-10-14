@@ -19,7 +19,6 @@ def broken(s: Signal) -> str:
     match s:
         case DEFAULT:
             return f"DEFAULT is now {DEFAULT}"
-    return "unreachable"
 
 print(act(Signal.GO), act(Signal.STOP))
 #: accelerate brake
