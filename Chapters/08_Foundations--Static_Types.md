@@ -779,7 +779,7 @@ A call that leaves out `width` draws `missing-argument`.
 
 The checkers disagree about a misspelled keyword.
 Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
-but `ty` 0.0.86 accepts that call silently.
+but `ty` 0.0.87 accepts that call silently.
 At runtime `fil` becomes an extra key in `style`.
 `label()` ignores that key, so the fill stays a space.
 

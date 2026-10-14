@@ -355,26 +355,21 @@ A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 declares its attributes in the same form, an annotation with no value,
 since it describes what a class must have and leaves the value to the class.
 
-`ty` 0.0.86 enforces most of what the declaration states.
+`ty` 0.0.87 enforces what the declaration states about the value.
 A subclass that writes `sides = "four"` draws `invalid-assignment` on that line,
 since the checker compares the value with the declared `ClassVar[int]`.
 A subclass that redeclares the attribute as `sides: ClassVar[str] = "four"` draws `invalid-attribute-override`.
+A subclass that narrows the type, as `sides: ClassVar[bool] = True` does,
+draws `invalid-mutable-override`.
+A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
+so a subclass must keep the type it inherits.
 
-Two mistakes pass the checker.
+One mistake passes the checker.
 Nothing requires `Blob` to supply a `sides`.
 The declaration says the attribute exists,
 and the checker accepts that statement.
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
-
-The second mistake is a subclass that narrows the type,
-as `sides: ClassVar[bool] = True` does.
-`ty` accepts it, where Pyright rejects it.
-A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
-so a subclass must keep the type it inherits.
-`ty` tracks the narrowing case as an open issue,
-"Enforce the Liskov Substitution Principle for non-methods"
-(`astral-sh/ty` issue 2158).
 
 ### What `ClassVar` Catches
 

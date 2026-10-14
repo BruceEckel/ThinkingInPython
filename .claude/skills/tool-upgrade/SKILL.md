@@ -110,6 +110,27 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   `tip fix-eol` runs before the commit. winget's pandoc step failed to
   uninstall 3.11 (exit 1603), so pandoc stays at 3.11 with 3.12.1
   available; typst 0.15.1 and vale 3.24.0 were current.
+  The 0.0.86 to 0.0.87 upgrade (2026-10-13, with hypothesis 6.169.0
+  to 6.169.1; ruff, pyright, uv, and the libraries unchanged) had no
+  gate failure and one prose casualty, the same chapter 09 paragraph
+  as the upgrade before. `tip sweep` green on both trees; the pyright
+  delta was three GONE lines in Solutions 31 `exercise_9.py`, caused by
+  that day's typed-rules rewrite of the listing rather than the
+  upgrade (pyright had not moved), and accepted. 0.0.87 adds
+  `invalid-mutable-override`: a subclass's `sides: ClassVar[bool] =
+  True` under a base `sides: ClassVar[int]` is now rejected, so the
+  narrowing gap closed and chapter 09's "Two mistakes pass the checker"
+  became "One mistake", the missing value; the Pyright contrast and
+  the issue 2158 pointer (still open that day, its title is the
+  general LSP rule) came out. The other nine probes held (one
+  `verify-claims-opus` agent, about 80k tokens, two minutes) and all
+  43 quoted diagnostics matched (one agent, about 130k tokens, four
+  minutes; it also ran every probe under `uv tool run --from
+  ty==0.0.86 ty check` and found the two versions print the same, a
+  faster answer to "did the upgrade move a quote" than reading each
+  one). Trap: `tip pyright-review` re-extracts both build trees, so
+  running it while a probe agent works deletes the agent's scratch
+  files mid-run; run it before launching the agents.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -275,16 +296,16 @@ chapter 09 said it missed.
 
   Chapter 09's "A Base Class Declares, a Subclass Supplies" pins to a
   `ty` version what the checker enforces of `sides: ClassVar[int]` in a
-  base. On 0.0.86: a subclass `sides = "four"` draws `invalid-assignment`
+  base. On 0.0.87: a subclass `sides = "four"` draws `invalid-assignment`
   against the declared type; `sides: ClassVar[str] = "four"` draws
-  `invalid-attribute-override`; `sides: ClassVar[bool] = True` passes,
-  though the attribute is mutable and so invariant (Pyright rejects it,
-  `reportIncompatibleVariableOverride`; `ty` tracks it under issue
-  2158); and a subclass with no `sides` draws nothing. Probe all four in
-  a scratch copy of `required_classvar.py` in `build/examples/09_*/`.
-  The day the narrowing is reported, or a missing value is, rewrite the
-  paragraph's "Two gaps remain" and check whether issue 2158 closed;
-  otherwise bump the version string.
+  `invalid-attribute-override`; `sides: ClassVar[bool] = True` draws
+  `invalid-mutable-override` (new in 0.0.87; on 0.0.86 it passed, and
+  the chapter named Pyright's `reportIncompatibleVariableOverride` and
+  `ty` issue 2158 as the contrast); and a subclass with no `sides`
+  draws nothing. Probe all four in a scratch copy of
+  `required_classvar.py` in `build/examples/09_*/`. The day a missing
+  value is reported, rewrite the paragraph's "One mistake passes the
+  checker" and drop the version string; otherwise bump it.
 
 ## Pyright: a periodic review, never a gate
 

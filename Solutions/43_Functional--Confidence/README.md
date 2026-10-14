@@ -712,7 +712,7 @@ Inside the `Ok`, `ty` knows `float` either way.
 **Rule out a shared subclass.** The precision behind that agreement
 depends on one decorator: both `Ok` and `Err` carry `@final`, in
 `describe_isinstance.py` and in `utils/result.py`. Without that decorator `ty`
-0.0.86 allows for a class inheriting from both, so it keeps the
+0.0.87 allows for a class inheriting from both, so it keeps the
 intersection of the two as a possible type.
 The value in the `Ok` then comes back as
 `float | Unknown` rather than plain `float`. The `match` and the
