@@ -264,25 +264,24 @@ Added 2026-09-29, when chapter 17 dropped its two `cast(EventMaker, ...)` calls.
   `ty` 0.0.84 reads a `type(name, (Event,), {"__init__": init})` call
   whose namespace is a dict literal, takes the constructor from `init()`,
   and checks the class against the `EventMaker` alias
-  (`Callable[[int, int], Event]`). So `eager_event_classes.py`'s
-  `return new_cls` and `greenhouse.py`'s `maker = new_cls` pass with no
-  cast, and chapter 17's "A Family of Generated Classes" says `ty`
-  verifies the signature, where a cast would state it unchecked. Re-probe on
-  each `ty` upgrade: in scratch copies of both listings in
-  `build/examples/17_*/`, add a third parameter `x: int` to `init()`.
-  `eager_event_classes.py` must draw `invalid-return-type` on
-  `return new_cls` with an `info:` line naming the unexpected extra parameter `x`;
-  `greenhouse.py` must draw `invalid-assignment` on
-  `self[class_name] = maker` and `invalid-return-type` on
-  `return maker`. The unedited listings must stay clean. If `ty` stops
+  (`Callable[[int, int], Event]`). Since 2026-10-13 the call lives in
+  one place, `make()` in chapter 17's `events.py`, which
+  `eager_event_classes.py` and `greenhouse.py` import. So `make()`'s
+  `return new_cls` passes with no cast, and chapter 17's "A Family of
+  Generated Classes" says `ty` verifies the signature, where a cast
+  would state it unchecked. Re-probe on each `ty` upgrade: in a scratch
+  copy of `events.py` in `build/examples/17_*/`, add a third parameter
+  `x: int` to `init()`. It must draw `invalid-return-type` on
+  `return new_cls` with an `info:` line naming the unexpected extra
+  parameter `x`. The unedited listing must stay clean. If `ty` stops
   following the call, the listings fail the gate (the class becomes an
   unknown type that is not an `EventMaker`), and the fix is to restore
-  the casts and the paragraph's old wording. If `ty` still accepts the
-  listings but misses the extra parameter, the gate stays green while
+  the cast and the paragraph's old wording. If `ty` still accepts the
+  listing but misses the extra parameter, the gate stays green while
   the prose turns false. Pyright gives the class `Event`'s
-  three-argument constructor and rejects both listings; those are three
-  `pyright_baseline.txt` entries (one in `eager_event_classes.py`, two
-  in `greenhouse.py`).
+  three-argument constructor and rejects `make()`; that is one
+  `pyright_baseline.txt` entry in `events.py` (three before the move,
+  one in `eager_event_classes.py` and two in `greenhouse.py`).
 
 ## Probe: a misspelled keyword through `Unpack[TypedDict]`
 

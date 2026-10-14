@@ -266,3 +266,28 @@ Record each calibration run here with its date and result.
   nothing pre-marked. About 100k tokens per report agent, 30 s to
   2.5 min each; the whole round ran in about 35 minutes with twenty
   agents at a time.
+- **2026-10-13, round 2 decided by Jev, then applied in full.**
+  Round 2 ran at a higher bar after every round-1 card was decided:
+  49 Opus report agents, 98 proposals in 42 files (Q1 24, Q2 7, Q3 7,
+  Q4 48, Q5 7, Q6 5). Jev decided every card with the author's
+  round-1 record and eight of his applies and leaves as examples:
+  92 apply, 6 leave. Bruce's ruling: apply Jev's recommendations, the
+  whole apply set this time, not the confident-and-safe subset. The
+  brief carried each card's Jev risk, with a check to run for
+  `exercise` (does the change hand out a solution) and `order` (does
+  it use a later chapter's construct); every agent that checked one
+  found it unfounded. 42 Opus agents, one per chapter, applied 91 of
+  92 (80-140k tokens, 25 s to 3 min, twenty at a time, slots refilled
+  as agents finished); the one skip, moving chapter 22's `Frozen*`
+  classes out of `still_a_tuple.py`, would separate them from their
+  `order=True` twins, which `CLAUDE.md` keeps side by side. Six agents
+  edited Solutions prose outside the code blocks the brief allows,
+  each time because the card's change made a sentence false; that is
+  the right call, so the brief should say so. Two agents edited
+  `pyproject.toml` for a per-file `I001` after a listing split or
+  rename, also right. One quoted `ty` diagnostic went stale when an
+  import pushed a listing down a line; the agent reported the NEW line
+  as told and the session requoted it after rebuilding the exercise's
+  edited copy under `ty`. The whole-book `tip verify` was green on
+  the first run, with no drift; `tip pyright-review` moved three
+  baseline entries to chapter 17's new `events.py`.
