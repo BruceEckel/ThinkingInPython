@@ -299,14 +299,15 @@ Every function past that boundary takes `NonZero` and stays total:
 ```python
 # slope_edge.py
 from nonzero import NonZero, slope
-from result import Err, Ok
-from safe import safe
+from result import Err, Ok, Result
 
-@safe
-def parse_run(text: str) -> NonZero:
-    return NonZero(int(text))
+def parse_run(text: str) -> Result[NonZero, ValueError]:
+    try:
+        return Ok(NonZero(int(text)))
+    except ValueError as error:
+        return Err(error)
 
-for text in ["2", "0"]:
+for text in ["2", "0", "two"]:
     match parse_run(text):
         case Ok(run):
             print(f"{text!r}: {slope(10, run)}")
@@ -314,10 +315,15 @@ for text in ["2", "0"]:
             print(f"{text!r}: {error}")
 #: '2': 5.0
 #: '0': NonZero cannot hold 0
+#: 'two': invalid literal for int() with base 10: 'two'
 ```
 
-`parse_run()` is the only place that can fail,
-and `@safe` turns that failure into a `Result` its caller must unpack.
+`parse_run()` is the only place that can fail.
+`int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`,
+and the `except` turns either one into an `Err` its caller must unpack.
+Unlike `@safe`'s `Exception`,
+the return type names the failure the caller handles,
+and a bug inside `parse_run()` still raises its own exception.
 Once the `match` unpacks an `Ok`, `slope()` checks nothing.
 `NonZero` guarantees `run.value` isn't 0.
 

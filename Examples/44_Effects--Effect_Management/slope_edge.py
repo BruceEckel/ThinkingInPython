@@ -1,13 +1,14 @@
 # slope_edge.py
 from nonzero import NonZero, slope
-from result import Err, Ok
-from safe import safe
+from result import Err, Ok, Result
 
-@safe
-def parse_run(text: str) -> NonZero:
-    return NonZero(int(text))
+def parse_run(text: str) -> Result[NonZero, ValueError]:
+    try:
+        return Ok(NonZero(int(text)))
+    except ValueError as error:
+        return Err(error)
 
-for text in ["2", "0"]:
+for text in ["2", "0", "two"]:
     match parse_run(text):
         case Ok(run):
             print(f"{text!r}: {slope(10, run)}")
@@ -15,3 +16,4 @@ for text in ["2", "0"]:
             print(f"{text!r}: {error}")
 #: '2': 5.0
 #: '0': NonZero cannot hold 0
+#: 'two': invalid literal for int() with base 10: 'two'
