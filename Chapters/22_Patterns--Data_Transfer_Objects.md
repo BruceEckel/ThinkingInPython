@@ -270,7 +270,6 @@ including a different record type with the same shape:
 # still_a_tuple.py
 from dataclasses import dataclass
 from typing import NamedTuple
-from exceptions import expected
 
 class Color(NamedTuple):
     r: int
@@ -285,8 +284,6 @@ class Dimensions(NamedTuple):
 print(Color(1, 2, 3) == Dimensions(1, 2, 3))
 #: True
 print(Color(1, 2, 3) == (1, 2, 3))
-#: True
-print(Color(1, 2, 3) < Dimensions(1, 2, 4))
 #: True
 
 @dataclass(frozen=True)
@@ -303,6 +300,43 @@ class FrozenDimensions:
 
 print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 #: False
+```
+
+`Color` and `Dimensions` mean different things,
+yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
+Equal tuples hash alike, so the two are also the same `dict` key.
+The frozen data classes compare unequal,
+because a data class's generated `__eq__()` tests `other.__class__ is self.__class__` before it compares the fields.
+
+A `NamedTuple` inherits ordering from `tuple` the same way.
+`tuple_ordering.py` repeats `Color`, `Dimensions`,
+and `FrozenColor` beside two data classes that pass `order=True`:
+
+```python
+# tuple_ordering.py
+from dataclasses import dataclass
+from typing import NamedTuple
+from exceptions import expected
+
+class Color(NamedTuple):
+    r: int
+    g: int
+    b: int
+
+class Dimensions(NamedTuple):
+    width: int
+    height: int
+    depth: int
+
+print(Color(1, 2, 3) < Dimensions(1, 2, 4))
+#: True
+
+@dataclass(frozen=True)
+class FrozenColor:
+    r: int
+    g: int
+    b: int
+
 with expected(TypeError):
     FrozenColor(1, 2, 3) < FrozenColor(1, 2, 4)  # type: ignore
 #: [TypeError] '<' not supported between instances of
@@ -328,14 +362,7 @@ with expected(TypeError):
 #: 'OrderedColor' and 'OrderedDimensions'
 ```
 
-`Color` and `Dimensions` mean different things,
-yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
-Equal tuples hash alike, so the two are also the same `dict` key.
-The frozen data classes compare unequal,
-because a data class's generated `__eq__()` tests `other.__class__ is self.__class__` before it compares the fields.
-
-A `NamedTuple` inherits ordering from `tuple` the same way,
-and that ordering also crosses record types,
+Tuple ordering also crosses record types,
 as `Color(1, 2, 3) < Dimensions(1, 2, 4)` shows.
 Sorting a list of `Color`s orders them by `r`, then `g`, then `b`.
 The sequence of the field declarations sets that order implicitly.
@@ -345,8 +372,9 @@ so `<` between two `FrozenColor`s raises a `TypeError`.
 `OrderedColor` compares with its own class,
 and `<` against an `OrderedDimensions` raises a `TypeError`.
 
-The listing writes `@dataclass(frozen=True)` in full instead of `@record`,
-so that `order=True` is the one difference between each `Frozen` class and its `Ordered` twin.
+Both listings write `@dataclass(frozen=True)` in full instead of `@record`,
+so that `order=True` is the one difference between `FrozenColor` and its twin,
+`OrderedColor`.
 
 Tuple behavior affects serialization too.
 `json.dumps(Color(1, 2, 3))` writes the array `[1, 2, 3]`,
