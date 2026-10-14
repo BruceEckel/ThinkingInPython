@@ -8,6 +8,8 @@ class InsufficientFunds(Exception):
                  amount: float) -> None:
         super().__init__(
             f"balance {balance} is less than {amount}")
+        self.balance = balance
+        self.amount = amount
 
 @dataclass
 class Account:

@@ -116,6 +116,8 @@ class InsufficientFunds(Exception):
                  balance: float, amount: float) -> None:
         super().__init__(
             f"balance {balance} is less than {amount}")
+        self.balance = balance
+        self.amount = amount
 
 @dataclass
 class Account:
@@ -247,8 +249,9 @@ from account import Account, InsufficientFunds
 def test_overdraft_names_amount_keeps_balance() -> None:
     account = Account(100)
     with pytest.raises(InsufficientFunds,
-                       match="less than 250"):
+                       match="less than 250") as excinfo:
         account.withdraw(250)
+    assert excinfo.value.amount == 250
     assert account.balance == 100
 ```
 
@@ -258,10 +261,17 @@ The full message here is `balance 100 is less than 250`.
 If the message holds `.`, `(`, or another regular-expression metacharacter,
 pass the copied text through `re.escape()` so the pattern matches it literally.
 
-The assertion after the block belongs outside it.
+`as excinfo` binds an `ExceptionInfo` object, and once the block exits,
+`excinfo.value` holds the exception that `withdraw()` raised.
+`InsufficientFunds` stores `balance` and `amount` as attributes,
+so the test checks `excinfo.value.amount` as a number.
+A reworded message breaks the `match=` pattern when the test runs,
+while a renamed attribute shows up in the type checker before the run.
+
+The assertions after the block belong outside it.
 A failed withdrawal must leave the balance alone,
 and that check is separate from the exception.
-Inside the block the assertion never runs.
+Inside the block neither assertion runs.
 The exception from `withdraw()` skips the rest of the block,
 and `pytest.raises()` then catches and suppresses it.
 
@@ -728,7 +738,7 @@ The same computation becomes `elapsed(start: float, now: Callable[[], float]) ->
 which receives the clock as an argument instead of calling `time.monotonic()`:
 
 ```python
-# clock_injected.py
+# stopwatch_clock.py
 from collections.abc import Callable
 
 def elapsed(start: float,
@@ -739,16 +749,16 @@ def elapsed(start: float,
 The test hands it a function that returns the same time on every call:
 
 ```python
-# test_clock_injected.py
-import clock_injected
+# test_stopwatch_clock.py
+import stopwatch_clock
 
 def test_elapsed() -> None:
-    assert clock_injected.elapsed(
+    assert stopwatch_clock.elapsed(
         40.0, lambda: 100.0) == 60.0
 ```
 
 Both tests check the same arithmetic.
-`test_clock_injected.py` runs with no `monkeypatch`,
+`test_stopwatch_clock.py` runs with no `monkeypatch`,
 and the `elapsed()` it tests names the source of the time in its signature.
 
 The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.

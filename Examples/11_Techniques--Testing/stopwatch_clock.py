@@ -1,4 +1,4 @@
-# clock_injected.py
+# stopwatch_clock.py
 from collections.abc import Callable
 
 def elapsed(start: float,
