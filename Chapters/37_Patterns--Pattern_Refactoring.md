@@ -452,7 +452,7 @@ class Trash:
     weight: float
 
     def note(self) -> str:
-        return f"{type(self).__name__}: nothing special"
+        return "nothing special"
 
     # New requirement, so a new method here
     def hazard(self) -> str:
@@ -460,26 +460,27 @@ class Trash:
 
 class Aluminum(Trash):
     def note(self) -> str:
-        return "Aluminum: crush and bale"
+        return "crush and bale"
 
     def hazard(self) -> str:
         return "sharp edges"
 
 class Glass(Trash):
     def note(self) -> str:
-        return "Glass: sort by color, then crush"
+        return "sort by color, then crush"
 
     def hazard(self) -> str:
         return "sharp edges"
 
 class Cardboard(Trash):
     def note(self) -> str:
-        return "Cardboard: flatten and bundle"
+        return "flatten and bundle"
 
 materials = [Aluminum, Glass, Cardboard]
 for material in materials:
     piece = material(1.0)
-    print(f"{piece.note()} | hazard: {piece.hazard()}")
+    print(f"{material.__name__}: {piece.note()}"
+          f" | hazard: {piece.hazard()}")
 #: Aluminum: crush and bale | hazard: sharp edges
 #: Glass: sort by color, then crush | hazard: sharp edges
 #: Cardboard: flatten and bundle | hazard: none
@@ -531,22 +532,23 @@ from trash import Aluminum, Cardboard, Glass, Trash
 
 @singledispatch
 def recycling_note(piece: Trash) -> str:
-    return f"{type(piece).__name__}: no special handling"
+    return "no special handling"
 
 @recycling_note.register
 def _(piece: Aluminum) -> str:
-    return "Aluminum: crush and bale"
+    return "crush and bale"
 
 @recycling_note.register
 def _(piece: Glass) -> str:
-    return "Glass: sort by color, then crush"
+    return "sort by color, then crush"
 
 @recycling_note.register
 def _(piece: Cardboard) -> str:
-    return "Cardboard: flatten and bundle"
+    return "flatten and bundle"
 
 for material in Trash.registry.values():
-    print(recycling_note(material(1.0)))
+    note = recycling_note(material(1.0))
+    print(f"{material.__name__}: {note}")
 #: Aluminum: crush and bale
 #: Paper: no special handling
 #: Glass: sort by color, then crush

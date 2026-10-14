@@ -31,23 +31,24 @@ class Plastic(Trash):
 class Sorter:
     @singledispatchmethod
     def recycling_note(self, t: Trash) -> str:
-        return f"{type(t).__name__}: no special handling"
+        return "no special handling"
 
     @recycling_note.register
     def _(self, t: Aluminum) -> str:
-        return "Aluminum: crush and bale"
+        return "crush and bale"
 
     @recycling_note.register
     def _(self, t: Glass) -> str:
-        return "Glass: sort by color, then crush"
+        return "sort by color, then crush"
 
     @recycling_note.register
     def _(self, t: Cardboard) -> str:
-        return "Cardboard: flatten and bundle"
+        return "flatten and bundle"
 
 sorter = Sorter()
 for cls in Trash.registry.values():
-    print(sorter.recycling_note(cls(1.0)))
+    note = sorter.recycling_note(cls(1.0))
+    print(f"{cls.__name__}: {note}")
 #: Aluminum: crush and bale
 #: Paper: no special handling
 #: Glass: sort by color, then crush

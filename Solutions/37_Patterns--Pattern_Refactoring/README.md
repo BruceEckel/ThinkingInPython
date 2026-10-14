@@ -351,23 +351,24 @@ class Plastic(Trash):
 class Sorter:
     @singledispatchmethod
     def recycling_note(self, t: Trash) -> str:
-        return f"{type(t).__name__}: no special handling"
+        return "no special handling"
 
     @recycling_note.register
     def _(self, t: Aluminum) -> str:
-        return "Aluminum: crush and bale"
+        return "crush and bale"
 
     @recycling_note.register
     def _(self, t: Glass) -> str:
-        return "Glass: sort by color, then crush"
+        return "sort by color, then crush"
 
     @recycling_note.register
     def _(self, t: Cardboard) -> str:
-        return "Cardboard: flatten and bundle"
+        return "flatten and bundle"
 
 sorter = Sorter()
 for cls in Trash.registry.values():
-    print(sorter.recycling_note(cls(1.0)))
+    note = sorter.recycling_note(cls(1.0))
+    print(f"{cls.__name__}: {note}")
 #: Aluminum: crush and bale
 #: Paper: no special handling
 #: Glass: sort by color, then crush
@@ -492,11 +493,11 @@ class Glass(Trash):
 
 @singledispatch
 def recycling_note(t: Trash) -> str:
-    return f"{type(t).__name__}: no special handling"
+    return "no special handling"
 
 @recycling_note.register
 def _(t: Aluminum) -> str:
-    return "Aluminum: crush and bale"
+    return "crush and bale"
 
 pieces: list[Trash] = [
     Aluminum(30.0), CrushedAluminum(20.0), Glass(10.0)]
@@ -507,8 +508,10 @@ for t in pieces:
 print(sorted(k.__name__ for k in exact))
 #: ['Aluminum', 'CrushedAluminum', 'Glass']
 
-print(recycling_note(CrushedAluminum(1.0)))
-#: Aluminum: crush and bale
+crushed = CrushedAluminum(1.0)
+print(f"{type(crushed).__name__}: "
+      f"{recycling_note(crushed)}")
+#: CrushedAluminum: crush and bale
 
 shared: dict[type[Trash], list[Trash]] = defaultdict(list)
 for t in pieces:
