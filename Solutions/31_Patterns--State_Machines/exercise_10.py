@@ -4,7 +4,8 @@ from enum import Enum, StrEnum
 from typing import Protocol
 from record import record
 
-# The chapter's state.py and state_machine.py, inlined:
+# The chapter's state.py, state_machine.py, and
+# enum_states.py's StateRow, inlined:
 class State(Protocol):
     def run(self) -> None: ...
     def next(self, input_: object, /) -> State: ...
@@ -29,12 +30,10 @@ class Input(StrEnum):
     CALM = "calm"
     TAKE_PILL = "take pill"
 
-type Transition = Callable[[object], Mood]
-
 @record
 class StateRow:
     message: str
-    next: Transition
+    next: Callable[[object], State]
     def run(self) -> None:
         print(self.message)
 

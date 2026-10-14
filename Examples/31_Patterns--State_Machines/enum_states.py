@@ -3,13 +3,12 @@ from collections.abc import Callable
 from enum import Enum
 from mouse_action import MouseAction as M
 from record import record
-
-type Transition = Callable[[object], TrapState]
+from state import State
 
 @record
 class StateRow:
     message: str
-    next: Transition
+    next: Callable[[object], State]
 
     def run(self) -> None:
         print(self.message)

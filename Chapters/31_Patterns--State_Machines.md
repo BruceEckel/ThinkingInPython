@@ -887,13 +887,12 @@ from collections.abc import Callable
 from enum import Enum
 from mouse_action import MouseAction as M
 from record import record
-
-type Transition = Callable[[object], TrapState]
+from state import State
 
 @record
 class StateRow:
     message: str
-    next: Transition
+    next: Callable[[object], State]
 
     def run(self) -> None:
         print(self.message)
@@ -941,9 +940,8 @@ class TrapState(StateRow, Enum):
 ```
 
 A `StateRow` holds the message its `run()` prints and the function its `next` names.
-The `Transition` alias names `TrapState` above the class statement that creates it.
-A `type` alias evaluates its right side lazily,
-so the forward reference resolves when the checker or the program reads the alias.
+The function returns a `State`, which is all the engine asks of it,
+so a `StateRow` serves any enum of states.
 The four transition functions are the first design's `next()` methods pulled out of their classes:
 `waiting()` matches on the input the way `Waiting.next()` in `mouse_trap_states.py` does,
 and names the member the trap enters next.
