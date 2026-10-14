@@ -450,7 +450,14 @@ class State(Enum):
     SELECTING = auto()
     UNAVAILABLE = auto()
     WANT_MORE = auto()
+```
 
+Each kind of input has its own class,
+and a `Slot` holds one item's price and quantity:
+
+
+```python
+# tabledriven/vending_machine.py (continued)
 @record
 class Money:
     name: str
@@ -482,7 +489,28 @@ class Column:
 class Slot:
     price: int
     quantity: int
+```
 
+The inputs `Money` and `Column` are records,
+values the machine reads and leaves as they are.
+`Row` is an `Enum` whose four members name the rows,
+so a row outside the grid is a type error at the call rather than an index error inside `_slot()`.
+`Slot` stays a mutable `@dataclass`,
+because `dispense()` decrements its `quantity` in place.
+
+The engine's lookup keys on the exact `type(input_)`,
+so finding the rules takes one dictionary lookup rather than an `isinstance()` test against each rule.
+That exactness lets the table keep separate entries for `Row` and `Column`,
+two input classes that each carry a grid index.
+The same exactness excludes a further subclass.
+An input whose class derives from `Money` matches none of `Money`'s rules,
+because the key is the input's exact class.
+
+`VendingMachine` holds the table, its conditions, and its actions:
+
+
+```python
+# tabledriven/vending_machine.py (continued)
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents
@@ -551,21 +579,6 @@ class VendingMachine(StateMachine):
         self.message = f"Returning {self.amount}"
         self.amount = 0
 ```
-
-The inputs `Money` and `Column` are records,
-values the machine reads and leaves as they are.
-`Row` is an `Enum` whose four members name the rows,
-so a row outside the grid is a type error at the call rather than an index error inside `_slot()`.
-`Slot` stays a mutable `@dataclass`,
-because `dispense()` decrements its `quantity` in place.
-
-The engine's lookup keys on the exact `type(input_)`,
-so finding the rules takes one dictionary lookup rather than an `isinstance()` test against each rule.
-That exactness lets the table keep separate entries for `Row` and `Column`,
-two input classes that each carry a grid index.
-The same exactness excludes a further subclass.
-An input whose class derives from `Money` matches none of `Money`'s rules,
-because the key is the input's exact class.
 
 The rules go in `__init__()` rather than in the class body,
 because each rule holds a bound method.
