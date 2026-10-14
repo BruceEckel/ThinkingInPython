@@ -1631,7 +1631,7 @@ because `catch()` matches the yielded value before the driver gets it and never 
 and that `Handler` breaks the condition that no handler sits between `run()` and the Effect.
 Its loop passes an error outward instead of throwing that error back into the Effect it wraps,
 so the driver's `throw()` raises that error in the `Handler`'s own frame,
-not `guarded()`'s.
+not `guarded()`'s frame.
 The error propagates out of `run()`, and the inner `except` never runs:
 
 ```python
@@ -1891,7 +1891,7 @@ Try each exercise before opening its [solution](../Solutions/46_Effects--Statele
     Fix the error by changing only the annotation,
     then check what `greet_all()`'s callers must now declare.
 3.  Apply `reveal_type()` to `catch(ValueError)(one_unhandled)` and run `ty check`.
-    Explain why its result type differs from `all_handled()`'s,
+    Explain why its result type differs from `all_handled()`'s result type,
     given that both have handled every error `read_score()` declares.
 4.  Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
     then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.

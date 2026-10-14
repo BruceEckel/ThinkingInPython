@@ -236,7 +236,7 @@ as `class_attribute_confusion.py` shows.
 `total: ClassVar[int] = 0` has the `= 0`,
 so it exists on `Tally` before any instance exists.
 `label: str` has no `=`, so it stays a declaration.
-The annotation goes into `Tally.__annotations__` beside `total`'s and records that a `Tally` will carry a `label`.
+The annotation goes into `Tally.__annotations__` beside `total`'s entry and records that a `Tally` will carry a `label`.
 `display_object()` reports attributes that exist,
 so the declaration stays out of its report.
 
@@ -247,7 +247,7 @@ which creates a real `label` attribute on `a`, not on `Tally`.
 `total` shows up too, by fallback.
 Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrates in `class_attribute_confusion.py`.
-The `total` that `a` reports is `Tally`'s.
+The `total` that `a` reports is `Tally.total`.
 The `[CV]` tag, for *class variable*, marks an attribute the class stores,
 and the tags agree.
 `label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,

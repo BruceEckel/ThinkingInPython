@@ -59,7 +59,7 @@ p.g()
 
 ### What the Implementation Supplies
 
-`Implementation` can have an interface different from `Proxy`'s.
+`Implementation` can have an interface different from `Proxy`'s interface.
 `Proxy` qualifies as long as code calls it in place of the implementation.
 That definition is looser than the one in *GoF Design Patterns*,
 because it depends only on how code uses `Proxy`.

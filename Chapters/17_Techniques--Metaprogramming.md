@@ -1901,7 +1901,7 @@ so a class that overrides none of them shows no dunders.
 deliberately narrowing the comparison to those four.
 
 Every class, even an empty one, has its own `__module__`, `__dict__`,
-and a handful of other bookkeeping dunders that always differ from `object`'s,
+and a handful of other bookkeeping dunders that always differ from the ones on `object`,
 so comparing every dunder this way shows that bookkeeping instead of filtering it out.
 The comparison uses `is`, not `==`,
 since a dunder inherited unchanged from `object` is the same function object,

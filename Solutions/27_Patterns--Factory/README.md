@@ -136,7 +136,7 @@ s.draw()
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`.
 Here, `exercise_2.py` shows the new shape alone. In the chapter file its entry joins
-`_Circle`'s and `_Square`'s, and `"Triangle"` joins the demo's list:
+the entries for `_Circle` and `_Square`, and `"Triangle"` joins the demo's list:
 
 ```python
 # exercise_2.py

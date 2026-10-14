@@ -219,7 +219,7 @@ the requirement out.
 ## 3. Catching an error that is already handled
 
 > Apply `reveal_type()` to `catch(ValueError)(one_unhandled)` and run `ty check`.
-> Explain why its result type differs from `all_handled()`'s,
+> Explain why its result type differs from `all_handled()`'s result type,
 > given that both have handled every error `read_score()` declares.
 
 <details>

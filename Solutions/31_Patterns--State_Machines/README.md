@@ -1142,7 +1142,7 @@ keep the default `None` condition too, so both fields are optional per rule.
 ## 9. A `Nickel` the table has never heard of
 
 > Build a two-state machine that collects `Money`,
-> modeled on `vending_machine.py`'s.
+> modeled on the machine in `vending_machine.py`.
 > Add a `Nickel` class deriving from `Money` and feed one in without touching the table.
 > Explain the exception, then make it work two ways: by adding a rule,
 > and by making `Nickel` an instance of `Money` rather than a subclass.

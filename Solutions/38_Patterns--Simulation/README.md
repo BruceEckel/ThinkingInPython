@@ -769,7 +769,7 @@ class GameBuilder:
 > Add a new kind of `Item` to the robot maze.
 > Define a `Coin` subclass of `Item` with the symbol `$`.
 > Its `interact()` removes the coin from its room,
-> as `Food`'s does for the food,
+> as `Food`'s `interact()` does for the food,
 > and adds one to a coin count carried by the `Robot`.
 > Place a few `$` characters in the maze and report how many the robot collects.
 > `item_factory()`, `Room`, and `GameBuilder` stay as they are.

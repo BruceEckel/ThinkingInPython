@@ -181,7 +181,7 @@ The listing prints a deterministic check instead, because the `#:` marker
 is constant and the raw number changes every run.
 
 **Stack the layers.** `@trace` above `@timing` means `add = trace(timing(add))`, so `trace`'s
-wrapper is the outermost layer and `timing`'s is inside it.
+wrapper is the outermost layer and `timing`'s wrapper is inside it.
 
 **Run the layers outside in.** Calling
 `add(2, 3)` enters `trace`'s wrapper first.

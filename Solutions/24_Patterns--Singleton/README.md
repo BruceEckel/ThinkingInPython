@@ -610,7 +610,7 @@ not per-subclass. The class hierarchy hides that sharing.
 Read separately, `Singleton` and `Other` look like independent siblings.
 
 **Give a subclass its own storage.** The fix is one line per subclass. `Separate` declares its own
-`_shared_state`, so the lookup finds `Separate`'s dict before `Borg`'s.
+`_shared_state`, so the lookup finds `Separate`'s dict before `Borg`'s dict.
 `Separate`'s instances share that dict among themselves. Martelli
 makes the same point in the article the chapter links: a subclass that
 needs state of its own declares it.

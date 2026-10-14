@@ -765,7 +765,7 @@ def ledger(cell: Cell) -> tuple[
 ```
 
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
-`Put` has `Tell`'s: payload out, nothing back.
+`Put` has `Tell`'s shape: payload out, nothing back.
 `purchase()` uses both.
 It reads, decides, and writes, and the decision sits between the two requests,
 in code that mentions no cell.

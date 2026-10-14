@@ -678,7 +678,7 @@ print(Counted.total, SubCounted.total)
 ```
 
 **Watch the subclass fork the counter.** Before the first `Sub()`
-(`[1]`), `vars(Sub)` has no `total`, so `Sub` reads `Base`'s. The
+(`[1]`), `vars(Sub)` has no `total`, so `Sub` reads `Base`'s `total`. The
 `Sub()` at `[1]` runs `type(self).total += 1` with `type(self)` as
 `Sub`. The read falls back to `Base.total`, which is `1`, and the
 write stores `2` in `Sub`'s own dictionary. From then on `Sub` has its

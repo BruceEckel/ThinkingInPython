@@ -1078,7 +1078,8 @@ then resume to read them back.
 Each task reads its own `request_id` and every task reads the same `current`,
 because by the time any of them resumes, the global holds `req-3`.
 The last line shows the other direction.
-Because `main()` creates the tasks, their contexts are copies of `main()`'s,
+Because `main()` creates the tasks,
+their contexts are copies of `main()`'s context,
 so whatever a task sets stays in its own copy.
 `request_id` returns to its default while the global stays clobbered.
 
@@ -1607,7 +1608,7 @@ At full speed, with no deliberate sleep, the GIL makes this race rare,
 not impossible.
 Threads that share mutable state need a lock,
 or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues).
-The fix mirrors `async_locks.py`'s.
+The fix mirrors the one in `async_locks.py`.
 Wrap the read, the sleep, and the write in a `threading.Lock`:
 
 ```python
@@ -2261,7 +2262,7 @@ while an `asyncio` task is small enough to run in the thousands.
 cancellable batches have no thread equivalent.
 Python still offers no safe way to cancel a running thread.
 Free threading changes a thread's job.
-It leaves `asyncio`'s as it was.
+It leaves `asyncio`'s job as it was.
 
 ### Measuring the Memory
 

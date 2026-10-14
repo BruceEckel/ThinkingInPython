@@ -483,7 +483,7 @@ through `super().compete(opponent)` and the inherited `eval_*()` methods.
 The table version has no comparable override.
 The lookup matches classes exactly,
 so `DampPaper` inherits none of `Paper`'s rows.
-It needs seven rows of its own, five of them copies of `Paper`'s.
+It needs seven rows of its own, five of them copies of `Paper`'s rows.
 Editing `Paper`'s rows instead changes the game for every `Paper`.
 
 ## Testing Both Versions

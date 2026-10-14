@@ -189,7 +189,7 @@ so an `update()` that accepts only a `Thermometer` cannot substitute for one tha
 Both versions below keep the read of `subject.celsius` and make `t.attach(Display())` type-check,
 the first by widening the parameter again and the second by changing the protocol.
 
-**Declare the widest subject type.** The protocol here is `classic_observer.py`'s, unchanged.
+**Declare the widest subject type.** The protocol here is the one from `classic_observer.py`, unchanged.
 `update()` declares the widest type `notify()` can hand it,
 `Subject[float]`, and narrows that to a `Thermometer` before reading
 `celsius`:
@@ -1244,7 +1244,7 @@ model.select((0, 0))
 #: s:3 p:4 k:2
 ```
 
-**Reuse the chapter's model.** The model is `grid_observer.py`'s, copied here so the solution runs on
+**Reuse the chapter's model.** The model is the one from `grid_observer.py`, copied here so the solution runs on
 its own: `Color`, `new_grid()`, and `recolored()` unchanged, and a
 `Broadcaster` trimmed to the two methods this example calls.
 `GridModel` stays as the chapter writes it, which the exercise requires.

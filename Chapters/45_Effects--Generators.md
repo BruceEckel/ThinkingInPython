@@ -894,7 +894,7 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     It collects money, takes two digits, then dispenses or refuses.
     It yields its current state and receives each event with `send()`,
     so the position in the generator's body carries the state.
-    This generator's `yield` runs the opposite direction from `interview()`'s:
+    This generator's `yield` runs the opposite direction from `interview()`'s `yield`:
     it reports the state the machine reached instead of requesting something the machine needs.
     Say which of the two versions you would rather extend with another state,
     and why.

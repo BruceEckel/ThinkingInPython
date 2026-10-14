@@ -833,7 +833,7 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     A single `TemperatureReading` input must be able to lead to heating,
     cooling, or idle, decided entirely by conditions on one `(state, input)` key.
 9.  Build a two-state machine that collects `Money`,
-    modeled on `vending_machine.py`'s.
+    modeled on the machine in `vending_machine.py`.
     Add a `Nickel` class deriving from `Money` and feed one in without touching the table.
     Explain the exception, then make it work two ways: by adding a rule,
     and by making `Nickel` an instance of `Money` rather than a subclass.

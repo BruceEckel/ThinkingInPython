@@ -1023,7 +1023,7 @@ The decorator reads the [bare annotations](09_Foundations--Class_Attributes.md#a
 (e.g. `celsius: float`)
 and writes an `__init__()` and a `__repr__()` onto the class.
 That `__init__()` has one parameter per field,
-so `Thermometer`'s is `__init__(self, celsius: float)`,
+so `Thermometer`'s `__init__()` is `__init__(self, celsius: float)`,
 and its body assigns `self.celsius = celsius`.
 `eq=False` keeps identity equality and also leaves the instances hashable.
 `dataclass()` modifies the class in place and returns it,

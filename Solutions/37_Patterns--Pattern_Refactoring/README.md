@@ -538,7 +538,7 @@ itself, so by default every material keeps a bin of its own.
 
 **Let a subclass share its parent's bin.** `CrushedAluminum` opts in by setting `bin` to `Aluminum`.
 It restates the `ClassVar` annotation the way the chapter's
-subclasses restate `value`'s.
+subclasses restate `value`'s annotation.
 The type checker treats that restatement as optional.
 
 **Sort by the declared key.** The sorting loop becomes
