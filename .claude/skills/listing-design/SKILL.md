@@ -245,3 +245,24 @@ Record each calibration run here with its date and result.
   old `apply\` directory, so the first wave re-read the first pass's
   files and found everything in place; check the brief's paths with
   `grep` before launching.
+- **2026-10-13, Bruce decided the remaining 97 cards, then round 2.**
+  He marked 52 apply and 45 leave on the page. A third apply pass (33
+  Opus agents, `APPLY-BRIEF3.md`, `apply3/<stem>.json`) applied 50:
+  four were already in place from round 1, two cross-chapter cards
+  (chapter 12's `Month` reaching chapter 27, chapter 23's `traced()`
+  reaching chapter 18's `utils/benchmark.py`) went to a second agent
+  each with permission to edit the other chapter, and two stay
+  skipped (c20-plugged conflicts with an applied card; c41's
+  `partial(pad, 3)` needs a `# type: ignore` on the line whose `ty`
+  error the prose already quotes). Whole-book `tip verify` green.
+  Then round 2: 49 Opus report agents under `round2/BRIEF.md`, each
+  given `round2/context/<stem>.json` (round 1's applied, left, and
+  pending cards for its chapter, so it reports only what is new) and
+  a higher bar ("a change that is a matter of taste is not a
+  proposal"). 894 listings read, 98 proposals (Q1 24, Q2 7, Q3 7,
+  Q4 48, Q5 7, Q6 5) in 42 of 49 files; seven agents also named a
+  left round-1 card they agreed with (`still_stands`). The page is
+  "Listing Proposals 2" (project memory `listing-proposals-2-page`),
+  nothing pre-marked. About 100k tokens per report agent, 30 s to
+  2.5 min each; the whole round ran in about 35 minutes with twenty
+  agents at a time.
