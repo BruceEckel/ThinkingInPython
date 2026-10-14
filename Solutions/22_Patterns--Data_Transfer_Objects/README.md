@@ -450,3 +450,97 @@ the type checker, so the record holds whatever the JSON held.
 
 </details>
 </details>
+
+## 8. A `Point` that survives addition
+
+> Give `point_tuple.py`'s `Point` an `__add__()` that returns a `Point`,
+> and a `__repr__()` that prints `Point(1.0, 2.0)`.
+> Check that slicing still returns a plain tuple.
+
+<details>
+<summary>Where to look</summary>
+
+[Subclassing `tuple` Directly](../../Chapters/22_Patterns--Data_Transfer_Objects.md#subclassing-tuple-directly) shows that tuple operations return plain tuples.
+Override `__add__()` to build the sum through `type(self)(...)`, so the result is a `Point`, and write `__repr__()` from the two properties.
+Slicing goes through `__getitem__()`, which the exercise leaves alone, so predict what `p[:1]` returns before you run it.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from typing import Self
+
+class Point(tuple[float, float]):
+    __slots__ = ()
+
+    def __new__(cls, x: float, y: float) -> Self:
+        ...
+
+    @property
+    def x(self) -> float:
+        ...
+
+    @property
+    def y(self) -> float:
+        ...
+
+    def __add__(self, other: tuple[float, ...]) -> Self:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
+```python
+# exercise_8.py
+from typing import Self
+
+class Point(tuple[float, float]):
+    __slots__ = ()
+
+    def __new__(cls, x: float, y: float) -> Self:
+        return super().__new__(cls, (x, y))
+
+    @property
+    def x(self) -> float:
+        return self[0]
+
+    @property
+    def y(self) -> float:
+        return self[1]
+
+    def __add__(self, other: tuple[float, ...]) -> Self:
+        x, y = other
+        return type(self)(self.x + x, self.y + y)
+
+    def __repr__(self) -> str:
+        return f"Point({self.x}, {self.y})"
+
+p = Point(1.0, 2.0) + Point(3.0, 4.0)
+print(p, type(p).__name__)
+#: Point(4.0, 6.0) Point
+print(p + (1.0, 1.0), p == (4.0, 6.0))
+#: Point(5.0, 7.0) True
+print(p[:1], (1.0, 1.0) + p)
+#: (4.0,) (1.0, 1.0, 4.0, 6.0)
+```
+
+**Build the result through the class.** `tuple.__add__()` concatenates and returns a `tuple`, so the override replaces it with a sum of the coordinates and constructs the result with `type(self)(...)`.
+Using `type(self)` rather than `Point` means a subclass of `Point` gets an instance of its own class back.
+The parameter carries `tuple[float, ...]` rather than `tuple[float, float]` because an override must accept everything the base method accepts.
+`tuple.__add__()` takes a tuple of any length, so `ty` reports `invalid-method-override` for the two-element annotation, citing the Liskov Substitution Principle.
+The wider annotation lets `p + (1.0, 1.0)` type-check as well as `Point + Point`, and the unpacking `x, y = other` raises a `ValueError` for a tuple of any other length.
+
+**Reuse the properties in `__repr__()`.** `tuple.__repr__()` prints `(4.0, 6.0)`; the override prints the class name around the two properties, so the record names its type the way a `NamedTuple` does.
+
+**What stays a tuple.** Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone, so `p[:1]` is the plain `(4.0,)`.
+A tuple on the left of `+` is the other gap: `(1.0, 1.0) + p` runs `tuple.__add__()` first and concatenates to a four-element tuple, since `Point` defines no `__radd__()`.
+Each tuple operation a `Point` must survive is one more override, which is why a `NamedTuple` or a record is the better choice when positional tuple behavior is a feature rather than a surface to defend.
+
+</details>
+</details>
+</details>

@@ -501,3 +501,6 @@ Try each exercise before opening its [solution](../Solutions/22_Patterns--Data_T
     a configuration bag whose keys first appear at runtime;
     a 2D grid coordinate that must work as a `dict` key;
     a record decoded from a JSON API response whose fields you also validate.
+8.  Give `point_tuple.py`'s `Point` an `__add__()` that returns a `Point`,
+    and a `__repr__()` that prints `Point(1.0, 2.0)`.
+    Check that slicing still returns a plain tuple.
