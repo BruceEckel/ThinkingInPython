@@ -160,7 +160,7 @@ The Stateless version threads nothing.
 where a type checker verifies them.
 The return type is the second channel in the signature that Effect Management says an EMS needs.
 
-The whole library is visible in `two_way_generator.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
+The whole library is visible in `drive.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
 An Effect is a generator, so you can drive one yourself,
 as `hand_driven.py` in [Nothing Runs Yet](46_Effects--Stateless.md#nothing-runs-yet)
 does with that chapter's `greet("Alice")`.

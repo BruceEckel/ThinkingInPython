@@ -1,9 +1,14 @@
 # task_runner_send.py
 from collections import deque
 from collections.abc import Generator, Iterable
+from typing import Final
+
+REPLIES: Final[dict[str, str]] = {
+    "download: headers?": "200 OK, 512 bytes",
+}
 
 def answer(request: str) -> str:
-    return f"answer to {request}"
+    return REPLIES.get(request, "ok")
 
 def download() -> Generator[str, str]:
     reply = yield "download: headers?"
@@ -29,7 +34,7 @@ def task_runner(
 
 task_runner([download(), index()])
 #: download: headers?
-#: download: answer to download: headers?
+#: download: 200 OK, 512 bytes
 #: index: build
 #: download: checksum
 #: index: merge

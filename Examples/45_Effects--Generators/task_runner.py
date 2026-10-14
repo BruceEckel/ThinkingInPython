@@ -16,7 +16,7 @@ def task_runner(ready: deque[Iterator[str]]) -> None:
         try:
             print(next(job))
         except StopIteration:
-            continue  # Finished: never requeued
+            continue
         ready.append(job)
 
 task_runner(deque([download(), index()]))

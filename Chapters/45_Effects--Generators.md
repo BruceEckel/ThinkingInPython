@@ -208,15 +208,14 @@ The generator yields a *request* out,
 and whatever drives it sends the *answer* back in.
 That conversation makes an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
 (EMS) possible.
-Typically, a driver function steps the generator:
+Typically, a driver function steps the generator.
+`drive.py` holds one, along with a table of answers:
 
 ```python
-# two_way_generator.py
-import inspect
+# drive.py
 from collections.abc import Generator
 from typing import Final
-from interview_generator import (Answer, Question,
-                                 Result, interview)
+from interview_generator import Answer, Question, Result
 
 ANSWERS: Final[dict[Question, Answer]] = {
     Question("name"): Answer("Alice"),
@@ -234,20 +233,28 @@ def drive(conversation: Generator[Question, Answer, Result],
             request = conversation.send(answer)
         except StopIteration as stop:
             return stop.value
+```
 
-if __name__ == "__main__":
-    conversation = interview()
-    print(inspect.getgeneratorstate(conversation))
-    result = drive(conversation, ANSWERS)
-    print(f"{result = }")
+`two_way_generator.py` runs `interview()` under that driver:
+
+```python
+# two_way_generator.py
+import inspect
+from drive import ANSWERS, drive
+from interview_generator import interview
+
+conversation = interview()
+print(inspect.getgeneratorstate(conversation))
 #: GEN_CREATED
+result = drive(conversation, ANSWERS)
 #: request = 'name', answer = 'Alice'
 #: request = 'town', answer = 'Wonderland'
 #: request = 'friend', answer = 'Rabbit'
+print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
-The listing imports the generator unchanged.
+`two_way_generator.py` imports `interview()` unchanged.
 The driver is new.
 The first line of output shows the state of the generator `interview()` returned.
 `inspect.getgeneratorstate()` reports `GEN_CREATED`:
@@ -483,8 +490,8 @@ The send channel appears in the declaration and goes unused.
 ```python
 # yield_from_delegates.py
 from collections.abc import Generator
+from drive import ANSWERS, drive
 from interview_generator import Answer, Question, Result
-from two_way_generator import ANSWERS, drive
 
 def ask(
     question: Question
@@ -510,7 +517,7 @@ if __name__ == "__main__":
 #: Alice of Wonderland, friend Rabbit
 ```
 
-The listing imports `drive()` unchanged from `two_way_generator.py`,
+The listing imports `drive()` unchanged from `drive.py`,
 and nothing in `drive()` refers to `ask()`.
 The new code is all on the generator side.
 
@@ -542,8 +549,8 @@ In `yield_from_delegates.py`, `drive()` receives `interview()`'s `Result`.
 ```python
 # yield_from_nested.py
 from collections.abc import Generator
+from drive import ANSWERS, drive
 from interview_generator import Answer, Question, Result
-from two_way_generator import ANSWERS, drive
 from yield_from_delegates import ask, interview
 
 def survey() -> Generator[Question, Answer, Result]:
@@ -749,7 +756,7 @@ def task_runner(ready: deque[Iterator[str]]) -> None:
         try:
             print(next(job))
         except StopIteration:
-            continue  # Finished: never requeued
+            continue
         ready.append(job)
 
 task_runner(deque([download(), index()]))
@@ -777,9 +784,14 @@ Letting each job ask a question combines turn-taking and answering in one loop:
 # task_runner_send.py
 from collections import deque
 from collections.abc import Generator, Iterable
+from typing import Final
+
+REPLIES: Final[dict[str, str]] = {
+    "download: headers?": "200 OK, 512 bytes",
+}
 
 def answer(request: str) -> str:
-    return f"answer to {request}"
+    return REPLIES.get(request, "ok")
 
 def download() -> Generator[str, str]:
     reply = yield "download: headers?"
@@ -805,7 +817,7 @@ def task_runner(
 
 task_runner([download(), index()])
 #: download: headers?
-#: download: answer to download: headers?
+#: download: 200 OK, 512 bytes
 #: index: build
 #: download: checksum
 #: index: merge
@@ -815,6 +827,8 @@ The queue holds each job paired with its latest request.
 `task_runner()` primes every job with `next()`, as a driver must.
 On each turn it prints the request and sends back the answer.
 That `send()` resumes the job until the job yields its next request.
+`answer()` looks the request up in `REPLIES`,
+and every request missing from the table gets `"ok"`.
 
 `download()` reads what it receives, into `reply`.
 `index()` discards what it receives,

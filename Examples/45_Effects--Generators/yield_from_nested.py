@@ -1,7 +1,7 @@
 # yield_from_nested.py
 from collections.abc import Generator
+from drive import ANSWERS, drive
 from interview_generator import Answer, Question, Result
-from two_way_generator import ANSWERS, drive
 from yield_from_delegates import ask, interview
 
 def survey() -> Generator[Question, Answer, Result]:
