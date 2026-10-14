@@ -663,7 +663,7 @@ print(counts["Lizard"])
 ```
 
 **Make the tally optional.** `counts` is an optional parameter with a default of `None`,
-so a caller that wants only the pairs writes `random_pairs(Item, 10)`.
+so a caller that needs only the pairs writes `random_pairs(Item, 10)`.
 The generator yields a `(player, opponent)` pair each time.
 
 **Tally into the caller's counter.** A caller that wants the tally

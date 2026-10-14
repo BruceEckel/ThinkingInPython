@@ -74,7 +74,6 @@ Chapters/10_Foundations--Cleanup.md	only: so that count is correct only if CODE 
 Chapters/11_Techniques--Testing.md	exactly: CODE is exactly CODE on any IEEE double
 Chapters/11_Techniques--Testing.md	exactly: that CODE ran exactly once
 Chapters/11_Techniques--Testing.md	is what: The CODE in CODE is what CODE produces first
-Chapters/11_Techniques--Testing.md	never: Inside the block the assertion never runs
 Chapters/11_Techniques--Testing.md	only: A *black-box* test treats the code as an opaque box and exercises only its public interface
 Chapters/11_Techniques--Testing.md	only: CODE runs only the tests whose names contain "overdraft"
 Chapters/11_Techniques--Testing.md	only: Only CODE calls it
@@ -86,7 +85,6 @@ Chapters/11_Techniques--Testing.md	only: so that only implementation remains
 Chapters/12_Techniques--Data_Classes_as_Types.md	is what: one field different" is what you do with any immutable value
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: A read-only CODE keeps users from assigning to CODE
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: Because fields after CODE are keyword-only
-Chapters/12_Techniques--Data_Classes_as_Types.md	only: CODE tags only one
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: CODE works only on data classes
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: Passing CODE to CODE makes every field keyword-only
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: and those members are the only values the type has
@@ -215,6 +213,7 @@ Chapters/19_Techniques--Concurrency.md	only: so two threads contend only when th
 Chapters/19_Techniques--Concurrency.md	only: while a coroutine yields only at an CODE you chose to write
 Chapters/19_Techniques--Concurrency.md	price: CODE gives each run of a price function its own CODE
 Chapters/19_Techniques--Concurrency.md	price: CODE runs a price function sequentially and threaded and confirms the two agree
+Chapters/19_Techniques--Concurrency.md	price: It puts the order and its price on the queue instead of returning the price
 Chapters/19_Techniques--Concurrency.md	price: writing the same price lookup twice
 Chapters/19_Techniques--Concurrency.md	prices: the same prices CODE prints
 Chapters/19_Techniques--Concurrency.md	want: and that is what you want
@@ -318,6 +317,7 @@ Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional
 Chapters/31_Patterns--State_Machines.md	expensive: Too expensive returns to CODE with the money still inserted
 Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
 Chapters/31_Patterns--State_Machines.md	paid: and a CODE selects from every paid state but CODE
+Chapters/31_Patterns--State_Machines.md	price: and a CODE holds one item's price and quantity
 Chapters/31_Patterns--State_Machines.md	price: decided by price and stock
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
@@ -367,7 +367,6 @@ Chapters/38_Patterns--Simulation.md	itself: it keeps the first for itself and sp
 Chapters/38_Patterns--Simulation.md	itself: not to itself
 Chapters/38_Patterns--Simulation.md	itself: so a new kind of item registers itself
 Chapters/38_Patterns--Simulation.md	never: because a maze character is one character long and never equals CODE's empty CODE
-Chapters/38_Patterns--Simulation.md	only: A single CODE would await only the tasks in the list at the moment of the call
 Chapters/38_Patterns--Simulation.md	only: Because CODE depends only on the CODE CODE
 Chapters/38_Patterns--Simulation.md	only: CODE is CODE only for a type checker reading the file and CODE at runtime
 Chapters/38_Patterns--Simulation.md	only: Only a maze with a loop lets two rats try to claim the same new cell
@@ -411,6 +410,8 @@ Chapters/41_Functional--Toolkits.md	only: you can describe an infinite sequence 
 Chapters/41_Functional--Toolkits.md	want: CODE is the right choice when equal lengths are an invariant you want checked
 Chapters/41_Functional--Toolkits.md	want: CODE to take as many of them as you want
 Chapters/41_Functional--Toolkits.md	want: Keeping one is right when you want each pair of distinct elements once
+Chapters/42_Functional--Error_Handling.md	never: and it never sees a field name
+Chapters/42_Functional--Error_Handling.md	never: which CODE never receives
 Chapters/42_Functional--Error_Handling.md	only: The only way to the answer is narrowing to one of the two classes
 Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type says which side you received
 Chapters/42_Functional--Error_Handling.md	wants: A caller who wants the original must read it from the new exception's CODE
@@ -605,8 +606,6 @@ Solutions/29_Patterns--Changing_the_Interface/README.md	only: and only the *Adap
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: import only that function elsewhere
 Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE
 Solutions/30_Patterns--Observer/README.md	never: Class access is the part a validating descriptor never needs
-Solutions/31_Patterns--State_Machines/README.md	itself: A state that stays the same returns itself
-Solutions/31_Patterns--State_Machines/README.md	itself: and both answer CODE with a CODE that returns itself for everything after
 Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a quarter only in a number the existing action reads
 Solutions/31_Patterns--State_Machines/README.md	only: only a lookup
 Solutions/31_Patterns--State_Machines/README.md	only: which leads only to CODE

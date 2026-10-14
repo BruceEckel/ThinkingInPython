@@ -419,7 +419,7 @@ then `get_traced_memory()` and `stop()` after it.
 The `Traced` object it yields fills in when the block ends.
 `current` holds the bytes still allocated at that point,
 and `peak` holds the most the block allocated at once.
-The `finally` clause stops tracing even when the block raises an exception.
+The `finally` clause stops tracing whether the block ends normally or raises an exception.
 `tee.py` in [Iterators](23_Patterns--Iterators.md#what-tee-buffers)
 measures each of its three cases with `traced()`.
 

@@ -384,7 +384,7 @@ The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 
 `build_tree.py` puts the integer on the left of `*` and on the right of `+`.
 The test checks the integer on either side of `+`,
-and a product with no integer at all:
+and a product with no integer:
 
 ```python
 # test_expr.py
