@@ -46,52 +46,6 @@ annotations are evaluated lazily, so the name resolves.
 The input is typed `object`,
 so a function can accept any input and `match` on it.
 
-The `StateMachine` holds the current state and advances it on each input:
-
-```python
-# state_machine.py
-from collections.abc import Iterable
-from state import State
-
-class StateMachine:
-    def __init__(self, initial_state: State) -> None:
-        self.current_state = initial_state
-        self.current_state.run()
-    def step(self, input_: object) -> None:
-        state = self.current_state
-        self.current_state = state.next(input_)
-        print(state, input_, "->", self.current_state)
-        self.current_state.run()
-
-def run_all(machine: StateMachine,
-            inputs: Iterable[object]) -> None:
-    for input_ in inputs:
-        machine.step(input_)
-```
-
-The constructor sets the initial state and runs it.
-`step()` takes one input, asks the current state for its successor,
-and moves there.
-The parameter is `input_`, with a trailing underscore,
-because a bare `input` shadows the builtin `input()`.
-It then prints the transition (the old state, the input, and the new state)
-and calls `run()` for the new state.
-A state prints as its name, through a `__str__()` the enum of states defines.
-`run_all()` is a convenience outside the class:
-it feeds any iterable of inputs to `step()`, one at a time.
-This is the *State* pattern combined with automated transitions,
-producing *State Machine*.
-
-The behavior of `run()` depends on the current state.
-`step()` defines the flow,
-while each `State`'s `run()` and `next()` supply the varying behavior.
-
-This split has a name.
-A machine whose action belongs to the state, and takes no input,
-is a *Moore machine*: what a state does depends on the state alone,
-and the input chooses the successor.
-`run()` takes no argument for that reason.
-
 In this style of *State Machine*, each state decides the next state.
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
@@ -199,6 +153,52 @@ so `TrapState.WAITING` is a `TrapState` member and a `State` at once,
 with `message` and `next` as attributes.
 `__str__()` returns the member's name in the form the trace prints,
 so `WAITING` prints as `Waiting`, and `step()` prints each state through it.
+
+The `StateMachine` holds the current state and advances it on each input:
+
+```python
+# state_machine.py
+from collections.abc import Iterable
+from state import State
+
+class StateMachine:
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
+    def step(self, input_: object) -> None:
+        state = self.current_state
+        self.current_state = state.next(input_)
+        print(state, input_, "->", self.current_state)
+        self.current_state.run()
+
+def run_all(machine: StateMachine,
+            inputs: Iterable[object]) -> None:
+    for input_ in inputs:
+        machine.step(input_)
+```
+
+The constructor sets the initial state and runs it.
+`step()` takes one input, asks the current state for its successor,
+and moves there.
+The parameter is `input_`, with a trailing underscore,
+because a bare `input` shadows the builtin `input()`.
+It then prints the transition (the old state, the input, and the new state)
+and calls `run()` for the new state.
+A state prints as its name, through the `__str__()` that `TrapState` defines.
+`run_all()` is a convenience outside the class:
+it feeds any iterable of inputs to `step()`, one at a time.
+This is the *State* pattern combined with automated transitions,
+producing *State Machine*.
+
+The behavior of `run()` depends on the current state.
+`step()` defines the flow,
+while each `State`'s `run()` and `next()` supply the varying behavior.
+
+This split has a name.
+A machine whose action belongs to the state, and takes no input,
+is a *Moore machine*: what a state does depends on the state alone,
+and the input chooses the successor.
+`run()` takes no argument for that reason.
 
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
 then feeds a fresh trap the one input for which `waiting()` has no `case`:
