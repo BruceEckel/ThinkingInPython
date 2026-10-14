@@ -261,7 +261,8 @@ C().show()  # A comes first in the MRO
 #: A.show
 ```
 
-`C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s version, not `B`'s.
+`C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s `show()`,
+not `B`'s `show()`.
 The bases appear in the order the `class` statement lists them.
 Writing `class C(B, A)` puts `B` first,
 and `C().show()` then runs `B`'s version.

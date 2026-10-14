@@ -528,7 +528,7 @@ Each call to `make_counter()` builds an independent counter with its own `count`
 When state must exist,
 a closure is one way to let exactly one function change it.
 
-A closure's privacy is stronger than a leading underscore's,
+A closure's privacy is stronger than the privacy of a leading underscore,
 and weaker than a guarantee.
 Any code can write `obj._field`.
 The name `count` exists inside `make_counter()` alone,

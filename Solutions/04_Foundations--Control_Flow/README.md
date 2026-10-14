@@ -142,7 +142,7 @@ print()
 #: 0 1 2 4 5
 ```
 
-The output matches the original order's.
+The output is the same as with the original order.
 The two `if` blocks test for different values of `n` (`6` and `3`),
 so at most one of them is true on any iteration,
 and each block's outcome stays the same whichever runs first.

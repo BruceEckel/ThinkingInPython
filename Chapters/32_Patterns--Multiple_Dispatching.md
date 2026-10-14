@@ -552,7 +552,7 @@ Python then tries `type(b).__radd__(b, a)`, the *reflected* form of `__add__()`.
 `NotImplemented` is a sentinel value,
 not the lookalike `NotImplementedError` exception.
 Returning `NotImplemented` tells the interpreter to try the other operand's reflected method next.
-The first call dispatches on `a`'s type, the fallback on `b`'s.
+The first call dispatches on `a`'s type, the fallback on `b`'s type.
 That is double dispatching, built into the language.
 The fallback is how a type written decades after `int` can sit to the right of an `int` in a sum.
 
@@ -624,9 +624,9 @@ When both operands have the same type, Python tries `__add__()` alone,
 so `__add__()` resolves `Meters + Meters`.
 Adding two instances of a class that implements `__radd__()` alone raises a `TypeError`.
 One case reverses the order.
-When the right operand's type is a subclass of the left's and overrides the reflected method,
+When the right operand's type is a subclass of the left operand's type and overrides the reflected method,
 Python tries that reflected method first,
-so the subclass's method runs before the base's.
+so the subclass's method runs before the base class's method.
 
 Both methods declare `-> Meters` although each can return `NotImplemented`.
 That is the standard convention rather than a shortcut.

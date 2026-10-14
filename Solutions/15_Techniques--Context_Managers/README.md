@@ -65,7 +65,7 @@ with Trace("A") as t:
 
 Entering is outside-in (`A` then `C`), and exiting is inside-out (`C`
 then `A`). `C`'s whole lifetime, enter and exit, sits nested inside
-`A`'s. [Combining Context
+`A`'s lifetime. [Combining Context
 Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows the same last-in-first-out order for `tag("ul")` and
 `tag("li")` written on one `with` line. The order is the same whether
 you write the nesting as two separate `with` statements or as one

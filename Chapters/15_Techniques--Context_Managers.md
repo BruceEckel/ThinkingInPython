@@ -276,7 +276,7 @@ except ValueError as error:
 
 `KeyError('original')` never propagates to the `except`.
 `BrokenCleanup.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
-so the caller catches the cleanup's failure instead of the block's.
+so the caller catches the cleanup's `ValueError` instead of the block's `KeyError`.
 Python keeps the `KeyError` as `error.__context__`,
 the same chaining it applies when an `except` block raises an exception.
 
@@ -1156,7 +1156,7 @@ validate an item before lending it out, or give `get()` a timeout,
 so a borrower facing an empty pool gets a `queue.Empty` exception instead of waiting forever.
 
 Those refinements all guard the pool's side.
-The opposite mistake is the borrower's.
+The opposite mistake is on the borrower's side.
 `Pool` lets a borrower keep a reference after the `with` block ends,
 then use it after the pool has lent the object to another borrower.
 The pool hands out the same object again, not a copy,

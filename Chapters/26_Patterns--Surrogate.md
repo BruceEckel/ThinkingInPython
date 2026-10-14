@@ -301,7 +301,7 @@ so `len(p)` passes the check and fails at runtime.
 so the lookup on `type(p)` finds `object`'s version.
 `w` prints as `spam eggs` and the proxy prints as `<proxy_getattr.Proxy object at ...>`.
 Whenever `object` defines the dunder,
-Python calls `object`'s version instead of the implementation's.
+Python calls `object`'s version instead of the implementation's version.
 A proxy that must forward special methods therefore defines each one in its class body.
 
 ### Forwarding Writes
@@ -379,7 +379,8 @@ so storing a double-underscore name through `object.__setattr__()` means writing
 `"_WriteProxy__implementation"`, by hand.
 The single underscore keeps the name as written.
 If the implementation has an `_implementation` of its own,
-`p._implementation` finds the proxy's, which hides the implementation's.
+`p._implementation` finds the proxy's attribute,
+which hides the implementation's attribute.
 
 ### The Recursion Trap
 

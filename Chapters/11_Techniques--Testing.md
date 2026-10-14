@@ -547,7 +547,7 @@ and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
 The rewritten name is a real attribute like any other,
 so `v._Vault__pin` reads it.
 
-Mangling exists to keep a base class's private-looking names apart from a subclass's,
+Mangling exists to keep a base class's private-looking names apart from a subclass's names,
 not to hide the attribute.
 In Python the distinction between white-box and black-box remains one of discipline,
 not of compiler enforcement.

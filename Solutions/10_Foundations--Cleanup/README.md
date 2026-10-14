@@ -426,7 +426,7 @@ after the book's output checker has finished capturing.
 
 `B closed` now prints after `End of program`,
 where the chapter's version prints it at the `del b`.
-The rest of the output matches the chapter's, so the mistake is hard to see.
+The rest of the output matches the chapter's output, so the mistake is hard to see.
 The callback still runs, at a different time and for a different reason.
 
 **Register the cleanup callback.** The callback keeps the `Connection` alive. `self.close`

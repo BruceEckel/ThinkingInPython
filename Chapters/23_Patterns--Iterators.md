@@ -201,7 +201,7 @@ Iterating over a generator keeps one value alive at a time,
 while collecting the same million values into a list keeps all of them alive at once.
 In [Performance](18_Techniques--Performance.md#lazy-evaluation-with-generators),
 `lazy_pipeline.py` measures the difference with `tracemalloc`.
-The generator pipeline's peak stays under one percent of the list version's.
+The generator pipeline's peak stays under one percent of the list version's peak.
 
 A [generator expression](16_Techniques--Comprehensions.md#generator-expressions)
 such as `(i * i for i in range(n))` is the one-line form of a generator,

@@ -137,7 +137,7 @@ so the outer `e` keeps its value.
 A `for` loop behaves the opposite way.
 Its loop variable remains bound in the enclosing scope after the loop ends.
 
-The scope works like a function's, and that matters in a class body.
+The scope works like a function scope, and that matters in a class body.
 Python skips the class body when it looks up a name from a scope nested inside the class,
 so a comprehension there cannot read the class's other attributes.
 With `base = 3` in the class body,

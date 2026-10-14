@@ -309,7 +309,7 @@ asyncio.run(main())
 #: 9 (5, 1) (7, 3)
 ```
 
-**Reuse the chapter's classes.** The classes are the chapter's, with six parts removed:
+**Reuse the chapter's classes.** The classes come from the chapter, with six parts removed:
 rat numbers, logging, the task list, `render()`, the
 `Board` `Protocol`, and the file loader.
 The removals leave the exploration logic as the chapter wrote it. `claim()` keeps the
@@ -1355,7 +1355,7 @@ correct, but the run needs more steps to finish,
 more than anyone wants to watch.
 
 `kick=0.5` fails differently, and its agitation readings look like a
-successful run's. Agitation falls to `0.00` as convincingly as it does at
+successful run's readings. Agitation falls to `0.00` as convincingly as it does at
 the default kick, and the figure does not appear.
 One kick moves a grain up to half the plate,
 or the full width where the amplitude peaks at 2,

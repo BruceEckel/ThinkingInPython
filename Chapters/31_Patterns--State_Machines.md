@@ -780,7 +780,7 @@ In the one-table design,
 an action the machine needs at startup is a call you make before the first input.
 
 The deciding question is which you would rather read: one state's transitions,
-gathered in that state's function, or the whole machine's,
+gathered in that state's function, or the whole machine's transitions,
 gathered in one table.
 A machine with a few states works in either,
 and a machine you drew as a diagram first belongs in the table.

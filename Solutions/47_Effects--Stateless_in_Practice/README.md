@@ -1711,10 +1711,10 @@ runs, because `handle()` reads `get_type_hints()` on the handler to learn which
 Ability the handler answers.
 
 The two annotations therefore do different jobs.
-The accessor's is for the type checker, and the handler's is data the library
+The accessor's annotation serves the type checker, and the handler's annotation is data the library
 reads at runtime.
-Only the accessor's is optional,
-though the handler's is the one that looks like bookkeeping.
+The accessor's annotation is the optional one,
+though the handler's annotation looks more like bookkeeping.
 
 </details>
 </details>

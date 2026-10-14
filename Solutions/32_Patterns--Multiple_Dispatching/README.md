@@ -802,7 +802,7 @@ Python's message naming the pair of types that has no defined subtraction.
 [One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) shows `exact_match.py`, where the key uses `type()`.
 A dictionary probe compares keys by equality, so a subclass finds no row.
 Every class has an `__mro__` tuple that lists it and then its bases in lookup order.
-Loop over one operand's `__mro__`, and inside that loop over the other's.
+Loop over one operand's `__mro__`, and inside that loop over the other operand's `__mro__`.
 Skip classes that are not an `Item` (such as `object`), and return the first pair that has a row in `OUTCOME`.
 
 <details>
@@ -1473,7 +1473,7 @@ if __name__ == "__main__":
 **Declare the first dispatch on the base.**
 `Weapon` declares `compete()` so that `battle()` can call it on the `Weapon` that `get_weapon()` returns.
 The `eval_*()` methods live in the subclasses alone,
-and their `item` parameters take `Any`, as the chapter's do.
+and their `item` parameters take `Any`, as the chapter's `item` parameters do.
 
 **Answer for the original caller.**
 As in `paper_scissors_rock.py`,

@@ -2268,7 +2268,7 @@ The missing `race` rules out the hedging strategy that races a delayed second re
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.
 Two forked Effects that share the `Cell` of [State as an Ability](#state-as-an-ability)
 race on it, and no type reports the race.
-Shared state between forked Effects is your problem and Python's.
+The library leaves shared state between forked Effects to you and to Python.
 Above that sit the resilience patterns a production system eventually needs
 (rate limiting, bulkheads, and circuit breakers), none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,

@@ -29,7 +29,7 @@ def function5():
 <details>
 <summary>Solution</summary>
 
-The package's `__init__.py` is the chapter's:
+The package's `__init__.py` is the one from the chapter:
 
 ```python
 # a_package/__init__.py
@@ -367,7 +367,7 @@ the one package Python does find on that path.
 
 `python -m a_package.module4` works with either form and fixes both
 problems at once. `-m` sets `sys.path[0]` to the current directory
-rather than the script's, so Python finds `a_package`. `-m` also imports
+rather than the script's directory, so Python finds `a_package`. `-m` also imports
 the module as a member of its package rather than running the file
 by its path, so `__package__` holds `a_package` and the dot resolves.
 

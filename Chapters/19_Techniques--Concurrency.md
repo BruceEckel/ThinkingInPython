@@ -1756,7 +1756,7 @@ Arguments and results cross that boundary by copying.
 Because a subinterpreter needs no separate build and no separate install,
 it is the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
-The one compatibility check mirrors free threading's.
+The one compatibility check mirrors the check for free threading.
 Pure Python always works,
 but a C extension must support per-interpreter isolation before a subinterpreter can import it.
 

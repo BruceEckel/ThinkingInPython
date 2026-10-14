@@ -240,7 +240,7 @@ print(Err("boom").map_error(prefix))
 ```
 
 This exercise changes `Ok` and `Err`,
-so the listing defines its own pair instead of importing the chapter's.
+so the listing defines its own pair instead of importing the chapter's pair.
 
 `map_error()` works on the side `bind()` skips. `bind()` passes a success to the next step and
 leaves a failure alone, while `map_error()` transforms the failure and

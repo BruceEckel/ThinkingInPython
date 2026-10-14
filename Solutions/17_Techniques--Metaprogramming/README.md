@@ -250,7 +250,7 @@ print(c1 is a)
 #: False
 ```
 
-**Type the result as the calling class.** The `__call__[T]` signature is the chapter's, and this solution keeps it
+**Type the result as the calling class.** The `__call__[T]` signature is the one from the chapter, and this solution keeps it
 rather than simplifying to `-> Any`. The signature declares the return type as
 the class `cls` names, so `CSingleton()` type-checks as a `CSingleton`.
 The type checker then catches a misspelled attribute on the result.

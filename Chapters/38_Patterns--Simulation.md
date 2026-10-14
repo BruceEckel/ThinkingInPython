@@ -728,7 +728,7 @@ Doors that lead nowhere point at one shared `EDGE` room,
 the void outside the maze,
 so the robot can try any direction without a special case.
 `EDGE` is a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object).
-`Robot.move()` calls `EDGE.enter()` as it does any other room's.
+`Robot.move()` calls `EDGE.enter()` as it calls any other room's `enter()`.
 The occupant of `EDGE` is a `Wall`, whose `interact()` returns `robot.room`,
 so the robot stays where it was.
 
@@ -1209,7 +1209,7 @@ A `Grain` is a position.
 `step()` contains all of the simulation's logic.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
-Each grain stores its own position and reads no other grain's.
+Each grain stores its own position and reads no other grain's position.
 
 ```python
 # chladni_plate/chladni.py
@@ -1448,7 +1448,7 @@ The nodal lines keep thinning as long as `step()` keeps running,
 so in any one run the step count, not the plate, sets their width.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
 Exercise 7 asks you to tell the physics from the rule that models it.
-If you swap `amplitude()`'s formula for a membrane's,
+If you swap `amplitude()`'s formula for a membrane's formula,
 every figure changes while the rest of the program stays the same.
 
 When behavior emerges, reading the code is not enough.

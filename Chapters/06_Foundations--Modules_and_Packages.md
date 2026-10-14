@@ -529,7 +529,7 @@ Prefer a single run-together word when you can.
 **Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`).
 This book uses `test_*.py`, e.g. `test_result.py`.
 
-Give your modules names that differ from the standard library's.
+Give your modules names that no standard library module uses.
 A file named `random.py`, `string.py`,
 or `weakref.py` can shadow the stdlib one and break imports,
 because Python [searches the script's directory before the standard library](#pythonpath).
@@ -647,7 +647,7 @@ print("noisy" in sys.lazy_modules)
 ```
 
 This script marks one import lazy, yet the set holds more than one name.
-`sys.lazy_modules` mixes the standard library's deferred imports with your program's.
+`sys.lazy_modules` mixes the standard library's deferred imports with your program's deferred imports.
 `noisy` leaves the set once `announce()` loads it,
 so the set tracks names still waiting, not names your program ever deferred.
 Check it for a specific name you marked lazy.

@@ -721,7 +721,7 @@ If `bump()` declares `-> Tally`, the type checker rejects `report()`,
 because `Tally` has no such method.
 Alternative constructors benefit the same way.
 A `@classmethod` that ends with `return cls(...)` declares `-> Self`,
-so a call on a subclass has the subclass's type, not the base's.
+so a call on a subclass has the subclass's type, not the base's type.
 
 ## Typing `**kwargs` with a `TypedDict` {#typed-kwargs}
 

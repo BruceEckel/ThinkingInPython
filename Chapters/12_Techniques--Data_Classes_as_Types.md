@@ -965,7 +965,7 @@ A member passes wherever the mix-in type is expected,
 and carries its name with it.
 
 `StrEnum` is `str` mixed in by the standard library, with one addition:
-its `__str__()` is the string's,
+its `__str__()` is `str.__str__()`,
 so an f-string shows `info` rather than `Level.INFO`,
 and a member answers every `str` method.
 A class written as `(str, Enum)` by hand keeps `Enum`'s `__str__()` and prints `Level.INFO`;

@@ -250,7 +250,8 @@ The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
 The type checker reports a misread `Result`,
 and noticing an ignored one is up to you.
-The listing shows each limit once, the caller's and the author's:
+The listing shows each limit once,
+one on the author's side and one on the caller's side:
 
 ```python
 # totality_gap.py
@@ -445,7 +446,7 @@ Exercise 2's `map_error()` is the same idea applied to the error side.
 
 A second mistake: mixing error types.
 `Result[A, E]` names one error type for the whole chain.
-If one step's `Err` carries a type different from an earlier step's,
+If one step's `Err` carries a type different from an earlier step's `Err`,
 the chain returns a union of both types,
 and that union is wider than the annotation you wrote.
 Keep a chain's error type the same at every step,

@@ -872,7 +872,7 @@ so a real game adds a place to vary them: a subclass overriding `play()`,
 or a rules object passed alongside the factory.
 
 `interact_with()` dispatches on the character's type,
-and `obstacle.description()` dispatches again on the obstacle's.
+and `obstacle.description()` dispatches again on the obstacle's type.
 Thus, the pair of calls chooses behavior from both types.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.

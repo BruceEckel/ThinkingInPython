@@ -236,7 +236,7 @@ each named for what its patterns do:
     *State* appears beside *Proxy*, and *Interpreter* beside *Composite*,
     for the reason that closes this section.
 
-The catalog above is GoF's.
+The catalog above comes from GoF.
 Patterns from outside it,
 like the [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object),
 appear in the [Pattern Catalog](39_Patterns--Pattern_Catalog.md).
@@ -439,7 +439,7 @@ With an abstract base class, two edges exist in source:
 the caller names `Shape`, and `Circle` names `Shape` in its `class` line.
 With a `Protocol`, one edge exists in source.
 `Circle` does not mention `Shape`.
-The type checker connects the two when it compares `Circle`'s members with the protocol's,
+The type checker connects the two when it compares `Circle`'s members with the protocol's members,
 and the figure draws that connection as a dotted edge.
 A dotted edge exists only at check time,
 and neither of its ends names the other.

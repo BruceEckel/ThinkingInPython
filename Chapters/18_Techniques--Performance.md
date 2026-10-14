@@ -485,7 +485,7 @@ With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
 The advice under [Numbers on Your Machine](#numbers-on-your-machine)
 applies to CPython's own developers too.]
 
-The JIT in the next section adds its speedup to the tail-calling interpreter's.
+The JIT in the next section adds its speedup to the tail-calling interpreter's speedup.
 The JIT compiles the hot paths,
 and the tail-calling interpreter runs everything else faster.
 The macOS figure in that section uses a tail-calling build as its baseline.
@@ -554,7 +554,7 @@ The documentation warns against branching on its result,
 since a tracing compiler can give different answers to the same call.
 
 The speedup is again a percentage,
-and a smaller one than the tail-calling interpreter's on Windows.
+and on Windows it is smaller than the tail-calling interpreter's speedup.
 On the `pyperformance` suite,
 3.15 measures 7-8% faster on x86-64 Linux against the standard optimized build,
 and 11-12% faster on AArch64 macOS against the tail-calling interpreter.
@@ -1282,7 +1282,7 @@ A class whose base declares no `__slots__` writes `@record(slots=False)`.
 The base gives every instance its `__dict__` back,
 so slots on the subclass would remove nothing.
 The flag states that at the class.
-That form is for a base someone else owns, such as a library's,
+That form is for a base someone else owns, such as a library class,
 and for the rare class whose code reads the instance dict on purpose.
 When the base is yours,
 an empty `__slots__ = ()` on it keeps the records under it slotted,
@@ -1588,7 +1588,7 @@ The explicit call keeps the original `count_primes()` as the Python baseline.
 `njit()` returns `fast_count_primes`,
 and Numba compiles that function at its first call.
 The `assert` makes that first call on a small input, before the timing starts.
-That call compiles `fast_count_primes()` and checks its answer against the Python version's,
+That call compiles `fast_count_primes()` and checks its answer against the Python version's answer,
 so the timed calls measure steady-state speed.
 
 On numeric code over simple types and NumPy arrays,

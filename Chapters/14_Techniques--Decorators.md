@@ -182,10 +182,10 @@ if __name__ == "__main__":
 It copies the attributes named in the tuple `functools.WRAPPER_ASSIGNMENTS`:
 `__module__`, `__name__`, `__qualname__`, `__doc__`, `__annotate__`,
 and `__type_params__`.
-It also merges the original's `__dict__` into the wrapper's.
+It also merges the original's `__dict__` into the wrapper's `__dict__`.
 Without `wraps`, the decorated `add` reports its name as `wrapper` and loses its docstring,
 so debuggers, `help()`,
-and documentation tools show the wrapper's metadata instead of the function's.
+and documentation tools show the wrapper's metadata instead of the function's metadata.
 `wraps` is optional, and nearly every wrapper should use it.
 
 `tracer.py` relies on that copy.
@@ -449,7 +449,7 @@ given a function, `label` returns a function of the same signature;
 given keyword arguments alone, it returns a decorator.
 The second overload gives that decorator the type `Decorator[P, R]`,
 a generic alias for the shape `repeat.py` takes apart,
-whose parameters are the wrapped function's.
+whose parameters come from the wrapped function.
 The implementation must satisfy both overloads,
 so it declares the widest return type, `Any`,
 and the overloads narrow that back down at every call site.

@@ -299,7 +299,7 @@ print([mood.name for mood in Mood])
 
 **Each mood is one row.** `Mood.HAPPY` holds its greeting and `happy()`, the function that names its successors, so reading the member tells you what the mood says and where it can go.
 `PROZAC` needs no function of its own: its transition is a lambda that answers every input with `Mood.PROZAC`.
-The engine is the chapter's, and the trace prints the inputs as the `StrEnum`'s words.
+The engine is the chapter's `StateMachine`, and the trace prints the inputs as the `StrEnum`'s words.
 
 **Let each mood pick its successor.** `happy()` answers `ANNOY` with `GRUMPY`, `grumpy()` answers `CALM` with `HAPPY`, and both answer `TAKE_PILL` with `PROZAC`, which stays put for everything after.
 The moods alone hold the transition rules, which distinguishes this design from the chapter's table-driven one, where the rules live in a dictionary a reader can audit in one place.

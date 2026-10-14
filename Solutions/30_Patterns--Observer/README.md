@@ -1516,7 +1516,7 @@ class Thermometer:
 <details>
 <summary>Solution</summary>
 
-If `__get__()` always returns the stored value, as a validating descriptor's does,
+If `__get__()` always returns the stored value, as a validating descriptor's `__get__()` does,
 `Thermometer.celsius` runs `getattr(None, "_celsius")`
 and raises an `AttributeError` before the call to `connect()`.
 The type checker passes that version, since the overloads still declare that class access returns the descriptor.

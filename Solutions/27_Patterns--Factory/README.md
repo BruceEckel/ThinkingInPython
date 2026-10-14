@@ -1269,7 +1269,7 @@ and `names()` requires that type.
 
 **Choose from the full list.** `random.choice()` takes a
 sequence, so `shape_name()` materializes the generator with `list()`.
-With the same seed the sequence differs from the chapter's, because
+With the same seed the sequence differs from the chapter's sequence, because
 `choice()` now picks from three classes instead of two.
 
 `Circle` stays in the list, because recursion adds the deeper classes and keeps the
@@ -1411,7 +1411,7 @@ The error names the key rather than the class or the missing line.
 test. Calling `unregistered(globals())` at the end of the module, or
 from a test, prints the name of each class the registry lacks.
 
-The runtime test is weaker than the checker's. `issubclass()` checks
+The runtime test is weaker than the type checker's test. `issubclass()` checks
 for an attribute named `draw` and ignores its signature, so a
 class whose `draw()` takes an extra parameter passes here.
 The type checker rejects that class at `@make.register`.

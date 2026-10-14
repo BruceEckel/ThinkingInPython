@@ -670,7 +670,7 @@ ZIO allows the same mistake for the same reason.
 An Effect written as a bare statement is a discarded value there too.
 In ZIO Direct the fix is `.run`,
 and in a `for` comprehension it is the `<-` binding.
-Python's is `yield from`.
+In Python it is `yield from`.
 Deferred execution causes the hazard, not generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
@@ -1275,7 +1275,7 @@ neither `report()` nor anything that calls it needs `async`.
 
 You need `wait()` at the point where an Effect requests a coroutine's result.
 A function that already returns an Effect needs no `wait()`,
-because `yield from` composes the returned Effect into the caller's.
+because `yield from` composes the returned Effect into the caller's Effect.
 `stateless.time.sleep()` is such a function,
 and it pairs an `Async` request with a dependency.
 Here, `delayed_sum()` composes `sleep()` with a bare `yield from`:

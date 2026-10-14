@@ -199,7 +199,7 @@ print(f"lazy peak under 1% of one list: "
 **Build one list.** `one_list()` filters `x * x` instead
 of first building a `squares` list and then an `evens` list from it,
 so the million-element `squares` list disappears.
-Peak memory drops to about half of the two-list version's.
+Peak memory drops to about half of the two-list version's peak.
 That is as close as an eager version gets.
 
 **Measure the remaining gap.** The last line shows that the lazy peak is under one percent of the one-list peak.

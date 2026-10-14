@@ -2,7 +2,7 @@
 
 Each listing below is self-contained.
 It redeclares the `Console` and `greet()` it needs instead of importing
-the chapter's, so a solution keeps working when a chapter listing changes.
+them from the chapter, so a solution keeps working when a chapter listing changes.
 
 ## 1. A `Console` that reads as well as prints
 

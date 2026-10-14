@@ -109,7 +109,7 @@ The two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real
 belong to the class, so they stay out of `__init__()`.
 
 Each subclass's `value` line creates a class attribute of its own,
-separate from `Trash.value` and from its siblings'.
+separate from `Trash.value` and from its siblings' `value` attributes.
 Each subclass restates `ClassVar[float]`,
 a restatement the type checker does not require.
 The checker [applies the base's declaration to an override](09_Foundations--Class_Attributes.md#classvar-and-inheritance),
@@ -388,7 +388,7 @@ That dispatch first appeared in an [event bus keyed by type](28_Patterns--Functi
 
 The key is the *exact* class.
 If you derive `CrushedAluminum` from `Aluminum`,
-a `CrushedAluminum` sorts into its own bin rather than its parent's.
+a `CrushedAluminum` sorts into its own bin rather than its parent's bin.
 A bin per exact class is usually what a sorter needs,
 but keep that key in mind before you subclass a material.
 Subclasses are another place where `sort_by_match()` and `sort_by_type()` differ.
@@ -511,7 +511,7 @@ Its `hazard()` supplies the default answer that `Cardboard` inherits.
 The base's `hazard()` also lets the type checker accept `piece.hazard()` on a piece typed as `Trash`,
 such as one from `parse()`.
 So one new operation is three edits: the base,
-plus each material whose answer differs from the base's.
+plus each material whose answer differs from the base's answer.
 The next operation edits the base again,
 along with each material whose answer to it differs.
 

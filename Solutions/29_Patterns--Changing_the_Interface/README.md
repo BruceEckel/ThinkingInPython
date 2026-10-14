@@ -327,14 +327,14 @@ Check whether the wrapper changes the interface, adds behavior to each call, or 
 <summary>Solution</summary>
 
 **The logging wrapper is a *Decorator*.** Its interface is the wrapped
-object's, unchanged, and it adds behavior around each call it forwards. If you
+object's interface, unchanged, and it adds behavior around each call it forwards. If you
 remove it, every call still reaches the same method with the same
 arguments and returns the same result. What you lose is the log. That
 is the *Decorator* row: same interface, added behavior, and the
 behavior disappears.
 
 **The `read()` wrapper is an *Adapter*.** Its interface differs from
-the wrapped object's. The caller asks for `read()`, and the wrapped object
+the wrapped object's interface. The caller asks for `read()`, and the wrapped object
 offers `next_chunk()` instead.
 The wrapper exists to translate the caller's `read()` into a `next_chunk()` call.
 If you remove it, you lose that translation.
@@ -347,7 +347,7 @@ from the *Decorator*. Both wrappers forward, and only the *Adapter*
 changes the name the caller uses.
 
 **The flag-checking wrapper is a *Proxy*.** Its interface is the
-wrapped object's, and it adds no behavior to a call that goes through.
+wrapped object's interface, and it adds no behavior to a call that goes through.
 What it adds is a decision about whether the call proceeds. If you
 remove it, every call reaches the implementation, including the ones
 the proxy refuses.
