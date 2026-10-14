@@ -1,9 +1,15 @@
 # thermometer_demo.py
 from thermometer import Thermometer
 
+def display(celsius: float) -> None:
+    print(f"display: {celsius}C")
+
+def alarm(celsius: float) -> None:
+    print(f"alarm: {celsius > 100}")
+
 t = Thermometer(20.0)
-t.connect(lambda c: print(f"display: {c}C"))
-t.connect(lambda c: print(f"alarm: {c > 100}"))
+t.connect(display)
+t.connect(alarm)
 t.celsius = 25
 #: display: 25C
 #: alarm: False

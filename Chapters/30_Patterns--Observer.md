@@ -361,9 +361,15 @@ Connected callables react to every `celsius` assignment:
 # thermometer_demo.py
 from thermometer import Thermometer
 
+def display(celsius: float) -> None:
+    print(f"display: {celsius}C")
+
+def alarm(celsius: float) -> None:
+    print(f"alarm: {celsius > 100}")
+
 t = Thermometer(20.0)
-t.connect(lambda c: print(f"display: {c}C"))
-t.connect(lambda c: print(f"alarm: {c > 100}"))
+t.connect(display)
+t.connect(alarm)
 t.celsius = 25
 #: display: 25C
 #: alarm: False
@@ -372,13 +378,12 @@ t.celsius = 150
 #: alarm: True
 ```
 
-The responders here are lambdas, but any function or bound method works.
+The responders here are functions, but a lambda or a bound method works too.
 `Thermometer` is a `Broadcaster[float]`,
 so the type of each responder in its list is `Responder[float]`,
 a `Callable[[float], None]`.
 
-This figure shows one notification,
-naming the two lambdas `display` and `alarm`:
+This figure shows one notification:
 
 ![](_images/observer_story)
 
@@ -965,12 +970,10 @@ not from this property.
 
 ```python
 # broadcasting.py
-from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import dataclass_transform
+from broadcaster import Responder
 from published import published
-
-type Responder[T] = Callable[[T], None]
 
 @dataclass_transform(eq_default=False)
 class Broadcasting[T]:

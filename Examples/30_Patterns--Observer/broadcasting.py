@@ -1,10 +1,8 @@
 # broadcasting.py
-from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import dataclass_transform
+from broadcaster import Responder
 from published import published
-
-type Responder[T] = Callable[[T], None]
 
 @dataclass_transform(eq_default=False)
 class Broadcasting[T]:

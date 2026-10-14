@@ -6,7 +6,7 @@ none replies, and a new responder connects with no edit to
 `Thermometer`. The shaded region on the right is what `Thermometer`
 cannot see; its list holds only callables. The names are the ones in
 `thermometer_demo.py` and `broadcaster.py` (`display` and `alarm` are
-that demo's two lambdas; `plot` is dashed because no listing has it).
+that demo's two functions; `plot` is dashed because no listing has it).
 """
 
 from tools.story_figures import (
