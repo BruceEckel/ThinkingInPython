@@ -390,6 +390,55 @@ writes `{"r": 1, "g": 2, "b": 3}`.
 The `TypeError` is the safer failure of the two,
 because the array version drops the names silently.
 
+## Subclassing `tuple` Directly
+
+`NamedTuple` generates a `tuple` subclass for you,
+and you can write one by hand when you need the tuple protocol together with your own construction or methods.
+A tuple takes its contents at creation,
+so `__init__()` runs too late to choose them.
+The subclass overrides `__new__()` instead and hands the items to `tuple.__new__()`:
+
+```python
+# point_tuple.py
+from typing import Self
+
+class Point(tuple[float, float]):
+    __slots__ = ()
+
+    def __new__(cls, x: float, y: float) -> Self:
+        return super().__new__(cls, (x, y))
+
+    @property
+    def x(self) -> float:
+        return self[0]
+
+    @property
+    def y(self) -> float:
+        return self[1]
+
+p = Point(1.0, 2.0)
+print(p, p.x, p.y)
+#: (1.0, 2.0) 1.0 2.0
+print(isinstance(p, tuple), p == (1.0, 2.0))
+#: True True
+print(type(p + (3.0,)).__name__, type(p[:1]).__name__)
+#: tuple tuple
+print(hasattr(p, "__dict__"))
+#: False
+```
+
+`Point(1.0, 2.0)` builds a tuple of two floats,
+and the properties read the two positions by name.
+Indexing, slicing, unpacking, hashing, and equality all come from `tuple`,
+so a `Point` works anywhere code expects a tuple,
+and it equals the bare `(1.0, 2.0)`,
+the same structural equality that `still_a_tuple.py` shows.
+Tuple operations return plain tuples: `p + (3.0,)` and `p[:1]` are `tuple`s,
+not `Point`s, so a subclass that must survive those operations overrides the operators.
+The empty `__slots__ = ()` keeps a `Point` as small as a tuple.
+A subclass that declares no `__slots__` gives each instance a `__dict__`,
+and with it the ability to grow attributes beyond the ones the class declares.
+
 ## Which Should You Use?
 
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
@@ -403,6 +452,8 @@ Between it and a `NamedTuple`,
 the deciding question is whether tuple behavior is a feature.
 Choose `NamedTuple` when it is: unpacking, multiple return values,
 compatibility with code that expects a tuple.
+Subclass `tuple` yourself, as `point_tuple.py` does,
+when that tuple behavior must come with your own construction or methods.
 Choose a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability)
 when the value should be a distinct type that equals instances of its own class alone.
 Choose the frozen data class too when inherited ordering and array-shaped JSON are wrong rather than convenient,
