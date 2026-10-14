@@ -22,8 +22,3 @@ class Capture:
 
     def tell(self, message: str) -> None:
         self.messages.append(message)
-
-captured = Capture()
-greet(Scripted(), captured)
-print(captured.messages)
-#: ['Hello, Alice!']

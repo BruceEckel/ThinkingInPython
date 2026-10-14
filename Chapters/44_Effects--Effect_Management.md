@@ -526,6 +526,17 @@ class Capture:
 
     def tell(self, message: str) -> None:
         self.messages.append(message)
+```
+
+`greet()` performs an `Ask` Effect and a `Tell` Effect,
+and its signature says so, because the parameters are the Effects.
+The bindings come later.
+`greet_demo.py` binds them to test stand-ins, `Scripted` and `Capture`,
+and checks the greeting with no console in sight:
+
+```python
+# greet_demo.py
+from ask_tell import Capture, Scripted, greet
 
 captured = Capture()
 greet(Scripted(), captured)
@@ -533,11 +544,6 @@ print(captured.messages)
 #: ['Hello, Alice!']
 ```
 
-`greet()` performs an `Ask` Effect and a `Tell` Effect,
-and its signature says so, because the parameters are the Effects.
-The bindings come later.
-The demo binds them to test stand-ins, `Scripted` and `Capture`,
-and checks the greeting with no console in sight.
 A production caller passes objects that read with `input()` and write with `print()`,
 and `greet()` stays the same.
 Delayed binding by hand explains why "pass in your dependencies" is such durable advice.
@@ -551,18 +557,7 @@ Parameters accumulate at every level of the call stack:
 
 ```python
 # bookkeeping_scales.py
-from dataclasses import dataclass, field
-from typing import Protocol
-
-class Ask(Protocol):
-    def ask(self, prompt: str) -> str: ...
-
-class Tell(Protocol):
-    def tell(self, message: str) -> None: ...
-
-def greet(ask: Ask, tell: Tell) -> None:
-    name = ask.ask("What is your name? ")
-    tell.tell(f"Hello, {name}!")
+from ask_tell import Ask, Capture, Scripted, Tell, greet
 
 def session(ask: Ask, tell: Tell) -> None:
     greet(ask, tell)
@@ -572,17 +567,6 @@ def menu(ask: Ask, tell: Tell) -> None:
 
 def main(ask: Ask, tell: Tell) -> None:
     menu(ask, tell)
-
-class Scripted:
-    def ask(self, prompt: str) -> str:
-        return "Alice"
-
-@dataclass
-class Capture:
-    messages: list[str] = field(default_factory=list)
-
-    def tell(self, message: str) -> None:
-        self.messages.append(message)
 
 captured = Capture()
 main(Scripted(), captured)
