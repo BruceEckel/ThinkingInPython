@@ -1,18 +1,10 @@
 # near_miss.py
 from difflib import get_close_matches
-from typing import final, override
+from typing import override
 from exceptions import expected
+from framework import ApplicationFramework
 
-class ApplicationFramework:
-    @final
-    def run(self) -> None:
-        for _ in range(2):
-            self.customize1()
-            self.customize2()
-
-    def customize1(self) -> None: ...
-    def customize2(self) -> None: ...
-
+class CheckedFramework(ApplicationFramework):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         inherited = {
@@ -38,7 +30,7 @@ class ApplicationFramework:
                     f"did you mean {near[0]}?"
                 )
 
-class MyApp(ApplicationFramework):
+class MyApp(CheckedFramework):
     @override
     def customize1(self) -> None:
         print("one")
@@ -46,18 +38,18 @@ class MyApp(ApplicationFramework):
     def report(self) -> None: ...
 
 with expected(TypeError):
-    class Typo(ApplicationFramework):
+    class Typo(CheckedFramework):
         def customise1(self) -> None:
             print("never runs")
 #: [TypeError] Typo.customise1: did you mean customize1?
 
 with expected(TypeError):
-    class Hijack(ApplicationFramework):
+    class Hijack(CheckedFramework):
         def run(self) -> None:  # type: ignore
             print("never runs")
 #: [TypeError] Hijack.run overrides a @final method
 
 with expected(TypeError):
-    class Weird(ApplicationFramework):
+    class Weird(CheckedFramework):
         def customer(self) -> None: ...
 #: [TypeError] Weird.customer: did you mean customize2?

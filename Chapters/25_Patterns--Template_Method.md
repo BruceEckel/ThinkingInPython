@@ -137,25 +137,18 @@ If you leave `@override` off the misspelled method,
 the checker accepts it as a new method,
 because the typing rules let a subclass add any method.
 A runtime check can reject the misspelled method.
-The base class's `__init_subclass__()` runs at each subclass's `class` statement,
+In `near_miss.py`, `CheckedFramework` inherits from `ApplicationFramework` and adds that check.
+Its `__init_subclass__()` runs at each subclass's `class` statement,
 and it can use the standard library's `difflib` to find names that nearly match:
 
 ```python
 # near_miss.py
 from difflib import get_close_matches
-from typing import final, override
+from typing import override
 from exceptions import expected
+from framework import ApplicationFramework
 
-class ApplicationFramework:
-    @final
-    def run(self) -> None:
-        for _ in range(2):
-            self.customize1()
-            self.customize2()
-
-    def customize1(self) -> None: ...
-    def customize2(self) -> None: ...
-
+class CheckedFramework(ApplicationFramework):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         inherited = {
@@ -181,7 +174,7 @@ class ApplicationFramework:
                     f"did you mean {near[0]}?"
                 )
 
-class MyApp(ApplicationFramework):
+class MyApp(CheckedFramework):
     @override
     def customize1(self) -> None:
         print("one")
@@ -189,25 +182,26 @@ class MyApp(ApplicationFramework):
     def report(self) -> None: ...
 
 with expected(TypeError):
-    class Typo(ApplicationFramework):
+    class Typo(CheckedFramework):
         def customise1(self) -> None:
             print("never runs")
 #: [TypeError] Typo.customise1: did you mean customize1?
 
 with expected(TypeError):
-    class Hijack(ApplicationFramework):
+    class Hijack(CheckedFramework):
         def run(self) -> None:  # type: ignore
             print("never runs")
 #: [TypeError] Hijack.run overrides a @final method
 
 with expected(TypeError):
-    class Weird(ApplicationFramework):
+    class Weird(CheckedFramework):
         def customer(self) -> None: ...
 #: [TypeError] Weird.customer: did you mean customize2?
 ```
 
-`inherited` collects every non-dunder name the base classes define,
-including `run`.
+`inherited` collects every non-dunder name the base classes define.
+For `MyApp` those bases are `CheckedFramework`, which adds no such name,
+and `ApplicationFramework`, which supplies `run` and the two steps.
 For each name the subclass defines,
 `getattr(super(cls, cls), name, None)` finds the attribute that the name replaces,
 searching the classes that follow `cls` in its [method resolution order](07_Foundations--Classes.md#method-resolution-order).

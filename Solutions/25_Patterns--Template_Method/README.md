@@ -684,10 +684,11 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
+class CheckedFramework(ApplicationFramework):
     def __init_subclass__(cls) -> None:
         ...
 
-class MyApp(ApplicationFramework):
+class MyApp(CheckedFramework):
     @override
     def customize1(self) -> None:
         ...
@@ -709,10 +710,11 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
+class CheckedFramework(ApplicationFramework):
     def __init_subclass__(cls) -> None:
         ...
 
-class MyApp(ApplicationFramework):
+class MyApp(CheckedFramework):
     @override
     def customize1(self) -> None:
         ...
@@ -747,6 +749,7 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
+class CheckedFramework(ApplicationFramework):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         inherited = {
@@ -772,7 +775,7 @@ class ApplicationFramework:
                     f"did you mean {near[0]}?"
                 )
 
-class MyApp(ApplicationFramework):
+class MyApp(CheckedFramework):
     @override
     def customize1(self) -> None:
         print("one")
@@ -810,6 +813,7 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
+class CheckedFramework(ApplicationFramework):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         declared = {
@@ -834,7 +838,7 @@ class ApplicationFramework:
                     f"did you mean {near[0]}?"
                 )
 
-class MyApp(ApplicationFramework):
+class MyApp(CheckedFramework):
     @override
     def customize1(self) -> None:
         print("one")
