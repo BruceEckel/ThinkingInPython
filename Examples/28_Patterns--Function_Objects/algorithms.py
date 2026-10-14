@@ -8,19 +8,6 @@ type RootFinder = Callable[[Fn, float, float], float | None]
 TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
 
-def bisection(f: Fn, a: float, b: float) -> float | None:
-    if f(a) * f(b) > 0:  # Endpoints must bracket a root
-        return None
-    for _ in range(MAX_ITER):
-        mid = (a + b) / 2
-        if abs(f(mid)) < TOLERANCE:
-            return mid
-        if f(a) * f(mid) <= 0:
-            b = mid
-        else:
-            a = mid
-    return None
-
 def bisection_tol(f: Fn, a: float, b: float,
                   tolerance: float) -> float | None:
     if f(a) * f(b) > 0:  # Endpoints must bracket a root
@@ -32,6 +19,9 @@ def bisection_tol(f: Fn, a: float, b: float,
         else:
             a = mid
     return (a + b) / 2
+
+def bisection(f: Fn, a: float, b: float) -> float | None:
+    return bisection_tol(f, a, b, TOLERANCE)
 
 def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b

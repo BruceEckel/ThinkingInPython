@@ -145,6 +145,7 @@ lines-after-imports = 1
 # hand-sorted in isort order.
 "**/test_pizza_decorator.py" = ["I001"]
 "**/chain.py" = ["I001"]
+"**/test_chain.py" = ["I001"]
 "**/strategy.py" = ["I001"]
 "**/adapter_variations.py" = ["I001"]
 "**/test_grid_observer.py" = ["I001"]

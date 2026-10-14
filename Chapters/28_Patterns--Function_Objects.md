@@ -133,12 +133,12 @@ class Account:
         self.balance += 50
         print(f"balance: {self.balance}")
 
-def alert() -> None:
+def audit() -> None:
     print("audit: checking balance")
 
 account = Account(100)
 macro: list[Command] = [
-    account.deposit, alert, account.deposit,
+    account.deposit, audit, account.deposit,
 ]
 for command in macro:
     command()
@@ -283,19 +283,6 @@ type RootFinder = Callable[[Fn, float, float], float | None]
 TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
 
-def bisection(f: Fn, a: float, b: float) -> float | None:
-    if f(a) * f(b) > 0:  # Endpoints must bracket a root
-        return None
-    for _ in range(MAX_ITER):
-        mid = (a + b) / 2
-        if abs(f(mid)) < TOLERANCE:
-            return mid
-        if f(a) * f(mid) <= 0:
-            b = mid
-        else:
-            a = mid
-    return None
-
 def bisection_tol(f: Fn, a: float, b: float,
                   tolerance: float) -> float | None:
     if f(a) * f(b) > 0:  # Endpoints must bracket a root
@@ -307,6 +294,9 @@ def bisection_tol(f: Fn, a: float, b: float,
         else:
             a = mid
     return (a + b) / 2
+
+def bisection(f: Fn, a: float, b: float) -> float | None:
+    return bisection_tol(f, a, b, TOLERANCE)
 
 def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b
@@ -388,10 +378,11 @@ use a [*closure*](40_Functional--Foundations.md#closures).
 An outer function takes the settings and returns the strategy,
 and those settings stay available to the strategy after the outer function returns.
 
-`algorithms.py` also defines `bisection_tol()`,
-a bisection that stops once the bracket is narrower than `tolerance`.
+In `algorithms.py`, `bisection()` calls `bisection_tol()`,
+a bisection that stops once the bracket is narrower than `tolerance`,
+and always passes it `TOLERANCE`.
 `RootFinder` describes three parameters and `bisection_tol()` has four,
-so a closure supplies the tolerance:
+so a closure supplies a tolerance of your choosing:
 
 ```python
 # configured_strategy.py
@@ -405,17 +396,17 @@ def bisection_within(tolerance: float) -> RootFinder:
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
 
-coarse = bisection_within(0.1)
-fine = bisection_within(1e-9)
-for finder in (coarse, fine):
-    print(f"{solve(f, 0.0, 2.0, finder):.6f}")
-#: 1.406250
-#: 1.414214
+for tolerance in (0.1, 1e-9):
+    finder = bisection_within(tolerance)
+    root = solve(f, 0.0, 2.0, finder)
+    print(f"tolerance {tolerance}: {root:.6f}")
+#: tolerance 0.1: 1.406250
+#: tolerance 1e-09: 1.414214
 ```
 
 Each call to `bisection_within()` returns a new finder whose closure holds that call's tolerance.
-The coarse strategy stops within a tenth and reports 1.406250.
-The fine one agrees with the true root to six places.
+The finder built with `0.1` stops within a tenth and reports 1.406250.
+The finder built with `1e-9` agrees with the true root to six places.
 Because both satisfy `RootFinder`, `solve()` accepts either unchanged.
 So does `first_root()`, which the next section defines in `chain.py`.
 
@@ -432,12 +423,12 @@ from algorithms import bisection_tol, solve
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
 
-coarse = partial(bisection_tol, tolerance=0.1)
-fine = partial(bisection_tol, tolerance=1e-9)
-for finder in (coarse, fine):
-    print(f"{solve(f, 0.0, 2.0, finder):.6f}")
-#: 1.406250
-#: 1.414214
+for tolerance in (0.1, 1e-9):
+    finder = partial(bisection_tol, tolerance=tolerance)
+    root = solve(f, 0.0, 2.0, finder)
+    print(f"tolerance {tolerance}: {root:.6f}")
+#: tolerance 0.1: 1.406250
+#: tolerance 1e-09: 1.414214
 ```
 
 Each `partial` object satisfies `RootFinder`,
@@ -536,8 +527,9 @@ The test file confirms that:
 
 ```python
 # test_chain.py
-from algorithms import bisection, newton, secant
-from chain import Fn, RootFinder, first_root
+from algorithms import (Fn, RootFinder, bisection,
+                        newton, secant)
+from chain import first_root
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2

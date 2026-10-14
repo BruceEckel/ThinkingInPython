@@ -1,6 +1,7 @@
 # test_chain.py
-from algorithms import bisection, newton, secant
-from chain import Fn, RootFinder, first_root
+from algorithms import (Fn, RootFinder, bisection,
+                        newton, secant)
+from chain import first_root
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2

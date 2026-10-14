@@ -11,12 +11,12 @@ class Account:
         self.balance += 50
         print(f"balance: {self.balance}")
 
-def alert() -> None:
+def audit() -> None:
     print("audit: checking balance")
 
 account = Account(100)
 macro: list[Command] = [
-    account.deposit, alert, account.deposit,
+    account.deposit, audit, account.deposit,
 ]
 for command in macro:
     command()
