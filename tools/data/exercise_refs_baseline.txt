@@ -54,7 +54,7 @@ Chapters/Simulation	Simulation	7	Changing the physics
 Chapters/Singleton	Singleton	1	`singleton_pattern.py` rewritten to eager initialization
 Chapters/Singleton	Singleton	7	`__init__()` runs on every construction
 Chapters/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
-Chapters/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
+Chapters/State_Machines	State_Machines	2	The mood machine, on the first design
 Chapters/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
 Chapters/Stateless	Effect_Management	2	Threading a `Log` Effect through by hand
 Chapters/Stateless_in_Practice	Stateless_in_Practice	5	A fourth failure
@@ -97,9 +97,12 @@ Solutions/Simulation	Simulation	4	A `Coin` item
 Solutions/Simulation	Simulation	5	Sending the robot somewhere other than the `!`
 Solutions/Simulation	Simulation	7	Changing the physics
 Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
-Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
-Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
-Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
+Solutions/State_Machines	State_Machines	2	The mood machine, on the first design
+Solutions/State_Machines	State_Machines	2	The mood machine, on the first design
+Solutions/State_Machines	State_Machines	2	The mood machine, on the first design
+Solutions/State_Machines	State_Machines	2	The mood machine, on the first design
+Solutions/State_Machines	State_Machines	2	The mood machine, on the first design
+Solutions/State_Machines	State_Machines	2	The mood machine, on the first design
 Solutions/State_Machines	State_Machines	2	The mood machine, on the first design
 Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
 Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables

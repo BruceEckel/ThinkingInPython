@@ -30,11 +30,15 @@ from typing import Protocol
 
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, input_: object) -> State: ...
+    def next(self, input_: object, /) -> State: ...
 ```
 
 The parameter is `input_`, with a trailing underscore,
 because a bare `input` would shadow the builtin `input()`.
+The `/` after it makes the parameter positional-only.
+A function stored in an attribute takes its argument by position alone,
+and the chapter's last design stores `next` that way,
+so the Protocol asks for no more than a stored function gives.
 
 The `StateMachine` holds the current state and advances it on each input:
 
@@ -50,8 +54,7 @@ class StateMachine:
     def step(self, input_: object) -> None:
         state = self.current_state
         self.current_state = state.next(input_)
-        print(type(state).__name__, input_, "->",
-              type(self.current_state).__name__)
+        print(state, input_, "->", self.current_state)
         self.current_state.run()
 
 def run_all(machine: StateMachine,
@@ -65,6 +68,7 @@ The constructor sets the initial state and runs it.
 and moves there.
 It then prints the transition (the old state, the input, and the new state)
 and calls `run()` for the new state.
+A state prints as its name, through a `__str__()` each state class defines.
 `run_all()` is a convenience outside the class:
 it feeds any iterable of inputs to `step()`, one at a time.
 This is the *State* pattern combined with automated transitions,
@@ -128,6 +132,9 @@ class Waiting:
     def run(self) -> None:
         print("Broadcasting cheese smell")
 
+    def __str__(self) -> str:
+        return type(self).__name__
+
     def next(self, input_: object) -> State:
         match input_:
             case MouseAction.APPEARS:
@@ -138,6 +145,9 @@ class Waiting:
 class Luring:
     def run(self) -> None:
         print("Presenting Cheese, door open")
+
+    def __str__(self) -> str:
+        return type(self).__name__
 
     def next(self, input_: object) -> State:
         match input_:
@@ -152,6 +162,9 @@ class Trapping:
     def run(self) -> None:
         print("Closing door")
 
+    def __str__(self) -> str:
+        return type(self).__name__
+
     def next(self, input_: object) -> State:
         match input_:
             case MouseAction.ESCAPES:
@@ -164,6 +177,9 @@ class Trapping:
 class Holding:
     def run(self) -> None:
         print("Mouse caught")
+
+    def __str__(self) -> str:
+        return type(self).__name__
 
     def next(self, input_: object) -> State:
         match input_:
@@ -186,6 +202,7 @@ class MouseTrap(StateMachine):
 Each `next()` performs a `match` on the input,
 providing a `case` for every input the state recognizes.
 The default `case _` returns `self`, so the state doesn't change.
+Each class's `__str__()` returns its own name, which is what `step()` prints.
 
 `StateMachine`'s constructor runs the initial state,
 so constructing the machine starts the engine.
@@ -261,6 +278,9 @@ class TableState(ABC):
     @abstractmethod
     def run(self) -> None: ...
 
+    def __str__(self) -> str:
+        return type(self).__name__
+
     def next(self, input_: object) -> State:
         try:
             return self.transitions[input_]
@@ -273,6 +293,8 @@ class TableState(ABC):
 `TableState` is an `ABC` rather than a Protocol because the base has code to share.
 Both `next()` and `run()` have the signatures the `State` Protocol names,
 so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
+The base also supplies the `__str__()` the trace prints,
+so the four subclasses inherit it.
 
 The constructor starts each state with an empty `transitions` table,
 and module-level code fills it after every state object exists.
@@ -853,9 +875,10 @@ def test_no_transition_raises() -> None:
 ## States as `Enum` Members
 
 `enum_states.py` is the first design again,
-with each state as a row of data rather than a class.
-`State` is a record of two callables,
-and `TrapState` is an `Enum` whose members are `State`s:
+with each state as a row of data rather than a class, run by the same engine.
+`Row` is a record that satisfies `State`: its `run()` prints a stored message,
+and its `next` is a stored function rather than a method.
+`TrapState` is an `Enum` whose members are `Row`s:
 
 ```python
 # enum_states.py
@@ -864,22 +887,24 @@ from enum import Enum
 from mouse_action import MouseAction as M
 from record import record
 
-type Behavior = Callable[[M], str]
-type Transition = Callable[[M], TrapState]
+type Transition = Callable[[object], TrapState]
 
 @record
-class State:
-    behavior: Behavior
-    transition: Transition
+class Row:
+    message: str
+    next: Transition
 
-def waiting(input_: M) -> TrapState:
+    def run(self) -> None:
+        print(self.message)
+
+def waiting(input_: object) -> TrapState:
     match input_:
         case M.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
-def luring(input_: M) -> TrapState:
+def luring(input_: object) -> TrapState:
     match input_:
         case M.RUNS_AWAY:
             return TrapState.WAITING
@@ -888,7 +913,7 @@ def luring(input_: M) -> TrapState:
         case _:
             return TrapState.LURING
 
-def trapping(input_: M) -> TrapState:
+def trapping(input_: object) -> TrapState:
     match input_:
         case M.ESCAPES:
             return TrapState.WAITING
@@ -897,33 +922,25 @@ def trapping(input_: M) -> TrapState:
         case _:
             return TrapState.TRAPPING
 
-def holding(input_: M) -> TrapState:
+def holding(input_: object) -> TrapState:
     match input_:
         case M.REMOVED:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
 
-class TrapState(State, Enum):
-    WAITING = (lambda _: "Broadcasting cheese smell",
-               waiting)
-    LURING = (lambda _: "Presenting Cheese, door open",
-              luring)
-    TRAPPING = (lambda _: "Closing door", trapping)
-    HOLDING = (lambda _: "Mouse caught", holding)
+class TrapState(Row, Enum):
+    WAITING = ("Broadcasting cheese smell", waiting)
+    LURING = ("Presenting Cheese, door open", luring)
+    TRAPPING = ("Closing door", trapping)
+    HOLDING = ("Mouse caught", holding)
 
-class StateMachine:
-    def __init__(self, start: TrapState) -> None:
-        self.state = start
-
-    def step(self, input_: M) -> str:
-        self.state = self.state.transition(input_)
-        return self.state.behavior(input_)
+    def __str__(self) -> str:
+        return self.name.capitalize()
 ```
 
-A `State` holds a behavior, which turns the input into the machine's output,
-and a transition, which turns the input into the next state.
-Both aliases name `TrapState` above the class statement that creates it.
+A `Row` holds the message its `run()` prints and the function its `next` names.
+The `Transition` alias names `TrapState` above the class statement that creates it.
 A `type` alias evaluates its right side lazily,
 so the forward reference resolves when the checker or the program reads the alias.
 The four transition functions are the first design's `next()` methods pulled out of their classes:
@@ -932,74 +949,84 @@ and names the member the trap enters next.
 A function body runs after the whole module has loaded,
 so a `TrapState` named inside one resolves too.
 
-`TrapState` mixes `State` into `Enum`.
+`TrapState` mixes `Row` into `Enum`.
 Each member's value is a tuple,
-and `Enum` passes the tuple to `State`'s constructor,
-so `TrapState.WAITING` is a `TrapState` member and a `State` at once,
-with `behavior` and `transition` as attributes.
-The behaviors here are lambdas that ignore their input,
-since the trap announces the same thing whatever the mouse does.
-A machine whose output depends on the input as well as the state is the one that uses that parameter.
-`StateMachine.step()` asks the current state for its successor, stores it,
-and then runs the new state's behavior,
-the order `step()` follows in `state_machine.py`.
+and `Enum` passes the tuple to `Row`'s constructor,
+so `TrapState.WAITING` is a `TrapState` member and a `Row` at once,
+with `message` and `next` as attributes.
+The engine's call `state.next(input_)` reads the same whether `next` is a method or a stored function.
+The type checker accepts the row as a `State` because `State.next()` declares its parameter positional-only:
+a stored function takes its argument by position alone,
+where a method's parameter would also accept the keyword form `input_=`.
+`__str__()` returns the member's name in the form the trace prints,
+so `WAITING` prints as `Waiting`.
 
-`enum_states_demo.py` runs the trap through `MOVES` and prints each transition above the action of the state it entered.
-The trace is `mouse_trap_states_demo.py`'s,
-after the start-up action that the first design's constructor prints,
-since this constructor stores the start state and returns:
+`enum_states_demo.py` runs the rows through the first design's engine,
+and the trace is `mouse_trap_states_demo.py`'s, line for line:
 
 ```python
 # enum_states_demo.py
-from enum_states import StateMachine, TrapState
+from enum_states import TrapState
 from mouse_moves import MOVES
+from state_machine import StateMachine, run_all
 
-machine = StateMachine(TrapState.WAITING)
-for move in MOVES:
-    before = machine.state
-    result = machine.step(move)
-    print(before.name, move, "->", machine.state.name)
-    print("   ", result)
-#: WAITING mouse appears -> LURING
-#:     Presenting Cheese, door open
-#: LURING mouse runs away -> WAITING
-#:     Broadcasting cheese smell
-#: WAITING mouse appears -> LURING
-#:     Presenting Cheese, door open
-#: LURING mouse enters trap -> TRAPPING
-#:     Closing door
-#: TRAPPING mouse escapes -> WAITING
-#:     Broadcasting cheese smell
-#: WAITING mouse appears -> LURING
-#:     Presenting Cheese, door open
-#: LURING mouse enters trap -> TRAPPING
-#:     Closing door
-#: TRAPPING mouse trapped -> HOLDING
-#:     Mouse caught
-#: HOLDING mouse removed -> WAITING
-#:     Broadcasting cheese smell
+run_all(StateMachine(TrapState.WAITING), MOVES)
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse runs away -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse escapes -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse trapped -> Holding
+#: Mouse caught
+#: Holding mouse removed -> Waiting
+#: Broadcasting cheese smell
+```
+
+`test_enum_states.py` holds the rows to that trace:
+
+```python
+# test_enum_states.py
+import mouse_trap_states
+import pytest
+from enum_states import TrapState
+from mouse_moves import MOVES
+from state_machine import StateMachine, run_all
+
+def test_rows_print_the_class_trace(
+        capsys: pytest.CaptureFixture[str]) -> None:
+    run_all(mouse_trap_states.MouseTrap(), MOVES)
+    by_class = capsys.readouterr().out
+    run_all(StateMachine(TrapState.WAITING), MOVES)
+    by_row = capsys.readouterr().out
+    assert by_class == by_row
 ```
 
 Two consequences follow from the mixin.
 `Enum` folds members with equal values into one,
 and a record's equality compares its fields,
-so two members that share the same behavior and transition functions collapse into a single member with two names.
-Every state therefore needs functions of its own.
-The type checker reads `behavior` and `transition` from the record's fields,
-so a transition that returns a `str`,
-or a call that passes a `str` where the function takes a `MouseAction`,
-fails the check.
+so two members with the same message and the same function collapse into a single member with two names.
+Every state therefore needs a function of its own.
+The type checker reads `next` from the record's field,
+so the engine's `state.next(input_)` checks against `State` the way a method call does.
 It leaves a member's tuple uncompared with the fields:
-a tuple holding one callable, or the two in the wrong order,
+a tuple holding the message alone, or the two in the wrong order,
 passes `ty` and fails at import or at run time.
-Pyright reports all three.
+Pyright reports both.
 
 Against `mouse_trap_states.py`, what changes is where a state lives.
-A class with two methods becomes a row holding two functions,
-the `ClassVar` holder on `MouseTrap` becomes the enum,
-and the trace names a state with `.name` rather than `type(state).__name__`.
-What stays is the decision structure:
-each state names its own successors in a `match`.
+A class with two methods becomes a row holding a message and a function,
+and the `ClassVar` holder on `MouseTrap` becomes the enum.
+The Protocol, the engine, and the trace stay the same.
 
 ## Which Design Should You Use?
 
@@ -1036,7 +1063,7 @@ or write a helper that those rules call.
 
 States as `Enum` members is the first design with records in place of classes.
 Each member names its own successors, as `Luring` does,
-and carries its action as data, run on entry as `run()` is.
+and carries its action as data, and the first design's engine runs both.
 The enum supplies what four loose classes cannot:
 `list(TrapState)` enumerates every state,
 and a parameter typed `TrapState` accepts a member and rejects anything else.
@@ -1106,7 +1133,8 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     Explain the exception, then make it work two ways: by adding a rule,
     and by making `Nickel` an instance of `Money` rather than a subclass.
     Say which you would keep.
-10. Rewrite exercise 1's `UnpredictablePerson` in the shape of `enum_states.py`:
-    a `Mood` enum whose members each carry their `hello()` greeting and the transition to the next `Mood`,
-    driven by an `Input` enum of `ANNOY`, `CALM`, and `TAKE_PILL`.
+10. Rewrite exercise 2's mood machine in the shape of `enum_states.py`:
+    a `Mood` enum of rows,
+    each carrying its greeting and its transition function,
+    with the inputs as a `StrEnum` and `state_machine.py`'s engine running it.
     Say what a mood gains and loses as an enum member rather than a class.

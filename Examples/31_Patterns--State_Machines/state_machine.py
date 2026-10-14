@@ -9,8 +9,7 @@ class StateMachine:
     def step(self, input_: object) -> None:
         state = self.current_state
         self.current_state = state.next(input_)
-        print(type(state).__name__, input_, "->",
-              type(self.current_state).__name__)
+        print(state, input_, "->", self.current_state)
         self.current_state.run()
 
 def run_all(machine: StateMachine,

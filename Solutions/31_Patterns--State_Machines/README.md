@@ -169,7 +169,7 @@ from typing import Protocol
 
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, input_: object) -> State: ...
+    def next(self, input_: object, /) -> State: ...
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -196,17 +196,23 @@ class Calm:
 class Happy:
     def run(self) -> None:
         ...
+    def __str__(self) -> str:
+        ...
     def next(self, input_: object) -> State:
         ...
 
 class Grumpy:
     def run(self) -> None:
         ...
+    def __str__(self) -> str:
+        ...
     def next(self, input_: object) -> State:
         ...
 
 class Prozac:
     def run(self) -> None:
+        ...
+    def __str__(self) -> str:
         ...
     def next(self, input_: object) -> State:
         ...
@@ -232,7 +238,7 @@ from typing import Protocol
 # The chapter's state.py and state_machine.py, inlined:
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, input_: object) -> State: ...
+    def next(self, input_: object, /) -> State: ...
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -241,8 +247,7 @@ class StateMachine:
     def step(self, input_: object) -> None:
         state = self.current_state
         self.current_state = state.next(input_)
-        print(type(state).__name__, input_, "->",
-              type(self.current_state).__name__)
+        print(state, input_, "->", self.current_state)
         self.current_state.run()
 
 def run_all(machine: StateMachine,
@@ -265,6 +270,8 @@ class Calm:
 class Happy:
     def run(self) -> None:
         print("Great to see you!")
+    def __str__(self) -> str:
+        return type(self).__name__
     def next(self, input_: object) -> State:
         if isinstance(input_, Annoy):
             return Grumpy()
@@ -275,6 +282,8 @@ class Happy:
 class Grumpy:
     def run(self) -> None:
         print("What do you want?")
+    def __str__(self) -> str:
+        return type(self).__name__
     def next(self, input_: object) -> State:
         if isinstance(input_, Calm):
             return Happy()
@@ -285,6 +294,8 @@ class Grumpy:
 class Prozac:
     def run(self) -> None:
         print("Everything is wonderful.")
+    def __str__(self) -> str:
+        return type(self).__name__
     def next(self, input_: object) -> State:
         return self
 
@@ -1301,63 +1312,70 @@ separate value.
 
 ## 10. The mood machine, as `Enum` members
 
-> Rewrite exercise 1's `UnpredictablePerson` in the shape of `enum_states.py`:
-> a `Mood` enum whose members each carry their `hello()` greeting and the transition to the next `Mood`,
-> driven by an `Input` enum of `ANNOY`, `CALM`, and `TAKE_PILL`.
+> Rewrite exercise 2's mood machine in the shape of `enum_states.py`:
+> a `Mood` enum of rows,
+> each carrying its greeting and its transition function,
+> with the inputs as a `StrEnum` and `state_machine.py`'s engine running it.
 > Say what a mood gains and loses as an enum member rather than a class.
 
 <details>
 <summary>Where to look</summary>
 
-[States as `Enum` Members](../../Chapters/31_Patterns--State_Machines.md#states-as-enum-members) shows the shape: a record of two callables mixed into an `Enum`.
-Make the inputs an `Enum` too, so each transition function can `match` on them.
-Let `hello()` run the transition and then the new mood's behavior, the way `StateMachine.step()` does.
+[States as `Enum` Members](../../Chapters/31_Patterns--State_Machines.md#states-as-enum-members) shows the shape: a record with a `run()` and a stored `next`, mixed into an `Enum` and driven by the first design's engine.
+Make the inputs a `StrEnum`, so each transition function can `match` on them and the trace prints them as words.
+Inline `state.py` and `state_machine.py` the way exercise 2 does.
 
 <details>
 <summary>The shape</summary>
 
 ```python
 # The shape of exercise_10.py
-from collections.abc import Callable
-from enum import Enum, auto
-from typing import Final
+from collections.abc import Callable, Iterable
+from enum import Enum, StrEnum
+from typing import Protocol
 from record import record
 
-class Input(Enum):
-    ANNOY = auto()
-    CALM = auto()
-    TAKE_PILL = auto()
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, input_: object, /) -> State: ...
 
-type Behavior = Callable[[Input], str]
-type Transition = Callable[[Input], Mood]
+class StateMachine:
+    def __init__(self, initial_state: State) -> None:
+        ...
+    def step(self, input_: object) -> None:
+        ...
+
+def run_all(machine: StateMachine,
+            inputs: Iterable[object]) -> None:
+    ...
+
+class Input(StrEnum):
+    ANNOY = "annoy"
+    CALM = "calm"
+    TAKE_PILL = "take pill"
+
+type Transition = Callable[[object], Mood]
 
 @record
-class State:
-    behavior: Behavior
-    transition: Transition
+class Row:
+    message: str
+    next: Transition
+    def run(self) -> None:
+        ...
 
-def happy(input_: Input) -> Mood:
+def happy(input_: object) -> Mood:
     ...
 
-def grumpy(input_: Input) -> Mood:
+def grumpy(input_: object) -> Mood:
     ...
 
-class Mood(State, Enum):
-    HAPPY = (lambda _: "Great to see you!", happy)
-    GRUMPY = (lambda _: "What do you want?", grumpy)
-    PROZAC = (lambda _: "Everything is wonderful.",
+class Mood(Row, Enum):
+    HAPPY = ("Great to see you!", happy)
+    GRUMPY = ("What do you want?", grumpy)
+    PROZAC = ("Everything is wonderful.",
               lambda _: Mood.PROZAC)
-
-class UnpredictablePerson:
-    def __init__(self, mood: Mood) -> None:
+    def __str__(self) -> str:
         ...
-
-    def hello(self, input_: Input) -> str:
-        ...
-
-INPUTS: Final[list[Input]] = [
-    Input.ANNOY, Input.CALM, Input.TAKE_PILL, Input.ANNOY,
-]
 ```
 
 <details>
@@ -1365,25 +1383,46 @@ INPUTS: Final[list[Input]] = [
 
 ```python
 # exercise_10.py
-from collections.abc import Callable
-from enum import Enum, auto
-from typing import Final
+from collections.abc import Callable, Iterable
+from enum import Enum, StrEnum
+from typing import Protocol
 from record import record
 
-class Input(Enum):
-    ANNOY = auto()
-    CALM = auto()
-    TAKE_PILL = auto()
+# The chapter's state.py and state_machine.py, inlined:
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, input_: object, /) -> State: ...
 
-type Behavior = Callable[[Input], str]
-type Transition = Callable[[Input], Mood]
+class StateMachine:
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
+    def step(self, input_: object) -> None:
+        state = self.current_state
+        self.current_state = state.next(input_)
+        print(state, input_, "->", self.current_state)
+        self.current_state.run()
+
+def run_all(machine: StateMachine,
+            inputs: Iterable[object]) -> None:
+    for input_ in inputs:
+        machine.step(input_)
+
+class Input(StrEnum):
+    ANNOY = "annoy"
+    CALM = "calm"
+    TAKE_PILL = "take pill"
+
+type Transition = Callable[[object], Mood]
 
 @record
-class State:
-    behavior: Behavior
-    transition: Transition
+class Row:
+    message: str
+    next: Transition
+    def run(self) -> None:
+        print(self.message)
 
-def happy(input_: Input) -> Mood:
+def happy(input_: object) -> Mood:
     match input_:
         case Input.ANNOY:
             return Mood.GRUMPY
@@ -1392,7 +1431,7 @@ def happy(input_: Input) -> Mood:
         case _:
             return Mood.HAPPY
 
-def grumpy(input_: Input) -> Mood:
+def grumpy(input_: object) -> Mood:
     match input_:
         case Input.CALM:
             return Mood.HAPPY
@@ -1401,47 +1440,39 @@ def grumpy(input_: Input) -> Mood:
         case _:
             return Mood.GRUMPY
 
-class Mood(State, Enum):
-    HAPPY = (lambda _: "Great to see you!", happy)
-    GRUMPY = (lambda _: "What do you want?", grumpy)
-    PROZAC = (lambda _: "Everything is wonderful.",
+class Mood(Row, Enum):
+    HAPPY = ("Great to see you!", happy)
+    GRUMPY = ("What do you want?", grumpy)
+    PROZAC = ("Everything is wonderful.",
               lambda _: Mood.PROZAC)
+    def __str__(self) -> str:
+        return self.name.capitalize()
 
-class UnpredictablePerson:
-    def __init__(self, mood: Mood) -> None:
-        self.mood = mood
-
-    def hello(self, input_: Input) -> str:
-        self.mood = self.mood.transition(input_)
-        return self.mood.behavior(input_)
-
-INPUTS: Final[list[Input]] = [
-    Input.ANNOY, Input.CALM, Input.TAKE_PILL, Input.ANNOY,
-]
-person = UnpredictablePerson(Mood.HAPPY)
-for input_ in INPUTS:
-    before = person.mood
-    greeting = person.hello(input_)
-    print(f"{before.name} {input_.name}: {greeting}"
-          f" -> {person.mood.name}")
-#: HAPPY ANNOY: What do you want? -> GRUMPY
-#: GRUMPY CALM: Great to see you! -> HAPPY
-#: HAPPY TAKE_PILL: Everything is wonderful. -> PROZAC
-#: PROZAC ANNOY: Everything is wonderful. -> PROZAC
+run_all(StateMachine(Mood.HAPPY), [
+    Input.ANNOY, Input.CALM, Input.TAKE_PILL, Input.ANNOY])
+#: Great to see you!
+#: Happy annoy -> Grumpy
+#: What do you want?
+#: Grumpy calm -> Happy
+#: Great to see you!
+#: Happy take pill -> Prozac
+#: Everything is wonderful.
+#: Prozac annoy -> Prozac
+#: Everything is wonderful.
 print([mood.name for mood in Mood])
 #: ['HAPPY', 'GRUMPY', 'PROZAC']
 ```
 
 **Each mood is one row.** `Mood.HAPPY` holds its greeting and `happy()`, the function that names its successors, so reading the member tells you what the mood says and where it can go.
 `PROZAC` needs no function of its own: its transition is a lambda that answers every input with `Mood.PROZAC`, the same "stays put" that exercise 2's `Prozac.next()` wrote as `return self`.
-`UnpredictablePerson` is the chapter's `StateMachine` under its old name, with `hello()` playing `step()`: it moves to the next mood and returns that mood's greeting, so what you do to the person decides the greeting you get.
+The engine is exercise 2's, unchanged, and the trace is exercise 2's with the inputs printed as the `StrEnum`'s words.
 
 **What a mood gains as a member.** The moods are a closed set the program and the type checker both know.
-`list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`, and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 passed to `change_to()`.
-Exercise 1's `UnpredictablePerson` accepts any object with a `hello()` method, so the set of moods is open and nothing lists it.
+`list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`, and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 2 constructs.
+Exercise 2's engine accepts any object with `run()` and `next()`, so the set of moods there is open and nothing lists it.
 
-**What a mood loses.** A member is one frozen record shared by every person in the program, so a mood that keeps data of its own, such as a count of the `ANNOY` inputs it has received, has nowhere to put it.
-Exercise 1's classes can carry that state per instance, and a mood whose behavior needs more than one callable is a class in either design.
+**What a mood loses.** A member is one frozen record shared by every machine in the program, so a mood that keeps data of its own, such as a count of the `ANNOY` inputs it has received, has nowhere to put it.
+Exercise 2's classes can carry that state per instance, and a mood whose behavior needs more than a message and a successor is a class in either design.
 
 </details>
 </details>

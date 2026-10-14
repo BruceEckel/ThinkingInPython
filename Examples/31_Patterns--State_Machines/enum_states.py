@@ -4,22 +4,24 @@ from enum import Enum
 from mouse_action import MouseAction as M
 from record import record
 
-type Behavior = Callable[[M], str]
-type Transition = Callable[[M], TrapState]
+type Transition = Callable[[object], TrapState]
 
 @record
-class State:
-    behavior: Behavior
-    transition: Transition
+class Row:
+    message: str
+    next: Transition
 
-def waiting(input_: M) -> TrapState:
+    def run(self) -> None:
+        print(self.message)
+
+def waiting(input_: object) -> TrapState:
     match input_:
         case M.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
-def luring(input_: M) -> TrapState:
+def luring(input_: object) -> TrapState:
     match input_:
         case M.RUNS_AWAY:
             return TrapState.WAITING
@@ -28,7 +30,7 @@ def luring(input_: M) -> TrapState:
         case _:
             return TrapState.LURING
 
-def trapping(input_: M) -> TrapState:
+def trapping(input_: object) -> TrapState:
     match input_:
         case M.ESCAPES:
             return TrapState.WAITING
@@ -37,25 +39,18 @@ def trapping(input_: M) -> TrapState:
         case _:
             return TrapState.TRAPPING
 
-def holding(input_: M) -> TrapState:
+def holding(input_: object) -> TrapState:
     match input_:
         case M.REMOVED:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
 
-class TrapState(State, Enum):
-    WAITING = (lambda _: "Broadcasting cheese smell",
-               waiting)
-    LURING = (lambda _: "Presenting Cheese, door open",
-              luring)
-    TRAPPING = (lambda _: "Closing door", trapping)
-    HOLDING = (lambda _: "Mouse caught", holding)
+class TrapState(Row, Enum):
+    WAITING = ("Broadcasting cheese smell", waiting)
+    LURING = ("Presenting Cheese, door open", luring)
+    TRAPPING = ("Closing door", trapping)
+    HOLDING = ("Mouse caught", holding)
 
-class StateMachine:
-    def __init__(self, start: TrapState) -> None:
-        self.state = start
-
-    def step(self, input_: M) -> str:
-        self.state = self.state.transition(input_)
-        return self.state.behavior(input_)
+    def __str__(self) -> str:
+        return self.name.capitalize()

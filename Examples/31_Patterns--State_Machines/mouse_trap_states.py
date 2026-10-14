@@ -8,6 +8,9 @@ class Waiting:
     def run(self) -> None:
         print("Broadcasting cheese smell")
 
+    def __str__(self) -> str:
+        return type(self).__name__
+
     def next(self, input_: object) -> State:
         match input_:
             case MouseAction.APPEARS:
@@ -18,6 +21,9 @@ class Waiting:
 class Luring:
     def run(self) -> None:
         print("Presenting Cheese, door open")
+
+    def __str__(self) -> str:
+        return type(self).__name__
 
     def next(self, input_: object) -> State:
         match input_:
@@ -32,6 +38,9 @@ class Trapping:
     def run(self) -> None:
         print("Closing door")
 
+    def __str__(self) -> str:
+        return type(self).__name__
+
     def next(self, input_: object) -> State:
         match input_:
             case MouseAction.ESCAPES:
@@ -44,6 +53,9 @@ class Trapping:
 class Holding:
     def run(self) -> None:
         print("Mouse caught")
+
+    def __str__(self) -> str:
+        return type(self).__name__
 
     def next(self, input_: object) -> State:
         match input_:

@@ -1,28 +1,25 @@
 # enum_states_demo.py
-from enum_states import StateMachine, TrapState
+from enum_states import TrapState
 from mouse_moves import MOVES
+from state_machine import StateMachine, run_all
 
-machine = StateMachine(TrapState.WAITING)
-for move in MOVES:
-    before = machine.state
-    result = machine.step(move)
-    print(before.name, move, "->", machine.state.name)
-    print("   ", result)
-#: WAITING mouse appears -> LURING
-#:     Presenting Cheese, door open
-#: LURING mouse runs away -> WAITING
-#:     Broadcasting cheese smell
-#: WAITING mouse appears -> LURING
-#:     Presenting Cheese, door open
-#: LURING mouse enters trap -> TRAPPING
-#:     Closing door
-#: TRAPPING mouse escapes -> WAITING
-#:     Broadcasting cheese smell
-#: WAITING mouse appears -> LURING
-#:     Presenting Cheese, door open
-#: LURING mouse enters trap -> TRAPPING
-#:     Closing door
-#: TRAPPING mouse trapped -> HOLDING
-#:     Mouse caught
-#: HOLDING mouse removed -> WAITING
-#:     Broadcasting cheese smell
+run_all(StateMachine(TrapState.WAITING), MOVES)
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse runs away -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse escapes -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse trapped -> Holding
+#: Mouse caught
+#: Holding mouse removed -> Waiting
+#: Broadcasting cheese smell

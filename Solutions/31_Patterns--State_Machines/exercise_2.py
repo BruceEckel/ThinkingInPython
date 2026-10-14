@@ -5,7 +5,7 @@ from typing import Protocol
 # The chapter's state.py and state_machine.py, inlined:
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, input_: object) -> State: ...
+    def next(self, input_: object, /) -> State: ...
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -14,8 +14,7 @@ class StateMachine:
     def step(self, input_: object) -> None:
         state = self.current_state
         self.current_state = state.next(input_)
-        print(type(state).__name__, input_, "->",
-              type(self.current_state).__name__)
+        print(state, input_, "->", self.current_state)
         self.current_state.run()
 
 def run_all(machine: StateMachine,
@@ -38,6 +37,8 @@ class Calm:
 class Happy:
     def run(self) -> None:
         print("Great to see you!")
+    def __str__(self) -> str:
+        return type(self).__name__
     def next(self, input_: object) -> State:
         if isinstance(input_, Annoy):
             return Grumpy()
@@ -48,6 +49,8 @@ class Happy:
 class Grumpy:
     def run(self) -> None:
         print("What do you want?")
+    def __str__(self) -> str:
+        return type(self).__name__
     def next(self, input_: object) -> State:
         if isinstance(input_, Calm):
             return Happy()
@@ -58,6 +61,8 @@ class Grumpy:
 class Prozac:
     def run(self) -> None:
         print("Everything is wonderful.")
+    def __str__(self) -> str:
+        return type(self).__name__
     def next(self, input_: object) -> State:
         return self
 
