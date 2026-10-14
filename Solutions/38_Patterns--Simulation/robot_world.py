@@ -64,14 +64,6 @@ class Teleport(Item):
 class Empty(Item):
     symbol: ClassVar[str] = "_"
 
-class Edge(Item):
-    symbol: ClassVar[str] = "/"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        # The void outside the maze: stay put
-        return robot.room
-
 class EndGame(Item):
     symbol: ClassVar[str] = "!"
 
@@ -119,7 +111,8 @@ class Doors:
     def open(self, urge: Urge) -> Room:
         return self.neighbors.get(urge, EDGE)
 
-EDGE: Final[Room] = Room(Edge())
+# The void outside the maze
+EDGE: Final[Room] = Room(Wall())
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
@@ -149,6 +142,6 @@ class GameBuilder:
             t1.target_room = room2
             t2.target_room = room1
 
-    def run(self, solution: str) -> None:
-        for char in "".join(solution.split()):
+    def run(self, moves: str) -> None:
+        for char in moves:
             self.robot.move(Urge(char))

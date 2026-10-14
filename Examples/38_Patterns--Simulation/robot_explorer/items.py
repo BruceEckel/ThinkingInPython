@@ -65,14 +65,6 @@ class Teleport(Item):
 class Empty(Item):
     symbol: ClassVar[str] = "_"
 
-class Edge(Item):
-    symbol: ClassVar[str] = "/"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        # The void outside the maze: stay put
-        return robot.room
-
 class EndGame(Item):
     symbol: ClassVar[str] = "!"
 

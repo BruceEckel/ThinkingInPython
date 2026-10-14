@@ -2,12 +2,12 @@
 from collections import deque
 from collections.abc import Callable
 from typing import Final
-from robot_world import (Edge, EndGame, Food, GameBuilder,
-                         Room, Teleport, Urge, Wall)
+from robot_world import (EndGame, Food, GameBuilder, Room,
+                         Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     beyond = room.doors.open(urge)
-    if isinstance(beyond.occupant, Wall | Edge):
+    if isinstance(beyond.occupant, Wall):
         return None
     if isinstance(beyond.occupant, Teleport):
         return beyond.occupant.target_room

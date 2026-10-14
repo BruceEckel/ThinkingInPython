@@ -121,10 +121,10 @@ def edge_room() -> str:
     left, right = at(0, COLS[0])[0] - 40, at(0, COLS[-1])[0] + 40
     top, h = 36, 44
     b = rect(left, top, right - left, h, stroke=INK, width=1.6)
-    b += text((left + right) / 2, top + 19, "EDGE = Room(Edge())", 12.5,
+    b += text((left + right) / 2, top + 19, "EDGE = Room(Wall())", 12.5,
               INK, "middle", bold=True)
     b += text((left + right) / 2, top + 35,
-              "Edge.interact() returns robot.room", 10.5, MUTED, "middle")
+              "Wall.interact() returns robot.room", 10.5, MUTED, "middle")
     for col in COLS:
         x, y = at(0, col)
         b += arrow((x, y - R), (x, top + h), MUTED, "mz-muted")

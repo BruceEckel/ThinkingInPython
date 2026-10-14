@@ -199,8 +199,6 @@ class Blackboard:
     maze: Maze
     visited: set[Coord] = field(
         init=False, default_factory=set)
-    tasks: list[asyncio.Task[None]] = field(
-        init=False, default_factory=list)
     messages: list[str] = field(
         init=False, default_factory=list)
     _numbers: Iterator[int] = field(
@@ -217,8 +215,7 @@ class Blackboard:
         return False
 
     def spawn(self, x: int, y: int) -> None:
-        rat = Rat(self, x, y)
-        self.tasks.append(self.group.create_task(rat.run()))
+        self.group.create_task(Rat(self, x, y).run())
 
     def next_number(self) -> int:
         return next(self._numbers)
@@ -251,8 +248,9 @@ class Blackboard:
 The `async with` block of a `TaskGroup` waits until every task in the group has finished,
 including tasks created after the block began.
 That wait matches this problem, in which each rat can create more rats.
-A single `asyncio.gather(*self.tasks)` would await only the tasks in the list at the moment of the call,
-because `*self.tasks` unpacks the list at that moment.
+If `spawn()` kept each task in a list,
+a single `asyncio.gather(*tasks)` would await only the tasks in the list at the moment of the call,
+because `*tasks` unpacks the list at that moment.
 Most of the rats spawn later.
 
 `group` carries `field(init=False)` and no default,
@@ -266,8 +264,8 @@ so `group` needs `field(init=False)`.
 The robot example later in this chapter declares `Robot.room` for the same reason.
 `Robot` is an ordinary class, so its declaration is a bare annotation.
 
-The other four `init=False` fields, `visited`, `tasks`, `messages`,
-and `_numbers`, are internal bookkeeping.
+The other three `init=False` fields, `visited`, `messages`, and `_numbers`,
+are internal bookkeeping.
 `init=False` keeps them out of the generated signature,
 and each `default_factory` builds a fresh object per blackboard.
 
@@ -297,7 +295,9 @@ The rest is the maze.
 *********************
 ```
 
-The demo awaits `explore()`, then prints the log and the mapped maze:
+The demo awaits `explore()`, then prints the log and the mapped maze.
+Each rat logs one line,
+so the closing count of rats is the number of log messages:
 
 ```python
 # rats_and_mazes/rats_and_mazes.py
@@ -313,7 +313,7 @@ async def main() -> None:
         print(message)
     print("Mapped maze (# wall, . visited):")
     print(blackboard.render())
-    print(f"{len(blackboard.tasks)} rats mapped "
+    print(f"{len(blackboard.messages)} rats mapped "
           f"{len(blackboard.visited)} cells.")
 
 asyncio.run(main())
@@ -513,9 +513,9 @@ class RecordingBlackboard(Blackboard):
             self.order.append((x, y))
         return claimed
 
-def show(layout: str = "amaze.txt",
+def show(filename: str = "amaze.txt",
          step_ms: int = 60) -> None:
-    maze = Maze.from_file(layout)
+    maze = Maze.from_file(filename)
     board = RecordingBlackboard(maze)
     asyncio.run(board.explore())
 
@@ -656,14 +656,6 @@ class Teleport(Item):
 class Empty(Item):
     symbol: ClassVar[str] = "_"
 
-class Edge(Item):
-    symbol: ClassVar[str] = "/"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        # The void outside the maze: stay put
-        return robot.room
-
 class EndGame(Item):
     symbol: ClassVar[str] = "!"
 
@@ -680,7 +672,7 @@ def item_factory(symbol: str) -> Item:
     return Teleport(symbol)
 ```
 
-`world.py` imports `Edge`, `Item`, `Robot`, and `Urge` from `items.py`,
+`world.py` imports `Item`, `Robot`, `Urge`, and `Wall` from `items.py`,
 so `from world import Room` here is circular.
 `TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
 so the runtime skips that import and the cycle exists for the checker alone.
@@ -732,7 +724,7 @@ the void outside the maze,
 so the robot can try any direction without a special case.
 `EDGE` is a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object).
 `Robot.move()` calls `EDGE.enter()` as it does any other room's.
-The `Edge` occupant's `interact()` returns `robot.room`,
+The occupant of `EDGE` is a `Wall`, whose `interact()` returns `robot.room`,
 so the robot stays where it was.
 
 ![The maze as a graph of rooms](_images/maze_graph)
@@ -744,7 +736,7 @@ Two rooms whose `Teleport` items share a target letter lead to each other.
 ```python
 # robot_explorer/world.py
 from typing import Final
-from items import Edge, Item, Robot, Urge
+from items import Item, Robot, Urge, Wall
 
 type Coord = tuple[int, int]  # (row, col)
 type RoomMap = dict[Coord, Room]
@@ -778,8 +770,9 @@ class Doors:
     def open(self, urge: Urge) -> Room:
         return self.neighbors.get(urge, EDGE)
 
-# Created once both classes exist; its own doors stay unset
-EDGE: Final[Room] = Room(Edge())
+# The void outside the maze, created once both classes
+# exist; its own doors stay unset
+EDGE: Final[Room] = Room(Wall())
 ```
 
 The `Coord` here is `(row, col)`,
@@ -854,8 +847,8 @@ class GameBuilder:
                 rows[-1] += str(room.occupant)
         return "\n".join(rows)
 
-    def run(self, solution: str) -> None:
-        for char in "".join(solution.split()):
+    def run(self, moves: str) -> None:
+        for char in moves:
             self.robot.move(Urge(char))
 ```
 
@@ -943,7 +936,7 @@ so it works entirely in rooms and the moves between them.
 
 `landing()` decides whether a door is passable by testing the occupant's type with `isinstance()`.
 That test reproduces what `Room.enter()` gets from `interact()`.
-For a `Wall` or an `Edge`, `landing()` returns `None`,
+For a `Wall`, including the one in `EDGE`, `landing()` returns `None`,
 for a `Teleport` the target room,
 and for anything else the room beyond the door:
 
@@ -951,13 +944,13 @@ and for anything else the room beyond the door:
 # robot_explorer/solver.py
 from collections import deque
 from game import GameBuilder
-from items import Edge, EndGame, Teleport, Urge, Wall
+from items import EndGame, Teleport, Urge, Wall
 from world import Room
 
 def landing(room: Room, urge: Urge) -> Room | None:
     # Where a door leads, or None when it is blocked
     beyond = room.doors.open(urge)
-    if isinstance(beyond.occupant, Wall | Edge):
+    if isinstance(beyond.occupant, Wall):
         return None
     if isinstance(beyond.occupant, Teleport):
         return beyond.occupant.target_room
@@ -1008,16 +1001,13 @@ from robot_maze import MAZE
 from solver import solve
 
 game = GameBuilder(MAZE)
-solution = solve(game)
-print(len(solution), "moves")
+moves = solve(game)
+print(len(moves), "moves")
 #: 198 moves
-game.run(solution)
+game.run(moves)
 if game.robot.finished:
     print("Game over!")
 #: Game over!
-print("\nfinal:")
-#:
-#: final:
 print(game.show_maze())
 #: ###############################
 #: #_#.____#_____#_______#_______#

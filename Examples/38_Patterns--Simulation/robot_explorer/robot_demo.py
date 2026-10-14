@@ -4,16 +4,13 @@ from robot_maze import MAZE
 from solver import solve
 
 game = GameBuilder(MAZE)
-solution = solve(game)
-print(len(solution), "moves")
+moves = solve(game)
+print(len(moves), "moves")
 #: 198 moves
-game.run(solution)
+game.run(moves)
 if game.robot.finished:
     print("Game over!")
 #: Game over!
-print("\nfinal:")
-#:
-#: final:
 print(game.show_maze())
 #: ###############################
 #: #_#.____#_____#_______#_______#

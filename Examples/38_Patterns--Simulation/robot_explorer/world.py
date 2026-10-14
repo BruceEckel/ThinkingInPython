@@ -1,6 +1,6 @@
 # robot_explorer/world.py
 from typing import Final
-from items import Edge, Item, Robot, Urge
+from items import Item, Robot, Urge, Wall
 
 type Coord = tuple[int, int]  # (row, col)
 type RoomMap = dict[Coord, Room]
@@ -34,5 +34,6 @@ class Doors:
     def open(self, urge: Urge) -> Room:
         return self.neighbors.get(urge, EDGE)
 
-# Created once both classes exist; its own doors stay unset
-EDGE: Final[Room] = Room(Edge())
+# The void outside the maze, created once both classes
+# exist; its own doors stay unset
+EDGE: Final[Room] = Room(Wall())

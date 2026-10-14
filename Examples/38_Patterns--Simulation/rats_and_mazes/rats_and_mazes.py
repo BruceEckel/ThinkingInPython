@@ -11,7 +11,7 @@ async def main() -> None:
         print(message)
     print("Mapped maze (# wall, . visited):")
     print(blackboard.render())
-    print(f"{len(blackboard.tasks)} rats mapped "
+    print(f"{len(blackboard.messages)} rats mapped "
           f"{len(blackboard.visited)} cells.")
 
 asyncio.run(main())

@@ -11,8 +11,6 @@ class Blackboard:
     maze: Maze
     visited: set[Coord] = field(
         init=False, default_factory=set)
-    tasks: list[asyncio.Task[None]] = field(
-        init=False, default_factory=list)
     messages: list[str] = field(
         init=False, default_factory=list)
     _numbers: Iterator[int] = field(
@@ -29,8 +27,7 @@ class Blackboard:
         return False
 
     def spawn(self, x: int, y: int) -> None:
-        rat = Rat(self, x, y)
-        self.tasks.append(self.group.create_task(rat.run()))
+        self.group.create_task(Rat(self, x, y).run())
 
     def next_number(self) -> int:
         return next(self._numbers)

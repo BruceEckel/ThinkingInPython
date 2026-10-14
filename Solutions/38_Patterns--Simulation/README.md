@@ -681,14 +681,6 @@ class Teleport(Item):
 class Empty(Item):
     symbol: ClassVar[str] = "_"
 
-class Edge(Item):
-    symbol: ClassVar[str] = "/"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        # The void outside the maze: stay put
-        return robot.room
-
 class EndGame(Item):
     symbol: ClassVar[str] = "!"
 
@@ -736,7 +728,8 @@ class Doors:
     def open(self, urge: Urge) -> Room:
         return self.neighbors.get(urge, EDGE)
 
-EDGE: Final[Room] = Room(Edge())
+# The void outside the maze
+EDGE: Final[Room] = Room(Wall())
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
@@ -766,8 +759,8 @@ class GameBuilder:
             t1.target_room = room2
             t2.target_room = room1
 
-    def run(self, solution: str) -> None:
-        for char in "".join(solution.split()):
+    def run(self, moves: str) -> None:
+        for char in moves:
             self.robot.move(Urge(char))
 ```
 
@@ -908,8 +901,8 @@ Loop with the walrus operator, `while (leg := solve(...)) is not None`, and walk
 from collections import deque
 from collections.abc import Callable
 from typing import Final
-from robot_world import (Edge, EndGame, Food, GameBuilder,
-                         Room, Teleport, Urge, Wall)
+from robot_world import (EndGame, Food, GameBuilder, Room,
+                         Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     ...
@@ -941,12 +934,12 @@ Returning `None` makes an empty search the loop's ordinary exit.
 from collections import deque
 from collections.abc import Callable
 from typing import Final
-from robot_world import (Edge, EndGame, Food, GameBuilder,
-                         Room, Teleport, Urge, Wall)
+from robot_world import (EndGame, Food, GameBuilder, Room,
+                         Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     beyond = room.doors.open(urge)
-    if isinstance(beyond.occupant, Wall | Edge):
+    if isinstance(beyond.occupant, Wall):
         return None
     if isinstance(beyond.occupant, Teleport):
         return beyond.occupant.target_room

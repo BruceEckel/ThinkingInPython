@@ -19,9 +19,9 @@ class RecordingBlackboard(Blackboard):
             self.order.append((x, y))
         return claimed
 
-def show(layout: str = "amaze.txt",
+def show(filename: str = "amaze.txt",
          step_ms: int = 60) -> None:
-    maze = Maze.from_file(layout)
+    maze = Maze.from_file(filename)
     board = RecordingBlackboard(maze)
     asyncio.run(board.explore())
 

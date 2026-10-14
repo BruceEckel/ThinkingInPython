@@ -1,13 +1,13 @@
 # robot_explorer/solver.py
 from collections import deque
 from game import GameBuilder
-from items import Edge, EndGame, Teleport, Urge, Wall
+from items import EndGame, Teleport, Urge, Wall
 from world import Room
 
 def landing(room: Room, urge: Urge) -> Room | None:
     # Where a door leads, or None when it is blocked
     beyond = room.doors.open(urge)
-    if isinstance(beyond.occupant, Wall | Edge):
+    if isinstance(beyond.occupant, Wall):
         return None
     if isinstance(beyond.occupant, Teleport):
         return beyond.occupant.target_room

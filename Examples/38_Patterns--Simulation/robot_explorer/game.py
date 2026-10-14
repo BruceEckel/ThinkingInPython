@@ -47,6 +47,6 @@ class GameBuilder:
                 rows[-1] += str(room.occupant)
         return "\n".join(rows)
 
-    def run(self, solution: str) -> None:
-        for char in "".join(solution.split()):
+    def run(self, moves: str) -> None:
+        for char in moves:
             self.robot.move(Urge(char))
