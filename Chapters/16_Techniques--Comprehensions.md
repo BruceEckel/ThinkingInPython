@@ -56,25 +56,17 @@ print(squared_ints)
 The built-in functions `map()` and `filter()`, each given a `lambda`,
 produce the same list that `list_comprehension.py` builds.
 `filter()` applies a predicate to an iterable and retains the members that pass it.
-It produces a lazy iterator, which `list()` expands into a `list`:
+It produces a lazy iterator, which `list()` expands into a `list`.
+`map()` applies a function to each member,
+here squaring each integer that `filter()` keeps:
 
 ```python
-# filtering.py
+# filter_then_map.py
 from a_list import a_list
 
 ints = list(filter(lambda e: isinstance(e, int), a_list))
-
-if __name__ == "__main__":
-    print(ints)
+print(ints)
 #: [1, 9, 0, 4]
-```
-
-`map()` applies a function to each member:
-
-```python
-# mapping.py
-from filtering import ints
-
 print(list(map(lambda e: e ** 2, ints)))  # type: ignore
 #: [1, 81, 0, 16]
 ```
@@ -212,13 +204,13 @@ The colon decides which.
 # set_comprehension.py
 names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
 
-unique = {name[0].upper() + name[1:].lower()
+unique = {name.capitalize()
           for name in names if len(name) > 1}
 
 print(sorted(unique))  # Sorted for stable display
 #: ['Alice', 'Bob', 'John']
 
-same = set([name[0].upper() + name[1:].lower()
+same = set([name.capitalize()
             for name in names if len(name) > 1])
 
 print(unique == same)

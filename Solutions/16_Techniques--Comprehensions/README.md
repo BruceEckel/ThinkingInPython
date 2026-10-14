@@ -153,8 +153,7 @@ Two entries collide only if their normalized strings are equal.
 # exercise_4.py
 names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
 
-unique = {name[0].upper() + name[1:].lower()
-          for name in names}
+unique = {name.capitalize() for name in names}
 
 print(len(unique))
 #: 4
@@ -172,8 +171,8 @@ collapse to `Bob`, `John`, and `Alice`.
 because the normalization changes case and keeps every character.
 `"JOHN"` becomes `"John"`.
 `"J"` stays `"J"`,
-because `name[1:]` on a one-character string is the empty string,
-so the concatenation leaves the capital as it is.
+because `capitalize()` lower-cases every character after the first,
+and `"J"` has one character.
 `"J"` and `"John"` are distinct strings, so the set keeps both.
 
 The filter exists to drop the initial `"J"` as noise.
