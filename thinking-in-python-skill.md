@@ -183,10 +183,32 @@ legal value** (PEP 661, Python 3.15+).
 - **Exception names need no `Error` suffix.** `InsufficientFunds` and
   `TypeFailure` are fine. Ignore lint rule N818.
 
-- **`@dataclass(frozen=True)` already blocks new attributes** (its
-  `__setattr__` rejects every assignment). Pair it with `slots=True`
-  for the memory and access-speed win (the dropped `__dict__`), not
-  to prevent attribute growth.
+- **A frozen data class is frozen and slotted, written `@record`.**
+  `utils/record.py` (chapter 18) is
+  `dataclass(frozen=True, slots=True)` under
+  `dataclass_transform(frozen_default=True)`. From that section on,
+  a listing writes `@record` with `from record import record`, and
+  the prose noun is "record". `frozen=True` on its own rejects every
+  assignment through `__setattr__`, so the slots are for the memory
+  and access-speed win (the dropped `__dict__`), not to prevent
+  attribute growth. The rulings around it:
+  - A base the book owns gets an empty `__slots__ = ()` so its
+    frozen subclasses are records.
+  - A class whose base is a library's and declares no `__slots__`,
+    or a listing that reads the instance `__dict__` or pickles
+    across versions, writes `@record(slots=False)`. The flag makes
+    dropping slots a visible choice; a bare `@record` under an
+    unslotted base lets the base take the slots back.
+  - A class that needs an option `record()` lacks keeps `@dataclass`
+    written out: `order=True`, `weakref_slot=True`, a
+    `cached_property`.
+  - A mutable `@dataclass` whose instances the program reads and
+    leaves unchanged is a record. One whose state grows (a test
+    double accumulating into a list field) or whose identity is the
+    point (a Singleton) stays a data class.
+  - A sentence that names `frozen=True` about a converted class says
+    "record" instead. The long form stays where `frozen=True` is the
+    listing's subject.
 
 - **A class whose `__init__()` only assigns parameters or defaults to
   fields is a `@dataclass`** (frozen unless mutation is the point).
@@ -216,6 +238,19 @@ legal value** (PEP 661, Python 3.15+).
   clash; a double leading underscore is reserved for class-attribute
   name mangling, not general "privacy." Never name a variable `l`,
   `O`, or `I`; in many fonts they are indistinguishable from `1`/`0`.
+
+- **A name only its own class uses takes a leading underscore.** A
+  helper method or state attribute that no code outside the class
+  reads is `_responders` or `_slot()`, so the reader can tell the
+  class's interface from its internals. These stay public: record,
+  dataclass, and NamedTuple fields (constructor parameters and repr
+  content), a constructor parameter stored on `self` as data, a name
+  a dispatch table or the prose cites, the second leg of a double
+  dispatch called on another object, and an introspection demo whose
+  point is the visible method. When a lazily built list must live in
+  the instance `__dict__` under the accessor's name, make the
+  accessor a getter-only `@property`: a data descriptor outranks the
+  dict entry, where a plain method is shadowed after the first call.
 
 - **Prefer absolute imports** over relative ones, except within a
   package's own submodules, and avoid wildcard imports
@@ -329,6 +364,17 @@ legal value** (PEP 661, Python 3.15+).
   too: shorten what the program prints rather than letting a `#:`
   marker run past 60.
 
+- **Prose that walks a listing points with tags, not positions.** A
+  line the prose refers to carries a trailing `# [1]`, `# [2]`, ...
+  comment, numbered from 1 in order within the listing, and the
+  prose cites it as a code span, `` `[1]` ``, never bare. "The
+  second `print()`" makes the reader count, and "the `for` loop"
+  fails when the listing has two. Name the construct when the
+  listing has one of it and the prose mentions it once; tags are for
+  an ordered walk. A tag counts toward the 60-column width, so a
+  tagged line near the limit is split or carries the tag on its own
+  line above it, which refers to the line below.
+
 - **Comment capitalization:** start with a capital when the first
   word is prose. Leave the case alone when the comment begins with a
   code identifier (`# os.path.join handles this`).
@@ -371,11 +417,30 @@ legal value** (PEP 661, Python 3.15+).
   combined test module. When a test carries the verification, the
   inline demo can stay short.
 
-- **Importable modules can carry a top-level demo if it is guarded by
-  `__main__`.** A module that another file imports must not print on
-  import, so put its demo under `if __name__ == "__main__":`. Split it
-  into a demo-free library module plus a separate runnable file when
-  the demo is long enough to obscure the library.
+- **A module another listing imports carries no top-level demo.**
+  `#:` markers are validated as top-level chunks, so a demo under
+  `if __name__ == "__main__":` cannot carry them. Split instead: a
+  library listing with classes and functions and no import-time
+  effects, plus a separate demo listing that imports it and holds
+  the markers (chapter 31's `observers.py` and `thermometer.py`). A
+  listing nothing imports, with a few lines of demo, stays whole.
+  The `__main__` guard survives for a demo that carries no markers,
+  such as a multiprocessing listing whose output lives in prose.
+
+- **A demonstrated exception goes through `expect()`.** When a
+  listing shows that a call raises an exception, write
+  `expect(ExcType, fn, *args)` from `utils/exceptions.py`
+  (`from exceptions import expect`); its marker reads
+  `#: [TypeError] message`. `expected(ExcType)` is the context
+  manager for a statement that cannot be passed as a call, and
+  `aexpect()` the form for an awaited call. A `try`/`except` that
+  prints the message is for a chapter teaching `try`/`except`, a
+  handler that returns or continues, or a listing whose point is
+  that `ty` flags the call, since through `expect()` the checker
+  sees nothing. One trap: `expect()` evaluates its arguments before
+  its own `try`, so an exception raised while building the argument
+  list (`Proxy(x).f`, a failing constructor) escapes it; use
+  `expected` there.
 
 - **Nondeterministic output needs taming** before it can be asserted
   or displayed: round floats (`f"{x:.6f}"`), print
@@ -402,6 +467,48 @@ legal value** (PEP 661, Python 3.15+).
   pytest reports each case independently rather than a single test
   hiding after the first failing input.
 
+## The listing serves the chapter
+
+A listing can type-check, run, and match its prose and still be the
+wrong listing for its section. Ask these of each one you write or
+revise:
+
+- **Which lines show the subject?** Sort the lines into the ones
+  that show the pattern or construct the section teaches and the
+  ones that exist so the demo can run: reading a file, parsing
+  input, building fixtures, formatting. Incidental code that
+  outgrows the subject code, repeats in a second listing, or needs
+  sentences of prose moves to a helper module, becomes a literal of
+  typed objects, or goes.
+
+- **What does it check at runtime that the checker could check?** A
+  string that must match a member, a dict keyed by the names of
+  things the module defines, a lookup that raises a `KeyError` for a
+  misspelling, an `isinstance()` chain over a known set of classes:
+  an `Enum`, a record, a `Protocol`, or a generic lets the checker
+  report the mistake before the program runs. Keep the runtime check
+  when the boundary where untrusted input arrives is the subject, or
+  when the dynamic form is (a registry, a plugin table).
+
+- **Does the trace show the subject?** A state machine's trace shows
+  the transition (from, input, to) on one line; an observer demo
+  shows who was notified of what; a cache demo shows hits and
+  misses; a timing demo puts the two numbers side by side. A trace
+  that prints the input on one line and the resulting action on the
+  next makes the reader assemble the transition.
+
+- **Do the names match the prose?** A parameter named `event` under
+  prose that says "input", a method `handle()` the prose calls
+  "dispatch": each makes the reader translate. Use the prose word in
+  the code, with the usual escape (`input_`, `class_`) when a
+  builtin or keyword takes it.
+
+- **Does an output line repeat its neighbor?** A state name one line
+  prints as a prefix and the next prints as the current state, a
+  message echoed by a wrapper and again by the callee: drop the copy
+  that carries less, and check that the first and last lines of the
+  trace still identify themselves.
+
 ## Design patterns
 
 - **Name a pattern only when the structure earns it.** A staged
@@ -409,8 +516,10 @@ legal value** (PEP 661, Python 3.15+).
   the X pattern," confirm the code has the pattern's defining
   structure. Otherwise describe the technique plainly.
 
-- **Capitalize pattern names** as proper nouns: Template Method,
-  Factory Method, Observer.
+- **Capitalize pattern names and set them in italics on every
+  mention,** in prose and in link text: *Template Method*, *Factory
+  Method*, *Observer*. Headings stay plain, and the lowercase word
+  keeps its ordinary sense ("an observer registers").
 
 - Many classic patterns dissolve in Python. First ask whether a
   function, a dataclass, a protocol, or a closure already solves the
@@ -470,3 +579,33 @@ legal value** (PEP 661, Python 3.15+).
 - Offload CPU-bound work to `asyncio.to_thread()` rather than
   awaiting it directly; `await` alone never yields the event loop to
   another coroutine during CPU-bound computation.
+
+- An asyncio demo whose output depends on the order in which
+  deadlines fire needs 5-10x gaps between competing sleeps
+  (0.01/0.05/0.25), widest where a cancellation must propagate.
+  Windows timers tick at about 15 ms, so 0.01/0.02/0.03 lets a task
+  finish inside the tick that was meant to cancel it, and a
+  self-healing marker then records the opposite of what the prose
+  says.
+
+- `slots=True` makes `dataclass()` create and return a new class,
+  since a class's slots are set at creation. A decorator that
+  registers a class must register what `dataclass()` returns:
+  `EVENTS.add(cls)` before the call files a class no instance
+  belongs to, and a registering decorator stacked under `@record`
+  sees the pre-slots class the same way. Separately, `ty` mistypes
+  `record(cls)` on a `type[E]` parameter, so such a decorator calls
+  `dataclass(frozen=True, slots=True)(cls)` directly (chapter 28's
+  `tagged_bus.py`).
+
+- A seeded simulation can still print differently across platforms.
+  The seed holds the random draws still, but the C library's `cos`
+  differs in the last bit between Windows and glibc, and a chaotic
+  run multiplies that bit each step until a three-decimal reading
+  moves. Print two decimals from such a run; leave the seed alone.
+
+- A warning goes to stderr, and a `#:` marker captures stdout alone. A
+  listing that must show one records it with
+  `warnings.catch_warnings(record=True)` and
+  `simplefilter("always")`, then prints the category and message
+  under `#:`.
