@@ -392,11 +392,11 @@ because the array version drops the names silently.
 
 ## Subclassing `tuple` Directly
 
-`NamedTuple` generates a `tuple` subclass for you,
-and you can write one by hand when you need the tuple protocol together with your own construction or methods.
+`NamedTuple` generates a `tuple` subclass.
+You can also subclass `tuple` directly when you need the tuple protocol together with your own construction or methods.
 A tuple takes its contents at creation,
-so `__init__()` runs too late to choose them.
-The subclass overrides `__new__()` instead and hands the items to `tuple.__new__()`:
+so `__init__()` runs too late to assign them.
+A custom `tuple` subclass overrides `__new__()` and hands the items to `tuple.__new__()`:
 
 ```python
 # point_tuple.py
@@ -427,12 +427,11 @@ print(hasattr(p, "__dict__"))
 #: False
 ```
 
-`Point(1.0, 2.0)` builds a tuple of two floats,
-and the properties read the two positions by name.
 Indexing, slicing, unpacking, hashing, and equality all come from `tuple`,
 so a `Point` works anywhere code expects a tuple,
 and it equals the bare `(1.0, 2.0)`,
 the same structural equality that `still_a_tuple.py` shows.
+
 Tuple operations return plain tuples: `p + (3.0,)` and `p[:1]` are `tuple`s,
 not `Point`s, so a subclass that must survive those operations overrides the operators.
 The empty `__slots__ = ()` keeps a `Point` as small as a tuple.
