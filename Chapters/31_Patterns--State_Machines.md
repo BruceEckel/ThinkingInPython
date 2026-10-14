@@ -893,6 +893,154 @@ Choose one of the two designs here when you cannot take that dependency,
 or want the mechanism visible in your own code.
 Choose a library once the machine needs more than a page of code.
 
+## States as `Enum` Members
+
+The one-table design keeps its states as bare `Enum` members and puts every action in the table.
+A third shape gives each member its own action and its own transition function,
+so the enum is the table.
+`State` is a record of two callables,
+and `Trap` is an `Enum` whose members are `State`s:
+
+```python
+# enum_states.py
+from collections.abc import Callable
+from enum import Enum
+from mouse_action import MouseAction as M
+from record import record
+
+type Behavior = Callable[[M], str]
+type Transition = Callable[[M], Trap]
+
+@record
+class State:
+    behavior: Behavior
+    transition: Transition
+
+def waiting_next(input_: M) -> Trap:
+    match input_:
+        case M.APPEARS:
+            return Trap.LURING
+        case _:
+            return Trap.WAITING
+
+def luring_next(input_: M) -> Trap:
+    match input_:
+        case M.RUNS_AWAY:
+            return Trap.WAITING
+        case M.ENTERS:
+            return Trap.TRAPPING
+        case _:
+            return Trap.LURING
+
+def trapping_next(input_: M) -> Trap:
+    match input_:
+        case M.ESCAPES:
+            return Trap.WAITING
+        case M.TRAPPED:
+            return Trap.HOLDING
+        case _:
+            return Trap.TRAPPING
+
+def holding_next(input_: M) -> Trap:
+    match input_:
+        case M.REMOVED:
+            return Trap.WAITING
+        case _:
+            return Trap.HOLDING
+
+class Trap(State, Enum):
+    WAITING = (lambda _: "Broadcasting cheese smell",
+               waiting_next)
+    LURING = (lambda _: "Presenting Cheese, door open",
+              luring_next)
+    TRAPPING = (lambda _: "Closing door", trapping_next)
+    HOLDING = (lambda _: "Mouse caught", holding_next)
+
+class StateMachine:
+    def __init__(self, start: Trap) -> None:
+        self.state = start
+
+    def output(self, input_: M) -> str:
+        result = self.state.behavior(input_)
+        self.state = self.state.transition(input_)
+        return result
+```
+
+A `State` holds a behavior, which turns the input into the machine's output,
+and a transition, which turns the input into the next state.
+Both aliases name `Trap` above the class statement that creates it.
+A `type` alias evaluates its right side lazily,
+so the forward reference resolves when the checker or the program reads the alias.
+The four transition functions `match` on the input the way the states in `mouse_trap_states.py` do,
+and each names the `Trap` members that follow it.
+A function body runs after the whole module has loaded,
+so a `Trap` named inside one resolves too.
+
+`Trap` mixes `State` into `Enum`.
+Each member's value is a tuple,
+and `Enum` passes the tuple to `State`'s constructor,
+so `Trap.WAITING` is a `Trap` member and a `State` at once,
+with `behavior` and `transition` as attributes.
+The behaviors here are lambdas that ignore their input,
+since the trap announces the same thing whatever the mouse does.
+A machine whose output depends on the input as well as the state is the one that uses that parameter.
+`StateMachine.output()` asks the current state for the output,
+then for the next state, and stores it.
+
+`enum_states_demo.py` runs the trap through `MOVES` and prints each transition above the output it produced:
+
+```python
+# enum_states_demo.py
+from enum_states import StateMachine, Trap
+from mouse_moves import MOVES
+
+machine = StateMachine(Trap.WAITING)
+for move in MOVES:
+    before = machine.state
+    result = machine.output(move)
+    print(before.name, move, "->", machine.state.name)
+    print("   ", result)
+#: WAITING mouse appears -> LURING
+#:     Broadcasting cheese smell
+#: LURING mouse runs away -> WAITING
+#:     Presenting Cheese, door open
+#: WAITING mouse appears -> LURING
+#:     Broadcasting cheese smell
+#: LURING mouse enters trap -> TRAPPING
+#:     Presenting Cheese, door open
+#: TRAPPING mouse escapes -> WAITING
+#:     Closing door
+#: WAITING mouse appears -> LURING
+#:     Broadcasting cheese smell
+#: LURING mouse enters trap -> TRAPPING
+#:     Presenting Cheese, door open
+#: TRAPPING mouse trapped -> HOLDING
+#:     Closing door
+#: HOLDING mouse removed -> WAITING
+#:     Mouse caught
+```
+
+Two consequences follow from the mixin.
+`Enum` folds members with equal values into one,
+and a record's equality compares its fields,
+so two members that share the same behavior and transition functions collapse into a single member with two names.
+Every state therefore needs functions of its own.
+The type checker reads `behavior` and `transition` from the record's fields,
+so a transition that returns a `str`,
+or a call that passes a `str` where the function takes a `MouseAction`,
+fails the check.
+It leaves a member's tuple uncompared with the fields:
+a tuple holding one callable, or the two in the wrong order,
+passes `ty` and fails at import or at run time.
+Pyright reports all three.
+
+The action travels with the state rather than with every rule that leads to it,
+which is the one-table design's weakness from the previous section.
+In exchange, the transitions sit in four functions above the enum rather than in one table.
+Which shape reads best is again a question of which you would rather read:
+the whole machine as one table,
+or each state as one row holding its own action and its own successors.
+
 ## Exercises
 
 Try each exercise before opening its [solution](../Solutions/31_Patterns--State_Machines/).
