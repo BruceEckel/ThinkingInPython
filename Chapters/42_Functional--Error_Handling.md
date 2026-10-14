@@ -79,9 +79,9 @@ def func_a(i: int) -> int | str:
         return f"func_a({i})"
     return i
 
-outputs = [func_a(i) for i in range(5)]
-for r in outputs:
-    match r:
+results = [func_a(i) for i in range(5)]
+for result in results:
+    match result:
         case int(answer):
             print(f"answer = {answer}")
         case str(error):
@@ -741,21 +741,27 @@ def parse_seconds(text: str) -> int:
     try:
         return int(text)
     except ValueError as e:
-        e.add_note(f"timeout was set to {text!r}")
         e.add_note("expected a whole number of seconds")
         raise
 
+def read_setting(name: str, text: str) -> int:
+    try:
+        return parse_seconds(text)
+    except ValueError as e:
+        e.add_note(f"setting {name!r} was {text!r}")
+        raise
+
 try:
-    parse_seconds("no")
+    read_setting("timeout", "no")
 except ValueError as e:
     print("".join(traceback.format_exception_only(e)),
           end="")
 #: ValueError: invalid literal for int() with base 10: 'no'
-#: timeout was set to 'no'
 #: expected a whole number of seconds
+#: setting 'timeout' was 'no'
 ```
 
-The bare `raise` re-raises the same object, so the exception keeps its type,
+Each bare `raise` re-raises the same object, so the exception keeps its type,
 `ValueError`, and its original traceback.
 The listing prints with `traceback.format_exception_only()`,
 which renders the message and the notes and leaves out the file paths a full traceback carries.
@@ -764,6 +770,9 @@ Notes accumulate.
 As the exception propagates,
 each `except` clause that catches and re-raises it can add a line built from its own frame's locals.
 The frame that raised the exception cannot see those locals.
+In `add_note.py`, `parse_seconds()` adds the first note,
+and `read_setting()` adds the second from its own parameter `name`,
+which `parse_seconds()` never receives.
 
 `add_note()` appends each note to a list, `__notes__`,
 which the first call creates.
@@ -793,23 +802,27 @@ def parse_field(name: str,
         e.add_note(f"field {name!r} received {text!r}")
         return Err(e)
 
-for name, text in (("age", "42"), ("size", "oops")):
-    match parse_field(name, text):
-        case Ok(answer):
-            print(f"{name} = {answer}")
+results = [parse_field("age", "42"),
+           parse_field("size", "oops")]
+for result in results:
+    match result:
+        case Ok():
+            print(result)
         case Err(error):
-            print(f"{name}: {type(error).__name__}")
+            print(type(error).__name__)
             for note in error.__notes__:
                 print(f"  {note}")
-#: age = 42
-#: size: ValueError
+#: Ok(answer=42)
+#: ValueError
 #:   field 'size' received 'oops'
 ```
 
 `parse_field()` adds the note before it returns the exception as a value,
 in the one frame that has both the exception and the field name.
-Code that reads the `Err` later, after `parse_field()` has returned,
-can still report which field failed.
+The loop reads each `Result` after `parse_field()` has returned,
+and it never sees a field name.
+It still reports which field failed,
+because the `Err` holds the exception and the exception holds the note.
 
 The note applies the chapter's opening argument to the exception inside the `Err`.
 `Err` says the call failed, the exception says what went wrong,

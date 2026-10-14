@@ -6,9 +6,9 @@ def func_a(i: int) -> int | str:
         return f"func_a({i})"
     return i
 
-outputs = [func_a(i) for i in range(5)]
-for r in outputs:
-    match r:
+results = [func_a(i) for i in range(5)]
+for result in results:
+    match result:
         case int(answer):
             print(f"answer = {answer}")
         case str(error):
