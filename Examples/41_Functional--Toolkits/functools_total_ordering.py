@@ -15,5 +15,5 @@ class Weight:
 
 light = Weight(2)
 heavy = Weight(5)
-print(light < heavy, light <= heavy, light > heavy)
-#: True True False
+print(light <= heavy, light > heavy, light >= heavy)
+#: True False False

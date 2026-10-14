@@ -468,13 +468,14 @@ def group_rounds(
                 history[frozenset(pair)] += 1
         yield round_result
 
-students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
+students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia",
+            "Hal"]
 first = next(group_rounds(students, 2, random.Random(0)))
 second = next(group_rounds(students, 2, random.Random(0)))
 print(first == second)
 #: True
-print(first)
-#: [('Gia', 'Eve', 'Ana'), ('Di', 'Cy'), ('Fi', 'Bo')]
+print(*map("-".join, first))
+#: Gia-Eve Hal-Bo Di-Fi Ana-Cy
 ```
 
 The `rng` parameter preserves determinism,

@@ -364,8 +364,8 @@ class Weight:
 
 light = Weight(2)
 heavy = Weight(5)
-print(light < heavy, light <= heavy, light > heavy)
-#: True True False
+print(light <= heavy, light > heavy, light >= heavy)
+#: True False False
 ```
 
 `Weight` is a hand-written class to show the tool.
@@ -487,8 +487,11 @@ the way `[start:stop:step]` slices a list.
 # itertools_islice.py
 from itertools import islice
 
-print(list(islice(range(10), 2, 8, 2)))
+it = iter(range(10))
+print(list(islice(it, 2, 8, 2)))
 #: [2, 4, 6]
+print(next(it))
+#: 8
 ```
 
 `islice()` differs from a list slice in two ways.
@@ -496,7 +499,10 @@ It rejects negative indices with a `ValueError`,
 since a negative index counts back from the end,
 and an iterator may have no end.
 And it consumes every element it passes.
-An iterator you pass to `islice()` resumes where the slice stopped.
+An iterator you pass to `islice()` resumes where the slice stopped,
+so `next(it)` returns `8`.
+`islice()` consumed the `7` on its way to the stop index,
+although it yielded nothing for it.
 A list slice leaves the list as it was.
 
 ### `count`
@@ -567,14 +573,17 @@ A hand-written loop gets that remainder wrong easily.
 ```python
 # itertools_batched.py
 from itertools import batched
+from exceptions import expect
 
 print(list(batched(range(7), 3)))
 #: [(0, 1, 2), (3, 4, 5), (6,)]
+expect(ValueError, list, batched(range(7), 3, strict=True))
+#: [ValueError] batched(): incomplete batch
 ```
 
 A short final batch is normal for pagination and wrong for fixed-width records.
-For fixed-width records,
-`batched(data, 3, strict=True)` raises `ValueError: batched(): incomplete batch` instead.
+For fixed-width records, `strict=True` raises a `ValueError` instead,
+as the last line of output shows.
 `zip(strict=True)` under [`zip_longest`](#zip_longest) offers the same choice.
 
 ### `accumulate`
@@ -777,13 +786,19 @@ from itertools import tee
 a, b = tee([1, 2, 3])
 print(list(a), list(b))
 #: [1, 2, 3] [1, 2, 3]
+source = iter([1, 2, 3])
+a, b = tee(source)
+next(source)  # [1]
+print(list(a), list(b))
+#: [2, 3] [2, 3]
 ```
 
 Two cautions apply.
 After `tee()`, use the returned iterators and leave the source alone.
 Advancing the original source consumes values that the copies then miss.
+The second case advances `source` once at `[1]`, so both copies start at `2`.
 And `tee()` buffers every value one copy has consumed and the other has yet to read.
-This demo drains `a` completely before touching `b`,
+Each case drains `a` completely before touching `b`,
 so `tee()` stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and uses the same memory.
@@ -1086,21 +1101,23 @@ def group_rounds(
         yield round_result
 ```
 
-The first demo schedules seven students in pairs for seven rounds and counts who met whom:
+The first demo schedules eight students in pairs for seven rounds,
+the circle method's own case, and counts who met whom:
 
 ```python
 # pair_rounds.py
 from itertools import combinations, islice
 from student_groups import group_rounds
 
-students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
+students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia",
+            "Hal"]
 rounds = list(islice(group_rounds(students, 2),
-                     len(students)))
+                     len(students) - 1))
 for i, grouping in enumerate(rounds[:3]):
-    print(i, grouping)
-#: 0 [('Gia', 'Eve', 'Ana'), ('Di', 'Cy'), ('Fi', 'Bo')]
-#: 1 [('Di', 'Bo', 'Eve'), ('Cy', 'Ana'), ('Gia', 'Fi')]
-#: 2 [('Eve', 'Fi', 'Ana'), ('Bo', 'Gia'), ('Cy', 'Di')]
+    print(i, *map("-".join, grouping))
+#: 0 Gia-Eve Hal-Bo Di-Fi Ana-Cy
+#: 1 Gia-Bo Hal-Ana Cy-Eve Di-Fi
+#: 2 Cy-Fi Hal-Eve Bo-Di Ana-Gia
 
 meetings = [*map(frozenset, combinations(group, 2))
             for r in rounds for group in r]
@@ -1108,24 +1125,23 @@ possible = set(map(frozenset, combinations(students, 2)))
 distinct = set(meetings)
 print(len(distinct), "of", len(possible),
       "pairs met at least once")
-#: 21 of 21 pairs met at least once
+#: 26 of 28 pairs met at least once
 print(len(meetings) - len(distinct), "repeat meetings")
-#: 14 repeat meetings
+#: 2 repeat meetings
 ```
 
 Called with `size=2`,
-`group_rounds()` covers all `21` possible pairs across the seven rounds.
+`group_rounds()` covers `26` of the `28` possible pairs across the seven rounds.
 Each round is a shuffle, then a greedy choice repeated until the pool is empty,
 in place of the circle method's rotation around a stationary player.
 
-The same seven rounds hold `14` repeat meetings.
-An odd roster leaves one player over,
-so each round adds that player to an existing pair.
-A triple holds three meetings where a pair holds one,
-so the leftover player adds two meetings a round.
-Over seven rounds, those additional meetings are the `14` repeats.
+The same seven rounds hold `2` repeat meetings.
+For the same eight students and seven rounds,
+the circle method schedules each of the `28` pairs once, with no repeats.
+The greedy search picks each partner from the meeting counts so far and plans no later round,
+so its schedule is good rather than perfect.
 
-Trios come from the same seven students:
+Trios come from the first seven of those students:
 
 ```python
 # trio_rounds.py
@@ -1143,7 +1159,8 @@ for i, grouping in enumerate(trios):
 
 Called with `size=3`, the same function schedules trios instead.
 Seven students make two threes with one left over, so one group grows to four.
-Growing one group is the join-instead-of-sit-out choice `pair_rounds.py` shows for pairs.
+The leftover student joins a group instead of sitting out the round,
+the alternative to the circle method's phantom player.
 
 The last case asks for groups of five from a roster of two:
 
@@ -1173,7 +1190,7 @@ so it looks like the place for [`@cache`](#cache).
 If you add `@cache`, the first call raises a `TypeError`,
 because `met()` takes a `list` and a `list` is unhashable.
 If you pass a tuple instead, the calls succeed and the schedule gets worse.
-The seven rounds `pair_rounds.py` schedules then cover 20 of the 21 pairs instead of all 21.
+The seven rounds `pair_rounds.py` schedules then cover 22 of the 28 pairs instead of 26.
 `met()` reads `history`, which changes at the end of every round.
 An answer cached in round 0 therefore comes back unchanged in a later round,
 after the counts it summed have grown.
