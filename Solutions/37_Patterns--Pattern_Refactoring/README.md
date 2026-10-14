@@ -4,7 +4,7 @@
 
 > Add a `Plastic` material to `trash.py`,
 > then point `recycle_dict.py` at `plastic.dat` and run it.
-> Confirm that its sorting loop and `parse_trash.py` need no other changes,
+> Confirm that `sort_by_type()` and `parse_trash.py` need no changes,
 > then account for every pound of plastic that `plastic_dropped.py` loses.
 > Which test in `test_trash.py` fails, and why is that failure correct?
 
@@ -406,7 +406,7 @@ method returns too.
 > add it to the data `recycle_dict.py` reads,
 > then run `recycle_dict.py` and `recycling_note.py`.
 > Explain why `CrushedAluminum` gets its own bin but not its own note.
-> Then change `recycle_dict.py` so a subclass shares its parent's bin,
+> Then change `sort_by_type()` so a subclass shares its parent's bin,
 > without naming any material in the sorting loop.
 
 <details>

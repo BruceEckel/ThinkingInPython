@@ -1,12 +1,9 @@
 # recycle_dict.py
-from collections import defaultdict
+from dict_sorter import sort_by_type
 from parse_trash import parse
-from trash import Bins, report
+from trash import report
 
-bins: Bins = defaultdict(list)
-for piece in parse("trash.dat"):
-    bins[type(piece)].append(piece)  # Piece picks its bin
-report(bins)
+report(sort_by_type(parse("trash.dat")))
 #: Glass: 88.78
 #: Paper: 21.20
 #: Aluminum: 584.50

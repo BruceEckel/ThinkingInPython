@@ -231,24 +231,35 @@ The `rtti` in the file name stands for *run-time type identification*,
 the C++ name for discovering a type at runtime:
 
 ```python
-# recycle_rtti.py
+# rtti_sorter.py
 from collections import defaultdict
-from parse_trash import parse
 from trash import (Aluminum, Bins, Cardboard, Glass,
-                   Paper, report)
+                   Paper, Trash)
 
-bins: Bins = defaultdict(list)
-for piece in parse("trash.dat"):
-    match piece:
-        case Aluminum():
-            bins[Aluminum].append(piece)
-        case Paper():
-            bins[Paper].append(piece)
-        case Glass():
-            bins[Glass].append(piece)
-        case Cardboard():
-            bins[Cardboard].append(piece)
-report(bins)
+def sort_by_match(pieces: list[Trash]) -> Bins:
+    bins: Bins = defaultdict(list)
+    for piece in pieces:
+        match piece:
+            case Aluminum():
+                bins[Aluminum].append(piece)
+            case Paper():
+                bins[Paper].append(piece)
+            case Glass():
+                bins[Glass].append(piece)
+            case Cardboard():
+                bins[Cardboard].append(piece)
+    return bins
+```
+
+`recycle_rtti.py` sorts the pieces in `trash.dat` with `sort_by_match()`:
+
+```python
+# recycle_rtti.py
+from parse_trash import parse
+from rtti_sorter import sort_by_match
+from trash import report
+
+report(sort_by_match(parse("trash.dat")))
 #: Glass: 88.78
 #: Paper: 21.20
 #: Aluminum: 584.50
@@ -256,7 +267,7 @@ report(bins)
 ```
 
 `recycle_rtti.py` sorts every piece and reports each material's total,
-but it has a classic flaw.
+but `sort_by_match()` has a classic flaw.
 It tests for every type.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you write the type-to-bin lookup by hand.
@@ -296,29 +307,21 @@ Aluminum:30
 Plastic:40
 ```
 
+`plastic_dropped.py` defines `Plastic` and passes the new data to the imported `sort_by_match()`,
+which stays as written:
+
 ```python
 # plastic_dropped.py
-from collections import defaultdict
 from typing import ClassVar
 from parse_trash import parse
-from trash import (Aluminum, Bins, Cardboard, Glass, Paper,
-                   Trash, report)
+from rtti_sorter import sort_by_match
+from trash import Trash, report
 
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
-bins: Bins = defaultdict(list)
-for piece in pieces:
-    match piece:
-        case Aluminum():
-            bins[Aluminum].append(piece)
-        case Paper():
-            bins[Paper].append(piece)
-        case Glass():
-            bins[Glass].append(piece)
-        case Cardboard():
-            bins[Cardboard].append(piece)
+bins = sort_by_match(pieces)
 report(bins)
 #: Glass: 2.30
 #: Aluminum: 50.10
@@ -348,15 +351,27 @@ The `match` alone loses trash silently.
 A dictionary keyed by type replaces the `match`:
 
 ```python
-# recycle_dict.py
+# dict_sorter.py
 from collections import defaultdict
-from parse_trash import parse
-from trash import Bins, report
+from trash import Bins, Trash
 
-bins: Bins = defaultdict(list)
-for piece in parse("trash.dat"):
-    bins[type(piece)].append(piece)  # Piece picks its bin
-report(bins)
+def sort_by_type(pieces: list[Trash]) -> Bins:
+    bins: Bins = defaultdict(list)
+    for piece in pieces:
+        # Piece picks its bin
+        bins[type(piece)].append(piece)
+    return bins
+```
+
+`recycle_dict.py` sorts `trash.dat` with `sort_by_type()` and prints the same report as `recycle_rtti.py`:
+
+```python
+# recycle_dict.py
+from dict_sorter import sort_by_type
+from parse_trash import parse
+from trash import report
+
+report(sort_by_type(parse("trash.dat")))
 #: Glass: 88.78
 #: Paper: 21.20
 #: Aluminum: 584.50
@@ -376,9 +391,9 @@ If you derive `CrushedAluminum` from `Aluminum`,
 a `CrushedAluminum` sorts into its own bin rather than its parent's.
 A bin per exact class is usually what a sorter needs,
 but keep that key in mind before you subclass a material.
-Subclasses are another place where `recycle_rtti.py` and `recycle_dict.py` differ.
+Subclasses are another place where `sort_by_match()` and `sort_by_type()` differ.
 `case Aluminum()` matches any subclass,
-so `recycle_rtti.py` puts a `CrushedAluminum` in the `Aluminum` bin.
+so `sort_by_match()` puts a `CrushedAluminum` in the `Aluminum` bin.
 Swapping the `match` for the dictionary is a redesign, not a rename.
 
 The `defaultdict(list)` creates a material's bin the first time the loop reads a piece of that material.
@@ -387,22 +402,20 @@ so a type checker accepts `bins: Bins = {}` too.
 That version raises a `KeyError` on the first piece of trash.
 
 `plastic_dropped.py` drops the plastic in `plastic.dat`.
-Here, `recycle_dict_plastic.py` points the same sorter at that file and defines `Plastic` the same way `plastic_dropped.py` does:
+Here, `recycle_dict_plastic.py` passes that file to `sort_by_type()` and defines `Plastic` the same way `plastic_dropped.py` does:
 
 ```python
 # recycle_dict_plastic.py
-from collections import defaultdict
 from typing import ClassVar
+from dict_sorter import sort_by_type
 from parse_trash import parse
-from trash import Bins, Trash, report
+from trash import Trash, report
 
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
-bins: Bins = defaultdict(list)
-for piece in pieces:
-    bins[type(piece)].append(piece)  # Piece picks its bin
+bins = sort_by_type(pieces)
 report(bins)
 #: Glass: 2.30
 #: Plastic: 9.00
@@ -414,11 +427,13 @@ print(f"parsed {len(pieces)}, binned {binned}")
 
 The loop bins every piece, plastic included: `parsed 4, binned 4`.
 The last two lines count the pieces for the comparison with `plastic_dropped.py`.
-Apart from those lines, handling plastic takes two changes to `recycle_dict.py`:
+Apart from those lines,
+`recycle_dict_plastic.py` differs from `recycle_dict.py` in two places:
 the `Plastic` definition and the data file's name.
-The sorting line, `bins[type(piece)].append(piece)`,
-reads the same as in `recycle_dict.py`,
-while the `match` in `recycle_rtti.py` and `plastic_dropped.py` would need a new `case`.
+Both plastic listings import their sorter,
+so `sort_by_type()` and `sort_by_match()` run on `plastic.dat` as written.
+The sorting line, `bins[type(piece)].append(piece)`, bins the new material,
+while the `match` in `sort_by_match()` would need a new `case`.
 
 Here is the path each line of `plastic.dat` takes through `recycle_dict_plastic.py`:
 
@@ -659,7 +674,7 @@ Try each exercise before opening its [solution](../Solutions/37_Patterns--Patter
 
 1.  Add a `Plastic` material to `trash.py`,
     then point `recycle_dict.py` at `plastic.dat` and run it.
-    Confirm that its sorting loop and `parse_trash.py` need no other changes,
+    Confirm that `sort_by_type()` and `parse_trash.py` need no changes,
     then account for every pound of plastic that `plastic_dropped.py` loses.
     Which test in `test_trash.py` fails, and why is that failure correct?
 2.  Write a `price()` operation as a function over a list of `Trash`,
@@ -671,7 +686,7 @@ Try each exercise before opening its [solution](../Solutions/37_Patterns--Patter
     add it to the data `recycle_dict.py` reads,
     then run `recycle_dict.py` and `recycling_note.py`.
     Explain why `CrushedAluminum` gets its own bin but not its own note.
-    Then change `recycle_dict.py` so a subclass shares its parent's bin,
+    Then change `sort_by_type()` so a subclass shares its parent's bin,
     without naming any material in the sorting loop.
 5.  Define `Plastic`, whose disposal hazard is toxic fumes,
     and leave it out of `disposal_hazard.py`'s registrations.

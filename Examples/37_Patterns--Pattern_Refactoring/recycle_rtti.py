@@ -1,21 +1,9 @@
 # recycle_rtti.py
-from collections import defaultdict
 from parse_trash import parse
-from trash import (Aluminum, Bins, Cardboard, Glass,
-                   Paper, report)
+from rtti_sorter import sort_by_match
+from trash import report
 
-bins: Bins = defaultdict(list)
-for piece in parse("trash.dat"):
-    match piece:
-        case Aluminum():
-            bins[Aluminum].append(piece)
-        case Paper():
-            bins[Paper].append(piece)
-        case Glass():
-            bins[Glass].append(piece)
-        case Cardboard():
-            bins[Cardboard].append(piece)
-report(bins)
+report(sort_by_match(parse("trash.dat")))
 #: Glass: 88.78
 #: Paper: 21.20
 #: Aluminum: 584.50
