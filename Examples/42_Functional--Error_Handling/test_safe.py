@@ -6,8 +6,6 @@ def test_good_input_becomes_an_ok() -> None:
     assert parse("42") == Ok(42)
 
 def test_exception_becomes_an_err() -> None:
-    match parse("oops"):
-        case Err(error):
-            assert isinstance(error, ValueError)
-        case _:
-            raise AssertionError("expected an Err")
+    result = parse("oops")
+    assert isinstance(result, Err)
+    assert isinstance(result.error, ValueError)
