@@ -78,6 +78,12 @@ The behavior of `run()` depends on the current state.
 `step()` defines the flow,
 while each `State`'s `run()` and `next()` supply the varying behavior.
 
+This split has a name.
+A machine whose action belongs to the state, and takes no input,
+is a *Moore machine*: what a state does depends on the state alone,
+and the input chooses the successor.
+`run()` takes no argument for that reason.
+
 In this style of *State Machine*, each state decides the next state.
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
@@ -453,6 +459,12 @@ and what state comes next:
 
 A condition is any callable returning a `bool`, an action is any callable,
 and the rules are a list the engine groups into an ordinary `dict`.
+
+The action on a rule takes the input,
+so what the machine does depends on the state and the input together.
+That is a *Mealy machine*, the other classical shape.
+The first design's `run()` acts per state and sees no input,
+while a rule's `action` acts per transition and reads the input that fired it.
 
 The mousetrap's inputs are `Mouse` members, bare names.
 The vending machine's inputs carry values: what a coin is worth,
@@ -1041,6 +1053,7 @@ The design reads best when the transitions are obvious from the state's own name
 An action that must run on every entry into one state belongs in that state's `run()`,
 written once.
 Sounding a chime whenever the trap reaches `Holding` is such an action.
+That is the Moore shape: the action belongs to the state.
 
 Inside the each-state-decides design,
 `match` statements and per-state tables differ in which code handles an unrecognized input.
@@ -1059,6 +1072,8 @@ In the one-table design the states are `Enum` members, bare names,
 so an action that runs on every entry into one state must go in the table.
 You repeat the action on every rule that leads to that state,
 or write a helper that those rules call.
+That is the Mealy shape: the action belongs to the transition,
+and in return it can read the input that caused the transition.
 
 States as `Enum` members is the first design with records in place of classes.
 Each member names its own successors, as `Luring` does,
