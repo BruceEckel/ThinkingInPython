@@ -1,6 +1,6 @@
 # recursive_accept.py
 from typing import Any, Protocol
-from flower_visitors import Bee, Gladiolus, Ranunculus
+from flower_visitors import Bee, Gladiolus, Ranunculus, Worm
 
 class Accepts(Protocol):
     def accept(self, visitor: Any) -> None: ...
@@ -17,6 +17,9 @@ class Corsage:
 if __name__ == "__main__":
     corsage = Corsage(
         Gladiolus(), Corsage(Ranunculus()))
-    corsage.accept(Bee())
+    for bug in (Bee(), Worm()):
+        corsage.accept(bug)
 #: Gladiolus pollinated by Bee
 #: Ranunculus pollinated by Bee
+#: Gladiolus eaten by Worm
+#: Ranunculus eaten by Worm

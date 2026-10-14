@@ -385,7 +385,7 @@ so the loop over the elements stays inside the object:
 ```python
 # recursive_accept.py
 from typing import Any, Protocol
-from flower_visitors import Bee, Gladiolus, Ranunculus
+from flower_visitors import Bee, Gladiolus, Ranunculus, Worm
 
 class Accepts(Protocol):
     def accept(self, visitor: Any) -> None: ...
@@ -402,9 +402,12 @@ class Corsage:
 if __name__ == "__main__":
     corsage = Corsage(
         Gladiolus(), Corsage(Ranunculus()))
-    corsage.accept(Bee())
+    for bug in (Bee(), Worm()):
+        corsage.accept(bug)
 #: Gladiolus pollinated by Bee
 #: Ranunculus pollinated by Bee
+#: Gladiolus eaten by Worm
+#: Ranunculus eaten by Worm
 ```
 
 The recursion works because `Corsage` and `Flower` both define `accept()`.
@@ -418,7 +421,8 @@ In `bug_visits.py` the loop that calls `accept()` sits outside the hierarchy,
 at module level, and takes one flower at a time from a tuple.
 In `recursive_accept.py` the loop runs inside `accept()`,
 the situation where the classic pattern still fits.
-Every visitor reuses that one loop.
+Every visitor reuses that one loop:
+the `Bee` and the `Worm` both reach the nested `Ranunculus` through it.
 A new visitor defines `visit()` for a single flower,
 and `Corsage.accept()` passes that visitor to every nested element.
 
