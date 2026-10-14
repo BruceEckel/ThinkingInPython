@@ -404,9 +404,9 @@ def f(a, b, c):
 x = [1, 2, 3]
 f(*x)
 #: 1 2 3
-f(*(4, 5, 6))
+f(*range(4, 7))
 #: 4 5 6
-d = {"a": 3.14, "b": 1.62, "c": 2.72}
+d = {"c": 2.72, "a": 3.14, "b": 1.62}
 f(**d)
 #: 3.14 1.62 2.72
 
@@ -426,6 +426,12 @@ trace(report, "point", *nums, **opts)
 #: calling report
 #: point (1, 2, 3) {'color': 'red', 'size': 10}
 ```
+
+`f(*range(4, 7))` unpacks a `range`,
+which computes its values as `*` consumes them.
+`d` lists its keys out of order,
+yet `f(**d)` prints the values in parameter order,
+because `**` binds each value to the parameter its key names.
 
 Because collecting and unpacking are inverses,
 a function can collect arguments beyond its named parameters and pass them on as they arrived.
@@ -538,10 +544,14 @@ def f(a, /, b, *args, c, **kwargs):
 
 f(1, 2, 3, 4, c=5, d=6)
 #: 1 2 (3, 4) 5 {'d': 6}
+f(1, b=2, c=5)
+#: 1 2 () 5 {}
 ```
 
 `a` must arrive positionally, `c` must arrive by name,
-and `b` can arrive either way.
+and `b` can arrive either way:
+by position in `f(1, 2, 3, 4, c=5, d=6)` and by name in `f(1, b=2, c=5)`.
+With no extra arguments, `args` and `kwargs` stay empty.
 
 In the standard library,
 many built-in functions and methods take positional-only parameters,
