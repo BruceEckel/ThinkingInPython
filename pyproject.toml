@@ -169,6 +169,7 @@ lines-after-imports = 1
 "**/47_Effects--Stateless_in_Practice/exercise_10.py" = ["I001"]
 "**/47_Effects--Stateless_in_Practice/exercise_11.py" = ["I001"]
 "**/47_Effects--Stateless_in_Practice/exercise_3.py" = ["I001"]
+"**/bug_visits.py" = ["I001"]
 "**/catch_everything.py" = ["I001"]
 "**/dunder_modes.py" = ["I001"]
 "**/effect_table.py" = ["I001"]

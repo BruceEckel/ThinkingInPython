@@ -1,18 +1,14 @@
 # bug_visits.py
-import random
-from flower_visitors import Bee, Fly, Worm, flower_gen
+from flower_visitors import (Bee, Chrysanthemum, Fly,
+                             Gladiolus, Ranunculus, Worm)
 
 bee = Bee()
 fly = Fly()
 worm = Worm()
-random.seed(47)  # Reproducible flower sequence
-for flower in flower_gen(4):
+for flower in (Gladiolus(), Ranunculus(), Chrysanthemum()):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
-#: Ranunculus pollinated by Bee
-#: Ranunculus pollinated by Fly
-#: Ranunculus eaten by Worm
 #: Gladiolus pollinated by Bee
 #: Gladiolus pollinated by Fly
 #: Gladiolus eaten by Worm

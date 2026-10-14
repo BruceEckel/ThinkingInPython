@@ -1,6 +1,4 @@
 # flower_visitors.py
-import random
-from collections.abc import Iterator
 from typing import Any, override
 
 # The Flower hierarchy cannot be changed:
@@ -48,8 +46,3 @@ class Fly(Pollinator):
     pass
 class Worm(Predator):
     pass
-
-def flower_gen(n: int) -> Iterator[Flower]:
-    flowers = Flower.__subclasses__()
-    for _ in range(n):
-        yield random.choice(flowers)()

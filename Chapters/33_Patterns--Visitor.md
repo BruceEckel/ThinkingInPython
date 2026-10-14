@@ -34,8 +34,6 @@ Here, bugs visit flowers:
 
 ```python
 # flower_visitors.py
-import random
-from collections.abc import Iterator
 from typing import Any, override
 
 # The Flower hierarchy cannot be changed:
@@ -83,34 +81,22 @@ class Fly(Pollinator):
     pass
 class Worm(Predator):
     pass
-
-def flower_gen(n: int) -> Iterator[Flower]:
-    flowers = Flower.__subclasses__()
-    for _ in range(n):
-        yield random.choice(flowers)()
 ```
 
-`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`,
-the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).
-
-`bug_visits.py` sends each bug to four random flowers:
+`bug_visits.py` sends each bug to each flower:
 
 ```python
 # bug_visits.py
-import random
-from flower_visitors import Bee, Fly, Worm, flower_gen
+from flower_visitors import (Bee, Chrysanthemum, Fly,
+                             Gladiolus, Ranunculus, Worm)
 
 bee = Bee()
 fly = Fly()
 worm = Worm()
-random.seed(47)  # Reproducible flower sequence
-for flower in flower_gen(4):
+for flower in (Gladiolus(), Ranunculus(), Chrysanthemum()):
     flower.accept(bee)
     flower.accept(fly)
     flower.accept(worm)
-#: Ranunculus pollinated by Bee
-#: Ranunculus pollinated by Fly
-#: Ranunculus eaten by Worm
 #: Gladiolus pollinated by Bee
 #: Gladiolus pollinated by Fly
 #: Gladiolus eaten by Worm
@@ -429,7 +415,7 @@ so the type checker reports an element that lacks `accept()`,
 such as `Corsage("rose")`, before the program runs.
 
 In `bug_visits.py` the loop that calls `accept()` sits outside the hierarchy,
-at module level, and takes one flower at a time from `flower_gen()`.
+at module level, and takes one flower at a time from a tuple.
 In `recursive_accept.py` the loop runs inside `accept()`,
 the situation where the classic pattern still fits.
 Every visitor reuses that one loop.
