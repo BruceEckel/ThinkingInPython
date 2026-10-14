@@ -1614,9 +1614,10 @@ def moved(name: str) -> Success[str]:
         case _:
             assert_never(value)
 
-print(run(guarded("Carol")), run(moved("Carol")))
+if __name__ == "__main__":
+    print(run(guarded("Carol")), run(moved("Carol")))
+    print(repr(run(catch(KeyError)(guarded)("Carol"))))
 #: Carol: unknown Carol: unknown
-print(repr(run(catch(KeyError)(guarded)("Carol"))))
 #: KeyError('Carol')
 ```
 
@@ -1635,29 +1636,18 @@ The error propagates out of `run()`, and the inner `except` never runs:
 
 ```python
 # handler_blocks_except.py
+from except_vs_catch import guarded
 from exceptions import expect
 from greeter import Console
-from scores import score
-from stateless import Effect, Need, need, run, supply
-
-def guarded(
-    name: str
-) -> Effect[Need[Console], KeyError, str]:
-    try:
-        value = yield from score(name)
-    except KeyError:
-        return f"{name}: unknown"
-    console = yield from need(Console)
-    console.print(f"{name}: {value}")
-    return f"{name}: {value}"
+from stateless import run, supply
 
 expect(KeyError, run, supply(Console())(guarded)("Carol"))
 #: [KeyError] 'Carol'
 ```
 
-`guarded()` here is the same function as before,
-except that it also needs a `Console`, which this path does not reach.
-Wrapping `guarded()` in `supply(Console())` is enough to keep the `KeyError` out of its `except` clause.
+This `guarded()` is the one that returned `Carol: unknown` in `except_vs_catch.py`.
+It requests no `Console`, so the `supply(Console())` around it answers nothing.
+Wrapping `guarded()` in that `supply()` is enough to keep the `KeyError` out of its `except` clause.
 
 `catch_score.py` in [Turning an Error Into a Value](#turning-an-error-into-a-value)
 has the same shape.

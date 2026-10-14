@@ -21,7 +21,8 @@ def moved(name: str) -> Success[str]:
         case _:
             assert_never(value)
 
-print(run(guarded("Carol")), run(moved("Carol")))
+if __name__ == "__main__":
+    print(run(guarded("Carol")), run(moved("Carol")))
+    print(repr(run(catch(KeyError)(guarded)("Carol"))))
 #: Carol: unknown Carol: unknown
-print(repr(run(catch(KeyError)(guarded)("Carol"))))
 #: KeyError('Carol')
