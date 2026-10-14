@@ -13,18 +13,18 @@ class TwoWay(Broadcaster[int]):
     @value.setter
     def value(self, new: int) -> None:
         if new == self._value:
+            print(f"unchanged: {new}")
             return  # Breaks the re-entry
         self._value = new
         self.announce(new)
 
 model = TwoWay()
-seen: list[int] = []
 
 def echo(v: int) -> None:
-    seen.append(v)
-    model.value = v  # Now a no-op
+    print(f"echo: {v}")
+    model.value = v
 
 model.connect(echo)
 model.value = 1
-print(seen)
-#: [1]
+#: echo: 1
+#: unchanged: 1

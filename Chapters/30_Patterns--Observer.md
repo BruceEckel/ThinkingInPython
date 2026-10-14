@@ -702,25 +702,27 @@ class TwoWay(Broadcaster[int]):
     @value.setter
     def value(self, new: int) -> None:
         if new == self._value:
+            print(f"unchanged: {new}")
             return  # Breaks the re-entry
         self._value = new
         self.announce(new)
 
 model = TwoWay()
-seen: list[int] = []
 
 def echo(v: int) -> None:
-    seen.append(v)
-    model.value = v  # Now a no-op
+    print(f"echo: {v}")
+    model.value = v
 
 model.connect(echo)
 model.value = 1
-print(seen)
-#: [1]
+#: echo: 1
+#: unchanged: 1
 ```
 
-`echo` writes back the value,
-so the setter returns before it reaches `announce()` a second time.
+The assignment `model.value = 1` announces 1,
+and `echo` prints `echo: 1` and writes 1 back.
+The setter finds the value unchanged, prints `unchanged: 1`,
+and returns before it reaches `announce()` a second time.
 `announce()` runs once, for the original assignment.
 
 The alternative is a re-entry flag, set before `announce()` and cleared after,
@@ -1162,17 +1164,17 @@ async def main() -> None:
     t = Thermometer(15.0)
     t.connect(alarm)
     t.connect(log_reading)
-    print("set 20:")
     await t.set_celsius(20)  # Below the alarm threshold
-    print("set 150:")
+    print("announced 20")
     await t.set_celsius(150)  # Triggers the alarm too
+    print("announced 150")
 
 asyncio.run(main())
-#: set 20:
 #: logged: 20C
-#: set 150:
+#: announced 20
 #: logged: 150C
 #: alarm sent: 150C
+#: announced 150
 ```
 
 Although `alarm` connects before `log_reading`,
@@ -1181,6 +1183,8 @@ Concurrency means each responder finishes as soon as its own wait ends,
 so the faster responder prints first.
 The results from `gather()` stay in argument order.
 Only the side effects interleave.
+Each `announced` line prints after every line its change produced,
+because `set_celsius()` returns when `gather()` has waited for both responders.
 
 ### Disconnecting During an Async Notification
 
@@ -1253,7 +1257,9 @@ asyncio.run(main())
 ```
 
 `announce()` raises the `ValueError` from `gather()` the moment `failing()` raises it.
-`slow` is still sleeping at that point.
+`slow` is still sleeping at that point,
+so this `announce()` ends while a responder still runs,
+unlike the one in `async_thermometer_demo.py`.
 The event loop keeps running `slow`'s task,
 but the `gather()` call has returned,
 so no `await` remains to collect the task's result.
