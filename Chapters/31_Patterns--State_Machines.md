@@ -455,7 +455,6 @@ class State(Enum):
 Each kind of input has its own class,
 and a `Slot` holds one item's price and quantity:
 
-
 ```python
 # tabledriven/vending_machine.py (continued)
 @record
@@ -507,7 +506,6 @@ An input whose class derives from `Money` matches none of `Money`'s rules,
 because the key is the input's exact class.
 
 `VendingMachine` holds the table, its conditions, and its actions:
-
 
 ```python
 # tabledriven/vending_machine.py (continued)
