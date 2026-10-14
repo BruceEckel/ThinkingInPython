@@ -1,13 +1,6 @@
 # dunder_bypass.py
-from typing import Any
 from exceptions import expect
-
-class Proxy:
-    def __init__(self, impl: Any) -> None:
-        self.__implementation = impl
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__implementation, name)
+from proxy_getattr import Proxy
 
 class Words:
     def __init__(self) -> None:
@@ -27,4 +20,4 @@ print(p.__len__())  # The explicit call delegates
 expect(TypeError, len, p)  # type: ignore
 #: [TypeError] object of type 'Proxy' has no len()
 print(w, "|", str(p).split(" at ")[0])
-#: spam eggs | <__main__.Proxy object
+#: spam eggs | <proxy_getattr.Proxy object

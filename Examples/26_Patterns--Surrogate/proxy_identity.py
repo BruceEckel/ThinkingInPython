@@ -1,15 +1,10 @@
 # proxy_identity.py
-from typing import Any, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
+from proxy_getattr import Proxy
 
 @runtime_checkable
 class Service(Protocol):
     def f(self) -> None: ...
-
-class Proxy:
-    def __init__(self, impl: Any) -> None:
-        self.__implementation = impl
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__implementation, name)
 
 class Implementation:
     def f(self) -> None: print("Implementation.f()")

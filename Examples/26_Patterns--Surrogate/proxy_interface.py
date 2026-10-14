@@ -10,12 +10,12 @@ class Service(ABC):
     def g(self) -> None: ...
 
 class Proxy(Service):
-    def __init__(self, service: Service) -> None:
-        self.__service = service
+    def __init__(self, impl: Service) -> None:
+        self.__implementation = impl
     @override
-    def f(self) -> None: self.__service.f()
+    def f(self) -> None: self.__implementation.f()
     @override
-    def g(self) -> None: self.__service.g()
+    def g(self) -> None: self.__implementation.g()
 
 class Complete(Service):
     @override

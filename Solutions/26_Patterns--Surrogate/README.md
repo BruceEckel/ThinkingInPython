@@ -581,7 +581,7 @@ each loan of the connection.
 
 ## 6. Forwarding `__len__()` explicitly
 
-> `len(p)` raises a `TypeError` on `dunder_bypass.py`'s `Proxy`.
+> `len(p)` raises a `TypeError` on the `Proxy` that `dunder_bypass.py` imports from `proxy_getattr.py`.
 > Give that `Proxy` a `__len__()` that forwards to the implementation,
 > and confirm `len(p)` returns 2.
 > Then explain why `__getattr__()` could not have supplied it.

@@ -2,8 +2,9 @@
 from counting_proxy import CountingProxy
 
 class Doubler:
+    factor = 2
     def double(self, n: int) -> int:
-        return n * 2
+        return n * self.factor
 
 def test_proxy_forwards_call_and_result() -> None:
     p = CountingProxy(Doubler())
@@ -11,13 +12,9 @@ def test_proxy_forwards_call_and_result() -> None:
     assert p.double(3) == 6
 
 def test_proxy_counts_only_calls() -> None:
-    class HasValue:
-        answer = 42
-
-    p = CountingProxy(HasValue())
-    assert p.answer == 42
-    p2 = CountingProxy(Doubler())
-    p2.double(1)
-    p2.double(1)
+    p = CountingProxy(Doubler())
+    assert p.factor == 2
     assert p.calls == 0
-    assert p2.calls == 2
+    p.double(1)
+    p.double(1)
+    assert p.calls == 2

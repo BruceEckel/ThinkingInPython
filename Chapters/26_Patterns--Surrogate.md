@@ -85,12 +85,12 @@ class Service(ABC):
     def g(self) -> None: ...
 
 class Proxy(Service):
-    def __init__(self, service: Service) -> None:
-        self.__service = service
+    def __init__(self, impl: Service) -> None:
+        self.__implementation = impl
     @override
-    def f(self) -> None: self.__service.f()
+    def f(self) -> None: self.__implementation.f()
     @override
-    def g(self) -> None: self.__service.g()
+    def g(self) -> None: self.__implementation.g()
 
 class Complete(Service):
     @override
@@ -175,6 +175,13 @@ class Proxy:
         self.__implementation = impl
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
+```
+
+The demo gives this `Proxy` an implementation with three methods:
+
+```python
+# getattr_demo.py
+from proxy_getattr import Proxy
 
 class Implementation:
     def f(self) -> None:
@@ -252,15 +259,8 @@ while an explicit `p.__len__()` delegates:
 
 ```python
 # dunder_bypass.py
-from typing import Any
 from exceptions import expect
-
-class Proxy:
-    def __init__(self, impl: Any) -> None:
-        self.__implementation = impl
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__implementation, name)
+from proxy_getattr import Proxy
 
 class Words:
     def __init__(self) -> None:
@@ -280,7 +280,7 @@ print(p.__len__())  # The explicit call delegates
 expect(TypeError, len, p)  # type: ignore
 #: [TypeError] object of type 'Proxy' has no len()
 print(w, "|", str(p).split(" at ")[0])
-#: spam eggs | <__main__.Proxy object
+#: spam eggs | <proxy_getattr.Proxy object
 ```
 
 `p.__len__()` and `len(p)` look interchangeable but take different lookup paths.
@@ -299,7 +299,7 @@ so `len(p)` passes the check and fails at runtime.
 `str(p)` succeeds instead.
 `object` defines `__str__()`,
 so the lookup on `type(p)` finds `object`'s version.
-`w` prints as `spam eggs` and the proxy prints as `<__main__.Proxy object at ...>`.
+`w` prints as `spam eggs` and the proxy prints as `<proxy_getattr.Proxy object at ...>`.
 Whenever `object` defines the dunder,
 Python calls `object`'s version instead of the implementation's.
 A proxy that must forward special methods therefore defines each one in its class body.
@@ -310,13 +310,7 @@ Delegation using `__getattr__()` forwards reads but not writes:
 
 ```python
 # proxy_writes.py
-from typing import Any
-
-class Proxy:
-    def __init__(self, impl: Any) -> None:
-        self.__implementation = impl
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__implementation, name)
+from proxy_getattr import Proxy
 
 class Settings:
     def __init__(self) -> None:
@@ -450,17 +444,12 @@ so a proxy that supplies every method through `__getattr__()` also fails the `is
 
 ```python
 # proxy_identity.py
-from typing import Any, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
+from proxy_getattr import Proxy
 
 @runtime_checkable
 class Service(Protocol):
     def f(self) -> None: ...
-
-class Proxy:
-    def __init__(self, impl: Any) -> None:
-        self.__implementation = impl
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__implementation, name)
 
 class Implementation:
     def f(self) -> None: print("Implementation.f()")
@@ -697,8 +686,9 @@ and that the proxy counts calls and leaves attribute reads out of the tally:
 from counting_proxy import CountingProxy
 
 class Doubler:
+    factor = 2
     def double(self, n: int) -> int:
-        return n * 2
+        return n * self.factor
 
 def test_proxy_forwards_call_and_result() -> None:
     p = CountingProxy(Doubler())
@@ -706,16 +696,12 @@ def test_proxy_forwards_call_and_result() -> None:
     assert p.double(3) == 6
 
 def test_proxy_counts_only_calls() -> None:
-    class HasValue:
-        answer = 42
-
-    p = CountingProxy(HasValue())
-    assert p.answer == 42
-    p2 = CountingProxy(Doubler())
-    p2.double(1)
-    p2.double(1)
+    p = CountingProxy(Doubler())
+    assert p.factor == 2
     assert p.calls == 0
-    assert p2.calls == 2
+    p.double(1)
+    p.double(1)
+    assert p.calls == 2
 ```
 
 ## State
@@ -909,7 +895,7 @@ Try each exercise before opening its [solution](../Solutions/26_Patterns--Surrog
     the system must check that connection back in for reuse.
     To guarantee this, return a proxy instead of a reference to the actual connection,
     and design the proxy to release the connection back to the system.
-6.  `len(p)` raises a `TypeError` on `dunder_bypass.py`'s `Proxy`.
+6.  `len(p)` raises a `TypeError` on the `Proxy` that `dunder_bypass.py` imports from `proxy_getattr.py`.
     Give that `Proxy` a `__len__()` that forwards to the implementation,
     and confirm `len(p)` returns 2.
     Then explain why `__getattr__()` could not have supplied it.
