@@ -33,12 +33,3 @@ def simplify(e: Expr) -> Expr:
                     return Mul(lhs, rhs)
         case _:
             assert_never(e)
-
-if __name__ == "__main__":
-    from infix import to_infix
-    x = Var("x")
-    messy = 1 * x + 0 * Var("y") + (Num(2) + 3) * x
-    print(to_infix(messy))
-    print(to_infix(simplify(messy)))
-#: (((1 * x) + (0 * y)) + ((2 + 3) * x))
-#: (x + (5 * x))
