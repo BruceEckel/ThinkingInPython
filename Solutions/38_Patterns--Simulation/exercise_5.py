@@ -5,10 +5,6 @@ from typing import Final
 from robot_world import (Edge, EndGame, Food, GameBuilder,
                          Room, Teleport, Urge, Wall)
 
-MOVES: Final[dict[Urge, str]] = {
-    Urge.NORTH: "n", Urge.SOUTH: "s",
-    Urge.EAST: "e", Urge.WEST: "w"}
-
 def landing(room: Room, urge: Urge) -> Room | None:
     beyond = room.doors.open(urge)
     if isinstance(beyond.occupant, Wall | Edge):
@@ -26,12 +22,12 @@ def solve(game: GameBuilder,
         room, path = queue.popleft()
         if arrived(room):
             return path
-        for urge, char in MOVES.items():
+        for urge in Urge:
             beyond = landing(room, urge)
             if beyond is None or beyond in seen:
                 continue
             seen.add(beyond)
-            queue.append((beyond, path + char))
+            queue.append((beyond, path + urge.value))
     return None
 
 def food(room: Room) -> bool:

@@ -69,7 +69,7 @@ from typing import Final, Protocol
 DIRECTIONS: Final[list[tuple[int, int]]] = [
     (0, 1), (0, -1), (-1, 0), (1, 0)]
 
-class Recorder(Protocol):
+class Board(Protocol):
     def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
     def log(self, message: str) -> None: ...
@@ -77,7 +77,7 @@ class Recorder(Protocol):
 
 @dataclass
 class Rat:
-    blackboard: Recorder
+    blackboard: Board
     x: int
     y: int
     number: int = field(init=False)
@@ -109,7 +109,7 @@ class Rat:
 `number` comes from a call to `blackboard.next_number()`,
 which advances a counter, so no static default can supply it.
 With `field(init=False)` on `number` and `start`,
-the generated `__init__()` is `__init__(self, blackboard: Recorder, x: int, y: int)`.
+the generated `__init__()` is `__init__(self, blackboard: Board, x: int, y: int)`.
 The generated `__init__()` assigns `self.blackboard`, `self.x`, and `self.y`,
 then calls `self.__post_init__()`,
 which fills in `number` and records the rat's start cell.
@@ -575,8 +575,9 @@ Object-oriented design is another.
 This second example, adapted from my *Atomic Kotlin* book,
 walks a single robot through a maze.
 It shows how polymorphism removes conditionals.
-A `Room` calls its occupant's `interact()`,
-and each type of occupant defines its own.
+A `Room` calls its occupant's `interact()`.
+Each type of occupant defines its own, or inherits `Item`'s default,
+which lets the robot into the room.
 
 ### Rooms, Robots, and the Item Factory
 
@@ -589,17 +590,17 @@ No `if` or `elif` on the type of occupant appears in the movement code:
 
 ```python
 # robot_explorer/items.py
-from enum import Enum, auto
+from enum import Enum
 from typing import TYPE_CHECKING, ClassVar, override
 
 if TYPE_CHECKING:
     from world import Room
 
 class Urge(Enum):
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
+    NORTH = "n"
+    SOUTH = "s"
+    EAST = "e"
+    WEST = "w"
 
 class Item:
     symbol: ClassVar[str] = ""
@@ -655,10 +656,6 @@ class Teleport(Item):
 class Empty(Item):
     symbol: ClassVar[str] = "_"
 
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        return room
-
 class Edge(Item):
     symbol: ClassVar[str] = "/"
 
@@ -693,7 +690,7 @@ so no line of `items.py` looks `Room` up at runtime.
 
 The rats avoid the same kind of cycle with a `Protocol`.
 `blackboard.py` imports `Rat`,
-and `rat.py` states what it needs from a blackboard in the `Recorder` `Protocol`,
+and `rat.py` states what it needs from a blackboard in the `Board` `Protocol`,
 so it imports nothing from `blackboard.py`.
 
 `Robot` holds its two pieces of state in different ways.
@@ -816,7 +813,7 @@ from world import Room, RoomMap
 class GameBuilder:
     def __init__(self, maze: str) -> None:
         self.rooms: RoomMap = {}
-        teleports: list[Room] = []
+        teleports: list[tuple[Teleport, Room]] = []
         # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):
             for col, char in enumerate(line):
@@ -829,24 +826,20 @@ class GameBuilder:
                     room = Room(occupant)
                 self.rooms[row, col] = room
                 if isinstance(occupant, Teleport):
-                    teleports.append(room)
+                    teleports.append((occupant, room))
         # Stage 2: connect each room to its neighbors
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
         # Stage 3: pair teleports sharing a target letter
-        def target(room: Room) -> str:
-            assert isinstance(room.occupant, Teleport)
-            return room.occupant.target
-
-        teleports.sort(key=target)
-        for letter, group in groupby(teleports, key=target):
+        teleports.sort(key=lambda entry: entry[0].target)
+        for letter, group in groupby(
+            teleports, key=lambda entry: entry[0].target
+        ):
             pair = list(group)
             assert len(pair) == 2, letter
-            room1, room2 = pair
-            assert isinstance(room1.occupant, Teleport)
-            assert isinstance(room2.occupant, Teleport)
-            room1.occupant.target_room = room2
-            room2.occupant.target_room = room1
+            (t1, room1), (t2, room2) = pair
+            t1.target_room = room2
+            t2.target_room = room1
 
     def show_maze(self) -> str:
         rows: list[str] = []
@@ -862,15 +855,16 @@ class GameBuilder:
         return "\n".join(rows)
 
     def run(self, solution: str) -> None:
-        moves = {"n": Urge.NORTH, "s": Urge.SOUTH,
-                 "e": Urge.EAST, "w": Urge.WEST}
         for char in "".join(solution.split()):
-            self.robot.move(moves[char])
+            self.robot.move(Urge(char))
 ```
+
+Stage 1 stores each teleport beside its room, as a `(Teleport, Room)` tuple,
+so the `Teleport` type that `isinstance()` establishes stays in the list's type.
 
 Stage 3 pairs the teleports.
 Sorting by target letter puts each pair of partners side by side.
-`groupby(teleports, key=target)` then walks the sorted rooms in one pass,
+`groupby()`, with the same key, then walks the sorted list in one pass,
 yielding each run of matching letters,
 and `pair = list(group)` collects each run.
 
@@ -879,12 +873,12 @@ Every target letter marks exactly two rooms.
 A typo that gives a letter one room, or three, fails here at build time,
 naming the offending letter.
 If you remove the check, the build still stops,
-at `room1, room2 = pair` on the next line.
+at the unpacking on the next line.
 The `ValueError` that unpacking raises says how many values it expected and leaves you to find the letter.
 
-The `assert isinstance()` lines that follow check each occupant at runtime.
-For the type checker,
-each one narrows the occupant to `Teleport` before the code assigns `target_room`.
+The unpacking names each teleport beside its room.
+The list's type tells the type checker that `t1` and `t2` are `Teleport`s,
+so the code assigns `target_room` with no runtime check.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
@@ -933,6 +927,9 @@ MAZE: Final[str] = """
 
 The robot can now move,
 and `run()` replays a string of `n`/`s`/`e`/`w` characters.
+Each character is the value of one `Urge` member,
+so `Urge(char)` turns a character into a direction,
+and `urge.value` turns a direction back into its character.
 So far a person writes that string,
 as `test_robot.py` does in the next section with `game.run("e")`.
 For the whole maze, `solve()` computes the string by searching the room graph,
@@ -953,14 +950,9 @@ and for anything else the room beyond the door:
 ```python
 # robot_explorer/solver.py
 from collections import deque
-from typing import Final
 from game import GameBuilder
 from items import Edge, EndGame, Teleport, Urge, Wall
 from world import Room
-
-MOVES: Final[dict[Urge, str]] = {
-    Urge.NORTH: "n", Urge.SOUTH: "s",
-    Urge.EAST: "e", Urge.WEST: "w"}
 
 def landing(room: Room, urge: Urge) -> Room | None:
     # Where a door leads, or None when it is blocked
@@ -979,12 +971,12 @@ def solve(game: GameBuilder) -> str:
         room, path = queue.popleft()
         if isinstance(room.occupant, EndGame):
             return path
-        for urge, char in MOVES.items():
+        for urge in Urge:
             beyond = landing(room, urge)
             if beyond is None or beyond in seen:
                 continue
             seen.add(beyond)
-            queue.append((beyond, path + char))
+            queue.append((beyond, path + urge.value))
     raise ValueError("No path to the EndGame room")
 ```
 
@@ -1016,30 +1008,6 @@ from robot_maze import MAZE
 from solver import solve
 
 game = GameBuilder(MAZE)
-print("start:")
-#: start:
-print(game.show_maze())
-#: ###############################
-#: #R#.____#____.#_______#_______#
-#: #_###_#_###_#_#_#_#####_#####_#
-#: #___#_#___#_#_#_#.#__b__#___#_#
-#: ###_#_###_#_#_###_#_#####_#_#_#
-#: #.#_#_#.__#_#__.#_#__b__#_#___#
-#: #_#_#_#_###_###_#_#####_#_#####
-#: #_#_#_#__.#_#_#_____#___#_____#
-#: #_#_#_###_#_#_#_#####_#######_#
-#: #.#___#___#_#___#____.#_____#_#
-#: #_#####_###_#_###_#####_#_###_#
-#: #___#a__#.__#.__#__.#___#_#___#
-#: #_#_#_###_#####_###_###_###_#_#
-#: #_#.#_#___#!______#_____#___#_#
-#: #_#_#_###_#############_#_###_#
-#: #_#_#__a#_______________#___#_#
-#: #_#####_###_###########_###_#_#
-#: #_____#.__#_#___#_____#_#___#_#
-#: #_#_#####_###_#_#_###_###_###_#
-#: #.#___________#___#____.__#___#
-#: ###############################
 solution = solve(game)
 print(len(solution), "moves")
 #: 198 moves
@@ -1140,9 +1108,6 @@ CELL: Final[int] = 20
 FILL: Final[dict[str, str]] = {
     "#": "dimgray", "!": "tomato", ".": "khaki",
     "_": "white", "R": "royalblue"}
-MOVES: Final[dict[str, Urge]] = {
-    "n": Urge.NORTH, "s": Urge.SOUTH,
-    "e": Urge.EAST, "w": Urge.WEST}
 
 def show(maze: str = MAZE,
          step_ms: int = 80) -> None:
@@ -1174,7 +1139,7 @@ def show(maze: str = MAZE,
         draw()
         move = next(route, None)
         if move is not None:
-            game.robot.move(MOVES[move])
+            game.robot.move(Urge(move))
             root.after(step_ms, step)
 
     step()
@@ -1499,7 +1464,7 @@ Run it.
 Try each exercise before opening its [solution](../Solutions/38_Patterns--Simulation/).
 
 1.  Test a `Rat` with a fake blackboard.
-    Because `Rat` depends only on the `Recorder` `Protocol`,
+    Because `Rat` depends only on the `Board` `Protocol`,
     you can drive it with a stand-in.
     Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` records the coordinates it receives instead of starting a rat,
     run one rat with `asyncio.run(rat.run())`,
@@ -1512,7 +1477,7 @@ Try each exercise before opening its [solution](../Solutions/38_Patterns--Simula
     and explain what makes a cell unreachable.
 3.  Break the atomicity of `claim()`.
     Make `claim()` an `async def`,
-    which forces matching changes in the `Recorder` protocol,
+    which forces matching changes in the `Board` protocol,
     `Rat.run()`'s comprehension, and `explore()`.
     Put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
     Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,

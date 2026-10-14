@@ -3,7 +3,7 @@
 ## 1. Testing a `Rat` with a fake blackboard
 
 > Test a `Rat` with a fake blackboard.
-> Because `Rat` depends only on the `Recorder` `Protocol`,
+> Because `Rat` depends only on the `Board` `Protocol`,
 > you can drive it with a stand-in.
 > Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` records the coordinates it receives instead of starting a rat,
 > run one rat with `asyncio.run(rat.run())`,
@@ -13,7 +13,7 @@
 <details>
 <summary>Where to look</summary>
 
-[The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows `Rat` calling only the methods of the `Recorder` `Protocol`.
+[The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows `Rat` calling only the methods of the `Board` `Protocol`.
 Write a class with those methods, so it satisfies the `Protocol` by shape.
 Make `claim()` return values from an iterator you script, and have `spawn()` append to a list.
 After `asyncio.run(rat.run())`, assert on the rat's position and on that list.
@@ -37,7 +37,7 @@ from typing import Final, Protocol
 DIRECTIONS: Final[list[tuple[int, int]]] = [
     (0, 1), (0, -1), (-1, 0), (1, 0)]
 
-class Recorder(Protocol):
+class Board(Protocol):
     def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
     def log(self, message: str) -> None: ...
@@ -45,7 +45,7 @@ class Recorder(Protocol):
 
 @dataclass
 class Rat:
-    blackboard: Recorder
+    blackboard: Board
     x: int
     y: int
     number: int = field(init=False)
@@ -104,7 +104,7 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
         "Rat 1 ran (0, 0) to (0, -1)."]
 ```
 
-**Stand in for the blackboard.** `Rat` depends on the `Recorder`
+**Stand in for the blackboard.** `Rat` depends on the `Board`
 `Protocol`, not on `Blackboard`, so any class with the right methods can stand in.
 `FakeBlackboard` defines `claim()`, `spawn()`, `log()`, and
 `next_number()`, which satisfies the `Protocol` by shape.
@@ -311,7 +311,7 @@ asyncio.run(main())
 
 **Reuse the chapter's classes.** The classes are the chapter's, with six parts removed:
 rat numbers, logging, the task list, `render()`, the
-`Recorder` `Protocol`, and the file loader.
+`Board` `Protocol`, and the file loader.
 The removals leave the exploration logic as the chapter wrote it. `claim()` keeps the
 chapter's body word for word.
 `explore()` still opens a
@@ -351,7 +351,7 @@ however many of them spawn.
 
 > Break the atomicity of `claim()`.
 > Make `claim()` an `async def`,
-> which forces matching changes in the `Recorder` protocol,
+> which forces matching changes in the `Board` protocol,
 > `Rat.run()`'s comprehension, and `explore()`.
 > Put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
 > Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,
@@ -407,13 +407,13 @@ class Maze:
     def entry(self) -> Coord:
         ...
 
-class Recorder(Protocol):
+class Board(Protocol):
     async def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
 
 @dataclass
 class Rat:
-    blackboard: Recorder
+    blackboard: Board
     x: int
     y: int
 
@@ -502,13 +502,13 @@ class Maze:
                     return x, y
         raise ValueError("the maze has no open cell")
 
-class Recorder(Protocol):
+class Board(Protocol):
     async def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
 
 @dataclass
 class Rat:
-    blackboard: Recorder
+    blackboard: Board
     x: int
     y: int
 
@@ -567,7 +567,7 @@ asyncio.run(main())
 
 **Carry the `async` to every caller.** The one requested change forces three more edits,
 because a caller must `await` an `async def` to get its result.
-Once `claim()` is an `async def`, the `Recorder` protocol must declare
+Once `claim()` is an `async def`, the `Board` protocol must declare
 it `async` too, `Rat.run()`'s comprehension needs
 `if await self.blackboard.claim(*pos)`, and `explore()` must `await`
 its own first claim.
@@ -616,15 +616,15 @@ The module defines `Item` and its subclasses, `Room`, `Doors`, and `GameBuilder`
 
 ```python
 # robot_world.py
-from enum import Enum, auto
+from enum import Enum
 from itertools import groupby
 from typing import ClassVar, Final, override
 
 class Urge(Enum):
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
+    NORTH = "n"
+    SOUTH = "s"
+    EAST = "e"
+    WEST = "w"
 
 class Item:
     symbol: ClassVar[str] = ""
@@ -741,7 +741,7 @@ EDGE: Final[Room] = Room(Edge())
 class GameBuilder:
     def __init__(self, maze: str) -> None:
         self.rooms: RoomMap = {}
-        teleports: list[Room] = []
+        teleports: list[tuple[Teleport, Room]] = []
         for row, line in enumerate(maze.splitlines()):
             for col, char in enumerate(line):
                 occupant = item_factory(char)
@@ -753,29 +753,22 @@ class GameBuilder:
                     room = Room(occupant)
                 self.rooms[row, col] = room
                 if isinstance(occupant, Teleport):
-                    teleports.append(room)
+                    teleports.append((occupant, room))
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
-
-        def target(room: Room) -> str:
-            assert isinstance(room.occupant, Teleport)
-            return room.occupant.target
-
-        teleports.sort(key=target)
-        for letter, group in groupby(teleports, key=target):
+        teleports.sort(key=lambda entry: entry[0].target)
+        for letter, group in groupby(
+            teleports, key=lambda entry: entry[0].target
+        ):
             pair = list(group)
             assert len(pair) == 2, letter
-            room1, room2 = pair
-            assert isinstance(room1.occupant, Teleport)
-            assert isinstance(room2.occupant, Teleport)
-            room1.occupant.target_room = room2
-            room2.occupant.target_room = room1
+            (t1, room1), (t2, room2) = pair
+            t1.target_room = room2
+            t2.target_room = room1
 
     def run(self, solution: str) -> None:
-        moves = {"n": Urge.NORTH, "s": Urge.SOUTH,
-                 "e": Urge.EAST, "w": Urge.WEST}
         for char in "".join(solution.split()):
-            self.robot.move(moves[char])
+            self.robot.move(Urge(char))
 ```
 
 ## 4. A `Coin` item
@@ -918,10 +911,6 @@ from typing import Final
 from robot_world import (Edge, EndGame, Food, GameBuilder,
                          Room, Teleport, Urge, Wall)
 
-MOVES: Final[dict[Urge, str]] = {
-    Urge.NORTH: "n", Urge.SOUTH: "s",
-    Urge.EAST: "e", Urge.WEST: "w"}
-
 def landing(room: Room, urge: Urge) -> Room | None:
     ...
 
@@ -955,10 +944,6 @@ from typing import Final
 from robot_world import (Edge, EndGame, Food, GameBuilder,
                          Room, Teleport, Urge, Wall)
 
-MOVES: Final[dict[Urge, str]] = {
-    Urge.NORTH: "n", Urge.SOUTH: "s",
-    Urge.EAST: "e", Urge.WEST: "w"}
-
 def landing(room: Room, urge: Urge) -> Room | None:
     beyond = room.doors.open(urge)
     if isinstance(beyond.occupant, Wall | Edge):
@@ -976,12 +961,12 @@ def solve(game: GameBuilder,
         room, path = queue.popleft()
         if arrived(room):
             return path
-        for urge, char in MOVES.items():
+        for urge in Urge:
             beyond = landing(room, urge)
             if beyond is None or beyond in seen:
                 continue
             seen.add(beyond)
-            queue.append((beyond, path + char))
+            queue.append((beyond, path + urge.value))
     return None
 
 def food(room: Room) -> bool:

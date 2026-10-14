@@ -1,13 +1,13 @@
 # robot_world.py
-from enum import Enum, auto
+from enum import Enum
 from itertools import groupby
 from typing import ClassVar, Final, override
 
 class Urge(Enum):
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
+    NORTH = "n"
+    SOUTH = "s"
+    EAST = "e"
+    WEST = "w"
 
 class Item:
     symbol: ClassVar[str] = ""
@@ -124,7 +124,7 @@ EDGE: Final[Room] = Room(Edge())
 class GameBuilder:
     def __init__(self, maze: str) -> None:
         self.rooms: RoomMap = {}
-        teleports: list[Room] = []
+        teleports: list[tuple[Teleport, Room]] = []
         for row, line in enumerate(maze.splitlines()):
             for col, char in enumerate(line):
                 occupant = item_factory(char)
@@ -136,26 +136,19 @@ class GameBuilder:
                     room = Room(occupant)
                 self.rooms[row, col] = room
                 if isinstance(occupant, Teleport):
-                    teleports.append(room)
+                    teleports.append((occupant, room))
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
-
-        def target(room: Room) -> str:
-            assert isinstance(room.occupant, Teleport)
-            return room.occupant.target
-
-        teleports.sort(key=target)
-        for letter, group in groupby(teleports, key=target):
+        teleports.sort(key=lambda entry: entry[0].target)
+        for letter, group in groupby(
+            teleports, key=lambda entry: entry[0].target
+        ):
             pair = list(group)
             assert len(pair) == 2, letter
-            room1, room2 = pair
-            assert isinstance(room1.occupant, Teleport)
-            assert isinstance(room2.occupant, Teleport)
-            room1.occupant.target_room = room2
-            room2.occupant.target_room = room1
+            (t1, room1), (t2, room2) = pair
+            t1.target_room = room2
+            t2.target_room = room1
 
     def run(self, solution: str) -> None:
-        moves = {"n": Urge.NORTH, "s": Urge.SOUTH,
-                 "e": Urge.EAST, "w": Urge.WEST}
         for char in "".join(solution.split()):
-            self.robot.move(moves[char])
+            self.robot.move(Urge(char))

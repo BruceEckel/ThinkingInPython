@@ -6,7 +6,7 @@ from world import Room, RoomMap
 class GameBuilder:
     def __init__(self, maze: str) -> None:
         self.rooms: RoomMap = {}
-        teleports: list[Room] = []
+        teleports: list[tuple[Teleport, Room]] = []
         # Stage 1: a Room for every character
         for row, line in enumerate(maze.splitlines()):
             for col, char in enumerate(line):
@@ -19,24 +19,20 @@ class GameBuilder:
                     room = Room(occupant)
                 self.rooms[row, col] = room
                 if isinstance(occupant, Teleport):
-                    teleports.append(room)
+                    teleports.append((occupant, room))
         # Stage 2: connect each room to its neighbors
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
         # Stage 3: pair teleports sharing a target letter
-        def target(room: Room) -> str:
-            assert isinstance(room.occupant, Teleport)
-            return room.occupant.target
-
-        teleports.sort(key=target)
-        for letter, group in groupby(teleports, key=target):
+        teleports.sort(key=lambda entry: entry[0].target)
+        for letter, group in groupby(
+            teleports, key=lambda entry: entry[0].target
+        ):
             pair = list(group)
             assert len(pair) == 2, letter
-            room1, room2 = pair
-            assert isinstance(room1.occupant, Teleport)
-            assert isinstance(room2.occupant, Teleport)
-            room1.occupant.target_room = room2
-            room2.occupant.target_room = room1
+            (t1, room1), (t2, room2) = pair
+            t1.target_room = room2
+            t2.target_room = room1
 
     def show_maze(self) -> str:
         rows: list[str] = []
@@ -52,7 +48,5 @@ class GameBuilder:
         return "\n".join(rows)
 
     def run(self, solution: str) -> None:
-        moves = {"n": Urge.NORTH, "s": Urge.SOUTH,
-                 "e": Urge.EAST, "w": Urge.WEST}
         for char in "".join(solution.split()):
-            self.robot.move(moves[char])
+            self.robot.move(Urge(char))

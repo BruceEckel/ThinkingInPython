@@ -1,15 +1,15 @@
 # robot_explorer/items.py
-from enum import Enum, auto
+from enum import Enum
 from typing import TYPE_CHECKING, ClassVar, override
 
 if TYPE_CHECKING:
     from world import Room
 
 class Urge(Enum):
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
+    NORTH = "n"
+    SOUTH = "s"
+    EAST = "e"
+    WEST = "w"
 
 class Item:
     symbol: ClassVar[str] = ""
@@ -64,10 +64,6 @@ class Teleport(Item):
 
 class Empty(Item):
     symbol: ClassVar[str] = "_"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        return room
 
 class Edge(Item):
     symbol: ClassVar[str] = "/"

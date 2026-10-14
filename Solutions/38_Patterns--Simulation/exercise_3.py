@@ -47,13 +47,13 @@ class Maze:
                     return x, y
         raise ValueError("the maze has no open cell")
 
-class Recorder(Protocol):
+class Board(Protocol):
     async def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
 
 @dataclass
 class Rat:
-    blackboard: Recorder
+    blackboard: Board
     x: int
     y: int
 

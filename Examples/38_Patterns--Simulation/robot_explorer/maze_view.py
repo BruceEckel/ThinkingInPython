@@ -10,9 +10,6 @@ CELL: Final[int] = 20
 FILL: Final[dict[str, str]] = {
     "#": "dimgray", "!": "tomato", ".": "khaki",
     "_": "white", "R": "royalblue"}
-MOVES: Final[dict[str, Urge]] = {
-    "n": Urge.NORTH, "s": Urge.SOUTH,
-    "e": Urge.EAST, "w": Urge.WEST}
 
 def show(maze: str = MAZE,
          step_ms: int = 80) -> None:
@@ -44,7 +41,7 @@ def show(maze: str = MAZE,
         draw()
         move = next(route, None)
         if move is not None:
-            game.robot.move(MOVES[move])
+            game.robot.move(Urge(move))
             root.after(step_ms, step)
 
     step()

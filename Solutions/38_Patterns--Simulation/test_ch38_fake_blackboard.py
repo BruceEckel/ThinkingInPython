@@ -6,7 +6,7 @@ from typing import Final, Protocol
 DIRECTIONS: Final[list[tuple[int, int]]] = [
     (0, 1), (0, -1), (-1, 0), (1, 0)]
 
-class Recorder(Protocol):
+class Board(Protocol):
     def claim(self, x: int, y: int) -> bool: ...
     def spawn(self, x: int, y: int) -> None: ...
     def log(self, message: str) -> None: ...
@@ -14,7 +14,7 @@ class Recorder(Protocol):
 
 @dataclass
 class Rat:
-    blackboard: Recorder
+    blackboard: Board
     x: int
     y: int
     number: int = field(init=False)
