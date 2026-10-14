@@ -183,7 +183,7 @@ which reserves uppercase for constants and CapWords for class names.
 
 ## 5. A third `Template` consumer
 
-> In `tstrings.py`, write a third consumer, `quoted(template)`,
+> In `template_consumers.py`, write a third consumer, `quoted(template)`,
 > that wraps every interpolated value in single quotes and leaves the literal text alone,
 > then print `quoted(message)`.
 > Explain why you cannot post-process an f-string the same way.

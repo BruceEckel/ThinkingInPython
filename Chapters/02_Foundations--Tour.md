@@ -478,6 +478,8 @@ print("ababab".replace("a", "X"))
 #: XbXbXb
 print(s.strip()[0:5])
 #: Hello
+print(repr(s))
+#: '  Hello, World  '
 print("test_setup".lstrip("test_"))
 #: up
 print("test_setup".removeprefix("test_"))
@@ -487,6 +489,8 @@ print("notes.txt".removesuffix(".txt"))
 ```
 
 String methods return new values and leave the original string intact.
+After three calls on `s`, `repr(s)` still shows its surrounding spaces,
+and the quotes that `repr()` adds make those spaces visible.
 `replace()` replaces every occurrence, as `XbXbXb` shows.
 An optional third argument limits how many it replaces.
 
@@ -573,7 +577,7 @@ or reject the values before they become part of the result.
 
 ```python
 # tstrings.py
-from string.templatelib import Interpolation, Template
+from string.templatelib import Template
 
 name = "Alice"
 score = 91.5
@@ -585,6 +589,38 @@ for piece in message.interpolations:
           repr(piece.format_spec))
 #: name Alice ''
 #: score 91.5 '.0f'
+```
+
+A `Template` stores its two kinds of piece separately.
+`message.strings` holds the literal text,
+with one entry more than `message.interpolations`.
+A template that opens with a value therefore opens with an empty string,
+which prints as `''`.
+`message.interpolations` holds one `Interpolation` per value.
+Each `Interpolation` keeps the value,
+the source text of the expression that produced it, and its format spec.
+The `for` loop over `message.interpolations` prints those three attributes:
+`expression`, `value`, and `format_spec`.
+
+Iterating over a `Template` produces the pieces in order,
+each either a `str` the author typed or an `Interpolation`.
+Iteration skips empty literal strings,
+so a loop over `message` starts with the `Interpolation` for `name`.
+Because of that skipping,
+a consumer cannot assume that literals and interpolations alternate.
+Iterating over `t"{first}{last}"`, with two interpolations side by side,
+produces two `Interpolation`s in a row.
+
+`template_consumers.py` rebuilds `message` from the same t-string and passes it to two consumers,
+`shout()` and `safe()`:
+
+```python
+# template_consumers.py
+from string.templatelib import Interpolation, Template
+
+name = "Alice"
+score = 91.5
+message: Template = t"{name} scored {score:.0f}%"
 
 def shout(template: Template) -> str:
     parts: list[str] = []
@@ -621,26 +657,6 @@ except ValueError as e:
     print(e)
 #: unsafe value: "Bob'; rm -rf /"
 ```
-
-A `Template` stores its two kinds of piece separately.
-`message.strings` holds the literal text,
-with one entry more than `message.interpolations`.
-A template that opens with a value therefore opens with an empty string,
-which prints as `''`.
-`message.interpolations` holds one `Interpolation` per value.
-Each `Interpolation` keeps the value,
-the source text of the expression that produced it, and its format spec.
-The `for` loop over `message.interpolations` prints those three attributes:
-`expression`, `value`, and `format_spec`.
-
-Iterating over a `Template` produces the pieces in order,
-each either a `str` the author typed or an `Interpolation`.
-Iteration skips empty literal strings,
-so a loop over `message` starts with the `Interpolation` for `name`.
-Because of that skipping,
-a consumer cannot assume that literals and interpolations alternate.
-Iterating over `t"{first}{last}"`, with two interpolations side by side,
-produces two `Interpolation`s in a row.
 
 `shout()` uppercases the literal text and leaves the interpolated values in their original case.
 `shout()` turns each value into text with the built-in `format()` and the format spec stored in the `Interpolation`,
@@ -708,7 +724,7 @@ Try each exercise before opening its [solution](../Solutions/02_Foundations--Tou
     Using [Naming Conventions](#naming-conventions),
     say what each form signals to a reader who did not write the code,
     and which of the three a linter reports.
-5.  In `tstrings.py`, write a third consumer, `quoted(template)`,
+5.  In `template_consumers.py`, write a third consumer, `quoted(template)`,
     that wraps every interpolated value in single quotes and leaves the literal text alone,
     then print `quoted(message)`.
     Explain why you cannot post-process an f-string the same way.

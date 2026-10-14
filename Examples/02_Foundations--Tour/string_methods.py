@@ -15,6 +15,8 @@ print("ababab".replace("a", "X"))
 #: XbXbXb
 print(s.strip()[0:5])
 #: Hello
+print(repr(s))
+#: '  Hello, World  '
 print("test_setup".lstrip("test_"))
 #: up
 print("test_setup".removeprefix("test_"))
