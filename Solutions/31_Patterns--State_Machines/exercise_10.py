@@ -46,9 +46,8 @@ class UnpredictablePerson:
         self.mood = mood
 
     def hello(self, input_: Input) -> str:
-        greeting = self.mood.behavior(input_)
         self.mood = self.mood.transition(input_)
-        return greeting
+        return self.mood.behavior(input_)
 
 INPUTS: Final[list[Input]] = [
     Input.ANNOY, Input.CALM, Input.TAKE_PILL, Input.ANNOY,
@@ -59,9 +58,9 @@ for input_ in INPUTS:
     greeting = person.hello(input_)
     print(f"{before.name} {input_.name}: {greeting}"
           f" -> {person.mood.name}")
-#: HAPPY ANNOY: Great to see you! -> GRUMPY
-#: GRUMPY CALM: What do you want? -> HAPPY
-#: HAPPY TAKE_PILL: Great to see you! -> PROZAC
+#: HAPPY ANNOY: What do you want? -> GRUMPY
+#: GRUMPY CALM: Great to see you! -> HAPPY
+#: HAPPY TAKE_PILL: Everything is wonderful. -> PROZAC
 #: PROZAC ANNOY: Everything is wonderful. -> PROZAC
 print([mood.name for mood in Mood])
 #: ['HAPPY', 'GRUMPY', 'PROZAC']

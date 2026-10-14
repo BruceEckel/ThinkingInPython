@@ -9,20 +9,20 @@ for move in MOVES:
     print(before.name, move, "->", machine.state.name)
     print("   ", result)
 #: WAITING mouse appears -> LURING
-#:     Broadcasting cheese smell
+#:     Presenting Cheese, door open
 #: LURING mouse runs away -> WAITING
-#:     Presenting Cheese, door open
-#: WAITING mouse appears -> LURING
 #:     Broadcasting cheese smell
-#: LURING mouse enters trap -> TRAPPING
+#: WAITING mouse appears -> LURING
 #:     Presenting Cheese, door open
+#: LURING mouse enters trap -> TRAPPING
+#:     Closing door
 #: TRAPPING mouse escapes -> WAITING
-#:     Closing door
-#: WAITING mouse appears -> LURING
 #:     Broadcasting cheese smell
-#: LURING mouse enters trap -> TRAPPING
+#: WAITING mouse appears -> LURING
 #:     Presenting Cheese, door open
-#: TRAPPING mouse trapped -> HOLDING
+#: LURING mouse enters trap -> TRAPPING
 #:     Closing door
-#: HOLDING mouse removed -> WAITING
+#: TRAPPING mouse trapped -> HOLDING
 #:     Mouse caught
+#: HOLDING mouse removed -> WAITING
+#:     Broadcasting cheese smell

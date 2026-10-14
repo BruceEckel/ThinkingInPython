@@ -57,6 +57,5 @@ class StateMachine:
         self.state = start
 
     def step(self, input_: M) -> str:
-        result = self.state.behavior(input_)
         self.state = self.state.transition(input_)
-        return result
+        return self.state.behavior(input_)

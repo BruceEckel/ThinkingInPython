@@ -844,9 +844,8 @@ def test_no_transition_raises() -> None:
 
 ## States as `Enum` Members
 
-The one-table design keeps its states as bare `Enum` members and puts every action in the table.
-A third shape gives each member its own action and its own transition function,
-so the enum is the table.
+`enum_states.py` is the first design again,
+with each state as a row of data rather than a class.
 `State` is a record of two callables,
 and `TrapState` is an `Enum` whose members are `State`s:
 
@@ -910,9 +909,8 @@ class StateMachine:
         self.state = start
 
     def step(self, input_: M) -> str:
-        result = self.state.behavior(input_)
         self.state = self.state.transition(input_)
-        return result
+        return self.state.behavior(input_)
 ```
 
 A `State` holds a behavior, which turns the input into the machine's output,
@@ -934,10 +932,14 @@ with `behavior` and `transition` as attributes.
 The behaviors here are lambdas that ignore their input,
 since the trap announces the same thing whatever the mouse does.
 A machine whose output depends on the input as well as the state is the one that uses that parameter.
-`StateMachine.step()` asks the current state for the output,
-then for the next state, and stores it.
+`StateMachine.step()` asks the current state for its successor, stores it,
+and then runs the new state's behavior,
+the order `run_all()` follows in `state_machine.py`.
 
-`enum_states_demo.py` runs the trap through `MOVES` and prints each transition above the output it produced:
+`enum_states_demo.py` runs the trap through `MOVES` and prints each transition above the action of the state it entered.
+The trace is `mouse_trap_states_demo.py`'s,
+after the start-up action that the first design's constructor prints,
+since this constructor stores the start state and returns:
 
 ```python
 # enum_states_demo.py
@@ -951,23 +953,23 @@ for move in MOVES:
     print(before.name, move, "->", machine.state.name)
     print("   ", result)
 #: WAITING mouse appears -> LURING
-#:     Broadcasting cheese smell
+#:     Presenting Cheese, door open
 #: LURING mouse runs away -> WAITING
-#:     Presenting Cheese, door open
-#: WAITING mouse appears -> LURING
 #:     Broadcasting cheese smell
-#: LURING mouse enters trap -> TRAPPING
+#: WAITING mouse appears -> LURING
 #:     Presenting Cheese, door open
+#: LURING mouse enters trap -> TRAPPING
+#:     Closing door
 #: TRAPPING mouse escapes -> WAITING
-#:     Closing door
-#: WAITING mouse appears -> LURING
 #:     Broadcasting cheese smell
-#: LURING mouse enters trap -> TRAPPING
+#: WAITING mouse appears -> LURING
 #:     Presenting Cheese, door open
-#: TRAPPING mouse trapped -> HOLDING
+#: LURING mouse enters trap -> TRAPPING
 #:     Closing door
-#: HOLDING mouse removed -> WAITING
+#: TRAPPING mouse trapped -> HOLDING
 #:     Mouse caught
+#: HOLDING mouse removed -> WAITING
+#:     Broadcasting cheese smell
 ```
 
 Two consequences follow from the mixin.
@@ -984,8 +986,12 @@ a tuple holding one callable, or the two in the wrong order,
 passes `ty` and fails at import or at run time.
 Pyright reports all three.
 
-The action travels with the state rather than with every rule that leads to it.
-In exchange, the transitions sit in four functions above the enum rather than in one table.
+Against `mouse_trap_states.py`, what changes is where a state lives.
+A class with two methods becomes a row holding two functions,
+the `ClassVar` holder on `MouseTrap` becomes the enum,
+and the trace names a state with `.name` rather than `type(state).__name__`.
+What stays is the decision structure:
+each state names its own successors in a `match`.
 
 ## Which Design Should You Use?
 
@@ -1022,8 +1028,7 @@ or write a helper that those rules call.
 
 States as `Enum` members is the first design with records in place of classes.
 Each member names its own successors, as `Luring` does,
-and carries its action as data, so the action runs once per input,
-from a single definition.
+and carries its action as data, run on entry as `run()` is.
 The enum supplies what four loose classes cannot:
 `list(TrapState)` enumerates every state,
 and a parameter typed `TrapState` accepts a member and rejects anything else.
