@@ -147,14 +147,15 @@ with expected(AttributeError):
 #: [FrozenInstanceError] cannot assign to field 'x'
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)
-print(moved)
-#: Point(x=11, y=2)
+print(p, moved)
+#: Point(x=1, y=2) Point(x=11, y=2)
 ```
 
 The type checker rejects the direct form `p.x = 5` before the program runs.
 To show that the runtime rejects the assignment too,
 the listing writes it as `setattr(p, "x", 5)`, which the type checker accepts.
-The original `p` still holds `x=1`, and `moved` is a separate value.
+The output shows the original `p` still holding `x=1`, beside `moved`,
+a separate value.
 
 Restating every field works for a two-field `Point`.
 For a record with many fields,

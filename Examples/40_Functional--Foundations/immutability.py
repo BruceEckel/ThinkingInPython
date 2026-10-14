@@ -14,5 +14,5 @@ with expected(AttributeError):
 #: [FrozenInstanceError] cannot assign to field 'x'
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)
-print(moved)
-#: Point(x=11, y=2)
+print(p, moved)
+#: Point(x=1, y=2) Point(x=11, y=2)
