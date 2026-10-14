@@ -59,16 +59,9 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-    @abstractmethod
-    def erase(self) -> None: ...
-
 class _Triangle(Shape):
     @override
     def draw(self) -> None:
-        ...
-
-    @override
-    def erase(self) -> None:
         ...
 
     class Factory:
@@ -86,11 +79,14 @@ def create_shape(kind: str) -> Shape:
 <details>
 <summary>Solution</summary>
 
-If you add the `_Triangle` class and stop there, the type checker accepts both files,
-but with the chapter's seed both demos stop with an exception.
+If you add the `_Triangle` class to `shape_factory_method.py` and stop there, the type checker accepts the file,
+but with the chapter's seed the demo stops with an exception.
 `shape_name()` draws from `Shape.__subclasses__()`, which lists `_Triangle` as soon as its `class` statement runs,
-so each demo asks for a `"Triangle"` that its creation point cannot build.
-`Shape.factory()` raises `ValueError: Bad shape: Triangle`, and `create_shape()` raises `KeyError: 'Triangle'`.
+so the demo asks for a `"Triangle"` that `Shape.factory()` cannot build,
+and `Shape.factory()` raises `ValueError: Bad shape: Triangle`.
+`shape_factory_objects.py` names its shapes in a literal list,
+so its demo asks for `"Triangle"` once you add the name to that list.
+Without a `FACTORIES` entry, `create_shape()` then raises `KeyError: 'Triangle'`.
 Each solution therefore adds the class and its entry together.
 
 `shape_factory_method.py`'s single static `factory()` needs one new `case`:
@@ -140,7 +136,7 @@ s.draw()
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`.
 Here, `exercise_2.py` shows the new shape alone. In the chapter file its entry joins
-`_Circle`'s and `_Square`'s:
+`_Circle`'s and `_Square`'s, and `"Triangle"` joins the demo's list:
 
 ```python
 # exercise_2.py
@@ -154,17 +150,10 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-    @abstractmethod
-    def erase(self) -> None: ...
-
 class _Triangle(Shape):
     @override
     def draw(self) -> None:
         print("Triangle.draw")
-
-    @override
-    def erase(self) -> None:
-        print("Triangle.erase")
 
     class Factory:
         def create(self) -> _Triangle:
