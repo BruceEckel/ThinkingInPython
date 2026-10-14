@@ -12,7 +12,7 @@
  },
  "13b2b6ac69779a36": {
   "file": "06_Foundations--Modules_and_Packages.md",
-  "line": 493,
+  "line": 498,
   "target": "24_Patterns--Singleton.md",
   "terms": [
    "__all__"
@@ -56,7 +56,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1061,
+  "line": 1062,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -67,7 +67,7 @@
  },
  "7c9a753f95d1c66a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1243,
+  "line": 1246,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace_class"
@@ -89,7 +89,7 @@
  },
  "a6f80d7775b0cbcd": {
   "file": "16_Techniques--Comprehensions.md",
-  "line": 309,
+  "line": 301,
   "target": "03_Foundations--Containers.md",
   "terms": [
    "SIZE"
@@ -111,7 +111,7 @@
  },
  "0bfdf37ac6c6f194": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1446,
+  "line": 1441,
   "target": "22_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -122,7 +122,7 @@
  },
  "19283748bd6927e4": {
   "file": "22_Patterns--Data_Transfer_Objects.md",
-  "line": 393,
+  "line": 421,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "messenger_idiom.py",
@@ -134,7 +134,7 @@
  },
  "04acbadd1165eaba": {
   "file": "23_Patterns--Iterators.md",
-  "line": 756,
+  "line": 753,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
    "__iter__",
@@ -146,7 +146,7 @@
  },
  "1121029ae76447a0": {
   "file": "23_Patterns--Iterators.md",
-  "line": 826,
+  "line": 823,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "GoFIterator"
@@ -157,7 +157,7 @@
  },
  "674efb071da3872a": {
   "file": "23_Patterns--Iterators.md",
-  "line": 890,
+  "line": 887,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -168,7 +168,7 @@
  },
  "f149830ef146ed79": {
   "file": "24_Patterns--Singleton.md",
-  "line": 190,
+  "line": 197,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
@@ -179,7 +179,7 @@
  },
  "a51f08d6349a2b99": {
   "file": "24_Patterns--Singleton.md",
-  "line": 719,
+  "line": 722,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -190,7 +190,7 @@
  },
  "c358c8813c054976": {
   "file": "25_Patterns--Template_Method.md",
-  "line": 211,
+  "line": 205,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "getattr"
@@ -212,7 +212,7 @@
  },
  "2e71dc56c76b481b": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 802,
+  "line": 799,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -294,7 +294,7 @@
  },
  "4910c32d94273207": {
   "file": "30_Patterns--Observer.md",
-  "line": 581,
+  "line": 586,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "disconnect"
@@ -305,7 +305,7 @@
  },
  "fa774505d1fd8381": {
   "file": "30_Patterns--Observer.md",
-  "line": 643,
+  "line": 648,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "announce"
@@ -316,7 +316,7 @@
  },
  "a4f132fd61a9bf31": {
   "file": "30_Patterns--Observer.md",
-  "line": 1110,
+  "line": 1113,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "gather",
@@ -328,7 +328,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1928,
+  "line": 1931,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -351,7 +351,7 @@
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 455,
+  "line": 440,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -362,7 +362,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 918,
+  "line": 903,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -375,7 +375,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 930,
+  "line": 915,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -383,18 +383,6 @@
   ],
   "sentence": "5.  Write a `mouse_move_generator()`, a [generator](23_Patterns--Iterators.md#generators) that yields valid `MouseAction` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
- },
- "806a7dc7e24cfdff": {
-  "file": "33_Patterns--Visitor.md",
-  "line": 93,
-  "target": "27_Patterns--Factory.md",
-  "terms": [
-   "flower_gen",
-   "Flower"
-  ],
-  "sentence": "`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`, the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).",
-  "p_terms": 0.01,
   "asked": "2026-09-27"
  },
  "6e7bf0b5ce335367": {
@@ -455,7 +443,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 628,
+  "line": 630,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -468,7 +456,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 686,
+  "line": 695,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -490,7 +478,7 @@
  },
  "73da2fe803454604": {
   "file": "44_Effects--Effect_Management.md",
-  "line": 902,
+  "line": 886,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "greet"
@@ -501,7 +489,7 @@
  },
  "709ba98f5b49d11a": {
   "file": "46_Effects--Stateless.md",
-  "line": 1342,
+  "line": 1343,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Need"

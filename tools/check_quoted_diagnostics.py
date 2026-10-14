@@ -57,6 +57,11 @@ because the book sometimes explains the comment after the quote
 ("The `# type: ignore` silences that diagnostic"). It has no baseline;
 do not add it to the gate without first getting its count to zero.
 
+This check reads gutter lines only. `tip quoted-diagnostics-probe`
+(tools/quoted_diagnostics_probe.py) reruns `ty` on each quote's listing
+and compares the headline, location, and labels too, the parts a
+`ty` upgrade can change.
+
 Usage:
     python -m tools.check_quoted_diagnostics            # the delta
     python -m tools.check_quoted_diagnostics --all      # every hit

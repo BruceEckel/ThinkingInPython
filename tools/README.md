@@ -1210,6 +1210,45 @@ NEW hit is either a stale quote to fix or a fresh deliberate edit to
 accept with `tip quoted-diagnostics-accept`. `--all` lists every hit
 regardless of the baseline.
 
+## quoted_diagnostics_probe.py
+
+Advisory. `check_quoted_diagnostics.py` compares a quote's gutter
+lines with the listing, so it catches a moved line but not a `ty`
+upgrade that rewords a message, renames a rule, or changes a caret
+label. `tip quoted-diagnostics-probe` closes that gap: for each of the
+book's 42 quoted diagnostics it rebuilds the listing the quote
+describes, runs `uv run ty check` on the copy, and compares what `ty`
+prints with what the book shows. It replaces the report-only agent that
+used to re-derive every quote by hand after an upgrade.
+
+Many quotes are against an edited copy of the listing: a
+`# type: ignore` removed, a `match` block deleted, a line uncommented,
+a scratch call appended. `tools/data/quoted_diagnostics_probes.txt`
+records the edit for every quote, one tab-separated entry each (the
+Markdown file, the quote's ordinal in it, the listing, and one or more
+edits). The edits are `none`, `strip-ignore`, `replace`, `delete`,
+`delete-range`, `insert-after`, `append`, and `uncomment`, each
+anchored on text in the listing so a moved line leaves the spec
+intact. The module docstring has the full form. The probe lands in
+`build/quoted-probe/`, outside the extracted trees, with the listing's
+siblings copied beside it so a local import resolves.
+
+The comparison cuts the quote and `ty`'s output into headline, `info:`
+line, location, source line, and caret-label events, normalizes
+whitespace so the book's line wrapping does not matter, and requires
+every event the quote shows to appear in order in one of `ty`'s
+diagnostics. A line the quote leaves out is not a mismatch, because the
+book omits trailing `info:` lines by choice. A changed message, rule,
+location, source line, or label is. The run prints one line per quote,
+MATCH or STALE, then the quoted and actual text for each STALE one, and
+exits nonzero if any is STALE, if a quote has no spec entry, or if an
+entry names a quote that is gone. `ARGS=--list` prints the spec,
+`ARGS=--keep` leaves the probes for inspection, and
+`ARGS="--only PATH"` checks one Markdown file.
+
+Run it after `tip tools-upgrade`. It joins no gate, on the same terms
+as `tip pyright-review`.
+
 ## exercise_refs.py
 
 The book names its exercises by number in prose: "Exercise 8 works

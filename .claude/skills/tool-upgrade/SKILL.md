@@ -142,6 +142,19 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   marker. `grep -rn "^error\[\|^warning\[\|^info\[" Chapters/ Solutions/`
   finds all 40 in the book (33 errors, 7 `reveal_type` quotes), so the
   sweep is small once you remember it.
+  `tip quoted-diagnostics-probe` (`tools/quoted_diagnostics_probe.py`)
+  now does that sweep, so it replaces the report-only agent on an
+  upgrade. It rebuilds the listing behind each of the 42 quotes in
+  `Chapters/` and `Solutions/` (the edit for each, such as a stripped
+  `# type: ignore` or a deleted `match` block, lives in
+  `tools/data/quoted_diagnostics_probes.txt`), runs `uv run ty check`
+  on it, and prints MATCH or STALE per quote with the quoted and actual
+  text side by side. The run takes a few seconds and exits nonzero on
+  any STALE. Read each STALE against its prose: requote a changed
+  message, or fix the spec entry if the book's own edit moved. A new
+  quote with no spec entry also fails, so you add its edit when you add
+  the quote. The probe is report-only like `tip pyright-review`, and
+  joins no gate.
   Chapters 46-47 and Solutions 43 pin five behavior claims to a
   ty version ("under `ty` 0.0.82"; `grep -rn '0\.0\.[0-9]' Chapters
   Solutions` finds them): the `type`-alias probe (46), the

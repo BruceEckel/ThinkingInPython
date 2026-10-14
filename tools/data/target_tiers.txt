@@ -71,6 +71,7 @@ pyright-review	normal
 python-upgrade	very long
 quoted-diagnostics	quick
 quoted-diagnostics-accept	quick
+quoted-diagnostics-probe	quick
 records	quick
 reflow	quick
 reflow-check	quick

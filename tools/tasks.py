@@ -824,6 +824,23 @@ def pyright(v: Vars) -> None:
     tool("pyright", "build/examples", "build/solutions")
 
 
+@task("Re-derive every quoted ty diagnostic and compare it with the book "
+      "(advisory; run after a ty upgrade)",
+      deps=("extract",))
+def quoted_diagnostics_probe(v: Vars) -> None:
+    """Report-only, in no gate. Rebuilds the listing each quoted `ty`
+    diagnostic describes (the edit per quote lives in
+    tools/data/quoted_diagnostics_probes.txt), runs `uv run ty check` on
+    it, and compares the headline, location, source lines, caret labels,
+    and `info:` lines the quote shows with what `ty` prints. Prints MATCH
+    or STALE per quote and exits nonzero on any STALE. Run it after
+    `tip tools-upgrade`; `ARGS=--keep` leaves the probes under
+    build/quoted-probe/, `ARGS=--list` prints the spec, and
+    `ARGS="--only Chapters/46_Effects--Stateless.md"` checks one file.
+    """
+    py("tools.quoted_diagnostics_probe", *v.words("ARGS"))
+
+
 section("Book builds (site, EPUB, PDF)")
 
 

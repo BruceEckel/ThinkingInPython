@@ -1,0 +1,55 @@
+# How to rebuild each quoted `ty` diagnostic before checking it.
+# One entry per quote: markdown path, the quote's ordinal in that file
+# (every quote counted from 1; a block holding two diagnostics counts
+# as two), the extracted listing to start from, then one or more edits.
+# Fields are separated by tabs. Edits: none, strip-ignore,
+# `replace: OLD => NEW`, `delete: TEXT`, `delete-range: A => B`,
+# `insert-after: ANCHOR => TEXT`, `append: TEXT`, `uncomment: TEXT`.
+# Each anchors on text in the listing, never on a line number, and
+# a backslash-n in TEXT starts a new line. An edit reproduces what the
+# prose around the quote says the author did: the `# type: ignore`
+# removed, a `match` block deleted, a line uncommented, a call appended.
+# Written by hand; `tip quoted-diagnostics-probe` reads it and reports
+# a quote with no entry. See tools/quoted_diagnostics_probe.py.
+Chapters/07_Foundations--Classes.md	1	override_intro.py	uncomment: # @override  # "shwo"
+Chapters/08_Foundations--Static_Types.md	1	area.py	strip-ignore
+Chapters/29_Patterns--Changing_the_Interface.md	1	adapter_variations.py	uncomment: # def op(self, item: WhatIHave) -> None:	delete: def op(self, item: WhatIWant | WhatIHave) -> None:
+Chapters/35_Patterns--Flyweight.md	1	tile_enum_match.py	strip-ignore
+Chapters/46_Effects--Stateless.md	1	reveal_bound.py	none
+Chapters/46_Effects--Stateless.md	2	reveal_bound.py	none
+Chapters/46_Effects--Stateless.md	3	unsupplied.py	strip-ignore
+Chapters/46_Effects--Stateless.md	4	undeclared_need.py	strip-ignore
+Chapters/46_Effects--Stateless.md	5	protocol_supply.py	strip-ignore
+Chapters/46_Effects--Stateless.md	6	scores.py	none
+Chapters/46_Effects--Stateless.md	7	catch_score.py	insert-after: console = yield from need(Console) =>     console.print(f"{name}: {value + 1}")	delete-range: match value: => assert_never(value)
+Chapters/47_Effects--Stateless_in_Practice.md	1	bakery.py	replace: Need[Dough] | Need[Oven] | Need[Toaster], str => Need[Toaster], str
+Chapters/47_Effects--Stateless_in_Practice.md	2	bakery.py	append: print(supply(Dough("a"), Oven(1), Toaster(2), Dough("b"), Oven(3), Toaster(4), Dough("c"), Oven(5), Toaster(6), Dough("d"))(toast))
+Chapters/47_Effects--Stateless_in_Practice.md	3	nested_handle.py	none
+Chapters/47_Effects--Stateless_in_Practice.md	4	nested_handle.py	none
+Chapters/47_Effects--Stateless_in_Practice.md	5	nested_handle.py	none
+Chapters/47_Effects--Stateless_in_Practice.md	6	partial_handling.py	strip-ignore
+Solutions/07_Foundations--Classes/README.md	1	exercise_6.py	uncomment: # @override  # Uncomment	replace: class Base: => from typing import override\n\nclass Base:
+Solutions/08_Foundations--Static_Types/README.md	1	area.py	strip-ignore
+Solutions/08_Foundations--Static_Types/README.md	2	type_aliases.py	replace: paint(grid, (2, 3), "red") => paint(grid, (2, 3), "purple")
+Solutions/13_Techniques--Pattern_Matching/README.md	1	exhaustive.py	replace: type Shape = Circle | Square => @dataclass(frozen=True)\nclass Rectangle:\n    width: float\n    height: float\n\ntype Shape = Circle | Square | Rectangle
+Solutions/13_Techniques--Pattern_Matching/README.md	2	notifications_match.py	replace: type Notification = Email | Sms | Push => @dataclass(frozen=True)\nclass Webhook:\n    url: str\n\ntype Notification = Email | Sms | Push | Webhook
+Solutions/17_Techniques--Metaprogramming/README.md	1	metaclass_layout_conflict.py	strip-ignore
+Solutions/20_Patterns--Rethinking_Objects/README.md	1	exercise_3.py	strip-ignore
+Solutions/20_Patterns--Rethinking_Objects/README.md	2	exercise_5.py	replace: case Square(side=side): => # case Square(side=side):	replace: return side * side => # return side * side
+Solutions/25_Patterns--Template_Method/README.md	1	exercise_3.py	strip-ignore
+Solutions/27_Patterns--Factory/README.md	1	exercise_3_protocol.py	delete: def make_obstacle(self) -> Fairy: return Fairy()
+Solutions/27_Patterns--Factory/README.md	2	exercise_11.py	replace: PROTOTYPES[name] = build() => PROTOTYPES[build.__name__] = build()
+Solutions/29_Patterns--Changing_the_Interface/README.md	1	exercise_5.py	strip-ignore
+Solutions/40_Functional--Foundations/README.md	1	exercise_6.py	strip-ignore
+Solutions/40_Functional--Foundations/README.md	2	exercise_6_tuple.py	append: CONFIG.append(3)
+Solutions/45_Effects--Generators/README.md	1	yield_from_nested.py	replace: yield from interview() => interview()
+Solutions/45_Effects--Generators/README.md	2	send_none_is_next.py	strip-ignore
+Solutions/46_Effects--Stateless/README.md	1	undeclared_need.py	strip-ignore
+Solutions/46_Effects--Stateless/README.md	2	exercise_3.py	none
+Solutions/46_Effects--Stateless/README.md	3	greeter.py	replace: console = yield from need(Console) => console = need(Console)
+Solutions/46_Effects--Stateless/README.md	4	greeter.py	replace: console = yield from need(Console) => console = need(Console)
+Solutions/46_Effects--Stateless/README.md	5	exercise_10.py	replace: KeyError | ValueError, None => KeyError, None
+Solutions/46_Effects--Stateless/README.md	6	exercise_11.py	append: run(supply(as_type(Recorder)(Terminal()))(to_log)("Carol"))
+Solutions/47_Effects--Stateless_in_Practice/README.md	1	fork_leak.py	append: from greeter import Console\nfrom stateless import need\n\n@fork\ndef announce(n: int) -> Depend[Need[Console], None]:\n    console = yield from need(Console)\n    console.print(f"{n}")
+Solutions/47_Effects--Stateless_in_Practice/README.md	2	exercise_13.py	replace: def buttered() -> Depend[ => def buttered() -> Depend[Need[Butter], str]:	delete-range: Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter], => ]:
+Solutions/47_Effects--Stateless_in_Practice/README.md	3	exercise_13.py	replace: Oven(220), Toaster(3), => Oven(220),
