@@ -18,9 +18,13 @@ def greet() -> Annotated[None, performs(Ask, Tell)]:
 def shout(message: str) -> None:
     tell(message.upper())
 
-for f in ask, tell, greet, shout:
+def quiet() -> Annotated[None, performs()]:
+    shout("hi")
+
+for f in ask, tell, greet, shout, quiet:
     print(f.__name__, row(f))
 #: ask ['Ask']
 #: tell ['Tell']
 #: greet ['Ask', 'Tell']
 #: shout []
+#: quiet []

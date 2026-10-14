@@ -203,12 +203,16 @@ def greet() -> Annotated[None, performs(Ask, Tell)]:
 def shout(message: str) -> None:
     tell(message.upper())
 
-for f in ask, tell, greet, shout:
+def quiet() -> Annotated[None, performs()]:
+    shout("hi")
+
+for f in ask, tell, greet, shout, quiet:
     print(f.__name__, row(f))
 #: ask ['Ask']
 #: tell ['Tell']
 #: greet ['Ask', 'Tell']
 #: shout []
+#: quiet []
 ```
 
 The bodies are ordinary eager code, with no generators and no `yield from`.
@@ -230,9 +234,11 @@ A row inside `Annotated` is a structured comment until a tool reads it.
 `greet()`'s row is right because I typed it correctly.
 
 `shout()`'s empty row has a second reading.
-A function that declares `performs()` with no arguments states that it is pure.
-`row()` returns the same empty list for that function,
+`quiet()` declares `performs()` with no arguments, which states that it is pure.
+`row(quiet)` returns the same empty list,
 so an empty list can mean either a function declared pure or [one that declares nothing](#decide-what-untracked-code-performs).
+The declaration is also wrong: `quiet()` calls `shout()`, which calls `tell()`,
+and `row()` reads each declaration alone.
 
 `ask()` calls `input()` in its own body.
 `Ask` is a label here, an empty class,
