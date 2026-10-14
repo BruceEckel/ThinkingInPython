@@ -32,7 +32,7 @@ class Input(StrEnum):
 type Transition = Callable[[object], Mood]
 
 @record
-class Row:
+class StateRow:
     message: str
     next: Transition
     def run(self) -> None:
@@ -56,7 +56,7 @@ def grumpy(input_: object) -> Mood:
         case _:
             return Mood.GRUMPY
 
-class Mood(Row, Enum):
+class Mood(StateRow, Enum):
     HAPPY = ("Great to see you!", happy)
     GRUMPY = ("What do you want?", grumpy)
     PROZAC = ("Everything is wonderful.",

@@ -876,9 +876,10 @@ def test_no_transition_raises() -> None:
 
 `enum_states.py` is the first design again,
 with each state as a row of data rather than a class, run by the same engine.
-`Row` is a record that satisfies `State`: its `run()` prints a stored message,
+`StateRow` is a record that satisfies `State`:
+its `run()` prints a stored message,
 and its `next` is a stored function rather than a method.
-`TrapState` is an `Enum` whose members are `Row`s:
+`TrapState` is an `Enum` whose members are `StateRow`s:
 
 ```python
 # enum_states.py
@@ -890,7 +891,7 @@ from record import record
 type Transition = Callable[[object], TrapState]
 
 @record
-class Row:
+class StateRow:
     message: str
     next: Transition
 
@@ -929,7 +930,7 @@ def holding(input_: object) -> TrapState:
         case _:
             return TrapState.HOLDING
 
-class TrapState(Row, Enum):
+class TrapState(StateRow, Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)
@@ -939,7 +940,7 @@ class TrapState(Row, Enum):
         return self.name.capitalize()
 ```
 
-A `Row` holds the message its `run()` prints and the function its `next` names.
+A `StateRow` holds the message its `run()` prints and the function its `next` names.
 The `Transition` alias names `TrapState` above the class statement that creates it.
 A `type` alias evaluates its right side lazily,
 so the forward reference resolves when the checker or the program reads the alias.
@@ -949,10 +950,10 @@ and names the member the trap enters next.
 A function body runs after the whole module has loaded,
 so a `TrapState` named inside one resolves too.
 
-`TrapState` mixes `Row` into `Enum`.
+`TrapState` mixes `StateRow` into `Enum`.
 Each member's value is a tuple,
-and `Enum` passes the tuple to `Row`'s constructor,
-so `TrapState.WAITING` is a `TrapState` member and a `Row` at once,
+and `Enum` passes the tuple to `StateRow`'s constructor,
+so `TrapState.WAITING` is a `TrapState` member and a `StateRow` at once,
 with `message` and `next` as attributes.
 The engine's call `state.next(input_)` reads the same whether `next` is a method or a stored function.
 The type checker accepts the row as a `State` because `State.next()` declares its parameter positional-only:

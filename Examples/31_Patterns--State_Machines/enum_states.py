@@ -7,7 +7,7 @@ from record import record
 type Transition = Callable[[object], TrapState]
 
 @record
-class Row:
+class StateRow:
     message: str
     next: Transition
 
@@ -46,7 +46,7 @@ def holding(input_: object) -> TrapState:
         case _:
             return TrapState.HOLDING
 
-class TrapState(Row, Enum):
+class TrapState(StateRow, Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)
