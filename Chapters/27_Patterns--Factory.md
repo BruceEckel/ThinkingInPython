@@ -1075,17 +1075,27 @@ PROTOTYPES: Final[dict[Kind, Monster]] = {
 
 def spawn(kind: Kind) -> Monster:
     return copy.deepcopy(PROTOTYPES[kind])
+```
 
-if __name__ == "__main__":
-    a = spawn("goblin")
-    b = spawn("goblin")
-    b.hp = 5
-    print(a.hp, b.hp)  # The copies are independent
-    print(spawn("troll"))
-#: 10 5
+`spawn_demo.py` spawns two goblins and appends a power to one of them:
+
+```python
+# spawn_demo.py
+from prototype_registry import spawn
+
+a = spawn("goblin")
+b = spawn("goblin")
+b.powers.append("curse")
+print(a.powers, b.powers)  # The copies are independent
+#: ['bite'] ['bite', 'curse']
+print(spawn("troll"))
 #: Monster(name='Troll', hp=40, powers=['smash', 'regen'])
 ```
 
+`a.powers` keeps its one entry because `spawn()` calls `copy.deepcopy()`,
+so each goblin owns its list.
+With `copy.copy()`, both goblins would share the prototype's list,
+as `shallow` shares `goblin`'s list in `prototype.py`.
 Because `spawn()` returns an independent object every time,
 callers can modify their copy while the prototype stays as it was.
 
@@ -1196,7 +1206,6 @@ Keyword arguments with defaults are Python's built-in builder:
 
 ```python
 # pizza_direct.py
-from dataclasses import replace
 from record import record
 
 @record
@@ -1204,13 +1213,20 @@ class Pizza:
     size: int = 12
     cheese: bool = True
     toppings: tuple[str, ...] = ()
+```
 
-if __name__ == "__main__":
-    pizza = Pizza(size=16, toppings=("basil", "olives"))
-    print(pizza)
-    family = replace(pizza, size=20)
-    print(family)
+`pizza_order.py` orders a pizza in one call and varies it with `replace()`:
+
+```python
+# pizza_order.py
+from dataclasses import replace
+from pizza_direct import Pizza
+
+pizza = Pizza(size=16, toppings=("basil", "olives"))
+print(pizza)
 #: Pizza(size=16, cheese=True, toppings=('basil', 'olives'))
+family = replace(pizza, size=20)
+print(family)
 #: Pizza(size=20, cheese=True, toppings=('basil', 'olives'))
 ```
 
