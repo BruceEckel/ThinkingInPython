@@ -15,8 +15,7 @@ the list gives them, since the engine tries them in that order and the
 first condition that passes wins; the chapter's last three events turn
 on that order.
 
-This is not a trace: the chapter's opening figure (`ch31_state_machines`,
-`state_story.svg`) already traces the mousetrap's run. State, event,
+This is a graph of the machine, not a trace of one run. State, event,
 condition, and action names come from the `table` in
 `tabledriven/vending_machine.py`; the initial state is the one its
 `super().__init__()` call passes.
