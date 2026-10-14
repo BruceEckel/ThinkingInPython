@@ -130,7 +130,7 @@ Each call to `B()` runs the generated `__init__()`, which assigns `100`
 to `self.x` as a fresh instance attribute for that object.
 `b.x = -1` replaces the value of `b`'s own attribute.
 `b2` comes from a separate `B()` call and keeps its `100`,
-as `A()` does in `real_defaults.py`.
+the way each `A()` in `real_defaults.py` holds its own `x`.
 A constructor default creates one value per instance,
 unlike a class-body attribute,
 which creates one value shared by all instances until something shadows it.

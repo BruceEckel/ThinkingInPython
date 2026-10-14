@@ -9,10 +9,8 @@ class A:
 class B:
     x: int = 100  # Becomes a constructor default
 
-a = A()
-a.x = -1
-print(a.x, A().x)  # The change in a does not leak
-#: -1 100
+print(vars(A()), A(7).x)  # Each instance holds x
+#: {'x': 100} 7
 print(B().x, B(7).x)
 #: 100 7
 print(vars(B)["x"], vars(B())["x"])

@@ -551,10 +551,8 @@ class A:
 class B:
     x: int = 100  # Becomes a constructor default
 
-a = A()
-a.x = -1
-print(a.x, A().x)  # The change in a does not leak
-#: -1 100
+print(vars(A()), A(7).x)  # Each instance holds x
+#: {'x': 100} 7
 print(B().x, B(7).x)
 #: 100 7
 print(vars(B)["x"], vars(B())["x"])
@@ -568,6 +566,9 @@ In `real_defaults.py` the `100` is a default argument,
 `__init__(self, x: int = 100) -> None`.
 `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
+A new `A()` holds `x` in its own dictionary from the start:
+`vars(A())` prints `{'x': 100}`,
+where the first `vars(a)` in `inside_objects.py` prints `{}`.
 
 Python still builds the [default value](05_Foundations--Functions.md#the-mutable-default-trap)
 once, at definition time,
