@@ -267,14 +267,19 @@ Importing the package alone leaves its submodules unloaded:
 ```python
 # package_only.py
 import a_package
+from exceptions import expect
 
 #: initializing a_package
-print(hasattr(a_package, "module1"))
-#: False
+expect(AttributeError, lambda: a_package.module1)  # type: ignore
+#: [AttributeError] module 'a_package' has no attribute
+#: 'module1'
 ```
 
-`a_package.module1.function1()` here raises `AttributeError: module 'a_package' has no attribute 'module1'`.
+Reading `a_package.module1` raises an `AttributeError`,
+so `a_package.module1.function1()` fails here too.
 The submodule becomes an attribute of the package only when something imports it by name.
+The type checker warns that `module1` might not be imported,
+the same fact the marker shows, and the `# type: ignore` silences that warning.
 
 You can also name the package with `from`:
 
