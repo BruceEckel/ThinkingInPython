@@ -360,8 +360,9 @@ for s in scores:
         scores.remove(s)
 print(scores)
 #: [1, 2, 3]
-print([s for s in [1, 2, 2, 3] if s != 2])
-#: [1, 3]
+scores = [1, 2, 2, 3]
+print([s for s in scores if s != 2], scores)
+#: [1, 3] [1, 2, 2, 3]
 ages = {"a": 1, "b": 2}
 try:
     for name in ages:
@@ -621,22 +622,31 @@ def look_first(text):
         return int(text)
     return None
 
-print(look_first("-5"), int("-5"))
+def parse_int(text):
+    try:
+        return int(text)
+    except ValueError:
+        return None
+
+print(look_first("-5"), parse_int("-5"))
 #: None -5
 try:
     look_first("\N{SUPERSCRIPT TWO}")
 except ValueError as e:
     print("look_first:", e)
 #: look_first: invalid literal for int() with base 10: '²'
+print(parse_int("\N{SUPERSCRIPT TWO}"))
+#: None
 ```
 
 `isdigit()` and `int()` disagree in both directions.
 `isdigit()` rejects `"-5"`, which `int()` converts fine,
 and `isdigit()` accepts `"²"`, which `int()` refuses with a `ValueError`.
-`parse_int()` in `demonstrate_exceptions.py` is the EAFP version of `look_first()`.
+`parse_int()`, repeated from `demonstrate_exceptions.py`,
+is the EAFP version of `look_first()`.
 Its `try` block runs the conversion and catches the failure,
 so the test and the operation are one call and cannot disagree.
-`parse_int()` returns `-5` for `"-5"` and `None` for `"²"`,
+The output shows `parse_int()` returning `-5` for `"-5"` and `None` for `"²"`,
 the two answers `look_first()` gets wrong.
 
 The file system can also change between the test and the operation.
