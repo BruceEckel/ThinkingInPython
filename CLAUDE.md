@@ -214,12 +214,16 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Four report-only
+Five report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
 ending on a preposition whose object moved) and `tip watch-words`
 (`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
+`tip possessives` (`tools/stranded_possessives.py`, 2026-10-14) lists a
+possessive whose head noun is elided ("not the base's"), the possessive
+cousin of the stranded preposition; the sweeps that day fixed 83 and the
+baseline holds the judged keeps.
 `tip internal-names` (`tools/internal_names.py`, 2026-10-07) lists each
 public class name, in code under `Examples/` and `Solutions/`, that no
 code outside its class and no prose code span uses, a candidate for a
@@ -235,7 +239,7 @@ tag is skipped. Its baseline was seeded from the 2026-10-07 tag sweep,
 which read every hit, so a new hit is a pointer to tag or a false
 positive to accept (an ordinal naming an argument, a version, a
 runtime call, output, or data).
-`tip stranded-accept`, `tip watch-words-accept`,
+`tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, and `tip positional-accept` add the
 current new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.

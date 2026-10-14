@@ -396,8 +396,8 @@ def editor_pin(v: Vars) -> None:
 @task("House-style lint with Vale (CH=29 for one chapter; needs vale binary)")
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
-    the report-only stranded-preposition, watch-word,
-    positional-reference, and internal-name scans (the last reads the
+    the report-only stranded-preposition, stranded-possessive,
+    watch-word, positional-reference, and internal-name scans (the last reads the
     whole book). Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
@@ -409,6 +409,7 @@ def prose(v: Vars) -> None:
         run(["vale", "sync"])
     run(["vale", *prose_files(v)])
     py("tools.stranded_prepositions", *prose_files(v))
+    py("tools.stranded_possessives", *prose_files(v))
     py("tools.watch_words", *prose_files(v))
     py("tools.positional_refs", *prose_files(v))
     py("tools.internal_names")
@@ -430,6 +431,26 @@ def stranded(v: Vars) -> None:
       "stale entries", secondary=True)
 def stranded_accept(v: Vars) -> None:
     py("tools.stranded_prepositions", "--accept")
+
+
+@task("Report new possessives whose head noun is elided "
+      "(report-only; accept with `tip possessives-accept`)")
+def possessives(v: Vars) -> None:
+    """Report prose clauses with a stranded possessive ("not the
+    base's"), a possessive whose head noun is elided. It reports and
+    never gates; `tip prose` runs it after the stranded-preposition
+    scan. CH= picks one chapter and its Solutions file. Hits judged
+    false positives live in
+    tools/data/stranded_possessives_baseline.txt, so the run prints
+    only new ones; ARGS=--all lists every hit.
+    """
+    py("tools.stranded_possessives", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new stranded-possessive hits to the baseline and drop "
+      "stale entries", secondary=True)
+def possessives_accept(v: Vars) -> None:
+    py("tools.stranded_possessives", "--accept")
 
 
 @task("Report public class names that only their class uses "

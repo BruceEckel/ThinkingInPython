@@ -64,6 +64,8 @@ pattern-names	normal
 pdf	normal
 positional	quick
 positional-accept	quick
+possessives	quick
+possessives-accept	quick
 prose	quick
 prune	quick
 pyright-accept	normal
