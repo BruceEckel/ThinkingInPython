@@ -17,3 +17,5 @@ except AssertionError as e:
 #: Failing test case: roundtrip(
 #:     sample='\x80',
 #: )
+print(repr(decode(encode("\x80"))))  # [1]
+#: 'Â\x80'

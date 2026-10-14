@@ -319,9 +319,8 @@ from codec import decode, encode
 random.seed(42)  # A failing search must be reproducible
 alphabet = "abcde"
 for _ in range(1000):
-    size = random.randint(0, 8)
-    sample = "".join(random.choice(alphabet)
-                     for _ in range(size))
+    sample = "".join(
+        random.choices(alphabet, k=random.randint(0, 8)))
     assert decode(encode(sample)) == sample
 print("1000 random cases passed")
 #: 1000 random cases passed
@@ -399,6 +398,8 @@ except AssertionError as e:
 #: Failing test case: roundtrip(
 #:     sample='\x80',
 #: )
+print(repr(decode(encode("\x80"))))  # [1]
+#: 'Â\x80'
 ```
 
 `shrinking.py` imports `encode()` from `codec.py`,
@@ -414,8 +415,8 @@ Hypothesis draws from every character UTF-8 can encode.
 It shrinks its failure to `'\x80'`,
 the smallest code point on which the two decodings disagree.
 `'\x80'` is the first character UTF-8 encodes in two bytes instead of one.
-Decoding those two bytes as Latin-1 returns two characters where one went in,
-so the round trip returns a different string.
+Decoding those two bytes as Latin-1 returns two characters where one went in
+(`[1]`), so the round trip returns `'Â\x80'` instead of `'\x80'`.
 That code point is the unusual Unicode the hand-written loop's alphabet excludes.
 Hypothesis finds it by drawing from a wider alphabet,
 treating `decode()` as opaque throughout.
