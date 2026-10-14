@@ -1,5 +1,0 @@
-# schedule.txt
-LightOff 2:00
-LightOn 1:00
-RingBell 7:00
-LightOn 8:00

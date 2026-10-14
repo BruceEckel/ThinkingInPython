@@ -230,8 +230,13 @@ Delaying the build takes a `dict` subclass that builds a class when a lookup mis
 # greenhouse.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from pathlib import Path
-from typing import ClassVar, Final, cast
+from typing import Final
+
+@dataclass
+class Event:
+    action: str
+    hour: int
+    minute: int
 
 type EventMaker = Callable[[int, int], Event]
 NAMES: Final[frozenset[str]] = frozenset({
@@ -255,45 +260,10 @@ class EventMakers(dict[str, EventMaker]):
     def built(self) -> str:
         return (f"{len(self)} of {len(NAMES)}"
                 " event classes built")
-
-@dataclass
-class Event:
-    action: str
-    hour: int
-    minute: int
-    # Registry of all Events
-    events: ClassVar[list[Event]] = []
-    _event_maker: ClassVar[EventMakers] = EventMakers()
-
-    def __post_init__(self) -> None:
-        Event.events.append(self)
-
-    @staticmethod
-    def load_schedule(path: Path) -> None:
-        lines = [
-            line for line in path.read_text().splitlines()
-            if line.strip() and not line.startswith("#")
-        ]
-        for line in lines:
-            class_name, hour, minute = (
-                line.replace(":", " ").split())
-            Event._event_maker[class_name](
-                int(hour), int(minute))
-
-    @staticmethod
-    def run_events() -> None:
-        bell = cast(
-            type, Event._event_maker["RingBell"])
-        for e in sorted(
-                Event.events,
-                key=lambda e: (e.hour, e.minute)):
-            prefix = "* " if isinstance(e, bell) else ""
-            line = f"{e.hour}:{e.minute:02d}: {e.action}"
-            print(prefix + line)
 ```
 
 `EventMakers` subclasses `dict`,
-so the call site `Event._event_maker[class_name]` reads as an ordinary lookup.
+so the call site `makers[name]` reads as an ordinary lookup.
 When the key is absent,
 `dict.__getitem__()` calls `__missing__()` and returns its result,
 so `__missing__()` builds the class, stores it under its name, and returns it.
@@ -302,71 +272,72 @@ so `__missing__()` builds each class once.
 Without `__missing__()`,
 every caller would check for the name and build the missing class.
 
-`Event._event_maker` starts out empty,
+A new `EventMakers` starts out empty,
 and the module-level `NAMES` holds the seven legitimate event names.
 `__missing__()` checks a name against `NAMES` before building anything,
 so every key the dict acquires names a real event.
 
-Now the end user writes and maintains only the schedule file:
-
-```text
-# schedule.txt
-LightOff 2:00
-LightOn 1:00
-RingBell 7:00
-LightOn 8:00
-```
-
-`load_schedule()` reads that file, filtering out blank lines and comments,
-then builds an `Event` from each resulting line.
-`line.replace(":", " ").split()` turns `"LightOn 1:00"` into three strings in a single step,
-replacing the colon with a second space before splitting on whitespace.
-`Event._event_maker[class_name]` gets the class object that builds that `Event`.
-On the first lookup of an event type,
-`EventMakers` builds the class and registers it under its name.
-An unknown name raises a `KeyError`, as a missing key in any `dict` does,
-so a `try: ... except KeyError` around a lookup catches it.
-
-Running the schedule prints a line for each class as `EventMakers` builds it,
+The demo holds the schedule in `SCHEDULE`,
+one `(name, hour, minute)` tuple per event.
+Building the events prints a line for each class as `EventMakers` builds it,
 then a count of the classes built, then the events in time order:
 
 ```python
 # greenhouse_demo.py
-from pathlib import Path
-from greenhouse import Event
+from typing import Final, cast
+from greenhouse import EventMakers
 
-Event.load_schedule(Path("schedule.txt"))
+SCHEDULE: Final[tuple[tuple[str, int, int], ...]] = (
+    ("LightOff", 2, 0),
+    ("LightOn", 1, 0),
+    ("RingBell", 7, 0),
+    ("LightOn", 8, 0),
+)
+makers = EventMakers()
+events = [makers[name](hour, minute)
+          for name, hour, minute in SCHEDULE]
 #: Creating LightOff
 #: Creating LightOn
 #: Creating RingBell
-print(Event._event_maker.built())
+print(makers.built())
 #: 3 of 7 event classes built
-Event.run_events()
+bell = cast(type, makers["RingBell"])
+for event in sorted(
+        events, key=lambda e: (e.hour, e.minute)):
+    prefix = "* " if isinstance(event, bell) else ""
+    print(f"{prefix}{event.hour}:{event.minute:02d}"
+          f": {event.action}")
 #: 1:00: LightOn
 #: 2:00: LightOff
 #: * 7:00: RingBell
 #: 8:00: LightOn
 ```
 
+`makers[name]` gets the class object that builds each `Event`.
+On the first lookup of an event type,
+`EventMakers` builds the class and registers it under its name.
+An unknown name raises a `KeyError`, as a missing key in any `dict` does,
+so a `try: ... except KeyError` around a lookup catches it.
+
 The schedule names three of the seven declared event types.
 `built()` compares the classes in the dict with the names in `NAMES`,
 so its line states the result: seven classes declared, three built.
 
-`run_events()` uses the type distinction.
-It fetches the `RingBell` class through `_event_maker`,
-the same lookup `load_schedule()` uses,
-and prefixes `* ` to every event that `isinstance()` reports as a `RingBell`.
+The last lines of the demo use the type distinction.
+They fetch the `RingBell` class through `makers`,
+the same lookup the comprehension uses,
+and prefix `* ` to every event that `isinstance()` reports as a `RingBell`.
 That is what a distinct subclass adds.
 Each event carries its kind as its type,
 where `isinstance()` or a `match` class pattern can test it.
 
-Calling the base class, `Event(class_name, hour, minute)`,
+Calling the base class, `Event(name, hour, minute)`,
 produces the right field values, but every entry shares one type,
-and `run_events()` has no `RingBell` class for `isinstance()` to test.
+and the loop has no `RingBell` class for `isinstance()` to test.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
 
-`run_events()` wraps its lookup in `cast(type, ...)`.
+The demo wraps its `RingBell` lookup in `cast(type, ...)`.
 `EventMakers` declares its values as `EventMaker`, a callable,
 and `isinstance()` requires a class,
 so without the cast the type checker reports an `invalid-argument-type`.
