@@ -1,6 +1,6 @@
 # third_party_stub.py
 from typing import Final
-from row_check import check
+from row_check import check, lines
 
 APP: Final[str] = '''
 import requests
@@ -20,7 +20,11 @@ def get(
     url: str,
 ) -> Annotated[object, performs(Network)]: ...
 '''
-print(check({"app": APP}).findings)
-#: [Undeclared(where='app.fetch', effect='Unknown')]
-print(check({"app": APP, "requests": STUB}).findings)
-#: []
+for line in lines(check({"app": APP})):
+    print(line)
+#: app.fetch ['Network']
+#: ! app.fetch undeclared Unknown
+for line in lines(check({"app": APP, "requests": STUB})):
+    print(line)
+#: app.fetch ['Network']
+#: requests.get ['Network']

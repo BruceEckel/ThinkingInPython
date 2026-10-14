@@ -985,7 +985,7 @@ then one for each finding.
 It returns the strings and leaves the printing to the program that runs the checker,
 so the core stays pure.
 
-Here is the checker on Appendix A's greeting program, with one function added:
+Here is the checker on Appendix A's greeting program:
 
 ```python
 # greeting_check.py
@@ -1027,7 +1027,7 @@ for line in lines(check({"greeting": GREETING})):
 ```
 
 The demo prints each nonempty row, then each finding.
-Appendix A's `row(shout)` reads `[]`, because `shout()` declares nothing.
+Appendix A's `row()` reads `[]` for both `shout()` and `quiet()`.
 The checker infers `['Tell']` from the call to `tell()`.
 `quiet()` declares itself pure and calls `shout()`,
 so the checker reports `quiet()`,
@@ -1115,7 +1115,7 @@ passed to `check()` under the library's module name.
 ```python
 # third_party_stub.py
 from typing import Final
-from row_check import check
+from row_check import check, lines
 
 APP: Final[str] = '''
 import requests
@@ -1135,17 +1135,22 @@ def get(
     url: str,
 ) -> Annotated[object, performs(Network)]: ...
 '''
-print(check({"app": APP}).findings)
-#: [Undeclared(where='app.fetch', effect='Unknown')]
-print(check({"app": APP, "requests": STUB}).findings)
-#: []
+for line in lines(check({"app": APP})):
+    print(line)
+#: app.fetch ['Network']
+#: ! app.fetch undeclared Unknown
+for line in lines(check({"app": APP, "requests": STUB})):
+    print(line)
+#: app.fetch ['Network']
+#: requests.get ['Network']
 ```
 
 With `APP` alone, the table reads `requests.get` as `Unknown`,
 so `fetch()` draws a finding.
-With the stub, `requests.get` is a declared function like any other.
+With the stub, `requests.get` is a declared function like any other,
+and the second run prints its row, `['Network']`.
 `fetch()`'s body row takes the stub's declared `Network`.
-`fetch()` declares `Network` too, so the findings list is empty.
+`fetch()` declares `Network` too, so the second run reports no finding.
 The stub's body is the constant `...`,
 so its body row is empty and stays within its declaration.
 Type checkers solve the same problem the same way,
