@@ -138,8 +138,8 @@ Each transition function contains a `case` for every input its state recognizes,
 and produces the state the trap enters next.
 The default `case _` returns the current state, so the state stays the same.
 Each function names `TrapState`, which the file defines below them.
-A function body runs at each call, not at the `def`,
-and by the first call the whole module has loaded and `TrapState` exists.
+A function body runs when it is called, not at the `def`,
+so by the first call the whole module has loaded and `TrapState` exists.
 
 `TrapState` is an `Enum` whose members are the records, in the same file:
 
@@ -158,10 +158,8 @@ class TrapState(State, Enum):
 `TrapState` mixes `State` into `Enum`.
 Each member's value is a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
-so `TrapState.WAITING` is a `TrapState` member and a `State` at once,
+so `TrapState.WAITING` is both a `TrapState` member and a `State`,
 with `message` and `next` as attributes.
-`__str__()` returns the member's name in the form the trace prints,
-so `WAITING` prints as `Waiting`, and `step()` prints each state through it.
 
 The `StateMachine` holds the current state and advances it on each input:
 
@@ -186,13 +184,13 @@ def run_all(machine: StateMachine,
         machine.step(input_)
 ```
 
-The constructor sets the initial state and runs it.
-`step()` takes one input, asks the current state for its successor,
-and moves there.
-The parameter is `input_`, with a trailing underscore,
+The `step()` parameter is `input_`, with a trailing underscore,
 because a bare `input` shadows the builtin `input()`.
-It then prints the transition (the old state, the input, and the new state)
-and calls `run()` for the new state.
+`step()` prints the transition (the old state, the input, and the new state),
+then calls `run()` on the new state, the one the machine has just entered.
+A state's action runs on entry:
+each transition arrives in a state and runs that state's `run()`,
+and the constructor runs the initial state's for the same reason.
 A state prints as its name, through the `__str__()` that `TrapState` defines.
 `run_all()` is a convenience outside the class:
 it feeds any iterable of inputs to `step()`, one at a time.
