@@ -3,7 +3,7 @@
 def public():
     return "public"
 
-def helper():
+def _helper():
     return "helper"
 
 def _internal():

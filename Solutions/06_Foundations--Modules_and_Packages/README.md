@@ -399,7 +399,7 @@ Copy `exporting.py` without the line, add a name of your own, and print what `di
 def public():
     ...
 
-def helper():
+def _helper():
     ...
 
 def _internal():
@@ -418,7 +418,7 @@ def undeclared():
 def public():
     return "public"
 
-def helper():
+def _helper():
     return "helper"
 
 def _internal():
@@ -433,15 +433,15 @@ def undeclared():
 from exporting_no_all import *  # noqa: F403
 
 print(sorted(n for n in dir() if not n.startswith("__")))
-#: ['helper', 'public', 'undeclared']
+#: ['public', 'undeclared']
 ```
 
 Without `__all__`, the star import falls back to the underscore
 convention.
 The star import binds every top-level name that does not start with an
-underscore. `undeclared` therefore joins `public` and
-`helper`, and `_internal` stays out. Restoring the `__all__` line
-limits the star import to `public` and `helper` again.
+underscore. `undeclared` therefore joins `public`,
+and `_helper` and `_internal` stay out. Restoring the `__all__` line
+limits the star import to `public` and `_helper` again.
 
 When a module defines `__all__`, that list replaces the
 underscore convention. The star import binds each listed name,

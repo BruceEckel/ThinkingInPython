@@ -1,11 +1,11 @@
 # exporting.py
 
-__all__ = ["public", "helper"]
+__all__ = ["public", "_helper"]
 
 def public():
     return "public"
 
-def helper():
+def _helper():
     return "helper"
 
 def _internal():

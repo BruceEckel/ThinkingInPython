@@ -462,12 +462,12 @@ and documentation tools read it to report a module's public names.
 ```python
 # exporting.py
 
-__all__ = ["public", "helper"]
+__all__ = ["public", "_helper"]
 
 def public():
     return "public"
 
-def helper():
+def _helper():
     return "helper"
 
 def _internal():
@@ -482,12 +482,12 @@ def undeclared():
 from exporting import *  # noqa: F403
 
 print(sorted(n for n in dir() if not n.startswith("__")))
-#: ['helper', 'public']
+#: ['_helper', 'public']
 ```
 
 Without `__all__`, the star import binds every name that starts with a letter:
-`public`, `helper`, and `undeclared`.
-With `__all__`, it binds the two listed names,
+`public` and `undeclared`.
+With `__all__`, it binds the two listed names, including `_helper`,
 and `undeclared` stays in `exporting` with `_internal`.
 
 The `# noqa: F403` silences the linter's warning about the star import.
