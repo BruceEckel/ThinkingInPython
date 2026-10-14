@@ -32,6 +32,7 @@ class Robot(Item):
     def move(self, urge: Urge) -> None:
         self.room = self.room.doors.open(urge).enter(self)
 
+# robot_explorer/items.py (continued)
 class Wall(Item):
     symbol: ClassVar[str] = "#"
 

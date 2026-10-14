@@ -622,7 +622,35 @@ class Robot(Item):
 
     def move(self, urge: Urge) -> None:
         self.room = self.room.doors.open(urge).enter(self)
+```
 
+`world.py` imports `Item`, `Robot`, `Urge`, and `Wall` from `items.py`,
+so `from world import Room` here is circular.
+`TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
+so the runtime skips that import and the cycle exists for the checker alone.
+Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`).
+Python evaluates an annotation only when something reads it,
+so no line of `items.py` looks `Room` up at runtime.
+
+The rats avoid the same kind of cycle with a `Protocol`.
+`blackboard.py` imports `Rat`,
+and `rat.py` states what it needs from a blackboard in the `Board` `Protocol`,
+so it imports nothing from `blackboard.py`.
+
+`Robot` holds its two pieces of state in different ways.
+`__init__()` assigns `finished`, so each robot owns its own flag from the start.
+`room` gets a bare declaration, `room: Room`.
+The declaration gives the type checker the attribute's type,
+`Room` rather than `Room | None`,
+so code that reads `room` skips the `None` check.
+`GameBuilder` creates the attribute by assigning `robot.room` when it places the robot.
+Reading `room` before then raises an `AttributeError`.
+The builder runs first, so every read comes afterward.
+
+The remaining occupants and the factory that builds them complete `items.py`:
+
+```python
+# robot_explorer/items.py (continued)
 class Wall(Item):
     symbol: ClassVar[str] = "#"
 
@@ -671,29 +699,6 @@ def item_factory(symbol: str) -> Item:
     # Anything else is a teleport target
     return Teleport(symbol)
 ```
-
-`world.py` imports `Item`, `Robot`, `Urge`, and `Wall` from `items.py`,
-so `from world import Room` here is circular.
-`TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
-so the runtime skips that import and the cycle exists for the checker alone.
-Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`).
-Python evaluates an annotation only when something reads it,
-so no line of `items.py` looks `Room` up at runtime.
-
-The rats avoid the same kind of cycle with a `Protocol`.
-`blackboard.py` imports `Rat`,
-and `rat.py` states what it needs from a blackboard in the `Board` `Protocol`,
-so it imports nothing from `blackboard.py`.
-
-`Robot` holds its two pieces of state in different ways.
-`__init__()` assigns `finished`, so each robot owns its own flag from the start.
-`room` gets a bare declaration, `room: Room`.
-The declaration gives the type checker the attribute's type,
-`Room` rather than `Room | None`,
-so code that reads `room` skips the `None` check.
-`GameBuilder` creates the attribute by assigning `robot.room` when it places the robot.
-Reading `room` before then raises an `AttributeError`.
-The builder runs first, so every read comes afterward.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
