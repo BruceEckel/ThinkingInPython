@@ -17,8 +17,7 @@ def heap_min_extractions() -> list[int]:
 def sorted_min_extractions() -> list[int]:
     return sorted(data)[:100]
 
-assert (heap_min_extractions()
-        == sorted_min_extractions())
+assert heap_min_extractions() == sorted_min_extractions()
 t_heap = min(timeit.repeat(
     heap_min_extractions, number=50, repeat=5
 ))

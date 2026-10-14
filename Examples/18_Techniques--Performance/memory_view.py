@@ -7,5 +7,3 @@ print(bytes(chunk))
 view[0] = ord("z")  # Writes through to the original
 print(data)
 #: bytearray(b'zBCDEF')
-print(view.nbytes)
-#: 6

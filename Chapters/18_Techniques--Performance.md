@@ -651,8 +651,12 @@ def with_hoisted_local() -> list[int]:
     return out
 
 assert with_attribute_lookup() == with_hoisted_local()
-t_attr = timeit.timeit(with_attribute_lookup, number=100)
-t_local = timeit.timeit(with_hoisted_local, number=100)
+t_attr = min(timeit.repeat(
+    with_attribute_lookup, number=100, repeat=5
+))
+t_local = min(timeit.repeat(
+    with_hoisted_local, number=100, repeat=5
+))
 report(attribute_lookup=t_attr, hoisted_local=t_local)
 print(f"hoisting did not halve the time: "
       f"{t_local * 2 > t_attr}")
@@ -805,10 +809,8 @@ import heapq
 
 nums = [5, 1, 8, 3, 2]
 heapq.heapify(nums)  # Rearrange into a min-heap in place
-print(nums)
+print(nums)  # The smallest stays at the front
 #: [1, 2, 8, 3, 5]
-print(nums[0])  # The smallest stays at the front
-#: 1
 heapq.heappush(nums, 7)
 print(nums)
 #: [1, 2, 7, 3, 5, 8]
@@ -841,10 +843,8 @@ import heapq
 max_nums = [5, 1, 8, 3, 2]
 # Rearrange into a max-heap in place
 heapq.heapify_max(max_nums)
-print(max_nums)
+print(max_nums)  # The largest stays at the front
 #: [8, 3, 5, 1, 2]
-print(max_nums[0])  # The largest stays at the front
-#: 8
 heapq.heappush_max(max_nums, 9)
 print(max_nums)
 #: [9, 3, 8, 1, 2, 5]
@@ -916,8 +916,7 @@ def heap_min_extractions() -> list[int]:
 def sorted_min_extractions() -> list[int]:
     return sorted(data)[:100]
 
-assert (heap_min_extractions()
-        == sorted_min_extractions())
+assert heap_min_extractions() == sorted_min_extractions()
 t_heap = min(timeit.repeat(
     heap_min_extractions, number=50, repeat=5
 ))
@@ -1139,7 +1138,6 @@ A data class can generate the slots.
 ```python
 # slots_dataclass.py
 from dataclasses import dataclass
-from exceptions import expected
 
 @dataclass(slots=True)
 class Point:
@@ -1149,11 +1147,8 @@ class Point:
 p = Point(1, 2)
 print(p)
 #: Point(x=1, y=2)
-with expected(AttributeError):
-    # z is not one of the declared slots:
-    p.z = 3  # type: ignore
-#: [AttributeError] 'Point' object has no attribute 'z' and
-#: no __dict__ for setting new attributes
+print(Point.__slots__)
+#: ('x', 'y')
 ```
 
 If a class can be a data class,
@@ -1422,8 +1417,6 @@ print(bytes(chunk))
 view[0] = ord("z")  # Writes through to the original
 print(data)
 #: bytearray(b'zBCDEF')
-print(view.nbytes)
-#: 6
 ```
 
 The view shares storage with `data`, so writing through it changes the original.

@@ -3,10 +3,8 @@ import heapq
 
 nums = [5, 1, 8, 3, 2]
 heapq.heapify(nums)  # Rearrange into a min-heap in place
-print(nums)
+print(nums)  # The smallest stays at the front
 #: [1, 2, 8, 3, 5]
-print(nums[0])  # The smallest stays at the front
-#: 1
 heapq.heappush(nums, 7)
 print(nums)
 #: [1, 2, 7, 3, 5, 8]
