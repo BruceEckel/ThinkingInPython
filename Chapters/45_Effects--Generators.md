@@ -404,11 +404,11 @@ g = both()
 print(next(g))
 #: alpha needs a value
 for value in [1, 2, 3]:
-    print(g.send(value))
-#: alpha needs another
+    print(f"send({value}) -> {g.send(value)}")
+#: send(1) -> alpha needs another
 #: alpha got 1 and 2
-#: beta needs a value
-#: beta needs another
+#: send(2) -> beta needs a value
+#: send(3) -> beta needs another
 try:
     g.send(4)
 except StopIteration:
@@ -434,6 +434,9 @@ so the body of `both()` is its two delegations.
 That finish completes the `yield from` at `[2]`,
 so `both()` starts the `yield from` at `[3]`.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
+The output shows it on adjacent lines:
+`alpha got 1 and 2` prints during `send(2)`,
+and `send(2)` returns `beta needs a value`.
 The driver sees `StopIteration` only when `both()` finishes its last delegation.
 
 The natural first attempt is to write the forwarding as a loop by hand.

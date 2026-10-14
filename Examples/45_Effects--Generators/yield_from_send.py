@@ -14,11 +14,11 @@ g = both()
 print(next(g))
 #: alpha needs a value
 for value in [1, 2, 3]:
-    print(g.send(value))
-#: alpha needs another
+    print(f"send({value}) -> {g.send(value)}")
+#: send(1) -> alpha needs another
 #: alpha got 1 and 2
-#: beta needs a value
-#: beta needs another
+#: send(2) -> beta needs a value
+#: send(3) -> beta needs another
 try:
     g.send(4)
 except StopIteration:
