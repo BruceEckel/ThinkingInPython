@@ -769,7 +769,6 @@ def run(surrogate: Any) -> None:
     surrogate.f()
     surrogate.g()
     surrogate.h()
-    surrogate.g()
 
 first: Behavior = Implementation1()
 second: Behavior = Implementation2()
@@ -778,13 +777,11 @@ run(surrogate)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.
 #: Ho ho ho, tee hee hee,
-#: Eric the half a bee.
 surrogate.change_to(second)
 run(surrogate)
 #: We're Knights of the Round Table.
 #: We dance whene'er we're able.
 #: We do routines and chorus scenes
-#: We dance whene'er we're able.
 ```
 
 The two calls to `run(surrogate)` print different verses,
