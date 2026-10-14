@@ -22,23 +22,29 @@ In the second, a single table holds all transitions.
 
 ## Each State Decides
 
-A `State` runs its operation and, given an input, names the next `State`:
+A `State` is a record holding the message its `run()` prints and the function that,
+given an input, names the next `State`:
 
 ```python
 # state.py
-from typing import Protocol
+from collections.abc import Callable
+from record import record
 
-class State(Protocol):
-    def run(self) -> None: ...
-    def next(self, input_: object, /) -> State: ...
+@record
+class State:
+    message: str
+    next: Callable[[object], State]
+
+    def run(self) -> None:
+        print(self.message)
 ```
 
-The parameter is `input_`, with a trailing underscore,
-because a bare `input` shadows the builtin `input()`.
-The `/` makes the parameter positional-only.
-A function stored in an attribute takes its argument by position alone,
-and the mousetrap's states store `next` that way,
-so the Protocol asks for no more than a stored function gives.
+`next` is a stored function rather than a method,
+so the call `state.next(input_)` passes the input alone, with no `self`.
+The field's annotation names `State` inside its own class body;
+annotations are evaluated lazily, so the name resolves.
+The input is typed `object`,
+so a function can accept any input and `match` on it.
 
 The `StateMachine` holds the current state and advances it on each input:
 
@@ -66,9 +72,11 @@ def run_all(machine: StateMachine,
 The constructor sets the initial state and runs it.
 `step()` takes one input, asks the current state for its successor,
 and moves there.
+The parameter is `input_`, with a trailing underscore,
+because a bare `input` shadows the builtin `input()`.
 It then prints the transition (the old state, the input, and the new state)
 and calls `run()` for the new state.
-A state prints as its name, through a `__str__()` each state class defines.
+A state prints as its name, through a `__str__()` the enum of states defines.
 `run_all()` is a convenience outside the class:
 it feeds any iterable of inputs to `step()`, one at a time.
 This is the *State* pattern combined with automated transitions,
@@ -124,28 +132,15 @@ MOVES: Final[list[Mouse]] = [
 
 ### The Mousetrap
 
-Each state of the trap is a row of data:
+Each state of the trap is a `State` record:
 the message its `run()` prints and the function that names its successor.
-`StateRow` is a record that satisfies `State`:
-its `run()` prints a stored message,
-and its `next` is a stored function rather than a method.
-`TrapState` is an `Enum` whose members are `StateRow`s:
+`TrapState` is an `Enum` whose members are those records:
 
 ```python
 # trap_states.py
-from collections.abc import Callable
 from enum import Enum
 from mouse import Mouse
-from record import record
 from state import State
-
-@record
-class StateRow:
-    message: str
-    next: Callable[[object], State]
-
-    def run(self) -> None:
-        print(self.message)
 
 def waiting(input_: object) -> TrapState:
     match input_:
@@ -179,7 +174,7 @@ def holding(input_: object) -> TrapState:
         case _:
             return TrapState.HOLDING
 
-class TrapState(StateRow, Enum):
+class TrapState(State, Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)
@@ -189,9 +184,6 @@ class TrapState(StateRow, Enum):
         return self.name.capitalize()
 ```
 
-A `StateRow` holds the message its `run()` prints and the function its `next` names.
-The function returns a `State`, which is all the engine asks of it,
-so a `StateRow` serves any enum of states.
 Each transition function performs a `match` on the input,
 with a `case` for every input its state recognizes,
 and names the member the trap enters next.
@@ -200,15 +192,11 @@ so the state stays the same.
 A function body runs after the whole module has loaded,
 so a `TrapState` named inside one resolves too.
 
-`TrapState` mixes `StateRow` into `Enum`.
+`TrapState` mixes `State` into `Enum`.
 Each member's value is a tuple,
-and `Enum` passes the tuple to `StateRow`'s constructor,
-so `TrapState.WAITING` is a `TrapState` member and a `StateRow` at once,
+and `Enum` passes the tuple to `State`'s constructor,
+so `TrapState.WAITING` is a `TrapState` member and a `State` at once,
 with `message` and `next` as attributes.
-The engine's call `state.next(input_)` reads the same whether `next` is a method or a stored function.
-The type checker accepts the row as a `State` because `State.next()` declares its parameter positional-only:
-a stored function takes its argument by position alone,
-where a method's parameter would also accept the keyword form `input_=`.
 `__str__()` returns the member's name in the form the trace prints,
 so `WAITING` prints as `Waiting`, and `step()` prints each state through it.
 
@@ -289,8 +277,7 @@ Two consequences follow from the mixin.
 and a record's equality compares its fields,
 so two members with the same message and the same function collapse into a single member with two names.
 Every state therefore needs a function of its own.
-The type checker reads `next` from the record's field,
-so the engine's `state.next(input_)` checks against `State` the way a method call does.
+The type checker reads `next` from the record's field and checks the engine's call `state.next(input_)` against it.
 It leaves a member's tuple uncompared with the fields:
 a tuple holding the message alone, or the two in the wrong order,
 passes `ty` and fails at import or at run time.
@@ -355,7 +342,7 @@ and the table keys on that class rather than on a value.
 
 This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
-`State` is now an `Enum` of names rather than a `Protocol` the state classes satisfy.
+`State` is now an `Enum` of names rather than the record the mousetrap's states are.
 The states in this design are bare names.
 The table holds all the behavior.
 
@@ -798,9 +785,8 @@ In both designs the states are `Enum` members.
 and a parameter typed `TrapState` accepts a member and rejects anything else.
 A member is one frozen record shared by every machine that uses it,
 so a state that keeps data of its own has nowhere to put it.
-Such a state is a class with a `run()` and a `next()`,
-which satisfies `State` as a row does,
-and the first design's engine runs it unchanged.
+Such a state is a class with a `run()` and a `next()` of its own,
+and an engine that drives both a class and a record types its parameter as a Protocol naming those two methods.
 
 The first design's constructor calls the initial state's `run()`,
 but the constructor in `table_machine.py` stores `initial` and returns.
@@ -828,8 +814,11 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
 1.  Using [*State*](26_Patterns--Surrogate.md#state),
     make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add another kind of `Mood` called `Prozac`.
-2.  Turn exercise 1's `UnpredictablePerson` into a state machine using `state_machine.py`,
-    the first design, where each state decides the next one.
+2.  Turn exercise 1's `UnpredictablePerson` into a state machine in the shape of `trap_states.py`:
+    a `Mood` enum of rows,
+    each carrying its greeting and its transition function,
+    with the inputs as a `StrEnum` and `state_machine.py`'s engine running it.
+    Say what a mood gains and loses as an enum member rather than a class.
 3.  Create a *State Machine* system in which the current state and the input together determine the next state.
     Make the states an `Enum` of rows, as in `trap_states.py`,
     where each row's transition function consults that state's own `dict`,
@@ -863,8 +852,3 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     Explain the exception, then make it work two ways: by adding a rule,
     and by making `Nickel` an instance of `Money` rather than a subclass.
     Say which you would keep.
-10. Rewrite exercise 2's mood machine in the shape of `trap_states.py`:
-    a `Mood` enum of rows,
-    each carrying its greeting and its transition function,
-    with the inputs as a `StrEnum` and `state_machine.py`'s engine running it.
-    Say what a mood gains and loses as an enum member rather than a class.

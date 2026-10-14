@@ -1,6 +1,11 @@
 # state.py
-from typing import Protocol
+from collections.abc import Callable
+from record import record
 
-class State(Protocol):
-    def run(self) -> None: ...
-    def next(self, input_: object, /) -> State: ...
+@record
+class State:
+    message: str
+    next: Callable[[object], State]
+
+    def run(self) -> None:
+        print(self.message)

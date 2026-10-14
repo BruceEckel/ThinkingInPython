@@ -1,17 +1,7 @@
 # trap_states.py
-from collections.abc import Callable
 from enum import Enum
 from mouse import Mouse
-from record import record
 from state import State
-
-@record
-class StateRow:
-    message: str
-    next: Callable[[object], State]
-
-    def run(self) -> None:
-        print(self.message)
 
 def waiting(input_: object) -> TrapState:
     match input_:
@@ -45,7 +35,7 @@ def holding(input_: object) -> TrapState:
         case _:
             return TrapState.HOLDING
 
-class TrapState(StateRow, Enum):
+class TrapState(State, Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)

@@ -1,11 +1,16 @@
 # exercise_2.py
-from collections.abc import Iterable
-from typing import Protocol
+from collections.abc import Callable, Iterable
+from enum import Enum, StrEnum
+from record import record
 
 # The chapter's state.py and state_machine.py, inlined:
-class State(Protocol):
-    def run(self) -> None: ...
-    def next(self, input_: object, /) -> State: ...
+@record
+class State:
+    message: str
+    next: Callable[[object], State]
+
+    def run(self) -> None:
+        print(self.message)
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -22,58 +27,47 @@ def run_all(machine: StateMachine,
     for input_ in inputs:
         machine.step(input_)
 
-class TakePill:
-    def __repr__(self) -> str:
-        return "TakePill"
+class Input(StrEnum):
+    ANNOY = "annoy"
+    CALM = "calm"
+    TAKE_PILL = "take pill"
 
-class Annoy:
-    def __repr__(self) -> str:
-        return "Annoy"
+def happy(input_: object) -> Mood:
+    match input_:
+        case Input.ANNOY:
+            return Mood.GRUMPY
+        case Input.TAKE_PILL:
+            return Mood.PROZAC
+        case _:
+            return Mood.HAPPY
 
-class Calm:
-    def __repr__(self) -> str:
-        return "Calm"
+def grumpy(input_: object) -> Mood:
+    match input_:
+        case Input.CALM:
+            return Mood.HAPPY
+        case Input.TAKE_PILL:
+            return Mood.PROZAC
+        case _:
+            return Mood.GRUMPY
 
-class Happy:
-    def run(self) -> None:
-        print("Great to see you!")
+class Mood(State, Enum):
+    HAPPY = ("Great to see you!", happy)
+    GRUMPY = ("What do you want?", grumpy)
+    PROZAC = ("Everything is wonderful.",
+              lambda _: Mood.PROZAC)
     def __str__(self) -> str:
-        return type(self).__name__
-    def next(self, input_: object) -> State:
-        if isinstance(input_, Annoy):
-            return Grumpy()
-        if isinstance(input_, TakePill):
-            return Prozac()
-        return self
+        return self.name.capitalize()
 
-class Grumpy:
-    def run(self) -> None:
-        print("What do you want?")
-    def __str__(self) -> str:
-        return type(self).__name__
-    def next(self, input_: object) -> State:
-        if isinstance(input_, Calm):
-            return Happy()
-        if isinstance(input_, TakePill):
-            return Prozac()
-        return self
-
-class Prozac:
-    def run(self) -> None:
-        print("Everything is wonderful.")
-    def __str__(self) -> str:
-        return type(self).__name__
-    def next(self, input_: object) -> State:
-        return self
-
-run_all(StateMachine(Happy()),
-        [Annoy(), Calm(), TakePill(), Annoy()])
+run_all(StateMachine(Mood.HAPPY), [
+    Input.ANNOY, Input.CALM, Input.TAKE_PILL, Input.ANNOY])
 #: Great to see you!
-#: Happy Annoy -> Grumpy
+#: Happy annoy -> Grumpy
 #: What do you want?
-#: Grumpy Calm -> Happy
+#: Grumpy calm -> Happy
 #: Great to see you!
-#: Happy TakePill -> Prozac
+#: Happy take pill -> Prozac
 #: Everything is wonderful.
-#: Prozac Annoy -> Prozac
+#: Prozac annoy -> Prozac
 #: Everything is wonderful.
+print([mood.name for mood in Mood])
+#: ['HAPPY', 'GRUMPY', 'PROZAC']
