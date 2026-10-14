@@ -141,20 +141,25 @@ the call `add(2, 3)` raises a `TypeError`.
 The wrapper takes zero positional arguments, and the call passes two.
 A wrapper that must handle any function uses the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
 The wrapper collects the arguments with `*args, **kwargs` and passes them on to the original function.
-Here, the `trace` decorator traces calls, and its `wrapper()` takes that shape:
+Here, the `trace` decorator traces calls, and its `wrapper()` takes that shape.
+The helper `call_text()` formats a call as text, such as `add(2, b=3)`,
+so `wrapper()` holds the trace lines, the forwarded call, and the return:
 
 ```python
 # tracer.py
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from functools import wraps
+
+def call_text(name: str, args: tuple[object, ...],
+              kwargs: Mapping[str, object]) -> str:
+    positional = [repr(a) for a in args]
+    named = [f"{k}={v!r}" for k, v in kwargs.items()]
+    return f"{name}({', '.join(positional + named)})"
 
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        positional = [repr(a) for a in args]
-        named = [f"{k}={v!r}" for k, v in kwargs.items()]
-        arglist = ", ".join(positional + named)
-        print(f"-> {func.__name__}({arglist})")  # type: ignore
+        print("->", call_text(func.__name__, args, kwargs))  # type: ignore
         result = func(*args, **kwargs)
         print(f"<- {func.__name__} = {result!r}")  # type: ignore
         return result
@@ -571,12 +576,13 @@ and `functools.partial` are all lowercase classes for that reason.
 
 ### A Stateless Class-Form Decorator
 
-The class version of `trace`:
+The class version of `trace` imports `call_text()` from `tracer.py`:
 
 ```python
 # trace_class.py
 from collections.abc import Callable
 from functools import update_wrapper
+from tracer import call_text
 
 class trace[**P, R]:
     __name__: str  # Set by update_wrapper(), not __init__
@@ -588,10 +594,7 @@ class trace[**P, R]:
 
     def __call__(self, *args: P.args,
                  **kwargs: P.kwargs) -> R:
-        positional = [repr(a) for a in args]
-        named = [f"{k}={v!r}" for k, v in kwargs.items()]
-        arglist = ", ".join(positional + named)
-        print(f"-> {self.__name__}({arglist})")
+        print("->", call_text(self.__name__, args, kwargs))
         result = self.func(*args, **kwargs)
         print(f"<- {self.__name__} = {result!r}")
         return result

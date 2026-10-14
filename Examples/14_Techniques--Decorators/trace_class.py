@@ -1,6 +1,7 @@
 # trace_class.py
 from collections.abc import Callable
 from functools import update_wrapper
+from tracer import call_text
 
 class trace[**P, R]:
     __name__: str  # Set by update_wrapper(), not __init__
@@ -12,10 +13,7 @@ class trace[**P, R]:
 
     def __call__(self, *args: P.args,
                  **kwargs: P.kwargs) -> R:
-        positional = [repr(a) for a in args]
-        named = [f"{k}={v!r}" for k, v in kwargs.items()]
-        arglist = ", ".join(positional + named)
-        print(f"-> {self.__name__}({arglist})")
+        print("->", call_text(self.__name__, args, kwargs))
         result = self.func(*args, **kwargs)
         print(f"<- {self.__name__} = {result!r}")
         return result

@@ -1,14 +1,17 @@
 # tracer.py
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from functools import wraps
+
+def call_text(name: str, args: tuple[object, ...],
+              kwargs: Mapping[str, object]) -> str:
+    positional = [repr(a) for a in args]
+    named = [f"{k}={v!r}" for k, v in kwargs.items()]
+    return f"{name}({', '.join(positional + named)})"
 
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        positional = [repr(a) for a in args]
-        named = [f"{k}={v!r}" for k, v in kwargs.items()]
-        arglist = ", ".join(positional + named)
-        print(f"-> {func.__name__}({arglist})")  # type: ignore
+        print("->", call_text(func.__name__, args, kwargs))  # type: ignore
         result = func(*args, **kwargs)
         print(f"<- {func.__name__} = {result!r}")  # type: ignore
         return result
