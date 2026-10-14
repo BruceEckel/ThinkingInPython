@@ -190,7 +190,7 @@ because a bare `input` shadows the builtin `input()`.
 then calls `run()` on the new state, the one the machine has just entered.
 A state's action runs on entry:
 each transition arrives in a state and runs that state's `run()`,
-and the constructor runs the initial state's for the same reason.
+and the constructor runs the initial state's `run()` for the same reason.
 A state prints as its name, through the `__str__()` that `TrapState` defines.
 `run_all()` is a convenience outside the class:
 it feeds any iterable of inputs to `step()`, one at a time.
