@@ -5,3 +5,7 @@ try:
 except NameError as e:
     print(e)
 #: name 'row' is not defined
+
+row = [7, 8]
+print([x for x in row for row in rows])
+#: [7, 7, 7, 8, 8, 8]
