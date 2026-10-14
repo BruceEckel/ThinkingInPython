@@ -436,19 +436,19 @@ so you can build and maintain the table from a state-transition diagram.
 The example is a vending machine, built in two steps: a general-purpose engine,
 then the vending machine's table.
 
-For a given current state and input, a transition row records three things:
+For a given current state and input, a rule records three things:
 whether a condition must pass, what action runs during the transition,
 and what state comes next.
-As a table:
+As a record:
 
-    {(current_state, InputType): [(condition, action, next_state), ...]}
+    Rule(state, InputType, next_state, action, condition)
 
 The original Java version of this example needed two extra class hierarchies,
 `Condition` and `Transition`,
 because the Java of the time had no way to store a method as a value.
 Python functions are first-class, so the Python version needs neither hierarchy.
 A condition is any callable returning a `bool`, an action is any callable,
-and the table is an ordinary `dict`.
+and the rules are a list the engine groups into an ordinary `dict`.
 
 The inputs change shape too.
 The mousetrap's inputs are `MouseAction` members, bare names.
@@ -456,11 +456,16 @@ The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
 So each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
-An enum is the wrong shape here for two reasons.
-You set its members when you write it,
-so its values are the ones you knew about then.
+A coin is the wrong shape for an enum for two reasons.
+You set an enum's members when you write it,
+so a `Money` enum would hold the denominations you knew about then.
 Every member of one enum also shares that enum's class,
-so `type(input_)` is the same key for all of them.
+so `type(input_)` would be the same key for every coin.
+A row is the right shape: the grid has four rows,
+so `Row` is an `Enum` whose one class is the one key the table needs,
+and whose member says which row.
+`Column` carries its index as a value,
+since columns have numbers rather than names.
 
 This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
