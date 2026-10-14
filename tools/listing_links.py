@@ -63,13 +63,14 @@ def listing_index(docs: Iterable[tuple[str, Document]]
     Both the full slug and its basename are keys, so `mouse/MouseAction.py`
     and `MouseAction.py` reach the same block. A name that two chapters
     both define is left out: a link to either would be a guess, and
-    check_unique_slugs.py reports the collision on its own.
+    check_unique_slugs.py reports the collision on its own. A block
+    continuing a file carries no id, so a mention reaches the first part.
     """
     found: defaultdict[str, list[Target]] = defaultdict(list)
     for stem, doc in docs:
         for block in doc.blocks:
             slug = block.slug
-            if slug is None:
+            if slug is None or block.continued:
                 continue
             target = (stem, listing_id(slug))
             for key in {slug, slug.rsplit("/", 1)[-1]}:
@@ -136,13 +137,14 @@ def fence_ids(text: str) -> str:
     ```` ```python ```` becomes ```` ``` {#listing-name.py .python} ````,
     which pandoc renders as a `div` carrying that id around the
     highlighted block. A fence naming no file is left alone, and so is
-    one already written in the attribute form.
+    one already written in the attribute form, and one continuing a file
+    whose first block carries the id.
     """
     doc = Document.from_text(text)
     lines = list(doc.lines)
     for block in doc.blocks:
         slug = block.slug
-        if slug is None:
+        if slug is None or block.continued:
             continue
         m = FENCE.match(lines[block.open_at])
         if m is None:

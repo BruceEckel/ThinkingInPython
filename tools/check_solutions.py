@@ -287,6 +287,8 @@ def misnamed_listings(doc: Document) -> Iterator[Finding]:
         if m:
             sections.append((lineno, expand(m.group(1)), m.group(1)))
     for block in doc.python_blocks():
+        if block.continued:
+            continue  # Its first block was paired with the heading.
         slug = block.slug
         m = EXERCISE_LISTING.match(Path(slug).name) if slug else None
         above = [s for s in sections if s[0] <= block.open_at]

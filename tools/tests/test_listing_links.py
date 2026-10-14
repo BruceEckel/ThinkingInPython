@@ -248,3 +248,24 @@ def test_book_markdown_can_leave_mentions_alone(tmp_path: Path) -> None:
     # The PDF path: no ids are written, so no links may point at them.
     text = book_markdown(chapters, set(), set(), hang_code=False)
     assert "listing-link" not in text
+
+
+# ── continued blocks ─────────────────────────────────────────────────────────
+
+CONTINUED = (
+    "```python\n# split.py\nx = 1\n```\n\nProse.\n\n"
+    "```python\n# split.py (continued)\ny = 2\n```\n"
+)
+
+def test_index_points_a_mention_at_the_first_part() -> None:
+    index = listing_index([("ch", Document.from_text(CONTINUED))])
+    assert index["split.py"] == ("ch", "listing-split.py")
+
+def test_fence_ids_leaves_the_continued_part_without_an_id() -> None:
+    out = fence_ids(CONTINUED)
+    assert out.count("{#listing-split.py .python}") == 1
+    assert "```python\n# split.py (continued)" in out
+
+def test_epub_continued_part_carries_no_id() -> None:
+    out = hang_listings(CONTINUED)
+    assert out.count('id="listing-split.py"') == 1

@@ -13,7 +13,9 @@ the gate expects. This extracts nothing itself; run it after the tree is built
 names an extractable file, it runs ``ruff check --fix-only --select I,F401``
 over the tree (sort the import block and drop unused imports, leaving
 deliberately-unused ones that per-file-ignores exempt), then splices each fixed
-file back into the block it came from.
+file back into the block it came from. A file split across blocks (a later
+block's path line ends "(continued)", see tools/extract.py) is split back at
+those lines, and each part goes into its own block.
 
 Usage:
     python -m tools.fix_imports          # report listings to organize (exit 1)
@@ -28,6 +30,7 @@ from pathlib import Path
 
 from tools.config import CHAPTERS_DIR, PATH_LINE_RE, ROOT
 from tools.config import EXAMPLES_TREE as DEFAULT_TREE
+from tools.extract import split_parts
 from tools.pycode import walk_fenced
 from tools.repo import chapter_stem, md_files, write_text_lf
 
@@ -81,6 +84,7 @@ def splice_markdown(
     out: list[str] = []
     changed: list[str] = []
     n = len(lines)
+    seen: dict[str, int] = {}  # How many blocks of each file so far
 
     for ev in walk_fenced(
         lines, wanted=lambda m: (m.group(1) or '') in ('python', 'py'),
@@ -95,6 +99,11 @@ def splice_markdown(
 
         slug = block_slug(block)
         fixed = fixed_for(slug) if slug is not None else None
+        if slug is not None and fixed is not None:
+            parts = split_parts(fixed, slug)
+            index = seen.get(slug, 0)
+            seen[slug] = index + 1
+            fixed = parts[index] if index < len(parts) else None
         if (slug is not None and fixed is not None
                 and fixed != ''.join(block)):
             out.extend(fixed.splitlines(keepends=True))

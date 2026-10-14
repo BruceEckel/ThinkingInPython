@@ -138,6 +138,20 @@ def block_slug(block: list[str]) -> str | None:
     return None
 
 
+def block_continued(block: list[str]) -> bool:
+    """Whether the block's path comment ends "(continued)".
+
+    The block then appends to the file an earlier block of the same
+    chapter named; `block_slug()` gives that file. tools/markdown.py's
+    `Block.continued` is the same test on a parsed block.
+    """
+    for line in block:
+        if line.strip():
+            m = PATH_LINE_RE.match(line.rstrip('\n\r'))
+            return m is not None and m.group(2) is not None
+    return False
+
+
 def load_glob_list(path: Path) -> list[str]:
     """Forward-slash glob patterns from a norun.txt-style file.
 

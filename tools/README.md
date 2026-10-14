@@ -26,6 +26,17 @@ example folder to match. Blocks without such a first line are illustrative
 fragments and are ignored. Data files (`.txt`, `.dat`) tagged the same way are
 extracted too, so examples that read them can run.
 
+A file can span several blocks. A later block whose path line is
+`# trace.py (continued)` appends to `trace.py`, after one blank line, with
+its path line kept as a comment, so every Markdown line maps to one line
+of the file and prose can follow each part. `tools/extract.py` does the
+join and reports a `(continued)` block with no earlier block of its file
+in the same chapter. `validate_output.py` and `marker_placement.py` run
+the parts in order in one namespace, marked or not; `fix_imports.py`
+splits the fixed file back into its parts (`split_parts()`); the listing
+id and the prose links go to the first part; every per-block check sees
+each part as a listing of its own.
+
 `Examples/` is the curated copy committed to git. `build/examples/` is a
 throwaway tree (git-ignored) regenerated from the Markdown for running.
 

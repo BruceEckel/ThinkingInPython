@@ -103,3 +103,19 @@ def test_committed_text_moves_unchanged(tmp_path: Path) -> None:
         "#: end\n"))
     assert moved
     assert text == "print(0.5)\n#: 0.4\nprint('end')\n#: end\n"
+
+
+# ── continued blocks ─────────────────────────────────────────────────────────
+
+def test_a_continued_part_runs_in_the_shared_namespace(tmp_path: Path) -> None:
+    shared: dict = {"__name__": "__main__", "__file__": "split.py"}
+    first = check_block(
+        ["# split.py\n", "x = 40\n"], tmp_path / "x.md", "ch", 0,
+        tree=tmp_path, skips=[], shared_namespace=shared)
+    assert not first.stuck and not first.moved
+    second = check_block(
+        ["# split.py (continued)\n", "print(x + 2)\n", "#: 42\n"],
+        tmp_path / "x.md", "ch", 5, tree=tmp_path, skips=[],
+        shared_namespace=shared)
+    assert not second.stuck, second.notes
+    assert not second.moved

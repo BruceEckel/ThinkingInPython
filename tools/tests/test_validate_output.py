@@ -869,3 +869,28 @@ def test_a_py_file_named_directly_is_still_collected(tmp_path: Path) -> None:
     one = tmp_path / "a.py"
     one.write_text("", encoding="utf-8")
     assert collect_files([one]) == [one]
+
+
+# ── continued blocks ─────────────────────────────────────────────────────────
+
+def test_markdown_continued_block_sees_the_first_blocks_names(
+    tmp_path: Path,
+) -> None:
+    src = (
+        "```python\n# split.py\nx = 40\n```\n\n"
+        "Prose between the parts.\n\n"
+        "```python\n# split.py (continued)\nprint(x + 2)\n#: 0\n```\n"
+    )
+    p = write(tmp_path, "ch.md", src)
+    assert process_markdown(p, update=True) is True
+    assert p.read_text(encoding="utf-8") == src.replace("#: 0", "#: 42")
+
+def test_markdown_unmarked_first_part_that_fails_fails_the_file(
+    tmp_path: Path,
+) -> None:
+    src = (
+        "```python\n# split.py\nraise ValueError('part one')\n```\n\n"
+        "```python\n# split.py (continued)\nprint(1)\n#: 1\n```\n"
+    )
+    p = write(tmp_path, "ch.md", src)
+    assert process_markdown(p, update=False) is False

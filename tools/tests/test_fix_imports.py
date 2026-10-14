@@ -115,3 +115,21 @@ def test_collect_markdown_directory(tmp_path: Path) -> None:
     a.write_text("", encoding="utf-8")
     b.write_text("", encoding="utf-8")
     assert set(collect_markdown([tmp_path])) == {a, b}
+
+
+# ── continued blocks ─────────────────────────────────────────────────────────
+
+def test_splice_puts_each_part_of_a_split_file_in_its_own_block() -> None:
+    src = (
+        "```python\n# a.py\nimport b, a\n```\n\n"
+        "Prose.\n\n"
+        "```python\n# a.py (continued)\nimport d, c\n```\n"
+    )
+    fixed = "# a.py\nimport a, b\n\n# a.py (continued)\nimport c, d\n"
+    new_text, changed = splice_markdown(src, fixed_map({"a.py": fixed}))
+    assert changed == ["a.py", "a.py"]
+    assert new_text == (
+        "```python\n# a.py\nimport a, b\n```\n\n"
+        "Prose.\n\n"
+        "```python\n# a.py (continued)\nimport c, d\n```\n"
+    )

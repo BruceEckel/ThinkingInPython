@@ -93,7 +93,7 @@ MOVES: Final[list[Mouse]] = [
 
 Each state of the trap is a `State` record:
 the message its `run()` prints and the function that names its successor.
-`TrapState` is an `Enum` whose members are those records:
+The transition functions come first:
 
 ```python
 # trap_states.py
@@ -132,15 +132,6 @@ def holding(input_: object) -> TrapState:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
-
-class TrapState(State, Enum):
-    WAITING = ("Broadcasting cheese smell", waiting)
-    LURING = ("Presenting Cheese, door open", luring)
-    TRAPPING = ("Closing door", trapping)
-    HOLDING = ("Mouse caught", holding)
-
-    def __str__(self) -> str:
-        return self.name.capitalize()
 ```
 
 Each transition function performs a `match` on the input,
@@ -150,6 +141,20 @@ The default `case _` returns the function's own member,
 so the state stays the same.
 A function body runs after the whole module has loaded,
 so a `TrapState` named inside one resolves too.
+
+`TrapState` is an `Enum` whose members are the records, in the same file:
+
+```python
+# trap_states.py (continued)
+class TrapState(State, Enum):
+    WAITING = ("Broadcasting cheese smell", waiting)
+    LURING = ("Presenting Cheese, door open", luring)
+    TRAPPING = ("Closing door", trapping)
+    HOLDING = ("Mouse caught", holding)
+
+    def __str__(self) -> str:
+        return self.name.capitalize()
+```
 
 `TrapState` mixes `State` into `Enum`.
 Each member's value is a tuple,

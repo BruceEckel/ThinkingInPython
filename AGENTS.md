@@ -73,6 +73,8 @@ Solutions written in these conventions are easier to compare with the book's.
 - From chapter 18 on, `@record` is the book's frozen, slotted data class. Import it with `from record import record`; chapter 18's `utils/record.py` defines it. Before chapter 18 the book writes `@dataclass(frozen=True)`.
 - `#:` marks expected output, placed directly after the statement that prints it.
 - A listing's first line is a `# name.py` path comment.
+  A later block whose first line is `# name.py (continued)` is the rest of the same file,
+  and the extracted copy holds both parts.
 - `utils/` holds shared helpers that a listing may import.
   At run time Python finds them through `build/examples/utils`, so a reader's file that imports one (`from record import record`) runs with that directory on `PYTHONPATH`, after `uv run tip extract` has written it.
 

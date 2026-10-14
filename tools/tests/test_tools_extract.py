@@ -118,3 +118,48 @@ def test_check_against_clean_tree_reports_nothing(tmp_path: Path) -> None:
     result = extract([doc], [chapter_route])
     write_tree(result, tmp_path)
     assert check_against(result, tmp_path) == ([], [])
+
+
+# ── continued blocks ─────────────────────────────────────────────────────────
+
+CH = "14_Techniques--Decorators"
+
+def test_a_continued_block_appends_after_one_blank_line() -> None:
+    doc = doc_of(
+        "```python\n# a.py\nx = 1\n```\n\nProse.\n\n"
+        "```python\n# a.py (continued)\ny = x + 1\n```\n"
+    )
+    result = extract([doc], [chapter_route])
+    assert result.orphans == [] and result.conflicts == []
+    assert result.files[f"{CH}/a.py"].content == (
+        "# a.py\nx = 1\n\n# a.py (continued)\ny = x + 1\n"
+    )
+
+def test_a_continued_block_with_no_earlier_block_is_an_orphan() -> None:
+    doc = doc_of("```python\n# a.py (continued)\ny = 2\n```\n")
+    result = extract([doc], [chapter_route])
+    assert result.files == {}
+    assert [(o.path, o.line) for o in result.orphans] == [(f"{CH}/a.py", 2)]
+
+def test_a_continuation_in_another_document_is_an_orphan() -> None:
+    first = doc_of("```python\n# a.py\nx = 1\n```\n")
+    other = doc_of("```python\n# a.py (continued)\ny = 2\n```\n",
+                   "15_Techniques--Context_Managers.md")
+    result = extract([first, other], [chapter_route])
+    assert len(result.orphans) == 1
+    assert result.files[f"{CH}/a.py"].content == "# a.py\nx = 1\n"
+
+def test_a_second_plain_block_is_still_a_conflict() -> None:
+    doc = doc_of("```python\n# a.py\nx = 1\n```\n```python\n# a.py\nx = 2\n```\n")
+    assert len(extract([doc], [chapter_route]).conflicts) == 1
+
+def test_split_parts_inverts_the_join() -> None:
+    from tools.extract import split_parts
+    joined = "# a.py\nx = 1\n\n# a.py (continued)\ny = 2\n\n# a.py (continued)\nz = 3\n"
+    assert split_parts(joined, "a.py") == [
+        "# a.py\nx = 1\n", "# a.py (continued)\ny = 2\n", "# a.py (continued)\nz = 3\n",
+    ]
+
+def test_split_parts_of_an_unsplit_file_is_the_file() -> None:
+    from tools.extract import split_parts
+    assert split_parts("# a.py\nx = 1\n\ny = 2\n", "a.py") == ["# a.py\nx = 1\n\ny = 2\n"]

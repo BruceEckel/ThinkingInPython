@@ -26,8 +26,9 @@ Imported as ``tools.extract``, so no book listing's filename can shadow
 it; tools/repo.py's docstring has the history.
 """
 
+import re
 from collections.abc import Callable, Iterable, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from tools.markdown import Block, Document
@@ -63,10 +64,20 @@ class Conflict:
     second: str
 
 
+@dataclass(frozen=True)
+class Orphan:
+    """A "(continued)" block with no earlier block of its file to append to."""
+
+    path: str
+    source_md: str
+    line: int
+
+
 @dataclass
 class ExtractResult:
     files: dict[str, ExtractedFile] = field(default_factory=dict)
     conflicts: list[Conflict] = field(default_factory=list)
+    orphans: list[Orphan] = field(default_factory=list)
     fragments: int = 0
     """Blocks no router claimed: illustrative listings, not files."""
 
@@ -74,6 +85,30 @@ class ExtractResult:
 def block_content(block: Block) -> str:
     """A block's text, normalized to exactly one trailing newline."""
     return "\n".join(block.lines).rstrip("\n") + "\n"
+
+
+def continuation_line(slug: str) -> str:
+    """The path comment a block appending to `slug` opens with."""
+    return f"# {slug} (continued)"
+
+
+def split_parts(text: str, slug: str) -> list[str]:
+    """A joined file's text back into the block texts it came from.
+
+    The inverse of the join `extract()` makes: each part after the first
+    opens with its "(continued)" line, and each part but the last ends in
+    the blank line that joined it to the next, which is removed here so
+    the part matches its block. A file with no continuation is one part.
+    """
+    marker = re.compile(rf"^#\s*{re.escape(slug)}\s+\(continued\)\s*$")
+    parts: list[list[str]] = [[]]
+    for line in text.splitlines(keepends=True):
+        if marker.match(line.rstrip("\n\r")):
+            parts.append([])
+        parts[-1].append(line)
+    texts = ["".join(part) for part in parts]
+    return [t[:-1] if i < len(texts) - 1 and t.endswith("\n\n") else t
+            for i, t in enumerate(texts)]
 
 
 def extract(
@@ -84,7 +119,12 @@ def extract(
     The first block to claim a path wins; a later block claiming the same
     path with different text is recorded as a conflict rather than
     silently overwriting, since which one the reader meant is not
-    something this can decide.
+    something this can decide. A block whose path line ends
+    "(continued)" is the exception: it appends to the file an earlier
+    block of the same document claimed, after one blank line, and keeps
+    its path line as a comment, so every Markdown line maps to one file
+    line. One with no such earlier block, or whose earlier block is in
+    another document, is recorded as an orphan and extracts nothing.
     """
     result = ExtractResult()
     for doc in docs:
@@ -98,15 +138,22 @@ def extract(
                 result.fragments += 1
                 continue
             content = block_content(block)
+            source = f"{chapter_stem(doc.path)}.md"
             existing = result.files.get(rel)
+            if block.continued:
+                if existing is None or existing.source_md != source:
+                    result.orphans.append(
+                        Orphan(rel, source, block.line_number(0)))
+                    continue
+                result.files[rel] = replace(
+                    existing, content=existing.content + "\n" + content)
+                continue
             if existing and existing.content != content:
                 result.conflicts.append(
-                    Conflict(rel, existing.source_md, f"{chapter_stem(doc.path)}.md")
+                    Conflict(rel, existing.source_md, source)
                 )
                 continue
-            result.files[rel] = ExtractedFile(
-                rel, content, f"{chapter_stem(doc.path)}.md", block.lang
-            )
+            result.files[rel] = ExtractedFile(rel, content, source, block.lang)
     return result
 
 
@@ -155,6 +202,16 @@ def report_conflicts(result: ExtractResult) -> None:
     for conflict in result.conflicts:
         print(f"  ! {conflict.path}  "
               f"({conflict.first} vs {conflict.second})")
+
+
+def report_orphans(result: ExtractResult) -> None:
+    """Print the "(continued)" blocks that continue nothing, if any."""
+    if not result.orphans:
+        return
+    print(f"\n{len(result.orphans)} \"(continued)\" block(s) with no "
+          "earlier block of that file in the same chapter:")
+    for orphan in result.orphans:
+        print(f"  ! {orphan.path}  ({orphan.source_md}:{orphan.line})")
 
 
 def report_drift(

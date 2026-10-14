@@ -429,6 +429,8 @@ def shapes(rest: list[str]) -> list[list[str]]:
             continue
         content = rest[i + 1:j]
         first = next((line for line in content if line.strip()), "")
+        # A "(continued)" part has no shape of its own: the regex stops
+        # at the name, so such a block is passed over here.
         m = re.match(r"^#\s*([\w./-]+\.py)\s*$", first)
         if m is None or m.group(1).rsplit("/", 1)[-1].startswith("test_"):
             continue

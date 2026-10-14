@@ -35,6 +35,7 @@ def holding(input_: object) -> TrapState:
         case _:
             return TrapState.HOLDING
 
+# trap_states.py (continued)
 class TrapState(State, Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)

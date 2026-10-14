@@ -630,7 +630,8 @@ def hang_listings(text: str, ids: bool = True) -> str:
         out.extend(doc.lines[index:block.open_at])
         slug = block.slug
         anchor = (listing_links.listing_id(slug)
-                  if ids and slug is not None else None)
+                  if ids and slug is not None and not block.continued
+                  else None)
         out.append(listing_html(block.lines, python=block.is_python,
                                 id=anchor))
         index = block.end + 1

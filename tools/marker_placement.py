@@ -20,6 +20,9 @@ It then lays the markers out again:
   since one #: line cannot be split across two runs.
 - Statements on one line share a run.
 
+A file split across blocks (a later block's path line ends
+"(continued)", see tools/extract.py) runs every part in order in one
+namespace, marked or not, and each marked part is laid out on its own.
 A block whose current layout differs is reported. With --write the block
 is rewritten with the same marker text in the new layout. A block whose
 total output differs from its markers (a stale marker, a timing listing,
@@ -49,7 +52,8 @@ from tools.config import (
     utils_dir)
 from tools.pycode import walk_fenced
 from tools.repo import (
-    add_jobs_arg, block_slug, chapter_stem, load_glob_list, write_text_lf)
+    add_jobs_arg, block_continued, block_slug, chapter_stem, load_glob_list,
+    write_text_lf)
 from tools.skip_stamps import (
     PLACEMENT_STAMP, forced_full, marker_context, markers_current,
     record_markers)
@@ -201,26 +205,53 @@ class BlockOutcome:
     stuck: bool
 
 
-def check_block(
-    block: list[str], path: Path, chapter: str, start: int, *,
-    tree: Path, skips: list[str],
-) -> BlockOutcome:
-    """Check one marked block; return its lines in the wanted layout."""
-    keep = BlockOutcome(block, [], moved=False, stuck=False)
+def locate(
+    block: list[str], chapter: str, tree: Path,
+) -> tuple[str | None, Path | None]:
+    """The (chapter/slug, extracted path) a block names, if it names one."""
     slug = block_slug(block)
     if slug is None:
-        rel, filepath = None, None
-    elif slug.startswith("utils/"):
-        rel, filepath = slug, tree / slug
-    else:
-        rel, filepath = f"{chapter}/{slug}", tree / chapter / slug
+        return None, None
+    if slug.startswith("utils/"):
+        return slug, tree / slug
+    return f"{chapter}/{slug}", tree / chapter / slug
+
+
+def continued_files(lines: list[str], chapter: str, tree: Path) -> set[str]:
+    """The chapter/slug of every file some "(continued)" block appends to."""
+    found: set[str] = set()
+    for ev in walk_fenced(
+        lines, wanted=lambda m: (m.group(1) or "") in ("python", "py"),
+    ):
+        if ev.match is None:
+            continue
+        block = lines[ev.open_at + 1:ev.end]
+        if block_continued(block):
+            rel, _ = locate(block, chapter, tree)
+            if rel is not None:
+                found.add(rel)
+    return found
+
+
+def check_block(
+    block: list[str], path: Path, chapter: str, start: int, *,
+    tree: Path, skips: list[str], shared_namespace: dict | None = None,
+) -> BlockOutcome:
+    """Check one marked block; return its lines in the wanted layout.
+
+    With `shared_namespace`, the block is one part of a file split across
+    blocks and runs in that namespace, which the caller carries to the
+    next part; an unmarked part runs for its definitions and is kept.
+    """
+    keep = BlockOutcome(block, [], moved=False, stuck=False)
+    rel, filepath = locate(block, chapter, tree)
     if INLINE_NORUN_MARKER in "".join(block) or (
         rel and any(fnmatch.fnmatch(rel, pat) for pat in skips)
     ):
         return keep
     label = f"{path.as_posix()}:{start + 1} {rel or '(no slug)'}"
     code, where, have = split_block(block)
-    namespace: dict = {
+    namespace: dict = shared_namespace if shared_namespace is not None else {
         "__name__": "__main__",
         "__file__": str(filepath) if filepath else str(path),
     }
@@ -230,11 +261,14 @@ def check_block(
             results, error = run_statements(code, str(filepath), namespace)
     except SyntaxError as exc:
         results, error = [], f"SyntaxError: {exc}"
-    del namespace
-    collect_now()
+    if shared_namespace is None:
+        del namespace
+        collect_now()
     if error:
         keep.notes.append(f"{label}: skipped, {error}")
         keep.stuck = True
+        return keep
+    if not have:
         return keep
     # Output below the last run is deliberately unmarked (it varies by
     # machine, say), as validate_output.py also treats it.
@@ -277,6 +311,8 @@ def process(
     out: list[str] = []
     notes: list[str] = []
     moved = stuck = marked = False
+    split = continued_files(lines, chapter, tree.resolve())
+    namespaces: dict[str, dict] = {}
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         for ev in walk_fenced(
@@ -286,11 +322,19 @@ def process(
             if ev.match is None:
                 continue
             block = lines[ev.open_at + 1:ev.end]
-            if any(is_marker(line) for line in block):
-                marked = True
+            rel, filepath = locate(block, chapter, tree.resolve())
+            part = rel is not None and rel in split
+            has_marker = any(is_marker(line) for line in block)
+            if has_marker or part:
+                marked = marked or has_marker
+                shared = None
+                if part:
+                    shared = namespaces.setdefault(rel, {
+                        "__name__": "__main__", "__file__": str(filepath)})
                 result = check_block(
                     block, path, chapter, ev.open_at + 1,
-                    tree=tree.resolve(), skips=skips)
+                    tree=tree.resolve(), skips=skips,
+                    shared_namespace=shared)
                 notes.extend(result.notes)
                 moved = moved or result.moved
                 stuck = stuck or result.stuck
@@ -298,6 +342,9 @@ def process(
             out.extend(block)
             if ev.end < len(lines):
                 out.append(lines[ev.end])
+    if namespaces:
+        namespaces.clear()
+        collect_now()
     if moved and write:
         write_text_lf(path, "".join(out))
     report = "".join(f"  {note}\n" for note in notes)

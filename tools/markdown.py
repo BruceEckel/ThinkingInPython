@@ -73,12 +73,16 @@ class Block:
     def is_python(self) -> bool:
         return self.lang in PYTHON_LANGS
 
-    def _first_content_path(self, pattern: re.Pattern[str]) -> str | None:
+    def _first_content_match(
+            self, pattern: re.Pattern[str]) -> re.Match[str] | None:
         for line in self.lines:
             if line.strip():
-                m = pattern.match(line.rstrip("\n\r"))
-                return m.group(1).replace("\\", "/") if m else None
+                return pattern.match(line.rstrip("\n\r"))
         return None
+
+    def _first_content_path(self, pattern: re.Pattern[str]) -> str | None:
+        m = self._first_content_match(pattern)
+        return m.group(1).replace("\\", "/") if m else None
 
     @property
     def slug(self) -> str | None:
@@ -93,6 +97,19 @@ class Block:
         Python examples tree.
         """
         return self._first_content_path(PATH_LINE_RE)
+
+    @property
+    def continued(self) -> bool:
+        """Whether the path line ends "(continued)".
+
+        Such a block appends to the file an earlier block of the same
+        chapter named: `slug` is that file, and tools/extract.py joins
+        the parts. For every per-block check the part is a listing of
+        its own; only the extractor, the two marker tools, the import
+        fixer, and the listing ids treat the parts as one file.
+        """
+        m = self._first_content_match(PATH_LINE_RE)
+        return m is not None and m.group(2) is not None
 
     @property
     def rust_slug(self) -> str | None:

@@ -170,3 +170,21 @@ def test_outside_fences_keeps_headings_and_lists() -> None:
     assert list(doc.outside_fences()) == [
         (1, "# H"), (2, "- item"), (6, "tail"), (7, ""),
     ]
+
+
+# ── continued blocks ─────────────────────────────────────────────────────────
+
+def test_a_continued_block_names_its_file_and_says_so() -> None:
+    doc = Document.from_text("```python\n# a.py (continued)\ny = 2\n```\n")
+    block = doc.blocks[0]
+    assert block.slug == "a.py"
+    assert block.continued
+
+def test_a_plain_path_line_is_not_continued() -> None:
+    doc = Document.from_text("```python\n# a.py\nx = 1\n```\n")
+    assert not doc.blocks[0].continued
+
+def test_a_slugless_block_is_not_continued() -> None:
+    doc = Document.from_text("```python\nx = 1\n```\n")
+    assert doc.blocks[0].slug is None
+    assert not doc.blocks[0].continued

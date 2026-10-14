@@ -73,7 +73,13 @@ PY_FENCE_RE = re.compile(r"^\s*```python\s*$")
 # (extract_examples.py): that slug is excluded entirely, since it is a
 # Python caller for a Rust module built by extract_rust.py, not a normal
 # book example the main build can run.
-PATH_LINE_RE = re.compile(r"^#\s*([\w./\\-]+\.\w+)\s*$")
+#
+# Group 2 is present when the line ends "(continued)": the block appends
+# to the file that an earlier block of the same chapter named, joined by
+# tools/extract.py with one blank line. Every reader that takes group 1
+# alone sees the same slug for both blocks.
+PATH_LINE_RE = re.compile(
+    r"^#\s*([\w./\\-]+\.\w+)(\s+\(continued\))?\s*$")
 
 # A ```rust opener at any indent, for extract_rust.py.
 RUST_FENCE_RE = re.compile(r"^\s*```rust\s*$")

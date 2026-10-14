@@ -22,6 +22,11 @@ run and the #: lines inside the block are rewritten in place. A block is run
 from its extracted chapter directory (build/examples/<chapter>/), so imports of
 sibling files and relative data paths resolve the way the book assumes. Run
 `tools/extract_examples.py --write` first so that tree exists.
+The exception is a file split across blocks: a block whose path line ends
+"(continued)" appends to its file (tools/extract.py), so every block of
+that file runs in order in one namespace, marked or not, and each block's
+markers are checked at its own lines. A listing in timing.txt cannot be
+split this way, since a claim's rerun would need the whole file again.
 
 Markers in the listings named by tools/data/timing.txt are treated as
 claims rather than observations: those listings print booleans derived
@@ -97,6 +102,7 @@ from tools.config import (
 from tools.pycode import walk_fenced
 from tools.repo import (
     add_jobs_arg,
+    block_continued,
     block_slug,
     chapter_stem,
     load_glob_list,
@@ -399,6 +405,10 @@ def process_markdown(
     changed = False
     any_markers = False
     n = len(lines)
+    # A file split across blocks runs every part, marked or not, in one
+    # namespace, so a later part sees what the earlier ones defined.
+    split = continued_files(lines, chapter, tree)
+    namespaces: dict[str, dict] = {}
 
     for ev in walk_fenced(
         lines, wanted=lambda m: (m.group(1) or '') in ('python', 'py'),
@@ -412,12 +422,20 @@ def process_markdown(
         fence_close = lines[ev.end] if ev.end < n else None
 
         out.append(lines[ev.open_at])  # opening fence
-        if any(is_marker(line) for line in block):
+        marked = any(is_marker(line) for line in block)
+        rel, filepath = locate(block, chapter, tree)
+        part = rel is not None and rel in split
+        if marked or part:
+            shared = None
+            if part:
+                shared = namespaces.setdefault(rel, {
+                    '__name__': '__main__', '__file__': str(filepath)})
             result = process_md_block(
                 block, path, chapter, block_start,
                 tree=tree, skips=skips, claims=claims, update=update,
+                shared_namespace=shared,
             )
-            any_markers = True
+            any_markers = any_markers or marked
             ok = ok and result.ok
             changed = changed or result.changed
             out.extend(result.lines)
@@ -426,6 +444,9 @@ def process_markdown(
         if fence_close is not None:
             out.append(fence_close)
 
+    if namespaces:
+        namespaces.clear()
+        collect_now()
     if not any_markers:
         return None
     # changed can be True here with update=False only via a placeholder
@@ -444,6 +465,34 @@ class BlockResult:
         self.changed = changed
 
 
+def locate(
+    block: list[str], chapter: str, tree: Path,
+) -> tuple[str | None, Path | None]:
+    """The (chapter/slug, extracted path) a block names, if it names one."""
+    slug = block_slug(block)
+    if slug is None:
+        return None, None
+    if slug.startswith('utils/'):
+        return slug, tree / slug
+    return f'{chapter}/{slug}', tree / chapter / slug
+
+
+def continued_files(lines: list[str], chapter: str, tree: Path) -> set[str]:
+    """The chapter/slug of every file some "(continued)" block appends to."""
+    found: set[str] = set()
+    for ev in walk_fenced(
+        lines, wanted=lambda m: (m.group(1) or '') in ('python', 'py'),
+    ):
+        if ev.match is None:
+            continue
+        block = lines[ev.open_at + 1:ev.end]
+        if block_continued(block):
+            rel, _ = locate(block, chapter, tree)
+            if rel is not None:
+                found.add(rel)
+    return found
+
+
 def process_md_block(
     block: list[str],
     path: Path,
@@ -454,18 +503,15 @@ def process_md_block(
     skips: list[str],
     update: bool,
     claims: list[str] | None = None,
+    shared_namespace: dict | None = None,
 ) -> BlockResult:
-    """Run one ```python block and check or rewrite its #: markers."""
-    slug = block_slug(block)
-    if slug is None:
-        rel: str | None = None
-        filepath: Path | None = None
-    elif slug.startswith('utils/'):
-        rel = slug
-        filepath = tree / rel
-    else:
-        rel = f'{chapter}/{slug}'
-        filepath = tree / chapter / slug
+    """Run one ```python block and check or rewrite its #: markers.
+
+    With `shared_namespace`, the block is one part of a file split across
+    blocks: it runs in that namespace, which the caller owns and carries
+    to the next part, and a claim listing's reruns do not apply.
+    """
+    rel, filepath = locate(block, chapter, tree)
     text = ''.join(block)
 
     if INLINE_NORUN_MARKER in text or (
@@ -476,10 +522,11 @@ def process_md_block(
 
     rundir = filepath.parent if filepath else None
     label = f'{path}:{rel}' if rel else str(path)
-    attempts = CLAIM_ATTEMPTS if is_claim(rel, claims or []) else 1
+    attempts = 1 if shared_namespace is not None else (
+        CLAIM_ATTEMPTS if is_claim(rel, claims or []) else 1)
 
     for attempt in range(1, attempts + 1):
-        namespace: dict = {
+        namespace: dict = shared_namespace if shared_namespace is not None else {
             '__name__': '__main__',
             '__file__': str(filepath) if filepath else str(path),
         }
@@ -489,8 +536,9 @@ def process_md_block(
                 update=update and attempts == 1,
                 namespace=namespace, line_offset=block_start,
             )
-        del namespace
-        collect_now()
+        if shared_namespace is None:
+            del namespace
+            collect_now()
         if ok or attempt == attempts:
             break
         print(f"  {label}: claim marker mismatch; rerunning "

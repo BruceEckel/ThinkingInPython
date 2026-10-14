@@ -64,7 +64,7 @@ def collisions() -> list[Finding]:
         doc = Document.parse(md)
         for block in doc.python_blocks():
             slug = block.slug
-            if slug is None:
+            if slug is None or block.continued:
                 continue
             # A shared listing is one file by design.
             if slug.startswith("utils/"):

@@ -48,7 +48,8 @@ from pathlib import Path
 
 from tools.extract_examples import extract, find_strays, is_derived, report_strays
 from tools.config import BUILD_DIR, CHAPTERS_DIR, SOLUTIONS_DIR, SOLUTIONS_MD
-from tools.extract import check_against, report_conflicts, write_tree
+from tools.extract import (check_against, report_conflicts, report_orphans,
+                           write_tree)
 from tools.repo import chapter_stem, solutions_files
 
 COMMITTED_DIR = SOLUTIONS_DIR
@@ -105,6 +106,8 @@ def main(argv: list[str] | None = None) -> int:
           f"{len(result.files)} file-blocks, {result.fragments} fragments.")
 
     report_conflicts(result)
+    report_orphans(result)
+    broken = bool(result.conflicts or result.orphans)
 
     if args.write:
         print()
@@ -113,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Cleaned {args.out}.")
         written = write_tree(result, args.out)
         print(f"Wrote {written} changed file(s) to {args.out}.")
-        return 1 if result.conflicts else 0
+        return 1 if broken else 0
 
     missing, changed = check_against(result, COMMITTED_DIR)
     # Worded "in Solutions" rather than report_drift's "in the book",
@@ -134,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
                                          search=[SOLUTIONS_DIR],
                                          prune=args.prune)
 
-    if not (missing or changed or result.conflicts or orphaned):
+    if not (missing or changed or broken or orphaned):
         if referenced:
             print("\nIn sync otherwise: every solution matches the "
                   "committed tree.")

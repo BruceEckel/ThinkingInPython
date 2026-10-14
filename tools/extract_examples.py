@@ -33,6 +33,11 @@ here would fail; see ``rust/README.md``.
 Blocks without such a first line, or with a ``rust/``-prefixed slug, are
 illustrative fragments and are skipped.
 
+A block whose path line ends ``(continued)`` appends to the file an earlier
+block of the same chapter named, after one blank line (see
+``tools/extract.py``), so a long listing can be shown in parts with prose
+between them. One with no such earlier block is reported and fails.
+
 Default mode is ``check``: nothing is written, drift between the Markdown and
 the committed ``Examples/`` tree is reported, and a non-zero exit signals
 trouble (useful in CI). Pass ``--write`` to materialize the tree.
@@ -75,6 +80,7 @@ from tools.extract import (
     extract as extract_blocks,
     report_conflicts,
     report_drift,
+    report_orphans,
     write_tree,
 )
 from tools.markdown import Block, Document
@@ -271,6 +277,8 @@ def main(argv: list[str] | None = None) -> int:
           f"{len(result.files)} file-blocks, {result.fragments} fragments.")
 
     report_conflicts(result)
+    report_orphans(result)
+    broken = bool(result.conflicts or result.orphans)
 
     if args.write:
         print()
@@ -279,7 +287,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Cleaned {args.out}.")
         written = write_tree(result, args.out)
         print(f"Wrote {written} changed file(s) to {args.out}.")
-        return 1 if result.conflicts else 0
+        return 1 if broken else 0
 
     # Default: check mode against the committed Examples/ tree.
     missing, changed = check_against(result, COMMITTED_DIR)
@@ -290,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
     orphaned, referenced = report_strays(strays, COMMITTED_DIR,
                                          prune=args.prune)
 
-    if not (missing or changed or result.conflicts or orphaned):
+    if not (missing or changed or broken or orphaned):
         if referenced:
             print("\nIn sync otherwise: every book example matches the "
                   "committed tree.")

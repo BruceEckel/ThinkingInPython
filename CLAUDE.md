@@ -14,6 +14,17 @@ is a `# path/slug.py` comment is an extractable example. `Examples/` is **genera
 from the Markdown** by `tools/extract_examples.py`, so:
 
 - Edit the code **in the Markdown block**, never in `Examples/` directly.
+- A file can span several blocks (since 2026-10-14): a later block whose
+  path line is `# slug.py (continued)` appends to the file, after one
+  blank line, so prose can follow each part. The parts run in order in
+  one namespace for the `#:` markers and marker placement, the import
+  fixer splits the fixed file back into its parts, the listing id and
+  the prose links go to the first part, and every per-block check
+  (widths, tags, comments) sees each part as a listing of its own. A
+  `(continued)` block with no earlier block of its file in the same
+  chapter fails the extract step. A listing in `timing.txt` cannot be
+  split, and a Solutions part under a `Hint:` gets no shape block.
+  Chapter 31's `trap_states.py` is the first split listing.
 - After editing, sync the committed trees: `tip sync`
   (= `uv run python -m tools.extract_examples --write -o Examples` and
   the same for `extract_solutions` into `Solutions/`).
