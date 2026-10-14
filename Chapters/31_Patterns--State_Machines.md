@@ -274,19 +274,12 @@ class TableState(ABC):
 Both `next()` and `run()` have the signatures the `State` Protocol names,
 so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
 
-The constructor starts each state with `transitions` set to `None`,
-so a state whose table you forget to fill holds `None` rather than a missing attribute.
+The constructor starts each state with `transitions` set to `None`.
 `next()` checks for `None` before the lookup and raises `EmptyTable`,
-whose message names the state,
 so the state reports the mistake at its first input.
-A table set to `{}` on purpose, for a state with no way out, passes that check,
-and the same `is None` test narrows the attribute to a `dict` for the lookup that follows.
 When the table is filled but has no entry for the input,
-the lookup raises a `KeyError`,
-and the `except` clause reports that as `NoTransition`.
-Both derive from `RuntimeError`, `EmptyTable` through `NoTransition`,
-so a caller can catch one failure, both,
-or every `RuntimeError` an action might raise.
+the `except` clause raises `NoTransition`.
+
 The `KeyError` that `next()` catches carries the input as its key,
 and the `NoTransition` message includes the same input,
 so a chained traceback would show it twice.
@@ -294,8 +287,8 @@ so a chained traceback would show it twice.
 which drops the chained `KeyError`.
 
 The state classes and the `MouseTrap` that instantiates them must be defined before the state tables,
-so that the table entries can name the other states.
-Module-level code fills in the tables once every state object exists:
+so the table entries can name the other states.
+Module-level code fills in the tables after every state object exists:
 
 ```python
 # mouse_trap_tables.py
@@ -351,8 +344,7 @@ MouseTrap.holding.transitions = {
 ```
 
 The demo uses the same nine `MOVES` as the prior example.
-The two `expect()` calls show what a table does with an input it lacks,
-and what a table nobody filled does with any input:
+The two `expect()` calls show the detection of failing cases:
 
 ```python
 # mouse_trap_tables_demo.py
