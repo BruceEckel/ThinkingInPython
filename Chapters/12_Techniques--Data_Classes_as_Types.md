@@ -332,6 +332,7 @@ but with field declarations that look like class variables:
 ```python
 # ordinary_class.py
 from comparison import show
+from exceptions import expect
 
 class A:
     x: int
@@ -345,6 +346,8 @@ show(A())
 
 print(A.__annotations__)
 #: {'x': <class 'int'>, 's': <class 'str'>}
+expect(AttributeError, getattr, A(), "x")
+#: [AttributeError] 'A' object has no attribute 'x'
 ```
 
 `A` inherits `__init__()`, `__repr__()`, `__eq__()`,
@@ -358,7 +361,8 @@ The two annotations record in `A.__annotations__` that some future `A` will carr
 Python allocates the storage when code assigns a value.
 `A` has no `__init__()` to assign them,
 so neither the class nor the instance holds an `x` or an `s`.
-`show(A())` reports `None` under both headings.
+`show(A())` reports `None` under both headings,
+and reading `A().x` raises an `AttributeError`.
 
 ### `B`: Class-Level Defaults
 
@@ -456,14 +460,8 @@ show(D)
 #:   • __init__(self, x: int = 99) -> None
 #:   • __repr__(self)
 
-show(D())
-#: [Attributes]
-#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
-#:   • x: int = 99
-#: [Methods]
-#:   • __eq__(self, other)
-#:   • __init__(self, x: int = 99) -> None
-#:   • __repr__(self)
+print(vars(D()))
+#: {'x': 99}
 
 for k, v in D.__annotations__.items():
     print(f"'{k}': {v}")
@@ -476,18 +474,18 @@ expect(AttributeError, getattr, D, "f")
 
 `show(D)` tags both attributes `[CV]`, since it inspects the class,
 where both live.
-`show(D())` tags only one.
-The `__init__()` that `@dataclass` generates decides which one keeps the tag.
+`vars(D())` returns an instance's own `__dict__`, which holds `x` alone.
+The `__init__()` that `@dataclass` generates decides which attributes the instance receives.
 
 `x` is an ordinary field,
 so the generated `__init__()` assigns it to each instance.
-`show(D())` finds `x: int = 99` in that instance's own `__dict__` and gives it no tag.
+That assignment puts `'x': 99` in the instance's `__dict__`.
 
 `s`, declared `ClassVar[str]`, behaves differently.
 `__init__(self, x: int = 99) -> None` takes `x` and leaves `s` out,
-so `s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
+so `s` stays on `D`, and every `D` object reads it from the class.
 
-`f: ClassVar[float]` appears in neither report.
+`f: ClassVar[float]` appears in neither `show(D)` nor `vars(D())`.
 It has no initializer, so it is a bare annotation, like `x` and `s` in `A`.
 The declaration lives in `D.__annotations__` alone.
 `expect()` shows that `D.f` raises an `AttributeError`,
@@ -866,9 +864,6 @@ class Month(Enum):
         check(day.n <= self.max_days, f"Day({day.n})",
               f"is past the end of {self.name}")
 
-    def __repr__(self) -> str:
-        return self.name
-
 @dataclass(frozen=True)
 class BirthDate:
     month: Month
@@ -877,10 +872,6 @@ class BirthDate:
 
     def __post_init__(self) -> None:
         self.month.check_day(self.day)
-
-if __name__ == "__main__":
-    print(BirthDate(Month(7), Day(8), Year(1957)))
-#: BirthDate(month=JULY, day=Day(n=8), year=Year(n=1957))
 ```
 
 The `Enum` creates the constrained set of `Month`s.
