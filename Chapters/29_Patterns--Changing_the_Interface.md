@@ -99,6 +99,7 @@ class WhatIUse2(WhatIUse):
             case WhatIWant():
                 super().op(item)
             case WhatIHave():
+                print("WhatIUse2.op() wraps it")
                 super().op(ProxyAdapter(item))
 
 # Approach 3: build adapter into WhatIHave:
@@ -110,6 +111,7 @@ class WhatIHave2(WhatIHave, WhatIWant):
         self.h()
 
 WhatIUse2().op(WhatIHave())  # Approach 2
+#: WhatIUse2.op() wraps it
 #: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
@@ -128,8 +130,11 @@ three structures produce one behavior.
 Each call ends in the same `g()` and `h()` on a `WhatIHave`.
 The approaches differ in where the adaptation lives,
 and the first line of each trace names that place:
-`ProxyAdapter.f()` for the object adapter and Approach 2,
-`WhatIHave2.f()` for Approach 3.
+`ProxyAdapter.f()` for the object adapter,
+`WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
+When `WhatIUse2.op()` receives a `ProxyAdapter`,
+the `WhatIWant` branch passes it on as it is,
+so that trace opens with `ProxyAdapter.f()`.
 
 *GoF Design Patterns* names two families of adapter.
 `ProxyAdapter` is an *object adapter*.

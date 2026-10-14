@@ -13,6 +13,7 @@ class WhatIUse2(WhatIUse):
             case WhatIWant():
                 super().op(item)
             case WhatIHave():
+                print("WhatIUse2.op() wraps it")
                 super().op(ProxyAdapter(item))
 
 # Approach 3: build adapter into WhatIHave:
@@ -24,6 +25,7 @@ class WhatIHave2(WhatIHave, WhatIWant):
         self.h()
 
 WhatIUse2().op(WhatIHave())  # Approach 2
+#: WhatIUse2.op() wraps it
 #: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()

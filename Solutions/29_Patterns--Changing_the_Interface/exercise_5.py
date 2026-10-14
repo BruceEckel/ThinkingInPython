@@ -36,6 +36,7 @@ class Renamed(WhatIUse):
             case WhatIWant():
                 super().op(item)
             case WhatIHave():
+                print("WhatIUse2.op() wraps it")
                 super().op(ProxyAdapter(item))
 
 class WhatIUse2(WhatIUse):
@@ -47,6 +48,7 @@ class WhatIUse2(WhatIUse):
             case WhatIWant():
                 super().op(what_i_want)
             case WhatIHave():
+                print("WhatIUse2.op() wraps it")
                 super().op(ProxyAdapter(what_i_want))
 
 def run(user: WhatIUse) -> None:
@@ -64,6 +66,7 @@ run(WhatIUse2())
 #: WhatIHave.g()
 #: WhatIHave.h()
 WhatIUse2().op(what_i_want=WhatIHave())
+#: WhatIUse2.op() wraps it
 #: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
