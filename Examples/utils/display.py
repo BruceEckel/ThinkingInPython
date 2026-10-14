@@ -42,6 +42,7 @@ def _show_dunder(
         return _redefined(name, value)
     return name in dunder
 
+# utils/display.py (continued)
 def _shared(obj: object, name: str) -> bool:
     # A class has no instance-level storage to compare
     # against, so every attribute it shows is class-level

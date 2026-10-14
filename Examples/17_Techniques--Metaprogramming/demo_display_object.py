@@ -34,8 +34,9 @@ display_object(Fraggle(9, 2.3))  # [2]
 #:   • g(self, x: int) -> float
 #:   • h(self, s: str) -> str
 
+# demo_display_object.py (continued)
 # ALL_DUNDERS also reveals what @dataclass generated:
-display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)  # [3]
+display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)  # [1]
 #: [Attributes]
 #:   • __annotations_cache__ = {'x': <class 'int'>, ... [CV]
 #:   • __class__ = <attribute '__class__'> [CV]

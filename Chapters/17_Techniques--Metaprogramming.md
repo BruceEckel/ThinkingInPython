@@ -1876,91 +1876,7 @@ def _show_dunder(
     if dunder is REDEFINED_DUNDERS:
         return _redefined(name, value)
     return name in dunder
-
-def _shared(obj: object, name: str) -> bool:
-    # A class has no instance-level storage to compare
-    # against, so every attribute it shows is class-level
-    # storage by construction. For an instance, only a name
-    # missing from its own __dict__ is:
-    if inspect.isclass(obj):
-        return True
-    return name not in getattr(obj, "__dict__", {})
-
-def _truncate(text: str, budget: int) -> str:
-    # Fit the budget, marking a cut with an ellipsis:
-    if len(text) <= budget:
-        return text
-    if budget < 4:  # No room for text plus the ellipsis
-        return "..."[:max(budget, 0)]
-    return text[:budget - 3] + "..."
-
-def _format_method(
-    name: str, value: Callable[..., object], max_width: int
-) -> str:
-    try:
-        sig = str(inspect.signature(value))
-    except (ValueError, TypeError):
-        sig = "(...)"
-    sig = _truncate(sig, max_width - len(name) - 4)
-    return f"  • {name}{sig}"
-
-def _format_attribute(
-    obj: object,
-    name: str,
-    value: object,
-    annotations: dict[str, object],
-    max_width: int,
-) -> str:
-    label = name
-    if name in annotations:
-        label = f"{name}: {_type_name(annotations[name])}"
-    tag = " [CV]" if _shared(obj, name) else ""
-    budget = max_width - len(label) - len(tag) - 7
-    val_str = _truncate(repr(value), budget)
-    return f"  • {label} = {val_str}{tag}"
-
-def display_object(
-    obj: object,
-    dunder: (Sequence[str] | ALL_DUNDERS
-             | REDEFINED_DUNDERS) = (),
-    max_width: int = 57,
-    exclude: Sequence[str] = (),
-) -> None:
-    # For a class, the class; for an instance, its class:
-    cls = obj if inspect.isclass(obj) else type(obj)
-    annotations = _annotations(cls)
-    attributes: list[str] = []
-    methods: list[str] = []
-    # Read members statically, without triggering
-    # dynamic descriptors:
-    for name, value in inspect.getmembers_static(obj):
-        if name in exclude:
-            continue
-        is_dunder = (name.startswith("__")
-                     and name.endswith("__"))
-        if is_dunder and not _show_dunder(
-                dunder, name, value):
-            continue  # Skip standard dunder clutter
-        if callable(value):
-            methods.append(
-                _format_method(name, value, max_width))
-        else:
-            attributes.append(_format_attribute(
-                obj, name, value, annotations, max_width
-            ))
-    print("[Attributes]")
-    print("\n".join(attributes) or "  None")
-    print("[Methods]")
-    print("\n".join(methods) or "  None")
 ```
-
-Importing into any example works because the example tooling puts `utils/` on the import path,
-not because Python searches other directories automatically.
-`tools/run_examples.py` sets `PYTHONPATH` to the tree's `utils/` directory before running each script.
-The same directory reaches pytest through `pythonpath` in `pyproject.toml`.
-Without either, `from display import display_object` fails with `ModuleNotFoundError`.
-
-### Choosing Which Dunders to Show
 
 `display_object()` hides standard dunder members by default.
 Pass their names in `dunder` to keep specific ones.
@@ -2061,6 +1977,94 @@ so an excluded name stays out of `[Attributes]` and `[Methods]` no matter which 
 minus `__hash__`.
 That form helps once an earlier listing has explained the `__hash__` row and repeating the row would add noise.
 
+The rest of the file selects the members, formats each one,
+and prints the report:
+
+```python
+# utils/display.py (continued)
+def _shared(obj: object, name: str) -> bool:
+    # A class has no instance-level storage to compare
+    # against, so every attribute it shows is class-level
+    # storage by construction. For an instance, only a name
+    # missing from its own __dict__ is:
+    if inspect.isclass(obj):
+        return True
+    return name not in getattr(obj, "__dict__", {})
+
+def _truncate(text: str, budget: int) -> str:
+    # Fit the budget, marking a cut with an ellipsis:
+    if len(text) <= budget:
+        return text
+    if budget < 4:  # No room for text plus the ellipsis
+        return "..."[:max(budget, 0)]
+    return text[:budget - 3] + "..."
+
+def _format_method(
+    name: str, value: Callable[..., object], max_width: int
+) -> str:
+    try:
+        sig = str(inspect.signature(value))
+    except (ValueError, TypeError):
+        sig = "(...)"
+    sig = _truncate(sig, max_width - len(name) - 4)
+    return f"  • {name}{sig}"
+
+def _format_attribute(
+    obj: object,
+    name: str,
+    value: object,
+    annotations: dict[str, object],
+    max_width: int,
+) -> str:
+    label = name
+    if name in annotations:
+        label = f"{name}: {_type_name(annotations[name])}"
+    tag = " [CV]" if _shared(obj, name) else ""
+    budget = max_width - len(label) - len(tag) - 7
+    val_str = _truncate(repr(value), budget)
+    return f"  • {label} = {val_str}{tag}"
+
+def display_object(
+    obj: object,
+    dunder: (Sequence[str] | ALL_DUNDERS
+             | REDEFINED_DUNDERS) = (),
+    max_width: int = 57,
+    exclude: Sequence[str] = (),
+) -> None:
+    # For a class, the class; for an instance, its class:
+    cls = obj if inspect.isclass(obj) else type(obj)
+    annotations = _annotations(cls)
+    attributes: list[str] = []
+    methods: list[str] = []
+    # Read members statically, without triggering
+    # dynamic descriptors:
+    for name, value in inspect.getmembers_static(obj):
+        if name in exclude:
+            continue
+        is_dunder = (name.startswith("__")
+                     and name.endswith("__"))
+        if is_dunder and not _show_dunder(
+                dunder, name, value):
+            continue  # Skip standard dunder clutter
+        if callable(value):
+            methods.append(
+                _format_method(name, value, max_width))
+        else:
+            attributes.append(_format_attribute(
+                obj, name, value, annotations, max_width
+            ))
+    print("[Attributes]")
+    print("\n".join(attributes) or "  None")
+    print("[Methods]")
+    print("\n".join(methods) or "  None")
+```
+
+Importing into any example works because the example tooling puts `utils/` on the import path,
+not because Python searches other directories automatically.
+`tools/run_examples.py` sets `PYTHONPATH` to the tree's `utils/` directory before running each script.
+The same directory reaches pytest through `pythonpath` in `pyproject.toml`.
+Without either, `from display import display_object` fails with `ModuleNotFoundError`.
+
 ### The Tool in Use
 
 ```python
@@ -2099,9 +2103,23 @@ display_object(Fraggle(9, 2.3))  # [2]
 #:   • f(self) -> None
 #:   • g(self, x: int) -> float
 #:   • h(self, s: str) -> str
+```
 
+The calls at `[1]` and `[2]` display the same class two ways.
+`display_object(Fraggle)` inspects the class object.
+It lists `y` and `z`, the fields with defaults.
+`x`'s declaration is `x: int` with no default,
+so on the class it is an annotation with no bound attribute,
+and `getmembers_static()` skips it.
+
+`display_object(Fraggle(9, 2.3))` inspects an instance,
+whose attributes hold its field values, so `x` now appears beside `y` and `z`.
+The method list is the same either way, because methods live on the class.
+
+```python
+# demo_display_object.py (continued)
 # ALL_DUNDERS also reveals what @dataclass generated:
-display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)  # [3]
+display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)  # [1]
 #: [Attributes]
 #:   • __annotations_cache__ = {'x': <class 'int'>, ... [CV]
 #:   • __class__ = <attribute '__class__'> [CV]
@@ -2147,18 +2165,7 @@ display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)  # [3]
 #:   • h(self, s: str) -> str
 ```
 
-The calls at `[1]` and `[2]` display the same class two ways.
-`display_object(Fraggle)` inspects the class object.
-It lists `y` and `z`, the fields with defaults.
-`x`'s declaration is `x: int` with no default,
-so on the class it is an annotation with no bound attribute,
-and `getmembers_static()` skips it.
-
-`display_object(Fraggle(9, 2.3))` inspects an instance,
-whose attributes hold its field values, so `x` now appears beside `y` and `z`.
-The method list is the same either way, because methods live on the class.
-
-The call at `[3]` passes `ALL_DUNDERS`.
+The call at `[1]` passes `ALL_DUNDERS`.
 A `@dataclass` produces many of these dunders:
 
 - `__dataclass_fields__`
