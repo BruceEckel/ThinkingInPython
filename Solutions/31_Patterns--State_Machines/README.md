@@ -660,7 +660,7 @@ table is the stricter of the two.
 
 [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rules under a `(state, input type)` key in order and takes the first whose condition passes.
 Put a guarded rule for the heavy load ahead of an unconditional rule, and let the condition read the load from the machine.
-For the stray `Start`, see how [An Unexpected Input](../../Chapters/31_Patterns--State_Machines.md#an-unexpected-input) weighs staying in the same state against raising an exception, then weigh a control panel's stray presses against a cycle that stops.
+For the stray `Start`, note that `trap_states.py`'s `case _` keeps the machine in its state while [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) raises a `NoTransition`, then weigh a control panel's stray presses against a cycle that stops.
 
 <details>
 <summary>The shape</summary>

@@ -46,7 +46,13 @@ annotations are evaluated lazily, so the name resolves.
 The input is typed `object`,
 so a function can accept any input and `match` on it.
 
-In this style of *State Machine*, each state decides the next state.
+In this design each state decides the next state.
+The action belongs to the state and takes no input:
+`run()` prints the state's message, and the input goes to `next`,
+which chooses the successor.
+A machine built that way is a *Moore machine*:
+what a state does depends on the state alone.
+
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
 
@@ -194,12 +200,6 @@ The behavior of `run()` depends on the current state.
 `step()` defines the flow,
 while each `State`'s `run()` and `next()` supply the varying behavior.
 
-This split has a name.
-A machine whose action belongs to the state, and takes no input,
-is a *Moore machine*: what a state does depends on the state alone,
-and the input chooses the successor.
-`run()` takes no argument for that reason.
-
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
 then feeds a fresh trap the one input for which `waiting()` has no `case`:
 
@@ -282,32 +282,6 @@ It leaves a member's tuple uncompared with the fields:
 a tuple holding the message alone, or the two in the wrong order,
 passes `ty` and fails at import or at run time.
 Pyright reports both.
-
-### An Unexpected Input
-
-Every one of the nine moves in `MOVES` matches a transition out of the current state.
-The demo then feeds `Mouse.ESCAPES` to a fresh trap in `Waiting`,
-and the trap prints `Broadcasting cheese smell` a second time.
-The figure traces the nine moves:
-
-![](_images/state_story)
-
-In each row the current state's `next()` returns the successor,
-so the machine moves from member to member and leaves every decision to the states.
-
-The `case _` arm returns the current state,
-so an unrecognized input keeps the machine in its current state.
-Staying in the same state has a visible effect.
-`step()` calls `run()` on whatever state `next()` returns,
-so returning the current state runs that state's action a second time.
-The other policy is to raise an exception from `case _`,
-so an input for which the state has no `case` stops the program and reports itself.
-
-Either policy can be right, so choose one on purpose.
-Staying in the same state suits a machine fed from a source that includes inputs meant for something else.
-Raising an exception suits a table you are still building,
-where a missing entry is a bug the exception reports.
-The table-driven engine in `tabledriven/table_machine.py` raises an exception for that reason.
 
 ## Table-Driven State Machine
 
