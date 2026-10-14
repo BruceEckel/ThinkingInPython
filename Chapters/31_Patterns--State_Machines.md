@@ -47,7 +47,6 @@ class StateMachine:
     def __init__(self, initial_state: State) -> None:
         self.current_state = initial_state
         self.current_state.run()
-    # Template method:
     def run_all(self, inputs: Iterable[object]) -> None:
         for input_ in inputs:
             state = self.current_state
@@ -127,7 +126,7 @@ class Waiting:
             case MouseAction.APPEARS:
                 return MouseTrap.luring
             case _:
-                return MouseTrap.waiting
+                return self
 
 class Luring:
     def run(self) -> None:
@@ -140,7 +139,7 @@ class Luring:
             case MouseAction.ENTERS:
                 return MouseTrap.trapping
             case _:
-                return MouseTrap.luring
+                return self
 
 class Trapping:
     def run(self) -> None:
@@ -153,7 +152,7 @@ class Trapping:
             case MouseAction.TRAPPED:
                 return MouseTrap.holding
             case _:
-                return MouseTrap.trapping
+                return self
 
 class Holding:
     def run(self) -> None:
@@ -164,7 +163,7 @@ class Holding:
             case MouseAction.REMOVED:
                 return MouseTrap.waiting
             case _:
-                return MouseTrap.holding
+                return self
 
 class MouseTrap(StateMachine):
     waiting: ClassVar[State] = Waiting()
@@ -179,8 +178,7 @@ class MouseTrap(StateMachine):
 `MouseTrap` holds all possible states as class attributes and sets up the initial state.
 Each `next()` performs a `match` on the input,
 providing a `case` for every input the state recognizes.
-The default `case _` returns the machine's current state,
-which means that the state doesn't change.
+The default `case _` returns `self`, so the state doesn't change.
 
 `StateMachine`'s constructor runs the initial state,
 so constructing the machine starts the engine.
@@ -248,37 +246,31 @@ from state import State
 class NoTransition(RuntimeError):
     "This state's table has no entry for the input."
 
-class EmptyTable(NoTransition):
-    "This state's table was never filled."
-
 class TableState(ABC):
     def __init__(self) -> None:
-        self.transitions: dict[object, State] | None = None
+        self.transitions: dict[object, State] = {}
 
     @abstractmethod
     def run(self) -> None: ...
 
     def next(self, input_: object) -> State:
-        name = type(self).__name__
-        if self.transitions is None:
-            raise EmptyTable(f"{name}: table never filled")
         try:
             return self.transitions[input_]
         except KeyError:
             raise NoTransition(
-                f"{name}: no transition on {input_}"
-            ) from None
+                f"{type(self).__name__}: "
+                f"no transition on {input_}") from None
 ```
 
 `TableState` is an `ABC` rather than a Protocol because the base has code to share.
 Both `next()` and `run()` have the signatures the `State` Protocol names,
 so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
 
-The constructor starts each state with `transitions` set to `None`.
-`next()` checks for `None` before the lookup and raises `EmptyTable`,
-so the state reports the mistake at its first input.
-When the table is filled but has no entry for the input,
-the `except` clause raises `NoTransition`.
+The constructor starts each state with an empty `transitions` table,
+and module-level code fills it after every state object exists.
+A lookup that finds no entry,
+in a table nobody filled or in one missing that input,
+raises `NoTransition` from the `except` clause.
 
 The `KeyError` that `next()` catches carries the input as its key,
 and the `NoTransition` message includes the same input,
@@ -326,7 +318,6 @@ class MouseTrap(StateMachine):
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
 
-# Each table can name its next states directly:
 MouseTrap.waiting.transitions = {
     MouseAction.APPEARS: MouseTrap.luring,
 }
@@ -343,62 +334,49 @@ MouseTrap.holding.transitions = {
 }
 ```
 
-The demo uses the same nine `MOVES` as the prior example.
-The two `expect()` calls show the detection of failing cases:
+The demo feeds a fresh trap the one input `Waiting` has no entry for,
+and `expect()` shows the exception:
 
 ```python
 # mouse_trap_tables_demo.py
-from typing import override
 from exceptions import expect
 from mouse_action import MouseAction
-from mouse_moves import MOVES
 from mouse_trap_tables import MouseTrap
-from table_state import EmptyTable, NoTransition, TableState
-
-MouseTrap().run_all(MOVES)
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse runs away -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse escapes -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse trapped -> Holding
-#: Mouse caught
-#: Holding mouse removed -> Waiting
-#: Broadcasting cheese smell
+from table_state import NoTransition
 
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()
 #: Broadcasting cheese smell
 expect(NoTransition, trap.run_all, [MouseAction.ESCAPES])
 #: [NoTransition] Waiting: no transition on mouse escapes
-
-# A table nobody filled fails on its first input:
-class Lost(TableState):
-    @override
-    def run(self) -> None: ...
-
-expect(EmptyTable, Lost().next, MouseAction.APPEARS)
-#: [EmptyTable] Lost: table never filled
 ```
 
 With many `State` classes to maintain,
 the tables read more easily than the `match` statements.
 
+Over the nine `MOVES`, both versions print the same trace,
+and `test_mouse_traps.py` holds them to it:
+
+```python
+# test_mouse_traps.py
+import mouse_trap_states
+import mouse_trap_tables
+import pytest
+from mouse_moves import MOVES
+
+def test_both_versions_print_the_same_trace(
+        capsys: pytest.CaptureFixture[str]) -> None:
+    mouse_trap_states.MouseTrap().run_all(MOVES)
+    by_match = capsys.readouterr().out
+    mouse_trap_tables.MouseTrap().run_all(MOVES)
+    by_table = capsys.readouterr().out
+    assert by_match == by_table
+```
+
 ### An Unexpected Input
 
 Every one of the nine moves in `MOVES` matches a transition out of the current state.
-Both demo files end with one more call,
-which feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
+Each demo file feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
 Neither `Waiting`'s `match` nor its table names that input.
 Version 1 prints `Broadcasting cheese smell` a second time.
 Version 2 raises `NoTransition: Waiting: no transition on mouse escapes`.

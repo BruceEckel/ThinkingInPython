@@ -13,7 +13,7 @@ class Waiting:
             case MouseAction.APPEARS:
                 return MouseTrap.luring
             case _:
-                return MouseTrap.waiting
+                return self
 
 class Luring:
     def run(self) -> None:
@@ -26,7 +26,7 @@ class Luring:
             case MouseAction.ENTERS:
                 return MouseTrap.trapping
             case _:
-                return MouseTrap.luring
+                return self
 
 class Trapping:
     def run(self) -> None:
@@ -39,7 +39,7 @@ class Trapping:
             case MouseAction.TRAPPED:
                 return MouseTrap.holding
             case _:
-                return MouseTrap.trapping
+                return self
 
 class Holding:
     def run(self) -> None:
@@ -50,7 +50,7 @@ class Holding:
             case MouseAction.REMOVED:
                 return MouseTrap.waiting
             case _:
-                return MouseTrap.holding
+                return self
 
 class MouseTrap(StateMachine):
     waiting: ClassVar[State] = Waiting()
