@@ -1,6 +1,6 @@
 # iterators.py
 from collections.abc import Iterable, Iterator
-from dataclasses import dataclass
+from record import record
 
 def fibonacci(n: int) -> Iterator[int]:
     a, b = 0, 1
@@ -8,7 +8,7 @@ def fibonacci(n: int) -> Iterator[int]:
         yield a
         a, b = b, a + b
 
-@dataclass
+@record
 class Countdown:
     start: int
 

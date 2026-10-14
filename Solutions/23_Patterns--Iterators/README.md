@@ -75,9 +75,9 @@ For the explanation, consider what a generator keeps between calls to `next()`, 
 ```python
 # The shape of exercise_2.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from record import record
 
-@dataclass
+@record
 class Countdown:
     start: int
 
@@ -100,9 +100,9 @@ The solution returns `max(self.start, 0)`, so the length matches the zero values
 ```python
 # exercise_2.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from record import record
 
-@dataclass
+@record
 class Countdown:
     start: int
 
@@ -228,12 +228,12 @@ Weigh the two by what each keeps in memory and what each recomputes.
 ```python
 # The shape of exercise_4.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from record import record
 
 def squares(n: int) -> Iterator[int]:
     ...
 
-@dataclass
+@record
 class Squares:
     n: int
 
@@ -247,7 +247,7 @@ class Squares:
 ```python
 # exercise_4.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from record import record
 
 def squares(n: int) -> Iterator[int]:
     for i in range(n):
@@ -261,7 +261,7 @@ print(collected)
 #: [0, 1, 4, 9, 16]
 
 # Fix two: __iter__() builds a fresh generator per pass
-@dataclass
+@record
 class Squares:
     n: int
 

@@ -1,6 +1,6 @@
 # exercise_4.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from record import record
 
 def squares(n: int) -> Iterator[int]:
     for i in range(n):
@@ -14,7 +14,7 @@ print(collected)
 #: [0, 1, 4, 9, 16]
 
 # Fix two: __iter__() builds a fresh generator per pass
-@dataclass
+@record
 class Squares:
     n: int
 

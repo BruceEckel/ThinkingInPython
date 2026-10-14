@@ -1,6 +1,6 @@
 # exercise_7.py
-from dataclasses import dataclass
 from enum import Enum, auto
+from record import record
 from table_machine import StateMachine, Table
 
 class ElevatorState(Enum):
@@ -10,7 +10,7 @@ class ElevatorState(Enum):
     DOORS_OPEN = auto()
     DOORS_CLOSING = auto()
 
-@dataclass
+@record
 class CallButton:
     floor: int
 
@@ -19,7 +19,7 @@ class ArrivedAtFloor:
 class CloseDoors:
     pass
 
-@dataclass
+@record
 class DoorSensor:
     blocked: bool
 

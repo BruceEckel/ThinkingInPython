@@ -656,11 +656,11 @@ def research() -> Effect[
 
 ```python
 # feeds.py
-from dataclasses import dataclass
 from typing import Final
+from record import record
 from research import NoArticle, Unavailable
 
-@dataclass
+@record
 class Wire:
     headline: str
     def latest(self) -> str:
@@ -676,7 +676,7 @@ class StaleWire:
         print("feed: fetching")
         raise Unavailable("stale connection")
 
-@dataclass
+@record
 class Library:
     articles: dict[str, str]
     def article(self, topic: str) -> str:
@@ -1334,7 +1334,7 @@ Then change each version to fail with a different exception and note which one `
 
 ```python
 # The shape of exercise_10.py
-from dataclasses import dataclass
+from record import record
 from stateless import (Effect, Need, catch, need, run,
                        supply, throw, throws)
 
@@ -1344,7 +1344,7 @@ class Unavailable(Exception):
 class Empty(Exception):
     pass
 
-@dataclass
+@record
 class Ticker:
     headline: str
     def latest(self) -> str:
@@ -1369,7 +1369,7 @@ def lifted() -> Effect[Need[Ticker], Unavailable, str]:
 
 ```python
 # exercise_10.py
-from dataclasses import dataclass
+from record import record
 from stateless import (Effect, Need, catch, need, run,
                        supply, throw, throws)
 
@@ -1379,7 +1379,7 @@ class Unavailable(Exception):
 class Empty(Exception):
     pass
 
-@dataclass
+@record
 class Ticker:
     headline: str
     def latest(self) -> str:
@@ -1471,14 +1471,14 @@ Afterward, delete the annotation and look at what `reveal_type()` reports for th
 
 ```python
 # The shape of exercise_11.py
-from dataclasses import dataclass
+from record import record
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable)
 from research_long import TooLong, research
 from stateless import run, supply
 from stateless.effect import catch_all
 
-@dataclass
+@record
 class Bulletin:
     headline: str
     def latest(self) -> str:
@@ -1504,14 +1504,14 @@ def outcome(
 
 ```python
 # exercise_11.py
-from dataclasses import dataclass
+from record import record
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable)
 from research_long import TooLong, research
 from stateless import run, supply
 from stateless.effect import catch_all
 
-@dataclass
+@record
 class Bulletin:
     headline: str
     def latest(self) -> str:

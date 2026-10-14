@@ -659,9 +659,9 @@ For the stray `Start`, see how [An Unexpected Input](../../Chapters/31_Patterns-
 ```python
 # The shape of exercise_6.py
 from collections.abc import Callable
-from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
+from record import record
 from table_machine import NoTransition, StateMachine, Table
 
 class WashState(Enum):
@@ -672,7 +672,7 @@ class WashState(Enum):
     SPINNING = auto()
     DONE = auto()
 
-@dataclass
+@record
 class Start:
     load_kg: float
 
@@ -712,9 +712,9 @@ so the solution lists the guarded row first and leaves the unconditional row to 
 ```python
 # exercise_6.py
 from collections.abc import Callable
-from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
+from record import record
 from table_machine import NoTransition, StateMachine, Table
 
 class WashState(Enum):
@@ -725,7 +725,7 @@ class WashState(Enum):
     SPINNING = auto()
     DONE = auto()
 
-@dataclass
+@record
 class Start:
     load_kg: float
 
@@ -846,8 +846,8 @@ The condition is a method that reads the input, so the table stays data.
 
 ```python
 # The shape of exercise_7.py
-from dataclasses import dataclass
 from enum import Enum, auto
+from record import record
 from table_machine import StateMachine, Table
 
 class ElevatorState(Enum):
@@ -857,7 +857,7 @@ class ElevatorState(Enum):
     DOORS_OPEN = auto()
     DOORS_CLOSING = auto()
 
-@dataclass
+@record
 class CallButton:
     floor: int
 
@@ -866,7 +866,7 @@ class ArrivedAtFloor:
 class CloseDoors:
     pass
 
-@dataclass
+@record
 class DoorSensor:
     blocked: bool
 
@@ -901,8 +901,8 @@ The solution keeps that row last, as the group's `else`.
 
 ```python
 # exercise_7.py
-from dataclasses import dataclass
 from enum import Enum, auto
+from record import record
 from table_machine import StateMachine, Table
 
 class ElevatorState(Enum):
@@ -912,7 +912,7 @@ class ElevatorState(Enum):
     DOORS_OPEN = auto()
     DOORS_CLOSING = auto()
 
-@dataclass
+@record
 class CallButton:
     floor: int
 
@@ -921,7 +921,7 @@ class ArrivedAtFloor:
 class CloseDoors:
     pass
 
-@dataclass
+@record
 class DoorSensor:
     blocked: bool
 
@@ -1020,8 +1020,8 @@ Order the rows so the conditional ones come first and an unconditional row, as t
 
 ```python
 # The shape of exercise_8.py
-from dataclasses import dataclass
 from enum import Enum, auto
+from record import record
 from table_machine import StateMachine, Table
 
 class HVACState(Enum):
@@ -1029,7 +1029,7 @@ class HVACState(Enum):
     HEATING = auto()
     COOLING = auto()
 
-@dataclass
+@record
 class TemperatureReading:
     degrees: float
 
@@ -1058,8 +1058,8 @@ the unconditional row last, as the fallback.
 
 ```python
 # exercise_8.py
-from dataclasses import dataclass
 from enum import Enum, auto
+from record import record
 from table_machine import StateMachine, Table
 
 class HVACState(Enum):
@@ -1067,7 +1067,7 @@ class HVACState(Enum):
     HEATING = auto()
     COOLING = auto()
 
-@dataclass
+@record
 class TemperatureReading:
     degrees: float
 

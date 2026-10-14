@@ -1,9 +1,9 @@
 # feeds.py
-from dataclasses import dataclass
 from typing import Final
+from record import record
 from research import NoArticle, Unavailable
 
-@dataclass
+@record
 class Wire:
     headline: str
     def latest(self) -> str:
@@ -19,7 +19,7 @@ class StaleWire:
         print("feed: fetching")
         raise Unavailable("stale connection")
 
-@dataclass
+@record
 class Library:
     articles: dict[str, str]
     def article(self, topic: str) -> str:

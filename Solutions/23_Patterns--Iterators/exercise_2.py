@@ -1,8 +1,8 @@
 # exercise_2.py
 from collections.abc import Iterator
-from dataclasses import dataclass
+from record import record
 
-@dataclass
+@record
 class Countdown:
     start: int
 

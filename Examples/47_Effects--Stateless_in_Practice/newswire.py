@@ -1,9 +1,9 @@
 # newswire.py
-from dataclasses import dataclass
 from typing import Final
+from record import record
 from research import NoArticle, Unavailable
 
-@dataclass
+@record
 class Wire:
     headline: str
     def latest(self) -> str:
@@ -14,7 +14,7 @@ class DeadWire:
     def latest(self) -> str:
         raise Unavailable("offline")
 
-@dataclass
+@record
 class Library:
     articles: dict[str, str]
     def article(self, topic: str) -> str:

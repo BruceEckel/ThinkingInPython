@@ -1,5 +1,5 @@
 # exercise_10.py
-from dataclasses import dataclass
+from record import record
 from stateless import (Effect, Need, catch, need, run,
                        supply, throw, throws)
 
@@ -9,7 +9,7 @@ class Unavailable(Exception):
 class Empty(Exception):
     pass
 
-@dataclass
+@record
 class Ticker:
     headline: str
     def latest(self) -> str:

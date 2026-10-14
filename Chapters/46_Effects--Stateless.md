@@ -413,10 +413,10 @@ Here, `Console` carries a tag so the output says which handler answered:
 
 ```python
 # default_console.py
-from dataclasses import dataclass
+from record import record
 from stateless import Depend, Need, need, run, supply
 
-@dataclass
+@record
 class Console:
     tag: str
     def print(self, message: str) -> None:

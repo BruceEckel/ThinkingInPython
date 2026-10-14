@@ -1,6 +1,6 @@
 # exercise_8.py
-from dataclasses import dataclass
 from enum import Enum, auto
+from record import record
 from table_machine import StateMachine, Table
 
 class HVACState(Enum):
@@ -8,7 +8,7 @@ class HVACState(Enum):
     HEATING = auto()
     COOLING = auto()
 
-@dataclass
+@record
 class TemperatureReading:
     degrees: float
 

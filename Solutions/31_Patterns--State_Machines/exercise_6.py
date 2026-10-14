@@ -1,8 +1,8 @@
 # exercise_6.py
 from collections.abc import Callable
-from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
+from record import record
 from table_machine import NoTransition, StateMachine, Table
 
 class WashState(Enum):
@@ -13,7 +13,7 @@ class WashState(Enum):
     SPINNING = auto()
     DONE = auto()
 
-@dataclass
+@record
 class Start:
     load_kg: float
 
