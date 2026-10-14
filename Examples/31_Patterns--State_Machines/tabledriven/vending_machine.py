@@ -1,6 +1,7 @@
 # tabledriven/vending_machine.py
 from dataclasses import dataclass
 from enum import Enum, auto
+from record import record
 from table_machine import StateMachine, Table
 
 class State(Enum):
@@ -10,7 +11,7 @@ class State(Enum):
     UNAVAILABLE = auto()
     WANT_MORE = auto()
 
-@dataclass
+@record
 class Money:
     name: str
     value: int
@@ -22,14 +23,16 @@ class Quit:
     def __str__(self) -> str:
         return "Quit"
 
-@dataclass
+@record
 class Key:
     value: int
 
+@record
 class Row(Key):
     def __str__(self) -> str:
         return "ABCD"[self.value]
 
+@record
 class Column(Key):
     def __str__(self) -> str:
         return f"col {self.value}"

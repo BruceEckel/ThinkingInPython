@@ -1150,21 +1150,21 @@ Compare how many rows each fix needs as denominations and states multiply.
 
 ```python
 # The shape of exercise_9.py
-from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
+from record import record
 from table_machine import NoTransition, StateMachine, Table
 
 class State(Enum):
     QUIESCENT = auto()
     COLLECTING = auto()
 
-@dataclass
+@record
 class Money:
     name: str
     value: int
 
-@dataclass
+@record
 class Nickel(Money):  # A subclass, not a new instance
     pass
 
@@ -1184,21 +1184,21 @@ NICKEL = Money("nickel", 5)
 
 ```python
 # exercise_9.py
-from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
+from record import record
 from table_machine import NoTransition, StateMachine, Table
 
 class State(Enum):
     QUIESCENT = auto()
     COLLECTING = auto()
 
-@dataclass
+@record
 class Money:
     name: str
     value: int
 
-@dataclass
+@record
 class Nickel(Money):  # A subclass, not a new instance
     pass
 

@@ -1,19 +1,19 @@
 # exercise_9.py
-from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
+from record import record
 from table_machine import NoTransition, StateMachine, Table
 
 class State(Enum):
     QUIESCENT = auto()
     COLLECTING = auto()
 
-@dataclass
+@record
 class Money:
     name: str
     value: int
 
-@dataclass
+@record
 class Nickel(Money):  # A subclass, not a new instance
     pass
 
