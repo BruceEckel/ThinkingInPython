@@ -9,6 +9,8 @@ sketch_v2.SketchV2 = SketchV1  # type: ignore
 restored = pickle.loads(blob)
 print(restored)
 #: SketchV1(strokes=('circle',))
+print(restored.title)
+#: Duck
 print(restored.__dict__)
 #: {'strokes': ('circle',), 'title': 'Duck'}
 print(restored == SketchV1(("circle",)))

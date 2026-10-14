@@ -3,17 +3,20 @@ from dataclasses import FrozenInstanceError
 from exceptions import expect, expected
 from sketch import Sketch
 
-def restore_tuple(strokes: tuple[str, ...]) -> None:
-    print(strokes)
+def restore_tuple(sketch: Sketch,
+                  strokes: tuple[str, ...]) -> None:
+    sketch.strokes = list(strokes)
 
 sketch = Sketch()
 sketch.draw("circle")
 checkpoint = sketch.save()
 
-restore_tuple(checkpoint.strokes)
-#: ('circle',)
-restore_tuple(("unrelated", "tuple"))
-#: ('unrelated', 'tuple')
+restore_tuple(sketch, checkpoint.strokes)
+print(sketch)
+#: circle
+restore_tuple(sketch, ("unrelated", "tuple"))
+print(sketch)
+#: unrelated tuple
 
 sketch.restore(checkpoint)
 print(sketch)

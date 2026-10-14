@@ -181,17 +181,20 @@ from dataclasses import FrozenInstanceError
 from exceptions import expect, expected
 from sketch import Sketch
 
-def restore_tuple(strokes: tuple[str, ...]) -> None:
-    print(strokes)
+def restore_tuple(sketch: Sketch,
+                  strokes: tuple[str, ...]) -> None:
+    sketch.strokes = list(strokes)
 
 sketch = Sketch()
 sketch.draw("circle")
 checkpoint = sketch.save()
 
-restore_tuple(checkpoint.strokes)
-#: ('circle',)
-restore_tuple(("unrelated", "tuple"))
-#: ('unrelated', 'tuple')
+restore_tuple(sketch, checkpoint.strokes)
+print(sketch)
+#: circle
+restore_tuple(sketch, ("unrelated", "tuple"))
+print(sketch)
+#: unrelated tuple
 
 sketch.restore(checkpoint)
 print(sketch)
@@ -208,8 +211,9 @@ with expected(FrozenInstanceError):
 #: [FrozenInstanceError] cannot assign to field 'strokes'
 ```
 
-`restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`.
-`restore()` accepts the checkpoint,
+`restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`,
+so it installs the stray tuple as the sketch's state with no complaint.
+`restore()` accepts the checkpoint and brings back `circle`,
 and the type checker reports the plain tuple before the program runs.
 At runtime, `restore()` raises an `AttributeError` when it reads `memento.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
@@ -747,7 +751,8 @@ while `getattr()` still finds it in `__dict__`.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
 
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
-The deleted-field drift raises nothing, and the data is wrong.
+The deleted-field drift raises nothing,
+and reading the deleted `title` returns stale data.
 Running the same reassignment backwards shows the deleted field:
 
 ```python
@@ -762,6 +767,8 @@ sketch_v2.SketchV2 = SketchV1  # type: ignore
 restored = pickle.loads(blob)
 print(restored)
 #: SketchV1(strokes=('circle',))
+print(restored.title)
+#: Duck
 print(restored.__dict__)
 #: {'strokes': ('circle',), 'title': 'Duck'}
 print(restored == SketchV1(("circle",)))
