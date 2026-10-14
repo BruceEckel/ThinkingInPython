@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
+from typing import Final
 from validation import check
 
 @dataclass(frozen=True)
@@ -19,29 +20,26 @@ class Year:
         check(1900 < self.n <= date.today().year,
               f"Year({self.n})")
 
-class Month(Enum):
-    JANUARY = (1, 31)
-    FEBRUARY = (2, 28)  # Leap years are left as an exercise
-    MARCH = (3, 31)
-    APRIL = (4, 30)
-    MAY = (5, 31)
-    JUNE = (6, 30)
-    JULY = (7, 31)
-    AUGUST = (8, 31)
-    SEPTEMBER = (9, 30)
-    OCTOBER = (10, 31)
-    NOVEMBER = (11, 30)
-    DECEMBER = (12, 31)
+DAYS: Final[tuple[int, ...]] = (31, 28, 31, 30, 31, 30,
+                                31, 31, 30, 31, 30, 31)
 
-    @staticmethod
-    def of(month_number: int) -> Month:
-        check(1 <= month_number <= 12,
-              f"Month({month_number})")
-        return list(Month)[month_number - 1]
+class Month(Enum):
+    JANUARY = 1
+    FEBRUARY = 2  # Leap years are left as an exercise
+    MARCH = 3
+    APRIL = 4
+    MAY = 5
+    JUNE = 6
+    JULY = 7
+    AUGUST = 8
+    SEPTEMBER = 9
+    OCTOBER = 10
+    NOVEMBER = 11
+    DECEMBER = 12
 
     @property
     def max_days(self) -> int:
-        return self.value[1]
+        return DAYS[self.value - 1]
 
     def check_day(self, day: Day) -> None:
         check(day.n <= self.max_days, f"Day({day.n})",
@@ -60,5 +58,5 @@ class BirthDate:
         self.month.check_day(self.day)
 
 if __name__ == "__main__":
-    print(BirthDate(Month.of(7), Day(8), Year(1957)))
+    print(BirthDate(Month(7), Day(8), Year(1957)))
 #: BirthDate(month=JULY, day=Day(n=8), year=Year(n=1957))

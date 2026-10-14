@@ -206,29 +206,28 @@ after the program drops its last instance.
 
 ### Alternative Constructors Are Factories
 
-[`Month.of()`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-is an alternative constructor,
-a method on the type that builds an instance from data the constructor rejects.
-There, `Month(7)` raises a `ValueError` because each member's value is a pair such as `(7, 31)`,
-while `Month.of(7)` returns `JULY`.
-
-`Month.of()` is also a factory, of the same form as `factory()`.
-Both are static methods within the type.
-Each takes data and returns an instance,
-and each raises an exception for data it does not recognize.
-For `Month`, that is a number outside one through twelve.
-Where `factory()` has a `match` that names each class,
-`of()` indexes `list(Month)`,
-because the `Enum` holds every member `of()` could return.
-A factory over a closed set of products reduces to a lookup.
-
 [`from_fahrenheit()`](07_Foundations--Classes.md#static-and-class-methods)
-is the usual form of alternative constructor:
-a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`.
+is an alternative constructor,
+a method on the type that takes data in another form and converts it into the constructor's arguments.
+It is also a factory of the same kind as `factory()`:
+each takes data and returns an instance.
+The usual alternative constructor is a `@classmethod` like `from_fahrenheit()`,
+which computes the constructor's arguments and ends with `return cls(...)`.
 That form is the most common factory.
 The standard library's `dict.fromkeys()` and `datetime.fromisoformat()` are two examples.
 The `@classmethod` form chooses arguments rather than a class,
 so a subclass that calls the inherited method gets an instance of the subclass.
+
+An `Enum` makes its constructor a factory over a closed set.
+In [Enums Are Types Too](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too),
+each `Month` member's value is its month number,
+so `Month(7)` returns the existing member `JULY` rather than building a new object.
+`Month(13)` raises a `ValueError`,
+as `factory()` raises one for a name it does not recognize.
+Where `factory()` has a `match` that names each class,
+the `Enum` looks the value up in a table of its members,
+because the class holds every member the call could return.
+A factory over a closed set of products reduces to a lookup.
 
 ## The Pythonic Factory: a Dictionary
 

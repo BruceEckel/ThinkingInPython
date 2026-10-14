@@ -823,6 +823,7 @@ The day must fit the month.
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
+from typing import Final
 from validation import check
 
 @dataclass(frozen=True)
@@ -840,29 +841,26 @@ class Year:
         check(1900 < self.n <= date.today().year,
               f"Year({self.n})")
 
-class Month(Enum):
-    JANUARY = (1, 31)
-    FEBRUARY = (2, 28)  # Leap years are left as an exercise
-    MARCH = (3, 31)
-    APRIL = (4, 30)
-    MAY = (5, 31)
-    JUNE = (6, 30)
-    JULY = (7, 31)
-    AUGUST = (8, 31)
-    SEPTEMBER = (9, 30)
-    OCTOBER = (10, 31)
-    NOVEMBER = (11, 30)
-    DECEMBER = (12, 31)
+DAYS: Final[tuple[int, ...]] = (31, 28, 31, 30, 31, 30,
+                                31, 31, 30, 31, 30, 31)
 
-    @staticmethod
-    def of(month_number: int) -> Month:
-        check(1 <= month_number <= 12,
-              f"Month({month_number})")
-        return list(Month)[month_number - 1]
+class Month(Enum):
+    JANUARY = 1
+    FEBRUARY = 2  # Leap years are left as an exercise
+    MARCH = 3
+    APRIL = 4
+    MAY = 5
+    JUNE = 6
+    JULY = 7
+    AUGUST = 8
+    SEPTEMBER = 9
+    OCTOBER = 10
+    NOVEMBER = 11
+    DECEMBER = 12
 
     @property
     def max_days(self) -> int:
-        return self.value[1]
+        return DAYS[self.value - 1]
 
     def check_day(self, day: Day) -> None:
         check(day.n <= self.max_days, f"Day({day.n})",
@@ -881,24 +879,26 @@ class BirthDate:
         self.month.check_day(self.day)
 
 if __name__ == "__main__":
-    print(BirthDate(Month.of(7), Day(8), Year(1957)))
+    print(BirthDate(Month(7), Day(8), Year(1957)))
 #: BirthDate(month=JULY, day=Day(n=8), year=Year(n=1957))
 ```
 
 The `Enum` creates the constrained set of `Month`s.
 No thirteenth month can exist, because `Month` defines no such value.
 
-Each member is a pair rather than a bare day count because `Enum` treats members with equal values as aliases of one another.
-Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`.
-The twelve months share three distinct day counts,
-so `list(Month)` would return three members instead of twelve.
-Pairing each month with its number keeps all twelve values distinct,
-which `of()` relies on when it indexes `list(Month)`.
-The member's value is now the pair, so `Month(7)` raises a `ValueError`.
-`of()` is the replacement lookup.
+Each member's value is its month number, so `Month(7)` looks up `JULY` by value.
+`Month(13)` raises a `ValueError`, because no member holds 13.
+The `Enum`'s lookup performs the range check, so `Month` writes none.
 
-The tests confirm that `Month.of(7)` finds `JULY` in a legal date,
-and that a day past the end of its month and a month number outside the twelve both raise `TypeFailure`:
+The day counts live in `DAYS`,
+and `max_days` indexes that tuple with `self.value - 1`.
+A day count cannot serve as the member's value,
+because `Enum` treats members with equal values as aliases of one another.
+Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`.
+
+The tests confirm that `Month(7)` finds `JULY` in a legal date,
+that a day past the end of its month raises `TypeFailure`,
+and that a month number outside the twelve raises the `Enum`'s `ValueError`:
 
 ```python
 # test_birth_date.py
@@ -906,8 +906,8 @@ import pytest
 from birth_date import BirthDate, Day, Month, Year
 from validation import TypeFailure
 
-def test_of_finds_the_month() -> None:
-    bd = BirthDate(Month.of(7), Day(8), Year(1957))
+def test_lookup_finds_the_month() -> None:
+    bd = BirthDate(Month(7), Day(8), Year(1957))
     assert bd.month is Month.JULY
 
 @pytest.mark.parametrize("month_n, day_n", [
@@ -917,19 +917,19 @@ def test_of_finds_the_month() -> None:
 ])
 def test_day_past_end_of_month(month_n: int,
                                day_n: int) -> None:
-    assert Month.of(month_n).max_days < day_n
+    assert Month(month_n).max_days < day_n
     with pytest.raises(TypeFailure):
-        BirthDate(Month.of(month_n), Day(day_n), Year(2020))
+        BirthDate(Month(month_n), Day(day_n), Year(2020))
 
 @pytest.mark.parametrize("bad", [0, 13, -1])
 def test_month_number_outside_twelve(bad: int) -> None:
-    with pytest.raises(TypeFailure):
-        Month.of(bad)
+    with pytest.raises(ValueError):
+        Month(bad)
 ```
 
 ### Mixing a Type into an Enum {#enum-mix-ins}
 
-A `Month` member carries a pair as its value, and the pair is not the month.
+A `Month` member carries a number as its value, and the number is not the month.
 Sometimes the member is a value of some type: a direction is a pair of offsets,
 a log level is a string.
 A class listed before `Enum` in the bases is a *mix-in*,
@@ -982,8 +982,8 @@ ruff's `UP042` rewrites that form to `StrEnum`.
 `IntEnum` is the same arrangement for `int`.
 
 Mix in a type when the member is one of that type.
-`Month` stays a bare `Enum`: a month is not a pair, it carries one,
-and `max_days` reads the pair through `.value`.
+`Month` stays a bare `Enum`: a month is not an `int`, it carries one,
+and `max_days` reads the number through `.value`.
 A class of your own can be the mix-in too.
 `Enum` passes the assigned value to its `__init__()`,
 so each member is built the way an ordinary instance of that class would be.
@@ -1045,6 +1045,7 @@ print(Month("Smarch", 7, 30))
 `Month("Smarch", 7, 30)` passes every `check()`,
 so the data class accepts an invented month and a second July.
 The `Enum` defines no such value.
+`Months.of()` also writes out the range check that the `Enum`'s lookup performs for `Month(7)`.
 
 `Months` carries a list of its twelve `Month`s,
 so its `months` field needs `field(default_factory=make_months)` rather than a default value.

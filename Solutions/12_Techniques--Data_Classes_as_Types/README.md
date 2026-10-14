@@ -38,6 +38,7 @@ only when the year is leap:
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
+from typing import Final
 import pytest
 
 @dataclass(eq=False)
@@ -72,29 +73,26 @@ class Year:
         return self.n % 4 == 0 and (
             self.n % 100 != 0 or self.n % 400 == 0)
 
-class Month(Enum):
-    JANUARY = (1, 31)
-    FEBRUARY = (2, 28)
-    MARCH = (3, 31)
-    APRIL = (4, 30)
-    MAY = (5, 31)
-    JUNE = (6, 30)
-    JULY = (7, 31)
-    AUGUST = (8, 31)
-    SEPTEMBER = (9, 30)
-    OCTOBER = (10, 31)
-    NOVEMBER = (11, 30)
-    DECEMBER = (12, 31)
+DAYS: Final[tuple[int, ...]] = (31, 28, 31, 30, 31, 30,
+                                31, 31, 30, 31, 30, 31)
 
-    @staticmethod
-    def of(month_number: int) -> Month:
-        check(1 <= month_number <= 12,
-              f"Month({month_number})")
-        return list(Month)[month_number - 1]
+class Month(Enum):
+    JANUARY = 1
+    FEBRUARY = 2
+    MARCH = 3
+    APRIL = 4
+    MAY = 5
+    JUNE = 6
+    JULY = 7
+    AUGUST = 8
+    SEPTEMBER = 9
+    OCTOBER = 10
+    NOVEMBER = 11
+    DECEMBER = 12
 
     @property
     def max_days(self) -> int:
-        return self.value[1]
+        return DAYS[self.value - 1]
 
     def check_day(self, day: Day, year: Year) -> None:
         max_days = self.max_days
@@ -116,24 +114,24 @@ class BirthDate:
         self.month.check_day(self.day, self.year)
 
 def test_feb_29_allowed_in_leap_year() -> None:
-    bd = BirthDate(Month.of(2), Day(29), Year(2020))
+    bd = BirthDate(Month(2), Day(29), Year(2020))
     assert bd.day.n == 29
 
 def test_feb_29_allowed_in_2000() -> None:
-    bd = BirthDate(Month.of(2), Day(29), Year(2000))
+    bd = BirthDate(Month(2), Day(29), Year(2000))
     assert bd.day.n == 29
 
 def test_feb_29_rejected_in_non_leap_year() -> None:
     with pytest.raises(TypeFailure):
-        BirthDate(Month.of(2), Day(29), Year(2021))
+        BirthDate(Month(2), Day(29), Year(2021))
 
 def test_feb_30_always_rejected() -> None:
     with pytest.raises(TypeFailure):
-        BirthDate(Month.of(2), Day(30), Year(2020))
+        BirthDate(Month(2), Day(30), Year(2020))
 ```
 
 **Accept both kinds of leap year.**
-`BirthDate(Month.of(2), Day(29), Year(2020))` succeeds because 2020 is
+`BirthDate(Month(2), Day(29), Year(2020))` succeeds because 2020 is
 divisible by 4 and not by 100.
 2000 is divisible by 100 and also by 400,
 so it is a leap year too,
