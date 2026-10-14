@@ -684,6 +684,11 @@ class VendingMachine(StateMachine):
         self.amount = 0
 ```
 
+The inputs `Money`, `Key`, `Row`, and `Column` are records,
+values the machine reads and leaves as they are.
+`ItemSlot` stays a mutable `@dataclass`,
+because `dispense()` decrements its `quantity` in place.
+
 The engine's lookup keys on the exact `type(input_)`,
 so finding the rows takes one dictionary lookup rather than an `isinstance()` test against each row.
 That exactness lets the table keep separate entries for `Row` and `Column`,
