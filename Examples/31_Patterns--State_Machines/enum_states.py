@@ -12,14 +12,14 @@ class State:
     behavior: Behavior
     transition: Transition
 
-def from_waiting(input_: M) -> TrapState:
+def waiting(input_: M) -> TrapState:
     match input_:
         case M.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
-def from_luring(input_: M) -> TrapState:
+def luring(input_: M) -> TrapState:
     match input_:
         case M.RUNS_AWAY:
             return TrapState.WAITING
@@ -28,7 +28,7 @@ def from_luring(input_: M) -> TrapState:
         case _:
             return TrapState.LURING
 
-def from_trapping(input_: M) -> TrapState:
+def trapping(input_: M) -> TrapState:
     match input_:
         case M.ESCAPES:
             return TrapState.WAITING
@@ -37,7 +37,7 @@ def from_trapping(input_: M) -> TrapState:
         case _:
             return TrapState.TRAPPING
 
-def from_holding(input_: M) -> TrapState:
+def holding(input_: M) -> TrapState:
     match input_:
         case M.REMOVED:
             return TrapState.WAITING
@@ -46,11 +46,11 @@ def from_holding(input_: M) -> TrapState:
 
 class TrapState(State, Enum):
     WAITING = (lambda _: "Broadcasting cheese smell",
-               from_waiting)
+               waiting)
     LURING = (lambda _: "Presenting Cheese, door open",
-              from_luring)
-    TRAPPING = (lambda _: "Closing door", from_trapping)
-    HOLDING = (lambda _: "Mouse caught", from_holding)
+              luring)
+    TRAPPING = (lambda _: "Closing door", trapping)
+    HOLDING = (lambda _: "Mouse caught", holding)
 
 class StateMachine:
     def __init__(self, start: TrapState) -> None:
