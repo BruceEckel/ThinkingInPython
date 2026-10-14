@@ -313,7 +313,7 @@ so the table entries can name the other states.
 Module-level code fills in the tables after every state object exists:
 
 ```python
-# mouse_trap_tables.py
+# trap_tables.py
 from typing import ClassVar, override
 from mouse import Mouse
 from state_machine import StateMachine
@@ -368,11 +368,11 @@ The demo feeds a fresh trap the one input for which `Waiting` has no entry,
 and `expect()` shows the exception:
 
 ```python
-# mouse_trap_tables_demo.py
+# trap_tables_demo.py
 from exceptions import expect
 from mouse import Mouse
-from mouse_trap_tables import MouseTrap
 from table_state import NoTransition
+from trap_tables import MouseTrap
 
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()
@@ -385,13 +385,13 @@ With many `State` classes to maintain,
 the tables read more easily than the `match` statements.
 
 Over the nine `MOVES`, both versions print the same trace,
-and `test_mouse_traps.py` holds them to it:
+and `test_traps.py` holds them to it:
 
 ```python
-# test_mouse_traps.py
-import mouse_trap_tables
+# test_traps.py
 import pytest
 import trap_states
+import trap_tables
 from mouse_moves import MOVES
 from state_machine import run_all
 
@@ -399,7 +399,7 @@ def test_both_versions_print_the_same_trace(
         capsys: pytest.CaptureFixture[str]) -> None:
     run_all(trap_states.MouseTrap(), MOVES)
     by_match = capsys.readouterr().out
-    run_all(mouse_trap_tables.MouseTrap(), MOVES)
+    run_all(trap_tables.MouseTrap(), MOVES)
     by_table = capsys.readouterr().out
     assert by_match == by_table
 ```

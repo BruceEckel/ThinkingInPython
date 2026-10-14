@@ -1,8 +1,8 @@
-# mouse_trap_tables_demo.py
+# trap_tables_demo.py
 from exceptions import expect
 from mouse import Mouse
-from mouse_trap_tables import MouseTrap
 from table_state import NoTransition
+from trap_tables import MouseTrap
 
 # ESCAPES is not a key in Waiting.transitions:
 trap = MouseTrap()

@@ -75,7 +75,7 @@
   <text x="20" y="481" font-size="10" fill="#7a6e62" text-anchor="start">case _ returns the current state,</text>
   <text x="20" y="495" font-size="10" fill="#7a6e62" text-anchor="start">so run() prints its line again</text>
   <text x="390" y="403" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="start">table version</text>
-  <text x="390" y="418" font-size="10" fill="#7a6e62" text-anchor="start">mouse_trap_tables.py</text>
+  <text x="390" y="418" font-size="10" fill="#7a6e62" text-anchor="start">trap_tables.py</text>
   <rect x="390" y="433" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
   <text x="426" y="450" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Waiting</text>
   <text x="527" y="440" font-size="10" fill="#1a1612" text-anchor="middle">mouse escapes</text>

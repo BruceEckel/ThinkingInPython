@@ -14,8 +14,8 @@ version's `next()` raises a `NoTransition`.
 This complements the chapter's other figure, `vending_story.svg`, which
 draws the vending machine's states and transitions as a static graph.
 The names, inputs, and printed lines come from `mouse.py`,
-`mouse_moves.py`, `trap_states.py`, `mouse_trap_tables.py`,
-`trap_states_demo.py`, and `mouse_trap_tables_demo.py`
+`mouse_moves.py`, `trap_states.py`, `trap_tables.py`,
+`trap_states_demo.py`, and `trap_tables_demo.py`
 and their `#:` markers.
 """
 
@@ -137,7 +137,7 @@ def render() -> str:
               MUTED)
     b += policy(EX, y0 + 48, "match version", "trap_states.py",
                 raises=False)
-    b += policy(390, y0 + 48, "table version", "mouse_trap_tables.py",
+    b += policy(390, y0 + 48, "table version", "trap_tables.py",
                 raises=True)
     defs = markers(**{"ss-red": ("filled", RED)})
     return svg(W, y0 + 160, TITLE, defs, b)

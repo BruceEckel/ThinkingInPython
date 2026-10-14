@@ -1,4 +1,4 @@
-# mouse_trap_tables.py
+# trap_tables.py
 from typing import ClassVar, override
 from mouse import Mouse
 from state_machine import StateMachine
