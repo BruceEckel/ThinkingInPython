@@ -10,6 +10,5 @@ def describe(tile: Tile) -> str:  # type: ignore
         case Tile.WATER:
             return "water"
 
-if __name__ == "__main__":
-    print(describe(Tile.GRASS))
+print(describe(Tile.GRASS))
 #: grass
