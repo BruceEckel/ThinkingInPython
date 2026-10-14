@@ -831,9 +831,9 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
 2.  Turn exercise 1's `UnpredictablePerson` into a state machine using `state_machine.py`,
     the first design, where each state decides the next one.
 3.  Create a *State Machine* system in which the current state and the input together determine the next state.
-    Use a `dict` to map a `str` naming a state to its state object.
-    Give each state subclass its own transition table,
-    which its `next_state()` method consults.
+    Make the states an `Enum` of rows, as in `trap_states.py`,
+    where each row's transition function consults that state's own `dict`,
+    mapping a word to the name of the next state.
     Feed the machine a sequence of single words,
     such as a text file with one word per line.
 4.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.

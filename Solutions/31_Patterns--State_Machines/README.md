@@ -337,110 +337,105 @@ worth making explicit and easy to audit.
 ## 3. A word-driven state machine with per-state transition tables
 
 > Create a *State Machine* system in which the current state and the input together determine the next state.
-> Use a `dict` to map a `str` naming a state to its state object.
-> Give each state subclass its own transition table,
-> which its `next_state()` method consults.
+> Make the states an `Enum` of rows, as in `trap_states.py`,
+> where each row's transition function consults that state's own `dict`,
+> mapping a word to the name of the next state.
 > Feed the machine a sequence of single words,
 > such as a text file with one word per line.
 
 <details>
 <summary>Where to look</summary>
 
-[Each State Decides](../../Chapters/31_Patterns--State_Machines.md#each-state-decides) has each state name its own successor; here a dictionary in each state object does the naming.
-Here the table maps a word to the name of the next state, with a wildcard entry for words the state ignores.
-A controller holding a `dict` of name to state object looks up the current state and asks it for the next name.
+[The Mousetrap](../../Chapters/31_Patterns--State_Machines.md#the-mousetrap) stores each state's transition function in its row.
+Here a factory builds that function around the state's own table, a `dict` from word to the name of the next state, with a wildcard entry for words the state ignores.
+The enum turns the name into the member, so no controller holds a `dict` of name to state object.
 
 <details>
 <summary>The shape</summary>
 
 ```python
 # The shape of exercise_3.py
-from typing import ClassVar
+from collections.abc import Callable
+from enum import Enum
+from record import record
 
-class Controller:
-    def __init__(self, initial: str) -> None:
+type Next = Callable[[str], Turnstile]
+
+@record
+class WordRow:
+    next: Next
+
+def table(transitions: dict[str, str]) -> Next:
+    ...
+
+class Turnstile(WordRow, Enum):
+    LOCKED = (table({"coin": "UNLOCKED", "*": "LOCKED"}),)
+    UNLOCKED = (table({"push": "LOCKED", "*": "UNLOCKED"}),)
+
+    def __str__(self) -> str:
         ...
-
-    def register(self, name: str, state: WordState) -> None:
-        ...
-
-    def process(self, word: str) -> None:
-        ...
-
-class WordState:
-    TRANSITIONS: ClassVar[dict[str, str]] = {}
-
-    def next_state(self, word: str) -> str:
-        ...
-
-class Locked(WordState):
-    TRANSITIONS = {"coin": "unlocked", "*": "locked"}
-
-class Unlocked(WordState):
-    TRANSITIONS = {"push": "locked", "*": "unlocked"}
 ```
 
 <details>
 <summary>Solution</summary>
 
-If `next_state()` indexes the table with `self.TRANSITIONS[word]`,
+If `next_state()` indexes the table with `transitions[word]`,
 the first word, `push` while locked, raises `KeyError: 'push'`.
 A turnstile ignores a word that changes nothing,
-so each table carries a `"*"` entry, and `next_state()` falls back on it through `.get()`.
+so each table carries a `"*"` entry, and the lookup falls back on it through `.get()`.
 
 ```python
 # exercise_3.py
-from typing import ClassVar
+from collections.abc import Callable
+from enum import Enum
+from record import record
 
-class Controller:
-    def __init__(self, initial: str) -> None:
-        self._states: dict[str, WordState] = {}
-        self.current = initial
+type Next = Callable[[str], Turnstile]
 
-    def register(self, name: str, state: WordState) -> None:
-        self._states[name] = state
+@record
+class WordRow:
+    next: Next
 
-    def process(self, word: str) -> None:
-        state = self._states[self.current]
-        self.current = state.next_state(word)
+def table(transitions: dict[str, str]) -> Next:
+    def next_state(word: str) -> Turnstile:
+        name = transitions.get(word, transitions["*"])
+        return Turnstile[name]
+    return next_state
 
-class WordState:
-    TRANSITIONS: ClassVar[dict[str, str]] = {}
+class Turnstile(WordRow, Enum):
+    LOCKED = (table({"coin": "UNLOCKED", "*": "LOCKED"}),)
+    UNLOCKED = (table({"push": "LOCKED", "*": "UNLOCKED"}),)
 
-    def next_state(self, word: str) -> str:
-        return self.TRANSITIONS.get(
-            word, self.TRANSITIONS["*"])
-
-class Locked(WordState):
-    TRANSITIONS = {"coin": "unlocked", "*": "locked"}
-
-class Unlocked(WordState):
-    TRANSITIONS = {"push": "locked", "*": "unlocked"}
-
-controller = Controller("locked")
-controller.register("locked", Locked())
-controller.register("unlocked", Unlocked())
+    def __str__(self) -> str:
+        return self.name.lower()
 
 words = ["push", "coin", "push", "coin", "coin", "push"]
-history = [controller.current]
+state = Turnstile.LOCKED
+history = [state]
 for word in words:
-    controller.process(word)
-    history.append(controller.current)
-print(" ".join(history))
+    state = state.next(word)
+    history.append(state)
+print(" ".join(str(s) for s in history))
 #: locked locked unlocked locked unlocked unlocked locked
 ```
 
-**Delegate to the current state.** `Controller` asks the current state object what comes next, as
-`state_machine.py`'s `step()` does when it calls `next()`.
+**Build the function around the table.** `table()` closes over one state's dictionary and returns the function the row stores,
+so each member's line holds that state's whole table.
+`next_state()` names `Turnstile` in its body, which runs after the enum exists.
 
-**Look up the next state.** `next_state()` looks the word up in its class's table with
-`.get(word, ...["*"])`, so `Controller` has no branch on the current
-state or word.
+**Look up the next state by name.** The table's values are member names,
+and `Turnstile[name]` turns a name into the member,
+so the enum replaces the `dict` of name to state object a controller would otherwise keep.
 
-**Give each state its own table.** The machine is the classic turnstile: `push` while locked does nothing (the
+**Wrap the function in a tuple.** A function has a `__get__()`,
+and `Enum` leaves a name whose value is a descriptor as a method rather than a member,
+so each value is a one-element tuple holding the function.
+`Enum` unpacks the tuple into the row's constructor,
+as it unpacks `trap_states.py`'s two-element tuples.
+
+The machine is the classic turnstile: `push` while locked does nothing (the
 `"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
-again. Each state subclass carries its own transition table as a class
-attribute.
+again.
 
 Reading the words
 from a file, one per line, takes one line of code:
@@ -494,7 +489,7 @@ A dictionary keyed on `(state, word)` has no wildcard,
 so the solution writes out the two rows that leave the state unchanged.
 
 The per-state design in exercise 3 spreads the turnstile's rules
-across two classes, one dictionary each. A single table keyed by
+across two rows, one dictionary each. A single table keyed by
 `(state, word)` collects both dictionaries and makes the whole
 machine's behavior editable in one place:
 

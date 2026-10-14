@@ -1,39 +1,32 @@
 # exercise_3.py
-from typing import ClassVar
+from collections.abc import Callable
+from enum import Enum
+from record import record
 
-class Controller:
-    def __init__(self, initial: str) -> None:
-        self._states: dict[str, WordState] = {}
-        self.current = initial
+type Next = Callable[[str], Turnstile]
 
-    def register(self, name: str, state: WordState) -> None:
-        self._states[name] = state
+@record
+class WordRow:
+    next: Next
 
-    def process(self, word: str) -> None:
-        state = self._states[self.current]
-        self.current = state.next_state(word)
+def table(transitions: dict[str, str]) -> Next:
+    def next_state(word: str) -> Turnstile:
+        name = transitions.get(word, transitions["*"])
+        return Turnstile[name]
+    return next_state
 
-class WordState:
-    TRANSITIONS: ClassVar[dict[str, str]] = {}
+class Turnstile(WordRow, Enum):
+    LOCKED = (table({"coin": "UNLOCKED", "*": "LOCKED"}),)
+    UNLOCKED = (table({"push": "LOCKED", "*": "UNLOCKED"}),)
 
-    def next_state(self, word: str) -> str:
-        return self.TRANSITIONS.get(
-            word, self.TRANSITIONS["*"])
-
-class Locked(WordState):
-    TRANSITIONS = {"coin": "unlocked", "*": "locked"}
-
-class Unlocked(WordState):
-    TRANSITIONS = {"push": "locked", "*": "unlocked"}
-
-controller = Controller("locked")
-controller.register("locked", Locked())
-controller.register("unlocked", Unlocked())
+    def __str__(self) -> str:
+        return self.name.lower()
 
 words = ["push", "coin", "push", "coin", "coin", "push"]
-history = [controller.current]
+state = Turnstile.LOCKED
+history = [state]
 for word in words:
-    controller.process(word)
-    history.append(controller.current)
-print(" ".join(history))
+    state = state.next(word)
+    history.append(state)
+print(" ".join(str(s) for s in history))
 #: locked locked unlocked locked unlocked unlocked locked
