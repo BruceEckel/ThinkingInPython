@@ -358,10 +358,9 @@ but it saves memory over a list only when the two branches advance together:
 
 ```python
 # tee.py
-import tracemalloc
 from itertools import tee
 from typing import Final
-from benchmark import report
+from benchmark import report, traced
 
 # Two independent readers, one source
 a, b = tee(i * i for i in range(5))
@@ -370,46 +369,44 @@ print(list(a), list(b))
 
 N: Final[int] = 100_000
 first, second = tee(i * i for i in range(N))
-tracemalloc.start()
-for _ in first:  # Drain one branch; second has not started
-    pass
-buffered, _ = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-
-tracemalloc.start()
-collected = [i * i for i in range(N)]
-listed, _ = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-report(tee_bytes=buffered, list_bytes=listed)
+with traced() as buffered:
+    for _ in first:  # Drain first; second waits
+        pass
+with traced() as listed:
+    collected = [i * i for i in range(N)]
+report(tee_bytes=buffered.current,
+       list_bytes=listed.current)
 print(f"tee held as much as the list: "
-      f"{buffered > listed * 0.9}")
+      f"{buffered.current > listed.current * 0.9}")
 #: tee held as much as the list: True
 
 # Same N, but both branches advance together:
 first2, second2 = tee(i * i for i in range(N))
-tracemalloc.start()
-for _ in zip(first2, second2, strict=True):
-    pass
-_, lockstep = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-report(lockstep_bytes=lockstep)
+with traced() as lockstep:
+    for _ in zip(first2, second2, strict=True):
+        pass
+report(lockstep_bytes=lockstep.peak)
 print(f"lockstep buffered far less: "
-      f"{lockstep < listed * 0.1}")
+      f"{lockstep.peak < listed.current * 0.1}")
 #: lockstep buffered far less: True
 ```
 
 Both branches see all five squares,
 so `tee()` delivers the second pass the generator could not.
+Each `with traced()` block measures the memory its body allocates,
+using the helper from [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine).
+`current` is what the block leaves allocated,
+and `peak` is the most it held at once.
 `tee()` buffers every item the leading branch consumes until the trailing branch catches up.
 When `first` drains while `second` waits,
 the buffer therefore holds the whole stream.
 That buffer uses as much memory as a list,
-and the `buffered > listed * 0.9` comparison confirms it
+and the `buffered.current > listed.current * 0.9` comparison confirms it
 (one machine measured 4,096,992 bytes buffered against 3,999,904 for the list).
 The last block advances `first2` and `second2` together instead,
 one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 That gap stays near zero,
-and the `lockstep < listed * 0.1` comparison confirms it.
+and the `lockstep.peak < listed.current * 0.1` comparison confirms it.
 Use `tee()` when two consumers advance together,
 not when one finishes before the other starts.
 
@@ -964,7 +961,7 @@ Try each exercise before opening its [solution](../Solutions/23_Patterns--Iterat
     Advance one branch `k` items ahead of the other,
     then walk both together so the leading branch stays `k` items ahead.
     Predict how the buffer grows with `k` before you measure it,
-    then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
+    then measure it for two values of `k` with `traced()`, as `tee.py` does,
     and explain the result using the rule in [What `tee()` Buffers](#what-tee-buffers).
 6.  The prose pairs the generator expression's `if` clause with `filter()`,
     but no test covers `filter()`.

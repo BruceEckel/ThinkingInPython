@@ -361,6 +361,10 @@ Each listing still takes its measurements, and one flag prints them:
 ```python
 # utils/benchmark.py
 import sys
+import tracemalloc
+from collections.abc import Generator
+from contextlib import contextmanager
+from dataclasses import dataclass
 from typing import Final
 
 NUMBERS: Final[bool] = "--numbers" in sys.argv
@@ -376,6 +380,22 @@ def report(**measured: float) -> None:
         else:
             shown = f"{value:,.6f}"
         print(f"  {name:<{width}} {shown}")
+
+@dataclass
+class Traced:
+    current: int = 0
+    peak: int = 0
+
+@contextmanager
+def traced() -> Generator[Traced]:
+    measured = Traced()
+    tracemalloc.start()
+    try:
+        yield measured
+    finally:
+        current, peak = tracemalloc.get_traced_memory()
+        measured.current, measured.peak = current, peak
+        tracemalloc.stop()
 ```
 
 `report()` prints when the flag is present and stays silent otherwise,
@@ -391,6 +411,17 @@ adds the measurements above that line:
 The names are the keyword arguments at the call site,
 so each listing labels its own measurements.
 Your ratio differs from the one above.
+
+`traced()` measures memory instead of time.
+It wraps the `tracemalloc` calls that `lazy_pipeline.py` makes by hand in [Lazy Evaluation with Generators](#lazy-evaluation-with-generators):
+`start()` before the `with` block,
+then `get_traced_memory()` and `stop()` after it.
+The `Traced` object it yields fills in when the block ends.
+`current` holds the bytes still allocated at that point,
+and `peak` holds the most the block allocated at once.
+The `finally` clause stops tracing even when the block raises an exception.
+`tee.py` in [Iterators](23_Patterns--Iterators.md#what-tee-buffers)
+measures each of its three cases with `traced()`.
 
 ## Try a Faster Platform
 

@@ -304,7 +304,7 @@ its data once, as a network response does.
 > Advance one branch `k` items ahead of the other,
 > then walk both together so the leading branch stays `k` items ahead.
 > Predict how the buffer grows with `k` before you measure it,
-> then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
+> then measure it for two values of `k` with `traced()`, as `tee.py` does,
 > and explain the result using the rule in [What `tee()` Buffers](../../Chapters/23_Patterns--Iterators.md#what-tee-buffers).
 
 <details>
@@ -312,18 +312,17 @@ its data once, as a network response does.
 
 [What `tee()` Buffers](../../Chapters/23_Patterns--Iterators.md#what-tee-buffers) gives the rule for what `tee()` holds.
 Use `islice()` to advance one branch `k` items, then walk both with `zip()` so the gap stays the same.
-Measure the peak with `tracemalloc` for two values of `k`, and compare the growth to the size of the gap.
+Measure the peak with `traced()` for two values of `k`, and compare the growth to the size of the gap.
 
 <details>
 <summary>The shape</summary>
 
 ```python
 # The shape of exercise_5.py
-import tracemalloc
 from collections.abc import Iterator
 from itertools import islice, tee
 from typing import Final
-from benchmark import report
+from benchmark import report, traced
 
 def squares(n: int) -> Iterator[int]:
     ...
@@ -339,11 +338,10 @@ def peak_at_gap(k: int) -> int:
 
 ```python
 # exercise_5.py
-import tracemalloc
 from collections.abc import Iterator
 from itertools import islice, tee
 from typing import Final
-from benchmark import report
+from benchmark import report, traced
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
@@ -352,14 +350,12 @@ N: Final[int] = 100_000
 
 def peak_at_gap(k: int) -> int:
     ahead, behind = tee(squares(N))
-    tracemalloc.start()
-    for _ in islice(ahead, k):  # Open the gap
-        pass
-    for _ in zip(ahead, behind, strict=False):
-        pass  # Both advance, the gap stays k
-    _, peak = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-    return peak
+    with traced() as memory:
+        for _ in islice(ahead, k):  # Open the gap
+            pass
+        for _ in zip(ahead, behind, strict=False):
+            pass  # Both advance, the gap stays k
+    return memory.peak
 
 near = peak_at_gap(100)
 far = peak_at_gap(10_000)
