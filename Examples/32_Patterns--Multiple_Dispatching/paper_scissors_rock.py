@@ -1,6 +1,5 @@
 # paper_scissors_rock.py
 from typing import Any
-from arena import all_pairs, duel
 from outcome import Outcome
 
 class Item:
@@ -48,16 +47,3 @@ class Rock(Item):
     def eval_rock(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Rock, and it draws
         return Outcome.DRAW
-
-if __name__ == "__main__":
-    for player, opponent in all_pairs(Item):
-        duel(player, opponent)
-#: Paper <--> Paper : draw
-#: Paper <--> Scissors : lose
-#: Paper <--> Rock : win
-#: Scissors <--> Paper : win
-#: Scissors <--> Scissors : draw
-#: Scissors <--> Rock : lose
-#: Rock <--> Paper : lose
-#: Rock <--> Scissors : win
-#: Rock <--> Rock : draw

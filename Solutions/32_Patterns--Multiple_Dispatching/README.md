@@ -141,7 +141,8 @@ the six ordered pairs `Lizard` forms with the other three, plus
 
 **Guard the demonstration.** The `__main__` guard lets exercise 3 import this module and skip
 its demonstration.
-The chapter's `paper_scissors_rock.py` carries the same guard.
+The chapter moves its demonstration to `methods_demo.py` instead,
+so importing `paper_scissors_rock.py` runs nothing.
 
 </details>
 </details>

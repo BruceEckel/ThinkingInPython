@@ -96,7 +96,6 @@ and this file must serve both.
 ```python
 # paper_scissors_rock.py
 from typing import Any
-from arena import all_pairs, duel
 from outcome import Outcome
 
 class Item:
@@ -144,10 +143,17 @@ class Rock(Item):
     def eval_rock(self, caller: Any) -> Outcome:
         # Second dispatch: caller was Rock, and it draws
         return Outcome.DRAW
+```
 
-if __name__ == "__main__":
-    for player, opponent in all_pairs(Item):
-        duel(player, opponent)
+`methods_demo.py` plays each of the nine pairs through `duel()`:
+
+```python
+# methods_demo.py
+from arena import all_pairs, duel
+from paper_scissors_rock import Item
+
+for player, opponent in all_pairs(Item):
+    duel(player, opponent)
 #: Paper <--> Paper : draw
 #: Paper <--> Scissors : lose
 #: Paper <--> Rock : win
@@ -172,7 +178,7 @@ Which competitor does that method's result describe?
 `Paper.eval_scissors()` returns `WIN`.
 Scissors cut paper, so that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running.
-The listing's output reports it that way: `Scissors <--> Paper : win`.
+`methods_demo.py` reports it that way: `Scissors <--> Paper : win`.
 Every `eval_*()` method returns the outcome for the original caller,
 the type named in the method's own name.
 If you read that convention the other way,
@@ -246,7 +252,7 @@ OUTCOME: Final[Table] = {
 
 A tuple works as a dictionary key, the same as a single object,
 so each key in `OUTCOME` is a pair of classes.
-The same `all_pairs()` loop over these classes prints the same nine duels that `paper_scissors_rock.py` prints.
+The same `all_pairs()` loop over these classes prints the same nine duels that `methods_demo.py` prints.
 
 Both versions now hold the same nine answers, one for each pair of types:
 
@@ -331,14 +337,14 @@ from paper_scissors_rock_table import Item, Paper, Rock
 class Origami(Paper):
     pass
 
-def compete(a: Item, b: Item) -> Outcome:
-    match a, b:
+def compete(player: Item, opponent: Item) -> Outcome:
+    match player, opponent:
         case Paper(), Rock():
             return Outcome.WIN
         case Rock(), Paper():
             return Outcome.LOSE
         case _:
-            raise ValueError(f"{a}, {b}")
+            raise ValueError(f"{player}, {opponent}")
 
 print(compete(Origami(), Rock()))
 #: win
@@ -379,7 +385,7 @@ from functools import singledispatchmethod
 
 class Item:
     @singledispatchmethod
-    def compete(self, item: object) -> str:
+    def compete(self, opponent: object) -> str:
         raise NotImplementedError
 
 class Paper(Item):
@@ -389,11 +395,11 @@ class Rock(Item):
     pass
 
 @Paper.compete.register  # type: ignore  # [1]
-def _(self: Item, item: Rock) -> str:
+def _(self: Item, opponent: Rock) -> str:
     return "paper wins"
 
 @Rock.compete.register  # type: ignore  # [2]
-def _(self: Item, item: Rock) -> str:
+def _(self: Item, opponent: Rock) -> str:
     return "rock draws"
 
 print(Paper().compete(Rock()))
@@ -439,6 +445,7 @@ so the subclass overrides `compete()` for its own side and one `eval_*()` method
 ```python
 # paper_scissors_rock_subclass.py
 from typing import Any
+from arena import duel
 from outcome import Outcome
 from paper_scissors_rock import Paper, Rock, Scissors
 
@@ -450,12 +457,12 @@ class DampPaper(Paper):
     def eval_rock(self, caller: Any) -> Outcome:
         return Outcome.DRAW  # Rock's side of the same draw
 
-print(DampPaper().compete(Rock()))
-#: draw
-print(Rock().compete(DampPaper()))
-#: draw
-print(DampPaper().compete(Scissors()))
-#: lose
+duel(DampPaper(), Rock())
+#: DampPaper <--> Rock : draw
+duel(Rock(), DampPaper())
+#: Rock <--> DampPaper : draw
+duel(DampPaper(), Scissors())
+#: DampPaper <--> Scissors : lose
 ```
 
 `DampPaper`'s own result against `Rock` comes from `Rock.eval_paper()`,
@@ -534,10 +541,6 @@ The test then reads each expected answer from `EXPECTED`.
 `compete()` also checks the result's type.
 A `StrEnum` member equals its string,
 so a version that returned the bare string `"win"` would pass the `==` alone.
-
-`paper_scissors_rock.py` guards its demonstration loop with `if __name__ == "__main__"`,
-so running it as a script executes the loop,
-and importing it for the test defines its classes and runs no duels.
 
 ## Operators Dispatch Twice
 

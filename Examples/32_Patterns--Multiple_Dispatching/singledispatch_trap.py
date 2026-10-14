@@ -3,7 +3,7 @@ from functools import singledispatchmethod
 
 class Item:
     @singledispatchmethod
-    def compete(self, item: object) -> str:
+    def compete(self, opponent: object) -> str:
         raise NotImplementedError
 
 class Paper(Item):
@@ -13,11 +13,11 @@ class Rock(Item):
     pass
 
 @Paper.compete.register  # type: ignore  # [1]
-def _(self: Item, item: Rock) -> str:
+def _(self: Item, opponent: Rock) -> str:
     return "paper wins"
 
 @Rock.compete.register  # type: ignore  # [2]
-def _(self: Item, item: Rock) -> str:
+def _(self: Item, opponent: Rock) -> str:
     return "rock draws"
 
 print(Paper().compete(Rock()))

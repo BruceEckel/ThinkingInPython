@@ -5,14 +5,14 @@ from paper_scissors_rock_table import Item, Paper, Rock
 class Origami(Paper):
     pass
 
-def compete(a: Item, b: Item) -> Outcome:
-    match a, b:
+def compete(player: Item, opponent: Item) -> Outcome:
+    match player, opponent:
         case Paper(), Rock():
             return Outcome.WIN
         case Rock(), Paper():
             return Outcome.LOSE
         case _:
-            raise ValueError(f"{a}, {b}")
+            raise ValueError(f"{player}, {opponent}")
 
 print(compete(Origami(), Rock()))
 #: win
