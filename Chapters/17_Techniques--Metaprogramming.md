@@ -144,11 +144,12 @@ Printing the class of the class produces the metaclass.
 ### A Family of Generated Classes
 
 Generating classes with `type()` suits a family of classes that differ only by name.
-A greenhouse controller runs scheduled events, one class per kind of event,
-and a dict comprehension builds all of them:
+A greenhouse controller runs scheduled events, one class per kind of event.
+The library `events.py` holds the base class `Event`, the seven event names,
+and `make()`, which builds the class for one name:
 
 ```python
-# eager_event_classes.py
+# events.py
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Final
@@ -160,16 +161,23 @@ class Event:
     minute: int
 
 type EventMaker = Callable[[int, int], Event]
-NAMES: Final[tuple[str, ...]] = (
+NAMES: Final[frozenset[str]] = frozenset({
     "ThermostatDay", "ThermostatNight", "LightOn",
     "LightOff", "WaterOn", "WaterOff", "RingBell",
-)
+})
 
 def make(name: str) -> EventMaker:
     def init(self: Event, hour: int, minute: int) -> None:
         Event.__init__(self, name, hour, minute)
     new_cls = type(name, (Event,), {"__init__": init})
     return new_cls
+```
+
+A dict comprehension builds all seven classes:
+
+```python
+# eager_event_classes.py
+from events import NAMES, Event, make
 
 makers = {name: make(name) for name in NAMES}
 print(len(makers))
@@ -200,7 +208,7 @@ If `init()` gains a third parameter,
 `ty` reports an `invalid-return-type` that names the extra parameter.
 Pyright builds the class from its bases alone,
 so it gives the class `Event`'s three-argument constructor and rejects `return new_cls`.
-Under Pyright the listing needs `cast(EventMaker, new_cls)`.
+Under Pyright `make()` needs `cast(EventMaker, new_cls)`.
 Under mypy the result is an unknown class,
 so mypy checks nothing and accepts either form.
 
@@ -224,36 +232,18 @@ The dict comprehension in `eager_event_classes.py` builds all seven classes whet
 Seven classes are few enough to build up front.
 With hundreds, the schedule uses few of the classes the comprehension builds.
 So the next version delays building each class until the first lookup of its name.
-Delaying the build takes a `dict` subclass that builds a class when a lookup misses:
+Delaying the build takes a `dict` subclass that calls `make()` from `events.py` when a lookup misses:
 
 ```python
 # greenhouse.py
-from collections.abc import Callable
-from dataclasses import dataclass
-from typing import Final
-
-@dataclass
-class Event:
-    action: str
-    hour: int
-    minute: int
-
-type EventMaker = Callable[[int, int], Event]
-NAMES: Final[frozenset[str]] = frozenset({
-    "ThermostatDay", "ThermostatNight", "LightOn",
-    "LightOff", "WaterOn", "WaterOff", "RingBell",
-})
+from events import NAMES, EventMaker, make
 
 class EventMakers(dict[str, EventMaker]):
     def __missing__(self, name: str) -> EventMaker:
         if name not in NAMES:
             raise KeyError(f"Unknown event class: {name!r}")
         print(f"Creating {name}")
-        # Local function to pass to type constructor:
-        def init(self: Event,
-                 hour: int, minute: int) -> None:
-            Event.__init__(self, name, hour, minute)
-        new_cls = type(name, (Event,), {"__init__": init})
+        new_cls = make(name)
         self[name] = new_cls
         return new_cls
 
@@ -272,8 +262,8 @@ so `__missing__()` builds each class once.
 Without `__missing__()`,
 every caller would check for the name and build the missing class.
 
-A new `EventMakers` starts out empty,
-and the module-level `NAMES` holds the seven legitimate event names.
+A new `EventMakers` starts out empty, and `NAMES`, imported from `events.py`,
+holds the seven legitimate event names.
 `__missing__()` checks a name against `NAMES` before building anything,
 so every key the dict acquires names a real event.
 
@@ -346,7 +336,7 @@ so the cast states something true that the declared type leaves out.
 
 ## Generating Classes with `exec()`
 
-The `type()` approach in `greenhouse.py` builds a class from a name,
+The `type()` approach in `events.py` builds a class from a name,
 a tuple of bases, and a namespace dict.
 A second way is to write an ordinary `class` statement in an f-string,
 then `exec()` that string as code.
@@ -357,7 +347,7 @@ which is easier to read and modify than a namespace dict:
 # commander.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, ClassVar, cast
+from typing import ClassVar, cast
 from exceptions import expected
 
 @dataclass
@@ -380,7 +370,7 @@ class {class_name}(Command):
     def __init__(self) -> None:
         super().__init__("{class_name}")
 """
-        namespace: dict[str, Any] = {"Command": Command}
+        namespace: dict[str, object] = {"Command": Command}
         exec(klass, namespace)
         return cast(Callable[[], Command],
                     namespace[class_name])
@@ -402,9 +392,10 @@ and seeds it with `{"Command": Command}` so the generated class can find its bas
 `exec()` also adds a `__builtins__` entry, the dictionary of built-in names,
 to any globals mapping that lacks one, so `namespace` holds more than classes.
 The type checker checks none of the code inside the string,
-so `namespace` carries the annotation `dict[str, Any]`,
-and `namespace[class_name]` is an `Any`.
-`cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class.
+so `namespace` carries the annotation `dict[str, object]`,
+and `namespace[class_name]` is an `object`.
+Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
+`cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
 `EventMakers` stores each class it builds,
 and `make_class()` builds a fresh class on every call.
@@ -413,7 +404,7 @@ Calling `make_class("Start")` twice produces two distinct classes.
 The `__init__()` in `klass` sits textually inside a `class` block,
 and the compiler treats a block compiled from a string the same as one read from a file.
 So this `__init__()` gets a `__class__` cell and can call zero-argument `super()`.
-`init()` in `greenhouse.py` is a nested function rather than a method in a class body,
+`init()` in `events.py` is a nested function rather than a method in a class body,
 so it has no such cell and names `Event.__init__()` instead.
 
 ### The Injection Risk
@@ -426,7 +417,7 @@ Without validation, that statement would break out of the `class` block and run 
 the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check prevents that injection.
 Only three known names reach the template.
-`EventMakers` is safe from injection,
+`make()` in `events.py` is safe from injection,
 because `type(name, (Event,), ...)` treats `name` as a string value,
 not as source code.
 Treat `exec()` and `eval()` like string-built SQL:
@@ -445,9 +436,10 @@ because pickle looks the class up as `builtins.Start` and does not find it.
 `inspect.getsource()` raises a `TypeError`,
 because a built-in class carries no source.
 `type()`-built classes fail differently.
-`LightOn` gets `__module__` set to `eager_event_classes` correctly,
-but the `makers` dict holds it, and the module has no attribute of that name.
-Pickle therefore looks for `eager_event_classes.LightOn` and does not find that either.
+`LightOn` gets `__module__` set to `events`,
+the module where `make()` calls `type()`, but the `makers` dict holds it,
+and the module has no attribute of that name.
+Pickle therefore looks for `events.LightOn` and does not find that either.
 `inspect.getsource()` raises an `OSError` instead of a `TypeError`.
 For both generators' classes, then,
 `pickle` and `inspect.getsource()` raise exceptions,
@@ -456,8 +448,7 @@ and the rest of `inspect` works, as `display_object(MyList)` shows.
 Pickle records a class as its module and name,
 and checks that the pair leads back to the class.
 If `make()` also binds each class as an attribute of its module,
-`globals()[name] = new_cls`,
-the pair `eager_event_classes.LightOn` leads to `LightOn`,
+`globals()[name] = new_cls`, the pair `events.LightOn` leads to `LightOn`,
 and the round trip works.
 `inspect.getsource()` still raises an `OSError`,
 because no source file holds the class.

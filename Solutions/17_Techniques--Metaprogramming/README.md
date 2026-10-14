@@ -723,7 +723,7 @@ Open a triple-quoted string in the payload's last line so the text up to the sec
 # The shape of ch17_exec_injection.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import cast
 
 @dataclass
 class Command:
@@ -756,7 +756,7 @@ closes, so the spliced source compiles.
 # ch17_exec_injection.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import cast
 
 @dataclass
 class Command:
@@ -775,7 +775,7 @@ class {class_name}(Command):
     def __init__(self) -> None:
         super().__init__("{class_name}")
 """
-        namespace: dict[str, Any] = {"Command": Command}
+        namespace: dict[str, object] = {"Command": Command}
         exec(klass, namespace)
         return cast(Callable[[], Command],
                     namespace[class_name])

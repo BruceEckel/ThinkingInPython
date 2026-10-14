@@ -1,7 +1,7 @@
 # commander.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, ClassVar, cast
+from typing import ClassVar, cast
 from exceptions import expected
 
 @dataclass
@@ -24,7 +24,7 @@ class {class_name}(Command):
     def __init__(self) -> None:
         super().__init__("{class_name}")
 """
-        namespace: dict[str, Any] = {"Command": Command}
+        namespace: dict[str, object] = {"Command": Command}
         exec(klass, namespace)
         return cast(Callable[[], Command],
                     namespace[class_name])
