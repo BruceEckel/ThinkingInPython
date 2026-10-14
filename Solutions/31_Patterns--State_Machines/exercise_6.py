@@ -3,7 +3,7 @@ from collections.abc import Callable
 from enum import Enum, auto
 from exceptions import expect
 from record import record
-from table_machine import NoTransition, StateMachine, Table
+from table_machine import NoTransition, Rule, StateMachine
 
 class WashState(Enum):
     IDLE = auto()
@@ -30,26 +30,24 @@ class WashingMachine(StateMachine):
     def __init__(self) -> None:
         self.load_kg = 0.0
         self.log: list[str] = []
-        table: Table = {
-            (WashState.IDLE, Start):
-                [(None, self.begin, WashState.FILLING)],
-            (WashState.FILLING, Full):
-                [(None, self.log_msg("washing"),
-                  WashState.WASHING)],
-            (WashState.WASHING, WashDone):
-                [(None, self.log_msg("rinsing"),
-                  WashState.RINSING)],
-            (WashState.RINSING, RinseDone): [
-                (self.too_heavy, self.log_msg("slow spin"),
-                 WashState.SPINNING),
-                (None, self.log_msg("fast spin"),
-                 WashState.SPINNING),
-            ],
-            (WashState.SPINNING, SpinDone):
-                [(None, self.log_msg("done"),
-                  WashState.DONE)],
-        }
-        super().__init__(WashState.IDLE, table)
+        rules = [
+            Rule(WashState.IDLE, Start, WashState.FILLING,
+                 self.begin),
+            Rule(WashState.FILLING, Full, WashState.WASHING,
+                 self.log_msg("washing")),
+            Rule(WashState.WASHING, WashDone,
+                 WashState.RINSING,
+                 self.log_msg("rinsing")),
+            Rule(WashState.RINSING, RinseDone,
+                 WashState.SPINNING,
+                 self.log_msg("slow spin"), self.too_heavy),
+            Rule(WashState.RINSING, RinseDone,
+                 WashState.SPINNING,
+                 self.log_msg("fast spin")),
+            Rule(WashState.SPINNING, SpinDone,
+                 WashState.DONE, self.log_msg("done")),
+        ]
+        super().__init__(WashState.IDLE, rules)
 
     def begin(self, start: Start) -> None:
         self.load_kg = start.load_kg
@@ -80,7 +78,7 @@ print(light.log)
 busy = WashingMachine()
 busy.handle(Start(3))
 expect(NoTransition, busy.handle, Start(5))
-#: [NoTransition] no transition from <WashState.FILLING: 2>
-#: on Start
+#: [NoTransition] no rule from <WashState.FILLING: 2> on
+#: Start
 print(busy.state.name, busy.load_kg)
 #: FILLING 3

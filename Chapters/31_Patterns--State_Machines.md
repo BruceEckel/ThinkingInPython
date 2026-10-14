@@ -476,58 +476,79 @@ with no error.
 ### The Engine
 
 For the current state and the type of the incoming input,
-the engine tries the candidate transitions in order,
+the engine tries the candidate rules in order,
 takes the first whose condition passes (or has no condition),
-runs that transition's action, and moves to the next state:
+runs that rule's action, and moves to the next state:
 
 ```python
 # tabledriven/table_machine.py
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from enum import Enum
+from typing import Any
+from record import record
 
-# (condition, action, next_state); condition and action
-# may be None. A state is an Enum member, so a misspelled
-# state is a type error rather than a silent dead end.
-type Transition = tuple[
-    Callable[..., bool] | None, Callable[..., None] | None,
-    Enum
-]
-type Table = dict[tuple[Enum, type], list[Transition]]
+@record
+class Rule[I]:
+    state: Enum
+    input_type: type[I]
+    next_state: Enum
+    action: Callable[[I], None] | None = None
+    condition: Callable[[I], bool] | None = None
+
+type Table = dict[tuple[Enum, type], list[Rule[Any]]]
 
 class NoTransition(RuntimeError):
-    "No table row matched this state and input."
+    "No rule matched this state and input."
 
 class StateMachine:
-    def __init__(self, initial: Enum, table: Table) -> None:
+    def __init__(self, initial: Enum,
+                 rules: Sequence[Rule[Any]]) -> None:
         self.state = initial
-        self.table = table
+        self.table: Table = {}
+        for rule in rules:
+            key = (rule.state, rule.input_type)
+            self.table.setdefault(key, []).append(rule)
 
     def handle(self, input_: object) -> None:
-        for condition, action, next_state in self.table.get(
+        for rule in self.table.get(
                 (self.state, type(input_)), []):
+            condition = rule.condition
             if condition is None or condition(input_):
-                if action is not None:
-                    action(input_)
-                self.state = next_state
+                if rule.action is not None:
+                    rule.action(input_)
+                self.state = rule.next_state
                 return
         raise NoTransition(
-            f"no transition from {self.state!r} "
+            f"no rule from {self.state!r} "
             f"on {type(input_).__name__}")
 ```
 
-The listing writes `StateMachine` by hand rather than as a `@dataclass`.
-A generated `__init__()` names each parameter after its field,
-so a `@dataclass` would generate `__init__(self, state: Enum, table: Table)`.
-The hand-written `__init__(self, initial: Enum, table: Table)` assigns `self.state = initial`.
-The caller passes `initial`, but the attribute is `state`,
-which `handle()` updates.
+A `Rule` reads as a sentence: from `state`, on an input of `input_type`,
+go to `next_state`, running `action` if the rule has one,
+provided `condition` passes if the rule has one.
+A state is an `Enum` member,
+so a misspelled state is a type error rather than a silent dead end.
+`Rule` is generic in `I`, the input class, and `input_type` is `type[I]`:
+a rule that names `Column` as its input type has `I` of `Column`,
+and the checker then requires that rule's `action` and `condition` to accept a `Column`.
 
-Several candidate transitions can share one `(state, input)` key.
+The constructor groups the rules by `(state, input_type)` into a dictionary,
+so `handle()` finds the candidates for the current state and the input's class in one lookup.
+The engine holds the rules as `Rule[Any]`:
+it calls each condition and action with whatever input arrived,
+and the input class was checked where the rule was built.
+
+The listing writes `StateMachine` by hand rather than as a `@dataclass`.
+A generated `__init__()` names each parameter after its field and stores it unchanged.
+This constructor takes `rules` and stores `table`,
+and its parameter is `initial` while the attribute `handle()` updates is `state`.
+
+Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
-The engine tries them top to bottom,
+The engine tries them in the order the list gives them,
 so a single input can lead to different states depending on a test.
-A row whose condition is `None` matches every time,
-so it belongs last in its group, as the `else` for the rows above it.
+A rule whose condition is `None` matches every time,
+so it belongs last in its group, as the `else` for the rules above it.
 
 When every condition in a group returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
@@ -565,7 +586,7 @@ so a plain `Enum` with `auto()` serves:
 from dataclasses import dataclass
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class State(Enum):
     QUIESCENT = auto()
@@ -586,11 +607,14 @@ class Quit:
     def __str__(self) -> str:
         return "Quit"
 
-@record
-class Row:
-    value: int
+class Row(Enum):
+    A = 0
+    B = 1
+    C = 2
+    D = 3
+
     def __str__(self) -> str:
-        return "ABCD"[self.value]
+        return self.name
 
 @record
 class Column:
@@ -599,53 +623,44 @@ class Column:
         return f"col {self.value}"
 
 @dataclass
-class ItemSlot:
+class Slot:
     price: int
     quantity: int
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents
-        self.row = 0  # The selected row
+        self.row = Row.A  # The selected row
         # Last action, for the caller to show
         self.message = ""
         # A 4x4 grid; column c costs (c + 1) * 25 cents:
-        self.items = [[ItemSlot((c + 1) * 25, 5)
+        self.slots = [[Slot((c + 1) * 25, 5)
                        for c in range(4)]
                       for _ in range(4)]
         # One sold-out slot
-        self.items[3][0] = ItemSlot(25, 0)
-        table: Table = {
-            (State.QUIESCENT, Money):
-                [(None, self.add_money, State.COLLECTING)],
-            (State.COLLECTING, Money):
-                [(None, self.add_money, State.COLLECTING)],
-            (State.COLLECTING, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.COLLECTING, Row):
-                [(None, self.choose_row, State.SELECTING)],
-            (State.SELECTING, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.SELECTING, Column): [
-                (self.too_expensive, self.clear,
-                 State.COLLECTING),
-                (self.sold_out, self.clear,
-                 State.UNAVAILABLE),
-                (None, self.dispense, State.WANT_MORE),
-            ],
-            (State.UNAVAILABLE, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.UNAVAILABLE, Row):
-                [(None, self.choose_row, State.SELECTING)],
-            (State.WANT_MORE, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.WANT_MORE, Row):
-                [(None, self.choose_row, State.SELECTING)],
-        }
-        super().__init__(State.QUIESCENT, table)
+        self.slots[3][0] = Slot(25, 0)
+        paid = [s for s in State
+                if s is not State.QUIESCENT]
+        rules = [
+            Rule(State.QUIESCENT, Money, State.COLLECTING,
+                 self.add_money),
+            Rule(State.COLLECTING, Money, State.COLLECTING,
+                 self.add_money),
+            Rule(State.SELECTING, Column, State.COLLECTING,
+                 self.clear, self.too_expensive),
+            Rule(State.SELECTING, Column, State.UNAVAILABLE,
+                 self.clear, self.sold_out),
+            Rule(State.SELECTING, Column, State.WANT_MORE,
+                 self.dispense),
+            *[Rule(s, Quit, State.QUIESCENT, self.refund)
+              for s in paid],
+            *[Rule(s, Row, State.SELECTING, self.choose_row)
+              for s in paid if s is not State.SELECTING],
+        ]
+        super().__init__(State.QUIESCENT, rules)
 
-    def _slot(self, col: Column) -> ItemSlot:
-        return self.items[self.row][col.value]
+    def _slot(self, col: Column) -> Slot:
+        return self.slots[self.row.value][col.value]
 
     # Conditions:
     def too_expensive(self, col: Column) -> bool:
@@ -659,11 +674,10 @@ class VendingMachine(StateMachine):
         self.message = f"Total = {self.amount}"
 
     def choose_row(self, row: Row) -> None:
-        self.row = row.value
+        self.row = row
         prices = [slot.price
-                  for slot in self.items[self.row]]
-        self.message = (f"Row {row}: {min(prices)}c "
-                        f"to {max(prices)}c")
+                  for slot in self.slots[row.value]]
+        self.message = f"{min(prices)}c to {max(prices)}c"
 
     def clear(self, col: Column) -> None:
         slot = self._slot(col)
@@ -682,36 +696,49 @@ class VendingMachine(StateMachine):
         self.amount = 0
 ```
 
-The inputs `Money`, `Row`, and `Column` are records,
+The inputs `Money` and `Column` are records,
 values the machine reads and leaves as they are.
-`ItemSlot` stays a mutable `@dataclass`,
+`Row` is an `Enum` whose four members name the rows,
+so a row outside the grid is a type error at the call rather than an index error inside `_slot()`.
+`Slot` stays a mutable `@dataclass`,
 because `dispense()` decrements its `quantity` in place.
 
 The engine's lookup keys on the exact `type(input_)`,
-so finding the rows takes one dictionary lookup rather than an `isinstance()` test against each row.
+so finding the rules takes one dictionary lookup rather than an `isinstance()` test against each rule.
 That exactness lets the table keep separate entries for `Row` and `Column`,
-two classes that carry the same `value` field.
+two input classes that each carry a grid index.
 The same exactness excludes a further subclass.
-An input whose class derives from `Money` matches none of `Money`'s rows,
+An input whose class derives from `Money` matches none of `Money`'s rules,
 because the key is the input's exact class.
 
-The table goes in `__init__()` rather than in the class body,
-because each entry is a bound method.
+The rules go in `__init__()` rather than in the class body,
+because each rule holds a bound method.
 `self.add_money` holds a reference to this machine,
-so each `VendingMachine`'s table calls methods that read and write its own `amount` and `items`.
+so each `VendingMachine`'s rules call methods that read and write its own `amount` and `slots`.
+`Quit` refunds from every paid state,
+and a `Row` selects from every paid state but `SELECTING`,
+which is waiting for a `Column`.
+Those seven rules come from two comprehensions over `paid` rather than seven lines that differ in one member.
 
 The engine passes the input to both the condition and the action,
 so `refund()` takes an argument it ignores.
 Each method declares the specific input type it handles,
-and those types differ from row to row.
-So the `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...`.
-With that `...`, the type checker accepts any callable in any row,
-whatever input class the key names.
-If you pair a `Column` key with a method written for a `Row`,
-the table type-checks clean, and at runtime that method runs on a `Column`.
+and those types differ from rule to rule.
+`Rule[I]` ties the input type to the methods on the same rule:
+naming `Column` makes `I` `Column`,
+so the checker requires `clear()` and `too_expensive()` to accept a `Column`.
+If you pair `Column` with `choose_row()`, written for a `Row`,
+`ty` reports `invalid-argument-type` on that rule.
+`refund()` accepts `object`, so it pairs with any input type.
+
+The list is bound to `rules`, with no annotation, before the call.
+Written inline as the argument,
+the list would take the parameter's `Sequence[Rule[Any]]` as its expected type,
+and that `Any` would reach into every `Rule(...)` and make its `I` `Any`,
+so the checker would accept any method on any rule.
 
 Adding a state or an input is now a local change:
-an entry in the table and a method or two.
+a rule in the list and a method or two.
 Nothing here needs a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
 The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
@@ -730,19 +757,19 @@ inputs = [
     Money("quarter", 25), Money("quarter", 25),
     Money("dollar", 100),
     # Buy [0][1]
-    Row(0), Column(1),
+    Row.A, Column(1),
     # Buy it again
-    Row(0), Column(1),
+    Row.A, Column(1),
     # Too expensive
-    Row(2), Column(2),
+    Row.C, Column(2),
     # Sold out
-    Row(3), Column(0),
+    Row.D, Column(0),
     Quit(),  # Refund and reset
     # Row D, col 0 is both too expensive (a dime
     # isn't 25 cents) and sold out (quantity 0);
     # too_expensive is listed first, so it wins:
     Money("dime", 10),
-    Row(3), Column(0),
+    Row.D, Column(0),
 ]
 machine = VendingMachine()
 for input_ in inputs:
@@ -753,17 +780,17 @@ for input_ in inputs:
 #: QUIESCENT quarter -> COLLECTING: Total = 25
 #: COLLECTING quarter -> COLLECTING: Total = 50
 #: COLLECTING dollar -> COLLECTING: Total = 150
-#: COLLECTING A -> SELECTING: Row A: 25c to 100c
+#: COLLECTING A -> SELECTING: 25c to 100c
 #: SELECTING col 1 -> WANT_MORE: Dispensing; remaining 100
-#: WANT_MORE A -> SELECTING: Row A: 25c to 100c
+#: WANT_MORE A -> SELECTING: 25c to 100c
 #: SELECTING col 1 -> WANT_MORE: Dispensing; remaining 50
-#: WANT_MORE C -> SELECTING: Row C: 25c to 100c
+#: WANT_MORE C -> SELECTING: 25c to 100c
 #: SELECTING col 2 -> COLLECTING: Cleared: 75c, 5 left
-#: COLLECTING D -> SELECTING: Row D: 25c to 100c
+#: COLLECTING D -> SELECTING: 25c to 100c
 #: SELECTING col 0 -> UNAVAILABLE: Cleared: 25c, 0 left
 #: UNAVAILABLE Quit -> QUIESCENT: Returning 50
 #: QUIESCENT dime -> COLLECTING: Total = 10
-#: COLLECTING D -> SELECTING: Row D: 25c to 100c
+#: COLLECTING D -> SELECTING: 25c to 100c
 #: SELECTING col 0 -> COLLECTING: Cleared: 25c, 0 left
 ```
 
@@ -778,13 +805,13 @@ The last three inputs insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true.
 `too_expensive()` comes first in the `(State.SELECTING, Column)` list,
-so the engine takes the `too_expensive()` row.
+so the engine takes the `too_expensive()` rule.
 The machine reports `COLLECTING`, as though more money would sell the item,
 although the slot is empty and no amount of money would.
-If you swap the row order, the same input reports `UNAVAILABLE` instead.
+If you swap the rule order, the same input reports `UNAVAILABLE` instead.
 Both results follow from the engine's [ordering rule](#the-engine).
-The engine runs the first row whose condition passes,
-whether or not a lower row matters more.
+The engine runs the first rule whose condition passes,
+whether or not a later rule matters more.
 
 ### Testing the Vending Machine
 
@@ -811,31 +838,31 @@ def feed(vm: VendingMachine, *inputs: object) -> None:
 
 def test_buy_dispenses_and_spends() -> None:
     vm = VendingMachine()
-    assert vm.items[0][1].price == 50
+    assert vm.slots[0][1].price == 50
     feed(vm, Money("quarter", 25), Money("quarter", 25),
-         Row(0), Column(1))
+         Row.A, Column(1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0  # 50 in, 50 spent
     # One dispensed from five
-    assert vm.items[0][1].quantity == 4
+    assert vm.slots[0][1].quantity == 4
     assert vm.message == "Dispensing; remaining 0"
 
 def test_too_expensive_clears_back_to_collecting() -> None:
     vm = VendingMachine()
-    assert vm.items[0][1].price == 50
+    assert vm.slots[0][1].price == 50
     # 25c in
-    feed(vm, Money("quarter", 25), Row(0), Column(1))
+    feed(vm, Money("quarter", 25), Row.A, Column(1))
     assert vm.state is State.COLLECTING
     assert vm.amount == 25  # Money kept
-    assert vm.items[0][1].quantity == 5  # Nothing dispensed
+    assert vm.slots[0][1].quantity == 5  # Nothing dispensed
 
 def test_sold_out_clears_to_unavailable() -> None:
     vm = VendingMachine()
     # [3][0] is sold out
-    feed(vm, Money("quarter", 25), Row(3), Column(0))
+    feed(vm, Money("quarter", 25), Row.D, Column(0))
     assert vm.state is State.UNAVAILABLE
     assert vm.amount == 25  # Money kept
-    assert vm.items[3][0].quantity == 0  # Nothing dispensed
+    assert vm.slots[3][0].quantity == 0  # Nothing dispensed
 
 def test_quit_refunds_and_resets() -> None:
     vm = VendingMachine()
@@ -876,12 +903,12 @@ because every state's transitions have the same shape and appear together at the
 One-table suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram.
-Adding a state or an input is an entry in the table and a method or two.
+Adding a state or an input is a rule in the list and a method or two.
 
 In the one-table design the states are `Enum` members, bare names,
 so an action that runs on every entry into one state must go in the table.
-You repeat the action on every row that leads to that state,
-or write a helper that those rows call.
+You repeat the action on every rule that leads to that state,
+or write a helper that those rules call.
 
 The first design's constructor calls the initial state's `run()`,
 but the constructor in `table_machine.py` stores `initial` and returns.
@@ -924,15 +951,15 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.
 6.  Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
-    Give one `(state, input)` pair two rows told apart by a condition,
+    Give one `(state, input)` pair two rules told apart by a condition,
     such as a load too heavy for the fast spin.
     Then press `Start` in the middle of a cycle,
-    an input for which that state has no row,
+    an input for which that state has no rule,
     and decide what the caller does with the `NoTransition`:
     ignore the press or stop the machine.
     Say which policy suits a washing machine, and why.
 7.  Create an elevator state machine using `tabledriven/table_machine.py`.
-    Give the "doors closing" state two rows for the same input,
+    Give the "doors closing" state two rules for the same input,
     one guarded by a door-obstruction condition.
 8.  Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
     A single `TemperatureReading` input must be able to lead to heating,
@@ -940,6 +967,6 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
 9.  Build a two-state machine that collects `Money`,
     modeled on `vending_machine.py`'s.
     Add a `Nickel` class deriving from `Money` and feed one in without touching the table.
-    Explain the exception, then make it work two ways: by adding a row,
+    Explain the exception, then make it work two ways: by adding a rule,
     and by making `Nickel` an instance of `Money` rather than a subclass.
     Say which you would keep.

@@ -5,33 +5,44 @@ so it appears once here, in its own file that those exercises import:
 
 ```python
 # table_machine.py
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from enum import Enum
+from typing import Any
+from record import record
 
-type Transition = tuple[
-    Callable[..., bool] | None,
-    Callable[..., None] | None, Enum
-]
-type Table = dict[tuple[Enum, type], list[Transition]]
+@record
+class Rule[I]:
+    state: Enum
+    input_type: type[I]
+    next_state: Enum
+    action: Callable[[I], None] | None = None
+    condition: Callable[[I], bool] | None = None
+
+type Table = dict[tuple[Enum, type], list[Rule[Any]]]
 
 class NoTransition(RuntimeError):
-    "No table row matched this state and input."
+    "No rule matched this state and input."
 
 class StateMachine:
-    def __init__(self, initial: Enum, table: Table) -> None:
+    def __init__(self, initial: Enum,
+                 rules: Sequence[Rule[Any]]) -> None:
         self.state = initial
-        self.table = table
+        self.table: Table = {}
+        for rule in rules:
+            key = (rule.state, rule.input_type)
+            self.table.setdefault(key, []).append(rule)
 
     def handle(self, input_: object) -> None:
-        for condition, action, next_state in self.table.get(
+        for rule in self.table.get(
                 (self.state, type(input_)), []):
+            condition = rule.condition
             if condition is None or condition(input_):
-                if action is not None:
-                    action(input_)
-                self.state = next_state
+                if rule.action is not None:
+                    rule.action(input_)
+                self.state = rule.next_state
                 return
         raise NoTransition(
-            f"no transition from {self.state!r} "
+            f"no rule from {self.state!r} "
             f"on {type(input_).__name__}")
 ```
 
@@ -638,10 +649,10 @@ table is the stricter of the two.
 ## 6. A washing machine, table-driven
 
 > Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
-> Give one `(state, input)` pair two rows told apart by a condition,
+> Give one `(state, input)` pair two rules told apart by a condition,
 > such as a load too heavy for the fast spin.
 > Then press `Start` in the middle of a cycle,
-> an input for which that state has no row,
+> an input for which that state has no rule,
 > and decide what the caller does with the `NoTransition`:
 > ignore the press or stop the machine.
 > Say which policy suits a washing machine, and why.
@@ -649,8 +660,8 @@ table is the stricter of the two.
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rows under a `(state, input type)` key in order and takes the first whose condition passes.
-Put a guarded row for the heavy load ahead of an unconditional row, and let the condition read the load from the machine.
+[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rules under a `(state, input type)` key in order and takes the first whose condition passes.
+Put a guarded rule for the heavy load ahead of an unconditional rule, and let the condition read the load from the machine.
 For the stray `Start`, see how [An Unexpected Input](../../Chapters/31_Patterns--State_Machines.md#an-unexpected-input) weighs staying in the same state against raising an exception, then weigh a control panel's stray presses against a cycle that stops.
 
 <details>
@@ -662,7 +673,7 @@ from collections.abc import Callable
 from enum import Enum, auto
 from exceptions import expect
 from record import record
-from table_machine import NoTransition, StateMachine, Table
+from table_machine import NoTransition, Rule, StateMachine
 
 class WashState(Enum):
     IDLE = auto()
@@ -703,11 +714,11 @@ class WashingMachine(StateMachine):
 <details>
 <summary>Solution</summary>
 
-If you put the unconditional fast-spin row first,
+If you put the unconditional fast-spin rule first,
 it matches every `RinseDone`, and the eight-kilogram load logs `'fast spin'` like the light one.
-A row with no condition matches every time,
+A rule with no condition matches every time,
 as [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) points out,
-so the solution lists the guarded row first and leaves the unconditional row to catch the rest.
+so the solution lists the guarded rule first and leaves the unconditional rule to catch the rest.
 
 ```python
 # exercise_6.py
@@ -715,7 +726,7 @@ from collections.abc import Callable
 from enum import Enum, auto
 from exceptions import expect
 from record import record
-from table_machine import NoTransition, StateMachine, Table
+from table_machine import NoTransition, Rule, StateMachine
 
 class WashState(Enum):
     IDLE = auto()
@@ -742,26 +753,24 @@ class WashingMachine(StateMachine):
     def __init__(self) -> None:
         self.load_kg = 0.0
         self.log: list[str] = []
-        table: Table = {
-            (WashState.IDLE, Start):
-                [(None, self.begin, WashState.FILLING)],
-            (WashState.FILLING, Full):
-                [(None, self.log_msg("washing"),
-                  WashState.WASHING)],
-            (WashState.WASHING, WashDone):
-                [(None, self.log_msg("rinsing"),
-                  WashState.RINSING)],
-            (WashState.RINSING, RinseDone): [
-                (self.too_heavy, self.log_msg("slow spin"),
-                 WashState.SPINNING),
-                (None, self.log_msg("fast spin"),
-                 WashState.SPINNING),
-            ],
-            (WashState.SPINNING, SpinDone):
-                [(None, self.log_msg("done"),
-                  WashState.DONE)],
-        }
-        super().__init__(WashState.IDLE, table)
+        rules = [
+            Rule(WashState.IDLE, Start, WashState.FILLING,
+                 self.begin),
+            Rule(WashState.FILLING, Full, WashState.WASHING,
+                 self.log_msg("washing")),
+            Rule(WashState.WASHING, WashDone,
+                 WashState.RINSING,
+                 self.log_msg("rinsing")),
+            Rule(WashState.RINSING, RinseDone,
+                 WashState.SPINNING,
+                 self.log_msg("slow spin"), self.too_heavy),
+            Rule(WashState.RINSING, RinseDone,
+                 WashState.SPINNING,
+                 self.log_msg("fast spin")),
+            Rule(WashState.SPINNING, SpinDone,
+                 WashState.DONE, self.log_msg("done")),
+        ]
+        super().__init__(WashState.IDLE, rules)
 
     def begin(self, start: Start) -> None:
         self.load_kg = start.load_kg
@@ -792,16 +801,16 @@ print(light.log)
 busy = WashingMachine()
 busy.handle(Start(3))
 expect(NoTransition, busy.handle, Start(5))
-#: [NoTransition] no transition from <WashState.FILLING: 2>
-#: on Start
+#: [NoTransition] no rule from <WashState.FILLING: 2> on
+#: Start
 print(busy.state.name, busy.load_kg)
 #: FILLING 3
 ```
 
 **Split one input on a condition.** The `(RINSING, RinseDone)` key
-holds the two rows the exercise requires, told apart by
+holds the two rules the exercise requires, told apart by
 `too_heavy()`. A load over six kilograms takes the slow spin, and
-anything lighter falls through to the unconditional fast-spin row
+anything lighter falls through to the unconditional fast-spin rule
 below it. The rest of the cycle is a straight line, one input type
 per state, and the machine is still the chapter's
 `table_machine.py` engine unchanged.
@@ -810,9 +819,9 @@ per state, and the machine is still the chapter's
 own, so the condition reads `load_kg` off the machine, where
 `begin()` recorded it when the cycle started.
 
-**Reject an input with no row.** A second `Start` during `FILLING` finds no row, so `handle()` raises
+**Reject an input with no rule.** A second `Start` during `FILLING` finds no rule, so `handle()` raises
 `NoTransition`. The press changes nothing. The state is still
-`FILLING` and `load_kg` is still 3, because the engine finds a row
+`FILLING` and `load_kg` is still 3, because the engine finds a rule
 before it runs any action.
 
 For a washing machine the caller should
@@ -831,14 +840,14 @@ a report.
 ## 7. An elevator, table-driven
 
 > Create an elevator state machine using `tabledriven/table_machine.py`.
-> Give the "doors closing" state two rows for the same input,
+> Give the "doors closing" state two rules for the same input,
 > one guarded by a door-obstruction condition.
 
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) lets several rows share one `(state, input type)` key, tried in order.
-Under the doors-closing state and a sensor input, put the obstruction condition on the first row and leave the second row unconditional.
+[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) lets several rules share one `(state, input type)` key, tried in order.
+Under the doors-closing state and a sensor input, put the obstruction condition on the first rule and leave the second rule unconditional.
 The condition is a method that reads the input, so the table stays data.
 
 <details>
@@ -848,7 +857,7 @@ The condition is a method that reads the input, so the table stays data.
 # The shape of exercise_7.py
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class ElevatorState(Enum):
     IDLE = auto()
@@ -893,17 +902,17 @@ class Elevator(StateMachine):
 <details>
 <summary>Solution</summary>
 
-If you leave out the unconditional `(None, None, ElevatorState.DOORS_OPEN)` row under `(IDLE, CallButton)`,
+If you leave out the unconditional rule to `ElevatorState.DOORS_OPEN` under `(IDLE, CallButton)`,
 a call for the floor the car is on fails both `above()` and `below()`,
-and `handle()` raises `NoTransition`: `no transition from <ElevatorState.IDLE: 1> on CallButton`.
+and `handle()` raises `NoTransition`: `no rule from <ElevatorState.IDLE: 1> on CallButton`.
 The demo makes no such call, so its output does not change.
-The solution keeps that row last, as the group's `else`.
+The solution keeps that rule last, as the group's `else`.
 
 ```python
 # exercise_7.py
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class ElevatorState(Enum):
     IDLE = auto()
@@ -929,29 +938,28 @@ class Elevator(StateMachine):
     def __init__(self, floor: int = 0) -> None:
         self.floor = floor
         self.target = floor
-        table: Table = {
-            (ElevatorState.IDLE, CallButton): [
-                (self.above, self.set_target,
-                 ElevatorState.MOVING_UP),
-                (self.below, self.set_target,
-                 ElevatorState.MOVING_DOWN),
-                (None, None, ElevatorState.DOORS_OPEN),
-            ],
-            (ElevatorState.MOVING_UP, ArrivedAtFloor):
-                [(None, self.arrive,
-                  ElevatorState.DOORS_OPEN)],
-            (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
-                [(None, self.arrive,
-                  ElevatorState.DOORS_OPEN)],
-            (ElevatorState.DOORS_OPEN, CloseDoors):
-                [(None, None, ElevatorState.DOORS_CLOSING)],
-            (ElevatorState.DOORS_CLOSING, DoorSensor): [
-                (self.obstructed, None,
+        rules = [
+            Rule(ElevatorState.IDLE, CallButton,
+                 ElevatorState.MOVING_UP, self.set_target,
+                 self.above),
+            Rule(ElevatorState.IDLE, CallButton,
+                 ElevatorState.MOVING_DOWN, self.set_target,
+                 self.below),
+            Rule(ElevatorState.IDLE, CallButton,
                  ElevatorState.DOORS_OPEN),
-                (None, None, ElevatorState.IDLE),
-            ],
-        }
-        super().__init__(ElevatorState.IDLE, table)
+            Rule(ElevatorState.MOVING_UP, ArrivedAtFloor,
+                 ElevatorState.DOORS_OPEN, self.arrive),
+            Rule(ElevatorState.MOVING_DOWN, ArrivedAtFloor,
+                 ElevatorState.DOORS_OPEN, self.arrive),
+            Rule(ElevatorState.DOORS_OPEN, CloseDoors,
+                 ElevatorState.DOORS_CLOSING),
+            Rule(ElevatorState.DOORS_CLOSING, DoorSensor,
+                 ElevatorState.DOORS_OPEN,
+                 condition=self.obstructed),
+            Rule(ElevatorState.DOORS_CLOSING, DoorSensor,
+                 ElevatorState.IDLE),
+        ]
+        super().__init__(ElevatorState.IDLE, rules)
 
     def above(self, call: CallButton) -> bool:
         return call.floor > self.floor
@@ -985,7 +993,7 @@ print(elevator.state)
 #: ElevatorState.IDLE
 ```
 
-**Choose a direction from the call.** The `(IDLE, CallButton)` key holds three candidate rows, in the vending machine's
+**Choose a direction from the call.** The `(IDLE, CallButton)` key holds three candidate rules, in the vending machine's
 `(State.SELECTING, Column)` shape: candidate transitions share
 one key, `handle()` tries them in order, and the first whose condition
 passes wins. `above()` and `below()` pick `MOVING_UP` or
@@ -993,9 +1001,9 @@ passes wins. `above()` and `below()` pick `MOVING_UP` or
 conditions to open the doors with no travel.
 
 **Reopen the doors on an obstruction.** The "doors closing" state
-carries the two rows the exercise requires, the same idiom two wide.
-Under `(DOORS_CLOSING, DoorSensor)`, the first row reopens the doors
-when `obstructed()` passes, and the unconditional row below it
+carries the two rules the exercise requires, the same idiom two wide.
+Under `(DOORS_CLOSING, DoorSensor)`, the first rule reopens the doors
+when `obstructed()` passes, and the unconditional rule below it
 finishes the close in `IDLE`.
 
 </details>
@@ -1013,7 +1021,7 @@ finishes the close in `IDLE`.
 
 [A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) shows one input type leading to different next states through conditions on a shared key.
 Give `TemperatureReading` a `degrees` field and write two condition methods that compare it with a target and a band.
-Order the rows so the conditional ones come first and an unconditional row, as the last resort, returns to idle.
+Order the rules so the conditional ones come first and an unconditional rule, as the last resort, returns to idle.
 
 <details>
 <summary>The shape</summary>
@@ -1022,7 +1030,7 @@ Order the rows so the conditional ones come first and an unconditional row, as t
 # The shape of exercise_8.py
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class HVACState(Enum):
     IDLE = auto()
@@ -1048,19 +1056,19 @@ class HVAC(StateMachine):
 <details>
 <summary>Solution</summary>
 
-If you put the unconditional `(None, None, HVACState.IDLE)` row first
+If you put the unconditional rule to `HVACState.IDLE` first
 under `(IDLE, TemperatureReading)`, every reading prints `IDLE`, from
-`15 IDLE` through `30 IDLE`. `handle()` takes the first row whose
-condition passes, and a row with no condition always passes, so the
+`15 IDLE` through `30 IDLE`. `handle()` takes the first rule whose
+condition passes, and a rule with no condition always passes, so the
 machine stops there and does not reach the `too_cold()` and `too_hot()`
-rows below it. The solution lists the conditional rows first and keeps
-the unconditional row last, as the fallback.
+rules below it. The solution lists the conditional rules first and keeps
+the unconditional rule last, as the fallback.
 
 ```python
 # exercise_8.py
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class HVACState(Enum):
     IDLE = auto()
@@ -1076,22 +1084,27 @@ class HVAC(StateMachine):
                  band: float = 2) -> None:
         self.target = target
         self.band = band
-        table: Table = {
-            (HVACState.IDLE, TemperatureReading): [
-                (self.too_cold, None, HVACState.HEATING),
-                (self.too_hot, None, HVACState.COOLING),
-                (None, None, HVACState.IDLE),
-            ],
-            (HVACState.HEATING, TemperatureReading): [
-                (self.too_cold, None, HVACState.HEATING),
-                (None, None, HVACState.IDLE),
-            ],
-            (HVACState.COOLING, TemperatureReading): [
-                (self.too_hot, None, HVACState.COOLING),
-                (None, None, HVACState.IDLE),
-            ],
-        }
-        super().__init__(HVACState.IDLE, table)
+        rules = [
+            Rule(HVACState.IDLE, TemperatureReading,
+                 HVACState.HEATING,
+                 condition=self.too_cold),
+            Rule(HVACState.IDLE, TemperatureReading,
+                 HVACState.COOLING,
+                 condition=self.too_hot),
+            Rule(HVACState.IDLE, TemperatureReading,
+                 HVACState.IDLE),
+            Rule(HVACState.HEATING, TemperatureReading,
+                 HVACState.HEATING,
+                 condition=self.too_cold),
+            Rule(HVACState.HEATING, TemperatureReading,
+                 HVACState.IDLE),
+            Rule(HVACState.COOLING, TemperatureReading,
+                 HVACState.COOLING,
+                 condition=self.too_hot),
+            Rule(HVACState.COOLING, TemperatureReading,
+                 HVACState.IDLE),
+        ]
+        super().__init__(HVACState.IDLE, rules)
 
     def too_cold(self, r: TemperatureReading) -> bool:
         return r.degrees < self.target - self.band
@@ -1111,19 +1124,19 @@ for degrees in [15, 17, 21, 30, 20]:
 ```
 
 **Decide among three outcomes.** The machine has one input type. The `(IDLE, TemperatureReading)` key
-holds three rows, so a single reading leads to heating, cooling, or
+holds three rules, so a single reading leads to heating, cooling, or
 staying idle, and the two conditions decide which, as the exercise
 requires.
 
 **Run until back inside the band.** The running states carry their own
-two-row groups. A reading still outside the band keeps the system
+two-rule groups. A reading still outside the band keeps the system
 running, and one inside the band falls through to the unconditional
-row back to `IDLE`.
+rule back to `IDLE`.
 
 Every
 decision in the machine is a condition on the one input type. Every
-action slot here holds `None`, and the fall-through rows leave the
-condition slot `None` too, so both slots are optional per row.
+rule here keeps the default `None` action, and the fall-through rules
+keep the default `None` condition too, so both fields are optional per rule.
 
 </details>
 </details>
@@ -1134,16 +1147,16 @@ condition slot `None` too, so both slots are optional per row.
 > Build a two-state machine that collects `Money`,
 > modeled on `vending_machine.py`'s.
 > Add a `Nickel` class deriving from `Money` and feed one in without touching the table.
-> Explain the exception, then make it work two ways: by adding a row,
+> Explain the exception, then make it work two ways: by adding a rule,
 > and by making `Nickel` an instance of `Money` rather than a subclass.
 > Say which you would keep.
 
 <details>
 <summary>Where to look</summary>
 
-[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) explains that the engine looks up `type(input_)` as the key, so a subclass of an input type has no row of its own.
+[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) explains that the engine looks up `type(input_)` as the key, so a subclass of an input type has no rule of its own.
 Read the `NoTransition` message to see which class it reports, then fix it once by adding keys and once by choosing what the input is.
-Compare how many rows each fix needs as denominations and states multiply.
+Compare how many rules each fix needs as denominations and states multiply.
 
 <details>
 <summary>The shape</summary>
@@ -1153,7 +1166,7 @@ Compare how many rows each fix needs as denominations and states multiply.
 from enum import Enum, auto
 from exceptions import expect
 from record import record
-from table_machine import NoTransition, StateMachine, Table
+from table_machine import NoTransition, Rule, StateMachine
 
 class State(Enum):
     QUIESCENT = auto()
@@ -1187,7 +1200,7 @@ NICKEL = Money("nickel", 5)
 from enum import Enum, auto
 from exceptions import expect
 from record import record
-from table_machine import NoTransition, StateMachine, Table
+from table_machine import NoTransition, Rule, StateMachine
 
 class State(Enum):
     QUIESCENT = auto()
@@ -1206,15 +1219,16 @@ class Machine(StateMachine):
     def __init__(self, *,
                  accept_nickels: bool = False) -> None:
         self.amount = 0
-        rows = [(None, self.add, State.COLLECTING)]
-        table: Table = {
-            (State.QUIESCENT, Money): rows,
-            (State.COLLECTING, Money): rows,
-        }
-        if accept_nickels:  # Fix 1: a row keyed on Nickel
-            table[(State.QUIESCENT, Nickel)] = rows
-            table[(State.COLLECTING, Nickel)] = rows
-        super().__init__(State.QUIESCENT, table)
+        rules = [
+            Rule(s, Money, State.COLLECTING, self.add)
+            for s in State
+        ]
+        if accept_nickels:  # Fix 1: rules keyed on Nickel
+            rules += [
+                Rule(s, Nickel, State.COLLECTING, self.add)
+                for s in State
+            ]
+        super().__init__(State.QUIESCENT, rules)
 
     def add(self, input_: Money) -> None:
         self.amount += input_.value
@@ -1224,8 +1238,8 @@ m.handle(Money("quarter", 25))
 print(m.state, m.amount)
 #: State.COLLECTING 25
 expect(NoTransition, m.handle, Nickel("nickel", 5))
-#: [NoTransition] no transition from <State.COLLECTING: 2>
-#: on Nickel
+#: [NoTransition] no rule from <State.COLLECTING: 2> on
+#: Nickel
 
 # Fix 1: the table names Nickel too
 m1 = Machine(accept_nickels=True)
@@ -1242,19 +1256,19 @@ print(m2.amount)
 ```
 
 **Reproduce the failure.** The exception is `NoTransition`, not a `TypeError` or a silent no-op,
-and its message names the input class that found no row: `Nickel`.
+and its message names the input class that found no rule: `Nickel`.
 `handle()` looks up `(self.state, type(input_))`, and
 `type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares
-keys by equality, so the `Nickel` key misses the `Money` row although
+keys by equality, so the `Nickel` key misses the `Money` rule although
 `Nickel` subclasses `Money`. Nothing walks the
 [MRO](../../Chapters/07_Foundations--Classes.md#method-resolution-order).
 That lookup is the exact-type dispatch the chapter describes, and a
 subclass of an input type is how most readers first meet it.
 
-**Give the subclass its own rows.** Fix 1 adds `(state, Nickel)`
-rows. Those rows work, and they scale badly. Every new denomination
-needs a row for every state that accepts
-money, so a machine with five states and six coins carries thirty rows
+**Give the subclass its own rules.** Fix 1 adds `(state, Nickel)`
+rules. Those rules work, and they scale badly. Every new denomination
+needs a rule for every state that accepts
+money, so a machine with five states and six coins carries thirty rules
 that all do the same thing.
 
 Fix 1 is the right fix when the new subclass really does behave
@@ -1272,7 +1286,7 @@ Keep fix 2. A subclass is worth creating when the machine must treat
 the input differently. A nickel differs from a quarter only in a
 number the existing action reads. The two fixes illustrate a
 general rule: under exact-type dispatch, a class is a dispatch key,
-so create one when you want a separate row and not when you want a
+so create one when you want a separate rule and not when you want a
 separate value.
 
 </details>

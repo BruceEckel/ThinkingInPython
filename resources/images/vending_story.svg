@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 470"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>The vending machine's states: Money moves QUIESCENT to COLLECTING, Row moves any of three states to SELECTING, SELECTING's Column rows lead to three states in table order, and Quit returns every shaded state to QUIESCENT</title>
+  <title>The vending machine's states: Money moves QUIESCENT to COLLECTING, Row moves any of three states to SELECTING, SELECTING's Column rules lead to three states in list order, and Quit returns every shaded state to QUIESCENT</title>
   <defs>
     <marker id="vs-ink" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">

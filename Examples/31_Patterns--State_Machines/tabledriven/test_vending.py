@@ -10,31 +10,31 @@ def feed(vm: VendingMachine, *inputs: object) -> None:
 
 def test_buy_dispenses_and_spends() -> None:
     vm = VendingMachine()
-    assert vm.items[0][1].price == 50
+    assert vm.slots[0][1].price == 50
     feed(vm, Money("quarter", 25), Money("quarter", 25),
-         Row(0), Column(1))
+         Row.A, Column(1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0  # 50 in, 50 spent
     # One dispensed from five
-    assert vm.items[0][1].quantity == 4
+    assert vm.slots[0][1].quantity == 4
     assert vm.message == "Dispensing; remaining 0"
 
 def test_too_expensive_clears_back_to_collecting() -> None:
     vm = VendingMachine()
-    assert vm.items[0][1].price == 50
+    assert vm.slots[0][1].price == 50
     # 25c in
-    feed(vm, Money("quarter", 25), Row(0), Column(1))
+    feed(vm, Money("quarter", 25), Row.A, Column(1))
     assert vm.state is State.COLLECTING
     assert vm.amount == 25  # Money kept
-    assert vm.items[0][1].quantity == 5  # Nothing dispensed
+    assert vm.slots[0][1].quantity == 5  # Nothing dispensed
 
 def test_sold_out_clears_to_unavailable() -> None:
     vm = VendingMachine()
     # [3][0] is sold out
-    feed(vm, Money("quarter", 25), Row(3), Column(0))
+    feed(vm, Money("quarter", 25), Row.D, Column(0))
     assert vm.state is State.UNAVAILABLE
     assert vm.amount == 25  # Money kept
-    assert vm.items[3][0].quantity == 0  # Nothing dispensed
+    assert vm.slots[3][0].quantity == 0  # Nothing dispensed
 
 def test_quit_refunds_and_resets() -> None:
     vm = VendingMachine()

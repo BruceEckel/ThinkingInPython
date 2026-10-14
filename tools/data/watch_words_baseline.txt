@@ -316,6 +316,8 @@ Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs 
 Chapters/31_Patterns--State_Machines.md	expensive: The sold-out and too-expensive clears both start from CODE on a column
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
 Chapters/31_Patterns--State_Machines.md	expensive: Too expensive returns to CODE with the money still inserted
+Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
+Chapters/31_Patterns--State_Machines.md	paid: and a CODE selects from every paid state but CODE
 Chapters/31_Patterns--State_Machines.md	price: decided by price and stock
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
@@ -608,7 +610,7 @@ Solutions/31_Patterns--State_Machines/README.md	itself: and both answer CODE wit
 Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a quarter only in a number the existing action reads
 Solutions/31_Patterns--State_Machines/README.md	only: only a lookup
 Solutions/31_Patterns--State_Machines/README.md	only: which leads only to CODE
-Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate row and not when you want a separate value
+Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate rule and not when you want a separate value
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count leaves each weapon an opposite that draws
 Solutions/32_Patterns--Multiple_Dispatching/README.md	exactly: That is what the chapter's "matches classes exactly" means

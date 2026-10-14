@@ -1,7 +1,7 @@
 # exercise_7.py
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class ElevatorState(Enum):
     IDLE = auto()
@@ -27,29 +27,28 @@ class Elevator(StateMachine):
     def __init__(self, floor: int = 0) -> None:
         self.floor = floor
         self.target = floor
-        table: Table = {
-            (ElevatorState.IDLE, CallButton): [
-                (self.above, self.set_target,
-                 ElevatorState.MOVING_UP),
-                (self.below, self.set_target,
-                 ElevatorState.MOVING_DOWN),
-                (None, None, ElevatorState.DOORS_OPEN),
-            ],
-            (ElevatorState.MOVING_UP, ArrivedAtFloor):
-                [(None, self.arrive,
-                  ElevatorState.DOORS_OPEN)],
-            (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
-                [(None, self.arrive,
-                  ElevatorState.DOORS_OPEN)],
-            (ElevatorState.DOORS_OPEN, CloseDoors):
-                [(None, None, ElevatorState.DOORS_CLOSING)],
-            (ElevatorState.DOORS_CLOSING, DoorSensor): [
-                (self.obstructed, None,
+        rules = [
+            Rule(ElevatorState.IDLE, CallButton,
+                 ElevatorState.MOVING_UP, self.set_target,
+                 self.above),
+            Rule(ElevatorState.IDLE, CallButton,
+                 ElevatorState.MOVING_DOWN, self.set_target,
+                 self.below),
+            Rule(ElevatorState.IDLE, CallButton,
                  ElevatorState.DOORS_OPEN),
-                (None, None, ElevatorState.IDLE),
-            ],
-        }
-        super().__init__(ElevatorState.IDLE, table)
+            Rule(ElevatorState.MOVING_UP, ArrivedAtFloor,
+                 ElevatorState.DOORS_OPEN, self.arrive),
+            Rule(ElevatorState.MOVING_DOWN, ArrivedAtFloor,
+                 ElevatorState.DOORS_OPEN, self.arrive),
+            Rule(ElevatorState.DOORS_OPEN, CloseDoors,
+                 ElevatorState.DOORS_CLOSING),
+            Rule(ElevatorState.DOORS_CLOSING, DoorSensor,
+                 ElevatorState.DOORS_OPEN,
+                 condition=self.obstructed),
+            Rule(ElevatorState.DOORS_CLOSING, DoorSensor,
+                 ElevatorState.IDLE),
+        ]
+        super().__init__(ElevatorState.IDLE, rules)
 
     def above(self, call: CallButton) -> bool:
         return call.floor > self.floor

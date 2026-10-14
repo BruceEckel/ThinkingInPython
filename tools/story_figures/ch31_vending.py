@@ -6,12 +6,12 @@ thirteen transitions as curves, four of them `Quit / refund` arcs, and
 its labels crowded each other. Here every edge is straight and every state sits on one of
 two columns. `SELECTING` is the hub: each of the other three states in
 the shaded region is one spoke, with `Row / choose_row` running
-in and a `Column` row running out. The four `Quit / refund` rows
+in and a `Column` rule running out. The four `Quit / refund` rules
 become one arrow from the shaded region to `QUIESCENT`, which is what
 the prose says about them: `Quit` refunds from any other state.
 
-The three `Column` rows are red and numbered 1 to 3 in the order
-the table lists them, since the engine tries them in that order and the
+The three `Column` rules are red and numbered 1 to 3 in the order
+the list gives them, since the engine tries them in that order and the
 first condition that passes wins; the chapter's last three events turn
 on that order.
 
@@ -35,7 +35,7 @@ RTOP, RBOT = 100, 454  # The shaded region
 OFF = 11  # Half the gap between the two edges of a pair
 TITLE = ("The vending machine's states: Money moves QUIESCENT to "
          "COLLECTING, Row moves any of three states to SELECTING, "
-         "SELECTING's Column rows lead to three states in table "
+         "SELECTING's Column rules lead to three states in list "
          "order, and Quit returns every shaded state to QUIESCENT")
 
 

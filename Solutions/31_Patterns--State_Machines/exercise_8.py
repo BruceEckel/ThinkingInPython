@@ -1,7 +1,7 @@
 # exercise_8.py
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class HVACState(Enum):
     IDLE = auto()
@@ -17,22 +17,27 @@ class HVAC(StateMachine):
                  band: float = 2) -> None:
         self.target = target
         self.band = band
-        table: Table = {
-            (HVACState.IDLE, TemperatureReading): [
-                (self.too_cold, None, HVACState.HEATING),
-                (self.too_hot, None, HVACState.COOLING),
-                (None, None, HVACState.IDLE),
-            ],
-            (HVACState.HEATING, TemperatureReading): [
-                (self.too_cold, None, HVACState.HEATING),
-                (None, None, HVACState.IDLE),
-            ],
-            (HVACState.COOLING, TemperatureReading): [
-                (self.too_hot, None, HVACState.COOLING),
-                (None, None, HVACState.IDLE),
-            ],
-        }
-        super().__init__(HVACState.IDLE, table)
+        rules = [
+            Rule(HVACState.IDLE, TemperatureReading,
+                 HVACState.HEATING,
+                 condition=self.too_cold),
+            Rule(HVACState.IDLE, TemperatureReading,
+                 HVACState.COOLING,
+                 condition=self.too_hot),
+            Rule(HVACState.IDLE, TemperatureReading,
+                 HVACState.IDLE),
+            Rule(HVACState.HEATING, TemperatureReading,
+                 HVACState.HEATING,
+                 condition=self.too_cold),
+            Rule(HVACState.HEATING, TemperatureReading,
+                 HVACState.IDLE),
+            Rule(HVACState.COOLING, TemperatureReading,
+                 HVACState.COOLING,
+                 condition=self.too_hot),
+            Rule(HVACState.COOLING, TemperatureReading,
+                 HVACState.IDLE),
+        ]
+        super().__init__(HVACState.IDLE, rules)
 
     def too_cold(self, r: TemperatureReading) -> bool:
         return r.degrees < self.target - self.band

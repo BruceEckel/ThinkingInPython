@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 from record import record
-from table_machine import StateMachine, Table
+from table_machine import Rule, StateMachine
 
 class State(Enum):
     QUIESCENT = auto()
@@ -23,11 +23,14 @@ class Quit:
     def __str__(self) -> str:
         return "Quit"
 
-@record
-class Row:
-    value: int
+class Row(Enum):
+    A = 0
+    B = 1
+    C = 2
+    D = 3
+
     def __str__(self) -> str:
-        return "ABCD"[self.value]
+        return self.name
 
 @record
 class Column:
@@ -36,53 +39,44 @@ class Column:
         return f"col {self.value}"
 
 @dataclass
-class ItemSlot:
+class Slot:
     price: int
     quantity: int
 
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents
-        self.row = 0  # The selected row
+        self.row = Row.A  # The selected row
         # Last action, for the caller to show
         self.message = ""
         # A 4x4 grid; column c costs (c + 1) * 25 cents:
-        self.items = [[ItemSlot((c + 1) * 25, 5)
+        self.slots = [[Slot((c + 1) * 25, 5)
                        for c in range(4)]
                       for _ in range(4)]
         # One sold-out slot
-        self.items[3][0] = ItemSlot(25, 0)
-        table: Table = {
-            (State.QUIESCENT, Money):
-                [(None, self.add_money, State.COLLECTING)],
-            (State.COLLECTING, Money):
-                [(None, self.add_money, State.COLLECTING)],
-            (State.COLLECTING, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.COLLECTING, Row):
-                [(None, self.choose_row, State.SELECTING)],
-            (State.SELECTING, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.SELECTING, Column): [
-                (self.too_expensive, self.clear,
-                 State.COLLECTING),
-                (self.sold_out, self.clear,
-                 State.UNAVAILABLE),
-                (None, self.dispense, State.WANT_MORE),
-            ],
-            (State.UNAVAILABLE, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.UNAVAILABLE, Row):
-                [(None, self.choose_row, State.SELECTING)],
-            (State.WANT_MORE, Quit):
-                [(None, self.refund, State.QUIESCENT)],
-            (State.WANT_MORE, Row):
-                [(None, self.choose_row, State.SELECTING)],
-        }
-        super().__init__(State.QUIESCENT, table)
+        self.slots[3][0] = Slot(25, 0)
+        paid = [s for s in State
+                if s is not State.QUIESCENT]
+        rules = [
+            Rule(State.QUIESCENT, Money, State.COLLECTING,
+                 self.add_money),
+            Rule(State.COLLECTING, Money, State.COLLECTING,
+                 self.add_money),
+            Rule(State.SELECTING, Column, State.COLLECTING,
+                 self.clear, self.too_expensive),
+            Rule(State.SELECTING, Column, State.UNAVAILABLE,
+                 self.clear, self.sold_out),
+            Rule(State.SELECTING, Column, State.WANT_MORE,
+                 self.dispense),
+            *[Rule(s, Quit, State.QUIESCENT, self.refund)
+              for s in paid],
+            *[Rule(s, Row, State.SELECTING, self.choose_row)
+              for s in paid if s is not State.SELECTING],
+        ]
+        super().__init__(State.QUIESCENT, rules)
 
-    def _slot(self, col: Column) -> ItemSlot:
-        return self.items[self.row][col.value]
+    def _slot(self, col: Column) -> Slot:
+        return self.slots[self.row.value][col.value]
 
     # Conditions:
     def too_expensive(self, col: Column) -> bool:
@@ -96,11 +90,10 @@ class VendingMachine(StateMachine):
         self.message = f"Total = {self.amount}"
 
     def choose_row(self, row: Row) -> None:
-        self.row = row.value
+        self.row = row
         prices = [slot.price
-                  for slot in self.items[self.row]]
-        self.message = (f"Row {row}: {min(prices)}c "
-                        f"to {max(prices)}c")
+                  for slot in self.slots[row.value]]
+        self.message = f"{min(prices)}c to {max(prices)}c"
 
     def clear(self, col: Column) -> None:
         slot = self._slot(col)
