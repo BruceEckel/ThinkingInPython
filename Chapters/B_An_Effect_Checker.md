@@ -950,6 +950,21 @@ def check(
     for facts in known.values():
         findings += undeclared(facts, rows, table)
     return Report(rows, findings)
+
+def describe(finding: Finding) -> str:
+    match finding:
+        case Undeclared(where, effect):
+            return f"! {where} undeclared {effect}"
+        case Unparsed(where, message):
+            return f"! {where} {message}"
+
+def lines(report: Report) -> list[str]:
+    rows = [
+        f"{name} {sorted(report.rows[name])}"
+        for name in report.rows
+        if report.rows[name]
+    ]
+    return rows + [describe(f) for f in report.findings]
 ```
 
 `check()` receives each module's source text keyed by module name, plus a table,
@@ -962,13 +977,20 @@ and `undeclared()` reports each Effect a row omits as an `Undeclared` finding.
 `Finding` is the union of the two records,
 so a caller matches on the kind of finding and reads the fields of that kind:
 the Effect name of an `Undeclared`, the parse error of an `Unparsed`.
+`describe()` is one such caller,
+and turns each kind of finding into a line of text.
+
+`lines()` formats a whole `Report`: one line for each nonempty row,
+then one for each finding.
+It returns the strings and leaves the printing to the program that runs the checker,
+so the core stays pure.
 
 Here is the checker on Appendix A's greeting program, with one function added:
 
 ```python
 # greeting_check.py
 from typing import Final
-from row_check import check
+from row_check import check, lines
 
 GREETING: Final[str] = '''
 from typing import Annotated
@@ -993,19 +1015,15 @@ def shout(message: str) -> None:
 def quiet() -> Annotated[None, performs()]:
     shout("hi")
 '''
-report = check({"greeting": GREETING})
-for name, row in report.rows.items():
-    if row:
-        print(name, sorted(row))
+for line in lines(check({"greeting": GREETING})):
+    print(line)
 #: greeting.ask ['Ask']
 #: greeting.tell ['Tell']
 #: greeting.greet ['Ask', 'Tell']
 #: greeting.shout ['Tell']
-for finding in report.findings:
-    print(finding)
-#: Undeclared(where='greeting.ask', effect='Console')
-#: Undeclared(where='greeting.tell', effect='Console')
-#: Undeclared(where='greeting.quiet', effect='Tell')
+#: ! greeting.ask undeclared Console
+#: ! greeting.tell undeclared Console
+#: ! greeting.quiet undeclared Tell
 ```
 
 The demo prints each nonempty row, then each finding.
@@ -1146,7 +1164,7 @@ from pathlib import Path
 from typing import Annotated, Final
 from effect_names import Console, FileSystem
 from effect_rows import performs
-from row_check import Report, Undeclared, Unparsed, check
+from row_check import Report, check, lines
 
 def read(
     path: Path,
@@ -1161,15 +1179,8 @@ def load(
 def show(
     report: Report,
 ) -> Annotated[None, performs(Console)]:
-    for name in report.rows:
-        if row := report.rows[name]:
-            print(name, sorted(row))
-    for finding in report.findings:
-        match finding:
-            case Undeclared(where, effect):
-                print("!", where, "undeclared", effect)
-            case Unparsed(where, message):
-                print("!", where, message)
+    for line in lines(report):
+        print(line)
 
 FILES: Final[list[str]] = [
     "effect_table.py",
@@ -1260,7 +1271,7 @@ Here, both functions perform `FileSystem`:
 ```python
 # binding_check.py
 from typing import Final
-from row_check import check
+from row_check import check, lines
 
 SOURCE: Final[str] = '''
 from pathlib import Path
@@ -1274,10 +1285,8 @@ def load() -> str:
     path = Path(path)
     return path.read_text()
 '''
-report = check({"m": SOURCE})
-for name, row in report.rows.items():
-    if row:
-        print(name, sorted(row))
+for line in lines(check({"m": SOURCE})):
+    print(line)
 #: m.clear ['Unknown']
 #: m.load ['Unknown']
 ```

@@ -1,6 +1,6 @@
 # greeting_check.py
 from typing import Final
-from row_check import check
+from row_check import check, lines
 
 GREETING: Final[str] = '''
 from typing import Annotated
@@ -25,16 +25,12 @@ def shout(message: str) -> None:
 def quiet() -> Annotated[None, performs()]:
     shout("hi")
 '''
-report = check({"greeting": GREETING})
-for name, row in report.rows.items():
-    if row:
-        print(name, sorted(row))
+for line in lines(check({"greeting": GREETING})):
+    print(line)
 #: greeting.ask ['Ask']
 #: greeting.tell ['Tell']
 #: greeting.greet ['Ask', 'Tell']
 #: greeting.shout ['Tell']
-for finding in report.findings:
-    print(finding)
-#: Undeclared(where='greeting.ask', effect='Console')
-#: Undeclared(where='greeting.tell', effect='Console')
-#: Undeclared(where='greeting.quiet', effect='Tell')
+#: ! greeting.ask undeclared Console
+#: ! greeting.tell undeclared Console
+#: ! greeting.quiet undeclared Tell

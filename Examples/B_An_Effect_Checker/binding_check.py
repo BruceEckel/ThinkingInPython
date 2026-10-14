@@ -1,6 +1,6 @@
 # binding_check.py
 from typing import Final
-from row_check import check
+from row_check import check, lines
 
 SOURCE: Final[str] = '''
 from pathlib import Path
@@ -14,9 +14,7 @@ def load() -> str:
     path = Path(path)
     return path.read_text()
 '''
-report = check({"m": SOURCE})
-for name, row in report.rows.items():
-    if row:
-        print(name, sorted(row))
+for line in lines(check({"m": SOURCE})):
+    print(line)
 #: m.clear ['Unknown']
 #: m.load ['Unknown']

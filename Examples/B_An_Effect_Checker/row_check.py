@@ -48,3 +48,18 @@ def check(
     for facts in known.values():
         findings += undeclared(facts, rows, table)
     return Report(rows, findings)
+
+def describe(finding: Finding) -> str:
+    match finding:
+        case Undeclared(where, effect):
+            return f"! {where} undeclared {effect}"
+        case Unparsed(where, message):
+            return f"! {where} {message}"
+
+def lines(report: Report) -> list[str]:
+    rows = [
+        f"{name} {sorted(report.rows[name])}"
+        for name in report.rows
+        if report.rows[name]
+    ]
+    return rows + [describe(f) for f in report.findings]
