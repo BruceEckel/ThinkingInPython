@@ -17,7 +17,7 @@ class State:
     behavior: Behavior
     transition: Transition
 
-def happy_next(input_: Input) -> Mood:
+def from_happy(input_: Input) -> Mood:
     match input_:
         case Input.ANNOY:
             return Mood.GRUMPY
@@ -26,7 +26,7 @@ def happy_next(input_: Input) -> Mood:
         case _:
             return Mood.HAPPY
 
-def grumpy_next(input_: Input) -> Mood:
+def from_grumpy(input_: Input) -> Mood:
     match input_:
         case Input.CALM:
             return Mood.HAPPY
@@ -36,8 +36,8 @@ def grumpy_next(input_: Input) -> Mood:
             return Mood.GRUMPY
 
 class Mood(State, Enum):
-    HAPPY = (lambda _: "Great to see you!", happy_next)
-    GRUMPY = (lambda _: "What do you want?", grumpy_next)
+    HAPPY = (lambda _: "Great to see you!", from_happy)
+    GRUMPY = (lambda _: "What do you want?", from_grumpy)
     PROZAC = (lambda _: "Everything is wonderful.",
               lambda _: Mood.PROZAC)
 

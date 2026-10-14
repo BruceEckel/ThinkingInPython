@@ -1328,15 +1328,15 @@ class State:
     behavior: Behavior
     transition: Transition
 
-def happy_next(input_: Input) -> Mood:
+def from_happy(input_: Input) -> Mood:
     ...
 
-def grumpy_next(input_: Input) -> Mood:
+def from_grumpy(input_: Input) -> Mood:
     ...
 
 class Mood(State, Enum):
-    HAPPY = (lambda _: "Great to see you!", happy_next)
-    GRUMPY = (lambda _: "What do you want?", grumpy_next)
+    HAPPY = (lambda _: "Great to see you!", from_happy)
+    GRUMPY = (lambda _: "What do you want?", from_grumpy)
     PROZAC = (lambda _: "Everything is wonderful.",
               lambda _: Mood.PROZAC)
 
@@ -1375,7 +1375,7 @@ class State:
     behavior: Behavior
     transition: Transition
 
-def happy_next(input_: Input) -> Mood:
+def from_happy(input_: Input) -> Mood:
     match input_:
         case Input.ANNOY:
             return Mood.GRUMPY
@@ -1384,7 +1384,7 @@ def happy_next(input_: Input) -> Mood:
         case _:
             return Mood.HAPPY
 
-def grumpy_next(input_: Input) -> Mood:
+def from_grumpy(input_: Input) -> Mood:
     match input_:
         case Input.CALM:
             return Mood.HAPPY
@@ -1394,8 +1394,8 @@ def grumpy_next(input_: Input) -> Mood:
             return Mood.GRUMPY
 
 class Mood(State, Enum):
-    HAPPY = (lambda _: "Great to see you!", happy_next)
-    GRUMPY = (lambda _: "What do you want?", grumpy_next)
+    HAPPY = (lambda _: "Great to see you!", from_happy)
+    GRUMPY = (lambda _: "What do you want?", from_grumpy)
     PROZAC = (lambda _: "Everything is wonderful.",
               lambda _: Mood.PROZAC)
 
@@ -1425,7 +1425,7 @@ print([mood.name for mood in Mood])
 #: ['HAPPY', 'GRUMPY', 'PROZAC']
 ```
 
-**Each mood is one row.** `Mood.HAPPY` holds its greeting and `happy_next()`, the function that names its successors, so reading the member tells you what the mood says and where it can go.
+**Each mood is one row.** `Mood.HAPPY` holds its greeting and `from_happy()`, the function that names its successors, so reading the member tells you what the mood says and where it can go.
 `PROZAC` needs no function of its own: its transition is a lambda that answers every input with `Mood.PROZAC`, the same "stays put" that exercise 2's `Prozac.next()` wrote as `return self`.
 `UnpredictablePerson` is the chapter's `StateMachine` under its old name, with `hello()` playing `output()`: it returns the current mood's greeting and then moves to the next mood, so what you did to the person changes the greeting you get next time.
 

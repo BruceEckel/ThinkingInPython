@@ -865,14 +865,14 @@ class State:
     behavior: Behavior
     transition: Transition
 
-def waiting_next(input_: M) -> TrapState:
+def from_waiting(input_: M) -> TrapState:
     match input_:
         case M.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
-def luring_next(input_: M) -> TrapState:
+def from_luring(input_: M) -> TrapState:
     match input_:
         case M.RUNS_AWAY:
             return TrapState.WAITING
@@ -881,7 +881,7 @@ def luring_next(input_: M) -> TrapState:
         case _:
             return TrapState.LURING
 
-def trapping_next(input_: M) -> TrapState:
+def from_trapping(input_: M) -> TrapState:
     match input_:
         case M.ESCAPES:
             return TrapState.WAITING
@@ -890,7 +890,7 @@ def trapping_next(input_: M) -> TrapState:
         case _:
             return TrapState.TRAPPING
 
-def holding_next(input_: M) -> TrapState:
+def from_holding(input_: M) -> TrapState:
     match input_:
         case M.REMOVED:
             return TrapState.WAITING
@@ -899,11 +899,11 @@ def holding_next(input_: M) -> TrapState:
 
 class TrapState(State, Enum):
     WAITING = (lambda _: "Broadcasting cheese smell",
-               waiting_next)
+               from_waiting)
     LURING = (lambda _: "Presenting Cheese, door open",
-              luring_next)
-    TRAPPING = (lambda _: "Closing door", trapping_next)
-    HOLDING = (lambda _: "Mouse caught", holding_next)
+              from_luring)
+    TRAPPING = (lambda _: "Closing door", from_trapping)
+    HOLDING = (lambda _: "Mouse caught", from_holding)
 
 class StateMachine:
     def __init__(self, start: TrapState) -> None:
@@ -920,8 +920,9 @@ and a transition, which turns the input into the next state.
 Both aliases name `TrapState` above the class statement that creates it.
 A `type` alias evaluates its right side lazily,
 so the forward reference resolves when the checker or the program reads the alias.
-The four transition functions `match` on the input the way the states in `mouse_trap_states.py` do,
-and each names the `TrapState` members that follow it.
+The four transition functions are the first design's `next()` methods pulled out of their classes:
+`from_waiting()` matches on the input the way `Waiting.next()` in `mouse_trap_states.py` does,
+and names the member the trap enters next.
 A function body runs after the whole module has loaded,
 so a `TrapState` named inside one resolves too.
 
