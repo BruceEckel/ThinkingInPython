@@ -37,7 +37,7 @@ The parameter is `input_`, with a trailing underscore,
 because a bare `input` shadows the builtin `input()`.
 The `/` makes the parameter positional-only.
 A function stored in an attribute takes its argument by position alone,
-and the chapter's last design stores `next` that way,
+and the mousetrap's states store `next` that way,
 so the Protocol asks for no more than a stored function gives.
 
 The `StateMachine` holds the current state and advances it on each input:
@@ -122,115 +122,107 @@ MOVES: Final[list[Mouse]] = [
 ]
 ```
 
-### One State Class per Behavior
+### The Mousetrap
 
-In this first version of the mousetrap program,
-each state class defines its `run()` behavior and decides its next state with a `match` statement:
+Each state of the trap is a row of data:
+the message its `run()` prints and the function that names its successor.
+`StateRow` is a record that satisfies `State`:
+its `run()` prints a stored message,
+and its `next` is a stored function rather than a method.
+`TrapState` is an `Enum` whose members are `StateRow`s:
 
 ```python
 # trap_states.py
-from typing import ClassVar
+from collections.abc import Callable
+from enum import Enum
 from mouse import Mouse
+from record import record
 from state import State
-from state_machine import StateMachine
 
-class Waiting:
+@record
+class StateRow:
+    message: str
+    next: Callable[[object], State]
+
     def run(self) -> None:
-        print("Broadcasting cheese smell")
+        print(self.message)
+
+def waiting(input_: object) -> TrapState:
+    match input_:
+        case Mouse.APPEARS:
+            return TrapState.LURING
+        case _:
+            return TrapState.WAITING
+
+def luring(input_: object) -> TrapState:
+    match input_:
+        case Mouse.RUNS_AWAY:
+            return TrapState.WAITING
+        case Mouse.ENTERS:
+            return TrapState.TRAPPING
+        case _:
+            return TrapState.LURING
+
+def trapping(input_: object) -> TrapState:
+    match input_:
+        case Mouse.ESCAPES:
+            return TrapState.WAITING
+        case Mouse.TRAPPED:
+            return TrapState.HOLDING
+        case _:
+            return TrapState.TRAPPING
+
+def holding(input_: object) -> TrapState:
+    match input_:
+        case Mouse.REMOVED:
+            return TrapState.WAITING
+        case _:
+            return TrapState.HOLDING
+
+class TrapState(StateRow, Enum):
+    WAITING = ("Broadcasting cheese smell", waiting)
+    LURING = ("Presenting Cheese, door open", luring)
+    TRAPPING = ("Closing door", trapping)
+    HOLDING = ("Mouse caught", holding)
 
     def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.APPEARS:
-                return MouseTrap.luring
-            case _:
-                return self
-
-class Luring:
-    def run(self) -> None:
-        print("Presenting Cheese, door open")
-
-    def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.RUNS_AWAY:
-                return MouseTrap.waiting
-            case Mouse.ENTERS:
-                return MouseTrap.trapping
-            case _:
-                return self
-
-class Trapping:
-    def run(self) -> None:
-        print("Closing door")
-
-    def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.ESCAPES:
-                return MouseTrap.waiting
-            case Mouse.TRAPPED:
-                return MouseTrap.holding
-            case _:
-                return self
-
-class Holding:
-    def run(self) -> None:
-        print("Mouse caught")
-
-    def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.REMOVED:
-                return MouseTrap.waiting
-            case _:
-                return self
-
-class MouseTrap(StateMachine):
-    waiting: ClassVar[State] = Waiting()
-    luring: ClassVar[State] = Luring()
-    trapping: ClassVar[State] = Trapping()
-    holding: ClassVar[State] = Holding()
-
-    def __init__(self) -> None:
-        super().__init__(MouseTrap.waiting)
+        return self.name.capitalize()
 ```
 
-`MouseTrap` holds all possible states as class attributes and sets up the initial state.
-Each `next()` performs a `match` on the input,
-providing a `case` for every input the state recognizes.
-The default `case _` returns `self`, so the state doesn't change.
-Each class's `__str__()` returns its own name, which is what `step()` prints.
+A `StateRow` holds the message its `run()` prints and the function its `next` names.
+The function returns a `State`, which is all the engine asks of it,
+so a `StateRow` serves any enum of states.
+Each transition function performs a `match` on the input,
+with a `case` for every input its state recognizes,
+and names the member the trap enters next.
+The default `case _` returns the function's own member,
+so the state stays the same.
+A function body runs after the whole module has loaded,
+so a `TrapState` named inside one resolves too.
 
-`StateMachine`'s constructor runs the initial state,
-so constructing the machine starts the engine.
-[*Template Method* discourages that choice](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
-Two facts make that choice safe here:
-`MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
-and no state's `run()` reads anything off the machine.
+`TrapState` mixes `StateRow` into `Enum`.
+Each member's value is a tuple,
+and `Enum` passes the tuple to `StateRow`'s constructor,
+so `TrapState.WAITING` is a `TrapState` member and a `StateRow` at once,
+with `message` and `next` as attributes.
+The engine's call `state.next(input_)` reads the same whether `next` is a method or a stored function.
+The type checker accepts the row as a `State` because `State.next()` declares its parameter positional-only:
+a stored function takes its argument by position alone,
+where a method's parameter would also accept the keyword form `input_=`.
+`__str__()` returns the member's name in the form the trace prints,
+so `WAITING` prints as `Waiting`, and `step()` prints each state through it.
 
-None of the four state classes inherits from `State`.
-Each satisfies the Protocol by defining `run()` and `next()`,
-and a class that leaves one out fails the type checker where the program uses it as a `State`.
-
-`trap_states_demo.py` runs a `MouseTrap` through every move in `MOVES`:
+`trap_states_demo.py` runs a trap through every move in `MOVES`,
+then feeds a fresh trap the one input for which `waiting()` has no `case`:
 
 ```python
 # trap_states_demo.py
 from mouse import Mouse
 from mouse_moves import MOVES
-from state_machine import run_all
-from trap_states import MouseTrap
+from state_machine import StateMachine, run_all
+from trap_states import TrapState
 
-run_all(MouseTrap(), MOVES)
+run_all(StateMachine(TrapState.WAITING), MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open
@@ -251,200 +243,89 @@ run_all(MouseTrap(), MOVES)
 #: Holding mouse removed -> Waiting
 #: Broadcasting cheese smell
 
-# ESCAPES has no case in Waiting, so case _
+# ESCAPES has no case in waiting(), so case _
 # fires and the machine stays at Waiting:
-trap = MouseTrap()
+trap = StateMachine(TrapState.WAITING)
 #: Broadcasting cheese smell
 trap.step(Mouse.ESCAPES)
 #: Waiting mouse escapes -> Waiting
 #: Broadcasting cheese smell
 ```
 
-### A Table Inside Each State
+`StateMachine`'s constructor runs the initial state,
+so constructing the machine starts the engine.
+[*Template Method* discourages that choice](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
+Two facts make that choice safe here:
+the call is the constructor's last statement,
+and no state's `run()` reads anything off the machine.
 
-A machine with many states means many `match` statements,
-spread across many classes.
-A second approach puts a table inside each `State` object,
-mapping the input object to the next state.
-The base class holds the lookup,
-and each state supplies its own table and its own `run()`:
-
-```python
-# table_state.py
-from abc import ABC, abstractmethod
-from state import State
-
-class NoTransition(RuntimeError):
-    "This state's table has no entry for the input."
-
-class TableState(ABC):
-    def __init__(self) -> None:
-        self.transitions: dict[object, State] = {}
-
-    @abstractmethod
-    def run(self) -> None: ...
-
-    def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        try:
-            return self.transitions[input_]
-        except KeyError:
-            raise NoTransition(
-                f"{type(self).__name__}: "
-                f"no transition on {input_}") from None
-```
-
-`TableState` is an `ABC` rather than a Protocol because the base has code to share.
-Both `next()` and `run()` have the signatures the `State` Protocol names,
-so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
-The base also supplies the `__str__()` the trace prints,
-so the four subclasses inherit it.
-
-The constructor starts each state with an empty `transitions` table,
-and module-level code fills it after every state object exists.
-A lookup that finds no entry,
-in a table nobody filled or in one missing that input,
-raises `NoTransition` from the `except` clause.
-
-The `KeyError` that `next()` catches carries the input as its key,
-and the `NoTransition` message includes the same input,
-so a chained traceback would show it twice.
-`next()` raises `NoTransition` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
-which drops the chained `KeyError`.
-
-The state classes and the `MouseTrap` that instantiates them must be defined before the state tables,
-so the table entries can name the other states.
-Module-level code fills in the tables after every state object exists:
+`test_trap_states.py` holds the trap to two facts the trace shows:
+the nine moves bring it back to `Waiting`,
+and every state answers every move with a state:
 
 ```python
-# trap_tables.py
-from typing import ClassVar, override
+# test_trap_states.py
 from mouse import Mouse
-from state_machine import StateMachine
-from table_state import TableState
-
-class Waiting(TableState):
-    @override
-    def run(self) -> None:
-        print("Broadcasting cheese smell")
-
-class Luring(TableState):
-    @override
-    def run(self) -> None:
-        print("Presenting Cheese, door open")
-
-class Trapping(TableState):
-    @override
-    def run(self) -> None:
-        print("Closing door")
-
-class Holding(TableState):
-    @override
-    def run(self) -> None:
-        print("Mouse caught")
-
-class MouseTrap(StateMachine):
-    waiting: ClassVar[TableState] = Waiting()
-    luring: ClassVar[TableState] = Luring()
-    trapping: ClassVar[TableState] = Trapping()
-    holding: ClassVar[TableState] = Holding()
-
-    def __init__(self) -> None:
-        super().__init__(MouseTrap.waiting)
-
-MouseTrap.waiting.transitions = {
-    Mouse.APPEARS: MouseTrap.luring,
-}
-MouseTrap.luring.transitions = {
-    Mouse.RUNS_AWAY: MouseTrap.waiting,
-    Mouse.ENTERS: MouseTrap.trapping,
-}
-MouseTrap.trapping.transitions = {
-    Mouse.ESCAPES: MouseTrap.waiting,
-    Mouse.TRAPPED: MouseTrap.holding,
-}
-MouseTrap.holding.transitions = {
-    Mouse.REMOVED: MouseTrap.waiting,
-}
-```
-
-The demo feeds a fresh trap the one input for which `Waiting` has no entry,
-and `expect()` shows the exception:
-
-```python
-# trap_tables_demo.py
-from exceptions import expect
-from mouse import Mouse
-from table_state import NoTransition
-from trap_tables import MouseTrap
-
-# ESCAPES is not a key in Waiting.transitions:
-trap = MouseTrap()
-#: Broadcasting cheese smell
-expect(NoTransition, trap.step, Mouse.ESCAPES)
-#: [NoTransition] Waiting: no transition on mouse escapes
-```
-
-With many `State` classes to maintain,
-the tables read more easily than the `match` statements.
-
-Over the nine `MOVES`, both versions print the same trace,
-and `test_traps.py` holds them to it:
-
-```python
-# test_traps.py
-import pytest
-import trap_states
-import trap_tables
 from mouse_moves import MOVES
-from state_machine import run_all
+from state_machine import StateMachine, run_all
+from trap_states import TrapState
 
-def test_both_versions_print_the_same_trace(
-        capsys: pytest.CaptureFixture[str]) -> None:
-    run_all(trap_states.MouseTrap(), MOVES)
-    by_match = capsys.readouterr().out
-    run_all(trap_tables.MouseTrap(), MOVES)
-    by_table = capsys.readouterr().out
-    assert by_match == by_table
+def test_nine_moves_return_to_waiting() -> None:
+    trap = StateMachine(TrapState.WAITING)
+    run_all(trap, MOVES)
+    assert trap.current_state is TrapState.WAITING
+
+def test_every_state_answers_every_move() -> None:
+    for state in TrapState:
+        for move in Mouse:
+            assert state.next(move) in TrapState
 ```
+
+The second test iterates the enum,
+so a state added to `TrapState` joins the test with no edit to the test.
+
+Two consequences follow from the mixin.
+`Enum` folds members with equal values into one,
+and a record's equality compares its fields,
+so two members with the same message and the same function collapse into a single member with two names.
+Every state therefore needs a function of its own.
+The type checker reads `next` from the record's field,
+so the engine's `state.next(input_)` checks against `State` the way a method call does.
+It leaves a member's tuple uncompared with the fields:
+a tuple holding the message alone, or the two in the wrong order,
+passes `ty` and fails at import or at run time.
+Pyright reports both.
 
 ### An Unexpected Input
 
 Every one of the nine moves in `MOVES` matches a transition out of the current state.
-Each demo file feeds `Mouse.ESCAPES` to a fresh trap in `Waiting`.
-Neither `Waiting`'s `match` nor its table names that input.
-Version 1 prints `Broadcasting cheese smell` a second time.
-Version 2 raises `NoTransition: Waiting: no transition on mouse escapes`.
-The figure traces the run both versions share, then this one input:
+The demo then feeds `Mouse.ESCAPES` to a fresh trap in `Waiting`,
+and the trap prints `Broadcasting cheese smell` a second time.
+The figure traces the nine moves:
 
 ![](_images/state_story)
 
-The trace at the top covers the nine shared moves.
 In each row the current state's `next()` returns the successor,
-so the machine moves from object to object and leaves every decision to the states.
-Below the trace, the one input on which the versions differ appears twice,
-once under each policy.
+so the machine moves from member to member and leaves every decision to the states.
 
-Version 1's `case _` arms return the current state,
+The `case _` arm returns the current state,
 so an unrecognized input keeps the machine in its current state.
 Staying in the same state has a visible effect.
 `step()` calls `run()` on whatever state `next()` returns,
 so returning the current state runs that state's action a second time.
-Version 2's table holds the explicit transitions alone,
-and its `next()` raises an exception on every other input.
+The other policy is to raise an exception from `case _`,
+so an input for which the state has no `case` stops the program and reports itself.
 
 Either policy can be right, so choose one on purpose.
 Staying in the same state suits a machine fed from a source that includes inputs meant for something else.
 Raising an exception suits a table you are still building,
 where a missing entry is a bug the exception reports.
-The table-driven engine in `tabledriven/table_machine.py` raises an exception for the same reason.
+The table-driven engine in `tabledriven/table_machine.py` raises an exception for that reason.
 
 ## Table-Driven State Machine
 
 The each-state-decides design keeps each state's transitions with that state,
-in its `next()` or in its table.
+in its `next` function.
 A fully table-driven design represents the entire machine as a single transition table.
 All the behavior is then in one place,
 so you can build and maintain the table from a state-transition diagram.
@@ -562,7 +443,7 @@ so it belongs last in its group, as the `else` for the rules above it.
 
 When every condition in a group returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
-Like `table_state.py`'s, this `NoTransition` derives from `RuntimeError`,
+`NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
 ### A Vending Machine
@@ -884,184 +765,21 @@ def test_no_transition_raises() -> None:
         vm.handle(Quit())
 ```
 
-## States as `Enum` Members
-
-`enum_states.py` is the first design again,
-with each state as a row of data rather than a class, run by the same engine.
-`StateRow` is a record that satisfies `State`:
-its `run()` prints a stored message,
-and its `next` is a stored function rather than a method.
-`TrapState` is an `Enum` whose members are `StateRow`s:
-
-```python
-# enum_states.py
-from collections.abc import Callable
-from enum import Enum
-from mouse import Mouse
-from record import record
-from state import State
-
-@record
-class StateRow:
-    message: str
-    next: Callable[[object], State]
-
-    def run(self) -> None:
-        print(self.message)
-
-def waiting(input_: object) -> TrapState:
-    match input_:
-        case Mouse.APPEARS:
-            return TrapState.LURING
-        case _:
-            return TrapState.WAITING
-
-def luring(input_: object) -> TrapState:
-    match input_:
-        case Mouse.RUNS_AWAY:
-            return TrapState.WAITING
-        case Mouse.ENTERS:
-            return TrapState.TRAPPING
-        case _:
-            return TrapState.LURING
-
-def trapping(input_: object) -> TrapState:
-    match input_:
-        case Mouse.ESCAPES:
-            return TrapState.WAITING
-        case Mouse.TRAPPED:
-            return TrapState.HOLDING
-        case _:
-            return TrapState.TRAPPING
-
-def holding(input_: object) -> TrapState:
-    match input_:
-        case Mouse.REMOVED:
-            return TrapState.WAITING
-        case _:
-            return TrapState.HOLDING
-
-class TrapState(StateRow, Enum):
-    WAITING = ("Broadcasting cheese smell", waiting)
-    LURING = ("Presenting Cheese, door open", luring)
-    TRAPPING = ("Closing door", trapping)
-    HOLDING = ("Mouse caught", holding)
-
-    def __str__(self) -> str:
-        return self.name.capitalize()
-```
-
-A `StateRow` holds the message its `run()` prints and the function its `next` names.
-The function returns a `State`, which is all the engine asks of it,
-so a `StateRow` serves any enum of states.
-The four transition functions are the first design's `next()` methods pulled out of their classes:
-`waiting()` matches on the input the way `Waiting.next()` in `trap_states.py` does,
-and names the member the trap enters next.
-A function body runs after the whole module has loaded,
-so a `TrapState` named inside one resolves too.
-
-`TrapState` mixes `StateRow` into `Enum`.
-Each member's value is a tuple,
-and `Enum` passes the tuple to `StateRow`'s constructor,
-so `TrapState.WAITING` is a `TrapState` member and a `StateRow` at once,
-with `message` and `next` as attributes.
-The engine's call `state.next(input_)` reads the same whether `next` is a method or a stored function.
-The type checker accepts the row as a `State` because `State.next()` declares its parameter positional-only:
-a stored function takes its argument by position alone,
-where a method's parameter would also accept the keyword form `input_=`.
-`__str__()` returns the member's name in the form the trace prints,
-so `WAITING` prints as `Waiting`.
-
-`enum_states_demo.py` runs the rows through the first design's engine,
-and the trace is `trap_states_demo.py`'s, line for line:
-
-```python
-# enum_states_demo.py
-from enum_states import TrapState
-from mouse_moves import MOVES
-from state_machine import StateMachine, run_all
-
-run_all(StateMachine(TrapState.WAITING), MOVES)
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse runs away -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse escapes -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse trapped -> Holding
-#: Mouse caught
-#: Holding mouse removed -> Waiting
-#: Broadcasting cheese smell
-```
-
-`test_enum_states.py` holds the rows to that trace:
-
-```python
-# test_enum_states.py
-import pytest
-import trap_states
-from enum_states import TrapState
-from mouse_moves import MOVES
-from state_machine import StateMachine, run_all
-
-def test_rows_print_the_class_trace(
-        capsys: pytest.CaptureFixture[str]) -> None:
-    run_all(trap_states.MouseTrap(), MOVES)
-    by_class = capsys.readouterr().out
-    run_all(StateMachine(TrapState.WAITING), MOVES)
-    by_row = capsys.readouterr().out
-    assert by_class == by_row
-```
-
-Two consequences follow from the mixin.
-`Enum` folds members with equal values into one,
-and a record's equality compares its fields,
-so two members with the same message and the same function collapse into a single member with two names.
-Every state therefore needs a function of its own.
-The type checker reads `next` from the record's field,
-so the engine's `state.next(input_)` checks against `State` the way a method call does.
-It leaves a member's tuple uncompared with the fields:
-a tuple holding the message alone, or the two in the wrong order,
-passes `ty` and fails at import or at run time.
-Pyright reports both.
-
-Against `trap_states.py`, what changes is where a state lives.
-A class with two methods becomes a row holding a message and a function,
-and the `ClassVar` holder on `MouseTrap` becomes the enum.
-The Protocol, the engine, and the trace stay the same.
-
 ## Which Design Should You Use?
 
-The three designs answer the same question, which state comes next,
+The two designs answer the same question, which state comes next,
 and put the answer in different places.
 
 Each-state-decides suits a machine whose states do something and have few transitions apiece.
-The state class holds both the action and the transitions,
-so reading `trap_states.py`'s `Luring` tells you what luring does and which states can follow it.
-Adding a state is one class.
+The row holds the action and its function holds the transitions,
+so reading `trap_states.py`'s `LURING` and `luring()` tells you what luring does and which states can follow it.
+Adding a state is one row and one function.
 The design reads best when the transitions are obvious from the state's own name.
 
 An action that must run on every entry into one state belongs in that state's `run()`,
 written once.
 Sounding a chime whenever the trap reaches `Holding` is such an action.
 That is the Moore shape: the action belongs to the state.
-
-Inside the each-state-decides design,
-`match` statements and per-state tables differ in which code handles an unrecognized input.
-With `match`, each state's `case _` sets its own policy, in the method you read.
-With tables, `TableState.next()` sets one policy for every state,
-and each class defines `run()` and inherits `next()`.
-The tables read better as the states multiply,
-because every state's transitions have the same shape and appear together at the bottom of the file.
 
 One-table suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
@@ -1075,16 +793,14 @@ or write a helper that those rules call.
 That is the Mealy shape: the action belongs to the transition,
 and in return it can read the input that caused the transition.
 
-States as `Enum` members is the first design with records in place of classes.
-Each member names its own successors, as `Luring` does,
-and carries its action as data, and the first design's engine runs both.
-The enum supplies what four loose classes cannot:
+In both designs the states are `Enum` members.
 `list(TrapState)` enumerates every state,
 and a parameter typed `TrapState` accepts a member and rejects anything else.
-The shape suits a machine whose states each do one thing and whose transitions are a `match` apiece.
-A state that keeps data of its own has nowhere to put it,
-since a member is one frozen record shared by every machine that uses it,
-and such a state is a class.
+A member is one frozen record shared by every machine that uses it,
+so a state that keeps data of its own has nowhere to put it.
+Such a state is a class with a `run()` and a `next()`,
+which satisfies `State` as a row does,
+and the first design's engine runs it unchanged.
 
 The first design's constructor calls the initial state's `run()`,
 but the constructor in `table_machine.py` stores `initial` and returns.
@@ -1092,12 +808,12 @@ In the one-table design,
 an action the machine needs at startup is a call you make before the first input.
 
 The deciding question is which you would rather read: one state's transitions,
-gathered in that state, the whole machine's, gathered in one table,
-or each state as one enum row holding its action and its successors.
-A machine with a few states works in any of the three,
+gathered in that state's function, or the whole machine's,
+gathered in one table.
+A machine with a few states works in either,
 and a machine you drew as a diagram first belongs in the table.
 
-With any of these designs you write for yourself what a library supplies.
+With either design you write for yourself what a library supplies.
 Mature libraries such as `transitions` and `python-statemachine` supply guards,
 callbacks, and hierarchical states.
 Using a library adds a dependency.
@@ -1147,7 +863,7 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     Explain the exception, then make it work two ways: by adding a rule,
     and by making `Nickel` an instance of `Money` rather than a subclass.
     Say which you would keep.
-10. Rewrite exercise 2's mood machine in the shape of `enum_states.py`:
+10. Rewrite exercise 2's mood machine in the shape of `trap_states.py`:
     a `Mood` enum of rows,
     each carrying its greeting and its transition function,
     with the inputs as a `StrEnum` and `state_machine.py`'s engine running it.

@@ -1,74 +1,55 @@
 # trap_states.py
-from typing import ClassVar
+from collections.abc import Callable
+from enum import Enum
 from mouse import Mouse
+from record import record
 from state import State
-from state_machine import StateMachine
 
-class Waiting:
+@record
+class StateRow:
+    message: str
+    next: Callable[[object], State]
+
     def run(self) -> None:
-        print("Broadcasting cheese smell")
+        print(self.message)
+
+def waiting(input_: object) -> TrapState:
+    match input_:
+        case Mouse.APPEARS:
+            return TrapState.LURING
+        case _:
+            return TrapState.WAITING
+
+def luring(input_: object) -> TrapState:
+    match input_:
+        case Mouse.RUNS_AWAY:
+            return TrapState.WAITING
+        case Mouse.ENTERS:
+            return TrapState.TRAPPING
+        case _:
+            return TrapState.LURING
+
+def trapping(input_: object) -> TrapState:
+    match input_:
+        case Mouse.ESCAPES:
+            return TrapState.WAITING
+        case Mouse.TRAPPED:
+            return TrapState.HOLDING
+        case _:
+            return TrapState.TRAPPING
+
+def holding(input_: object) -> TrapState:
+    match input_:
+        case Mouse.REMOVED:
+            return TrapState.WAITING
+        case _:
+            return TrapState.HOLDING
+
+class TrapState(StateRow, Enum):
+    WAITING = ("Broadcasting cheese smell", waiting)
+    LURING = ("Presenting Cheese, door open", luring)
+    TRAPPING = ("Closing door", trapping)
+    HOLDING = ("Mouse caught", holding)
 
     def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.APPEARS:
-                return MouseTrap.luring
-            case _:
-                return self
-
-class Luring:
-    def run(self) -> None:
-        print("Presenting Cheese, door open")
-
-    def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.RUNS_AWAY:
-                return MouseTrap.waiting
-            case Mouse.ENTERS:
-                return MouseTrap.trapping
-            case _:
-                return self
-
-class Trapping:
-    def run(self) -> None:
-        print("Closing door")
-
-    def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.ESCAPES:
-                return MouseTrap.waiting
-            case Mouse.TRAPPED:
-                return MouseTrap.holding
-            case _:
-                return self
-
-class Holding:
-    def run(self) -> None:
-        print("Mouse caught")
-
-    def __str__(self) -> str:
-        return type(self).__name__
-
-    def next(self, input_: object) -> State:
-        match input_:
-            case Mouse.REMOVED:
-                return MouseTrap.waiting
-            case _:
-                return self
-
-class MouseTrap(StateMachine):
-    waiting: ClassVar[State] = Waiting()
-    luring: ClassVar[State] = Luring()
-    trapping: ClassVar[State] = Trapping()
-    holding: ClassVar[State] = Holding()
-
-    def __init__(self) -> None:
-        super().__init__(MouseTrap.waiting)
+        return self.name.capitalize()

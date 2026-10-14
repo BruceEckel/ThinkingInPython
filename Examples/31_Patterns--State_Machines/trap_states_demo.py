@@ -1,10 +1,10 @@
 # trap_states_demo.py
 from mouse import Mouse
 from mouse_moves import MOVES
-from state_machine import run_all
-from trap_states import MouseTrap
+from state_machine import StateMachine, run_all
+from trap_states import TrapState
 
-run_all(MouseTrap(), MOVES)
+run_all(StateMachine(TrapState.WAITING), MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open
@@ -25,9 +25,9 @@ run_all(MouseTrap(), MOVES)
 #: Holding mouse removed -> Waiting
 #: Broadcasting cheese smell
 
-# ESCAPES has no case in Waiting, so case _
+# ESCAPES has no case in waiting(), so case _
 # fires and the machine stays at Waiting:
-trap = MouseTrap()
+trap = StateMachine(TrapState.WAITING)
 #: Broadcasting cheese smell
 trap.step(Mouse.ESCAPES)
 #: Waiting mouse escapes -> Waiting

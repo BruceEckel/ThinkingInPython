@@ -5,7 +5,7 @@ from typing import Protocol
 from record import record
 
 # The chapter's state.py, state_machine.py, and
-# enum_states.py's StateRow, inlined:
+# trap_states.py's StateRow, inlined:
 class State(Protocol):
     def run(self) -> None: ...
     def next(self, input_: object, /) -> State: ...

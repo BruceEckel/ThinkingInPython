@@ -346,7 +346,7 @@ worth making explicit and easy to audit.
 <details>
 <summary>Where to look</summary>
 
-[A Table Inside Each State](../../Chapters/31_Patterns--State_Machines.md#a-table-inside-each-state) puts a dictionary in each state object and has `next()` consult it.
+[Each State Decides](../../Chapters/31_Patterns--State_Machines.md#each-state-decides) has each state name its own successor; here a dictionary in each state object does the naming.
 Here the table maps a word to the name of the next state, with a wildcard entry for words the state ignores.
 A controller holding a `dict` of name to state object looks up the current state and asks it for the next name.
 
@@ -552,7 +552,7 @@ makes the same trade-off over the per-state `trap_states.py`.
 <details>
 <summary>Where to look</summary>
 
-In [One State Class per Behavior](../../Chapters/31_Patterns--State_Machines.md#one-state-class-per-behavior), each state's `match` names the `Mouse` moves that make sense after it.
+In [The Mousetrap](../../Chapters/31_Patterns--State_Machines.md#the-mousetrap), each transition function's `match` names the `Mouse` moves that make sense after its state.
 Write those legal successors as a `dict` from the previous action to a list of allowed next actions, with a starting key for "nothing yet."
 Loop `count` times, pick from the list with `random.choice()`, and `yield` the pick, which becomes the previous action.
 
@@ -1312,7 +1312,7 @@ separate value.
 
 ## 10. The mood machine, as `Enum` members
 
-> Rewrite exercise 2's mood machine in the shape of `enum_states.py`:
+> Rewrite exercise 2's mood machine in the shape of `trap_states.py`:
 > a `Mood` enum of rows,
 > each carrying its greeting and its transition function,
 > with the inputs as a `StrEnum` and `state_machine.py`'s engine running it.
@@ -1321,7 +1321,7 @@ separate value.
 <details>
 <summary>Where to look</summary>
 
-[States as `Enum` Members](../../Chapters/31_Patterns--State_Machines.md#states-as-enum-members) shows the shape: a record with a `run()` and a stored `next`, mixed into an `Enum` and driven by the first design's engine.
+[The Mousetrap](../../Chapters/31_Patterns--State_Machines.md#the-mousetrap) shows the shape: a record with a `run()` and a stored `next`, mixed into an `Enum` and driven by the first design's engine.
 Make the inputs a `StrEnum`, so each transition function can `match` on them and the trace prints them as words.
 Inline `state.py` and `state_machine.py` the way exercise 2 does.
 
@@ -1387,7 +1387,7 @@ from typing import Protocol
 from record import record
 
 # The chapter's state.py, state_machine.py, and
-# enum_states.py's StateRow, inlined:
+# trap_states.py's StateRow, inlined:
 class State(Protocol):
     def run(self) -> None: ...
     def next(self, input_: object, /) -> State: ...

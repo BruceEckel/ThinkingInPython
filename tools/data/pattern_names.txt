@@ -67,8 +67,6 @@ Object Pool
 !Context Manager as Decorator
 !A Type-Checking Iterator
 !Each State Decides
-!A Table Inside Each State
-!One State Class per Behavior
 !Intrinsic and Extrinsic State
 !The Rat and the Blackboard
 

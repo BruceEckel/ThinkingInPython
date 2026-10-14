@@ -6,21 +6,17 @@ the machine occupies after that input. The red arrows are the calls to
 `next(input_)`, so the reader sees the current state, not the machine,
 pick each successor, and the machine's position move by itself from
 object to object. The right column is what each new state's `run()`
-prints. Below the trace, one unexpected input (`mouse escapes` in
-`Waiting`) meets the two versions' policies side by side: the `match`
-version's `case _` keeps the state and runs it again, and the table
-version's `next()` raises a `NoTransition`.
+prints.
 
 This complements the chapter's other figure, `vending_story.svg`, which
 draws the vending machine's states and transitions as a static graph.
 The names, inputs, and printed lines come from `mouse.py`,
-`mouse_moves.py`, `trap_states.py`, `trap_tables.py`,
-`trap_states_demo.py`, and `trap_tables_demo.py`
+`mouse_moves.py`, `trap_states.py`, and `trap_states_demo.py`
 and their `#:` markers.
 """
 
-from tools.story_figures import (INK, MUTED, RED, Point, arrow, cross,
-                                 line, markers, rect, svg, text)
+from tools.story_figures import (INK, MUTED, RED, Point, arrow, line,
+                                 markers, rect, svg, text)
 
 STEM = "state_story"
 W = 740
@@ -51,10 +47,8 @@ MOVES = (
     ("mouse removed", "Waiting"),
 )
 TITLE = ("The mousetrap's nine inputs as a trace: in each row the current "
-         "state's next(input_) picks the next of four state objects, whose "
-         "run() prints a line; below, an input Waiting does not name keeps "
-         "the match version in Waiting and makes the table version raise "
-         "a NoTransition")
+         "state's next(input_) picks the next of four TrapState members, "
+         "whose run() prints a line")
 
 
 def dot(p: Point) -> str:
@@ -74,7 +68,8 @@ def edge(a: Point, b: Point) -> str:
 
 def trace() -> tuple[str, float]:
     """The header, the grid, and the nine rows; the bottom's y."""
-    b = text(EX, 22, "MouseTrap().run_all(MOVES)", 12, bold=True)
+    b = text(EX, 22, "run_all(StateMachine(TrapState.WAITING), MOVES)",
+             12, bold=True)
     b += text(EX, 38, "each row: current_state.next(input_) returns the "
               "next state (red), and run() on it prints", 10, MUTED)
     b += text(EX, HY + 18, "input", 11, MUTED)
@@ -85,7 +80,7 @@ def trace() -> tuple[str, float]:
         b += rect(x - BW / 2, HY, BW, BH, stroke=INK)
         b += text(x, HY + 17, s, 11.5, anchor="middle", bold=True)
     col = {s: x for x, s in zip(CX, STATES)}
-    b += text(EX, R0 + 4, "MouseTrap()", 10.5, MUTED)
+    b += text(EX, R0 + 4, "TrapState.WAITING", 10.5, MUTED)
     here = (col["Waiting"], R0)
     b += dot(here) + text(OX, R0 + 4, RUN["Waiting"], 10)
     for i, (input_, state) in enumerate(MOVES, 1):
@@ -98,46 +93,7 @@ def trace() -> tuple[str, float]:
     return b, last + 26
 
 
-def policy(x0: float, y0: float, name: str, file: str,
-           raises: bool) -> str:
-    """One version's answer to `mouse escapes` in Waiting."""
-    b = text(x0, y0, name, 11.5, bold=True)
-    b += text(x0, y0 + 15, file, 10, MUTED)
-    bx, by = x0, y0 + 30
-    b += rect(bx, by, BW, BH, stroke=INK)
-    b += text(bx + BW / 2, by + 17, "Waiting", 11.5, anchor="middle",
-              bold=True)
-    tx = bx + BW + 130
-    mid = by + BH / 2
-    b += text((bx + BW + tx) / 2, mid - 6, "mouse escapes", 10, INK,
-              "middle")
-    if raises:
-        cx = tx + 10
-        b += line((bx + BW, mid), (cx - 10, mid), RED, 1.5)
-        b += cross(cx, mid)
-        b += text(bx, by + BH + 22, "NoTransition: Waiting:", 10, RED)
-        b += text(bx, by + BH + 36, "no transition on mouse escapes", 10,
-                  RED)
-    else:
-        b += arrow((bx + BW, mid), (tx, mid), RED, "ss-red", width=1.5)
-        b += rect(tx, by, BW, BH, stroke=INK)
-        b += text(tx + BW / 2, by + 17, "Waiting", 11.5, anchor="middle",
-                  bold=True)
-        b += text(bx, by + BH + 22, "case _ returns the current state,",
-                  10, MUTED)
-        b += text(bx, by + BH + 36, "so run() prints its line again", 10,
-                  MUTED)
-    return b
-
-
 def render() -> str:
     b, y0 = trace()
-    b += line((16, y0), (W - 16, y0))
-    b += text(EX, y0 + 22, "an input the current state does not name", 11,
-              MUTED)
-    b += policy(EX, y0 + 48, "match version", "trap_states.py",
-                raises=False)
-    b += policy(390, y0 + 48, "table version", "trap_tables.py",
-                raises=True)
     defs = markers(**{"ss-red": ("filled", RED)})
-    return svg(W, y0 + 160, TITLE, defs, b)
+    return svg(W, y0, TITLE, defs, b)
