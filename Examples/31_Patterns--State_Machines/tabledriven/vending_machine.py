@@ -24,16 +24,14 @@ class Quit:
         return "Quit"
 
 @record
-class Key:
+class Row:
     value: int
-
-@record
-class Row(Key):
     def __str__(self) -> str:
         return "ABCD"[self.value]
 
 @record
-class Column(Key):
+class Column:
+    value: int
     def __str__(self) -> str:
         return f"col {self.value}"
 

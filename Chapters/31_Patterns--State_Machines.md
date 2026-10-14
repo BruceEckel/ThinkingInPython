@@ -587,16 +587,14 @@ class Quit:
         return "Quit"
 
 @record
-class Key:
+class Row:
     value: int
-
-@record
-class Row(Key):
     def __str__(self) -> str:
         return "ABCD"[self.value]
 
 @record
-class Column(Key):
+class Column:
+    value: int
     def __str__(self) -> str:
         return f"col {self.value}"
 
@@ -684,7 +682,7 @@ class VendingMachine(StateMachine):
         self.amount = 0
 ```
 
-The inputs `Money`, `Key`, `Row`, and `Column` are records,
+The inputs `Money`, `Row`, and `Column` are records,
 values the machine reads and leaves as they are.
 `ItemSlot` stays a mutable `@dataclass`,
 because `dispense()` decrements its `quantity` in place.
@@ -692,7 +690,7 @@ because `dispense()` decrements its `quantity` in place.
 The engine's lookup keys on the exact `type(input_)`,
 so finding the rows takes one dictionary lookup rather than an `isinstance()` test against each row.
 That exactness lets the table keep separate entries for `Row` and `Column`,
-two subclasses of `Key` that carry the same `value` field.
+two classes that carry the same `value` field.
 The same exactness excludes a further subclass.
 An input whose class derives from `Money` matches none of `Money`'s rows,
 because the key is the input's exact class.
