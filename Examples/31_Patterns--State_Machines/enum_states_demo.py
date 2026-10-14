@@ -1,8 +1,8 @@
 # enum_states_demo.py
-from enum_states import StateMachine, Trap
+from enum_states import MouseTrap, StateMachine
 from mouse_moves import MOVES
 
-machine = StateMachine(Trap.WAITING)
+machine = StateMachine(MouseTrap.WAITING)
 for move in MOVES:
     before = machine.state
     result = machine.output(move)

@@ -5,46 +5,46 @@ from mouse_action import MouseAction as M
 from record import record
 
 type Behavior = Callable[[M], str]
-type Transition = Callable[[M], Trap]
+type Transition = Callable[[M], MouseTrap]
 
 @record
 class State:
     behavior: Behavior
     transition: Transition
 
-def waiting_next(input_: M) -> Trap:
+def waiting_next(input_: M) -> MouseTrap:
     match input_:
         case M.APPEARS:
-            return Trap.LURING
+            return MouseTrap.LURING
         case _:
-            return Trap.WAITING
+            return MouseTrap.WAITING
 
-def luring_next(input_: M) -> Trap:
+def luring_next(input_: M) -> MouseTrap:
     match input_:
         case M.RUNS_AWAY:
-            return Trap.WAITING
+            return MouseTrap.WAITING
         case M.ENTERS:
-            return Trap.TRAPPING
+            return MouseTrap.TRAPPING
         case _:
-            return Trap.LURING
+            return MouseTrap.LURING
 
-def trapping_next(input_: M) -> Trap:
+def trapping_next(input_: M) -> MouseTrap:
     match input_:
         case M.ESCAPES:
-            return Trap.WAITING
+            return MouseTrap.WAITING
         case M.TRAPPED:
-            return Trap.HOLDING
+            return MouseTrap.HOLDING
         case _:
-            return Trap.TRAPPING
+            return MouseTrap.TRAPPING
 
-def holding_next(input_: M) -> Trap:
+def holding_next(input_: M) -> MouseTrap:
     match input_:
         case M.REMOVED:
-            return Trap.WAITING
+            return MouseTrap.WAITING
         case _:
-            return Trap.HOLDING
+            return MouseTrap.HOLDING
 
-class Trap(State, Enum):
+class MouseTrap(State, Enum):
     WAITING = (lambda _: "Broadcasting cheese smell",
                waiting_next)
     LURING = (lambda _: "Presenting Cheese, door open",
@@ -53,7 +53,7 @@ class Trap(State, Enum):
     HOLDING = (lambda _: "Mouse caught", holding_next)
 
 class StateMachine:
-    def __init__(self, start: Trap) -> None:
+    def __init__(self, start: MouseTrap) -> None:
         self.state = start
 
     def output(self, input_: M) -> str:
