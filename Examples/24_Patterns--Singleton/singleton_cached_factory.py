@@ -12,7 +12,8 @@ def settings() -> Settings:
 
 a = settings()
 b = settings()
-assert a is b
+print(a is b)
+#: True
 a.data["theme"] = "dark"
 print(b)
 #: Settings(data={'theme': 'dark'})

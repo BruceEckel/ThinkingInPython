@@ -151,7 +151,8 @@ def settings() -> Settings:
 
 a = settings()
 b = settings()
-assert a is b
+print(a is b)
+#: True
 a.data["theme"] = "dark"
 print(b)
 #: Settings(data={'theme': 'dark'})
@@ -265,7 +266,7 @@ built outside the cache.
 ### The First-Call Race
 
 The first-call race is easy to see with a wide enough window.
-The three race listings in this chapter share a slow `Settings` and a `distinct_objects()` helper.
+The four race listings in this chapter share a slow `Settings` and a `distinct_objects()` helper.
 The helper calls a factory from eight threads at once and counts the distinct objects they get back:
 
 ```python
@@ -413,22 +414,21 @@ Eager creation is a better answer when you can build the object at import time:
 
 ```python
 # singleton_eager_factory.py
-from dataclasses import dataclass, field
 from functools import cache
-
-@dataclass
-class Settings:
-    data: dict[str, str] = field(default_factory=dict)
+from race_settings import Settings, distinct_objects
 
 @cache
 def settings() -> Settings:
     return Settings()
 
 settings()  # Build it before any thread can race for it
-print(settings() is settings())
-#: True
+print(distinct_objects(settings))
+#: 1
 ```
 
+Apart from the line it prints,
+the listing is `singleton_cached_race.py` plus the priming call,
+and the eight threads now get back one object.
 The priming call is safe for the same reason the module form is.
 The import system runs a module body once,
 so the object exists before any thread can ask for it.
