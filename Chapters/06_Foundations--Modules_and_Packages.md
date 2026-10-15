@@ -187,7 +187,8 @@ though it collects them in a dictionary instead of in the module's namespace.
 ## Packages
 
 As your programs get larger, you further organize your code into *packages*.
-A package is a directory that contains multiple modules.
+A package is a directory that contains multiple modules,
+each one a *submodule* of the package.
 It forms its own namespace, named after the directory.
 
 To make a directory a package, you put a special file named `__init__.py` in it.
@@ -674,7 +675,7 @@ The `__getattr__()` pattern serves code that must run on a Python older than 3.1
 
 ### Limits of `lazy`
 
-`lazy` works with both `import` and `from ... import`, but only at module scope.
+`lazy` works with both `import` and `from ... import`, but only at module level.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and Python likewise rejects `lazy from module import *` and a `lazy from __future__` import.
 
