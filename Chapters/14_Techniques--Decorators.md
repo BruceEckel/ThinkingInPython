@@ -876,7 +876,7 @@ For the same reason, `repeat_class.repeat` works on methods.
 Its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
 
-With a fully typed class-based decorator, like `trace_class.trace`,
+With a fully typed class-form decorator, like `trace_class.trace`,
 the type checker catches the failure in `method_decoration.py` before the program runs.
 It reports a missing argument and a type mismatch on a call like `ex.method(5)`.
 
@@ -1293,7 +1293,7 @@ Try each exercise before opening its [solution](../Solutions/14_Techniques--Deco
     (Whipped cream, Decaf, Extra shot).
     Build an espresso decorated with an extra shot and whipped cream,
     then print its cost and description.
-4.  Write `trace` as a class-based decorator that also keeps a class-level counter shared across every decorated function,
+4.  Write `trace` as a class-form decorator that also keeps a class-level counter shared across every decorated function,
     and report the total number of traced calls in the program.
     Note where the shared state lives compared to the per-instance `count` in `count_calls`.
 5.  Write a `memo` decorator that works both with and without parentheses,
@@ -1308,4 +1308,4 @@ Try each exercise before opening its [solution](../Solutions/14_Techniques--Deco
     and a second method with `logged` from `method_decoration.py`.
     Call the first through an instance,
     then print the type of the object each method name refers to in the class.
-    Explain why one class-based decorator works on a method and the other does not.
+    Explain why one class-form decorator works on a method and the other does not.

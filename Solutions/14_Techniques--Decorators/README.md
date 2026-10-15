@@ -333,7 +333,7 @@ since each layer reads `cost` and `description` from the one drink it wraps.
 
 ## 4. A class-level counter shared across every decorated function
 
-> Write `trace` as a class-based decorator that also keeps a class-level counter shared across every decorated function,
+> Write `trace` as a class-form decorator that also keeps a class-level counter shared across every decorated function,
 > and report the total number of traced calls in the program.
 > Note where the shared state lives compared to the per-instance `count` in `count_calls`.
 
@@ -744,7 +744,7 @@ the `TypeError` to the caller.
 > and a second method with `logged` from `method_decoration.py`.
 > Call the first through an instance,
 > then print the type of the object each method name refers to in the class.
-> Explain why one class-based decorator works on a method and the other does not.
+> Explain why one class-form decorator works on a method and the other does not.
 
 <details>
 <summary>Where to look</summary>
