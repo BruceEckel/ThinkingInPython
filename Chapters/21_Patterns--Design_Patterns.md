@@ -284,8 +284,8 @@ Both of that first chapter's design principles tell you to loosen one particular
 "Program to an interface,
 not an implementation" says stop naming concrete classes.
 "Favor object composition over class inheritance" says stop inheriting implementations.
-*GoF Design Patterns* has a name for the result, *abstract coupling*:
-a class that holds a reference to an abstract class "refers to a *type* of object,
+*GoF Design Patterns* has a name for the result, *abstract coupling*.
+A class that holds a reference to an abstract class "refers to a *type* of object,
 not a concrete object."
 Read this way, the catalog is one idea applied twenty-three times.
 
