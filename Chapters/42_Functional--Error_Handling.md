@@ -489,7 +489,7 @@ def test_manual_and_bind_agree(i: int) -> None:
 
 ## Combining Multiple Results
 
-`bind()` passes one value from each step to the next.
+`bind()` passes one answer from each step to the next.
 When you have several independent inputs,
 nest the binds so each answer stays in scope for the next step:
 
@@ -569,7 +569,7 @@ def test_combined_returns_answer_or_first_failure(
 In `steps.py`, `func_c()` wraps a division in a `try`/`except` and returns an `Err` by hand when the division raises a `ZeroDivisionError`.
 A decorator can capture that pattern.
 `@safe` takes a function that can raise an exception and produces one that returns a `Result`,
-with the exception as the `Err` value.
+with the exception as the error the `Err` wraps.
 Like `result.py`, it lives in `utils/` and any chapter can import it:
 
 ```python
