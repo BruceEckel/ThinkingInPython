@@ -76,8 +76,8 @@ print(70 + withdraw(30))
 The first `withdraw(30)` evaluates to `70`,
 so substituting `70` for it ought to change nothing.
 The substitution changes `110` into `140`.
-`withdraw()` is not referentially transparent,
-and every expression that calls it fails the same substitution.
+`withdraw()` is not referentially transparent.
+Every expression that calls it fails the same substitution.
 
 A `global` statement is one way to break substitution.
 A function that mutates an argument is another:
@@ -103,9 +103,11 @@ print(cart)
 Each call to `add_item()` returns the same list the caller passed in,
 so replacing the call with that list looks safe.
 It is not.
-The call also appends to `cart`, and the list put in its place appends nothing.
+The call also appends to `cart`.
+The list put in its place appends nothing.
 The rest of the listing puts the returned list in place of the `add_item()` call that produced it
-(`[1]`), and `cart` ends with a single `'eggs'`.
+(`[1]`).
+`cart` then ends with a single `'eggs'`.
 
 Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
@@ -153,7 +155,7 @@ and takes the wrapped function's referential transparency on trust.
 A pure function is automatically parallelizable.
 Each call's answer comes from its arguments alone, so no call affects another.
 The calls can run in any order, on any schedule, on any number of cores,
-and the answers stay the same.
+and still return the same answers.
 
 Shared state makes the answers depend on the schedule.
 Two parallel `withdraw()` calls could both read `balance` before either writes it back.
@@ -210,8 +212,8 @@ prints the two times only when you run the listing with `--numbers`.
 On the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
 well over the 1.3x margin `faster` checks.
-At small enough limits the serial run finishes before a pool has started its workers,
-and the parallel run takes longer than the serial one.
+At small enough limits the serial run finishes before a pool has started its workers.
+At those sizes the parallel run takes longer than the serial one.
 Purity makes parallel safe.
 Whether parallel runs faster at a given size is a separate question,
 and the timing answers it.
@@ -221,8 +223,8 @@ Each argument and each result pickles to cross the process boundary.
 The function pickles as its qualified name,
 so `count_primes()` must sit at the top level of a module a worker can import.
 A `lambda` or a [closure](40_Functional--Foundations.md#closures)
-fails with a `PicklingError`,
-and that rules out two shapes these chapters use often.
+fails with a `PicklingError`.
+That rules out two shapes these chapters use often.
 By contrast, a `functools.partial` pickles as its wrapped function plus its bound arguments.
 
 The `if __name__ == "__main__"` guard follows from the same import.
@@ -253,8 +255,8 @@ A description of the result is easier to check than a sequence of steps,
 because less of it can be wrong.
 
 A description of the result also leaves the steps to the runtime.
-A SQL query, a NumPy expression, or a dataframe operation describes its result,
-and the library chooses an optimized or parallel engine to compute it.
+A SQL query, a NumPy expression, or a dataframe operation describes its result.
+The library chooses an optimized or parallel engine to compute that result.
 
 You decide how far up the spectrum to go.
 
@@ -373,8 +375,8 @@ The framework automates falsification.
 
 ### Shrinking a Failure
 
-`property_check.py` and `test_property.py` both pass,
-and shrinking needs a failure.
+`property_check.py` and `test_property.py` both pass.
+Shrinking needs a failure.
 The next codec has a bug.
 Hypothesis exposes it with [unusual Unicode](#the-same-law-in-hypothesis):
 
