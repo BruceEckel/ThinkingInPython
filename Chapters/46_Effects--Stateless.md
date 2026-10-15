@@ -167,7 +167,7 @@ must capture stdout.
 
 `Depend[Need[Console], None]` states the dependency.
 A caller now has two options: supply a `Console`,
-or declare the same need in its own signature and pass the requirement to its own caller.
+or declare the same need in its own signature and pass the Ability to its own caller.
 A caller that does neither fails the type check.
 
 In `greeter.py`, two details deserve attention:
@@ -670,7 +670,7 @@ An Effect written as a bare statement is a discarded value there too.
 In ZIO Direct the fix is `.run`,
 and in a `for` comprehension it is the `<-` binding.
 In Python it is `yield from`.
-Deferred execution causes the hazard, not generators.
+The description/execution split causes the hazard, not generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
 You declare the Ability by hand, and the type checker verifies the declaration.
