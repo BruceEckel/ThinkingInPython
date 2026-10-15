@@ -71,12 +71,12 @@ print(vars(A)["x"])  # The class entry is unchanged
 Before the assignment, `vars(a)` is empty,
 so `a.x` falls back to the class and reads `100`.
 After `a.x = 1`, the instance's own entry shadows the class entry,
-and `a.x` reads `1` while `vars(A)["x"]` still holds `100`.
+so `a.x` reads `1` while `vars(A)["x"]` still holds `100`.
 
 The listing subscripts `vars(A)` instead of printing it whole,
 because a class's dictionary carries the compiler's own bookkeeping alongside `x`.
 That dictionary is a read-only `mappingproxy`,
-and writing to it raises a `TypeError`.
+so writing to it raises a `TypeError`.
 Assigning through the class name changes the entry, as `Stars.rating = 9` does,
 and `setattr(A, "x", 5)` does the same when the name arrives as a string.
 The instance dictionary is a plain `dict` holding what the code assigned,
@@ -140,8 +140,8 @@ show(b)
 #: 9
 ```
 
-`rerate(9)` changes the rating for every `Stars`,
-and `show(a)` still prints `1`.
+`rerate(9)` changes the rating for every `Stars`.
+`show(a)` still prints `1`.
 Someone debugging that stale `1` finds `rerate()` and `show()` both correct.
 The cause is the assignment inside `sell()`,
 which gave `a` its own `rating` before the class attribute changed.
@@ -249,7 +249,7 @@ Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrates in `class_attribute_confusion.py`.
 The `total` that `a` reports is `Tally.total`.
 The `[CV]` tag (for "class variable," another name for a class attribute)
-marks an attribute the class stores, and the tags agree.
+marks an attribute the class stores.
 `label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,
 keeps it.
 
@@ -274,7 +274,7 @@ instead of `label` appearing first inside the constructor.
 [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
 shows the case that requires the annotation.
 There, code outside the class sets the attribute,
-and the bare annotation is the type checker's one source for its type.
+so the bare annotation is the type checker's one source for its type.
 
 ### A `ClassVar` With No Value Declares Too
 
@@ -400,7 +400,8 @@ print(a.total, b.total, Tally.total)
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
-Every `Tally` counts itself once, and the shared counter stays at `0`.
+Every `Tally` counts itself once.
+The shared counter stays at `0`.
 The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 
@@ -559,8 +560,8 @@ print(vars(B)["x"], vars(B())["x"])
 #: 100 100
 ```
 
-`real_defaults.py`'s `A` and `inside_objects.py`'s `A` both start `x` at `100`,
-and the two behave in opposite ways.
+`real_defaults.py`'s `A` and `inside_objects.py`'s `A` both start `x` at `100`.
+The two behave in opposite ways.
 In `inside_objects.py` the class holds the `100` and every instance reads it.
 In `real_defaults.py` the `100` is a default argument,
 `__init__(self, x: int = 100) -> None`.
@@ -601,7 +602,7 @@ print(vars(b), B().x)  # The same shadowing as Stars
 ```
 
 The name stays an ordinary shared class attribute,
-and the generated `__init__()` is `__init__(self)`.
+so the generated `__init__()` is `__init__(self)`.
 Neither Python nor the type checker reports an error.
 `b.x = -1` shadows the class attribute for that one instance.
 An assignment through the class changes every instance that falls back to the class,
