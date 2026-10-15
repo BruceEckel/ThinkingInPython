@@ -196,7 +196,8 @@ Each generated class is a real type, not a label.
 `light` and `water` are both `Event` instances,
 so `isinstance(light, Event)` is `True`,
 but `type(light) is type(water)` is `False`.
-They belong to distinct subclasses, and `isinstance()` tells them apart.
+They belong to distinct subclasses.
+`isinstance()` tells them apart.
 
 Type checkers read different amounts of a `type()` call.
 `ty` reads the bases and a namespace written as a dict literal.
@@ -262,8 +263,8 @@ so `__missing__()` builds each class once.
 Without `__missing__()`,
 every caller would check for the name and build the missing class.
 
-A new `EventMakers` starts out empty, and `NAMES`, imported from `events.py`,
-holds the seven legitimate event names.
+A new `EventMakers` starts out empty.
+`NAMES`, imported from `events.py`, holds the seven legitimate event names.
 `__missing__()` checks a name against `NAMES` before building anything,
 so every key the dict acquires names a real event.
 
@@ -322,8 +323,8 @@ Each event carries its kind as its type,
 where `isinstance()` or a `match` class pattern can test it.
 
 Calling the base class, `Event(name, hour, minute)`,
-produces the right field values, but every entry shares one type,
-and the loop has no `RingBell` class for `isinstance()` to test.
+produces the right field values, but every entry shares one type.
+The loop then has no `RingBell` class for `isinstance()` to test.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
 
@@ -397,8 +398,8 @@ and `namespace[class_name]` is an `object`.
 Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
 `cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
-`EventMakers` stores each class it builds,
-and `make_class()` builds a fresh class on every call.
+`EventMakers` stores each class it builds.
+`make_class()` builds a fresh class on every call.
 Calling `make_class("Start")` twice produces two distinct classes.
 
 The `__init__()` in `klass` sits textually inside a `class` block,
@@ -437,13 +438,14 @@ because pickle looks the class up as `builtins.Start` and does not find it.
 because a built-in class carries no source.
 `type()`-built classes fail differently.
 `LightOn` gets `__module__` set to `events`,
-the module where `make()` calls `type()`, but the `makers` dict holds it,
-and the module has no attribute of that name.
+the module where `make()` calls `type()`.
+But the `makers` dict holds the class,
+and `events` has no attribute named `LightOn`.
 Pickle therefore looks for `events.LightOn` and does not find that either.
 `inspect.getsource()` raises an `OSError` instead of a `TypeError`.
 For both generators' classes, then,
-`pickle` and `inspect.getsource()` raise exceptions,
-and the rest of `inspect` works, as `display_object(MyList)` shows.
+`pickle` and `inspect.getsource()` raise exceptions.
+The rest of `inspect` works, as `display_object(MyList)` shows.
 
 Pickle records a class as its module and name,
 and checks that the pair leads back to the class.
@@ -926,7 +928,8 @@ Method binding is the descriptor protocol at work.
 
 Telling a class attribute its own name is another job that once needed a metaclass.
 In `x = Field()` below, `Field()` runs before the assignment,
-so `Field`'s constructor finishes before Python binds the name `x`.
+so `Field`'s constructor finishes before Python binds the name `x`,
+too early to learn it.
 Python delivers that name automatically.
 When a `class` body finishes executing,
 Python calls `__set_name__(owner, name)` on every class attribute that defines it,
@@ -1296,8 +1299,8 @@ so the singletons are independent.
 
 The `[T]` on `__call__()` ties its return type to `cls`,
 so `ty` infers `ASingleton` as the type of `ASingleton()` instead of `Any`.
-Without the `[T]`, every singleton comes back as `Any` under `ty` and Pyright,
-and a misspelled attribute access on the result passes the check.
+Without the `[T]`, every singleton comes back as `Any` under `ty` and Pyright.
+A misspelled attribute access on the result then passes the check.
 Under mypy the `[T]` changes nothing,
 because mypy ignores a metaclass `__call__()` return type and keeps `ASingleton` either way.
 
@@ -1347,7 +1350,8 @@ with expected(TypeError):
 ```
 
 The failure has nothing to do with metaclasses.
-`class X(list, dict): pass` fails the same way, and neither base is a metaclass.
+`class X(list, dict): pass` fails the same way.
+Neither base is a metaclass.
 Because `type`, `list`, and `dict` each bring a layout of their own,
 no class can combine two of them.
 
@@ -1387,8 +1391,8 @@ with expected(AttributeError):  # A metamethod: class only
 Lookup on `Sub` finds `helper()` through its metaclass,
 and lookup on a `Sub` instance does not.
 The `AttributeError` comes from the metamethod rule at the start of [Intercepting Instance Creation](#intercepting-instance-creation).
-Lookup on a `Sub` instance searches `Sub` and its bases,
-and `Mixin` sits among the bases of `HelperMeta` instead.
+Lookup on a `Sub` instance searches `Sub` and its bases.
+`Mixin` sits among the bases of `HelperMeta` instead.
 A `classmethod` works on both.
 
 A metaclass that needs a `dict` holds one in an attribute,
@@ -1455,8 +1459,8 @@ Use a metaclass when you need to change the class object rather than react to it
   (metamethods such as the `__call__()` in `singleton.py`, or the `__iter__()` that lets `EnumType` make `for c in Color` work).
 - Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
 - Enforcing an invariant across a family of classes that shares no base class.
-  `__init_subclass__()` requires a common base to define it,
-  and such a family shares a metaclass instead.
+  `__init_subclass__()` requires a common base to define it.
+  Such a family shares a metaclass instead.
 
 A metaclass can give the class object an `__iter__()`,
 the same method that lets `EnumType` make `for c in Color` work:
@@ -1541,8 +1545,8 @@ No other hook can detect the `on_open` at `[2]`.
 `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
 by which time `[2]` has overwritten `[1]`.
-The static half of the check is ruff's report of the same mistake,
-and the `# noqa: F811` suppresses it so the listing can run.
+The static half of the check is ruff's report of the same mistake.
+The `# noqa: F811` suppresses that report so the listing can run.
 `__prepare__()` detects the mistake at run time,
 including on names the body computes.
 
@@ -1899,7 +1903,7 @@ because a class inherits `object`'s version of any it leaves out,
 and the report lists an inherited dunder the same way as one the class wrote.
 `REDEFINED_DUNDERS` filters harder.
 Among those same four,
-it keeps only the ones whose value differs from `object`'s own,
+it keeps only the ones whose value differs from `object`'s version,
 so a class that overrides none of them shows no dunders.
 `_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
 deliberately narrowing the comparison to those four.
