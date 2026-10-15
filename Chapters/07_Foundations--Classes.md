@@ -124,8 +124,8 @@ With inheritance in C++ or Java,
 you often inherit to establish a common interface.
 Python is different.
 Because Python is dynamically typed,
-it applies an operation to an object without checking an interface first,
-so you inherit an implementation, to reuse the code from the base class.
+it applies an operation to an object without checking an interface first.
+You therefore inherit an implementation, to reuse the code from the base class.
 To name an interface,
 Python uses a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols),
 which describes the shape a function needs.
@@ -264,8 +264,8 @@ C().show()  # A comes first in the MRO
 `C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s `show()`,
 not `B`'s `show()`.
 The bases appear in the order the `class` statement lists them.
-Writing `class C(B, A)` puts `B` first,
-and `C().show()` then runs `B`'s version.
+Writing `class C(B, A)` puts `B` first.
+`C().show()` then runs `B`'s version.
 
 ### Calling the Base Constructor
 
@@ -339,8 +339,8 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 ```
 
 Python runs the program either way.
-Reporting the mistake takes a separate tool,
-and [Static Types](08_Foundations--Static_Types.md#the-type-checker-ty)
+Reporting the mistake takes a separate tool.
+[Static Types](08_Foundations--Static_Types.md#the-type-checker-ty)
 sets that tool up.
 
 At run time `@override` returns the same function object it received.
@@ -356,8 +356,8 @@ and dunders such as `__repr__()` and `__str__()` that replace a default inherite
 
 ## Properties
 
-With `@property`, you can start with a plain attribute and convert it to a computed one later,
-and the calling code stays as it was:
+With `@property`, you can start with a plain attribute and convert it to a computed one later.
+The calling code stays as it was:
 
 ```python
 # properties.py
@@ -648,8 +648,8 @@ so the alternative constructor produces the right kind of object.
 `Reading` inherits the method unchanged.
 `Reading.from_fahrenheit(212)` passes `Reading` as `cls`,
 so `type(r).__name__` reports `'Reading'`.
-Writing `return Temperature(...)` instead hard-codes the class,
-and `Reading.from_fahrenheit()` then returns a `Temperature`.
+Writing `return Temperature(...)` instead hard-codes the class.
+`Reading.from_fahrenheit()` then returns a `Temperature`.
 
 `is_freezing()` also works as a module-level function,
 and that is the usual choice.
