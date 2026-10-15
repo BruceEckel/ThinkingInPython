@@ -172,9 +172,9 @@ limited to the part that needs no type inference.
 
 ## The Examples
 
-The book targets Python 3.15 and later, uses type hints,
+The book targets Python 3.15 and later, uses type annotations,
 and tests with `pytest`.
-Early chapters mostly omit type hints,
+Early chapters mostly omit type annotations,
 until [Static Types](08_Foundations--Static_Types.md) introduces the syntax.
 Every chapter afterward uses them consistently.
 
@@ -185,7 +185,7 @@ Some are modules that another listing imports,
 and the `test_*.py` files hold tests that `pytest` runs.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the code block starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
+so the listing starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
 is the file `Examples/14_Techniques--Decorators/tracer.py`.
 
 A helper that more than one chapter uses carries a `utils/` path in its filename comment instead,
