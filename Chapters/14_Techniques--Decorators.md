@@ -769,7 +769,7 @@ Its `wrapper()` makes the first call before the loop,
 so `result` holds a value before the loop starts.
 `repeat.py` relies on the `times >= 1` check for that guarantee instead.
 
-`test_repeat_class.py` differs from `test_repeat.py` in its import alone:
+`test_repeat_class.py` differs from `test_repeat.py` in its import alone.
 `test_repeat_call_count` parametrizes over `times`,
 and `test_repeat_rejects_times_below_one` covers the rejection in the constructor:
 
