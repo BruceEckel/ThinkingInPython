@@ -64,13 +64,13 @@ It stores the CPU register set, which includes:
 - The stack pointer
 - Other registers and flags the program uses
 
-The context switch leaves the thread's stack in place,
-since every thread has its own.
+Every thread has its own stack,
+so the context switch leaves that stack in place.
 All threads in that process share a single heap.
 
 Context switching between threads is as efficient as possible,
-but it has overhead,
-and that overhead recurs because the OS must time slice frequently to distribute computing resources evenly across threads.
+but it has overhead.
+That overhead recurs because the OS must time slice frequently to distribute computing resources evenly across threads.
 Typically a thread runs only a few milliseconds at a time.
 
 Using more than one thread within a program solves an immediate problem.
@@ -201,8 +201,8 @@ and Python emits a `RuntimeWarning: coroutine 'fetch' was never awaited` when th
 `gather()` wraps each coroutine in a *task*,
 the event loop's unit of scheduling, and schedules the tasks in the order given.
 Scheduling and running are separate steps.
-`gather()` returns an *awaitable*, an object that `await` accepts,
-and the task bodies execute later, after `main()` suspends at its `await`,
+`gather()` returns an *awaitable*, an object that `await` accepts.
+The task bodies execute later, after `main()` suspends at its `await`,
 which returns control to the event loop.
 
 Each task runs until it reaches its own `await`,
@@ -248,8 +248,8 @@ writing the same price lookup twice.
 
 A `Meter` records the peak number of tasks in flight at once.
 `Meter` is a [context manager](15_Techniques--Context_Managers.md).
-`__enter__()` counts the task in flight, `__exit__()` counts it done,
-and `__exit__()` runs whether or not the body raises an exception.
+`__enter__()` counts the task in flight, and `__exit__()` counts it done.
+`__exit__()` runs whether or not the body raises an exception.
 A shared module defines `Meter` because [Semaphores](#semaphores) uses it too:
 
 ```python
@@ -485,8 +485,8 @@ How does `gather()` respond to a failure?
 If one of its coroutines raises an exception,
 `gather()` re-raises that exception into the awaiting code,
 but the other tasks it started keep running.
-Those other tasks become unsupervised,
-and `gather()` discards their results and errors.
+Those other tasks become unsupervised.
+`gather()` discards their results and errors.
 
 The next two listings run the same six fetches, which a shared module defines:
 
@@ -886,8 +886,8 @@ such as a set number of database connections.
 ## Deadlock and Livelock
 
 A lock fixes a race, but a program that takes two locks can stop altogether.
-Shared mutable state, not threads, is the source of deadlock and livelock,
-and `asyncio` shares it just as readily as threads do.
+Shared mutable state, not threads, is the source of deadlock and livelock.
+`asyncio` shares it just as readily as threads do.
 Removing the OS thread scheduler moves where these failures arise and leaves the failures themselves in place.
 With threads, a failure can arise anywhere the OS decides to preempt you.
 `asyncio` narrows those places to the `await` points you wrote yourself.
@@ -1027,16 +1027,16 @@ for example letting the task with the lower ID give way while the other proceeds
 Some values are not the subject of the work but the circumstances of it:
 which request the code is serving, which user authorized it,
 which trace to use for logging.
-Everything deep in the call chain needs them,
-and nothing in the middle uses them.
+Everything deep in the call chain needs them.
+Nothing in the middle uses them.
 Threading such a value through as a parameter adds it to the signature of every function in the middle,
 and every new caller must remember to pass it along.
 
 A module-level global is the obvious shortcut,
 and it fails as soon as two tasks overlap.
 `async_race.py` shows why.
-The last write replaces every earlier one,
-and each reader resumes to find another task's value.
+The last write replaces every earlier one.
+Each reader resumes to find another task's value.
 A `ContextVar` is the same convenience without that failure.
 It holds a value per *context*.
 Every task starts with a copy of the context current when `create_task()` runs,
@@ -1076,8 +1076,9 @@ asyncio.run(main())
 The listing puts the global and the `ContextVar` side by side because they behave differently for the same code.
 All three tasks assign both, then suspend at the `await`,
 then resume to read them back.
-Each task reads its own `request_id` and every task reads the same `current`,
-because by the time any of them resumes, the global holds `req-3`.
+Each task reads its own `request_id`.
+Every task reads the same `current`, because by the time any of them resumes,
+the global holds `req-3`.
 The last line shows the other direction.
 Because `main()` creates the tasks,
 their contexts are copies of `main()`'s context,
@@ -1838,8 +1839,8 @@ every blocked or future `get()` raises `queue.ShutDown` instead of waiting forev
 `consume()` catches it and returns,
 so `consumer.result()` completes instead of hanging.
 Calling `shutdown()` while items remain in the queue is safe too.
-Those items still come out through `get()` normally,
-and only a `get()` against an empty, shut-down queue raises `ShutDown`.
+Those items still come out through `get()` normally.
+Only a `get()` against an empty, shut-down queue raises `ShutDown`.
 A `put()` after `shutdown()` raises the same exception immediately,
 which tells a producer that the queue has shut down.
 
@@ -2023,8 +2024,8 @@ and `synchronized_iterator()` wraps the callable that makes them.
 Serializing solves the case where the workers divide one stream.
 When each worker needs the whole stream,
 `itertools.tee()` looks like the answer and is not.
-Tee'd iterators share an internal buffer with no locking,
-and advancing two of them from different threads at once can raise a `RuntimeError`.
+Tee'd iterators share an internal buffer with no locking.
+Advancing two of them from different threads at once can raise a `RuntimeError`.
 `threading.concurrent_tee()` is the answer:
 
 ```python
@@ -2048,18 +2049,18 @@ with ThreadPoolExecutor(max_workers=READERS) as pool:
 #: [4950, 4950, 4950, 4950]
 ```
 
-Each of the four threads sees all one hundred values,
-and the underlying generator advances once per value, not four times.
+Each of the four threads sees all one hundred values.
+The underlying generator advances once per value, not four times.
 
 One caution carries over.
-A `concurrent_tee()` iterator is safe to hand to one thread,
-and that is why the listing makes four of them.
+A `concurrent_tee()` iterator is safe to hand to one thread.
+That is why the listing makes four of them.
 Sharing a single one across several threads needs `serialize_iterator()` on top.
 
 `serialize_iterator()`, `synchronized_iterator()`,
 and `concurrent_tee()` arrived in 3.15.
-Before that, you wrote the lock wrapper yourself,
-and that wrapper is easy to get subtly wrong.
+Before that, you wrote the lock wrapper yourself.
+That wrapper is easy to get subtly wrong.
 The tempting fix is a lock inside the loop:
 
 ```
@@ -2269,8 +2270,8 @@ It leaves `asyncio`'s job as it was.
 
 Two numbers support the claim that a thread uses far more memory than a task.
 The first is the stack each new thread reserves.
-The platform sets its size,
-and `threading.stack_size()` changes it for threads created afterward.
+The platform sets its size.
+`threading.stack_size()` changes it for threads created afterward.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint,
 since a task consists of ordinary Python objects.
