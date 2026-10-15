@@ -886,7 +886,7 @@ and the movement code that runs afterward tests no types.
 
 The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
-so its cell gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
+so its room gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
 `show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
 
 `robot_maze.py` holds the maze as text in `MAZE`, which the demo, the tests,
@@ -1048,11 +1048,11 @@ because every route to the `!` passes through a teleport.
 
 A test can check the model without opening a window.
 `test_search_walks_the_robot_to_the_end()` builds the maze, searches it,
-walks the result, and checks that the robot finished on the `!` square.
+walks the result, and checks that the robot finished in the `!` room.
 `test_walls_block_and_food_is_eaten()` walks a three-cell maze east twice.
 The first move eats the food, and the second leaves the robot where it was,
 because a wall blocks it.
-A last step back west shows the food cell empty:
+A last step back west shows the room that held the food now empty:
 
 ```python
 # robot_explorer/test_robot.py
