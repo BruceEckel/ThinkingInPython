@@ -110,8 +110,8 @@ all from that one line.
 ## 3. A `NamedTuple` holding a list
 
 > Add a `NamedTuple` called `Recipe` with fields `name: str` and `steps: list[str]` to `color_namedtuple.py`.
-> Mutate the `steps` list of an instance and print the record.
-> Then try to use the record as a `dict` key and explain the result.
+> Mutate the `steps` list of an instance and print the `Recipe`.
+> Then try to use the `Recipe` as a `dict` key and explain the result.
 
 <details>
 <summary>Where to look</summary>
@@ -391,7 +391,7 @@ or a distinct type whose `==` matches its own class.
 > and say why the others do not:
 > a configuration bag whose keys first appear at runtime;
 > a 2D grid coordinate that must work as a `dict` key;
-> a record decoded from a JSON API response whose fields you also validate.
+> an object decoded from a JSON API response whose fields you also validate.
 
 <details>
 <summary>Where to look</summary>

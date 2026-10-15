@@ -148,7 +148,7 @@ This book's listings write the frozen form as [`@record`](18_Techniques--Perform
 
 ### `NamedTuple`
 
-A `NamedTuple` declares its fields the same way but produces an immutable record.
+A `NamedTuple` declares its fields the same way but produces immutable instances.
 `typing.NamedTuple` is the class form of [`namedtuple()`](03_Foundations--Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names.
 The class form adds a type for each field,
@@ -193,20 +193,20 @@ Because the constructor sets every field once,
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for a `NamedTuple`, a frozen data class,
 and any other type that defines `__replace__()`.
-Immutability also makes the record hashable,
+Immutability also makes a `NamedTuple` hashable,
 so a `Color` can serve as a `dict` key or a `set` element.
 
 Immutability applies to the fields, not to the objects they name.
 A `NamedTuple` holding a list lets that list change,
 the same leak [`frozen=True` has](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
-Such a record is also unhashable, mutated or not,
+Such a `NamedTuple` is also unhashable, mutated or not,
 because hashing a tuple hashes its contents,
 and `hash()` on a list raises a `TypeError`.
 An immutable record needs immutable fields.
 
 The leading underscore on `_replace()`, `_asdict()`,
 and `_fields` keeps the ordinary names free for your fields.
-A record can declare a field called `replace` or `fields`.
+A `NamedTuple` can declare a field called `replace` or `fields`.
 The underscore marks `NamedTuple`'s own members, not private ones.
 
 ## Returning Multiple Values
@@ -264,7 +264,7 @@ covers the recursive, copying behavior of `astuple()`.
 A `NamedTuple` inherits its equality from `tuple`,
 which compares elements by position and ignores the class.
 Any tuple-shaped value with the same contents compares equal,
-including a different record type with the same shape:
+including a different `NamedTuple` class with the same shape:
 
 ```python
 # still_a_tuple.py
@@ -446,7 +446,7 @@ and a `NamedTuple` for typed fields set once.
 The hand-rolled `Messenger` is worth writing only to show how `SimpleNamespace` works underneath.
 
 The frozen data class, which this book writes as `@record`,
-is the other typed immutable record.
+is the other immutable type with typed fields.
 Between it and a `NamedTuple`,
 the deciding question is whether tuple behavior is a feature.
 Choose `NamedTuple` when it is: unpacking, multiple return values,
@@ -479,8 +479,8 @@ Try each exercise before opening its [solution](../Solutions/22_Patterns--Data_T
     to the `Point` data class,
     and update the `Point(...)` call to pass three arguments.
 3.  Add a `NamedTuple` called `Recipe` with fields `name: str` and `steps: list[str]` to `color_namedtuple.py`.
-    Mutate the `steps` list of an instance and print the record.
-    Then try to use the record as a `dict` key and explain the result.
+    Mutate the `steps` list of an instance and print the `Recipe`.
+    Then try to use the `Recipe` as a `dict` key and explain the result.
 4.  In `display_namespace.py`,
     add a fourth attribute to `m` by passing it to the constructor,
     then add it by assignment after the existing `m.more = 11` instead.
@@ -499,7 +499,7 @@ Try each exercise before opening its [solution](../Solutions/22_Patterns--Data_T
     and say why the others do not:
     a configuration bag whose keys first appear at runtime;
     a 2D grid coordinate that must work as a `dict` key;
-    a record decoded from a JSON API response whose fields you also validate.
+    an object decoded from a JSON API response whose fields you also validate.
 8.  Give `point_tuple.py`'s `Point` an `__add__()` that returns a `Point`,
     and a `__repr__()` that prints `Point(1.0, 2.0)`.
     Check that slicing still returns a plain tuple.
