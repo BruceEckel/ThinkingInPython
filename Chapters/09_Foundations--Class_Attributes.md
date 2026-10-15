@@ -567,7 +567,7 @@ In `real_defaults.py` the `100` is a default argument,
 `__init__(self, x: int = 100) -> None`.
 `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
-A new `A()` holds `x` in its own dictionary from the start:
+A new `A()` holds `x` in its own dictionary from the start.
 `vars(A())` prints `{'x': 100}`,
 where `inside_objects.py`'s `vars(a)` prints `{}` until `a.x = 1` runs.
 
