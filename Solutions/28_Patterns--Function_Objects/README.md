@@ -147,8 +147,8 @@ still update the balance.
 
 ## 2. `chain.py`, reporting every attempt
 
-> Rewrite `chain.py` so each handler also reports why it failed,
-> and the solver prints every attempt before returning the winner.
+> Rewrite `chain.py` so each finder also reports why it failed,
+> and `first_root()` prints every attempt before returning the winner.
 
 <details>
 <summary>Where to look</summary>

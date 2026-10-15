@@ -495,7 +495,7 @@ The `[1.0, 1.3]` line shows the fall-through.
 Both ends of that interval lie below the root, so bisection returns `None`.
 The loop in `first_root()` then calls `secant()`,
 which needs no bracket and finds the root.
-Adding, removing, or reordering the handlers means editing the `chain` list.
+Adding, removing, or reordering the finders means editing the `chain` list.
 
 The test in `first_root()` is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero.
@@ -511,11 +511,11 @@ When `None` is a possible result, it cannot double as the failure mark,
 and a [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
 takes that role.
 
-Each handler decides for itself whether it succeeded,
+Each finder decides for itself whether it succeeded,
 and reports that decision as its return value.
 `secant()` and `newton()` report success when their latest step shrinks below the tolerance.
 A step below the tolerance is not quite the same as reaching a root,
-so a chain's answer is as trustworthy as the handler that gave it.
+so a chain's answer is as trustworthy as the finder that gave it.
 
 The test file confirms that:
 
@@ -1022,8 +1022,8 @@ Try each exercise before opening its [solution](../Solutions/28_Patterns--Functi
 1.  Add an "undo" capability to `command.py`.
     What do the commands need to become, and is a function still enough,
     or do you now want an object?
-2.  Rewrite `chain.py` so each handler also reports why it failed,
-    and the solver prints every attempt before returning the winner.
+2.  Rewrite `chain.py` so each finder also reports why it failed,
+    and `first_root()` prints every attempt before returning the winner.
 3.  Use `sorted()` with a `key` function to sort a list of `(name, score)` tuples by score,
     then by name.
     Explain why `key` is the *Strategy* pattern.
