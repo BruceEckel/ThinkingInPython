@@ -418,7 +418,7 @@ so the enum replaces the `dict` of name to state object a controller would other
 and `Enum` leaves a name whose value is a descriptor as a method rather than a member,
 so each value is a one-element tuple holding the function.
 `Enum` unpacks the tuple into the row's constructor,
-as it unpacks `trap_states.py`'s two-element tuples.
+as it unpacks the tuples in `trap_states.py`.
 
 The machine is the classic turnstile: `push` while locked does nothing (the
 `"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
@@ -439,9 +439,9 @@ from a file, one per line, takes one line of code:
 <details>
 <summary>Where to look</summary>
 
-[Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine) moves every rule out of the state classes and into data.
+[Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine) moves every rule out of the states' transition functions and into data.
 Key one `dict` on a `(state, word)` tuple and let its value be the next state.
-The controller then holds no rules, only a lookup.
+The controller then holds the table and does one lookup per word.
 
 <details>
 <summary>The shape</summary>
@@ -630,8 +630,8 @@ print(" ".join(m.name for m in moves[4:]))
 
 **Encode the legal successors.** `NEXT_ACTIONS` is a small state machine of its own: a dictionary from
 "the action just produced" to "the legal actions that can follow it,"
-including the special `None` key for "no action yet," which
-leads only to `APPEARS`.
+including the special `None` key for "no action yet," whose
+one successor is `APPEARS`.
 
 **Remember the last move.** The generator's own state is just `previous`,
 the last action it yielded. Each time `list()` calls `next()` on the
@@ -1058,7 +1058,7 @@ class HVAC(StateMachine):
 
 If you put the unconditional rule to `HVACState.IDLE` first
 under `(IDLE, TemperatureReading)`, every reading prints `IDLE`, from
-`15 IDLE` through `30 IDLE`. `handle()` takes the first rule whose
+`15 IDLE` to `20 IDLE`. `handle()` takes the first rule whose
 condition passes, and a rule with no condition always passes, so the
 machine stops there and does not reach the `too_cold()` and `too_hot()`
 rules below it. The solution lists the conditional rules first and keeps
@@ -1142,7 +1142,7 @@ keep the default `None` condition too, so both fields are optional per rule.
 </details>
 </details>
 
-## 9. A `Nickel` the table has never heard of
+## 9. A `Nickel` with No Rule
 
 > Build a two-state machine that collects `Money`,
 > modeled on the machine in `vending_machine.py`.
@@ -1270,7 +1270,7 @@ needs a rule for every state that accepts
 money, so a machine with five states and six coins carries thirty rules
 that all do the same thing.
 
-Fix 1 is the right fix when the new subclass really does behave
+Fix 1 is the right fix when the new input behaves
 differently, as `Row` and `Column` do in
 `vending_machine.py`. They exist as separate classes so they arrive
 under different keys.

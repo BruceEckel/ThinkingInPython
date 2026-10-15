@@ -20,7 +20,8 @@ In the second, a single table holds all transitions.
 
 ## Each State Decides
 
-A `State` is a record holding the function that produces the next `State` and an action that produces the `State`'s behavior:
+A `State` is a record holding a message to print,
+the function that chooses the next `State`, and an action:
 
 ```python
 # state.py
@@ -71,8 +72,8 @@ class Mouse(StrEnum):
 We use an [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 to define a restricted set of objects.
 Because `Mouse` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
-each member is a `str`.
-`step()` prints `mouse appears` rather than `Mouse.APPEARS`.
+each member is a `str`, and `print()` shows a member as its value,
+`mouse appears` rather than `Mouse.APPEARS`.
 
 A sequence of nine moves covers every transition in the trap:
 
@@ -140,9 +141,9 @@ Each transition function contains a `case` for every input its state recognizes,
 and produces the state the trap enters next.
 The default `case _` returns the current state, so the state stays the same.
 Each function names `TrapState`, which the file defines below them.
-A function body runs when it is called, not at the `def`,
+A function body runs at the call, not at the `def`,
 so by the first call the whole module has loaded and `TrapState` exists.
-`chime()` is the trap's one action: it sounds when a mouse is caught.
+`chime()` is the trap's one action: it sounds when the trap catches a mouse.
 
 `TrapState` is an `Enum` whose members are the records, in the same file:
 
@@ -193,7 +194,7 @@ The `step()` parameter is `input_`, with a trailing underscore,
 because a bare `input` shadows the builtin `input()`.
 `step()` prints the transition (the old state, the input, and the new state),
 then calls `run()` on the new state, the one the machine has just entered.
-`run()` fires on entry:
+`run()` is an entry action:
 each transition arrives in a state and calls that state's `run()`,
 and the constructor calls the initial state's `run()` for the same reason.
 A state prints as its name, through the `__str__()` that `TrapState` defines.
@@ -209,7 +210,7 @@ while each `State`'s fields supply the varying behavior:
 `next` chooses the successor, and `action` does what that state alone does.
 
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
-then feeds a fresh trap the one input for which `waiting()` has no `case`:
+then feeds a fresh trap an input that `waiting()`'s `case _` alone matches:
 
 ```python
 # trap_states_demo.py
@@ -254,10 +255,11 @@ so constructing the machine starts the engine.
 [*Template Method* discourages that choice](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
 Two facts make that choice safe here:
 the call is the constructor's last statement,
-and no state's `run()` reads anything off the machine.
+and a state's `run()` reads the state's own fields alone.
 
-`test_trap_states.py` holds the trap to two facts the trace shows:
-the nine moves bring it back to `Waiting`,
+`test_trap_states.py` checks two facts:
+the nine moves bring the trap back to `Waiting`, as the trace shows,
+
 and every state answers every move with a state:
 
 ```python
@@ -279,14 +281,14 @@ def test_every_state_answers_every_move() -> None:
 ```
 
 The second test iterates the enum,
-so a state added to `TrapState` joins the test with no edit to the test.
+so a member added to `TrapState` is tested as soon as it exists.
 
 Two consequences follow from the mixin.
 `Enum` folds members with equal values into one,
 and a record's equality compares its fields,
 so two members with the same message, the same function,
 and the same action collapse into a single member with two names.
-Every state therefore needs a transition function of its own.
+Two states that share a transition function must differ in their message or their action.
 The type checker reads `next` from the record's field and checks the engine's call `state.next(input_)` against it.
 It leaves a member's tuple uncompared with the fields:
 a tuple holding the message alone, or the two in the wrong order,
@@ -326,9 +328,8 @@ and the table keys on that class rather than on a value.
 
 This design reuses two names with new meanings.
 `table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
-`State` is now an `Enum` of names rather than the record the mousetrap's states are.
-The states in this design are bare names.
-The table holds all the behavior.
+`State` is now an `Enum` of bare names rather than the record the mousetrap's states are,
+and the table holds all the behavior.
 
 The name `table_machine.py` differs from the first engine's `state_machine.py` on purpose.
 Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md),
@@ -390,15 +391,14 @@ go to `next_state`, running `action` if the rule has one,
 provided `condition` passes if the rule has one.
 A state is an `Enum` member,
 so a misspelled state is a type error rather than a silent dead end.
-`Rule` is generic in `I`, the input class, and `input_type` is `type[I]`:
-a rule that names `Column` as its input type has `I` of `Column`,
-and the checker then requires that rule's `action` and `condition` to accept a `Column`.
+`Rule` is generic in `I`, the input class, and `input_type` is `type[I]`,
+so a rule's `action` and `condition` must accept the class its `input_type` names.
 
 The constructor groups the rules by `(state, input_type)` into a dictionary,
 so `handle()` finds the candidates for the current state and the input's class in one lookup.
 The engine holds the rules as `Rule[Any]`:
 it calls each condition and action with whatever input arrived,
-and the input class was checked where the rule was built.
+and the checker matched each input class to its methods where the rule was built.
 
 The listing writes `StateMachine` by hand rather than as a `@dataclass`.
 A generated `__init__()` names each parameter after its field and stores it unchanged.
@@ -433,9 +433,9 @@ A `Row` moves it to `SELECTING`.
 A `Column` moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
-The vending machine's states need no value,
-since the demo prints a state by its `name`.
-It only needs a plain `Enum` with `auto()` initialization:
+The vending machine's states carry no data,
+and the demo prints a state by its `name`,
+so a plain `Enum` with `auto()` values is enough:
 
 ```python
 # vending_machine.py
@@ -499,10 +499,8 @@ because `dispense()` decrements its `quantity` in place.
 
 The engine's lookup keys on the exact `type(input_)`,
 so finding the rules takes one dictionary lookup rather than an `isinstance()` test against each rule.
-That exactness lets the table keep separate entries for `Row` and `Column`,
-two input classes that each carry a grid index.
-The same exactness excludes a further subclass.
-An input whose class derives from `Money` matches none of `Money`'s rules,
+The same lookup excludes a subclass:
+an input whose class derives from `Money` matches none of `Money`'s rules,
 because the key is the input's exact class.
 
 `VendingMachine` holds the table, its conditions, and its actions:
@@ -598,7 +596,7 @@ If you pair `Column` with `choose_row()`, written for a `Row`,
 `ty` reports `invalid-argument-type` on that rule.
 `refund()` accepts `object`, so it pairs with any input type.
 
-The list is bound to `rules`, with no annotation, before the call.
+The listing binds the list to `rules`, with no annotation, before the call.
 Written inline as the argument,
 the list would take the parameter's `Sequence[Rule[Any]]` as its expected type,
 and that `Any` would reach into every `Rule(...)` and make its `I` `Any`,
@@ -662,8 +660,8 @@ The sold-out and too-expensive clears both start from `SELECTING` on a column,
 both print `Cleared`, and end in different states.
 Too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
-The state after the arrow names the condition.
-The message alone leaves you inferring the condition from the quantity.
+The state after the arrow names the condition;
+the message alone would leave you to infer it from the `left` count.
 
 The last three inputs insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
@@ -773,7 +771,8 @@ and in return it can read the input that caused the transition.
 In both designs the states are `Enum` members.
 `list(TrapState)` enumerates every state,
 and a parameter typed `TrapState` accepts a member and rejects anything else.
-A member is one frozen record shared by every machine that uses it,
+A member is one object shared by every machine that uses it,
+and in the first design a frozen record besides,
 so a state that keeps data of its own has nowhere to put it.
 Such a state is a class with a `run()` and a `next()` of its own,
 and an engine that drives both a class and a record types its parameter as a Protocol naming those two methods.
@@ -790,7 +789,7 @@ A machine with a few states works in either,
 and a machine you drew as a diagram first belongs in the table.
 
 With either design you write for yourself what a library supplies.
-Mature libraries such as `transitions` and `python-statemachine` supply guards,
+Mature libraries such as `transitions` and `python-statemachine` offer guards,
 callbacks, and hierarchical states.
 Using a library adds a dependency.
 Choose one of the designs here when you cannot take that dependency,
