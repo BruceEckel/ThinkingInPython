@@ -63,7 +63,7 @@ def comprehension() -> str:
     top, bottom = BOX_Y, BOX_Y + BOX_H
     b += step(a_x + 30, 22, 4, "Output Expression")
     b += arrow((a_x, 28), (a_x, top), MUTED, "lc-muted")
-    b += step(list_x, 22, 1, "Input Sequence")
+    b += step(list_x, 22, 1, "Input Iterable")
     b += arrow((list_x, 28), (list_x, top), MUTED, "lc-muted")
     b += arrow((e_x, bottom + 26), (e_x, bottom), MUTED, "lc-muted")
     b += step(e_x, bottom + 42, 2, "Variable")
