@@ -433,15 +433,15 @@ One more diagram explains why so many of the pattern chapters subtract code as t
 Take a caller, a function `area()` that needs the area of whatever it receives,
 and write the same dependence three ways.
 
-![One dependency written three ways](_images/coupling_edges)
+![One dependence written three ways](_images/coupling_edges)
 
 With an abstract base class, two edges exist in source:
 the caller names `Shape`, and `Circle` names `Shape` in its `class` line.
 With a `Protocol`, one edge exists in source.
 `Circle` does not mention `Shape`.
 The type checker connects the two when it compares `Circle`'s members with the protocol's members,
-and the figure draws that connection as a dotted edge.
-A dotted edge exists only at check time,
+and the figure draws that connection as a dashed edge with a hollow head.
+A dashed edge exists only at check time,
 and neither of its ends names the other.
 With a `Callable`, the interface has no name and no file of its own.
 The caller's signature declares it,
@@ -495,7 +495,7 @@ and the rest are here for your own designs.
     The Law of Demeter is another way to say "minimize coupling."
 -   *Independence* or *Orthogonality*.
     Express independent ideas independently.
-    Orthogonality complements separating what varies from what stays the same,
+    Orthogonality complements separating things that change from things that stay the same,
     and is part of the Low-Coupling-High-Cohesion message.
     Coupling is the degree to which one part depends on another,
     so low coupling means few connections between parts.
@@ -556,7 +556,7 @@ You can hold this handful of fundamental ideas in your head while analyzing a de
 
 Most of the chapters ahead take a pattern,
 or a family of patterns that share a structure, and ask three questions of it.
-What varies and what stays the same?
+What changes and what stays the same?
 That names the problem the pattern exists to solve.
 How much of the answer does Python supply on its own?
 That decides how much remains for you to write.
@@ -572,7 +572,7 @@ through [*Memento*](36_Patterns--Memento.md),
 each pattern chapter includes a figure of its pattern at work,
 drawn from that chapter's own listings.
 The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
-shows which way each dependency points.
+shows which way each edge points.
 Each chapter's figure shows what happens, in what order,
 and which part knows about which.
 
