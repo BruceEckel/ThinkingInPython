@@ -355,12 +355,12 @@ Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
 uses this same self-registration.
-`Shape.__subclasses__()` can build the table instead,
+`Shape.__subclasses__()` can build the registry instead,
 but it stops at direct subclasses,
 while `__init_subclass__()` runs for every class anywhere below `Shape`.
 
 Importing `registry` runs its two `class` statements,
-and the key list shows the table they left behind:
+and the key list shows the registry they left behind:
 
 ```python
 # registry_demo.py
@@ -421,18 +421,18 @@ the second to register silently replaces the first.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
 
 The registry also keeps every entry it receives.
-A class defined inside a function or a test stays in the table,
+A class defined inside a function or a test stays in the registry,
 and the strong reference keeps the class alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose.
 `cls.registry` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
-so a subclass that defines its own `registry` creates a second table beside the one `make()` reads,
+so a subclass that defines its own `registry` creates a second registry beside the one `make()` reads,
 with no error to signal it.
 
 `make()` stays a module-level function for three reasons.
 A `@classmethod` looks up `cls.registry`.
 When a subclass such as `Triangle` defines its own `registry`,
-`Triangle.make()` reads that second table,
+`Triangle.make()` reads that second registry,
 the one `__init_subclass__()` avoids by naming `Shape.registry`.
 And `Circle.make("Square")` is legal as well as misleading,
 since the key decides what `make()` builds,
@@ -618,7 +618,7 @@ def test_each_factory_starts_empty() -> None:
 `test_each_factory_starts_empty()` passes although `test_make_builds_a_registered_class()` registered `Triangle`,
 because each test registers with a `ShapeFactory` of its own.
 Every test in `test_registry.py` shares `Shape.registry`,
-one table for the whole process,
+one registry for the whole process,
 so `test_unknown_name_raises_key_error()` there asks for `"Hexagon"`.
 
 The ordinary Python factory is a dictionary of classes,
@@ -1331,7 +1331,7 @@ Match the machinery to what varies:
   When each builder call sets one optional value,
   keyword arguments are the builder.
 
-The static `factory()` method and the nested-`Factory`-class dispatcher are here because the object-oriented tradition writes factories that way,
+The static `factory()` method and the factory objects in nested `Factory` classes are here because the object-oriented tradition writes factories that way,
 not because Python needs them.
 Both exist to work around languages where a class is not an object you can put in a dictionary.
 
@@ -1368,7 +1368,7 @@ Try each exercise before opening its [solution](../Solutions/27_Patterns--Factor
     (`uv run pytest Examples/27_Patterns--Factory/test_prototype.py` from the repository root),
     and explain which assertions fail and why.
     Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
-8.  Recreate the `eval()` dispatcher described after `shape_factory_objects.py`'s listing:
+8.  Recreate the `eval()` factory described after `shape_factory_objects.py`'s listing:
     a `create_shape()` that builds each factory with `eval(f"_{kind}.Factory()")` instead of consulting `FACTORIES`.
     Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
     and show that it runs the expression.

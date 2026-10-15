@@ -1003,7 +1003,7 @@ The second assertion tests that spawn, the one `copy.copy()` corrupts.
 
 ## 8. What the `eval()` dispatcher accepts
 
-> Recreate the `eval()` dispatcher described after `shape_factory_objects.py`'s listing:
+> Recreate the `eval()` factory described after `shape_factory_objects.py`'s listing:
 > a `create_shape()` that builds each factory with `eval(f"_{kind}.Factory()")` instead of consulting `FACTORIES`.
 > Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
 > and show that it runs the expression.
