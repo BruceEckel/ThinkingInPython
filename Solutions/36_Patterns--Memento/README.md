@@ -2,7 +2,7 @@
 
 ## 1. `erase()` in both sketches
 
-> Add `erase()` to both sketches.
+> Add `erase()` to both `Sketch` and `Drawing`.
 > It removes the last stroke.
 > In `sketch.py` it mutates.
 > In `frozen_sketch.py` it returns a new `Drawing`.

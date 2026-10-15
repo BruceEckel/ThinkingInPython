@@ -144,7 +144,7 @@ leaving `checkpoint.strokes` alone.
 Languages with access control enforce that rule.
 In Python the rule is a convention,
 though a frozen memento raises an exception on an accidental edit.
-Assigning different strokes to the snapshot raises a `FrozenInstanceError`.
+Assigning different strokes to the memento raises a `FrozenInstanceError`.
 
 ### Why `Memento` Is a Class
 
@@ -213,7 +213,7 @@ with expected(FrozenInstanceError):
 
 `restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`,
 so it installs the stray tuple as the sketch's state with no complaint.
-`restore()` accepts the checkpoint and brings back `circle`,
+`restore()` accepts the memento and brings back `circle`,
 and the type checker reports the plain tuple before the program runs.
 At runtime, `restore()` raises an `AttributeError` when it reads `memento.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
@@ -256,7 +256,7 @@ def test_drawing_after_restore_spares_memento() -> None:
 
 `test_drawing_after_restore_spares_memento()` checks for the sharing bug.
 If the memento shares a mutable list with the sketch (see exercise 4),
-drawing after a restore appends to the snapshot's list too.
+drawing after a restore appends to the memento's list too.
 Both `save()` and `restore()` must copy.
 
 ## Immutability
@@ -820,7 +820,7 @@ Whenever you see rewind, rollback, or restore, something produces mementos.
 
 Try each exercise before opening its [solution](../Solutions/36_Patterns--Memento/).
 
-1.  Add `erase()` to both sketches.
+1.  Add `erase()` to both `Sketch` and `Drawing`.
     It removes the last stroke.
     In `sketch.py` it mutates.
     In `frozen_sketch.py` it returns a new `Drawing`.
