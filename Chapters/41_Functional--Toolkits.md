@@ -1219,7 +1219,7 @@ The rule for both modules is the same.
 Before writing a loop, ask whether the loop has a name in one of these modules.
 A running total is `accumulate()`, a width-two sliding window is `pairwise()`,
 a remainder-safe chunking is `batched()`,
-and a memoized pure function is `@cache`.
+and a cached pure function is `@cache`.
 Each of those replaces a small piece of code that works on the first input you try and fails on the empty input,
 the single element, or the last partial batch.
 
