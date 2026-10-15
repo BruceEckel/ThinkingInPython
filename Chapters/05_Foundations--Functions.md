@@ -145,8 +145,8 @@ including a required one such as `host`, which the last call names.
 At the call site, write every keyword argument after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
 `positional argument follows keyword argument`.
-The grammar allows a few rarer arrangements that this chapter leaves alone,
-and keeping the keyword arguments last avoids every one of them.
+The grammar allows a few rarer arrangements that this chapter leaves alone.
+Keeping the keyword arguments last avoids every one of them.
 
 Every required parameter must come before the first parameter with a default.
 `def f(a=1, b):` is a `SyntaxError`:
@@ -189,8 +189,8 @@ print(good_append(2))
 ```
 
 A mutable default persists because the function object holds it and every call reuses it.
-The function object keeps its default values in the tuple `__defaults__`,
-and both calls append to the same list inside that tuple.
+The function object keeps its default values in the tuple `__defaults__`.
+Both calls append to the same list inside that tuple.
 The default looks like an expression each call evaluates,
 but Python evaluates it once, at the `def`.
 
@@ -565,7 +565,7 @@ With `def trace(func, /, *args, **kwargs)`,
 `kwargs` collects a caller's `func=` keyword,
 and `trace()` passes it on to the wrapped function.
 Without the `/`, the same keyword gives `trace()`'s own `func` a second value,
-and the call raises a `TypeError`.
+so the call raises a `TypeError`.
 
 ## Lambdas
 
