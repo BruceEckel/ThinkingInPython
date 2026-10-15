@@ -33,8 +33,8 @@ To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
 Two unknown types means two dispatches, which is *double dispatching*.
 In `paper_scissors_rock.py`,
-both interacting objects come from a single hierarchy,
-and the two dispatches go through methods named `compete()` and `eval_*()`.
+both interacting objects come from a single hierarchy.
+The two dispatches go through methods named `compete()` and `eval_*()`.
 If two different type hierarchies interact,
 you need a dispatching method call for each hierarchy.
 
@@ -173,7 +173,8 @@ and calls `paper.eval_scissors(...)`.
 That call is the second dispatch.
 It resolves `paper` and runs `Paper.eval_scissors()`,
 the one method that the two dispatches together select.
-Its class is `Paper` and its name says `Scissors`.
+Its class is `Paper`.
+Its name says `Scissors`.
 Which item does that method's result describe?
 `Paper.eval_scissors()` returns `WIN`.
 Scissors cut paper, so that is the outcome for the scissors that started the duel,
@@ -190,8 +191,8 @@ This game ignores the argument,
 since the outcome depends on the two types alone.
 
 Those `Any` annotations turn off static checking.
-Classes that supply eight of the nine answers then pass the type checker,
-and Python raises an `AttributeError` at the first duel that calls the ninth.
+Classes that supply eight of the nine answers then pass the type checker.
+Python raises an `AttributeError` at the first duel that calls the ninth.
 `Item` declares `__str__()` alone,
 so each `opponent` and `caller` parameter takes `Any`.
 A precise type needs a declaration of all four methods,
@@ -263,7 +264,7 @@ the versions differ in where each one keeps the grid.
 The method version stores one column of the grid in each class,
 so finding a cell takes two dispatches.
 The table version stores the whole grid in `OUTCOME`,
-and one lookup finds the same cell.
+so one lookup finds the same cell.
 
 The dashed fourth item shows what adding a class requires of each version.
 In the method version,
@@ -312,13 +313,12 @@ per-type functions, as [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-
 shows.
 For dispatch on two or more types at once,
 the `OUTCOME` table is the idiomatic answer: a `dict` keyed by a tuple of types.
-Adding a new `Item` then means adding rows to the table,
-and the classes stay as they are.
+Adding a new `Item` then means adding rows to the table and leaving the classes as they are.
 
 `singledispatch` and the table match types differently.
 `singledispatch` resolves through the MRO,
-so a function registered for a base class serves every subclass,
-while the table matches the class exactly.
+so a function registered for a base class serves every subclass.
+The table matches the class exactly.
 Swapping one for the other changes which pairings the code covers,
 as well as how many types it considers.
 
@@ -476,7 +476,7 @@ an ordinary override.
 Both overrides are necessary.
 With the `compete()` override alone,
 the inherited `Paper.eval_rock()` reports that the rock loses,
-and the two orders of one duel disagree.
+so the two orders of one duel disagree.
 Every other combination comes from `Paper`,
 through `super().compete(opponent)` and the inherited `eval_*()` methods.
 
