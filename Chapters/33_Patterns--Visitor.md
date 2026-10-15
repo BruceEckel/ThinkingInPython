@@ -421,8 +421,8 @@ In `bug_visits.py` the loop that calls `accept()` sits outside the hierarchy,
 at module level, and takes one flower at a time from a tuple.
 In `recursive_accept.py` the loop runs inside `accept()`,
 the situation where the classic pattern still fits.
-Every visitor reuses that one loop:
-the `Bee` and the `Worm` both reach the nested `Ranunculus` through it.
+Every visitor reuses that one loop.
+The `Bee` and the `Worm` both reach the nested `Ranunculus` through it.
 A new visitor defines `visit()` for a single flower.
 `Corsage.accept()` passes that visitor to every nested element.
 
