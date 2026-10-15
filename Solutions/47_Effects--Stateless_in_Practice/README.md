@@ -912,7 +912,7 @@ Only in the Effect version does a tool report that the set of failures changed.
 
 > `scenarios.py` supplies a `DeadWire` that fails without printing anything.
 > Write a `StaleWire` whose `latest()` prints `feed: fetching` and then raises `Unavailable`.
-> Predict the trace, then say why it differs from `DeadWire`'s even though both fail the same way.
+> Predict the trace, then say why it differs from `DeadWire`'s trace even though both fail the same way.
 
 <details>
 <summary>Where to look</summary>
