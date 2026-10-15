@@ -503,7 +503,7 @@ Code that checks a surrogate with `isinstance()` should check for the method ins
 3.  *Protection proxy*.
     Restricts the client programmer's access to the implementation.
 4.  *Smart reference*.
-    Adds actions when code accesses the proxied object.
+    Adds actions when code accesses the implementation.
     For example, a smart reference can log the calls to a particular method.
     It can also count the references to an object,
     which makes *copy-on-write* possible.
