@@ -460,7 +460,8 @@ The last form is a class decorator.
 
 ### Lazy Creation
 
-The classic approach is lazy: it builds the inner object on the first call,
+The classic approach is lazy.
+It builds the inner object on the first call,
 so it needs the `None` sentinel and the `if` guard.
 
 ```python
