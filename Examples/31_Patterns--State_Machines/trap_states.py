@@ -3,14 +3,14 @@ from enum import Enum
 from mouse import Mouse
 from state import State
 
-def waiting(input_: object) -> TrapState:
+def waiting(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
-def luring(input_: object) -> TrapState:
+def luring(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.RUNS_AWAY:
             return TrapState.WAITING
@@ -19,7 +19,7 @@ def luring(input_: object) -> TrapState:
         case _:
             return TrapState.LURING
 
-def trapping(input_: object) -> TrapState:
+def trapping(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.ESCAPES:
             return TrapState.WAITING
@@ -28,18 +28,18 @@ def trapping(input_: object) -> TrapState:
         case _:
             return TrapState.TRAPPING
 
-def holding(input_: object) -> TrapState:
+def holding(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.REMOVED:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
 
+# trap_states.py (continued)
 def chime() -> None:
     print("*ding*")
 
-# trap_states.py (continued)
-class TrapState(State, Enum):
+class TrapState(State[Mouse], Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)

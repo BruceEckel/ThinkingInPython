@@ -3,9 +3,9 @@ from collections.abc import Callable
 from record import record
 
 @record
-class State:
+class State[I]:
     message: str
-    next: Callable[[object], State]
+    next: Callable[[I], State[I]]
     action: Callable[[], None] = lambda: None
 
     def run(self) -> None:

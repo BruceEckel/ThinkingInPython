@@ -5,27 +5,27 @@ from record import record
 
 # The chapter's state.py and state_machine.py, inlined:
 @record
-class State:
+class State[I]:
     message: str
-    next: Callable[[object], State]
+    next: Callable[[I], State[I]]
     action: Callable[[], None] = lambda: None
 
     def run(self) -> None:
         print(self.message)
         self.action()
 
-class StateMachine:
-    def __init__(self, initial_state: State) -> None:
+class StateMachine[I]:
+    def __init__(self, initial_state: State[I]) -> None:
         self.current_state = initial_state
         self.current_state.run()
-    def step(self, input_: object) -> None:
+    def step(self, input_: I) -> None:
         state = self.current_state
         self.current_state = state.next(input_)
         print(state, input_, "->", self.current_state)
         self.current_state.run()
 
-def run_all(machine: StateMachine,
-            inputs: Iterable[object]) -> None:
+def run_all[I](machine: StateMachine[I],
+               inputs: Iterable[I]) -> None:
     for input_ in inputs:
         machine.step(input_)
 
@@ -34,7 +34,7 @@ class Input(StrEnum):
     CALM = "calm"
     TAKE_PILL = "take pill"
 
-def happy(input_: object) -> Mood:
+def happy(input_: Input) -> Mood:
     match input_:
         case Input.ANNOY:
             return Mood.GRUMPY
@@ -43,7 +43,7 @@ def happy(input_: object) -> Mood:
         case _:
             return Mood.HAPPY
 
-def grumpy(input_: object) -> Mood:
+def grumpy(input_: Input) -> Mood:
     match input_:
         case Input.CALM:
             return Mood.HAPPY
@@ -52,7 +52,7 @@ def grumpy(input_: object) -> Mood:
         case _:
             return Mood.GRUMPY
 
-class Mood(State, Enum):
+class Mood(State[Input], Enum):
     HAPPY = ("Great to see you!", happy)
     GRUMPY = ("What do you want?", grumpy)
     PROZAC = ("Everything is wonderful.",

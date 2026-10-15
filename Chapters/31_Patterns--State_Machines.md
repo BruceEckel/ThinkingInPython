@@ -29,9 +29,9 @@ from collections.abc import Callable
 from record import record
 
 @record
-class State:
+class State[I]:
     message: str
-    next: Callable[[object], State]
+    next: Callable[[I], State[I]]
     action: Callable[[], None] = lambda: None
 
     def run(self) -> None:
@@ -44,6 +44,11 @@ so neither receives `self`.
 `state.next(input_)` passes the input alone.
 The state plus input decides the next state.
 
+`State` is generic in `I`, the type of input the machine reads.
+`next` takes an `I` and returns another `State[I]`,
+so one engine serves machines with different input types,
+and each machine's transition functions declare the input type they accept.
+
 This is a *Moore machine*, where what a state does depends on the state alone.
 `run()` calls `self.action()` with no arguments.
 `action` defaults to a do-nothing function.
@@ -55,7 +60,7 @@ However, Python supplies `self` only when the lookup finds the function on the c
 Here, `next` and `action` are references to external (non-method) functions.
 `self.action()` therefore looks up and calls the stored function with no arguments.
 
-The annotation on `next` names `State` inside the `State` class body,
+The annotation on `next` names `State[I]` inside the `State` class body,
 which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
 
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
@@ -96,9 +101,8 @@ MOVES: Final[list[Mouse]] = [
 
 ### Mousetrap States
 
-Each state of the trap is a `State` record: the message its `run()` prints,
-the function that names its successor, and, for one state, an action.
-Here are the transition functions and that action:
+The trap has four states.
+Every state needs a transition function that takes a `Mouse` input and produces the trap's next state:
 
 ```python
 # trap_states.py
@@ -106,14 +110,14 @@ from enum import Enum
 from mouse import Mouse
 from state import State
 
-def waiting(input_: object) -> TrapState:
+def waiting(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.APPEARS:
             return TrapState.LURING
         case _:
             return TrapState.WAITING
 
-def luring(input_: object) -> TrapState:
+def luring(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.RUNS_AWAY:
             return TrapState.WAITING
@@ -122,7 +126,7 @@ def luring(input_: object) -> TrapState:
         case _:
             return TrapState.LURING
 
-def trapping(input_: object) -> TrapState:
+def trapping(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.ESCAPES:
             return TrapState.WAITING
@@ -131,31 +135,33 @@ def trapping(input_: object) -> TrapState:
         case _:
             return TrapState.TRAPPING
 
-def holding(input_: object) -> TrapState:
+def holding(input_: Mouse) -> TrapState:
     match input_:
         case Mouse.REMOVED:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
-
-def chime() -> None:
-    print("*ding*")
 ```
 
 Each transition function contains a `case` for every input its state recognizes,
 and produces the state the trap enters next.
 The default `case _` returns the current state, so the state stays the same.
-Each function names `TrapState`, which the file defines below them.
-A function body runs at the call, not at the `def`,
+The four functions use `TrapState` before the file defines it,
+in their return annotations and their `return` statements.
+Both uses come after the `def` has run.
+A function body runs at the call, and an annotation is evaluated lazily,
 so by the first call the whole module has loaded and `TrapState` exists.
-`chime()` is the trap's one action.
-The chime sounds when the trap catches a mouse.
 
-`TrapState` is an `Enum` whose members are the records, in the same file:
+The file continues with `chime()`, the one non-empty `action` a state performs,
+and with the four states,
+`State` records held as the members of a `TrapState` enum:
 
 ```python
 # trap_states.py (continued)
-class TrapState(State, Enum):
+def chime() -> None:
+    print("*ding*")
+
+class TrapState(State[Mouse], Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)
@@ -165,13 +171,14 @@ class TrapState(State, Enum):
         return self.name.capitalize()
 ```
 
-`TrapState` mixes `State` into `Enum`.
+`TrapState` mixes `State[Mouse]` into `Enum`.
 Each member's value is a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
 so `TrapState.WAITING` is both a `TrapState` member and a `State`,
 with `message` and `next` as attributes.
 `HOLDING`'s tuple has a third element, so its `action` is `chime()`;
 the other three members keep the default.
+The chime sounds when the trap catches a mouse.
 
 The `StateMachine` holds the current state and advances it on each input:
 
@@ -180,18 +187,18 @@ The `StateMachine` holds the current state and advances it on each input:
 from collections.abc import Iterable
 from state import State
 
-class StateMachine:
-    def __init__(self, initial_state: State) -> None:
+class StateMachine[I]:
+    def __init__(self, initial_state: State[I]) -> None:
         self.current_state = initial_state
         self.current_state.run()
-    def step(self, input_: object) -> None:
+    def step(self, input_: I) -> None:
         state = self.current_state
         self.current_state = state.next(input_)
         print(state, input_, "->", self.current_state)
         self.current_state.run()
 
-def run_all(machine: StateMachine,
-            inputs: Iterable[object]) -> None:
+def run_all[I](machine: StateMachine[I],
+               inputs: Iterable[I]) -> None:
     for input_ in inputs:
         machine.step(input_)
 ```
@@ -206,6 +213,10 @@ The constructor calls the initial state's `run()` for the same reason.
 A state prints as its name, through the `__str__()` that `TrapState` defines.
 `run_all()`, a convenience outside the class,
 feeds any iterable of inputs to `step()`, one at a time.
+`StateMachine` is generic in the same `I`.
+The type checker infers `I` from the initial state,
+so `StateMachine(TrapState.WAITING)` is a `StateMachine[Mouse]` whose `step()` accepts a `Mouse` alone.
+Passing a string is a type error.
 This is the *State* pattern combined with automated transitions,
 producing *State Machine*.
 
