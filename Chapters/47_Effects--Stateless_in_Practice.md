@@ -24,7 +24,7 @@ The rest of the chapter adds:
   and whose body is only the success path
 - A failure that enters the channel as a value,
   and a catch that takes the whole channel
-- Dependency graphs that go deep, and a cast of Abilities that goes wide
+- Dependency graphs that go deep, and a cast of actors that goes wide
 - Decorators that add retry and parallelism to code they leave as written
 - An account of where the guarantee stops
 
@@ -1307,7 +1307,7 @@ print(run(kitchen(toast)()))
 #: toasted loaf of rye dough
 ```
 
-You supply appliances and make products, and the listing keeps the two apart.
+You supply leaves and make products, and the listing keeps the two apart.
 `Dough`, `Oven`, and `Toaster` are the leaves,
 so `supply()` binds one instance of each.
 The loaf is a product.
@@ -1370,12 +1370,12 @@ and the graph you can read is the union in the signature.
 ## Supplying a Whole Cast
 
 The bakery graph goes deep,
-with two of its three appliances reached through `bread()`.
+with two of its three leaves reached through `bread()`.
 The next example goes wide instead.
 [Abstract Factories](27_Patterns--Factory.md#abstract-factories)
 builds a gaming environment where a `GameElementFactory` returns a matched `Character` and `Obstacle`,
 and a `GameEnvironment` plays whatever that factory produces.
-Here each kind of actor is an Ability the program requests:
+Here each kind of actor is a type the program requests through a `Need`:
 
 ```python
 # quest.py
@@ -1409,14 +1409,14 @@ def encounter() -> Depend[
 It constructs no `GameEnvironment`, holds no factory,
 and mentions only the three Protocols.
 It prints nothing itself.
-Output is an Ability like `Hero` and `Obstacle`.
+Output is a requested type like `Hero` and `Obstacle`.
 `Narrator` is one of the three requests,
 so the code that supplies it chooses whether a line prints, goes into a list,
 or disappears.
 As [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-effect)
 recommends, the union appears in full rather than as an alias.
 
-Each Ability needs a shape of its own.
+Each requested type needs a shape of its own.
 You could rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
 `Hero` stays distinct even then, since it also declares `approach()`.
 But every hero then satisfies `Obstacle` as well.
@@ -1522,7 +1522,7 @@ That is a real loss against the *Abstract Factory*,
 whose purpose is families of matched products.
 `KittiesAndPuzzles.make_obstacle()` cannot return a `Weapon`,
 because the class defines the pairing.
-`supply()` takes a flat list and checks each argument against one Ability,
+`supply()` takes a flat list and checks each argument against one requested type,
 not against the others.
 You recover the matched set by writing it down in a function,
 as `kitties_and_puzzles()` does.
@@ -1848,7 +1848,7 @@ If you fork and wait inside a single loop,
 each `wait()` blocks on the task the same iteration just created,
 so the sleeps run one after another and take about five times as long.
 
-The pool is an Ability, not a global,
+The pool is a supplied dependency, not a global,
 so `squares()` declares `Need[Executor]` and names no pool.
 Supplying a `ProcessPoolExecutor` moves the same work into processes.
 `squares()` stays as written.
@@ -2225,7 +2225,7 @@ A Python generator is one-shot, so each `yield` resumes once.
 Two pieces of the library show that limit.
 `Effect[A, E, R]` carries a separate `E` that `@throws` fills and `catch()` empties.
 Koka needs no such type parameter,
-because an exception there is an ordinary Effect whose handler declines to resume.
+because an exception there is an ordinary Ability whose handler declines to resume.
 The extra type parameter exists because a Stateless Ability cannot fail.
 The `ZIO[R, E, A]` of [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 carries one for the same reason.
@@ -2474,7 +2474,7 @@ Try each exercise before opening its [solution](../Solutions/47_Effects--Statele
     and once with a handler that walks a scripted sequence.
     Then delete the `low: int` annotation from the accessor's parameter and say what changes,
     and delete the annotation on the *handler's* parameter and say what changes.
-13. Add a `Butter` appliance to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
+13. Add a `Butter` leaf to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
     Write `buttered()`'s signature with `Need[Butter]` alone first, run `ty`,
     and read the diagnostic before fixing it.
     Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.

@@ -1766,7 +1766,7 @@ def toast() -> Depend[
 
 ## 13. A dependency two levels down
 
-> Add a `Butter` appliance to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
+> Add a `Butter` leaf to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
 > Write `buttered()`'s signature with `Need[Butter]` alone first, run `ty`,
 > and read the diagnostic before fixing it.
 > Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
