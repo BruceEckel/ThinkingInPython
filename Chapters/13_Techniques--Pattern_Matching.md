@@ -4,7 +4,8 @@
 > `match` tests the shape, takes the value apart,
 > and binds the parts in one statement.
 
-The `match` statement compares a value against a series of *patterns* and runs the body of the first `case` whose pattern fits.
+The `match` statement compares a value, its *subject*,
+against a series of *patterns* and runs the body of the first `case` whose pattern fits.
 No C-style `switch` can express this case:
 
 ```python
@@ -149,7 +150,7 @@ It matches `Signal.GO`,
 binds that member to a local name `DEFAULT` inside `broken()`,
 and leaves the module-level constant untouched.
 
-When a later `case` follows a bare-name capture,
+When a later `case` follows a capture pattern,
 Python refuses to compile the `match` and reports `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here,
 Python compiles the `match` silently, and `ty` accepts it.
@@ -377,7 +378,7 @@ The full set is `bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`,
 `tuple`, `dict`, `frozendict`, `set`, and `frozenset`.
 
 Dropping the parentheses changes the meaning.
-`case str:` is a bare-name capture, not a type test,
+`case str:` is a capture pattern, not a type test,
 matching any value and binding it to a local named `str`.
 `case str:` repeats the `DEFAULT` mistake from `value_patterns.py`.
 Python rejects it the same way and refuses to compile any `case` after it:
@@ -535,7 +536,7 @@ print(survey([Point(1, 2), Point(3, 4)]))
 ```
 
 The case at `[1]` is a sequence pattern holding a class pattern holding two literals,
-with a starred capture beside the class pattern.
+with a starred name beside the class pattern.
 `as` binds whatever its sub-pattern matched,
 so `start` is the whole `Point` while `0, 0` checks its fields.
 With `as`, one pattern both tests the shape and keeps the object.
@@ -864,7 +865,7 @@ def test_oo_and_match_agree(
 
 Try growing the system in each direction.
 First, add a new type: a `Webhook` channel.
-In the object version,
+In the inheritance version,
 you write one new subclass with its own `render()` and `cost()`,
 and nothing else changes.
 In the match version,
@@ -874,7 +875,7 @@ Each function needs a `Webhook` case to pass:
 `case Webhook(url):` in `render()` and `case Webhook():` in `cost()`.
 
 Second, add a new operation: `priority()`, which ranks channels by urgency.
-In the object version, every existing subclass needs a new method.
+In the inheritance version, every existing subclass needs a new method.
 In the match version, you write one new function with its own `match`,
 and the existing classes and functions stay untouched.
 
@@ -914,4 +915,4 @@ Try each exercise before opening its [solution](../Solutions/13_Techniques--Patt
 6.  Give `value_patterns.py`'s `Signal` a third member,
     and write `act()` so that it compares against a module-level `FALLBACK: Final[Signal]`.
     Run it and confirm that the constant captures instead of comparing.
-    Then fix `act()` two ways, with a dotted name and with a guard.
+    Then fix `act()` two ways, with a value pattern and with a guard.
