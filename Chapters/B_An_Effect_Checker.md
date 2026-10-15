@@ -31,8 +31,8 @@ The largest remaining group is a method called on a local variable with no annot
 
 The checker follows [Koka's policy](A_Effect_Tracking.md#why-a-native-system-tracks-best).
 A function with no declared row gets an inferred one.
-The checker compares a declared row with the function's body,
-and the function's callers use the declaration in place of the body.
+The checker compares a declared row with the function's body.
+The function's callers use the declaration in place of the body.
 An empty `performs()` declares that a function is pure.
 
 ## Effect Names and the Table
@@ -133,7 +133,8 @@ Python names are case-sensitive, so the table's patterns must be too.
 `lookup()` returns the row of the first pattern that matches.
 A specific name goes above the glob that would otherwise match it,
 because a dictionary keeps insertion order.
-`"os.path.join"` is pure, and the `"os.*"` below it is `FileSystem`.
+`"os.path.join"` is pure.
+The `"os.*"` below it is `FileSystem`.
 Whole modules take one line each, which keeps the table short.
 
 A name that matches no pattern gets `UNKNOWN`.
@@ -482,8 +483,8 @@ which a pattern alone cannot do.
 For a function that declares no row, `marked(func, "performs")` returns `None`,
 which means "inferred."
 An empty row means "pure," so `None` and the empty row must differ.
-`Row | None` is an ordinary optional,
-and each reader tests for `None` instead of asserting that the row is present.
+`Row | None` is an ordinary optional.
+Each reader tests for `None` instead of asserting that the row is present.
 
 ```python
 # function_facts.py (continued)
@@ -638,8 +639,8 @@ and so does a name that two assignments give different types.
 An annotation overrides `UNRESOLVED` in both cases.
 
 The or-pattern in `assigned()` handles every one of those binding nodes.
-Each alternative binds `name`, as an or-pattern requires,
-and `values` supplies the type.
+Each alternative binds `name`, as an or-pattern requires.
+`values` supplies the name's type.
 `ast.walk()` visits an assignment before its target,
 so `values` holds the type of the right side when the walk reaches the target's `Name`.
 
@@ -807,7 +808,8 @@ Each time, `str.upper()` comes back `UNRESOLVED` instead of resolving to `builti
 ## Rows to a Fixed Point
 
 Appendix A's rule is recursive.
-A function's row needs its callees' rows, which need theirs.
+A function's row needs its callees' rows,
+which in turn need their callees' rows.
 Two functions that call each other make the recursion circular.
 The standard answer is to start every row empty and apply the rule until the rows stop changing.
 Rows that the rule leaves unchanged are a *fixed point* of the rule:
@@ -991,8 +993,8 @@ def lines(report: Report) -> list[str]:
     return rows + [describe(f) for f in report.findings]
 ```
 
-The `match` on `read_module()`'s result turns a parse failure into an `Unparsed` finding,
-and `undeclared()` reports each Effect a row omits as an `Undeclared` finding.
+The `match` on `read_module()`'s result turns a parse failure into an `Unparsed` finding.
+`undeclared()` reports each Effect a row omits as an `Undeclared` finding.
 `Finding` is the union of the two records,
 so a caller matches on the kind of finding and reads the fields of that kind:
 the Effect name of an `Undeclared`, the parse error of an `Unparsed`.
@@ -1231,8 +1233,8 @@ The output names no function from `effect_table.py`, `call_names.py`,
 so the checker confirms that its core is pure.
 `FileSystem` and `Console` appear in three functions at the edge and in the module that calls them.
 [Effect Management](44_Effects--Effect_Management.md#a-program-can-never-be-pure)
-calls that arrangement pushing the Effects to the edges,
-and here a tool verifies it.
+calls that arrangement pushing the Effects to the edges.
+Here a tool verifies it.
 
 The one `Unknown` is `Ok.bind()`, which calls the function it receives.
 That call is the callback problem of [Effect Tracking](A_Effect_Tracking.md#propagate-through-callbacks),
@@ -1348,8 +1350,8 @@ A production tool must remove each one:
 - A declaration written with `typing.Annotated` or an `as` alias,
   because the checker finds `Annotated` and `performs` by those names.
 - A decorator that wraps a function.
-  It changes what calling the function performs,
-  and the checker reads the undecorated body.
+  It changes what calling the function performs.
+  The checker reads the undecorated body.
 - `hides()`, whose claim the checker takes on trust.
 
 Some of the limits are bookkeeping,
