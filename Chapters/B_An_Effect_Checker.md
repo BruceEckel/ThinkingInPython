@@ -30,8 +30,8 @@ The largest remaining group is a method called on a local variable with no annot
 [From a Call to a Name](#from-a-call-to-a-name) recovers part of that group.
 
 The checker follows [Koka's policy](A_Effect_Tracking.md#why-a-native-system-tracks-best).
-A function with no written row gets an inferred one.
-The checker compares a written row with the function's body,
+A function with no declared row gets an inferred one.
+The checker compares a declared row with the function's body,
 and the function's callers use the declaration in place of the body.
 An empty `performs()` declares that a function is pure.
 
@@ -1065,7 +1065,7 @@ The test file confirms that:
 - An Effect the body performs and the declared row omits is a finding.
 - An Effect the row declares is no finding.
 - `hides()` removes an Effect from the body's row.
-- A function with no written row gets an inferred one and draws no finding.
+- A function with no declared row gets an inferred one and draws no finding.
 - An unresolved call adds `Unknown`.
 - A module that fails to parse becomes a finding under its module name.
 
