@@ -379,7 +379,7 @@ through any name, rebind only through the module.
 ## 5. A lock in the wrong place
 
 > Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
-> wrapping only the body of the cached function, and run it.
+> wrapping only the body of the constructor function, and run it.
 > Explain why the object count does not drop to one,
 > then fix it without a lock.
 

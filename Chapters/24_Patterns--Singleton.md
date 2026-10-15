@@ -251,7 +251,7 @@ built outside the cache.
    With a constructor slow enough to widen that race,
    eight threads calling `settings()` at once usually run the constructor eight times and return eight different objects.
    When threads can arrive before the singleton exists,
-   create it eagerly instead.
+   create it *eagerly* instead.
    Call `settings()` once at import time, or use the module form,
    which the import system builds once.
 
@@ -529,7 +529,7 @@ as it does throughout [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-ge
 
 The laziness is a choice.
 When the inner object needs nothing from that first call,
-you can create it *eagerly* in the class body instead,
+you can create it eagerly in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Eager creation removes the sentinel, the guard,
 and the first-call race that the cached factory has under threads.
@@ -865,7 +865,7 @@ Try each exercise before opening its [solution](../Solutions/24_Patterns--Single
     Predict both printed values before running it,
     and explain the difference using the [mutate-versus-rebind distinction](#a-module-is-already-a-singleton).
 5.  Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
-    wrapping only the body of the cached function, and run it.
+    wrapping only the body of the constructor function, and run it.
     Explain why the object count does not drop to one,
     then fix it without a lock.
 6.  Give `singleton_borg.py` a second `Borg` subclass and construct one of each.
