@@ -348,7 +348,7 @@ An earlier statement can bind one, as `row = [7, 8]` does here.
 The first clause then iterates over that stale `row`,
 and the comprehension silently produces a wrong list.
 Each `x` from the stale `row` repeats once per element of `rows`,
-because the second clause runs inside the first.
+because the `for row in rows` clause runs inside `for x in row`.
 
 ## Supplying the Input Sequence
 

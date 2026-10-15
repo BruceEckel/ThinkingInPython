@@ -73,6 +73,7 @@ Chapters/27_Patterns--Factory.md	the first `build()`	Every `.topping()` call aft
 Chapters/27_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` raises a `NotImplementedError` would report the omission later, at the first `draw()` call.
 Chapters/27_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/29_Patterns--Changing_the_Interface.md	the first line	The approaches differ in where the adaptation lives, and the first line of each trace names that place: `ProxyAdapter.f()` for the object adapter and Approach 2, `WhatIHave2.f()` for Approach 3.
+Chapters/29_Patterns--Changing_the_Interface.md	the first line	The approaches differ in where the adaptation lives, and the first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/30_Patterns--Observer.md	The second `announce()`	The second `announce()` copies the shortened list, so `always` receives both changes and `once` receives one.
 Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, not at the `def`, so by the first call the whole module has loaded and `TrapState` exists.
 Chapters/32_Patterns--Multiple_Dispatching.md	The last case	The last case shows why the sentinel exists.

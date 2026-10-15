@@ -583,7 +583,7 @@ expect(ValueError, list, batched(range(7), 3, strict=True))
 
 A short final batch is normal for pagination and wrong for fixed-width records.
 For fixed-width records, `strict=True` raises a `ValueError` instead,
-as the last line of output shows.
+as the `[ValueError]` line shows.
 `zip(strict=True)` under [`zip_longest`](#zip_longest) offers the same choice.
 
 ### `accumulate`

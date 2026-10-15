@@ -871,7 +871,7 @@ Every target letter marks exactly two rooms.
 A typo that gives a letter one room, or three, fails here at build time,
 naming the offending letter.
 If you remove the check, the build still stops,
-at the unpacking on the next line.
+at the unpacking `(t1, room1), (t2, room2) = pair`.
 The `ValueError` that unpacking raises says how many values it expected and leaves you to find the letter.
 
 The unpacking names each teleport beside its room.

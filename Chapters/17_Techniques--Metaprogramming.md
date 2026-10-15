@@ -313,10 +313,10 @@ The schedule names three of the seven declared event types.
 `built()` compares the classes in the dict with the names in `NAMES`,
 so its line states the result: seven classes declared, three built.
 
-The last lines of the demo use the type distinction.
-They fetch the `RingBell` class through `makers`,
+The demo's loop over the sorted events uses the type distinction.
+The demo fetches the `RingBell` class through `makers`,
 the same lookup the comprehension uses,
-and prefix `* ` to every event that `isinstance()` reports as a `RingBell`.
+and prefixes `* ` to every event that `isinstance()` reports as a `RingBell`.
 That is what a distinct subclass adds.
 Each event carries its kind as its type,
 where `isinstance()` or a `match` class pattern can test it.

@@ -568,7 +568,7 @@ In `real_defaults.py` the `100` is a default argument,
 giving each object its own storage before anything can read it.
 A new `A()` holds `x` in its own dictionary from the start:
 `vars(A())` prints `{'x': 100}`,
-where the first `vars(a)` in `inside_objects.py` prints `{}`.
+where `inside_objects.py`'s `vars(a)` prints `{}` until `a.x = 1` runs.
 
 Python still builds the [default value](05_Foundations--Functions.md#the-mutable-default-trap)
 once, at definition time,
