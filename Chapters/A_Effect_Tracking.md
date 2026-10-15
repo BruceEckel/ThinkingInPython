@@ -237,7 +237,8 @@ A row inside `Annotated` is a structured comment until a tool reads it.
 `quiet()` declares `performs()` with no arguments, which states that it is pure.
 `row(quiet)` returns the same empty list,
 so an empty list can mean either a function declared pure or [one that declares nothing](#decide-what-untracked-code-performs).
-The declaration is also wrong: `quiet()` calls `shout()`, which calls `tell()`.
+The declaration is also wrong.
+`quiet()` calls `shout()`, which calls `tell()`.
 `row()` reads each declaration alone,
 so it returns the empty row `quiet()` declares.
 
