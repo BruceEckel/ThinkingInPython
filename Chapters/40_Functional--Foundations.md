@@ -783,8 +783,8 @@ Try each exercise before opening its [solution](../Solutions/40_Functional--Foun
     and say what you see and why.
 8.  In `make_counter.py`, give `make_counter()` a `step: int = 1` parameter,
     so `make_counter(10)` builds a counter that counts 10, 20, 30.
-    `increment()` reads `step` without declaring it `nonlocal`:
-    explain why `count` needs the declaration and `step` does not.
+    `increment()` reads `step` without declaring it `nonlocal`.
+    Explain why `count` needs the declaration and `step` does not.
     Then delete the `nonlocal` line and compare the type checker's report with the runtime failure.
 9.  In `pipeline.py`, add `colder_than(limit, r)` beside `warmer_than()`,
     and give `report()` a second `filter()` stage built with `partial()`,
