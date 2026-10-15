@@ -89,8 +89,8 @@ The 28 hits are the calls that found a stored answer.
 That is fifty-nine calls in all, against 2,692,537 for the undecorated version,
 where every branch recomputes the whole subtree beneath it.
 [Caching](18_Techniques--Performance.md#caching)
-runs both versions side by side, and [Recursion](#recursion)
-comes back to why the recursive form is worth keeping.
+runs both versions side by side.
+[Recursion](#recursion) comes back to why the recursive form is worth keeping.
 
 An iterative Fibonacci, `a, b = b, a + b` in a loop,
 needs neither recursion nor a cache.
@@ -332,8 +332,8 @@ Joined, the sorted strings form the largest number the five pieces can make.
 
 The rule compares two strings at a time,
 so where `"3"` belongs depends on the string beside it.
-A per-element key for this order is hard to find,
-and the comparator states the rule.
+A per-element key for this order is hard to find.
+The comparator states the rule.
 When a key function exists, it is the better choice,
 as in `sorted(words, key=len, reverse=True)`, which orders words by length.
 `cmp_to_key()` is for a comparator that arrives from older code,
@@ -758,9 +758,9 @@ print([(k, list(g))
 ```
 
 The `print()` at `[1]` shows what unsorted input does.
-`"b"` comes back as two separate groups, and `groupby()` raises no exception.
-Sorting first is the fix,
-and at `[2]` the two `"b"` elements come back as one group.
+`groupby()` silently returns `"b"` as two separate groups.
+Sorting first is the fix.
+At `[2]` the two `"b"` elements come back as one group.
 With a key function, pass the same one to both calls,
 as in `groupby(sorted(data, key=keyfunc), key=keyfunc)`.
 `sorted()` returns a new list and leaves `data` as it was,
@@ -876,8 +876,8 @@ print(list(islice(squares, 3)))  # [1]
 #: [256, 289, 324]
 ```
 
-The pipeline stacks four stages on an infinite source,
-and every stage waits for `list()` to pull.
+The pipeline stacks four stages on an infinite source.
+Every stage waits for `list()` to pull.
 To stop, `takewhile()` pulls one more total,
 the 590 from the batch `(169, 196, 225)`, and discards it as over the limit.
 That pull consumes squares 13 through 15,
@@ -914,8 +914,8 @@ for sq in islice(squares(), 3):
 #: got 9
 ```
 
-`squares()` yields squares forever,
-yet the program terminates because `islice()` requests three values,
+`squares()` yields squares forever, yet the program terminates.
+`islice()` requests three values,
 so the third `computing square` line is the last.
 The output alternates.
 Each `computing square N` line appears the moment the loop over `islice()` pulls that value,
