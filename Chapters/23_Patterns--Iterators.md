@@ -284,7 +284,8 @@ expect(ValueError, squares, -1)
 ```
 
 `lazy_squares()` contains a `yield`,
-so the call `lazy_squares(-1)` runs none of its body and the check waits for `next()`.
+so the call `lazy_squares(-1)` runs none of its body.
+The check waits for `next()`.
 `squares()` has no `yield`, so calling it runs the check immediately.
 Only `produce()` waits.
 
@@ -293,7 +294,8 @@ Only `produce()` waits.
 The second surprise in `generator_lifecycle.py` is its second call to `list(sq)`.
 An exhausted generator answers every `next()` with `StopIteration`,
 which `list()` absorbs as the normal end.
-The second `list(sq)` therefore returns `[]`, and no exception reports the bug.
+The second `list(sq)` therefore returns `[]`.
+No exception reports the bug.
 
 When you must walk data twice, collect it into a list once,
 or hand out an iterable like `Countdown` in `iterators.py`,
@@ -481,8 +483,8 @@ as `flatten()` does.
 The `yield from` expression, however, has a value.
 `result = yield from inner()` binds whatever `inner()` returned when it stopped.
 The hand-written loop drops that value.
-`yield from` also forwards `send()` and `throw()` into the inner generator,
-and the hand-written loop forwards neither.
+`yield from` also forwards `send()` and `throw()` into the inner generator.
+The hand-written loop forwards neither.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 uses all three channels: the yielded values, the return value, and `send()`.
 
@@ -548,15 +550,15 @@ covers `chain()` and `groupby()` in full,
 including why `groupby()` needs sorted input.
 
 Choose `takewhile()` deliberately.
-Its lookalike is the `if` clause of a generator expression (or `filter()`),
-and the two behave differently with an infinite source.
+Its lookalike is the `if` clause of a generator expression (or `filter()`).
+The two behave differently with an infinite source.
 The `if` version skips nonmatching values but keeps looking,
 so once values stop matching, a `list()` around it runs forever.
 `takewhile()` stops at the first failure.
 On finite data whose values stop matching for good, as the rising squares do,
 skipping and stopping give the same result.
-On infinite data of that kind,
-`takewhile()` finishes and the `if` clause runs forever.
+On infinite data of that kind, `takewhile()` finishes.
+The `if` clause runs forever.
 
 A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
@@ -924,14 +926,14 @@ A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),
 so the ordinary end of the source propagates out of `list()` as an error.
 Only a bare `next()` raises `StopIteration` into your code.
-With a default, `next()` returns the default,
-and every other construct here absorbs the exception.
+With a default, `next()` returns the default.
+Every other construct here absorbs the exception.
 
 `yield from source` stops delegating when the source runs out.
 It passes each value through unchanged, though,
 so per-item work such as doubling needs a loop.
-That is why `doubled_ok()` uses `for`,
-and the loop absorbs the exception as every `for` loop in this chapter does.
+That is why `doubled_ok()` uses `for`.
+The loop absorbs the exception as every `for` loop in this chapter does.
 The fix is rarely a `try`.
 Let a `for` loop call `next()`.
 
