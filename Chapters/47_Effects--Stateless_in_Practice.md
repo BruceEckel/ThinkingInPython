@@ -1505,7 +1505,7 @@ print(script.lines)
 #: ['Kitty arrives', 'and bats at the puzzle']
 ```
 
-The fourth run swaps one cast member and captures the output.
+The fourth run swaps one actor and captures the output.
 `Script` records what arrives,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching.
 The engine holds no printing to intercept.
@@ -1765,7 +1765,7 @@ The cache also has no size limit by default,
 so it keeps every result as long as the memoized function exists.
 `memoize(maxsize=128)` bounds it.
 
-That cache key is the argument, not the environment.
+That cache key is the argument, not the scenario.
 `memoize()` wraps `save_user()` before `supply()` runs,
 so a different `Database` supplied to the same memoized call changes nothing in the cache:
 
@@ -1789,10 +1789,10 @@ print(db1.attempts, db2.attempts)
 `db2` never runs.
 The second call's answer comes from `db1`'s cache entry,
 because `memoize()` keys on `"Morty"` alone.
-In a chapter built on swapping the environment, the caution matters.
-Memoize a function only where one environment serves the memoized call for its whole lifetime,
+In a chapter built on swapping the scenario, the caution matters.
+Memoize a function only where one scenario serves the memoized call for its whole lifetime,
 the way [State as an Ability](#state-as-an-ability)'s `Cell` does once bound,
-or key the cache on the environment too.
+or key the cache on the scenario too.
 
 ## Running Effects in Parallel
 
