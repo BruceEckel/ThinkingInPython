@@ -41,8 +41,8 @@ you might expect it to appear first in low-level design.
 But a pattern embodies a complete idea within a program,
 so it can appear at the analysis phase or high-level design phase,
 where you are still describing what the system does rather than how to build it.
-A pattern appears at every level,
-and often you first discover that you need one when you reach the code.
+A pattern appears at every level.
+Often you first discover that you need one when you reach the code.
 
 The basic concept of a pattern is also the basic concept of program design:
 adding a layer of abstraction.
@@ -56,8 +56,8 @@ which makes the code easier to maintain and usually simpler to understand.
 ### What an Abstraction Erases
 
 Isolating what changes discards information.
-An abstraction is a guess about which details no caller will need,
-and a good abstraction does more than hide those details.
+An abstraction is a guess about which details no caller will need.
+A good abstraction does more than hide those details.
 It erases them.
 Code outside the boundary cannot recover information the boundary discards,
 so a caller that turns out to need an erased detail cannot work around the interface.
@@ -209,11 +209,11 @@ each named for what its patterns do:
 
 1.  **Creational**: how to create an object.
     When you isolate the details of object creation,
-    your code stops depending on which object types exist,
-    and adding a type leaves that code unchanged.
-    [*Singleton*](24_Patterns--Singleton.md) counts as a *Creational* pattern,
-    and [Factory](27_Patterns--Factory.md) covers the other four:
-    *Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
+    your code stops depending on which object types exist.
+    Adding a type then leaves that code unchanged.
+    [*Singleton*](24_Patterns--Singleton.md) counts as a *Creational* pattern.
+    [Factory](27_Patterns--Factory.md) covers the other four: *Factory Method*,
+    *Abstract Factory*, *Prototype*, and *Builder*.
 2.  **Structural**: how objects connect to other objects,
     arranged so that changes leave those connections alone.
     The structural patterns in this book appear in [*Surrogate*](26_Patterns--Surrogate.md),
@@ -257,16 +257,16 @@ so that classification doesn't lead me to a solution
 (I'll readily admit that I may be missing something here).
 <!-- vale House.Weasel = YES -->
 
-Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
-and this book groups them by that resemblance.
+Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest.
+This book groups them by that resemblance.
 [*Surrogate*](26_Patterns--Surrogate.md)
 treats *Proxy* and *State* as one front-object structure.
 [Function Objects](28_Patterns--Function_Objects.md) treats *Command*,
 *Strategy*, and *Chain of Responsibility* as one function-passing structure.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 treats both of its patterns as one recursive-data structure.
-When two patterns share a structure, learning one teaches you most of the other,
-and the remaining difference is intent.
+When two patterns share a structure, learning one teaches you most of the other.
+The remaining difference is intent.
 
 ## Coupling
 
@@ -277,7 +277,7 @@ Six of the eight are a dependence of one part on another: on a class name,
 on a specific operation, on a platform, on an object's representation,
 on an algorithm, or on each other, which the list calls *tight coupling*.
 The other two are about what a dependence makes hard once it exists:
-extending by subclassing, and being unable to alter a class.
+extending by subclassing, and altering a class.
 
 The glossary defines coupling as "the degree to which software components depend on each other."
 Both of that first chapter's design principles tell you to loosen one particular dependence.
@@ -313,8 +313,8 @@ A subclass knows its parent's internals: which methods call which,
 the attributes' names, what a `super()` call expects to find.
 A change to any of that can reach the subclass.
 That reach is why *GoF Design Patterns* repeats the saying that "inheritance breaks encapsulation."
-A caller that writes `Circle(2)` knows a name and a constructor signature,
-and a caller that writes `isinstance(s, Circle)` knows the name and tests an object's type against it.
+A caller that writes `Circle(2)` knows a name and a constructor signature.
+A caller that writes `isinstance(s, Circle)` knows the name and tests an object's type against it.
 A caller written against an abstract base class knows a set of method names and signatures,
 and every class that implements them says so in its own `class` line.
 A caller written against a `Protocol` knows the same set of names,
@@ -334,8 +334,8 @@ and the type checker reports each place that passes it to a caller.
 
 In Python, the `Protocol` and `Callable` rungs require nothing from an implementer.
 An abstract base class is a class you write and every implementer inherits.
-A `Protocol` is a class you write and no implementer inherits,
-and a `Callable` annotation is not a class.
+A `Protocol` is a class you write and no implementer inherits.
+A `Callable` annotation is not a class.
 Those two rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
 In a language where every implementer must name its interface,
 a pattern exists to build a declared interface.
@@ -391,8 +391,8 @@ The visitor names every concrete element.
 The pattern concentrates the heavy edges in one place on purpose.
 Adding an operation means writing one new visitor and changing nothing else,
 while adding an element type means changing every visitor.
-That choice defines [*Visitor*](33_Patterns--Visitor.md),
-and the diagram shows where the choice puts the heavy edges.
+That choice defines [*Visitor*](33_Patterns--Visitor.md).
+The diagram shows where the choice puts the heavy edges.
 
 Seen this way, the patterns differ less in how much coupling they carry than in where they put it and which way it points.
 A heavy edge is acceptable when it sits in a part that is easy to change,
@@ -439,8 +439,8 @@ With an abstract base class, two edges exist in source:
 the caller names `Shape`, and `Circle` names `Shape` in its `class` line.
 With a `Protocol`, one edge exists in source.
 `Circle` does not mention `Shape`.
-The type checker connects the two when it compares `Circle`'s members with the protocol's members,
-and the figure draws that connection as a dashed edge with a hollow head.
+The type checker connects the two when it compares `Circle`'s members with the protocol's members.
+The figure draws that connection as a dashed edge with a hollow head.
 A dashed edge exists only at check time,
 and neither of its ends names the other.
 With a `Callable`, the interface has no name and no file of its own.
@@ -469,8 +469,8 @@ a claim the design either satisfies or violates.
 Most of the principles below hold for any code,
 but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 The list is a reference.
-Later chapters name a few of these principles when a design depends on them,
-and the rest are here for your own designs.
+Later chapters name a few of these principles when a design depends on them.
+The rest are here for your own designs.
 
 <!-- Several principles below quote their sources word for word (Saint-Exupery
      in the Subtraction footnote, Kevlin Henney under Simplicity before
