@@ -336,6 +336,9 @@ The header checks that the stack has an item, pops it, names it, and tests it,
 so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
+A *comprehension* builds a list, dictionary,
+or set from an iterable in one expression,
+and [the last section of this chapter](#comprehensions) shows its three forms.
 A comprehension can use `:=` the same way,
 and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
@@ -515,7 +518,7 @@ so the bug looks like the expected failure.
 A bare `except:` with no type is the broadest of all.
 It catches everything,
 including the `KeyboardInterrupt` you press to stop a runaway program.
-When you do need a broad catch, write `except Exception:`.
+When you do need a broad handler, write `except Exception:`.
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
 so they propagate past that clause and stop the program.
 
@@ -711,7 +714,7 @@ which open the file and close it again.
 
 ## Comprehensions
 
-A *comprehension* builds a list, dictionary,
+A comprehension builds a list, dictionary,
 or set from an iterable in one expression,
 replacing a loop that builds up a result:
 
