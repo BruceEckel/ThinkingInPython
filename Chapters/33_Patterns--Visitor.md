@@ -122,7 +122,7 @@ because `Chrysanthemum` overrides `eat()`
 The worm's type chooses `eat()`,
 and the flower's type chooses which `eat()` runs.
 If you delete the override, every flower resolves to the same `Flower.eat()`,
-and the visitor's type alone decides which method runs.
+so the visitor's type alone decides which method runs.
 
 `bug_visits.py`'s output shows results, not mechanism.
 `dispatch_trace.py` makes both dispatches visible by printing the qualified name of the method to which each dispatch resolves:
@@ -183,8 +183,8 @@ since a second `def visit()` replaces the first.
 [`@overload`](14_Techniques--Decorators.md#decorators-with-optional-parentheses)
 declares extra signatures for the type checker and leaves the runtime with one implementation,
 which must branch on the argument's type.
-`flower_visitors.py` therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
-and the visitors choose between those two methods.
+`flower_visitors.py` therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead.
+The visitors choose between those two methods.
 So `flower_visitors.py`'s primary hierarchy holds the operations the pattern exists to keep out of it.
 
 A Python visitor can keep the operations instead by building the method name from the element's class,
@@ -423,8 +423,8 @@ In `recursive_accept.py` the loop runs inside `accept()`,
 the situation where the classic pattern still fits.
 Every visitor reuses that one loop:
 the `Bee` and the `Worm` both reach the nested `Ranunculus` through it.
-A new visitor defines `visit()` for a single flower,
-and `Corsage.accept()` passes that visitor to every nested element.
+A new visitor defines `visit()` for a single flower.
+`Corsage.accept()` passes that visitor to every nested element.
 
 ## One Dispatch Is Enough
 
@@ -449,16 +449,16 @@ so the language must resolve that type at runtime along with the element's type.
 Once an operation can be a function defined outside the hierarchy,
 the call site names the operation,
 so writing `nectar()` rather than `fragrance()` selects it before the program runs.
-The flower's type is the one thing left for runtime to resolve,
-and one dispatch covers it.
+The flower's type is the one thing left for runtime to resolve.
+One dispatch covers it.
 
 *Visitor* adds operations to a hierarchy you cannot edit,
 and its double dispatch is the means.
 *Multiple Dispatching* is the end in itself.
 Two objects must interact, and both their types stay unknown until runtime,
 as in `paper_scissors_rock.py`.
-`singledispatch` resolves one argument's type,
-and the *Multiple Dispatching* problem needs two.
+`singledispatch` resolves one argument's type.
+The *Multiple Dispatching* problem needs two.
 When both types must resolve together at runtime,
 use the table from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many),
 keyed by a tuple of types.
