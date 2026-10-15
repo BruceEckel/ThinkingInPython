@@ -138,7 +138,8 @@ The wrappers so far take zero parameters,
 so `add_behavior` works on a function that takes zero arguments and fails on any other.
 With `add_behavior` on a `def add(a, b)`,
 the call `add(2, 3)` raises a `TypeError`.
-The wrapper takes zero positional arguments, and the call passes two.
+The wrapper takes zero positional arguments.
+The call passes two.
 A wrapper that must handle any function uses the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
 The wrapper collects the arguments with `*args, **kwargs` and passes them on to the original function.
 Here, the `trace` decorator traces calls, and its `wrapper()` takes that shape.
@@ -186,7 +187,8 @@ It also merges the original's `__dict__` into the wrapper's `__dict__`.
 Without `wraps`, the decorated `add` reports its name as `wrapper` and loses its docstring,
 so debuggers, `help()`,
 and documentation tools show the wrapper's metadata instead of the function's metadata.
-`wraps` is optional, and nearly every wrapper should use it.
+`wraps` is optional.
+Nearly every wrapper should use it.
 
 `tracer.py` relies on that copy.
 Inside `wrapper()`, the name `wrapper` refers to the decorated function object,
@@ -221,8 +223,8 @@ def test_trace_returns_original_result() -> None:
 
 ### `**P` and `R` Keep the Static Interface {#p-and-r-keep-the-static-interface}
 
-`wraps` keeps the runtime interface,
-and the [type parameters](08_Foundations--Static_Types.md#generic-functions-and-classes)
+`wraps` keeps the runtime interface.
+The [type parameters](08_Foundations--Static_Types.md#generic-functions-and-classes)
 keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
@@ -239,8 +241,8 @@ as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to the parameters captured by `**P`.
 The type checker then accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 although the body of `wrapper()` forwards anything.
-Without `**P` you fall back to `*args: Any, **kwargs: Any`,
-and the wrapper accepts any arguments,
+Without `**P` you fall back to `*args: Any, **kwargs: Any`.
+The wrapper then accepts any arguments,
 discarding the signature the decorator should preserve.
 
 `R` checks the wrapper's result the same way.
@@ -448,8 +450,8 @@ The two `@overload` declarations state for the type checker what the runtime bra
 given a function, `label` returns a function of the same signature;
 given keyword arguments alone, it returns a decorator.
 The second overload gives that decorator the type `Decorator[P, R]`,
-a generic alias for the shape `repeat.py` takes apart,
-whose parameters come from the wrapped function.
+a generic alias for the shape `repeat.py` takes apart.
+The alias takes its parameters from the wrapped function.
 The implementation must satisfy both overloads,
 so it declares the widest return type, `Any`,
 and the overloads narrow that back down at every call site.
@@ -527,7 +529,7 @@ Each layer also adds two things that remain after `wraps` copies the metadata.
 A traceback through a decorated function shows a `wrapper` frame for each layer,
 on top of the frames for the caller and the original body.
 Each call also makes an extra Python-level function call per layer,
-the wrapper's own, before the real body runs.
+the call to that layer's wrapper, before the real body runs.
 For a function called occasionally, both are small.
 For one called in a tight loop, both add up,
 and they grow with the number of stacked layers.
@@ -567,8 +569,8 @@ A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
 
 The class form puts the two phases in separate methods.
-The constructor runs once, at decoration,
-and `__call__()` runs on every call to the decorated function.
+The constructor runs once, at decoration.
+`__call__()` runs on every call to the decorated function.
 
 These classes take lowercase names, against the usual `PascalCase` rule,
 because a decorator reads like a function at the call site.
@@ -725,8 +727,8 @@ shows what a function's `__dict__` does suit.
 When the decorator takes arguments,
 the class form is easier to follow than the [function form](#decorators-that-take-arguments).
 Without arguments, the constructor receives the function.
-With arguments, the constructor receives the arguments,
-and `__call__()` receives the function and returns the wrapper:
+With arguments, the constructor receives the arguments.
+`__call__()` then receives the function and returns the wrapper:
 
 ```python
 # repeat_class.py
@@ -886,8 +888,8 @@ It reports a missing argument and a type mismatch on a call like `ex.method(5)`.
 Python passes the function to the constructor.
 `@repeat(times=3)` calls `repeat(times=3)` first, producing an instance,
 then applies that instance to `greet`.
-Python passes the arguments to the constructor, and the function arrives later,
-at `__call__()`.
+Python passes the arguments to the constructor.
+The function arrives later, at `__call__()`.
 Adding arguments moves the function from a parameter of `__init__()` to a parameter of `__call__()`.
 The function form hides this shift inside an extra nested `def`.
 The class form makes it visible.
@@ -956,8 +958,8 @@ just as a function decorator returns a replacement function.
 
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
 If `register`'s annotation is `(cls: type) -> type`,
-`register()` returns a bare `type`,
-and `ty` and Pyright infer `Espresso()` as an `Any`.
+`register()` returns a bare `type`.
+`ty` and Pyright then infer `Espresso()` as an `Any`.
 
 A registry filled this way is as complete as the imports that ran.
 A class in a module nobody imported stays out of the registry.
@@ -1198,7 +1200,8 @@ Satisfying a `Protocol` by shape alone is [structural typing](08_Foundations--St
 
 A read-only `@property` in a `Protocol` requires that reading the name produce the property's return type,
 and lets each class choose how.
-`Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property.
+`Margherita` supplies `cost` as a class attribute.
+`Topping` computes it in a property.
 Both read as a `float`, so both match.
 
 `Topping.__init__()` sets `self.name = type(self).__name__`,
