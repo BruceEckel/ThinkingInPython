@@ -143,7 +143,7 @@ It holds the adaptee and can wrap any instance passed to it at runtime.
 Approach 2 uses the same object adapter and moves the wrapping into `op()`.
 `WhatIHave2` is a *class adapter*.
 It inherits from the adaptee.
-The base-class list names the adapted class at definition time.
+The base-class list names the adaptee at definition time.
 Every caller of `WhatIHave2` can call every method of the adaptee,
 `g()` and `h()` included.
 Composition keeps the two interfaces separate.
