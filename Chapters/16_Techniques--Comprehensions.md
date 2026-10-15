@@ -189,13 +189,13 @@ print(cubes)
 The `if` tests that result, and the output expression reuses `y`.
 Without the walrus, the filter and the output each need their own call:
 `cube_if_even(x) is not None` in the filter and `cube_if_even(x)` in the output.
-`cube_if_even()` then runs twice for every element that passes (see exercise 9).
+`cube_if_even()` then runs twice for every member that passes (see exercise 9).
 
 ## Set Comprehensions
 
 Set comprehensions use the same principles as list comprehensions,
 with `{}` instead of `[]`.
-Braces build a set when the comprehension produces one value per element,
+Braces build a set when the comprehension produces one value per member,
 and a dict when it produces a `key: value` pair.
 The colon decides which.
 `{}` is an empty dict, so an empty set needs `set()`.
@@ -225,7 +225,7 @@ The set comprehension adds each name straight to the set.
 ## Dictionary Comprehensions
 
 A dictionary comprehension builds a `dict`.
-Each element produces a key and a value, with an optional filter.
+Each member produces a key and a value, with an optional filter.
 Here each name becomes an upper-case key mapped to its length,
 keeping the names longer than three characters:
 
@@ -767,7 +767,7 @@ In an ordinary brace comprehension, the colon decides between the two.
 Neither unpacking comprehension has a colon, so the operator decides.
 
 In parentheses, `(*row for row in rows)` is a generator expression that produces the same spliced values one at a time.
-The asynchronous generator form `(*a async for a in agen())` works the same way.
+The asynchronous generator expression `(*a async for a in agen())` works the same way.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 introduces `async` syntax.
 
