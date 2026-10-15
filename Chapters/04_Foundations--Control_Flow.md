@@ -129,8 +129,8 @@ The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
 then stops at `6` with `break`, so `6` through `9` never print.
 
 `print()` ends with a newline by default.
-`end=" "` replaces that newline with a space, so the numbers print on one line,
-and a bare `print()` ends the line afterward.
+`end=" "` replaces that newline with a space, so the numbers print on one line.
+A bare `print()` ends the line afterward.
 
 `break` and `continue` both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
@@ -161,7 +161,7 @@ so the test sits between the `pop()` and the addition.
 ### The Loop `else` Clause
 
 A loop may have an `else` clause.
-It runs when the loop runs to the end, and a `break` skips it.
+It runs when the loop runs to the end, but a `break` skips it.
 That makes the `else` clause natural for search loops:
 
 ```python
@@ -337,8 +337,8 @@ so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 A *comprehension* builds a list, dictionary,
-or set from an iterable in one expression,
-and [the last section of this chapter](#comprehensions) shows its three forms.
+or set from an iterable in one expression.
+[The last section of this chapter](#comprehensions) shows its three forms.
 A comprehension can use `:=` the same way,
 and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
@@ -380,7 +380,7 @@ Removing an item shifts the next one down into the slot the loop has passed,
 so the loop skips that item.
 One of the two `2`s survives, and no exception reports the skip.
 Adding a key while the loop walks `ages` changes the dictionary's size,
-and the dictionary raises a `RuntimeError` instead of skipping silently.
+so the dictionary raises a `RuntimeError` instead of skipping silently.
 
 The same three fixes work for both containers.
 Build a new container with a comprehension,
