@@ -19,8 +19,8 @@ so some of those patterns become unnecessary.
 The example is a trash sorting simulation, and it evolves across the chapter.
 A first design works until a new requirement makes it leave trash out of its report.
 A reshaping confines that change to one new class.
-Then a second vector of change appears,
-and the reshaped design leaves it unsolved.
+Then a second vector of change appears.
+The reshaped design leaves it unsolved.
 Read that evolution as a template for your own designs,
 which can start as an adequate fit for one problem and become a flexible fit for a class of problems.
 
@@ -110,8 +110,8 @@ belong to the class, so they stay out of `__init__()`.
 
 Each subclass's `value` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings' `value` attributes.
-Each subclass restates `ClassVar[float]`,
-a restatement the type checker does not require.
+Each subclass restates `ClassVar[float]`.
+The type checker treats the restatement as optional.
 The checker [applies the base's declaration to an override](09_Foundations--Class_Attributes.md#classvar-and-inheritance),
 so it rejects `Aluminum(1.0).value = 2.0` with or without the restatement.
 
@@ -284,7 +284,8 @@ If you add `case _: assert_never(piece)`,
 the type checker reports the call although the `match` names all four materials.
 A `Trash` instance, or an instance of a subclass defined later,
 can still reach the wildcard.
-A report that also appears for a complete `match` cannot find a missing `case`.
+Because the report appears for a complete `match` as well,
+it cannot point to a missing `case`.
 [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
 warns against this shape: a `match` over an open set.
 
@@ -573,8 +574,8 @@ for material in Trash.registry.values():
 Each implementation above takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
 
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
-Three materials register a note, and `Paper`, the fourth,
-falls through to the base function.
+Three materials register a note.
+`Paper`, the fourth, falls through to the base function.
 
 The fallback is also the risk.
 A forgotten material gets the default answer,
@@ -618,8 +619,9 @@ print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 0
 ```
 
-The loop reads every material from the registry, `hazard()` answers for each,
-and `trash.py` stays as written.
+The loop reads every material from the registry,
+and `hazard()` answers for each.
+`trash.py` stays as written.
 A third operation and a fourth are one more file each.
 In `note_methods.py`,
 every new operation edits the base and each material that answers differently.
