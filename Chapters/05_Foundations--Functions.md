@@ -117,7 +117,7 @@ which the caller usually unpacks:
 
 The commas build the tuple, so the function returns one object.
 
-## Default Arguments
+## Default Parameter Values
 
 Parameters can have default values.
 Keyword arguments let callers pass arguments by name, in any order.
@@ -266,7 +266,7 @@ Test the parameter with `is None` rather than truthiness.
 `if not target:` also discards an empty list the caller passed on purpose.
 
 `None` works there because every real `target` is a list.
-When `None` is a valid argument, you need a distinct marker.
+When `None` is a valid argument, you need a distinct sentinel.
 Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
 adds a `sentinel` built-in that creates a unique self-describing value for this purpose:
 
