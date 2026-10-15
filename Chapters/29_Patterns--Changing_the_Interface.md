@@ -525,7 +525,7 @@ Under that reading the same-interface rule no longer separates a *Proxy* from an
 so both names describe the `ProxyAdapter` in `adapter.py`.
 That leaves the last two columns to separate them:
 a *Proxy* controls access to one implementation,
-an *Adapter* makes one type fit a caller that expects another.
+and an *Adapter* makes one type fit a caller that expects another.
 Name a wrapper for why it is there, not for its shape.
 
 ## Deprecating the Old Interface {#deprecating-the-old-interface}
