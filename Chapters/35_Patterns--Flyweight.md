@@ -348,7 +348,7 @@ print(len(Color._pool))
 The construction syntax stays the same,
 so a caller sees an ordinary constructor call and receives a shared object.
 `int("256")` works the same way.
-An ordinary constructor call returns a cached object.
+An ordinary constructor call returns a shared object.
 
 You write the bookkeeping yourself,
 and it must account for the way Python calls `__init__()` after `__new__()`.
