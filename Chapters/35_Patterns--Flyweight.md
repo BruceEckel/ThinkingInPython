@@ -37,7 +37,8 @@ print(low is low2, high is high2)
 Both `int("256")` calls return the same cached object.
 Each `int("100000")` call builds a fresh one.
 The cache covers a set range of values chosen at CPython build time.
-The range usually quoted is `-5` through `256`, but each build picks its own.
+The range usually quoted is `-5` through `256`,
+but each build picks its own range.
 The CPython build this book uses caches up to 1024,
 so the listing uses `100000` rather than `257` for the fresh object.
 
@@ -51,8 +52,8 @@ Python emits a `SyntaxWarning` when a literal is an operand of `is`,
 as in `high is 100000`.
 
 String *interning* keeps one copy of each distinct string in a pool.
-CPython interns identifier-like string constants automatically,
-and `sys.intern()` adds any string to the pool,
+CPython interns identifier-like string constants automatically.
+`sys.intern()` adds any string to the pool,
 or returns the pooled copy if one exists:
 
 ```python
@@ -67,8 +68,8 @@ print(intern(joined) is intern(joined2))
 #: True
 ```
 
-The two `join()` calls build equal but distinct strings,
-and `intern()` maps both to one shared copy.
+The two `join()` calls build equal but distinct strings.
+`intern()` maps both to one shared copy.
 Equal interned strings compare in one step.
 CPython's `==` on two strings checks identity before it compares characters,
 and for interned strings, equal means identical.
@@ -192,8 +193,8 @@ the object count stays at the number of tile kinds however large the grid grows.
 `[*row for row in field]` uses [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
 to flatten the grid into one list of cells.
 The listing counts `id(t)` rather than `len(set(cells))` on purpose.
-Because `Tile` is a record, its generated `__eq__()` compares field values,
-and a set of cells collapses to three with or without sharing.
+Because `Tile` is a record, its generated `__eq__()` compares field values.
+A set of cells therefore collapses to three with or without sharing.
 Only identity proves sharing.
 The listing shows the object count, not the memory behind it (see exercise 2).
 
@@ -216,8 +217,8 @@ but callers call the wrapper that `@cache` returns.
 The wrapper's signature keeps the return type and drops the parameter type.
 The decorated `tile` is a `functools._lru_cache_wrapper`,
 whose call accepts any hashable arguments.
-The type checker therefore accepts `tile("?")`,
-and the call raises a `KeyError` at runtime when it indexes `SPECS`.
+The type checker therefore accepts `tile("?")`.
+The call then raises a `KeyError` at runtime when it indexes `SPECS`.
 The boundary is therefore `to_symbol()`,
 the one function that takes a `str` and returns a `Symbol`.
 
@@ -314,8 +315,8 @@ hide the pool inside `__new__()` instead.
 keeps its pool in `__new__()` the same way.
 Here the pool keys on the constructor arguments instead of a single constant key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
-A *Multiton*'s objects can be mutable, and a flyweight's cannot,
-so `Color` is a record:
+A *Multiton*'s objects can be mutable.
+A flyweight must be immutable, so `Color` is a record:
 
 ```python
 # interned_color.py
@@ -373,8 +374,8 @@ so a `Color` prints its components and works as a dict key.
 
 `_pool` stays a plain dict with an explicit membership test,
 not a `defaultdict`.
-A `defaultdict` calls its `default_factory` with no arguments,
-and `super().__new__(cls)` needs the class that asked.
+A `defaultdict` calls its `default_factory` with no arguments.
+`super().__new__(cls)` needs the class that asked.
 
 `_pool` keys on the components alone, and every subclass shares the one dict.
 The first request for a set of components builds the object,
@@ -383,8 +384,8 @@ whether `Color` or a subclass asks.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
 
 The factory `tile()` and the interning `Color` differ in one guarantee.
-`tile()` interns the calls that go through it,
-and a direct `Tile("~", "water", False)` bypasses it,
+`tile()` interns the calls that go through it.
+A direct `Tile("~", "water", False)` bypasses `tile()`,
 building a second object equal to the pooled water tile.
 Every `Color(...)` call looks in the pool first,
 so two `Color`s with the same components are the same object and `is` returns the same result as `==`.
@@ -458,8 +459,8 @@ every call to `name("alpha")` returns that same object.
 When the last reference goes away,
 CPython's reference counting frees the object,
 and the weak reference's callback removes the pool entry.
-The pool guarantees sharing,
-and each object lives as long as a reference outside the pool holds it.
+The pool guarantees sharing.
+Each object lives as long as a reference outside the pool holds it.
 `sys.intern()` follows the same design.
 
 *Flyweight* cuts the number of objects,
@@ -513,8 +514,8 @@ When you know the full set of shared values as you write the program,
 the class definition can build the pool.
 An [Enum](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 is a flyweight pool the language maintains.
-Python constructs each member once, at class creation,
-and any reference produces that one object.
+Python constructs each member once, at class creation.
+Any reference produces that one object.
 Here is `tile_map.py`'s `Tile` recast as an enum,
 with the pool moved into the language and the member name replacing the `name` field:
 
@@ -553,8 +554,8 @@ so `__new__()` must assign that name rather than a name of its own such as `_sym
 
 `__new__()`, not `__init__()`, must assign `_value_`.
 Enum reads `_value_` as soon as `__new__()` returns.
-An `__init__()` that assigns `_value_` runs too late,
-and the lookup table behind `Tile(".")` stays keyed by the tuples.
+An `__init__()` that assigns `_value_` runs too late.
+The lookup table behind `Tile(".")` then stays keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
 `object.__new__(cls)` builds a bare instance by going straight to `object`,
