@@ -13,8 +13,8 @@ without reading their contents.
 The pattern exists because of mutation.
 An object that changes in place overwrites its earlier state,
 so you must copy that state before the change and freeze the copy.
-Python has the classic form when you need it,
-and immutable state removes the need.
+Python has the classic form when you need it.
+Immutable state removes the need.
 
 ## A Snapshot Is Not a Reference
 
@@ -40,7 +40,7 @@ print(copied)
 `saved = todo` binds a second name to the same list,
 so every later append to `todo` appears in `saved`.
 `list(todo)` makes a real copy,
-and later appends to `todo` leave `copied` as it was.
+so later appends to `todo` leave `copied` as it was.
 
 A one-level copy is enough here because the elements are immutable strings.
 When state nests mutable objects inside mutable objects,
@@ -70,8 +70,8 @@ But their elements are the same inner lists,
 so `todo[0].append("cheese")` changes the first element of `shallow` too.
 `copy.deepcopy()` walks the whole structure and copies every nested container,
 so `deep` holds inner lists of its own.
-The later `todo[0].append("jam")` grows `todo[0]` to four elements,
-and `deep[0]` keeps its three.
+The later `todo[0].append("jam")` grows `todo[0]` to four elements.
+`deep[0]` keeps its three.
 
 `copy.deepcopy()` takes time and memory proportional to the whole nested structure it rebuilds,
 however small the change.
@@ -136,8 +136,8 @@ The copy's `strokes` is the same list as `sketch.strokes`,
 the alias from `aliased_snapshot.py` one level down.
 
 `save()`'s one-level copy is enough because a stroke is a string.
-An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
-and each save then [rebuilds the whole nested structure](#a-snapshot-is-not-a-reference).
+An originator holding containers inside containers needs `copy.deepcopy()` in `save()`.
+Each save then [rebuilds the whole nested structure](#a-snapshot-is-not-a-reference).
 
 The caretaker's side of the contract is to store `checkpoint` and return it,
 leaving `checkpoint.strokes` alone.
@@ -213,8 +213,8 @@ with expected(FrozenInstanceError):
 
 `restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`,
 so it installs the stray tuple as the sketch's state with no complaint.
-`restore()` accepts the memento and brings back `circle`,
-and the type checker reports the plain tuple before the program runs.
+`restore()` accepts the memento and brings back `circle`.
+The type checker reports the plain tuple before the program runs.
 At runtime, `restore()` raises an `AttributeError` when it reads `memento.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
 and the runtime raises `FrozenInstanceError`.
@@ -316,8 +316,8 @@ and the copying.
 Frames 1 to 3 trace `sketch_demo.py`,
 with a copy at each crossing between the sketch and the caretaker.
 Frame 4 traces `frozen_demo.py` and has no copy.
-The caretaker keeps `before`,
-and `draw()` returns `after` as a new object beside it.
+The caretaker keeps `before`.
+`draw()` returns `after` as a new object beside it.
 
 `after` shares the two original stroke strings with `before`,
 so a history of `Drawing` states stores each stroke once and duplicates only the pointers:
@@ -617,8 +617,8 @@ print(history.undo())
 #: Goose: circle beak scribble
 ```
 
-`checkpoint` names a past `Drawing`, and immutability keeps that name accurate,
-since the state it names keeps its value.
+`checkpoint` names a past `Drawing`.
+Immutability keeps that name accurate, since the state it names keeps its value.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state new to the history.
 The restore goes through `apply()` like any other action,
@@ -728,8 +728,8 @@ skipping `__init__()`, and copies in the fields the old bytes had.
 
 Pickle writes the fields into the object's `__dict__`,
 bypassing the frozen check.
-A record's generated `__setattr__()` raises `FrozenInstanceError`,
-and pickle updates `__dict__` without calling `__setattr__()`.
+A record's generated `__setattr__()` raises `FrozenInstanceError`.
+Pickle updates `__dict__` without calling `__setattr__()`.
 Skipping `__init__()` also skips `__post_init__()`,
 so a memento saved before you add validation to a field loads with that field unchecked.
 
