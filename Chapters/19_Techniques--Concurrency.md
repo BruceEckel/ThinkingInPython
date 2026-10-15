@@ -201,8 +201,9 @@ and Python emits a `RuntimeWarning: coroutine 'fetch' was never awaited` when th
 `gather()` wraps each coroutine in a *task*,
 the event loop's unit of scheduling, and schedules the tasks in the order given.
 Scheduling and running are separate steps.
-`gather()` returns an awaitable, and the task bodies execute later,
-after `main()` suspends at its `await`, which returns control to the event loop.
+`gather()` returns an *awaitable*, an object that `await` accepts,
+and the task bodies execute later, after `main()` suspends at its `await`,
+which returns control to the event loop.
 
 Each task runs until it reaches its own `await`,
 so the started lines print as a, b, c.
@@ -595,7 +596,8 @@ The `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
 so both stop before their `fetched` print.
 
-The shared deadline puts both failures in the group.
+The shared deadline puts both failures in one *exception group*,
+a container for simultaneous failures.
 The loop runs every timer due at one instant in the same turn,
 so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
 If each calls `asyncio.sleep(0.03)`,
@@ -603,11 +605,10 @@ the two calls set their timers a few microseconds apart,
 since each call reads the clock when it runs.
 A loop that wakes between the two timers runs `c`'s failure,
 cancels `d` while `d`'s timer is still pending,
-and delivers a group holding one exception.
+and delivers an exception group holding one exception.
 
 The block exits once every task has either finished or ended in cancellation.
-As it exits, it re-raises both failures wrapped in an *exception group*,
-a container for simultaneous failures,
+As it exits, it re-raises both failures wrapped in an exception group,
 since more than one task can fail at once.
 The `except*` form catches members of a group by type,
 and iterating through `group.exceptions` reaches every member.
@@ -2132,7 +2133,7 @@ It is a suspended function that runs only when the event loop resumes it.
 
 The second point of convergence is `await`.
 A native coroutine, a `to_thread()` call,
-and a `run_in_executor()` call all produce an *awaitable*.
+and a `run_in_executor()` call all produce an awaitable.
 [`TaskGroup`](#structured-concurrency-with-taskgroup) holds any of them:
 
 ```python
