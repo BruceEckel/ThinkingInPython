@@ -19,8 +19,8 @@ with pool.lease() as conn:
 ```
 
 `lease()` puts the connection back in the [pool](#an-object-pool)
-on every path out of that block, including the exception path,
-and the borrower writes nothing to arrange it.
+on every path out of that block, including the exception path.
+The borrower writes nothing to arrange it.
 
 ## A Basic Context Manager
 
@@ -236,7 +236,8 @@ except RuntimeError as error:
 because Python registers the cleanup when `__enter__()` returns,
 and this `__enter__()` raises an exception instead.
 A `with` naming several managers applies the same rule per manager.
-The ones that entered still exit, and the failing one gets no `__exit__()` call.
+The ones that entered still exit.
+The failing one gets no `__exit__()` call.
 The statement stops at the failing manager,
 before Python evaluates the managers listed after it.
 
@@ -251,8 +252,8 @@ That shorter form suits a cleanup that runs the same way however the block ended
 The guarantee also assumes that cleanup succeeds.
 Cleanup can fail.
 When `__exit__()` raises an exception,
-that new exception replaces the block's original one,
-and Python keeps the original only as the new exception's `__context__`:
+that new exception replaces the block's original one.
+Python keeps the original only as the new exception's `__context__`:
 
 ```python
 # exit_masks.py
@@ -630,8 +631,8 @@ The parentheses in `@banner("quarterly")` matter.
 The call constructs the manager, which then decorates the function.
 Written bare, `@banner` passes the function `quarterly` as `title`,
 so the name `quarterly` holds a manager object rather than a function.
-Calling `quarterly()` then raises a `TypeError`,
-and the type checker flags the decorator line.
+Calling `quarterly()` then raises a `TypeError`.
+The type checker flags the decorator line.
 
 Each call of the decorated function builds a fresh manager,
 so `quarterly()` can run any number of times, each with its own enter and exit.
@@ -818,7 +819,8 @@ the stack unwinds the managers that entered earlier.
 `exit_stack_fails.py` enters two `tag()` managers from `multiple.py`,
 then a third manager, `broken()`,
 which raises a `RuntimeError` before its `yield` and so fails to enter.
-The first two unwind, and `ExitStack` registers nothing for the third:
+The first two unwind.
+`ExitStack` registers nothing for the third:
 
 ```python
 # exit_stack_fails.py
@@ -846,8 +848,8 @@ with expected(RuntimeError):
 #: [RuntimeError] c failed to open
 ```
 
-`ExitStack` registers a manager's exit after its `__enter__()` returns,
-and the `__enter__()` of `broken("c")` raises a `RuntimeError` instead.
+`ExitStack` registers a manager's exit after its `__enter__()` returns.
+The `__enter__()` of `broken("c")` raises a `RuntimeError` instead.
 Because `a` and `b` entered first, both unwind in reverse,
 the same rule a comma-separated `with` follows.
 
@@ -1044,8 +1046,8 @@ An object pool differs from [*Flyweight*](35_Patterns--Flyweight.md),
 the pattern closest to it.
 A flyweight is immutable and shared by everyone at once.
 A pooled object is usually mutable or stateful,
-so the pool lends it to one borrower at a time,
-and the lease exists to take it back.
+so the pool lends it to one borrower at a time.
+The lease exists to take it back.
 
 ### An Empty Pool Blocks the Borrower
 
