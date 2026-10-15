@@ -1870,7 +1870,7 @@ The channels resolve differently:
 The difference follows from what each channel holds.
 An unbound dependency has no answer anywhere in the program,
 so a driver that receives one has one response, `MissingAbilityError`.
-An unhandled failure has a clear meaning at the boundary: raise the exception,
+An unhandled failure has a clear meaning at the edge: raise the exception,
 which Python does with or without the Effect type.
 So the two channels guarantee different things.
 You must resolve a dependency before anything runs,
