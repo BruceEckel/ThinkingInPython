@@ -321,7 +321,7 @@ The base `run()` calls `customize1()` and `customize2()`.
 The algorithm works only if each step the subclass supplies does its part on every call.
 A subclass can break that requirement in three ways and still pass the type checker:
 it raises an exception where the base does not,
-leaves a step empty when the flow depends on it,
+leaves a step empty when the anchored algorithm depends on it,
 or performs the step on one pass and skips the next.
 `faithless_step.py` shows the third failure:
 
@@ -440,13 +440,13 @@ A *Strategy* swaps out a whole algorithm behind a single interface.
 In `template_function.py` the algorithm stays in `run_framework()`,
 and the caller supplies the steps.
 
-A stateless hook is usually better as a function than as an overridden method.
+A stateless step is usually better as a function than as an overridden method.
 You make the same choice between a class and a function when you write a [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 
 ## What Anchors the Algorithm
 
 An anchored algorithm is only as secure as its anchor.
-Each of this chapter's four anchors guards against a different way of breaking the flow:
+Each of this chapter's four anchors guards against a different way of breaking the anchored algorithm:
 
 - Structure, in `template_function.py`.
   The loop lives in a function body, out of every caller's reach.
@@ -490,7 +490,7 @@ Try each exercise before opening its [solution](../Solutions/25_Patterns--Templa
     What does that tell you about the source of the anchored algorithm's guarantee?
 4.  Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
     one whose `customize1()` raises an exception the base does not raise,
-    and one that leaves `customize2()` at its `...` default when the flow depends on it.
+    and one that leaves `customize2()` at its `...` default when the anchored algorithm depends on it.
     The type checker reports neither.
     What must be true of the base class for the type checker to catch either one?
 5.  In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.

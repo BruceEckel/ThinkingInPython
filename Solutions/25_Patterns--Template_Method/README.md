@@ -513,7 +513,7 @@ before anyone constructs an instance.
 
 > Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
 > one whose `customize1()` raises an exception the base does not raise,
-> and one that leaves `customize2()` at its `...` default when the flow depends on it.
+> and one that leaves `customize2()` at its `...` default when the anchored algorithm depends on it.
 > The type checker reports neither.
 > What must be true of the base class for the type checker to catch either one?
 
