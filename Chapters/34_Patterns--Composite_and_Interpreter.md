@@ -25,8 +25,8 @@ One call works on a file, a directory, or the whole tree.
 
 ![Each directory adds up what its entries return](_images/composite_tree)
 
-`disk_usage(root)` adds up every file below `root` to get 1940,
-and the same call on `src` or on a single file returns the size of that subtree or file.
+`disk_usage(root)` adds up every file below `root` to get 1940.
+The same call on `src` or on a single file returns the size of that subtree or file.
 
 The traditional version puts each operation inside the node classes,
 under an abstract method on a shared base:
@@ -190,9 +190,9 @@ Any consumer of that stream stays decoupled from the tree structure.
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
 A `list` there would leave the tree mutable.
-A record freezes the binding of the field, and,
-as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
-demonstrates, the list it holds keeps its `append()`.
+A record freezes the binding of the field.
+As [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
+demonstrates, a list in that field keeps its `append()`.
 With the tuple, sharing a subtree is safe.
 `test_filesystem.py` builds `SUB` first, then places it inside `TREE`,
 and `SUB` stays as built.
@@ -248,8 +248,8 @@ which makes `pathlib` look like a *Composite*.
 Both yield a `Path` for each entry, whatever its kind.
 `pathlib` lacks the structure.
 A `Path` is an immutable value that names a location and holds no entries.
-The tree lives in the operating system's filesystem,
-and `iterdir()` asks the OS for the children each time you call it.
+The tree lives in the operating system's filesystem.
+`iterdir()` asks the OS for the children each time you call it.
 The caller must add up any result over that tree, as `disk_usage()` does.
 On a directory, `stat().st_size` reports the size of the directory entry rather than the size of its contents,
 so you add up the sizes yourself:
@@ -345,12 +345,11 @@ If you annotate `evaluate()` with `Operators` instead,
 
 ### Operators That Build Nodes
 
-Every node inherits `__add__()` and `__mul__()`,
-and those methods compute nothing.
+Every node inherits `__add__()` and `__mul__()`, which compute nothing.
 They build nodes.
 Annotating `self` as `Expr` lets `Add(self, ...)` type-check.
-An implicit `self` means "some subclass of `Operators`,"
-and the `Expr` annotation declares to the type checker that `self` is a member of the union.
+An implicit `self` means "some subclass of `Operators`."
+The `Expr` annotation declares to the type checker that `self` is a member of the union.
 
 `ty` accepts a `self` annotation narrower than the class.
 Pyright and mypy require the declared type of `self` to be a supertype of its class.
@@ -653,9 +652,9 @@ reported when the module compiles rather than as an unbound name at runtime.
 
 Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
-A `case Add(Num(0), other)` at the top of the function tests the tree as the caller wrote it,
-so `(0 * y) + x` keeps its zero.
-The left child is a `Mul` until something simplifies it into a `Num`.
+A `case Add(Num(0), other)` at the top of the function tests the tree as the caller wrote it.
+In `(0 * y) + x`, the left child is a `Mul` until something simplifies it into a `Num`,
+so the expression keeps its zero.
 Simplifying both children first, then matching the results,
 applies the rule to the `Num(0)` the recursion just produced.
 That order lets the demo's `((1 * x) + (0 * y))` simplify to `x`.
@@ -733,7 +732,8 @@ The alternative is an iterative walk with an explicit stack of pending nodes
 
 ## A Template Is a Tree {#a-template-is-a-tree}
 
-Python has a composite of its own, and its walker is yours to write.
+Python has a composite of its own.
+Its walker is yours to write.
 A [`t`-string](02_Foundations--Tour.md#t-strings) evaluates to a `Template`:
 a stream of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
