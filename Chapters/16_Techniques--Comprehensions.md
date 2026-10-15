@@ -112,8 +112,8 @@ print(list(map(lambda e: e ** 2, filter(is_int, a_list))))
 ```
 
 The `TypeIs[int]` return type of `is_int()` declares that every element passing it is an `int`.
-The `lambda` inside `map()` therefore receives an `int`,
-and the listing needs no `# type: ignore` comment.
+The `lambda` inside `map()` therefore receives an `int`.
+The listing needs no `# type: ignore` comment.
 
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values,
@@ -345,8 +345,8 @@ print([x for x in row for row in rows])
 
 The `NameError` depends on the enclosing scope having no `row`.
 An earlier statement can bind one, as `row = [7, 8]` does here.
-The first clause then iterates over that stale `row`,
-and the comprehension silently produces a wrong list.
+The first clause then iterates over that stale `row`.
+The comprehension silently produces a wrong list.
 Each `x` from the stale `row` repeats once per element of `rows`,
 because the `for row in rows` clause runs inside `for x in row`.
 
@@ -427,8 +427,8 @@ Testing the bare filename leaves `Path` construction to the output expression,
 which runs only for the files that pass.
 
 A `with` block, unlike a function body, runs in the enclosing scope.
-The assignment to `py_paths` sits inside the `with`,
-and the name stays bound after the block ends,
+The assignment to `py_paths` sits inside the `with`.
+The name stays bound after the block ends,
 so the `for path in sorted(py_paths):` line below it can read `py_paths`.
 
 The comprehension finishes building `py_paths`, as strings,
@@ -551,8 +551,8 @@ print(wasted)
 The comprehension calls `print()` for its side effect.
 `print()` returns `None`, so `wasted` ends up holding three `None`s,
 one for each call.
-Worse, a reader scanning `[...]` expects a meaningful collection,
-and this comprehension is a loop written with the wrong punctuation.
+Worse, a reader scanning `[...]` expects a meaningful collection.
+This comprehension is a loop written with the wrong punctuation.
 
 ```python
 # for_loop_side_effects.py
@@ -763,7 +763,7 @@ so the nested `[2, 3]` above stays a single element of the result.
 `**` does the same for dictionaries, merging each mapping into the result,
 where a later key's value replaces an earlier one.
 With braces, `*` builds a set and `**` builds a dict.
-Everywhere else the colon decides between the two.
+In an ordinary brace comprehension, the colon decides between the two.
 Neither unpacking comprehension has a colon, so the operator decides.
 
 In parentheses, `(*row for row in rows)` is a generator expression that produces the same spliced values one at a time.
