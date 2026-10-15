@@ -69,8 +69,8 @@ With `Any`, the type checker accepts every operation on `m`.
 An ad-hoc attribute bag declares none of your attribute names,
 so the type checker cannot verify them.
 The `expected(AttributeError)` block reads `m.inof`, a typo for `m.info`.
-The type checker accepts `m.inof` because `m` is `Any`,
-and the read raises an `AttributeError` at runtime.
+The type checker accepts `m.inof` because `m` is `Any`.
+At runtime the read raises an `AttributeError`.
 
 Instead of annotating every variable that holds a `Messenger`,
 you can move that `Any` into the class.
@@ -78,9 +78,9 @@ Declare a [`__getattr__()`](26_Patterns--Surrogate.md#forwarding-with-getattr)
 that returns `Any` and a `__setattr__()` that accepts one.
 The `__getattr__()` covers reads,
 and the write `m.more = 11` needs the `__setattr__()`.
-The standard library's type declaration for `SimpleNamespace` has such a pair,
-with `__getattribute__()`, which intercepts every attribute access,
-as its read half in place of `__getattr__()`.
+The standard library's type declaration for `SimpleNamespace` has such a pair.
+In place of `__getattr__()`, its read half is `__getattribute__()`,
+which intercepts every attribute access.
 Because of that pair, the next listing needs no annotation.
 
 ## The Standard-Library Versions
@@ -109,8 +109,8 @@ print(m == SimpleNamespace(info="Spam",
 The `print()` at `[1]` shows the keyword arguments stored in the instance `__dict__`,
 as in the hand-rolled version.
 `SimpleNamespace` adds a readable `repr()` and equality by contents.
-`Messenger` prints as `<__main__.Messenger object at 0x...>`,
-and two `Messenger`s with identical attributes compare unequal,
+`Messenger` prints as `<__main__.Messenger object at 0x...>`.
+Two `Messenger`s with identical attributes compare unequal,
 because `Messenger` inherits `object`'s identity-based equality.
 
 A `SimpleNamespace` also accepts any name you invent.
@@ -373,8 +373,8 @@ The sequence of the field declarations sets that order implicitly.
 A frozen data class generates ordering methods only when the decorator receives `order=True`.
 `FrozenColor` leaves `order` at its default, `False`,
 so `<` between two `FrozenColor`s raises a `TypeError`.
-`OrderedColor` compares with its own class,
-and `<` against an `OrderedDimensions` raises a `TypeError`.
+`OrderedColor` compares with its own class.
+Comparing an `OrderedColor` with an `OrderedDimensions` raises a `TypeError`.
 
 Both listings write `@dataclass(frozen=True)` in full instead of `@record`,
 so that `order=True` is the one difference between `FrozenColor` and its twin,
@@ -428,12 +428,13 @@ print(hasattr(p, "__dict__"))
 ```
 
 Indexing, slicing, unpacking, hashing, and equality all come from `tuple`,
-so a `Point` works anywhere code expects a tuple,
-and it equals the bare `(1.0, 2.0)`,
+so a `Point` works anywhere code expects a tuple.
+A `Point` also equals the bare `(1.0, 2.0)`,
 the same structural equality that `still_a_tuple.py` shows.
 
 Tuple operations return plain tuples: `p + (3.0,)` and `p[:1]` are `tuple`s,
-not `Point`s, so a subclass that must survive those operations overrides the operators.
+not `Point`s.
+A subclass that must survive those operations overrides the operators.
 The empty `__slots__ = ()` keeps a `Point` as small as a tuple.
 A subclass that declares no `__slots__` gives each instance a `__dict__`,
 and with it the ability to grow attributes beyond the ones the class declares.
