@@ -434,7 +434,7 @@ so each listing shows one idea.
 
 ### A Surrogate Is Not Its Implementation
 
-A proxy is not an instance of the implementation's class.
+A surrogate is not an instance of the implementation's class.
 Delegation forwards the methods, not the type,
 and `isinstance()` checks only the proxy's own class.
 A `@runtime_checkable` `Protocol` gives the same answer.
@@ -499,7 +499,7 @@ Code that checks a surrogate with `isinstance()` should check for the method ins
 2.  *Virtual proxy*.
     Provides "lazy initialization" to create expensive objects on demand.
 3.  *Protection proxy*.
-    Restricts the client programmer's access to the proxied object.
+    Restricts the client programmer's access to the implementation.
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
     For example, a smart reference can log the calls to a particular method.
@@ -801,7 +801,7 @@ the checker would reject `run(surrogate)`,
 because `Surrogate` defines no `f()` of its own.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
 
-The test passes the *State* surrogate two small stand-ins,
+The test passes the *State* surrogate two small implementations,
 `StateA` and `StateB`,
 and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
@@ -833,7 +833,7 @@ The `Any` on the parameters of `__init__()` and `change_to()` is a choice.
 and the checker would then verify every implementation that reaches either method.
 That annotation also limits the surrogate to implementations of one Protocol,
 but the generic surrogate exists to accept any implementation.
-`test_state.py` passes the same `Surrogate` two stand-ins,
+`test_state.py` passes the same `Surrogate` two implementations,
 `StateA` and `StateB`,
 each with a `name()` and none of `Behavior`'s three methods.
 With `Behavior` on those parameters, `ty` rejects that test:
