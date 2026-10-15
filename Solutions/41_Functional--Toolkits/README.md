@@ -397,7 +397,7 @@ and caching `deep_sum()` would be correct once its argument is hashable.
 <details>
 <summary>Where to look</summary>
 
-[Case Study: Pairing Rotations](../../Chapters/41_Functional--Toolkits.md#case-study-pairing-rotations) builds its own `random.Random` from a `seed`.
+[Case Study: Pairing Rounds](../../Chapters/41_Functional--Toolkits.md#case-study-pairing-rounds) builds its own `random.Random` from a `seed`.
 Accept the `Random` object as a parameter and call its `shuffle()` where the function called its own.
 Then ask which part of reproducibility the function still controls and which part the caller now decides.
 

@@ -1012,7 +1012,7 @@ and you must get the push and pop right at every depth.
 In the recursive version the call stack does that bookkeeping.
 Each open sublist is a frame waiting for its `deep_sum()` call to return.
 
-## Case Study: Pairing Rotations
+## Case Study: Pairing Rounds
 
 Pair up participants for an activity across several rounds,
 and repeat a pairing only after every possible pairing has occurred once.
@@ -1047,7 +1047,7 @@ A perfect trio schedule exists only when the roster size leaves a remainder of 3
 so seven students have none.
 
 A given `students` and `size` may have no exact answer.
-Here, the general version therefore replaces rotation with a greedy search,
+Here, the general version therefore replaces the circle method with a greedy search,
 which produces a good schedule rather than a perfect one.
 The greedy search builds each group one member at a time,
 adding whoever the current members have met the fewest times.
