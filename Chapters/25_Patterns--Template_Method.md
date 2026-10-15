@@ -210,7 +210,7 @@ If that attribute carries `__final__`,
 `class Hijack` fails that check,
 because the `run()` it replaces carries `__final__`.
 
-The `__final__` check exists because a subclass that replaces the anchor moves the algorithm out of the base class,
+The `__final__` check exists because a subclass that replaces `run()` moves the algorithm out of the base class,
 and `@final` stops that replacement only when the type checker runs.
 
 The `__final__` check reads a flag rather than a method name.
@@ -471,7 +471,7 @@ Try each exercise before opening its [solution](../Solutions/25_Patterns--Templa
     It opens every file but the last for reading, and the last one for writing.
     It processes each input file by a step the subclass or the function supplies,
     and writes the output to the last file.
-    Supply each of these policies twice,
+    Supply each of these steps twice,
     once by subclassing and once by passing a function:
 
     1.  Convert all the letters in each file to uppercase.

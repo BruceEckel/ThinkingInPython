@@ -6,7 +6,7 @@
 > It opens every file but the last for reading, and the last one for writing.
 > It processes each input file by a step the subclass or the function supplies,
 > and writes the output to the last file.
-> Supply each of these policies twice,
+> Supply each of these steps twice,
 > once by subclassing and once by passing a function:
 >
 > 1.  Convert all the letters in each file to uppercase.
