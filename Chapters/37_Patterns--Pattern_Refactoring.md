@@ -19,7 +19,7 @@ so some of those patterns become unnecessary.
 The example is a trash sorting simulation, and it evolves across the chapter.
 A first design works until a new requirement makes it leave trash out of its report.
 A reshaping confines that change to one new class.
-Then a second axis of change appears,
+Then a second vector of change appears,
 and the reshaped design leaves it unsolved.
 Read that evolution as a template for your own designs,
 which can start as an adequate fit for one problem and become a flexible fit for a class of problems.
@@ -115,8 +115,8 @@ a restatement the type checker does not require.
 The checker [applies the base's declaration to an override](09_Foundations--Class_Attributes.md#classvar-and-inheritance),
 so it rejects `Aluminum(1.0).value = 2.0` with or without the restatement.
 
-A new recyclable type registers itself, and `create()` builds it.
-`sum_value()` also handles the new type as written.
+A new material registers itself, and `create()` builds it.
+`sum_value()` also handles the new material as written.
 That ordinary function reads `piece.value` and `piece.weight` polymorphically,
 so each piece answers `value` from its own class.
 
@@ -445,7 +445,7 @@ The registry, `create()`, and the sorting line all predate plastic.
 ## Adding Operations: Visitor, and Why Python Skips It
 
 So far adding a new *type* means writing one class definition and editing nothing else.
-The other axis of change is adding new *operations*.
+The other vector of change is adding new *operations*.
 In a design where adding a type means writing one new class,
 adding an operation ordinarily means editing every class.
 That asymmetry is the [expression problem](13_Techniques--Pattern_Matching.md#the-expression-problem).
