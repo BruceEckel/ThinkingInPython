@@ -47,17 +47,13 @@ The state plus input decides the next state.
 This is a *Moore machine*, where what a state does depends on the state alone.
 `run()` calls `self.action()` with no arguments.
 `action` defaults to a do-nothing function.
-A state with more to do supplies an `action` as the third constructor argument.
+A state that needs additional behavior supplies an `action` as the third constructor argument.
 
-Note that the form of `self.action()` is identical to a method call,
-where `self` is automatically passed as the first argument.
-Python supplies `self` only when the lookup finds the function on the class.
-A function stored there is a descriptor,
-and reading it through an instance binds that instance,
-as a call to `run()` shows.
-`action` is a field, so the lookup finds the function stored in the instance,
-where it is data, and Python returns it as it is.
-`self.action()` therefore calls the stored function with no arguments.
+Note that the form of `self.action()` looks like a method call.
+In a method call, `self` is automatically passed as the first argument.
+However, Python supplies `self` only when the lookup finds the function on the class.
+Here, `next` and `action` are references to external (non-method) functions.
+`self.action()` therefore looks up and calls the stored function with no arguments.
 
 The annotation on `next` names `State` inside the `State` class body,
 which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
@@ -82,7 +78,7 @@ We use an [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-
 to define a restricted set of objects.
 Because `Mouse` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins),
 each member is a `str`, and `print()` shows a member as its value,
-`mouse appears` rather than `Mouse.APPEARS`.
+e.g. `mouse appears` rather than `Mouse.APPEARS`.
 
 A sequence of nine moves covers every transition in the trap:
 
