@@ -841,7 +841,7 @@ a report.
 
 > Create an elevator state machine using `table_machine.py`.
 > Give the "doors closing" state two rules for the same input,
-> one guarded by a door-obstruction condition.
+> one with a door-obstruction condition.
 
 <details>
 <summary>Where to look</summary>

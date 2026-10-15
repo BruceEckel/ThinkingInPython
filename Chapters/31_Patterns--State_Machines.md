@@ -844,7 +844,7 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     Say which policy suits a washing machine, and why.
 7.  Create an elevator state machine using `table_machine.py`.
     Give the "doors closing" state two rules for the same input,
-    one guarded by a door-obstruction condition.
+    one with a door-obstruction condition.
 8.  Create a heating/air-conditioning system using `table_machine.py`.
     A single `TemperatureReading` input must be able to lead to heating,
     cooling, or idle, decided entirely by conditions on one `(state, input)` key.
