@@ -863,8 +863,8 @@ and assert against what the calling code returns.
 
 ### Stubs and Mocks
 
-A stand-in like `fake_urlopen()` is a stub:
-it answers with a canned value and records nothing.
+A stand-in like `fake_urlopen()` is a stub.
+It answers with a canned value and records nothing.
 The standard library's `unittest.mock` appears in most existing test code.
 It builds stubs for you, and it builds *mocks*.
 A `Mock` goes further than a stub.
