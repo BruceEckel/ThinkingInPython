@@ -26,8 +26,8 @@ Subclasses provide the individual steps.
 puts the `typing.final` decorator on a class.
 The decorator also works on a single method.
 On a method, it declares that no subclass may override that method.
-In `framework.py`, `run()` is the template method,
-and `@final` on `run()` makes the type checker reject any subclass that overrides it:
+In `framework.py`, `run()` is the template method.
+`@final` on `run()` makes the type checker reject any subclass that overrides it:
 
 ```python
 # framework.py
@@ -107,8 +107,8 @@ the framework defines the flow of control and calls your code,
 rather than your code calling into a library.
 
 Only the type checker enforces `@final`.
-At runtime the decorator sets `__final__ = True` on the function,
-and nothing in the interpreter reads that attribute.
+At runtime the decorator sets `__final__ = True` on the function.
+Nothing in the interpreter reads that attribute.
 Your own code can read it.
 If you want an override to fail at runtime,
 the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
@@ -218,10 +218,11 @@ A second `@final` instance method in `ApplicationFramework` therefore gets the s
 The check misses a `@final` on a `@property`,
 and a `@final` written above `@classmethod` or `@staticmethod`.
 For those, `getattr()` on the class returns the property object, a bound method,
-or the bare function, and none of them carries `__final__`.
+or the bare function.
+None of them carries `__final__`.
 Written below `@classmethod` or `@staticmethod`, `@final` marks the function,
-which `getattr()` returns as the bare function or through a bound method,
-and the check catches the override.
+which `getattr()` returns as the bare function or through a bound method.
+The check then catches the override.
 
 Reading the attribute through `getattr()` also passes the type checker,
 because `getattr()` with a default accepts any name.
@@ -304,8 +305,8 @@ and `step()` reads `self.name` before the constructor assigns it.
 
 The quick repair is reordering.
 Assign `self.name` first, then call `super().__init__()`.
-That works, but it inverts the convention Python programmers expect,
-and the next subclass author might restore the usual order out of habit.
+That works, but it inverts the convention Python programmers expect.
+The next subclass author might restore the usual order out of habit.
 The reliable repair changes the framework.
 Separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
@@ -316,8 +317,8 @@ That is why `ApplicationFramework` has no `__init__()` and the client calls `MyA
 The *Template Method* depends on the [Liskov Substitution Principle](20_Patterns--Rethinking_Objects.md#liskov-substitution):
 when code expects a base-class instance,
 an instance of a subclass must work in its place.
-The base `run()` calls `customize1()` and `customize2()`,
-and the algorithm works only if each step the subclass supplies does its part on every call.
+The base `run()` calls `customize1()` and `customize2()`.
+The algorithm works only if each step the subclass supplies does its part on every call.
 A subclass can break that requirement in three ways and still pass the type checker:
 it raises an exception where the base does not,
 leaves a step empty when the flow depends on it,
@@ -349,7 +350,8 @@ OnlyOnce().run()
 #: Say no more, say no more!
 ```
 
-`run()` calls `customize1()` twice, and `OnlyOnce` performs the step once.
+`run()` calls `customize1()` twice.
+`OnlyOnce` performs the step once.
 The name, the parameters, and the return type all match the base,
 so the type checker accepts `@override` and reports nothing.
 The base states its algorithm in the loop, not in any type.
@@ -427,8 +429,8 @@ so the type checker reports a call that omits it.
 
 The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.
-Here a caller passes the steps in as arguments,
-and the loop stays in the body of `run_framework()`, out of the caller's reach.
+Here a caller passes the steps in as arguments.
+The loop stays in the body of `run_framework()`, out of the caller's reach.
 Structure anchors the algorithm,
 and that anchor holds at runtime as well as under the type checker.
 
@@ -458,8 +460,8 @@ Each of this chapter's four anchors guards against a different way of breaking t
   whereas the type checker alone enforces `@final`.
 - Discipline, via the Liskov Substitution Principle.
   The principle governs whether each step is a faithful substitute.
-  `@abstractmethod` checks that a required step exists,
-  and no tool checks what the step does.
+  `@abstractmethod` checks that a required step exists.
+  No tool checks what the step does.
 
 Ask how the algorithm might break, and choose the mechanism that protects it.
 
