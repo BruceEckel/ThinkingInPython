@@ -198,8 +198,8 @@ An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 An `__init__.py` with content usually re-exports the package's public names.
 If `a_package/__init__.py` re-exports `function1`,
-callers write `from a_package import function1`,
-and the submodule that defines `function1` stays a detail inside the package.
+callers write `from a_package import function1`.
+The submodule that defines `function1` then stays a detail inside the package.
 
 You can also import a directory without `__init__.py` as a *namespace package*.
 This book uses an explicit `__init__.py` by default,
@@ -280,7 +280,8 @@ Reading `a_package.module1` raises an `AttributeError`,
 so `a_package.module1.function1()` fails here too.
 The submodule becomes an attribute of the package only when something imports it by name.
 The type checker warns that `module1` might not be imported,
-the same fact the marker shows, and the `# type: ignore` silences that warning.
+the same fact the marker shows.
+The `# type: ignore` silences that warning.
 
 You can also name the package with `from`:
 
@@ -445,8 +446,8 @@ because Python has no `private` keyword.
 A module states its boundary by convention and by one optional list.
 
 A leading underscore marks a name as internal.
-The mark informs a reader,
-and Python grants access to an underscored name like any other.
+The mark informs a reader.
+Python still grants access to an underscored name like any other.
 For a module `accounting` that defines `_Engine`, `accounting._Engine` resolves,
 and `from accounting import _Engine` works.
 The underscore changes one mechanical thing:
@@ -488,16 +489,16 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 
 Without `__all__`, the star import binds every name that starts with a letter:
 `public` and `undeclared`.
-With `__all__`, it binds the two listed names, including `_helper`,
-and `undeclared` stays in `exporting` with `_internal`.
+With `__all__`, it binds the two listed names, including `_helper`.
+`undeclared` stays in `exporting` with `_internal`.
 
 The `# noqa: F403` silences the linter's warning about the star import.
 A star import hides the source of each name from a reader and from the tools.
 Name what you import,
 and keep the star for experiments at the interactive prompt.
 
-The underscore and `__all__` both say which names a caller should use,
-and that stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade)
+The underscore and `__all__` both say which names a caller should use.
+That stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade)
 over its internals or as a shared single instance
 ([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).
 
@@ -594,7 +595,8 @@ Once the module loads, its names behave like eagerly imported ones.
 
 ### Watching the Deferral
 
-Here, importing a module whose body prints when it runs shows when `lazy` loads it:
+Here, `noisy.py` prints a message when its body runs,
+so the output shows when `lazy` loads it:
 
 ```python
 # noisy.py
@@ -695,9 +697,9 @@ installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
 the module's body and its registration wait for the rest of the run.
 The failure is silent: no error, just a table with a row missing.
-The same silent failure makes `all` an experiment to run rather than a setting to leave on.
 `all` defers ordinary `import` statements too,
 including the ones that exist to run a module's body.
+The same silent failure therefore makes `all` an experiment to run rather than a setting to leave on.
 
 ## Exercises
 
