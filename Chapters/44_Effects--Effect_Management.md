@@ -490,7 +490,7 @@ and the code of all hundred functions stays the same.
 Cross-cutting behavior binds at the same point.
 To add caching, tracing, or retries to every storage access,
 you insert a layer at the binding point instead of touching every call site.
-Variation concentrates at the boundary of the program,
+Variation concentrates at the edge of the program,
 and the functions below it stay simple and uniform.
 
 ### Effects by Hand
@@ -687,7 +687,7 @@ The handlers remove `ask` and `tell`,
 and the row that remains holds the Effects the handler bodies perform:
 `console` from the printing and reading, `exn` because `readline()` can fail.
 
-Separating the request from its fulfillment is the core of every Effect system.
+Separating the request from its fulfillment is the core of every Effect Management System.
 The code that requests an Effect is separate from the code that performs it,
 and a handler connects the two.
 `greet()` names `ask` and `tell`, and the handler decides what each one means.
@@ -717,7 +717,7 @@ but not resume twice, because nothing can copy a generator's paused frame.
 the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
 
 [Flix](https://flix.dev/) expresses the same model with different notation.
-The Effect set follows a backslash:
+The Effect row follows a backslash:
 
 ```flix
 def greet(): Unit \ {Ask, Tell} =
@@ -813,7 +813,7 @@ const ConsoleTell = Layer.succeed(Tell, {
 Effect.runPromise(hello.pipe(Effect.provide(ConsoleTell)))
 ```
 
-The description/execution split is an artifact of building the system as a library,
+The description/action split is an artifact of building the system as a library,
 rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
@@ -893,9 +893,9 @@ Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyn
 a description of work, and `ran` stays empty.
 The body runs only when something drives the description: an `await`, a task,
 or `asyncio.run()`.
-That description/execution split is the library Effect system model.
+That description/action split is the library Effect system model.
 Descriptions compose inside `async def` functions,
-and `asyncio.run()` is the boundary where description becomes action.
+and `asyncio.run()` is the edge where description becomes action.
 
 Python enforces the tracking the way an EMS does.
 `await` is a syntax error outside an `async def`,
@@ -914,7 +914,7 @@ a `Maybe` container for a value that might be absent,
 an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
 The [effect](https://pypi.org/project/effect/)
-library ports the description/execution split to Python.
+library ports the description/action split to Python.
 The name is all it shares with the TypeScript library.
 Code builds objects that describe intents.
 Separate performers execute them, and a test can swap in its own performers.
@@ -971,7 +971,7 @@ Systems grow until hand-tracking fails.
 The solution moves that tracking into the language or the toolchain,
 and a generation later, nobody can imagine doing it by hand.
 
-Namespaces are the clearest example.
+Namespaces are a clear example.
 Early languages put every name in one global namespace,
 and the programmer prevented collisions by hand.
 Collisions were often silent, producing hidden bugs,
@@ -993,8 +993,8 @@ Garbage collection took the tracking of memory ownership out of the programmer's
 Each of these met resistance as unnecessary overhead, then won adoption,
 then faded as a question.
 
-Effects are the barrier we are inside right now,
-and a barrier is hardest to see from inside.
+A barrier is hardest to see from inside,
+and Effects are the barrier we are inside right now.
 We build programs from other people's code,
 and we don't know what that code does.
 It might change something in the world.
@@ -1022,8 +1022,7 @@ and future programmers will regard a function with hidden Effects the way you re
 
 Python offers no native Effect tracking beyond `async`, and will not soon.
 [Generators](45_Effects--Generators.md) supplies the mechanism a library needs,
-[Stateless](46_Effects--Stateless.md)
-builds a library Effect system on that mechanism,
+[Stateless](46_Effects--Stateless.md) builds a library EMS on that mechanism,
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 puts the library to work.
 
