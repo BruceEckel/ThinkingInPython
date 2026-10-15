@@ -1275,7 +1275,7 @@ with expected(AttributeError):
 The checker treats `Point` as frozen and reports `p.x = 3` before the program runs.
 `@dataclass_transform` has no parameter that describes slots,
 so the checker cannot tell that `Point` has slots.
-On a frozen class that missing information changes nothing,
+On a record that missing information changes nothing,
 because the checker rejects every assignment to an instance.
 
 A class whose base declares no `__slots__` writes `@record(slots=False)`.
