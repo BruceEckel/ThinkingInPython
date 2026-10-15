@@ -40,16 +40,27 @@ class State:
 ```
 
 `next` and `action` are functions stored in fields, not methods,
-so neither receives `self`: `state.next(input_)` passes the input alone,
-and `run()` calls `self.action()` with no arguments.
-`action` defaults to a function that does nothing.
+so neither receives `self`.
+`state.next(input_)` passes the input alone.
+The state plus input decides the next state.
+
+This is a *Moore machine*, where what a state does depends on the state alone.
+`run()` calls `self.action()` with no arguments.
+`action` defaults to a do-nothing function.
 A state with more to do supplies an `action` as the third constructor argument.
+
+Note that the form of `self.action()` is identical to a method call,
+where `self` is automatically passed as the first argument.
+Python supplies `self` only when the lookup finds the function on the class:
+a function stored there is a descriptor,
+and reading it through an instance binds that instance,
+as a call to `run()` shows.
+`action` is a field, so the lookup finds the function stored in the instance,
+where it is data, and Python returns it as it is.
+`self.action()` therefore calls the stored function with no arguments.
 
 The annotation on `next` names `State` inside the `State` class body,
 which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
-
-Each state decides the next state.
-This is a *Moore machine*, where what a state does depends on the state alone.
 
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
