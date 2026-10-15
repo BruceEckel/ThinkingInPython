@@ -444,7 +444,7 @@ An *oracle* states that two implementations agree.
 The simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 
-Avoid a property that restates the implementation.
+Avoid a law that restates the implementation.
 Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip law,
