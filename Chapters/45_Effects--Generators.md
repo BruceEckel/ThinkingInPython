@@ -286,7 +286,7 @@ and it receives the answers through its `answers: dict[Question, Answer]` parame
 Swapping the dictionary for a database changes a single argument.
 
 `interview()` and `drive()` form an EMS in miniature.
-The generator declares Effects, and the driver interprets them.
+The generator declares requests, and the driver interprets them.
 
 Each generator has one driver.
 No annotation states that pairing, but the runtime enforces it.
@@ -391,7 +391,7 @@ so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 
 ### The Send Channel
 
-The `SendType` is the type of the value a caller sends back into the generator.
+The `SendType` is the type of the value a driver sends back into the generator.
 A generator that receives values and returns `None` can leave the `ReturnType` at its default:
 
 ```python
@@ -537,7 +537,7 @@ a different kind of value from the answer to any one question.
 and treats it the same as one that `interview()` yielded in its own body.
 The answer `drive()` sends back becomes the value of the `yield` inside `ask()`,
 and nothing in `ask()` names the driver that sent it.
-A single loop at the edge of the program interprets Effects yielded anywhere inside it.
+A single loop at the edge of the program interprets requests yielded anywhere inside it.
 
 ### Composing Is Not Interpreting
 
@@ -767,13 +767,13 @@ task_runner(deque([download(), index()]))
 #: download: checksum
 ```
 
-`task_runner()` gives the front task one `next()` per turn.
-When a task yields, the runner appends it to the back of the queue.
-When a task finishes, `next()` raises `StopIteration`,
-and the runner drops the task.
-Each `yield` suspends its task and returns control to `task_runner()`,
-which then runs the next task.
-The output interleaves the two tasks in a single thread,
+`task_runner()` gives the front job one `next()` per turn.
+When a job yields, the runner appends it to the back of the queue.
+When a job finishes, `next()` raises `StopIteration`,
+and the runner drops the job.
+Each `yield` suspends its job and returns control to `task_runner()`,
+which then runs the next job.
+The output interleaves the two jobs in a single thread,
 although neither names the other.
 
 `task_runner()` calls `next()` and takes turns.
@@ -832,8 +832,8 @@ and every request missing from the table gets `"ok"`.
 
 `download()` reads what it receives, into `reply`.
 `index()` discards what it receives,
-as a task that yields to take turns is free to do.
-The queue still rotates task to task,
+as a job that yields to take turns is free to do.
+The queue still rotates job to job,
 and now the runner also does `drive()`'s work,
 answering each request before the next turn.
 
@@ -849,7 +849,7 @@ to the task that drives it.
 When the `Future` has a result, the loop resumes the coroutine,
 and the `await` expression evaluates to that result.
 
-`asyncio.run()` is the single interpreter at the edge of the program.
+`asyncio.run()` is the single driver at the edge of the program.
 Every request must travel up to that loop,
 so an `await` in a function makes every caller `async` in turn.
 
