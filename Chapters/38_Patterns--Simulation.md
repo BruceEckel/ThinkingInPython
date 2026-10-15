@@ -1178,7 +1178,7 @@ A ringing plate moves unevenly.
 Standing waves divide it into regions that swing up and down.
 The *nodal lines* between them stay still.
 The vibration bounces sand out of the moving regions.
-When a grain comes to rest on a still line, it stays there.
+When a grain comes to rest on a nodal line, it stays there.
 Within seconds the random motion sweeps the sand into sharp, symmetric curves.
 Bowing a different spot rings the plate in a different mode and draws a different figure.
 
