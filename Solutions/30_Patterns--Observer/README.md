@@ -1282,8 +1282,8 @@ which runs the window's event loop until the window closes, so call `show()` las
 
 > Work out which colors the whole grid can reach from `new_grid(size)` under `grid_observer.py`'s rule.
 > Selecting a cell advances up to five cells by one, modulo three,
-> and selections commute, so this is a linear system over the integers mod 3:
-> the unknowns are how many times you select each cell.
+> and selections commute, so this is a linear system over the integers mod 3.
+> The unknowns are how many times you select each cell.
 > Write Gaussian elimination mod 3 to decide whether the system has a solution,
 > and print the reachable colors for every size from 3 through 8.
 > The 8x8 grid reaches `palegreen` alone,

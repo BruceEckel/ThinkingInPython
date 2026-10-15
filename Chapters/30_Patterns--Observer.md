@@ -294,7 +294,7 @@ one announcement would collect an unknown number of them.
 The broadcaster would then need a rule for combining those values.
 Returning `None` makes that rule unnecessary.
 
-A design that needs an answer uses a different pattern:
+A design that needs an answer uses a different pattern.
 [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
 
@@ -1928,8 +1928,8 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
     and leave the model as `grid_observer.py` has it.
 9.  Work out which colors the whole grid can reach from `new_grid(size)` under `grid_observer.py`'s rule.
     Selecting a cell advances up to five cells by one, modulo three,
-    and selections commute, so this is a linear system over the integers mod 3:
-    the unknowns are how many times you select each cell.
+    and selections commute, so this is a linear system over the integers mod 3.
+    The unknowns are how many times you select each cell.
     Write Gaussian elimination mod 3 to decide whether the system has a solution,
     and print the reachable colors for every size from 3 through 8.
     The 8x8 grid reaches `palegreen` alone,
