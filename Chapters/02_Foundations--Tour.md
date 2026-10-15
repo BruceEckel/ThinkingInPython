@@ -19,8 +19,9 @@ People often call Python a scripting language,
 but scripting languages tend to limit you,
 especially in the range of problems they can solve.
 Python is a programming language that also supports scripting.
-It is marvelous for scripting, and you may replace all your batch files,
-shell scripts, and simple programs with Python scripts.
+It is marvelous for scripting.
+You may replace all your batch files, shell scripts,
+and simple programs with Python scripts.
 
 ## How to Read the Examples
 
@@ -69,8 +70,8 @@ In Python, an `if` or a `for` block shares the scope around it.
 New scopes come from functions, classes, modules, and comprehensions.
 
 Python binds a name only when the assignment runs.
-With `response` set to `"no"`, the `if` skips `val = 1`,
-and `print(val)` raises a `NameError`.
+With `response` set to `"no"`, the `if` skips `val = 1`.
+`print(val)` then raises a `NameError`.
 
 ```python
 # unbound_val.py
@@ -108,7 +109,7 @@ A semicolon's one job is to separate two statements that share a line.
 An open parenthesis, bracket,
 or brace continues the statement across lines until it closes.
 You choose the indentation of those continued lines.
-The longer calls in `tstrings.py` wrap that way.
+The longer calls in `tstrings.py` and `template_consumers.py` wrap that way.
 
 ## Variables and References
 
@@ -150,8 +151,8 @@ Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
 
 `a[:]` is a *shallow* copy.
-It duplicates the outer list,
-and the copy shares the outer list's inner objects.
+It duplicates the outer list.
+The copy shares the outer list's inner objects.
 Because `nested` and `shallow` still share the same inner list,
 `shallow[1].append(99)` also changes `nested[1]`.
 The standard library's `copy.deepcopy()` duplicates the inner objects as well.
@@ -223,7 +224,7 @@ print(True + True, True == 1)  # A bool is an int
 so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`.
 C's `round()` rounds half away from zero instead.
 The format spec of an [f-string](#f-strings), later in this chapter,
-rounds ties the same way.
+rounds ties the way `round()` does.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
 Arithmetic treats them as numbers too, so `True + True` is `2`.
@@ -450,7 +451,8 @@ In an ordinary string, a backslash starts an escape sequence, as in C and Java.
 The `r` right before a string means "raw."
 Python takes each backslash in a raw string literally, as a single character.
 Without the `r`, the last literal in `strings.py` is a syntax error.
-`\u` starts a Unicode escape, and `tils` is not the four hex digits it requires.
+`\u` starts a Unicode escape, which requires four hex digits.
+The `tils` after it supplies none.
 A raw string has one limit: it cannot end with a single backslash,
 because a backslash in a raw string still makes the quote after it part of the string's text.
 
@@ -593,8 +595,8 @@ for piece in message.interpolations:
 ```
 
 A `Template` stores its two kinds of piece separately.
-`message.strings` holds the literal text,
-with one entry more than `message.interpolations`.
+`message.strings` holds the literal text around and between the values,
+so it has one entry more than `message.interpolations`.
 A template that opens with a value therefore opens with an empty string,
 which prints as `''`.
 `message.interpolations` holds one `Interpolation` per value.
