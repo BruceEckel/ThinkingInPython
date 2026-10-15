@@ -31,7 +31,7 @@ because a verdict on a hard case is a fact about one checker, not about Python.
 ## Gradual Typing
 
 You can add type hints one function at a time.
-Code without annotations still works.
+Code without hints still works.
 The type checker treats it as the type `Any`,
 which is compatible with everything.
 Thus, typed and untyped code can coexist,
@@ -445,7 +445,7 @@ It is a keyword only at the start of this statement.
 Everywhere else, `type` is still the built-in `type()` function,
 so the listing's `type(grid)` call returns `dict` as it always has.
 
-A `type` alias is a new name, not a new type.
+A `type` statement creates a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the type checker accepts any pair of ints as a `Coord`.
 (For a type the type checker keeps separate from its base, use [`NewType`](#aliases-and-distinct-types).)
@@ -685,7 +685,7 @@ so `T` exists only inside that function or class.
 ## The `Self` Return Type {#the-self-type}
 
 A method that returns its own instance allows call chaining.
-What should the type annotation be?
+What should the type hint be?
 Naming the enclosing class works until someone inherits from it.
 `Self` means "an instance of the class on which you called this method,"
 so in a subclass it means the subclass:
@@ -803,7 +803,7 @@ Those are the places where the code's reader and writer are different people,
 and where the most code separates a wrong assumption from the failure it causes.
 
 Let the type checker infer the rest.
-A local variable whose type is obvious from its initializer gains nothing from an annotation.
+A local variable whose type is obvious from its initializer gains nothing from a hint.
 `count: int = 0` says the same as `count = 0`, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
 A hint helps in proportion to the distance between a value's creation and its use.
@@ -817,7 +817,7 @@ These are the type hints you encounter, in their modern forms.
 Each subsection opens with a link to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
 [Thinking in Types](https://thinkingintypes.com/) explores types in more depth.
 
-Annotations go in three places: a parameter (`x: int`), a return value
+Type hints go in three places: a parameter (`x: int`), a return value
 (`-> str`), and a variable or attribute (`total: int = 0`).
 Most of the names below come from the `typing` module.
 The abstract container types come from `collections.abc`.
