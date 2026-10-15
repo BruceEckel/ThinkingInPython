@@ -202,7 +202,7 @@ the same leak [`frozen=True` has](20_Patterns--Rethinking_Objects.md#the-immutab
 Such a `NamedTuple` is also unhashable, mutated or not,
 because hashing a tuple hashes its contents,
 and `hash()` on a list raises a `TypeError`.
-An immutable record needs immutable fields.
+An immutable type needs immutable fields.
 
 The leading underscore on `_replace()`, `_asdict()`,
 and `_fields` keeps the ordinary names free for your fields.
@@ -453,11 +453,11 @@ Choose `NamedTuple` when it is: unpacking, multiple return values,
 compatibility with code that expects a tuple.
 Subclass `tuple` yourself, as `point_tuple.py` does,
 when that tuple behavior must come with your own construction or methods.
-Choose a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability)
+Choose a [record](12_Techniques--Data_Classes_as_Types.md#immutability)
 when the value should be a distinct type that equals instances of its own class alone.
-Choose the frozen data class too when inherited ordering and array-shaped JSON are wrong rather than convenient,
+Choose the record too when inherited ordering and array-shaped JSON are wrong rather than convenient,
 or when the type must check its own values.
-A frozen data class runs [`__post_init__()`](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+A record runs [`__post_init__()`](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 on every construction, so its values are legal as well as typed.
 By contrast, [a `NamedTuple` cannot validate itself](12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate).
 
