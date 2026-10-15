@@ -9,8 +9,8 @@ introduced library Effect systems.
 [Stateless](https://github.com/suned/stateless)
 implements an Effect Management System (EMS).
 
-Stateless encodes an Effect's dependencies and failures into the return type of a function,
-and a type checker verifies that every caller either handles each Effect or declares it in its own signature.
+Stateless encodes an Effect's dependencies and failures into the return type of a function.
+A type checker then verifies that every caller either handles each Effect or declares it in its own signature.
 If you forget to declare a dependency, the check fails.
 If you forget to supply one, the check fails.
 Those two checks are the Effect tracking and delayed binding of a full EMS,
@@ -160,9 +160,8 @@ def greet(name: str) -> None:
 ```
 
 That signature is incomplete.
-`-> None` describes the return value,
-and the body also writes to standard output,
-a side effect the signature leaves out.
+`-> None` describes the return value.
+The body also writes to standard output, a side effect the signature leaves out.
 A caller who wants to redirect the output, or to test the function,
 must capture stdout.
 
@@ -223,14 +222,14 @@ The request in `greet()` reads `console = yield from need(Console)`,
 not `console = yield Need(Console)`.
 The reason is that `Any`.
 
-A generator has one SendType for its whole life,
-and an Effect needs a different answer for each request:
+A generator has one SendType for its whole life.
+An Effect needs a different answer for each request:
 
 - A `yield` that requests a `Need[Console]` should get back a `Console`.
 - A `yield` that requests a `Need[Log]` should get back a `Log`.
 
-What comes back depends on which Ability the `yield` requested,
-and one SendType covers every `yield`.
+What comes back depends on which Ability the `yield` requested.
+One SendType covers every `yield`.
 If you pin it to `Console`,
 the type checker reads `yield Need(Log)` as producing a `Console`.
 So the SendType is `Any`, which accepts every answer unchecked.
@@ -769,16 +768,16 @@ The difference is how many places you edit.
 A new parameter changes every call site along with every signature,
 and each function in between accepts the object and hands it onward.
 A new Ability changes the signatures alone.
-`yield from greet_logged(name)` stays as it is, and the instance appears once,
-at `supply()`.
+`yield from greet_logged(name)` stays as it is.
+The instance appears once, at `supply()`.
 
 Multiple Abilities combine with `|` because the union describes one request at a time.
 Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`.
 Over the whole run, `greet_all()` makes both kinds of request,
 so `supply()` must provide a `Console` and a `Log`.
 
-The repeated union is the shape a `type` alias normally shortens,
-and elsewhere the book writes one.
+The repeated union is the shape a `type` alias normally shortens.
+Elsewhere the book writes one.
 Under `ty` 0.0.87 the alias checks the same as the written-out signature.
 An undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
 This book still writes Effect signatures out in full,
@@ -880,8 +879,8 @@ def test_greet_all(console: Console) -> None:
 
 The test varies the console and checks the log,
 which records the same greeting under either `Console`.
-The test has two rows and two `Console` implementations,
-and `greet_all()` and `greet_logged()` keep their parameter lists.
+The test has two rows and two `Console` implementations.
+`greet_all()` and `greet_logged()` keep their parameter lists.
 The parameter-passed version adds a `console` argument to both,
 although `greet()`, one level further down, is the one function that uses it.
 
@@ -935,7 +934,8 @@ No check reports it.
 ### An Interface Instead of a Base Class
 
 Stateless's own `Console` is the concrete class [Built-in Dependencies](#builtin-dependencies)
-named, and only a subclass can replace it.
+named.
+Only a subclass can replace it.
 Its accessors name that class,
 so `isinstance()` accepts an instance of the class or a subclass.
 A structurally identical double fails twice.
@@ -970,8 +970,8 @@ def greet(name: str) -> Depend[Need[Console], None]:
 A full EMS does [three things](44_Effects--Effect_Management.md#tracking-and-management),
 and the second is to separate each Effect's interface from its implementation.
 `Console` as a `Protocol` holds no implementation.
-`Terminal` is one implementation and `Recorder` is another,
-and `greet()` names neither.
+`Terminal` is one implementation and `Recorder` is another.
+`greet()` names neither.
 `Recorder` qualifies as a `Console` without inheriting from `Console`,
 because a `Protocol` matches on structure.
 
@@ -1009,8 +1009,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 Structural matching decides the runtime issue, not the static one.
 `supply(Terminal())` still builds a handler for `Need[Terminal]`,
 which leaves `greet()`'s `Need[Console]` in place.
-The unhandled request stays in the type that reaches `run()`,
-and that call is the line the type checker reports.
+The unhandled request stays in the type that reaches `run()`.
+That call is the line the type checker reports.
 An interface needs the `as_type()` upcast more than a base class does.
 You can instantiate a concrete `Console` and supply it with no upcast,
 but an interface reaches `supply()` only through an implementation.
@@ -1136,8 +1136,8 @@ The DI registration key also does the work `as_type(Console)` does for `supply()
 so `supply(recorder)` is a `Handler[Need[Recorder]]`,
 and no `Need[Console]` matches it.
 
-`DI_CONTAINER` holds instances of unrelated types,
-and a `dict` gives every value the same type.
+`DI_CONTAINER` holds instances of unrelated types.
+A `dict` gives every value the same type.
 The key carries the type information.
 With `object` as the value type,
 the type checker rejects `get()`'s `return DI_CONTAINER[t]`,
@@ -1174,7 +1174,7 @@ the same parameter an EMS replaces with a channel in the return type.
 
 An EMS requires more.
 The dependency must appear in the signature so the type checker can verify it.
-That is why the EMS `greet()` returns `Depend[Need[Console], None]` while `dependency_injection.py`'s returns `None`.
+That is why the EMS `greet()` returns `Depend[Need[Console], None]` while `dependency_injection.py`'s `greet()` returns `None`.
 An EMS tracks every dependency,
 so the type checker reports the errors that a programmer's memory or an exhaustive test suite must otherwise find.
 
@@ -1201,8 +1201,8 @@ Having no container has three consequences:
 3. Stateless Abilities live in the function type.
    DI leaves that information in the bodies that ask for it.
    You must read the implementation to learn what a DI function needs.
-   `holds()` declares `Need[Material] | Need[Nailer]` in its signature,
-   and a caller that does not supply them inherits both Abilities.
+   `holds()` declares `Need[Material] | Need[Nailer]` in its signature.
+   A caller that does not supply them inherits both Abilities.
 
 ### Churn in Every Signature
 
@@ -1213,8 +1213,8 @@ Under DI, the same change leaves every signature as it was.
 
 Type checking is the earliest practical time to discover a forgotten dependency,
 so the objection concerns churn and coupling rather than correctness.
-A pass-through function such as `greet_all()` still names `Need[Log]` in its type,
-and taking that Ability back out later changes every signature on the path a second time.
+A pass-through function such as `greet_all()` still names `Need[Log]` in its type.
+Taking that Ability back out later changes every signature on the path a second time.
 People made the same complaint against [Java's checked exceptions](44_Effects--Effect_Management.md#catch-the-exception-you-expect),
 where an exception added three levels down meant editing every signature above it.
 That complaint is why [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
@@ -1340,8 +1340,8 @@ It is an ordinary class whose one method is `async def sleep()`.
 
 ### A Clock That Never Waits
 
-Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect),
-and `Need[Time]` moves that into the Ability channel.
+Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect).
+`Need[Time]` moves that side cause into the Ability channel.
 A test can then supply a clock that never waits:
 
 ```python
@@ -1379,8 +1379,8 @@ as `Recorder` goes through `as_type(Console)`.
 `Instant` is a record because `Time` is a frozen data class,
 and a data class that inherits from a frozen one must be frozen too.
 The record drops its slots because `Time` declares none.
-Freezing prevents rebinding `waited`,
-and `sleep()` can still append to the list it holds.
+Freezing prevents rebinding `waited`.
+`sleep()` can still append to the list it holds.
 
 ## Where to Call `run()`
 
@@ -1557,8 +1557,8 @@ expect(KeyError, run, supply(Console())(announce)("Carol"))
 #: [KeyError] 'Carol'
 ```
 
-The error channel records which failures can occur,
-and `run()` turns any that reach it back into ordinary Python exceptions.
+The error channel records which failures can occur.
+`run()` turns any that reach it back into ordinary Python exceptions.
 
 The channel carries the failures `@throws` lifted into it.
 `@throws` lifts the exception types it names.
@@ -1799,8 +1799,8 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
 
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure moves into the result, so the error channel is empty.
-Each failure reaches the `match` in `all_handled()` as a value,
-and `all_handled()` returns `Success[str]`.
+Each failure reaches the `match` in `all_handled()` as a value.
+`all_handled()` returns `Success[str]`.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moves to the result and the uncaught one remains.
@@ -1849,7 +1849,8 @@ Emptying a channel takes one of two vocabularies, and a third case needs none:
    `Async` sits in the same channel as a `Need`,
    and `run()` answers it by awaiting the request's awaitable in the event loop it starts.
 
-The vocabularies differ, and the operation underneath them is the same.
+The vocabularies differ.
+The operation underneath them is the same.
 Both subtract from the type.
 `supply()` removes an Ability from the union,
 and the channel reads `Never` once a handler answers the last Ability.
@@ -1875,8 +1876,8 @@ which Python does with or without the Effect type.
 So the two channels guarantee different things.
 You must resolve a dependency before anything runs,
 while a declared failure stays in the type until you choose where to handle it.
-The type checker covers both declarations,
-and forgetting to declare either is a type error.
+The type checker covers both declarations.
+Forgetting to declare either is a type error.
 
 ## Exercises
 
