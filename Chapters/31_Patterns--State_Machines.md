@@ -42,7 +42,7 @@ class State:
 `next` is a stored function rather than a method,
 so the call `state.next(input_)` passes the input alone, with no `self`.
 The field's annotation names `State` inside its own class body;
-the name resolves because annotations are evaluated lazily.
+the name resolves because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
 
 `action` is a stored function too.
 A state whose whole behavior is its message leaves it at the default,
@@ -478,9 +478,12 @@ class Row(Enum):
     def __str__(self) -> str:
         return self.name
 
-@record
-class Column:
-    value: int
+class Column(Enum):
+    C0 = 0
+    C1 = 1
+    C2 = 2
+    C3 = 3
+
     def __str__(self) -> str:
         return f"col {self.value}"
 
@@ -490,10 +493,10 @@ class Slot:
     quantity: int
 ```
 
-The inputs `Money` and `Column` are records,
-values the machine reads and leaves as they are.
-`Row` is an `Enum` whose four members name the rows,
-so a row outside the grid is a type error at the call rather than an index error inside `_slot()`.
+`Money` is a record, a value the machine reads and leaves as it is.
+`Row` and `Column` are `Enum`s whose members name the rows and the columns,
+so a selection outside the grid is a type error at the call rather than an index error inside `_slot()`.
+`Column(1)` looks up the member whose value is 1.
 `Slot` stays a mutable `@dataclass`,
 because `dispense()` decrements its `quantity` in place.
 

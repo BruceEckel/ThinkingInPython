@@ -33,9 +33,12 @@ class Row(Enum):
     def __str__(self) -> str:
         return self.name
 
-@record
-class Column:
-    value: int
+class Column(Enum):
+    C0 = 0
+    C1 = 1
+    C2 = 2
+    C3 = 3
+
     def __str__(self) -> str:
         return f"col {self.value}"
 
