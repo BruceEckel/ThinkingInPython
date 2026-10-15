@@ -8,12 +8,9 @@
 Recall [*State*](26_Patterns--Surrogate.md#state):
 a surrogate forwards calls to one of several implementations,
 and the client programmer chooses an implementation.
-*State Machine* adds a structure that makes the switch automatically,
-from one implementation to the next.
+*State Machine* adds a structure that makes the switch from one implementation to the next.
 The system behaves differently as it moves from state to state.
 
-A [*Template Method*](25_Patterns--Template_Method.md)
-is often used to change states.
 You call `run()` on a state to perform its behavior.
 Providing an input to `next()` moves the machine into its subsequent state.
 
@@ -23,9 +20,7 @@ In the second, a single table holds all transitions.
 
 ## Each State Decides
 
-A `State` is a record holding the message its `run()` prints, the function that,
-given an input, produces the next `State`,
-and an action that `run()` calls after printing:
+A `State` is a record holding the function that produces the next `State` and an action that produces the `State`'s behavior:
 
 ```python
 # state.py
@@ -46,21 +41,15 @@ class State:
 `next` is a stored function rather than a method,
 so the call `state.next(input_)` passes the input alone, with no `self`.
 The field's annotation names `State` inside its own class body;
-annotations are evaluated lazily, so the name resolves.
-The input is typed `object`,
-so a function can accept any input and `match` on it.
+the name resolves because annotations are evaluated lazily.
 
-`action` is a stored function too, and its default does nothing.
-A state whose whole behavior is its message supplies two fields,
-and a state that does more supplies a third.
-`run()` is the same method for every state,
-but what it does differs with the row: every state prints its message,
-and a state with an action runs that as well.
+`action` is a stored function too.
+A state whose whole behavior is its message leaves it at the default,
+which does nothing; a state that does more passes a third constructor argument.
+`run()` is the same method for every state and calls `action` in each one,
+default or supplied.
 
-In this design each state decides the next state.
-The action belongs to the state and takes no input.
-`run()` prints the state's message and calls its action,
-and the input goes to `next`, which chooses the successor.
+Each state decides the next state.
 This is a *Moore machine*, where what a state does depends on the state alone.
 
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
