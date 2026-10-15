@@ -129,8 +129,8 @@ Counting the *object adapter* in `adapter.py`
 (an adapter that wraps an instance of the adaptee),
 three structures produce one behavior.
 Each call ends in the same `g()` and `h()` on a `WhatIHave`.
-The approaches differ in where the adaptation lives,
-and the first line of each trace names that place:
+The approaches differ in where the adaptation lives.
+The first line of each trace names that place:
 `ProxyAdapter.f()` for the object adapter,
 `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 When `WhatIUse2.op()` receives a `ProxyAdapter`,

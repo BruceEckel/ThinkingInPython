@@ -45,7 +45,6 @@ Chapters/06_Foundations--Modules_and_Packages.md	only: The condition is true onl
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
 Chapters/06_Foundations--Modules_and_Packages.md	only: When the cycle exists only in annotations
 Chapters/06_Foundations--Modules_and_Packages.md	only: a keyword only inside an CODE statement
-Chapters/06_Foundations--Modules_and_Packages.md	only: but only at module scope
 Chapters/06_Foundations--Modules_and_Packages.md	only: defers only the imports you marked CODE
 Chapters/06_Foundations--Modules_and_Packages.md	only: only flags the directory as a package.^[The name CODE often confuses people
 Chapters/06_Foundations--Modules_and_Packages.md	only: the way CODE is a keyword only inside a CODE statement
@@ -57,7 +56,6 @@ Chapters/08_Foundations--Static_Types.md	never: The Python runtime never acts on
 Chapters/08_Foundations--Static_Types.md	only: It is a keyword only at the start of this statement
 Chapters/08_Foundations--Static_Types.md	only: It stores the hint and evaluates it only when something reads the annotations
 Chapters/08_Foundations--Static_Types.md	only: The Python runtime checks types only when an operation runs
-Chapters/08_Foundations--Static_Types.md	only: and only the type checker rejects a reassignment
 Chapters/08_Foundations--Static_Types.md	only: but that is only a hint to human readers
 Chapters/08_Foundations--Static_Types.md	only: that rejection is the only enforcement
 Chapters/08_Foundations--Static_Types.md	want: If you want static type checking like you get from a compiler in a typed language
@@ -80,7 +78,6 @@ Chapters/11_Techniques--Testing.md	only: Only CODE calls it
 Chapters/11_Techniques--Testing.md	only: Only convention says
 Chapters/11_Techniques--Testing.md	only: Only the code changes to satisfy it
 Chapters/11_Techniques--Testing.md	only: The test passes only if the block raises the expected exception
-Chapters/11_Techniques--Testing.md	only: and only a parameter delivers its value
 Chapters/11_Techniques--Testing.md	only: so that only implementation remains
 Chapters/12_Techniques--Data_Classes_as_Types.md	is what: one field different" is what you do with any immutable value
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: A read-only CODE keeps users from assigning to CODE
@@ -152,7 +149,6 @@ Chapters/17_Techniques--Metaprogramming.md	only: Only three known names reach th
 Chapters/17_Techniques--Metaprogramming.md	only: Testing shows that each registry holds only its current leaf classes
 Chapters/17_Techniques--Metaprogramming.md	only: The comment suppresses the diagnostic only because provoking that crash is educational
 Chapters/17_Techniques--Metaprogramming.md	only: Use a metaclass only when these cannot do the job
-Chapters/17_Techniques--Metaprogramming.md	only: it keeps only the ones whose value differs from CODE's own
 Chapters/17_Techniques--Metaprogramming.md	only: so only the current leaves remain
 Chapters/17_Techniques--Metaprogramming.md	only: while a metamethod works only through the class
 Chapters/17_Techniques--Metaprogramming.md	spelling: You might expect to parameterize[^parameterize-spelling] the class
@@ -206,7 +202,6 @@ Chapters/19_Techniques--Concurrency.md	only: Typically a thread runs only a few 
 Chapters/19_Techniques--Concurrency.md	only: Usually only one thread touches an object
 Chapters/19_Techniques--Concurrency.md	only: an isolated object that reacts only to messages sent to its own mailbox
 Chapters/19_Techniques--Concurrency.md	only: and a free-threaded build only once you know every extension you use supports it
-Chapters/19_Techniques--Concurrency.md	only: and only a CODE against an empty
 Chapters/19_Techniques--Concurrency.md	only: but only in the way a crash is better than corruption
 Chapters/19_Techniques--Concurrency.md	only: only the type of object the call built
 Chapters/19_Techniques--Concurrency.md	only: so two threads contend only when they touch the same container
@@ -258,7 +253,6 @@ Chapters/24_Patterns--Singleton.md	only: Rebind only through the module
 Chapters/24_Patterns--Singleton.md	only: The compiler mangles names only inside a class body
 Chapters/24_Patterns--Singleton.md	only: because an annotation evaluates only when something reads it
 Chapters/24_Patterns--Singleton.md	only: but only when something needs those handles to be objects
-Chapters/24_Patterns--Singleton.md	only: wrapping only the body of the cached function
 Chapters/24_Patterns--Singleton.md	want: Alex Martelli observes that what you usually want is not one object but one shared set of state
 Chapters/24_Patterns--Singleton.md	want: If you want a class
 Chapters/24_Patterns--Singleton.md	want: If you want many handles sharing one set of state
@@ -283,7 +277,6 @@ Chapters/26_Patterns--Surrogate.md	only: A guest reaches only the names in CODE
 Chapters/26_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a set number of connections at a time
 Chapters/26_Patterns--Surrogate.md	only: Only the surrogate's current implementation changes
 Chapters/26_Patterns--Surrogate.md	only: Python calls it only after normal lookup fails
-Chapters/26_Patterns--Surrogate.md	only: and CODE checks only the proxy's own class
 Chapters/27_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
 Chapters/27_Patterns--Factory.md	even: even momentarily
 Chapters/27_Patterns--Factory.md	itself: CODE lets each subclass register itself
@@ -315,6 +308,7 @@ Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs 
 Chapters/31_Patterns--State_Machines.md	expensive: The sold-out and too-expensive clears both start from CODE on a column
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
 Chapters/31_Patterns--State_Machines.md	expensive: Too expensive returns to CODE with the money still inserted
+Chapters/31_Patterns--State_Machines.md	never: where a misspelled string would be a key the machine never reaches
 Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
 Chapters/31_Patterns--State_Machines.md	paid: and a CODE selects from every paid state but CODE
 Chapters/31_Patterns--State_Machines.md	price: and a CODE holds one item's price and quantity
@@ -324,7 +318,6 @@ Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior f
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table (see exercise 9)
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: It matches classes exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: The lookup matches classes exactly
-Chapters/32_Patterns--Multiple_Dispatching.md	exactly: while the table matches the class exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	only: CODE needs only the CODE and CODE cases
 Chapters/32_Patterns--Multiple_Dispatching.md	only: Only a returned sentinel makes Python try the right operand's CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	only: The counter fills only as you consume the generator
@@ -354,7 +347,6 @@ Chapters/36_Patterns--Memento.md	only: CODE exists only for the type checker
 Chapters/36_Patterns--Memento.md	only: Only unpickle data you trust
 Chapters/36_Patterns--Memento.md	only: The record makes the attribute that holds it read-only too
 Chapters/36_Patterns--Memento.md	only: so a history of CODE states stores each stroke once and duplicates only the pointers
-Chapters/37_Patterns--Pattern_Refactoring.md	itself: A new recyclable type registers itself
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: The tests confirm that each subclass registers itself
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: so each one can register itself in CODE automatically
 Chapters/37_Patterns--Pattern_Refactoring.md	wants: Now the safety officer wants a disposal hazard printed beside the instruction
@@ -375,7 +367,7 @@ Chapters/38_Patterns--Simulation.md	only: The teleports are not shortcuts but th
 Chapters/38_Patterns--Simulation.md	only: The third example gives you only half the outcome
 Chapters/38_Patterns--Simulation.md	only: and a plate of vibrating sand runs on grains that hold only a position
 Chapters/39_Patterns--Pattern_Catalog.md	only: and several exist only to work around limits of a particular language
-Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the bound ones
+Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the preset ones
 Chapters/40_Functional--Foundations.md	already: CODE and CODE are a better choice when the function already exists
 Chapters/40_Functional--Foundations.md	already: each with one argument already supplied
 Chapters/40_Functional--Foundations.md	already: use the higher-order form when the function already exists
@@ -467,7 +459,6 @@ Chapters/46_Effects--Stateless.md	only: Only the static type changes
 Chapters/46_Effects--Stateless.md	only: That CODE is the only CODE in CODE
 Chapters/46_Effects--Stateless.md	only: You can catch both errors or only one
 Chapters/46_Effects--Stateless.md	only: and CODE handles only a CODE
-Chapters/46_Effects--Stateless.md	only: and only a subclass can replace it
 Chapters/46_Effects--Stateless.md	only: but an interface reaches CODE only through an implementation
 Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
@@ -478,25 +469,22 @@ Chapters/47_Effects--Stateless_in_Practice.md	costs: CODE reuses the running loo
 Chapters/47_Effects--Stateless_in_Practice.md	costs: Running the listing with CODE prints both per-call costs
 Chapters/47_Effects--Stateless_in_Practice.md	even: CODE stays distinct even then
 Chapters/47_Effects--Stateless_in_Practice.md	even: CODE type-checks even though its CODE claim is false
-Chapters/47_Effects--Stateless_in_Practice.md	even: then say why it differs from CODE's even though both fail the same way
+Chapters/47_Effects--Stateless_in_Practice.md	even: then say why it differs from CODE's trace even though both fail the same way
 Chapters/47_Effects--Stateless_in_Practice.md	is what: Here is what ZIO does that Stateless cannot
 Chapters/47_Effects--Stateless_in_Practice.md	is what: The difference between the two ways in is what the type checker verifies
 Chapters/47_Effects--Stateless_in_Practice.md	itself: It prints nothing itself
 Chapters/47_Effects--Stateless_in_Practice.md	never: CODE never runs
+Chapters/47_Effects--Stateless_in_Practice.md	never: This one never propagates
 Chapters/47_Effects--Stateless_in_Practice.md	never: and the driver never resumes the generator
-Chapters/47_Effects--Stateless_in_Practice.md	never: and this one never propagates
-Chapters/47_Effects--Stateless_in_Practice.md	nothing more: and here a scenario is nothing more than arguments to CODE
 Chapters/47_Effects--Stateless_in_Practice.md	only: Add a wind turbine to CODE that is available only during a set windy stretch of the evening
 Chapters/47_Effects--Stateless_in_Practice.md	only: CODE comes from the only two schedule combinators the library has
 Chapters/47_Effects--Stateless_in_Practice.md	only: CODE's signature is also the only place its failures appear
-Chapters/47_Effects--Stateless_in_Practice.md	only: Memoize a function only where one environment serves the memoized call for its whole lifetime
 Chapters/47_Effects--Stateless_in_Practice.md	only: Stateless offers only the first of the three
 Chapters/47_Effects--Stateless_in_Practice.md	only: That restriction is the only one the checker enforces
 Chapters/47_Effects--Stateless_in_Practice.md	only: The channel carries only what you put into it
 Chapters/47_Effects--Stateless_in_Practice.md	only: These two are the only functions that perform work
 Chapters/47_Effects--Stateless_in_Practice.md	only: Trust a green check only where you have seen the same construct produce a red one
 Chapters/47_Effects--Stateless_in_Practice.md	only: and only the function can build a second description
-Chapters/47_Effects--Stateless_in_Practice.md	only: and the CODE that comes back is only a return value
 Chapters/47_Effects--Stateless_in_Practice.md	only: and whose body is only the success path
 Chapters/47_Effects--Stateless_in_Practice.md	only: so the only evidence is a bug report saying the log file is occasionally short by a few lines
 Chapters/47_Effects--Stateless_in_Practice.md	price: Assert that CODE attempts every price and writes once per purchase
@@ -607,8 +595,6 @@ Solutions/29_Patterns--Changing_the_Interface/README.md	only: import only that f
 Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE
 Solutions/30_Patterns--Observer/README.md	never: Class access is the part a validating descriptor never needs
 Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a quarter only in a number the existing action reads
-Solutions/31_Patterns--State_Machines/README.md	only: only a lookup
-Solutions/31_Patterns--State_Machines/README.md	only: which leads only to CODE
 Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate rule and not when you want a separate value
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count leaves each weapon an opposite that draws

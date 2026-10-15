@@ -665,8 +665,8 @@ print(stringify([1, 2, 3]))
 #: ['1', '2', '3']
 ```
 
-Each `@overload` line is a declaration for the type checker,
-and the final `def` is the function that runs.
+Each `@overload` line is a declaration for the type checker.
+The final `def` is the function that runs.
 `stringify(42)` checks as returning `str`,
 and `stringify([1, 2, 3])` checks as returning `list[str]`,
 although both calls run the same branching body.

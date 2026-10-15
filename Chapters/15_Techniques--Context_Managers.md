@@ -1038,8 +1038,8 @@ print("available after crash:", pool.available())
 #: available after crash: 2
 ```
 
-The second `with` block raises a `RuntimeError`,
-and the `finally` in `lease()` still returns the connection,
+The second `with` block raises a `RuntimeError`.
+The `finally` in `lease()` still returns the connection,
 so the count is back to two.
 
 An object pool differs from [*Flyweight*](35_Patterns--Flyweight.md),
