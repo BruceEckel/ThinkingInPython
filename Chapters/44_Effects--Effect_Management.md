@@ -81,7 +81,7 @@ what the environment does to the function.
 Suppose your function reads the time of day.
 The read changes nothing in the environment,
 yet the result differs from one call to the next.
-Information a function uses beyond its arguments is a side cause whenever it can change between calls.
+Information a function uses beyond its arguments is a side cause whenever that information can change between calls.
 The usual sources are I/O: the time of day, a random number,
 a database or network read.
 Reading a global variable that something else can rebind is enough on its own.
@@ -119,8 +119,8 @@ There are two answers:
     Replacing the function call with the crash leaves the program's behavior the same.
 
 2.  **Functional.**
-    Exceptions bypass normal control flow,
-    and that bypass makes it difficult to reason about code.
+    Exceptions bypass normal control flow.
+    That bypass makes it difficult to reason about code.
     Functional programming avoids them altogether for that reason.
     A [*Total Function*](42_Functional--Error_Handling.md#total-functions)
     returns errors as data in explicit wrapper types instead of raising them.
@@ -203,8 +203,8 @@ expect(ValueError, slope, 10, -1)
 
 Catching the exception works with the types you have.
 But it guards only the exceptions `slope()`'s `try` names.
-`validate()` raises `ValueError` for a negative `run`,
-and the `try` around it catches `ZeroDivisionError` and lets `ValueError` propagate.
+`validate()` raises `ValueError` for a negative `run`.
+The `try` around that call catches `ZeroDivisionError` and lets `ValueError` propagate.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
 
@@ -212,8 +212,8 @@ Because `slope()` calls `validate()`,
 so the uncaught `ValueError` is easy to spot.
 In a real call stack the `raise` is usually in another file, several calls down.
 Catching by hand covers only the exceptions you know a callee can raise.
-Knowing every one of them means reading every callee,
-and an Effect Management System replaces that tedious, error-prone work.
+Knowing every one of them means reading every callee.
+An Effect Management System replaces that tedious, error-prone work.
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
@@ -322,8 +322,8 @@ for text in ["2", "0", "two"]:
 `int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`,
 and the `except` turns either one into an `Err` its caller must unpack.
 Unlike `@safe`'s `Exception`,
-the return type names the failure the caller handles,
-and a bug inside `parse_run()` still raises its own exception.
+the return type names the failure the caller handles.
+A bug inside `parse_run()` still raises its own exception.
 Once the `match` unpacks an `Ok`, `slope()` checks nothing.
 `NonZero` guarantees `run.value` isn't 0.
 
@@ -386,8 +386,8 @@ Think of Effect analysis as two phases.
 The first phase separates pure from impure, and produces parallelism, caching,
 and easy testing for the pure part.
 
-The second phase divides the impure part by kind,
-and each kind yields its own benefit:
+The second phase divides the impure part by kind.
+Each kind yields its own benefit:
 
 - **Exceptions** [become data](#converting-effectful-to-pure) in a `Result`.
   Failures turn into values whose type the checker verifies,
@@ -470,7 +470,8 @@ and names the kinds of impurity a caller inherits.
 Effect management is tracking plus the second and third items.
 Once an Effect is an interface and a caller binds the implementation later,
 you can replace what the Effect does and leave the function that performs it as written.
-Tracking reports a function's Effects, and management lets you control them.
+Tracking reports a function's Effects.
+Management lets you control them.
 Tracking alone appears twice later in this chapter:
 in most of the languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects),
 and in Python's `async`,
@@ -534,8 +535,8 @@ class Capture:
         self.messages.append(message)
 ```
 
-`greet()` performs an `Ask` Effect and a `Tell` Effect,
-and its signature says so, because the parameters are the Effects.
+`greet()` performs an `Ask` Effect and a `Tell` Effect.
+Its signature says so, because the parameters are the Effects.
 The bindings come later.
 `greet_demo.py` binds them to test stand-ins, `Scripted` and `Capture`,
 and checks the greeting with no console in sight:
@@ -550,8 +551,8 @@ print(captured.messages)
 #: ['Hello, Alice!']
 ```
 
-A production caller passes objects that read with `input()` and write with `print()`,
-and `greet()` stays the same.
+A production caller passes objects that read with `input()` and write with `print()`.
+`greet()` stays the same.
 Delayed binding by hand explains why "pass in your dependencies" is such durable advice.
 
 The signature says what `greet()` needs, not everything `greet()` might do.
@@ -600,14 +601,15 @@ holds a value for the current task,
 and any function the task calls reads the value without receiving it as an argument.
 The `ContextVar` supplies automatic propagation,
 but it removes the parameter along with the one benefit the parameter provided.
-`greet(ask, tell)` states its Effects in its signature,
-and a `greet()` that reads two `ContextVar`s hides them.
+`greet(ask, tell)` states its Effects in its signature.
+A `greet()` that reads two `ContextVar`s hides them.
 Setting the wrong one, or forgetting to set one,
 raises a `LookupError` at the read, in whatever frame reads it.
 A `ContextVar` created with a default returns that default instead,
 so the read succeeds and the mistake appears later,
 as whatever wrong result the default produces.
-The bookkeeping stays, and the type checker can no longer verify it.
+The bookkeeping stays.
+The type checker can no longer verify it.
 
 An EMS moves the bookkeeping into the type system.
 A native system maintains it for you.
@@ -661,7 +663,8 @@ fun main() : <console,exn> ()
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
 The row is the second channel.
-`ask` and `tell` are part of the type, and the parameter list stays empty.
+`ask` and `tell` are part of the type.
+The parameter list stays empty.
 
 The compiler infers the row from what the body calls.
 If another function calls `greet()`,
@@ -690,7 +693,8 @@ and the row that remains holds the Effects the handler bodies perform:
 Separating the request from its fulfillment is the core of every Effect Management System.
 The code that requests an Effect is separate from the code that performs it,
 and a handler connects the two.
-`greet()` names `ask` and `tell`, and the handler decides what each one means.
+`greet()` names `ask` and `tell`.
+The handler decides what each one means.
 A different handler decides differently.
 A test installs one that returns a known name, and the same `greet()` runs.
 
@@ -894,8 +898,8 @@ a description of work, and `ran` stays empty.
 The body runs only when something drives the description: an `await`, a task,
 or `asyncio.run()`.
 That description/action split is the library Effect system model.
-Descriptions compose inside `async def` functions,
-and `asyncio.run()` is the edge where description becomes action.
+Descriptions compose inside `async def` functions.
+`asyncio.run()` is the edge where description becomes action.
 
 Python enforces the tracking the way an EMS does.
 `await` is a syntax error outside an `async def`,
