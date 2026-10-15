@@ -207,7 +207,7 @@ What `run()` does depends on the current state: every state prints its message,
 and `Holding` also sounds its chime.
 `step()` defines the flow,
 while each `State`'s fields supply the varying behavior:
-`next` chooses the successor, and `action` does what that state alone does.
+`next` chooses the next state, and `action` does what that state alone does.
 
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
 then feeds a fresh trap an input that `waiting()`'s `case _` alone matches:
@@ -408,7 +408,7 @@ and its parameter is `initial` while the attribute `handle()` updates is `state`
 Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
 The engine tries them in the order the list gives them,
-so a single input can lead to different states depending on a test.
+so a single input can lead to different states depending on a condition.
 A rule whose condition is `None` matches every time,
 so it belongs last in its group, as the `else` for the rules above it.
 
@@ -759,12 +759,12 @@ written once.
 and no other row mentions it.
 That is the Moore shape: the action belongs to the state.
 
-One-table suits a machine you build from a diagram, whose inputs carry data,
+Table-driven suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram.
 Adding a state or an input is a rule in the list and a method or two.
 
-In the one-table design the states are `Enum` members, bare names,
+In the table-driven design the states are `Enum` members, bare names,
 so an action that runs on every entry into one state must go in the table.
 You repeat the action on every rule that leads to that state,
 or write a helper that those rules call.
@@ -782,7 +782,7 @@ and an engine that drives both a class and a record types its parameter as a Pro
 
 The first design's constructor calls the initial state's `run()`,
 but the constructor in `table_machine.py` stores `initial` and returns.
-In the one-table design,
+In the table-driven design,
 an action the machine needs at startup is a call you make before the first input.
 
 The deciding question is which you would rather read: one state's transitions,
