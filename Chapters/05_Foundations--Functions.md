@@ -307,7 +307,7 @@ Create a sentinel once and share that name.
 Two `sentinel()` calls with the same name build two different objects,
 so `default is sentinel("MISSING")` compares against a second object and is always false.
 
-Code written before 3.15 builds the same marker as `MISSING = object()`.
+Code written before 3.15 builds the same sentinel as `MISSING = object()`.
 A bare `object()` is unique, so `is` tells it apart from every other value.
 It prints as `<object object at 0x...>`, though,
 where a `sentinel()` value prints its name.
