@@ -649,7 +649,7 @@ table is the stricter of the two.
 
 ## 6. A washing machine, table-driven
 
-> Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
+> Apply the table-driven `StateMachine` from `table_machine.py` to a washing-machine problem.
 > Give one `(state, input)` pair two rules told apart by a condition,
 > such as a load too heavy for the fast spin.
 > Then press `Start` in the middle of a cycle,
@@ -839,7 +839,7 @@ a report.
 
 ## 7. An elevator, table-driven
 
-> Create an elevator state machine using `tabledriven/table_machine.py`.
+> Create an elevator state machine using `table_machine.py`.
 > Give the "doors closing" state two rules for the same input,
 > one guarded by a door-obstruction condition.
 
@@ -1012,7 +1012,7 @@ finishes the close in `IDLE`.
 
 ## 8. A heating/air-conditioning system, table-driven
 
-> Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
+> Create a heating/air-conditioning system using `table_machine.py`.
 > A single `TemperatureReading` input must be able to lead to heating,
 > cooling, or idle, decided entirely by conditions on one `(state, input)` key.
 

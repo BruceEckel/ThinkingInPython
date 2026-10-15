@@ -1,4 +1,4 @@
-# tabledriven/test_vending.py
+# test_vending.py
 import pytest
 from table_machine import NoTransition
 from vending_machine import (Column, Money, Quit, Row,

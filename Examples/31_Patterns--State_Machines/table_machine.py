@@ -1,4 +1,4 @@
-# tabledriven/table_machine.py
+# table_machine.py
 from collections.abc import Callable, Sequence
 from enum import Enum
 from typing import Any

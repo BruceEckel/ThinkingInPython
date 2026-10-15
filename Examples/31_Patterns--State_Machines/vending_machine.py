@@ -1,4 +1,4 @@
-# tabledriven/vending_machine.py
+# vending_machine.py
 from dataclasses import dataclass
 from enum import Enum, auto
 from record import record
@@ -11,7 +11,7 @@ class State(Enum):
     UNAVAILABLE = auto()
     WANT_MORE = auto()
 
-# tabledriven/vending_machine.py (continued)
+# vending_machine.py (continued)
 @record
 class Money:
     name: str
@@ -44,7 +44,7 @@ class Slot:
     price: int
     quantity: int
 
-# tabledriven/vending_machine.py (continued)
+# vending_machine.py (continued)
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents

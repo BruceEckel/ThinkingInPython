@@ -17,7 +17,7 @@ on that order.
 
 This is a graph of the machine, not a trace of one run. State, event,
 condition, and action names come from the `table` in
-`tabledriven/vending_machine.py`; the initial state is the one its
+`vending_machine.py`; the initial state is the one its
 `super().__init__()` call passes.
 """
 

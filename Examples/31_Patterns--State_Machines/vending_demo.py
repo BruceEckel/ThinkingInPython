@@ -1,4 +1,4 @@
-# tabledriven/vending_demo.py
+# vending_demo.py
 from vending_machine import (Column, Money, Quit, Row,
                              VendingMachine)
 

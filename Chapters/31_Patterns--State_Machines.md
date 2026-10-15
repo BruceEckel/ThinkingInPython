@@ -321,7 +321,7 @@ and what state comes next:
     Rule(state, InputType, next_state, action, condition)
 
 A condition is any callable returning a `bool`, an action is any callable,
-and the rules are a list the engine groups into an ordinary `dict`.
+and the rules are a list the engine groups into a `dict`.
 
 The action on a rule takes the input,
 so what the machine does depends on the state and the input together.
@@ -336,7 +336,7 @@ Each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
 
 This design reuses two names with new meanings.
-`tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
+`table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
 `State` is now an `Enum` of names rather than the record the mousetrap's states are.
 The states in this design are bare names.
 The table holds all the behavior.
@@ -354,7 +354,7 @@ takes the first whose condition passes (or has no condition),
 runs that rule's action, and moves to the next state:
 
 ```python
-# tabledriven/table_machine.py
+# table_machine.py
 from collections.abc import Callable, Sequence
 from enum import Enum
 from typing import Any
@@ -444,18 +444,12 @@ A `Row` moves it to `SELECTING`.
 A `Column` moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
-The states are an `Enum`,
-so the type checker reports a misspelled state name before the program runs.
-A misspelled string would pass every check,
-and the engine would raise a `NoTransition` at runtime.
-`Mouse` is a `StrEnum` so that the trace prints each input as its value,
-`mouse appears`.
 The vending machine's states need no value,
-since the demo prints a state by its `name`,
-so a plain `Enum` with `auto()` serves:
+since the demo prints a state by its `name`.
+It only needs a plain `Enum` with `auto()` initialization:
 
 ```python
-# tabledriven/vending_machine.py
+# vending_machine.py
 from dataclasses import dataclass
 from enum import Enum, auto
 from record import record
@@ -473,7 +467,7 @@ Each kind of input has its own class,
 and a `Slot` holds one item's price and quantity:
 
 ```python
-# tabledriven/vending_machine.py (continued)
+# vending_machine.py (continued)
 @record
 class Money:
     name: str
@@ -525,7 +519,7 @@ because the key is the input's exact class.
 `VendingMachine` holds the table, its conditions, and its actions:
 
 ```python
-# tabledriven/vending_machine.py (continued)
+# vending_machine.py (continued)
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents
@@ -633,7 +627,7 @@ the state before, the input, and the state after,
 followed by the message the action left:
 
 ```python
-# tabledriven/vending_demo.py
+# vending_demo.py
 from vending_machine import (Column, Money, Quit, Row,
                              VendingMachine)
 
@@ -707,7 +701,7 @@ The cases worth testing are:
 - The error when no transition matches
 
 ```python
-# tabledriven/test_vending.py
+# test_vending.py
 import pytest
 from table_machine import NoTransition
 from vending_machine import (Column, Money, Quit, Row,
@@ -839,7 +833,7 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.
-6.  Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
+6.  Apply the table-driven `StateMachine` from `table_machine.py` to a washing-machine problem.
     Give one `(state, input)` pair two rules told apart by a condition,
     such as a load too heavy for the fast spin.
     Then press `Start` in the middle of a cycle,
@@ -847,10 +841,10 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     and decide what the caller does with the `NoTransition`:
     ignore the press or stop the machine.
     Say which policy suits a washing machine, and why.
-7.  Create an elevator state machine using `tabledriven/table_machine.py`.
+7.  Create an elevator state machine using `table_machine.py`.
     Give the "doors closing" state two rules for the same input,
     one guarded by a door-obstruction condition.
-8.  Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
+8.  Create a heating/air-conditioning system using `table_machine.py`.
     A single `TemperatureReading` input must be able to lead to heating,
     cooling, or idle, decided entirely by conditions on one `(state, input)` key.
 9.  Build a two-state machine that collects `Money`,
