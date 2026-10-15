@@ -336,7 +336,8 @@ An expression is a number, a variable, a sum, or a product.
 and the split is on purpose.
 Every node shares the operator methods,
 so those live on a base and each node inherits them.
-Each node means something different, so meaning lives in the walkers.
+Each node means something different, so meaning lives in the *walkers*,
+the recursive functions that `match` on the union.
 Each walker's `assert_never()` needs the union to verify that its `match` covers every member,
 so `Expr` is the contract.
 A base class is an open set, since any module can define a new subclass.
