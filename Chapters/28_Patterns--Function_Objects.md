@@ -116,7 +116,7 @@ describes that type with a [`Protocol`](08_Foundations--Static_Types.md#structur
 Halfway between the function form and the class form,
 a *bound method* is a ready-made command.
 `account.deposit` names a function with its instance attached,
-so a command list can hold it alongside plain functions.
+so a macro can hold it alongside plain functions.
 The bound instance carries the state that a `Command` subclass would hold:
 
 ```python
@@ -201,7 +201,7 @@ so you can read the command's configuration from outside the object.
 A closure's `repr` shows its function's name and a memory address.
 
 `Command` describes one call.
-An undoable list of commands needs a second operation on each command, `undo()`.
+An undoable macro needs a second operation on each command, `undo()`.
 A command's type then has two members, `__call__()` and `undo()`,
 and a `Protocol` describes that type (see exercise 1).
 [*Memento*](36_Patterns--Memento.md#the-caretaker-a-generic-history)
@@ -590,7 +590,7 @@ All three patterns share one shape:
 
 In every lane the call site stays the same short loop or call,
 and it depends on the signature alone.
-The patterns differ in how many of the chosen callables the call site runs:
+The patterns differ in how many of the chosen function objects the call site runs:
 all of them in turn, one per call, or the first that succeeds.
 That count, rather than a class structure, separates *Command*, *Strategy*,
 and *Chain of Responsibility* in Python.
