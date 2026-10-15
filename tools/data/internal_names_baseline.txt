@@ -29,6 +29,7 @@ Solutions/14_Techniques--Decorators/decorated_methods.py::Counter.total
 Solutions/14_Techniques--Decorators/exercise_1.py::Point.y
 Solutions/14_Techniques--Decorators/exercise_3.py::Extra.drink
 Solutions/26_Patterns--Surrogate/exercise_5.py::Connection.number
+Solutions/31_Patterns--State_Machines/exercise_3.py::Turnstile.UNLOCKED
 Solutions/31_Patterns--State_Machines/exercise_6.py::WashingMachine.log_msg
 Solutions/31_Patterns--State_Machines/exercise_7.py::Elevator.arrive
 Solutions/31_Patterns--State_Machines/exercise_7.py::Elevator.set_target
