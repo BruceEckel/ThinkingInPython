@@ -146,8 +146,8 @@ because it catches the `StopIteration` and discards the exception.
 To read the `ReturnType`, catch the exception yourself,
 as `drive_by_hand.py` does.
 
-The body finishes with `return`,
-and Python raises the `StopIteration` on the generator's behalf.
+When the body finishes with `return`,
+Python raises the `StopIteration` on the generator's behalf.
 If a `StopIteration` propagates out of the body instead,
 Python converts it into a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)).
@@ -344,8 +344,8 @@ Without `from`, a bare `yield one()` yields the generator object as a single val
 so `list(outer())` would show `<generator object one at ...>` in place of `'only'`.
 
 Exhaustion is transitive.
-`top()` delegates to `outer()`, which delegates to `one()` and `three()`,
-and the driver still receives one flat sequence.
+`top()` delegates to `outer()`, which delegates to `one()` and `three()`.
+The driver still receives one flat sequence.
 `top()`'s single `yield from` finishes only after every generator beneath it has finished.
 
 ### The Return Channel
@@ -379,8 +379,8 @@ It yields strings, receives `None`,
 and returns the `int` total it accumulates while iterating over `items`.
 
 The return channel delivers a value from a generator to the generator that delegated to it.
-`report()` receives the total `emit()` computed,
-and neither function names the driver.
+`report()` receives the total `emit()` computed.
+Neither function names the driver.
 
 Any iterable can follow `yield from`.
 The expression takes its value from the `StopIteration` that ends the iteration.
@@ -535,8 +535,8 @@ a different kind of value from the answer to any one question.
 
 `drive()` receives a request that `ask()` yielded two frames down,
 and treats it the same as one that `interview()` yielded in its own body.
-The answer `drive()` sends back becomes the value of the `yield` inside `ask()`,
-and nothing in `ask()` names the driver that sent it.
+The answer `drive()` sends back becomes the value of the `yield` inside `ask()`.
+Nothing in `ask()` names the driver that sent it.
 A single loop at the edge of the program interprets requests yielded anywhere inside it.
 
 ### Composing Is Not Interpreting
@@ -690,7 +690,7 @@ The driver calls `throw()` on `outer()`, but `inner()` prints the `caught` line.
 `inner()`'s `except` clause handles it,
 so the `ValueError` stays inside `inner()`.
 `g.close()` raises `GeneratorExit` in `inner()` first,
-and the cleanup lines print from the inside out.
+so the cleanup lines print from the inside out.
 Holding the outermost generator is enough for a driver to stop and clean up every frame beneath it.
 
 A generator can catch `GeneratorExit` and yield again instead of letting it end the frame.
@@ -827,14 +827,13 @@ The queue holds each job paired with its latest request.
 `task_runner()` primes every job with `next()`, as a driver must.
 On each turn it prints the request and sends back the answer.
 That `send()` resumes the job until the job yields its next request.
-`answer()` looks the request up in `REPLIES`,
-and every request missing from the table gets `"ok"`.
+`answer()` looks the request up in `REPLIES` and returns `"ok"` for any request missing from the table.
 
 `download()` reads what it receives, into `reply`.
 `index()` discards what it receives,
 as a job that yields to take turns is free to do.
-The queue still rotates job to job,
-and now the runner also does `drive()`'s work,
+The queue still rotates job to job.
+Now the runner also does `drive()`'s work,
 answering each request before the next turn.
 
 You have run a driver like `drive()` many times.
