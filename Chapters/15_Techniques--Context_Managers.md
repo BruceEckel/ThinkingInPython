@@ -307,7 +307,7 @@ and execution continues after the block.
 Any truthy value suppresses, not `True` alone.
 An `__exit__()` that returns the result of its last cleanup call,
 such as a count or a status string,
-swallows the block's exception whenever that result is truthy.
+suppresses the block's exception whenever that result is truthy.
 Annotate `__exit__()` as `-> None`, the way `Trace` does,
 unless suppressing is the manager's job.
 The type checker then rejects any value the method returns.
@@ -338,7 +338,7 @@ print("survived")
 
 A generator manager has no return value to set.
 `@contextmanager` raises the exception at the `yield`,
-so catching it there and swallowing it is the equivalent of `__exit__()` returning `True`.
+so catching it there and suppressing it is the equivalent of `__exit__()` returning `True`.
 Re-raising it, or omitting the `except` clause,
 is the equivalent of returning a falsy value.
 
@@ -856,7 +856,7 @@ the same rule a comma-separated `with` follows.
 The `contextlib` module provides ready-made managers.
 Choose these before writing `__enter__()` and `__exit__()` by hand.
 
-- `suppress(*exceptions)` ignores the listed exceptions,
+- `suppress(*exceptions)` suppresses the listed exceptions,
   covering the case the `expected` class handles,
   without `expected`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
