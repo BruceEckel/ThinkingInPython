@@ -42,8 +42,8 @@ class State:
 `next` and `action` are functions stored in fields, not methods,
 so neither receives `self`: `state.next(input_)` passes the input alone,
 and `run()` calls `self.action()` with no arguments.
-`action` defaults to a function that does nothing,
-and a state that does more passes its own as the third constructor argument.
+`action` defaults to a function that does nothing.
+A state with more to do supplies an `action` as the third constructor argument.
 
 The annotation on `next` names `State` inside the `State` class body,
 which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
