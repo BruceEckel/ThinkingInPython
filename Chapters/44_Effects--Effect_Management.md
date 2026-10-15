@@ -89,7 +89,6 @@ A [captured constant](40_Functional--Foundations.md#closures) is not.
 
 The third is an exception,
 which propagates from callee to caller the same way and appears in no signature either.
-People argue about whether an exception makes a function impure.
 
 ## Are Exceptions Impure?
 
@@ -103,7 +102,7 @@ def slope(rise: int, run: int) -> float:
 `slope()` produces the same result for the same inputs,
 except when `run` is zero,
 where it raises an exception instead of returning a result.
-Does the exception break purity?
+Does the exception break purity? There are two answers:
 
 1.  **Pure.**
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
@@ -129,8 +128,8 @@ This chapter asks a different question:
 does the exception pass from callee to caller?
 If you write a function `a()` that calls a function `b()` that raises an exception,
 then `a()` raises that exception too, unless `a()` catches it.
-`a()`'s signature says nothing about the exception.
-Whichever school you join, `a()` takes the exception on by calling `b()`.
+`a()`'s signature says nothing about the exception,
+but `a()` takes the exception on by calling `b()`.
 An exception is therefore an Effect,
 alongside the side effect and the side cause.
 
