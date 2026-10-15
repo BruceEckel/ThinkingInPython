@@ -144,7 +144,7 @@ Approach 2 uses the same object adapter and moves the wrapping into `op()`.
 `WhatIHave2` is a *class adapter*.
 It inherits from the adaptee.
 The base-class list names the adapted class at definition time.
-Every client of `WhatIHave2` can call every method of the adaptee,
+Every caller of `WhatIHave2` can call every method of the adaptee,
 `g()` and `h()` included.
 Composition keeps the two interfaces separate.
 Inheritance merges them.
@@ -319,7 +319,7 @@ The test file confirms that:
 
 - The new `f()` puts its own output in front of the adaptee's `g()` and `h()` results.
 - A forwarded method returns what the adaptee's method returns.
-- A forwarded method is bound to the wrapped object.
+- A forwarded method is bound to the adaptee.
 - A copy and a pickled adapter both still work.
 
 ```python
