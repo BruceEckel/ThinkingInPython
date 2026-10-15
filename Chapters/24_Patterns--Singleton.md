@@ -259,7 +259,7 @@ built outside the cache.
 3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
    is the other fix for that race.
    Where the lock goes matters.
-   A `threading.Lock` around the cached function's body changes nothing,
+   A `threading.Lock` around the constructor function's body changes nothing,
    because every thread misses the cache before reaching the lock.
    The threads serialize, but each still builds an object.
    The cache keeps whichever finished last.
@@ -832,8 +832,8 @@ Use the lightest tool that fits:
   or override `__new__()` as `singleton_class_variable.py` does.
   Both create the instance on the first call,
   so under threads build it once at import time or use the module form.
-- If you want many handles sharing one set of state, use *Borg*,
-  but only when something needs those handles to be objects:
+- If you want many objects sharing one set of state, use *Borg*,
+  but only when something needs those objects to be class instances:
   an existing class-based interface, an `isinstance()` check, or subclassing.
   A module shares that state with every importer and needs no class,
   so shared data alone is no reason to use *Borg*.
