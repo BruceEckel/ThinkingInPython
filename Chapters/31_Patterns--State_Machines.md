@@ -389,8 +389,8 @@ class StateMachine:
 A `Rule` reads as a sentence: from `state`, on an input of `input_type`,
 go to `next_state`, running `action` if the rule has one,
 provided `condition` passes if the rule has one.
-A state is an `Enum` member,
-so a misspelled state is a type error rather than a silent dead end.
+A state is an `Enum` member, so a misspelled state is a type error,
+where a misspelled string would be a key the machine never reaches.
 `Rule` is generic in `I`, the input class, and `input_type` is `type[I]`,
 so a rule's `action` and `condition` must accept the class its `input_type` names.
 
@@ -682,7 +682,7 @@ whether or not a later rule matters more.
 
 Because the machine is deterministic,
 a test can drive it through a sequence of inputs and check which state it reaches.
-The cases worth testing are:
+The tests cover:
 
 - A successful purchase
 - The too-expensive conditional branch
