@@ -150,8 +150,7 @@ so importing `paper_scissors_rock.py` runs nothing.
 
 ## 2. Adding `Lizard` to the double-dispatch version
 
-> Add the same `Lizard` to `paper_scissors_rock.py`,
-> the double-dispatch version,
+> Add the same `Lizard` to `paper_scissors_rock.py`, the method version,
 > which means adding an `eval_lizard()` method to every existing class,
 > plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
 > Compare how much code this took versus adding `Lizard` to the table version.
@@ -1525,7 +1524,7 @@ as it does in a real rock-paper-scissors tournament.
 > Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.
 > Dry paper wraps the rock and wins, wet paper is too soggy and draws,
 > whichever of the two calls `compete()`.
-> The chapter gives two reasons for preferring the double-dispatch version.
+> The chapter gives two reasons for preferring the method version.
 > Say which one this change answers, and which one survives it.
 
 <details>

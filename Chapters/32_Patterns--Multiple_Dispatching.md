@@ -174,7 +174,7 @@ That call is the second dispatch.
 It resolves `paper` and runs `Paper.eval_scissors()`,
 the one method that the two dispatches together select.
 Its class is `Paper` and its name says `Scissors`.
-Which competitor does that method's result describe?
+Which item does that method's result describe?
 `Paper.eval_scissors()` returns `WIN`.
 Scissors cut paper, so that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running.
@@ -427,7 +427,7 @@ The programmer resolves by hand what dispatch would resolve on its own.
 Every new `Item` requires an edit to every ladder.
 Both patterns in this chapter replace the ladder.
 
-The double-dispatch version puts `eval_paper()`, `eval_scissors()`,
+The method version puts `eval_paper()`, `eval_scissors()`,
 and `eval_rock()` on every class.
 It comes from languages where a table keyed by a pair of types is awkward to write.
 There, spreading the table across the classes is the easier form.
@@ -436,7 +436,7 @@ so the table is both shorter and easier to maintain.
 A table cell can hold a function, so even elaborate behavior fits the table
 (see exercise 9).
 
-Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
+Use the method version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
 A combination has two sides, one for each order of the duel,
@@ -552,9 +552,9 @@ Python then tries `type(b).__radd__(b, a)`, the *reflected* form of `__add__()`.
 `NotImplemented` is a sentinel value,
 not the lookalike `NotImplementedError` exception.
 Returning `NotImplemented` tells the interpreter to try the other operand's reflected method next.
-The first call dispatches on `a`'s type, the fallback on `b`'s type.
+The first call dispatches on `a`'s type, the reflected call on `b`'s type.
 That is double dispatching, built into the language.
-The fallback is how a type written decades after `int` can sit to the right of an `int` in a sum.
+The reflected call is how a type written decades after `int` can sit to the right of an `int` in a sum.
 
 Every binary arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
@@ -674,8 +674,7 @@ Try each exercise before opening its [solution](../Solutions/32_Patterns--Multip
     Lizard versus Lizard is a draw.
     Add the seven new entries that `OUTCOME` needs:
     both orders of each mixed pair, plus Lizard versus Lizard.
-2.  Add the same `Lizard` to `paper_scissors_rock.py`,
-    the double-dispatch version,
+2.  Add the same `Lizard` to `paper_scissors_rock.py`, the method version,
     which means adding an `eval_lizard()` method to every existing class,
     plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
     Compare how much code this took versus adding `Lizard` to the table version.
@@ -735,6 +734,6 @@ Try each exercise before opening its [solution](../Solutions/32_Patterns--Multip
     Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.
     Dry paper wraps the rock and wins, wet paper is too soggy and draws,
     whichever of the two calls `compete()`.
-    The chapter gives two reasons for preferring the double-dispatch version.
+    The chapter gives two reasons for preferring the method version.
     Say which one this change answers, and which one survives it.
 10. Modify exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.
