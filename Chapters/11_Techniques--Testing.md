@@ -24,8 +24,8 @@ or the network instead of receiving them as arguments.
 
 When you find a bug that no test caught, the patch is half the job.
 Start by writing a test that reproduces the bug, and watch it fail.
-The fix then turns that test green, and if the bug returns,
-that test reports it.
+The fix then turns that test green.
+If the bug returns, that test reports it.
 The other half of the job is asking what allowed the bug:
 a case the tests missed, a claim the annotations left out,
 an interface that makes misuse easy.
@@ -269,8 +269,8 @@ A reworded message breaks the `match=` pattern when the test runs,
 while a renamed attribute shows up in the type checker before the run.
 
 The assertions after the block belong outside it.
-A failed withdrawal must leave the balance alone,
-and that check is separate from the exception.
+A failed withdrawal must leave the balance alone.
+That check is separate from the exception.
 Inside the block neither assertion runs.
 The exception from `withdraw()` skips the rest of the block,
 and `pytest.raises()` then catches and suppresses it.
@@ -305,8 +305,8 @@ def test_interest_compounds() -> None:
 Applying 5% five times produces `127.62815624999999`,
 so the same assertion written with `==` against `127.62815625` fails.
 Use `approx()` for every floating-point comparison from the start.
-Some tests pass with `==`, as `test_interest_adds_to_balance()` does,
-and you cannot tell by looking which ones need `approx()`.
+Some tests pass with `==`, as `test_interest_adds_to_balance()` does.
+You cannot tell by looking which ones need `approx()`.
 
 ## Parametrizing Tests
 
@@ -314,8 +314,8 @@ When the same logic should run against several inputs,
 write one test and mark it with `parametrize`,
 as `test_nonpositive_deposit_raises()` does.
 `pytest` runs the test once per case and reports each separately.
-That single function becomes three independent tests,
-and a failure names the case that failed.
+That single function becomes three independent tests.
+A failure names the case that failed.
 
 A `parametrize` mark can carry several names, followed by a list of tuples,
 one tuple per case:
@@ -344,16 +344,16 @@ The names in the string line up, in order, with the values in each tuple.
 `@pytest.mark.skip` and `@pytest.mark.skipif` leave a test out,
 unconditionally or on a condition such as the platform.
 `@pytest.mark.xfail` records a known bug.
-The test still runs,
-and `pytest` counts its failure as expected rather than as a new break.
+The test still runs.
+`pytest` counts the test's failure as expected rather than as a new break.
 The suite stays green, and the test that proves the bug stays in place.
 
 ## Fixtures Replace Setup and Teardown
 
 JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
 `pytest` replaces both with *fixtures*: functions that build what a test needs.
-You declare fixtures as parameters to a test,
-and each parameter name tells `pytest` to call that fixture and pass its result to the test.
+You declare fixtures as parameters to a test.
+Each parameter name tells `pytest` to call that fixture and pass its result to the test.
 
 The `funded()` function in `test_account.py` is a fixture.
 Only `pytest` calls it.
@@ -361,7 +361,7 @@ A test that calls `funded()` fails with `Fixture "funded" called directly`.
 
 Each test gets its own freshly built `funded` account,
 so every test starts from a balance of 100,
-whatever earlier tests did to theirs.
+whatever earlier tests did to their accounts.
 
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
@@ -405,7 +405,8 @@ Autouse suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs,
 as `test_storage.py` does later in this chapter.
 
-Autouse runs the fixture, and only a parameter delivers its value.
+Autouse runs the fixture.
+Only a parameter delivers the fixture's value.
 If you mark `funded` autouse and leave it out of the parameter list,
 the bare name `funded` refers to the fixture object the decorator returns,
 rather than the `Account` the function returns.
@@ -667,8 +668,8 @@ def test_roll_returns_known_value(
 `import random` binds the one module object every importer shares,
 so `dice.random` and `random` are the same object.
 The patch therefore replaces `randint()` process-wide.
-`monkeypatch` restores the original when the test ends,
-and that restoration makes a process-wide patch safe.
+`monkeypatch` restores the original when the test ends.
+That restoration makes a process-wide patch safe.
 
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
@@ -759,8 +760,8 @@ def test_elapsed() -> None:
 ```
 
 Both tests check the same arithmetic.
-`test_stopwatch_clock.py` runs with no `monkeypatch`,
-and the `elapsed()` it tests names the source of the time in its signature.
+`test_stopwatch_clock.py` runs with no `monkeypatch`.
+The `elapsed()` it tests names the source of the time in its signature.
 
 The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
 When that code sits several calls deep in a real codebase,
@@ -802,13 +803,13 @@ def test_current_year_is_frozen() -> None:
     assert datetime.now() == datetime.now()
 ```
 
-`travel` sets the clock to the given moment for the test,
-and `tick=False` holds it there so every reading is equal,
+`travel` sets the clock to the given moment for the test.
+`tick=False` holds the clock there, so every reading is equal,
 as `datetime.now() == datetime.now()` shows.
 `time.monotonic()` and `time.perf_counter()` keep running,
 because they measure elapsed intervals rather than dates.
-`stopwatch.elapsed()` therefore keeps changing under `time-machine`,
-and patching or injection still controls its result.
+`stopwatch.elapsed()` therefore keeps changing under `time-machine`.
+Patching or injection still controls its result.
 
 `monkeypatch` comes with `pytest`, and `time-machine` is a separate dependency.
 Still, `time-machine` is the standard answer for code built around `datetime`.
