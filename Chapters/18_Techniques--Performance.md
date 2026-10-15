@@ -127,7 +127,7 @@ so a hot loop shows up as the line inside it.
 The table has `tottime` and `cumtime` columns, estimated from the samples,
 and no `ncalls` column.
 A sampling profiler records which line is running at each snapshot,
-and the snapshots cannot count the calls made between them.
+so the calls made between snapshots go uncounted.
 When the call count is the question, use the tracing profiler.
 
 Beyond the standard library, [Scalene](https://github.com/plasma-umass/scalene)
@@ -148,8 +148,8 @@ the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
 and name the code to which the event applies.
 
-The interpreter instruments only the code that has an event attached,
-and everything else keeps its specialized bytecode and runs at full speed.
+The interpreter instruments only the code that has an event attached.
+Everything else keeps its specialized bytecode and runs at full speed.
 `sys.settrace()`, by contrast, slows every Python function its thread runs,
 since its trace function runs on each call,
 and the local trace function it returns runs on each line:
@@ -192,7 +192,7 @@ print(counts)
 and the interpreter calls it each time a monitored Python function begins.
 `set_local_events()` is the narrow instrument.
 It attaches the event to one code object,
-and that is why `square()` is absent from the count although it ran.
+so `square()` is absent from the count although it ran.
 The event stays on that one code object,
 so a helper that `fib()` invokes goes uncounted as well.
 The global form is `set_events()`,
@@ -245,7 +245,8 @@ print(len(results), calls["used"], calls["unused"])
 ```
 
 Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location until someone calls `restart_events()`.
-`used()` ran a thousand times and the callback ran for it once.
+`used()` ran a thousand times.
+The callback ran for it once.
 
 `DISABLE` keeps coverage measurement fast.
 The question is "was this reached,"
@@ -322,8 +323,8 @@ A million lookups is the difference between instant and minutes.
 ### Trusting a Measurement
 
 A single measurement includes whatever else the machine is doing.
-`timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
-and the smallest of them is the run with the least interference.
+`timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals.
+The smallest of them is the run with the least interference.
 Report `min(...)`, not the mean.
 A slow run means another process held the CPU for part of the run,
 so averaging adds that interruption to your answer.
@@ -349,8 +350,8 @@ the measurement then leaves out the collection pauses a production run includes.
 Pass `setup="gc.enable()"` when collection pauses are part of what you compare.
 
 Benchmark with data shaped like production data.
-A `list` of ten elements can beat a `set`,
-and an optimization tuned to toy input can behave badly in production.
+A `list` of ten elements can beat a `set`.
+An optimization tuned to toy input can behave badly in production.
 
 ### Numbers on Your Machine {#numbers-on-your-machine}
 
@@ -458,7 +459,7 @@ and nothing at run time turns it on or off.
 A standard build dispatches every bytecode instruction through one large C `switch`.
 Since 3.14, a CPython build can instead make each instruction a small C function that ends by calling the function for the next instruction.
 The C compiler turns each of those calls into a jump,
-and the loop that runs Python bytecode gets faster.
+so the loop that runs Python bytecode gets faster.
 The tail call is in C, inside the interpreter.
 It is unrelated to [tail-call optimization of Python functions](41_Functional--Toolkits.md#recursion),
 which CPython does not do.
@@ -566,8 +567,8 @@ To measure your own program,
 time the workload with `PYTHON_JIT` set to `1` and to `0`,
 and hold everything else the same.
 
-Numba's [`@njit`](#jit-compilation-with-numba) is also a just-in-time compiler,
-and the two take opposite approaches.
+Numba's [`@njit`](#jit-compilation-with-numba) is also a just-in-time compiler.
+The two compilers take opposite approaches.
 The CPython JIT works on your code as written,
 applies to whatever code turns out to be hot, and speeds it up by percentages.
 `@njit` applies only to numeric functions, requires a decorator,
@@ -725,8 +726,8 @@ print([grade(s) for s in (55, 65, 85, 95)])
 
 `bisect()` is an alias for `bisect_right()`,
 and `insort()` is likewise an alias for `insort_right()`.
-`bisect_left()` and `bisect_right()` both answer "where does this go,"
-and their answers differ when the list holds the target.
+`bisect_left()` and `bisect_right()` both answer "where does this go."
+Their answers differ when the list holds the target.
 `bisect_left()` returns the position before any elements equal to the target,
 which is the target's index.
 `bisect_right()` returns the position after them.
@@ -939,7 +940,7 @@ One machine measured the heap at about 3 times faster here.
 
 The comparison holds only when the input order gives neither side an advantage.
 On descending data, the kind `heap_corruption.py` uses,
-Timsort detects the existing run and `sorted()` is the faster of the two.
+Timsort detects the existing run, so `sorted()` is the faster of the two.
 Which one wins depends on the data,
 so measure with data shaped like production data.
 
@@ -1160,8 +1161,8 @@ The slotted class's instances then accept only the declared attributes.
 Frozen blocks every attribute assignment, new fields included,
 so a frozen instance cannot gain attributes,
 the same restriction `slots` gives you.
-But frozen enforces that restriction by overriding `__setattr__()`,
-and the instance keeps its `__dict__` underneath.
+But frozen enforces that restriction by overriding `__setattr__()`.
+The instance keeps its `__dict__` underneath.
 `slots=True` removes that `__dict__`,
 so pairing it with `frozen=True` gives you the same immutability in a fraction of the space.
 That makes the pair the natural default:
@@ -1585,8 +1586,8 @@ print(f"Numba at least 3x faster: {t_numba * 3 < t_python}")
 
 `njit(count_primes)` is the call that `@njit` above the `def` would make.
 The explicit call keeps the original `count_primes()` as the Python baseline.
-`njit()` returns `fast_count_primes`,
-and Numba compiles that function at its first call.
+`njit()` returns `fast_count_primes`.
+Numba compiles that function at its first call.
 The `assert` makes that first call on a small input, before the timing starts.
 That call compiles `fast_count_primes()` and checks its answer against the Python version's answer,
 so the timed calls measure steady-state speed.
@@ -1838,11 +1839,11 @@ Measure first.
 A profiler finds the slow spots without guessing.
 It also tells you whether the program spends its time computing or waiting,
 and the rest of this list depends on that answer.
-A program mostly waiting on a database, a socket, or a subprocess is I/O-bound,
-and steps 2 through 9 below help it little.
+A program mostly waiting on a database, a socket, or a subprocess is I/O-bound.
+Steps 2 through 9 below help it little.
 Skip to step 10 and restructure around `asyncio` instead.
-A program mostly consuming CPU is compute-bound,
-and the list below targets that case, simplest change first.
+A program mostly consuming CPU is compute-bound.
+The list below targets that case, simplest change first.
 
 Every performance optimization adds effort, complexity, or dependencies.
 Work down this list from the simplest change to the most involved,
