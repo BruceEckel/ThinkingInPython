@@ -125,7 +125,8 @@ WhatIUse().op(WhatIHave2())  # Approach 3
 #: WhatIHave.h()
 ```
 
-Counting the object adapter in `adapter.py`,
+Counting the *object adapter* in `adapter.py`
+(an adapter that wraps an instance of the adaptee),
 three structures produce one behavior.
 Each call ends in the same `g()` and `h()` on a `WhatIHave`.
 The approaches differ in where the adaptation lives,
@@ -137,7 +138,7 @@ the `WhatIWant` branch passes it on as it is,
 so that trace opens with `ProxyAdapter.f()`.
 
 *GoF Design Patterns* names two families of adapter.
-`ProxyAdapter` is an *object adapter*.
+`ProxyAdapter` is an object adapter.
 It holds the adaptee and can wrap any instance passed to it at runtime.
 Approach 2 uses the same object adapter and moves the wrapping into `op()`.
 `WhatIHave2` is a *class adapter*.
