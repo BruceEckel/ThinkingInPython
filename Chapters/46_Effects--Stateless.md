@@ -645,7 +645,7 @@ so one listing holds every function between the request and `supply()`.
 Effects propagate the way `async` does.
 An `async` function's callers must also be `async`,
 all the way to `asyncio.run()`.
-A `Depend` function's callers must also declare the dependency,
+A `Depend` function's callers must also declare the Ability,
 all the way to `supply()`.
 The difference is that you can declare as many Abilities as you like.
 
@@ -1198,7 +1198,7 @@ Having no container has three consequences:
    Test cases need no reset between them.
    A typical DI container has one flat registry and no equivalent to [handler layering](#layering-handlers).
 
-3. Stateless function requirements live in the function type.
+3. Stateless Abilities live in the function type.
    DI leaves that information in the bodies that ask for it.
    You must read the implementation to learn what a DI function needs.
    `holds()` declares `Need[Material] | Need[Nailer]` in its signature,
@@ -1277,7 +1277,7 @@ You need `wait()` at the point where an Effect requests a coroutine's result.
 A function that already returns an Effect needs no `wait()`,
 because `yield from` composes the returned Effect into the caller's Effect.
 `stateless.time.sleep()` is such a function,
-and it pairs an `Async` request with a dependency.
+and it pairs an `Async` request with a `Need[Time]` Ability.
 Here, `delayed_sum()` composes `sleep()` with a bare `yield from`:
 
 ```python
