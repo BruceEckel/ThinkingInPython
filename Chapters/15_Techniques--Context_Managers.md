@@ -29,7 +29,7 @@ function with a single `yield`.
 The `contextlib.contextmanager` decorator turns that function into a context manager.
 [Generators](45_Effects--Generators.md) covers the two-way form.
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Techniques--Testing.md#fixtures-replace-setup-and-teardown).
-Everything before the `yield` is setup, and everything after it is teardown.
+Everything before the `yield` is setup, and everything after it is cleanup.
 That shape is all a context manager needs.
 
 ```python
@@ -1062,7 +1062,7 @@ so an async pool holds an `asyncio.Queue`, awaits its `get()`,
 and builds `lease()` with `asynccontextmanager`.
 
 `pool_contention.py` puts the pool under real contention.
-Eight threads share a pool of two connections and lease and release two hundred times each.
+Eight threads share a pool of two connections and lease and return a connection two hundred times each.
 
 ```python
 # pool_contention.py
@@ -1106,7 +1106,7 @@ Each thread increments it once the lease begins and decrements it just before th
 `peak` records the highest count `held` reaches.
 The `time.sleep()` keeps each lease open long enough for other threads to call `lease()`,
 so both connections are out at once.
-Across sixteen hundred lease-and-release cycles,
+Across sixteen hundred lease-and-return cycles,
 spread over eight threads competing for two connections, `peak` tops out at two.
 A thread that calls `lease()` while the pool is empty blocks in `get()` until another thread returns a connection.
 A pool with no limit would let all eight threads hold a lease together and print a peak of eight.
