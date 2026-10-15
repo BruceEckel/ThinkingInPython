@@ -126,7 +126,7 @@ Its rows are source lines, where `cProfile`'s rows are functions,
 so a hot loop shows up as the line inside it.
 The table has `tottime` and `cumtime` columns, estimated from the samples,
 and no `ncalls` column.
-A sampler records which line is running at each snapshot,
+A sampling profiler records which line is running at each snapshot,
 and the snapshots cannot count the calls made between them.
 When the call count is the question, use the tracing profiler.
 
