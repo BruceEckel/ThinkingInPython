@@ -102,7 +102,8 @@ def slope(rise: int, run: int) -> float:
 `slope()` produces the same result for the same inputs,
 except when `run` is zero,
 where it raises an exception instead of returning a result.
-Does the exception break purity? There are two answers:
+Does the exception break purity?
+There are two answers:
 
 1.  **Pure.**
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
@@ -784,7 +785,7 @@ the way a native handler can.
 A library works with values alone, so every Effect must become a value.
 `hello` is a data structure describing a program.
 Execution begins when the ZIO runtime interprets that structure at `run`,
-the boundary between description and action (sometimes called "the edge").
+the edge between description and action.
 
 The TypeScript [Effect](https://effect.website/) library works the same way:
 
