@@ -167,7 +167,7 @@ for player, opponent in all_pairs(Item):
 
 ![](_images/double_dispatch)
 
-Follow one duel to see which competitor each result describes.
+Follow one duel to see which item each result describes.
 `scissors.compete(paper)` resolves `self` to `Scissors`, the first dispatch,
 and calls `paper.eval_scissors(...)`.
 That call is the second dispatch.
