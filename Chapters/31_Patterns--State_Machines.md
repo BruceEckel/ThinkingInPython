@@ -257,7 +257,6 @@ and a state's `run()` reads the state's own fields alone.
 
 `test_trap_states.py` checks two facts:
 the nine moves bring the trap back to `Waiting`, as the trace shows,
-
 and every state answers every move with a state:
 
 ```python
@@ -309,8 +308,8 @@ and what state comes next:
 
     Rule(state, InputType, next_state, action, condition)
 
-A condition is any callable returning a `bool`, an action is any callable,
-and the rules are a list the engine groups into a `dict`.
+A condition is any callable returning a `bool`, and an action is any callable.
+The rules are a list, which the engine groups into a `dict`.
 
 The action on a rule takes the input,
 so what the machine does depends on the state and the input together.
@@ -321,13 +320,13 @@ while a rule's `action` acts per transition and reads the input that fired it.
 The mousetrap's inputs are `Mouse` members, bare names.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
-Each input becomes an object of its own class,
-and the table keys on that class rather than on a value.
+Each input becomes an object of its own class.
+The table keys on that class rather than on a value.
 
 This design reuses two names with new meanings.
 `table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
-`State` is now an `Enum` of bare names rather than the record the mousetrap's states are,
-and the table holds all the behavior.
+`State` is now an `Enum` of bare names rather than the record the mousetrap's states are.
+The table holds all the behavior.
 
 The name `table_machine.py` differs from the first engine's `state_machine.py` on purpose.
 Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md),
@@ -395,8 +394,8 @@ so a rule's `action` and `condition` must accept the class its `input_type` name
 The constructor groups the rules by `(state, input_type)` into a dictionary,
 so `handle()` finds the candidates for the current state and the input's class in one lookup.
 The engine holds the rules as `Rule[Any]`:
-it calls each condition and action with whatever input arrived,
-and the checker matched each input class to its methods where the rule was built.
+it calls each condition and action with whatever input arrived.
+The checker matched each input class to its methods where the rule was built.
 
 The listing writes `StateMachine` by hand rather than as a `@dataclass`.
 A generated `__init__()` names each parameter after its field and stores it unchanged.
@@ -599,8 +598,8 @@ If you pair `Column` with `choose_row()`, written for a `Row`,
 
 The listing binds the list to `rules`, with no annotation, before the call.
 Written inline as the argument,
-the list would take the parameter's `Sequence[Rule[Any]]` as its expected type,
-and that `Any` would reach into every `Rule(...)` and make its `I` `Any`,
+the list would take the parameter's `Sequence[Rule[Any]]` as its expected type.
+That `Any` would reach into every `Rule(...)` and make its `I` `Any`,
 so the checker would accept any method on any rule.
 
 Adding a state or an input is now a local change:
@@ -775,8 +774,9 @@ and a parameter typed `TrapState` accepts a member and rejects anything else.
 A member is one object shared by every machine that uses it,
 and in the first design a frozen record besides,
 so a state that keeps data of its own has nowhere to put it.
-Such a state is a class with a `run()` and a `next()` of its own,
-and an engine that drives both a class and a record types its parameter as a Protocol naming those two methods.
+Such a state is a class with a `run()` and a `next()` of its own.
+To drive both a class and a record,
+an engine annotates its parameter with a Protocol naming those two methods.
 
 The first design's constructor calls the initial state's `run()`,
 but the constructor in `table_machine.py` stores `initial` and returns.
@@ -786,8 +786,8 @@ an action the machine needs at startup is a call you make before the first input
 The deciding question is which you would rather read: one state's transitions,
 gathered in that state's function, or the whole machine's transitions,
 gathered in one table.
-A machine with a few states works in either,
-and a machine you drew as a diagram first belongs in the table.
+A machine with a few states works in either.
+A machine you drew as a diagram first belongs in the table.
 
 With either design you write for yourself what a library supplies.
 Mature libraries such as `transitions` and `python-statemachine` offer guards,

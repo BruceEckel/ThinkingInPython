@@ -274,3 +274,19 @@ before/after pair, and it becomes part of every future pass.
   clause with its object in place ("No listing here builds one."),
   or name the thing instead of the quantifier ("an undecorated
   builder", "the type with no values").
+- **An "and" joining two clauses with different subjects** (2026-10-15).
+  "`action` defaults to a function that does nothing, and a state with
+  more to do supplies an `action` as the third constructor argument"
+  joins a default and its override with an additive "and", so the
+  reader expects the second clause to continue the first subject's
+  story and must work out the contrast from the content.
+  Test by substitution: if "but", "so", "while", or "whereas" fits where
+  the "and" sits without changing the meaning, the "and" is not additive,
+  and the fix is a period: "`action` defaults to a function that does
+  nothing. A state with more to do supplies an `action` as the third
+  constructor argument."
+  A second tell is weight: each clause is a claim the reader needs on
+  its own, so neither should ride on the other.
+  Keep the "and" when the clauses share a subject or are two steps of
+  one action ("`run()` prints the message and then calls `action`").
+  The same rule is in the global `CLAUDE.md` under Writing style.
