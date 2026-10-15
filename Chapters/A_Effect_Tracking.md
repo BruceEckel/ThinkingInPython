@@ -41,10 +41,10 @@ Koka and the other native systems compute this rule as part of algebraic effects
 the design [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 names.
 An algebraic effect is a set of operations declared as an interface.
-A handler gives those operations their meaning,
-and handling removes the effect from the row.
-The design has two halves, the row and the handlers,
-and a language can have one without the other.
+A handler gives those operations their meaning.
+Handling removes the effect from the row.
+The design has two halves, the row and the handlers.
+A language can have one without the other.
 OCaml 5 has handlers and records no row in a function's type.
 *Algebraic effect tracking* is the row half: the `row(f)` rule,
 computed and checked for every function.
@@ -237,14 +237,15 @@ A row inside `Annotated` is a structured comment until a tool reads it.
 `quiet()` declares `performs()` with no arguments, which states that it is pure.
 `row(quiet)` returns the same empty list,
 so an empty list can mean either a function declared pure or [one that declares nothing](#decide-what-untracked-code-performs).
-The declaration is also wrong: `quiet()` calls `shout()`, which calls `tell()`,
-and `row()` reads each declaration alone.
+The declaration is also wrong: `quiet()` calls `shout()`, which calls `tell()`.
+`row()` reads each declaration alone,
+so it returns the empty row `quiet()` declares.
 
 `ask()` calls `input()` in its own body.
 `Ask` is a label here, an empty class,
-and `input()` stays the one implementation `ask()` can run.
-The row tracks the Effect,
-and [Tracking Is Not Management](#tracking-is-not-management)
+so `input()` stays the one implementation `ask()` can run.
+The row tracks the Effect.
+[Tracking Is Not Management](#tracking-is-not-management)
 explains why a row alone cannot manage it.
 
 ## What a Checker for the Row Must Do
@@ -267,7 +268,8 @@ A method call is the ordinary case, and it is hard.
 For `console.print(message)` the tool needs the type of `console`.
 That type may come from a parameter annotation, an assignment,
 a narrowing `isinstance()`, a generic, or an overload.
-A subclass may also override the method, and an override needs its own rule.
+A subclass may also override the method.
+An override needs its own rule.
 The overriding method's row must fit inside the row of the method it replaces,
 or a caller holding the base type performs Effects the base row omits.
 
@@ -346,8 +348,8 @@ or the checker rejects its `yield from`.
 ### Subtract What a Handler Discharges
 
 Without subtraction a row grows at every level of the call stack.
-`main()` would carry every Effect in the program,
-and a row that lists everything tells you nothing.
+`main()` would carry every Effect in the program.
+A row that lists everything tells you nothing.
 The tool therefore needs a construct that marks a handler's scope:
 
 ```python
@@ -396,8 +398,8 @@ Dynamic code adds to the unknowns: `getattr(obj, name)()`,
 a decorator that returns a wrapper with a different row,
 a module-level `__getattr__()`, a function replaced at runtime by a test.
 A type checker infers `Any` or `Unknown` for the same constructs.
-The Effect tool would answer `Unknown` for them too,
-and every row that includes `Unknown` would be incomplete.
+The Effect tool would answer `Unknown` for them too.
+Every row that includes `Unknown` would be incomplete.
 
 ### Find a Place to Run
 
@@ -440,8 +442,8 @@ No test could replace that call.
 The row names an Effect,
 but `ask()` holds both the Effect's interface and its implementation,
 bound together when you write `ask()`.
-Interface separation and delayed binding are the second and third properties of a full EMS,
-and the tool supplies neither.
+Interface separation and delayed binding are the second and third properties of a full EMS.
+The tool supplies neither.
 
 Metadata is data, and its reader decides what it means.
 A static reader can treat it as a row.
@@ -457,8 +459,8 @@ divides algebraic effects into a row half and a handler half.
 algebraic effect tracking.
 No metadata can supply the handler half.
 A native handler receives the continuation and decides what to do with it.
-In Python the handler half would come from a library,
-and [Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
+In Python the handler half would come from a library.
+[Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
 shows the limit Python puts on that half.
 A Python generator is one-shot, so a handler can resume a computation once.
 
