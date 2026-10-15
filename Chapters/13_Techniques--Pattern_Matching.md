@@ -381,7 +381,8 @@ Dropping the parentheses changes the meaning.
 `case str:` is a capture pattern, not a type test,
 matching any value and binding it to a local named `str`.
 `case str:` repeats the `DEFAULT` mistake from `value_patterns.py`.
-Python rejects it the same way, refusing to compile the `match` when another `case` follows:
+Python rejects it the same way,
+refusing to compile the `match` when another `case` follows:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
 Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
