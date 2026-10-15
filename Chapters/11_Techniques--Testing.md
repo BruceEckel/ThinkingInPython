@@ -500,7 +500,7 @@ def test_bank_name_from_conftest(bank_name: str) -> None:
 Nothing imports either fixture.
 `pytest` finds them in `conftest.py` and supplies them by name.
 
-`parametrize` multiplies the one test it decorates.
+`parametrize` multiplies the one test it marks.
 A parametrized fixture multiplies every test that requests it,
 in this file and every other file that can see the `conftest.py`.
 Use the mark when the cases belong to one test,
@@ -647,7 +647,8 @@ def roll() -> int:
     return random.randint(1, 6)
 ```
 
-`monkeypatch` replaces `randint()` with a function that returns a known value,
+`monkeypatch` replaces `randint()` with a *stub*,
+a function that returns a known value,
 so `roll()` stays predictable while the test runs:
 
 ```python
@@ -861,7 +862,7 @@ and assert against what the calling code returns.
 
 ### Stubs and Mocks
 
-A stand-in like `fake_urlopen()` is a *stub*:
+A stand-in like `fake_urlopen()` is a stub:
 it answers with a canned value and records nothing.
 The standard library's `unittest.mock` appears in most existing test code.
 It builds stubs for you, and it builds *mocks*.
