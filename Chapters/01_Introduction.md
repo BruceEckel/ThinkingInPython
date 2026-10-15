@@ -181,8 +181,8 @@ Every chapter afterward uses them consistently.
 Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete file rather than a fragment.
 Most run on their own.
-Some are modules that another listing imports,
-and the `test_*.py` files hold tests that `pytest` runs.
+Some are modules that another listing imports.
+The `test_*.py` files hold tests that `pytest` runs.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
 so the listing starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
@@ -202,7 +202,7 @@ that has a command for running one example.
 supplies the working directory and import path the book assumes,
 and prints the equivalent by-hand commands first.
 
-The short form, `tip <name>`, gives the listing's name alone.
+The short form, `tip <name>`, takes the listing's name alone.
 `tip membership` runs `membership.py`.
 Words after the name go to the program,
 so `tip membership --numbers` passes the `--numbers` flag to `membership.py`.
@@ -216,8 +216,8 @@ names a file in the repository's `rust/` directory, outside the Python build.
 
 `uv` and other tools make setup short.
 The repository's [README](https://github.com/BruceEckel/ThinkingInPython#setup)
-has the instructions, including how to install `tip`,
-and `tools/README.md` explains how to build the book and run the examples yourself.
+has the instructions, including how to install `tip`.
+`tools/README.md` explains how to build the book and run the examples yourself.
 
 The book's build system extracts the examples, then type-checks
 (with Astral's `ty`), lints (with `ruff`), runs, and tests them.
