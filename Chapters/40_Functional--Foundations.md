@@ -120,7 +120,7 @@ asks whether raising an exception breaks the purity of `slope()`.
 ## Immutability
 
 An *immutable* value cannot change after creation.
-Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
+Tuples, strings, `frozenset`, and records are immutable.
 Each freezes only its own top level.
 The tuple `([1], 2)` always holds that same list,
 and anyone can still append to the list.
@@ -169,7 +169,7 @@ and concurrent code needs no lock to read it.
 That safety requires copying.
 Python's immutable types share no structure.
 `moved = Point(p.x + 10, p.y)` in `immutability.py` builds a new `Point`.
-Changing one field of a large tuple or frozen dataclass likewise means rebuilding the whole value,
+Changing one field of a large tuple or record likewise means rebuilding the whole value,
 not patching one slot in place.
 
 Copying a two-field `Point` takes negligible time.
