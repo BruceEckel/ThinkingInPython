@@ -3,7 +3,7 @@ from itertools import tee
 from typing import Final
 from benchmark import report, traced
 
-# Two independent readers, one source
+# Two independent branches, one source
 a, b = tee(i * i for i in range(5))
 print(list(a), list(b))
 #: [0, 1, 4, 9, 16] [0, 1, 4, 9, 16]

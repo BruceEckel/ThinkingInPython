@@ -366,7 +366,7 @@ from itertools import tee
 from typing import Final
 from benchmark import report, traced
 
-# Two independent readers, one source
+# Two independent branches, one source
 a, b = tee(i * i for i in range(5))
 print(list(a), list(b))
 #: [0, 1, 4, 9, 16] [0, 1, 4, 9, 16]
@@ -411,7 +411,7 @@ The last block advances `first2` and `second2` together instead,
 one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 That gap stays near zero,
 and the `lockstep.peak < listed.current * 0.1` comparison confirms it.
-Use `tee()` when two consumers advance together,
+Use `tee()` when two branches advance together,
 not when one finishes before the other starts.
 
 The branches of one `tee()` call also belong in a single thread.
@@ -660,7 +660,7 @@ The `dataclass` decoration carries `eq=False`.
 A data class that generates `__eq__()` sets `__hash__` to `None`,
 so the wrapper can no longer go in a set or serve as a dict key,
 as every other iterator can.
-Field-by-field comparison is also the wrong question to ask about a cursor.
+Field-by-field comparison is also the wrong question to ask about an iterator.
 Two wrappers over one source compare equal as soon as their counts agree,
 though each has delivered different items.
 Two wrappers over separate iterators of the same list compare unequal.
