@@ -480,6 +480,6 @@ describes.
 `Annotated` keeps the code ordinary and eager, and nothing verifies the row.
 A native system keeps ordinary code and a verified row,
 because the compiler that compiles the code also computes and checks its rows.
-That is the case for putting Effect tracking in the language,
+That is the case for putting algebraic effect tracking in the language,
 and it is why [Effects Are the Next Barrier](44_Effects--Effect_Management.md#effects-are-the-next-barrier)
 expects the tracking to move into the language or its toolchain.
