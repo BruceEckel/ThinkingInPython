@@ -170,8 +170,8 @@ because mypy compares the types in an override and ignores the name of any param
 The rename is the smaller of the two changes.
 `WhatIUse2.op()` also changes the parameter's type,
 from `what_i_want: WhatIWant` to `item: WhatIWant | WhatIHave`.
-The base version accepts a `WhatIWant`,
-and the override accepts a `WhatIWant` or a `WhatIHave`.
+The base version accepts a `WhatIWant`.
+The override accepts a `WhatIWant` or a `WhatIHave`.
 Both `case` branches call the inherited `op()`,
 with a `WhatIWant` as it is and a `WhatIHave` wrapped in a `ProxyAdapter`.
 An override may widen what it accepts.
@@ -184,8 +184,8 @@ The commented-out signature in `adapter_variations.py`,
 which is all Approach 2 needs for its own callers.
 If you use that signature in place of the union,
 a type checker rejects the override.
-A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts,
-and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
+A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts.
+That refusal breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
 `ty` reports the rejection as `invalid-method-override`:
 
 ```text
@@ -423,8 +423,8 @@ The figure shows each pattern as a before-and-after pair:
 
 ![](_images/interface_story)
 
-In both pairs, the code you have on the right stays the same,
-and the difference sits in the middle column.
+In both pairs, the code you have on the right stays the same.
+The difference sits in the middle column.
 *Adapter* puts a class there whose `f()` calls `g()` and `h()`,
 so the caller keeps calling `f()`.
 *Façade* puts a class there that builds the three objects,
@@ -479,8 +479,8 @@ The façade can rearrange both while every caller's code stays the same.
 
 The underscore is a convention,
 and `checkout._PriceEngine` resolves for anyone who types it.
-Mechanically, `from checkout import *` skips a name with a leading underscore,
-and an [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
+Mechanically, `from checkout import *` skips a name with a leading underscore.
+An [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
 list of the public names states the same boundary explicitly.
 A façade is an agreement about which names to call,
 not a restriction on the rest.
@@ -570,7 +570,7 @@ print(caught[0].message)
 so existing callers get a warning in place of an `AttributeError`.
 The mark works in two halves.
 The static half is a `ty` diagnostic on the deprecated call,
-and the caller sees it before running anything.
+which the caller sees before running anything.
 The `# type: ignore` silences that diagnostic here,
 since this listing calls the deprecated method on purpose.
 
@@ -590,8 +590,8 @@ with `DeprecationWarning` as the category.
 That call supplies the runtime half alone,
 since a type checker reads it as an ordinary function call.
 
-`warnings.deprecated()` requires the message,
-and that message should say what to use instead.
+`warnings.deprecated()` requires the message.
+That message should say what to use instead.
 "Deprecated" tells a reader that someone decided callers should stop using this.
 "replaced by `render()`" tells them what to do about it.
 
