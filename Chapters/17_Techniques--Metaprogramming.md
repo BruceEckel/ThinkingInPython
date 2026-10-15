@@ -739,6 +739,9 @@ At `B`'s creation, Python runs the version `B` inherits from `A`,
 which is `object`'s do-nothing default.
 Use the runtime version in the rare case where the interpreter must refuse the subclass too.
 
+A decorator like `@final`,
+which sets an attribute and leaves enforcement to the type checker,
+is a *marker*.
 Testing confirms that the `@final` marker is present,
 the runtime-final class refuses subclassing,
 and its non-final base still allows it:
@@ -771,7 +774,7 @@ The language devices you have met divide into four families.
 
 ### The Four Families
 
-`@final` and `@override` are *markers*.
+`@final` and `@override` are markers.
 At runtime each sets a single attribute, `__final__` or `__override__`,
 that the interpreter ignores and your own code can read, as `near_miss.py` does.
 The type checker enforces the rule each marker names,
