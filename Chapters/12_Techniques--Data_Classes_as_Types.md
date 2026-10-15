@@ -546,7 +546,7 @@ Adding `slots=True` drops it, for less memory and faster attribute access.
 [Performance](18_Techniques--Performance.md#slots)
 measures the memory difference.
 
-The standard library has a second immutable record, `typing.NamedTuple`,
+The standard library has a second immutable type, `typing.NamedTuple`,
 which also rejects assignment and hashes under the same rule.
 Every field it holds must be hashable.
 The two differ in equality.
@@ -555,7 +555,7 @@ while a `NamedTuple` [equals any tuple holding the same values](22_Patterns--Dat
 They also [differ in validation](#namedtuple-cannot-validate).
 
 If every part of an object stays as construction left it,
-then validating it at construction makes it valid for its lifetime.
+then validating it at construction makes it legal for its lifetime.
 
 ## A Type Is a Set of Values
 
@@ -730,7 +730,7 @@ def test_illegal_result_is_rejected() -> None:
 
 Once each small type guarantees its own values,
 you can safely build larger types out of them.
-A `Person` made of a valid `FullName` and a valid `EmailAddress` is valid by construction:
+A `Person` made of a legal `FullName` and a legal `EmailAddress` is legal by construction:
 
 ```python
 # person.py
@@ -1122,7 +1122,7 @@ Subscript the factory when you want that agreement checked.
 
 ## A `NamedTuple` Cannot Validate Itself {#namedtuple-cannot-validate}
 
-A `NamedTuple` is the other immutable record,
+A `NamedTuple` is the other immutable type,
 and it is tempting for a small type like `Stars`.
 `typing.NamedTuple` forbids overriding the methods that build an instance,
 so validation must live in a factory function beside the type.
@@ -1188,7 +1188,7 @@ including the ones you did not anticipate.
 because it builds the copy through the constructor.
 Running the check on every construction is the deciding difference whenever a type must guarantee its own values.
 When every value of the field types is legal,
-a `NamedTuple` is a fine [immutable record](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).
+a `NamedTuple` is a fine [immutable type](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).
 
 ## Inheritance and the Generated `__init__()` {#dataclass-inheritance}
 
@@ -1318,7 +1318,7 @@ with expected(TypeError):
 ```
 
 Both defenses reject these classes.
-The type checker reports each class as an invalid frozen-dataclass subclass,
+The type checker reports an `invalid-frozen-dataclass-subclass` error for each class,
 which the `# type: ignore` silences so the listing can reach the runtime failure.
 
 `frozen=True` works by installing a `__setattr__()` that rejects an assignment to any field of the frozen class,
