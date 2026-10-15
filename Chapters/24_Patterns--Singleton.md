@@ -95,8 +95,8 @@ Rebinding is the mistake that quietly ends it.
 `from config import settings` gives your module its own name for the same `dict` object named by `config.settings`.
 Mutating through your name, `settings["theme"] = "dark"`,
 changes that shared object, so every module sees it.
-But `settings = {}` in your module rebinds your module's name,
-and your module and `config` silently diverge.
+But `settings = {}` in your module rebinds your module's name.
+Your module and `config` silently diverge.
 `config.settings` still holds the old dict,
 while your module's name now refers to a new, unshared dict.
 
@@ -201,15 +201,15 @@ so at module level `__Settings` keeps its name as written,
 as reachable as any other.
 The second underscore has one effect, and that effect is a failure.
 In code inside a class body,
-the compiler rewrites a reference to `m.__Settings` into a lookup for `m._TheClass__Settings`,
-and that lookup fails.
+the compiler rewrites a reference to `m.__Settings` into a lookup for `m._TheClass__Settings`.
+That lookup fails.
 
 The cached-factory listings name the class `Settings`, with no underscore,
 because the name is public.
 `settings()` returns a `Settings`,
 so the class appears in the module's public signature.
-A caller who annotates the result must write that name,
-and a type outsiders must name is public, whatever its first character.
+A caller who annotates the result must write that name.
+A type outsiders must name is public, whatever its first character.
 `_Settings` fits a type that stays inside the module.
 
 Two stronger-looking moves fail the same way.
@@ -231,7 +231,8 @@ The signature must name something reachable,
 so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to name in its place.
 
 Privacy in Python is advice, not enforcement.
-An underscore marks a name as internal, and Python lets any caller use it.
+An underscore marks a name as internal.
+Python lets any caller use it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
 makes the same case about hidden data.
 The reachable class is also useful when a test needs a fresh `Settings`,
@@ -245,8 +246,8 @@ built outside the cache.
 
 2. Every *lazy* singleton builds its object on the first call,
    so it has a first-call race under threads.
-   Concurrent first calls can each run the constructor,
-   and each caller can end up holding a different object.
+   Concurrent first calls can each run the constructor.
+   Each caller can end up holding a different object.
    The cache keeps one of those objects.
    With a constructor slow enough to widen that race,
    eight threads calling `settings()` at once usually run the constructor eight times and return eight different objects.
@@ -260,8 +261,8 @@ built outside the cache.
    Where the lock goes matters.
    A `threading.Lock` around the cached function's body changes nothing,
    because every thread misses the cache before reaching the lock.
-   The threads serialize, but each still builds an object,
-   and the cache keeps whichever finished last.
+   The threads serialize, but each still builds an object.
+   The cache keeps whichever finished last.
    The check must run inside the lock, as `singleton_locked_settings.py` shows.
 
 ### The First-Call Race
@@ -428,8 +429,8 @@ print(distinct_objects(settings))
 ```
 
 Apart from the line it prints,
-the listing is `singleton_cached_race.py` plus the priming call,
-and the eight threads now get back one object.
+the listing is `singleton_cached_race.py` plus the priming call.
+The eight threads now get back one object.
 The priming call is safe for the same reason the module form is.
 The import system runs a module body once,
 so the object exists before any thread can ask for it.
@@ -723,11 +724,11 @@ Why does `__call__()` intercept the constructor for a `Registry`?
 To evaluate `obj(...)`,
 Python [looks up `__call__()` on the *type* of `obj`](26_Patterns--Surrogate.md#special-methods-bypass-getattr).
 For an ordinary class `C`, `type(C)` is `type`,
-and the parentheses run `type.__call__()`,
+so the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
 After decoration, `type(Registry)` is `singleton`,
-so the same parentheses run `singleton.__call__()` instead,
-and the wrapped class's constructor runs only when that method calls it.
+so the same parentheses run `singleton.__call__()` instead.
+The wrapped class's constructor runs only when that method calls it.
 `__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
 so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 
@@ -782,7 +783,7 @@ def test_subclassing_the_decorated_name_raises() -> None:
 `ty` and Pyright reject `Sub` statically.
 Its base has type `singleton`, not a class.
 Under mypy, which ignores a class decorator's return type,
-`Registry` is still a class and `Sub` passes.
+`Registry` is still a class, so `Sub` passes.
 
 At runtime the `class` statement raises a `TypeError`.
 `singleton.__init__()` takes two positional arguments and receives four.
@@ -805,8 +806,8 @@ and that is the reason to prefer it.
 A metaclass can also intercept construction.
 [Metaprogramming](17_Techniques--Metaprogramming.md#intercepting-instance-creation)
 shows that singleton.
-Its metaclass overrides `__call__()`,
-and that override skips `__new__()` and `__init__()` on every later construction,
+Its metaclass overrides `__call__()`.
+That override skips `__new__()` and `__init__()` on every later construction,
 so only the first call's arguments reach the constructor.
 In a class that overrides `__new__()` instead,
 as `singleton_class_variable.py` does, `__new__()` still runs on every call.
