@@ -31,9 +31,10 @@ One of those groupings is GoF's [*Creational*/*Structural*/*Behavioral* split](2
 which [Design Patterns](21_Patterns--Design_Patterns.md)
 accepts for *Creational* and questions for *Structural* and *Behavioral*.
 A few idioms below belong to no single source.
-They sit instead in three groups by what they share: language idioms
-(most of them tied to C++ or Java's limits), functional idioms,
-and the patterns that supply a collaborator from outside.
+They sit instead in three groups by what they share:
+language and implementation idioms (most of them tied to C++ or Java's limits),
+functional idioms, and dependency supply
+(the patterns that supply a collaborator from outside).
 Everything else sits in [Other Patterns and Idioms](#other-patterns-and-idioms),
 whose rows share no trait.
 The source and group tables list their rows alphabetically.
