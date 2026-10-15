@@ -243,7 +243,8 @@ built outside the cache.
    The cached factory offers a reset the classic forms lack.
    `settings.cache_clear()` discards the instance, so each test can start fresh.
 
-2. Every lazy singleton has a first-call race under threads.
+2. Every *lazy* singleton builds its object on the first call,
+   so it has a first-call race under threads.
    Concurrent first calls can each run the constructor,
    and each caller can end up holding a different object.
    The cache keeps one of those objects.
@@ -453,12 +454,12 @@ Each does more work than a module or a cached factory.
 
 The first form wraps a single instance of a private nested class.
 The second form keeps the instance in a class variable.
-*Borg* replaces the one object with many objects that share one set of state.
+Alex Martelli's *Borg* replaces the one object with many objects that share one set of state.
 The last form is a class decorator.
 
 ### Lazy Creation
 
-The classic approach is *lazy*: it builds the inner object on the first call,
+The classic approach is lazy: it builds the inner object on the first call,
 so it needs the `None` sentinel and the `if` guard.
 
 ```python
