@@ -22,8 +22,8 @@ The type checker also forces a caller to check for the failure before reading th
 
 Control flow also stays local.
 The failure returns to the immediate caller, the way any value does.
-A failure in one call therefore leaves the results of the others intact,
-and each caller handles the failure next to the call that produced it.
+A failure in one call therefore leaves the results of the others intact.
+Each caller handles the failure next to the call that produced it.
 
 This material comes from my PyCon 2024 talk,
 [Functional Error Handling](https://github.com/BruceEckel/functional_error_handling).
@@ -248,8 +248,8 @@ Totality is therefore a discipline the function's author keeps.
 
 The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
-The type checker reports a misread `Result`,
-and noticing an ignored one is up to you.
+The type checker reports a misread `Result`.
+Noticing an ignored one is up to you.
 The listing shows each limit once,
 one on the author's side and one on the caller's side:
 
@@ -385,8 +385,8 @@ if __name__ == "__main__":
 #: 4 4
 ```
 
-The two `composed()` functions succeed and fail on the same inputs,
-and the exception version is shorter, but its signature says less.
+The two `composed()` functions succeed and fail on the same inputs.
+The exception version is shorter, but its signature says less.
 `-> int` names no failure, where `-> Result[int, str]` names one.
 In the exception version, Python also deletes `e` when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
@@ -532,8 +532,8 @@ where each step needs the previous step's answer,
 as in `composing_with_bind.py` above.
 In `combining.py`, the three steps take their inputs from `i` and `j` rather than from an earlier step's answer,
 so stopping at the first `Err` discards whatever the later steps would have found.
-For `(1, 2)`, `func_b(2)` and `func_c(3)` would fail too,
-and the result reports `func_a(1)` alone (see exercise 3).
+For `(1, 2)`, `func_b(2)` and `func_c(3)` would fail too.
+The result reports `func_a(1)` alone (see exercise 3).
 The exception in `exceptions_lose_data.py` does the same.
 It ends the comprehension at `func_a(3)`, before `func_a(4)` runs.
 
@@ -732,7 +732,7 @@ which `raise New(...) from e` sets, or from `__context__`,
 which Python sets when a handler raises an exception without `from`.
 `BaseException.add_note()`, added in Python 3.11,
 improves the message and keeps the exception.
-It appends a line to the existing message, and the traceback prints that line:
+It attaches a line that the traceback prints after the original message:
 
 ```python
 # add_note.py
@@ -864,8 +864,8 @@ They are routine, and the type should say so.
 
 You can now write a function whose signature declares that it can fail,
 and chain three of them without a single `try` in the calling code.
-The chain returns either an answer or the first failure,
-and the type checker makes a caller tell the two apart.
+The chain returns either an answer or the first failure.
+The type checker makes a caller tell the two apart.
 [Confidence](43_Functional--Confidence.md)
 examines what this discipline lets you claim,
 and [Effect Management](44_Effects--Effect_Management.md#converting-effectful-to-pure)
