@@ -213,13 +213,13 @@ and hands control back to the event loop.
 
 A suspended task is a paused frame that runs no bytecode and uses no processor time.
 Local variables keep their values until the task resumes.
-The event loop starts the next coroutine,
+The event loop starts the next task,
 so all three are in flight during the first wait.
 
 Suspending also registers a wake-up condition with the event loop.
 `asyncio.sleep()` asks for a timer,
 but a real network request asks the loop to watch a socket for the reply.
-When the timer expires, the loop resumes that task where it paused,
+When the timer expires, the loop resumes that task where it suspended,
 just after the `await`.
 
 The three delays make the resumptions visible.
@@ -751,7 +751,7 @@ instead of one call.
 
 ## A Single Thread Still Races
 
-`asyncio` runs one coroutine at a time,
+`asyncio` runs one task at a time,
 and that fact tempts you to conclude that shared state needs no locking.
 But "one at a time" protects the instructions between two `await`s,
 not a value read before an `await` and written after it.
@@ -1823,7 +1823,7 @@ tuple comparison falls through to the second field, the description string.
 Collecting the producer futures and calling `result()` [turns a producer's exception into one you can see](#what-a-process-pool-requires).
 
 `consume()` calls `get()` in a loop, the way a live consumer should.
-Parked there, it uses no processor time while it waits,
+Blocked there, it uses no processor time while it waits,
 and it wakes the instant `put()` adds an item, with no polling in between.
 This listing's queue holds every job by the time `consume()` starts,
 so its first `get()` returns immediately.
@@ -1831,7 +1831,7 @@ The same code runs unchanged whether the queue is empty or stocked.
 The [*Object Pool*](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-borrower)
 in Context Managers uses the same `Queue` as a throttle.
 
-A consumer parked in `get()` still needs a way to stop.
+A consumer blocked in `get()` still needs a way to stop.
 `tasks.shutdown()` (3.13) answers that.
 Once the queue runs empty,
 every blocked or future `get()` raises `queue.ShutDown` instead of waiting forever.
@@ -2391,10 +2391,10 @@ How many threads can one machine support before `Thread.start()` raises `Runtime
 That number depends on the machine, not on Python.
 On one well-provisioned machine,
 60,000 threads started in about four seconds with room to spare,
-each parked on a `threading.Event` that nothing sets.
+each blocked on a `threading.Event` that nothing sets.
 A laptop with far less memory can fail at a fraction of that.
 To find your own machine's number,
-start threads that park on a `threading.Event` that nothing sets and increase the count until `start()` raises an exception.
+start threads that block on a `threading.Event` that nothing sets and increase the count until `start()` raises an exception.
 A task's limit is heap memory alone,
 because a task uses neither of the per-thread OS resources that limit threads:
 a stack reservation and a scheduler entry.
@@ -2454,7 +2454,7 @@ a stack reservation and a scheduler entry.
   Catching `asyncio.CancelledError` and swallowing it leaves the `TaskGroup` waiting on a task it cancelled.
 - **Several locks avoid deadlock when every task acquires them in one agreed order.**
   Acquire shared locks in the same sequence everywhere.
-  When two units keep yielding to each other instead,
+  When two tasks keep yielding to each other instead,
   break the symmetry so one of them gives way and the other goes ahead.
 
 ## Concurrency Is Not Easy
