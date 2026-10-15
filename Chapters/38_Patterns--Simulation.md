@@ -266,8 +266,8 @@ The robot example later in this chapter declares `Robot.room` for the same reaso
 
 The other three `init=False` fields, `visited`, `messages`, and `_numbers`,
 are internal bookkeeping.
-`init=False` keeps them out of the generated signature,
-and each `default_factory` builds a fresh object per blackboard.
+`init=False` keeps them out of the generated signature.
+Each `default_factory` builds a fresh object per blackboard.
 
 ### Running the Maze
 
@@ -423,8 +423,8 @@ tested from both ends.
 Rat 1 dead-ends at `(2, 3)` because rat 2 claimed `(3, 3)` first,
 and rat 2 dead-ends at `(3, 3)` because rat 1 claimed `(2, 3)` first.
 Each rat loses a cell to the other, not to itself.
-That is the race `claim()`'s atomicity exists to resolve,
-and a perfect maze like `amaze.txt` cannot produce it.
+That is the race `claim()`'s atomicity exists to resolve.
+A perfect maze like `amaze.txt` cannot produce it.
 
 ### Testing Full Coverage
 
@@ -435,7 +435,7 @@ and that rat tests all four of its neighbors.
 Coverage does not depend on atomic claiming.
 `visited` is a set, so a cell claimed twice still counts once.
 Atomicity adds the other guarantee, one rat per cell,
-which only a count like exercise 3's can detect.
+which only a count like the one in exercise 3 can detect.
 The test checks coverage by comparing the cells the rats visited against a flood fill of the same maze.
 
 ```python
@@ -576,8 +576,8 @@ This second example, adapted from my *Atomic Kotlin* book,
 walks a single robot through a maze.
 It shows how polymorphism removes conditionals.
 A `Room` calls its occupant's `interact()`.
-Each type of occupant defines its own, or inherits `Item`'s default,
-which lets the robot into the room.
+Each type of occupant defines its own `interact()`,
+or inherits `Item`'s default, which lets the robot into the room.
 
 ### Rooms, Robots, and the Item Factory
 
@@ -633,8 +633,8 @@ Python evaluates an annotation only when something reads it,
 so no line of `items.py` looks `Room` up at runtime.
 
 The rats avoid the same kind of cycle with a `Protocol`.
-`blackboard.py` imports `Rat`,
-and `rat.py` states what it needs from a blackboard in the `Board` `Protocol`,
+`blackboard.py` imports `Rat`.
+`rat.py` states what it needs from a blackboard in the `Board` `Protocol`,
 so it imports nothing from `blackboard.py`.
 
 `Robot` holds its two pieces of state in different ways.
@@ -881,8 +881,8 @@ so the code assigns `target_room` with no runtime check.
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 Those tests are not the type switch that polymorphism removes.
-`GameBuilder` must tell the kinds of item apart, once,
-and the movement code that runs afterward tests no types.
+`GameBuilder` must tell the kinds of item apart, once.
+The movement code that runs afterward tests no types.
 
 The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
@@ -1050,8 +1050,8 @@ A test can check the model without opening a window.
 `test_search_walks_the_robot_to_the_end()` builds the maze, searches it,
 walks the result, and checks that the robot finished in the `!` room.
 `test_walls_block_and_food_is_eaten()` walks a three-cell maze east twice.
-The first move eats the food, and the second leaves the robot where it was,
-because a wall blocks it.
+The first move eats the food.
+The second leaves the robot where it was, because a wall blocks it.
 A last step back west shows the room that held the food now empty:
 
 ```python
@@ -1087,8 +1087,8 @@ The same model drives a graphical view.
 `maze_view.py` builds the maze, calls `solve()` for the route,
 draws each room as a colored cell,
 and steps the robot along that route on a timer.
-The view is the one module that imports `tkinter`,
-and the imports point one way, from `maze_view.py` into the model's modules.
+The view is the one module that imports `tkinter`.
+The imports point one way, from `maze_view.py` into the model's modules.
 
 ```python
 # robot_explorer/maze_view.py
@@ -1175,8 +1175,8 @@ to discover behavior instead of confirming it.
 In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
 The bow made the plate ring.
 A ringing plate moves unevenly.
-Standing waves divide it into regions that swing up and down,
-and the *nodal lines* between them stay still.
+Standing waves divide it into regions that swing up and down.
+The *nodal lines* between them stay still.
 The vibration bounces sand out of the moving regions.
 When a grain comes to rest on a still line, it stays there.
 Within seconds the random motion sweeps the sand into sharp, symmetric curves.
