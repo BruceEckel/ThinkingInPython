@@ -124,8 +124,8 @@ expect(OverflowError, fill, BoundedStack(), 5)
 ```
 
 `BoundedStack.push()` takes the same argument and returns the same type as `Stack.push()`,
-so the signatures match,
-and `@override` finds a `push()` in `Stack` to override.
+so the signatures match.
+`@override` finds a `push()` in `Stack` to override.
 The type checker reports nothing.
 `fill()` takes a `Stack` and relies on its `push()` always succeeding.
 A `BoundedStack` handed to `fill()` raises an `OverflowError` on the third item.
@@ -240,15 +240,15 @@ A `@dataclass` version of `Plugged` trims the constructor,
 but its generated `__repr__()` prints `_numbers` and `_bob`,
 leaking the internals yet again.
 
-The `numbers` and `bob` getters also copy differently,
-and the wrong kind of copy reopens the leak.
+The `numbers` and `bob` getters also copy differently.
+The wrong kind of copy reopens the leak.
 `list.copy()` is *shallow*: it duplicates the container but shares the elements.
 That sharing is safe here because the elements are immutable `int`s.
 `Bob` gets `deepcopy()`,
 which recursively copies everything the object references.
 A deep copy is the conservative choice when a field's own fields might be mutable.
 A shallow copy of a list of `Bob`s protects the list and leaves the `Bob`s shared.
-The caller's copy holds the same `Bob` objects yours does,
+The caller's copy holds the same `Bob` objects as your list,
 so the caller can change each one.
 
 A test confirms that the defensive copy holds.
@@ -316,8 +316,8 @@ def test_frozen_field_refuses_assignment() -> None:
 Two smaller choices in `immutable.py` matter as much as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
 `frozen=True` is shallow.
-It blocks assignment to the fields of `Immutable`,
-and a field whose value is mutable stays mutable.
+It blocks assignment to the fields of `Immutable`.
+A field whose value is mutable stays mutable.
 If you declare the field as a `list` instead, the leak reopens:
 
 ```python
@@ -554,8 +554,8 @@ What changes is which code holds the bug: the class you read,
 not the `list` internals hidden behind `CountingList`.
 
 Composition does more than repair a broken subclass.
-A type holds other types as fields,
-and records compare by value and work as keys:
+A type holds other types as fields.
+Records compare by value and work as keys:
 
 ```python
 # composition.py
@@ -624,8 +624,8 @@ Cardelli and Wegner added the third, subtyping,
 in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where subtyping appears as *inclusion polymorphism*.].
 
 *Subtype polymorphism* is what the four subsections below demonstrate.
-One function accepts any type that fits a shape,
-and each subsection defines that shape differently: an `ABC` the type inherits,
+One function accepts any type that fits a shape.
+Each subsection defines that shape differently: an `ABC` the type inherits,
 a method an `Any` parameter calls at runtime,
 a `Protocol` the type matches structurally,
 or a union the `match` statement covers.
@@ -717,8 +717,8 @@ for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
 ```
 
 Inheriting from `ABC` and marking `area()` with `@abstractmethod` makes `Shape` abstract.
-Calling `Shape()` raises a `TypeError`,
-and a subclass becomes instantiable once it defines `area()`.
+Calling `Shape()` raises a `TypeError`.
+A subclass becomes instantiable once it defines `area()`.
 
 The empty `__slots__` on `Shape` is there for the records that inherit from it.
 A base class with no `__slots__` gives every instance of its subclasses a `__dict__`,
@@ -736,8 +736,8 @@ A bare `@record` there would declare slots and still get the base's `__dict__`.
 ### Dynamic Typing
 
 With dynamic typing, any type works as long as it has the necessary methods.
-The parameter accepts any argument, and the one validity check comes at runtime,
-when the call runs:
+The parameter accepts any argument.
+The one validity check comes at runtime, when the call runs:
 
 ```python
 # dynamic_typing.py
@@ -809,8 +809,8 @@ Dynamic typing and protocols are the same idea, checked at different times.
 
 An abstract base class is *nominal* (named),
 so a type joins by inheriting from it.
-The subclass's own source declares membership,
-and the base can carry shared implementation for its children.
+The subclass's own source declares membership.
+The base can carry shared implementation for its children.
 A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
@@ -972,13 +972,13 @@ def test_newtype_has_no_runtime_effect() -> None:
 Both assertions in that test always pass.
 Passing a raw `int` where a signature says `UserId` raises no exception either.
 In `newtype_boundary.py`,
-the `# type: ignore` silences the type checker's diagnostic,
-and at runtime `lookup(42)` prints `user-42`, the same as `lookup(UserId(42))`.
+the `# type: ignore` silences the type checker's diagnostic.
+At runtime, `lookup(42)` prints `user-42`, the same as `lookup(UserId(42))`.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
-A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too,
-and each value then needs a constructor call instead of a bare literal.
+A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too.
+Each value then needs a constructor call instead of a bare literal.
 
 A protocol also clarifies what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not guarantee.
@@ -1042,8 +1042,8 @@ In the functional version, the exhaustiveness check covers adding a shape.
 Adding a member to the `Shape` union leaves every existing `match` incomplete,
 and `assert_never()` turns each one into a type checker error naming the shape you missed.
 
-The OOP approach assumes you add types more often than operations,
-and that assumption often fails.
+The OOP approach assumes you add types more often than operations.
+That assumption often fails.
 This trade-off is the [expression problem](13_Techniques--Pattern_Matching.md#the-expression-problem).
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
