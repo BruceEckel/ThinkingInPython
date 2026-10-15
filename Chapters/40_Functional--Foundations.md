@@ -6,8 +6,8 @@
 This chapter begins the book's exploration of functional programming.
 The ideas are useful before you learn their names.
 A pure function cannot corrupt state you overlooked.
-A bug in a pure function reproduces from the arguments alone,
-and the function needs no mock or fixture to test.
+A bug in a pure function reproduces from the arguments alone.
+A pure function needs no mock or fixture to test.
 The standard library supplies and tests a cache in `functools` and a sliding window in `itertools`,
 so each one handles the edge case you would otherwise miss.
 A function that shares no state is safe to run in parallel.
@@ -122,8 +122,8 @@ asks whether raising an exception breaks the purity of `slope()`.
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and records are immutable.
 Each freezes only its own top level.
-The tuple `([1], 2)` always holds that same list,
-and anyone can still append to the list.
+The tuple `([1], 2)` always holds that same list.
+Anyone can still append to the list.
 A value that is immutable all the way down, such as a tuple of strings,
 stays what you last read, whatever code ran in between.
 That guarantee is why removing shared mutable state is the practical core of the functional style.
@@ -269,8 +269,8 @@ A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 `MutablePoint` and a `list` both compare by contents,
 so a dictionary that stored one as a key would lose the entry once the key's contents changed.
-Python therefore sets their `__hash__` to `None`,
-and `hash([3, 4])` raises the same `TypeError` as `hash(MutablePoint(3, 4))`.
+Python therefore sets their `__hash__` to `None`.
+`hash([3, 4])` raises the same `TypeError` as `hash(MutablePoint(3, 4))`.
 
 Freezing a dataclass lets it keep contents-based equality and a hash at the same time.
 [`@record`](18_Techniques--Performance.md#record) freezes `Point`,
@@ -546,15 +546,15 @@ reads that local before anything has assigned it,
 and fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 [`global`](05_Foundations--Functions.md#names-inside-a-function)
-does the same for a module-level name, and each statement targets its own scope.
+does the same for a module-level name.
+Each statement targets its own scope.
 With `global count` in place of `nonlocal count`,
 `increment()` looks for a module-level `count`, finds none,
 and raises a `NameError`.
 
 Forgetting the declaration is the usual mistake when a closure first assigns to a captured name.
-The runtime message,
-"cannot access local variable 'count' where it is not associated with a value,"
-names a local variable instead of the missing declaration.
+The runtime message names a local variable instead of the missing declaration:
+"cannot access local variable 'count' where it is not associated with a value."
 The type checker finds the same mistake before the program runs.
 If you delete the `nonlocal` line,
 `ty` reports `Name 'count' used when not defined` on the `count += 1` line.
@@ -643,7 +643,7 @@ and refuses to assign that callable to the declared `Callable[[int], int]`.
 Both reports fall on the assignment line, so one comment covers them.
 The runtime behaves correctly.
 
-The declaration on its own line states the shape that `Placeholder` builds.
+The declaration on its own line states the type of the function that `partial()` builds.
 `ty` takes the type of `percent` from that declaration and checks the three calls against it.
 A call to `percent()` with no argument draws a `missing-argument` report,
 so `ty` catches the `TypeError` case before the program runs.
@@ -687,7 +687,8 @@ The type parameters matter at `[1]`.
 The type checker verifies that `label()` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
-You grow a composition by adding a stage, and each stage is testable on its own.
+You grow a composition by adding a stage.
+Each stage is testable on its own.
 A larger behavior is a new named composition of existing stages.
 When a requirement changes,
 you insert or swap a single stage and the others stay as they were.
