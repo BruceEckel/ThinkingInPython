@@ -432,7 +432,7 @@ and one assignment (`self.x = x`) per field.
 `dataclasses.fields()` reports the field list `@dataclass` recorded.
 `@dataclass` leaves a field with no default off the class,
 so `x` is still absent from `C.__dict__` after decoration, as it was before.
-The difference from `A` lies in what the decorator adds:
+The difference from `A` lies in what the decorator adds.
 `@dataclass` leaves the annotations as they were and builds an `__init__()` that acts on them.
 
 ### `D`: A Real `ClassVar`
@@ -975,7 +975,8 @@ ruff's `UP042` rewrites that form to `StrEnum`.
 `IntEnum` is the same arrangement for `int`.
 
 Mix in a type when the member is one of that type.
-`Month` stays a bare `Enum`: a month is not an `int`, it carries one,
+`Month` stays a bare `Enum`.
+A month is not an `int`, it carries one,
 and `max_days` reads the number through `.value`.
 A class of your own can be the mix-in too.
 `Enum` passes the assigned value to its `__init__()`,
