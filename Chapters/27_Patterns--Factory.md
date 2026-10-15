@@ -394,7 +394,7 @@ so you can compare the edits that adding `Triangle` requires before and after th
 In the first frame, each call site holds its own arrow to every class,
 so a new class needs a new arrow, and an edit, at each call site.
 In the registry frames the arrows run the other way.
-Each class points at the table, and the callers point at `make()` alone.
+Each class points at the registry, and the callers point at `make()` alone.
 `Triangle` adds one arrow, from its own `class` statement.
 
 ### Hazards of Self Registration
@@ -761,11 +761,11 @@ Overriding a creation method in a subclass is the form *GoF Design Patterns* des
 and the reason the pattern takes its name from a method rather than a class.
 
 *Factory Method* adds a second hierarchy.
-Each product needs a creator that produces it,
+Each product needs a factory that produces it,
 so the two hierarchies grow together.
-The second hierarchy is worth having only when the creator does work of its own,
+The second hierarchy is worth having only when the factory does work of its own,
 as `render()` does here.
-When choosing the class is the creator's only job,
+When choosing the class is the factory's only job,
 a dictionary of classes says the same thing in one table:
 `shape_table.py` when the set of shapes is closed,
 `protocol_registry.py` when it is open.
@@ -1106,7 +1106,7 @@ Here the table holds instances and `spawn()` copies one.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
 A prototype registry has two required properties.
-Each spawn must be independent, and the stored prototype must stay unchanged:
+Each clone must be independent, and the stored prototype must stay unchanged:
 
 ```python
 # test_prototype.py
