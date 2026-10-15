@@ -152,7 +152,8 @@ The default `case _` returns the current state, so the state stays the same.
 Each function names `TrapState`, which the file defines below them.
 A function body runs at the call, not at the `def`,
 so by the first call the whole module has loaded and `TrapState` exists.
-`chime()` is the trap's one action: it sounds when the trap catches a mouse.
+`chime()` is the trap's one action.
+The chime sounds when the trap catches a mouse.
 
 `TrapState` is an `Enum` whose members are the records, in the same file:
 
@@ -204,16 +205,16 @@ because a bare `input` shadows the builtin `input()`.
 `step()` prints the transition (the old state, the input, and the new state),
 then calls `run()` on the new state, the one the machine has just entered.
 `run()` is an entry action:
-each transition arrives in a state and calls that state's `run()`,
-and the constructor calls the initial state's `run()` for the same reason.
+each transition arrives in a state and calls that state's `run()`.
+The constructor calls the initial state's `run()` for the same reason.
 A state prints as its name, through the `__str__()` that `TrapState` defines.
-`run_all()` is a convenience outside the class:
-it feeds any iterable of inputs to `step()`, one at a time.
+`run_all()`, a convenience outside the class,
+feeds any iterable of inputs to `step()`, one at a time.
 This is the *State* pattern combined with automated transitions,
 producing *State Machine*.
 
-What `run()` does depends on the current state: every state prints its message,
-and `Holding` also sounds its chime.
+What `run()` does depends on the current state.
+Every state prints its message, and `Holding` also sounds its chime.
 `step()` defines the flow,
 while each `State`'s fields supply the varying behavior:
 `next` chooses the next state, and `action` does what that state alone does.
@@ -298,8 +299,8 @@ so two members with the same message, the same function,
 and the same action collapse into a single member with two names.
 Two states that share a transition function must differ in their message or their action.
 The type checker reads `next` from the record's field and checks the engine's call `state.next(input_)` against it.
-It leaves a member's tuple uncompared with the fields:
-a tuple holding the message alone, or the two in the wrong order,
+It leaves a member's tuple uncompared with the fields.
+A tuple holding the message alone, or the two in the wrong order,
 passes `ty` and fails at import or at run time.
 Pyright reports both.
 
@@ -404,8 +405,8 @@ so a rule's `action` and `condition` must accept the class its `input_type` name
 
 The constructor groups the rules by `(state, input_type)` into a dictionary,
 so `handle()` finds the candidates for the current state and the input's class in one lookup.
-The engine holds the rules as `Rule[Any]`:
-it calls each condition and action with whatever input arrived.
+The engine holds the rules as `Rule[Any]`.
+It calls each condition and action with whatever input arrived.
 The checker matched each input class to its methods where the rule was built.
 
 The listing writes `StateMachine` by hand rather than as a `@dataclass`.
@@ -600,8 +601,8 @@ The engine passes the input to both the condition and the action,
 so `refund()` takes an argument it ignores.
 Each method declares the specific input type it handles,
 and those types differ from rule to rule.
-`Rule[I]` ties the input type to the methods on the same rule:
-naming `Column` makes `I` `Column`,
+`Rule[I]` ties the input type to the methods on the same rule.
+Naming `Column` makes `I` `Column`,
 so the checker requires `clear()` and `too_expensive()` to accept a `Column`.
 If you pair `Column` with `choose_row()`, written for a `Row`,
 `ty` reports `invalid-argument-type` on that rule.
@@ -776,8 +777,8 @@ In the table-driven design the states are `Enum` members, bare names,
 so an action that runs on every entry into one state must go in the table.
 You repeat the action on every rule that leads to that state,
 or write a helper that those rules call.
-That is the Mealy shape: the action belongs to the transition,
-and in return it can read the input that caused the transition.
+That is the Mealy shape: the action belongs to the transition.
+In return, the action can read the input that caused the transition.
 
 In both designs the states are `Enum` members.
 `list(TrapState)` enumerates every state,
