@@ -53,8 +53,8 @@ when it tears down the global `counters` list.
 That list holds the only remaining references,
 so destroying the list drops each `Counter`'s reference count to zero,
 and Python destroys each `Counter` in turn.
-The listing ends at `End of delete loop`, the program's last statement,
-and each `__del__()` prints afterward.
+The listing ends at `End of delete loop`, the program's last statement.
+Each `__del__()` prints afterward.
 If you run `cleanup.py` as a standalone program,
 three more lines follow `End of delete loop`:
 
@@ -129,7 +129,8 @@ print("still running")
 #: still running
 ```
 
-The release fails, and nothing printed to stdout reports the failure.
+The release fails.
+Nothing printed to stdout reports the failure.
 Python prints a traceback to `sys.stderr`, labeled `Exception ignored`,
 and discards the exception.
 No caller can catch the `RuntimeError`, the exit status is still `0`,
@@ -211,8 +212,8 @@ Two approaches are more reliable than `__del__()`.
 The first is an explicit cleanup method,
 such as the `close()` that file objects provide,
 which a [`with` block](04_Foundations--Control_Flow.md#context-managers) calls.
-Here a class supplies the two methods that `with` calls,
-and `close()` runs whether or not an error interrupts the block:
+Here a class supplies the two methods that `with` calls.
+`close()` runs whether or not an error interrupts the block:
 
 ```python
 # closable.py
@@ -274,7 +275,8 @@ as a file object's `close()` does.
 That ordering matters when `__init__()` fails.
 If `__init__()` raises an exception after acquiring the resource,
 the `with` statement receives no context manager.
-Neither `__enter__()` nor `__exit__()` runs, and the resource leaks silently:
+Neither `__enter__()` nor `__exit__()` runs.
+The resource leaks silently:
 
 ```python
 # faulty_init.py
@@ -361,7 +363,8 @@ so the object survives until the program ends.
 
 The `close()` at `[1]` runs the callback immediately.
 The second `close()`, at `[2]`, finds the finalizer dead and returns `None`.
-A finalizer runs at most once, and `alive` reports whether it still can.
+A finalizer runs at most once.
+Its `alive` attribute reports whether it can still run.
 
 `b` holds the only strong reference to its `Connection`,
 so `del b` destroys the object here, where the `del c` in `cleanup.py` does not.
@@ -418,8 +421,8 @@ holds the object the same way.
 
 `Leaky` prints nothing, since its callback is waiting in the registry.
 No error reports the leak.
-With `atexit` left on, the callback runs as the program exits,
-and a late `L closed` is the one sign of the leak.
+With `atexit` left on, the callback runs as the program exits.
+A late `L closed` is then the one sign of the leak.
 The listing turns `atexit` off on `Leaky`'s finalizer,
 so its output ends at `Safe alive: False`.
 
@@ -428,8 +431,8 @@ so its output ends at `Safe alive: False`.
 `finalize()` needs a target that supports weak references,
 and so does the `WeakValueDictionary` in the next section.
 A class that declares [`__slots__`](18_Techniques--Performance.md#slots)
-lists its instance attributes ahead of time,
-and its instances store those attributes in slots instead of a per-instance `__dict__`.
+lists its instance attributes ahead of time.
+Its instances store those attributes in slots instead of a per-instance `__dict__`.
 `finalize()` rejects an instance of a class whose `__slots__` omits `__weakref__`:
 
 ```python
