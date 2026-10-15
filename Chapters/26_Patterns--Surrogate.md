@@ -203,7 +203,7 @@ p.h()
 `__getattr__()` makes the forwarding generic.
 Because `Proxy` passes every name it lacks to the implementation,
 it keeps working when you add a method to the implementation.
-`Implementation` here has an `h()` that `proxy_forwarding.py`'s lacks,
+`Implementation` here has an `h()` that the `Implementation` in `proxy_forwarding.py` lacks,
 and the same `Proxy` forwards `p.h()`.
 
 The double underscore on `self.__implementation` matters.
@@ -299,7 +299,8 @@ so `len(p)` passes the check and fails at runtime.
 `str(p)` succeeds instead.
 `object` defines `__str__()`,
 so the lookup on `type(p)` finds `object`'s version.
-`w` prints as `spam eggs` and the proxy prints as `<proxy_getattr.Proxy object at ...>`.
+`w` prints as `spam eggs`.
+The proxy prints as `<proxy_getattr.Proxy object at ...>`.
 Whenever `object` defines the dunder,
 Python calls `object`'s version instead of the implementation's version.
 A proxy that must forward special methods therefore defines each one in its class body.
@@ -329,8 +330,8 @@ print(p.level, settings.level)
 Python calls it as the fallback for a read,
 and sends an assignment to `__setattr__()`,
 which `Proxy` inherits from `object`.
-`object.__setattr__()` stores `level` in the proxy's `__dict__`,
-and the implementation keeps its own `level`.
+`object.__setattr__()` stores `level` in the proxy's `__dict__`.
+The implementation keeps its own `level`.
 The next `p.level` lookup finds the proxy's `level`,
 so Python skips `__getattr__()`.
 The proxy reports `"high"` and the implementation reports `"low"`.
@@ -392,7 +393,7 @@ not the `AttributeError` that names the cause.
 
 A misspelled `self._implementation` is one cause.
 Rebuilding a proxy through `copy.copy()` or `pickle` is another.
-Both construct the new instance and skip `__init__()`,
+`copy.copy()` and `pickle` both construct the new instance and skip `__init__()`,
 so its `__dict__` is empty when the first failed lookup calls `__getattr__()`.
 The fix is a guard at the top of `__getattr__()` that raises `AttributeError` for any name that starts with an underscore:
 
@@ -435,8 +436,8 @@ so each listing shows one idea.
 ### A Surrogate Is Not Its Implementation
 
 A surrogate is not an instance of the implementation's class.
-Delegation forwards the methods, not the type,
-and `isinstance()` checks only the proxy's own class.
+Delegation forwards the methods, not the type.
+`isinstance()` checks only the proxy's own class.
 A `@runtime_checkable` `Protocol` gives the same answer.
 Since Python 3.12 the Protocol check uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries instead of running attribute lookup.
@@ -479,7 +480,8 @@ and neither verifies anything:
     whatever methods it has.
 -   A `__class__` property returning the implementation's class makes `isinstance()` test that class in place of `Proxy`.
 
-Both satisfy the runtime check and neither satisfies a type checker.
+Both workarounds satisfy the runtime check.
+Neither satisfies a type checker.
 Inheritance satisfies both checks.
 `proxy_interface.py`'s `Proxy` inherits `Service`,
 so `isinstance(p, Service)` returns `True`,
@@ -662,8 +664,8 @@ A data attribute comes back unchanged, so reading one leaves `calls` as it was.
 
 Normal lookup fails on every `p.f`,
 so every access calls `__getattr__()` and builds another `counted`.
-Two lookups of the same name therefore produce two different objects,
-and the wrapper reports its own name, `counted`, rather than `f`.
+Two lookups of the same name therefore produce two different objects.
+The wrapper reports its own name, `counted`, rather than `f`.
 Building a `counted` leaves the tally alone,
 so the `p.f is p.f` test and the `__name__` read leave it at three.
 
@@ -779,8 +781,8 @@ The figure follows `surrogate.f()` through each step:
 
 The first frame alone is a *Proxy*.
 The second and third show what *State* adds.
-One assignment inside `change_to()` rebinds `__implementation`,
-and the same `__getattr__()` forwarding then reaches the other implementation.
+One assignment inside `change_to()` rebinds `__implementation`.
+The same `__getattr__()` forwarding then reaches the other implementation.
 Only the surrogate's current implementation changes.
 
 Here the client programmer calls `change_to()`,
@@ -829,8 +831,8 @@ which the book's typing guidance treats as a last resort.
 `__getattr__()` returns `Any` because it returns the attribute for any name the caller reads,
 whatever that attribute's type.
 The `Any` on the parameters of `__init__()` and `change_to()` is a choice.
-`state_demo.py` would still type-check if both parameters carried `Behavior`,
-and the checker would then verify every implementation that reaches either method.
+`state_demo.py` would still type-check if both parameters carried `Behavior`.
+The checker would then verify every implementation that reaches either method.
 That annotation also limits the surrogate to implementations of one Protocol,
 but the generic surrogate exists to accept any implementation.
 `test_state.py` passes the same `Surrogate` two implementations,
