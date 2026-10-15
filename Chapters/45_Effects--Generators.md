@@ -778,7 +778,7 @@ although neither names the other.
 
 `task_runner()` calls `next()` and takes turns.
 `drive()` calls `send()` and answers questions.
-Letting each job ask a question combines turn-taking and answering in one loop:
+Letting each job make a request combines turn-taking and answering in one loop:
 
 ```python
 # task_runner_send.py
