@@ -7,8 +7,8 @@
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
-The call site names the signature it calls,
-and the callable can come from anywhere.
+The call site names the signature it calls.
+The callable can come from anywhere.
 [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 states that principle as "design the communication, not the parts."
 
@@ -262,8 +262,8 @@ or `None` when it cannot find one.
 
 Bisection reads the two hints as a bracket,
 an interval whose ends lie on opposite sides of the root.
-The secant method reads them as two starting points,
-and Newton's method averages them into one.
+The secant method reads them as two starting points.
+Newton's method averages them into one.
 The secant and Newton methods are *open*: they need somewhere to start,
 not a bracket.
 `chain_demo.py`, under *Chain of Responsibility*,
@@ -370,13 +370,13 @@ where a model notifies its views.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy.
-It chooses the value the algorithm compares for each item,
-and that algorithm stays the same (see exercise 3).
+It chooses the value the algorithm compares for each item.
+The algorithm stays the same (see exercise 3).
 
 When a strategy needs configuration,
 use a [*closure*](40_Functional--Foundations.md#closures).
-An outer function takes the settings and returns the strategy,
-and those settings stay available to the strategy after the outer function returns.
+An outer function takes the settings and returns the strategy.
+Those settings stay available to the strategy after the outer function returns.
 
 In `algorithms.py`, `bisection()` calls `bisection_tol()`,
 a bisection that stops once the bracket is narrower than `tolerance`,
@@ -446,8 +446,8 @@ Configuration alone is a closure's job.
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
 *GoF Design Patterns* implements the chain as a linked structure.
 Each handler holds a reference to the next and decides whether to pass the request along.
-In Python that chain is a list of functions,
-and `first_root()` returns the first root a finder in the list reports:
+In Python that chain is a list of functions.
+`first_root()` returns the first root a finder in the list reports:
 
 ```python
 # chain.py
@@ -464,8 +464,8 @@ def first_root(f: Fn, a: float, b: float,
 
 Each handler is a *Strategy* function, `chain` is the list of strategies,
 and a returned `float` signals success.
-An exhausted chain returns `None` rather than raising an exception,
-and the caller decides what an empty result means.
+An exhausted chain returns `None` rather than raising an exception.
+The caller decides what an empty result means.
 
 Bisection needs the interval to bracket a root.
 The open methods need only a place to start.
@@ -507,9 +507,9 @@ Whichever value marks failure, compare the result against it with `is`.
 
 `None` is the right failure value here because a root is always a `float`,
 so `float | None` says which result is which.
-When `None` is a possible result, it cannot double as the failure mark,
-and a [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
-takes that role.
+When `None` is a possible result, it cannot double as the failure mark.
+A [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
+takes that role instead.
 
 Each finder decides for itself whether it succeeded,
 and reports that decision as its return value.
@@ -601,8 +601,8 @@ and *Chain of Responsibility* in Python.
 If you key that structure by type instead of by position,
 you have an *event bus*.
 The bus is a `dict` keyed by event type.
-Each key maps to a list of handlers,
-and `subscribe()` appends a handler to the list under the event type it handles.
+Each key maps to a list of handlers.
+`subscribe()` appends a handler to the list under the event type it handles.
 Publishing an event looks up its type and calls every handler registered for that type.
 Calling every handler is the second difference from the chain,
 which stops at the first handler that succeeds.
@@ -752,8 +752,8 @@ and the bus is a `dict`.
 Each `subscribe()` call repeats the event type that the handler's annotation names.
 A second version reads the annotation, so a handler names its event once.
 
-The second version gives each side a decorator,
-and both decorators produce records.
+The second version gives each side a decorator.
+Both decorators produce records.
 `@event` registers its class in `EVENTS`.
 `@handler` makes a class whose instances are function objects,
 with fields that hold their configuration.
@@ -827,8 +827,8 @@ Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
 Python sets a class's slots when it creates the class,
 so `slots=True` makes `dataclass()` build a new class and return it.
-Registering `cls` puts the original class in `EVENTS`,
-and every event is an instance of `built` instead.
+Registering `cls` puts the original class in `EVENTS`.
+Every event is an instance of `built` instead.
 `publish()` then refuses every event.
 `@handler` refuses every handler class,
 because the annotation it reads names the class that `dataclass()` returned
@@ -919,9 +919,8 @@ The tagged bus gives up the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
 The tagged `subscribe()` takes one argument, typed `Handler[Any]`,
 so the type checker accepts any callable of that shape.
-An instance of an undecorated class with the right `__call__()` therefore passes the type checker,
-and `subscribe()` rejects it at run time,
-when it looks up the class in `HANDLES`.
+An instance of an undecorated class with the right `__call__()` therefore passes the type checker.
+`subscribe()` rejects it at run time, when it looks up the class in `HANDLES`.
 
 The test file confirms that:
 
@@ -979,8 +978,8 @@ On the bus, a type may have many handlers.
 When each type needs exactly one,
 and a new type must add its own without editing a central function,
 use `functools.singledispatch`.
-The dispatcher calls the function registered for the type of its first argument,
-and each new type adds its own function with `register()`.
+The dispatcher calls the function registered for the type of its first argument.
+Each new type adds its own function with `register()`.
 [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)
 both use `singledispatch`.
@@ -1002,8 +1001,8 @@ Stop at the first form that supports what you need:
 5.  A class, when the behavior needs a second operation such as `undo()`,
     or the several related methods and mutable state the *Strategy* section describes.
 
-A function that carries data in its `__dict__` would sit between entries 1 and 3,
-and the list leaves it out.
+A function that carries data in its `__dict__` would sit between entries 1 and 3.
+The list leaves it out.
 The type checker reports each [dotted access to such an attribute](17_Techniques--Metaprogramming.md#attributes-on-a-function),
 so configuration goes in a closure or a callable object instead.
 
