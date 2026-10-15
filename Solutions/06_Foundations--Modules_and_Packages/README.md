@@ -320,8 +320,8 @@ an import and its file always match in case.
 
 > Change `a_package/module4.py` to the absolute import `from a_package.module1 import function1` and confirm `use_module4.py` still works.
 > Then run `python a_package/module4.py`, both before and after the change.
-> Both fail, with different errors: explain each,
-> and say why `python -m a_package.module4` works either way.
+> Both fail, with different errors.
+> Explain each, and say why `python -m a_package.module4` works either way.
 
 <details>
 <summary>Where to look</summary>

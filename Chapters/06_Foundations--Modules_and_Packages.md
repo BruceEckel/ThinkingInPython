@@ -734,8 +734,8 @@ Try each exercise before opening its [solution](../Solutions/06_Foundations--Mod
     Look up `PYTHONCASEOK` to confirm your explanation.
 5.  Change `a_package/module4.py` to the absolute import `from a_package.module1 import function1` and confirm `use_module4.py` still works.
     Then run `python a_package/module4.py`, both before and after the change.
-    Both fail, with different errors: explain each,
-    and say why `python -m a_package.module4` works either way.
+    Both fail, with different errors.
+    Explain each, and say why `python -m a_package.module4` works either way.
 6.  Remove the `__all__` line from `exporting.py`.
     Predict what `star_import.py` prints without it, run it to check,
     then restore the line.
