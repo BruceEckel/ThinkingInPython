@@ -54,12 +54,12 @@ Python strips every `assert` when you run with `-O` or `-OO`.
 `assert` is a debugging aid for an invariant the program's own logic guarantees,
 so the optimizer may remove it.
 Under those flags, validation written with `assert` disappears silently and lets in the illegal values this chapter exists to keep out.
-A value that arrives from outside the program needs a check that stays,
-and no flag removes a `raise`.
+A value that arrives from outside the program needs a check that stays.
+No flag removes a `raise`.
 
 `eq=False` turns off the generated `__eq__()`, for two reasons.
-A mutable data class that defines `__eq__()` [sets `__hash__` to `None`](#data-classes),
-and putting an unhashable exception in a set raises a `TypeError`.
+A mutable data class that defines `__eq__()` [sets `__hash__` to `None`](#data-classes).
+Putting an unhashable exception in a set raises a `TypeError`.
 Identity is the correct comparison for an exception.
 Two failures carrying the same text are still two separate failures.
 
@@ -101,8 +101,9 @@ and the type system is no help.
 The `int` annotation says "any integer,"
 a far larger set than the ratings you mean.
 `f3()` shows a forgotten check.
-`11` lies outside the legal range, and nothing objects: not the annotation,
-not the type checker, not the running program.
+`11` lies outside the legal range.
+Nothing objects: not the annotation, not the type checker,
+not the running program.
 `f3(11)` returns 1100, beyond anything a legal rating produces,
 and the caller receives it as if it were fine.
 
@@ -157,8 +158,8 @@ The object's own methods still mutate `_number`,
 so `f1()` must re-check the result before returning it.
 That check runs after the mutation,
 so it reports the illegal value instead of preventing it.
-`Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`,
-and the object goes on holding that illegal value.
+`Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`.
+The object goes on holding that illegal value.
 Catching the exception leaves `_number` at 13.
 
 The order is a choice, not something mutation forces.
@@ -763,8 +764,8 @@ class Person:
 
 `Person` declares no checks of its own.
 Its annotations require a `FullName` and an `EmailAddress`,
-which the type checker enforces,
-and every `FullName` and `EmailAddress` is legal from construction.
+which the type checker enforces.
+Every `FullName` and `EmailAddress` is legal from construction.
 
 `test_person_composes_validated_parts()` builds a `Person` from legal parts and reads them back.
 `test_full_name_needs_first_and_last()` and `test_email_needs_at_sign()` show that the constructors reject an illegal name or email,
@@ -920,7 +921,8 @@ def test_month_number_outside_twelve(bad: int) -> None:
 
 ### Mixing a Type into an Enum {#enum-mix-ins}
 
-A `Month` member carries a number as its value, and the number is not the month.
+A `Month` member carries a number as its value.
+The number is not the month.
 Sometimes the member is a value of some type: a direction is a pair of offsets,
 a log level is a string.
 A class listed before `Enum` in the bases is a *mix-in*,
@@ -964,10 +966,10 @@ and `len(Direction)` counts four members.
 A member passes wherever the mix-in type is expected,
 and carries its name with it.
 
-`StrEnum` is `str` mixed in by the standard library, with one addition:
-its `__str__()` is `str.__str__()`,
-so an f-string shows `info` rather than `Level.INFO`,
-and a member answers every `str` method.
+`StrEnum` is `str` mixed in by the standard library,
+so a member answers every `str` method.
+It makes one addition: its `__str__()` is `str.__str__()`,
+so an f-string shows `info` rather than `Level.INFO`.
 A class written as `(str, Enum)` by hand keeps `Enum`'s `__str__()` and prints `Level.INFO`;
 ruff's `UP042` rewrites that form to `StrEnum`.
 `IntEnum` is the same arrangement for `int`.
@@ -1053,15 +1055,16 @@ The rejection prevents shared storage.
 Python evaluates a default value once, at class definition,
 so with that default every `Months` reads and writes one list,
 the [mutable-default trap](05_Foundations--Functions.md#the-mutable-default-trap).
-`field(default_factory=make_months)` supplies a function instead of a value,
-and each new `Months` calls it and gets its own fresh list.
+`field(default_factory=make_months)` supplies a function instead of a value.
+Each new `Months` calls it and gets its own fresh list.
 
 That rejection is narrower than it looks.
 `@dataclass` refuses a default it recognizes as shared storage,
 which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability.
 An instance of an ordinary class you wrote is hashable by default,
-so it passes as a default, and every data class instance shares it.
+so it passes as a default.
+Every data class instance then shares the same default object.
 That sharing is the same bug the check exists to prevent.
 Use `default_factory` for any mutable default.
 
@@ -1103,8 +1106,8 @@ print(Checked().data)
 Nothing objects to `Unchecked`.
 `ty` accepts it, the linter (`ruff`) accepts it,
 and the declaration says `dict[str, str]`, so every reader expects a dict.
-What arrives is a `set`,
-and Python reports the mistake at the first item assignment,
+What arrives is a `set`.
+Python reports the mistake at the first item assignment,
 which can be far from the declaration that caused it.
 
 For a bare `list`, `dict`, or `set` factory,
@@ -1114,8 +1117,8 @@ so `ty` accepts any bare factory for the field.
 Checkers differ here.
 Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
 
-Subscripting makes the factory's return type concrete,
-and `field(default_factory=dict[int, int])` on this field then draws a type error.
+Subscripting makes the factory's return type concrete.
+`field(default_factory=dict[int, int])` on this field then draws a type error.
 Use the bare form when the factory and the annotation agree,
 which is most of the time.
 Subscript the factory when you want that agreement checked.
@@ -1464,8 +1467,8 @@ and so does `pickle`.
 Because none of the three runs `__init__()` or `__post_init__()`,
 each can produce a `Stars` holding a number that no check saw.
 That is harmless while the copy comes from a legal original.
-It is dangerous when the state comes from a file that an older version of the class wrote,
-and [*Memento*](36_Patterns--Memento.md) revisits that case.
+It is dangerous when the state comes from a file that an older version of the class wrote.
+[*Memento*](36_Patterns--Memento.md) revisits that case.
 `copy.replace()` alone keeps the guarantee,
 because rebuilding through the constructor is the only way to run the check again.
 
@@ -1626,8 +1629,8 @@ the parsed JSON, the database row, the form field, the command-line argument.
 `from_json()` is that boundary written out.
 It reads untrusted text and hands the pieces to `FullName` and `EmailAddress`.
 That boundary is the last point where you can reject a bad value before the rest of the program receives it.
-After those constructor calls your code holds types rather than raw data,
-and a function receiving a `FullName` or an `EmailAddress` does its work and trusts the value.
+After those constructor calls your code holds types rather than raw data.
+A function receiving a `FullName` or an `EmailAddress` does its work and trusts the value.
 
 Away from the boundaries, the types also use more memory and time.
 Every value is now an object.
