@@ -511,7 +511,7 @@ A `History` of lists is a stack of aliases, the bug in `aliased_snapshot.py`.
 
 `History` holds the classic form as well.
 Because the classic `Memento` from `sketch.py` is immutable,
-the same generic caretaker holds snapshots of the mutable `Sketch`.
+the same generic caretaker holds mementos of the mutable `Sketch`.
 Where `History` holds each frozen `Drawing` as it is,
 a `Sketch` needs `save()` before each `do()` and `restore()` after each `undo()`,
 so the code around the `History` calls both:
