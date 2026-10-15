@@ -596,7 +596,7 @@ When the general function exists, as `power()` does here,
 Use partial application when an API expects a function of one argument and you have a function of several.
 Unlike a lambda, `partial()` keeps the preset arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
-It also binds their values when you build it,
+It also presets their values when you build it,
 whereas a lambda created in a loop reads each captured name at call time,
 the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
 
