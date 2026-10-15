@@ -39,17 +39,14 @@ class State:
         self.action()
 ```
 
-`next` is a function stored in a field, not a method.
-A stored function receives no `self`,
-so the call `state.next(input_)` passes the input alone.
-The field's annotation names `State` inside the `State` class body,
-which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
+`next` and `action` are functions stored in fields, not methods,
+so neither receives `self`: `state.next(input_)` passes the input alone,
+and `run()` calls `self.action()` with no arguments.
+`action` defaults to a function that does nothing,
+and a state that does more passes its own as the third constructor argument.
 
-`action` is a stored function too, and its default does nothing.
-A state whose whole behavior is printing its message keeps the default;
-a state that does more passes its own `action` as the third constructor argument.
-`run()` is the same for every state:
-it prints the message and then calls `action`, default or supplied.
+The annotation on `next` names `State` inside the `State` class body,
+which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
 
 Each state decides the next state.
 This is a *Moore machine*, where what a state does depends on the state alone.
