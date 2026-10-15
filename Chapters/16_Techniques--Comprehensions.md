@@ -46,7 +46,7 @@ print(squared_ints)
 
 ![The parts of a list comprehension, numbered in the order Python evaluates them](_images/listComprehensions)
 
--   The `for` clause walks through each member `e` of the input sequence `a_list`.
+-   The `for` clause walks through each member `e` of the input iterable `a_list`.
 -   The filter checks whether the member is an integer.
 -   If the member is an integer,
     the output expression squares it and the comprehension appends the square to the output list.
@@ -164,7 +164,7 @@ It lets a comprehension accumulate a value without a separate loop.
 
 The walrus has three restrictions inside a comprehension.
 Each of these uses is a `SyntaxError`:
-a walrus that rebinds the comprehension's own iteration variable,
+a walrus that rebinds the comprehension's own loop variable,
 a walrus inside the iterable expression that follows `in`,
 and a walrus in a comprehension inside a class body.
 
@@ -350,7 +350,7 @@ and the comprehension silently produces a wrong list.
 Each `x` from the stale `row` repeats once per element of `rows`,
 because the `for row in rows` clause runs inside `for x in row`.
 
-## Supplying the Input Sequence
+## Supplying the Input Iterable
 
 Everything to the right of `in` is an ordinary iterable expression,
 so anything that produces one works there.
