@@ -44,7 +44,8 @@ and that attribute shadows the class attribute when you read `a.rating`.
 ## 2. A third subclass with no override
 
 > In `class_var_inheritance.py`,
-> add a third subclass `class Middle(Base): pass` (no override, like `Left`)
+> add a third subclass `class Middle(Base): pass`
+> (no shadowing `shared`, like `Left`)
 > and print `Middle.shared` alongside the others at each step.
 > Confirm `Middle` tracks `Base` the way `Left` does.
 

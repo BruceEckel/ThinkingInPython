@@ -248,8 +248,8 @@ which creates a real `label` attribute on `a`, not on `Tally`.
 Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrates in `class_attribute_confusion.py`.
 The `total` that `a` reports is `Tally.total`.
-The `[CV]` tag, for *class variable*, marks an attribute the class stores,
-and the tags agree.
+The `[CV]` tag (for "class variable," another name for a class attribute)
+marks an attribute the class stores, and the tags agree.
 `label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,
 keeps it.
 
@@ -352,7 +352,7 @@ with expected(AttributeError):
 `Shape` states that every shape carries a `sides`, `Square` supplies one,
 and `Blob` supplies none.
 A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
-declares its attributes in the same form, an annotation with no value,
+declares its attributes in the same form, a bare annotation,
 since it describes what a class must have and leaves the value to the class.
 
 `ty` 0.0.87 enforces what the declaration states about the value.
@@ -462,7 +462,7 @@ Each line prints `Base`, `Left`, and `Right` in that order.
 `Left` inherits `shared`,
 so its column follows `Base.shared` until `Left.shared = 5` creates `Left`'s own attribute,
 which leaves `Base.shared` at `9`.
-`Right` overrides `shared` at class-definition time,
+`Right` shadows `shared` at class-definition time,
 so it keeps `100` when `Base.shared` changes.
 
 Attribute lookup on a subclass is the shadowing rule from `class_attribute_confusion.py`,
@@ -635,7 +635,8 @@ Try each exercise before opening its [solution](../Solutions/09_Foundations--Cla
     Predict its value before running,
     then explain why it differs from `a.rating`.
 2.  In `class_var_inheritance.py`,
-    add a third subclass `class Middle(Base): pass` (no override, like `Left`)
+    add a third subclass `class Middle(Base): pass`
+    (no shadowing `shared`, like `Left`)
     and print `Middle.shared` alongside the others at each step.
     Confirm `Middle` tracks `Base` the way `Left` does.
 3.  In `real_defaults.py`, create `b = B()` and assign `b.x = -1`.
