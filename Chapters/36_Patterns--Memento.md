@@ -158,7 +158,7 @@ At runtime it is a callable that returns its argument,
 so the caretaker still holds a plain tuple it can index, unpack,
 or build from scratch.
 
-Wrapping the tuple in a one-field data class makes `Memento` a class of its own at runtime.
+Wrapping the tuple in a one-field record makes `Memento` a class of its own at runtime.
 A parameter typed `tuple[str, ...]` still accepts any tuple of strings,
 whatever built it.
 A parameter typed `Memento` accepts only a `Memento`,
