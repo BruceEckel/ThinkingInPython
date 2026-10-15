@@ -70,8 +70,8 @@ a [dictionary is often shorter](#when-not-to-match).
 
 ## Alternatives and Capture
 
-`|` joins several patterns in one `case`,
-and the case matches when any one of them fits.
+`|` joins several patterns in one `case`.
+The case matches when any one of them fits.
 A pattern has no `or`.
 Writing `case "up" or "u":`, as you would in an `if` condition,
 fails with a bare `SyntaxError: invalid syntax`.
@@ -159,7 +159,7 @@ so `broken()` needs no `return` after its `match`.
 `ruff` flags the line only when you enable its pep8-naming rules.
 Then N806 reports `DEFAULT` as an uppercase variable inside a function.
 That message is about naming style rather than the capture,
-and `ruff` reports nothing for a constant with a lowercase name.
+so `ruff` reports nothing for a constant with a lowercase name.
 This book's `ruff` configuration turns N806 off for `value_patterns.py`,
 since the capture is the mistake the listing exists to show.
 
@@ -236,8 +236,8 @@ so `case 0, 0:` and `case [0, 0]:` are the same pattern.
 The subject can be any expression, and a comma builds a tuple there too.
 Given a `sign()` helper that returns `-1`, `0`, or `1`,
 `match sign(x), sign(y):` matches on a pair computed inline.
-Transforming the subject this way turns a set of comparisons into literal patterns,
-and literal patterns usually read better than the [guards](#guards)
+Transforming the subject this way turns a set of comparisons into literal patterns.
+Literal patterns usually read better than the [guards](#guards)
 you would write otherwise.
 
 ## Class Patterns
@@ -330,8 +330,8 @@ A positional pattern can also check a subset of fields.
 `Point(0)` supplies one sub-pattern, which goes to `x`,
 the first name in `__match_args__`.
 `Point(_, 0)` puts the wildcard in `x`'s position to check `y` alone.
-Naming the attribute is clearer,
-and a keyword pattern matches the same attribute whatever the field order.
+Naming the attribute is clearer.
+A keyword pattern matches the same attribute whatever the field order.
 Reordering the fields rewrites `__match_args__`,
 so every positional pattern silently starts matching a different field.
 
@@ -381,12 +381,13 @@ Dropping the parentheses changes the meaning.
 `case str:` is a capture pattern, not a type test,
 matching any value and binding it to a local named `str`.
 `case str:` repeats the `DEFAULT` mistake from `value_patterns.py`.
-Python rejects it the same way and refuses to compile any `case` after it:
+Python rejects it the same way, refusing to compile the `match` when another `case` follows:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
 Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
-relies on that dispatch, and there a subclass finds no entry.
+relies on that dispatch.
+There, a subclass finds no entry.
 
 ## Guards
 
@@ -542,8 +543,8 @@ so `start` is the whole `Point` while `0, 0` checks its fields.
 With `as`, one pattern both tests the shape and keeps the object.
 
 The case at `[2]` is a one-element sequence pattern whose element alternates two class patterns.
-`survey([Point(0, 5)])` matches,
-and for a list of two points `match` moves on to the next `case`.
+`survey([Point(0, 5)])` matches.
+For a list of two points, `match` moves on to the next `case`.
 Either alternative binds `n`.
 The compiler enforces the [same-names rule](#alternatives-and-capture).
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
