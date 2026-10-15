@@ -548,8 +548,9 @@ The format spec after a colon controls width, precision, and alignment.
 `>` right-aligns and `<` left-aligns within the given width.
 A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
-An `=` after the expression, as in `{name = }`, prints the expression's text,
-the `=` with any spaces you put around it, and then the value.
+An `=` after the expression, as in `{name = }`, is the *debug specifier*.
+It prints the expression's text, the `=` with any spaces you put around it,
+and then the value.
 By default the value appears as its `repr()`,
 so the output shows `'Alice'` in quotes.
 Use `=` to label values in your own exploring and debugging code.
