@@ -290,3 +290,23 @@ before/after pair, and it becomes part of every future pass.
   Keep the "and" when the clauses share a subject or are two steps of
   one action ("`run()` prints the message and then calls `action`").
   The same rule is in the global `CLAUDE.md` under Writing style.
+- **A colon standing in for a conjunction** (2026-10-15).
+  "Python supplies `self` only when the lookup finds the function on
+  the class: a function stored there is a descriptor, and reading it
+  through an instance binds that instance" puts a second claim, the
+  reason for the first, after a colon, so the reader who expects the
+  first half to be completed starts a new sentence instead.
+  A colon is a pointer: the words before it announce something
+  unfinished (a count, "this shape:", "the error is:") and the words
+  after it deliver it (the items, the example, the quoted text).
+  Insertion test: "namely" or "that is" after the colon keeps the
+  meaning, so the colon stays; "because", "so", "and", or "but" fits
+  instead, so the colon becomes a period or that conjunction.
+  Deletion test: cover the first half, and if the second half makes
+  its own claim as a full sentence, it takes a period.
+  Weight: a colon delivers one thing, so two clauses joined by "and"
+  after it mean the first claim gets a period.
+  Fix: "Python supplies `self` only when the lookup finds the function
+  on the class. A function stored there is a descriptor, and reading it
+  through an instance binds that instance."
+  The same rule is in the global `CLAUDE.md` under Writing style.

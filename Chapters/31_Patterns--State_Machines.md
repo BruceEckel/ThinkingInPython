@@ -51,8 +51,8 @@ A state with more to do supplies an `action` as the third constructor argument.
 
 Note that the form of `self.action()` is identical to a method call,
 where `self` is automatically passed as the first argument.
-Python supplies `self` only when the lookup finds the function on the class:
-a function stored there is a descriptor,
+Python supplies `self` only when the lookup finds the function on the class.
+A function stored there is a descriptor,
 and reading it through an instance binds that instance,
 as a call to `run()` shows.
 `action` is a field, so the lookup finds the function stored in the instance,
