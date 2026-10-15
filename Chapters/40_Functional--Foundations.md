@@ -583,7 +583,7 @@ print(square.func.__name__, square.keywords)
 `square` and `cube` are specializations of `power()`,
 each with one argument already supplied.
 The keyword does real work here.
-`partial(power, 2)` binds `base` instead,
+`partial(power, 2)` presets `base` instead,
 because positional arguments fill from the left.
 `square(5)` would then compute `2 ** 5`.
 
@@ -594,7 +594,7 @@ When the general function exists, as `power()` does here,
 `partial()` removes the factory.
 
 Use partial application when an API expects a function of one argument and you have a function of several.
-Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
+Unlike a lambda, `partial()` keeps the preset arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also binds their values when you build it,
 whereas a lambda created in a loop reads each captured name at call time,
@@ -631,7 +631,7 @@ Before 3.14, a hand-written wrapper supplied that specialization.
 
 Calling `percent()` with no argument raises a `TypeError`.
 The library also rejects a trailing placeholder as redundant.
-`partial()` already appends the call's arguments after the bound ones,
+`partial()` already appends the call's arguments after the preset ones,
 so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
 
 The `# type: ignore` comment marks a type checker limitation rather than a code problem.
