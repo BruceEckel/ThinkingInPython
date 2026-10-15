@@ -234,7 +234,7 @@ def test_empty_directory() -> None:
 ```
 
 The classic version is a better choice when the set of node types is open.
-If plugins or other packages must add new kinds of entries,
+If plugins or other packages must add new node types,
 a method on a base class lets them do that in their own code,
 but a central `match` needs an edit in yours.
 The [guidance on when not to match](13_Techniques--Pattern_Matching.md#when-not-to-match)
@@ -411,9 +411,8 @@ If each operator method returns `NotImplemented` for an operand it cannot use,
 
 SymPy expressions, Polars column arithmetic,
 and SQLAlchemy filter conditions all use this technique.
-Overloaded operators build an expression tree,
-and a library interprets that tree later, symbolically, over a whole column,
-or as SQL.
+Overloaded operators build an AST, and a library interprets that tree later,
+symbolically, over a whole column, or as SQL.
 
 You can overload the arithmetic, bitwise, and comparison operators this way,
 so an expression written with them builds nodes instead of computing.
@@ -878,7 +877,7 @@ Try each exercise before opening its [solution](../Solutions/34_Patterns--Compos
     and check that the two agree on a small expression.
     Raising the limit with `sys.setrecursionlimit()` also avoids the error.
     Name its drawbacks.
-9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
-    Sketch what breaks, then write the version of `disk_usage()` that supports the plugin's entry types.
+9.  A plugin package needs to add its own node types to `filesystem.py` without editing your code.
+    Sketch what breaks, then write the version of `disk_usage()` that supports the plugin's node types.
     For a file system, would you use a `match` over a union or a method on a base class?
     Which would you use for the expression language in `expr.py`?
