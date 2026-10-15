@@ -68,8 +68,8 @@ Slicing works on the built-in sequences, including strings and tuples.
 
 ### Growing, Shrinking, and Sorting
 
-Lists grow and shrink in place,
-and `len()` and `in` report their size and contents:
+Lists grow and shrink in place.
+`len()` and `in` report their size and contents:
 
 ```python
 # list_ops.py
@@ -195,8 +195,8 @@ Each `remove()` shifts the following elements one place to the left,
 and the loop then advances its index,
 so it steps over the element that moved into the vacated slot.
 The loop prints `1` and `3`, the values it visits, and skips `2` and `4`.
-Skipping every other element leaves half of `xs`,
-and no exception reports the skip.
+Skipping every other element leaves half of `xs`.
+No exception reports the skip.
 Build a new list instead, with a comprehension that keeps the items you need,
 or iterate over a copy with `for x in xs[:]`.
 
@@ -238,8 +238,8 @@ so `number` is an `int`.
 The empty tuple `()` is the exception to the comma rule,
 because it has nothing to separate.
 
-One name per element is the simplest unpacking,
-and two extensions handle other shapes.
+One name per element is the simplest unpacking.
+Two extensions handle other shapes.
 A starred name collects the remaining elements,
 and a target can nest to match the shape of the value:
 
@@ -306,7 +306,7 @@ and they mix freely with ordinary elements.
 so the pair builds a new list holding `evens` rotated by one place.
 `evens` stays as it was.
 `+` joins two lists as well, but both operands must be lists,
-and `[0, 2] + (1, 3)` raises a `TypeError`.
+so `[0, 2] + (1, 3)` raises a `TypeError`.
 [Functions](05_Foundations--Functions.md#unpacking-arguments)
 uses the same star to spread an iterable into a call's arguments.
 
@@ -424,8 +424,8 @@ print(names & other.keys())  # Set algebra on a view
 #: {'Bob'}
 ```
 
-`names` comes from `ages.keys()` before `"Dan"` joins `ages`,
-and printing `names` shows `Dan` too.
+`names` comes from `ages.keys()` before `"Dan"` joins `ages`.
+Printing `names` shows `Dan` too.
 
 `|` merges two dictionaries, `pop()` and `del` remove entries,
 and `dict()` builds a dictionary from pairs:
@@ -448,16 +448,16 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 #: {'a': 1, 'b': 2, 'c': 3}
 ```
 
-`|` builds a merged `dict`, and `|=` updates the left `dict` in place,
-as `update()` does.
-For sets, `|` means union, and the operands can come in either order.
+`|` builds a merged `dict`.
+`|=` updates the left `dict` in place, as `update()` does.
+For sets, `|` means union, so the operands can come in either order.
 For dictionaries the order matters.
 When both dictionaries hold the same key,
 the merged `dict` keeps the right operand's value, so `"y"` comes out as `20`.
 
 `{**a, **b}` builds the same merged `dict`.
-`**` spreads each dictionary's entries the way `*` spreads a list's elements,
-and a later entry replaces an earlier one with the same key.
+`**` spreads each dictionary's entries the way `*` spreads a list's elements.
+A later entry replaces an earlier one with the same key.
 Like a list display,
 a `dict` display accepts any number of double-starred operands,
 with ordinary `key: value` entries among them.
@@ -649,8 +649,8 @@ print(Counter("aab") - Counter("ab"))  # Multiset diff
 #: Counter({'a': 1})
 ```
 
-A missing key counts as zero rather than raising a `KeyError`,
-and `most_common()` returns the highest counts first.
+A missing key counts as zero rather than raising a `KeyError`.
+`most_common()` returns the highest counts first.
 `-`, `&`, and `|` also work between two counters.
 They are the operators from [Sets](#sets), here meaning multiset difference,
 minimum, and maximum.
@@ -699,8 +699,8 @@ In `plain.setdefault(kind, []).append(name)`,
 `setdefault()` returns the list already stored under `kind`.
 When `kind` is missing,
 `setdefault()` stores the new `[]` and returns that instead.
-The `[]` argument builds an empty list on every call,
-and a call that finds `kind` discards it.
+The `[]` argument builds an empty list on every call.
+A call that finds `kind` discards that list.
 Every line that looks up a key must also repeat the whole expression.
 A `defaultdict` states the default once, where you create the dictionary.
 
@@ -803,7 +803,8 @@ print(window)
 ```
 
 Appending five values to a window of three keeps the last three.
-A `deque` with a `maxlen` is a sliding window, and a `list` has no equivalent.
+A `deque` with a `maxlen` is a sliding window.
+A `list` has no equivalent.
 
 ### `namedtuple`
 
@@ -968,8 +969,8 @@ except TypeError as e:
 #: 'tuple' object does not support item assignment
 ```
 
-The `tuple` holds the same `list` for its whole life,
-and that `list` stays free to change.
+The `tuple` holds the same `list` for its whole life.
+That `list` stays free to change.
 An immutable container holding an unhashable object is unhashable too.
 
 Immutability is beneficial when every nested object is immutable too,
