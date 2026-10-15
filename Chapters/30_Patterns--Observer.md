@@ -170,7 +170,7 @@ A `notify()` call therefore calls every observer in `_observers` at the moment t
 If `detach()` removes an observer from `_observers` partway through a `notify()` call,
 the copy still holds that observer,
 so the observer receives the call's notification.
-An observer attached during the call joins `_observers` alone,
+An observer attached during the call joins `_observers` after `notify()` has copied the list,
 so its first notification comes from the next `notify()` call.
 [Disconnecting During a Notification](#disconnecting-during-a-notification)
 runs a responder that disconnects itself,
@@ -268,8 +268,8 @@ the broadcaster packs them in a tuple and each responder unpacks it.
 A responder that needs no data ignores the argument it receives.
 
 `Broadcaster` announces data of any type.
-Its type parameter `T` sets the type of each notification,
-and a class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
+Its type parameter `T` sets the type of each notification.
+A class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
 and `announce()`.
 
 A responder returns `None`, as the `Responder` `type` alias declares.
@@ -577,8 +577,8 @@ Connections are strong references.
 A bound method holds the object it came from,
 so connecting `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the connection.
 When the program finishes with `plot`, it drops its other references to `plot`.
-A `plot.redraw` that is still connected keeps `plot` in memory,
-and `redraw()` runs on every announcement.
+A `plot.redraw` that is still connected keeps `plot` in memory.
+Every announcement still calls `redraw()`.
 A responder the program stops using but leaves connected is a *lapsed listener*.
 Over a long run the broadcaster accumulates lapsed listeners,
 creating a memory leak.
@@ -624,7 +624,7 @@ broadcaster.announce(30.0)
 A `Broadcaster` holds a strong reference to whatever you `connect()`,
 so `weak_responder.py` puts the weak reference inside the responder.
 A different broadcaster could store weak references for every responder.
-With `Broadcaster`, a responder that needs a weak reference supplies its own.
+With `Broadcaster`, a responder that needs a weak reference creates and holds that reference.
 
 An ordinary `weakref.ref(plot.redraw)` is dead from the moment you make it.
 Its argument, `plot.redraw`, builds a new bound-method object,
@@ -646,8 +646,8 @@ and the responder again holds the `Plot` object through the weak reference alone
 `del plot` removes the one strong reference to the `Plot` object.
 CPython's reference counting collects the object at once.
 An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
-such as PyPy, collects the object when its collector runs,
-and the `gc.collect()` call runs that collector before `announce(30.0)`.
+such as PyPy, collects the object when its collector runs.
+The `gc.collect()` call runs that collector before `announce(30.0)`.
 In a program that leaves the timing to the collector,
 `weak` keeps calling `redraw()` until the collector runs.
 
@@ -657,8 +657,8 @@ The copy that `announce()` iterates over makes a mid-notification disconnect saf
 as it does for `once` in `self_removing_responder.py`.
 
 For most programs, strong connections are fine.
-A broadcaster that lives no longer than its responders releases them when Python collects it,
-and an explicit `disconnect()` covers a responder that leaves early.
+A broadcaster that lives no longer than its responders releases them when Python collects it.
+An explicit `disconnect()` covers a responder that leaves early.
 Use a weak responder only when a long-lived broadcaster holds short-lived responders that the program drops while they are still connected.
 
 ### Re-entrant Notification
@@ -1075,8 +1075,8 @@ and the setter that announced the change waits for all of them.
 An asynchronous broadcaster removes the wait between responders.
 Its responders are coroutines,
 and its `announce()` awaits them together with `asyncio.gather()`.
-One state change therefore notifies all responders at once,
-and each responder finishes when its own awaits complete.
+One state change therefore notifies all responders at once.
+Each responder finishes when its own awaits complete.
 `gather()` waits for all of them,
 so `announce()` returns only after every responder finishes.
 
@@ -1228,8 +1228,8 @@ so `always` is the one responder left to receive the second change.
 ### A Failing Responder Orphans the Rest
 
 A failing asynchronous responder behaves differently from a failing synchronous one.
-`gather()` re-raises the first exception to its caller right away,
-and the unfinished responders keep running with nobody awaiting them:
+`gather()` re-raises the first exception to its caller right away.
+The unfinished responders keep running with nobody awaiting them:
 
 ```python
 # gather_orphan.py
@@ -1280,8 +1280,8 @@ so a single broken responder cancels the others mid-notification.
 This example emphasizes the model-view split.
 The *model*, `grid_observer.py`,
 is a grid of colored boxes and the rule that decides what changes for a selection event.
-The model manipulates `Grid` values,
-and `grid_view.py` displays them separately,
+The model manipulates `Grid` values.
+`grid_view.py` displays them separately,
 using `tkinter` from the standard library.
 
 Clicking a box advances it to the next color, along with the boxes above, below,
@@ -1758,8 +1758,8 @@ or when interpreting input needs tests that draw nothing.
 means one job per class.
 `Thermometer` has three jobs: it measures, it decides which changes to announce,
 and it notifies the responders.
-Measuring is the thermometer's actual job,
-and *Observer* adds deciding and notification.
+Measuring is the thermometer's actual job.
+*Observer* adds deciding and notification.
 
 Three designs in this chapter separate the notification code from the measuring code:
 
@@ -1847,10 +1847,10 @@ print(log)
 `_delta` is the thermometer's field,
 but the half degree is a judgment about what `display` needs.
 For `log`, which exists to record every reading, the same half degree is wrong.
-The thermometer announces two of the four readings,
-and `log` misses the other two.
-`ThresholdThermometer` applies `_delta` to every responder alike,
-and nothing in its code shows that the threshold serves `display`.
+The thermometer announces two of the four readings.
+`log` misses the other two.
+`ThresholdThermometer` applies `_delta` to every responder alike.
+Nothing in its code shows that the threshold serves `display`.
 
 The alternative moves the comparison out of the thermometer and into `display`,
 the responder that the threshold serves.
