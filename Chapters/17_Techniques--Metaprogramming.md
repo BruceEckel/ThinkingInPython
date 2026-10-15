@@ -1651,7 +1651,8 @@ prints as `name = value`.
 The value is the member's `repr()`,
 truncated to keep the line within `max_width`.
 
-An attribute tagged `[CV]`, for *class variable*,
+An attribute tagged `[CV]`
+(for "class variable," another name for a class attribute)
 lives on the class or a base class rather than in `obj`'s own `__dict__`.
 When `obj` is a class, every attribute lives on a class,
 so all of them carry the tag.
