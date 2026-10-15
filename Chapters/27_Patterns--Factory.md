@@ -80,8 +80,8 @@ with no error to signal the gap.
 `export_svg()` has a wildcard case that raises an exception,
 so it reports the gap at runtime, the first time someone asks it for a triangle.
 
-No tool reports the missing case at edit time,
-and `kind: str` gives the type checker no list of the strings `export_svg()` should handle.
+No tool reports the missing case at edit time.
+`kind: str` gives the type checker no list of the strings `export_svg()` should handle.
 An `Enum` for `kind` and an `assert_never()` wildcard [move that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 An if-chain like `render()` has no wildcard, so it still gets no report.
 Either way, adding a type means editing every call site.
@@ -281,7 +281,7 @@ The `dict` values have the type `type[Shape]` because they are classes,
 and calling one constructs an instance.
 If the table held instances instead, as in `{"Circle": Circle()}`,
 `make()` would return the stored object,
-and every caller would share one `Circle`.
+so every caller would share one `Circle`.
 [*Prototype*](#prototype)
 keeps a table of instances on purpose and copies one for each caller.
 
@@ -335,7 +335,8 @@ The two `class` statements fill `Shape.registry` on their own.
 `Shape` is an abstract base class rather than a `Protocol` because it registers subclasses through `__init_subclass__()`.
 `__init_subclass__()` runs for each class that inherits from `Shape`,
 so a class that satisfies a Protocol by structure alone stays out of the registry.
-Inheritance is the mechanism, and `ABC` adds one guard on top of that.
+Inheritance is the mechanism.
+`ABC` adds one guard on top of that.
 
 A subclass registers as its `class` statement executes,
 so a subclass that lacks `draw()` still registers.
@@ -421,8 +422,8 @@ the second to register silently replaces the first.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
 
 The registry also keeps every entry it receives.
-A class defined inside a function or a test stays in the registry,
-and the strong reference keeps the class alive for the rest of the process.
+A class defined inside a function or a test stays in the registry.
+The registry's strong reference keeps the class alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose.
 `cls.registry` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
@@ -554,8 +555,8 @@ where a subclass that lacks `draw()` registers, fails at construction,
 and gets no report from the checker.
 
 The bound is also why the factory names `Shape` instead of taking a type parameter.
-A generic factory would need `register()`'s bound to name the factory's own type parameter,
-and the type checker rejects a bound that contains another type parameter.
+A generic factory would need `register()`'s bound to name the factory's own type parameter.
+The type checker rejects a bound that contains another type parameter.
 
 `register()` returns `type[S]`, the decorated class's own type,
 so the checker types the decorated name `Circle` as `type[Circle]`,
@@ -1020,8 +1021,8 @@ print(goblin.powers)  # The original changed too
 ```
 
 Because the `clone()` method wraps `copy.deepcopy()`,
-`captain` gets its own `powers` list,
-and appending to it leaves `goblin.powers` unchanged.
+`captain` gets its own `powers` list.
+Appending to that list leaves `goblin.powers` unchanged.
 
 `deepcopy()` restores the clone's state without running the constructor,
 so a clone [skips the `__post_init__()` check](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor).
@@ -1045,7 +1046,7 @@ with no error to signal the sharing.
 a socket, or a lock.
 A prototype holding one makes `deepcopy()` raise a `TypeError`.
 For a lock the message is `cannot pickle '_thread.lock' object`.
-The message names pickling because `deepcopy()` copies a type it has no rule for through the pickle protocol.
+The message names pickling because `deepcopy()` falls back on the pickle protocol for a type that has no copy rule of its own.
 Give such a class a `__deepcopy__()` that says what the copy holds instead:
 a fresh connection, or an empty slot the clone fills when it first needs one.
 
@@ -1197,8 +1198,8 @@ Every `.topping()` call after the first `build()` adds to that same list,
 so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
 The chained call in `__main__` hides the problem,
 because it discards the builder once `build()` returns.
-Making the builder reusable means resetting the fields in `build()`,
-and that reset removes the other reasonable use:
+Making the builder reusable means resetting the fields in `build()`.
+That reset removes the other reasonable use:
 configuring a builder once and building from it twice.
 
 Apart from that hazard, the builder class solves a problem Python does not have.
