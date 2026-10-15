@@ -307,8 +307,8 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 `Color` and `Dimensions` mean different things,
 yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
 Equal tuples hash alike,
-so the two are also the same `set` element or `dict` key:
-the `in` test finds a `Dimensions` in a `set` that holds a `Color`.
+so the two are also the same `set` element or `dict` key.
+The `in` test finds a `Dimensions` in a `set` that holds a `Color`.
 The frozen data classes compare unequal,
 because a data class's generated `__eq__()` tests `other.__class__ is self.__class__` before it compares the fields.
 
