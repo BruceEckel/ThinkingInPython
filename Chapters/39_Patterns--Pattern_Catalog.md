@@ -19,10 +19,11 @@ The body of this book argues that those workarounds often [dissolve in Python](2
 
 One overlapping pair is [*State*](26_Patterns--Surrogate.md#state)
 and [*State Machine*](31_Patterns--State_Machines.md).
-*State* changes an object's behavior when its internal state changes,
-and the client chooses each new state.
+*State* changes an object's behavior when its internal state changes.
+The client chooses each new state.
 *State Machine* builds on *State* and drives an object through a known set of states in response to inputs.
-The client supplies the inputs, and the machine chooses each next state.
+The client supplies the inputs.
+The machine chooses each next state.
 
 The tables follow each source's own grouping,
 so each name sits where its source puts it.
@@ -35,8 +36,8 @@ They sit instead in three groups by what they share: language idioms
 and the patterns that supply a collaborator from outside.
 Everything else sits in [Other Patterns and Idioms](#other-patterns-and-idioms),
 whose rows share no trait.
-The source and group tables list their rows alphabetically,
-and for the classic patterns that is also GoF's own order.
+The source and group tables list their rows alphabetically.
+GoF lists the classic patterns in the same order.
 
 When this book covers a pattern, its name links to that coverage.
 A name without a link leaves that pattern to the literature.
