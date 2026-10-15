@@ -17,13 +17,13 @@ It stores the hint and evaluates it only when something reads the annotations.
 
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool.
-Mypy is the original and most widely deployed one,
-and Pyright is the one most editors run.
+Mypy is the original and most widely deployed one.
+Pyright is the one most editors run.
 This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
 from the same group that makes `uv` and `ruff`.
 
-Pyright checks the same listings as a second opinion,
-and the book's build relies on `ty`'s verdict alone.
+Pyright checks the same listings as a second opinion.
+The book's build relies on `ty`'s verdict alone.
 Where Pyright or mypy disagrees with `ty` on a listing,
 the text says so and names the checker,
 because a verdict on a hard case is a fact about one checker, not about Python.
@@ -48,7 +48,7 @@ Each is compatible with everything.
 `Any` and `object` differ, though both accept every value.
 `object` is the base of every class,
 so an `object` value carries the methods every class shares.
-The type checker rejects every operation beyond `object`'s own.
+The type checker rejects every operation beyond those methods.
 `Any` permits every operation instead,
 so it switches the checker off for that value rather than describing a wide set of values.
 Choose `object` for a value you store or pass along untouched,
@@ -84,7 +84,7 @@ so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
 The `...` in `tuple[int, ...]` means zero or more `int`s.
 
 A function that returns nothing declares `-> None`,
-and that is why every `__init__()` in this chapter's listings carries that annotation.
+so every `__init__()` in this chapter's listings carries that annotation.
 
 ## The Type Checker: `ty`
 
@@ -193,7 +193,7 @@ Test `is not None` when an empty value counts as supplied (see exercise 8).
 
 Narrowing also makes an `object` parameter usable.
 [Gradual Typing](#gradual-typing)
-says the type checker rejects every operation on an `object` beyond `object`'s own,
+says the type checker rejects every operation on an `object` beyond the methods every class shares,
 so a function needs an `isinstance()` test before it can do more with the value:
 
 ```python
@@ -218,8 +218,8 @@ With `Any` in place of `object`, the commented-out line checks too,
 and `describe(42)` then fails at runtime with an `AttributeError`.
 
 Narrowing an attribute is riskier than narrowing a local variable.
-A call between the check and the use can reset that attribute,
-and the type checker assumes the call leaves the attribute as it was:
+A call between the check and the use can reset that attribute.
+The type checker assumes the call leaves the attribute as it was:
 
 ```python
 # narrowing_attribute.py
@@ -263,8 +263,8 @@ because a function defined elsewhere cannot rebind its caller's local variable
 
 The naming convention in [Tour](02_Foundations--Tour.md#naming-conventions)
 uses ALL_CAPS to signal a constant, but that is only a hint to human readers.
-At runtime, a `Final` name is an ordinary variable,
-and only the type checker rejects a reassignment:
+At runtime, a `Final` name is an ordinary variable.
+Only the type checker rejects a reassignment:
 
 ```python
 # final_constants.py
@@ -297,7 +297,7 @@ The two forms differ when the initializer says less than you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
 so the type checker accepts any value you put into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
-and the type checker enforces `list[str]`.
+so the type checker enforces `list[str]`.
 Every other listing in this book writes the type out on `Final`.
 
 ## Structural Typing with Protocols
@@ -362,8 +362,8 @@ The type checker rejects that class where an annotation names `Drawable`.
 If you pass an object without a `draw()` to `render()`,
 the type checker rejects the call.
 `Blob` is the case worth watching.
-It draws, in the everyday sense, but the method's name is `paint()`,
-and a protocol matches on names and signatures rather than on intent.
+It draws, in the everyday sense, but the method's name is `paint()`.
+A protocol matches on names and signatures rather than on intent.
 A protocol accepts any class with the right methods, as dynamic typing does,
 and reports a mismatch before the program runs, as static type checking does.
 
@@ -482,7 +482,7 @@ whatever that type is.
 
 `Any` loses that connection.
 `first_any()` accepts any list,
-and the return type then says nothing about what the list holds:
+but its return type says nothing about what the list holds:
 
 ```python
 # first_any.py
@@ -626,8 +626,8 @@ print(counts.top() + 1)
 #: 3
 ```
 
-`words: Stack` names the class without its brackets,
-and the default makes that annotation mean `Stack[str]`,
+`words: Stack` names the class without its brackets.
+The default makes that annotation mean `Stack[str]`,
 so `words.top()` is a `str` and `upper()` checks.
 `reveal_type()` shows that inferred type, and the type checker reports `str`.
 
@@ -771,7 +771,7 @@ At runtime `fil` becomes an extra key in `style`.
 
 A `TypedDict` helps most when several functions accept the same options.
 One `TypedDict` declares them once,
-and every signature that unpacks it accepts the same keywords.
+so every signature that unpacks it accepts the same keywords.
 
 ## Hints Are Not Enforced at Run Time
 
