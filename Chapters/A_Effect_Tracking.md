@@ -434,7 +434,7 @@ It stands to the static tool as `isinstance()` assertions stand to the type chec
 ## Tracking Is Not Management
 
 If the static tool existed, complete and correct, it would fill all three roles,
-and you would have Effect tracking.
+and you would have algebraic effect tracking.
 `ask()` would still call `input()`.
 No test could replace that call.
 The row names an Effect,
