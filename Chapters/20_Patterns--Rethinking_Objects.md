@@ -473,7 +473,7 @@ A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
 Both classes here keep `x` and `y` read-only.
 `PairCoord` computes `x` from its `Pair`,
-and the frozen `Point` rejects assignment to every field.
+and the `Point` record rejects assignment to every field.
 Both satisfy the property form, and both fail the annotation form.
 Declare a protocol member read-only unless callers really do write to it.
 
@@ -555,7 +555,7 @@ not the `list` internals hidden behind `CountingList`.
 
 Composition does more than repair a broken subclass.
 A type holds other types as fields,
-and frozen instances compare by value and work as keys:
+and records compare by value and work as keys:
 
 ```python
 # composition.py
