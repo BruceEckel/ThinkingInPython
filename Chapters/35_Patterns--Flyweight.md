@@ -384,7 +384,7 @@ whether `Color` or a subclass asks.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
 
 The factory `tile()` and the interning `Color` differ in one guarantee.
-`tile()` interns the calls that go through it.
+`tile()` shares one object among the calls that go through it.
 A direct `Tile("~", "water", False)` bypasses `tile()`,
 building a second object equal to the pooled water tile.
 Every `Color(...)` call looks in the pool first,
@@ -630,7 +630,7 @@ Three questions decide whether a type is a candidate for *Flyweight*.
 First, do uses far outnumber distinct values?
 A map with millions of cells and three kinds of tile qualifies.
 A list of customer records, each one different, does not.
-Second, can everything that varies per use move out of the object?
+Second, can all the extrinsic state move out of the object?
 If a position, an owner, or a count must live inside,
 every use needs its own object, as `unshared_cells.py` shows.
 Third, can you freeze what remains?
