@@ -459,7 +459,7 @@ through a chain of references.
 
 > In `cycle.py`, change `self_link()` to build a two-object cycle
 > (`a.peer = b` and `b.peer = a`) instead of a self-reference.
-> Confirm both finalizers run at `gc.collect()`,
+> Confirm both `__del__()` methods run at `gc.collect()`,
 > then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
 > although this small program still prints them in the same place every run.
 

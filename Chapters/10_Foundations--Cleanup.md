@@ -70,7 +70,8 @@ The order in which the three `__del__()` methods run is an implementation detail
 It depends on how the interpreter tears down the `counters` list at shutdown,
 and it can differ from one CPython build to the next.
 Another implementation, such as PyPy with a tracing garbage collector,
-could destroy the objects in a different order, or skip the finalizers at exit.
+could destroy the objects in a different order,
+or skip the `__del__()` methods at exit.
 
 So `__del__()` is fragile.
 The language specifies neither when it runs nor whether it runs.
@@ -613,7 +614,7 @@ Try each exercise before opening its [solution](../Solutions/10_Foundations--Cle
     and say what keeps the `Connection` alive.
 6.  In `cycle.py`, change `self_link()` to build a two-object cycle
     (`a.peer = b` and `b.peer = a`) instead of a self-reference.
-    Confirm both finalizers run at `gc.collect()`,
+    Confirm both `__del__()` methods run at `gc.collect()`,
     then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
     although this small program still prints them in the same place every run.
 7.  In `faulty_init.py`,
