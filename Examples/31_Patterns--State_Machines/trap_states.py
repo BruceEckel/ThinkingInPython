@@ -35,12 +35,15 @@ def holding(input_: object) -> TrapState:
         case _:
             return TrapState.HOLDING
 
+def chime() -> None:
+    print("*ding*")
+
 # trap_states.py (continued)
 class TrapState(State, Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)
-    HOLDING = ("Mouse caught", holding)
+    HOLDING = ("Mouse caught", holding, chime)
 
     def __str__(self) -> str:
         return self.name.capitalize()

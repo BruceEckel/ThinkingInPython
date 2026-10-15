@@ -175,6 +175,7 @@ from record import record
 class State:
     message: str
     next: Callable[[object], State]
+    action: Callable[[], None] = lambda: None
 
     def run(self) -> None:
         ...
@@ -232,9 +233,11 @@ from record import record
 class State:
     message: str
     next: Callable[[object], State]
+    action: Callable[[], None] = lambda: None
 
     def run(self) -> None:
         print(self.message)
+        self.action()
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -309,7 +312,7 @@ The moods alone hold the transition rules, which distinguishes this design from 
 Exercise 1's `UnpredictablePerson` accepts any object with a `hello()`, so the set of moods there is open and nothing lists it.
 
 **What a mood loses.** A member is one frozen record shared by every machine in the program, so a mood that keeps data of its own, such as a count of the `ANNOY` inputs it has received, has nowhere to put it.
-Exercise 1's classes can carry that state per instance, and a mood whose behavior needs more than a message and a successor is a class in either design.
+Exercise 1's classes can carry that state per instance, and a mood whose behavior needs more than a message, a successor, and an action is a class in either design.
 
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood` object through `change_to()`, this machine reaches the same moods by returning the next member from a transition function.
 Both model a thing that changes behavior over time.

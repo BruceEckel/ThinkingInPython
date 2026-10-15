@@ -22,6 +22,7 @@ run_all(StateMachine(TrapState.WAITING), MOVES)
 #: Closing door
 #: Trapping mouse trapped -> Holding
 #: Mouse caught
+#: *ding*
 #: Holding mouse removed -> Waiting
 #: Broadcasting cheese smell
 

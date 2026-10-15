@@ -23,8 +23,9 @@ In the second, a single table holds all transitions.
 
 ## Each State Decides
 
-A `State` is a record holding the message its `run()` prints and the function that,
-given an input, produces the next `State`:
+A `State` is a record holding the message its `run()` prints, the function that,
+given an input, produces the next `State`,
+and an action that `run()` calls after printing:
 
 ```python
 # state.py
@@ -35,9 +36,11 @@ from record import record
 class State:
     message: str
     next: Callable[[object], State]
+    action: Callable[[], None] = lambda: None
 
     def run(self) -> None:
         print(self.message)
+        self.action()
 ```
 
 `next` is a stored function rather than a method,
@@ -47,10 +50,17 @@ annotations are evaluated lazily, so the name resolves.
 The input is typed `object`,
 so a function can accept any input and `match` on it.
 
+`action` is a stored function too, and its default does nothing.
+A state whose whole behavior is its message supplies two fields,
+and a state that does more supplies a third.
+`run()` is the same method for every state,
+but what it does differs with the row: every state prints its message,
+and a state with an action runs that as well.
+
 In this design each state decides the next state.
 The action belongs to the state and takes no input.
-`run()` prints the state's message, and the input goes to `next`,
-which chooses the successor.
+`run()` prints the state's message and calls its action,
+and the input goes to `next`, which chooses the successor.
 This is a *Moore machine*, where what a state does depends on the state alone.
 
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
@@ -91,9 +101,9 @@ MOVES: Final[list[Mouse]] = [
 
 ### Mousetrap States
 
-Each state of the trap is a `State` record:
-the message its `run()` prints and the function that names its successor.
-Here are the transition functions:
+Each state of the trap is a `State` record: the message its `run()` prints,
+the function that names its successor, and, for one state, an action.
+Here are the transition functions and that action:
 
 ```python
 # trap_states.py
@@ -132,6 +142,9 @@ def holding(input_: object) -> TrapState:
             return TrapState.WAITING
         case _:
             return TrapState.HOLDING
+
+def chime() -> None:
+    print("*ding*")
 ```
 
 Each transition function contains a `case` for every input its state recognizes,
@@ -140,6 +153,7 @@ The default `case _` returns the current state, so the state stays the same.
 Each function names `TrapState`, which the file defines below them.
 A function body runs when it is called, not at the `def`,
 so by the first call the whole module has loaded and `TrapState` exists.
+`chime()` is the trap's one action: it sounds when a mouse is caught.
 
 `TrapState` is an `Enum` whose members are the records, in the same file:
 
@@ -149,7 +163,7 @@ class TrapState(State, Enum):
     WAITING = ("Broadcasting cheese smell", waiting)
     LURING = ("Presenting Cheese, door open", luring)
     TRAPPING = ("Closing door", trapping)
-    HOLDING = ("Mouse caught", holding)
+    HOLDING = ("Mouse caught", holding, chime)
 
     def __str__(self) -> str:
         return self.name.capitalize()
@@ -160,6 +174,8 @@ Each member's value is a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
 so `TrapState.WAITING` is both a `TrapState` member and a `State`,
 with `message` and `next` as attributes.
+`HOLDING`'s tuple has a third element, so its `action` is `chime()`;
+the other three members keep the default.
 
 The `StateMachine` holds the current state and advances it on each input:
 
@@ -188,18 +204,20 @@ The `step()` parameter is `input_`, with a trailing underscore,
 because a bare `input` shadows the builtin `input()`.
 `step()` prints the transition (the old state, the input, and the new state),
 then calls `run()` on the new state, the one the machine has just entered.
-A state's action runs on entry:
-each transition arrives in a state and runs that state's `run()`,
-and the constructor runs the initial state's `run()` for the same reason.
+`run()` fires on entry:
+each transition arrives in a state and calls that state's `run()`,
+and the constructor calls the initial state's `run()` for the same reason.
 A state prints as its name, through the `__str__()` that `TrapState` defines.
 `run_all()` is a convenience outside the class:
 it feeds any iterable of inputs to `step()`, one at a time.
 This is the *State* pattern combined with automated transitions,
 producing *State Machine*.
 
-The behavior of `run()` depends on the current state.
+What `run()` does depends on the current state: every state prints its message,
+and `Holding` also sounds its chime.
 `step()` defines the flow,
-while each `State`'s `run()` and `next()` supply the varying behavior.
+while each `State`'s fields supply the varying behavior:
+`next` chooses the successor, and `action` does what that state alone does.
 
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
 then feeds a fresh trap the one input for which `waiting()` has no `case`:
@@ -229,6 +247,7 @@ run_all(StateMachine(TrapState.WAITING), MOVES)
 #: Closing door
 #: Trapping mouse trapped -> Holding
 #: Mouse caught
+#: *ding*
 #: Holding mouse removed -> Waiting
 #: Broadcasting cheese smell
 
@@ -276,8 +295,9 @@ so a state added to `TrapState` joins the test with no edit to the test.
 Two consequences follow from the mixin.
 `Enum` folds members with equal values into one,
 and a record's equality compares its fields,
-so two members with the same message and the same function collapse into a single member with two names.
-Every state therefore needs a function of its own.
+so two members with the same message, the same function,
+and the same action collapse into a single member with two names.
+Every state therefore needs a transition function of its own.
 The type checker reads `next` from the record's field and checks the engine's call `state.next(input_)` against it.
 It leaves a member's tuple uncompared with the fields:
 a tuple holding the message alone, or the two in the wrong order,
@@ -306,7 +326,7 @@ and the rules are a list the engine groups into an ordinary `dict`.
 The action on a rule takes the input,
 so what the machine does depends on the state and the input together.
 That is a *Mealy machine*, the other classical shape.
-The first design's `run()` acts per state and sees no input,
+The first design's `action` acts per state and sees no input,
 while a rule's `action` acts per transition and reads the input that fired it.
 
 The mousetrap's inputs are `Mouse` members, bare names.
@@ -749,9 +769,10 @@ so reading `trap_states.py`'s `LURING` and `luring()` tells you what luring does
 Adding a state is one row and one function.
 The design reads best when the transitions are obvious from the state's own name.
 
-An action that must run on every entry into one state belongs in that state's `run()`,
+An action that must run on every entry into one state belongs in that state's row,
 written once.
-Sounding a chime whenever the trap reaches `Holding` is such an action.
+`HOLDING`'s `chime()` sounds whenever the trap reaches that state,
+and no other row mentions it.
 That is the Moore shape: the action belongs to the state.
 
 One-table suits a machine you build from a diagram, whose inputs carry data,

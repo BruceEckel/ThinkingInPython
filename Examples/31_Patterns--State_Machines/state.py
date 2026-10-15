@@ -6,6 +6,8 @@ from record import record
 class State:
     message: str
     next: Callable[[object], State]
+    action: Callable[[], None] = lambda: None
 
     def run(self) -> None:
         print(self.message)
+        self.action()

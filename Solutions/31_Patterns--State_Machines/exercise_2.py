@@ -8,9 +8,11 @@ from record import record
 class State:
     message: str
     next: Callable[[object], State]
+    action: Callable[[], None] = lambda: None
 
     def run(self) -> None:
         print(self.message)
+        self.action()
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
