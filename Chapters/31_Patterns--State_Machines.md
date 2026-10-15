@@ -20,8 +20,8 @@ In the second, a single table holds all transitions.
 
 ## Each State Decides
 
-A `State` is a record holding a message to print,
-the function that chooses the next `State`, and an action:
+A `State` is a record holding an action performed by that state,
+and the function that chooses the next `State`:
 
 ```python
 # state.py
@@ -39,16 +39,17 @@ class State:
         self.action()
 ```
 
-`next` is a stored function rather than a method,
-so the call `state.next(input_)` passes the input alone, with no `self`.
-The field's annotation names `State` inside its own class body;
-the name resolves because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
+`next` is a function stored in a field, not a method.
+A stored function receives no `self`,
+so the call `state.next(input_)` passes the input alone.
+The field's annotation names `State` inside the `State` class body,
+which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
 
-`action` is a stored function too.
-A state whose whole behavior is its message leaves it at the default,
-which does nothing; a state that does more passes a third constructor argument.
-`run()` is the same method for every state and calls `action` in each one,
-default or supplied.
+`action` is a stored function too, and its default does nothing.
+A state whose whole behavior is printing its message keeps the default;
+a state that does more passes its own `action` as the third constructor argument.
+`run()` is the same for every state:
+it prints the message and then calls `action`, default or supplied.
 
 Each state decides the next state.
 This is a *Moore machine*, where what a state does depends on the state alone.
