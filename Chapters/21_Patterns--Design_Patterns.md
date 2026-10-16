@@ -93,8 +93,8 @@ You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Foundations--Classes.md)
 as a design pattern (albeit one built into the language).
 Inheritance lets you express differences in behavior in objects that all have the same interface.
-The behavior is the thing that changes,
-and the interface is what stays the same.
+The behavior changes from one subclass to the next,
+while the interface stays the same.
 [Composition](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
 also qualifies as a pattern,
 since it lets you change the objects to which your class delegates,
