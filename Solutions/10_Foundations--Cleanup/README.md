@@ -338,7 +338,7 @@ value, so `_instances` alone keeps every `Counter` alive, whatever
 registry keeps its own. The `Counter`'s reference count stays above
 zero, so the `Counter` survives.
 
-The registry now causes the leak it exists to detect. `live_count()`
+The registry now leaks every `Counter` it tracks. `live_count()`
 reports how many `Counter` objects the program has created,
 because the registry keeps them all alive. A
 `WeakValueDictionary` holds its values weakly, so it counts the
