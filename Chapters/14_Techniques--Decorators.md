@@ -832,8 +832,8 @@ expect(TypeError, ex.method, 5)
 ```
 
 `Ex.method` is a `logged` instance, stored as a class attribute.
-Python binds a class attribute to an instance only when that attribute is a *descriptor*,
-an object with a `__get__()` method.
+Python binds a class attribute to an instance only when that attribute is a descriptor,
+an object whose class defines `__get__()`.
 Every ordinary function is a descriptor.
 A `logged` instance has no `__get__()`,
 so `ex.method` returns the `logged` instance unbound.
@@ -845,8 +845,8 @@ so `5` fills `method`'s own `self` parameter and leaves nothing for `x`.
 The `TypeError` reports a missing `x`,
 and its message says nothing about the real cause, a missing `__get__()`.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
-shows the descriptor protocol,
-the `__get__()` that `logged` would need to work on methods.
+shows the full descriptor protocol,
+including the `__get__()` that `logged` would need to work on methods.
 
 Because a function is a descriptor,
 `wrapper()` in the function form binds to an instance like any other method:
