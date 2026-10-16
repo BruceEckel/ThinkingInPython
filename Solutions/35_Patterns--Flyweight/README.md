@@ -377,7 +377,8 @@ print(field[0][1].walkable, field[1][0].walkable,
 
 **Expose the shared state.** Setting `walkable = False` on the tile at `(0, 0)` changes `walkable`
 for every other grass cell in the map too, because all four cells
-share one `MutableTile` object. Here, the test asserts that the assignment reaches a different cell:
+share one `MutableTile` object.
+The test asserts that the assignment reaches a different cell:
 
 ```python
 # test_ch35_mutation_leak.py
