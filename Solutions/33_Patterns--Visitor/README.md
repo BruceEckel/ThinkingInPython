@@ -414,7 +414,7 @@ suppresses the checker's report on the `Beetle` call so the listing can
 show the runtime failure. If you remove the comment, `ty` reports an
 `invalid-argument-type`.
 
-As the chapter says, `Any` gives up every check on the visitor side,
+`Any` gives up every check on the visitor side,
 so a bad visitor that the type checker could report before the program runs
 shows up as a runtime `AttributeError` instead.
 The chapter's version needs the `Any` because its `Visitor` base is empty.
