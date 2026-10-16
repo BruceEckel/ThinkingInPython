@@ -319,7 +319,7 @@ The test file confirms that:
 
 - The new `f()` puts its own output in front of the adaptee's `g()` and `h()` results.
 - A forwarded method returns what the adaptee's method returns.
-- A forwarded method is bound to the adaptee.
+- A forwarded method carries the adaptee as its `__self__`.
 - A copy and a pickled adapter both still work.
 
 ```python
