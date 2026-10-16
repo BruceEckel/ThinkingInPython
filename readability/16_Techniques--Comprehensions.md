@@ -33,26 +33,26 @@ as the applied-directly record.
 - Line 3-4, the epigraph's loop/comprehension contrast: §32/§47 by
   shape, but an epigraph is deliberate voice and the chapter's opening
   paragraph then develops it.
-- Line 162 "That leak is deliberate." and line 200 "The colon decides
+- Line 163 "That leak is deliberate." and line 200 "The colon decides
   which.": short beats among longer sentences, each doing work (recurring
   keep: a short emphatic fragment is a beat).
-- Line 555 "This comprehension is a loop written with the wrong
+- Line 556 "This comprehension is a loop written with the wrong
   punctuation.": aphorism-shaped (§32), but concrete and true of the
   listing above it, and it states the section's verdict in the chapter's
   own build-versus-execute terms.
-- Line 96 "checks nothing there", line 439 "prints nothing and raises no
-  exception", line 643 "saves nothing": each negative is the claim (a
+- Line 96 "checks nothing there", line 440 "prints nothing and raises no
+  exception", line 644 "saves nothing": each negative is the claim (a
   silent failure or an absent benefit), not a hidden positive.
-- Line 349, 369, 674 "silently": not empty adverbs; each marks the
+- Line 350, 370, 675 "silently": not empty adverbs; each marks the
   absence of an error the reader would otherwise expect.
-- Line 576 "consume the result only once", line 427 "runs only for the
-  files that pass", line 787 "computes only the values the consumer
+- Line 577 "consume the result only once", line 428 "runs only for the
+  files that pass", line 788 "computes only the values the consumer
   pulls": each `only` marks a real restriction in a shape the 2026-10-04
   ruling keeps.
-- Line 14, 445, 569, 781 "want": addressed to the reader (recurring keep).
+- Line 14, 446, 570, 782 "want": addressed to the reader (recurring keep).
 - Line 8-10, "and" between "originated" and "adopted", and between
   "Haskell had" and "Python borrowed": a historical sequence, additive in
   sense, left as the chapter's opening voice.
-- Line 776-787, the closing "Choosing a Form" section restates the four
+- Line 775-788, the closing "Choosing a Form" section restates the four
   delimiters: its second paragraph adds the eager-versus-deferred timing
   synthesis, so it is not a §25 generic conclusion.
