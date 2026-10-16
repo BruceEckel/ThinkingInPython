@@ -188,8 +188,9 @@ def checkout(
 <details>
 <summary>Solution</summary>
 
-The pattern is *Strategy*, in the shape it takes in Java. Its usual
-form requires:
+The pattern is
+[*Strategy*](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime),
+in the shape it takes in Java. Its usual form requires:
 
 - an interface, `ShippingStrategy`, declaring one method, `cost()`
 - a concrete class per algorithm, `FlatRate` and `ByWeight`, each
