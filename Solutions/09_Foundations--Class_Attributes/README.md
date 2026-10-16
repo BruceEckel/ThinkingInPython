@@ -593,7 +593,7 @@ that order, so the class depends on its callers to keep it.
 > In `classvar_fork.py`,
 > print `vars(Sub).get("total")` before the first `Sub()` call and after each one,
 > and use the three values to say which class's dictionary supplies each `Sub.total` the listing prints.
-> Then change the increment to `Base.total += 1` and predict all four lines before running.
+> Then change the increment to `Base.total += 1` and predict every line before running.
 
 <details>
 <summary>Where to look</summary>
