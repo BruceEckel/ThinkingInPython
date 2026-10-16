@@ -493,7 +493,7 @@ It drops `@cache` and hand-writes the check inside one lock.
 **Build the object before the threads start.** Without a lock, the fix is to remove the race rather than to order
 it. A race needs two threads arriving before the object exists, so
 build the object first. The module body calls `primed()` once,
-before any worker thread starts.
+before the second pool starts any worker thread.
 By the time the second `ThreadPoolExecutor` starts its workers,
 every call to `primed()` is a cache hit. The count is `1`.
 
@@ -610,6 +610,7 @@ Read separately, `Singleton` and `Other` look like independent siblings.
 
 **Give a subclass its own storage.** The fix is one line per subclass. `Separate` declares its own
 `_shared_state`, so the lookup finds `Separate`'s dict before `Borg`'s dict.
+`Separate` is `Other` with that one line added.
 `Separate`'s instances share that dict among themselves. Martelli
 makes the same point in the article the chapter links: a subclass that
 needs state of its own declares it.
