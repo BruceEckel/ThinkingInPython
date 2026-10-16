@@ -321,8 +321,8 @@ expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
 and `partial()` fills positional arguments from the left, so
 `value` and `high` stay open in order.
 
-**Show where the keyword fails.** Presetting `high` alone is the case
-that needs a `Placeholder`. `partial()` stores its arguments, and the
+**Show where the keyword fails.** Presetting `high` alone needs a
+`Placeholder`. `partial()` stores its arguments, and the
 signature check waits for the call, so building `partial(clamp, high=100)`
 succeeds. The partial fails at the call.
 `high` is positional-only, so the call must pass it by position.
