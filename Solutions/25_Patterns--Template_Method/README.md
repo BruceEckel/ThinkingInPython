@@ -126,13 +126,13 @@ def run_file_framework(
     Path(output).write_text("".join(pieces))
 ```
 
-**Let a subclass be a record.** The empty `__slots__` lets a subclass that carries data be a record,
-as
+**Let a subclass be a record.** The empty `__slots__` lets a subclass
+that carries data be a record, as
 [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 explains.
 
 The uppercase policy needs no data. The subclass overrides
-`process()`, and the function form passes `str.upper`, which has the
+`process()`. The function form passes `str.upper`, which has the
 signature the framework calls:
 
 ```python
@@ -169,8 +169,8 @@ demo()
 #: 'HELLO\nWORLD\n'
 ```
 
-Both produce `'HELLO\nWORLD\n'`, because both supply the same step
-through two different mechanisms.
+The two mechanisms supply the same step, so both produce
+`'HELLO\nWORLD\n'`.
 
 The search policy needs the word list while it processes each file.
 The framework treats every input alike, so the client reads the word
@@ -227,10 +227,10 @@ The report has one line for each input file, naming the search words
 that file contains.
 
 **Give the step its data.** The two forms differ in where they store
-the word list. `Search` stores it in a field, and the lambda closes over the
-local variable `words`. In both, `run()` and `run_file_framework()`
-stay the same. A new policy is a new step, and the algorithm that
-calls the step belongs to the framework.
+the word list. `Search` stores it in a field. The lambda closes over
+the local variable `words`. In both, `run()` and `run_file_framework()`
+stay the same. A new policy is a new step. The algorithm that calls
+the step belongs to the framework.
 
 </details>
 </details>
@@ -373,18 +373,18 @@ Each later subclass is safe only if its author remembers to do the same.
 The reorder asks every future
 subclass author to invert the convention they have used everywhere
 else, which is to call `super().__init__()` first.
-The signature of `Framework.__init__()` is silent on the order, and every type checker accepts the usual one.
-Python reports the failure as an `AttributeError` from the subclass's
-own `step()`, which a base class someone else wrote called.
-The reorder turns safety into a rule the next author must remember,
-and that author may not have read this chapter.
-A rule to remember is not a repair.
+The signature of `Framework.__init__()` is silent on the order.
+Every type checker accepts the usual one.
+Python reports the failure as an `AttributeError` raised in the
+subclass's own `step()`, called from a base class someone else wrote.
+The reorder turns safety into a rule the next author must remember.
+That author may not have read this chapter.
 
 Separating construction from starting makes the mistake impossible,
 because the engine starts in `run()`,
 and the client calls `run()` on a finished object.
-Each call site gains a line, `greeter.run()`,
-and that line moves the decision about when the algorithm starts
+Each call site gains a line, `greeter.run()`.
+That line moves the decision about when the algorithm starts
 from the base class to the client.
 The same reasoning favors eager creation in
 [*Singleton*](../../Chapters/24_Patterns--Singleton.md#double-checked-locking-and-eager-creation).
@@ -478,8 +478,8 @@ Reversed().run()
 #: one
 ```
 
-Python objects to nothing. The program runs, and the steps come out
-in the reversed order the subclass chose. The anchored algorithm is
+Python objects to nothing. The program runs and prints the steps in
+the reversed order the subclass chose. The anchored algorithm is
 no longer anchored.
 
 `ty` objects. The override carries a `# type: ignore` to keep this
@@ -491,8 +491,8 @@ info: `ApplicationFramework.run` is decorated with `@final`, forbidding override
 ```
 
 The guarantee comes from the type checker, not the language. `@final`
-sets `__final__ = True` on the function, and nothing in the
-interpreter consults that attribute. The *Template Method*'s central
+sets `__final__ = True` on the function. Nothing in the interpreter
+consults that attribute. The *Template Method*'s central
 guarantee is therefore in the same category as every other annotation
 in this book. A tool enforces it before the program executes, and
 only when you run that tool.
@@ -596,38 +596,38 @@ print(app.pending)
 #: ['work', 'work']
 ```
 
-The type checker accepts both classes. Both override with
-the right name, the right parameters, and the right return type, so both satisfy
+The type checker accepts both classes. Both override with the right
+name, the right parameters, and the right return type, so both satisfy
 `@override` and every signature rule the base class states.
 
 **Raise an unexpected exception.** `Exploder` breaks the algorithm on the first step of the first pass.
 Code written against `ApplicationFramework` expects `run()` to return
 normally for every subclass.
 `Exploder`'s `customize1()` raises an exception instead,
-and the exception propagates out of `run()`
+which propagates out of `run()`
 into a caller written for the base version.
 
 **Skip a step the flow needs.** `HalfDone` breaks the algorithm more quietly, which makes it the
 worse of the two. `customize1()` accumulates work for `customize2()`
 to consume, so the pair is a two-step flow. Leaving `customize2()` at
-its default breaks the second half, and the program completes normally.
+its default breaks the second half. The program still completes
+normally.
 `pending` grows on every pass.
 The flaw stays hidden until the program runs out of
 memory or whatever reads `pending` reports stale data.
 
-`Exploder` and `HalfDone` need different things from a type checker,
-and only one of those things exists.
+`Exploder` and `HalfDone` need different things from a type checker.
+Only one of those things exists.
 
-`HalfDone`'s omission is repairable. The `...` body makes the step
-optional.
-Through it, the base class declares that a subclass may skip this step.
+`HalfDone`'s omission is repairable. Through the `...` body, the base
+class declares that a subclass may skip this step.
 With that body, no checker can catch the omission,
-because "deliberately empty" and "forgotten" are the same code,
-and only the base class can record that difference.
+because "deliberately empty" and "forgotten" are the same code.
+Only the base class can record that difference.
 The base class can declare instead that a subclass must supply the step,
 by inheriting from `ABC` and marking `customize2()` with `@abstractmethod`.
-Then constructing `HalfDone` raises a `TypeError`,
-and the type checker reports the construction before the program runs.
+Then constructing `HalfDone` raises a `TypeError`.
+The type checker reports the construction before the program runs.
 
 `Exploder`'s exception is not repairable this way. For a type
 checker to catch `Exploder`, the base class must state which
@@ -732,8 +732,8 @@ class Audited(MyApp):
 
 The chapter's `__init_subclass__()` builds its set of names from every
 base class, so the set grows as the hierarchy does. `MyApp` adds
-`report()`, and a subclass of `MyApp` inherits that name along with
-the framework's own:
+`report()`. A subclass of `MyApp` inherits that name along with the
+framework's own names:
 
 ```python
 # exercise_5.py
@@ -793,9 +793,9 @@ with expected(TypeError):
 **Compare against every base.** The `class Audited` statement raises a `TypeError`. The check
 compares a new method against every non-dunder name in every base,
 and `report` is one of those names.
-Yet `report()` is a helper that `MyApp` added, not a step of the framework.
-The framework enforces a
-rule about a name that `MyApp` defined.
+Yet `report()` is a helper that `MyApp` added, not a step of the
+framework, so the framework enforces a rule about a name that belongs
+to `MyApp`.
 
 The narrower check reads its names from `ApplicationFramework` alone:
 
@@ -870,8 +870,8 @@ framework's three names.
 
 A misspelling of a name that a subclass introduced now passes the narrower check.
 If `Audited` meant to override `report()`, its
-`reports()` is a new method that nothing calls, and the framework
-accepts it. `Audited`'s author must catch that misspelling,
+`reports()` is a new method that nothing calls. The framework accepts
+it. `Audited`'s author must catch that misspelling,
 using the protection the chapter recommends for steps:
 `@override` on the method, and a type checker in the build.
 
