@@ -103,7 +103,7 @@ def slope(rise: int, run: int) -> float:
 except when `run` is zero,
 where it raises an exception instead of returning a result.
 Does the exception break purity?
-There are two answers:
+The question has two answers:
 
 1.  **Pure.**
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
@@ -935,7 +935,6 @@ Stateless therefore supplies tracking, interface separation,
 and delayed binding, the three properties of a full EMS,
 inside Python's existing type system.
 
-The guarantee has a limit.
 Stateless verifies that the Effects you declare propagate consistently.
 A function can still call `print()`, next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
