@@ -179,7 +179,7 @@ The classic pattern overloads `visit()` once per flower type and keeps each oper
 so `accept()` is the one method the pattern adds to the primary hierarchy.
 Python has no method overloading,
 since a second `def visit()` replaces the first.
-[`@overload`](14_Techniques--Decorators.md#decorators-with-optional-parentheses)
+[`@overload`](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
 declares extra signatures for the type checker and leaves the runtime with one implementation,
 which must branch on the argument's type.
 `flower_visitors.py` therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead.
