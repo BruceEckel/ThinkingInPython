@@ -69,7 +69,7 @@ def test_hello_is_not_a_palindrome() -> None:
 
 At this point `palindrome.py` does not exist,
 so running this file fails before a single assertion runs.
-The import on the file's first line raises a `ModuleNotFoundError`,
+The import at the top of the file raises a `ModuleNotFoundError`,
 which `pytest` reports as a collection error.
 That error, rather than a failing assertion,
 confirms the test detects a missing implementation.
