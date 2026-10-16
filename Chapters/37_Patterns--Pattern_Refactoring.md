@@ -436,7 +436,7 @@ so `sort_by_type()` and `sort_by_match()` run on `plastic.dat` as written.
 The sorting line, `bins[type(piece)].append(piece)`, bins the new material,
 while the `match` in `sort_by_match()` would need a new `case`.
 
-Here is the path each line of `plastic.dat` takes through `recycle_dict_plastic.py`:
+Each line of `plastic.dat` takes this path through `recycle_dict_plastic.py`:
 
 ![A new material registers itself and gets its own bin, with no edit to the parser or the sorter](_images/trash_sorter)
 
@@ -577,7 +577,6 @@ Each implementation above takes the [placeholder name `_`](33_Patterns--Visitor.
 Three materials register a note.
 `Paper`, the fourth, falls through to the base function.
 
-The fallback is also the risk.
 A forgotten material gets the default answer,
 with no exception at runtime and no report from the type checker.
 Here "no special handling" is a genuine answer for `Paper`,
