@@ -260,7 +260,7 @@ print(type(run(fixed())).__name__)
 ```
 
 **Leak the failure past `catch()`.** The types claim that `catch()` handles the `KeyError`.
-`catch(KeyError)(size)` says it moves a `KeyError` from the failure channel to the
+`catch(KeyError)(size)` says it moves a `KeyError` from the error channel to the
 return channel, and `caller()`'s `int | KeyError` says the caller is ready for either.
 The run does something else.
 `RAW["Bob"]` raises a `KeyError` while `size()` is still building its description,
