@@ -326,9 +326,7 @@ print(p.level, settings.level)
 #: high low
 ```
 
-`__getattr__()` handles reads.
-Python calls it as the fallback for a read,
-and sends an assignment to `__setattr__()`,
+Python calls `__getattr__()` as the fallback for a read and sends an assignment to `__setattr__()`,
 which `Proxy` inherits from `object`.
 `object.__setattr__()` stores `level` in the proxy's `__dict__`.
 The implementation keeps its own `level`.
@@ -487,7 +485,6 @@ Inheritance satisfies both checks.
 so `isinstance(p, Service)` returns `True`,
 and the type checker confirms that `Proxy`'s `f()` and `g()` match `Service`.
 Forwarding through `__getattr__()` gives up both.
-A surrogate is not its implementation.
 Code that checks a surrogate with `isinstance()` should check for the method instead.
 
 ## What Proxy Solves
@@ -515,7 +512,7 @@ but it solves none of these four.
 It forwards to a weakly referenced object and raises `ReferenceError` once the last strong reference to that object goes away.
 
 The `weakref` module supplies the `weakref.finalize()` and `weakref.ref()` that [Cleanup](10_Foundations--Cleanup.md#reliable-alternatives)
-uses, and the `WeakValueDictionary` in its [Watching Objects Without Holding Them](10_Foundations--Cleanup.md#watching-objects-without-holding-them)
+uses, and the `WeakValueDictionary` in that chapter's [Watching Objects Without Holding Them](10_Foundations--Cleanup.md#watching-objects-without-holding-them)
 section.
 Neither section needs `weakref.proxy()`.
 
@@ -605,9 +602,7 @@ not against a caller who reads `_doc`.
 `guest.__getattr__()` raises `PermissionError` instead,
 so `hasattr(guest, "erase")` raises `PermissionError` too,
 where a missing name on an ordinary object returns `False`.
-When a surrogate's `__getattr__()` raises something other than `AttributeError`,
-`hasattr()` raises that exception instead of returning `False`.
-The surrogate fails `isinstance()` for a [different reason](#a-surrogate-is-not-its-implementation).
+A surrogate fails `isinstance()` for a [different reason](#a-surrogate-is-not-its-implementation).
 
 ### Smart Reference
 
