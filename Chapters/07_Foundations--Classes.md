@@ -687,10 +687,10 @@ Try each exercise before opening its [solution](../Solutions/07_Foundations--Cla
     Print a single `Temperature` and a list of two of them,
     and confirm the list shows the same form for each element.
     Then add a `__str__()` returning `21.0C` and confirm which of the two `print()` uses for each case.
-6.  In `override_intro.py`, misspell `Derived`'s method as `shwo()`,
-    keeping the `@override` decorator.
-    Run the program and confirm it now prints `Base.show`,
+6.  In `override_intro.py`, rename `Base.show()` to `display()`,
+    leaving `Derived.show()` and its `@override` as they are.
+    Run the program and confirm it still prints `Derived.show`,
     then run the type checker
     ([Static Types](08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
-    and read what it says.
-    Remove `@override` and confirm the type checker reports no error while the program's behavior stays the same.
+    and read what it reports.
+    Remove `@override` and confirm the program runs the same way while the type checker reports nothing.

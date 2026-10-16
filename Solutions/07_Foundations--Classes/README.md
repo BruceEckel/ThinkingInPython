@@ -447,22 +447,22 @@ in output a user reads.
 </details>
 </details>
 
-## 6. A misspelled override, with and without the decorator
+## 6. A renamed base method, with and without the decorator
 
-> In `override_intro.py`, misspell `Derived`'s method as `shwo()`,
-> keeping the `@override` decorator.
-> Run the program and confirm it now prints `Base.show`,
+> In `override_intro.py`, rename `Base.show()` to `display()`,
+> leaving `Derived.show()` and its `@override` as they are.
+> Run the program and confirm it still prints `Derived.show`,
 > then run the type checker
 > ([Static Types](../../Chapters/08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
-> and read what it says.
-> Remove `@override` and confirm the type checker reports no error while the program's behavior stays the same.
+> and read what it reports.
+> Remove `@override` and confirm the program runs the same way while the type checker reports nothing.
 
 <details>
 <summary>Where to look</summary>
 
 [Marking Overrides with `@override`](../../Chapters/07_Foundations--Classes.md#marking-overrides-with-override) shows the decorator from `typing` on a method that replaces a base-class method.
-Python accepts any method name in a subclass, so the misspelling creates a new method.
-A call to `show()` still finds `Base.show()`.
+The renamed base leaves `Derived.show()` overriding nothing.
+The program never calls `display()`, so its output stays the same.
 The decorator is for the type checker, so run the checker with and without `@override` and compare.
 
 <details>
@@ -471,12 +471,12 @@ The decorator is for the type checker, so run the checker with and without `@ove
 ```python
 # The shape of exercise_6.py
 class Base:
-    def show(self):
+    def display(self):
         ...
 
 class Derived(Base):
     # @override  # Uncomment (and import) to see it complain
-    def shwo(self):
+    def show(self):
         ...
 ```
 
@@ -487,47 +487,45 @@ class Derived(Base):
 # exercise_6.py
 
 class Base:
-    def show(self):
-        print("Base.show")
+    def display(self):
+        print("Base.display")
 
 class Derived(Base):
     # @override  # Uncomment (and import) to see it complain
-    def shwo(self):
-        print("Derived.shwo")
+    def show(self):
+        print("Derived.show")
 
 Derived().show()
-#: Base.show
+#: Derived.show
 ```
 
-**Miss the base-class method.** The program prints `Base.show`.
-`shwo()` is a new method beside the inherited `show()`, so
-`Derived().show()` finds `show()` in `Base`. Python accepts any method
-name in a subclass and keeps no record of which ones you meant as
-overrides.
+**Rename the base-class method.** The program prints `Derived.show`.
+`Derived` defines `show()` itself, so `Derived().show()` finds it there
+and never looks in `Base`. The rename turns the override into an
+unrelated new method. Python accepts any method name in a subclass and
+keeps no record of which ones you meant as overrides.
 
 **Declare the intended override.** With `from typing import override` added and the decorator
-uncommented, the program still prints `Base.show`,
+uncommented, the program still prints `Derived.show`,
 because at run time the decorator returns the method it receives. The
 type checker reports the mismatch:
 
 ```text
-error[invalid-explicit-override]: Method `shwo` is decorated with
+error[invalid-explicit-override]: Method `show` is decorated with
 `@override` but does not override anything
-info: No `shwo` definitions were found on any superclasses of `Derived`
+info: No `show` definitions were found on any superclasses of `Derived`
 ```
 
-If you remove the decorator, the type checker reports no error.
-The program prints `Base.show` at every step of the exercise. The feature has
+If you remove the decorator, the type checker reports no error, since
+the code no longer states an intention for it to verify.
+The program prints `Derived.show` at every step of the exercise. The feature has
 three parts: `@override` states an intention, the type checker
 verifies it, and the running program ignores it.
 
-In a listing this short, the typo is easy to spot.
-`@override` matters most after the base class changes.
-Suppose someone renames or deletes `Base.show()` a year from now.
-Every override of it becomes an unrelated new method.
-Python reports nothing.
-With `@override` on every overriding method in the codebase,
-the type checker reports every method that overrode `Base.show()` before the change. A decorator that
+In a real codebase the base class and its overrides often sit in
+different files, so a rename slips past a reader. With `@override` on
+every overriding method, the type checker reports each one the rename
+left matching nothing. A decorator that
 changes no behavior at run time is worth writing when a tool reads it.
 
 </details>
