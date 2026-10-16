@@ -217,7 +217,8 @@ An Effect Management System replaces that tedious, error-prone work.
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
-Java's compiler checks the list,
+Java's compiler checks the list
+(Java calls the listed exceptions *checked exceptions*),
 while C++ checked it at runtime and ended the program on an exception the list left out.
 Neither language inferred the list from the functions a body called,
 so an exception introduced three levels down meant editing every signature above it by hand.
@@ -817,7 +818,7 @@ const ConsoleTell = Layer.succeed(Tell, {
 Effect.runPromise(hello.pipe(Effect.provide(ConsoleTell)))
 ```
 
-The description/action split is an artifact of building the system as a library,
+The description/execution split is an artifact of building the system as a library,
 rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
@@ -897,7 +898,7 @@ Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyn
 a description of work, and `ran` stays empty.
 The body runs only when something drives the description: an `await`, a task,
 or `asyncio.run()`.
-That description/action split is the library Effect system model.
+That description/execution split is the library Effect system model.
 Descriptions compose inside `async def` functions.
 `asyncio.run()` is the edge where description becomes action.
 
@@ -918,7 +919,7 @@ a `Maybe` container for a value that might be absent,
 an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
 The [effect](https://pypi.org/project/effect/)
-library ports the description/action split to Python.
+library ports the description/execution split to Python.
 The name is all it shares with the TypeScript library.
 Code builds objects that describe intents.
 Separate performers execute them, and a test can swap in its own performers.
