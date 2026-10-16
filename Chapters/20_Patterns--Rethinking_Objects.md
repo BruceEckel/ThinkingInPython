@@ -40,15 +40,15 @@ You built a program at runtime by finding the closest existing class and inherit
 That style guarantees nothing about substitutability.
 
 *C++* drew from Simula.
-Objects were optional,
-and C++ brought object-oriented programming and exceptions into the mainstream.
+Objects were optional.
+C++ brought object-oriented programming and exceptions into the mainstream.
 
 *Java* drew from Smalltalk.
 Everything lives inside a class,
 including code that would work as a standalone function.
 Java is statically compiled, so substitutability matters.
-Yet Java encouraged reusing code by inheriting implementation,
-and that reuse works against substitutability.
+Yet Java encouraged reusing code by inheriting implementation.
+That reuse works against substitutability.
 
 Newer languages backed away from inheritance.
 Rust, Swift, Go, and Kotlin build programs from data structures rather than deep class hierarchies,
@@ -413,8 +413,8 @@ The method keeps one advantage of its own.
 ## Protocols Generalize, Composition Adapts
 
 A function outside any class can work on anything shaped like a point.
-A `Protocol` describes that shape,
-and any type with matching attributes satisfies it, without inheritance.
+A `Protocol` describes that shape.
+Any type with matching attributes satisfies it, without inheritance.
 That matching is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 When someone hands you a type with a different shape,
 you adapt it by composition, not inheritance:
@@ -477,7 +477,7 @@ Both classes here keep `x` and `y` read-only.
 `PairCoord` computes `x` from its `Pair`,
 and the `Point` record rejects assignment to every field.
 Both satisfy the property form, and both fail the annotation form.
-Declare a protocol member read-only unless callers really do write to it.
+Declare a protocol member read-only unless callers write to it.
 
 ## Prefer Composition to Inheritance
 
@@ -556,7 +556,7 @@ What changes is which code holds the bug: the class you read,
 not the `list` internals hidden behind `CountingList`.
 
 Composition does more than repair a broken subclass.
-A type holds other types as fields.
+A composed type holds other types as fields.
 Records compare by value and work as keys:
 
 ```python
@@ -898,8 +898,8 @@ because each function's parameter names the one method it needs.
 #### What the Shape Does Not Say
 
 That same structural check compares method names and signatures alone.
-Two unrelated protocols can share a method name and signature by coincidence,
-and the checker treats them as interchangeable:
+Two unrelated protocols can share a method name and signature by coincidence.
+The checker treats them as interchangeable:
 
 ```python
 # protocol_collision.py
@@ -930,7 +930,8 @@ print(charge(package))  # Silently treated as a price
 The type checker accepts `package` as a `Priced` argument,
 and `charge()` returns `4.5`, silently treating a weight as a price.
 The checker matches the shape correctly.
-The mismatch is in what the number means, and no type checker checks meaning.
+The mismatch is in what the number means.
+No type checker checks meaning.
 
 A distinct type per concept would make the type checker report this mismatch.
 `typing.NewType` looks like the natural fix:
