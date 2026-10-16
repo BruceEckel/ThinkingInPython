@@ -16,7 +16,8 @@ Each pattern defers something:
 
 - *Command* defers *what* to do, so you can store the action and run it later.
 - *Strategy* defers *how*.
-  The job stays the same, and the caller picks the algorithm that performs it.
+  The job stays the same.
+  The caller picks the algorithm that performs it.
 - *Chain of Responsibility* defers *which* handler takes the job,
   trying candidates until one accepts.
 
@@ -971,8 +972,8 @@ def test_handler_needs_a_call_on_an_event() -> None:
 
 The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer)
 with one shared subject.
-Instead of every subject holding its own list,
-one bus holds every list and the event type selects the handlers.
+Instead of every subject holding its own list, one bus holds every list.
+The event type selects the handlers.
 
 On the bus, a type may have many handlers.
 When each type needs exactly one,
