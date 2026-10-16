@@ -274,8 +274,8 @@ Nothing verifies it.
 
 Inside the `try`, `StopIteration` means the conversation finished,
 so only the `send()` call sits there.
-A call such as `next()` on an exhausted answer source also raises `StopIteration`,
-so that `next()` call belongs outside the `try`.
+Any other call that can raise `StopIteration`,
+such as `next()` on an exhausted answer source, belongs outside the `try`.
 
 `interview()` accepts its answers from any driver that calls `send()`.
 Its body is three questions and a `return`,
@@ -286,7 +286,8 @@ and it receives the answers through its `answers: dict[Question, Answer]` parame
 Swapping the dictionary for a database changes a single argument.
 
 `interview()` and `drive()` form an EMS in miniature.
-The generator declares requests, and the driver interprets them.
+The generator declares requests.
+The driver interprets them.
 
 Each generator has one driver.
 No annotation states that pairing, but the runtime enforces it.
@@ -735,7 +736,8 @@ so the description can ask for something.
 and no generator in the chain names its driver.
 
 Those ideas are enough to build a task runner.
-A queue keeps the live generators, and the runner gives each a turn:
+A queue keeps the live generators.
+The runner gives each one a turn:
 
 ```python
 # task_runner.py
