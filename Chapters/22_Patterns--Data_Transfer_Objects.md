@@ -377,8 +377,8 @@ so `<` between two `FrozenColor`s raises a `TypeError`.
 Comparing an `OrderedColor` with an `OrderedDimensions` raises a `TypeError`.
 
 Both listings write `@dataclass(frozen=True)` in full instead of `@record`,
-so that `order=True` is the one difference between `FrozenColor` and its twin,
-`OrderedColor`.
+so that `FrozenColor` reads the same in each,
+and `order=True` is the one difference between `FrozenColor` and its twin `OrderedColor`.
 
 Tuple behavior affects serialization too.
 `json.dumps(Color(1, 2, 3))` writes the array `[1, 2, 3]`,

@@ -452,9 +452,10 @@ Bruce's rulings from 2026-09-17, revised 2026-09-26:
   says "record" instead. The exceptions are listings whose subject is
   `frozen=True`: chapter 20's `immutable.py` and `frozen_leaky.py`,
   Solutions 20 exercise 2, chapter 18's `frozen_vs_slotted.py`. Chapter
-  22's `still_a_tuple.py` (and Solutions 22 exercise 6) stays long-form
-  too: its `Frozen*` classes sit beside `order=True` twins, and the one
-  added option is the point of the comparison.
+  22's `still_a_tuple.py` and `tuple_ordering.py` (and Solutions 22
+  exercise 6) stay long-form too: `FrozenColor` reads the same in both,
+  and `tuple_ordering.py` sets it beside its `order=True` twin, so the
+  one added option is the point of the comparison.
 - **A Solutions copy of a chapter class follows its chapter listing.**
 - Slots make an instance smaller, so a marker that measures memory
   moves when a class becomes a record. Solutions 35 `exercise_2.py`
