@@ -923,9 +923,8 @@ library that automates it.
 
 ## Making Code Testable
 
-You can now take an untested function and make it testable.
-Name its dependencies: the clock, randomness, the filesystem, the environment,
-the network.
+To make an untested function testable, first name its dependencies: the clock,
+randomness, the filesystem, the environment, the network.
 Replace those at the boundary,
 by injection where you can change the code and with `monkeypatch` where you cannot.
 Then pin the remaining behavior with a handful of parametrized cases.
