@@ -590,7 +590,7 @@ at a point in the program you can see.
 Where a callback must still run if the caller forgets,
 add `weakref.finalize()` as the backstop, not as the plan.
 To track objects without owning them, hold them weakly,
-so the registry cannot become the leak it exists to catch.
+so the registry leaves each object's lifetime as it was.
 
 ## Exercises
 
