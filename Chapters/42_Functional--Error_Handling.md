@@ -30,6 +30,9 @@ This material comes from my PyCon 2024 talk,
 
 ## Exceptions Discard Partial Calculations
 
+[Functional Toolkits](41_Functional--Toolkits.md#choosing-from-the-toolkits)
+ends by asking what a pipeline of pure stages does when one stage fails.
+A comprehension is the smallest such pipeline.
 If a function raises an exception partway through a comprehension,
 you lose all partial calculations:
 
