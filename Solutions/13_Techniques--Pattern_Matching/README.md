@@ -357,6 +357,8 @@ info: `Never` and `Webhook & ~Email & ~Sms & ~Push` are not equivalent types
 
 The output above shows the first diagnostic, in `render()`.
 The second is the same diagnostic at line 43, in `cost()`.
+With both cases added, as in `exercise_4.py`, `ty check` reports
+`All checks passed!`.
 
 `assert_never()` declares its parameter as `Never`, the type with no
 values, so the call type-checks only when the cases above it have
