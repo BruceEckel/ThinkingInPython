@@ -957,8 +957,8 @@ asyncio.run(main())
 `asyncio.run()` starts the [event loop](19_Techniques--Concurrency.md)
 those awaits need.
 
-Everything this chapter says about ordering, the three exception arguments,
-and suppression through a truthy return applies to the async form as well.
+Ordering, the three exception arguments,
+and suppression through a truthy return work the same way in the async form.
 The Concurrency chapter uses `async with` throughout, for `asyncio.TaskGroup`,
 locks, and semaphores.
 Each of those is an object with the two `a`-prefixed methods.
