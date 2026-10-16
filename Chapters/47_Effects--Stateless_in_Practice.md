@@ -690,7 +690,7 @@ and `run_load()` decides when to stop drawing from the source it holds.
 The load's declared dependency stays the same.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
 and that type appears once.
-What changes is the object answering the need:
+The object answering the need changes:
 four objects in turn during the first run.
 A dependency bound before the program starts gives one answer for the whole run.
 Here the right answer changes with the hour.
@@ -1096,7 +1096,6 @@ The by-hand one returns early.
 The Effect one stops at the failure, and the driver never resumes the generator.
 The difference is who writes the branch that short-circuits.
 
-The comparison has limits.
 At this size the by-hand version is respectable, and a reader may prefer it.
 Two differences hold at any size.
 The by-hand signature, `(Feed, Encyclopedia) -> str`,
@@ -1790,7 +1789,6 @@ print(db1.attempts, db2.attempts)
 `db2` never runs.
 The second call's answer comes from `db1`'s cache entry,
 because `memoize()` keys on `"Morty"` alone.
-In a chapter built on swapping the scenario, the caution matters.
 Memoize a function only where one scenario serves the memoized call for its whole lifetime,
 the way [State as an Ability](#state-as-an-ability)'s `Cell` does once bound,
 or key the cache on the scenario too.
@@ -1870,8 +1868,8 @@ and it says nothing about a declared error.
 Two of those same four overloads accept an Effect that declares one,
 and both return a `Task` with [no error type on it](#fork-drops-the-error-channel).
 
-Notice who manages the pool's lifetime.
-The `with` block sits outside `run()`, at the edge, in ordinary Python.
+The `with` block that manages the pool's lifetime sits outside `run()`,
+at the edge, in ordinary Python.
 Stateless has no scoping mechanism of its own,
 so either a resource lives in a `with` block outside the Effect,
 as the pool does here, or the supplied object owns it.
@@ -1945,7 +1943,6 @@ which is the description/execution split in table form.
 
 ## `run()` Builds a Loop per Call
 
-The rule about where to call `run()` and `run_async()` has a reason.
 `run()` is `asyncio.run(run_async(effect))`,
 building a fresh event loop for the call and tearing it down after.
 If you call it from inside a running loop (the shape of any async web handler),
@@ -2209,7 +2206,7 @@ A monad plus handlers is how you build algebraic effects in a language with no n
 The monad is the mechanism that chains the steps,
 and the handlers are the interface.
 
-What a library cannot reproduce is a native handler's control over the rest of the Effect.
+A library cannot reproduce a native handler's control over the rest of the Effect.
 `handle()` passes a handler the Ability and takes back an answer,
 and the driver resumes the Effect with that answer, once, always.
 A native handler instead receives the *continuation* and chooses what to do with it.
