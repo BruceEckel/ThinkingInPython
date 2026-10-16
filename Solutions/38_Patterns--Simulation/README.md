@@ -309,9 +309,12 @@ asyncio.run(main())
 #: 9 (5, 1) (7, 3)
 ```
 
+The listing prints the size of `unreached` and its smallest and
+largest cells, `(5, 1)` and `(7, 3)`, the corners of the right room.
+
 **Reuse the chapter's classes.** The classes come from the chapter, with six parts removed:
-rat numbers, logging, the task list, `render()`, the
-`Board` `Protocol`, and the file loader.
+rat numbers, logging, `render()`, the `Board` `Protocol`, the file
+loader, and the comment-line test in `from_text()`.
 The removals leave the exploration logic as the chapter wrote it. `claim()` keeps the
 chapter's body word for word.
 `explore()` still opens a
