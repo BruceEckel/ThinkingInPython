@@ -6,7 +6,7 @@
 The Solutions file for chapter 44 carries no Tier 1 or Tier 2
 vocabulary, no signposting, no significance inflation, and no
 manufactured punchlines.
-Most of the thirteen direct edits split an "and" that joined clauses
+Most of the fourteen direct edits split an "and" that joined clauses
 with different subjects, where the relation was a consequence or a
 contrast.
 Two correct a claim against its source: exercise 2's Koka paragraph
