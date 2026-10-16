@@ -157,8 +157,8 @@ Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
 
 `factory()` names `_Circle` and `_Square` above the point where the file defines either class.
-Python looks up a name in a function body when the function runs,
-and both classes exist before anything calls `factory()`.
+Python looks up a name in a function body when the function runs.
+Both classes exist before anything calls `factory()`.
 
 *GoF Design Patterns* defines *Factory Method* as a creation method that [subclasses override](#subclasses-choose-the-type)
 to choose the concrete type.
@@ -347,8 +347,8 @@ at the first `draw()` call.
 
 The type checker reports a line that constructs such a class by name,
 but `make()` contains no such line.
-`Shape.registry[name]()` calls a `type[Shape]`,
-and any of those may be a concrete subclass, so the checker accepts it.
+`Shape.registry[name]()` calls a `type[Shape]`.
+Any `type[Shape]` may be a concrete subclass, so the checker accepts the call.
 [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
 moves that report to the check.
 
@@ -360,8 +360,8 @@ uses this same self-registration.
 but it stops at direct subclasses,
 while `__init_subclass__()` runs for every class anywhere below `Shape`.
 
-Importing `registry` runs its two `class` statements,
-and the key list shows the registry they left behind:
+Importing `registry` runs its two `class` statements.
+The key list shows the names they registered:
 
 ```python
 # registry_demo.py
@@ -544,12 +544,12 @@ make("Circle").draw()
 `@make.register` has the same form as `@nectar.register` in [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch),
 where `functools.singledispatch` keeps a function's table beside it.
 `singledispatch` cannot serve as this factory,
-because it picks an implementation by the type of its first argument,
-and `make()` receives a name.
+because it picks an implementation by the type of its first argument.
+`make()` receives a name.
 
-The type parameter of `register()` has `Shape` as its bound,
-and the bound turns the decorator into a check.
-A decorated class must satisfy the Protocol.
+The type parameter of `register()` has `Shape` as its bound.
+The bound turns the decorator into a check:
+a decorated class must satisfy the Protocol.
 If a class lacks `draw()`, or its `draw()` takes an extra parameter,
 the checker reports `invalid-argument-type` at the class's `@make.register` line before the program runs.
 [Self Registration](#self-registration) left the same omission to runtime,
@@ -571,7 +571,7 @@ No shape class carries a `make()` that a call like `Circle.make("Square")` could
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,
 an abstract `Polygon` between `Shape` and `Triangle` registers as well,
-and `make("Polygon")` fails with a `TypeError`.
+so `make("Polygon")` fails with a `TypeError`.
 
 Explicit registration fails the opposite way.
 Registration is opt-in,
@@ -963,8 +963,9 @@ the checker reports `protocol member make_obstacle is not defined on type Broken
 Both versions report the omission before the program runs, at different places.
 With the abstract base classes in `abstract_factory_abc.py`,
 the checker reports the line that constructs the incomplete factory.
-With the Protocol, constructing a `BrokenFactory` is legal,
-and the checker reports `[1]`, which passes it to `GameEnvironment`.
+With the Protocol, constructing a `BrokenFactory` is legal.
+The checker reports `[1]` instead,
+the line that passes the factory to `GameEnvironment`.
 
 The two versions differ more at runtime.
 Constructing the incomplete subclass of the abstract base class raises a `TypeError`,
