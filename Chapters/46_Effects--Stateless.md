@@ -49,6 +49,11 @@ asked of an Effect signature:
 - `E` is how it can fail.
 - `R` is what it produces.
 
+Stateless reuses the word Effect for the whole description a function returns.
+The Effects of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
+are what that description declares:
+its Abilities in `A` and its failures in `E`.
+
 For example:
 
 ```python
@@ -1883,6 +1888,10 @@ You must resolve a dependency before anything runs,
 while a declared failure stays in the type until you choose where to handle it.
 The type checker covers both declarations.
 Forgetting to declare either is a type error.
+
+Every Ability in this chapter comes from the library.
+[Stateless in Practice](47_Effects--Stateless_in_Practice.md)
+writes Abilities of your own and the handlers that answer them.
 
 ## Exercises
 
