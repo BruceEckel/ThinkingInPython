@@ -11,7 +11,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) shows `greet()` taking its `ask` and `tell` capabilities as parameters.
+[Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) shows `greet()` taking its `Ask` and `Tell` Effects as parameters.
 The `Ask` and `Tell` protocols are structural, so `Console` needs only methods with matching signatures.
 Pass one `Console` for both parameters, or pass a double for either.
 
@@ -91,7 +91,7 @@ object for both parameters. You can also replace either parameter with
 a double, and the other parameter keeps its binding.
 
 **Declare what the function needs.** `greet()` requires no change, and
-could not have required one. It names two capabilities it needs and
+could not have required one. It names the two Effects it performs and
 calls methods on them. Its body names none of `Console`, `input()`,
 `print()`, or `Scripted`, so changing the binding leaves that body
 as it is.
@@ -245,7 +245,7 @@ to hand down to `format_greeting()`.
 `session()`, `menu()`, and `main()`, each gain a `log` parameter whose
 one use is passing it to the next function.
 They sit between `greet()`, which uses the `Log`, and the call site that binds it.
-Their signatures now describe a capability they do not exercise,
+Their signatures now name an Effect they do not perform,
 so a reader of `menu()` learns something false about what `menu()`
 does.
 
@@ -578,10 +578,10 @@ list without anyone calling it an Effect system.
 `async` satisfies neither of the other two.
 
 It does not **separate the interface from the implementation**.
-`await price_of_async(item)` names no capability. It says "run this
+`await price_of_async(item)` names no interface. It says "run this
 particular coroutine," and the coroutine's body defines what awaiting
 it does. Compare `Ask` in `ask_tell.py`, where `greet()` names the
-capability and leaves the implementation to the caller. `async`
+interface and leaves the implementation to the caller. `async`
 has no equivalent of writing a function against "something awaitable
 that yields a price" and choosing the implementation later.
 
