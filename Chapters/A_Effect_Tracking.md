@@ -25,7 +25,8 @@ The body performs some of them directly, as a call to `print()` does.
 The function inherits the rest from the functions it calls.
 Handling removes Effects.
 A function that runs `greet()` inside a handler for `Ask` passes no `Ask` to its own callers.
-The *Effect row* of a function `f` therefore follows one rule:
+The [Effect row](44_Effects--Effect_Management.md#native-effect-management)
+of a function `f` therefore follows one rule:
 
 ```text
 row(f) = the Effects f performs directly
