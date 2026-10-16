@@ -227,7 +227,7 @@ and the outer `break` (`[3]`) runs right after.
 so the inner `else` continues on each row and the outer `else` (`[4]`)
 prints `"not found"`.
 
-Each call ends at `[5]`, after both loops, whichever way the search went.
+Each call ends at `[5]`, after both loops, whichever way the search goes.
 A `return` at the match would leave both loops in one step and skip `[5]` along with them.
 The `else` form keeps the function running past the search.
 It also works in loops at the top level of a module,
@@ -336,11 +336,12 @@ The header checks that the stack has an item, pops it, names it, and tests it,
 so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
+
 A comprehension builds a list, dictionary,
 or set from an iterable in one expression.
 [The last section of this chapter](#comprehensions) shows its three forms.
-A comprehension can use `:=` the same way,
-and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
+A comprehension can use `:=` the same way.
+[Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
 ### Mutating a Container While Looping
 
@@ -378,7 +379,8 @@ except RuntimeError as e:
 The list loop walks by position.
 Removing an item shifts the next one down into the slot the loop has passed,
 so the loop skips that item.
-One of the two `2`s survives, and no exception reports the skip.
+One of the two `2`s survives.
+No exception reports the skip.
 Adding a key while the loop walks `ages` changes the dictionary's size,
 so the dictionary raises a `RuntimeError` instead of skipping silently.
 
@@ -487,7 +489,7 @@ The `except` clauses catch exceptions raised in the `try` block alone.
 An exception from the follow-up work in the `else` propagates to the caller,
 past the handlers written for the `try` block's failure.
 
-The optional `finally` always runs, and that makes it the place for cleanup.
+Because the optional `finally` always runs, it is the place for cleanup.
 A `return`, `break`,
 or `continue` inside `finally` swallows any exception in flight,
 so keep all three out of cleanup code:
@@ -659,10 +661,10 @@ The EAFP form handles that case, because its `open()` is the test.
 ## Context Managers
 
 A `with` block guarantees that setup and cleanup run as a pair,
-even if the body raises an exception.
+whether or not the body raises an exception.
 It does the work of a `try`/`finally` whose `finally` holds the cleanup.
 The object that `with` manages supplies the cleanup,
-and that cleanup runs every time the block exits.
+which runs every time the block exits.
 Opening a file is the canonical case.
 The `with` block always closes the file on exit:
 
@@ -693,8 +695,8 @@ path.unlink()  # Delete the file
 ```
 
 The `RuntimeError` propagates, but `with` closes the file first.
-A `with` block shares the enclosing scope,
-so `f` stays bound after the block exits and the listing can print `f.closed`.
+Because a `with` block shares the enclosing scope,
+`f` stays bound after the block exits, so the listing can print `f.closed`.
 
 [Cleanup](10_Foundations--Cleanup.md)
 contrasts the close that `with` guarantees with leaving the close to Python's garbage collector.
@@ -768,7 +770,8 @@ Try each exercise before opening its [solution](../Solutions/04_Foundations--Con
 6.  Rewrite the `evens` list comprehension in `comprehensions_intro.py` as a `for` loop that appends to a list,
     then say which version you would rather read six months from now.
 7.  In `exception_chaining.py`,
-    add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs.
+    add a fourth function that catches the `ValueError` and raises `BadNumber` from a new exception object it constructs,
+    rather than from the caught `ValueError`.
     Predict which line the traceback shows above `BadNumber` before you run it.
 8.  Rewrite `context_manager.py`'s reading half using `path.read_text()`.
     Say what the `with` form gives you that the one-liner does not,
