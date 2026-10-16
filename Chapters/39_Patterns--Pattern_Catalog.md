@@ -227,7 +227,7 @@ built on the operating system's I/O completion ports.
 |---------|--------|
 | *Curiously Recurring Template Pattern* (CRTP) | Parameterize a base class by the subclass that inherits from it. |
 | *Marker Interface* | Tag a class with an empty interface to signal a capability. |
-| *Mixin* | Add reusable behavior through multiple inheritance. |
+| [*Mixin*](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins) | Add reusable behavior through multiple inheritance. |
 | *Pointer to Implementation* (Pimpl) | Store a class's implementation in a separate object reached through a pointer, so the implementation can change while clients keep their compiled code. |
 | [*Resource Acquisition Is Initialization* (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the matching destructor. |
 
