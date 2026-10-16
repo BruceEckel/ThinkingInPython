@@ -61,7 +61,7 @@ so `reduce(or_, [], {})` returns `{}`.
 Stores every result for as long as the function exists,
 so a repeated call with the same arguments returns the stored result straight from the cache.
 This caching by argument is memoization,
-the term [Singleton](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)
+the term [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)
 applies to its cached constructor function.
 `@cache` works correctly only for pure functions.
 A cached function with side effects runs those effects on the first call with each set of arguments,
