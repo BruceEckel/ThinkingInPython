@@ -23,9 +23,9 @@ The file holds no live block, so it is the record of the applied changes and of 
   Vague praise by the portability test, but it is the chapter's first-edition opening, and the sentence that follows answers it.
 - Line 434, "Later releases have continued that work."
   Short, and it states a fact (the speedups did not stop at 3.11) rather than padding.
-- Lines 1548-1549 and 1603-1604, "The 3x threshold sits far below any multiple you should see." appears twice, verbatim, in the NumPy and Numba sections, and line 1666 varies it.
+- Lines 1548 and 1603, "The 3x threshold sits far below any multiple you should see." appears twice, verbatim, in the NumPy and Numba sections, and line 1666 varies it.
   The two sections are parallel by design, like the book's prose decision tables, so the repetition helps a reader comparing them.
-- Line 1813, "The question is not the object count on its own but the work done per object crossed."
+- Line 1812, "The question is not the object count on its own but the work done per object crossed."
   §9 by shape, but both halves are named, and the sentence generalizes the `collatz_lengths()` case into the rule a reader takes away.
 - Line 1828, "Sometimes the fix is not a faster function but a different architecture."
   §9 by shape; the contrast is real and introduces the section's one point.
@@ -33,5 +33,5 @@ The file holds no live block, so it is the record of the applied changes and of 
   §9 by shape, but "fastest possible" against "fast enough" is the chapter's thesis, and the negative half names it.
 - Line 1102, "Multiply by a population in the millions to see why it matters."
   An instruction to the reader, which the global rules leave imperative.
-- "cost" at lines 310, 932-935, 951, 1400, and 1812 measures time or memory, the R2 carve-out.
-- "real" at lines 1427 ("a real protocol parser") and 1811 ("real work") each name the contrast in the same sentence (a demo buffer; the conversion overhead).
+- "cost" at lines 310, 931-934, 950, 1399, and 1811 measures time or memory, the R2 carve-out.
+- "real" at lines 1427 ("a real protocol parser") and 1810 ("real work") each name the contrast in the same sentence (a demo buffer; the conversion overhead).
