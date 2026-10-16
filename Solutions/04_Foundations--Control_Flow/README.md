@@ -11,7 +11,7 @@
 
 [The Loop `else` Clause](../../Chapters/04_Foundations--Control_Flow.md#the-loop-else-clause) says when a `for` loop runs its `else`.
 Ask whether any value of `d` reaches the `break` for 97.
-The `else` depends on how the loop ended, not on what the body did.
+The `else` depends on how the loop ends, not on what the body does.
 
 <details>
 <summary>The shape</summary>
@@ -74,10 +74,10 @@ def collatz_sequence(n):
 
 If you keep the chapter's one-line conditional expression and add `if n % 2 == 1: odd_count += 1` after it,
 the test sees the new `n`, not the value `n` held when the step began.
-The count then includes the `1` that ends the sequence, and `collatz_sequence(10)` returns `(6, 2)`.
+The count then includes the `1` that ends the sequence, so `collatz_sequence(10)` returns `(6, 2)`.
 The solution splits the conditional expression into an `if`/`else` statement.
 The odd case then has a branch of its own,
-and the increment runs under the same test that chooses `3 * n + 1`.
+where the increment runs under the same test that chooses `3 * n + 1`.
 
 ```python
 # exercise_2.py
@@ -144,8 +144,8 @@ print()
 
 The output is the same as with the original order.
 The two `if` blocks test for different values of `n` (`6` and `3`),
-so at most one of them is true on any iteration,
-and each block's outcome stays the same whichever runs first.
+so at most one of them is true on any iteration.
+Each block's outcome therefore stays the same whichever runs first.
 Order matters only when one value satisfies both conditions
 and the two blocks do different things with it,
 as when one ends the loop and the other skips to the next iteration.
@@ -323,15 +323,16 @@ print(evens)
 #: [0, 2, 4, 6, 8]
 ```
 
-The loop takes four lines instead of one, and until it finishes the
+The loop takes four lines instead of one. Until it finishes, the
 name `evens` holds a partial result. The comprehension states the
-contents of the list. The loop says how to build it, and the reader
+contents of the list. The loop says how to build it, so the reader
 traces the loop to learn the contents.
 For `evens`, the comprehension is the easier read six months from now.
 
-The loop version is a better choice when the body grows past one condition and one expression, since
-a comprehension with two filters and a nested loop is harder to read
-than the nested `for` loops it replaces.
+The loop version is a better choice when the body grows past one
+condition and one expression, since a comprehension with two filters
+and a nested loop is harder to read than the nested `for` loops it
+replaces.
 
 </details>
 </details>
@@ -412,8 +413,8 @@ When `__cause__` holds an exception,
 Python joins the two tracebacks with the "direct cause" line that `joining_line()` finds.
 An exception constructed in the `raise` statement joins the
 report the same way a caught one does.
-`from` accepts any expression that produces an exception,
-and a name bound by `except` is one such expression.
+`from` accepts any expression that produces an exception.
+A name bound by `except` is one such expression.
 
 **Compare the cause with the context.** The `print()` at `[1]`
 shows that both attributes hold an exception, and different ones.
@@ -526,8 +527,8 @@ and finds `1`. The loop leaves the survivor behind in slot 0.
 The prediction covers more than "one survives." It says which item
 and where. The survivor is whatever shifts into a slot the loop has
 passed, so its final position depends on the data.
-In the chapter's `[1, 2, 2, 3]` the survivor sits mid-list,
-and here it sits first.
+In the chapter's `[1, 2, 2, 3]` the survivor sits mid-list.
+Here it sits first.
 A prediction of each shifted item's new position therefore holds for one list at a time.
 
 The chapter's three fixes hold for every list.
@@ -575,7 +576,7 @@ for text in (" 42 ", "4_2"):
 #: '4_2' None 42
 ```
 
-`int()` accepts both strings and `look_first()` rejects both. `int()`
+`int()` accepts both strings. `look_first()` rejects both. `int()`
 strips surrounding whitespace, and it allows an underscore between
 digits, the same rule that makes `10_000_000` a valid literal.
 `isdigit()` asks whether every character is a digit, so the spaces
