@@ -251,10 +251,10 @@ print("End of delete loop")
 #: End of delete loop
 ```
 
-**Build the same list.** The output is identical to the original `for`-loop-with-`append()`
-version. A comprehension calls `Counter(name)` once per name, in
-order. The resulting list again holds the only references to those
-three objects.
+**Build the same list.** The output is identical to the original
+version, which calls `append()` in a `for` loop. A comprehension
+calls `Counter(name)` once per name, in order. The resulting list
+again holds the only references to those three objects.
 
 **Drop the loop variable's reference.** `del c` inside the loop unbinds the
 name `c` and leaves the list alone.
@@ -339,7 +339,7 @@ registry keeps its own. The `Counter`'s reference count stays above
 zero, so the `Counter` survives.
 
 The registry now causes the leak it exists to detect. `live_count()`
-now reports how many `Counter` objects the program has created,
+reports how many `Counter` objects the program has created,
 because the registry keeps them all alive. A
 `WeakValueDictionary` holds its values weakly, so it counts the
 objects and leaves their lifetimes as they were.
@@ -409,7 +409,7 @@ print("End of program")
 #: End of program
 ```
 
-Run as a standalone script, the whole output is:
+Run as a standalone script, the program prints:
 
 ```text
 A opened
