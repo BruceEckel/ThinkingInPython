@@ -223,8 +223,8 @@ while C++ checked it at runtime and ended the program on an exception the list l
 Neither language inferred the list from the functions a body called,
 so an exception introduced three levels down meant editing every signature above it by hand.
 Programmers usually avoided that work by widening the specification until it permitted every exception.
-The specifications exposed implementation details,
-and most people now count them a failure.
+The specifications exposed implementation details.
+Most people now count them a failure.
 C++ reduced its version to a single bit: whether a function can throw.
 
 ### Make the Bad Value Impossible
@@ -373,8 +373,7 @@ Effect Management keeps the Effects and isolates them,
 so the rest of the program can stay pure.
 People call this "pushing the Effects to the edges."
 
-What do you gain by keeping the rest pure?
-The first and most obvious answer is parallelism.
+The most obvious gain from keeping the rest pure is parallelism.
 A pure function reads and writes nothing shared,
 so it is safe to run in parallel.
 The same guarantee makes testing trivial.
@@ -402,8 +401,8 @@ Each kind yields its own benefit:
   then inspects the recording.
 
 Each of those benefits is a testing benefit, for one reason.
-A test must run in an environment it controls,
-and an untracked Effect is part of the environment outside that control.
+A test must run in an environment it controls.
+An untracked Effect is part of the environment outside that control.
 Every Effect you isolate is one your tests can control.
 
 Every one of those benefits depends on knowing where the Effects are.
@@ -414,8 +413,8 @@ An Effect Management System replaces it.
 ## Effect Management Systems
 
 The currency helper from the chapter's opening is the ordinary case.
-Most functions in most programs perform Effects their signatures leave out,
-and that makes code hard to understand:
+Most functions in most programs perform Effects their signatures leave out.
+The omission makes code hard to understand, and leaves these questions open:
 
 - Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
@@ -463,9 +462,7 @@ A full EMS does three things:
    Some caller or context supplies the implementation,
    at a point after the function's definition.
 
-The first item can stand alone.
-The difference between it and the whole list matters in the chapters that follow.
-*Effect tracking* tells you which Effects a function can perform.
+On its own, the first item is *Effect tracking*.
 Tracking alone tells you whether a function is pure,
 and names the kinds of impurity a caller inherits.
 Effect management is tracking plus the second and third items.
@@ -492,8 +489,8 @@ and the code of all hundred functions stays the same.
 Cross-cutting behavior binds at the same point.
 To add caching, tracing, or retries to every storage access,
 you insert a layer at the binding point instead of touching every call site.
-Variation concentrates at the edge of the program,
-and the functions below it stay simple and uniform.
+Variation concentrates at the edge of the program.
+The functions below it stay simple and uniform.
 
 ### Effects by Hand
 
@@ -924,7 +921,8 @@ The name is all it shares with the TypeScript library.
 Code builds objects that describe intents.
 Separate performers execute them, and a test can swap in its own performers.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
-Each of these supplies part of an EMS, and none supplies all three parts.
+Each of these supplies part of an EMS.
+None supplies all three parts.
 
 One library supplies all three parts.
 [Stateless](46_Effects--Stateless.md)
