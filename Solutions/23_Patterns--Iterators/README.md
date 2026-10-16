@@ -376,7 +376,7 @@ Each step takes one item from each branch, so the buffer keeps its
 size through the rest of the run.
 
 **Compare two gap widths.** One machine measured about
-9,800 bytes at `k` of 100 and about 416,000 at `k` of 10,000.
+9,300 bytes at `k` of 100 and about 416,000 at `k` of 10,000.
 A gap a hundred times wider takes roughly forty times the memory rather than a hundred,
 because the smaller figure includes overhead that stays the same at every `k`,
 and a short gap uses more bytes per item than a long one.
