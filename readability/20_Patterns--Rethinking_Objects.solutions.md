@@ -5,7 +5,7 @@
 
 The Solutions file for chapter 20 carries no Tier 1 or Tier 2
 vocabulary, no signposting, and no significance inflation.
-Most of the ten changes below apply the author's "and" rule: clauses
+Most of the eleven changes below apply the author's "and" rule: clauses
 with different subjects whose relation is a contrast or a consequence.
 The rest drop a doubled "at runtime", name the noun behind two vague
 pointers ("the author", "the object"), replace "The chapter describes
