@@ -517,7 +517,7 @@ using []
 
 **Close in reverse order of opening.** `enter_context()` pushes each manager onto the stack as the
 comprehension iterates over the list left to right. Leaving the `with` unwinds
-that stack, so the `close` lines print in reverse. The reversal holds
+that stack, so the closing tags print in reverse. The reversal holds
 for any number of names, zero included.
 
 In the empty run, nothing opens, so nothing closes.
