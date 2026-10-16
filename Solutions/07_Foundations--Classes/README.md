@@ -14,7 +14,8 @@
 
 [Adding a Setter](../../Chapters/07_Foundations--Classes.md#adding-a-setter) shows the `@radius.setter` that validates every assignment to `radius`.
 Write `shrink()` so it assigns to the public `radius` property instead of the underscore attribute.
-The setter then runs on the computed value, and the test catches the setter's `ValueError`.
+The setter then runs on the computed value.
+The test catches the setter's `ValueError`.
 
 <details>
 <summary>The shape</summary>
@@ -44,8 +45,8 @@ class Circle:
 
 If you write `shrink()` to assign `self._radius`,
 the assignment bypasses the setter.
-`shrink(-2)` then stores `-2.5`,
-and `expect()` fails with `AssertionError: no exception raised`.
+`shrink(-2)` then stores `-2.5`.
+`expect()` fails with `AssertionError: no exception raised`.
 The solution assigns to `self.radius`,
 so the setter checks every change to the radius.
 
@@ -360,7 +361,7 @@ reads `self.total` and gets that stored value. The `"summing"`
 message appears once, because the `n.total` access computes and
 caches `total` before `average` reads it. If you access `average`
 first, its read of `self.total` computes and caches `total` at that
-moment, and `"summing"` still appears once.
+moment. `"summing"` still appears once.
 
 </details>
 </details>
@@ -378,7 +379,6 @@ moment, and `"summing"` still appears once.
 
 [String Representation](../../Chapters/07_Foundations--Classes.md#string-representation) shows which method `print()` calls, `__repr__()` or `__str__()`, and which one a list calls for its elements.
 Define `__repr__()` first and print one object and a list, then add `__str__()` and print both again.
-Notice which method `print()` uses for the object and which one the list uses for its elements.
 
 <details>
 <summary>The shape</summary>
@@ -463,8 +463,7 @@ in output a user reads.
 [Marking Overrides with `@override`](../../Chapters/07_Foundations--Classes.md#marking-overrides-with-override) shows the decorator from `typing` on a method that replaces a base-class method.
 Python accepts any method name in a subclass, so the misspelling creates a new method.
 A call to `show()` still finds `Base.show()`.
-The decorator is for the type checker.
-Run the type checker with and without `@override` and compare.
+The decorator is for the type checker, so run the checker with and without `@override` and compare.
 
 <details>
 <summary>The shape</summary>
@@ -525,7 +524,8 @@ verifies it, and the running program ignores it.
 In a listing this short, the typo is easy to spot.
 `@override` matters most after the base class changes.
 Suppose someone renames or deletes `Base.show()` a year from now.
-Every override of it becomes an unrelated new method, and Python reports nothing.
+Every override of it becomes an unrelated new method.
+Python reports nothing.
 With `@override` on every overriding method in the codebase,
 the type checker reports every method that overrode `Base.show()` before the change. A decorator that
 changes no behavior at run time is worth writing when a tool reads it.
