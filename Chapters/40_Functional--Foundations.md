@@ -20,7 +20,8 @@ and then write it that way.
 
 This chapter builds the foundations: pure functions, immutable values,
 and the ways Python lets you pass, capture, specialize, and combine functions.
-[Toolkits](41_Functional--Toolkits.md) tours the standard library's support,
+[Functional Toolkits](41_Functional--Toolkits.md)
+tours the standard library's support,
 [Error Handling](42_Functional--Error_Handling.md)
 turns failure into an ordinary value,
 and [Confidence](43_Functional--Confidence.md)
@@ -374,9 +375,6 @@ a lambda keeps it at the call site, beside the code that uses it,
 instead of defining it as a named function elsewhere.
 `sorted(words, key=lambda w: (len(w), w))` states the sort order,
 by length and then alphabetically, right where the code sorts.
-For anything larger, write a `def`.
-A named function carries a docstring, a readable name in tracebacks,
-and room for more than one expression.
 
 A *higher-order function* takes a function as an argument, returns one, or both.
 Three built-ins cover the common cases.
@@ -417,17 +415,10 @@ so it returns a list rather than an iterator.
 which reorders the list in place and returns `None`.
 `sorted()` builds a new list and leaves its input as it was.
 
-When you would write a fresh lambda for `map()` or `filter()`,
-Python offers an alternative you should usually prefer:
-the [comprehension](16_Techniques--Comprehensions.md#the-map-and-filter-equivalent).
-`[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
-with no lambda and no function call.
-`[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
-`map()` and `filter()` are a better choice when the function already exists.
-`map(str.strip, lines)` reads better than `[line.strip() for line in lines]`,
-because `str.strip` names the operation once, with no loop variable to invent.
-As a rule of thumb, use the higher-order form when the function already exists,
-and the comprehension when you would write the expression inline.
+Prefer the comprehension when you would write a fresh lambda,
+and `map()` or `filter()` when the function already exists,
+as [Comprehensions](16_Techniques--Comprehensions.md#the-map-and-filter-equivalent)
+explains.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
 
