@@ -343,8 +343,8 @@ GameEnvironment(GnomesAndFairies()).play()
 A third concrete factory joins `KittiesAndPuzzles` and `WarriorsAndWeapons`,
 and `GameEnvironment` stays as it was.
 
-`abstract_factory_protocol.py` asks for the same factory without a base class. Leaving
-`make_obstacle()` out at first is the point of the second half:
+`abstract_factory_protocol.py` asks for the same factory without a base class.
+In the second half you leave `make_obstacle()` out at first, then add it back:
 
 ```python
 # exercise_3_protocol.py
@@ -958,9 +958,8 @@ rebinds an `int` field on the copy rather than mutating a shared object.
 The second assertion finds that `spawned.powers` is the prototype's own list,
 so `spawned.powers.append("bellow")` has given `PROTOTYPES["troll"].powers` a third entry.
 
-The difference between those two assertions shows the rule. A shallow
-copy duplicates the top object and shares everything it references, so
-the fields that break are the mutable ones, and only when
+A shallow copy duplicates the top object and shares everything it
+references, so the fields that break are the mutable ones, and only when
 something mutates them in place. Assignment to a field is always safe.
 `append()`, `[k] = v`, and `.update()` change the shared object.
 
@@ -1415,9 +1414,8 @@ The runtime test is weaker than the type checker's test. `issubclass()` checks
 for an attribute named `draw` and ignores its signature, so a
 class whose `draw()` takes an extra parameter passes here.
 The type checker rejects that class at `@make.register`.
-The two checks complement each other. The checker
-rejects a decorated class that does not fit, and `unregistered()`
-reports a fitting class that is not decorated.
+The checker rejects a decorated class that does not fit, and
+`unregistered()` reports a fitting class that is not decorated.
 
 `unregistered()` has two further limits.
 `issubclass()` against a Protocol works only when every member is a method.
