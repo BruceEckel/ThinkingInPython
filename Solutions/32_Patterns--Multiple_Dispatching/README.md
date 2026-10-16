@@ -141,8 +141,9 @@ the six ordered pairs `Lizard` forms with the other three, plus
 
 **Guard the demonstration.** The `__main__` guard lets exercise 3 import this module and skip
 its demonstration.
-The chapter moves its demonstration to `methods_demo.py` instead,
-so importing `paper_scissors_rock.py` runs nothing.
+The chapter keeps the method version's demonstration in a separate
+file, `methods_demo.py`, so importing `paper_scissors_rock.py` runs
+nothing.
 
 </details>
 </details>
@@ -472,7 +473,7 @@ Its helper, `compete()`, looks each class up by name on whichever module it rece
 so one `EXPECTED` checks both sets of classes.
 
 **Compare across separate enumerations.** Each module defines its own
-`Outcome`, and the comparison still works, since a `StrEnum` member
+`Outcome`. The comparison still works, since a `StrEnum` member
 equals its string value.
 
 The test in `test_paper_scissors.py` needs two changes once its two
@@ -665,7 +666,7 @@ print(counts["Lizard"])
 so a caller that needs only the pairs writes `random_pairs(Item, 10)`.
 The generator yields a `(player, opponent)` pair each time.
 
-**Tally into the caller's counter.** A caller that wants the tally
+**Tally into the caller's counter.** A caller that needs the tally
 passes its own `Counter`. The generator updates that counter in place
 for every pair it produces, one increment per item, so the caller can
 read `counts["Lizard"]` during or after the loop. With the same seed,
@@ -754,12 +755,12 @@ with expected(TypeError):
 ```
 
 **Handle each accepted type.** `__sub__()` is `__add__()` with the sign changed.
-The three cases of `__sub__()` line up the same way: a `Meters`, a number, or `NotImplemented` for
-anything else. `__rsub__()` needs only the numeric case, because
-Python calls the left operand's method first, and `Meters.__sub__()`
-handles `Meters(10) - Meters(3)`. Python skips the reflected
-form when both operands have the same type, so no call to
-`__rsub__()` receives two `Meters`.
+Its three cases match those of `__add__()`: a `Meters`, a number, or
+`NotImplemented` for anything else. `__rsub__()` needs only the
+numeric case, because Python calls the left operand's method first,
+and `Meters.__sub__()` handles `Meters(10) - Meters(3)`. Python skips
+the reflected form when both operands have the same type, so no call
+to `__rsub__()` receives two `Meters`.
 
 **Undo the swap.** The swap is where subtraction differs from addition. Python calls
 `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
@@ -769,13 +770,13 @@ must put them back in the order the source wrote them.
 Copying the body of `__sub__()`, `Meters(self.n - other)`, gives `Meters(-7)`.
 The copied `__rsub__()` looks correct and raises no exception,
 yet it returns the negative of every reflected subtraction.
-Addition commutes, so in `__radd__()` the swap leaves every result the same.
-The same mistake gives the right answer in `__radd__()` and the wrong answer in `__rsub__()`.
+Addition commutes, so the same copied body in `__radd__()` gives the
+right answer every time.
 
 **Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__()`, so Python calls
 `Meters.__rsub__()` next, which returns `NotImplemented` for a
-`str`. With both sides declining, Python raises the `TypeError`, and
-the message names both types.
+`str`. With both sides declining, Python raises the `TypeError`,
+whose message names both types.
 
 Returning `NotImplemented`, rather than raising an exception,
 lets Python report both operand types. An exception raised
@@ -934,7 +935,7 @@ which resolves through the MRO.
 a row, so `TolerantOrigami` finds `(TolerantPaper, TolerantRock)` one
 step up on the left. That version gives up the property the chapter
 names first, exact matching.
-The match now follows inheritance. Three consequences follow.
+The match now follows inheritance. That change has three consequences.
 
 The lookup becomes a nested loop over two MROs instead of one probe,
 so a miss now takes as many probes as the product of the two depths.
@@ -943,8 +944,8 @@ In an inner loop, it matters.
 
 Order now decides the answer. `(TolerantPaper, TolerantRock)` and
 `(TolerantOrigami, TolerantItem)` could both match.
-The order in which the loops walk picks the one that wins,
-and that rule lives in `compete()` instead of in the table.
+The order in which the loops walk picks the one that wins.
+That rule lives in `compete()` instead of in the table.
 The exact version settles the question with one probe.
 Either the pair is in the table or it is not.
 
@@ -1273,7 +1274,7 @@ and an `unresolved-attribute` at `battle()`'s call, because `get_weapon()` retur
 The solution declares `compete()` on the base,
 which gives that call and every `@override` a method to name.
 
-Here, each `Inhabitant` kind holds two of six weapon types,
+Each `Inhabitant` kind holds two of six weapon types,
 ranked around a cycle. Each weapon beats the previous two in the
 ranking and loses to the next two. Six is an even number, so each
 weapon has one opponent left over: its opposite, three steps around
@@ -1496,14 +1497,14 @@ plus a new class of eight methods.
 weighs the length of the method version against a table.
 Exercise 10 collects the same 36 answers in one place.
 
-The weapon ranking is a genuine cycle. Every weapon loses to two others,
+The weapon ranking is a cycle. Every weapon loses to two others,
 so no group can count on winning. The same cycle appears at the group
 level. An `Elf` beats a `Dwarf` on three of their four
 weapon pairings, a `Troll` beats an `Elf` on three of four, and a
 `Dwarf` beats a `Troll` on three of four, with the fourth pairing in
-each case the draw. Over two hundred seeds, each of the three kinds wins
-`meeting(5)` for some of them, so the outcome depends on the random draws each round,
-as it does in a real rock-paper-scissors tournament.
+each case the draw. Across two hundred seeds, each of the three kinds
+wins `meeting(5)` at least once, so the outcome depends on the random
+draws each round, as it does in a real rock-paper-scissors tournament.
 
 </details>
 </details>
@@ -1680,7 +1681,7 @@ cell with a single probe keyed on both types, and now calls what it
 finds instead of returning it. The call site stays the same:
 `player.compete(opponent)` reads as it does in
 `paper_scissors_rock.py`, where four method definitions per class
-stand behind it. A table of callables keeps the method-call syntax.
+stand behind it.
 
 **Wrap the constant answers.** `always()` keeps the table readable. It returns a closure
 that ignores both operands and returns one `Outcome`, so the seven
@@ -1693,8 +1694,8 @@ one duel has two orders and each order has its own cell. If the
 `(Rock, Paper)` cell ignored `opponent.wet`, a rock that calls
 `compete()` would still lose to wet paper.
 
-The chapter gives two reasons for preferring the double-dispatch version,
-and the first is behavior that reads the object's own state.
+The chapter gives two reasons for preferring the double-dispatch version.
+The first is behavior that reads the object's own state.
 A cell holding a function answers that reason. Whatever
 `Paper.eval_rock()` can read, `paper_vs_rock()` can read too, from the
 same two objects.
