@@ -1973,7 +1973,7 @@ so `calls` holds the two assignments that follow `@station.respond`.
 
 In [Document-View and MVC](../../Chapters/30_Patterns--Observer.md#document-view-and-mvc), `CountView` connects its `display()` to the model in `__post_init__()`.
 A second view does the same with its own display method,
-and the `Controller` feeds both as it stands.
+and a `Controller` that drives the `Counter` feeds both.
 
 <details>
 <summary>The shape</summary>
