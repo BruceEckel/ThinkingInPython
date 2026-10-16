@@ -54,7 +54,7 @@ reads it back with `inspect.getdoc()`.
 The signatures so far give the function name and the parameter names,
 with no [argument types or return types](08_Foundations--Static_Types.md#type-hints).
 Python is dynamically typed,
-so Python reports a type error at runtime rather than at compile time:
+so it reports a type error at runtime rather than at compile time:
 
 ```python
 # add.py
@@ -437,8 +437,8 @@ because `**` binds each value to the parameter its key names.
 
 Because collecting and unpacking are inverses,
 a function can collect arguments beyond its named parameters and pass them on as they arrived.
-`trace()` has the standard shape of a wrapper.
-It accepts any call and forwards it.
+`trace()` has the standard shape of a wrapper:
+it accepts any call and forwards it.
 `expect()` has the same shape.
 It receives a function and the arguments for it, and makes the call.
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
@@ -470,7 +470,7 @@ expect(TypeError, trace, report, *nums, **opts)
 #: 'label'
 ```
 
-`opts` carries a `"label"` key, and `trace()` forwards it as `label=`.
+`opts` carries a `"label"` key, which `trace()` forwards as `label=`.
 The same `func(*args, **kwargs)` call passes the items of `nums` positionally,
 so `report()`'s first parameter, `label`, also receives `1`.
 Each parameter takes one value.
@@ -536,7 +536,7 @@ The `True` in the `tally()` call at `[1]` joins `values` like any other position
 Only the named form, `total=True`, binds `total`.
 
 A signature can use every form at once, in one set order: positional-only,
-positional-or-keyword, `*args`, keyword-only, `**kwargs`:
+positional-or-keyword, `*args`, keyword-only, `**kwargs`.
 
 ```python
 # all_markers.py
