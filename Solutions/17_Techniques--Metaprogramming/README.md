@@ -796,9 +796,9 @@ except KeyError:
 
 **End the class block.** The payload's `pass` fills the body of a class `X`,
 and the dedented `print("injected code ran")` after it sits at module
-level, so it runs inside `exec()`. That is the danger. A name that
-reaches `make_class()` unchecked becomes source code, and source code
-can do anything the program can do.
+level, so it runs inside `exec()`. A name that reaches
+`make_class()` unchecked becomes source code, and source code can do
+anything the program can do.
 
 **Close the second splice's string.** The payload must compile at both splice points, because `make_class()` splices
 `class_name` in twice. The first splice supplies the attack lines. The
