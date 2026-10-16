@@ -44,10 +44,10 @@ def play(
 ) -> None:
     run(supply(narrator, hero, obstacle)(encounter)())
 
-def kitties(narrator: Narrator) -> None:
+def kitties_and_puzzles(narrator: Narrator) -> None:
     play(narrator, Kitty(), Puzzle())
 
-def warriors(narrator: Narrator) -> None:
+def warriors_and_weapons(narrator: Narrator) -> None:
     play(narrator, Warrior(), Weapon())
 
 type Cast = Callable[[Narrator], None]
@@ -56,7 +56,7 @@ def run_season(casts: list[Cast]) -> None:
     for cast in casts:
         cast(Loud())
 
-run_season([kitties, warriors])
+run_season([kitties_and_puzzles, warriors_and_weapons])
 #: Kitty meets the puzzle
 #: Warrior meets the nasty weapon
 play(Loud(), Kitty(), Weapon())

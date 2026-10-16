@@ -212,7 +212,8 @@ A linter can enforce a conservative version of that rule:
 flag any function annotated `Effect[...]`, `Depend[...]`, `Success[...]`, or `Try[...]`
 that contains no `yield` and whose body is more than a single `return` statement.
 That rule has false positives, since a pure local computation above the `return` is harmless,
-but every leak has the shape it flags.
+and false negatives, since a call inside the returned expression,
+as in `return success(datetime.now())`, also runs at build time.
 
 A type checker cannot catch that leak because purity is not a type.
 `print()` is a call returning `None`, legal in any function.
@@ -599,8 +600,9 @@ from an `Outlet` to a `Source`, and a test can call that function with an `Outle
 
 ## Shared code: the research pipeline
 
-The chapter's `research.py` and the doubles from `newswire.py` appear here
-without their demos, so the listings that follow can import them:
+The chapter's `research.py` and the doubles from `newswire.py` appear here,
+with exercise 6's `StaleWire` added, so the listings that follow can import
+them:
 
 ```python
 # research.py
@@ -689,7 +691,6 @@ STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")
 SHELF: Final[Library] = Library(
     {"stock market": "a history"})
-LONG: Final[Library] = Library({"genome": "chapter " * 40})
 ```
 
 ```python
@@ -1946,10 +1947,10 @@ def play(
 ) -> None:
     ...
 
-def kitties(narrator: Narrator) -> None:
+def kitties_and_puzzles(narrator: Narrator) -> None:
     ...
 
-def warriors(narrator: Narrator) -> None:
+def warriors_and_weapons(narrator: Narrator) -> None:
     ...
 
 type Cast = Callable[[Narrator], None]
@@ -2012,10 +2013,10 @@ def play(
 ) -> None:
     run(supply(narrator, hero, obstacle)(encounter)())
 
-def kitties(narrator: Narrator) -> None:
+def kitties_and_puzzles(narrator: Narrator) -> None:
     play(narrator, Kitty(), Puzzle())
 
-def warriors(narrator: Narrator) -> None:
+def warriors_and_weapons(narrator: Narrator) -> None:
     play(narrator, Warrior(), Weapon())
 
 type Cast = Callable[[Narrator], None]
@@ -2024,7 +2025,7 @@ def run_season(casts: list[Cast]) -> None:
     for cast in casts:
         cast(Loud())
 
-run_season([kitties, warriors])
+run_season([kitties_and_puzzles, warriors_and_weapons])
 #: Kitty meets the puzzle
 #: Warrior meets the nasty weapon
 play(Loud(), Kitty(), Weapon())
@@ -2044,7 +2045,7 @@ the same line the chapter runs in `two_games.py`, is the proof.
 `play()` accepts a `Kitty` facing a `Weapon`.
 Both satisfy their `Protocol`s, so the type checker reports nothing. An *Abstract Factory* in a language with a family type expresses "these
 come from one world" in the type. Here the matching is in
-`kitties()`'s body, a fact about how someone wrote that function.
+`kitties_and_puzzles()`'s body, a fact about how someone wrote that function.
 Nothing checks it.
 
 So the shared signature prevents some mismatches and permits others. A caller
