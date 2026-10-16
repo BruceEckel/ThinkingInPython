@@ -363,7 +363,7 @@ so Python searches the `a_package/` directory for `a_package`.
 The project root is nowhere on the path, so the
 search for a top-level package called `a_package` fails.
 The suggestion names `b_package`,
-the one package Python does find on that path.
+the name on the path closest to `a_package`.
 
 `python -m a_package.module4` works with either form and fixes both
 problems at once. `-m` sets `sys.path[0]` to the current directory
@@ -389,7 +389,7 @@ belongs at the top level, outside any package.
 
 [What a Module Exports](../../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports) shows `from module import *` and the role `__all__` plays in it.
 Without `__all__`, the star import falls back to a naming convention.
-Copy `exporting.py` without the line, add a name of your own, and print what `dir()` reports after the import.
+Copy `exporting.py` without the line and print what `dir()` reports after the import.
 
 <details>
 <summary>The shape</summary>
