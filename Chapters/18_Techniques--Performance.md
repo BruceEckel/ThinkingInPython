@@ -614,8 +614,7 @@ One machine measured `sum()` at about five times faster than the hand-written lo
 
 Other examples:
 
-- String concatenation.
-  `"".join(parts)` is faster than `+=` in a loop
+- For string concatenation, `"".join(parts)` is faster than `+=` in a loop
   (one linear pass instead of repeated reallocation).
 - A comprehension is faster than an `append()` loop,
   though the margin is now small
@@ -1468,7 +1467,7 @@ A `memoryview` over immutable `bytes` supports reading and slicing,
 but writing through it raises a `TypeError` regardless of whether anything else has it open.
 `memory_view.py` above writes through a view of a `bytearray`, which is mutable.
 
-The saving shows up at a size worth measuring:
+The saving shows up clearly in a million-byte buffer:
 
 ```python
 # memory_view_size.py
@@ -1838,7 +1837,7 @@ That is a design decision with its own chapter,
 Measure first.
 A profiler finds the slow spots without guessing.
 It also tells you whether the program spends its time computing or waiting,
-and the rest of this list depends on that answer.
+and which strategy fits depends on that answer.
 A program mostly waiting on a database, a socket, or a subprocess is I/O-bound.
 Steps 2 through 9 below help it little.
 Skip to step 10 and restructure around `asyncio` instead.
