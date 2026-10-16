@@ -367,7 +367,7 @@ greeter.run()  # The client starts the engine
 #: Hello, Brian!
 ```
 
-The redesign is the one that protects the next author.
+The redesign protects the next author.
 The reorder protects the one subclass that performs it.
 Each later subclass is safe only if its author remembers to do the same.
 The reorder asks every future
