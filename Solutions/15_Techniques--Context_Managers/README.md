@@ -447,7 +447,7 @@ block finishes cleanly, Python still calls `__exit__()`
 and passes `None` for all three arguments.
 Without the test, `issubclass(None, KeyError)` would raise a `TypeError`. Checking for `None`
 first also lets the type checker narrow `exc_type` to
-`type[BaseException]`, the type `issubclass()` requires.
+`type[BaseException]`, a class, as `issubclass()` requires.
 
 The class uses a lowercase name because you use it like a function.
 `contextlib.suppress` is lowercase for the same reason.
