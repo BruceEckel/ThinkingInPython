@@ -284,9 +284,9 @@ on every platform, Windows and macOS included. The
 suggestion shows that `Module.py` sits on the search path under a
 name that differs in case alone.
 
-The failure on Windows and macOS is the surprising part. Windows's
-NTFS and macOS's default filesystem both open `module.py` and
-`Module.py` as the same file, so an open by either name would succeed.
+Windows's NTFS and macOS's default filesystem both open `module.py`
+and `Module.py` as the same file, so an open by either name would
+succeed.
 Python checks the module name before it opens anything.
 Its import machinery reads the directory listing and compares the
 module name against the name on disk case-sensitively.
