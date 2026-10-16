@@ -212,7 +212,6 @@ Chapters/19_Techniques--Concurrency.md	price: It puts the order and its price on
 Chapters/19_Techniques--Concurrency.md	price: writing the same price lookup twice
 Chapters/19_Techniques--Concurrency.md	prices: the same prices CODE prints
 Chapters/19_Techniques--Concurrency.md	want: and that is what you want
-Chapters/20_Patterns--Rethinking_Objects.md	is what: *Subtype polymorphism* is what the four subsections below demonstrate
 Chapters/20_Patterns--Rethinking_Objects.md	never: An override may accept more than the base does but never less
 Chapters/20_Patterns--Rethinking_Objects.md	only: But a method is only a function whose first argument is the object
 Chapters/20_Patterns--Rethinking_Objects.md	only: CODE is only an aid during type checking
@@ -252,11 +251,9 @@ Chapters/24_Patterns--Singleton.md	only: Python calls it only when ordinary attr
 Chapters/24_Patterns--Singleton.md	only: Rebind only through the module
 Chapters/24_Patterns--Singleton.md	only: The compiler mangles names only inside a class body
 Chapters/24_Patterns--Singleton.md	only: because an annotation evaluates only when something reads it
-Chapters/24_Patterns--Singleton.md	only: but only when something needs those handles to be objects
 Chapters/24_Patterns--Singleton.md	want: Alex Martelli observes that what you usually want is not one object but one shared set of state
 Chapters/24_Patterns--Singleton.md	want: If you want a class
-Chapters/24_Patterns--Singleton.md	want: If you want many handles sharing one set of state
-Chapters/25_Patterns--Template_Method.md	hook: A stateless hook is usually better as a function than as an overridden method
+Chapters/24_Patterns--Singleton.md	want: If you want many objects sharing one set of state
 Chapters/25_Patterns--Template_Method.md	hook: This kind of optional step is a *hook*
 Chapters/25_Patterns--Template_Method.md	hook: whether the subclass overrides CODE or misspells a hook
 Chapters/25_Patterns--Template_Method.md	hooks: The CODE and CODE in the opening example are hooks
@@ -287,8 +284,6 @@ Chapters/27_Patterns--Factory.md	never: Run the program and confirm that CODE ne
 Chapters/27_Patterns--Factory.md	never: The classic failure is a plugin that "never registered
 Chapters/27_Patterns--Factory.md	only: An import written only to trigger registration never uses that name
 Chapters/27_Patterns--Factory.md	only: CODE is the only code that changes when you add a new type of CODE
-Chapters/27_Patterns--Factory.md	only: The second hierarchy is worth having only when the creator does work of its own
-Chapters/27_Patterns--Factory.md	only: When choosing the class is the creator's only job
 Chapters/27_Patterns--Factory.md	only: When the variant differs only in field values
 Chapters/27_Patterns--Factory.md	only: and a factory class only when that work has state of its own
 Chapters/27_Patterns--Factory.md	only: and the only method CODE and CODE override
