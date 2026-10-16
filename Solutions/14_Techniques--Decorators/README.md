@@ -108,8 +108,12 @@ The outermost wrapper runs first, so work out which layer prints before and whic
 ```python
 # The shape of exercise_2.py
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from functools import wraps
+
+def call_text(name: str, args: tuple[object, ...],
+              kwargs: Mapping[str, object]) -> str:
+    ...
 
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
@@ -138,18 +142,22 @@ and returns `result` after the report.
 ```python
 # exercise_2.py
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from functools import wraps
+
+def call_text(name: str, args: tuple[object, ...],
+              kwargs: Mapping[str, object]) -> str:
+    positional = [repr(a) for a in args]
+    named = [f"{k}={v!r}" for k, v in kwargs.items()]
+    return f"{name}({', '.join(positional + named)})"
 
 def trace[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        positional = [repr(a) for a in args]
-        named = [f"{k}={v!r}" for k, v in kwargs.items()]
-        arglist = ", ".join(positional + named)
-        print(f"-> {func.__name__}({arglist})")  # type: ignore
+        name = wrapper.__name__
+        print("->", call_text(name, args, kwargs))
         result = func(*args, **kwargs)
-        print(f"<- {func.__name__} = {result!r}")  # type: ignore
+        print(f"<- {name} = {result!r}")
         return result
     return wrapper
 
@@ -160,7 +168,7 @@ def timing[**P, R](func: Callable[P, R]) -> Callable[P, R]:
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
         ok = elapsed >= 0
-        name = func.__name__  # type: ignore
+        name = wrapper.__name__
         print(f"{name} timed, non-negative: {ok}")
         return result
     return wrapper
