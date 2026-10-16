@@ -666,6 +666,8 @@ None of the three is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
 Keep a pattern where it does more than a language feature does.
+This chapter follows [simplicity before generality](21_Patterns--Design_Patterns.md#design-principles).
+Each construct answers a requirement the plant stated and anticipates none that the plant left unstated.
 
 ## Exercises
 
