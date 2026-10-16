@@ -720,7 +720,7 @@ The wrapper's own `__dict__` could hold the count as well,
 but the type checker reports every dotted access to an attribute stored there.
 Call state therefore goes in a closure or an instance.
 [Attributes on a Function](17_Techniques--Metaprogramming.md#attributes-on-a-function)
-shows what a function's `__dict__` does suit.
+shows a use that suits a function's `__dict__`.
 
 ### A Class-Form Decorator with Arguments
 
@@ -1100,8 +1100,7 @@ print(fib_table)
 #: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```
 
-The run-once idiom is the most common real use of `@lambda`.
-The practical reason for the run-once idiom is scope.
+The run-once idiom is the most common use of `@lambda`, and it exists for scope.
 The loop needs a working variable, `table`,
 and building the list inside a function keeps `table` local.
 The module gains one name, `fib_table`, holding the finished list.
