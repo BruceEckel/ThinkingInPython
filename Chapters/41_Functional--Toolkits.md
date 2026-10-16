@@ -474,7 +474,7 @@ print(list(map(pow, range(5), repeat(2))))
 The counted form replaces the list you would write as `["x"] * 3`.
 The infinite form is the reason to import `repeat()`.
 It supplies a constant argument for as many calls as `map()` makes,
-and it holds one object in memory however many calls there are.
+and it holds one object in memory however many calls receive it.
 Here the output stops when `range(5)` runs out,
 because `map()` stops at its shortest input.
 
@@ -1215,8 +1215,8 @@ since `random.Random(seed)` draws every number from its own seeded state.
 
 ## Choosing From the Toolkits
 
-The rule for both modules is the same.
-Before writing a loop, ask whether the loop has a name in one of these modules.
+The first rule applies to both modules: before writing a loop,
+ask whether the loop has a name in one of them.
 A running total is `accumulate()`, a width-two sliding window is `pairwise()`,
 a remainder-safe chunking is `batched()`,
 and a cached pure function is `@cache`.
