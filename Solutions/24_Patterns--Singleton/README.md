@@ -335,7 +335,7 @@ print(config.settings)  # [2]
 
 The listing puts `import config` at the top, where ruff expects
 every import. Either order gives the same output. Whichever import comes
-first runs the body, and the other finds `config` in `sys.modules`.
+first runs the body. The other finds `config` in `sys.modules`.
 
 The prints at `[1]` and `[2]` disagree.
 
@@ -352,7 +352,7 @@ points at the original empty dict, so the print at `[2]` shows
 
 Nothing warns you at runtime. The module still imports, the
 assignment succeeds, and the local `settings` holds what you put in
-it. But each module now reads a different dict, and the sharing has ended.
+it. But the sharing has ended. Each module now reads a different dict.
 
 **Silence the deliberate rebinding.** A linter does report the rebinding, which is why the listing carries
 `# noqa: F811`. Ruff reads the assignment as redefining a name the
@@ -469,8 +469,8 @@ miss. Each thread that missed then waits for the lock and runs the
 body in turn.
 
 **Race eight first calls.** The lock changes the timing, not the outcome. Without it the eight
-constructors overlap and the whole run takes about 50 milliseconds.
-With it they queue, and the run takes about 400. Each thread still
+constructors overlap, so the whole run takes about 50 milliseconds.
+With it they queue, so the run takes about 400. Each thread still
 builds its own `Settings` and still returns the one it built.
 `@cache` keeps whichever finished last, so seven callers hold
 objects the cache has overwritten. The lock makes the program
@@ -493,9 +493,9 @@ It drops `@cache` and hand-writes the check inside one lock.
 **Build the object before the threads start.** Without a lock, the fix is to remove the race rather than to order
 it. A race needs two threads arriving before the object exists, so
 build the object first. The module body calls `primed()` once,
-before the second pool starts any worker thread.
-By the time the second `ThreadPoolExecutor` starts its workers,
-every call to `primed()` is a cache hit. The count is `1`.
+before the second pool starts any worker thread,
+so every call a worker makes to `primed()` is a cache hit.
+The count is `1`.
 
 The chapter's `singleton_eager_factory.py` uses the same technique.
 It primes the cache at import, before any thread can ask.
@@ -598,8 +598,8 @@ print(a.val, b.val, a.__dict__ is b.__dict__)
 ```
 
 `x.val` is `"eggs"`, the value `Other` set. Constructing an
-unrelated subclass overwrites a value belonging to `Singleton`, and
-nothing reports the overwrite.
+unrelated subclass overwrites a value belonging to `Singleton`.
+Nothing reports the overwrite.
 
 **Inherit the base's one dict.** `_shared_state` is one dict, and it lives on `Borg`. `Singleton` and
 `Other` inherit it, so `self._shared_state` resolves
@@ -611,7 +611,7 @@ Read separately, `Singleton` and `Other` look like independent siblings.
 **Give a subclass its own storage.** The fix is one line per subclass. `Separate` declares its own
 `_shared_state`, so the lookup finds `Separate`'s dict before `Borg`'s dict.
 `Separate` is `Other` with that one line added.
-`Separate`'s instances share that dict among themselves. Martelli
+The instances of `Separate` share its dict among themselves. Martelli
 makes the same point in the article the chapter links: a subclass that
 needs state of its own declares it.
 
@@ -620,13 +620,11 @@ class, not a quirk of *Borg*. The base declares one object, and
 every subclass inherits that same one.
 A subclass gets separate storage when its class body binds a new `_shared_state`
 instead of mutating the inherited one.
-The subclasses that leave it alone keep sharing the inherited one.
 
-*Borg*
-makes the trap worse, because every *Borg* instance writes its
-attributes into the shared dict by design. Any subclass that leaves
-`_shared_state` alone writes into `Borg`'s dict, beside every other
-such subclass.
+*Borg* makes the trap worse, because every *Borg* instance writes
+its attributes into the shared dict by design. Any subclass that
+leaves `_shared_state` alone writes into `Borg`'s dict, beside every
+other such subclass.
 
 </details>
 </details>
@@ -703,11 +701,10 @@ that object holds the value from the last construction.
 is a `SingletonClassVar`, the class under construction, so Python
 runs `__init__()` on it after every call to `__new__()`.
 
-**Reset the state on every construction.** The trace
-shows three runs. Each run rebinds `val` to a new one-item list,
-discarding the list before it. The
-object is single, and every caller who constructs it resets its
-state.
+**Reset the state on every construction.** The trace shows three
+runs. Each run rebinds `val` to a new one-item list, discarding the
+list before it. The object is single. Every caller who constructs
+it resets its state.
 
 The chapter's listing inherits `object.__init__()` and does all its work in `__new__()`.
 There the `None` test separates
