@@ -111,7 +111,7 @@ so the answer to an `Ask` is whatever `scripted()` returns.
 A `Tell` needs no answer,
 which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
 
-`ask()` and `tell()` are *accessors*,
+`ask()` and `tell()` are accessors,
 small functions that each wrap one Ability and declare its answer type.
 `need()` has the same shape,
 and the ZIO listing in [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
@@ -438,7 +438,7 @@ each reporting one moment however often you ask.
 
 ### A Source Named in the Type
 
-Compare these handlers to `student_groups.py` in [Functional Toolkits](41_Functional--Toolkits.md#groups-of-any-size),
+Compare these handlers to `student_groups.py` in [Toolkits](41_Functional--Toolkits.md#groups-of-any-size),
 which makes randomness repeatable a different way, by taking a `seed` parameter.
 A `seed` parameter works,
 but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
@@ -2211,7 +2211,8 @@ and the handlers are the interface.
 A library cannot reproduce a native handler's control over the rest of the Effect.
 `handle()` passes a handler the Ability and takes back an answer,
 and the driver resumes the Effect with that answer, once, always.
-A native handler instead receives the *continuation* and chooses what to do with it.
+A native handler instead receives the [continuation](44_Effects--Effect_Management.md#native-effect-management)
+and chooses what to do with it.
 Invoking it once gives you what Stateless has.
 Declining to invoke it makes the handled scope produce the handler's value instead,
 which is how an exception behaves.
