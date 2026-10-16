@@ -1,7 +1,7 @@
 # Readability carry-forward
 
-Two generations of `readability/` have existed. Both are gone from the working
-tree; both are recoverable from git.
+Three generations of `readability/` have existed. All three are gone from the
+working tree; all three are recoverable from git.
 
 - **First generation**, 84 files and roughly 6,700 lines, distilled 2026-08-09
   and deleted in `8660e7c1`. Recover any file with
@@ -15,6 +15,9 @@ tree; both are recoverable from git.
   path: the rename and the deletion landed in the same change, so the committed
   second-generation files carry the bare chapter name even though every one of
   them had been applied.
+- **Third generation**, 92 files written 2026-10-16, one per chapter and one
+  per Solutions README. Distilled 2026-10-16 into "The 2026-10-16 generation"
+  at the end of this file, which gives the recovery command.
 
 **What a fresh readability pass should do with this file.** Read it first. This
 skill hunts AI-writing tells and watch-list vocabulary, which makes it the pass
@@ -270,3 +273,308 @@ underscore colon, 08's structural-typing restatement, 20's "truly", 31's
 "stored directly", 33's "results, not mechanism", 34's three-walker
 paragraph, 40's two-colon parallel and its "Choose `match`" sentence)
 stand as recorded.
+
+---
+
+## The 2026-10-16 generation
+
+The third generation reviewed the whole book on 2026-10-16,
+one Opus agent per file.
+It held 92 files:
+48 chapter and appendix reviews named `readability/<stem>.md`,
+and 44 Solutions reviews named `readability/<stem>.solutions.md`.
+Together they list 650 direct fixes and 833 declined items,
+counted as list entries;
+a few entries bundle several hits of one kind.
+Eight files carried one block each.
+Bruce rejected none.
+All eight were applied the same day,
+which gave those files a leading `~`.
+`~31_Patterns--State_Machines.md`, a 2026-10-15 review of chapter 31 by the same pass
+(two direct fixes, five declines, no blocks),
+was deleted with them.
+The applied-directly lists stay out of this file, for the reason given above.
+
+Recover any of these files with
+`git show <hash>^:readability/~44_Effects--Effect_Management.md`,
+where `<hash>` is the commit "Readability: distill the 2026-10-16 generation and clear readability/",
+the one that deleted them.
+`git log --diff-filter=D -1 --format=%h -- readability/~44_Effects--Effect_Management.md`
+prints that hash.
+The nine closed files keep the `~` in their recovery path;
+every other file has the bare stem.
+
+### The eight blocks, all applied
+
+None of these is a standing rejection.
+Each sentence was decided on 2026-10-16,
+so a fresh pass treats the current wording as settled.
+
+- **10_Foundations--Cleanup, the last sentence of "The Rule".**
+  "the leak it exists to catch" gave the registry a leak-detection purpose,
+  where the chapter presents it as a live-instance counter.
+  It now reads "so the registry leaves each object's lifetime as it was."
+- **10 Solutions, exercise 4.**
+  "The registry now causes the leak it exists to detect" became
+  "The registry now leaks every `Counter` it tracks," decided together with the chapter's sentence.
+- **20_Patterns--Rethinking_Objects, line 140.**
+  The sentence now reads "Substitutability is the part of polymorphism that no tool can check."
+  The proposed wording went in, over the alternative that made substitutability a separate guarantee.
+- **21_Patterns--Design_Patterns, after the Design Principles list.**
+  The first-edition send-off "You can hold this handful of fundamental ideas in your head while analyzing a design" was cut,
+  so the section ends on its last principle.
+- **24_Patterns--Singleton, the mutate-versus-rebind passage.**
+  The middle statement of three, "Mutation makes the sharing work. Rebinding is the mistake that quietly ends it.", was cut.
+  The figure paragraph, the code walk, and the refrain "Mutate through any name. Rebind only through the module." stay.
+- **26_Patterns--Surrogate, the `weakref` cross-reference paragraph.**
+  Cut whole, since the paragraph above it closes the topic.
+- **29 Solutions, exercise 3.**
+  The causal "so" before `@staticmethod` is gone,
+  and the passage now reads "None of these functions uses `self`. `@staticmethod` makes Python call each one with the caller's arguments alone, even through an instance."
+- **44_Effects--Effect_Management, line 75.**
+  The "because" clause now gives the reason in place of the definition:
+  "because the operation that changes the environment sits in that function's body."
+
+### Keeps this round confirms
+
+Most of the 833 declines are instances of the recurring keeps above.
+A sweep that re-finds them should stop at the same place.
+The 2026-10-16 instances of each:
+
+- **A watch-list absolute that states a guarantee.**
+  08's "The Python runtime never acts on a type hint",
+  42 Solutions' "so it never propagates to the top-level handler",
+  34's "even with a case for every node" (the concession is the claim).
+- **"only" marking a restriction.**
+  The six shapes ruled fine on 2026-10-04 account for most `only` hits,
+  among them 05 Solutions' "Only `clear_by_method()` empties the caller's list",
+  35's "Only identity proves sharing",
+  and 41 Solutions' "accepts only an integer" (an open-ended alternative).
+- **"want" for the reader's intent or a human subject.**
+  16 Solutions' "whether you want the list",
+  32 Solutions' "Which behavior you want",
+  37's "the safety officer wants".
+- **"is what" with a complement that needs it.**
+  03 Solutions' "The rest is what `Counter` supplies",
+  46 Solutions' "That is what structural typing means".
+  A cleft with a noun-phrase complement, repeated to answer an exercise's question, stays too,
+  as in 29 Solutions' "What you lose is the log."
+- **"worth" weighing an effort against a condition.**
+  07 Solutions' "is worth writing when a tool reads it",
+  27 Solutions' "The second assertion is the one worth writing",
+  47's "worth retrying", where retrying is the program's own vocabulary.
+- **real/actual/genuine with the contrast named.**
+  19's "A real deadlock has no `timeout`" (against the demo's bounded run),
+  45's "The `# type: ignore` marks a real mismatch",
+  47's six uses of "real clock" against the handled clock.
+- **"plain" against a named alternative.**
+  30 Solutions' "A plain `except`" against `except*`,
+  37's "an alias for a plain `dict`" against `defaultdict`,
+  B's "a plain assignment" against the annotated one.
+- **A reflexive "itself".**
+  07's "keeps each method from calling itself",
+  47's "It prints nothing itself" (against the supplied `Narrator`),
+  33's idiom "the end in itself".
+- **A rhetorical question that names the section's problem.**
+  15's "What does `with` call?",
+  19's "How does `gather()` respond to a failure?",
+  21 Solutions' "What stops working? Nothing.", which repeats the exercise's own question.
+- **A rule of three that is an inventory.**
+  13 Solutions' "an `is` test like this one, a membership test, or a call",
+  34's "SymPy, Polars, and SQLAlchemy" (the next sentence uses each),
+  36's "rewind, rollback, or restore".
+- **A single tier hit.**
+  13's "valuable", 21's "One of the most compelling motivations", 01's "daunting" and "myriad".
+- **A short beat.**
+  30's "It is not.", 32's "It works.", 43's "looks safe. It is not."
+  19's "Three unrelated kinds of worker produce one set of answers." was weighed against the 2026-10-04 cut of verdict fragments and kept,
+  because it is a full sentence stating the section's point beside a listing with no `#:` markers.
+- **A superlative that orients the reader.**
+  The Factory precedent and 28's "best-known closure trap" cover
+  02's "one of the main reasons for Python's consistent readability",
+  04's "the classic control-flow bug",
+  and 41's "The best-known case is *Kirkman's schoolgirl problem*".
+- **The book's own term, generalizing the "hook" keep.**
+  A watch-list word or figure stays when it names a chapter's term or a listing,
+  as in 25 Solutions' `near_miss.py` (a listing name that holds a don't-use phrase),
+  39's "dissolve in Python" (chapter 21's heading "When a Pattern Dissolves"),
+  and 43's "spectrum" and "rung", which the heading and the numbered list share.
+
+### New recurring keeps
+
+These judgments recur across files and are new to this file.
+
+- **A negation that is the claim, or half of a named contrast.**
+  The positive-statement rule keeps these, and §9 fires on the "not X but Y" shape.
+  09's "The bug is not the class attribute. It is writing one where you meant a per-object default.",
+  33's "Nothing edits `Flower`.",
+  18's "The goal is not the fastest possible program."
+  A silent failure takes a negative too,
+  as in 16's "prints nothing and raises no exception".
+- **An additive "and" across a change of subject.**
+  The split rule fires on the subject change.
+  The substitution test decides.
+  Where no "but", "so", "while", or "whereas" fits, the "and" stays:
+  two links of one chain (29's "Turning the key primes the pump, and priming starts the engine"),
+  joint premises of a following "so" or "because"
+  (07 Solutions' "The lookup starts at the class of the object, and `self` is a `MoreDerived`, so ..."),
+  or two outcomes of one run (46's "`Terminal` prints Alice's greeting and `capture` stays empty").
+  Two splits were tried and reverted because they left a run of short sentences:
+  03's "`in` and `len()` work on all of them, and slicing works on the sequences"
+  and 13's "Cases do not fall through ..., and `match` has no `break` to forget".
+- **Bold step labels are the Solutions convention.**
+  §15 and §16 fire on every Solutions README.
+  The labels walk a solution's steps in prose (commit 85f6ce4d),
+  as in 02 Solutions' "**Tell values from literal text.**"
+  and 05 Solutions' "**Accumulate in the shared default.**".
+  A first sentence that echoes its label and then goes further stays,
+  as in 17 Solutions' "**Inherit the base's arithmetic.** `Celsius` inherits `float`'s arithmetic", which continues to the result type.
+  A sentence whose whole content is its label was cut (see the last subsection).
+  The same call covers the bold-label bullets of each chapter's Guidelines section (19)
+  and A's numbered list, whose bold leads are full sentences.
+- **A repeat that a collapsed step needs.**
+  The hint, the shape, and the solution open one at a time,
+  so a reader may see one step alone.
+  A fact stated in the hint and again in the solution stays,
+  as in 12 Solutions' 2000 as the one century year `Year` accepts,
+  35 Solutions' "`record()` forwards `slots=False` alone",
+  and 47 Solutions' "Without the guard, each worker builds another pool."
+- **The trap-first opening.**
+  A Solutions section opens on the wrong version failing,
+  and the labeled steps then walk the repair.
+  The overlap is the file's shape, not a treadmill.
+  This round's instances are 02 Solutions' solutions 1 and 5,
+  12 Solutions' solutions 2, 3, and 8,
+  and 34 Solutions' `RecursionError` in exercise 2.
+- **A restatement that adds a step.**
+  §70 fires on the shape.
+  The keep holds in three cases:
+  when the second statement names the misreading
+  (05's "The default looks like an expression each call evaluates, but Python evaluates it once, at the `def`."),
+  applies the rule to a new subject (23's `Collection` requirement applied to `Countdown`),
+  or re-establishes a frame after a digression
+  (34's "*Interpreter* is *Composite* applied to language" after the `pathlib` digression).
+- **A refrain or a parallel repeated by design.**
+  18's "The 3x threshold sits far below any multiple you should see." in both the NumPy and the Numba sections,
+  44's "An Effect Management System replaces ..." closing three separate arguments,
+  29's introduction previewing a section that other chapters link by its anchor,
+  so the section restates the point for a reader who arrives there directly.
+- **An aphorism that states the mechanism.**
+  §32 fires on the shape.
+  The keep holds when the sentence is concrete and true of the listing beside it,
+  as in 22's "An immutable type needs immutable fields.",
+  A's "A row that lists everything tells you nothing.",
+  and 46 Solutions' "a value nobody uses is a value nobody checks".
+  44's "a space heater with extra steps" is a joke that carries the claim.
+- **A colon that passes the "namely" test.**
+  §69 fires on the shape.
+  The colon rule keeps each of these:
+  12's "Nothing objects: not the annotation, not the type checker, not the running program" (the style guide's own example),
+  13's "It also has a name: the *expression problem*",
+  A's "says how long that took: a decade".
+- **A count lead-in.**
+  31's "Two consequences follow from the mixin",
+  04 Solutions' "Two things follow from that control.",
+  46's "Two details in `greeter.py` matter:".
+  Each count is exact.
+  The items follow at once.
+- **First-edition and first-person voice.**
+  Beyond the superlatives above, this round kept
+  17's "It is a fascinating tool and tempting to use",
+  25's "At the heart of a framework is the *Template Method*",
+  and 21's "(I'll readily admit that I may be missing something here)".
+  Epigraphs belong here (16, 28, 45, and 10, whose different-subject "and" stays as epigraph voice).
+  The author's "we" stays wherever it appears (27, 30, 31, 44).
+- **The author's framing of common practice.**
+  §5 fires on an unsourced generalization.
+  The book keeps these as the author's claims:
+  32's "Most programmers first write a third version.",
+  34's "Textbooks usually present the *Interpreter* pattern as ...",
+  44 Solutions' "Most codebases avoid the forwarding with a module-level logger."
+- **An adverb that carries content.**
+  §23's deletion test fails when the adverb states something the sentence needs,
+  as in 22's "automatically creates" (Python builds the `dict` with no code from the class),
+  38's "works entirely in rooms" (no grid coordinates),
+  and "silently" or "quietly" marking an error the reader would expect (12, 16).
+- **A commerce word for a measured quantity or the program's money.**
+  R2's carve-out covers 03 Solutions' "the whole loop costs O(n²)",
+  36's "cost about two million pointers",
+  and 13's "a rough cost to send a message", money in the program's domain.
+- **"exactly" for a precise match.**
+  19 Solutions' "Exactly half the increments survive" (200 of 400),
+  41's "exactly once", a combinatorial count, three times,
+  39's "exactly one receiver".
+- **Past tense for an event on the page.**
+  38 Solutions' "the default kick was down to `0.00` by step 400",
+  45 Solutions' "The type checker told you more.",
+  46 Solutions' "`greet_all()` did the right thing all along."
+- **A sharper rewrite that would add a claim.**
+  The vaguer sentence stays when every sharper version states a fact the file lacks,
+  as in 04's "the `KeyboardInterrupt` you press" (naming the key),
+  12's "Copying instead of mutating reduces errors.",
+  and 24 Solutions' "where ruff expects every import".
+- **A paragraph's position answers the question its listing raises.**
+  Moving the paragraph was weighed and declined in three cases:
+  10's `WeakSet` aside, which answers "why a dictionary?" right after the listing,
+  32 Solutions' `Origami(Paper)` paragraph,
+  and 19 Solutions' paragraph about the `return` in solution 10.
+
+### Conventions confirmed clean, 2026-10-16
+
+- **Review naming.**
+  A Solutions README review is `readability/<chapter stem>.solutions.md`,
+  beside the chapter's `readability/<chapter stem>.md`.
+  The readability skill names the chapter form alone.
+  A completed file takes the `~` prefix on either name.
+- **Bold step labels** and the six ruled-fine `only` shapes held across all 92 files.
+- **Hand-wrap width.**
+  Solutions READMEs are hand-wrapped near 70 columns,
+  and an edited paragraph is rewrapped to that width.
+  Hint paragraphs carry one sentence per line, in every Solutions file.
+  Long or ragged lines left by an earlier edit,
+  most often where a bold label went in,
+  render the same,
+  so a pass rewraps them when it edits the paragraph
+  or when a line broke after one or two words.
+- **"The test file confirms that:"**
+  is the book-wide lead-in for test bullets
+  (chapters 11, 23, 28, 29, 30, 34, 35, 36, and B).
+- **"Here," and a colon introducing a listing.**
+  B's four "Here," openers and 42's listing colons point at the listing that follows.
+- **A chapter roadmap in an opening paragraph** (04, 40, 41, 45) orients the reader,
+  so §28 and §70 leave it alone.
+- **Exercise wording.**
+  Exercise imperatives and questions stay,
+  including 23's "What has `first()` cost you on an infinite source?",
+  whose cost is the memory the listing reports.
+
+### Superseded, confirmed, and left open
+
+- 26's "in order to implement the *copy-on-write* idiom" keep, above, has lapsed.
+  The smart-reference item now reads "which makes *copy-on-write* possible",
+  with the causal link intact.
+- 08's standing rejection was confirmed again.
+- Three declines were left for an editing pass rather than ruled on:
+  47 Solutions' "The same distribution is why the chapter uses a factory function rather than more `supply()` arguments"
+  (the reason that follows is the nine-actor ceiling),
+  42's sentence pairing a deleted `e` with `sum_type.py`'s kept results,
+  and 23's closing list naming a peekable wrapper that exercise 8 builds.
+
+### What a fresh pass should still look for
+
+The 650 fixes clustered on a few shapes.
+A fresh pass will find more of each.
+Roughly 170 split an "and" that joined clauses with different subjects where "but", "so", or "while" fit.
+Two keeps in 15 Solutions pass the "whereas" test,
+"Entering is outside-in ..., and exiting is inside-out ..." and
+"A truthy value suppresses the exception, and a falsy value lets it continue",
+so a fresh pass should split them too.
+About 100 cut a restatement,
+most often a Solutions sentence that repeated its own bold label
+("**Make the hidden input a parameter.**" followed by "Move the hidden input into the parameter list.").
+Smaller clusters trimmed empty intensifiers (a bare "real", "truly", or "really"),
+"worth" frames that rated a list in place of introducing it ("The cases worth testing are:"),
+and pointers with two candidates,
+where a "This" or an "it" could name either of two nouns in the sentence before.
+Checking each rewritten claim against its listing turned up a few inaccuracies along the way,
+so a pass that rewrites a sentence reads the listing first.
