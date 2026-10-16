@@ -241,7 +241,9 @@ leaking the internals yet again.
 
 The `numbers` and `bob` getters also copy differently.
 The wrong kind of copy reopens the leak.
-`list.copy()` is *shallow*: it duplicates the container but shares the elements.
+`list.copy()` is shallow,
+as [Variables and References](02_Foundations--Tour.md#variables-and-references)
+shows for `a[:]`: it duplicates the container but shares the elements.
 That sharing is safe here because the elements are immutable `int`s.
 `Bob` gets `deepcopy()`,
 which recursively copies everything the object references.
@@ -314,7 +316,7 @@ def test_frozen_field_refuses_assignment() -> None:
 
 Two smaller choices in `immutable.py` matter as much as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
-`frozen=True` is shallow.
+`frozen=True` is shallow in the same way as the tuple in [Shallow Immutability](03_Foundations--Containers.md#shallow-immutability).
 It blocks assignment to the fields of `Immutable`.
 A field whose value is mutable stays mutable.
 If you declare the field as a `list` instead, the leak reopens:
