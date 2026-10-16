@@ -73,7 +73,7 @@ Chapters/27_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` 
 Chapters/27_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/29_Patterns--Changing_the_Interface.md	The first line	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/30_Patterns--Observer.md	The second `announce()`	The second `announce()` copies the shortened list, so `always` receives both changes and `once` receives one.
-Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, not at the `def`, so by the first call the whole module has loaded and `TrapState` exists.
+Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, and an annotation is evaluated lazily, so by the first call the whole module has loaded and `TrapState` exists.
 Chapters/32_Patterns--Multiple_Dispatching.md	The last case	The last case shows why the sentinel exists.
 Chapters/33_Patterns--Visitor.md	the last line	In the last line of `bug_visits.py`'s output, both dispatches change the result, because `Chrysanthemum` overrides `eat()` (chrysanthemums really do produce a natural insecticide).
 Chapters/33_Patterns--Visitor.md	the next `def _`	`@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name, so every implementation stays in the table.
@@ -182,7 +182,6 @@ Solutions/40_Functional--Foundations/README.md	the line that	`ty` reports `posit
 Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` group replaces the first under the same key, so the result holds one of the two `"b"` items.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` evicts nothing and the second `square(1)` becomes a hit.
-Solutions/43_Functional--Confidence/README.md	the second line	**Count the processes that answered.** The interesting number is the second line.
 Solutions/45_Effects--Generators/README.md	The third `send()`	The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first `yield`	`next(t)` runs the body up to the first `yield` and produces the first prompt.

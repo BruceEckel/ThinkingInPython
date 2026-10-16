@@ -486,7 +486,6 @@ Chapters/47_Effects--Stateless_in_Practice.md	price: Assert that CODE attempts e
 Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
 Chapters/B_An_Effect_Checker.md	is what: is what the checker resolves
 Chapters/B_An_Effect_Checker.md	itself: CODE declares itself pure and calls CODE
-Solutions/02_Foundations--Tour/README.md	is what: What differs is what a reader infers
 Solutions/02_Foundations--Tour/README.md	only: A post-processor has only the characters
 Solutions/03_Foundations--Containers/README.md	cost: CODE compares the cost of operations at the left end of a CODE and of a CODE
 Solutions/03_Foundations--Containers/README.md	costs: so the CODE loop costs O(n)
@@ -648,7 +647,7 @@ Solutions/44_Effects--Effect_Management/README.md	prices: so a test that needs f
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
 Solutions/45_Effects--Generators/README.md	only: and CODE is the only value it accepts
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
-Solutions/45_Effects--Generators/README.md	want: That is the argument for annotating a local whenever you want the checker to verify the type of the call that produces its value
+Solutions/45_Effects--Generators/README.md	want: So annotate a local whenever you want the checker to verify the type of the call that produces its value
 Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
 Solutions/46_Effects--Stateless/README.md	only: and only the annotation
 Solutions/46_Effects--Stateless/README.md	only: read both diagnostics and ask what the function has become once it loses its only CODE
