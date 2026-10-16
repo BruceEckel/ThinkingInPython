@@ -22,7 +22,6 @@ If you write `c = a` instead of `c = a[:]`, the program prints
 `c` is then a third name for the one list,
 so appending to `c` changes the list `a` names, as `b.append(4)` did.
 The solution keeps the slice.
-`c = a[:]` builds a new list, so `a` still holds `[1, 2, 3, 4]`.
 
 ```python
 # exercise_1.py
@@ -172,8 +171,8 @@ They say the author came from Java or JavaScript.
 
 A linter flags the camelCase form.
 Ruff's pep8-naming rules report `N816` for a mixed-case global.
-Ruff leaves those rules off by default,
-and this book's `pyproject.toml` turns them on with the `N` in its `select` list.
+Ruff leaves those rules off by default.
+This book's `pyproject.toml` turns them on with the `N` in its `select` list.
 The uppercase form passes the linter and still violates
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions),
 which reserves uppercase for constants and CapWords for class names.
@@ -241,7 +240,6 @@ print(quoted(message))
 `shout()`'s two branches.
 `shout()` changes the literal text and passes each value through,
 while `quoted()` changes each value and passes the literal text through.
-The `isinstance()` test decides which branch each piece takes.
 Iterating over a template yields a `str` for text the author typed
 and an `Interpolation` for a value the program supplied,
 so a two-branch `if`, rather than a parser, decides what to do with each piece.
@@ -257,7 +255,8 @@ The guess fails as soon as a literal matches a value.
 With `name = "scored"`, the finished string reads `scored scored 92%`,
 and either of the two words could be the value.
 
-That failed guess is the argument for `Template` in one example.
+`Template` removes that guess, because it keeps each value apart
+from the literal text.
 Quoting is a harmless demonstration, but the same reasoning covers
 escaping a value before it enters SQL or HTML, where a wrong guess is a
 security hole rather than a typo.
