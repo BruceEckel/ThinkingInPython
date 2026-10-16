@@ -251,6 +251,7 @@ def gate(v: Vars) -> None:
     py("tools.check_unique_slugs")
     py("tools.skill_copies")
     py("tools.extract_examples")
+    py("tools.extract_rust")
     py("tools.check_skip_lists")
     py("tools.extract_examples", "--write")
     if not markers_fresh(v):
@@ -788,11 +789,19 @@ def sync(v: Vars) -> None:
     py("tools.extract_solutions", "--write", "-o", "Solutions")
 
 
-@task("Verify the committed Examples/ and Solutions/ code matches "
-      "the Markdown")
+@task("Verify the committed Examples/, Solutions/, and rust/ code "
+      "matches the Markdown")
 def check(v: Vars) -> None:
+    """extract_rust runs in its default check mode: it reads the two
+    rust/ files chapter 18's blocks name and compares them with the
+    book, needing no Rust toolchain. Before 2026-10-16 nothing in the
+    gate compared them, and rust/fastcount/demo.py sat two sample-run
+    numbers behind the chapter for three days with every gate green;
+    `tip rust-sync` is the fix when this reports drift.
+    """
     py("tools.extract_examples")
     py("tools.extract_solutions")
+    py("tools.extract_rust")
 
 
 @task("Delete orphaned stray files under Examples/ and Solutions/ "

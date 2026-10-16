@@ -42,9 +42,12 @@ from the Markdown** by `tools/extract_examples.py`, so:
 ## Rust examples: rust/, isolated from the main build
 
 Chapter 18's Rust section has real PyO3/maturin crates under `rust/`. Only
-the `rust-*` tasks in `tools/tasks.py` enter `rust/` or need a Rust
-toolchain, so `verify`/`gate`/`ci` work with no Rust installed. Details:
-`rust/CLAUDE.md`.
+the `rust-*` tasks in `tools/tasks.py` build or run anything there or need
+a Rust toolchain, so `verify`/`gate`/`ci` work with no Rust installed. The
+gate does read `rust/`: `tip check` (and the gate's check step) runs
+`extract_rust.py` in check mode since 2026-10-16, so a chapter 18 edit that
+leaves `rust/fastcount/demo.py` or `src/lib.rs` stale fails the build, and
+`tip rust-sync` regenerates them. Details: `rust/CLAUDE.md`.
 
 ## Cloud sessions: tools/cloud-setup.sh
 

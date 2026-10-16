@@ -15,9 +15,12 @@ both first-line comments in a fenced block:
   `run_examples.py`), since the compiled module it imports does not exist
   in the main build's environment.
 
-This is deliberate: only the `rust-*` tasks in `tools/tasks.py` enter
-`rust/` or require a Rust toolchain, so `verify`/`gate`/`ci` all work
-with no Rust installed. `tip rust-all` syncs, builds, and runs the
+This is deliberate: only the `rust-*` tasks in `tools/tasks.py` build or
+run anything in `rust/` or require a Rust toolchain, so `verify`/`gate`/`ci`
+all work with no Rust installed. The one read the gate makes is
+`extract_rust.py`'s check mode, in `tip check` since 2026-10-16: it compares
+the two files the book's blocks name with the committed copies and fails on
+drift, which `tip rust-sync` fixes. `tip rust-all` syncs, builds, and runs the
 crates for real, and `verify-targets` never runs the `rust-*` tasks;
 see `rust/README.md`. A crate
 directory also holds real, hand-maintained project files

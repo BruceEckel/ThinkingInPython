@@ -33,7 +33,10 @@ done here, nor by the main build: see ``rust/README.md`` and the
 
 Default mode is ``check``: nothing is written, drift against the
 committed ``rust/`` tree is reported, and a non-zero exit signals
-trouble. Pass ``--write`` to update the tracked files.
+trouble. ``tip check`` and the gate run it (since 2026-10-16, after
+``demo.py`` drifted unnoticed for three days), so a chapter 18 edit
+that leaves ``rust/`` stale fails the build; ``tip rust-sync`` is the
+fix. Pass ``--write`` to update the tracked files.
 
 Usage:
     python -m tools.extract_rust            # check vs rust/
