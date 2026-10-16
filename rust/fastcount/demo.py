@@ -35,7 +35,7 @@ def speedup[T, R](
 
 speedup("count_primes", count_primes,
         fastcount.count_primes, 200_000)
-# Sample run: count_primes Rust speedup: 12.2x
+# Sample run: count_primes Rust speedup: 12.3x
 speedup("collatz_lengths", collatz_lengths,
         fastcount.collatz_lengths, list(range(1, 50_000)))
-# Sample run: collatz_lengths Rust speedup: 34.3x
+# Sample run: collatz_lengths Rust speedup: 36.0x
