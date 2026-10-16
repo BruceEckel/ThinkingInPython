@@ -318,7 +318,8 @@ Everything else is true, unless the object's type defines its own test.
 That rule is *truthiness*,
 and it lets you write `if items:` instead of `if len(items) != 0:`.
 
-A type defines that test with `__bool__()`.
+A type defines that test with `__bool__()`, a *dunder*:
+a name with double underscores at each end that Python reserves for the methods and attributes it uses.
 Without one, Python falls back to `__len__()`, so an empty container is false.
 
 ```python
