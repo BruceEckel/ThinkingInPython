@@ -80,8 +80,8 @@ because both names refer to one `dict`.
 No class, no ceremony.
 For most singleton needs, a module solves the problem.
 
-The three listings come down to three steps through `sys.modules`,
-and a fourth step shows the mistake that undoes the sharing:
+The three listings come down to three steps through `sys.modules`.
+A fourth step shows the mistake that undoes the sharing:
 
 ![](_images/singleton_story)
 
@@ -199,9 +199,9 @@ The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 names only inside a class body,
 so at module level `__Settings` keeps its name as written,
 as reachable as any other.
-The second underscore has one effect, and that effect is a failure.
-In code inside a class body,
-the compiler rewrites a reference to `m.__Settings` into a lookup for `m._TheClass__Settings`.
+The second underscore has one effect:
+it breaks a reference written inside a class body.
+There the compiler rewrites `m.__Settings` into a lookup for `m._TheClass__Settings`.
 That lookup fails.
 
 The cached-factory listings name the class `Settings`, with no underscore,
@@ -309,7 +309,6 @@ print(distinct_objects(settings) > 1)
 #: True
 ```
 
-Eight threads, more than one object.
 Every thread checks the cache before any of them has filled it,
 so each runs the constructor and returns a different object to its caller.
 The object from the last thread to finish stays in the cache.
@@ -322,7 +321,7 @@ and the sleep makes that result likely.
 The fix puts the check inside a lock.
 `@cache` runs its check inside its own wrapper,
 where your code cannot put a lock around it.
-Here, the locked version drops `@cache` and writes the check by hand:
+So the locked version drops `@cache` and writes the check by hand:
 
 ```python
 # singleton_locked_settings.py
