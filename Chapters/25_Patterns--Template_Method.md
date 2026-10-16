@@ -129,7 +129,7 @@ A forgotten step silently does nothing.
 The do-nothing default also hides a misspelling.
 `def customise1()` ('s' instead of 'z')
 adds a new method and leaves the base's do-nothing version in place.
-That is why every step override in these listings carries [`@override`](07_Foundations--Classes.md#marking-overrides-with-override).
+So every step override in these listings carries [`@override`](07_Foundations--Classes.md#marking-overrides-with-override).
 The type checker then rejects a method that overrides nothing.
 
 That check depends on the decorator.
@@ -310,7 +310,8 @@ The next subclass author might restore the usual order out of habit.
 The reliable repair changes the framework.
 Separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
-That is why `ApplicationFramework` has no `__init__()` and the client calls `MyApp().run()`.
+So `ApplicationFramework` has no `__init__()`,
+and the client calls `MyApp().run()`.
 
 ### Substitutability
 
