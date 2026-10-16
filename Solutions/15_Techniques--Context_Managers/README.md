@@ -99,8 +99,7 @@ positional arguments but 3 were given. Python makes that call before
 the `with` statement enters the manager, so the `TypeError` propagates
 straight out of the script. `ty` flags the call as
 `too-many-positional-arguments`. The solution wraps the two classes
-in a tuple, so `expected` receives one `types` argument,
-and `issubclass()` accepts a tuple as its second argument.
+in a tuple, so `expected` receives one `types` argument.
 
 ```python
 # ch15_expected_types.py
@@ -196,8 +195,8 @@ with (tag("ul") as outer, tag("li") as inner1,
 ```
 
 All three managers enter left to right (`ul`, then `li`, then `li`
-again) and exit in reverse order, for any number of managers on the
-line.
+again) and exit in reverse order. The reversal holds for any number
+of managers on the line.
 
 </details>
 </details>
@@ -395,8 +394,8 @@ class ignore_missing:
 
 If you return `issubclass(exc_type, KeyError)` without the `None` test,
 the demo prints the same two lines, because both of its blocks raise an exception.
-A block that finishes cleanly then fails.
-`__exit__()` receives `None`, and `issubclass()` raises a `TypeError`.
+In that version a block that finishes cleanly fails.
+`__exit__()` receives `None`, so `issubclass()` raises a `TypeError`.
 `ty` reports an `invalid-argument-type` at the `issubclass()` call,
 so the type checker catches the mistake that the demo's output hides.
 The solution tests `exc_type is not None` first.
@@ -436,11 +435,11 @@ with expected(ValueError):
 **Suppress one exception type.** The return value of `__exit__()` determines whether the exception continues.
 A truthy value suppresses the exception, and a falsy value lets it continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
-propagates everything else.
+lets every other exception propagate.
 
-**Check that other exceptions propagate.** The `ValueError` block confirms the
-propagation. `ignore_missing`'s `__exit__()` returns `False` for the `ValueError`,
-so the exception propagates to the chapter's `expected`, which prints it.
+**Check that other exceptions propagate.** In the `ValueError` block,
+`ignore_missing`'s `__exit__()` returns `False`, so the exception
+propagates to the chapter's `expected`, which prints it.
 
 **Handle a clean exit.** The `exc_type is not None` test keeps the normal path working. When a
 block finishes cleanly, Python still calls `__exit__()`
@@ -519,12 +518,13 @@ using []
 **Close in reverse order of opening.** `enter_context()` pushes each manager onto the stack as the
 comprehension iterates over the list left to right. Leaving the `with` unwinds
 that stack, so the closing tags print in reverse. The reversal holds
-for any number of names, zero included.
+for any number of names.
 
 In the empty run, nothing opens, so nothing closes.
 `with ExitStack() as stack:` still enters and exits
-around a body whose stack stays empty. That degenerate case
-shows why `ExitStack` exists.
+around a body whose stack stays empty.
+
+The empty run shows why `ExitStack` exists.
 A written-out `with a, b, c:` line settles its count in the source.
 `ExitStack` instead accepts a count settled at runtime,
 such as the number of names on a command line, zero included.
