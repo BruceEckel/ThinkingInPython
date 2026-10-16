@@ -407,7 +407,7 @@ print(sorted(words, key=len))
 Each call passes a function to another function, which runs the loop.
 
 The `list()` calls do real work.
-`map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#generators).
+`map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty).
 An iterator computes each value only when a consumer asks for it.
 `print()` displays the iterator's `repr()` instead of consuming it,
 so `print(map(...))` shows `<map object at 0x...>` rather than values.
@@ -422,7 +422,7 @@ which reorders the list in place and returns `None`.
 
 When you would write a fresh lambda for `map()` or `filter()`,
 Python offers an alternative you should usually prefer:
-the [comprehension](16_Techniques--Comprehensions.md).
+the [comprehension](16_Techniques--Comprehensions.md#the-map-and-filter-equivalent).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 with no lambda and no function call.
 `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
