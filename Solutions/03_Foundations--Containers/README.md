@@ -112,8 +112,8 @@ print(dict(counts))
 #: {'dog': 2, 'cat': 1}
 ```
 
-`defaultdict(int)` supplies `0` the first time the loop reads a key,
-because `int()` returns `0`.
+The `0` that `defaultdict(int)` supplies for a missing key comes from
+`int()`, which returns `0` when called with no arguments.
 That default lets `counts[kind] += 1` work with no "does this key exist yet" check.
 `defaultdict(list)` removes the same check before appending to a fresh list.
 
@@ -185,7 +185,7 @@ except TypeError as e:
 
 A `set` hashes each element once, at insertion, so every element must
 be hashable. `frozenset` is hashable because it is immutable.
-Because its contents stay the same after creation, its hash stays valid.
+Its contents stay the same after creation, so its hash stays valid.
 A `list` is mutable, so the `list` class sets `__hash__` to `None`.
 A set member or a dictionary key needs a hash, so a `list` can be neither.
 
@@ -254,7 +254,7 @@ Then reproduce `most_common()` with `sorted()` and a `key` function, and notice 
 
 If you leave the minus sign out of the `key` function,
 `sorted()` ranks the lowest counts first,
-and the slice prints `[('dog', 0), ('sat', 1)]`.
+so the slice prints `[('dog', 0), ('sat', 1)]`.
 Reading `counts["dog"]` earlier stored that `0` under `'dog'`.
 The minus sign negates each count, so `sorted()` puts the largest count first,
 matching `most_common()`, which ranks from the highest count down.
@@ -328,8 +328,8 @@ print(person[0], type(person[0]).__name__)
 The unpacking line stays the same, because a `namedtuple` is a tuple
 subclass. The `namedtuple` unpacks by position like any other tuple.
 
-Line `[1]` reads fields by name,
-and `person.height` names the field that `person[2]` reads by position.
+Line `[1]` reads fields by name.
+`person.height` names the field that `person[2]` reads by position.
 Unpacking and `person[0]` still work beside the names,
 so a heterogeneous tuple that passes between functions
 is usually better as a `namedtuple` or a data class.
@@ -414,8 +414,9 @@ For the explanation, compare how many items an unstarred target list requires wi
 If you index instead, writing
 `first, middle, last = row[0], row[1:-1], row[-1]`, the program
 prints the same `1 [2, 3, 4] 5`.
-That line uses the indexing the exercise rules out. The indexed line and the starred unpacking differ on a one-item list. The
-indexed version prints `1 [] 1`, counting the one item as both first
+That line uses the indexing the exercise rules out.
+The indexed line and the starred unpacking differ on a one-item list.
+The indexed version prints `1 [] 1`, counting the one item as both first
 and last, while `first, *middle, last = [1]` raises a `ValueError`
 (`not enough values to unpack`). The solution uses starred targets,
 because one target list states the shape it expects and Python
@@ -524,8 +525,7 @@ So `frozendict(pairs)` equals `frozendict(host="localhost", port=8080)`.
 hash and equality, not by identity.
 `config` and `same` are separate objects built in different entry orders.
 They hold the same pairs, so they compare equal and hash the same.
-With a `frozendict` key, any equal configuration reaches the same entry,
-whoever built it and whenever.
+With a `frozendict` key, any equal configuration reaches the same entry.
 
 **Catch the rejected assignment.** Assigning to an entry raises a `TypeError` at runtime,
 and the type checker rejects the assignment too. The
