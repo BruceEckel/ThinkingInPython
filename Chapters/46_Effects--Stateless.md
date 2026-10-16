@@ -170,7 +170,7 @@ A caller now has two options: supply a `Console`,
 or declare the same need in its own signature and pass the Ability to its own caller.
 A caller that does neither fails the type check.
 
-In `greeter.py`, two details deserve attention:
+Two details in `greeter.py` matter:
 
 1. `greet()` is a generator function, because it contains `yield from`,
    so calling it builds the Effect its signature declares.
@@ -1250,12 +1250,11 @@ if __name__ == "__main__":
 `Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
 Every signature so far read `Depend[Need[...], ...]`,
 while this one names the Ability bare.
-The rule is the same in both cases.
-The channel holds Abilities.
+One rule covers both cases: the channel holds Abilities.
 `Async` is an Ability, so it sits there bare.
 `Console` is an ordinary class,
 and `Need[Console]` is the Ability that asks for it.
-The first type parameter is bound to `Ability`,
+The first type parameter's bound is `Ability`,
 so the type checker rejects `Depend[Console, None]` at the annotation.
 [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 writes an Ability from scratch and explains what that type bound rejects.
@@ -1393,7 +1392,7 @@ On Windows, `run(success(42))` measured about 650 microseconds
 three to four orders of magnitude above a plain function call.
 That is the cost behind ["a synchronous program calls it once, at the outermost edge"](#the-simplest-effect).
 `test_nailer.py` starts a loop once per parametrized case,
-which is fine for four rows and worth remembering for a much longer parametrized list.
+which is fine for four rows and adds up over a much longer parametrized list.
 
 The event loop has a second consequence when you incorporate Stateless into an existing application.
 `asyncio.run()` cannot start a second event loop inside a running one,
