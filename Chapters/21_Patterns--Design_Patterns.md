@@ -551,8 +551,6 @@ The rest are here for your own designs.
 <!-- vale write-good.Passive = YES -->
 <!-- vale House.WeakVerb = YES -->
 
-You can hold this handful of fundamental ideas in your head while analyzing a design.
-
 ## Reading the Chapters Ahead
 
 Most of the chapters ahead take a pattern,
