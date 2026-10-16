@@ -16,7 +16,7 @@ them from the chapter, so a solution keeps working when a chapter listing change
 
 [Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface) shows a `Protocol` standing in for a base class, and `need(Console)` hands back whatever object the supplier gave.
 Add `read()` to the protocol, then write `ask_and_greet()` as a generator that gets the `Console` with `need()` and calls `read()` and `print()` on it.
-In the test, pass `supply()` a scripted class that returns a canned answer, and in the demo, pass it a class wrapping `input()`.
+In the test, pass `supply()` a scripted object that returns a canned answer, and in the demo, an object wrapping `input()`.
 
 <details>
 <summary>Solution</summary>
@@ -84,14 +84,14 @@ Hello, Alice!
 
 The demo in `test_ch46_ask_and_greet.py` uses `Scripted` rather than
 `Terminal` for the reason any book listing does: a call to `input()`
-has no terminal from which to read. `ask_and_greet()` stays character-for-character the same
-function under both bindings.
+has no terminal from which to read. `ask_and_greet()` stays
+character-for-character the same function under both bindings.
 
 **Request an interface, not a class.** `ask_and_greet()` names an interface
 in its return type and calls two methods on whatever answers.
 `Terminal`, `Scripted`, and any third implementation are
 interchangeable because none of them appears in the Effect. Adding
-`read()` to the protocol changed which classes qualify, and `supply()`
+`read()` to the protocol changed which classes qualify. `supply()`
 still picks among them the same way.
 
 **Supply under the protocol's type.** `as_type(Console)` acts on the static type in both
@@ -100,7 +100,7 @@ argument, so `supply(scripted)` alone builds a handler for
 `Need[Scripted]` rather than the `Need[Console]` that
 `ask_and_greet()` requests.
 The wrapper changes the argument's static type from `Scripted` to `Console`.
-At runtime the wrapper returns the same `scripted` object, and
+At runtime the wrapper returns the same `scripted` object.
 `supply()` still finds it, because `Console` is `@runtime_checkable`
 and `isinstance()` matches `Scripted` on shape.
 
@@ -416,13 +416,12 @@ print(recorder.printed, recorder.entries)
 ```
 
 **Fill both roles with one object.** One object satisfies both
-protocols. In `audit_log.py`, `Log` is a `dataclass` that
-holds its own entries, so a test constructs one and reads `log.entries`
-afterward.
-For one object to fill both roles there, it must belong to a class that inherits from both `Log` and `Console`.
-As a
-`Protocol`, `Log` is a shape, and a single `Recorder` can have that
-shape and the `Console` shape at once.
+protocols. In `audit_log.py`, `Log` is a `dataclass` that holds its
+own entries, so a test constructs one and reads `log.entries`
+afterward. For one object to fill both roles there, it must belong to
+a class that inherits from both `Log` and `Console`. As a `Protocol`,
+`Log` is a shape, so a single `Recorder` can have that shape and the
+`Console` shape at once.
 
 **Supply one object under two types.** The two `as_type()` calls make one object answerable to two
 requests. `supply()` reads the Ability from each argument's declared
@@ -585,9 +584,8 @@ def default(ability: Need[Console]) -> Console:
 If you return `Console()` in place of `ability.t()`, `greet()` still
 prints its greeting, but `stamped()` fails with
 `AttributeError: 'Console' object has no attribute 'now'`.
-The handler answers the
-`Clock` request too, as it answers every `Need`, and hands that request a
-`Console`.
+The handler answers the `Clock` request too, as it answers every
+`Need`, and hands that request a `Console`.
 The type checker reports nothing, since `default()`
 declares that it returns a `Console`. The solution calls `ability.t()`,
 which builds the class the request names, so the `Clock` request
@@ -635,7 +633,7 @@ run(defaults(stamped)("Bob"))  # type: ignore
 the class the request carries, and calls that class, so `default()`
 answers a request by constructing the requested class. That is the
 other kind of default. `default_console.py` supplies one prepared
-instance, and `default()` builds whatever the request names, on demand.
+instance. `default()` builds whatever the request names, on demand.
 
 **Run both Effects through one handler.** At runtime the handler
 answered three requests across the two calls, two for `Console` and one
@@ -706,8 +704,9 @@ runs to completion and prints:
 ```
 
 No greeting prints. `greet()` is a generator function, so calling
-`greet(name)` builds an Effect and returns it. The statement then discards that Effect
-before its body starts, and the `Need[Console]` request inside the body goes with the Effect.
+`greet(name)` builds an Effect and returns it. The statement then
+discards that Effect before its body starts, so the body never yields
+its `Need[Console]` request.
 
 The log entries appear because the deletion touches the
 greeting half of the function and leaves the logging half intact. The surviving entries make the failure
@@ -749,10 +748,9 @@ error[unresolved-attribute]: Object of type
 The `invalid-return-type` error says `greet()` has become an ordinary
 function. Removing the body's one `yield from` removes its last
 `yield`, so `greet()` returns `None` where its annotation declares a
-`Generator`. The
-`unresolved-attribute` error says the value in `console` has the wrong
-type: a `Generator` rather than a `Console`, and generators
-have no `print()`.
+`Generator`. The `unresolved-attribute` error says the value in
+`console` has the wrong type, a `Generator` rather than a `Console`.
+Generators have no `print()`.
 
 The difference between the two cases is whether anything later uses
 the dropped value. The discarded `greet(name)` ends at its statement,
@@ -874,7 +872,7 @@ That difference is why `retry()` takes a schedule and returns a
 decorator of type
 `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than
 one of type `Effect[...] -> Effect[...]`. Retrying means running the
-same work more than once, and an Effect supplies one run.
+same work more than once. An Effect supplies one run.
 By the time the first attempt fails, that attempt has run the
 generator to its end, and a finished generator stays finished. `retry()` needs
 a fresh Effect per attempt, and the function that builds the Effect
@@ -889,8 +887,8 @@ adds the clock on which it sleeps and replaces the error with a
 
 The same reasoning explains
 [`repeat()` and `memoize()`](../../Chapters/47_Effects--Stateless_in_Practice.md#repeat-and-memoize).
-It also
-explains the mistake in storing Effects in a registry, a queue, or a cache.
+It also explains the mistake in storing Effects in a registry, a
+queue, or a cache.
 The stored Effect looks fine until something runs it twice. Store the
 function, and apply the arguments where you need the Effect.
 
@@ -978,13 +976,13 @@ asyncio.run(main())
 **Relay the request, collect the results.** The annotation is `Depend[Async, list[str]]`. `report()` needs `Async`,
 and `yield from` relays each `Async` request to `report_all()`'s caller,
 so `report_all()` needs it too.
-A channel becomes a union such as `Need[Console] | Need[Log]` when its requirements differ,
-and here all three delegations request `Async`, so the channel stays at `Async`.
-The return type
-changes, from one `str` to a `list[str]`, since `report_all()`
-collects the results rather than relaying them.
+A channel becomes a union such as `Need[Console] | Need[Log]` when
+its requirements differ. Here all three delegations request `Async`,
+so the channel stays at `Async`. The return type changes, from one
+`str` to a `list[str]`, since `report_all()` collects the results
+rather than relaying them.
 
-**Drive the Effect from a coroutine.** `run()` raises a `RuntimeError`, and `await run_async(...)` works.
+**Drive the Effect from a coroutine.** `run()` raises a `RuntimeError`. `await run_async(...)` works.
 `run(effect)` is `asyncio.run(run_async(effect))`. `asyncio.run()`
 refuses to start an event loop inside a running one, so calling
 `run()` from `main()` fails. `run_async()` is the same driver in
@@ -1122,7 +1120,7 @@ cases each `yield from` relays the error value as is, through
 `announce()` and the `supply()` handler, to the driver. `run()`
 raises it as an ordinary exception because nothing along the way
 catches it. Declaring a failure is not handling it. The declaration
-says the failure can occur, and `catch()` turns it into a value the
+says the failure can occur. `catch()` turns it into a value the
 program handles.
 
 Deleting `ValueError` from the annotation gives:
@@ -1224,7 +1222,7 @@ Three implementations have six orderings, and one rule predicts them all.
 `supply()` scans its arguments and takes the first that satisfies the
 request, so whichever implementation comes first answers it. Two of
 the six orderings put `Terminal` first and send the greeting to the
-screen, and the remaining four split evenly between `Capture` and the
+screen. The remaining four split evenly between `Capture` and the
 third implementation.
 No ordering produces an error or a warning.
 
