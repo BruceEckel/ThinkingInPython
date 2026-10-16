@@ -6,9 +6,9 @@ and concludes that solving them all means rebuilding a type checker.
 This appendix builds the part that needs no type inference.
 The checker here reads source text, resolves the calls it can,
 infers a row for every function, and reports each declared row the body exceeds.
-It is about 450 lines, and most of its pieces come from earlier chapters:
-a `match` over syntax-tree nodes, records for the data,
-a `Result` for the one operation that can fail,
+It is about 450 lines.
+Most of its pieces come from earlier chapters: a `match` over syntax-tree nodes,
+records for the data, a `Result` for the one operation that can fail,
 and a pure core with its Effects at the edge.
 [The Checker Checks Itself](#the-checker-checks-itself)
 runs the checker on its own source to confirm that the core is pure.
@@ -36,8 +36,8 @@ An empty `performs()` declares that a function is pure.
 
 ## Effect Names and the Table
 
-An Effect is an empty class,
-as `Ask` and `Tell` are in Appendix A. These eight cover the standard library:
+An Effect is an empty class, as Appendix A's `Ask` and `Tell` are.
+These eight cover the standard library:
 
 ```python
 # effect_names.py
@@ -406,8 +406,8 @@ the Effects it hides, and the names it calls.
 
 Hiding needs a marker, and `ask()` in Appendix A shows why.
 `ask()` declares `Ask` and calls `input()`, which performs `Console`.
-Both descriptions are accurate, and [The Check](#the-check)
-shows the checker reporting each.
+Both descriptions are accurate.
+[The Check](#the-check) shows the checker reporting each.
 A second piece of metadata names the Effects the function performs and leaves out of its declared row:
 
 ```python
@@ -1046,9 +1046,8 @@ for line in lines(check({"greeting": GREETING})):
 #: ! greeting.quiet undeclared Tell
 ```
 
-The demo prints each nonempty row, then each finding.
 Appendix A's `row()` reads `[]` for both `shout()` and `quiet()`.
-The checker infers `['Tell']` from the call to `tell()`.
+The checker infers `['Tell']` for `shout()` from its call to `tell()`.
 `quiet()` declares itself pure and calls `shout()`,
 so the checker reports `quiet()`,
 two calls away from the `tell()` whose declaration supplies the `Tell`.
