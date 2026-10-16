@@ -16,8 +16,8 @@ builds the part of that tool that needs no type inference.
 
 [Tracking and Management](44_Effects--Effect_Management.md#tracking-and-management)
 separates tracking from management.
-Tracking tells you which Effects a function can perform,
-and management lets you replace what those Effects do.
+Tracking tells you which Effects a function can perform.
+Management lets you replace what those Effects do.
 This appendix concerns tracking.
 
 A function's Effects come from two sources.
@@ -238,7 +238,8 @@ A row inside `Annotated` is a structured comment until a tool reads it.
 `quiet()` declares `performs()` with no arguments, which states that it is pure.
 `row(quiet)` returns the same empty list,
 so an empty list can mean either a function declared pure or [one that declares nothing](#decide-what-untracked-code-performs).
-The declaration is also wrong.
+
+`quiet()`'s declaration is also wrong.
 `quiet()` calls `shout()`, which calls `tell()`.
 `row()` reads each declaration alone,
 so it returns the empty row `quiet()` declares.
@@ -256,7 +257,6 @@ explains why a row alone cannot manage it.
 and `row()` reads it back.
 To fill the second and third roles, computing the row and checking it,
 a tool must solve five problems.
-Each one is larger than it first appears.
 
 ### Resolve Every Call
 
@@ -437,8 +437,8 @@ It stands to the static tool as `isinstance()` assertions stand to the type chec
 
 ## Tracking Is Not Management
 
-If the static tool existed, complete and correct, it would fill all three roles,
-and you would have algebraic effect tracking.
+If the static tool existed, complete and correct,
+it would fill all three roles and give you algebraic effect tracking.
 `ask()` would still call `input()`.
 No test could replace that call.
 The row names an Effect,
@@ -478,7 +478,8 @@ A type variable gives Effect polymorphism, as `effect_variable.py` shows.
 Stateless requires the generator syntax and the description/execution split that [Library Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 describes.
 
-`Annotated` keeps the code ordinary and eager, and nothing verifies the row.
+`Annotated` keeps the code ordinary and eager.
+Nothing verifies the row.
 A native system keeps ordinary code and a verified row,
 because the compiler that compiles the code also computes and checks its rows.
 That is the case for putting algebraic effect tracking in the language,
