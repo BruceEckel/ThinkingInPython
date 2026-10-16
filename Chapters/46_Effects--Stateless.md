@@ -255,7 +255,9 @@ The `Console` in `greeter.py` is one this chapter defines.
 Stateless also provides three dependencies of its own:
 
 - `Console` in `stateless.console`,
-  whose `print_line()` and `read_line()` accessors call its `print()` and `input()` methods,
+  whose `print_line()` and `read_line()` *accessors*
+  (small functions that each wrap one request and declare its answer type)
+  call its `print()` and `input()` methods,
 - `Files` in `stateless.files` that reads a whole file,
 - `Time` in `stateless.time`,
   which [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
@@ -339,7 +341,7 @@ run(bound("Alice"))
 
 Those two lines do three things:
 
-1. `supply(Console())` builds a *handler*,
+1. `supply(Console())` builds a [handler](44_Effects--Effect_Management.md#native-effect-management),
    an object that answers `Need[Console]` with that instance.
 2. Calling the handler on `greet` returns a new function `bound` that answers the requests `greet()` makes.
 3. Calling that function with `"Alice"` builds an Effect with nothing left to supply,
@@ -855,12 +857,12 @@ Dependencies as parameters serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
 The two styles differ when a function three calls deep requests the dependency.
 The parameter version then adds two parameters to every function on the path.
-This version changes the row alone.
+This version changes the table row alone.
 `audit_log.py`'s `greet_all()` is that depth.
 The test calls `greet_all()`, `greet_all()` calls `greet_logged()`,
 and `greet_logged()` requests `Need[Log]` and calls `greet()`,
 which requests `Need[Console]`.
-Varying the environment there again touches the row alone:
+Varying the environment there again touches the table row alone:
 
 ```python
 # test_audit_log.py
