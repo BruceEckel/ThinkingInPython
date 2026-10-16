@@ -90,8 +90,6 @@ A mutation follows the name's arrow into the dict that `config` holds,
 so every importer sees the change.
 A rebinding moves the arrow to a new dict and leaves the module's dict as it was.
 
-Mutation makes the sharing work.
-Rebinding is the mistake that quietly ends it.
 `from config import settings` gives your module its own name for the same `dict` object named by `config.settings`.
 Mutating through your name, `settings["theme"] = "dark"`,
 changes that shared object, so every module sees it.
