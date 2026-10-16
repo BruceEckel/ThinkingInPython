@@ -374,8 +374,7 @@ Python then tries the tuple's own comparison, which also returns
 `NotImplemented`. When both sides return `NotImplemented`, `==` falls back to
 identity, which is `False` for two distinct objects.
 
-`NamedTuple` and the frozen data class offer a choice. A `NamedTuple`
-is a tuple with labels, so it works with any code that expects
+A `NamedTuple` is a tuple with labels, so it works with any code that expects
 a tuple and compares equal to any tuple holding the same values. A frozen
 data class is a distinct type, so `==` matches it against instances of
 its own class and answers `False` for everything else.
