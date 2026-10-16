@@ -139,7 +139,7 @@ because the typing rules let a subclass add any method.
 A runtime check can reject the misspelled method.
 In `near_miss.py`, `CheckedFramework` inherits from `ApplicationFramework` and adds that check.
 Its `__init_subclass__()` runs at each subclass's `class` statement,
-and it can use the standard library's `difflib` to find names that nearly match:
+and uses the standard library's `difflib` to find names that nearly match:
 
 ```python
 # near_miss.py
