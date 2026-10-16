@@ -33,8 +33,7 @@ A `case _` at the end is the wildcard.
 It matches anything, like a default.
 Without one, the `match` skips every body silently when the value fits no pattern.
 
-`match` tries the patterns top to bottom and runs the body of the first one that fits.
-After that one `case` body runs, the statement ends.
+`match` tries the patterns top to bottom and ends after the first matching `case` body runs.
 Cases do not fall through as they do in C's `switch`,
 and `match` has no `break` to forget:
 
@@ -217,7 +216,7 @@ binding the two ends by name and everything between them to `middle`.
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
 `case [a, b, c]` does not match `"abc"`,
 although a string is a sequence in every other context.
-A pattern rarely means to take a string apart character by character,
+You rarely want a pattern to take a string apart character by character,
 so the language rules that out.
 
 A tuple does match.
@@ -368,7 +367,7 @@ print(describe(3.5))
 
 Because a subclass matches, the order of the cases decides which body runs.
 `bool` is a subclass of `int`,
-so moving `case bool(b)` below `case int(n)` makes that case unreachable.
+so moving `case bool(b)` below `case int(n)` makes the `bool` case unreachable.
 `describe(True)` would then return `int True`.
 
 In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
@@ -681,8 +680,8 @@ A falsy value in the table would count as a miss too,
 but every value in `STATUS` is a nonempty string.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
-so its cost grows with the number of cases.
-A dictionary lookup costs the same at any size.
+so its running time grows with the number of cases.
+A dictionary lookup takes about the same time at any size.
 At three entries the difference is too small to matter,
 but the dictionary is faster as the table grows.
 You can also build or change a dictionary at runtime,
@@ -868,8 +867,8 @@ def test_oo_and_match_agree(
 Try growing the system in each direction.
 First, add a new type: a `Webhook` channel.
 In the inheritance version,
-you write one new subclass with its own `render()` and `cost()`,
-and nothing else changes.
+you write one new subclass with its own `render()` and `cost()`.
+Nothing else changes.
 In the match version,
 you add a `Webhook` data class to the `Notification` union.
 The type checker then reports an error at `assert_never()` in both `render()` and `cost()`.
@@ -878,8 +877,8 @@ Each function needs a `Webhook` case to pass:
 
 Second, add a new operation: `priority()`, which ranks channels by urgency.
 In the inheritance version, every existing subclass needs a new method.
-In the match version, you write one new function with its own `match`,
-and the existing classes and functions stay untouched.
+In the match version, you write one new function with its own `match`.
+The existing classes and functions stay untouched.
 
 Inheritance confines a new type to one new subclass.
 Pattern matching confines a new operation to one new function.
