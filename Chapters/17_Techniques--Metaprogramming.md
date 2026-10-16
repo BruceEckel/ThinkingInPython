@@ -219,7 +219,7 @@ The cast states the signature, and nothing confirms it.
 
 `make()` exists so that each `init()` closes over its own `name`.
 A lambda written inline in the comprehension closes over the comprehension's variable instead,
-so every generated class records the final name, `RingBell`, as its `action`.
+so every generated class records the last name the comprehension visits as its `action`.
 That is the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap)
 that `late_binding.py` demonstrates.
 
@@ -1639,7 +1639,7 @@ at the end of this chapter.
 `display_object()` walks every member that `inspect.getmembers_static()` returns.
 The static variant reads members from the `__dict__` of the object and of each of its classes,
 without invoking descriptors, properties, or `__getattr__()`.
-Inspecting an object therefore runs none of its code and triggers no side effect.
+Inspecting an object therefore runs none of its properties or descriptors.
 That safety matters when you point this tool at something unfamiliar.
 
 The tool sorts each member into one of two lists.
@@ -1648,7 +1648,8 @@ printed with the signature that `inspect.signature()` reports,
 or `(...)` when a built-in has no inspectable signature.
 Everything else becomes an attribute, printed as `name: type = value`.
 The declared type comes from the class annotations,
-which `inspect.get_annotations()` gathers across the whole inheritance chain in [`FORWARDREF` format](#reading-annotations-before-their-names-exist).
+which `_annotations()` gathers across the whole inheritance chain,
+calling `inspect.get_annotations()` on each class in [`FORWARDREF` format](#reading-annotations-before-their-names-exist).
 In that format, a name the module never defined prints as a `ForwardRef` instead of raising a `NameError`.
 An attribute with no annotation, such as one assigned dynamically,
 prints as `name = value`.
