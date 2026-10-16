@@ -11,7 +11,7 @@ Centralizing them here means a rename or convention change happens in one
 place instead of N.
 
 Behavior lives in tools/repo.py; this module holds only constants. Imported
-as ``tools.config``, so a book listing's own ``config.py`` (chapter 24's
+as ``tools.config``, so a book listing's own ``config.py`` (chapter 23's
 Singleton demo has one) cannot resolve to it; tools/repo.py's docstring
 has the history.
 """

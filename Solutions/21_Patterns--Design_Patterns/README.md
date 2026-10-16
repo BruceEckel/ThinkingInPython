@@ -189,7 +189,7 @@ def checkout(
 <summary>Solution</summary>
 
 The pattern is
-[*Strategy*](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime),
+[*Strategy*](../../Chapters/27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime),
 in the shape it takes in Java. Its usual form requires:
 
 - an interface, `ShippingStrategy`, declaring one method, `cost()`
@@ -565,7 +565,7 @@ version a new format means editing `Report`, a class whose subject is
 the report's content. In the second, the one edit is in `main()`, the
 part whose job is to assemble the pieces. The `match` in `main()` names
 every writer class, so `main()`'s heavy edges are the ones that remain.
-A [registry](../../Chapters/27_Patterns--Factory.md#self-registration)
+A [registry](../../Chapters/26_Patterns--Factory.md#self-registration)
 moves them out of `main()` as well.
 
 </details>

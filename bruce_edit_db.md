@@ -77,13 +77,13 @@ it raises", "whatever `slope()` raises", "what it re-raises"). Code and
 `#:` markers are never touched.
 
 **Sightings.** 3 (additive)
-- `27_Patterns--Factory` 2026-09-01 (`6f638b05`), was Claude-written:
+- `26_Patterns--Factory` 2026-09-01 (`6f638b05`), was Claude-written:
   "A placeholder raises only when something calls it" -> "A placeholder
   raises an exception only when something calls it"
-- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+- `24_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "The `class Typo` statement raises instead of finishing" ->
   "The `class Typo` statement raises a `TypeError` instead of finishing"
-- `Solutions/14_Techniques--Decorators`, `Solutions/25_Patterns--Template_Method`,
+- `Solutions/14_Techniques--Decorators`, `Solutions/24_Patterns--Template_Method`,
   `Solutions/47_Effects--Stateless_in_Practice` 2026-08-29, found by sweep after
   Bruce named the rule: "returns or raises." -> "returns or raises an
   exception."; "this one raises instead" -> "this one raises an exception
@@ -103,7 +103,7 @@ Delete the accounting and let the mechanism's own sentence lead.
 
 **Keep when.** A measured cost (time, memory, a benchmark) is the subject.
 
-**Sightings.** 3 (removal), all `25_Patterns--Template_Method` 2026-08-29, was
+**Sightings.** 3 (removal), all `24_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "The empty step is the price of the `...` defaults above. They make a
   step optional," -> "The `...` defaults make a step optional,"
@@ -136,14 +136,14 @@ sightings on `run()`/"runs" and `fix`/"fixes" stand as history.
 the steps" is about `run()`).
 
 **Sightings.** 4 (additive), 2 chapters
-- `27_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written, in
+- `26_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written, in
   a chapter whose class is `Shape`: "the shape a factory-object design
   takes" -> "the form a factory-object design takes"
-- `27_Patterns--Factory` 2026-09-12 (`4ab635e2`), was Claude-written, in
+- `26_Patterns--Factory` 2026-09-12 (`4ab635e2`), was Claude-written, in
   a chapter where `kind` is the selector parameter of six listings: "a
   factory of the same kind as `factory()`" -> "a factory, of the same
   form as `factory()`"
-- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+- `24_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "an override of `run()` is reported before the program runs" ->
   "Discovers an overridden `run()` before the program executes"
 - "the quick fix" / "the fixed algorithm" / "What Actually Fixes the
@@ -175,7 +175,7 @@ sentence back to "so" once he had added "Now" and "via the new
 is evidence for the exception, not against the rule.
 
 **Sightings.** 6 (3 chapters), plus one keep-when
-- `27_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written,
+- `26_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written,
   three: "A `class` statement is executable code, so every call would
   define fresh ... classes" -> "Because a `class` statement is
   executable code, every call ..."; "`deepcopy()` copies everything it
@@ -187,14 +187,14 @@ is evidence for the exception, not against the rule.
   the same commit: "Because the registry keys on `cls.__name__` alone,
   two classes ... overwrite" -> "The registry keys on `cls.__name__`
   alone, so two classes ...", where the keying is new information.
-- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+- `24_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "`run()` calls methods the subclass supplies, so the subclass must
   finish its own setup" -> "Because `run()` calls methods the subclass
   supplies, the subclass must finish its own setup"
-- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+- `24_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "Python functions are first-class, so you can also pass the steps" ->
   "Because Python functions are first-class, you can also pass the steps"
-- `26_Patterns--Surrogate` 2026-08-31, was Claude-written:
+- `25_Patterns--Surrogate` 2026-08-31, was Claude-written:
   "*GoF Design Patterns* gives *Proxy* and *State* different structures
   and so treats them as unrelated" -> "Because *GoF Design Patterns*
   gives *Proxy* and *State* different structures, it treats them as
@@ -214,7 +214,7 @@ the label starts "This".
 **Keep when.** None seen yet. A colon introducing a listing or a literal
 value is not a label.
 
-**Sightings.** 4, one list in `25_Patterns--Template_Method` 2026-08-29, was
+**Sightings.** 4, one list in `24_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "Structure, in `template_function.py`: no subclass exists, so nothing
   can replace the loop." -> "Structure, in `template_function.py`. There
@@ -237,7 +237,7 @@ requirement is that..."); a passive reporting who requires it ("the
 caller is required by the protocol to...") loses the agent if changed
 blindly.
 
-**Sightings.** 1, `25_Patterns--Template_Method` 2026-08-29 (`19b2b1e3`), was
+**Sightings.** 1, `24_Patterns--Template_Method` 2026-08-29 (`19b2b1e3`), was
 Claude-written:
 - "If every subclass is required to supply a step" -> "If every subclass
   must supply a step"
@@ -261,22 +261,22 @@ holds for a sentence that only announces a list that follows.
 its own ("The next listing shows the same trap in a generator").
 
 **Sightings.** 6 (removal), 3 chapters
-- `27_Patterns--Factory` 2026-09-01 (`0b7ff81d`), was Claude-written:
+- `26_Patterns--Factory` 2026-09-01 (`0b7ff81d`), was Claude-written:
   "The next step gives each of those operations its own object." ->
   deleted, ahead of "A *factory object* defines a single `create()`
   method"; "No factory method and no factory class. The `dict` is the
   factory:" -> "No factory method and no factory class:"
-- `27_Patterns--Factory` 2026-09-12 (`a03658af`), was Claude-written:
+- `26_Patterns--Factory` 2026-09-12 (`a03658af`), was Claude-written:
   "The rest of this chapter replaces call sites like these with a
   single place that knows about every shape." -> deleted; the next
   paragraph opens "The solution is to encapsulate object creation."
-- `27_Patterns--Factory` 2026-09-12 (`a9731125`), was Claude-written:
+- `26_Patterns--Factory` 2026-09-12 (`a9731125`), was Claude-written:
   "The next example, `registry.py`, cannot take the same fix. Its whole
   point is that a new `Shape` subclass registers itself" -> "It would
   be even nicer if a new `Shape` subclass would register itself"
-- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+- `24_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "The example below shows why." -> deleted
-- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, a list rather than a
+- `27_Patterns--Function_Objects` 2026-09-16, was Claude-written, a list rather than a
   listing: "The alternatives this chapter showed form one list. Go down
   it and stop at the first form that supports what you need:" -> "Stop
   at the first form that supports what you need:"
@@ -299,7 +299,7 @@ Delete it.
 **Keep when.** The comparison is the mechanism (the sentence says what the
 others miss and why).
 
-**Sightings.** 1 (removal), `25_Patterns--Template_Method` 2026-08-29, was
+**Sightings.** 1 (removal), `24_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "It reaches what the other three cannot: what the steps do once the flow
   itself is safe." -> deleted
@@ -331,27 +331,27 @@ alternative is unbounded ("accepts only keyword arguments") stays.
 
 **Sightings.** 7 (additive), 2 chapters, plus about 55 `only X` sites in
 roughly 25 files from 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
-- `26_Patterns--Surrogate`: "`hasattr()` catches only `AttributeError`"
+- `25_Patterns--Surrogate`: "`hasattr()` catches only `AttributeError`"
   -> "`hasattr()` catches `AttributeError` and lets every other
   exception propagate"
 - `46_Effects--Stateless`: "a double that overrides only `print()`" ->
   "a double that overrides `print()` and inherits `input()`"
-- `27_Patterns--Factory`: "it lists only direct subclasses" -> "it lists
+- `26_Patterns--Factory`: "it lists only direct subclasses" -> "it lists
   direct subclasses and misses their descendants"; "adding a new type
   only changes the factory" -> "changes the factory and no call site"
 - `Solutions/46_Effects--Stateless`: "the handler answers only
   `Need[Console]`" -> "answers `Need[Console]` and not `Need[Clock]`"
 - Widened to cover `only X` on 2026-10-04, at Bruce's approval.
-- `27_Patterns--Factory` 2026-09-01 (`2b18eed8`), was Bruce-written
+- `26_Patterns--Factory` 2026-09-01 (`2b18eed8`), was Bruce-written
   (older draft): "you will likely extend your program" -> "you often
   extend that program"; "first use polymorphism to create a common
   interface" -> "first create a base type as a common interface"
-- `27_Patterns--Factory` 2026-08-31 (`2b18eed8`), was Bruce-written
+- `26_Patterns--Factory` 2026-08-31 (`2b18eed8`), was Bruce-written
   (older draft): "`factory()` is now the only other code that changes"
   -> "Apart from the new subclass itself, `factory()` is the only code
   that changes"; and, Claude-written, "and rules span the steps" ->
   "and some rules apply across several steps"
-- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+- `24_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "pass the steps in directly" -> "pass the steps as arguments"
 - "an attribute nothing reads" -> "a type-checking attribute"
 - "code written later, potentially years later" -> "code written later,
@@ -374,7 +374,7 @@ Ask what the reader would observe; if the phrase does not say, replace it.
 already stated nearby, as in a summary sentence that closes a section.
 
 **Sightings.** 17 (3 chapters)
-- `26_Patterns--Surrogate` 2026-08-31, was Claude-written, five:
+- `25_Patterns--Surrogate` 2026-08-31, was Claude-written, five:
 - "puts the check where it costs nothing" -> "puts the check where it
   does not restrict the surrogate"
 - "The guard also satisfies `copy` and `pickle`" -> "The guard also makes
@@ -385,14 +385,14 @@ already stated nearby, as in a summary sentence that closes a section.
 - "As long as `Proxy` "speaks for" the class it forwards method calls to"
   -> "As long as code calls `Proxy` in place of the class that `Proxy`
   forwards method calls to"
-- `27_Patterns--Factory` 2026-09-01, was Claude-written, three:
+- `26_Patterns--Factory` 2026-09-01, was Claude-written, three:
   "The registry also never forgets:" -> "The registry also never
   removes an entry:"; "The chained call in `__main__` hides the problem
   by throwing the builder away on the same line that creates it" ->
   "never shows the problem, because it keeps no reference to the
   builder after `build()` returns"; "each implementation picks a side"
   -> "chooses one behavior or the other"
-- `27_Patterns--Factory` 2026-08-31 (`40323f50`, `2b18eed8`), five
+- `26_Patterns--Factory` 2026-08-31 (`40323f50`, `2b18eed8`), five
   more, logged 2026-09-15: "hands `cls.__name__` straight to
   `factory()`" -> "passes `cls.__name__` unchanged to `factory()`"; "A
   *factory object* carries a single `create()` method" -> "defines a
@@ -401,7 +401,7 @@ already stated nearby, as in a summary sentence that closes a section.
   "calls its `create()` immediately"; and, in Bruce's own older draft,
   "the most sensible first step is to use polymorphism" -> "first use
   polymorphism"
-- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, four, three of
+- `27_Patterns--Function_Objects` 2026-09-16, was Claude-written, four, three of
   them flagged by Bruce as a pasted phrase: "bisection declines by
   returning `None`" -> "bisection fails by returning `None`"; "the
   strategy keeps reading those settings after the outer function
@@ -442,13 +442,13 @@ system ("in Python, unlike Java"), which is the usual reason it was
 written.
 
 **Sightings.** 3 (2 chapters)
-- `26_Patterns--Surrogate` 2026-08-31, was Claude-written:
+- `25_Patterns--Surrogate` 2026-08-31, was Claude-written:
   "In Python both are the same few lines of `__getattr__()` delegation"
   -> "Both are the same few lines of `__getattr__()` delegation"
-- `27_Patterns--Factory` 2026-09-01, was Claude-written:
+- `26_Patterns--Factory` 2026-09-01, was Claude-written:
   "every place in your code that names a concrete type" -> "every place
   that names a concrete type"
-- `27_Patterns--Factory` 2026-09-01, was Bruce-written (older draft):
+- `26_Patterns--Factory` 2026-09-01, was Bruce-written (older draft):
   "the only other code in the system that needs to change" -> "the only
   other code that changes"
 
@@ -468,7 +468,7 @@ sighting from chapter 26 below is the point of the entry: a sweep that
 reads the others as "prefer the noun" will overshoot.
 
 **Sightings.** 18 (2 chapters)
-- `27_Patterns--Factory` 2026-08-31 (`40323f50`), was Claude-written,
+- `26_Patterns--Factory` 2026-08-31 (`40323f50`), was Claude-written,
   six: "It covers only the first level of inheritance" ->
   "`__subclasses__()` covers only the first level of inheritance"; "It
   registers itself" -> "`Triangle` registers itself"; "They fail at
@@ -477,10 +477,10 @@ reads the others as "prefer the noun" will overshoot.
   puts the creation method on a class" -> ": that pattern puts the
   creation method on a class"; "which is worse than unnecessary" ->
   "and that dispatch is worse than unnecessary"
-- `27_Patterns--Factory` 2026-09-14 (`7ec15c2e`), was Claude-written:
+- `26_Patterns--Factory` 2026-09-14 (`7ec15c2e`), was Claude-written:
   "the class solves a problem Python does not have" -> "the builder
   class solves a problem Python does not have" (competitor: `Pizza`)
-- `26_Patterns--Surrogate` 2026-08-31, was Claude-written, eleven. Ten
+- `25_Patterns--Surrogate` 2026-08-31, was Claude-written, eleven. Ten
   resolved a pointer that had a competitor:
   - "it calls that method in the implementing class" -> "the surrogate
     calls that method in the implementing class"
@@ -529,24 +529,24 @@ started with ("how this differs from the previous section's subject")
 is not the rule; the chapter that owns a comparison carries it.
 
 **Sightings.** 4 (removal), 2 chapters
-- `26_Patterns--Surrogate` 2026-08-31, was Claude-written: "That refusal
+- `25_Patterns--Surrogate` 2026-08-31, was Claude-written: "That refusal
   separates a *Proxy* from a *Decorator*: a decorator adds behavior
   around a call it always makes. This proxy decides whether to forward
   the call." -> "`Guarded` requires `admin` privileges to call
   `erase()`." The Proxy/Decorator comparison lives in
   `29_Patterns--Changing_the_Interface`'s table.
-- `26_Patterns--Surrogate` 2026-08-31, was Claude-written: "A *Smart
+- `25_Patterns--Surrogate` 2026-08-31, was Claude-written: "A *Smart
   reference* proxy adds behavior around each access without refusing
   any." -> "A *Smart reference* proxy adds behavior around each
   access." A contrast cut with no link beside it; the narrowing sets
   this sighting aside rather than claiming it.
-- `27_Patterns--Factory` 2026-08-31 (`d6144479`), was Claude-written:
+- `26_Patterns--Factory` 2026-08-31 (`d6144479`), was Claude-written:
   "a convention rather than concealment, and the convention is all
   Python provides ([Singleton](...) makes the same case)" -> "a
   convention rather than concealment ([Singleton](...) makes the same
   case)". Chapter 24's linked section says "Privacy in Python is advice,
   not enforcement."
-- `27_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
+- `26_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
   "`copy.replace()` is the general form of the same operation, working
   on any object that defines `__replace__()`, shown in [The General
   Form of `replace()`](...). A data class defines that method for you."
@@ -590,7 +590,7 @@ different `Console` in a test").
   only the factory when you add a new type" -> "so adding a new type
   only changes the factory"
 
-- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written: "You provide a
+- `27_Patterns--Function_Objects` 2026-09-16, was Claude-written: "You provide a
   function that decides how to compare." -> "That argument determines
   how comparison works."
 
@@ -617,8 +617,8 @@ where-to-read-more sentence closing a section.
 
 **Sightings.** 4, 2 chapters, was Claude-written:
 - 2026-08-31 (`d6144479`): "I have also used a *generator* (see
-  [Iterators](23_Patterns--Iterators.md#generators))." -> "I have also
-  used a [*generator*](23_Patterns--Iterators.md#generators)."
+  [Iterators](22_Patterns--Iterators.md#generators))." -> "I have also
+  used a [*generator*](22_Patterns--Iterators.md#generators)."
 - 2026-08-31 (`0b7ff81d`): "`cls.registry` resolves through the MRO" ->
   "resolves through the [MRO](07_Foundations--Classes.md#inheritance)"
 - 2026-09-15 (`a9ca27eb`): "`copy.replace()` is the general form of the
@@ -626,7 +626,7 @@ where-to-read-more sentence closing a section.
   shown in [The General Form of `replace()`](...)." -> "`copy.replace()`
   is the [general form of the operation](...), and works on any object
   that defines `__replace__()`."
-- `28_Patterns--Function_Objects` 2026-09-16: "It is a *closure* ([Functional
+- `27_Patterns--Function_Objects` 2026-09-16: "It is a *closure* ([Functional
   Foundations](40_Functional--Foundations.md#closures)):" -> "use a
   [*closure*](40_Functional--Foundations.md#closures)."
 
@@ -644,10 +644,10 @@ instance still succeeds"). Rewrite as "If you X, Y".
 exercise.
 
 **Sightings.** 3, 2 chapters, was Claude-written:
-- `27_Patterns--Factory` 2026-09-01 (`6f638b05`): "Uncomment the line
+- `26_Patterns--Factory` 2026-09-01 (`6f638b05`): "Uncomment the line
   that passes a `BrokenFactory` to `GameEnvironment`, and the checker
   reports" -> "If you uncomment the line ..., the checker reports"
-- `27_Patterns--Factory` 2026-09-01, in conversation: "Define a factory
+- `26_Patterns--Factory` 2026-09-01, in conversation: "Define a factory
   class with `make_character()` and stop there: creating an instance of
   it still succeeds" flagged as "still hard to follow"; rewritten with
   Python as the actor
@@ -672,10 +672,10 @@ the output.
 show on its own (why the lines match, what a difference would mean).
 
 **Sightings.** 3 (removal), 2 chapters, was Claude-written:
-- `28_Patterns--Function_Objects` 2026-09-16: "Three identical lines are
+- `27_Patterns--Function_Objects` 2026-09-16: "Three identical lines are
   the point: the algorithm changes and the caller stays the same." ->
   deleted
-- `28_Patterns--Function_Objects` 2026-09-16: "Those five classes
+- `27_Patterns--Function_Objects` 2026-09-16: "Those five classes
   produce the same three lines that one function argument produced."
   -> deleted
 - `29_Patterns--Changing_the_Interface` 2026-09-16 (`44ec1a58`): "The
@@ -700,20 +700,20 @@ a mechanism the earlier text did not state. A contrast drawn across
 several listings that no one listing shows is such a consequence.
 
 **Sightings.** 9, 3 chapters
-- `27_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
+- `26_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
   "Builder chains have a second use, starting from an existing
   configuration and varying it, covered by `dataclasses.replace()`."
   -> "A second use for builder chains is to vary an existing
   configuration." (the next sentence names `replace()`); "Each stage
   relies on what the previous stage established." -> "Each stage relies
   on the previous stage."
-- `27_Patterns--Factory` (`2b18eed8`), was Bruce-written (older draft):
+- `26_Patterns--Factory` (`2b18eed8`), was Bruce-written (older draft):
   "You must still find and edit every place that names a concrete type.
   Creation names the type. Use does not, because polymorphism handles
   use. The effect is the same: adding a new type means edits scattered
   through the code." -> "adding a type means finding and editing every
   place that names a concrete type."
-- `27_Patterns--Factory` (`0b7ff81d`), was Claude-written: "No factory
+- `26_Patterns--Factory` (`0b7ff81d`), was Claude-written: "No factory
   method and no factory class. The `dict` is the factory:" -> "No
   factory method and no factory class:"; "The next step gives each of
   those operations its own object. A *factory object* defines a single
@@ -821,7 +821,7 @@ separate sentences"):
   `always`, and `always: 1` would be missing."; "but not here: it cancels
   a failing task's siblings" -> "but not here. A `TaskGroup` cancels a
   failing task's siblings"
-- `27_Patterns--Factory` 2026-09-12 (`571d9ec2`): "Both are static
+- `26_Patterns--Factory` 2026-09-12 (`571d9ec2`): "Both are static
   methods of the type: each takes data and returns an instance" -> "Both
   are static methods within the type. Each takes data and returns an
   instance"; "`of()` needs no `match`, because the `Enum` already holds
@@ -868,7 +868,7 @@ paragraph. A one-paragraph discussion of a short listing may carry one
 label or none.
 
 **Sightings.** 3
-- `Solutions/22_Patterns--Data_Transfer_Objects` 2026-10-02, the three
+- `Solutions/28_Patterns--Data_Transfer_Objects` 2026-10-02, the three
   labeled paragraphs "**The configuration bag is a `SimpleNamespace`.**",
   "**The grid coordinate is a `NamedTuple`.**", and "**The JSON record
   is a `@dataclass`.**" These name a thing rather than a step, so they
@@ -932,7 +932,7 @@ In Solutions 30, four of eleven solutions (1, 5, 7, 8) have none.
     defines no `__getitem__()`. The type checker rejects the slice before
     the program runs, and `ty` reports it as `not-subscriptable`.
     `islice()` slices an iterator by pulling from it, as [Reusable
-    Algorithms](../../Chapters/23_Patterns--Iterators.md#reusable-algorithms)
+    Algorithms](../../Chapters/22_Patterns--Iterators.md#reusable-algorithms)
     notes."
 
 **Home.** this file only. Promoted 2026-10-03 on the second sighting, per
@@ -1038,7 +1038,7 @@ one Y that ...", "whose one Y is X", "leave X as the one open Y".
   reports only `number`, and the generated signature takes only `number`."
   -> "`number` is the one field that `dataclasses.fields()` reports and
   the one parameter that the generated signature takes."
-- `Solutions/25_Patterns--Template_Method`: "and leave only `process()`
+- `Solutions/24_Patterns--Template_Method`: "and leave only `process()`
   open" -> "and leave `process()` as the one open step"
 
 **Home.** CLAUDE.md watch list, inside the `only` bullet (R24).
@@ -1203,11 +1203,11 @@ in 17 files (additive).
   `keys()`" -> "Iterating over the `dict` iterates over `keys()`"; "A
   `dict` iterates in insertion order" -> "Iterating over a `dict`
   follows insertion order"
-- `23_Patterns--Iterators`: "computes nothing until you iterate," ->
+- `22_Patterns--Iterators`: "computes nothing until you iterate," ->
   "computes nothing until you iterate over it,"; "When a function
   iterates more than once" -> "When a function iterates over its
   argument more than once"
-- `Solutions/27_Patterns--Factory`: "builds a generator that nothing
+- `Solutions/26_Patterns--Factory`: "builds a generator that nothing
   iterates." -> "builds a generator and nothing iterates over it."
 - `Solutions/44_Effects--Effect_Management`: "which `sum()` cannot
   iterate." -> "and `sum()` cannot iterate over it."
@@ -1227,7 +1227,7 @@ of the adjacent listing (C16); "Here," belongs on a claim about that
 listing only.
 
 **Sightings.** 4 (additive), 2 chapters
-- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written:
+- `27_Patterns--Function_Objects` 2026-09-16, was Claude-written:
   "`Repeat` below is a frozen data class" -> "Here, `Repeat` is a
   frozen data class"; "`Handler` below names their signature, not an
   interface:" -> "Here, `Handler` names their signature, not an
@@ -1273,7 +1273,7 @@ subclass must work" -> "an instance of a subclass must work").
 **Keep when.** The universality is the claim ("any exception, not only
 `ValueError`").
 
-**Sightings.** 2, both `25_Patterns--Template_Method` 2026-08-29, was
+**Sightings.** 2, both `24_Patterns--Template_Method` 2026-08-29, was
 Claude-written (same chapter, so not yet independent):
 - "an instance of any subclass must work in its place" -> "an instance of
   a subclass must work in its place"
@@ -1291,7 +1291,7 @@ type checker, the caller) and use the verb that actor performs.
 or raises does so itself, and "`__getattr__()` returns a value" needs no
 rewriting.
 
-**Sightings.** 3, all `26_Patterns--Surrogate` 2026-08-31, was
+**Sightings.** 3, all `25_Patterns--Surrogate` 2026-08-31, was
 Claude-written (same chapter, so not yet independent):
 - "`__getattr__()` fires for any name the proxy and its class lack" ->
   "Python calls `__getattr__()` for any name the proxy and its class
@@ -1312,7 +1312,7 @@ comparative modifies.
 **Keep when.** The noun is the previous sentence's subject and repeating
 it would be padding.
 
-**Sightings.** 1 (additive), `27_Patterns--Factory` 2026-09-01
+**Sightings.** 1 (additive), `26_Patterns--Factory` 2026-09-01
 (`40323f50`), was Claude-written:
 - "Nesting the classes inside `factory()` looks stronger and is worse"
   -> "looks like stronger enforcement and is worse"
@@ -1331,7 +1331,7 @@ instances".
 **Keep when.** The two sentences are a deliberate two-beat ("Failures
 never vanish. They only relocate.").
 
-**Sightings.** 3 (additive), all `27_Patterns--Factory`, was
+**Sightings.** 3 (additive), all `26_Patterns--Factory`, was
 Claude-written (same chapter, so not yet independent):
 - 2026-08-31: "Where" in `40323f50`, corrected to "Whereas" in
   `d6144479`
@@ -1353,7 +1353,7 @@ what is the case, not an obligation on the reader. Use the plain verb.
 **Keep when.** The obligation is the claim ("every subclass must
 supply a step", which R6 covers).
 
-**Sightings.** 2, both `27_Patterns--Factory` 2026-09-01 (`40323f50`),
+**Sightings.** 2, both `26_Patterns--Factory` 2026-09-01 (`40323f50`),
 was Bruce-written (older draft) and Claude-written respectively:
 - "the only other code in the system that needs to change" -> "the
   only other code that changes"
@@ -1369,7 +1369,7 @@ listing sits in the same section. Write the filename in code font.
 **Keep when.** The filename was the previous sentence's subject, so
 repeating it would be padding.
 
-**Sightings.** 2, both `27_Patterns--Factory` 2026-08-31, was
+**Sightings.** 2, both `26_Patterns--Factory` 2026-08-31, was
 Claude-written (same chapter, so not yet independent):
 - (`d6144479`) "The listing keeps the plain names because" ->
   "`shape_factory1.py` keeps the plain names because"
@@ -1392,12 +1392,12 @@ just joined the hierarchy", "Here that argument is a string", "Here it
 is a `Protocol`", "Here the table holds instances") and wrote a fifth
 ("Here, we create one factory object per `Shape` subtype:"). The
 keep-when is the larger set; a sweep reads the sentence, not the word.
-`28_Patterns--Function_Objects` 2026-09-16 adds one more keep: Bruce split "In
+`27_Patterns--Function_Objects` 2026-09-16 adds one more keep: Bruce split "In
 Python the action is a function, and a 'macro' is a list of actions"
 into "In Python the action is a function. In this example, a 'macro'
 is a list of actions:", a locator on the listing-specific claim only.
 
-**Sightings.** 3, all `27_Patterns--Factory` (same chapter, so not yet
+**Sightings.** 3, all `26_Patterns--Factory` (same chapter, so not yet
 independent):
 - 2026-08-31 (`2b18eed8`), was Bruce-written (older draft): "In this
   example, the setup and play are simple, but" -> "Setup and play are
@@ -1418,7 +1418,7 @@ alternative constructor."
 **Keep when.** The item's lead is a label naming a thing rather than a
 condition; R5 governs those.
 
-**Sightings.** 1 (one list of six items), `27_Patterns--Factory`
+**Sightings.** 1 (one list of six items), `26_Patterns--Factory`
 2026-09-15 (`a9ca27eb`), was Claude-written:
 - "A name maps to a class: use a dictionary." -> "When a name maps to a
   class: use a dictionary." (the colon survived on this item alone)
@@ -1451,7 +1451,7 @@ match, so not yet promoted):
   colors." -> "`list(Color)` is the cycle of colors, because iterating
   over an enum produces its members in definition order." The
   paragraph is about `Color`'s cycle, so the claim leads.
-- `27_Patterns--Factory` 2026-08-31, three (same chapter, so not yet
+- `26_Patterns--Factory` 2026-08-31, three (same chapter, so not yet
   independent):
 - (`2b18eed8`), was Bruce-written (older draft): "If your program must
   call this factory whenever it needs one of your objects, then you
@@ -1476,7 +1476,7 @@ name for 'callable, plus `undo()`'"). Write the members the type has.
 
 **Keep when.** None seen yet.
 
-**Sightings.** 2 (additive), both `28_Patterns--Function_Objects` 2026-09-16,
+**Sightings.** 2 (additive), both `27_Patterns--Function_Objects` 2026-09-16,
 was Claude-written (chapter and Solutions, so not yet independent):
 - "a list of commands that also undo needs a name for "callable, plus
   `undo()`". That name is a `Protocol` with both members." -> "an
@@ -1497,7 +1497,7 @@ the claim itself.
 
 **Keep when.** None seen yet.
 
-**Sightings.** 1 (removal), `28_Patterns--Function_Objects` 2026-09-16, was
+**Sightings.** 1 (removal), `27_Patterns--Function_Objects` 2026-09-16, was
 Claude-written:
 - the seven-sentence roadmap after the opening ("*Command* appears
   first as a function, then as the classic class-based form.
@@ -1514,7 +1514,7 @@ each sentence carry only what differs.
 
 **Keep when.** None seen yet.
 
-**Sightings.** 1 (structural), `28_Patterns--Function_Objects` 2026-09-16, was
+**Sightings.** 1 (structural), `27_Patterns--Function_Objects` 2026-09-16, was
 Claude-written:
 - "A second version gives each side a decorator. `@event` makes a class
   a frozen data class and records it in `EVENTS`. `@handler` makes a
@@ -1535,7 +1535,7 @@ takes "you" off a sentence about how the design behaves.
 
 **Keep when.** None seen yet.
 
-**Sightings.** 1, `28_Patterns--Function_Objects` 2026-09-16, was Claude-written:
+**Sightings.** 1, `27_Patterns--Function_Objects` 2026-09-16, was Claude-written:
 - "Adding, removing, or reordering handlers means editing a list." ->
   "To add, remove, or reorder the handlers you edit the `chain` list."
 
@@ -1620,10 +1620,10 @@ the book were kept.
 
 **Sightings.** 2 (chapters 25 and 28), 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page; thin, so held as a
 candidate at the capture's suggestion:
-- `28_Patterns--Function_Objects`: "The tests can then assert not only the
+- `27_Patterns--Function_Objects`: "The tests can then assert not only the
   root but also which finders ran." -> "The tests can then assert both the
   root and the names of the finders that ran."
-- `25_Patterns--Template_Method`: "should expect to rename an occasional
+- `24_Patterns--Template_Method`: "should expect to rename an occasional
   legitimate method, not only to catch misspellings" -> "should expect to
   catch typos and also to rename an occasional legitimate method"
 
@@ -1756,7 +1756,7 @@ invites a reworded re-proposal.
 
 ### X1. Do not activate a passive that names an arrangement
 
-Proposed 2026-09-01 as a contradiction: `27_Patterns--Factory` had
+Proposed 2026-09-01 as a contradiction: `26_Patterns--Factory` had
 "If the code that creates objects appears throughout your application"
 (Claude-written) and Bruce changed it to "is distributed throughout",
 which vale flags. Bruce: "keep 'distributed'". The passive describes
@@ -1785,7 +1785,7 @@ The lead-in is the only prose before the listing. A paragraph that
 explains how the tests work (a helper they share, what they assert)
 goes after the listing, not before it.
 
-**Sightings.** 3, `27_Patterns--Factory` and `28_Patterns--Function_Objects`,
+**Sightings.** 3, `26_Patterns--Factory` and `27_Patterns--Function_Objects`,
 was Claude-written; plus the 2026-09-15 sweep
 - 2026-08-31 (`0b7ff81d`): "The tests confirm that every subclass
   registers itself" -> "Testing confirms that every subclass registers
@@ -1801,7 +1801,7 @@ was Claude-written; plus the 2026-09-15 sweep
   and `42` (twice) "The tests confirm that ..." -> each "Testing
   confirms that ...". Before the sweep the book had three "Testing
   confirms" (17, 26, 27) against those seven.
-- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, the ordering
+- `27_Patterns--Function_Objects` 2026-09-16, was Claude-written, the ordering
   note: "The first two tests wrap each finder in `watched()`, which
   records the finder's name as it runs. The tests can then assert not
   just the root but *which* finders ran." moved from before

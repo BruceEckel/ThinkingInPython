@@ -39,7 +39,7 @@ No live blocks: every finding had one sensible answer.
 
 ## For the session
 
-- **Chapter 15, line 32:** "[Iterators](23_Patterns--Iterators.md#generators) covers generators in full." Chapter 23 covers one-way generators and defers the full form to chapter 45, as its own line 90 says. Suggested fix: "covers generators", or add "and [Generators](45_Effects--Generators.md) covers the rest".
+- **Chapter 15, line 32:** "[Iterators](22_Patterns--Iterators.md#generators) covers generators in full." Chapter 23 covers one-way generators and defers the full form to chapter 45, as its own line 90 says. Suggested fix: "covers generators", or add "and [Generators](45_Effects--Generators.md) covers the rest".
 - **Stale baseline entries** that this review's edits removed (for pruning; I did not touch `tools/data/`): watch-words `itself: Nothing prints the CODE itself`, `only: Only the generator portion changed`, and Solutions 45's `only: ... arrives only once`; positional `'The second line' :: The second line of `send(6)`'s pair is the exception.`
 - **`tip grounding-triage` not run**, since it writes `tools/data/grounding_verdicts.json`. Three edited sentences link another chapter: the new chapter 23/15 short-form sentence, the chapter 15 quotation, and Solutions 4's chapter 19 link. Each sentence's code terms appear in the linked section.
 - **Exercise 7 and its solution depend on chapter 31** (open editing pass). I checked them against the current chapter 31 `vending_machine.py` (an `Enum` state, a transition table, `Quit` from every state but `QUIESCENT`) and made no change that depends on it.

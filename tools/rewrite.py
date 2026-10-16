@@ -60,8 +60,8 @@ Usage:
     python -m tools.rewrite 25 --also activate    # defaults + activate
     python -m tools.rewrite 25 --passes activate  # activate only
     python -m tools.rewrite 25 --model claude-sonnet-5
-    python -m tools.rewrite Chapters/25_Patterns--Template_Method.md --all
-    python -m tools.rewrite Solutions/25_Patterns--Template_Method/README.md
+    python -m tools.rewrite Chapters/24_Patterns--Template_Method.md --all
+    python -m tools.rewrite Solutions/24_Patterns--Template_Method/README.md
 
 A Solutions file named by its path runs the same passes, minus the
 reflow, which the gate never applies to `Solutions/`.
@@ -347,8 +347,8 @@ def claude_argv(
 
 
 def chapter_tag(chapter: Path) -> str:
-    """`[25]` from `Chapters/25_Patterns--Template_Method.md`, and `[S25]`
-    from `Solutions/25_Patterns--Template_Method/README.md`, for parallel
+    """`[25]` from `Chapters/24_Patterns--Template_Method.md`, and `[S25]`
+    from `Solutions/24_Patterns--Template_Method/README.md`, for parallel
     output."""
     if chapter.parts[0] == "Solutions":
         return f"[S{chapter.parent.name.split('_', 1)[0]}]"

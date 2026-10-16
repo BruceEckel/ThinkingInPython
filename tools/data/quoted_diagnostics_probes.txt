@@ -36,9 +36,9 @@ Solutions/13_Techniques--Pattern_Matching/README.md	2	notifications_match.py	rep
 Solutions/17_Techniques--Metaprogramming/README.md	1	metaclass_layout_conflict.py	strip-ignore
 Solutions/20_Patterns--Rethinking_Objects/README.md	1	exercise_3.py	strip-ignore
 Solutions/20_Patterns--Rethinking_Objects/README.md	2	exercise_5.py	replace: case Square(side=side): => # case Square(side=side):	replace: return side * side => # return side * side
-Solutions/25_Patterns--Template_Method/README.md	1	exercise_3.py	strip-ignore
-Solutions/27_Patterns--Factory/README.md	1	exercise_3_protocol.py	delete: def make_obstacle(self) -> Fairy: return Fairy()
-Solutions/27_Patterns--Factory/README.md	2	exercise_11.py	replace: PROTOTYPES[name] = build() => PROTOTYPES[build.__name__] = build()
+Solutions/24_Patterns--Template_Method/README.md	1	exercise_3.py	strip-ignore
+Solutions/26_Patterns--Factory/README.md	1	exercise_3_protocol.py	delete: def make_obstacle(self) -> Fairy: return Fairy()
+Solutions/26_Patterns--Factory/README.md	2	exercise_11.py	replace: PROTOTYPES[name] = build() => PROTOTYPES[build.__name__] = build()
 Solutions/29_Patterns--Changing_the_Interface/README.md	1	exercise_5.py	strip-ignore
 Solutions/40_Functional--Foundations/README.md	1	exercise_6.py	strip-ignore
 Solutions/40_Functional--Foundations/README.md	2	exercise_6_tuple.py	append: CONFIG.append(3)

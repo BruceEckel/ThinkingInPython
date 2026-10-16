@@ -37,10 +37,10 @@ exempt.
 
 It also checks how a solution *cites* its chapter. A solutions file sits
 two directories below the book root (`Solutions/<chapter>/README.md`), so
-a link written the way a chapter writes it, `](24_Patterns--Singleton.md#...)`,
+a link written the way a chapter writes it, `](23_Patterns--Singleton.md#...)`,
 resolves inside the chapter's solutions folder, and the one-level form
-`](../Chapters/24_Patterns--Singleton.md)` resolves inside `Solutions/`;
-both miss. The correct form is `../../Chapters/24_Patterns--Singleton.md`.
+`](../Chapters/23_Patterns--Singleton.md)` resolves inside `Solutions/`;
+both miss. The correct form is `../../Chapters/23_Patterns--Singleton.md`.
 Seventeen links were wrong this way before anything looked, and
 `heading_links.py` checks only links that carry an `#anchor`. Write `./`
 on the front for a deliberate link to a neighboring file.
@@ -96,15 +96,15 @@ JOINERS = re.compile(r"[&,]")
 EXERCISE_LISTING = re.compile(r"^exercise_(\d+)")
 
 # A Markdown link to a numbered book file with no directory in front of
-# it, so it resolves beside the linking file: "](24_Patterns--Singleton.md#state)".
+# it, so it resolves beside the linking file: "](23_Patterns--Singleton.md#state)".
 # A leading "./" or "../" fails the match, which is the opt-out.
 # The `-` in the class is for the `--` that sets a chapter's part name
-# off from its title (`26_Patterns--Surrogate.md`); without it this check
+# off from its title (`25_Patterns--Surrogate.md`); without it this check
 # silently stops matching every chapter and reports nothing.
 BARE_CHAPTER_LINK = re.compile(r"\]\((\d{2}_[A-Za-z_-]+\.md)([^)]*)\)")
 
 # A link to a chapter one level up, which from `Solutions/<chapter>/` is
-# a path inside Solutions/: "](../Chapters/24_Patterns--Singleton.md)".
+# a path inside Solutions/: "](../Chapters/23_Patterns--Singleton.md)".
 # Group 1 is the rest of the target. `](../../Chapters/` does not match.
 SHALLOW_CHAPTER_LINK = re.compile(r"\]\(\.\./Chapters/([^)\s]*)")
 

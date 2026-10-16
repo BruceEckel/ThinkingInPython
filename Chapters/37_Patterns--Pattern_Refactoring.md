@@ -34,7 +34,7 @@ To sort the pile, you must recover the type of each piece.
 In the `Trash` hierarchy, each material class declares a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically.
-The base class's `create()` method is the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary).
+The base class's `create()` method is the [dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary).
 It builds an instance from a material name.
 
 ```python
@@ -95,7 +95,7 @@ immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
 
 `create()` is a class method reading `cls.registry`.
-[Factory](27_Patterns--Factory.md#hazards-of-self-registration)
+[Factory](26_Patterns--Factory.md#hazards-of-self-registration)
 warns that this form can mislead.
 `Aluminum.create("Paper", 1.0)` is legal and returns a `Paper`.
 The lookup is safe here.
@@ -384,7 +384,7 @@ The loop has no list of materials to maintain and no case to forget.
 
 `bins[type(piece)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).
-That dispatch first appeared in an [event bus keyed by type](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
+That dispatch first appeared in an [event bus keyed by type](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
 
 The key is the *exact* class.
 If you derive `CrushedAluminum` from `Aluminum`,

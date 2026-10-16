@@ -1375,7 +1375,7 @@ and the graph you can read is the union in the signature.
 The bakery graph goes deep,
 with two of its three leaves reached through `bread()`.
 The next example goes wide instead.
-[Abstract Factories](27_Patterns--Factory.md#abstract-factories)
+[Abstract Factories](26_Patterns--Factory.md#abstract-factories)
 builds a gaming environment where a `GameElementFactory` returns a matched `Character` and `Obstacle`,
 and a `GameEnvironment` plays whatever that factory produces.
 Here each kind of actor is a type the program requests through a `Need`:

@@ -182,7 +182,7 @@ but `claim()` runs from its test to its `add()` as one synchronous stretch
 (see exercise 3).
 
 `next_number()` hands out rat numbers from `itertools.count()`,
-the [endless counter](23_Patterns--Iterators.md#reusable-algorithms).
+the [endless counter](22_Patterns--Iterators.md#reusable-algorithms).
 `explore()` claims the entry and creates the first rat's task inside an `asyncio.TaskGroup`,
 the [structured batch of tasks](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup):
 
@@ -705,7 +705,7 @@ def item_factory(symbol: str) -> Item:
 It searches `Item.__subclasses__()` for a matching `symbol`,
 so a new kind of item registers itself.
 Once you define the subclass with its symbol, the factory finds it.
-That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
+That search is the [registry idea](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 
 The factory builds the item with `return item_type()`,
@@ -720,7 +720,7 @@ If you derive a class from `Food` to inherit its behavior,
 that class is a grandchild of `Item`.
 `Item.__subclasses__()` leaves it out,
 so the loop finds no match and the function's last line builds a `Teleport`.
-[Factory](27_Patterns--Factory.md#simple-factory-method)
+[Factory](26_Patterns--Factory.md#simple-factory-method)
 describes the recursion for deeper hierarchies,
 and that chapter's exercise 9 writes the recursion.
 
@@ -798,7 +798,7 @@ The `interact()` methods implement every rule of the game.
 then the connections between rooms, then the teleport pairs.
 Each stage depends on the one before it,
 so each runs as its own labeled pass instead of all three interleaving in one loop.
-[Factory](27_Patterns--Factory.md#builder)
+[Factory](26_Patterns--Factory.md#builder)
 counts `GameBuilder` among the cases where *Builder* remains useful in Python,
 because construction here is a process rather than a single call.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
@@ -1148,7 +1148,7 @@ if __name__ == "__main__":
 Three ideas from earlier chapters make up the design.
 [Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
 replaces a type switch,
-a [factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
+a [factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 builds objects from data,
 and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object)
 removes the check for a missing door.

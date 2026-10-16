@@ -313,7 +313,7 @@ A factory function like `tile()` has a visibly different name and call syntax,
 so a caller can see that construction goes through the factory rather than the class.
 If you want callers to construct objects with an ordinary class call such as `Color(...)`,
 hide the pool inside `__new__()` instead.
-[*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
+[*Singleton*](23_Patterns--Singleton.md#the-classic-implementations)
 keeps its pool in `__new__()` the same way.
 Here the pool keys on the constructor arguments instead of a single constant key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
@@ -355,7 +355,7 @@ You write the bookkeeping yourself.
 It must account for the way Python calls `__init__()` after `__new__()`.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
-as [*Singleton*](24_Patterns--Singleton.md#one-instance-in-a-class-variable)
+as [*Singleton*](23_Patterns--Singleton.md#one-instance-in-a-class-variable)
 notes.
 The record's generated `__init__()` therefore runs at every construction,
 including the ones that return a pooled instance.
@@ -395,7 +395,7 @@ The bookkeeping exists for that guarantee, or for the constructor syntax.
 When you need neither,
 the `@cache` factory from `tile_map.py` does the same job.
 
-One more hazard from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory applies here.
+One more hazard from [*Singleton*](23_Patterns--Singleton.md#the-first-call-race)'s cached factory applies here.
 Every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object.
 The second store overwrites the first,

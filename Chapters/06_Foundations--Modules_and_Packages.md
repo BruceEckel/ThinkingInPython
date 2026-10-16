@@ -500,7 +500,7 @@ and keep the star for experiments at the interactive prompt.
 The underscore and `__all__` both say which names a caller should use.
 That stated boundary lets a module act as a [*Façade*](29_Patterns--Changing_the_Interface.md#façade)
 over its internals or as a shared single instance
-([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).
+([*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton)).
 
 ## File Names
 
@@ -692,7 +692,7 @@ including the ones marked `lazy`.
 CPython removed it before the 3.15 release.
 
 Keep an import eager when you import a module for what its body does rather than for a name it defines.
-A module that registers a [plugin class](27_Patterns--Factory.md#hazards-of-self-registration),
+A module that registers a [plugin class](26_Patterns--Factory.md#hazards-of-self-registration),
 installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
 the module's body and its registration wait for the rest of the run.

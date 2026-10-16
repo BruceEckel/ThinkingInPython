@@ -133,19 +133,19 @@ def test_a_listing_above_the_first_heading_is_exempt() -> None:
 # ── chapter citations ─────────────────────────────────────────────────────────
 
 def test_a_bare_chapter_link_is_flagged() -> None:
-    m = BARE_CHAPTER_LINK.search("see [State](26_Patterns--Surrogate.md#state) for")
+    m = BARE_CHAPTER_LINK.search("see [State](25_Patterns--Surrogate.md#state) for")
     assert m is not None
-    assert m.group(1) == "26_Patterns--Surrogate.md"
+    assert m.group(1) == "25_Patterns--Surrogate.md"
 
 def test_a_bare_link_with_no_anchor_is_flagged_too() -> None:
     assert BARE_CHAPTER_LINK.search("[Classes](07_Foundations--Classes.md)") is not None
 
 def test_a_chapters_prefixed_link_is_clean() -> None:
-    text = "[State](../Chapters/26_Patterns--Surrogate.md#state)"
+    text = "[State](../Chapters/25_Patterns--Surrogate.md#state)"
     assert BARE_CHAPTER_LINK.search(text) is None
 
 def test_an_explicit_sibling_link_is_the_opt_out() -> None:
-    assert BARE_CHAPTER_LINK.search("[that answer](./26_Patterns--Surrogate.md)") is None
+    assert BARE_CHAPTER_LINK.search("[that answer](./25_Patterns--Surrogate.md)") is None
 
 def test_a_same_file_anchor_is_not_a_chapter_link() -> None:
     assert BARE_CHAPTER_LINK.search("[above](#the-heading)") is None
@@ -299,24 +299,24 @@ def citation_messages(text: str, tmp_path: Path) -> list[str]:
 def test_a_bare_chapter_link_says_to_use_two_levels(
         tmp_path: Path) -> None:
     [message] = citation_messages(
-        "See [x](26_Patterns--Surrogate.md#state).\n", tmp_path)
-    assert "../../Chapters/26_Patterns--Surrogate.md" in message
+        "See [x](25_Patterns--Surrogate.md#state).\n", tmp_path)
+    assert "../../Chapters/25_Patterns--Surrogate.md" in message
 
 
 def test_a_one_level_chapters_link_is_reported(tmp_path: Path) -> None:
     [message] = citation_messages(
-        "See [x](../Chapters/26_Patterns--Surrogate.md#state).\n", tmp_path)
+        "See [x](../Chapters/25_Patterns--Surrogate.md#state).\n", tmp_path)
     assert "resolves inside Solutions/" in message
-    assert "../../Chapters/26_Patterns--Surrogate.md#state" in message
+    assert "../../Chapters/25_Patterns--Surrogate.md#state" in message
 
 
 def test_a_two_level_chapters_link_passes(tmp_path: Path) -> None:
     assert citation_messages(
-        "See [x](../../Chapters/26_Patterns--Surrogate.md#state).\n",
+        "See [x](../../Chapters/25_Patterns--Surrogate.md#state).\n",
         tmp_path) == []
 
 
 def test_a_one_level_link_in_a_fence_is_ignored(tmp_path: Path) -> None:
     assert citation_messages(
-        "```text\n[x](../Chapters/26_Patterns--Surrogate.md)\n```\n",
+        "```text\n[x](../Chapters/25_Patterns--Surrogate.md)\n```\n",
         tmp_path) == []

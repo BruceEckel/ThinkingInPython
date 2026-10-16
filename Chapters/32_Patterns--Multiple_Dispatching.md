@@ -84,7 +84,7 @@ def duel(player: Any, opponent: Any) -> None:
 
 `all_pairs()` is generic over whichever base class it receives.
 `__subclasses__()` lists that base's direct subclasses,
-as [`shape_name()`](27_Patterns--Factory.md#simple-factory-method) does.
+as [`shape_name()`](26_Patterns--Factory.md#simple-factory-method) does.
 `itertools.product()` pairs each subclass with every subclass, itself included,
 so a demo prints each of the nine answers once.
 `duel()` annotates both parameters `Any` because `paper_scissors_rock.py` and `paper_scissors_rock_table.py` define separate `Item` hierarchies,

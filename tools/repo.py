@@ -11,7 +11,7 @@ The shared modules carry short names (config, repo, markdown, ...) and
 are imported as ``tools.config`` and so on, not by bare name. That
 matters because validate_output.py execs every book listing in this
 same process, and a chapter's own example file can be "config.py" or
-"repo.py" (chapter 24's Singleton demo has one). When these modules were
+"repo.py" (chapter 23's Singleton demo has one). When these modules were
 bare siblings on sys.path they carried a ``tools_`` prefix, because a
 listing's ``import config`` silently resolved to the tool's module
 through the sys.modules cache once a tool had imported it. Inside the

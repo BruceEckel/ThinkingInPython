@@ -54,7 +54,7 @@ meeting the topic for the first time, and ask:
   use, and no listing depends on a construct introduced later in the
   book. The reverse direction matters too: when a chapter leans on
   earlier material, it should say which chapter, and a named link
-  (`[Iterators](23_Patterns--Iterators.md)`) beats "as you saw earlier", which
+  (`[Iterators](22_Patterns--Iterators.md)`) beats "as you saw earlier", which
   goes stale silently when chapters are split or renumbered.
 - **Escalating difficulty.** The first listing in a section should be
   the smallest thing that makes the point, with complications added one

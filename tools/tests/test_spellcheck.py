@@ -62,8 +62,8 @@ def test_fenced_code_is_still_skipped(tmp_path: Path) -> None:
 # ── codespell output ──────────────────────────────────────────────────────────
 
 def test_parse_codespell_lowercases_each_flagged_word() -> None:
-    out = ("Chapters\\25_Patterns--Template_Method.md:296: OnlyOnce ==> only once\n"
-           "Chapters\\25_Patterns--Template_Method.md:305: OnlyOnce ==> only once\n"
+    out = ("Chapters\\24_Patterns--Template_Method.md:296: OnlyOnce ==> only once\n"
+           "Chapters\\24_Patterns--Template_Method.md:305: OnlyOnce ==> only once\n"
            "Solutions/03_Foundations--Containers.md:12: teh ==> the\n")
     assert parse_codespell(out) == {"onlyonce", "teh"}
 

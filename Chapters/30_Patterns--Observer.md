@@ -295,7 +295,7 @@ The broadcaster would then need a rule for combining those values.
 Returning `None` makes that rule unnecessary.
 
 A design that needs an answer uses a different pattern.
-[*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+[*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
 
 The new `Thermometer` changes only its base class and the call in its `celsius` setter,
@@ -1867,7 +1867,7 @@ In `weather_station.py` every attribute's changes arrive on one channel,
 so each responder that acts on one attribute filters by name,
 and all of them write the same filter.
 
-[Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
+[Function Objects](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 removes the repeated name filter with a dictionary of handler lists keyed by event type.
 A handler is that chapter's name for a responder.
 An announcement carries its type,

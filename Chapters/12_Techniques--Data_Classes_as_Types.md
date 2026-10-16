@@ -551,7 +551,7 @@ which also rejects assignment and hashes under the same rule.
 Every field it holds must be hashable.
 The two differ in equality.
 A frozen data class equals another instance of its own class,
-while a `NamedTuple` [equals any tuple holding the same values](22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple).
+while a `NamedTuple` [equals any tuple holding the same values](28_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple).
 They also [differ in validation](#namedtuple-cannot-validate).
 
 If every part of an object stays as construction left it,
@@ -1166,7 +1166,7 @@ def test_the_check_cannot_move_inside() -> None:
 There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
 because a caller can call `Stars()` instead of the factory function.
-Every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes)
+Every factory in [Factory](26_Patterns--Factory.md#hiding-the-concrete-classes)
 shares that limit.
 
 `test_the_check_cannot_move_inside()` shows why the check cannot move inside the type.
@@ -1189,7 +1189,7 @@ including the ones you did not anticipate.
 because it builds the copy through the constructor.
 Running the check on every construction is the deciding difference whenever a type must guarantee its own values.
 When every value of the field types is legal,
-a `NamedTuple` is a fine [immutable type](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).
+a `NamedTuple` is a fine [immutable type](28_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).
 
 ## Inheritance and the Generated `__init__()` {#dataclass-inheritance}
 
@@ -1255,7 +1255,7 @@ If you delete `__post_init__()`,
 
 If a base `__init__()` instead replaces `self.__dict__`,
 calling it from `__post_init__()` discards the fields the data class just assigned.
-The [*Borg* singleton](24_Patterns--Singleton.md#borg-singleton-by-inheritance)
+The [*Borg* singleton](23_Patterns--Singleton.md#borg-singleton-by-inheritance)
 is that case.
 
 When the base class is also a data class, you need no `__post_init__()`.

@@ -280,7 +280,7 @@ The release with the most that the book has no equivalent for.
 - **`__qualname__` (PEP 3155).** **Consider** for chapter 17.
   Not covered.
   Decorators and registries that key on a function's name usually need the qualified one.
-  *Rechecked 2026-09-29: partly covered (Chapters/27_Patterns--Factory.md:415; 33_Patterns--Visitor.md:149 (used)); missing: not explained in ch 17.*
+  *Rechecked 2026-09-29: partly covered (Chapters/26_Patterns--Factory.md:415; 33_Patterns--Visitor.md:149 (used)); missing: not explained in ch 17.*
 - **PEP 3151, the `OSError` exception hierarchy.** **Consider** a short note wherever
   exception handling is taught.
   Catching `FileNotFoundError` rather than checking `errno` is the modern form

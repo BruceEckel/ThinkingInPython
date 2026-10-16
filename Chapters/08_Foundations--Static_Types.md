@@ -369,7 +369,7 @@ and reports a mismatch before the program runs, as static type checking does.
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of returning `True` or `False`.
 Decorating the Protocol with `@runtime_checkable` allows the call,
-but `isinstance()` then makes a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies).
+but `isinstance()` then makes a [weaker check](25_Patterns--Surrogate.md#what-the-implementation-supplies).
 It confirms that each method exists and ignores its signature.
 
 ## Classes as Values: `type[C]` {#classes-as-values-type}
@@ -913,7 +913,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `Protocol` | A required shape (methods and attributes), satisfied without inheritance, see [Structural Typing with Protocols](#structural-typing-with-protocols) |
-| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) |
+| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies) |
 
 ### Dictionary and Record Shapes
 
@@ -923,7 +923,7 @@ The abstract container types come from `collections.abc`.
 |-----------|---------|
 | `TypedDict` | A dict with specific keys and value types; `**kwargs: Unpack[TD]` types keyword arguments with one, see [Typing `**kwargs` with a `TypedDict`](#typed-kwargs) |
 | `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
-| `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#namedtuple) |
+| `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#namedtuple) |
 
 ### Type Narrowing
 

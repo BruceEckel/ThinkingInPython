@@ -72,7 +72,7 @@ and raises no surprising exceptions.
 When subclasses obey the principle,
 code you write against the base class works unchanged on any of them.
 That obedience makes polymorphism safe,
-and with it patterns like the [*Template Method*](25_Patterns--Template_Method.md).
+and with it patterns like the [*Template Method*](24_Patterns--Template_Method.md).
 
 Code written against the base class calls a method and depends on every subclass standing in for the base.
 A statically typed compiler can check that an override's signature stays compatible.

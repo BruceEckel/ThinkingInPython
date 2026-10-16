@@ -16,7 +16,7 @@ Please apply the following technical and structural refinements to the `39_Patte
 
 **3. Patterns Python Absorbed (Broadening Command absorption)**
 
-* **Target Text:** `| [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function stored in a list |`
+* **Target Text:** `| [*Command*](27_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function stored in a list |`
 * **Issue:** Describing Python's absorption of *Command* solely as "a function stored in a list" artificially restricts the pattern to macro or queue scenarios. The essence of a Command is encapsulating a deferred request, which in Python is frequently just a callable saved to a single variable or attribute (such as an `on_click` callback).
 * **Instruction:** Change the right-hand column to: `A callable saved to run later, or stored in a list`
 

@@ -137,8 +137,8 @@ Small, but they are what makes a straightened sentence still feel heavy:
   not every copula.
 - **Terms of art stay.**
   "That is the dissolution *Design Patterns* describes" looks like a
-  buried actor, but "dissolution" is the book's word in chapters 23, 27,
-  and 28, and chapter 28 phrases it the same way.
+  buried actor, but "dissolution" is the book's word in chapters 22, 26,
+  and 27, and chapter 27 phrases it the same way.
   Grep the book before rewording a noun that reads like jargon;
   if other chapters use it, it is a term, and changing one instance
   breaks the set.

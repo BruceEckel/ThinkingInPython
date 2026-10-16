@@ -6,7 +6,7 @@ so a bare "state" or even "State" does not read as the pattern. The
 book's rule is therefore that a pattern name, wherever it names the
 pattern, is written capitalized and in italics, on every mention and
 not only the first: *State*, *Chain of Responsibility*, and inside
-link text, [*Template Method*](25_Patterns--Template_Method.md).
+link text, [*Template Method*](24_Patterns--Template_Method.md).
 Headings stay plain (they are already title case), and code spans are
 class names, not pattern names. The lowercase word keeps its ordinary
 sense: "an observer registers interest", "a flyweight is immutable",
@@ -67,7 +67,7 @@ AMBIGUOUS_AT_START = frozenset({"State", "Command", "Bridge"})
 
 _PUA = 0xE000
 # Masked before matching: inline code, a link's destination (which holds
-# the chapter filename, "26_Patterns--Surrogate.md#state"), a reference
+# the chapter filename, "25_Patterns--Surrogate.md#state"), a reference
 # footnote marker, and an explicit heading id.
 _MASKED = re.compile(
     r"``[^`]*``|`[^`]*`|\]\([^)]*\)|\[\^[^\]]+\]|\{#[^}]*\}")

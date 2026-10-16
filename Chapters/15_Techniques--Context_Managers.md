@@ -24,7 +24,7 @@ The borrower writes nothing to arrange it.
 
 ## A Basic Context Manager
 
-The simplest way to write a context manager is a [generator](23_Patterns--Iterators.md#generators)
+The simplest way to write a context manager is a [generator](22_Patterns--Iterators.md#generators)
 function with a single `yield`.
 The `contextlib.contextmanager` decorator turns that function into a context manager.
 [Generators](45_Effects--Generators.md) covers the two-way form.

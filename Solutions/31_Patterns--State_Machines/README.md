@@ -48,14 +48,14 @@ class StateMachine:
 
 ## 1. `UnpredictablePerson` with a `Prozac` mood
 
-> Using [*State*](../../Chapters/26_Patterns--Surrogate.md#state),
+> Using [*State*](../../Chapters/25_Patterns--Surrogate.md#state),
 > make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
 > Add another kind of `Mood` called `Prozac`.
 
 <details>
 <summary>Where to look</summary>
 
-[*State*](../../Chapters/26_Patterns--Surrogate.md#state) shows a surrogate that forwards a call to whichever state object it currently holds.
+[*State*](../../Chapters/25_Patterns--Surrogate.md#state) shows a surrogate that forwards a call to whichever state object it currently holds.
 Define a `Mood` protocol with one `hello()` method, and give `UnpredictablePerson` a `change_to()` that swaps the held object.
 A new mood is another class with the same method, so the person needs no change.
 
@@ -140,7 +140,7 @@ print(person.hello())
 third mood changes the `Mood` object that `change_to()` installs, and
 no code in `UnpredictablePerson`.
 `UnpredictablePerson` is the
-[*State* surrogate](../../Chapters/26_Patterns--Surrogate.md#state),
+[*State* surrogate](../../Chapters/25_Patterns--Surrogate.md#state),
 applied to a new domain.
 
 </details>
@@ -525,7 +525,7 @@ section makes the same trade-off over the per-state `trap_states.py`.
 ## 5. `mouse_move_generator()`
 
 > Write a `mouse_move_generator()`,
-> a [generator](../../Chapters/23_Patterns--Iterators.md#generators)
+> a [generator](../../Chapters/22_Patterns--Iterators.md#generators)
 > that yields valid `Mouse` moves in sequence,
 > where each possible move depends on the previous one
 > (it is another state machine).

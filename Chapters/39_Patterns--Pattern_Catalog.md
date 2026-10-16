@@ -17,7 +17,7 @@ Many overlap, some solve the same problem in different ways,
 and several exist only to work around limits of a particular language.
 The body of this book argues that those workarounds often [dissolve in Python](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves).
 
-One overlapping pair is [*State*](26_Patterns--Surrogate.md#state)
+One overlapping pair is [*State*](25_Patterns--Surrogate.md#state)
 and [*State Machine*](31_Patterns--State_Machines.md).
 *State* changes an object's behavior when its internal state changes.
 The client chooses each new state.
@@ -83,11 +83,11 @@ so use this section's table when you know the problem but not the name.
 
 | Pattern | Intent |
 |---------|--------|
-| [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
-| [*Builder*](27_Patterns--Factory.md#builder) | Build a complex object in steps, keeping the assembly separate from the finished object. |
-| [*Factory Method*](27_Patterns--Factory.md#subclasses-choose-the-type) | Defer instantiation to a method so subclasses choose the concrete type. |
-| [*Prototype*](27_Patterns--Factory.md#prototype) | Create new objects by cloning an existing instance. |
-| [*Singleton*](24_Patterns--Singleton.md) | Ensure a class has one instance with a single point of access. |
+| [*Abstract Factory*](26_Patterns--Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
+| [*Builder*](26_Patterns--Factory.md#builder) | Build a complex object in steps, keeping the assembly separate from the finished object. |
+| [*Factory Method*](26_Patterns--Factory.md#subclasses-choose-the-type) | Defer instantiation to a method so subclasses choose the concrete type. |
+| [*Prototype*](26_Patterns--Factory.md#prototype) | Create new objects by cloning an existing instance. |
+| [*Singleton*](23_Patterns--Singleton.md) | Ensure a class has one instance with a single point of access. |
 
 ## Structural (GoF)
 
@@ -99,22 +99,22 @@ so use this section's table when you know the problem but not the name.
 | [*Decorator*](14_Techniques--Decorators.md#the-decorator-pattern) | Attach responsibilities to an object dynamically by wrapping it. |
 | [*Façade*](29_Patterns--Changing_the_Interface.md#façade) | Provide one simplified interface to a subsystem. |
 | [*Flyweight*](35_Patterns--Flyweight.md) | Share fine-grained objects to support large numbers of them efficiently. |
-| [*Proxy*](26_Patterns--Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |
+| [*Proxy*](25_Patterns--Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |
 
 ## Behavioral (GoF)
 
 | Pattern | Intent |
 |---------|--------|
-| [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | Pass a request along a chain until a handler processes it. |
-| [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |
+| [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | Pass a request along a chain until a handler processes it. |
+| [*Command*](27_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |
 | [*Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter) | Represent a grammar and evaluate sentences written in it. |
-| [*Iterator*](23_Patterns--Iterators.md) | Access the elements of a collection in order without exposing its structure. |
+| [*Iterator*](22_Patterns--Iterators.md) | Access the elements of a collection in order without exposing its structure. |
 | *Mediator* | Route communication between objects through one place to reduce coupling. |
 | [*Memento*](36_Patterns--Memento.md) | Capture and restore an object's state without breaking encapsulation. |
 | [*Observer*](30_Patterns--Observer.md) | Notify dependents automatically when an object changes state. |
-| [*State*](26_Patterns--Surrogate.md#state) | Change an object's behavior when its internal state changes. |
-| [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |
-| [*Template Method*](25_Patterns--Template_Method.md) | Define an algorithm's skeleton, letting subclasses fill in steps. |
+| [*State*](25_Patterns--Surrogate.md#state) | Change an object's behavior when its internal state changes. |
+| [*Strategy*](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |
+| [*Template Method*](24_Patterns--Template_Method.md) | Define an algorithm's skeleton, letting subclasses fill in steps. |
 | [*Visitor*](33_Patterns--Visitor.md) | Add operations to an object structure without changing its classes. |
 
 ## Concurrency (POSA and others)
@@ -123,7 +123,7 @@ so use this section's table when you know the problem but not the name.
 |---------|--------|
 | *Active Object* | Decouple a method call from its execution by giving the object its own thread. |
 | *Balking* | Refuse an action when the object is in the wrong state. |
-| [*Double-Checked Locking*](24_Patterns--Singleton.md#double-checked-locking-and-eager-creation) | Skip the lock once a lazily initialized shared resource exists. |
+| [*Double-Checked Locking*](23_Patterns--Singleton.md#double-checked-locking-and-eager-creation) | Skip the lock once a lazily initialized shared resource exists. |
 | [*Future/Promise*](19_Techniques--Concurrency.md#one-await-any-backend) | Represent a result that becomes available later. |
 | *Guarded Suspension* | Block a call until a precondition becomes true. |
 | *Half-Sync/Half-Async* | Separate synchronous and asynchronous work, joined by a queue. |
@@ -160,7 +160,7 @@ built on the operating system's I/O completion ports.
 | *Layers* | Stack responsibilities so each layer uses only the one beneath it. |
 | *Microkernel* | Keep a minimal core and add capability through plug-ins. |
 | [*Model-View-Controller* (MVC)](30_Patterns--Observer.md#document-view-and-mvc) | Separate data, presentation, and input handling. |
-| [*Pipes and Filters*](23_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |
+| [*Pipes and Filters*](22_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |
 | *Presentation-Abstraction-Control* (PAC) | Build interactive systems from cooperating agents, each split three ways. |
 | [*Reflection*](17_Techniques--Metaprogramming.md) | Let a program inspect and adjust its own structure at runtime. |
 
@@ -170,7 +170,7 @@ built on the operating system's I/O completion ports.
 |---------|--------|
 | *Active Record* | Wrap a table row in an object that loads and saves itself. |
 | *Data Mapper* | Move data between objects and the database, so neither names the other. |
-| [*Data Transfer Object* (DTO)](22_Patterns--Data_Transfer_Objects.md) | Carry data between processes in one batched object. |
+| [*Data Transfer Object* (DTO)](28_Patterns--Data_Transfer_Objects.md) | Carry data between processes in one batched object. |
 | *Domain Model* | Model business logic as a graph of objects. |
 | *Front Controller* | Route all requests through a single handler. |
 | *Gateway* | Wrap access to an external system in a simple interface. |
@@ -178,7 +178,7 @@ built on the operating system's I/O completion ports.
 | *Lazy Load* | Defer loading a persisted object until something needs it. |
 | *Money* | Represent monetary amounts together with their currency. |
 | *Plugin* | Select an implementation by naming its class in configuration rather than in code. |
-| [*Registry*](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | Keep one well-known object where the rest of the program looks up services or data. |
+| [*Registry*](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | Keep one well-known object where the rest of the program looks up services or data. |
 | *Repository* | Stand between the domain and the data store, presenting stored objects as a queryable collection. |
 | *Service Layer* | Define an application boundary as a set of operations. |
 | [*Special Case*](20_Patterns--Rethinking_Objects.md#null-object) | Supply a subclass for a particular case, such as a missing or unknown customer, instead of a conditional at every use. |
@@ -200,7 +200,7 @@ built on the operating system's I/O completion ports.
 | *Message Router* | Send a message to a destination chosen at runtime. |
 | *Message Translator* | Convert a message from one format to another. |
 | *Point-to-Point Channel* | Deliver a message to exactly one receiver. |
-| [*Publish-Subscribe Channel*](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) | Broadcast a message to every subscriber to its topic. |
+| [*Publish-Subscribe Channel*](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) | Broadcast a message to every subscriber to its topic. |
 | *Splitter* | Break one message into several. |
 
 ## Distributed and Cloud
@@ -244,25 +244,25 @@ built on the operating system's I/O completion ports.
 | Pattern | Intent |
 |---------|--------|
 | [*Dependency Injection*](11_Techniques--Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
-| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* applies *Inversion of Control* to an object's collaborators. The usual alternative to *Dependency Injection* is *Service Locator*. *Service Locator* keeps control in your code, which asks a registry for each collaborator. |
+| [*Inversion of Control*](24_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* applies *Inversion of Control* to an object's collaborators. The usual alternative to *Dependency Injection* is *Service Locator*. *Service Locator* keeps control in your code, which asks a registry for each collaborator. |
 | [*Service Locator*](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 
 ## Other Patterns and Idioms
 
 | Pattern | Intent |
 |---------|--------|
-| [*Borg* (Monostate)](24_Patterns--Singleton.md#borg-singleton-by-inheritance) | Let every instance share one set of state instead of sharing one instance. |
+| [*Borg* (Monostate)](23_Patterns--Singleton.md#borg-singleton-by-inheritance) | Let every instance share one set of state instead of sharing one instance. |
 | [*Double Dispatch*](32_Patterns--Multiple_Dispatching.md) | Resolve behavior from the runtime types of two objects, through two calls. |
-| [*Fluent Interface*](27_Patterns--Factory.md#builder) | Return the receiver from each method so calls chain into one expression. |
-| [*Function Object*](28_Patterns--Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
+| [*Fluent Interface*](26_Patterns--Factory.md#builder) | Return the receiver from each method so calls chain into one expression. |
+| [*Function Object*](27_Patterns--Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
 | [*Lazy Initialization*](07_Foundations--Classes.md#cached-property) | Create a value on first use. |
-| [*Messenger*](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) | Bundle values into one object with named attributes. *Messenger* is the in-process form of *Data Transfer Object*. |
+| [*Messenger*](28_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) | Bundle values into one object with named attributes. *Messenger* is the in-process form of *Data Transfer Object*. |
 | [*Multiton*](35_Patterns--Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
 | [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [*Object Pool*](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | *Specification* | Encapsulate a rule as a predicate that combines with others. |
 | [*State Machine*](31_Patterns--State_Machines.md) | Drive an object through a known set of states in response to inputs. |
-| [*Surrogate*](26_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work. *Proxy* and *State* are both forms of *Surrogate*. |
+| [*Surrogate*](25_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work. *Proxy* and *State* are both forms of *Surrogate*. |
 | *Type Object* | Represent a "kind of" thing as data rather than a subclass. |
 
 ## Patterns Python Absorbed
@@ -273,13 +273,13 @@ Python includes the piece their inventors set out to supply.
 
 | Pattern | What Python gives you instead |
 |---------|------------------------------|
-| [*Iterator*](23_Patterns--Iterators.md#the-pattern-that-disappeared) | The iteration protocol, called for you by `for` |
-| [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton) | A module, imported once and cached |
-| [*Factory Method*](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | A dictionary of classes, since a class is an object |
-| [*Prototype*](27_Patterns--Factory.md#prototype) | `copy.deepcopy()` and `copy.replace()` |
-| [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | A function passed as an argument |
-| [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function saved to run later |
-| [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | A list of functions, tried in order |
+| [*Iterator*](22_Patterns--Iterators.md#the-pattern-that-disappeared) | The iteration protocol, called for you by `for` |
+| [*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton) | A module, imported once and cached |
+| [*Factory Method*](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | A dictionary of classes, since a class is an object |
+| [*Prototype*](26_Patterns--Factory.md#prototype) | `copy.deepcopy()` and `copy.replace()` |
+| [*Strategy*](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | A function passed as an argument |
+| [*Command*](27_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function saved to run later |
+| [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | A list of functions, tried in order |
 | [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch`, or a `match` over a union of types |
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 

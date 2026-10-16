@@ -4,14 +4,14 @@ Please apply the following technical and structural refinements to the `29_Patte
 
 **1. Section: Façade (Abstract Factory pattern conflation)**
 
-* **Target Text:** "A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md)
-[*Abstract Factory*](27_Patterns--Factory.md#abstract-factories).
+* **Target Text:** "A *Façade* is often a [*Singleton*](23_Patterns--Singleton.md)
+[*Abstract Factory*](26_Patterns--Factory.md#abstract-factories).
 GoF supplies both halves of that combination.
 One *Façade* object is usually enough, which makes it a *Singleton*,
 and an *Abstract Factory* creates the subsystem's objects for it.
 A class containing static factory methods covers both halves:"
 * **Issue:** In GoF, *Façade* and *Abstract Factory* are distinct patterns; GoF notes that an Abstract Factory can be used *with* a Façade to construct subsystem objects polymorphically, not that a Façade *is* an Abstract Factory. In `facade.py`, `Facade.start_car()` is a static factory method constructing concrete classes directly (`Ignition(FuelPump(Engine()))`), which contradicts the definition of an *Abstract Factory* (producing families of related objects without specifying concrete classes) set in chapter 27.
-* **Instruction:** Clarify that a Façade often incorporates factory methods to assemble subsystem objects for the caller rather than being an *Abstract Factory*, with proposed wording: "A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md) that creates the subsystem's objects for callers. GoF notes that one *Façade* object is usually enough, which makes it a *Singleton*, and factory methods can build the subsystem objects. A class containing static factory methods covers both roles:"
+* **Instruction:** Clarify that a Façade often incorporates factory methods to assemble subsystem objects for the caller rather than being an *Abstract Factory*, with proposed wording: "A *Façade* is often a [*Singleton*](23_Patterns--Singleton.md) that creates the subsystem's objects for callers. GoF notes that one *Façade* object is usually enough, which makes it a *Singleton*, and factory methods can build the subsystem objects. A class containing static factory methods covers both roles:"
 
 **2. Section: Façade (Listing description omits subsystem class)**
 

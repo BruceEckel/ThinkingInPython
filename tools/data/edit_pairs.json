@@ -424,8 +424,8 @@
  "e32763198e88fbbd": {
   "file": "30_Patterns--Observer.md",
   "line": 273,
-  "before": "A design that needs an answer uses a different pattern; for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
-  "after": "For example, [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
+  "before": "A design that needs an answer uses a different pattern; for example [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
+  "after": "For example, [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
   "previous": "A notification names no receiver, and each listener may handle or ignore it, so one call with several listeners has no single answer to collect.",
   "following": "Testing confirms that `celsius` reports the value given to the constructor, that every subscriber receives the new value in subscription order, that a subscriber receives only the changes made after it subscribes, and that delivery stops after `unsubscribe()`.",
   "similarity": 0.841,
@@ -434,7 +434,7 @@
   "fault": "An abstract sentence ('uses a different pattern') precedes the concrete example that says the same thing.",
   "status": "searchable",
   "heading": "The Pythonic Observer: Callables in a List",
-  "paragraph": "A listener returns `None`, as seen in the `Listener` alias. The type checker rejects a subscriber that returns a value. Notification runs one way, from broadcaster to listeners, so `announce()` calls each listener as a statement. *GoF Design Patterns* gives the reason under broadcast communication. A notification names no receiver, and each listener may handle or ignore it, so one call with several listeners has no single answer to collect. A design that needs an answer uses a different pattern; for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
+  "paragraph": "A listener returns `None`, as seen in the `Listener` alias. The type checker rejects a subscriber that returns a value. Notification runs one way, from broadcaster to listeners, so `announce()` calls each listener as a statement. *GoF Design Patterns* gives the reason under broadcast communication. A notification names no receiver, and each listener may handle or ignore it, so one call with several listeners has no single answer to collect. A design that needs an answer uses a different pattern; for example [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
   "check": {
    "before": 0.81,
    "after": 0.08
@@ -1000,7 +1000,7 @@
   "line": 1336,
   "before": "The publisher decides which event it is publishing, which it already knows, in place of deciding who needs to hear.",
   "after": "The broadcaster then states which event it is announcing, which it knows, instead of guessing which responders need it.",
-  "previous": "[Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) removes it: one list becomes a dictionary of lists keyed by event type, so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.",
+  "previous": "[Function Objects](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) removes it: one list becomes a dictionary of lists keyed by event type, so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.",
   "following": "the smallest `Broadcaster` that lets callables subscribe, then notifies them.",
   "similarity": 0.65,
   "source": "2e61b3e7..HEAD",
@@ -1008,7 +1008,7 @@
   "fault": "'already' pads, 'who needs to hear' is a figure for which responders need the event, and 'publisher' is not the chapter's term for the broadcaster.",
   "status": "searchable",
   "heading": "Deciding What Matters",
-  "paragraph": "The repetition is correct for a question about *how much*, because each listener's threshold is its own number. *Which kind* is a different question, and repetition answers it badly, because a listener cannot subscribe to a kind of change the announcement never distinguishes. `watched.py` shows that repetition, with every watcher taking the attribute name and filtering it. [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) removes it: one list becomes a dictionary of lists keyed by event type, so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about. The publisher decides which event it is publishing, which it already knows, in place of deciding who needs to hear.",
+  "paragraph": "The repetition is correct for a question about *how much*, because each listener's threshold is its own number. *Which kind* is a different question, and repetition answers it badly, because a listener cannot subscribe to a kind of change the announcement never distinguishes. `watched.py` shows that repetition, with every watcher taking the attribute name and filtering it. [Function Objects](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) removes it: one list becomes a dictionary of lists keyed by event type, so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about. The publisher decides which event it is publishing, which it already knows, in place of deciding who needs to hear.",
   "check": {
    "before": 0.81,
    "after": 0.06
@@ -1108,8 +1108,8 @@
   "file": "bruce_edit_db.md",
   "line": 0,
   "rule": "R16",
-  "before": "I have also used a *generator* (see [Iterators](23_Patterns--Iterators.md#generators)).",
-  "after": "I have also used a [*generator*](23_Patterns--Iterators.md#generators).",
+  "before": "I have also used a *generator* (see [Iterators](22_Patterns--Iterators.md#generators)).",
+  "after": "I have also used a [*generator*](22_Patterns--Iterators.md#generators).",
   "previous": "",
   "following": "",
   "similarity": 0.0,

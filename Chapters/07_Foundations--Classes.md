@@ -43,7 +43,7 @@ The double underscores on both ends make it a dunder
 ([Tour](02_Foundations--Tour.md#booleans-none-and-truthiness) introduces the term),
 a method the language calls for you.
 The `__new__()` method is the constructor, which you rarely use
-([*Singleton*](24_Patterns--Singleton.md) shows a case that needs it).
+([*Singleton*](23_Patterns--Singleton.md) shows a case that needs it).
 Most programmers call `__init__()` the *constructor*,
 since it does the job of constructors in other OOP languages.
 This book follows that practice.

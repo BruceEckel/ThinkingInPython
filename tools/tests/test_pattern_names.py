@@ -27,10 +27,10 @@ def test_plain_capitalized_name_is_wrapped() -> None:
 
 
 def test_link_text_is_wrapped_and_target_is_not() -> None:
-    line = "see [Template Method](25_Patterns--Template_Method.md#a-template-method)"
+    line = "see [Template Method](24_Patterns--Template_Method.md#a-template-method)"
     new, _ = rewrite_line(line, NAMES)
     assert new == ("see [*Template Method*]"
-                   "(25_Patterns--Template_Method.md#a-template-method)")
+                   "(24_Patterns--Template_Method.md#a-template-method)")
 
 
 def test_code_span_is_ignored() -> None:

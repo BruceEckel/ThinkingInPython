@@ -249,7 +249,7 @@ Record each calibration run here with its date and result.
   He marked 52 apply and 45 leave on the page. A third apply pass (33
   Opus agents, `APPLY-BRIEF3.md`, `apply3/<stem>.json`) applied 50:
   four were already in place from round 1, two cross-chapter cards
-  (chapter 12's `Month` reaching chapter 27, chapter 23's `traced()`
+  (chapter 12's `Month` reaching chapter 26, chapter 22's `traced()`
   reaching chapter 18's `utils/benchmark.py`) went to a second agent
   each with permission to edit the other chapter, and two stay
   skipped (c20-plugged conflicts with an applied card; c41's
@@ -278,7 +278,7 @@ Record each calibration run here with its date and result.
   it use a later chapter's construct); every agent that checked one
   found it unfounded. 42 Opus agents, one per chapter, applied 91 of
   92 (80-140k tokens, 25 s to 3 min, twenty at a time, slots refilled
-  as agents finished); the one skip, moving chapter 22's `Frozen*`
+  as agents finished); the one skip, moving chapter 28's `Frozen*`
   classes out of `still_a_tuple.py`, would separate them from their
   `order=True` twins, which `CLAUDE.md` keeps side by side. Six agents
   edited Solutions prose outside the code blocks the brief allows,

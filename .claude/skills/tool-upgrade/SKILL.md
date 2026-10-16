@@ -66,9 +66,9 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   it retired a claim. 0.0.82 reports instantiating an abstract class
   (`error[call-non-callable]: Cannot instantiate abstract class`),
   directly or through a subclass that leaves an abstract method out.
-  The gate: ch26 `proxy_interface.py`'s `Proxy(Partial())` now carries
+  The gate: ch25 `proxy_interface.py`'s `Proxy(Partial())` now carries
   a `# type: ignore`, with a sentence saying the checker reports it
-  before the runtime refuses it. The claim: Solutions 25 exercise 4
+  before the runtime refuses it. The claim: Solutions 24 exercise 4
   said `ty` had no such rule and named Pyright and mypy as the
   checkers that report it; it now says the type checker reports the
   construction. Chapter 17's "`@abstractmethod` makes the checker
@@ -192,7 +192,7 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   with `half` still `() -> Generator[Ask, Any, None]`. Solutions 43:
   strip both `@final` from `describe_isinstance.py` and
   `reveal_type(result.answer)` in the `Ok` branch must read
-  `float | Unknown`. A sixth claim, Solutions 25 saying `ty` had no
+  `float | Unknown`. A sixth claim, Solutions 24 saying `ty` had no
   rule for instantiating an abstract class, was retired by 0.0.82,
   which added the rule.
 - **A Stateless upgrade is a book-wide event too.** The libraries the

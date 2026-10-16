@@ -79,7 +79,7 @@ plugin table, a validation pass at import time.
 Two other kinds of class decorator change the class or replace it.
 `@dataclass` returns the class it received after adding generated
 methods to it.
-[`@singleton`](../../Chapters/24_Patterns--Singleton.md#singleton-by-class-decorator)
+[`@singleton`](../../Chapters/23_Patterns--Singleton.md#singleton-by-class-decorator)
 returns a different object, a callable that returns one cached
 instance. Two things decide which kind you have written:
 what the decorator does to its argument, and what it returns.

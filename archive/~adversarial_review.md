@@ -817,7 +817,7 @@ analyzing a design," yet never mentions LSP. The immediately preceding
 chapter builds an entire section around it
 (`Chapters/20_Patterns--Rethinking_Objects.md:59` "## The Liskov
 Substitution Principle"), and chapter 25 cites it as the pattern's
-justification (`Chapters/25_Patterns--Template_Method.md:240,317`). An
+justification (`Chapters/24_Patterns--Template_Method.md:240,317`). An
 expert reader who just read chapter 20 will look for LSP here and not find
 it. Fix: add a bullet (or a pointer to `20_Patterns--Rethinking_Objects.md#liskov-substitution`)
 alongside the other cross-referenced principles (immutability, pure
@@ -856,7 +856,7 @@ demonstrates.
 
 ## Chapter 22 (Data Transfer Objects): 5 findings
 
-### [does-not-work] Chapters/22_Patterns--Data_Transfer_Objects.md:3 — chapter never teaches what a DTO is for
+### [does-not-work] Chapters/28_Patterns--Data_Transfer_Objects.md:3 — chapter never teaches what a DTO is for
 The chapter borrows Fowler's DTO name for "Messenger" but redefines it as
 something that "carries a function's return values" (line 5). Fowler's DTO,
 and the book's own catalog (`Chapters/39_Patterns--Pattern_Catalog.md:122`,
@@ -868,7 +868,7 @@ value. The chapter teaches a real idiom well, just not the boundary-crossing
 one its name and the catalog entry promise. Fix: add the missing
 boundary-crossing motivation, or retitle the teaching claim.
 
-### [does-not-work] Chapters/22_Patterns--Data_Transfer_Objects.md:265 — the cross-type `order=True` claim is asserted, never run
+### [does-not-work] Chapters/28_Patterns--Data_Transfer_Objects.md:265 — the cross-type `order=True` claim is asserted, never run
 Lines 265-266 claim a comparison "between two different frozen types raises
 [a `TypeError`] even" with `order=True` on both. `still_a_tuple.py` only
 demonstrates the *no*-`order=True` case. I ran the untested half: two
@@ -879,7 +879,7 @@ least-obvious half (a reader could plausibly expect `order=True` to enable
 cross-type comparison) without ever showing it, breaking the
 demonstrate-then-explain pattern the rest of the chapter uses.
 
-### [better] Chapters/22_Patterns--Data_Transfer_Objects.md:202 — `astuple()` copy semantics repeats ch12 with no link back
+### [better] Chapters/28_Patterns--Data_Transfer_Objects.md:202 — `astuple()` copy semantics repeats ch12 with no link back
 Lines 202-204 restate that `astuple()` recurses and "deep-copies every
 other field rather than sharing it" — the same fact chapter 12 already
 teaches with a full listing (`Chapters/12_Techniques--Data_Classes_as_Types.md:1230-1259`,
@@ -889,7 +889,7 @@ showing the book's own convention is to link rather than re-explain
 shared material; chapter 22 doesn't reciprocate here. Fix: replace the
 restatement with a link to chapter 12's `#more-data-class-tools` anchor.
 
-### [missing] Chapters/22_Patterns--Data_Transfer_Objects.md:301 — no exercise practices the chapter's actual decision framework
+### [missing] Chapters/28_Patterns--Data_Transfer_Objects.md:301 — no exercise practices the chapter's actual decision framework
 "Which Should You Use?" (lines 277-299) is the chapter's payoff: choosing
 among `SimpleNamespace`, `@dataclass`, `NamedTuple`, `TypedDict` by whether
 tuple behavior is wanted. All six exercises (301-326) instead ask for
@@ -899,7 +899,7 @@ scenario and justify it. The chapter's central teaching goes unexercised.
 Fix: add an exercise with 2-3 short scenarios (a config bag, a hashable
 coordinate, a JSON payload) asking which type fits and why.
 
-### [better] Chapters/22_Patterns--Data_Transfer_Objects.md:58 — one section covers three unrelated constructs
+### [better] Chapters/28_Patterns--Data_Transfer_Objects.md:58 — one section covers three unrelated constructs
 "The Standard-Library Versions" runs ~110 lines covering three separate
 constructs under one heading naming none of them: `SimpleNamespace`
 (60-90), `@dataclass` (91-110), `NamedTuple` (111-169). Each has its own
@@ -911,7 +911,7 @@ a reader jump straight to the comparison they need.
 
 ## Chapter 23 (Iterators): 4 findings
 
-### [missing] Chapters/23_Patterns--Iterators.md:164 — the chapter's central memory claim for generators is never measured
+### [missing] Chapters/22_Patterns--Iterators.md:164 — the chapter's central memory claim for generators is never measured
 "Generators are lazy... so it works on streams too large to hold in memory" (164-167) is the whole
 motivation for preferring a generator over a list, yet no listing measures it. `tee.py` later
 (291-321) goes to the trouble of `tracemalloc`-instrumenting a *cost* comparison (tee buffer vs.
@@ -921,7 +921,7 @@ the equivalent list (ratio ~92,769x). A short `tracemalloc` block placed right a
 mirroring `tee.py`'s style, would turn the chapter's opening promise into evidence instead of
 assertion.
 
-### [does-not-work] Chapters/23_Patterns--Iterators.md:584 — `TypedIterator` never demonstrates the reason to choose it
+### [does-not-work] Chapters/22_Patterns--Iterators.md:584 — `TypedIterator` never demonstrates the reason to choose it
 Line 584 says "Use the class when the wrapper needs its own state or extra methods. Use the
 generator when it does not," but `typed_iterator.py` (531-549) gives `TypedIterator` no state or
 method beyond `imp`/`expected`, exactly what `typed()` closes over too (566-577). The two listings
@@ -931,7 +931,7 @@ wants to know when to reach for the class form sees no example that needs it: e.
 `rejected_count` field or a `retry()` method would cash out the claim; as written the class looks
 strictly worse (more lines, same capability).
 
-### [missing] Chapters/23_Patterns--Iterators.md:330 — `tee`'s actual payoff case is never shown, only assigned as an exercise
+### [missing] Chapters/22_Patterns--Iterators.md:330 — `tee`'s actual payoff case is never shown, only assigned as an exercise
 "Use `tee` when two consumers advance together, not when one finishes before the other starts"
 (330-331) states tee's good case, but every run in `tee.py` (298-321) drains one branch to
 completion before touching the other — the worst case for tee, which the chapter itself measures
@@ -940,7 +940,7 @@ existence is pushed entirely into exercise 5 (803-806, "consume both branches in
 what happens to `buffered`"). Within the chapter body, tee is demonstrated only losing to the
 alternative it's introduced to beat.
 
-### [could-be-better] Chapters/23_Patterns--Iterators.md:421 — names four itertools functions, demonstrates two, with no pointer to where the rest live
+### [could-be-better] Chapters/22_Patterns--Iterators.md:421 — names four itertools functions, demonstrates two, with no pointer to where the rest live
 "the generic iterator algorithms `chain()`, `islice()`, `groupby()`, `takewhile()`, and more" (421-422)
 sets up `reusable_algorithms.py`, which only exercises `islice()` and `takewhile()` (430-443).
 `chain()` and `groupby()` do get real treatment later, in `41_Functional--Toolkits.md` (`groupby`'s
@@ -952,7 +952,7 @@ never appears.
 
 ## Chapter 24 (Singleton): 5 findings
 
-### [missing] Chapters/24_Patterns--Singleton.md:98 — the cached-factory footgun (arguments defeat it) is never named
+### [missing] Chapters/23_Patterns--Singleton.md:98 — the cached-factory footgun (arguments defeat it) is never named
 Line 98 says a *zero-argument* constructor function is what makes `@cache`
 turn a factory into a singleton, but never states the converse as a
 warning: give the factory function even one parameter and `@cache` keys
@@ -965,7 +965,7 @@ likely to hit the moment they need a configurable factory. Fix: one
 sentence stating that any parameter breaks the guarantee, since each
 distinct argument tuple gets its own cache entry and its own instance.
 
-### [missing] Chapters/24_Patterns--Singleton.md:171 — classic forms' test-isolation gap is named, never resolved
+### [missing] Chapters/23_Patterns--Singleton.md:171 — classic forms' test-isolation gap is named, never resolved
 Note 1 states plainly: "The cached factory has an escape hatch the
 classic forms lack." True, and left there — no fixture pattern, no
 `monkeypatch`, no manual reset shown for `OnlyOne.instance`,
@@ -977,7 +977,7 @@ Use?" (line 654) still recommends Borg for real code without returning
 to this gap. Fix: show one reset idiom (e.g., a pytest fixture that
 clears `_shared_state`) for at least the form the chapter recommends.
 
-### [missing] Chapters/24_Patterns--Singleton.md:293 — double-checked locking dismissed with an undemonstrated claim
+### [missing] Chapters/23_Patterns--Singleton.md:293 — double-checked locking dismissed with an undemonstrated claim
 "Double-checked locking works, but it asks the reader to reason about
 what a free-threaded interpreter may reorder" is the only unproven
 assertion in a section that otherwise proves every concurrency claim by
@@ -990,7 +990,7 @@ the book. Fix: either show the failure (a free-threaded repro, even if
 unrun like the speedup number at ch19:1261) or cut the claim down to
 what's demonstrated.
 
-### [better] Chapters/24_Patterns--Singleton.md:88 — the stated goal is falsified one subsection later, uncorrected
+### [better] Chapters/23_Patterns--Singleton.md:88 — the stated goal is falsified one subsection later, uncorrected
 "The goal is that every construction returns the same object" is stated
 as the cached factory's payoff, but lines 122-165 ("Nothing Keeps the
 Class Private") show that `Settings()` called directly bypasses the
@@ -1001,7 +1001,7 @@ returns the same object"). A hostile reader has the rug pulled out from
 under a promise made 30 lines earlier. Fix: soften line 88, or add one
 clause there flagging that direct construction of the class is exempt.
 
-### [better] Chapters/24_Patterns--Singleton.md:654 — Borg's advantage over "just use a module" is asserted, not argued
+### [better] Chapters/23_Patterns--Singleton.md:654 — Borg's advantage over "just use a module" is asserted, not argued
 "If you really want many handles sharing one set of state, use Borg" is
 the entire justification. But the module solution from the chapter's
 own opening section already gives every importer a shared, mutable
@@ -1016,7 +1016,7 @@ earns its keep over a module.
 
 ## Chapter 25 (Template Method): 4 findings
 
-### [does-not-work] Chapters/25_Patterns--Template_Method.md:313 — the interpreter guard never actually blocks an overridden `run()`
+### [does-not-work] Chapters/24_Patterns--Template_Method.md:313 — the interpreter guard never actually blocks an overridden `run()`
 The chapter claims (lines 72-73 and 313-315) the `__init_subclass__()` technique "refuses ... whether the subclass overrides `run()` or misspells a hook." But `near_miss.py`'s check only fires on near-misses: an exact name match, including `run`, hits `if name in hooks: continue` and is skipped. Verified by running:
 ```
 class BadOverride(ApplicationFramework):
@@ -1025,46 +1025,46 @@ BadOverride().run()
 ```
 prints `hijacked` with no `TypeError` — `uv run python` against a script importing `near_miss.ApplicationFramework`. Fix: add an explicit `if name == "run": raise TypeError(...)`, the check line 73 already promises but the code never implements.
 
-### [missing] Chapters/25_Patterns--Template_Method.md:145 — near-miss detection has false positives the chapter never mentions
+### [missing] Chapters/24_Patterns--Template_Method.md:145 — near-miss detection has false positives the chapter never mentions
 The text shows `report()` passing as "an ordinary new method," implying any sufficiently distinct name is safe from the typo check. But `get_close_matches`'s heuristic also rejects legitimate methods that merely share letters with a hook name. Verified: adding `def customized_report(self) -> None: ...` to a subclass raises `TypeError: Weird.customized_report: did you mean customize2?`, though it is not a typo. The chapter never states this trade-off, a real helper method can be blocked by this mechanism, which a reader adopting the pattern needs to know before shipping it.
 
-### [missing] Chapters/25_Patterns--Template_Method.md:286 — the function form's stated disadvantage is never demonstrated
+### [missing] Chapters/24_Patterns--Template_Method.md:286 — the function form's stated disadvantage is never demonstrated
 Prose says "the function form must give each parameter a default of its own," implying an asymmetry with the subclass hooks' free `...` default, but `template_function.py` never shows the failure this describes. Running `run_framework(lambda: print("one"))` (omitting `customize2`) raises `TypeError: run_framework() missing 1 required positional argument: 'customize2'`, exactly the point being made, yet the listing never runs this case, so a reader never sees the asymmetry, only the assertion.
 
-### [better] Chapters/25_Patterns--Template_Method.md:238 — Substitutability has no code, so the chapter's central risk stays abstract
+### [better] Chapters/24_Patterns--Template_Method.md:238 — Substitutability has no code, so the chapter's central risk stays abstract
 "Substitutability" describes overrides that "raise an exception where the base would not" or "leave a step empty when the flow depends on it," but shows no listing, leaving the failure to the reader's imagination. Exercise 4 asks the reader to build exactly this case, so the concept's only concrete form is optional homework; a reader who skips exercises never sees it happen. A short runnable counterexample in the body, mirroring `near_miss.py`'s pattern, would land the LSP violation before the exercises rather than only within them.
 
 ## Chapter 26 (Surrogate): 4 findings
 
-### [does-not-work] Chapters/26_Patterns--Surrogate.md:413 — "checks with `hasattr()`" claim is falsified by the chapter's own protection proxy
+### [does-not-work] Chapters/25_Patterns--Surrogate.md:413 — "checks with `hasattr()`" claim is falsified by the chapter's own protection proxy
 Lines 413-414 claim "Code that calls the method, or checks with `hasattr()`, works on a surrogate," offered as the reliable alternative to the broken `isinstance()` check just demonstrated. But `protection_proxy.py` (lines 493-496, earlier in this chapter) raises `PermissionError` from `__getattr__()` instead of `AttributeError`. Running `hasattr(guest, "erase")` against that exact class does not return `False`, it propagates `PermissionError: erase`, since `hasattr()` only swallows `AttributeError`. Confirmed by extracting `Guarded`/`Document` and calling `hasattr(guest, "erase")`: raises `PermissionError`. Fix: qualify the claim, or note that a surrogate raising anything but `AttributeError` from `__getattr__()` breaks `hasattr()` too.
 
-### [missing] Chapters/26_Patterns--Surrogate.md:469 — "Virtual proxy" is named, claimed, and then pushed entirely into an unweighted exercise
+### [missing] Chapters/25_Patterns--Surrogate.md:469 — "Virtual proxy" is named, claimed, and then pushed entirely into an unweighted exercise
 Line 469 lists *Virtual proxy* (lazy initialization) as one of four canonical Proxy uses; line 576 asserts "the same few lines serve lazy initialization ... over any object"; but no listing ever builds one. *Protection* and *Smart reference* both get worked, tested code. *Virtual* proxy, arguably the most common real-world use of Proxy in Python (lazy-loaded attributes, deferred expensive construction), is left as Exercise 1 ("Create an example of the virtual proxy") with no guidance, no test, and no worked model to check against, unlike every other exercise here. The chapter's centerpiece claim about this use case is unexercised in the body. Fix: add a short worked lazy-init proxy alongside `protection_proxy.py` and `counting_proxy.py`.
 
-### [missing] Chapters/26_Patterns--Surrogate.md:609 — State's `change_to()` swap is never flagged as unsafe under concurrent calls
+### [missing] Chapters/25_Patterns--Surrogate.md:609 — State's `change_to()` swap is never flagged as unsafe under concurrent calls
 The State section (609-720) presents `change_to()` as a plain attribute swap with no caveat about calling it while another thread is mid-call through the same surrogate — exactly the situation a connection-pool or request-handler State object would face. The book covers concurrency at length elsewhere, so an expert reader will ask this immediately, and nothing here answers it (not even a forward pointer). Fix: one sentence noting the swap is not safe under concurrent access, with a pointer to a synchronization mechanism (or to the State Machine chapter if it's handled there).
 
-### [missing] Chapters/26_Patterns--Surrogate.md:156 — stdlib's own `weakref.proxy()` is never connected to a chapter about proxies
+### [missing] Chapters/25_Patterns--Surrogate.md:156 — stdlib's own `weakref.proxy()` is never connected to a chapter about proxies
 The "Forwarding with `__getattr__()`" section (156) and "What Proxy Solves" (463-477) survey real uses of proxying but never mention `weakref.proxy()`, the standard library's own transparent forwarding wrapper (literally named "proxy"), which chapter 10 (Cleanup) already uses `weakref.ref`/`WeakValueDictionary` from the same module without ever calling out `proxy()`. An expert reader who knows the stdlib will wonder why the chapter's hand-rolled `__getattr__()` proxy is never related to it. Fix: one sentence tying `weakref.proxy()` to the pattern, even just to note it solves a different problem (breaking reference cycles) with the same mechanism.
 
 ## Chapter 27 (Factory): 4 findings
 
-### [missing] Chapters/27_Patterns--Factory.md:3 — motivating problem is asserted, never dramatized
+### [missing] Chapters/26_Patterns--Factory.md:3 — motivating problem is asserted, never dramatized
 The opening argues the pain factories solve: "the code that creates objects is distributed throughout your application, adding a type means finding and editing every place that names a concrete type" (line 11-12). No listing ever shows that "before" state — multiple call sites each naming `Circle()`/`Square()` directly, then edited one-by-one to add a type. `shape_factory1.py` (line 34) jumps straight to a single-call-site factory that already works. The reader is told what the alternative would have cost but never made to feel it. Fix: a short "naive" snippet with 2-3 scattered constructor calls, shown once, that the rest of the section replaces.
 
-### [missing] Chapters/27_Patterns--Factory.md:781 — the one bug the chapter narrates in prose is the one thing left untested
+### [missing] Chapters/26_Patterns--Factory.md:781 — the one bug the chapter narrates in prose is the one thing left untested
 Lines 781-792 describe a real defect in `PizzaBuilder`: `build()` doesn't clear `_toppings`, so a second `build()` on the same instance silently returns a pizza carrying the first one's toppings. I confirmed this by importing `pizza_builder` and calling `build()` twice (`basil` then `basil, olives`). Every other claimed behavior in this chapter (registration, prototype independence, shallow-copy aliasing) gets a `print()` or a `pytest` test proving it; this one, despite three paragraphs of explanation, gets neither in `test_pizza.py`. A `test_second_build_reuses_toppings` alongside the existing tests would make the hazard concrete instead of asserted.
 
-### [missing] Chapters/27_Patterns--Factory.md:287 — the chapter demonstrates static-typing beats runtime errors, then never applies it to its own string-keyed factories
+### [missing] Chapters/26_Patterns--Factory.md:287 — the chapter demonstrates static-typing beats runtime errors, then never applies it to its own string-keyed factories
 `test_unknown_name_raises` (line 287-289) treats `KeyError` from `make("Hexagon")` as the correct, accepted outcome. Later, `games2.py` makes exactly the opposite case: a Protocol lets the type checker "report the omission before the program runs" (line 594), earlier than a runtime error. That lesson is never carried back: `SHAPES`/`FACTORIES`/`Shape.registry` all key on plain `str`. I confirmed `Kind = Literal["Circle", "Square"]` on `make()`'s parameter makes `ty` reject `make("Hexagon")` at check time (`error[invalid-argument-type]`) instead of at `pytest.raises(KeyError)` time — a real option the chapter's own later argument recommends but never mentions for its earlier, still-live examples.
 
-### [better] Chapters/27_Patterns--Factory.md:404 — true Factory Method is never shown standalone, only embedded inside Abstract Factory
+### [better] Chapters/26_Patterns--Factory.md:404 — true Factory Method is never shown standalone, only embedded inside Abstract Factory
 Line 93-96 explicitly says `shape_factory1.py`'s static method is not the GoF pattern ("the smallest version of that idea"), and defers the real subclass-override form to "Abstract Factories." That section (line 404) never isolates it: `GameElementFactory.make_character()` appears only bundled with `make_obstacle()` inside the two-parallel-hierarchy Abstract Factory example. A reader never sees the minimal case — one hierarchy, one overridden creation method — separately from the matched-pair complexity Abstract Factory adds on top, making it harder to tell which part of `GameElementFactory` is "Factory Method" and which part is "Abstract Factory."
 
 ## Chapter 28 (Function Objects): 4 findings
 
-### [does-not-work] Chapters/28_Patterns--Function_Objects.md:19 — Strategy's "classic class-based form" is promised but never shown
+### [does-not-work] Chapters/27_Patterns--Function_Objects.md:19 — Strategy's "classic class-based form" is promised but never shown
 The intro states: "*Command* appears first as a function, then as the
 classic class-based form, a contrast that holds for *Strategy* as
 well" (line 19-20), setting up a code/code contrast like Command's
@@ -1072,12 +1072,12 @@ well" (line 19-20), setting up a code/code contrast like Command's
 *describes* the classic form in prose (line 285-291: "Each algorithm
 becomes a class deriving from a `FindRoot` interface... five classes
 to produce the same three lines"). No `strategy_pattern.py`-equivalent
-listing exists anywhere in `build/examples/28_Patterns--Function_Objects/`
+listing exists anywhere in `build/examples/27_Patterns--Function_Objects/`
 (checked directory listing). The reader is told two forms will
 contrast, and only sees one. Fix: either add the class-based listing,
 or correct the intro's promise.
 
-### [missing] Chapters/28_Patterns--Function_Objects.md:103 — Bound method, the second rung of the ladder, is never demonstrated in code
+### [missing] Chapters/27_Patterns--Function_Objects.md:103 — Bound method, the second rung of the ladder, is never demonstrated in code
 Lines 103-107 introduce the bound method as "a ready-made command"
 that "a command list can hold ... alongside plain functions," and the
 closing ladder (line 603) repeats it as option 2 of 5. Every other
@@ -1088,7 +1088,7 @@ the chapter. A reader cannot see a bound method sitting in the same
 list as a plain function, the exact claim being made. Fix: add a short
 listing mixing a bound method into `macro`.
 
-### [missing] Chapters/28_Patterns--Function_Objects.md:336 — `functools.partial`-for-configuration and `Placeholder` are described but never coded
+### [missing] Chapters/27_Patterns--Function_Objects.md:336 — `functools.partial`-for-configuration and `Placeholder` are described but never coded
 Lines 336-344 describe binding a trailing setting with `partial` and
 introduce `Placeholder` for a positional-only parameter, both new
 mechanisms in this chapter, entirely in prose, with a forward link to
@@ -1100,7 +1100,7 @@ markers). `Placeholder` is unfamiliar enough that a reader is asked to
 trust an unillustrated mechanism. Fix: add a two-line `partial(...,
 tolerance=...)` example alongside the closure one.
 
-### [better] Chapters/28_Patterns--Function_Objects.md:578 — `test_no_handler_is_a_noop` checks two unrelated things in one test
+### [better] Chapters/27_Patterns--Function_Objects.md:578 — `test_no_handler_is_a_noop` checks two unrelated things in one test
 ```python
 def test_no_handler_is_a_noop() -> None:
     bus = EventBus()
@@ -1541,7 +1541,7 @@ existing ones) covering persistence and messaging problems.
 The opening asserts overlap and competition among the cataloged
 patterns but names no instance anywhere in the chapter. A concrete case
 sits right in the tables: State (line 79, linked to
-26_Patterns--Surrogate.md#state) and State Machine (line 197, linked to
+25_Patterns--Surrogate.md#state) and State Machine (line 197, linked to
 31_Patterns--State_Machines.md) have intents close enough ("change
 behavior when state changes" vs. "drive through a fixed set of states")
 that a reader has to guess whether they're the same idea twice or
@@ -1564,7 +1564,7 @@ statements, or add a short discriminator per name.
 ### [better] Chapters/39_Patterns--Pattern_Catalog.md:44 — a principle is listed as a peer of the patterns that implement it
 Line 44's row, "Supplying a collaborator from outside," lists
 "Dependency Injection, Service Locator, Inversion of Control, Strategy"
-as four parallel options. But 25_Patterns--Template_Method.md (linked
+as four parallel options. But 24_Patterns--Template_Method.md (linked
 from the Inversion of Control entry, line 183) calls IoC "the general
 name for this reversal," i.e., the umbrella principle that DI and
 Service Locator each realize, not a fourth technique alongside them.
@@ -1641,7 +1641,7 @@ The chapter's central case for both `@cache` (line 61-68) and Recursion
 line 823) is recursive Fibonacci sped up by caching. Fibonacci has a
 trivial O(1)-space iterative form (`a, b = b, a+b`) needing neither
 recursion nor a cache, and the book already shows an iterative
-generator Fibonacci in `23_Patterns--Iterators.md:89-93`. Chapter 18
+generator Fibonacci in `22_Patterns--Iterators.md:89-93`. Chapter 18
 uses the same recursive+cached fib (line 868-891) with the identical
 gap. An expert reader's first question — "why not just loop?" — is
 never raised or answered. Fix: swap in a problem with genuine

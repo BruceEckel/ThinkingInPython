@@ -364,7 +364,7 @@ whatever earlier tests did to their accounts.
 
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
-A function containing `yield` is a [generator](23_Patterns--Iterators.md#generators),
+A function containing `yield` is a [generator](22_Patterns--Iterators.md#generators),
 a construct a later chapter covers.
 A fixture uses one part of generators, the `yield` statement,
 which divides the fixture into the code before it and the code after it:

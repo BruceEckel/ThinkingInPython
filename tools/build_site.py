@@ -108,7 +108,7 @@ ATX = re.compile(r"^#\s+(.*?)\s*#*\s*$")
 @dataclass
 class Chapter:
     md: Path
-    out_name: str   # e.g. "24_Patterns--Singleton.html"
+    out_name: str   # e.g. "23_Patterns--Singleton.html"
     number: str     # the 2-digit filename prefix, e.g. "24"
     title: str      # human title from the first heading
     label: str      # "Chapter 24", or "Front Matter"

@@ -220,7 +220,7 @@ The cast states the signature, and nothing confirms it.
 `make()` exists so that each `init()` closes over its own `name`.
 A lambda written inline in the comprehension closes over the comprehension's variable instead,
 so every generated class records the last name the comprehension visits as its `action`.
-That is the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap)
+That is the [late-binding trap](27_Patterns--Function_Objects.md#the-late-binding-trap)
 that `late_binding.py` demonstrates.
 
 `init()` calls `Event.__init__(self, ...)` by name instead of `super().__init__(...)`.
@@ -568,7 +568,7 @@ def test_independent_hierarchies_have_separate_registries(
 
 The mechanism is reliable.
 The registries built on it fail in two ways that have nothing to do with `__init_subclass__()`.
-[Factory](27_Patterns--Factory.md#hazards-of-self-registration) covers both:
+[Factory](26_Patterns--Factory.md#hazards-of-self-registration) covers both:
 a class in a module nobody imports stays out of the registry,
 and keying on `cls.__name__` lets two same-named classes overwrite each other.
 
@@ -676,7 +676,7 @@ The standard library marks functions the same way.
 `ABCMeta` collects the marked names into the class's `__abstractmethods__`,
 and `object.__new__()` raises a `TypeError` for a class whose `__abstractmethods__` is nonempty.
 `@final` sets `__final__`, and `@override` sets `__override__`.
-`near_miss.py` in [*Template Method*](25_Patterns--Template_Method.md#hooks-and-the-misspelled-override)
+`near_miss.py` in [*Template Method*](24_Patterns--Template_Method.md#hooks-and-the-misspelled-override)
 reads `__final__` through `getattr()` to refuse an override at runtime.
 `functools.wraps()` copies the wrapped function's `__dict__` onto the wrapper,
 so the wrapper of a decorator written with `@wraps` also carries any mark applied beneath it.
@@ -1251,7 +1251,7 @@ That `__call__()` runs first when you create an instance of the class.
 A metaclass that overrides `__call__()` replaces that step,
 so its code determines whether `__new__()` and `__init__()` run.
 That code can also return a cached instance instead of building a new one.
-Caching there is one way to build a [*Singleton*](24_Patterns--Singleton.md):
+Caching there is one way to build a [*Singleton*](23_Patterns--Singleton.md):
 
 ```python
 # singleton.py
@@ -1323,7 +1323,7 @@ and that call runs after `ASingleton` exists.
 
 The metaclass version works,
 but it is heavier than the problem usually requires.
-[*Singleton*](24_Patterns--Singleton.md) covers the lighter alternatives,
+[*Singleton*](23_Patterns--Singleton.md) covers the lighter alternatives,
 from a class decorator down to a module.
 Choose the lightest tool that solves your problem.
 

@@ -15,7 +15,7 @@ import pytest
 from tools import exercise_refs as er
 
 CHAPTER = "30_Patterns--Observer"
-OTHER = "27_Patterns--Factory"
+OTHER = "26_Patterns--Factory"
 
 SOLUTIONS = (
     "# Observer: Solutions\n\n"

@@ -595,7 +595,7 @@ revise:
   belongs to, and a registering decorator stacked under `@record`
   sees the pre-slots class the same way. Separately, `ty` mistypes
   `record(cls)` on a `type[E]` parameter, so such a decorator calls
-  `dataclass(frozen=True, slots=True)(cls)` directly (chapter 28's
+  `dataclass(frozen=True, slots=True)(cls)` directly (chapter 27's
   `tagged_bus.py`).
 
 - A seeded simulation can still print differently across platforms.

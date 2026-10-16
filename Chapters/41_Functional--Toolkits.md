@@ -60,7 +60,7 @@ so `reduce(or_, [], {})` returns `{}`.
 Stores every result for as long as the function exists,
 so a repeated call with the same arguments returns the stored result straight from the cache.
 This caching by argument is memoization,
-the term [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)
+the term [*Singleton*](23_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)
 applies to its cached constructor function.
 `@cache` works correctly only for pure functions.
 A cached function with side effects runs those effects on the first call with each set of arguments,
@@ -451,7 +451,7 @@ and the point where two sequences run out at different lengths.
 
 Combine `itertools` functions the way you combine any small function,
 by passing one's output to the next.
-[Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
+[Reusable Algorithms](22_Patterns--Iterators.md#reusable-algorithms)
 introduces several of these as stages in lazy pipelines.
 This section is the catalog.
 
@@ -639,7 +639,7 @@ because it skips a failing element and tests the next.
 `takewhile()` stops at the first failure, before it reaches the last element.
 On finite data the distinction is a detail.
 On an infinite source it decides whether the program terminates.
-[Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
+[Reusable Algorithms](22_Patterns--Iterators.md#reusable-algorithms)
 works through that case.
 
 ### `dropwhile`
@@ -803,7 +803,7 @@ When one consumer runs far ahead of the other,
 `list()` is simpler and uses the same memory.
 `tee()` saves memory when the consumers stay roughly in step.
 
-[Iterators](23_Patterns--Iterators.md#what-tee-buffers)
+[Iterators](22_Patterns--Iterators.md#what-tee-buffers)
 measures `tee()`'s buffering and adds a third caution.
 `tee()` shares one unlocked buffer between its branches,
 so two threads advancing them at the same time can raise a `RuntimeError`.

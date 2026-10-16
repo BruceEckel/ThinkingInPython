@@ -4,7 +4,7 @@
 > and continue when the answer arrives.
 > Python's generators can do that, and an Effect system is built on it.
 
-[Iterators](23_Patterns--Iterators.md#generators)
+[Iterators](22_Patterns--Iterators.md#generators)
 presents generators as a way to produce values lazily:
 a function containing `yield`,
 driven by a `for` loop that takes one value at a time.
@@ -26,7 +26,7 @@ the loop, and `yield from`, but generators are useful on their own.
 ## Annotating a Generator
 
 Earlier chapters annotate their generators with a short form:
-`Iterator[int]` in [Iterators](23_Patterns--Iterators.md#generators),
+`Iterator[int]` in [Iterators](22_Patterns--Iterators.md#generators),
 and `Generator[str]` in [Context Managers](15_Techniques--Context_Managers.md#a-basic-context-manager).
 A short form fits a generator that yields values and receives `None`.
 
@@ -152,7 +152,7 @@ If a `StopIteration` propagates out of the body instead,
 Python converts it into a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)).
 Calling `next()` on an exhausted iterator raises `StopIteration`,
-as [Asking Consumes an Item](23_Patterns--Iterators.md#asking-consumes-an-item)
+as [Asking Consumes an Item](22_Patterns--Iterators.md#asking-consumes-an-item)
 shows, so a `next()` call inside the body can trigger that conversion.
 
 A newly created generator pauses at the top of the function body,

@@ -95,7 +95,7 @@ SECTION = re.compile(r"^##\s+(.*?)\s*$")
 # `](#anchor)`: a link into the chapter's own headings.
 ANCHOR_LINK = re.compile(r"\]\(#")
 
-# `](24_Patterns--Singleton.md#state)` or `](A_Effect_Tracking.md)`: a link
+# `](23_Patterns--Singleton.md#state)` or `](A_Effect_Tracking.md)`: a link
 # to a book file with no directory in front. Requiring `.md` right after
 # the name, and `)` right after the optional anchor, leaves code spans
 # such as `last[T](items: list[T])` alone.

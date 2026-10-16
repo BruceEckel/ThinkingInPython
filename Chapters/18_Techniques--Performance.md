@@ -420,7 +420,7 @@ The `Traced` object it yields fills in when the block ends.
 `current` holds the bytes still allocated at that point,
 and `peak` holds the most the block allocated at once.
 The `finally` clause stops tracing whether the block ends normally or raises an exception.
-`tee.py` in [Iterators](23_Patterns--Iterators.md#what-tee-buffers)
+`tee.py` in [Iterators](22_Patterns--Iterators.md#what-tee-buffers)
 measures each of its three cases with `traced()`.
 
 ## Try a Faster Platform
@@ -621,7 +621,7 @@ Other examples:
   (one bytecode appends the element, instead of an attribute lookup and a call).
   Write it for the readability.
   The speed is a rounding error.
-- The C-implemented standard library's [`itertools`](23_Patterns--Iterators.md#reusable-algorithms),
+- The C-implemented standard library's [`itertools`](22_Patterns--Iterators.md#reusable-algorithms),
   `collections`, and `functools` are faster than hand-rolled equivalents.
 
 As a last resort in a proven hot loop,

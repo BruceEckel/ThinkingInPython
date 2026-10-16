@@ -184,7 +184,7 @@ works out the same split with shapes,
 including the `assert_never()` in each `case _`.
 
 `walk()` is a generator, so traversing a composite is lazy.
-The [`yield from`](23_Patterns--Iterators.md#delegating-with-yield-from)
+The [`yield from`](22_Patterns--Iterators.md#delegating-with-yield-from)
 flattens the recursion into a single stream of paths.
 Any consumer of that stream stays decoupled from the tree structure.
 

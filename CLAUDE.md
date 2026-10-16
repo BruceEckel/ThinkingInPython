@@ -360,7 +360,7 @@ reading.
 
 Every naming of a design pattern is written capitalized and in italics,
 on every mention, in prose and in link text: *State*, *Chain of
-Responsibility*, `[*Template Method*](25_...)`. Names like State, Command,
+Responsibility*, `[*Template Method*](24_...)`. Names like State, Command,
 Bridge, and Proxy are ordinary words otherwise, so this is the exception
 to the global "italics only to introduce a term" rule. Headings stay
 plain, and the lowercase word keeps its ordinary sense ("an observer
@@ -445,7 +445,7 @@ Bruce's rulings from 2026-09-17, revised 2026-09-26:
   never put a bare `@record` on a class and let a base take the
   slots back.
 - **A class that needs an option `record()` lacks keeps `@dataclass`
-  written out:** `order=True` (chapter 22), a weak reference
+  written out:** `order=True` (chapter 28), a weak reference
   (`weak_pool.py` and Solutions 35 exercise 5 are
   `@dataclass(frozen=True, slots=True, weakref_slot=True)`, one
   `__weakref__` slot and still no `__dict__`, since 2026-09-26), a
@@ -455,7 +455,7 @@ Bruce's rulings from 2026-09-17, revised 2026-09-26:
   says "record" instead. The exceptions are listings whose subject is
   `frozen=True`: chapter 20's `immutable.py` and `frozen_leaky.py`,
   Solutions 20 exercise 2, chapter 18's `frozen_vs_slotted.py`. Chapter
-  22's `still_a_tuple.py` and `tuple_ordering.py` (and Solutions 22
+  28's `still_a_tuple.py` and `tuple_ordering.py` (and Solutions 28
   exercise 6) stay long-form too: `FrozenColor` reads the same in both,
   and `tuple_ordering.py` sets it beside its `order=True` twin, so the
   one added option is the point of the comparison.
@@ -686,7 +686,7 @@ and how it was measured.
   calling `record(cls)` on its `type[E]` parameter.** `slots=True` makes `dataclass()` create and
   return a new class, since a class's slots are fixed at creation, so
   `EVENTS.add(cls)` before the call files a class that no instance
-  belongs to. Chapter 28's `tagged_bus.py` builds first and registers
+  belongs to. Chapter 27's `tagged_bus.py` builds first and registers
   `built`; the one-word swap to `slots=True` without that died at import
   with "Announce: not an @event". The same goes for any registering
   decorator stacked *under* `@record`: it would see the pre-slots

@@ -391,7 +391,7 @@ gate run" but "has anything changed since it did":
 
 ```
 gate passed 12 minutes ago (2026-07-25 14:03), at commit d6b9ad6
-3 files changed since: 23_Patterns--Iterators.md, 24_Patterns--Singleton.md, ...
+3 files changed since: 22_Patterns--Iterators.md, 23_Patterns--Singleton.md, ...
 ```
 
 **`tool_stamp.py` (`tip tools-status`)** records when `tip tools-upgrade`
@@ -751,12 +751,12 @@ first in `solutions-gate`, being the cheapest step and the only one that
 notices a missing answer.
 
 It also checks how a solution cites its chapter, which is a trap the layout
-sets. A link copied from a chapter, `](24_Patterns--Singleton.md#state)`,
+sets. A link copied from a chapter, `](23_Patterns--Singleton.md#state)`,
 resolves inside the chapter's solutions folder, and the one-level form
-`](../Chapters/24_Patterns--Singleton.md#state)` resolves inside `Solutions/`;
+`](../Chapters/23_Patterns--Singleton.md#state)` resolves inside `Solutions/`;
 both miss, with no warning from anything. Seventeen links were wrong this way
 before anything looked. The correct form is
-`](../../Chapters/24_Patterns--Singleton.md#state)`, and a leading `./`
+`](../../Chapters/23_Patterns--Singleton.md#state)`, and a leading `./`
 marks a deliberate link to a neighboring file.
 
 The check runs the other way too. Each chapter with exercises links its own
@@ -1341,7 +1341,7 @@ extension. The builder resolves each to the real file in `resources/images`
 
 Cross-references between chapters use standard relative Markdown links to the
 target chapter's `.md` file, for example
-`[Factory](27_Patterns--Factory.md)`.
+`[Factory](26_Patterns--Factory.md)`.
 These render correctly on GitHub; the builder rewrites intra-book `.md` links to
 `.html` so they also resolve in the site. External links (which carry a scheme)
 are left alone.
@@ -1401,7 +1401,7 @@ link is rewritten to match:
 | `## Immutability` | `## Immutability {#ch12-immutability}` |
 | `[x](12_Techniques--Data_Classes_as_Types.md#immutability)` | `[x](#ch12-immutability)` |
 | `[x](#immutability)` (same chapter) | `[x](#ch12-immutability)` |
-| `[x](24_Patterns--Singleton.md)` | `[x](#ch24)` |
+| `[x](23_Patterns--Singleton.md)` | `[x](#ch24)` |
 
 The `ch` prefix is not decoration: an EPUB is XHTML, where an id may not start
 with a digit. The old ids come from `heading_links.pandoc_anchor()`, the

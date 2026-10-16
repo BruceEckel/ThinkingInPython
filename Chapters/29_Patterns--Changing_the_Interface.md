@@ -69,13 +69,13 @@ Because `WhatIUse` calls `f()` and `WhatIHave` has no `f()`,
 `WhatIWant` is a bare placeholder,
 because this listing is about where the adaptation lives.
 For declaring the target interface,
-[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies)
+[*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
 compares an ABC with a `Protocol`.
 The empty `__slots__` on `WhatIWant` keeps `ProxyAdapter` a slotted [record](18_Techniques--Performance.md#record),
 as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 explains.
 
-The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely.
+The name `ProxyAdapter` uses the term "[*Proxy*](25_Patterns--Surrogate.md#proxy)" loosely.
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object to which it forwards.
 
 ### Three Places for the Adaptation
@@ -212,7 +212,7 @@ any object with an `f()` works, whatever its base classes.
 A type checker still enforces the annotation,
 so name the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 that lists `f()`, not with a base class to inherit.
-[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies)
+[*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
 makes the same substitution for a proxy's implementation.
 Here, `WhatIWant` is a `Protocol`, and the adapter inherits from nothing:
 
@@ -294,13 +294,13 @@ has a real adapter, `PairCoord`, which adapts a `Pair` to the `Coord` protocol.
 with two properties,
 written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.
 
-The limits [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
+The limits [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr)
 lists for `__getattr__()` apply to this forwarding too.
-[Special methods bypass `__getattr__()`](26_Patterns--Surrogate.md#special-methods-bypass-getattr),
+[Special methods bypass `__getattr__()`](25_Patterns--Surrogate.md#special-methods-bypass-getattr),
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders
 (see exercise 1).
 
-[The recursion trap](26_Patterns--Surrogate.md#the-recursion-trap)
+[The recursion trap](25_Patterns--Surrogate.md#the-recursion-trap)
 applies to an adapter that stores its adaptee in a hand-written `__init__()`.
 `copy.copy()` and `pickle` build the new instance without running `__init__()`,
 then look up `__setstate__()` on it.
@@ -358,11 +358,11 @@ That is *Façade*.
 If you have a confusing collection of classes and interactions,
 create an interface that presents only what the client programmer needs.
 
-A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md)
+A *Façade* is often a [*Singleton*](23_Patterns--Singleton.md)
 that also creates the subsystem's objects.
 GoF supplies both halves of that combination.
 One *Façade* object is usually enough, which makes it a *Singleton*.
-An [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories)
+An [*Abstract Factory*](26_Patterns--Factory.md#abstract-factories)
 can work with a *Façade* to create the subsystem's objects without naming their concrete classes.
 When one set of concrete classes is enough,
 a class containing static factory methods covers both halves:
@@ -432,7 +432,7 @@ so the caller names `Facade` in place of `Ignition`, `FuelPump`, and `Engine`.
 
 The cleaner Python façade is a module.
 A module presents a curated set of names over any confusing collection of classes behind it.
-As [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)
+As [*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton)
 notes, a module loads once, so every importer shares the same module.
 At module level, put the convenient functions and the few classes to expose.
 If you keep the messy internals private
@@ -513,12 +513,12 @@ ask what breaks if you remove it:
 
 | Wrapper | Interface | What it adds | What removing it loses |
 | --- | --- | --- | --- |
-| [*Proxy*](26_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call reaches the implementation |
+| [*Proxy*](25_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call reaches the implementation |
 | [*Decorator*](14_Techniques--Decorators.md#the-decorator-pattern) | same | behavior | the added behavior |
 | *Adapter* | changed | nothing | the fit between caller and callee |
 | *Façade* | many narrowed to a few | nothing | the simplicity |
 
-[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies)
+[*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
 takes the looser view of the first row:
 a surrogate forwarding to its implementation is a *Proxy* whether or not the interfaces match.
 Under that reading the same-interface rule no longer separates a *Proxy* from an *Adapter*,

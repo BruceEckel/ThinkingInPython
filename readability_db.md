@@ -159,12 +159,12 @@ Recorded so a sweep does not read them as defects:
   which the global rules carve out. Do not convert exercise imperatives to
   conditions.
 - **Parallel prose decision tables.** 35_Patterns--Flyweight's four-way `If X, do Y` block
-  and 27_Patterns--Factory's bullet list under "Which Factory Should You Use?" are
+  and 26_Patterns--Factory's bullet list under "Which Factory Should You Use?" are
   decision tables written as prose; the uniformity is what makes them scannable.
   (2026-10-04, Sweep Decisions: within that uniformity Bruce cut 35's trailing
   "which is the least machinery for the job" as awkward, and gave 27's "When
   a name maps to a class" bullet a comma, matching its siblings.)
-  25_Patterns--Template_Method's four-way "Structure fixes it… Discipline fixes the rest"
+  24_Patterns--Template_Method's four-way "Structure fixes it… Discipline fixes the rest"
   anaphora is the same call.
 
 ---
@@ -174,18 +174,18 @@ Recorded so a sweep does not read them as defects:
 These are watch-list hits and pattern matches a mechanical sweep will find
 again. Each was judged and kept.
 
-**27_Patterns--Factory, "Factory might be the most common design pattern."** An
+**26_Patterns--Factory, "Factory might be the most common design pattern."** An
 unsupported superlative by shape. Kept: it is hedged with "might", it opens the
 chapter, and it is first-edition voice. 11_Techniques--Testing's "One of the most valuable
 habits in modern programming is unit testing", 01_Introduction's "one of the
 most useful things this book can give you", and 21's "An important step forward
 in object-oriented design" all ride on this precedent.
 
-**28_Patterns--Function_Objects, "Python's best-known closure trap."** A superlative by
+**27_Patterns--Function_Objects, "Python's best-known closure trap."** A superlative by
 shape, but "best-known" orients the reader toward the trap they have heard of,
 and the late-binding loop variable is the one closure trap with a reputation.
 
-**28_Patterns--Function_Objects, "to say what one list of functions says directly."** Not
+**27_Patterns--Function_Objects, "to say what one list of functions says directly."** Not
 a finding at all: recorded as the sharpest sentence in the chapter and the
 reason the *Command* section works. Do not "tighten" it. (Superseded
 2026-10-04, Sweep Decisions: Bruce, "sentence can be simpler"; the "directly"
@@ -234,7 +234,7 @@ established book vocabulary, thirty-plus uses across the chapters.
 the avoid-if-possible list but earns its place: the call site exists whether
 you want it or not. This is the precedent a dozen other "already" keeps cite.
 
-**26_Patterns--Surrogate, "in order to implement the *copy-on-write* idiom."** The one
+**25_Patterns--Surrogate, "in order to implement the *copy-on-write* idiom."** The one
 Tier 1B "in order" in the book, and the deep review deliberately restored it:
 the bare comma version read as two unrelated purposes, losing the causal link
 that counting references is how copy-on-write knows when to copy. Binding.
@@ -323,10 +323,10 @@ so a fresh pass treats the current wording as settled.
 - **21_Patterns--Design_Patterns, after the Design Principles list.**
   The first-edition send-off "You can hold this handful of fundamental ideas in your head while analyzing a design" was cut,
   so the section ends on its last principle.
-- **24_Patterns--Singleton, the mutate-versus-rebind passage.**
+- **23_Patterns--Singleton, the mutate-versus-rebind passage.**
   The middle statement of three, "Mutation makes the sharing work. Rebinding is the mistake that quietly ends it.", was cut.
   The figure paragraph, the code walk, and the refrain "Mutate through any name. Rebind only through the module." stay.
-- **26_Patterns--Surrogate, the `weakref` cross-reference paragraph.**
+- **25_Patterns--Surrogate, the `weakref` cross-reference paragraph.**
   Cut whole, since the paragraph above it closes the topic.
 - **29 Solutions, exercise 3.**
   The causal "so" before `@staticmethod` is gone,

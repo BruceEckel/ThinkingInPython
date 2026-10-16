@@ -80,7 +80,7 @@ CALIBRATION = [
      "The `Tile` record from [Rethinking Objects](20_Patterns--"
      "Rethinking_Objects.md#the-immutability-solution) holds a `list`, "
      "so every cell that shares the tile shares that list."),
-    ("23_Patterns--Iterators.md", "05_Foundations--Functions.md",
+    ("22_Patterns--Iterators.md", "05_Foundations--Functions.md",
      "Functions", ["DONE"],
      "This listing reuses the `DONE` sentinel that [Functions]"
      "(05_Foundations--Functions.md#sentinel-values) defines."),
@@ -89,7 +89,7 @@ CALIBRATION = [
      "As in the `APPEARS` example in [Pattern Matching](13_Techniques--"
      "Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares), "
      "a dotted name compares the event with that member."),
-    ("28_Patterns--Function_Objects.md", "18_Techniques--Performance.md",
+    ("27_Patterns--Function_Objects.md", "18_Techniques--Performance.md",
      "record", ["Repeat"],
      "`Repeat` first appears in [Performance](18_Techniques--"
      "Performance.md#record), where it becomes a record."),

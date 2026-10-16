@@ -6,7 +6,7 @@ generated trees, and runs the whole gate: tens of seconds, nearly all of
 it spent on chapters you did not touch. After editing one chapter this
 runs the same loop scoped to that chapter and its Solutions file:
 
-    tip verify-ch CH=28        # or CH=28_Patterns--Function_Objects
+    tip verify-ch CH=28        # or CH=27_Patterns--Function_Objects
 
 The steps, in order, mirror `verify` (fixers first, markers before sync):
 

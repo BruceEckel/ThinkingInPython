@@ -966,7 +966,7 @@ A class in a module nobody imported stays out of the registry.
 Because `register()` keys on `cls.__name__`,
 when two modules each define a class with the same name,
 the class registered second replaces the first.
-[Factory](27_Patterns--Factory.md#hazards-of-self-registration) returns to both.
+[Factory](26_Patterns--Factory.md#hazards-of-self-registration) returns to both.
 
 [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 shows `__init_subclass__()`,
@@ -1079,7 +1079,7 @@ For anything simpler,
 a module-level constant computed the ordinary way reads better.
 
 A decorator can replace a class the same way.
-[*Singleton*](24_Patterns--Singleton.md#singleton-by-class-decorator)
+[*Singleton*](23_Patterns--Singleton.md#singleton-by-class-decorator)
 replaces a class with a callable object that stands in for it.
 The name that follows `class` then refers to that callable object,
 not to a class.
@@ -1225,7 +1225,7 @@ A list of toppings is data that a pizza holds.
 A decorator chain is a pizza,
 each layer satisfying the same interface the plain pizzas do.
 
-[Factory](27_Patterns--Factory.md#builder) has its own `Pizza`,
+[Factory](26_Patterns--Factory.md#builder) has its own `Pizza`,
 a frozen data class that a `PizzaBuilder` assembles,
 to illustrate the unrelated *Builder* pattern.
 The two examples share a topic, not a type.

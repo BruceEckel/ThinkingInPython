@@ -67,19 +67,19 @@ def test_index_skips_a_block_naming_no_file() -> None:
 
 # ── one line ─────────────────────────────────────────────────────────────────
 
-INDEX = {"registry.py": ("27_Patterns--Factory", "listing-registry.py"),
+INDEX = {"registry.py": ("26_Patterns--Factory", "listing-registry.py"),
          "sketch.py": ("30_Patterns--Observer", "listing-sketch.py")}
 
 
 def test_mention_becomes_a_classed_link_on_the_same_page() -> None:
     line = "The registry in `registry.py` does the same job."
-    out = link_line(line, INDEX, site_href("27_Patterns--Factory"))
+    out = link_line(line, INDEX, site_href("26_Patterns--Factory"))
     assert out == ("The registry in [`registry.py`](#listing-registry.py)"
                    "{.listing-link} does the same job.")
 
 
 def test_cross_chapter_mention_names_the_other_page() -> None:
-    out = link_line("see `sketch.py`", INDEX, site_href("27_Patterns--Factory"))
+    out = link_line("see `sketch.py`", INDEX, site_href("26_Patterns--Factory"))
     assert ("[`sketch.py`](30_Patterns--Observer.html#listing-sketch.py)"
             in out)
 
@@ -95,7 +95,7 @@ def test_unknown_name_and_longer_code_span_stay_code() -> None:
 
 
 def test_mention_inside_an_existing_link_is_left_alone() -> None:
-    line = "[the `registry.py` listing](27_Patterns--Factory.md#self-registration)"
+    line = "[the `registry.py` listing](26_Patterns--Factory.md#self-registration)"
     assert link_line(line, INDEX, epub_href) == line
 
 
@@ -129,14 +129,14 @@ def test_fence_naming_no_file_is_unchanged() -> None:
 
 def test_site_rewrite_links_and_ids_in_the_order_that_works() -> None:
     text = "```python\n# registry.py\nx = 1\n```\n\nprose `registry.py`\n"
-    out = site_rewrite(text, INDEX, "27_Patterns--Factory")
+    out = site_rewrite(text, INDEX, "26_Patterns--Factory")
     assert "[`registry.py`](#listing-registry.py){.listing-link}" in out
     assert "``` {#listing-registry.py .python}" in out
     # The other order changes the opener first. The parser's FENCE
     # regex then reads the closing fence as an opener, so every prose
     # line after a listing counts as code and stays unlinked.
     assert "listing-link" not in link_mentions(
-        fence_ids(text), INDEX, site_href("27_Patterns--Factory"))
+        fence_ids(text), INDEX, site_href("26_Patterns--Factory"))
 
 
 # ── the site's hover previews ────────────────────────────────────────────────

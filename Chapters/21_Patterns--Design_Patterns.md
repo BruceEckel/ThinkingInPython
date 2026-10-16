@@ -101,7 +101,7 @@ since it lets you change the objects to which your class delegates,
 and with them the way that class works.
 You can make that change dynamically or statically.
 
-Another pattern that appears in *GoF Design Patterns* is the [*Iterator*](23_Patterns--Iterators.md).
+Another pattern that appears in *GoF Design Patterns* is the [*Iterator*](22_Patterns--Iterators.md).
 An iterator lets you hide the particular implementation of the container as you step through it.
 You can write generic code that operates on all the elements in a sequence,
 however that sequence stores them.
@@ -131,8 +131,8 @@ stage two.
 The same dictionary becomes a standard design, stage three,
 once each subclass registers itself as its `class` statement runs.
 Adding a type then needs no edit to the dictionary.
-[Factory](27_Patterns--Factory.md) builds both designs.
-[*Template Method*](25_Patterns--Template_Method.md) is a design pattern,
+[Factory](26_Patterns--Factory.md) builds both designs.
+[*Template Method*](24_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.
 
 The stages are a history, not a ranking.
@@ -152,20 +152,20 @@ The pattern exists because the language leaves that code for them to write.
 
 A language can supply that missing piece in two ways.
 Sometimes a language adds the feature,
-and the feature replaces the pattern^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and a count for Python comes out differently. *Singleton* is one of the seven he leaves unchanged, but [*Singleton*](24_Patterns--Singleton.md)
+and the feature replaces the pattern^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and a count for Python comes out differently. *Singleton* is one of the seven he leaves unchanged, but [*Singleton*](23_Patterns--Singleton.md)
 shows that a Python module already is one.].
-[*Iterator*](23_Patterns--Iterators.md#the-pattern-that-disappeared)
+[*Iterator*](22_Patterns--Iterators.md#the-pattern-that-disappeared)
 is the clear case.
 It was implicit in the `for` loop from the start,
 and Python 2.2 made it a protocol the language calls on your behalf.
 More often the language had the piece all along,
 and the pattern came from a language that didn't.
-[*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
-and [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime)
+[*Strategy*](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
+and [*Command*](27_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime)
 shrink to passing a function, because a Python function is an object.
-A [Factory](27_Patterns--Factory.md) becomes a dictionary,
+A [Factory](26_Patterns--Factory.md) becomes a dictionary,
 because a class is an object too.
-[*Singleton*](24_Patterns--Singleton.md) becomes a module,
+[*Singleton*](23_Patterns--Singleton.md) becomes a module,
 because Python imports each module once and caches it.
 
 Here is the whole of a *Strategy* in Python:
@@ -194,7 +194,7 @@ holding the chosen algorithm in `strategy` for one call.
 
 This listing shows only the shape.
 Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.
-[Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
+[Function Objects](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through a case with a real motivation.
 
 A function with a `Callable` parameter can replace a pattern's interface and classes.
@@ -211,12 +211,12 @@ each named for what its patterns do:
     When you isolate the details of object creation,
     your code stops depending on which object types exist.
     Adding a type then leaves that code unchanged.
-    [*Singleton*](24_Patterns--Singleton.md) counts as a *Creational* pattern.
-    [Factory](27_Patterns--Factory.md) covers the other four: *Factory Method*,
+    [*Singleton*](23_Patterns--Singleton.md) counts as a *Creational* pattern.
+    [Factory](26_Patterns--Factory.md) covers the other four: *Factory Method*,
     *Abstract Factory*, *Prototype*, and *Builder*.
 2.  **Structural**: how objects connect to other objects,
     arranged so that changes leave those connections alone.
-    The structural patterns in this book appear in [*Surrogate*](26_Patterns--Surrogate.md),
+    The structural patterns in this book appear in [*Surrogate*](25_Patterns--Surrogate.md),
     [Changing the Interface](29_Patterns--Changing_the_Interface.md),
     [*Flyweight*](35_Patterns--Flyweight.md),
     [Decorators](14_Techniques--Decorators.md#the-decorator-pattern),
@@ -226,20 +226,20 @@ each named for what its patterns do:
     fulfilling a request, moving through a sequence (as in an iterator),
     or implementing an algorithm.
     The largest group of patterns in this book is behavioral:
-    [*Iterator*](23_Patterns--Iterators.md),
-    [*Template Method*](25_Patterns--Template_Method.md),
-    [Function Objects](28_Patterns--Function_Objects.md)
+    [*Iterator*](22_Patterns--Iterators.md),
+    [*Template Method*](24_Patterns--Template_Method.md),
+    [Function Objects](27_Patterns--Function_Objects.md)
     (*Command*, *Strategy*, and *Chain of Responsibility*),
     [*Observer*](30_Patterns--Observer.md),
     [*Visitor*](33_Patterns--Visitor.md), [*Memento*](36_Patterns--Memento.md),
-    [*State*](26_Patterns--Surrogate.md#state), and *Interpreter*.
+    [*State*](25_Patterns--Surrogate.md#state), and *Interpreter*.
     *State* appears beside *Proxy*, and *Interpreter* beside *Composite*,
     for the reason that closes this section.
 
 The catalog above comes from GoF.
 Patterns from outside it,
 like the [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object)
-and the [*Data Transfer Object*](22_Patterns--Data_Transfer_Objects.md),
+and the [*Data Transfer Object*](28_Patterns--Data_Transfer_Objects.md),
 appear in the [Pattern Catalog](39_Patterns--Pattern_Catalog.md).
 
 <!-- The quoted "clearly" below is the vague word this paragraph objects to,
@@ -260,9 +260,9 @@ so that classification doesn't lead me to a solution
 
 Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest.
 This book groups them by that resemblance.
-[*Surrogate*](26_Patterns--Surrogate.md)
+[*Surrogate*](25_Patterns--Surrogate.md)
 treats *Proxy* and *State* as one front-object structure.
-[Function Objects](28_Patterns--Function_Objects.md) treats *Command*,
+[Function Objects](27_Patterns--Function_Objects.md) treats *Command*,
 *Strategy*, and *Chain of Responsibility* as one function-passing structure.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 treats both of its patterns as one recursive-data structure.
@@ -420,7 +420,7 @@ On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
 because the new writer satisfies the protocol and `Report` names no writer.
 `main` still changes, since something must construct the new class.
-A [registry factory](27_Patterns--Factory.md#self-registration)
+A [registry factory](26_Patterns--Factory.md#self-registration)
 removes that last change too,
 by letting the new class register itself as its `class` statement runs.
 
@@ -566,10 +566,12 @@ and it is usually the intent rather than the structure.
 A pattern that subtracts to nothing is not a mistake.
 It is the right answer for a language missing the piece Python has.
 
-From [*Iterator*](23_Patterns--Iterators.md)
+From [*Iterator*](22_Patterns--Iterators.md)
 through [*Memento*](36_Patterns--Memento.md),
 each pattern chapter includes a figure of its pattern at work,
 drawn from that chapter's own listings.
+[*Data Transfer Objects*](28_Patterns--Data_Transfer_Objects.md)
+is the one chapter in that range without a figure.
 The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
 shows which way each edge points.
 Each chapter's figure shows what happens, in what order,

@@ -1454,7 +1454,7 @@ def compare(
 
 Two timings of the same type come back from one call,
 so a bare `tuple[float, float]` forces every caller to remember which float came first.
-`Times` [names them](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values).
+`Times` [names them](28_Patterns--Data_Transfer_Objects.md#returning-multiple-values).
 `io_threads.py` and `gil_threads.py` use the two styles a `NamedTuple` allows,
 access by field name and positional unpacking.
 
@@ -1908,7 +1908,7 @@ A producer decides what each consumer gets.
 The pull half looks simpler.
 Every worker gets the same iterator and takes the next item when it is ready.
 Nothing in the language stops you, and nothing in the language makes it work.
-An [iterator](23_Patterns--Iterators.md) is not thread-safe:
+An [iterator](22_Patterns--Iterators.md) is not thread-safe:
 
 ```python
 # shared_iterator.py
@@ -1970,7 +1970,7 @@ and the workers use it unchanged.
 If the iterator also defines `send()`, `throw()`, or `close()`,
 the wrapper serializes those too.
 
-A [generator](23_Patterns--Iterators.md#generators) fails differently,
+A [generator](22_Patterns--Iterators.md#generators) fails differently,
 and louder:
 
 ```python

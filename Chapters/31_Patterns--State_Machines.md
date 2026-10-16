@@ -5,7 +5,7 @@
 > The current state together with an input decides the next state.
 > A *State Machine* names the states and defines their transitions.
 
-Recall [*State*](26_Patterns--Surrogate.md#state):
+Recall [*State*](25_Patterns--Surrogate.md#state):
 a surrogate forwards calls to one of several implementations,
 and the client programmer chooses an implementation.
 *State Machine* adds a structure that makes the switch from one implementation to the next.
@@ -511,7 +511,7 @@ so finding the rules takes one dictionary lookup rather than an `isinstance()` t
 The same lookup excludes a subclass:
 an input whose class derives from `Money` matches none of `Money`'s rules,
 because the key is the input's exact class.
-The [event bus](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
+The [event bus](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 keys its handlers the same way,
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting)
@@ -815,7 +815,7 @@ Choose a library once the machine needs more than a page of code.
 
 Try each exercise before opening its [solution](../Solutions/31_Patterns--State_Machines/).
 
-1.  Using [*State*](26_Patterns--Surrogate.md#state),
+1.  Using [*State*](25_Patterns--Surrogate.md#state),
     make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add another kind of `Mood` called `Prozac`.
 2.  Turn exercise 1's `UnpredictablePerson` into a state machine in the shape of `trap_states.py`:
@@ -831,7 +831,7 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     such as a text file with one word per line.
 4.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
 5.  Write a `mouse_move_generator()`,
-    a [generator](23_Patterns--Iterators.md#generators)
+    a [generator](22_Patterns--Iterators.md#generators)
     that yields valid `Mouse` moves in sequence,
     where each possible move depends on the previous one
     (it is another state machine).

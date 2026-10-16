@@ -81,7 +81,7 @@ def test_heading_with_no_letters_gets_no_id() -> None:
 
 BOOK = Ids(
     prefixes={"12_Techniques--Data_Classes_as_Types": "ch12",
-              "24_Patterns--Singleton": "ch24"},
+              "23_Patterns--Singleton": "ch24"},
     known={"ch12", "ch24", "ch12-immutability", "ch24-borg",
            "ch12-dynamic-binding-vs.-pattern-matching"},
     aliases={"ch24-singleton": "ch24"},
@@ -95,10 +95,10 @@ def test_same_document_anchor_is_namespaced() -> None:
     assert rewritten("see [x](#immutability)") == "see [x](#ch12-immutability)"
 
 def test_cross_chapter_anchor_points_into_that_chapter() -> None:
-    assert rewritten("[x](24_Patterns--Singleton.md#borg)") == "[x](#ch24-borg)"
+    assert rewritten("[x](23_Patterns--Singleton.md#borg)") == "[x](#ch24-borg)"
 
 def test_whole_chapter_link_points_at_the_chapter() -> None:
-    assert rewritten("[x](24_Patterns--Singleton.md)") == "[x](#ch24)"
+    assert rewritten("[x](23_Patterns--Singleton.md)") == "[x](#ch24)"
 
 def test_anchor_may_contain_a_period() -> None:
     # Pandoc keeps a period in an auto id, and chapter 13 links to one.
@@ -126,7 +126,7 @@ def test_unknown_anchor_is_reported_and_left_alone() -> None:
     assert unresolved == {"#no-such-section"}
 
 def test_alias_sends_a_title_anchor_to_the_chapter_root() -> None:
-    assert rewritten("[x](24_Patterns--Singleton.md#singleton)") == "[x](#ch24)"
+    assert rewritten("[x](23_Patterns--Singleton.md#singleton)") == "[x](#ch24)"
 
 def test_outside_code_leaves_code_spans_alone() -> None:
     assert outside_code("a `b` c", str.upper) == "A `b` C"

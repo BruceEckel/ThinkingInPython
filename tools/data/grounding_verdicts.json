@@ -13,11 +13,11 @@
  "13b2b6ac69779a36": {
   "file": "06_Foundations--Modules_and_Packages.md",
   "line": 498,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "terms": [
    "__all__"
   ],
-  "sentence": "The underscore and `__all__` both say which names a caller should use, and that stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade) over its internals or as a shared single instance ([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).",
+  "sentence": "The underscore and `__all__` both say which names a caller should use, and that stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade) over its internals or as a shared single instance ([*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton)).",
   "p_terms": 0.0,
   "asked": "2026-10-13"
  },
@@ -112,16 +112,16 @@
  "0bfdf37ac6c6f194": {
   "file": "19_Techniques--Concurrency.md",
   "line": 1451,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
   ],
-  "sentence": "`Times` [names them](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values).",
+  "sentence": "`Times` [names them](28_Patterns--Data_Transfer_Objects.md#returning-multiple-values).",
   "p_terms": 0.04,
   "asked": "2026-10-05"
  },
  "19283748bd6927e4": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 425,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
@@ -133,7 +133,7 @@
   "asked": "2026-10-13"
  },
  "04acbadd1165eaba": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 758,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
@@ -145,7 +145,7 @@
   "asked": "2026-10-05"
  },
  "1121029ae76447a0": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 828,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
@@ -156,7 +156,7 @@
   "asked": "2026-10-13"
  },
  "674efb071da3872a": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 892,
   "target": "05_Foundations--Functions.md",
   "terms": [
@@ -167,7 +167,7 @@
   "asked": "2026-10-13"
  },
  "f149830ef146ed79": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 198,
   "target": "11_Techniques--Testing.md",
   "terms": [
@@ -178,18 +178,18 @@
   "asked": "2026-10-13"
  },
  "a51f08d6349a2b99": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 722,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "terms": [
    "__call__"
   ],
-  "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the *type* of `obj`](26_Patterns--Surrogate.md#special-methods-bypass-getattr).",
+  "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the *type* of `obj`](25_Patterns--Surrogate.md#special-methods-bypass-getattr).",
   "p_terms": 0.07,
   "asked": "2026-10-05"
  },
  "c358c8813c054976": {
-  "file": "25_Patterns--Template_Method.md",
+  "file": "24_Patterns--Template_Method.md",
   "line": 205,
   "target": "07_Foundations--Classes.md",
   "terms": [
@@ -200,7 +200,7 @@
   "asked": "2026-10-05"
  },
  "3b4e905cd9d9bcb5": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 210,
   "target": "11_Techniques--Testing.md",
   "terms": [
@@ -211,7 +211,7 @@
   "asked": "2026-10-13"
  },
  "2e71dc56c76b481b": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 785,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
@@ -222,18 +222,18 @@
   "asked": "2026-09-27"
  },
  "3711bb4c386a5bfa": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 168,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "terms": [
    "shape_name"
   ],
-  "sentence": "`shape_name()` is a [*generator*](23_Patterns--Iterators.md#generators).",
+  "sentence": "`shape_name()` is a [*generator*](22_Patterns--Iterators.md#generators).",
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
  "b61d0d217d395284": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 164,
   "target": "18_Techniques--Performance.md",
   "terms": [
@@ -244,7 +244,7 @@
   "asked": "2026-10-13"
  },
  "0f1b2d7a09ebf4e9": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 437,
   "target": "05_Foundations--Functions.md",
   "terms": [
@@ -258,11 +258,11 @@
  "69e6c2b3e73ff7e7": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 78,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "terms": [
    "ProxyAdapter"
   ],
-  "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](26_Patterns--Surrogate.md#proxy)\" loosely.",
+  "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](25_Patterns--Surrogate.md#proxy)\" loosely.",
   "p_terms": 0.0,
   "asked": "2026-10-05"
  },
@@ -363,25 +363,25 @@
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
   "line": 900,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
    "hello",
    "Mood"
   ],
-  "sentence": "1.  Using [*State*](26_Patterns--Surrogate.md#state), make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.",
+  "sentence": "1.  Using [*State*](25_Patterns--Surrogate.md#state), make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.",
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
   "line": 912,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
    "MouseAction"
   ],
-  "sentence": "5.  Write a `mouse_move_generator()`, a [generator](23_Patterns--Iterators.md#generators) that yields valid `MouseAction` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
+  "sentence": "5.  Write a `mouse_move_generator()`, a [generator](22_Patterns--Iterators.md#generators) that yields valid `MouseAction` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },

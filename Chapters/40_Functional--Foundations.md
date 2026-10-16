@@ -304,7 +304,7 @@ print(table["title"]("functional python"))
 
 The dictionary holds functions as values,
 so a lookup yields a function you can immediately call.
-The [Function Objects](28_Patterns--Function_Objects.md)
+The [Function Objects](27_Patterns--Function_Objects.md)
 chapter treats the same capability as a design pattern.
 
 Treating functions as values lets a data lookup select which function runs,
@@ -350,7 +350,7 @@ Supporting a new operator means adding a row to the table,
 whether the literal holds that row or a later line adds it,
 as the `operations["%"]` line does here.
 The dispatch code stays the same.
-The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
+The same structure underlies [the dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let you add features to a program from outside its core.
 
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
@@ -402,7 +402,7 @@ print(sorted(words, key=len))
 Each call passes a function to another function, which runs the loop.
 
 The `list()` calls are necessary.
-`map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty).
+`map()` and `filter()` return [one-shot iterators](22_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty).
 An iterator computes each value only when a consumer asks for it.
 `print()` displays the iterator's `repr()` instead of consuming it,
 so `print(map(...))` shows `<map object at 0x...>` rather than values.
@@ -585,7 +585,7 @@ Unlike a lambda, `partial()` keeps the preset arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also presets their values when you build it,
 whereas a lambda created in a loop reads each captured name at call time,
-the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
+the [late-binding trap](27_Patterns--Function_Objects.md#the-late-binding-trap).
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 

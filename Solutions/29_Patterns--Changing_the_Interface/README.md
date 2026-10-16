@@ -93,7 +93,7 @@ The adapter's `pairs` field refers to the same list as before.
 Python looks up a special method on the class, not on the instance,
 so the lookup skips `__getattr__()` and finds no `__len__()` on
 `PairsAdapter`.
-[Special Methods Bypass `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#special-methods-bypass-getattr)
+[Special Methods Bypass `__getattr__()`](../../Chapters/25_Patterns--Surrogate.md#special-methods-bypass-getattr)
 in *Surrogate* covers that lookup rule.
 `adapter[key]` works because the class defines `__getitem__()`.
 An adapter that must support `len()` defines a `__len__()` that
@@ -357,7 +357,7 @@ What it adds is a decision about whether the call proceeds. If you
 remove it, every call reaches the implementation, including the ones
 the proxy refuses.
 What you lose is control over when and whether a call proceeds. This wrapper is the
-[protection proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy).
+[protection proxy](../../Chapters/25_Patterns--Surrogate.md#protection-proxy).
 
 None of the three is a *Façade*, because a *Façade* narrows many
 objects to a few names, while each of these wraps one object.

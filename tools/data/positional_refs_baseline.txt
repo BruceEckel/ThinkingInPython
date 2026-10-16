@@ -59,18 +59,18 @@ Chapters/18_Techniques--Performance.md	The first call	The first call stops to co
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
 Chapters/19_Techniques--Concurrency.md	The last line	The last line shows the other direction.
 Chapters/20_Patterns--Rethinking_Objects.md	The final `def`	The final `def` is the function that runs.
-Chapters/23_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together instead, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
-Chapters/24_Patterns--Singleton.md	the first assignment	If you drop the inner test, every thread that passed the outer test before the first assignment builds its own object, one after another.
-Chapters/24_Patterns--Singleton.md	the first call	Only the first call constructs a `Registry`.
-Chapters/24_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list, where the metaclass form would discard it.
-Chapters/24_Patterns--Singleton.md	the first call	That override skips `__new__()` and `__init__()` on every later construction, so only the first call's arguments reach the constructor.
-Chapters/25_Patterns--Template_Method.md	the closing `run_framework()`	In `template_function.py`, `customize2` defaults to the do-nothing `lambda: None`, so the closing `run_framework()` call passes one step and the loop prints `one` twice.
-Chapters/26_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup finds the proxy's `level`, so Python skips `__getattr__()`.
-Chapters/26_Patterns--Surrogate.md	the first call	Because `Partial` defines `f()` and leaves `g()` abstract, constructing a `Partial` raises a `TypeError` before the first call.
-Chapters/26_Patterns--Surrogate.md	the second call	With the guard, the second call to `__getattr__()` reports the typo by name.
-Chapters/27_Patterns--Factory.md	the first `build()`	Every `.topping()` call after the first `build()` adds to that same list, so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
-Chapters/27_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` raises a `NotImplementedError` would report the omission later, at the first `draw()` call.
-Chapters/27_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
+Chapters/22_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together instead, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
+Chapters/23_Patterns--Singleton.md	the first assignment	If you drop the inner test, every thread that passed the outer test before the first assignment builds its own object, one after another.
+Chapters/23_Patterns--Singleton.md	the first call	Only the first call constructs a `Registry`.
+Chapters/23_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list, where the metaclass form would discard it.
+Chapters/23_Patterns--Singleton.md	the first call	That override skips `__new__()` and `__init__()` on every later construction, so only the first call's arguments reach the constructor.
+Chapters/24_Patterns--Template_Method.md	the closing `run_framework()`	In `template_function.py`, `customize2` defaults to the do-nothing `lambda: None`, so the closing `run_framework()` call passes one step and the loop prints `one` twice.
+Chapters/25_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup finds the proxy's `level`, so Python skips `__getattr__()`.
+Chapters/25_Patterns--Surrogate.md	the first call	Because `Partial` defines `f()` and leaves `g()` abstract, constructing a `Partial` raises a `TypeError` before the first call.
+Chapters/25_Patterns--Surrogate.md	the second call	With the guard, the second call to `__getattr__()` reports the typo by name.
+Chapters/26_Patterns--Factory.md	the first `build()`	Every `.topping()` call after the first `build()` adds to that same list, so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
+Chapters/26_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` raises a `NotImplementedError` would report the omission later, at the first `draw()` call.
+Chapters/26_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/29_Patterns--Changing_the_Interface.md	The first line	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/30_Patterns--Observer.md	The second `announce()`	The second `announce()` copies the shortened list, so `always` receives both changes and `once` receives one.
 Chapters/32_Patterns--Multiple_Dispatching.md	The last case	The last case shows why the sentinel exists.
@@ -152,21 +152,21 @@ Solutions/19_Techniques--Concurrency/README.md	the line before	`ty` rejects the 
 Solutions/19_Techniques--Concurrency/README.md	the next `next()`	The `with lock:` inside the body therefore starts after `next()` has returned a number, and ends before the next `next()` begins.
 Solutions/19_Techniques--Concurrency/README.md	the third `pool.submit(enqueue, ...)`	**Add a third producer.** The one change is the third `pool.submit(enqueue, ...)`.
 Solutions/20_Patterns--Rethinking_Objects/README.md	the last line	Without the `# type: ignore` on the last line, `ty` rejects the call:
-Solutions/22_Patterns--Data_Transfer_Objects/README.md	The line that	The line that reads `result.mean` and `result.count` breaks.
-Solutions/23_Patterns--Iterators/README.md	The following `next(it)`	The following `next(it)` returns `4`.
-Solutions/23_Patterns--Iterators/README.md	the line that	With the version that raises a `TypeError`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
-Solutions/23_Patterns--Iterators/README.md	the next `yield`	Each time something asks a generator for a value, its body runs to the next `yield` and pauses there.
-Solutions/23_Patterns--Iterators/README.md	the next call	A generator pauses inside its `for` loop at each `yield` and resumes there on the next call, so the loop that skips is the loop that yields.
-Solutions/26_Patterns--Surrogate/README.md	The final `print()`	The final `print()` shows `f` called twice and `g` once.
-Solutions/26_Patterns--Surrogate/README.md	The first `query()`	The first `query()` then reports `0 answered before build`.
-Solutions/26_Patterns--Surrogate/README.md	the first `query()`	The proxy serves three requests from a string it holds from the start and defers the slow construction until the first `query()`.
-Solutions/27_Patterns--Factory/README.md	The fifth `.topping()`	The fifth `.topping()` call raises a `ValueError` before appending, so `self._toppings` holds at most four.
-Solutions/27_Patterns--Factory/README.md	The outer call	The outer call takes the name and returns `register()`, which runs the builder once, stores the result, and returns the builder unchanged.
-Solutions/27_Patterns--Factory/README.md	the fifth `.topping()`	That builder checks the count when `build()` runs, so a window opens between the fifth `.topping()` call and that `build()` call.
-Solutions/27_Patterns--Factory/README.md	the line that	The type checker reports the line that constructs that factory.
-Solutions/28_Patterns--Function_Objects/README.md	a few lines earlier	`EVENTS` holds the original class instead, so `handler()` raises `TypeError: Announce: not an @event`, although `Deposit` went through `@event` a few lines earlier.
-Solutions/28_Patterns--Function_Objects/README.md	the first `@handler`	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
-Solutions/28_Patterns--Function_Objects/README.md	the first handler	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	The line that	The line that reads `result.mean` and `result.count` breaks.
+Solutions/22_Patterns--Iterators/README.md	The following `next(it)`	The following `next(it)` returns `4`.
+Solutions/22_Patterns--Iterators/README.md	the line that	With the version that raises a `TypeError`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
+Solutions/22_Patterns--Iterators/README.md	the next `yield`	Each time something asks a generator for a value, its body runs to the next `yield` and pauses there.
+Solutions/22_Patterns--Iterators/README.md	the next call	A generator pauses inside its `for` loop at each `yield` and resumes there on the next call, so the loop that skips is the loop that yields.
+Solutions/25_Patterns--Surrogate/README.md	The final `print()`	The final `print()` shows `f` called twice and `g` once.
+Solutions/25_Patterns--Surrogate/README.md	The first `query()`	The first `query()` then reports `0 answered before build`.
+Solutions/25_Patterns--Surrogate/README.md	the first `query()`	The proxy serves three requests from a string it holds from the start and defers the slow construction until the first `query()`.
+Solutions/26_Patterns--Factory/README.md	The fifth `.topping()`	The fifth `.topping()` call raises a `ValueError` before appending, so `self._toppings` holds at most four.
+Solutions/26_Patterns--Factory/README.md	The outer call	The outer call takes the name and returns `register()`, which runs the builder once, stores the result, and returns the builder unchanged.
+Solutions/26_Patterns--Factory/README.md	the fifth `.topping()`	That builder checks the count when `build()` runs, so a window opens between the fifth `.topping()` call and that `build()` call.
+Solutions/26_Patterns--Factory/README.md	the line that	The type checker reports the line that constructs that factory.
+Solutions/27_Patterns--Function_Objects/README.md	a few lines earlier	`EVENTS` holds the original class instead, so `handler()` raises `TypeError: Announce: not an @event`, although `Deposit` went through `@event` a few lines earlier.
+Solutions/27_Patterns--Function_Objects/README.md	the first `@handler`	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
+Solutions/27_Patterns--Function_Objects/README.md	the first handler	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 Solutions/31_Patterns--State_Machines/README.md	the following call	Each time `list()` calls `next()` on the generator, the generator picks a legal successor and remembers it for the following call.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	the first `next()`	Calling a generator function returns a generator object, and the body starts at the first `next()`.
 Solutions/35_Patterns--Flyweight/README.md	the first `make_color()`	If you keep `@record` on `Color`, the first `make_color()` call raises a `TypeError` at `_pool[key] = found`, because the `WeakValueDictionary` cannot create a weak reference to a slotted `Color` with no `__weakref__` slot.

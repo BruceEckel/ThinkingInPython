@@ -834,7 +834,7 @@ as in `name: str`, instead of listing bare names.
 A type checker then checks each field against its annotation.
 For a record that must be mutable,
 use a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes).
-[Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions)
+[Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#the-standard-library-versions)
 compares `typing.NamedTuple` with a data class.
 
 The standard library has more specialized containers.

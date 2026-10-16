@@ -23,7 +23,7 @@ It creates one tag and runs read-only checks.
 ## Step 1: resolve the chapter
 
 The argument is a chapter number (`28`), a stem prefix
-(`28_Patterns`), or a name (`Function Objects`).
+(`27_Patterns`), or a name (`Function Objects`).
 Resolve it to the two source files:
 
 ```

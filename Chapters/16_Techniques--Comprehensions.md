@@ -669,7 +669,7 @@ print(list(nums))
 A generator expression keeps its place between calls.
 Once its body has finished, every further `next()` raises `StopIteration`,
 which `sum()`, `any()`, and `list()` each read as the end
-([Iterators](23_Patterns--Iterators.md#iteration-comes-built-in) has the protocol).
+([Iterators](22_Patterns--Iterators.md#iteration-comes-built-in) has the protocol).
 
 In `spent_generator.py`, `sum()` drains `nums`,
 so `any()` finds it empty and reports `False` instead of `True`.
@@ -717,11 +717,11 @@ which runs after the `with` block exits and the context manager deletes the dire
 Its default, `on_error=None`, discards the error,
 so `sorted()` returns an empty list.
 
-A `lambda` created in a comprehension [reads its variables late](28_Patterns--Function_Objects.md#the-late-binding-trap)
+A `lambda` created in a comprehension [reads its variables late](27_Patterns--Function_Objects.md#the-late-binding-trap)
 by the same mechanism.
 Its body runs when something calls it, not when the comprehension creates it.
 
-[Iterators](23_Patterns--Iterators.md#generators) explores generators further,
+[Iterators](22_Patterns--Iterators.md#generators) explores generators further,
 and [Generators](45_Effects--Generators.md)
 covers the values they receive as well as the ones they produce.
 

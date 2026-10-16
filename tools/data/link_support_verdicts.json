@@ -202,9 +202,9 @@
  "649b43f24217755e": {
   "file": "03_Foundations--Containers.md",
   "line": 776,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "anchor": "the-standard-library-versions",
-  "sentence": "[Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions) compares `typing.NamedTuple` with a data class.",
+  "sentence": "[Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#the-standard-library-versions) compares `typing.NamedTuple` with a data class.",
   "verdict": "says_nothing",
   "confidence": 0.22,
   "asked": "2026-10-08"
@@ -362,9 +362,9 @@
  "8e9b1ea46882b5dd": {
   "file": "06_Foundations--Modules_and_Packages.md",
   "line": 466,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "a-module-is-already-a-singleton",
-  "sentence": "Both say which names a caller should use, and that agreement lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade) over its internals or as a shared single instance ([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).",
+  "sentence": "Both say which names a caller should use, and that agreement lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade) over its internals or as a shared single instance ([*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton)).",
   "verdict": "supports",
   "confidence": 0.79,
   "asked": "2026-10-08"
@@ -382,9 +382,9 @@
  "5e165728406ae9e9": {
   "file": "06_Foundations--Modules_and_Packages.md",
   "line": 665,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "hazards-of-self-registration",
-  "sentence": "A module that registers a [plugin class](27_Patterns--Factory.md#hazards-of-self-registration), installs a codec, or fills a table does that work as it loads.",
+  "sentence": "A module that registers a [plugin class](26_Patterns--Factory.md#hazards-of-self-registration), installs a codec, or fills a table does that work as it loads.",
   "verdict": "supports",
   "confidence": 0.44,
   "asked": "2026-10-08"
@@ -522,9 +522,9 @@
  "fda21d9a8a375e16": {
   "file": "08_Foundations--Static_Types.md",
   "line": 356,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "what-the-implementation-supplies",
-  "sentence": "Decorating the Protocol with `@runtime_checkable` allows the call, at the cost of a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies).",
+  "sentence": "Decorating the Protocol with `@runtime_checkable` allows the call, at the cost of a [weaker check](25_Patterns--Surrogate.md#what-the-implementation-supplies).",
   "verdict": "supports",
   "confidence": 0.23,
   "asked": "2026-10-08"
@@ -602,9 +602,9 @@
  "feff62f14cbaac23": {
   "file": "08_Foundations--Static_Types.md",
   "line": 891,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "what-the-implementation-supplies",
-  "sentence": "| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) |",
+  "sentence": "| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies) |",
   "verdict": "supports",
   "confidence": 0.28,
   "asked": "2026-10-08"
@@ -612,9 +612,9 @@
  "eb19e9657b29a975": {
   "file": "08_Foundations--Static_Types.md",
   "line": 901,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "anchor": "namedtuple",
-  "sentence": "| `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#namedtuple) |",
+  "sentence": "| `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#namedtuple) |",
   "verdict": "supports",
   "confidence": 0.31,
   "asked": "2026-10-08"
@@ -842,9 +842,9 @@
  "107f5a069463d208": {
   "file": "11_Techniques--Testing.md",
   "line": 350,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "A function containing `yield` is a [generator](23_Patterns--Iterators.md#generators), and a fixture needs only its shape.",
+  "sentence": "A function containing `yield` is a [generator](22_Patterns--Iterators.md#generators), and a fixture needs only its shape.",
   "verdict": "supports",
   "confidence": 0.74,
   "asked": "2026-10-08"
@@ -902,9 +902,9 @@
  "06f874e22f5dc77b": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
   "line": 556,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "anchor": "a-namedtuple-is-still-a-tuple",
-  "sentence": "A frozen data class equals another instance of its own class, while a `NamedTuple` [equals any tuple holding the same values](22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple).",
+  "sentence": "A frozen data class equals another instance of its own class, while a `NamedTuple` [equals any tuple holding the same values](28_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple).",
   "verdict": "supports",
   "confidence": 0.91,
   "asked": "2026-10-08"
@@ -942,9 +942,9 @@
  "6dd1493e99bec001": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
   "line": 1118,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "hiding-the-concrete-classes",
-  "sentence": "Here, `Stars(11)` builds one, because a factory function is advice rather than a gate, a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes) shares.",
+  "sentence": "Here, `Stars(11)` builds one, because a factory function is advice rather than a gate, a limit every factory in [Factory](26_Patterns--Factory.md#hiding-the-concrete-classes) shares.",
   "verdict": "supports",
   "confidence": 0.52,
   "asked": "2026-10-08"
@@ -952,9 +952,9 @@
  "40b6e3fa8c45fb75": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
   "line": 1141,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "anchor": "the-standard-library-versions",
-  "sentence": "When it need not, a `NamedTuple` is a fine [immutable record](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).",
+  "sentence": "When it need not, a `NamedTuple` is a fine [immutable record](28_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).",
   "verdict": "supports",
   "confidence": 0.55,
   "asked": "2026-10-08"
@@ -962,9 +962,9 @@
  "4a8a1b5e21e82aaa": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
   "line": 1208,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "borg-singleton-by-inheritance",
-  "sentence": "The [*Borg* singleton](24_Patterns--Singleton.md#borg-singleton-by-inheritance) is that case.",
+  "sentence": "The [*Borg* singleton](23_Patterns--Singleton.md#borg-singleton-by-inheritance) is that case.",
   "verdict": "supports",
   "confidence": 0.72,
   "asked": "2026-10-08"
@@ -1132,9 +1132,9 @@
  "aa727f6a1125bc61": {
   "file": "14_Techniques--Decorators.md",
   "line": 924,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "hazards-of-self-registration",
-  "sentence": "[Factory](27_Patterns--Factory.md#hazards-of-self-registration) returns to both.",
+  "sentence": "[Factory](26_Patterns--Factory.md#hazards-of-self-registration) returns to both.",
   "verdict": "supports",
   "confidence": 0.35,
   "asked": "2026-10-08"
@@ -1152,9 +1152,9 @@
  "0eca5118ae0b5611": {
   "file": "14_Techniques--Decorators.md",
   "line": 1058,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "singleton-by-class-decorator",
-  "sentence": "[*Singleton*](24_Patterns--Singleton.md#singleton-by-class-decorator) replaces a class with a callable object that stands in for it.",
+  "sentence": "[*Singleton*](23_Patterns--Singleton.md#singleton-by-class-decorator) replaces a class with a callable object that stands in for it.",
   "verdict": "supports",
   "confidence": 0.97,
   "asked": "2026-10-08"
@@ -1172,9 +1172,9 @@
  "9321227a48109afe": {
   "file": "14_Techniques--Decorators.md",
   "line": 1174,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "builder",
-  "sentence": "[Factory](27_Patterns--Factory.md#builder) has its own `Pizza`, a frozen data class that a `PizzaBuilder` assembles, to illustrate the unrelated *Builder* pattern.",
+  "sentence": "[Factory](26_Patterns--Factory.md#builder) has its own `Pizza`, a frozen data class that a `PizzaBuilder` assembles, to illustrate the unrelated *Builder* pattern.",
   "verdict": "supports",
   "confidence": 0.52,
   "asked": "2026-10-08"
@@ -1262,9 +1262,9 @@
  "6fa547c1e2f24e7c": {
   "file": "15_Techniques--Context_Managers.md",
   "line": 32,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "[Iterators](23_Patterns--Iterators.md#generators) covers generators in full.",
+  "sentence": "[Iterators](22_Patterns--Iterators.md#generators) covers generators in full.",
   "verdict": "supports",
   "confidence": 0.66,
   "asked": "2026-10-08"
@@ -1392,9 +1392,9 @@
  "ab6ed0bd6e03ef93": {
   "file": "16_Techniques--Comprehensions.md",
   "line": 632,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "iteration-comes-built-in",
-  "sentence": "The generator keeps its place between calls, and once its body has finished, every further `next()` raises `StopIteration` ([Iterators](23_Patterns--Iterators.md#iteration-comes-built-in) has the protocol), which `sum()`, `any()`, and `list()` each read as the end.",
+  "sentence": "The generator keeps its place between calls, and once its body has finished, every further `next()` raises `StopIteration` ([Iterators](22_Patterns--Iterators.md#iteration-comes-built-in) has the protocol), which `sum()`, `any()`, and `list()` each read as the end.",
   "verdict": "supports",
   "confidence": 0.97,
   "asked": "2026-10-08"
@@ -1402,9 +1402,9 @@
  "d4e47f624363312c": {
   "file": "16_Techniques--Comprehensions.md",
   "line": 676,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "the-late-binding-trap",
-  "sentence": "[Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap) demonstrates that trap.",
+  "sentence": "[Function Objects](27_Patterns--Function_Objects.md#the-late-binding-trap) demonstrates that trap.",
   "verdict": "supports",
   "confidence": 0.7,
   "asked": "2026-10-08"
@@ -1412,9 +1412,9 @@
  "23bb63b798087520": {
   "file": "16_Techniques--Comprehensions.md",
   "line": 678,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "[Iterators](23_Patterns--Iterators.md#generators) explores generators further, and [Generators](45_Effects--Generators.md) covers the values they receive as well as the ones they produce.",
+  "sentence": "[Iterators](22_Patterns--Iterators.md#generators) explores generators further, and [Generators](45_Effects--Generators.md) covers the values they receive as well as the ones they produce.",
   "verdict": "supports",
   "confidence": 0.34,
   "asked": "2026-10-08"
@@ -1452,9 +1452,9 @@
  "c209d2a6a577e7d8": {
   "file": "17_Techniques--Metaprogramming.md",
   "line": 239,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "the-late-binding-trap",
-  "sentence": "the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap) that `late_binding.py` demonstrates.",
+  "sentence": "the [late-binding trap](27_Patterns--Function_Objects.md#the-late-binding-trap) that `late_binding.py` demonstrates.",
   "verdict": "supports",
   "confidence": 0.98,
   "asked": "2026-10-08"
@@ -1462,9 +1462,9 @@
  "bcc9452b1af90ee5": {
   "file": "17_Techniques--Metaprogramming.md",
   "line": 612,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "hazards-of-self-registration",
-  "sentence": "[Factory](27_Patterns--Factory.md#hazards-of-self-registration) covers both:",
+  "sentence": "[Factory](26_Patterns--Factory.md#hazards-of-self-registration) covers both:",
   "verdict": "supports",
   "confidence": 0.44,
   "asked": "2026-10-08"
@@ -1472,9 +1472,9 @@
  "e87a2fbd93bc2d54": {
   "file": "17_Techniques--Metaprogramming.md",
   "line": 706,
-  "target": "25_Patterns--Template_Method.md",
+  "target": "24_Patterns--Template_Method.md",
   "anchor": "hooks-and-the-misspelled-override",
-  "sentence": "[*Template Method*](25_Patterns--Template_Method.md#hooks-and-the-misspelled-override)'s `near_miss.py` reads `__final__` through `getattr()` to refuse an override at runtime.",
+  "sentence": "[*Template Method*](24_Patterns--Template_Method.md#hooks-and-the-misspelled-override)'s `near_miss.py` reads `__final__` through `getattr()` to refuse an override at runtime.",
   "verdict": "supports",
   "confidence": 0.92,
   "asked": "2026-10-08"
@@ -1592,9 +1592,9 @@
  "4c9e754c8eb93b44": {
   "file": "18_Techniques--Performance.md",
   "line": 580,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
-  "sentence": "- The C-implemented standard library's [`itertools`](23_Patterns--Iterators.md#reusable-algorithms), `collections`, and `functools` are faster than hand-rolled equivalents.",
+  "sentence": "- The C-implemented standard library's [`itertools`](22_Patterns--Iterators.md#reusable-algorithms), `collections`, and `functools` are faster than hand-rolled equivalents.",
   "verdict": "says_nothing",
   "confidence": 0.77,
   "asked": "2026-10-08"
@@ -1722,9 +1722,9 @@
  "94b7496a706ae4a2": {
   "file": "19_Techniques--Concurrency.md",
   "line": 1283,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "anchor": "returning-multiple-values",
-  "sentence": "`Times` [names them](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values).",
+  "sentence": "`Times` [names them](28_Patterns--Data_Transfer_Objects.md#returning-multiple-values).",
   "verdict": "supports",
   "confidence": 0.95,
   "asked": "2026-10-08"
@@ -1742,9 +1742,9 @@
  "7edaf261ce801af7": {
   "file": "19_Techniques--Concurrency.md",
   "line": 1804,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "A [generator](23_Patterns--Iterators.md#generators) fails differently, and louder:",
+  "sentence": "A [generator](22_Patterns--Iterators.md#generators) fails differently, and louder:",
   "verdict": "says_nothing",
   "confidence": 0.82,
   "asked": "2026-10-08"
@@ -1932,9 +1932,9 @@
  "4e949734e0df12c4": {
   "file": "21_Patterns--Design_Patterns.md",
   "line": 153,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "the-pattern-that-disappeared",
-  "sentence": "[*Iterator*](23_Patterns--Iterators.md#the-pattern-that-disappeared) is the clear case.",
+  "sentence": "[*Iterator*](22_Patterns--Iterators.md#the-pattern-that-disappeared) is the clear case.",
   "verdict": "supports",
   "confidence": 0.59,
   "asked": "2026-10-08"
@@ -1942,9 +1942,9 @@
  "2ec720bf915bebdc": {
   "file": "21_Patterns--Design_Patterns.md",
   "line": 187,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "strategy-choosing-the-algorithm-at-runtime",
-  "sentence": "[Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) works through a case with a real motivation.",
+  "sentence": "[Function Objects](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) works through a case with a real motivation.",
   "verdict": "supports",
   "confidence": 0.59,
   "asked": "2026-10-08"
@@ -1964,7 +1964,7 @@
   "line": 209,
   "target": "14_Techniques--Decorators.md",
   "anchor": "the-decorator-pattern",
-  "sentence": "[*Surrogate*](26_Patterns--Surrogate.md), [Changing the Interface](29_Patterns--Changing_the_Interface.md), [*Flyweight*](35_Patterns--Flyweight.md), [Decorators](14_Techniques--Decorators.md#the-decorator-pattern), and the *Composite* half of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md) cover the structural patterns in this book.",
+  "sentence": "[*Surrogate*](25_Patterns--Surrogate.md), [Changing the Interface](29_Patterns--Changing_the_Interface.md), [*Flyweight*](35_Patterns--Flyweight.md), [Decorators](14_Techniques--Decorators.md#the-decorator-pattern), and the *Composite* half of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md) cover the structural patterns in this book.",
   "verdict": "supports",
   "confidence": 0.91,
   "asked": "2026-10-08"
@@ -1972,9 +1972,9 @@
  "7515b20a9ed1a6af": {
   "file": "21_Patterns--Design_Patterns.md",
   "line": 220,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "state",
-  "sentence": "[*Iterator*](23_Patterns--Iterators.md), [*Template Method*](25_Patterns--Template_Method.md), [Function Objects](28_Patterns--Function_Objects.md) (*Command*, *Strategy*, and *Chain of Responsibility*), [*Observer*](30_Patterns--Observer.md), [*Visitor*](33_Patterns--Visitor.md), [*Memento*](36_Patterns--Memento.md), [*State*](26_Patterns--Surrogate.md#state), and *Interpreter*, though *State* appears beside *Proxy* and *Interpreter* beside *Composite*, for the reason that closes this section.",
+  "sentence": "[*Iterator*](22_Patterns--Iterators.md), [*Template Method*](24_Patterns--Template_Method.md), [Function Objects](27_Patterns--Function_Objects.md) (*Command*, *Strategy*, and *Chain of Responsibility*), [*Observer*](30_Patterns--Observer.md), [*Visitor*](33_Patterns--Visitor.md), [*Memento*](36_Patterns--Memento.md), [*State*](25_Patterns--Surrogate.md#state), and *Interpreter*, though *State* appears beside *Proxy* and *Interpreter* beside *Composite*, for the reason that closes this section.",
   "verdict": "supports",
   "confidence": 0.64,
   "asked": "2026-10-08"
@@ -1992,9 +1992,9 @@
  "c6cd900e0681e968": {
   "file": "21_Patterns--Design_Patterns.md",
   "line": 407,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "self-registration",
-  "sentence": "A [registry factory](27_Patterns--Factory.md#self-registration) takes that last change out too, by letting the new class register itself as its `class` statement runs.",
+  "sentence": "A [registry factory](26_Patterns--Factory.md#self-registration) takes that last change out too, by letting the new class register itself as its `class` statement runs.",
   "verdict": "supports",
   "confidence": 0.85,
   "asked": "2026-10-08"
@@ -2070,7 +2070,7 @@
   "asked": "2026-10-08"
  },
  "a69b5e15cdd17d21": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 18,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "what-a-process-pool-requires",
@@ -2080,7 +2080,7 @@
   "asked": "2026-10-08"
  },
  "d656428cea967212": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 18,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "serializing-to-json",
@@ -2090,7 +2090,7 @@
   "asked": "2026-10-08"
  },
  "fb1806b3d303795c": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 53,
   "target": "05_Foundations--Functions.md",
   "anchor": "positional-only-and-keyword-only-parameters",
@@ -2100,17 +2100,17 @@
   "asked": "2026-10-08"
  },
  "5ca35d415e1220bc": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 64,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "forwarding-with-getattr",
-  "sentence": "You can move that `Any` into the class instead of repeating it at every use site, by declaring a [`__getattr__()`](26_Patterns--Surrogate.md#forwarding-with-getattr) that returns `Any` and a `__setattr__()` that accepts one.",
+  "sentence": "You can move that `Any` into the class instead of repeating it at every use site, by declaring a [`__getattr__()`](25_Patterns--Surrogate.md#forwarding-with-getattr) that returns `Any` and a `__setattr__()` that accepts one.",
   "verdict": "supports",
   "confidence": 0.86,
   "asked": "2026-10-08"
  },
  "9937e099aee99e56": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 136,
   "target": "18_Techniques--Performance.md",
   "anchor": "record",
@@ -2120,7 +2120,7 @@
   "asked": "2026-10-08"
  },
  "24fd98ddee509056": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 144,
   "target": "03_Foundations--Containers.md",
   "anchor": "namedtuple",
@@ -2130,7 +2130,7 @@
   "asked": "2026-10-08"
  },
  "113f545b3cc6494d": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 183,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "the-general-form-of-replace",
@@ -2140,7 +2140,7 @@
   "asked": "2026-10-08"
  },
  "1bfb4eae8b3a1dce": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 190,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "the-immutability-solution",
@@ -2150,7 +2150,7 @@
   "asked": "2026-10-08"
  },
  "142ec8085a2cc1e3": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 240,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "more-data-class-tools",
@@ -2160,7 +2160,7 @@
   "asked": "2026-10-08"
  },
  "61f7df0ae41bbbd0": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 347,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "immutability",
@@ -2170,7 +2170,7 @@
   "asked": "2026-10-08"
  },
  "bd243ad25bc38098": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 352,
   "target": "08_Foundations--Static_Types.md",
   "anchor": "dictionary-and-record-shapes",
@@ -2180,7 +2180,7 @@
   "asked": "2026-10-08"
  },
  "db64074b585b37d0": {
-  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "file": "28_Patterns--Data_Transfer_Objects.md",
   "line": 358,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "a-type-is-a-set-of-values",
@@ -2190,7 +2190,7 @@
   "asked": "2026-10-08"
  },
  "f28820d2f8a86bde": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 9,
   "target": "21_Patterns--Design_Patterns.md",
   "anchor": "design-principles",
@@ -2200,7 +2200,7 @@
   "asked": "2026-10-08"
  },
  "4b36a3d4516c40ed": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 90,
   "target": "45_Effects--Generators.md",
   "anchor": "annotating-a-generator",
@@ -2210,7 +2210,7 @@
   "asked": "2026-10-08"
  },
  "81197a0d24f5bcc9": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 194,
   "target": "16_Techniques--Comprehensions.md",
   "anchor": "generator-expressions",
@@ -2220,7 +2220,7 @@
   "asked": "2026-10-08"
  },
  "60cb18b316a939b8": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 422,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "sharing-an-iterator-between-threads",
@@ -2230,7 +2230,7 @@
   "asked": "2026-10-08"
  },
  "b381e4d741316f05": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 479,
   "target": "45_Effects--Generators.md",
   "anchor": "yield-from-composes-descriptions",
@@ -2240,7 +2240,7 @@
   "asked": "2026-10-08"
  },
  "d60b271e85cd1fda": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 510,
   "target": "16_Techniques--Comprehensions.md",
   "anchor": "generator-expressions",
@@ -2250,7 +2250,7 @@
   "asked": "2026-10-08"
  },
  "c17929fe8b8978bf": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 538,
   "target": "41_Functional--Toolkits.md",
   "anchor": "the-itertools-toolkit",
@@ -2260,7 +2260,7 @@
   "asked": "2026-10-08"
  },
  "da370c26232eb1e7": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 615,
   "target": "14_Techniques--Decorators.md",
   "anchor": "the-decorator-pattern",
@@ -2270,7 +2270,7 @@
   "asked": "2026-10-08"
  },
  "2e180c8952df775f": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 729,
   "target": "21_Patterns--Design_Patterns.md",
   "anchor": "when-a-pattern-dissolves",
@@ -2280,7 +2280,7 @@
   "asked": "2026-10-08"
  },
  "fcb087023d868899": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 799,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "protocols",
@@ -2290,7 +2290,7 @@
   "asked": "2026-10-08"
  },
  "fc599da86ea15776": {
-  "file": "23_Patterns--Iterators.md",
+  "file": "22_Patterns--Iterators.md",
   "line": 879,
   "target": "05_Foundations--Functions.md",
   "anchor": "sentinel-values",
@@ -2300,7 +2300,7 @@
   "asked": "2026-10-08"
  },
  "1362b95aa7b379b1": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 8,
   "target": "21_Patterns--Design_Patterns.md",
   "anchor": "when-a-pattern-dissolves",
@@ -2310,7 +2310,7 @@
   "asked": "2026-10-08"
  },
  "72d8d4f84d6b376d": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 23,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "subinterpreters",
@@ -2320,7 +2320,7 @@
   "asked": "2026-10-08"
  },
  "603ea33246a845ec": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 113,
   "target": "18_Techniques--Performance.md",
   "anchor": "caching",
@@ -2330,7 +2330,7 @@
   "asked": "2026-10-08"
  },
  "176b12766d171b97": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 177,
   "target": "11_Techniques--Testing.md",
   "anchor": "white-box-and-black-box-tests",
@@ -2340,7 +2340,7 @@
   "asked": "2026-10-08"
  },
  "8a32e8f172ebc0e0": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 214,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "encapsulation-leaks",
@@ -2350,7 +2350,7 @@
   "asked": "2026-10-08"
  },
  "23bdf5fd1e6f1b27": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 236,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "the-gil-does-not-prevent-races",
@@ -2360,7 +2360,7 @@
   "asked": "2026-10-08"
  },
  "df7f6de057da6116": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 332,
   "target": "05_Foundations--Functions.md",
   "anchor": "names-inside-a-function",
@@ -2370,17 +2370,17 @@
   "asked": "2026-10-08"
  },
  "fc499abb26535989": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 505,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "forwarding-with-getattr",
-  "sentence": "Delegation gives up static knowledge to forward every name, the cost [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr) pays throughout.",
+  "sentence": "Delegation gives up static knowledge to forward every name, the cost [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr) pays throughout.",
   "verdict": "supports",
   "confidence": 0.49,
   "asked": "2026-10-08"
  },
  "d6836e1d70a51307": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 604,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "dataclass-inheritance",
@@ -2390,7 +2390,7 @@
   "asked": "2026-10-08"
  },
  "f84174493e740d45": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 658,
   "target": "14_Techniques--Decorators.md",
   "anchor": "decorating-classes",
@@ -2400,17 +2400,17 @@
   "asked": "2026-10-08"
  },
  "a824a284a9846f8d": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 697,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "special-methods-bypass-getattr",
-  "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the *type* of `obj`](26_Patterns--Surrogate.md#special-methods-bypass-getattr).",
+  "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the *type* of `obj`](25_Patterns--Surrogate.md#special-methods-bypass-getattr).",
   "verdict": "supports",
   "confidence": 0.69,
   "asked": "2026-10-08"
  },
  "e3cfe4e73c684184": {
-  "file": "24_Patterns--Singleton.md",
+  "file": "23_Patterns--Singleton.md",
   "line": 775,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "intercepting-instance-creation",
@@ -2420,7 +2420,7 @@
   "asked": "2026-10-08"
  },
  "f00553f29f063c73": {
-  "file": "25_Patterns--Template_Method.md",
+  "file": "24_Patterns--Template_Method.md",
   "line": 26,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "making-a-class-final",
@@ -2430,7 +2430,7 @@
   "asked": "2026-10-08"
  },
  "0767ed63dc65221c": {
-  "file": "25_Patterns--Template_Method.md",
+  "file": "24_Patterns--Template_Method.md",
   "line": 112,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "making-a-class-final",
@@ -2440,7 +2440,7 @@
   "asked": "2026-10-08"
  },
  "70d69c502b66a5aa": {
-  "file": "25_Patterns--Template_Method.md",
+  "file": "24_Patterns--Template_Method.md",
   "line": 212,
   "target": "07_Foundations--Classes.md",
   "anchor": "method-resolution-order",
@@ -2450,7 +2450,7 @@
   "asked": "2026-10-08"
  },
  "85a25b38a9ed89c3": {
-  "file": "25_Patterns--Template_Method.md",
+  "file": "24_Patterns--Template_Method.md",
   "line": 246,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "abstract-base-classes",
@@ -2460,7 +2460,7 @@
   "asked": "2026-10-08"
  },
  "dfe260add4440404": {
-  "file": "25_Patterns--Template_Method.md",
+  "file": "24_Patterns--Template_Method.md",
   "line": 305,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "liskov-substitution",
@@ -2470,17 +2470,17 @@
   "asked": "2026-10-08"
  },
  "7f8d46cd1dd96774": {
-  "file": "25_Patterns--Template_Method.md",
+  "file": "24_Patterns--Template_Method.md",
   "line": 415,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "strategy-choosing-the-algorithm-at-runtime",
-  "sentence": "The choice between a class and a function is the same trade-off a [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) faces.",
+  "sentence": "The choice between a class and a function is the same trade-off a [*Strategy*](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) faces.",
   "verdict": "supports",
   "confidence": 0.8,
   "asked": "2026-10-08"
  },
  "09fefabbc9617817": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 66,
   "target": "29_Patterns--Changing_the_Interface.md",
   "anchor": "distinguishing-the-wrappers",
@@ -2490,7 +2490,7 @@
   "asked": "2026-10-08"
  },
  "800c27802410d49e": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 125,
   "target": "08_Foundations--Static_Types.md",
   "anchor": "structural-typing-with-protocols",
@@ -2500,7 +2500,7 @@
   "asked": "2026-10-08"
  },
  "2ff58d58b4dcfa65": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 200,
   "target": "11_Techniques--Testing.md",
   "anchor": "white-box-and-black-box-tests",
@@ -2510,7 +2510,7 @@
   "asked": "2026-10-08"
  },
  "ca507a615eda1584": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 500,
   "target": "10_Foundations--Cleanup.md",
   "anchor": "watching-objects-without-holding-them",
@@ -2520,7 +2520,7 @@
   "asked": "2026-10-08"
  },
  "f73371a62150a94b": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 500,
   "target": "10_Foundations--Cleanup.md",
   "anchor": "reliable-alternatives",
@@ -2530,7 +2530,7 @@
   "asked": "2026-10-08"
  },
  "b56d4a386436b04a": {
-  "file": "26_Patterns--Surrogate.md",
+  "file": "25_Patterns--Surrogate.md",
   "line": 775,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "the-gil-does-not-prevent-races",
@@ -2540,7 +2540,7 @@
   "asked": "2026-10-08"
  },
  "2d52aacff7935d58": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 85,
   "target": "13_Techniques--Pattern_Matching.md",
   "anchor": "exhaustive-matching",
@@ -2550,7 +2550,7 @@
   "asked": "2026-10-08"
  },
  "8760f1a96bb73da8": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 105,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "abstract-base-classes",
@@ -2560,27 +2560,27 @@
   "asked": "2026-10-08"
  },
  "3ef1a1814dc4da72": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 179,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "`shape_name()` is a [*generator*](23_Patterns--Iterators.md#generators).",
+  "sentence": "`shape_name()` is a [*generator*](22_Patterns--Iterators.md#generators).",
   "verdict": "supports",
   "confidence": 0.87,
   "asked": "2026-10-08"
  },
  "5e1bf155be91f949": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 205,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "nothing-keeps-the-class-private",
-  "sentence": "[*Singleton*](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case.",
+  "sentence": "[*Singleton*](23_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case.",
   "verdict": "supports",
   "confidence": 0.3,
   "asked": "2026-10-08"
  },
  "ceeded74869b678a": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 222,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "enums-are-types-too",
@@ -2590,7 +2590,7 @@
   "asked": "2026-10-08"
  },
  "a501727abe66af52": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 237,
   "target": "07_Foundations--Classes.md",
   "anchor": "static-and-class-methods",
@@ -2600,7 +2600,7 @@
   "asked": "2026-10-08"
  },
  "8e4de533bff4bdb7": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 251,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "defaults-built-not-shared",
@@ -2610,7 +2610,7 @@
   "asked": "2026-10-08"
  },
  "e684844ce432c792": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 251,
   "target": "03_Foundations--Containers.md",
   "anchor": "defaultdict",
@@ -2620,7 +2620,7 @@
   "asked": "2026-10-08"
  },
  "0b2abcdf956bed57": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 337,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "self-registration-of-subclasses",
@@ -2630,7 +2630,7 @@
   "asked": "2026-10-08"
  },
  "5a19e91eebf493eb": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 365,
   "target": "37_Patterns--Pattern_Refactoring.md",
   "anchor": "the-trash-hierarchy",
@@ -2640,7 +2640,7 @@
   "asked": "2026-10-08"
  },
  "b95b449fdf0df6ad": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 415,
   "target": "06_Foundations--Modules_and_Packages.md",
   "anchor": "lazy-imports",
@@ -2650,7 +2650,7 @@
   "asked": "2026-10-08"
  },
  "b5d15cd955cf0e6b": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 433,
   "target": "07_Foundations--Classes.md",
   "anchor": "method-resolution-order",
@@ -2660,7 +2660,7 @@
   "asked": "2026-10-08"
  },
  "f7563911a9815f77": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 491,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "attributes-on-a-function",
@@ -2670,7 +2670,7 @@
   "asked": "2026-10-08"
  },
  "9f01e72875e12adc": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 514,
   "target": "14_Techniques--Decorators.md",
   "anchor": "decorating-classes",
@@ -2680,17 +2680,17 @@
   "asked": "2026-10-08"
  },
  "5a6af941c3f32fe5": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 516,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "a-callable-object-as-a-command",
-  "sentence": "[`__call__()`](28_Patterns--Function_Objects.md#a-callable-object-as-a-command) makes a `ShapeFactory` instance callable, so you call the factory the way you call `make()` in `registry.py`.",
+  "sentence": "[`__call__()`](27_Patterns--Function_Objects.md#a-callable-object-as-a-command) makes a `ShapeFactory` instance callable, so you call the factory the way you call `make()` in `registry.py`.",
   "verdict": "supports",
   "confidence": 0.93,
   "asked": "2026-10-08"
  },
  "5989acca4c244536": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 546,
   "target": "33_Patterns--Visitor.md",
   "anchor": "the-pythonic-visitor-singledispatch",
@@ -2700,7 +2700,7 @@
   "asked": "2026-10-08"
  },
  "72dbc5576bde3e8b": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 628,
   "target": "21_Patterns--Design_Patterns.md",
   "anchor": "when-a-pattern-dissolves",
@@ -2710,17 +2710,17 @@
   "asked": "2026-10-08"
  },
  "5d3cad35de73728f": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 909,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "proxy",
-  "sentence": "Python defines the class, and the `TypeError` appears when you create an instance, before `GameEnvironment.__init__()` calls anything, the same way `make()` fails on a `Shape` subclass that forgets `draw()`, and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md#proxy).",
+  "sentence": "Python defines the class, and the `TypeError` appears when you create an instance, before `GameEnvironment.__init__()` calls anything, the same way `make()` fails on a `Shape` subclass that forgets `draw()`, and `Partial()` does in [*Surrogate*](25_Patterns--Surrogate.md#proxy).",
   "verdict": "supports",
   "confidence": 0.87,
   "asked": "2026-10-08"
  },
  "36371190f2e7c044": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 993,
   "target": "08_Foundations--Static_Types.md",
   "anchor": "structural-typing-with-protocols",
@@ -2730,7 +2730,7 @@
   "asked": "2026-10-08"
  },
  "b7296a1cf8b003e9": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 1052,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "copy-skips-the-constructor",
@@ -2740,7 +2740,7 @@
   "asked": "2026-10-08"
  },
  "9a8a662adff43a7c": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 1244,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "the-general-form-of-replace",
@@ -2750,7 +2750,7 @@
   "asked": "2026-10-08"
  },
  "ee27321479d1a6f8": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 1278,
   "target": "14_Techniques--Decorators.md",
   "anchor": "the-decorator-pattern",
@@ -2760,7 +2760,7 @@
   "asked": "2026-10-08"
  },
  "34a7233bbbe94707": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 1285,
   "target": "38_Patterns--Simulation.md",
   "anchor": "building-the-maze-in-stages",
@@ -2770,7 +2770,7 @@
   "asked": "2026-10-08"
  },
  "c7c6f6551959dc71": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 1354,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "a-type-is-a-set-of-values",
@@ -2780,17 +2780,17 @@
   "asked": "2026-10-08"
  },
  "05c55204a767448b": {
-  "file": "27_Patterns--Factory.md",
+  "file": "26_Patterns--Factory.md",
   "line": 1388,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "proxy",
-  "sentence": "`@runtime_checkable`, which [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows with `isinstance()`, also lets `issubclass()` test a class against a Protocol whose members are all methods.",
+  "sentence": "`@runtime_checkable`, which [*Surrogate*](25_Patterns--Surrogate.md#proxy) shows with `isinstance()`, also lets `issubclass()` test a class against a Protocol whose members are all methods.",
   "verdict": "supports",
   "confidence": 0.5,
   "asked": "2026-10-08"
  },
  "06c8ef7ccd696c4f": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 11,
   "target": "21_Patterns--Design_Patterns.md",
   "anchor": "design-principles",
@@ -2800,7 +2800,7 @@
   "asked": "2026-10-08"
  },
  "8d924c3c289bd040": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 25,
   "target": "21_Patterns--Design_Patterns.md",
   "anchor": "when-a-pattern-dissolves",
@@ -2810,7 +2810,7 @@
   "asked": "2026-10-08"
  },
  "512318b9df994736": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 160,
   "target": "14_Techniques--Decorators.md",
   "anchor": "a-class-form-decorator-with-state",
@@ -2820,7 +2820,7 @@
   "asked": "2026-10-08"
  },
  "5593bcdc6993cd6f": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 163,
   "target": "18_Techniques--Performance.md",
   "anchor": "record",
@@ -2830,7 +2830,7 @@
   "asked": "2026-10-08"
  },
  "6c418602475523ae": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 200,
   "target": "36_Patterns--Memento.md",
   "anchor": "the-caretaker-a-generic-history",
@@ -2840,7 +2840,7 @@
   "asked": "2026-10-08"
  },
  "8e4d444105503bf3": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 238,
   "target": "40_Functional--Foundations.md",
   "anchor": "partial-application",
@@ -2850,7 +2850,7 @@
   "asked": "2026-10-08"
  },
  "356e1dcdb92d9377": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 363,
   "target": "40_Functional--Foundations.md",
   "anchor": "closures",
@@ -2860,7 +2860,7 @@
   "asked": "2026-10-08"
  },
  "dd7f343af778ba4f": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 440,
   "target": "40_Functional--Foundations.md",
   "anchor": "leaving-a-gap-with-placeholder",
@@ -2870,7 +2870,7 @@
   "asked": "2026-10-08"
  },
  "6d42a8c7f4ef41cc": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 517,
   "target": "05_Foundations--Functions.md",
   "anchor": "sentinel-values",
@@ -2880,7 +2880,7 @@
   "asked": "2026-10-08"
  },
  "56047c66b44790f4": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 866,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "dataclass-transform",
@@ -2890,7 +2890,7 @@
   "asked": "2026-10-08"
  },
  "894e2281cd6c37bd": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 957,
   "target": "30_Patterns--Observer.md",
   "anchor": "the-pythonic-observer",
@@ -2900,7 +2900,7 @@
   "asked": "2026-10-08"
  },
  "083d519b2c5d4724": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 965,
   "target": "33_Patterns--Visitor.md",
   "anchor": "the-pythonic-visitor-singledispatch",
@@ -2910,7 +2910,7 @@
   "asked": "2026-10-08"
  },
  "afcba7fc57732409": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 965,
   "target": "37_Patterns--Pattern_Refactoring.md",
   "anchor": "one-singledispatch-function-per-operation",
@@ -2920,7 +2920,7 @@
   "asked": "2026-10-08"
  },
  "980e4d529ccebba0": {
-  "file": "28_Patterns--Function_Objects.md",
+  "file": "27_Patterns--Function_Objects.md",
   "line": 988,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "attributes-on-a-function",
@@ -2932,9 +2932,9 @@
  "5ec8feee9061e848": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 70,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "what-the-implementation-supplies",
-  "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) compares an ABC with a `Protocol`.",
+  "sentence": "[*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies) compares an ABC with a `Protocol`.",
   "verdict": "supports",
   "confidence": 0.61,
   "asked": "2026-10-08"
@@ -2962,9 +2962,9 @@
  "556028ff8e9782e7": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 76,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "proxy",
-  "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](26_Patterns--Surrogate.md#proxy)\" loosely.",
+  "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](25_Patterns--Surrogate.md#proxy)\" loosely.",
   "verdict": "supports",
   "confidence": 0.59,
   "asked": "2026-10-08"
@@ -2992,9 +2992,9 @@
  "a0ea0e701e6a57c9": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 196,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "what-the-implementation-supplies",
-  "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) makes the same substitution for a proxy's implementation.",
+  "sentence": "[*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies) makes the same substitution for a proxy's implementation.",
   "verdict": "says_nothing",
   "confidence": 0.52,
   "asked": "2026-10-08"
@@ -3022,9 +3022,9 @@
  "9ea360024d7b1890": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 280,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "forwarding-with-getattr",
-  "sentence": "The limits [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr) lists for `__getattr__()` apply to this forwarding too.",
+  "sentence": "The limits [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr) lists for `__getattr__()` apply to this forwarding too.",
   "verdict": "says_nothing",
   "confidence": 0.38,
   "asked": "2026-10-08"
@@ -3032,9 +3032,9 @@
  "a14f8c2e0cbd7d5c": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 282,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "special-methods-bypass-getattr",
-  "sentence": "[Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr), so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders (see exercise 1).",
+  "sentence": "[Special methods bypass it](25_Patterns--Surrogate.md#special-methods-bypass-getattr), so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders (see exercise 1).",
   "verdict": "supports",
   "confidence": 1.0,
   "asked": "2026-10-08"
@@ -3042,9 +3042,9 @@
  "6b0e7c140a414880": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 286,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "the-recursion-trap",
-  "sentence": "[The recursion trap](26_Patterns--Surrogate.md#the-recursion-trap) catches an adapter that stores its adaptee in a hand-written `__init__()`.",
+  "sentence": "[The recursion trap](25_Patterns--Surrogate.md#the-recursion-trap) catches an adapter that stores its adaptee in a hand-written `__init__()`.",
   "verdict": "supports",
   "confidence": 0.48,
   "asked": "2026-10-08"
@@ -3052,9 +3052,9 @@
  "4f3a7063494e53dc": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 343,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "abstract-factories",
-  "sentence": "A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md) [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories).",
+  "sentence": "A *Façade* is often a [*Singleton*](23_Patterns--Singleton.md) [*Abstract Factory*](26_Patterns--Factory.md#abstract-factories).",
   "verdict": "supports",
   "confidence": 0.37,
   "asked": "2026-10-08"
@@ -3062,9 +3062,9 @@
  "9b401736fb1d2bd8": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 412,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "a-module-is-already-a-singleton",
-  "sentence": "As [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton) notes, a module loads once, and every importer shares the same module.",
+  "sentence": "As [*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton) notes, a module loads once, and every importer shares the same module.",
   "verdict": "supports",
   "confidence": 0.88,
   "asked": "2026-10-08"
@@ -3082,9 +3082,9 @@
  "f7281f89bbc3db3e": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 495,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "proxy",
-  "sentence": "| [*Proxy*](26_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call reaches the implementation |",
+  "sentence": "| [*Proxy*](25_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call reaches the implementation |",
   "verdict": "supports",
   "confidence": 0.3,
   "asked": "2026-10-08"
@@ -3102,9 +3102,9 @@
  "0af89d1b4335a661": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 500,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "what-the-implementation-supplies",
-  "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) takes the looser view of the first row:",
+  "sentence": "[*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies) takes the looser view of the first row:",
   "verdict": "supports",
   "confidence": 0.61,
   "asked": "2026-10-08"
@@ -3132,9 +3132,9 @@
  "39ba32a469753ef5": {
   "file": "30_Patterns--Observer.md",
   "line": 280,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "chain-of-responsibility-choosing-the-handler-at-runtime",
-  "sentence": "For example, [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
+  "sentence": "For example, [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
   "verdict": "supports",
   "confidence": 0.92,
   "asked": "2026-10-08"
@@ -3292,9 +3292,9 @@
  "9f1fa8612510b131": {
   "file": "30_Patterns--Observer.md",
   "line": 1714,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "an-event-bus-handlers-keyed-by-type",
-  "sentence": "[Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) removes that repetition.",
+  "sentence": "[Function Objects](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) removes that repetition.",
   "verdict": "supports",
   "confidence": 0.55,
   "asked": "2026-10-08"
@@ -3332,9 +3332,9 @@
  "feda83778700542c": {
   "file": "31_Patterns--State_Machines.md",
   "line": 7,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "state",
-  "sentence": "Recall [*State*](26_Patterns--Surrogate.md#state):",
+  "sentence": "Recall [*State*](25_Patterns--Surrogate.md#state):",
   "verdict": "supports",
   "confidence": 0.52,
   "asked": "2026-10-08"
@@ -3362,9 +3362,9 @@
  "b945a088988ea9a6": {
   "file": "31_Patterns--State_Machines.md",
   "line": 241,
-  "target": "25_Patterns--Template_Method.md",
+  "target": "24_Patterns--Template_Method.md",
   "anchor": "dont-start-the-engine-in-the-constructor",
-  "sentence": "`StateMachine`'s constructor runs the initial state, the construction-starts-the-engine choice that [*Template Method* discourages](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).",
+  "sentence": "`StateMachine`'s constructor runs the initial state, the construction-starts-the-engine choice that [*Template Method* discourages](24_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).",
   "verdict": "supports",
   "confidence": 0.99,
   "asked": "2026-10-08"
@@ -3372,9 +3372,9 @@
  "262fdaf560a6bdd8": {
   "file": "31_Patterns--State_Machines.md",
   "line": 264,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "proxy",
-  "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option.",
+  "sentence": "[*Surrogate*](25_Patterns--Surrogate.md#proxy) shows one more option.",
   "verdict": "says_nothing",
   "confidence": 0.37,
   "asked": "2026-10-08"
@@ -3382,9 +3382,9 @@
  "e4490f8773883c07": {
   "file": "31_Patterns--State_Machines.md",
   "line": 946,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "the-late-binding-trap",
-  "sentence": "Sixteen lambdas closing over `r` and `c` would all read the loop's final values, the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).",
+  "sentence": "Sixteen lambdas closing over `r` and `c` would all read the loop's final values, the [late-binding trap](27_Patterns--Function_Objects.md#the-late-binding-trap).",
   "verdict": "supports",
   "confidence": 0.98,
   "asked": "2026-10-08"
@@ -3392,9 +3392,9 @@
  "2bf63d0ee7cf7f81": {
   "file": "31_Patterns--State_Machines.md",
   "line": 1000,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "state",
-  "sentence": "1.  Using [*State*](26_Patterns--Surrogate.md#state), make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.",
+  "sentence": "1.  Using [*State*](25_Patterns--Surrogate.md#state), make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.",
   "verdict": "supports",
   "confidence": 0.83,
   "asked": "2026-10-08"
@@ -3402,9 +3402,9 @@
  "bad8f4ee6eaad0aa": {
   "file": "31_Patterns--State_Machines.md",
   "line": 1012,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "5.  Write a `mouse_move_generator()`, a [generator](23_Patterns--Iterators.md#generators) that yields valid `MouseAction` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
+  "sentence": "5.  Write a `mouse_move_generator()`, a [generator](22_Patterns--Iterators.md#generators) that yields valid `MouseAction` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
   "verdict": "supports",
   "confidence": 0.66,
   "asked": "2026-10-08"
@@ -3422,9 +3422,9 @@
  "ceb0075f3cfb0d18": {
   "file": "32_Patterns--Multiple_Dispatching.md",
   "line": 87,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "simple-factory-method",
-  "sentence": "`__subclasses__()` lists that base's direct subclasses, as [`shape_name()`](27_Patterns--Factory.md#simple-factory-method) does.",
+  "sentence": "`__subclasses__()` lists that base's direct subclasses, as [`shape_name()`](26_Patterns--Factory.md#simple-factory-method) does.",
   "verdict": "supports",
   "confidence": 0.89,
   "asked": "2026-10-08"
@@ -3482,9 +3482,9 @@
  "29889dff7e0b896b": {
   "file": "33_Patterns--Visitor.md",
   "line": 117,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "simple-factory-method",
-  "sentence": "`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`, the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).",
+  "sentence": "`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`, the same registry-free enumeration as [Factory](26_Patterns--Factory.md#simple-factory-method).",
   "verdict": "supports",
   "confidence": 0.31,
   "asked": "2026-10-08"
@@ -3502,9 +3502,9 @@
  "b5040967622a93cd": {
   "file": "33_Patterns--Visitor.md",
   "line": 186,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "anchor": "a-hand-rolled-messenger",
-  "sentence": "The `Any` in `accept()` is a choice, unlike the one in [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger), where a bag of attributes named at runtime leaves no precise type to write.",
+  "sentence": "The `Any` in `accept()` is a choice, unlike the one in [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger), where a bag of attributes named at runtime leaves no precise type to write.",
   "verdict": "supports",
   "confidence": 0.97,
   "asked": "2026-10-08"
@@ -3622,9 +3622,9 @@
  "503c819023ee70fd": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
   "line": 197,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "delegating-with-yield-from",
-  "sentence": "The [`yield from`](23_Patterns--Iterators.md#delegating-with-yield-from) flattens the recursion into a single stream of paths, and any consumer of that stream stays decoupled from the tree structure.",
+  "sentence": "The [`yield from`](22_Patterns--Iterators.md#delegating-with-yield-from) flattens the recursion into a single stream of paths, and any consumer of that stream stays decoupled from the tree structure.",
   "verdict": "supports",
   "confidence": 0.58,
   "asked": "2026-10-08"
@@ -3752,9 +3752,9 @@
  "cdd6021ceb1cabaf": {
   "file": "35_Patterns--Flyweight.md",
   "line": 303,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "the-classic-implementations",
-  "sentence": "[*Singleton*](24_Patterns--Singleton.md#the-classic-implementations) keeps its pool in `__new__()` the same way.",
+  "sentence": "[*Singleton*](23_Patterns--Singleton.md#the-classic-implementations) keeps its pool in `__new__()` the same way.",
   "verdict": "supports",
   "confidence": 0.93,
   "asked": "2026-10-08"
@@ -3762,9 +3762,9 @@
  "4b0a07059daa0893": {
   "file": "35_Patterns--Flyweight.md",
   "line": 382,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "the-first-call-race",
-  "sentence": "One more property carries over from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory.",
+  "sentence": "One more property carries over from [*Singleton*](23_Patterns--Singleton.md#the-first-call-race)'s cached factory.",
   "verdict": "supports",
   "confidence": 0.83,
   "asked": "2026-10-08"
@@ -3852,9 +3852,9 @@
  "fd274f51d8e60e0f": {
   "file": "36_Patterns--Memento.md",
   "line": 563,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "a-callable-object-as-a-command",
-  "sentence": "Each undoable action carries its own inverse, the [*Command* variation](28_Patterns--Function_Objects.md#a-callable-object-as-a-command).",
+  "sentence": "Each undoable action carries its own inverse, the [*Command* variation](27_Patterns--Function_Objects.md#a-callable-object-as-a-command).",
   "verdict": "supports",
   "confidence": 0.33,
   "asked": "2026-10-08"
@@ -3872,9 +3872,9 @@
  "a2dcc9ccd0031e1a": {
   "file": "37_Patterns--Pattern_Refactoring.md",
   "line": 38,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "the-pythonic-factory-a-dictionary",
-  "sentence": "The base class's `create()` method is the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary).",
+  "sentence": "The base class's `create()` method is the [dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary).",
   "verdict": "supports",
   "confidence": 0.72,
   "asked": "2026-10-08"
@@ -3902,9 +3902,9 @@
  "0ea9960f36ce78dc": {
   "file": "37_Patterns--Pattern_Refactoring.md",
   "line": 97,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "hazards-of-self-registration",
-  "sentence": "[Factory](27_Patterns--Factory.md#hazards-of-self-registration) warns that this form can mislead.",
+  "sentence": "[Factory](26_Patterns--Factory.md#hazards-of-self-registration) warns that this form can mislead.",
   "verdict": "supports",
   "confidence": 0.66,
   "asked": "2026-10-08"
@@ -3962,9 +3962,9 @@
  "277648468492a00c": {
   "file": "37_Patterns--Pattern_Refactoring.md",
   "line": 375,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "an-event-bus-handlers-keyed-by-type",
-  "sentence": "That dispatch first appeared in an [event bus keyed by type](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).",
+  "sentence": "That dispatch first appeared in an [event bus keyed by type](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).",
   "verdict": "supports",
   "confidence": 0.98,
   "asked": "2026-10-08"
@@ -4072,9 +4072,9 @@
  "5002dbf470d4a257": {
   "file": "38_Patterns--Simulation.md",
   "line": 181,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
-  "sentence": "`next_number()` hands out rat numbers from `itertools.count()`, the [endless counter](23_Patterns--Iterators.md#reusable-algorithms).",
+  "sentence": "`next_number()` hands out rat numbers from `itertools.count()`, the [endless counter](22_Patterns--Iterators.md#reusable-algorithms).",
   "verdict": "supports",
   "confidence": 0.99,
   "asked": "2026-10-08"
@@ -4102,9 +4102,9 @@
  "989f79aadab0f60f": {
   "file": "38_Patterns--Simulation.md",
   "line": 704,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "the-pythonic-factory-a-dictionary",
-  "sentence": "That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary), using the class hierarchy as the registry.",
+  "sentence": "That search is the [registry idea](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary), using the class hierarchy as the registry.",
   "verdict": "supports",
   "confidence": 0.55,
   "asked": "2026-10-08"
@@ -4112,9 +4112,9 @@
  "b6a876dad0d1967b": {
   "file": "38_Patterns--Simulation.md",
   "line": 713,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "simple-factory-method",
-  "sentence": "The same chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies, and that chapter's exercise 9 writes the recursion.",
+  "sentence": "The same chapter's [Simple *Factory Method*](26_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies, and that chapter's exercise 9 writes the recursion.",
   "verdict": "supports",
   "confidence": 0.49,
   "asked": "2026-10-08"
@@ -4132,9 +4132,9 @@
  "80da54f775c3bbbb": {
   "file": "38_Patterns--Simulation.md",
   "line": 790,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "builder",
-  "sentence": "[Factory](27_Patterns--Factory.md#builder) counts `GameBuilder` among the cases where *Builder* survives in Python, because construction here is a process rather than a single call.",
+  "sentence": "[Factory](26_Patterns--Factory.md#builder) counts `GameBuilder` among the cases where *Builder* survives in Python, because construction here is a process rather than a single call.",
   "verdict": "says_nothing",
   "confidence": 0.27,
   "asked": "2026-10-08"
@@ -4144,7 +4144,7 @@
   "line": 1166,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "what-is-polymorphism",
-  "sentence": "[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism) replaces a type switch, a [factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) builds objects from data, and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) removes the check for a missing door.",
+  "sentence": "[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism) replaces a type switch, a [factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) builds objects from data, and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) removes the check for a missing door.",
   "verdict": "supports",
   "confidence": 0.56,
   "asked": "2026-10-08"
@@ -4154,7 +4154,7 @@
   "line": 1166,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "null-object",
-  "sentence": "[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism) replaces a type switch, a [factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) builds objects from data, and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) removes the check for a missing door.",
+  "sentence": "[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism) replaces a type switch, a [factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) builds objects from data, and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) removes the check for a missing door.",
   "verdict": "supports",
   "confidence": 0.91,
   "asked": "2026-10-08"
@@ -4162,9 +4162,9 @@
  "9d8c8fff37448457": {
   "file": "38_Patterns--Simulation.md",
   "line": 1166,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "the-pythonic-factory-a-dictionary",
-  "sentence": "[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism) replaces a type switch, a [factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) builds objects from data, and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) removes the check for a missing door.",
+  "sentence": "[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism) replaces a type switch, a [factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) builds objects from data, and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) removes the check for a missing door.",
   "verdict": "supports",
   "confidence": 0.98,
   "asked": "2026-10-08"
@@ -4172,9 +4172,9 @@
  "fef0cce010d46eba": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 18,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "state",
-  "sentence": "[*State*](26_Patterns--Surrogate.md#state) and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.",
+  "sentence": "[*State*](25_Patterns--Surrogate.md#state) and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.",
   "verdict": "supports",
   "confidence": 0.58,
   "asked": "2026-10-08"
@@ -4202,9 +4202,9 @@
  "2305ac35d74cc483": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 81,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "abstract-factories",
-  "sentence": "| [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |",
+  "sentence": "| [*Abstract Factory*](26_Patterns--Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |",
   "verdict": "supports",
   "confidence": 0.74,
   "asked": "2026-10-08"
@@ -4212,9 +4212,9 @@
  "ba7ab85ea1cee254": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 82,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "builder",
-  "sentence": "| [*Builder*](27_Patterns--Factory.md#builder) | Build a complex object in steps, keeping the assembly separate from the finished object. |",
+  "sentence": "| [*Builder*](26_Patterns--Factory.md#builder) | Build a complex object in steps, keeping the assembly separate from the finished object. |",
   "verdict": "supports",
   "confidence": 0.79,
   "asked": "2026-10-08"
@@ -4222,9 +4222,9 @@
  "ca864bfea007e205": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 83,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "subclasses-choose-the-type",
-  "sentence": "| [*Factory Method*](27_Patterns--Factory.md#subclasses-choose-the-type) | Defer instantiation to a method so subclasses choose the concrete type. |",
+  "sentence": "| [*Factory Method*](26_Patterns--Factory.md#subclasses-choose-the-type) | Defer instantiation to a method so subclasses choose the concrete type. |",
   "verdict": "supports",
   "confidence": 0.98,
   "asked": "2026-10-08"
@@ -4232,9 +4232,9 @@
  "af51381762028eb4": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 84,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "prototype",
-  "sentence": "| [*Prototype*](27_Patterns--Factory.md#prototype) | Create new objects by cloning an existing instance. |",
+  "sentence": "| [*Prototype*](26_Patterns--Factory.md#prototype) | Create new objects by cloning an existing instance. |",
   "verdict": "supports",
   "confidence": 0.71,
   "asked": "2026-10-08"
@@ -4272,9 +4272,9 @@
  "1505003acfac7eff": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 97,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "proxy",
-  "sentence": "| [*Proxy*](26_Patterns--Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |",
+  "sentence": "| [*Proxy*](25_Patterns--Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |",
   "verdict": "supports",
   "confidence": 0.66,
   "asked": "2026-10-08"
@@ -4282,9 +4282,9 @@
  "248eef0a7285ca69": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 103,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "chain-of-responsibility-choosing-the-handler-at-runtime",
-  "sentence": "| [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | Pass a request along a chain until a handler processes it. |",
+  "sentence": "| [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | Pass a request along a chain until a handler processes it. |",
   "verdict": "supports",
   "confidence": 0.93,
   "asked": "2026-10-08"
@@ -4292,9 +4292,9 @@
  "0ddc9a3732eb21b2": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 104,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "command-choosing-the-operation-at-runtime",
-  "sentence": "| [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |",
+  "sentence": "| [*Command*](27_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | Encapsulate a request as an object, enabling queues, logging, and undo. |",
   "verdict": "supports",
   "confidence": 0.89,
   "asked": "2026-10-08"
@@ -4312,9 +4312,9 @@
  "dfdb896f7796351a": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 110,
-  "target": "26_Patterns--Surrogate.md",
+  "target": "25_Patterns--Surrogate.md",
   "anchor": "state",
-  "sentence": "| [*State*](26_Patterns--Surrogate.md#state) | Change an object's behavior when its internal state changes. |",
+  "sentence": "| [*State*](25_Patterns--Surrogate.md#state) | Change an object's behavior when its internal state changes. |",
   "verdict": "supports",
   "confidence": 0.72,
   "asked": "2026-10-08"
@@ -4322,9 +4322,9 @@
  "3cbcd194a7f1e56f": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 111,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "strategy-choosing-the-algorithm-at-runtime",
-  "sentence": "| [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |",
+  "sentence": "| [*Strategy*](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |",
   "verdict": "supports",
   "confidence": 0.99,
   "asked": "2026-10-08"
@@ -4332,9 +4332,9 @@
  "b91be5e207f0ff88": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 121,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "double-checked-locking-and-eager-creation",
-  "sentence": "| [*Double-Checked Locking*](24_Patterns--Singleton.md#double-checked-locking-and-eager-creation) | Skip the lock once a lazily initialized shared resource exists. |",
+  "sentence": "| [*Double-Checked Locking*](23_Patterns--Singleton.md#double-checked-locking-and-eager-creation) | Skip the lock once a lazily initialized shared resource exists. |",
   "verdict": "supports",
   "confidence": 0.98,
   "asked": "2026-10-08"
@@ -4402,9 +4402,9 @@
  "0cbd45f85db90ec4": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 152,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
-  "sentence": "| [*Pipes and Filters*](23_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |",
+  "sentence": "| [*Pipes and Filters*](22_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |",
   "verdict": "supports",
   "confidence": 0.94,
   "asked": "2026-10-08"
@@ -4412,9 +4412,9 @@
  "37657f5b340d6eef": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 170,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "the-pythonic-factory-a-dictionary",
-  "sentence": "| [*Registry*](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | Keep one well-known object where the rest of the program looks up services or data. |",
+  "sentence": "| [*Registry*](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | Keep one well-known object where the rest of the program looks up services or data. |",
   "verdict": "supports",
   "confidence": 0.35,
   "asked": "2026-10-08"
@@ -4442,9 +4442,9 @@
  "411770315fd58932": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 192,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "an-event-bus-handlers-keyed-by-type",
-  "sentence": "| [*Publish-Subscribe Channel*](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) | Broadcast a message to every subscriber to its topic. |",
+  "sentence": "| [*Publish-Subscribe Channel*](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) | Broadcast a message to every subscriber to its topic. |",
   "verdict": "supports",
   "confidence": 0.84,
   "asked": "2026-10-08"
@@ -4522,9 +4522,9 @@
  "e29c4afb41ee20c3": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 236,
-  "target": "25_Patterns--Template_Method.md",
+  "target": "24_Patterns--Template_Method.md",
   "anchor": "the-anchored-algorithm",
-  "sentence": "| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* and *Service Locator* each implement *Inversion of Control*. |",
+  "sentence": "| [*Inversion of Control*](24_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* and *Service Locator* each implement *Inversion of Control*. |",
   "verdict": "supports",
   "confidence": 0.86,
   "asked": "2026-10-08"
@@ -4542,9 +4542,9 @@
  "d3793fb4389eaa12": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 243,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "borg-singleton-by-inheritance",
-  "sentence": "| [*Borg* (Monostate)](24_Patterns--Singleton.md#borg-singleton-by-inheritance) | Let every instance share one set of state instead of sharing one instance. |",
+  "sentence": "| [*Borg* (Monostate)](23_Patterns--Singleton.md#borg-singleton-by-inheritance) | Let every instance share one set of state instead of sharing one instance. |",
   "verdict": "supports",
   "confidence": 0.92,
   "asked": "2026-10-08"
@@ -4552,9 +4552,9 @@
  "0c1ead7f4de2c2ff": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 245,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "builder",
-  "sentence": "| [*Fluent Interface*](27_Patterns--Factory.md#builder) | Return the receiver from each method so calls chain into one expression. |",
+  "sentence": "| [*Fluent Interface*](26_Patterns--Factory.md#builder) | Return the receiver from each method so calls chain into one expression. |",
   "verdict": "supports",
   "confidence": 0.96,
   "asked": "2026-10-08"
@@ -4572,9 +4572,9 @@
  "79881eff6c829656": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 248,
-  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "target": "28_Patterns--Data_Transfer_Objects.md",
   "anchor": "a-hand-rolled-messenger",
-  "sentence": "| [*Messenger*](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) | Bundle values into one object with named attributes; the in-process form of *Data Transfer Object*. |",
+  "sentence": "| [*Messenger*](28_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) | Bundle values into one object with named attributes; the in-process form of *Data Transfer Object*. |",
   "verdict": "supports",
   "confidence": 0.71,
   "asked": "2026-10-08"
@@ -4612,9 +4612,9 @@
  "359cbfecb81daf24": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 265,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "the-pattern-that-disappeared",
-  "sentence": "| [*Iterator*](23_Patterns--Iterators.md#the-pattern-that-disappeared) | The iteration protocol, called for you by `for` |",
+  "sentence": "| [*Iterator*](22_Patterns--Iterators.md#the-pattern-that-disappeared) | The iteration protocol, called for you by `for` |",
   "verdict": "supports",
   "confidence": 0.56,
   "asked": "2026-10-08"
@@ -4622,9 +4622,9 @@
  "9d3e3643a8da42f3": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 266,
-  "target": "24_Patterns--Singleton.md",
+  "target": "23_Patterns--Singleton.md",
   "anchor": "a-module-is-already-a-singleton",
-  "sentence": "| [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton) | A module, imported once and cached |",
+  "sentence": "| [*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton) | A module, imported once and cached |",
   "verdict": "supports",
   "confidence": 0.95,
   "asked": "2026-10-08"
@@ -4632,9 +4632,9 @@
  "12135b80fd2ec810": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 267,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "the-pythonic-factory-a-dictionary",
-  "sentence": "| [*Factory Method*](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | A dictionary of classes, since a class is an object |",
+  "sentence": "| [*Factory Method*](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | A dictionary of classes, since a class is an object |",
   "verdict": "supports",
   "confidence": 0.94,
   "asked": "2026-10-08"
@@ -4642,9 +4642,9 @@
  "1cc1eeed640dca7e": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 268,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "prototype",
-  "sentence": "| [*Prototype*](27_Patterns--Factory.md#prototype) | `copy.deepcopy()` and `copy.replace()` |",
+  "sentence": "| [*Prototype*](26_Patterns--Factory.md#prototype) | `copy.deepcopy()` and `copy.replace()` |",
   "verdict": "supports",
   "confidence": 0.9,
   "asked": "2026-10-08"
@@ -4652,9 +4652,9 @@
  "d861f721f17a1783": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 269,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "strategy-choosing-the-algorithm-at-runtime",
-  "sentence": "| [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | A function passed as an argument |",
+  "sentence": "| [*Strategy*](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | A function passed as an argument |",
   "verdict": "supports",
   "confidence": 0.92,
   "asked": "2026-10-08"
@@ -4662,9 +4662,9 @@
  "f50a539d334390af": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 270,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "command-choosing-the-operation-at-runtime",
-  "sentence": "| [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function stored in a list |",
+  "sentence": "| [*Command*](27_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function stored in a list |",
   "verdict": "supports",
   "confidence": 0.89,
   "asked": "2026-10-08"
@@ -4672,9 +4672,9 @@
  "a71f601a6aad0a2a": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 271,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "chain-of-responsibility-choosing-the-handler-at-runtime",
-  "sentence": "| [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | A list of functions, tried in order |",
+  "sentence": "| [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | A list of functions, tried in order |",
   "verdict": "supports",
   "confidence": 0.94,
   "asked": "2026-10-08"
@@ -4772,9 +4772,9 @@
  "903ad96c0bda3cdc": {
   "file": "40_Functional--Foundations.md",
   "line": 336,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "the-pythonic-factory-a-dictionary",
-  "sentence": "The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) and the plugin registries that let a program grow without editing its core.",
+  "sentence": "The same structure underlies [the dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary) and the plugin registries that let a program grow without editing its core.",
   "verdict": "supports",
   "confidence": 0.72,
   "asked": "2026-10-08"
@@ -4792,9 +4792,9 @@
  "6655abca67dd8d80": {
   "file": "40_Functional--Foundations.md",
   "line": 392,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "`map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#generators).",
+  "sentence": "`map()` and `filter()` return [one-shot iterators](22_Patterns--Iterators.md#generators).",
   "verdict": "says_nothing",
   "confidence": 0.4,
   "asked": "2026-10-08"
@@ -4822,9 +4822,9 @@
  "4267f6c5875c9508": {
   "file": "40_Functional--Foundations.md",
   "line": 573,
-  "target": "28_Patterns--Function_Objects.md",
+  "target": "27_Patterns--Function_Objects.md",
   "anchor": "the-late-binding-trap",
-  "sentence": "It also binds their values when you build it, whereas a lambda created in a loop reads each captured name at call time, the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).",
+  "sentence": "It also binds their values when you build it, whereas a lambda created in a loop reads each captured name at call time, the [late-binding trap](27_Patterns--Function_Objects.md#the-late-binding-trap).",
   "verdict": "supports",
   "confidence": 0.87,
   "asked": "2026-10-08"
@@ -4922,9 +4922,9 @@
  "e66c060420471535": {
   "file": "41_Functional--Toolkits.md",
   "line": 402,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
-  "sentence": "[Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms) introduces several of these as stages in lazy pipelines.",
+  "sentence": "[Reusable Algorithms](22_Patterns--Iterators.md#reusable-algorithms) introduces several of these as stages in lazy pipelines.",
   "verdict": "supports",
   "confidence": 0.67,
   "asked": "2026-10-08"
@@ -4942,9 +4942,9 @@
  "bb9cdd15d8b3620f": {
   "file": "41_Functional--Toolkits.md",
   "line": 574,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
-  "sentence": "[Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms) works through that case.",
+  "sentence": "[Reusable Algorithms](22_Patterns--Iterators.md#reusable-algorithms) works through that case.",
   "verdict": "supports",
   "confidence": 0.88,
   "asked": "2026-10-08"
@@ -4962,9 +4962,9 @@
  "b2606c6532bc4d66": {
   "file": "41_Functional--Toolkits.md",
   "line": 711,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "what-tee-buffers",
-  "sentence": "[Iterators](23_Patterns--Iterators.md#what-tee-buffers) measures that buffering and adds a third caution.",
+  "sentence": "[Iterators](22_Patterns--Iterators.md#what-tee-buffers) measures that buffering and adds a third caution.",
   "verdict": "supports",
   "confidence": 0.74,
   "asked": "2026-10-08"
@@ -5302,9 +5302,9 @@
  "88bb6e7de9b62041": {
   "file": "45_Effects--Generators.md",
   "line": 7,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "generators",
-  "sentence": "[Iterators](23_Patterns--Iterators.md#generators) presents generators as a way to produce values lazily:",
+  "sentence": "[Iterators](22_Patterns--Iterators.md#generators) presents generators as a way to produce values lazily:",
   "verdict": "supports",
   "confidence": 0.8,
   "asked": "2026-10-08"
@@ -5312,9 +5312,9 @@
  "7137ae901b7829c4": {
   "file": "45_Effects--Generators.md",
   "line": 144,
-  "target": "23_Patterns--Iterators.md",
+  "target": "22_Patterns--Iterators.md",
   "anchor": "asking-consumes-an-item",
-  "sentence": "A `StopIteration` that escapes the body, such as one from calling `next()` on an exhausted iterator, becomes a `RuntimeError` ([PEP 479](https://peps.python.org/pep-0479/)), as [Asking Consumes an Item](23_Patterns--Iterators.md#asking-consumes-an-item) shows.",
+  "sentence": "A `StopIteration` that escapes the body, such as one from calling `next()` on an exhausted iterator, becomes a `RuntimeError` ([PEP 479](https://peps.python.org/pep-0479/)), as [Asking Consumes an Item](22_Patterns--Iterators.md#asking-consumes-an-item) shows.",
   "verdict": "supports",
   "confidence": 0.89,
   "asked": "2026-10-08"
@@ -5812,9 +5812,9 @@
  "b2dc40f7d24c840d": {
   "file": "47_Effects--Stateless_in_Practice.md",
   "line": 1353,
-  "target": "27_Patterns--Factory.md",
+  "target": "26_Patterns--Factory.md",
   "anchor": "abstract-factories",
-  "sentence": "[Abstract Factories](27_Patterns--Factory.md#abstract-factories) builds a gaming environment where a `GameElementFactory` returns a matched `Character` and `Obstacle`, and a `GameEnvironment` plays whatever that factory produces.",
+  "sentence": "[Abstract Factories](26_Patterns--Factory.md#abstract-factories) builds a gaming environment where a `GameElementFactory` returns a matched `Character` and `Obstacle`, and a `GameEnvironment` plays whatever that factory produces.",
   "verdict": "supports",
   "confidence": 0.91,
   "asked": "2026-10-08"

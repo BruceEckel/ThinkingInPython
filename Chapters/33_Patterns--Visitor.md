@@ -172,7 +172,7 @@ to show what the `Any` gives up: every check on the visitor side.
 In [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods),
 the `Any` in `paper_scissors_rock.py` lets a class that omits an `eval_*()` method pass the checker the same way.
 The `Any` in `accept()` is a choice,
-unlike the one in [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger),
+unlike the one in [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger),
 where a bag of attributes named at runtime leaves no precise type to write.
 
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
