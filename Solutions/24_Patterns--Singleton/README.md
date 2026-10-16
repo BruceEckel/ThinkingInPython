@@ -337,8 +337,7 @@ The listing puts `import config` at the top, where ruff expects
 every import. Either order gives the same output. Whichever import comes
 first runs the body, and the other finds `config` in `sys.modules`.
 
-The prints at `[1]` and `[2]` disagree, and the exercise turns on
-why.
+The prints at `[1]` and `[2]` disagree.
 
 **Give one dict two names.** `from config import settings` copies a binding.
 This module's `settings` and `config.settings` start out as two names for one dict.
