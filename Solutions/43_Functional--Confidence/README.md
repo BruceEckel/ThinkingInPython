@@ -594,8 +594,9 @@ every test after it.
 No argument list records the dependency.
 
 **Make the hidden input a parameter.** The repair is the same for
-`stale()` and `timeout()`, and it is the one this part of the book
-keeps making.
+`stale()` and `timeout()`, and it is the one
+[Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
+names: pass the implementation in as a parameter.
 `stale_pure()` takes the current time, and `timeout_pure()` takes the
 mapping to read. Both are now referentially transparent, and both are
 testable without a clock or a monkeypatched environment.
