@@ -149,7 +149,7 @@ Assigning different strokes to the memento raises a `FrozenInstanceError`.
 ### Why `Memento` Is a Class
 
 You could replace the class with `type Memento = tuple[str, ...]`.
-Every call site still type-checks.
+Every call to `save()` and `restore()` still type-checks.
 But an alias is a second name for an existing type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
