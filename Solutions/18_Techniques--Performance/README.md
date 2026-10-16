@@ -287,7 +287,7 @@ and the cache silently skips that side effect on every repeat.
 <details>
 <summary>Where to look</summary>
 
-[Heap](../../Chapters/18_Techniques--Performance.md#heap) explains the invariant that `heappop()` maintains and `list.pop(0)` breaks.
+[Heap](../../Chapters/18_Techniques--Performance.md#heap) shows `list.pop(0)` breaking the heap ordering that `heappop()` maintains.
 Call `heapify()`, then pop three times with `heappop()`, printing the heap and a check of `heap[0]` against `min()` each time.
 For the last question, compare the invariant with what "sorted" requires.
 
@@ -831,6 +831,8 @@ For the last question, consider where the measured work runs, how long the progr
 <details>
 <summary>Solution</summary>
 
+On the book's build, `jit_status.py` reports the first state, `no JIT in this build`.
+
 ```python
 # ch18_jit_probe.py
 import sys
@@ -875,8 +877,7 @@ and the JIT spends time tracing and compiling whatever code crosses that thresho
 `membership.py` starts, times two kinds of lookup,
 and exits before the compiled code has saved as much time as the compiling took.
 
-The listing prints a ratio, not a duration.
-`set at least 100x faster` compares the two lookups against each other,
+The `ratio` line compares the two lookups against each other,
 so anything that speeds up or slows down both of them equally leaves that ratio as it was.
 On a python.org 3.15 build, the `--numbers` lines from the two runs
 differ by about as much as two runs under the same setting.
@@ -886,8 +887,8 @@ long enough to cross the compiler's threshold and keep going:
 `count_primes()` from the
 [Numba section](../../Chapters/18_Techniques--Performance.md#jit-compilation-with-numba),
 at its full `limit`, timed with `min(timeit.repeat(...))`.
-Expect a single-digit percentage either way, and run-to-run noise of the same size.
-That noise is why `pyperformance` reports a geometric mean over dozens of benchmarks
+On a python.org 3.15 build, one machine measured `count_primes()` about 20% faster with the JIT on, against run-to-run noise of a few percent.
+Run-to-run noise is why `pyperformance` reports a geometric mean over dozens of benchmarks
 instead of one number from one program.
 
 </details>
