@@ -366,7 +366,7 @@ with expected(TypeError):
 #: 'OrderedColor' and 'OrderedDimensions'
 ```
 
-Tuple ordering also crosses record types,
+Tuple ordering also crosses `NamedTuple` classes,
 as `Color(1, 2, 3) < Dimensions(1, 2, 4)` shows.
 Sorting a list of `Color`s orders them by `r`, then `g`, then `b`.
 The sequence of the field declarations sets that order implicitly.
