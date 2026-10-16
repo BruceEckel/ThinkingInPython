@@ -971,7 +971,8 @@ def test_handler_needs_a_call_on_an_event() -> None:
 ```
 
 The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer)
-with one shared subject.
+with one shared subject
+(*Observer* calls the subject a broadcaster and each handler a responder).
 Instead of every subject holding its own list, one bus holds every list.
 The event type selects the handlers.
 
