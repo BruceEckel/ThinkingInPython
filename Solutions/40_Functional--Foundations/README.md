@@ -121,8 +121,8 @@ with expected(KeyError):
 ```
 
 The loop calls `operations["*"](6, 4)` the way it calls the other four
-entries, and the calling code stays as it was. Supporting the new
-operator takes one function and one row in the table.
+entries. The calling code stays as it was. Supporting the new operator
+takes one function and one row in the table.
 
 `expected()` from the shared `exceptions` helper catches the missing-key
 `KeyError`, as it does in the chapter's `dispatch.py`.
@@ -225,8 +225,8 @@ the program prints `64`.
 from right to left.
 Passing the stages square-first,
 `compose(increment_then_double, square)`, prints `20`.
-The type checker accepts that call too, since every stage takes and returns an
-`int`.
+The type checker accepts that call too, since every stage takes and
+returns an `int`.
 
 ```python
 # exercise_4.py
@@ -293,13 +293,14 @@ def clamp(low: int, value: int, high: int, /) -> int:
 <details>
 <summary>Solution</summary>
 
-If you build `at_least_ten` as `partial(clamp, 10, Placeholder, Placeholder)`,
-the `partial()` call raises a `TypeError` before you call the result:
-"trailing Placeholders are not allowed."
-A placeholder at the end marks a position the call's arguments would fill on their own,
-because `partial()` appends them after the bound ones.
-The library rejects that placeholder as redundant, as the chapter says.
-The solution passes `10` alone.
+If you build `at_least_ten` as
+`partial(clamp, 10, Placeholder, Placeholder)`, the `partial()` call
+raises a `TypeError` before you call the result: "trailing
+Placeholders are not allowed." A placeholder at the end marks a
+position the call's arguments would fill on their own, because
+`partial()` appends them after the bound ones. The library rejects
+that placeholder as redundant, as the chapter says. The solution
+passes `10` alone.
 
 ```python
 # exercise_5.py
@@ -317,15 +318,16 @@ expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
 #: passed as keyword arguments: 'high'
 ```
 
-**Preset the leading argument.** `at_least_ten` needs no `Placeholder`. `low` is the first parameter,
-and `partial()` fills positional arguments from the left, so
-`value` and `high` stay open in order.
+**Preset the leading argument.** `at_least_ten` needs no
+`Placeholder`. `low` is the first parameter, and `partial()` fills
+positional arguments from the left, so `value` and `high` stay open in
+order.
 
 **Show where the keyword fails.** Presetting `high` alone needs a
-`Placeholder`. `partial()` stores its arguments, and the
-signature check waits for the call, so building `partial(clamp, high=100)`
-succeeds. The partial fails at the call.
-`high` is positional-only, so the call must pass it by position.
+`Placeholder`. `partial()` stores its arguments, and the signature
+check waits for the call, so building `partial(clamp, high=100)`
+succeeds. The partial fails at the call. `high` is positional-only,
+so the call must pass it by position.
 
 Passing `high` positionally means passing `low` and `value` first,
 which is the opposite of leaving them to the caller.
@@ -333,12 +335,12 @@ which is the opposite of leaving them to the caller.
 `partial(clamp, Placeholder, Placeholder, 100)` presets `high`
 and leaves `low` and `value` to the caller.
 
-**Suppress the type checker's report.** The `# type: ignore` silences `ty`, which finds the mistake earlier
-than the runtime does. `ty` reports `positional-only-parameter-as-kwarg`
-on `partial(clamp, high=100)`, where the partial is built, and
-`missing-argument` on the `expect()` call that passes it `0, 5` with no
-`high`. Both reports fall on one line, so one comment covers them,
-while the runtime raises its `TypeError` only at the call.
+**Suppress the type checker's report.** The `# type: ignore` silences
+`ty`, which finds the mistake earlier than the runtime does. `ty`
+reports `positional-only-parameter-as-kwarg` on
+`partial(clamp, high=100)`, where the partial is built, and
+`missing-argument` on the `expect()` call that passes it `0, 5` with
+no `high`. Both reports fall on one line, so one comment covers them.
 
 </details>
 </details>
@@ -378,13 +380,14 @@ print(CONFIG, MAX_SIZE)
 **Separate mutation from rebinding.** `Final` constrains the binding
 between a name and an object. `CONFIG` must keep pointing at the same
 list forever. `Final` leaves that list's contents free to change, so
-the type checker accepts `CONFIG.append(3)`. `append()` mutates the object and leaves
-the binding alone. `MAX_SIZE = 200` is the operation `Final` exists to
-reject, because it binds the name to a different object.
+the type checker accepts `CONFIG.append(3)`. `append()` mutates the
+object and leaves the binding alone. `MAX_SIZE = 200` is the operation
+`Final` exists to reject, because it binds the name to a different
+object.
 
-**Suppress the rebinding error.** The reassignment carries a `# type: ignore` so the listing passes the
-book's build. With that comment removed, `ty` reports the
-reassignment and accepts the append:
+**Suppress the rebinding error.** The reassignment carries a
+`# type: ignore` so the listing passes the book's build. With that
+comment removed, `ty` reports the reassignment and accepts the append:
 
 ```
 error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allowed
@@ -396,7 +399,8 @@ error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allo
   | ^^^^^^^^^^^^^^ Symbol later reassigned here
 ```
 
-For the checker to reject the append, the value's own type must be immutable:
+For the checker to reject the append, the value's own type must be
+immutable:
 
 ```python
 # exercise_6_tuple.py
@@ -454,18 +458,17 @@ print(sorted(words, key=lambda w: w[-1]))
 #: ['banana', 'pie', 'kiwi', 'watermelon']
 ```
 
-**Write the expressions inline.** Both comprehensions compute what `map()` and `filter()` compute,
-with the expression written inline where the original passed a lambda.
-The chapter's rule of thumb picks the comprehension for an
-expression you write inline.
+**Write the expressions inline.** Both comprehensions compute what
+`map()` and `filter()` compute, with the expression written inline
+where the original passed a lambda. The chapter's rule of thumb picks
+the comprehension for an expression you write inline.
 
 **Change the sort key.** The last letters `a`, `e`, `i`, and `n`
 appear in alphabetical order in the list, so sorting by last letter
-returns the words in their original order.
-Run the sort to confirm that order.
-The chapter's `key=len`, by contrast, puts `pie` first.
+returns the words in their original order. The chapter's `key=len`,
+by contrast, puts `pie` first.
 
-Dropping the `list()` is the part that surprises:
+Without the `list()`, `raw` is a `map` object:
 
 ```python
 # exercise_7_map.py
@@ -479,11 +482,11 @@ print(list(raw))  # [2]
 #: []
 ```
 
-**Inspect the lazy object.** Printing `raw` bare
-shows `<map object at 0x...>` in place of the values.
-`map()` returns a lazy iterator that computes each value on demand,
-so its `repr()` shows the type and an address.
-The listing prints the type's name, since the address changes from run to run.
+**Inspect the lazy object.** Printing `raw` bare shows
+`<map object at 0x...>` in place of the values. `map()` returns a lazy
+iterator that computes each value on demand, so its `repr()` shows the
+type and an address. The listing prints the type's name, since the
+address changes from run to run.
 
 **Exhaust the iterator.** The second `list(raw)`, at `[2]`, is the
 more dangerous half. It returns `[]` and raises no error. The first
@@ -541,14 +544,14 @@ print(tally(), tally(), tally())
 #: 10 20 30
 ```
 
-**Declare the name you assign.** `increment()` captures two names, `step` and `count`,
-and `count` alone needs the `nonlocal` declaration. `increment()` reads `step` the
-way `multiply()` reads `factor` in `multiplier()`,
-so Python finds `step` in the enclosing scope.
-`increment()` assigns `count`, and assignment is how
-Python decides a name is local. Without `nonlocal`, that assignment
-makes `count` a local of `increment()`, and `count += step` reads
-the local before it holds a value.
+**Declare the name you assign.** `increment()` captures two names,
+`step` and `count`, but `count` alone needs the `nonlocal`
+declaration. `increment()` reads `step` the way `multiply()` reads
+`factor` in `multiplier()`, so Python finds `step` in the enclosing
+scope. `count` differs because `increment()` assigns it. Assignment
+is how Python decides a name is local. Without `nonlocal`, that
+assignment makes `count` a local of `increment()`, so `count += step`
+reads the local before it holds a value.
 
 Deleting the `nonlocal` line produces two errors, in order. `ty`
 reports `Name 'count' used when not defined` on the `count += step`
@@ -656,8 +659,9 @@ print([r.celsius for r in data])
 #: [18.0, 25.0, 30.5]
 ```
 
-**Add the upper bound.** `colder_than()` mirrors `warmer_than()`, and `partial()` turns each
-into the one-argument callable `filter()` requires.
+**Add the upper bound.** `colder_than()` mirrors `warmer_than()`, and
+`partial()` turns each into the one-argument callable `filter()`
+requires.
 
 **Narrow to the band.** Chaining the two filters keeps `b`, whose 25.0
 Celsius sits inside the band. `a` falls below the band and `c` above
@@ -665,23 +669,24 @@ it. The two filters commute, because each one tests the same original
 Celsius value.
 Applying the `colder_than()` filter first reports the same reading.
 
-**Reorder the stages.** The empty list from `converted_first()` shows that the `map()` does
-not commute with the filters. Once `to_fahrenheit()` has run, every
-reading carries a Fahrenheit number.
-The predicates still read `r.celsius`, so they now compare a Fahrenheit number
-against a Celsius limit.
-The Fahrenheit values 64.4, 77.0, and 86.9 all pass
-`warmer_than(20.0)` and all fail `colder_than(30.0)`.
+**Reorder the stages.** The empty list from `converted_first()` shows
+that the `map()` does not commute with the filters. Once
+`to_fahrenheit()` has run, every reading carries a Fahrenheit number.
+The predicates still read `r.celsius`, so they now compare a
+Fahrenheit number against a Celsius limit. The Fahrenheit values
+64.4, 77.0, and 86.9 all pass `warmer_than(20.0)` and all fail
+`colder_than(30.0)`.
 
 Nothing raises an exception, because `to_fahrenheit()` and each
-predicate are correct on their own.
-The field name `celsius` alone records the unit, and `to_fahrenheit()` keeps that name. A stage that changes what a
-value means must run after every stage that reads the old meaning.
+predicate are correct on their own. The field name `celsius` alone
+records the unit. `to_fahrenheit()` keeps that name. A stage that
+changes what a value means must run after every stage that reads the
+old meaning.
 
 **Show the input untouched.** `report()` and `converted_first()` both
-read `data` and leave it as it was.
-The Celsius values stay the same after three traversals,
-so running either function again gives the same answer.
+read `data` and leave it as it was. The Celsius values stay the same
+after both calls, so running either function again gives the same
+answer.
 
 </details>
 </details>
