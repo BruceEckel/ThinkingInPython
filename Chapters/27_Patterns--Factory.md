@@ -393,8 +393,10 @@ so you can compare the edits that adding `Triangle` requires before and after th
 
 In the first frame, each call site holds its own arrow to every class,
 so a new class needs a new arrow, and an edit, at each call site.
-In the registry frames the arrows run the other way.
-Each class points at the registry, and the callers point at `make()` alone.
+In the second frame the arrows run the other way:
+each class points at the registry.
+From then on a caller points at `make()` alone,
+and `make()` points at the class it finds.
 `Triangle` adds one arrow, from its own `class` statement.
 
 ### Hazards of Self Registration
