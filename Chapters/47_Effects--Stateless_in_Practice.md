@@ -90,6 +90,11 @@ print(messages)
 #: ['Hello, Alice!']
 ```
 
+`handle(capture)` builds a handler from `capture`,
+the way `supply(Console())` builds one from an instance in [Supplying the Dependency](46_Effects--Stateless.md#supplying-the-dependency).
+This chapter calls `capture` and `scripted` the handlers,
+since each function is the part you write.
+
 Inside `ask()`, the operand of `yield from` is not a generator but the Ability object.
 `yield from` calls `iter()` on its operand,
 and `Ability.__iter__` is a generator function,
@@ -157,7 +162,7 @@ Now compare these two listings to `ask_tell.py` in [Effect Management](44_Effect
 The by-hand version puts two objects in every signature.
 The Stateless version threads nothing.
 `greet()` takes no arguments.
-The two Effects appear in the return type, where a type checker verifies them.
+The two Abilities appear in the return type, where a type checker verifies them.
 The return type is the second channel in the signature that Effect Management says an EMS needs.
 
 The whole library is visible in `drive.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
@@ -438,7 +443,7 @@ each reporting one moment however often you ask.
 
 ### A Source Named in the Type
 
-Compare these handlers to `student_groups.py` in [Toolkits](41_Functional--Toolkits.md#groups-of-any-size),
+Compare these handlers to `student_groups.py` in [Functional Toolkits](41_Functional--Toolkits.md#groups-of-any-size),
 which makes randomness repeatable a different way, by taking a `seed` parameter.
 A `seed` parameter works,
 but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
@@ -2345,7 +2350,7 @@ Consider the signatures once more:
 
 Each one describes what a function needs, what it can produce,
 and how it can fail, before you read a single line of the body.
-That is the property this book has returned to since [Foundations](40_Functional--Foundations.md#pure-functions).
+That is the property this book has returned to since [Functional Foundations](40_Functional--Foundations.md#pure-functions).
 Purity is valuable because it is verifiable.
 Verifying it by reading code does not scale.
 
