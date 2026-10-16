@@ -16,13 +16,13 @@ This file holds no live block, so it is the applied-directly record.
 ## Considered and declined
 
 - Line 3-4, epigraph, "does it later or does it a different way each time": "does it" is on the watch list, but the repetition is the epigraph's rhythm. Kept.
-- Line 105, "to say what one list of functions says": settled at Bruce's 2026-10-04 ruling (`readability_db.md`).
-- Line 109, "A `Command` base class is worthwhile when the commands share implementation": weighs an effort against a stated condition ("worth" keep).
-- Line 119 and 991, "plain functions" / "A plain function": contrasts the function with the bound method, closure, and class forms around it ("plain" keep).
+- Line 106, "to say what one list of functions says": settled at Bruce's 2026-10-04 ruling (`readability_db.md`).
+- Line 110, "A `Command` base class is worthwhile when the commands share implementation": weighs an effort against a stated condition ("worth" keep).
+- Line 120 and 992, "plain functions" / "A plain function": contrasts the function with the bound method, closure, and class forms around it ("plain" keep).
 - Line 214, "Python's best-known closure mistake": a standing keep in `readability_db.md`.
-- Line 267, colon in "are *open*: they need somewhere to start, not a bracket": the colon delivers the definition of the italicized term (passes the "that is" test).
-- Line 337, 505, 595, 613, "X, not Y" contrasts: each names a real alternative the reader might assume (a `None` to check, the failure value, a class structure, an interface), and they sit far apart. Not a §9 cluster.
-- Line 471, "need only a place to start": "only a X" is a ruled-fine shape, and the restriction is the contrast with bisection's bracket.
+- Line 268, colon in "are *open*: they need somewhere to start, not a bracket": the colon delivers the definition of the italicized term (passes the "that is" test).
+- Line 338, 506, 596, 614, "X, not Y" contrasts: each names a real alternative the reader might assume (a `None` to check, the failure value, a class structure, an interface), and they sit far apart. Not a §9 cluster.
+- Line 472, "need only a place to start": "only a X" is a ruled-fine shape, and the restriction is the contrast with bisection's bracket.
 - Line 515, "decides for itself": reflexive and load-bearing.
 - Line 521, 708, 926, "The test file confirms that:": a book-wide lead-in for test bullets (chapters 11, 23, 29, 30, 34, 35, 36, and B use it). Not a §61 template tell.
 - Line 711, "A handler receives only its own event type.": the bullet mirrors the test name `test_handler_receives_only_its_event_type`, and "only its own" is a ruled-fine shape.
