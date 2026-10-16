@@ -5,8 +5,8 @@
 > specialize, chain.
 > `functools` and `itertools` supply them, written and tested.
 
-[Foundations](40_Functional--Foundations.md) builds behavior from small, pure,
-composable pieces.
+[Functional Foundations](40_Functional--Foundations.md)
+builds behavior from small, pure, composable pieces.
 `functools` operates on functions.
 `itertools` assembles lazy iterators from composable parts.
 This chapter tours both toolkits,
