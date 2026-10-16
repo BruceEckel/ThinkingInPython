@@ -579,7 +579,7 @@ The third request produces a working one, which then covers both hours.
 The test checks that re-request behavior with a handler that answers from a list
 instead of weather, a clock, or a battery.
 
-What the test cannot tell you is whether `controller()` is right.
+The test cannot tell you whether `controller()` is right.
 The test leaves every question about policy unchecked: whether `controller()`
 prefers solar before the battery, whether the battery reports itself
 unavailable once exhausted, whether `controller()` asks about the hour
@@ -1300,7 +1300,7 @@ run out.
 assertions together say that `spree()` tries every price and writes only the
 affordable ones.
 
-What this test cannot check is whether the `Get` and `Put` handlers agree. The `Cell`
+This test cannot check whether the `Get` and `Put` handlers agree. The `Cell`
 version has one piece of state, so the next `Get` returns whatever the last
 `Put` wrote. Here the test scripts the balances independently of the writes.
 The script says 40 follows the first purchase because the test's author did that
@@ -1558,7 +1558,7 @@ every type, so the returned value contradicts nothing.
 Pyright does infer the union from the body, and under Pyright the function
 changes its type every time `research()`'s error set changes.
 
-What `ty` stops checking is the correspondence between the annotation and the
+`ty` stops checking the correspondence between the annotation and the
 Effect. The annotation is where a human writes down which failures this program
 expects, and `ty`'s job is to confirm that the Effect agrees.
 Once you delete the annotation, the type checker has one description instead of
@@ -2031,12 +2031,12 @@ play(Loud(), Kitty(), Weapon())
 #: Kitty meets the nasty weapon
 ```
 
-**Name the factory's shape.** What the shared signature recovers is the *Abstract Factory*'s interface.
+**Name the factory's shape.** The shared signature recovers the *Abstract Factory*'s interface.
 `run_season()` accepts any function that stages a scene, and its body names no family of actors.
 Independence from the family is the property the pattern exists to provide. Python provides that property, because a function is already an object with a
 type. Saying so takes no abstract factory class.
 
-**Show the mismatch getting through.** What the shared signature does not recover is the guarantee that makes the pattern worth naming.
+**Show the mismatch getting through.** The shared signature does not recover the guarantee that makes the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other.
 The listing's last call, `play(Loud(), Kitty(), Weapon())`,
