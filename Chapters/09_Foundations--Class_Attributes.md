@@ -78,8 +78,8 @@ The listing subscripts `vars(A)` instead of printing it whole,
 because a class's dictionary carries the compiler's own bookkeeping alongside `x`.
 That dictionary is a read-only `mappingproxy`,
 so writing to it raises a `TypeError`.
-Assigning through the class name changes the entry, as `Stars.rating = 9` does,
-and `setattr(A, "x", 5)` does the same when the name arrives as a string.
+To change the entry, assign through the class name,
+or call `setattr(A, "x", 5)` when the name arrives as a string.
 The instance dictionary is a plain `dict` holding what the code assigned,
 and that alone.
 
@@ -173,10 +173,10 @@ print(a.items, b.items)
 
 `a.items.append("apple")` reads `items`, finds nothing on `a`,
 falls back to the class, and mutates the one list stored there.
-Shadowing starts with an assignment,
-and `.append()` leaves `a`'s dictionary empty,
+Shadowing starts with an assignment.
+`.append()` leaves `a`'s dictionary empty,
 so `b.items` reads the same list and holds the apple too.
-The type checker accepts the line too,
+The type checker also accepts the line,
 since `a.items.append("apple")` is a correct call on a `list[str]`.
 
 An augmented assignment both mutates and assigns.
@@ -187,7 +187,7 @@ creating an instance attribute that shadows the class list.
 Because both attributes refer to one list, the two printed values match.
 The plain assignment shows the split:
 `a.items = ["plum"]` rebinds `a`'s own attribute to a new list,
-and `b` still reads the shared one.
+while `b` still reads the shared one.
 
 A per-object list belongs in `__init__()`,
 as [Real Per-Object Defaults](#real-per-object-defaults) shows,
@@ -308,8 +308,8 @@ print(Registry().count)  # Found by fallback
 `count: ClassVar[int]` records that a count belongs to `Registry`.
 No attribute exists until something assigns one,
 so the first read raises an `AttributeError`.
-`Registry.count = 0` creates the attribute on the class,
-and an instance finds it by fallback.
+`Registry.count = 0` creates the attribute on the class.
+An instance then finds it by fallback.
 
 The type checker (`ty`) accepts that first read,
 for the reason it accepts a read of `label`.
@@ -319,7 +319,7 @@ Its optional `reportUninitializedInstanceVariable` rule checks instance variable
 not a `ClassVar`.
 
 An annotation states the type, and `ClassVar` adds where the attribute belongs.
-The assigned value brings the attribute into existence.
+The assignment creates the attribute.
 That holds for `label: str`,
 which `self.label = label` creates on each instance,
 for `total: ClassVar[int] = 0`,
@@ -327,7 +327,8 @@ and for the `count` that `Registry.count = 0` creates in `declared_classvar.py`.
 
 ### A Base Class Declares, a Subclass Supplies
 
-A base class usually declares a `ClassVar` with no value to name what its subclasses must supply:
+A `ClassVar` with no value usually appears in a base class,
+naming what its subclasses must supply:
 
 ```python
 # required_classvar.py
@@ -368,8 +369,8 @@ so a subclass must keep the type it inherits.
 
 One mistake passes the checker.
 Nothing requires `Blob` to supply a `sides`.
-The declaration says the attribute exists,
-and the checker accepts that statement.
+The declaration says the attribute exists.
+The checker accepts that statement.
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
 
@@ -402,8 +403,7 @@ print(a.total, b.total, Tally.total)
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
-Every `Tally` counts itself once.
-The shared counter stays at `0`.
+Every `Tally` counts itself once, while the shared counter stays at `0`.
 The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 
@@ -514,8 +514,8 @@ print(Base.total, Sub.total)
 ```
 
 `type(self)` is `Base` for the one `Base()` call and `Sub` for both `Sub()` calls.
-`Base()` (`[1]`) increments `Base.total` to `1`,
-and `Sub.total` reads through to that `1`.
+`Base()` (`[1]`) increments `Base.total` to `1`.
+`Sub.total` reads through to that `1`.
 The first `Sub()` (`[2]`) reads the same `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
@@ -622,8 +622,9 @@ covers the details.
 
 Every attribute question in this chapter reduces to one:
 which dictionary holds the value?
-Assignment answers it,
-and the answer depends on whether you assign through `self` or through the class name.
+Assignment answers it.
+Assigning through `self` writes the instance's dictionary,
+and assigning through the class name writes the class's dictionary.
 Decide which you want, then write the declaration that says so:
 `ClassVar` for shared,
 a constructor default or a `@dataclass` field for per-object.
