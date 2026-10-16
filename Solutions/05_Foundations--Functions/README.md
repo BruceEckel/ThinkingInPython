@@ -60,8 +60,8 @@ Every call that omits `target` reuses that object.
 
 **Try an immutable default.** `tuple_append()` is `bad_append()` with its default changed to `()`.
 That change removes the shared list and causes a different failure.
-The function appends to `target`, and a tuple has no `append()`.
-The first call that omits `target` therefore raises an `AttributeError`.
+The function appends to `target`.
+A tuple has no `append()`, so the first call that omits `target` raises an `AttributeError`.
 
 An immutable default suits a parameter the function reads, as in
 `immutable_default.py`. A function that mutates the parameter needs
@@ -252,8 +252,8 @@ report("nums", 1, 2, 3, total=True)
 ```
 
 `total` sits between `*values` and `**options` in the parameter list,
-so it is keyword-only. Callers must write `total=True`.
-Every positional argument goes to `values`.
+so it is keyword-only.
+Every positional argument after the first goes to `values`.
 The keyword `total=True` binds to `total` by name,
 and any other keywords go to `**options`. With the flag
 added, `report()` collects its positional and keyword
@@ -415,11 +415,12 @@ expect(TypeError, describe, name="Bob")  # type: ignore
 
 **Reject a keyword for `name`.** The `/` causes the `TypeError`.
 `name` is positional-only, so it takes its value by position.
-The keyword `name="Bob"` is therefore a leftover, and `**facts` collects leftover keywords.
-`facts` receives `name="Bob"`, and the parameter `name` stays empty.
-The message is therefore
+The keyword `name="Bob"` is therefore a leftover.
+`**facts` collects leftover keywords, so `facts` receives `name="Bob"`
+and the parameter `name` stays empty.
+The message,
 `describe() missing 1 required positional argument: 'name'`,
-which names the parameter the caller thought they were filling.
+names the parameter the caller thought they were filling.
 
 **Mark the deliberate mistake.** The type checker reports the mistake
 before the code runs.
@@ -430,10 +431,8 @@ Without `**facts`, Python reports the mismatch,
 the same error `divide(a=10, b=2)` raises in `param_markers.py`:
 `describe() got some positional-only arguments passed as keyword
 arguments: 'name'`.
-`**facts` replaces that message with the
-missing-argument one, because `**facts` collects the stray keyword
-and leaves the parameter `name` empty. Without the `/`,
-`describe(name="Bob")` succeeds and `facts` stays empty.
+`**facts` replaces that message with the missing-argument one.
+Without the `/`, `describe(name="Bob")` succeeds and `facts` stays empty.
 
 `**facts` works in the opposite direction from exercise 6. There, `**opts`
 at the call site spreads a dictionary into separate keyword arguments.
@@ -442,11 +441,10 @@ arguments back into a dictionary. The two forms share the `**` and
 invert each other. That inversion lets a function that declares
 `**kwargs` pass them through to another call as `**kwargs`.
 
-The `/` and `**facts` are also worth using together.
-`/` makes `name` positional-only.
-Because callers pass it by position, a later rename of the parameter leaves every caller working.
-`**facts` accepts any name a caller writes, and the `/` adds `name` to those names.
-`describe("Bob", name="Robert")` stores a fact called `name`.
+The `/` has two more effects on `describe()`.
+Because callers pass `name` by position, a later rename of the parameter leaves every caller working.
+The `/` also lets `**facts` collect a keyword called `name`,
+so `describe("Bob", name="Robert")` stores a fact called `name`.
 Without the `/`, the same call fails with two values for `name`.
 
 </details>
