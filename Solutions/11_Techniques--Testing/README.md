@@ -510,8 +510,7 @@ and the test asserts that the list stays empty.
 A stub that records its calls is a mock written by hand.
 `Mock` builds that recording for you, along with the assertions that read it.
 
-The hand-written version has one advantage.
-Its signature is `(message: str) -> None`,
+The hand-written stub declares its signature, `(message: str) -> None`,
 so the type checker checks it against `Callable[[str], None]`
 and reports a type error when either side changes.
 A `Mock` accepts any call.
