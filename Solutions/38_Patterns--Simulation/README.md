@@ -115,9 +115,9 @@ which neighbor the rat keeps and where it spawns new rats.
 The rat keeps the first cell the loop finds open, `(0, -1)`,
 and spawns a rat at every open cell after that, here `(1, 0)` alone.
 
-**Stop the rat when the script ends.** Once the script runs out, `claim()` returns
-`False` for every cell, so the rat dead-ends on its second turn and
-`run()` returns. The test needs no randomness and no real maze.
+**Stop the rat when the script ends.** Once the script runs out,
+`claim()` returns `False` for every cell, so the rat dead-ends on its
+second turn and `run()` returns.
 
 </details>
 </details>
@@ -585,7 +585,8 @@ and passes the same test.
 Both rats then add the cell and return `True`.
 
 Each of the two rats acts on its `True` as if it alone held the shared cell.
-Both move into it, and that overlap breaks the invariant of one rat per cell.
+Both move into it.
+That overlap breaks the invariant of one rat per cell.
 The extra `True` sends the second rat into a cell another rat has claimed,
 so the second rat explores nothing new.
 Here the shared cell is `(5, 5)`, where the loop closes, so both rats find every
@@ -601,10 +602,11 @@ with the size of `visited` exposes the double claim.
 
 The original `claim()` needs no lock because it has no `await`
 between the test and the add. A coroutine yields control only at an
-`await`, so the two statements run as one atomic step. The
-event loop can hand control to another rat before the test or after
-the add, but not between them. Adding the `await` lets the event loop
-run another rat between the test and the add, and that interleaving breaks the guarantee.
+`await`, so the two statements run as one atomic step. The event loop
+can hand control to another rat before the test or after the add, but
+not between them. Adding the `await` lets the event loop run another
+rat between the test and the add. That interleaving breaks the
+guarantee.
 
 </details>
 </details>
@@ -861,10 +863,10 @@ The loop runs to its end and falls through to the factory's last line,
 which treats every other symbol as a teleport target. So
 `item_factory("$")` returns `Teleport("$")`. The two `$` cells become
 a teleport pair.
-The route `"ee"` sends the robot through a
-teleporter where the maze should hold a coin, and `game.robot.coins`
-stays `0`. A one-word change to a class header moves `Coin` out of
-the factory's search, and the factory silently substitutes a different `Item`.
+The route `"ee"` sends the robot through a teleporter where the maze
+should hold a coin, so `game.robot.coins` stays `0`. A one-word
+change to a class header moves `Coin` out of the factory's search.
+The factory then silently substitutes a different `Item`.
 
 </details>
 </details>
@@ -1208,7 +1210,7 @@ second into the first, so the swap reverses the subtraction inside
 `amplitude()`'s `abs()`. On the line `x == y` the swap leaves the
 point where it was, so the subtraction there must equal its own negation.
 The one number equal to its own negation is zero. Every mode in which this plate can ring therefore
-has a nodal line straight down the main diagonal, and the figures all
+has a nodal line straight down the main diagonal, so the figures all
 share that one feature whichever `(m, n)` produced them.
 
 </details>
@@ -1293,9 +1295,9 @@ The plate's own field subtracts one product from another,
 `cos(mπx)cos(nπy)` minus `cos(nπx)cos(mπy)`.
 Each product separates on its own,
 but their difference does not factor into a function of `x` times a function of `y`.
-Its zeros lie along the curves where the
-two products agree, which is why the original figures are
-diagonals, crosses, and rings rather than a grid.
+The difference is zero along the curves where the two products agree,
+which is why the original figures are diagonals, crosses, and rings
+rather than a grid.
 The subtraction comes from the physics the chapter's formula approximates, a real plate
 with free edges rather than a membrane clamped all around its rim.
 
@@ -1357,9 +1359,8 @@ like noise with a faint trace of structure in it. The physics is
 correct, but the run needs more steps to finish,
 more than anyone wants to watch.
 
-`kick=0.5` fails differently, and its agitation readings look like a
-successful run's readings. Agitation falls to `0.00` as convincingly as it does at
-the default kick, and the figure does not appear.
+`kick=0.5` fails differently. Its agitation falls to `0.00` as
+convincingly as it does at the default kick, but no figure appears.
 One kick moves a grain up to half the plate,
 or the full width where the amplitude peaks at 2,
 so a single step can carry a grain across the plate.
@@ -1367,7 +1368,7 @@ Instead of walking toward the nearest nodal line, the grain jumps to a random sp
 and stays only if that spot is quiet. The spots that hold a grain
 best are the two corners where the main diagonal ends. At `(0, 0)`
 and `(1, 1)` the field is zero and also flat, so it stays weak over
-a whole patch, where along a nodal line it is weak only in a thin
+a whole patch, whereas along a nodal line it is weak only in a thin
 strip. Rendered, the run shows nearly every grain in those two
 corners and the nodal lines between them empty.
 The low agitation is accurate.
@@ -1384,7 +1385,7 @@ The loop works within a range of step sizes and fails outside it.
 A grain in a loud region gets a large kick and moves
 fast. As it nears a nodal line the amplitude shrinks and so does its
 step, so the grain slows down and settles on the line. Too small a kick
-keeps the step small in a loud region too, and the grain barely travels.
+keeps the step small in a loud region too, so the grain barely travels.
 Too large a kick keeps the step large near a nodal line,
 since a heavily scaled step can still carry the grain out of the neighborhood
 in which it was settling.
