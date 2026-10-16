@@ -286,8 +286,8 @@ either sets
 or imports the decorator under a private name,
 `from record import record as _record`, and writes `@_record`.
 
-The class version differs in one way that matters. `Facade` is a
-class used as a namespace, and the module around it is a namespace too.
+`Facade` is a class used as a namespace,
+and the module around it is a namespace too.
 `Facade.start_car()` and `shop.start_car()` read identically at the
 call site, but the class version adds a `class` statement and a
 `@staticmethod` on each function.
@@ -341,9 +341,9 @@ If you remove it, you lose that translation.
 The caller's `read()` then raises an `AttributeError`,
 because the wrapped object has no `read()`.
 
-An *Adapter*
-adds no behavior, and that is the test that separates the *Adapter*
-from the *Decorator*. Both wrappers forward, and only the *Adapter*
+An *Adapter* adds no behavior,
+which separates the *Adapter* from the *Decorator*.
+Both wrappers forward, and only the *Adapter*
 changes the name the caller uses.
 
 **The flag-checking wrapper is a *Proxy*.** Its interface is the
