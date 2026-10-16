@@ -504,7 +504,7 @@ An editor calls them to gray out the menu item.
 
 `History` stores whole states and moves them between stacks,
 so it works for any state type, from `int` to a full `Drawing`.
-The one condition is that states must be immutable.
+`History` requires one thing of a state: immutability.
 `History` keeps a reference, not a copy,
 so a list mutated in place changes in the past too.
 A `History` of lists is a stack of aliases, the bug in `aliased_snapshot.py`.
@@ -790,8 +790,8 @@ and the load still succeeds.
 
 ### Schema Migrations and Safer Formats
 
-Databases have the same drift, and its remedy there has a name.
-A *schema migration* makes the drift deliberate:
+Databases have the same drift.
+Their remedy, a *schema migration*, makes the drift deliberate:
 a versioned step that changes the table shape and its data together,
 instead of leaving a query to fail on the mismatch.
 
