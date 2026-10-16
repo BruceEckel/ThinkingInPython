@@ -97,8 +97,8 @@ Because `func_d()` sits before
 skip.
 
 **Make the skipped step visible.** `func_c()` prints a line when it
-runs, and that line confirms the skip. The line appears for `0` and `3` and
-is missing for `4`. `4` reaches `func_d()` because `func_a()` and
+runs. The line appears for `0` and `3` and is missing for `4`, which
+confirms the skip. `4` reaches `func_d()` because `func_a()` and
 `func_b()` both return an `Ok` for it.
 `func_d(4)` returns an `Err`,
 and `Err.bind()` returns `self` without calling `func_c()`,
@@ -263,7 +263,7 @@ because an `Ok` holds an answer and `func` transforms errors.
 wraps `func`'s return value in a new `Err`.
 
 **Prefix errors at the boundary.** To prefix every error in a chain,
-you then call `result.map_error(prefix)` once,
+you call `result.map_error(prefix)` once,
 at the boundary where you report the error,
 instead of adding the prefix inside every function that might produce an error.
 
@@ -496,10 +496,10 @@ an `Ok`. `parse("oops")` raises a `TypeError`, which
 `@safe(ValueError)` lets propagate out of `wrapper()`.
 `expect()` catches it outside `parse()` and prints it.
 
-A caller that calls `parse("oops")` receives the `TypeError`
-like any other exception. The chapter's `@safe` returns that
-same `TypeError` as `Err(TypeError(...))`, the same shape a
-bad-input failure takes.
+A caller of `parse("oops")` receives the `TypeError` like any
+other exception. The chapter's `@safe` returns the `TypeError`
+as `Err(TypeError(...))`, the same shape a bad-input failure
+takes.
 
 </details>
 </details>
@@ -572,11 +572,12 @@ report(load_setting("timeout", "30").bind(
 #:   setting 'retries' received 'many'
 ```
 
-**Note only the failing path.** The successful call carries no note. A successful
-`load_setting()` returns its `Ok` from inside the `try` block,
-and `add_note()` sits in the `except` clause.
-An `Ok` holds an answer, and notes attach to exceptions.
-A note therefore travels with a failure, the one result that has something to explain.
+**Note only the failing path.** The successful call carries no
+note. A successful `load_setting()` returns its `Ok` from inside
+the `try` block and never reaches `add_note()`, which sits in the
+`except` clause. An `Ok` holds an answer, while notes attach to
+exceptions. A note therefore travels with a failure, the one
+result that has something to explain.
 
 **Report without a traceback.** The second and third runs name a different setting and a different text in their notes.
 The `Err` holds the exception, and the exception holds the note as ordinary data,
@@ -588,11 +589,11 @@ so it never propagates to the top-level handler that prints a traceback.
 
 **Sequence the two loads.** The lambdas ignore their parameter, since
 the second load works from its own name and text. `bind()`
-reads worst in that case. It exists to pass one step's answer to the next step.
-Here it sequences the two calls, and the lambda discards the answer. The
-`returns` library's
+reads worst in that case. It exists to pass one step's answer to
+the next step. Here it sequences the two calls while the lambda
+discards the answer. The `returns` library's
 [do-notation](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
-reads better here.
+reads better.
 
 </details>
 </details>
@@ -677,9 +678,9 @@ for i in range(5):
 #: 4 4
 ```
 
-The three failures become one result. Inputs `1`, `2`,
-and `3` fail in three different functions for three different
-reasons, and `composed()` returns the same `None` for all three. Compare the
+The three failures become one result. Inputs `1`, `2`, and `3` fail
+in three different functions for three different reasons.
+`composed()` returns the same `None` for all three. Compare the
 `Result` version, where the same three inputs report `func_a(1)`,
 `func_b(2)`, and `func_c(3): division by zero`.
 
