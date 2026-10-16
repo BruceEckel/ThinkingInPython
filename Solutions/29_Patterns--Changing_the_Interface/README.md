@@ -295,8 +295,9 @@ and the module around it is a namespace too.
 `Facade.start_car()` and `shop.start_car()` read identically at the
 call site, but the class version adds a `class` statement and a
 `@staticmethod` on each function.
-None of these functions uses `self`,
-so `@staticmethod` makes Python call each one with the caller's arguments alone.
+None of these functions uses `self`. `@staticmethod` makes Python
+call each one with the caller's arguments alone, even through an
+instance.
 A module is a namespace as soon as Python creates it.
 It supports the underscore convention and `__all__`.
 Python runs its top-level code once, on the first import.
