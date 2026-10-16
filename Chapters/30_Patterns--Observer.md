@@ -958,8 +958,9 @@ and builds the property for any field name.
 `[3]` returns the pair as a `property()`.
 
 `announce()` comes from outside this file.
-It is a method of `Broadcasting`, the class that will own the property,
-so when `write()` runs, Python finds `announce()` on the instance.
+It is a method of `Broadcasting`,
+the base of every class that will own the property, so when `write()` runs,
+Python finds `announce()` on the instance.
 
 `published()` reaches `announce()` through `self`, whose annotation is `Any`,
 so the type checker accepts the call.
@@ -1763,9 +1764,9 @@ Measuring is the thermometer's actual job.
 
 Three designs in this chapter separate the notification code from the measuring code:
 
-- `Broadcaster`, `BoundBroadcaster`,
-  and `AsyncBroadcaster` hold the responder list and the notification loop,
+- `Broadcaster` and `AsyncBroadcaster` hold the responder list and the notification loop,
   and `Thermometer` inherits them.
+  `BoundBroadcaster` holds a tuple of responders and the same loop.
 - `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
   so one method covers every attribute.
 - `broadcasting.py` holds the list and the loop like `Broadcaster`,
