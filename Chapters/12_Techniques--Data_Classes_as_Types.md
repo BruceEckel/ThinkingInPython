@@ -974,8 +974,8 @@ ruff's `UP042` rewrites that form to `StrEnum`.
 
 Mix in a type when the member is one of that type.
 `Month` stays a bare `Enum`.
-A month is not an `int`, it carries one,
-and `max_days` reads the number through `.value`.
+A month carries an `int` rather than being one.
+`max_days` reads that number through `.value`.
 A class of your own can be the mix-in too.
 `Enum` passes the assigned value to its `__init__()`,
 so `Enum` builds each member the way a constructor call builds an ordinary instance.
@@ -1075,7 +1075,7 @@ A subscripted generic is callable too,
 so `field(default_factory=dict[str, str])` is legal and produces an empty dict.
 That form seems redundant, because the annotation on the left names the type,
 and the subscript vanishes at runtime.
-It gains one thing:
+It gains one thing, a check that the factory builds the type the annotation names:
 
 ```python
 # factory_checking.py
@@ -1638,7 +1638,7 @@ where a bare `int` or `str` needs neither.
 including the checks on fields it copied unchanged.
 For a hot path, or a structure nesting many values
 (many `Point`s inside a `Line`),
-the overhead is [worth measuring](18_Techniques--Performance.md)
+[measure the overhead](18_Techniques--Performance.md)
 before you adopt the types everywhere.
 
 ## Exercises
