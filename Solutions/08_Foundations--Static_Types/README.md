@@ -187,7 +187,7 @@ print(last(["a", "b", "c"]))
 `last()` mirrors `first()`: one type parameter `T`, inferred from
 whatever `list[T]` the caller passes.
 A call on a `list[int]` binds `T` to `int` for that call,
-and a call on a `list[str]` binds `T` to `str`, as with `first()`.
+and a call on a `list[str]` binds `T` to `str`.
 The type checker therefore infers that
 `last([10, 20, 30])` returns an `int` and `last(["a", "b", "c"])`
 returns a `str`.
@@ -514,16 +514,16 @@ argument because `list` is invariant.
 
 **Give up the write operations.** `shapes.append(...)` draws a
 diagnostic for the reason the widening works.
-`Sequence` is a read-only abstract base class, so it has no `append()`,
-and the diagnostic is `unresolved-attribute` rather than an argument-type error. The type
-checker does not say "you may not append a `Square` here." It says the
-type you declared has no such operation.
+`Sequence` is a read-only abstract base class, so it has no `append()`.
+The diagnostic is therefore `unresolved-attribute` rather than an
+argument-type error. The type checker does not say "you may not
+append a `Square` here." It says the type you declared has no such
+operation.
 
 The one edit shows both sides of variance. A writable container is
-invariant, and a read-only type is covariant. The
-practical rule follows: annotate a parameter with the weakest type
-the body needs, because each caller's argument must supply
-every capability you declare.
+invariant. A read-only type is covariant. The practical rule follows:
+annotate a parameter with the weakest type the body needs, because
+each caller's argument must supply every capability you declare.
 
 </details>
 </details>
@@ -576,16 +576,16 @@ same as `is not None` does.
 
 **Send empty values to the fallback.** The change is in which values reach which branch. `is not None` tests
 one condition, whether the value is missing. `if text:` tests
-whether the value is missing or empty, and the function returns `"(nothing)"`
-for both.
+whether the value is missing or empty. The function returns
+`"(nothing)"` for both.
 The function now treats an empty string the same as a missing value,
 including one a caller passed on purpose.
 
 Whether that matters depends on the caller. The type checker cannot
 tell you, because both versions are type-correct. The truthiness test
 is the same trap as [`if not target:` on a mutable
-default](../../Chapters/05_Foundations--Functions.md#sentinel-values),
-and the same answer applies. Test for the condition you mean. Use
+default](../../Chapters/05_Foundations--Functions.md#sentinel-values).
+The same answer applies: test for the condition you mean. Use
 `is None` when you mean "was anything supplied," and truthiness when
 an empty value belongs with the missing one.
 
@@ -659,7 +659,7 @@ print(box.val)
 
 **Narrow a name the function owns.** `reset()` still runs and still sets the attribute to `None`, as the
 second line of output shows. The call leaves `val` as it was, though.
-`val` is a second name for the string `"hi"`, and `reset()` rebinds
+`val` is a second name for the string `"hi"`. `reset()` rebinds
 `b.val`, not the local. The narrowing of `val` to `str` therefore
 holds through the call, and the type checker's verdict matches what
 the program does. In the chapter's version the verdict concerns
@@ -710,12 +710,13 @@ print(MAX_RETRIES, GREETING, HISTORY)
 #: 3 hello ('first',)
 ```
 
-**Freeze the name and the contents.** On a list, `Final` forbids rebinding the name,
-and any code holding a reference to the list can still change its contents. On a tuple, the
-name and the contents both stay as the definition sets them. `Final`
-stops a rebinding, and the tuple type has no method that changes its
-contents. The definition is therefore the one place to put a value
-into the constant. A reader looks for the value there too.
+**Freeze the name and the contents.** On a list, `Final` forbids
+rebinding the name. Any code holding a reference to the list can still
+change its contents. On a tuple, the name and the contents both stay
+as the definition sets them. `Final` stops a rebinding, and the tuple
+type has no method that changes its contents. The definition is
+therefore the one place to put a value into the constant. A reader
+looks for the value there too.
 
 </details>
 </details>
