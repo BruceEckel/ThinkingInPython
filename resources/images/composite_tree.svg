@@ -39,12 +39,12 @@
   <line x1="492" y1="20" x2="492" y2="250" stroke="#c8bfb0" stroke-width="0.8"/>
   <text x="506" y="34" font-size="10.5" fill="#7a6e62" text-anchor="start">the same call on</text>
   <text x="506" y="49" font-size="10.5" fill="#7a6e62" text-anchor="start">any node:</text>
-  <text x="506" y="74" font-size="10.5" fill="#1a1612" text-anchor="start">disk_usage(root)</text>
+  <text x="506" y="74" font-size="10.5" fill="#1a1612" text-anchor="start">root.disk_usage()</text>
   <text x="710" y="74" font-size="11" fill="#8b1a1a" font-weight="bold" text-anchor="end">1940</text>
-  <text x="506" y="98" font-size="10.5" fill="#1a1612" text-anchor="start">disk_usage(src)</text>
+  <text x="506" y="98" font-size="10.5" fill="#1a1612" text-anchor="start">src.disk_usage()</text>
   <text x="710" y="98" font-size="11" fill="#8b1a1a" font-weight="bold" text-anchor="end">650</text>
-  <text x="506" y="122" font-size="10.5" fill="#1a1612" text-anchor="start">disk_usage(</text>
-  <text x="518.6" y="137" font-size="10.5" fill="#1a1612" text-anchor="start">File("lone.txt", 10))</text>
+  <text x="506" y="122" font-size="10.5" fill="#1a1612" text-anchor="start">File("lone.txt", 10)</text>
+  <text x="518.6" y="137" font-size="10.5" fill="#1a1612" text-anchor="start">.disk_usage()</text>
   <text x="710" y="137" font-size="11" fill="#8b1a1a" font-weight="bold" text-anchor="end">10</text>
   <text x="506" y="186" font-size="10.5" fill="#7a6e62" text-anchor="start">the demo prints</text>
   <text x="506" y="210" font-size="14" fill="#8b1a1a" font-weight="bold" text-anchor="start">1940 650 10</text>

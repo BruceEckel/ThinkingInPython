@@ -19,8 +19,8 @@ one keeps to the section it sits in. Names, sizes, and the output come
 from `filesystem_classic.py` and `filesystem.py`, which build the same
 tree: `Directory("src", (File("main.py", 400), File("util.py", 250)))`,
 `Directory("root", (File("readme.md", 90), src, File("data.csv",
-1200)))`, the calls `disk_usage(root)`, `disk_usage(src)`,
-`disk_usage(File("lone.txt", 10))`, and the marker `1940 650 10`.
+1200)))`, the calls `root.disk_usage()`, `src.disk_usage()`,
+`File("lone.txt", 10).disk_usage()`, and the marker `1940 650 10`.
 """
 
 from math import hypot
@@ -89,9 +89,9 @@ def render() -> str:
     b += line((PX - 14, 20), (PX - 14, 250))
     b += text(PX, 34, "the same call on", 10.5, MUTED)
     b += text(PX, 49, "any node:", 10.5, MUTED)
-    rows = ((74, ("disk_usage(root)",), "1940"),
-            (98, ("disk_usage(src)",), "650"),
-            (122, ("disk_usage(", 'File("lone.txt", 10))'), "10"))
+    rows = ((74, ("root.disk_usage()",), "1940"),
+            (98, ("src.disk_usage()",), "650"),
+            (122, ('File("lone.txt", 10)', ".disk_usage()"), "10"))
     for y, calls, value in rows:
         for j, s in enumerate(calls):
             # Continuation lines indent two spaces, which SVG would collapse

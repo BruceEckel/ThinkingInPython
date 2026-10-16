@@ -25,7 +25,7 @@ One call works on a file, a directory, or the whole tree.
 
 ![Each directory adds up what its entries return](_images/composite_tree)
 
-`disk_usage(root)` adds up every file below `root` to get 1940.
+`root.disk_usage()` adds up every file below `root` to get 1940.
 The same call on `src` or on a single file returns the size of that subtree or file.
 
 The traditional version puts each operation inside the node classes,
