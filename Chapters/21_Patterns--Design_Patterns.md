@@ -225,7 +225,7 @@ each named for what its patterns do:
     These encapsulate processes such as interpreting a language,
     fulfilling a request, moving through a sequence (as in an iterator),
     or implementing an algorithm.
-    Most of the patterns in this book are behavioral:
+    The largest group of patterns in this book is behavioral:
     [*Iterator*](23_Patterns--Iterators.md),
     [*Template Method*](25_Patterns--Template_Method.md),
     [Function Objects](28_Patterns--Function_Objects.md)
