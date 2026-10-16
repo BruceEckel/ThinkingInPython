@@ -708,7 +708,7 @@ Every channel also has a rough cost to send a message.
 
 ### The Inheritance Version
 
-The inheritance answer declares both operations as abstract methods on a base class.
+The inheritance answer declares both operations as abstract methods on an [abstract base class](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
 Each channel is a subclass that implements them,
 and dynamic binding picks the correct implementation at each call:
 
