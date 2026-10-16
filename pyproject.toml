@@ -63,6 +63,10 @@ dev = [
     # derivation, and resizing for the composited book covers.
     "pillow>=12.3.0",
     "pyright>=1.1.414",
+    # mypy is never a gate (ty is the one checker the gates run); it is
+    # installed so the book's "mypy accepts/rejects" sentences can be
+    # verified in a claims sweep instead of left unverified.
+    "mypy",
 ]
 
 [tool.uv]
