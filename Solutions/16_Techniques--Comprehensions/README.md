@@ -35,8 +35,8 @@ print(result)
 #: [16]
 ```
 
-The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`,
-and `int(e)` runs when both are true.
+The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`.
+`int(e)` runs when both are true.
 `"a"` fails `isdigit()`,
 so the comprehension drops it before `int()` can raise a `ValueError` on it.
 `"4"` is the only element that is both a string and all digits,
@@ -177,8 +177,7 @@ and `"J"` has one character.
 
 The filter exists to drop the initial `"J"` as noise.
 Removing the filter shows what the set does on its own.
-The set collapses exact duplicates of the normalized form.
-It treats `"J"` and `"John"` as two distinct strings,
+The set collapses exact duplicates of the normalized form,
 so a `"J"` that abbreviates `"John"` stays a separate entry.
 
 </details>
@@ -256,8 +255,8 @@ and a loop when you want the side effect alone.
 
 A comprehension whose output expression has a side effect
 still deserves a second look when it returns something useful.
-`show()` does two jobs,
-and a reader must open it to learn that one of them is printing.
+`show()` does two jobs.
+A reader must open it to learn that one of them is printing.
 
 </details>
 </details>
