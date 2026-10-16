@@ -315,7 +315,7 @@ with `match`. `case Failed(reason)` prints the reason and lets the
 loop continue.
 Any other value matches `case root`, which prints the root and returns it.
 
-The chapter's advice about the failure value still holds.
+The chapter's advice about the failure value still holds:
 `first_root()` checks the result's type, not its truthiness.
 A `Failed` is never a root, so `float | Failed` says which result is which.
 
