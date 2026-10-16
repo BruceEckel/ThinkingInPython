@@ -374,7 +374,7 @@ It chooses the value the algorithm compares for each item.
 The algorithm stays the same (see exercise 3).
 
 When a strategy needs configuration,
-use a [*closure*](40_Functional--Foundations.md#closures).
+use a [closure](40_Functional--Foundations.md#closures).
 An outer function takes the settings and returns the strategy.
 Those settings stay available to the strategy after the outer function returns.
 
