@@ -230,13 +230,12 @@ print(list(walk(tree)))
 ```
 
 **Extend the union.** Once `Symlink` joins the union,
-the type checker rejects every `match` whose `case _` calls `assert_never()`,
-as the chapter says.
+the type checker rejects every `match` whose `case _` calls `assert_never()`.
 In both `disk_usage()` and `walk()`,
 it reports that `entry` can still be a `Symlink` at the `assert_never()` call.
 The `Symlink` case in each function clears that report.
-Deciding what a link should do is a judgment call.
-The type checker reports where a case belongs, and you write what the case does.
+The type checker reports where a case belongs.
+You decide what the case does.
 
 **Count each byte once.** `disk_usage()` counts a link
 as zero bytes, since the target file's own entry counts its bytes.
