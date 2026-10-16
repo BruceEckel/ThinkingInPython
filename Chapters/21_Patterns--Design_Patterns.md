@@ -503,8 +503,8 @@ The rest are here for your own designs.
     *Cohesion* is the degree to which the contents of one part serve a single subject,
     so high cohesion means one subject per part.
     The two measure the same design from opposite sides.
-    Changing a part with low cohesion means editing code for an unrelated subject in the same place,
-    and changing a tightly coupled part means editing the parts that depend on it.
+    Changing a part with low cohesion means editing code for an unrelated subject in the same place.
+    Changing a tightly coupled part means editing the parts that depend on it.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
     argues for composition on those grounds.
 -   *Managed Coupling*.
