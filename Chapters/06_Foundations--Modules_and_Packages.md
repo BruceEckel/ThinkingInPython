@@ -44,8 +44,7 @@ Python programmers call this `__name__` check the *main guard*.
 When another program imports this file as a library module,
 the guard skips the code at the bottom of the file,
 the part meant for a command-line run.
-The condition is true only when you run this file as a script.
-That is, `__name__` is `"__main__"` when you use the command line:
+`__name__` is `"__main__"` only when you run this file as a script from the command line:
 
 ```
 python use_module.py
@@ -92,14 +91,15 @@ so `use_module` and `second` are one object.
 Because every later `import` finds the cached object in `sys.modules`,
 a running program keeps the module it loaded,
 however you edit the module's file afterward.
-Restart the program, or call `importlib.reload(use_module)`,
+To load the edited file, restart the program,
+or call `importlib.reload(use_module)`,
 which re-runs the body into the existing module object.
 Reloading leaves every name bound by a `from ... import` pointing at the old objects,
 so restarting is the reliable choice.
 
 ## Importing Names with `from` and `as`
 
-Here, the `from` keyword brings `useful_function` into the current namespace:
+The `from` keyword brings `useful_function` into the current namespace:
 
 ```python
 # using_from.py
@@ -458,8 +458,8 @@ You assign it at module level as a list of strings naming the public names,
 and `from module import *` then imports the names on that list.
 A star import binds every name listed in `__all__`,
 including one that begins with an underscore.
-An `__all__` also gathers the public names into one readable place,
-and documentation tools read it to report a module's public names.
+An `__all__` also gathers the public names into one readable place.
+Documentation tools read it to report a module's public names.
 
 ```python
 # exporting.py
@@ -498,7 +498,7 @@ Name what you import,
 and keep the star for experiments at the interactive prompt.
 
 The underscore and `__all__` both say which names a caller should use.
-That stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade)
+That stated boundary lets a module act as a [*Façade*](29_Patterns--Changing_the_Interface.md#façade)
 over its internals or as a shared single instance
 ([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).
 
@@ -507,8 +507,8 @@ over its internals or as a shared single instance
 To be the target of an `import` statement,
 a module's file name must be a valid Python identifier and not a keyword.
 `import my-mod` is a syntax error.
-`importlib.import_module("my-mod")` loads the file,
-and plugin loaders open oddly named files that way.
+`importlib.import_module("my-mod")` loads the file.
+Plugin loaders open oddly named files that way.
 Give your own modules importable names.
 
 **Modules** (`.py` files).
@@ -595,7 +595,7 @@ Once the module loads, its names behave like eagerly imported ones.
 
 ### Watching the Deferral
 
-Here, `noisy.py` prints a message when its body runs,
+`noisy.py` prints a message when its body runs,
 so the output shows when `lazy` loads it:
 
 ```python
@@ -630,7 +630,7 @@ The `from` form takes `lazy` too.
 `lazy from noisy import announce` defers loading `noisy` until the first use of `announce`.
 
 `sys.lazy_modules` holds the names still waiting to load.
-Before your code runs, CPython loads standard-library modules at startup,
+Before your code runs, CPython loads standard-library modules,
 and some of them add lazy imports of their own to that set:
 
 ```python
