@@ -143,18 +143,16 @@ def holding(input_: Mouse) -> TrapState:
             return TrapState.HOLDING
 ```
 
-Each transition function contains a `case` for every input its state recognizes,
+Each transition function contains a `case` for every input its state cares about,
 and produces the state the trap enters next.
 The default `case _` returns the current state, so the state stays the same.
-The four functions use `TrapState` before the file defines it,
-in their return annotations and their `return` statements.
-Both uses come after the `def` has run.
+The four functions use `TrapState` before the file defines it.
 A function body runs at the call, and an annotation is evaluated lazily,
 so by the first call the whole module has loaded and `TrapState` exists.
 
-The file continues with `chime()`, the one non-empty `action` a state performs,
-and with the four states,
-`State` records held as the members of a `TrapState` enum:
+The file continues with `chime()`,
+the one non-empty `action` which is performed by `HOLDING`.
+`TrapState` is an enum because there are a fixed number of states:
 
 ```python
 # trap_states.py (continued)
@@ -171,14 +169,13 @@ class TrapState(State[Mouse], Enum):
         return self.name.capitalize()
 ```
 
-`TrapState` mixes `State[Mouse]` into `Enum`.
+`TrapState` [mixes `State[Mouse]` into `Enum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins).
 Each member's value is a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
 so `TrapState.WAITING` is both a `TrapState` member and a `State`,
 with `message` and `next` as attributes.
-`HOLDING`'s tuple has a third element, so its `action` is `chime()`;
-the other three members keep the default.
-The chime sounds when the trap catches a mouse.
+`HOLDING`'s tuple has a third element, so its `action` becomes `chime()`,
+which sounds when the trap catches a mouse.
 
 The `StateMachine` holds the current state and advances it on each input:
 
@@ -299,7 +296,7 @@ def test_every_state_answers_every_move() -> None:
 The second test iterates the enum,
 so a member added to `TrapState` is tested as soon as it exists.
 
-Two consequences follow from the mixin.
+Two consequences follow from the mix-in.
 `Enum` folds members with equal values into one,
 and a record's equality compares its fields,
 so two members with the same message, the same function,

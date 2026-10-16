@@ -1364,7 +1364,7 @@ The comment suppresses the diagnostic only because provoking that crash is educa
 <!-- vale proselint.Very = YES -->
 
 A metaclass can multiply inherit like any other class,
-as long as the extra class is a mixin with no competing layout:
+as long as the extra class is a mix-in with no competing layout:
 
 ```python
 # mixin.py
