@@ -144,7 +144,7 @@ and the test expects `100 * (1 + rate)`.
 Those two expressions can round differently,
 so the test compares them with `pytest.approx()`.
 For `0.0`, `0.05`, `0.5`, and `1.0` on a balance of `100`,
-the two sides are bit-identical and `==` passes just as well.
+the two sides are bit-identical, so `==` passes just as well.
 The assertion needs the tolerance for a rate such as `0.1`,
 where the two sides differ by one bit,
 or for interest applied more than once.
@@ -419,7 +419,7 @@ now wrong.
 and `current_temp_with()` calls whatever it receives.
 
 Exercise 4 draws the same lesson from the environment variable.
-Here the lesson applies to a different kind of dependency.
+Here the dependency is a function.
 A patched test depends on the name of the function it replaces,
 in the module where that name lives.
 So a patched test breaks under changes that leave `current_temp()` working:
@@ -514,7 +514,7 @@ The hand-written stub declares its signature, `(message: str) -> None`,
 so the type checker checks it against `Callable[[str], None]`
 and reports a type error when the two stop matching.
 A `Mock` accepts any call.
-The chapter's `create_autospec()` builds a mock that checks each call against the real function's signature.
+`create_autospec()`, which the chapter introduces, builds a mock that checks each call against the real function's signature.
 
 </details>
 </details>
