@@ -1321,6 +1321,8 @@ Match the machinery to what varies:
 - When construction does more than call a constructor
   (pooling, caching, consulting configuration), write a factory function,
   and a factory class only when that work has state of its own.
+  The cached factory in [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)
+  is one such function.
 - When a class does work that needs a product and each subclass picks the product,
   override a factory method,
   as `CircleSketch` and `SquareSketch` do in `shape_sketch.py`.
