@@ -118,7 +118,8 @@ The tile's position is extrinsic.
 It is the cell's coordinates in the grid, so it stays out of the `Tile` object.
 An operation that needs the position takes it as an argument.
 
-The factory is `tile()`, a constructor function under `functools.cache`.
+The factory is `tile()`,
+a constructor function under [`functools.cache`](18_Techniques--Performance.md#caching).
 `@cache` stores each result under its argument,
 so every call with the same symbol returns the object the first call built.
 
@@ -354,7 +355,9 @@ an ordinary constructor call returns a shared object.
 You write the bookkeeping yourself,
 and it must account for the way Python calls `__init__()` after `__new__()`.
 When `__new__()` returns an instance of the class, as it does here,
-Python calls `__init__()` on it.
+Python calls `__init__()` on it,
+as [*Singleton*](24_Patterns--Singleton.md#one-instance-in-a-class-variable)
+notes.
 The record's generated `__init__()` therefore runs at every construction,
 including the ones that return a pooled instance.
 On a new instance, that run fills in the fields,
@@ -619,8 +622,8 @@ Adding that case clears the diagnostic.
 The enum version cannot load its tile kinds at runtime.
 `tile()` could load `SPECS` from a file, but `Tile.GRASS` is source code.
 
-The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
-also uses an `Enum` as a flyweight pool, with its members serving as shared,
+Both designs in [State Machines](31_Patterns--State_Machines.md#which-design-should-you-use)
+also use an `Enum` as a flyweight pool, with its members serving as shared,
 comparable states.
 
 ## Choosing a Flyweight and Its Pool
