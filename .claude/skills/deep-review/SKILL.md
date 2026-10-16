@@ -222,18 +222,26 @@ Accrued notes from the chapters 18-38 review sweep:
 - Cross-chapter threads now exist whose ends must stay consistent when
   either end is edited: reflected operators and `NotImplemented` are
   taught in 32 (`radd_dispatch.py`) and applied in 34 (`expr.py`, plus
-  its exercise 6); exact-type dict dispatch is noted in 31 (engine),
-  32 (OUTCOME table), and 37 (`bins[type(t)]`); the registry factory's
-  import-time-registration and name-collision caveats live in 27 and
-  back the registries in 14 (`register.py`), 17 (`init_subclass.py`),
-  and 37; frozen-is-shallow is demonstrated in 20
+  its exercise 6); exact-type dict dispatch starts in 28 (the event bus's
+  `type(event)`) and is noted again in 31 (engine), 32 (OUTCOME table),
+  and 37 (`bins[type(piece)]`); the registry factory's caveats
+  (import-time registration, `__name__` collision, `cls.registry` via a
+  classmethod) live in 27's Hazards of Self Registration, which 14
+  (`register.py`), 17 (`init_subclass.py`), and 37 (`Trash.registry`)
+  point at; frozen-is-shallow is demonstrated in 20
   (`frozen_leaky.py`) and assumed by 22's `NamedTuple`-vs-frozen
   contrast and 35/36's immutability arguments; the load-bearing-`Any`
   bargain runs 22 → 33; the constructor-starts-the-engine trap runs
   25 (`premature_engine.py`) → 31 (StateMachine's `__init__`); 29's
-  wrapper disambiguation map (Proxy/Decorator/Adapter/Façade)
-  leans on 26 and 14; 21's dissolves-into-the-language thesis
-  (Norvig footnote) is what 23/24/27/28's "Pythonic" sections cash in.
+  Distinguishing the Wrappers section (the Proxy/Decorator/Adapter/
+  Façade map) leans on 26 and 14; 21's dissolves-into-the-language
+  thesis (Norvig footnote, #when-a-pattern-dissolves) is what 23, 24,
+  27, and 28 cash in by linking it; 21's "Design the communication, not
+  the parts" principle (Alan Kay) is the stated reason for the openings
+  of 23, 28, and 30, and points back to 20's Protocols Generalize,
+  Composition Adapts and forward to 46's `Need`. The project memory
+  `cross-chapter-threads` is the maintained copy of this list (verified
+  against the book 2026-10-16).
 
 ## Review-file workflow
 
