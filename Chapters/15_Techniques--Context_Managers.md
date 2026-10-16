@@ -1057,6 +1057,8 @@ Its `get()` blocks while the pool is empty,
 so a borrower waits until another borrower's `with` block ends and returns an item to the queue.
 When several threads share one pool, the queue limits concurrent use,
 the way a real database connection pool does.
+[Concurrency](19_Techniques--Concurrency.md) covers threads, locks,
+and the queues that coordinate them.
 
 That blocking is for threads.
 In an `asyncio` program a blocking `get()` blocks the whole event loop,
