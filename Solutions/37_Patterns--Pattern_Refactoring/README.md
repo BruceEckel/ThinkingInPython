@@ -108,9 +108,9 @@ piece. `Plastic` is a new key for the dictionary, and
 The one edit to `recycle_dict.py` is the filename, since the script hardcodes
 `parse("trash.dat")`. `parse_trash.py` needs no change because it
 calls `Trash.create(name, weight)` with a name read from the file and
-names no material. One step is optional.
-If `Plastic` needs special handling, it gets a
-`@recycling_note.register` function.
+names no material.
+If `Plastic` needs special handling, an optional
+`@recycling_note.register` function provides it.
 
 `plastic_dropped.py` parses four pieces and bins two. Its `match` has
 no `case` for `Plastic` and no `case _`.
