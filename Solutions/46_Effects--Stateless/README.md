@@ -87,7 +87,7 @@ The demo in `test_ch46_ask_and_greet.py` uses `Scripted` rather than
 has no terminal from which to read. `ask_and_greet()` stays character-for-character the same
 function under both bindings.
 
-**Request a capability, not a class.** `ask_and_greet()` names a capability
+**Request an interface, not a class.** `ask_and_greet()` names an interface
 in its return type and calls two methods on whatever answers.
 `Terminal`, `Scripted`, and any third implementation are
 interchangeable because none of them appears in the Effect. Adding
@@ -225,7 +225,7 @@ the requirement out.
 <details>
 <summary>Where to look</summary>
 
-[Turning an Error Into a Value](../../Chapters/46_Effects--Stateless.md#turning-an-error-into-a-value) shows `catch()` moving a declared error out of the failure channel.
+[Turning an Error Into a Value](../../Chapters/46_Effects--Stateless.md#turning-an-error-into-a-value) shows `catch()` moving a declared error out of the error channel.
 Compare the two result types and ask what remains in each return type after `catch()` has run.
 Then look at what a `match` over the caught value does to that type, and which function in the pair has a `match` that covers every error `read_score()` declares.
 
@@ -320,7 +320,7 @@ The `ValueError` stays declared, as `Try[ValueError, str]` says, so it
 is still in the yield channel when `catch(ValueError)` wraps
 `one_unhandled()`. `catch()` does not delete an error. It moves the error
 from the yield channel to the return channel, as a value. So the
-`ValueError` leaves the failure channel, and the return type becomes
+`ValueError` leaves the error channel, and the return type becomes
 `str | ValueError`.
 A caller needing a bare `str` has one case left to handle.
 
@@ -882,11 +882,14 @@ supplies one on each call.
 So `retry()` decorates the function, calls it once per attempt, and
 hands back a function that takes the same arguments.
 
-The Effect the returned function builds has a wider type. `retry()`
+The Effect the returned function builds has a wider type.
+[`retry()`](../../Chapters/47_Effects--Stateless_in_Practice.md#retry-and-a-flaky-database)
 adds the clock on which it sleeps and replaces the error with a
 `RetryError`.
 
-The same reasoning explains `repeat()` and `memoize()`. It also
+The same reasoning explains
+[`repeat()` and `memoize()`](../../Chapters/47_Effects--Stateless_in_Practice.md#repeat-and-memoize).
+It also
 explains the mistake in storing Effects in a registry, a queue, or a cache.
 The stored Effect looks fine until something runs it twice. Store the
 function, and apply the arguments where you need the Effect.
