@@ -26,7 +26,7 @@ and simple programs with Python scripts.
 ## How to Read the Examples
 
 The `#` starts a comment that runs to the end of the line,
-just like C++ and Java `//` comments.
+like C++ and Java `//` comments.
 [The Examples](01_Introduction.md#the-examples)
 explains the filename comment on a listing's first line and the `#:` output markers.
 
