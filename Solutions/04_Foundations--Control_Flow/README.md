@@ -339,7 +339,8 @@ than the nested `for` loops it replaces.
 ## 7. Chaining from an exception you build yourself
 
 > In `exception_chaining.py`,
-> add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs.
+> add a fourth function that catches the `ValueError` and raises `BadNumber` from a new exception object it constructs,
+> rather than from the caught `ValueError`.
 > Predict which line the traceback shows above `BadNumber` before you run it.
 
 <details>
