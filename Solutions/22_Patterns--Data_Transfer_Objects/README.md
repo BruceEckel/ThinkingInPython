@@ -118,7 +118,7 @@ all from that one line.
 
 [`NamedTuple`](../../Chapters/22_Patterns--Data_Transfer_Objects.md#namedtuple) says how far a `NamedTuple`'s immutability reaches, and why it hashes.
 Call a mutating method on the `list` field.
-That call assigns nothing to the record.
+That call assigns nothing to the `Recipe`.
 For the `dict` key, ask what hashing a tuple does with each of its elements.
 
 <details>
@@ -128,7 +128,7 @@ If you assign a longer list to the field, as in `toast.steps = toast.steps + ["b
 Python raises an `AttributeError` with the message `can't set attribute`.
 The type checker reports the assignment too,
 as `color_namedtuple.py` shows for `red.r = 9`.
-That attempt tests the record's immutability, which holds.
+That attempt tests the `Recipe`'s immutability, which holds.
 The solution calls `append()` instead, which edits the field's list in place.
 
 ```python
@@ -150,22 +150,22 @@ with expected(TypeError):
 #: type: 'list')
 ```
 
-**Mutate through the field.** The record changed, and both Python and the type checker accepted the change.
+**Mutate through the field.** The `Recipe` changed, and both Python and the type checker accepted the change.
 `NamedTuple` raises an `AttributeError` when code rebinds `toast.steps`,
 but `append()` leaves `toast.steps` bound to the same list.
 
-**Hash the record.** Using the record as a `dict` key raises a `TypeError`, whose message
+**Hash the `Recipe`.** Using the `Recipe` as a `dict` key raises a `TypeError`, whose message
 names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
 'list')`. Hashing a tuple hashes each element, so a `Recipe` is
 hashable only when every field is. The `list` has no hash, so the
-record has none either.
+`Recipe` has none either.
 
 The silent `append()` and the `TypeError` have one cause.
 A `NamedTuple` freezes which object each field references,
 and that object stays as mutable as it was.
 [`frozen=True`](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 is shallow the same way. Declaring `steps: tuple[str, ...]` fixes
-the silent `append()` and the `TypeError` at once. The contents freeze, and the record
+the silent `append()` and the `TypeError` at once. The contents freeze, and the `Recipe`
 becomes hashable. One declaration fixing both is the clue that they
 are one problem.
 
@@ -239,7 +239,7 @@ and so do the namespaces.
 <details>
 <summary>Where to look</summary>
 
-[Returning Multiple Values](../../Chapters/22_Patterns--Data_Transfer_Objects.md#returning-multiple-values) compares a bare tuple with a named record as a return type.
+[Returning Multiple Values](../../Chapters/22_Patterns--Data_Transfer_Objects.md#returning-multiple-values) compares a bare tuple with a `NamedTuple` as a return type.
 The broken line reads the fields by name, and a tuple has no `mean` (its `count` is a method), so index the tuple instead.
 To see what the type checker still catches, try unpacking into the wrong number of names, then swap two names that have different types or the same type.
 
@@ -534,7 +534,7 @@ The parameter carries `tuple[float, ...]` rather than `tuple[float, float]` beca
 `tuple.__add__()` takes a tuple of any length, so `ty` reports `invalid-method-override` for the two-element annotation, citing the Liskov Substitution Principle.
 The wider annotation lets `p + (1.0, 1.0)` type-check as well as `Point + Point`, and the unpacking `x, y = other` raises a `ValueError` for a tuple of any other length.
 
-**Reuse the properties in `__repr__()`.** `tuple.__repr__()` prints `(4.0, 6.0)`; the override prints the class name around the two properties, so the record names its type the way a `NamedTuple` does.
+**Reuse the properties in `__repr__()`.** `tuple.__repr__()` prints `(4.0, 6.0)`; the override prints the class name around the two properties, so the `Point` names its type the way a `NamedTuple` does.
 
 **What stays a tuple.** Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone, so `p[:1]` is the plain `(4.0,)`.
 A tuple on the left of `+` is the other gap: `(1.0, 1.0) + p` runs `tuple.__add__()` first and concatenates to a four-element tuple, since `Point` defines no `__radd__()`.
