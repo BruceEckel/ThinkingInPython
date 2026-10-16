@@ -63,7 +63,7 @@ with Trace("A") as t:
 #: exit A
 ```
 
-Entering is outside-in (`A` then `C`), and exiting is inside-out (`C`
+Entering is outside-in (`A` then `C`). Exiting is inside-out (`C`
 then `A`). `C`'s whole lifetime, enter and exit, sits nested inside
 `A`'s lifetime. [Combining Context
 Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows the same last-in-first-out order for `tag("ul")` and
@@ -429,7 +429,7 @@ with expected(ValueError):
 ```
 
 **Suppress one exception type.** The return value of `__exit__()` determines whether the exception continues.
-A truthy value suppresses the exception, and a falsy value lets it continue. Returning
+A truthy value suppresses the exception. A falsy value lets it continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
 lets every other exception propagate.
 

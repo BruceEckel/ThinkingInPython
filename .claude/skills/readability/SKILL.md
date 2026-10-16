@@ -1732,6 +1732,9 @@ and write the rest to `readability/NN_name.md`,
 a file whose name matches the chapter it reviews.
 So `readability/12_Techniques--Data_Classes_as_Types.md` reviews
 `Chapters/12_Techniques--Data_Classes_as_Types.md`.
+A review of a Solutions file goes beside it as `readability/NN_name.solutions.md`
+(the chapter stem plus `.solutions`, since a Solutions file's own stem is `README`),
+and takes the `~` prefix the same way when it is applied.
 Create the `readability/` directory if it does not exist.
 When you first create it, add a `!Notes.md` file for Bruce's own use.
 That file belongs to the human; never assume it holds instructions for you,
