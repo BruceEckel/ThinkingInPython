@@ -539,8 +539,7 @@ Every set-algebra operator in `sets.py` has a named method:
 `intersection()` for `&`, `union()` for `|`, `difference()` for `-`,
 `symmetric_difference()` for `^`, `issubset()` for `<=`,
 and `issuperset()` for `>=`.
-The methods are more flexible.
-They accept any iterable where the operators need a set on both sides,
+The methods accept any iterable where the operators need a set on both sides,
 and `union()`, `intersection()`,
 and `difference()` take several arguments at once.
 `isdisjoint()` adds one more test, with no operator form:
