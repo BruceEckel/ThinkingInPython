@@ -101,18 +101,17 @@ annotation the chapter explains. `Flower` also loses `pollinate()` and
 functions and one registration remain.
 
 The `Bug` classes hold no state. `Pollinator` and `Predator` each
-exist to name one operation.
-`Bee`, `Fly`, and `Worm` exist to be types for the `visit()` dispatch to resolve. Once the operation is a
+exist to name one operation. `Bee`, `Fly`, and `Worm` exist as the
+types on which the `visit()` call dispatches. Once the operation is a
 function, the call site names it. `pollinate(flower, "Bee")` says what
 `flower.accept(bee)` says with a class and a method.
 
 You lose one thing: holding a visitor in a variable and passing it
-around as an object. When that matters, pass the function instead, since a function is a value too.
-`op = eat` works.
-A `dict[str, Callable[[Flower, str], str]]` keyed by
-operation name lets a program choose an operation at runtime,
-as a `Visitor` hierarchy does,
-without the classes.
+around as an object. When that matters, pass the function instead,
+since a function is a value too. `op = eat` works.
+A `dict[str, Callable[[Flower, str], str]]` keyed by operation name
+lets a program choose an operation at runtime, as a `Visitor`
+hierarchy does, without the classes.
 
 </details>
 </details>
@@ -195,9 +194,11 @@ def _(flower: Rose) -> str:  # 3 lines
 
 If you add the `Rose` class alone,
 `nectar()` and `fragrance()` both fall back to their defaults,
-and the demo prints `Rose: no nectar / faint / sharp`.
-The interpreter and the type checker both accept that version, so the wrong answer arrives as ordinary output.
-The solution registers `Rose` with every operation whose default is wrong for a rose.
+so the demo prints `Rose: no nectar / faint / sharp`.
+The interpreter and the type checker both accept that version, so the
+wrong answer arrives as ordinary output.
+The solution registers `Rose` with every operation whose default is
+wrong for a rose.
 
 ```python
 # exercise_2.py
@@ -259,12 +260,12 @@ print(thorns(Gladiolus()))
 #: none
 ```
 
-**Add a type.** `Rose` needs eight lines: two for the class and three for each
-of its two registrations, one per operation whose default is wrong for
-a rose.
+**Add a type.** `Rose` needs eight lines: two for the class and three
+for each of its two registrations, one per operation whose default is
+wrong for a rose.
 
-**Add an operation.** `thorns()` needs six lines: three for the function and three
-for the one flower that differs.
+**Add an operation.** `thorns()` needs six lines: three for the
+function and three for the one flower that differs.
 
 Both changes add lines and leave every existing line as it was.
 Here the operation takes fewer lines to add than the type. `thorns()`
@@ -272,13 +273,12 @@ needs one registration, because three of the four flowers accept its
 default. `Rose` differs from the default in both existing operations,
 so it needs a registration in each.
 
-The new operation also sits in one
-place, while the new type's two registrations sit in two places,
-each beside the operation it extends.
+The new operation also sits in one place, while the new type's two
+registrations sit in two places, each beside the operation it extends.
 That difference is the
 [expression problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem).
-Methods on a class keep a new type in one place,
-and functions over a hierarchy keep a new operation in one place.
+Methods on a class keep a new type in one place.
+Functions over a hierarchy keep a new operation in one place.
 No arrangement does both at once.
 
 </details>
@@ -347,7 +347,8 @@ If you annotate the `accept()` parameter as `Visitor` instead of `Visits`,
 because the empty `Visitor` base declares no `visit()`.
 The `Beetle` call then passes the checker, since `Beetle` is a `Visitor`.
 At runtime the call raises the same `AttributeError` as it does under `Any`.
-The solution annotates the parameter with `Visits`, which names the method `accept()` calls.
+The solution annotates the parameter with `Visits`, which names the
+method `accept()` calls.
 
 ```python
 # exercise_3.py
@@ -392,8 +393,9 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 #: [AttributeError] 'Beetle' object has no attribute 'visit'
 ```
 
-**Declare the visitor's interface.** `Visits` names the one method `accept()` calls, so the parameter
-declares what `accept()` needs instead of accepting anything.
+**Declare the visitor's interface.** `Visits` names the one method
+`accept()` calls, so the parameter declares what `accept()` needs
+instead of accepting anything.
 A `Protocol` matches on structure,
 so `Bee` matches `Visits` through the `visit()` it inherits from `Pollinator`.
 Any class with a compatible `visit()`
@@ -403,22 +405,22 @@ The listing keeps the chapter's `Visitor`, `Bug`, `Pollinator`, and
 `Bee` as they are. It drops `Fly`, `Ranunculus`, and the eating half:
 `eat()`, `Chrysanthemum`, `Predator`, and `Worm`.
 
-The `Any` and `Visits` versions report the `Beetle` mistake at different times. Under
-`Any`, the type checker accepts every argument, so the call type-checks.
-At runtime `accept()` raises the `AttributeError` above.
-Under `Visits`, the type checker rejects the argument before the program runs,
-because `Visits` requires a `visit()` method and `Beetle` inherits none.
+The `Any` and `Visits` versions report the `Beetle` mistake at
+different times. Under `Any`, the type checker accepts every argument,
+so the call type-checks. At runtime `accept()` raises the
+`AttributeError` above.
+Under `Visits`, the type checker rejects the argument before the
+program runs, because `Visits` requires a `visit()` method and
+`Beetle` inherits none.
 
 **Demonstrate the runtime failure.** The `# type: ignore` comment
 suppresses the checker's report on the `Beetle` call so the listing can
 show the runtime failure. If you remove the comment, `ty` reports an
 `invalid-argument-type`.
 
-`Any` gives up every check on the visitor side,
-so a bad visitor that the type checker could report before the program runs
-shows up as a runtime `AttributeError` instead.
-The chapter's version needs the `Any` because its `Visitor` base is empty.
-Two fixes restore the check:
+The chapter's version needs the `Any` because its `Visitor` base is
+empty. Two fixes restore the checks that `Any` turns off on the
+visitor side:
 declaring `visit()` abstract on that base, as the classic pattern does,
 or annotating the parameter with the `Visits` protocol, as this solution does.
 
