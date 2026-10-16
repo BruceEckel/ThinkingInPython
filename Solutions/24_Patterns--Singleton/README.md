@@ -1,6 +1,6 @@
 # Singleton: Solutions
 
-## 1. `singleton_pattern.py` rewritten to eager initialization
+## 1. `singleton_pattern.py` rewritten to eager creation
 
 > `singleton_pattern.py` waits for the first construction to build its inner object.
 > Modify it to use eager creation,
