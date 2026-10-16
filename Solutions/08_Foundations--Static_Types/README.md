@@ -295,7 +295,7 @@ because Python starts method lookup at the object's own class.
 
 [Type Parameter Defaults](../../Chapters/08_Foundations--Static_Types.md#type-parameter-defaults) gives `Stack` a default for `T` so a bare `Stack` annotation means `Stack[str]`.
 Use `reveal_type()` from `typing` on `words.top()` with and without the default, and compare what the checker reports.
-The question is what type the checker infers
+Work out what type the checker infers
 for an expression whose type parameter stays unsolved.
 
 <details>
@@ -351,7 +351,7 @@ With the default removed, so does `words.top().no_such_method()`.
 
 A default turns a bare annotation that accepts every operation
 into one that checks each operation against `str`.
-That is the reason to give a default to a class whose parameter is usually the same type.
+So give a default to a class whose parameter is usually the same type.
 
 </details>
 </details>
