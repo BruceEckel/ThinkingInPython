@@ -27,6 +27,6 @@ This file holds no live block, so it is the applied-directly record.
 - Line 521, 708, 926, "The test file confirms that:": a book-wide lead-in for test bullets (chapters 11, 23, 29, 30, 34, 35, 36, and B use it). Not a §61 template tell.
 - Line 711, "A handler receives only its own event type.": the bullet mirrors the test name `test_handler_receives_only_its_event_type`, and "only its own" is a ruled-fine shape.
 - Line 882, "never runs it": the claim (the type checker reads the source statically).
-- Line 884-885, "so a handler names its event once": repeats the motivation from line 754. Kept as the paragraph's tie back to why the tagged bus reads the annotation.
+- Line 885, "so a handler names its event once": repeats the motivation from line 754. Kept as the paragraph's tie back to why the tagged bus reads the annotation.
 - Line 979, "exactly one": a precise count against "many handlers" in the sentence before.
 - Line 1024, exercise "or do you now want an object?": "want" addressed to the reader (carve-out), and exercise imperatives are exempt.
