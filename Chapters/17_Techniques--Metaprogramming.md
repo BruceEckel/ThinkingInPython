@@ -266,7 +266,7 @@ every caller would check for the name and build the missing class.
 A new `EventMakers` starts out empty.
 `NAMES`, imported from `events.py`, holds the seven legitimate event names.
 `__missing__()` checks a name against `NAMES` before building anything,
-so every key the dict acquires names a real event.
+so every key the dict acquires names a declared event.
 
 The demo holds the schedule in `SCHEDULE`,
 one `(name, hour, minute)` tuple per event.
@@ -306,20 +306,20 @@ for event in sorted(
 
 `makers[name]` gets the class object that builds each `Event`.
 On the first lookup of an event type,
-`EventMakers` builds the class and registers it under its name.
+`EventMakers` builds the class and registers it under its name,
+so `LightOn` gets one `Creating` line though `SCHEDULE` names it twice.
 An unknown name raises a `KeyError`, as a missing key in any `dict` does,
 so a `try: ... except KeyError` around a lookup catches it.
 
 The schedule names three of the seven declared event types.
-`built()` compares the classes in the dict with the names in `NAMES`,
-so its line states the result: seven classes declared, three built.
+`built()` counts the classes in the dict against the names in `NAMES`,
+so its line reports three of the seven built.
 
 The demo's loop over the sorted events uses the type distinction.
 The demo fetches the `RingBell` class through `makers`,
 the same lookup the comprehension uses,
 and prefixes `* ` to every event that `isinstance()` reports as a `RingBell`.
-That is what a distinct subclass adds.
-Each event carries its kind as its type,
+A distinct subclass lets each event carry its kind as its type,
 where `isinstance()` or a `match` class pattern can test it.
 
 Calling the base class, `Event(name, hour, minute)`,
@@ -436,6 +436,7 @@ and the class gets `__module__` set to `"builtins"`.
 because pickle looks the class up as `builtins.Start` and does not find it.
 `inspect.getsource()` raises a `TypeError`,
 because a built-in class carries no source.
+
 `type()`-built classes fail differently.
 `LightOn` gets `__module__` set to `events`,
 the module where `make()` calls `type()`.
@@ -663,8 +664,7 @@ so each new table starts from the inherited handlers.
 `handlers` holds the functions the class body defined, not bound methods,
 so `dispatch()` passes `self` to the function it finds.
 
-The listing writes `func.__dict__["event"]` rather than `func.event`,
-and the difference matters to the type checker.
+The listing writes `func.__dict__["event"]` rather than `func.event` to satisfy the type checker.
 A function's type declares a closed set of attributes,
 so the type checker reports `Button.press.event` as an unresolved attribute,
 and it reports the assignment `func.event = event` the same way.
@@ -996,7 +996,7 @@ That branch returns `self`, the descriptor object,
 which is why `isinstance(Point.x, Field)` is `True`.
 
 Each `Field` stores values under `_x` or `_y` in the instance's `__dict__`.
-The underscore prefix does real work.
+The underscore prefix keeps each storage key apart from the attribute's name.
 A descriptor that defines `__set__()` is a *data descriptor*,
 and on every lookup a data descriptor takes precedence over the instance's `__dict__`.
 If `__get__()` asks `obj` for `"x"`, the attribute's own name,
@@ -1448,8 +1448,8 @@ so the line carries a `# type: ignore`.
 
 Both failures have the same shape:
 an inheritance graph that looks legal until you check each base's layout or metaclass.
-That shape is one more reason to reserve metaclasses
-(and, arguably, multiple inheritance) for the cases that truly need them.
+That shape is one more reason to reserve metaclasses,
+and arguably multiple inheritance, for the cases that need them.
 
 ## When You Still Need a Metaclass
 
@@ -1462,8 +1462,7 @@ Use a metaclass when you need to change the class object rather than react to it
   `__init_subclass__()` requires a common base to define it.
   Such a family shares a metaclass instead.
 
-A metaclass can give the class object an `__iter__()`,
-the same method that lets `EnumType` make `for c in Color` work:
+The first case gives the class object an `__iter__()`:
 
 ```python
 # iterable_class.py
@@ -1639,8 +1638,8 @@ at the end of this chapter.
 `display_object()` walks every member that `inspect.getmembers_static()` returns.
 The static variant reads members from the `__dict__` of the object and of each of its classes,
 without invoking descriptors, properties, or `__getattr__()`.
-Inspecting an object therefore runs none of its properties or descriptors.
-That safety matters when you point this tool at something unfamiliar.
+Inspecting an object therefore runs none of its properties or descriptors,
+which makes the tool safe to point at something unfamiliar.
 
 The tool sorts each member into one of two lists.
 Callables become methods,
