@@ -916,7 +916,7 @@ exercise.
 [Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) explains the four operator methods that `expr.py` defines.
 The *Multiple Dispatching* chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
 In each method, test the operand with `isinstance()` and return `NotImplemented` when it is neither an `Expr` nor an `int`.
-Python then tries the reflected method on the other operand and, when that declines too, raises the `TypeError` for you.
+Python then tries the reflected method on the other operand, and when that declines too, the expression raises a `TypeError`.
 
 <details>
 <summary>The shape</summary>
@@ -1150,7 +1150,9 @@ pieces from the interpolations.
 
 **Escape the interpolated values.** `html.escape()` replaces the characters, so the exercise's
 real content is *where* `to_html()` calls it: on the interpolated
-values. The `<p>` and `</p>` the author typed pass through as written,
+values. `html.escape()` replaces the two quote characters, `"` and
+`'`, as well, because its `quote` argument defaults to `True`.
+The `<p>` and `</p>` the author typed pass through as written,
 so the browser sees the author's paragraph with the comment's markup
 escaped inside it.
 
@@ -1382,7 +1384,7 @@ language adds.
 
 **Keep the match exhaustive.** `Op` is an enum rather than a string so the `match` stays exhaustive.
 `work` holds `Expr | Op`, and every member of both types has its own
-case, so `assert_never()` type-checks. A string marker leaves
+case, so `assert_never()` type-checks. A marker typed `str` leaves
 `case _` reachable, and the type checker then rejects the `assert_never()` call.
 
 `sys.setrecursionlimit()` avoids the error for `evaluate()`, but it
