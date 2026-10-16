@@ -511,11 +511,6 @@ The standard library's `weakref.proxy()` is a transparent forwarding wrapper too
 but it solves none of these four.
 It forwards to a weakly referenced object and raises `ReferenceError` once the last strong reference to that object goes away.
 
-The `weakref` module supplies the `weakref.finalize()` and `weakref.ref()` that [Cleanup](10_Foundations--Cleanup.md#reliable-alternatives)
-uses, and the `WeakValueDictionary` in that chapter's [Watching Objects Without Holding Them](10_Foundations--Cleanup.md#watching-objects-without-holding-them)
-section.
-Neither section needs `weakref.proxy()`.
-
 ### Virtual Proxy
 
 A *virtual proxy* delays building a slow-to-build object until the first attribute access on the proxy:
