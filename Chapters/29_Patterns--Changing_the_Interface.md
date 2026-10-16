@@ -21,7 +21,7 @@ callers keep using the old one until a deprecation mark tells them to switch.
 ## Adapter
 
 An adapter's only job is to produce the interface you need from the one you have.
-In a common real case, a third-party library names its methods `g()` and `h()`,
+In a common case, a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
 An adapter implements `f()` by calling `g()` and `h()`.
@@ -433,7 +433,7 @@ so the caller names `Facade` in place of `Ignition`, `FuelPump`, and `Engine`.
 The cleaner Python façade is a module.
 A module presents a curated set of names over any confusing collection of classes behind it.
 As [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)
-notes, a module loads once, and every importer shares the same module.
+notes, a module loads once, so every importer shares the same module.
 At module level, put the convenient functions and the few classes to expose.
 If you keep the messy internals private
 (using a leading underscore, by convention), the `import` is the façade:
@@ -530,12 +530,13 @@ Name a wrapper for why it is there, not for its shape.
 
 ## Deprecating the Old Interface {#deprecating-the-old-interface}
 
-Replacing an interface you own takes two steps,
-and writing the new interface is the first.
+Replacing an interface you own takes two steps.
+The first is writing the new interface.
 Once the better interface exists,
 callers keep using the old one until something tells them to switch.
 Deleting the old interface breaks those callers.
-The second step marks it, which keeps it working and tells each caller to move.
+The second step marks the old interface as deprecated,
+which keeps it working and tells each caller to move.
 
 `warnings.deprecated()` marks a function, method,
 or class as scheduled for removal
