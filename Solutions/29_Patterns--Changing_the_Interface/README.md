@@ -91,6 +91,8 @@ and the adapter's `pairs` field refers to the same list as before.
 Python looks up a special method on the class, not on the instance,
 so the lookup skips `__getattr__()` and finds no `__len__()` on
 `PairsAdapter`.
+[Special Methods Bypass `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#special-methods-bypass-getattr)
+in *Surrogate* covers that lookup rule.
 `adapter[key]` works because the class defines `__getitem__()`.
 An adapter that must support `len()` defines a `__len__()` that
 returns `len(self.pairs)`.
