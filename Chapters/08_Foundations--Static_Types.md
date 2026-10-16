@@ -302,7 +302,7 @@ Every other listing in this book writes the type out on `Final`.
 
 ## Structural Typing with Protocols
 
-Earlier chapters rely on *dynamic typing*.
+Earlier chapters rely on dynamic typing.
 A function accepts any object,
 so long as the object supports the operations the function performs on it.
 Python checks the type at runtime, when the operation runs.
@@ -500,6 +500,13 @@ with expected(AttributeError):
 `ty check` passes this file.
 `n` is `Any`, so every attribute access on it type-checks,
 including one that runs and fails.
+
+`expected()` is the `with` form of the `expect()` helper that [Functions](05_Foundations--Functions.md)
+introduces.
+The block under `with expected(AttributeError):` runs,
+and the manager catches the named exception and prints it.
+[Context Managers](15_Techniques--Context_Managers.md#the-expected-manager)
+builds it.
 
 A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
@@ -946,7 +953,7 @@ The abstract container types come from `collections.abc`.
 | `@final` | Forbids subclassing the class, or overriding the method, see [Metaprogramming](17_Techniques--Metaprogramming.md#making-a-class-final) |
 | `cast(T, x)` | Tells the type checker to treat `x` as `T`; [*Flyweight*](35_Patterns--Flyweight.md#typing-the-symbol-set) shows the runtime guard to prefer over it |
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Type-checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) |
-| `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) |
+| `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Modules and Packages](06_Foundations--Modules_and_Packages.md#circular-imports) |
 
 These decorators and directives exist for the type checker and the reader,
 and at runtime most of them do nothing.
