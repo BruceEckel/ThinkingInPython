@@ -89,7 +89,8 @@ and its brackets show at a glance that it produces a list.
 `map()` and `filter()` are the better choice when a named function does the work:
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
 So the `lambda` makes `map_and_filter.py` worse, not `map()`.
-[Functional Foundations](40_Functional--Foundations.md) returns to the choice.
+[Functional Foundations](40_Functional--Foundations.md#higher-order-functions)
+compares what the two forms return.
 
 A `lambda` predicate leaves the element type of `filter()`'s result at `int | str`,
 so `ty` rejects `e ** 2`.
