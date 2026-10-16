@@ -21,6 +21,10 @@ Examples/24_Patterns--Singleton/singleton_class.py::singleton.wrapped
 Examples/27_Patterns--Factory/pizza_builder.py::PizzaBuilder.no_cheese
 Examples/30_Patterns--Observer/document_view.py::View.display_count
 Examples/30_Patterns--Observer/document_view.py::View.display_history
+Examples/31_Patterns--State_Machines/vending_machine.py::Column.C0
+Examples/31_Patterns--State_Machines/vending_machine.py::Column.C1
+Examples/31_Patterns--State_Machines/vending_machine.py::Column.C2
+Examples/31_Patterns--State_Machines/vending_machine.py::Column.C3
 Examples/31_Patterns--State_Machines/vending_machine.py::Row.B
 Examples/31_Patterns--State_Machines/vending_machine.py::VendingMachine.row
 Examples/31_Patterns--State_Machines/vending_machine.py::VendingMachine.sold_out

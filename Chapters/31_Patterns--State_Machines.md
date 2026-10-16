@@ -225,7 +225,7 @@ and `action` holds the behavior particular to one state,
 such as `Holding`'s chime.
 
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
-then feeds a fresh trap an input that `waiting()`'s `case _` alone matches:
+then feeds a fresh trap an input that only matches `waiting()`'s `case _`:
 
 ```python
 # trap_states_demo.py
@@ -387,10 +387,18 @@ class StateMachine:
 A `Rule` reads as a sentence: from `state`, on an input of `input_type`,
 go to `next_state`, running `action` if the rule has one,
 provided `condition` passes if the rule has one.
-A state is an `Enum` member, so a misspelled state is a type error,
-where a misspelled string would be a key the machine never reaches.
+A state is an `Enum` member, so a misspelled state is a type error.
+A misspelled string would pass the checker,
+so the machine would raise `NoTransition` at the first input the rule was written to handle.
 `Rule` is generic in `I`, the input class, and `input_type` is `type[I]`,
 so a rule's `action` and `condition` must accept the class its `input_type` names.
+
+`input_type` is a field as well as the argument of `type[I]`,
+because the two do different jobs.
+`I` exists for the type checker and is erased before the program runs,
+so a `Rule[Money]` object carries only what its fields hold.
+The `input_type` field holds the class,
+and the constructor uses it as half of each table key.
 
 The constructor groups the rules by `(state, input_type)` into a dictionary,
 so `handle()` finds the candidates for the current state and the input's class in one lookup.
@@ -417,7 +425,7 @@ so a caller can catch the specific failure instead of every `RuntimeError` an ac
 
 ### A Vending Machine
 
-One table now defines the whole machine.
+A single table can now define the machine.
 The conditions and actions are ordinary methods, stored in the table.
 The machine collects money, takes a selection as a row and then a column,
 then either dispenses the item, reports it sold out,
