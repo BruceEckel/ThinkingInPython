@@ -255,10 +255,6 @@ def test_both_leased_at_once() -> None:
     assert pool.available() == 2
 ```
 
-The solutions tree cannot import the chapter's `object_pool.py`, so
-the file carries its own copy of `Connection` and `Pool`. In the
-chapter's `test_object_pool.py` you add the test function alone.
-
 **Hold both connections at once.** The `lease()` at `[1]` takes one connection out of the queue, and the
 nested `lease()` at `[2]` takes the other, so `pool.available()` is `0`
 inside the inner `with`. The `0` confirms that the pool hands out one
