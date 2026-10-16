@@ -1,6 +1,3 @@
-3. Chapter 34's figure and listing disagree on the call form.
-In chapter 34, the composite_tree figure and the opening sentence write disk_usage(root) as a function while filesystem_classic.py calls root.disk_usage(). Decide which form the section teaches first, make the figure spec in tools/story_figures/ and the sentence agree with it, regenerate the figure, and commit.
-
 Are there any unresolved claude artifacts
 
 Implementation is Friction
@@ -37,11 +34,11 @@ Fatal vs recoverable errors
 ## Periodic
 
 - Have we learned anything new that should be added to thinking-in-python-skill.md?
-- Run 'make prose' on each chapter
 - Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better?
   Put the result at the root in ADVERSARIAL.md
-- Pass through looking for metadiscourse phrases, empty frames, and expletive constructions
-
+[[- Run 'tip prose' on each chapter
+- Do a Pass through the book looking for metadiscourse phrases, empty frames, and expletive constructions
+]] -- these are part of "activate" skill
 
 
 ******************
