@@ -466,6 +466,9 @@ print(distance(PairCoord(Pair(3, 0)),
 
 `Point` and `PairCoord` share no base class.
 Both have `x` and `y`, and those two attributes are all `distance()` requires.
+`PairCoord` is an *Adapter*,
+the pattern that [Changing the Interface](29_Patterns--Changing_the_Interface.md#adapter)
+covers.
 
 `Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
 A bare annotation in a protocol is a read-write attribute,
