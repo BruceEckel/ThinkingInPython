@@ -70,7 +70,7 @@ print(deque_time < list_time)
 But the margin grows with `n`. Each `list.insert(0, x)` or
 `list.pop(0)` shifts every remaining element, so the whole loop costs
 O(n²). Each `deque` operation is O(1), so the `deque` loop costs O(n).
-At a few dozen items the constant-factor overhead of a `deque` makes the two times nearly equal,
+At a handful of items the constant-factor overhead of a `deque` makes the two times nearly equal,
 though by `n = 2_000` the `deque` finishes several times faster.
 At large `n` the list's quadratic term dominates,
 so the list falls further behind the `deque` as `n` grows.
@@ -164,7 +164,7 @@ member of all three sets.
 <details>
 <summary>Where to look</summary>
 
-[Immutability](../../Chapters/03_Foundations--Containers.md#immutability) explains that immutable containers are hashable, so they work as set members or dictionary keys.
+[Immutability](../../Chapters/03_Foundations--Containers.md#immutability) explains that a `frozenset` is hashable, so it works as a set member or a dictionary key.
 A `set` must hash each element when it adds it.
 Wrap the `groups.add()` call in a `try`, catch `TypeError`, and relate the message to what a `list` allows you to do after creation.
 
