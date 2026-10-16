@@ -238,7 +238,8 @@ each named for what its patterns do:
 
 The catalog above comes from GoF.
 Patterns from outside it,
-like the [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object),
+like the [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object)
+and the next chapter's [*Data Transfer Object*](22_Patterns--Data_Transfer_Objects.md),
 appear in the [Pattern Catalog](39_Patterns--Pattern_Catalog.md).
 
 <!-- The quoted "clearly" below is the vague word this paragraph objects to,
