@@ -98,8 +98,8 @@ and `a.show()` finds it by the same fallback that finds `a.x`:
 nothing on the instance, so look at the class.
 Because the class dictionary holds the method,
 assigning `a.show = something` shadows the method for `a` alone.
-The inspection helper `display_object()` from [Classes](07_Foundations--Classes.md)
-reports attributes and methods separately,
+The inspection helper `display_object()` that [Classes](07_Foundations--Classes.md)
+introduces reports attributes and methods separately,
 but the same class dictionary holds both.
 
 One kind of class attribute follows a different rule.
