@@ -371,8 +371,7 @@ for name, age in ages.items():
 When a key might be missing, use `dict.get()`,
 which returns a default where `[]` raises a `KeyError`.
 
-Iterating over a `dict` follows insertion order,
-and the language guarantees that order.
+Iterating over a `dict` follows insertion order, which the language guarantees.
 
 `keys()`, `values()`, and `items()` each return a *view*:
 an object that reads the `dict`'s current contents each time you use it,
@@ -405,7 +404,8 @@ for name, age in {"Bo": 1, "Al": 2}:  # [2]
 At `[1]`, unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
 At `[2]`, every key has two characters,
-so each key unpacks into its two letters and the loop runs to the end with a letter in `name` and a letter in `age`.
+so each key unpacks into its two letters.
+The loop runs to the end with a letter in `name` and a letter in `age`.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable.
 Each supports the [set operators](#sets) `&`, `|`, `-`,
@@ -539,9 +539,9 @@ Every set-algebra operator in `sets.py` has a named method:
 `intersection()` for `&`, `union()` for `|`, `difference()` for `-`,
 `symmetric_difference()` for `^`, `issubset()` for `<=`,
 and `issuperset()` for `>=`.
-The methods accept any iterable where the operators need a set on both sides,
-and `union()`, `intersection()`,
-and `difference()` take several arguments at once.
+The methods accept any iterable where the operators need a set on both sides.
+`union()`, `intersection()`,
+and `difference()` also take several arguments at once.
 `isdisjoint()` adds one more test, with no operator form:
 
 ```python
@@ -972,7 +972,7 @@ The `tuple` holds the same `list` for its whole life.
 That `list` stays free to change.
 An immutable container holding an unhashable object is unhashable too.
 
-Immutability is beneficial when every nested object is immutable too,
+Immutability is beneficial when every nested object is also immutable,
 because then you can share or hash the container and trust that everything inside it stays the same.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 shows the same shallow immutability inside a frozen data class.
