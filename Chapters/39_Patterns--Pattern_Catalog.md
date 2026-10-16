@@ -135,7 +135,7 @@ so use this section's table when you know the problem but not the name.
 | *Read-Write Lock* | Allow concurrent readers but exclusive writers. |
 | [*Structured Concurrency*](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) | Tie concurrent tasks to a scope that exits only after every task finishes, cancelling the rest when one fails. |
 | [*Thread Pool*](19_Techniques--Concurrency.md#one-executor-interface-three-pools) | Reuse a set number of worker threads across many tasks. |
-| [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does. `ContextVar` scopes the value to the context instead. |
+| [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value. `ContextVar` scopes the value to the context instead. |
 
 The name *Reactor* says little about what the pattern does.
 The pattern is a dispatcher.
