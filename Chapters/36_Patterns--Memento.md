@@ -19,7 +19,8 @@ Immutable state removes the need.
 ## A Snapshot Is Not a Reference
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
-covers aliasing and copying, and a memento depends on the difference.
+shows a getter handing out a reference where the caller expects a copy,
+and a memento depends on that difference.
 A memento works when it is a copy and fails when it is an alias.
 The beginner's memento is an assignment, and an assignment aliases:
 
