@@ -336,7 +336,7 @@ The header checks that the stack has an item, pops it, names it, and tests it,
 so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
-A *comprehension* builds a list, dictionary,
+A comprehension builds a list, dictionary,
 or set from an iterable in one expression.
 [The last section of this chapter](#comprehensions) shows its three forms.
 A comprehension can use `:=` the same way,
