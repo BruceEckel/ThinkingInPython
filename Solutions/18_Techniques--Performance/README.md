@@ -725,7 +725,7 @@ print(f"both under 50 microseconds per call at 100 parts: "
 
 The ratio persists.
 One machine measured `join` about 19 times faster at 10,000 parts and about 7 times faster at 100.
-What shrinks is the absolute time.
+The absolute time shrinks instead.
 At 100 short strings both versions finish in a couple of microseconds,
 so `build_join()` and `build_concat()` must run thousands of times before the choice shows up in a profile.
 
