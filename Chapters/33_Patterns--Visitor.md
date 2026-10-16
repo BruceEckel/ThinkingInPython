@@ -325,7 +325,7 @@ instead.
 
 Because each operation is a plain function,
 a test calls it with each flower type and asserts the result.
-The cases worth covering are the registered types,
+The tests cover the registered types,
 the `@singledispatch` default for an unregistered type,
 and a subclass that resolves to its nearest registered ancestor:
 
@@ -426,7 +426,8 @@ A new visitor defines `visit()` for a single flower.
 
 ## One Dispatch Is Enough
 
-*Visitor* dispatches twice, and `singledispatch` dispatches once.
+*Visitor* dispatches twice.
+`singledispatch` dispatches once.
 The figure sets *Visitor* and `singledispatch` side by side,
 with the worm from `dispatch_trace.py` and the `nectar()` operation from `visitor_singledispatch.py`:
 
