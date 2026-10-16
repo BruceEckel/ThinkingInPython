@@ -1346,7 +1346,8 @@ with expected(TypeError):
 `cached_property` writes its cached value into the instance's `__dict__`,
 so a slotted class needs a `"__dict__"` entry of its own in `__slots__` before `cached_property` works.
 That entry gives back the per-instance dict that `slots=True` exists to remove.
-The same is true of weak references.
+The same is true of weak references,
+as [Cleanup](10_Foundations--Cleanup.md#slotted-class-needs-weakref) shows.
 Add `"__weakref__"` to `__slots__` if some other object needs to hold one
 (`weakref_slot=True` adds it to a data class).
 
