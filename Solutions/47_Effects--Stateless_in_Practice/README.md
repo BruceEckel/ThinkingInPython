@@ -137,11 +137,10 @@ but both strings then carry that moment.
 No handler can reproduce the bug,
 because the bug belongs to a function that asks twice and treats the answers as one.
 
-Asking twice and treating the answers as one is the general shape of a clock bug.
-Reading a clock twice reads a changing value twice,
-and two readings are two facts rather than one.
+Asking twice and treating the answers as one is the general shape of a
+clock bug, since two readings of a changing value are two facts.
 Naming the clock as an Ability makes the failure reproducible.
-Deriving both strings from a single reading removes the failure.
+Deriving both strings from a single reading removes it.
 
 </details>
 </details>
@@ -470,8 +469,9 @@ and whether one of them is new.
 Choosing the source in the handler is the same substitution `Console` and `Feed` allow, applied to a choice
 made fresh at every request rather than once at the start.
 
-**Leave an hour with no supplier.** With every other source shortened, hour 20 has no supplier,
-and the `Blackout` propagates out of `run()` instead of arriving on the Effect's error channel.
+**Leave an hour with no supplier.** With every other source shortened, hour 20 has no supplier.
+The `Blackout` propagates out of `run()` instead of arriving on the
+Effect's error channel.
 `catch(Blackout)` around `run_load()` does not intercept it,
 because `catch()` handles the failures an Effect yields on its error channel,
 and `choose()`, the handler, raises this one.
@@ -580,19 +580,20 @@ The third request produces a working one, which then covers both hours.
 The test checks that re-request behavior with a handler that answers from a list
 instead of weather, a clock, or a battery.
 
-The test cannot tell you whether `controller()` is right.
-The test leaves every question about policy unchecked: whether `controller()`
-prefers solar before the battery, whether the battery reports itself
+The test cannot tell you whether `controller()` is right. It leaves
+every question about policy unchecked: whether `controller()` prefers
+solar before the battery, whether the battery reports itself
 unavailable once exhausted, whether `controller()` asks about the hour
 for which `run_load()` draws power. The scripted handler ignores
-`request.hour`.
-Ignoring the hour makes the handler simple to write
-and also means the test exercises none of the choices `controller()` makes by the hour.
-The scripted test checks the consumer of the Ability and leaves the producer untested.
+`request.hour`, which makes it simple to write and means the test
+exercises none of the choices `controller()` makes by the hour. The
+scripted test checks the consumer of the Ability and leaves the
+producer untested.
 
-`controller()` needs its own test, and that test can be an ordinary one.
-`controller()` builds an ordinary function
-from an `Outlet` to a `Source`, and a test can call that function with an `Outlet` and check which `Source` it returns.
+`controller()` needs its own test, and that test can be an ordinary
+one. `controller()` builds an ordinary function from an `Outlet` to a
+`Source`, so a test can call that function with an `Outlet` and check
+which `Source` it returns.
 
 </details>
 </details>
@@ -826,8 +827,8 @@ def research() -> Effect[
     return checked
 ```
 
-**Add and declare the failure.** `research.py` takes four edits, and the
-type checker names one of them. `report()` needs three more.
+**Add and declare the failure.** `research.py` takes four edits, one of
+which the type checker names. `report()` needs three more.
 
 1. A new exception class, `TooLong`.
 2. A new `@throws(TooLong)` function, `within_limit()`, since `@throws` lifts a raised
@@ -1288,14 +1289,13 @@ print(run(scripted((60, 50, 30, 20))), written)
 `100` before the first purchase, `40` after it, `40` again because `purchase()`
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 
-**Prove the loop tries every price.** `spree()` attempts all four prices, and the test proves it from both sides.
-A fifth `Get` request would exhaust the script.
-`handle()` reads the `StopIteration` from `read()` as the end of the Effect,
-the silent failure the chapter describes,
-so `run()` would return `None` and the first assertion would fail on `None == 2`.
-Stopping early leaves a balance unread, and the
-final assertion catches that by checking that the iterator has
-run out.
+**Prove the loop tries every price.** The test proves from both sides
+that `spree()` attempts all four prices. A fifth `Get` request would
+exhaust the script. `handle()` reads the `StopIteration` from `read()`
+as the end of the Effect, the silent failure the chapter describes, so
+`run()` would return `None` and the first assertion would fail on
+`None == 2`. Stopping early would leave a balance unread, which the
+final assertion catches by checking that the iterator has run out.
 
 **Record each write.** `written` records one entry per successful purchase, `[40, 10]`, so the
 assertions together say that `spree()` tries every price and writes only the
@@ -1306,7 +1306,7 @@ version has one piece of state, so the next `Get` returns whatever the last
 `Put` wrote. Here the test scripts the balances independently of the writes.
 The script says 40 follows the first purchase because the test's author did that
 subtraction. A `spree()` that writes the wrong amount, say `funds` instead of
-`funds - price`, still fails, at `written == [40, 10]`.
+`funds - price`, still fails the test, at `written == [40, 10]`.
 
 The scripted test checks the Effect's shape: which requests the Effect makes, in
 which order, with which payloads.
@@ -1418,7 +1418,7 @@ for version in (thrown, lifted):
 #: lifted: Empty()
 ```
 
-**Give both versions one type.** The two versions produce the same results, as the loop demonstrates, and
+**Give both versions one type.** The two versions produce the same results, as the loop demonstrates.
 `reveal_type()` reports the same return type for both:
 `Generator[Need[Ticker] | Unavailable | Empty, Any, str]`.
 `thrown()` writes that union in its annotation. `lifted()` annotates the
@@ -1439,8 +1439,8 @@ annotation allows `Need[Ticker] | Unavailable | Empty`. If you change
 decorator still says `@throws(Empty)`, the checker reports nothing.
 At runtime the `ValueError` propagates through `catch(Unavailable, Empty)` and out of
 `run()` as an ordinary exception.
-The decorator's argument is a claim about the function, not a check on it,
-and no type checker compares a `raise` with a decorator's arguments.
+The decorator's argument is a claim about the function, not a check on it.
+No type checker compares a `raise` with a decorator's arguments.
 So the type checker verifies the version that yields its failure,
 and accepts the version that raises its failure without checking the `raise`.
 
@@ -1550,13 +1550,13 @@ print(type(long).__name__)  # [1]
 The declared `str | Unavailable | NotInteresting | NoArticle` is now too narrow.
 `ty` reports an `invalid-return-type` on the `return run(...)` line, naming
 `TooLong` as the member that does not fit. Adding `| TooLong` to the annotation
-fixes it, and the `print()` at `[1]` exercises the new branch.
+fixes it. The `print()` at `[1]` exercises the new branch.
 
 Removing `outcome()`'s return annotation makes the error disappear.
 `ty` infers no return type from the body.
 `reveal_type(outcome)` reports `-> Unknown`, and `Unknown` is compatible with
 every type, so the returned value contradicts nothing.
-Pyright does infer the union from the body, and under Pyright the function
+Pyright does infer the union from the body, so under Pyright the function
 changes its type every time `research()`'s error set changes.
 
 `ty` stops checking the correspondence between the annotation and the
@@ -1572,7 +1572,7 @@ the new member, up to the first caller with an annotation.
 Exercise 4 of
 [Generators](../../Chapters/45_Effects--Generators.md) needs a declared type to
 catch a missing `yield from` for the same reason.
-A type checker verifies claims, and an inferred type is not a claim.
+A type checker verifies claims. An inferred type is not a claim.
 
 </details>
 </details>
@@ -1712,8 +1712,8 @@ runs, because `handle()` reads `get_type_hints()` on the handler to learn which
 Ability the handler answers.
 
 The two annotations therefore do different jobs.
-The accessor's annotation serves the type checker, and the handler's annotation is data the library
-reads at runtime.
+The accessor's annotation serves the type checker.
+The handler's annotation is data the library reads at runtime.
 The accessor's annotation is the optional one,
 though the handler's annotation looks more like bookkeeping.
 
@@ -1853,7 +1853,7 @@ error[invalid-yield]: Yield expression type does not match annotation
 
 **Declare every inherited requirement.** The diagnostic points at the `yield from`, not at the signature, and it prints
 the whole union that `toast()` yields. That union is the answer to "what does
-`buttered()` need," and the fix is to write it down. `buttered()` names
+`buttered()` need?" The fix is to write it down. `buttered()` names
 `Dough` and `Oven` in its type, and its body reaches them through `toast()`.
 That is the propagation the chapter describes: a caller inherits every requirement of
 every Effect to which it delegates.
