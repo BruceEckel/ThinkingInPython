@@ -221,7 +221,7 @@ The words "observer" and "listener" name a role that waits and watches,
 and neither word says what happens when the change arrives.
 "Responder" names the action.
 That word poses the question every *Observer* design must answer:
-what does this code do when there's a change?
+what does this code do when something changes?
 A responder can disconnect itself mid-notification, raise an exception,
 wait on a slow network call, or write back to its broadcaster.
 Each of those behaviors changes how you write the broadcaster.
@@ -726,7 +726,7 @@ and returns before it reaches `announce()` a second time.
 `announce()` runs once, for the original assignment.
 
 The alternative is a re-entry flag, set before `announce()` and cleared after,
-with the setter returning early while the flag is set.
+with the setter returning early while the flag reads `True`.
 The flag breaks the cycle without comparing values,
 so a second write of the same reading still reaches the responders.
 That behavior suits a responder that counts readings rather than modifications.
@@ -1521,7 +1521,7 @@ and calls `select()`.
 
 ## Document-View and MVC
 
-This chapter opened by saying Document-View combines the controller with the view.
+Document-View combines the controller with the view.
 We'll look at two approaches that differ only in where the input handling lives.
 With Document-View, `View` has a `key()` method as a controller,
 while MVC gives `key()` to a `Controller` class.
