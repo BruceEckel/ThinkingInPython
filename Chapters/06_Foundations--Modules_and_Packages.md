@@ -33,8 +33,8 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
 The code at the end of `use_module.py` starts with an `if` clause that checks whether the standard variable `__name__` equals the string `"__main__"`.
-Any identifier that begins and ends with double underscores
-(commonly called a *dunder*) is special in some way.
+Any identifier that begins and ends with double underscores (a dunder)
+is special in some way.
 Python calls a class's dunder methods, for example,
 to apply the language's operators and built-in functions to its objects.
 [Classes](07_Foundations--Classes.md)
