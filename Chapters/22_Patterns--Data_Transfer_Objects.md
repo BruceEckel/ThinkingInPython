@@ -194,7 +194,7 @@ Because the constructor sets every field once,
 does the same job for a `NamedTuple`, a frozen data class,
 and any other type that defines `__replace__()`.
 Immutability also makes a `NamedTuple` hashable,
-so a `Color` can serve as a `dict` key or a `set` element.
+so a `Color` can be a `dict` key or a `set` element.
 
 Immutability applies to the fields, not to the objects they name.
 A `NamedTuple` holding a list lets that list change,
