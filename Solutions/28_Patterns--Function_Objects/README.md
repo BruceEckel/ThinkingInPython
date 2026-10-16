@@ -183,6 +183,10 @@ MAX_ITER: Final[int] = 200
 NO_CONVERGENCE: Final[Failed] = Failed(
     f"no convergence in {MAX_ITER} steps")
 
+def bisection_tol(f: Fn, a: float, b: float,
+                  tolerance: float) -> float | Failed:
+    ...
+
 def bisection(f: Fn, a: float, b: float) -> float | Failed:
     ...
 
@@ -234,18 +238,20 @@ MAX_ITER: Final[int] = 200
 NO_CONVERGENCE: Final[Failed] = Failed(
     f"no convergence in {MAX_ITER} steps")
 
-def bisection(f: Fn, a: float, b: float) -> float | Failed:
+def bisection_tol(f: Fn, a: float, b: float,
+                  tolerance: float) -> float | Failed:
     if f(a) * f(b) > 0:
         return Failed(f"no root bracketed by [{a}, {b}]")
-    for _ in range(MAX_ITER):
+    while abs(b - a) > tolerance:
         mid = (a + b) / 2
-        if abs(f(mid)) < TOLERANCE:
-            return mid
         if f(a) * f(mid) <= 0:
             b = mid
         else:
             a = mid
-    return NO_CONVERGENCE
+    return (a + b) / 2
+
+def bisection(f: Fn, a: float, b: float) -> float | Failed:
+    return bisection_tol(f, a, b, TOLERANCE)
 
 def secant(f: Fn, a: float, b: float) -> float | Failed:
     x0, x1 = a, b
@@ -304,11 +310,12 @@ so a handler that reports why it failed needs a failure value that holds the rea
 `Failed` is that value, a record with one field.
 Each finder now returns `float | Failed`.
 
-**Report each way to fail.** A finder has more than one way to fail,
+**Report each way to fail.** A finder can have more than one way to fail,
 and each failing `return` states its own reason.
-`bisection()` returns a `Failed` at once when `f` has the same sign at
-both ends of the interval.
-When its loop finishes `MAX_ITER` iterations, it returns `NO_CONVERGENCE`.
+`secant()` returns a `Failed` on a flat step, and `NO_CONVERGENCE`
+when its loop finishes `MAX_ITER` iterations.
+`bisection()` has one way to fail: it returns a `Failed` at once when
+`f` has the same sign at both ends of the interval.
 
 **Tell a root from a failure.** `first_root()` tells a root from a `Failed`
 with `match`. `case Failed(reason)` prints the reason and lets the

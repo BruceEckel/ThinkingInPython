@@ -19,18 +19,20 @@ MAX_ITER: Final[int] = 200
 NO_CONVERGENCE: Final[Failed] = Failed(
     f"no convergence in {MAX_ITER} steps")
 
-def bisection(f: Fn, a: float, b: float) -> float | Failed:
+def bisection_tol(f: Fn, a: float, b: float,
+                  tolerance: float) -> float | Failed:
     if f(a) * f(b) > 0:
         return Failed(f"no root bracketed by [{a}, {b}]")
-    for _ in range(MAX_ITER):
+    while abs(b - a) > tolerance:
         mid = (a + b) / 2
-        if abs(f(mid)) < TOLERANCE:
-            return mid
         if f(a) * f(mid) <= 0:
             b = mid
         else:
             a = mid
-    return NO_CONVERGENCE
+    return (a + b) / 2
+
+def bisection(f: Fn, a: float, b: float) -> float | Failed:
+    return bisection_tol(f, a, b, TOLERANCE)
 
 def secant(f: Fn, a: float, b: float) -> float | Failed:
     x0, x1 = a, b
