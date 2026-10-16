@@ -46,12 +46,15 @@ class Aluminum(Trash):
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
-def sum_value(items: list[Trash]) -> float:
+def sum_value(contents: list[Trash]) -> float:
     ...
 ```
 
 <details>
 <summary>Solution</summary>
+
+The listing bins a two-piece sample. On `plastic.dat`, the same binning
+yields the `Plastic: 9.00` total that `recycle_dict_plastic.py` prints.
 
 ```python
 # exercise_1.py
@@ -81,8 +84,9 @@ class Aluminum(Trash):
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
-def sum_value(items: list[Trash]) -> float:
-    return sum(t.weight * t.value for t in items)
+def sum_value(contents: list[Trash]) -> float:
+    return sum(piece.weight * piece.value
+               for piece in contents)
 
 items = [Trash.create("Plastic", 10.0),
          Trash.create("Aluminum", 2.0)]
@@ -100,8 +104,8 @@ for kind, group in bins.items():
 `class` statement runs, so `Trash.create("Plastic", weight)` finds
 the class with no further code.
 
-**Bin each piece by its class.** `recycle_dict.py`'s sorting loop needs no
-change because `bins[type(piece)].append(piece)` keys on the class of each
+**Bin each piece by its class.** `sort_by_type()` needs no change because
+its loop, `bins[type(piece)].append(piece)`, keys on the class of each
 piece. `Plastic` is a new key for the dictionary, and
 `defaultdict` creates its bin the way it creates every other.
 
@@ -112,8 +116,8 @@ names no material.
 If `Plastic` needs special handling, an optional
 `@recycling_note.register` function provides it.
 
-`plastic_dropped.py` parses four pieces and bins two. Its `match` has
-no `case` for `Plastic` and no `case _`.
+`plastic_dropped.py` parses four pieces and bins two. The `match` in
+`sort_by_match()` has no `case` for `Plastic` and no `case _`.
 The twenty-pound and forty-pound pieces fall through it,
 and the loop moves on to the next piece. Sixty pounds
 at 0.15 a pound is the `Plastic: 9.00` that

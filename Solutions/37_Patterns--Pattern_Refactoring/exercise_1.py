@@ -25,8 +25,9 @@ class Aluminum(Trash):
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
-def sum_value(items: list[Trash]) -> float:
-    return sum(t.weight * t.value for t in items)
+def sum_value(contents: list[Trash]) -> float:
+    return sum(piece.weight * piece.value
+               for piece in contents)
 
 items = [Trash.create("Plastic", 10.0),
          Trash.create("Aluminum", 2.0)]
