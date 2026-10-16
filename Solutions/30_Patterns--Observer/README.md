@@ -298,10 +298,9 @@ t.celsius = 25
 #: display: 25C
 ```
 
-**Name the subject the observer reads.** `Display.update()` now declares `subject: Thermometer` and
-`t.attach(Display())` type-checks.
+**Name the subject the observer reads.** With `Display.update()` declaring `subject: Thermometer`,
+`t.attach(Display())` now type-checks.
 The requirement the first version's `assert` stated now sits in the observer's type, which names the subject the observer watches.
-A display written for a `Thermometer` therefore cannot attach to a different `Subject[float]`.
 An observer that declares the wider `Subject[float]` still attaches to any `Subject[float]`,
 because a parameter is contravariant.
 An observer that reads `celsius` must declare `Thermometer`,
@@ -957,7 +956,7 @@ can also inherit from `Broadcaster[Grid]`, as `GridModel` does, and
 call `self.announce(self.grid)` at the end of a successful `select()`.
 `grid_view.py`'s existing view then repaints after every move. The
 drawing code needs no change, but `show()`'s parameter annotation does.
-That annotation names `GridModel`, and a `FloodGame` is not one.
+That annotation names `GridModel`, which a `FloodGame` is not.
 Widening the annotation lets the same view draw either model.
 The wider type can be a Protocol,
 or `Broadcaster[Grid]` plus `size`, `grid`, and `select()`.
@@ -1072,11 +1071,11 @@ inside it and the comprehension needs no `in grid` test.
 
 **Show the grid as text.** `initials()` prints each
 cell's first letter, one row per line.
-After the selection at column 1, row 2, that column and that row have advanced one color,
-and the other nine cells are as they were.
+After the selection at column 1, row 2, that column and that row have advanced one color.
+The other nine cells are as they were.
 
 Pasting this `recolored()` over the one in `grid_observer.py` changes
-what the window does, and `grid_view.py` runs as it stands. Two
+what the window does. `grid_view.py` runs as it stands. Two
 places in the view involve a selection. Its mouse responder calls
 `model.select()` with a coordinate, and its `draw()` receives a whole
 `Grid` and paints every cell. Both leave the choice of cells to the
@@ -1335,8 +1334,8 @@ def reachable(size: int) -> list[Color]:
 
 If you leave the `% MOD` off the subtraction, as ordinary elimination would,
 an entry can become a nonzero multiple of three.
-`next()` accepts such an entry as a pivot, since it is not zero,
-and `pow(x, -1, MOD)` then raises a `ValueError` ("base is not invertible for the given modulus"),
+`next()` accepts such an entry as a pivot, since it is not zero.
+`pow(x, -1, MOD)` then raises a `ValueError` ("base is not invertible for the given modulus"),
 so the script stops at 3x3 before printing a line.
 Reducing every result mod 3 keeps each entry in `0`, `1`, or `2`, where every nonzero value has an inverse.
 
@@ -1586,18 +1585,18 @@ print(t.celsius, t.humidity)
 so `celsius` and `humidity` derive different attribute
 names: `_celsius` and `_responders_celsius` for one, `_humidity` and
 `_responders_humidity` for the other. Two `Notifying` instances in one
-class therefore keep separate storage and separate responder lists,
-so each attribute has its own watchers. `Broadcaster` keeps one list for
+class therefore keep separate storage and separate responder lists.
+`Broadcaster` keeps one list for
 the whole object; a descriptor keeps one per attribute.
 
 **Return the descriptor on class access.** Class access is the part a validating descriptor never needs.
-`Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
-returning the descriptor there lets `Thermometer.celsius.connect()` call the descriptor's method.
+`Thermometer.celsius` calls `__get__()` with `obj` set to `None`.
+Returning the descriptor there lets `Thermometer.celsius.connect()` call the descriptor's method.
 
 **Type each kind of access.** The two `@overload` declarations tell the type checker which result each
 access gets: `Notifying[T]` from the class, `T` from an instance. If you
-remove them, the declared return type is the union, and the type checker
-rejects `t.celsius * 2`. The overloads also check the responder against the
+remove them, the declared return type is the union. The type checker
+then rejects `t.celsius * 2`. The overloads also check the responder against the
 attribute: `Thermometer.celsius.connect(t, readings.append)` passes
 because `readings.append` accepts a `float`.
 
@@ -1680,15 +1679,16 @@ def alarm(celsius: float) -> None:
 If `responds()` appends the function and returns nothing,
 the demo still prints its three lines, because `RESPONDERS` holds each function.
 The decorator's result replaces the name, though,
-so the name `display` refers to `None`, and calling `display(5.0)` raises a `TypeError`.
+so the name `display` refers to `None`.
+Calling `display(5.0)` then raises a `TypeError`.
 The type checker catches the mistake before any run.
 With `-> Responder` declared, it reports an `invalid-return-type` on `responds()`.
 Returning `fn` keeps each decorated name bound to its function.
 
 The return value also separates `Broadcasting.respond()` from the chapter's `Broadcaster.connect()`.
 `connect()` appends and returns `None`,
-so `@thermometer.connect` above a `def` would bind that name to `None`,
-and `respond()` exists to return the function.
+so `@thermometer.connect` above a `def` would bind that name to `None`.
+`respond()` exists to return the function.
 
 ```python
 # exercise_11.py
@@ -1746,7 +1746,8 @@ The load-time form removes three of the runtime problems:
 
 - `Broadcaster.announce()` copies its list because a responder can disconnect itself mid-notification.
   The registry has no `disconnect()`, so the setter iterates over `RESPONDERS` and skips the copy.
-- A lambda written inline in `connect()` leaves its caller nothing to pass to `disconnect()`, and that problem goes away with `disconnect()`.
+- A lambda written inline in `connect()` leaves its caller nothing to pass to `disconnect()`.
+  That problem disappears along with `disconnect()`.
   The `@` form also needs a `def`, so every decorated responder has a name.
 - A lapsed listener is an object kept alive by its connection.
   The registry holds module-level functions,
