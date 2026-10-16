@@ -971,7 +971,7 @@ should leave the rest of the file readable. With the version that raises a
 so the caller resumes by parsing the file again and somehow
 starting past the line that failed.
 
-Skipping hides what it drops, and the chapter keeps returning to that problem.
+Skipping hides what it drops.
 A filter that quietly drops every line looks the same as
 a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
