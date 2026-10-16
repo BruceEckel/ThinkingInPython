@@ -49,6 +49,11 @@ contains the term, or when the section holds a defining occurrence
 locators come first and are set bold; the rest follow in book order.
 An entry with more than eight locators is a warning.
 
+A section titled `Exercises` is never located, and its italics are
+never reported as untracked. An exercise poses the question, while the
+explanation sits in another section, so a locator there would send a
+reader to the question.
+
 A locator names the chapter, the section anchor, and the paragraph's
 index within the chapter. `BookIndex.inject_anchors()` adds an empty
 span, `[]{#ix-12-34}` (chapter 12, paragraph 34), at the start of each
@@ -104,6 +109,9 @@ TOP_KEYS = frozenset({"entry", "stop"})
 # More locators than this and an entry needs subentries or a tighter
 # pattern (INDEXING.md, Decision 2).
 MAX_LOCATORS = 8
+# A section with one of these heading titles is never located: it poses
+# questions, and the explanation sits in another section.
+UNLOCATED_SECTIONS = frozenset({"Exercises"})
 
 HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 LIST_ITEM = re.compile(r"^(\s*)([-*+]|\d+[.)])(\s+)(.*)$")
@@ -503,6 +511,11 @@ class Corpus:
                 if unit.kind == "heading" and unit.level <= 3:
                     section = unit
                 self.places.append(Place(c, unit, section))
+                if (section is not None
+                        and section.title.strip() in UNLOCATED_SECTIONS):
+                    prose.append("")
+                    code.append("")
+                    continue
                 p, k = unit_channels(unit, lines)
                 prose.append(p)
                 code.append(k)

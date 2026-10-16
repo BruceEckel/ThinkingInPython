@@ -199,6 +199,23 @@ def test_footnote_continuations_are_never_located() -> None:
         "item", "footnote", "footnote"]
 
 
+def test_exercises_sections_are_never_located() -> None:
+    body = ("## Closures\n\n"
+            "A *closure* keeps variables.\n\n"
+            "## Exercises\n\n"
+            "1. Write a closure that counts, then a *lambda*.\n\n"
+            "Another closure here.\n")
+    index = index_of(CLOSURE, body=body)
+    [loc] = index.by_term["closure"].locators
+    assert loc.section == "closures"
+    lam = Term("lambda", "concept", ("lambda",))
+    index = index_of(CLOSURE, lam, body=body)
+    assert index.by_term["lambda"].locators == []
+    assert "lambda" not in book_index.untracked_italics(index)
+    other = index_of(CLOSURE, body=body.replace("Exercises", "Practice"))
+    assert "lambda" in book_index.untracked_italics(other)
+
+
 # ── the term file ───────────────────────────────────────────────────────────
 
 GOOD = """\
