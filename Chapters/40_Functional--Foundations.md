@@ -111,8 +111,8 @@ print("ok")
 
 If you delete the reset at `[1]`, the assertion at `[2]` fails.
 `total` is still 5 from the first call, so the second call returns 10.
-The reset at `[1]` is the fixture the impure version needs,
-and purity removes it.
+The reset at `[1]` is the fixture the impure version needs.
+Purity removes it.
 
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
 asks whether raising an exception breaks the purity of `slope()`.
@@ -178,8 +178,7 @@ those copies add up in time and memory.
 Languages built around immutability use *persistent* data structures instead,
 which copy the part a change touches and share the rest with the old value.
 Python's standard library has none.
-For a large value that changes often,
-a mutable structure kept private to one function is the right choice.
+For such a value, a mutable structure kept private to one function is the right choice.
 
 ### Immutability in Annotations
 
@@ -206,7 +205,6 @@ print(MAX_SIZE, total([1, 2, 3]))
 #: 100 6
 ```
 
-Each annotation is a constraint the type checker enforces.
 The type checker rejects `MAX_SIZE = 200` written later in the module,
 and rejects `values.append(4)` inside `total()`.
 
@@ -233,8 +231,8 @@ The first is a *stable hash* of the contents,
 one that holds for the value's whole life,
 so the value can be a dictionary key or a set member.
 The second is sharing without a defensive copy.
-You can hand the value to any code, and the value stays as you built it.
-A mutable value offers neither.
+You can hand the value to any code.
+It stays as you built it.
 `hashable.py` sets a frozen `Point` beside `MutablePoint`,
 its unfrozen `@dataclass` twin:
 
@@ -308,9 +306,8 @@ so a lookup yields a function you can immediately call.
 The [Function Objects](28_Patterns--Function_Objects.md)
 chapter treats the same capability as a design pattern.
 
-Treating functions as values lets a data lookup select which function runs.
-A dictionary of functions replaces a long `if`/`elif` chain,
-because you select the behavior by looking it up:
+Treating functions as values lets a data lookup select which function runs,
+so a dictionary of functions can replace a long `if`/`elif` chain:
 
 ```python
 # dispatch.py
@@ -406,7 +403,7 @@ print(sorted(words, key=len))
 
 Each call passes a function to another function, which runs the loop.
 
-The `list()` calls do real work.
+The `list()` calls are necessary.
 `map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty).
 An iterator computes each value only when a consumer asks for it.
 `print()` displays the iterator's `repr()` instead of consuming it,
@@ -582,8 +579,7 @@ print(square.func.__name__, square.keywords)
 
 `square` and `cube` are specializations of `power()`,
 each with one argument already supplied.
-The keyword does real work here.
-`partial(power, 2)` presets `base` instead,
+Without the keyword, `partial(power, 2)` presets `base`,
 because positional arguments fill from the left.
 `square(5)` would then compute `2 ** 5`.
 
@@ -681,7 +677,8 @@ print(compose(label, increment_then_double)(10))  # [1]
 
 `compose(double, increment)` returns a function that increments first,
 then doubles.
-Each piece stays small and pure, and composition combines them as they are.
+Each piece stays small and pure.
+Composition combines the pieces as they are.
 
 The type parameters matter at `[1]`.
 The type checker verifies that `label()` accepts what `increment_then_double` produces,
@@ -690,8 +687,8 @@ and types the composed function `(int) -> str` rather than `(int) -> int`.
 You grow a composition by adding a stage.
 Each stage is testable on its own.
 A larger behavior is a new named composition of existing stages.
-When a requirement changes,
-you insert or swap a single stage and the others stay as they were.
+When a requirement changes, you insert or swap a single stage.
+The other stages stay as they were.
 
 The standard library supplies [whole modules](41_Functional--Toolkits.md)
 of these small, composable pieces.
