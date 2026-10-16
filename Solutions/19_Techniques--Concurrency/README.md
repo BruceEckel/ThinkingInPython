@@ -508,7 +508,8 @@ Importing the module runs every top-level statement,
 including the `with ProcessPoolExecutor()` line that creates workers. Each worker therefore tries to build a pool of
 its own, whose workers would import the module again.
 
-The `RuntimeError` comes from a safety check, and the recursion is the real failure.
+The recursion is the failure. The `RuntimeError` comes from a safety
+check against it.
 Python detects that a child process is spawning children during its own bootstrap and
 raises the error instead of starting them.
 The recursion therefore ends with the first generation of workers.
@@ -590,7 +591,9 @@ switch points elsewhere.
 A function call between the read and the write restores a switch point inside the sequence,
 whether it is a blocking I/O call, a `print()`, or an innocuous-looking helper.
 The counter then loses updates again,
-because the read-modify-write sequence is still not atomic. A free-threaded interpreter has no GIL,
+because the read-modify-write sequence is still not atomic.
+
+A free-threaded interpreter has no GIL,
 so its threads run at the same moment and can interleave any read and write.
 The fix is a lock around the read and the write.
 
@@ -832,7 +835,7 @@ whatever a real `fetch()` wrote to a database before it returned.
 Structured concurrency guarantees that every task has ended when the block exits.
 Every effect a task had before the failure stays in place.
 
-What a `TaskGroup` cannot undo matters when the tasks do more than sleep. A group of
+When the tasks write to a database instead of sleeping, a group of
 six writes where two fail leaves the successful writes in place.
 Undoing those writes is the job of your own code, not of the `TaskGroup`.
 [Context Managers](../../Chapters/15_Techniques--Context_Managers.md)
@@ -903,7 +906,8 @@ If you leave it out,
 the handler prints its line and execution falls through to `print(results)`.
 `results` is unbound at that point,
 so the line raises an `UnboundLocalError` right after the `gather raised` line.
-The type checker passes that version, so Python reports the failure at run time.
+The type checker passes that version, so the mistake shows up only
+at run time.
 
 **Propagate the first failure.** With `return_exceptions` at its default, `False`, the first child exception propagates
 out of the `await` immediately.
@@ -997,12 +1001,12 @@ asyncio.run(main())
 ```
 
 **Set the value before any task exists.** All three tasks print
-`context main`. Every task starts with a copy of the context current
-when `create_task()` runs, and inside `main()` that context already
-carries `request_id = "main"`, so each copy inherits the same value.
-The tasks leave the variable as it was, so all three copies stay identical.
-Every task reads `main`,
-where each task in the original version read the name of its own request.
+`context main`, where each task in the original version printed the
+name of its own request. Every task starts with a copy of the context
+current when `create_task()` runs, and inside `main()` that context
+already carries `request_id = "main"`, so each copy inherits the same
+value. The tasks leave the variable as it was, so all three copies stay
+identical.
 
 **Read the value after the group.** The `after:` line changes too. In
 the chapter's version it prints `context -`, the default, because each
@@ -1222,8 +1226,8 @@ thread alone touches it.
 
 Serializing an iterator means putting the lock where the mutation is,
 inside `__next__()`, where `threading.serialize_iterator()` puts it.
-A lock protects the statements it encloses,
-and a `for` loop calls `next()` in its header, outside them.
+A lock protects the statements it encloses.
+A `for` loop calls `next()` in its header, outside them.
 
 </details>
 </details>
@@ -1309,7 +1313,7 @@ twenty milliseconds rather than waiting out the half-second timeout.
 takes `lock_b`, which is free. Meanwhile the second task reaches
 `async with lock_a` and suspends, because the first task has it. That
 suspension is a wait, but the first task needs nothing the second
-task holds. The first task finishes and releases both locks, and the
+task holds. The first task finishes and releases both locks. The
 second task then finds both locks free.
 
 The deadlock version makes the waiting circular. Task one holds
@@ -1317,8 +1321,8 @@ The deadlock version makes the waiting circular. Task one holds
 waits for `lock_a`, so each task's progress depends on the other task's
 progress. A deadlock is that cycle. Acquiring the
 locks in one global order makes such a cycle impossible. Every lock a
-task waits for comes later in the order than every lock it holds,
-and "later" never loops back to "earlier."
+task waits for comes later in the order than every lock it holds.
+"Later" never loops back to "earlier."
 
 </details>
 </details>
@@ -1339,7 +1343,8 @@ and "later" never loops back to "earlier."
 
 [One Task, Many Backends](../../Chapters/19_Techniques--Concurrency.md#one-task-many-backends) and [One `await`, Any Backend](../../Chapters/19_Techniques--Concurrency.md#one-await-any-backend) show how an executor's work becomes awaitable.
 Check what type `pool.submit()` returns and whether that type defines `__await__`.
-The bridge is `loop.run_in_executor()`, and the `ExceptionGroup` comes from the `TaskGroup` that runs `process_price()`.
+The bridge is `loop.run_in_executor()`.
+The `ExceptionGroup` comes from the `TaskGroup` that runs `process_price()`.
 
 <details>
 <summary>Solution</summary>
@@ -1377,16 +1382,17 @@ reference to an event loop and defines no `__await__`.
 submits the call to the executor the same way `submit()` does, but
 returns an `asyncio.Future` bound to the running loop, an awaitable
 that resolves when the executor's own future completes. The task
-suspends on the `asyncio.Future` like any other `await`, and the loop keeps running the
-other two tasks in the meantime.
+suspends on the `asyncio.Future` like any other `await`. In the
+meantime the loop keeps running the other two tasks.
 
 The `TaskGroup` puts the wrapper around the `TypeError`.
 `process_price()` fails as a task inside the group, so the
 group cancels that task's two siblings, waits for them to end, and re-raises
 the failure wrapped in an `ExceptionGroup`.
-`task_group.py` catches the same wrapper with `except*`. `main()` has no
-`except*`, so the `ExceptionGroup` propagates out of `asyncio.run()` and prints
-as the grouped traceback above.
+`task_group.py` catches the same wrapper with `except*`.
+`mixed_await.py`'s `main()` has no `except*`, so the `ExceptionGroup`
+propagates out of `asyncio.run()` and prints as the grouped traceback
+above.
 
 </details>
 </details>
