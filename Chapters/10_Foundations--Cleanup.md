@@ -44,7 +44,7 @@ print("End of delete loop")
 It unbinds the name `c` and drops the one reference that name held.
 The `counters` list still references each `Counter`,
 so every `Counter`'s reference count stays above zero during the loop.
-So no `deleted` lines appear while the loop runs,
+No `deleted` lines appear while the loop runs,
 `Counter.count` still reads `3` after the loop,
 and `End of delete loop` prints before any deletion.
 
