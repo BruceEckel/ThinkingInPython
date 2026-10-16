@@ -195,15 +195,14 @@ assignment through an instance writes to the instance, not the
 class. That assignment creates a brand-new instance attribute
 named `total` on `a`, which then shadows `Tally.total` for `a`.
 
-**Check where the write went.** `vars(a)` shows the shadow. `a` now
-has its own `total` entry. `Tally.total`, read through the class,
-still reports `2`, because the assignment went to `a`'s dictionary.
+**Check where the write went.** `vars(a)` shows the shadow: a
+`total` entry in `a`'s own dictionary. `Tally.total`, read through
+the class, still reports `2`.
 
-This shadow is the
-bug `ClassVar` exists to catch. With `total: ClassVar[int] = 0`
-declared instead, the type checker reports `a.total = 99` as an error
-before the line runs, because the assignment writes to a `ClassVar`
-through an instance.
+This shadow is the bug `ClassVar` exists to catch. With
+`total: ClassVar[int] = 0` declared instead, the type checker reports
+`a.total = 99` as an error before the line runs, because the
+assignment writes to a `ClassVar` through an instance.
 
 </details>
 </details>
@@ -319,9 +318,7 @@ print(vars(A)["x"])
 **Remove the shadow.** `del a.x` (`[1]`) removes the entry from the
 instance dictionary, which is where assignment writes. `vars(a)` is
 empty again, and `a.x` reads `100`, because the lookup falls back to
-the class the way it did before any assignment. The assignment and the
-`del` both stay on the instance, so the class attribute keeps its
-`100` throughout.
+the class the way it did before any assignment.
 
 **Show that deletes stop at the instance.** The second `del a.x` (`[2]`) raises an `AttributeError` because the instance dictionary is empty.
 `del` acts on the instance dictionary alone, the way assignment does, so
@@ -420,8 +417,8 @@ what the write does at runtime.
 
 **Send the write to the class.** The fix names the class on the left. `Counting.total += 1` reads and
 writes the same class dictionary, so both instances report `2`.
-`vars(c)` is empty because the constructor writes to the class,
-and reading `c.total` falls back to that shared value.
+`vars(c)` is empty because the constructor writes to the class.
+Reading `c.total` falls back to that shared value.
 
 Writing the fix as `type(self).total += 1` also prints `2 2 2`
 here, because `Counting` has no subclass. Once a subclass exists,
@@ -493,16 +490,16 @@ print(Right2.shared is Base2.shared)
 #: False
 ```
 
-**Share one list across the hierarchy.** `Base.shared` holds `[1, 2]`, and so do both subclasses, because all
-three names share one list. `Left` and `Right` both inherit `shared`,
-so both names read through to `Base`, and `.append()` mutates
-the list stored there. `Left.shared is Base.shared` and
+**Share one list across the hierarchy.** `Base.shared` holds
+`[1, 2]`, and so do both subclasses. `Left` and `Right` both inherit
+`shared`, so both names read through to `Base`, and `.append()`
+mutates the list stored there. `Left.shared is Base.shared` and
 `Right.shared is Base.shared` together prove that the three names share
 one object, not three equal lists.
 
 This listing combines the shared mutable value of `shared_mutable.py`
 with the inheritance lookup of `class_var_inheritance.py`.
-A mutable `ClassVar` in a single class declares its sharing, so the
+In a single class, a mutable `ClassVar` declares its sharing, so the
 sharing stays visible.
 A subclass changes an inherited immutable `ClassVar` by assignment,
 which creates the subclass's own entry.
@@ -516,11 +513,9 @@ dictionary, so `Right2.shared` reads that entry.
 follows the same rule the integer `shared` in exercise 2 shows: one
 value per class that declares it.
 
-The listing models a bug.
-The base class declares one list,
-and each subclass treats that list as its own. Every subclass appends its
-entries to that one list. When one shared table is
-the intent, as in a registry of subclasses, the same code is correct.
+The listing models a bug in which every subclass treats the single
+list on the base class as its own. When one shared table is the intent, as
+in a registry of subclasses, the same code is correct.
 When each owner needs its own list, build the mutable value per owner
 rather than once in the class body. A `default_factory` field gives
 each instance its own list, and `__init_subclass__()`, which
@@ -587,8 +582,9 @@ The checker accepts that declaration and never checks that a method assigns `sea
 creates nothing. `vars(t)` holds `holder` alone, and reading `t.seat`
 raises an `AttributeError`.
 
-**Create the attribute from outside.** `t.seat = "14C"` creates the attribute on the instance, and the type checker
-checks that assignment against the declared `str`.
+**Create the attribute from outside.** `t.seat = "14C"` creates the
+attribute on the instance. The type checker checks that assignment
+against the declared `str`.
 
 A bare annotation is safe when the code that assigns the attribute
 runs before any code that reads it. The type checker cannot confirm
@@ -706,7 +702,7 @@ own counter, and the second `Sub()` (`[2]`) moves it to `3` while
 
 **Keep one counter for the hierarchy.** `Counted` names the class on the left, so every construction reads
 and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`
-at any point, and both names report the one shared count, so the three
+at any point. Both names report the one shared count, so the three
 lines read `1 1`, `2 2`, and `3 3`.
 
 </details>
