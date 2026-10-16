@@ -172,7 +172,7 @@ in place of a loop with `append()`.
 The comprehension evaluates `[0]` three times,
 once for each value from `range(3)`, so the rows are three separate lists.
 [Control Flow](04_Foundations--Control_Flow.md#comprehensions)
-introduces comprehensions,
+shows the three comprehension forms,
 and [Comprehensions](16_Techniques--Comprehensions.md)
 explores every form in depth.
 
