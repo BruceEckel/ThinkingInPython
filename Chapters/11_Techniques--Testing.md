@@ -766,6 +766,8 @@ The `rng` or `now` parameter must appear on every function between the caller an
 When that code sits several calls deep in a real codebase,
 you widen every signature along the way,
 or introduce a context object to carry the parameter.
+[Concurrency](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
+shows `ContextVar`, which carries such a value down the call chain and leaves every signature as it was.
 `monkeypatch` adds no parameters.
 It patches the name in place,
 and the patch applies process-wide until teardown restores the name.
