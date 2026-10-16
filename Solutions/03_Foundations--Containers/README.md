@@ -164,7 +164,7 @@ member of all three sets.
 <details>
 <summary>Where to look</summary>
 
-[Immutability](../../Chapters/03_Foundations--Containers.md#immutability) explains that immutable containers are hashable, so they can be set members or dictionary keys.
+[Immutability](../../Chapters/03_Foundations--Containers.md#immutability) explains that immutable containers are hashable, so they work as set members or dictionary keys.
 A `set` must hash each element when it adds it.
 Wrap the `groups.add()` call in a `try`, catch `TypeError`, and relate the message to what a `list` allows you to do after creation.
 
@@ -532,7 +532,7 @@ and the type checker rejects the assignment too. The
 line carries a `# type: ignore` because the listing makes the
 assignment on purpose, to show the runtime exception.
 
-**Find the limit of immutability.** `nested` shows how far a `frozendict`'s immutability reaches. A `frozendict` freezes
+**Find the limit of immutability.** A `frozendict` freezes
 the objects to which it maps its keys, not what those objects contain.
 To hash `nested`, `hash()` must hash its `list` value, and hashing a `list` raises a `TypeError`.
 The immutability is shallow, as it is for the `tuple` in `shallow_immutability.py`.
