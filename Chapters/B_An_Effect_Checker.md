@@ -36,7 +36,8 @@ An empty `performs()` declares that a function is pure.
 
 ## Effect Names and the Table
 
-An Effect is an empty class, as Appendix A's `Ask` and `Tell` are.
+An Effect is an empty class,
+as `Ask` and `Tell` are in [Effect Tracking](A_Effect_Tracking.md#a-row-inside-annotated).
 These eight cover the standard library:
 
 ```python
@@ -404,7 +405,9 @@ and `f()()` calls the result of a call.
 The checker needs three facts about a function: the row it declares,
 the Effects it hides, and the names it calls.
 
-Hiding needs a marker, and `ask()` in Appendix A shows why.
+Hiding needs a marker,
+and `ask()` in [Effect Tracking](A_Effect_Tracking.md#a-row-inside-annotated)
+shows why.
 `ask()` declares `Ask` and calls `input()`, which performs `Console`.
 Both descriptions are accurate.
 [The Check](#the-check) shows the checker reporting each.
@@ -806,7 +809,8 @@ Each time, `str.upper()` comes back `UNRESOLVED` instead of resolving to `builti
 
 ## Rows to a Fixed Point
 
-Appendix A's rule is recursive.
+The rule in [Effect Tracking](A_Effect_Tracking.md#the-tracking-problem)
+is recursive.
 A function's row needs its callees' rows,
 which in turn need their callees' rows.
 Two functions that call each other make the recursion circular.
@@ -1005,7 +1009,7 @@ then one for each finding.
 It returns the strings and leaves the printing to the program that runs the checker,
 so the core stays pure.
 
-Here is the checker on Appendix A's greeting program:
+Here is the checker on the greeting program from [Effect Tracking](A_Effect_Tracking.md#a-row-inside-annotated):
 
 ```python
 # greeting_check.py
