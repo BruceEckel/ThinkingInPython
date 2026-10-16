@@ -351,7 +351,8 @@ ones take about 0.05.
 <details>
 <summary>Where to look</summary>
 
-[Locks](../../Chapters/19_Techniques--Concurrency.md#locks) and [Semaphores](../../Chapters/19_Techniques--Concurrency.md#semaphores) show `async with` guarding a critical section.
+[Locks](../../Chapters/19_Techniques--Concurrency.md#locks) and [Semaphores](../../Chapters/19_Techniques--Concurrency.md#semaphores) show `async with` guarding a critical section,
+the read-modify-write that one task at a time may enter.
 A `Semaphore` holds a count of admitted holders, and `async with` decrements it on entry and restores it on exit.
 For the stray `release()`, ask how many tasks the count now admits and whether `release()` checks that an `acquire()` came first.
 
