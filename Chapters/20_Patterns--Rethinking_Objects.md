@@ -148,7 +148,6 @@ For each one, the question is what Python delivers and where it falls short.
 The first OOP promise is encapsulation: hide the data,
 expose it only through methods you control.
 Python hides a field with a leading underscore and a read-only property.
-That hiding is weaker than it looks.
 A getter that returns a mutable object hands the caller a reference to the underlying internals:
 
 ```python
@@ -623,8 +622,8 @@ named the first two, parametric and ad-hoc.
 Cardelli and Wegner added the third, subtyping,
 in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where subtyping appears as *inclusion polymorphism*.].
 
-*Subtype polymorphism* is what the four subsections below demonstrate.
-One function accepts any type that fits a shape.
+*Subtype polymorphism* means that one function accepts any type that fits a shape.
+The four subsections below demonstrate it.
 Each subsection defines that shape differently: an `ABC` the type inherits,
 a method an `Any` parameter calls at runtime,
 a `Protocol` the type matches structurally,
@@ -1131,7 +1130,6 @@ Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,
 and it is safe as a default argument value.
 
-The parameter's type also improves.
 `Logs` is a protocol, so any logger fits, and no caller sees a `| None`.
 
 The standard library includes this idea as `logging.NullHandler`.
