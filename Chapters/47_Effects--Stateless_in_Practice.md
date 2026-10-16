@@ -808,18 +808,16 @@ The pair of Abilities serves separate functions that share the cell,
 such as `purchase()` and any other spender.
 No parameter carries the cell through the signatures between them.
 
-This pattern has a name.
-Treatments of algebraic effects open with the *State effect*,
-`get` and `put` as its two operations.
+Treatments of algebraic effects open with this pattern and name it the *State effect*,
+with `get` and `put` as its two operations.
 Stateless's machinery is enough to build that effect.
 
-One warning comes with the pattern.
 No lock protects the cell.
-Forking two Effects that share a `Cell` interleaves their reads and writes.
+Forking two Effects that share a `Cell` interleaves their reads and writes,
+so the two Effects race on the cell the way two threads race on a Python global.
 No type reports the race.
 ZIO's `Ref` is this cell with atomic update built in.
-Stateless has no equivalent,
-so under `fork()` two Effects race on the cell the way two threads race on a Python global.
+Stateless has no equivalent.
 
 ## Composing a Program
 
@@ -882,7 +880,7 @@ def research() -> Effect[
 
 The `research()` signature declares what the program needs and how it can fail.
 `research()` reads a `Feed` and an `Encyclopedia` from outside and can fail three ways.
-`research()`'s signature is also the only place its failures appear.
+The signature is also the only place those failures appear.
 The body requests each dependency by its type,
 and nothing in it mentions a network, a file, or a print.
 Calling `research()` performs no work.
@@ -1306,7 +1304,8 @@ print(run(kitchen(toast)()))
 #: toasted loaf of rye dough
 ```
 
-You supply leaves and make products, and the listing keeps the two apart.
+You supply leaves and make products.
+The listing keeps the two apart.
 `Dough`, `Oven`, and `Toaster` are the leaves,
 so `supply()` binds one instance of each.
 The loaf is a product.
@@ -1417,7 +1416,7 @@ recommends, the union appears in full rather than as an alias.
 
 Each requested type needs a shape of its own.
 You could rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
-`Hero` stays distinct even then, since it also declares `approach()`.
+`Hero` would stay distinct, since it also declares `approach()`.
 But every hero then satisfies `Obstacle` as well.
 `play()` supplies the hero first,
 so the hero answers the request for an obstacle.
@@ -1517,7 +1516,7 @@ makes the same swap with one Ability rather than three.
 The third run mixes the casts, and nothing reports it.
 A `Kitty` bats at a `Weapon`.
 The unmatched cast type-checks, and it runs.
-That is a real loss against the *Abstract Factory*,
+That is a loss compared with the *Abstract Factory*,
 whose purpose is families of matched products.
 `KittiesAndPuzzles.make_obstacle()` cannot return a `Weapon`,
 because the class defines the pairing.
@@ -1526,7 +1525,6 @@ not against the others.
 You recover the matched set by writing it down in a function,
 as `kitties_and_puzzles()` does.
 The guarantee moves from a class hierarchy into a two-line function.
-Know which of those you are getting.
 
 ### The Nine-Argument Ceiling
 
@@ -2056,9 +2054,8 @@ so the `ZeroDivisionError` propagates as an ordinary raised exception,
 untracked.
 `catch()` matches the values an Effect yields, not exceptions the body raises,
 so a failure that no `@throws` lifts goes past `catch()` untouched.
-Watch for a failure going past `catch()`,
-because `catch(ZeroDivisionError)` type-checks and then does nothing.
-The protection appears to be there.
+The `catch(ZeroDivisionError)` in `caller()` type-checks and then does nothing,
+so the protection appears to be there.
 The channel carries only what you put into it.
 
 ZIO does not catch an undeclared failure at compile time either.
@@ -2360,7 +2357,8 @@ or the `Result` that [Error Handling](42_Functional--Error_Handling.md#a-result-
 builds.
 Asynchrony is `async def` and `await`.
 A resource's lifetime is a `with` block.
-Each is reasonable alone, and none composes with another.
+Each is reasonable alone.
+None composes with another.
 Some pairs allow no conversion.
 An `Awaitable` cannot become a `Result` without blocking and giving up the asynchrony.
 A `with` block's guarantee is lexical,
