@@ -239,7 +239,6 @@ print(repr(drive_naive(interview(),
 
 **Reuse the generator unchanged.** Nothing in `interview()` changes, and nothing could have. It yields a
 `Question` and receives an `Answer`, whatever the answer's source.
-That is the separation the chapter teaches.
 The generator describes the conversation, and the driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
@@ -441,8 +440,8 @@ that inference. The f-string then accepts any object, since formatting
 one calls `str()` on it.
 A generator object's `str()` is its repr, so the output shows the repr.
 The annotation alone gives the checker a declared type to compare.
-That is the argument for annotating a local whenever you want the
-checker to verify the type of the call that produces its value.
+So annotate a local whenever you want the checker to verify
+the type of the call that produces its value.
 
 </details>
 </details>
