@@ -348,8 +348,8 @@ print(len(Color._pool))
 
 The construction syntax stays the same,
 so a caller sees an ordinary constructor call and receives a shared object.
-`int("256")` works the same way.
-An ordinary constructor call returns a shared object.
+`int("256")` works the same way:
+an ordinary constructor call returns a shared object.
 
 You write the bookkeeping yourself,
 and it must account for the way Python calls `__init__()` after `__new__()`.
@@ -637,7 +637,8 @@ Sharing a mutable object lets one use's change appear in every use
 (see exercise 3).
 
 When all three answers are yes, the remaining choice is among the four pools.
-How much you know about the set of values decides it.
+Two things decide it: how much you know about the set of values,
+and whether callers must keep writing the constructor.
 If you know the set as you write the program,
 use an `Enum` and let the language hold the pool.
 If callers must keep writing `C(...)`,
