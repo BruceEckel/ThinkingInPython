@@ -523,8 +523,9 @@ entries to that one list. When one shared table is
 the intent, as in a registry of subclasses, the same code is correct.
 When each owner needs its own list, build the mutable value per owner
 rather than once in the class body. A `default_factory` field gives
-each instance its own list, and `__init_subclass__()` gives each
-subclass its own.
+each instance its own list, and `__init_subclass__()`, which
+[Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
+introduces, gives each subclass its own.
 
 </details>
 </details>
