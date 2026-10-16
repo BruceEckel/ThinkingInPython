@@ -11,7 +11,6 @@ But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,
 how can you get them to interact properly?
 
-The answer starts with a fact about the language that rarely comes up.
 Python dispatches on one type at a time.
 When two objects of unknown type interact,
 a method call resolves its receiver's type alone.
@@ -279,7 +278,6 @@ the fail-fast policy that suits a table you are still filling in
 Here the failure is the dictionary's own `KeyError`,
 where the state machine's engine raises `NoTransition`.
 
-Exact matching surprises people.
 The lookup raises a `KeyError` for a subclass.
 `Origami` derives from `Paper` and inherits its `compete()`,
 but the table has no row for `Origami`:
@@ -561,7 +559,7 @@ named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
 The in-place forms, `__iadd__()` and its siblings, are a separate family.
 They serve `+=`, not `a + b`.
-Here is the machinery, with each dispatch traced:
+`radd_dispatch.py` traces each dispatch:
 
 ```python
 # radd_dispatch.py
