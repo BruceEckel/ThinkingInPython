@@ -147,7 +147,7 @@ print(function6())
 relative equivalent, `from ..module5 import function5`, works too.
 Keep the relative form for siblings within one package.
 
-**Load the import chain first.** Python initializes both packages before it runs `module6`. `module5`
+**Trace the load order.** Python initializes both packages before it runs `module6`. `module5`
 then loads before `module6` finishes loading, because the import at
 the top of `module6` runs before the rest of its body. All four messages
 therefore print before the script's own `print()` runs.
@@ -302,16 +302,15 @@ case differs from its file fails on your own machine instead of in
 someone else's CI.
 
 Setting `PYTHONCASEOK` in the environment turns the check off on a
-case-insensitive platform, and `import module` then finds `Module.py`.
-Python reads that variable, and the filesystem ignores it.
-The variable's effect therefore confirms that Python, not the
-filesystem, compares the names. The
-variable exists for legacy code, so leave it unset in new code.
+case-insensitive platform, so `import module` finds `Module.py`.
+Because Python alone reads that variable, its effect confirms that
+Python, not the filesystem, compares the names. The variable exists
+for legacy code, so leave it unset in new code.
 
 Following the naming convention prevents the mismatch.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names)
-recommends `snake_case` for modules, and with an all-lowercase name,
-an import and its file always match in case.
+recommends `snake_case` for modules. With an all-lowercase name, an
+import and its file always match in case.
 
 </details>
 </details>
@@ -327,8 +326,10 @@ an import and its file always match in case.
 <summary>Where to look</summary>
 
 [Imports Within a Package](../../Chapters/06_Foundations--Modules_and_Packages.md#imports-within-a-package) shows `module4`'s relative import, and [`PYTHONPATH`](../../Chapters/06_Foundations--Modules_and_Packages.md#pythonpath) describes where Python searches for top-level names.
-A relative import needs the module's `__package__`, and a file run as a script has none.
-An absolute import needs the project root on `sys.path`, and the command you run decides the path's first entry.
+A relative import needs the module's `__package__`.
+A file run as a script has none.
+An absolute import needs the project root on `sys.path`.
+The command you run decides the path's first entry.
 Compare what `python file.py` and `python -m package.module` put there.
 
 <details>
@@ -346,9 +347,9 @@ With the relative import, `python a_package/module4.py` reports:
 ImportError: attempted relative import with no known parent package
 ```
 
-Python resolves a relative import against the module's `__package__`,
-and a file run as a script has none. The script runs as `__main__`,
-which belongs to no package. The single dot has no parent to name.
+Python resolves a relative import against the module's `__package__`.
+A file run as a script has none, since it runs as `__main__`, which
+belongs to no package. The single dot has no parent to name.
 
 With the absolute import, the same command reports:
 
@@ -357,13 +358,12 @@ ModuleNotFoundError: No module named 'a_package'. Did you mean: 'b_package'?
 ```
 
 The name is now fully qualified, so Python resolves it from
-`sys.path` alone. But `sys.path[0]` is the directory of the script you ran,
-`a_package/`,
-so Python searches the `a_package/` directory for `a_package`.
-The project root is nowhere on the path, so the
-search for a top-level package called `a_package` fails.
-The suggestion names `b_package`,
-the name on the path closest to `a_package`.
+`sys.path` alone. But `sys.path[0]` is the directory of the script
+you ran, `a_package/`, so Python searches the `a_package/` directory
+for `a_package`. With the project root nowhere on the path, the
+search for a top-level package called `a_package` fails. The
+suggestion names `b_package`, the name on the path closest to
+`a_package`.
 
 `python -m a_package.module4` works with either form and fixes both
 problems at once. `-m` sets `sys.path[0]` to the current directory
@@ -371,8 +371,8 @@ rather than the script's directory, so Python finds `a_package`. `-m` also impor
 the module as a member of its package rather than running the file
 by its path, so `__package__` holds `a_package` and the dot resolves.
 
-Because a module inside a package runs as a member of that package,
-you run it with `-m`. A file you intend to run with `python file.py`
+A module inside a package works only as a member of that package,
+so run it with `-m`. A file you intend to run with `python file.py`
 belongs at the top level, outside any package.
 
 </details>
@@ -439,9 +439,9 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 Without `__all__`, the star import falls back to the underscore
 convention.
 The star import binds every top-level name that does not start with an
-underscore. `undeclared` therefore joins `public`,
-and `_helper` and `_internal` stay out. Restoring the `__all__` line
-limits the star import to `public` and `_helper` again.
+underscore. `undeclared` therefore joins `public`. `_helper` and
+`_internal` stay out. Restoring the `__all__` line limits the star
+import to `public` and `_helper` again.
 
 When a module defines `__all__`, that list replaces the
 underscore convention. The star import binds each listed name,
@@ -498,14 +498,13 @@ print(plugins is plugin_list.plugins)
 
 **Share one list between two names.** `from plugin_list import plugins` binds the script's `plugins` to the
 list the module's name references, so at first the two names share one
-object. Appending changes that object, and both names show the new
+object. Appending changes that object, so both names show the new
 item.
 
 **Replace the module's list.** The assignment `plugin_list.plugins = []` rebinds the module's
-name to a second list.
-The script's name still references the first list, so
-the `append()` at `[1]` changes the second list and leaves the script's
-list as it was.
+name to a second list. The `append()` at `[1]` goes through the
+module's name, so it changes the second list. The script's name still
+references the first list, which stays as it was.
 
 `exercise_7.py` is `from_snapshot.py` with a mutable value. The
 `from` import shares the module's object.
