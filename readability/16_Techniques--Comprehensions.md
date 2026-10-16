@@ -33,7 +33,7 @@ as the applied-directly record.
 - Line 3-4, the epigraph's loop/comprehension contrast: §32/§47 by
   shape, but an epigraph is deliberate voice and the chapter's opening
   paragraph then develops it.
-- Line 163 "That leak is deliberate." and line 200 "The colon decides
+- Line 163 "That leak is deliberate." and line 201 "The colon decides
   which.": short beats among longer sentences, each doing work (recurring
   keep: a short emphatic fragment is a beat).
 - Line 556 "This comprehension is a loop written with the wrong
