@@ -11,7 +11,7 @@ Programmers have historically been bad at keeping objects inside that set.
 It's too easy to construct or mutate an object in an illegal state.
 Defensive checks then spread through your code.
 
-This chapter shows a better approach, built from frozen data classes.
+Frozen data classes offer a better approach.
 You validate the value once, at construction, and freeze it so it cannot change.
 The type then guarantees that every object is a legal value.
 Code that receives one need not check it again.
@@ -432,8 +432,7 @@ and one assignment (`self.x = x`) per field.
 `dataclasses.fields()` reports the field list `@dataclass` recorded.
 `@dataclass` leaves a field with no default off the class,
 so `x` is still absent from `C.__dict__` after decoration, as it was before.
-The difference from `A` lies in what the decorator adds.
-`@dataclass` leaves the annotations as they were and builds an `__init__()` that acts on them.
+`@dataclass` leaves the annotations as they were and adds an `__init__()` that acts on them.
 
 ### `D`: A Real `ClassVar`
 
@@ -802,8 +801,7 @@ It offers richer validators and converters.
 [Pydantic](https://docs.pydantic.dev)
 validates and parses each field according to its annotation,
 which is especially useful at the edges of a program where untrusted data can enter.
-The principle is the same.
-Make the type guarantee its own values.
+The principle is the same: make the type guarantee its own values.
 
 ## Enums Are Types Too
 
@@ -963,7 +961,7 @@ print(f"{Level.INFO}: ready", Level.WARNING.upper())
 The member keeps everything an enum member has:
 `Direction((0, -1))` looks `DOWN` up by value, `.value` holds the tuple,
 and `len(Direction)` counts four members.
-A member passes wherever the mix-in type is expected,
+A member passes wherever code expects the mix-in type,
 and carries its name with it.
 
 `StrEnum` is `str` mixed in by the standard library,
@@ -980,7 +978,7 @@ A month is not an `int`, it carries one,
 and `max_days` reads the number through `.value`.
 A class of your own can be the mix-in too.
 `Enum` passes the assigned value to its `__init__()`,
-so each member is built the way an ordinary instance of that class would be.
+so `Enum` builds each member the way a constructor call builds an ordinary instance.
 
 ## When an `Enum` Beats a Data Class
 
@@ -1059,7 +1057,6 @@ the [mutable-default trap](05_Foundations--Functions.md#the-mutable-default-trap
 `field(default_factory=make_months)` supplies a function instead of a value.
 Each new `Months` calls it and gets its own fresh list.
 
-That rejection is narrower than it looks.
 `@dataclass` refuses a default it recognizes as shared storage,
 which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability.
