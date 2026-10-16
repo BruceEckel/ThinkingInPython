@@ -7,8 +7,8 @@
 C++ and Java require type declarations,
 and they check those types during compilation.
 The Python runtime checks types only when an operation runs.
-The examples so far have used few type declarations,
-and on a small program you may not miss them.
+The examples so far have used few type declarations.
+On a small program you may not miss them.
 
 Python 3.5 (2015) introduced *type hints*,
 which look like the type declarations of statically typed languages.
@@ -214,8 +214,8 @@ print(describe(42))
 
 Inside the `if`, `value` is a `str`, so `upper()` checks.
 `repr()` accepts every object, so the `return` at `[1]` needs no test.
-With `Any` in place of `object`, the commented-out line checks too,
-and `describe(42)` then fails at runtime with an `AttributeError`.
+With `Any` in place of `object`, the commented-out line checks too.
+`describe(42)` then fails at runtime with an `AttributeError`.
 
 Narrowing an attribute is riskier than narrowing a local variable.
 A call between the check and the use can reset that attribute.
@@ -251,7 +251,7 @@ The `AttributeError` shows that `b.val` was `None` by the time `upper()` ran,
 while the checker still treated it as a `str`.
 
 A narrowing on a local variable holds.
-A narrowing on an attribute becomes false when a call rebinds the attribute,
+A narrowing on an attribute holds until a call rebinds the attribute,
 so recheck the attribute after any call that might change the object.
 Copying the attribute into a local variable before the test keeps the narrowing valid,
 because a function defined elsewhere cannot rebind its caller's local variable
@@ -554,8 +554,8 @@ Constructing `Box("gift")` binds `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
 
 A *bound* limits the parameter to one hierarchy.
-`class Box[T: Shape]` accepts `Shape` and its subclasses,
-and `T` keeps the subclass the caller passes.
+`class Box[T: Shape]` accepts `Shape` and its subclasses.
+`T` keeps the subclass the caller passes.
 A *constraint* lists unrelated choices.
 With `[T: (int, str)]`, `T` is `int` or `str`.
 An argument whose class subclasses `int` binds `T` to `int`,
@@ -635,10 +635,10 @@ print(counts.top() + 1)
 `words: Stack` names the class without its brackets.
 The default makes that annotation mean `Stack[str]`,
 so `words.top()` is a `str` and `upper()` checks.
-`reveal_type()` shows that inferred type, and the type checker reports `str`.
+At the `reveal_type()` call, the type checker reports that inferred type, `str`.
 
 A default matters most for a class whose type parameter is usually the same type.
-Callers who use that type omit the brackets, and the annotation stays precise.
+Callers who use that type omit the brackets and still get a precise annotation.
 
 Without the default, the annotation `words: Stack` leaves `T` unsolved
 (see exercise 5).
@@ -955,8 +955,8 @@ The abstract container types come from `collections.abc`.
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Type-checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) |
 | `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Modules and Packages](06_Foundations--Modules_and_Packages.md#circular-imports) |
 
-These decorators and directives exist for the type checker and the reader,
-and at runtime most of them do nothing.
+These decorators and directives exist for the type checker and the reader.
+At runtime most of them do nothing.
 Two act when a call reaches them: `assert_never()` raises an `AssertionError`,
 and `reveal_type()` prints its argument's runtime type.
 
