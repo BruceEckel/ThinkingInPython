@@ -905,6 +905,8 @@ class Monster:
 PROTOTYPES: Final[dict[str, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"],
                       parts={"arms": 2}),
+    "troll": Monster("Troll", hp=40,
+                     powers=["smash", "regen"]),
     "hydra": Monster("Hydra", hp=60, powers=["bite"],
                      parts={"heads": 9}),
 }
@@ -932,6 +934,8 @@ class Monster:
 PROTOTYPES: Final[dict[str, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"],
                       parts={"arms": 2}),
+    "troll": Monster("Troll", hp=40,
+                     powers=["smash", "regen"]),
     "hydra": Monster("Hydra", hp=60, powers=["bite"],
                      parts={"heads": 9}),
 }
@@ -947,6 +951,10 @@ print(PROTOTYPES["hydra"].parts)  # The prototype changed
 print(shallow_spawn("hydra").parts)
 #: {'heads': 1}
 ```
+
+`exercise_7.py` shows the bug in a function of its own, `shallow_spawn()`.
+The `pytest` results below come from `prototype_registry.py` with
+`parts` added and `spawn()` changed to `copy.copy()`.
 
 With `copy.copy()`, `test_spawn_is_independent()` fails first.
 `b.powers.append("curse")` appends to the one list both spawns share,

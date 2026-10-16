@@ -13,6 +13,8 @@ class Monster:
 PROTOTYPES: Final[dict[str, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"],
                       parts={"arms": 2}),
+    "troll": Monster("Troll", hp=40,
+                     powers=["smash", "regen"]),
     "hydra": Monster("Hydra", hp=60, powers=["bite"],
                      parts={"heads": 9}),
 }
