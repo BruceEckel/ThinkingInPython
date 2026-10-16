@@ -1,0 +1,5172 @@
+# The book's index entries, read by tools/book_index.py.
+# Seeded by tools/index_seed.py on 2026-10-16; edit by hand from
+# here on (the seeder does not run again). One [[entry]] table
+# per entry: term, kind (concept, pattern, python, pep), match
+# (plain strings on word boundaries, or `re:` regexes), and
+# optional under, see, see_also, code. book_index.py's
+# docstring has the rules; `tip index-report` checks the file.
+#
+# Python names left out of the seed for more than 25
+# locators each (add one back with subentries or a tighter
+# match):
+#   and (56), Any (65), append() (95), as (96), assert (102)
+#   async (49), asyncio (51), AttributeError (57), await (41)
+#   bool (45), @cache (28), Callable (60), case (57), check() (28)
+#   Circle (26), class (281), ClassVar (32), cls (42)
+#   collections (102), collections.abc (91), Console (40), count (36)
+#   data (32), @dataclass (86), dataclasses (79), def (457), dict (93)
+#   __dict__ (45), else (47), except (58), expect() (48), expected (65)
+#   False (82), field() (35), Final (67), first() (36), float (81)
+#   for (246), from (486), functools (60), Generator (29), get() (35)
+#   greet() (43), if (194), import (489), in (255), __init__() (138)
+#   int (261), is (137), isinstance() (72), item (34), items() (42)
+#   Iterator (26), itertools (41), key() (37), KeyError (37)
+#   lambda (46), len() (72), list (210), main() (31), __main__ (62)
+#   match (76), name (165), __name__ (125), Need (42), next() (41)
+#   None (331), not (111), number (32), object (104), one (29)
+#   @override (38), pass (54), __post_init__() (27), print() (499)
+#   @property (28), Protocol (42), pytest (55), raise (63), range (86)
+#   @record (65), report() (50), Result (33), result (45), return (336)
+#   run() (111), RuntimeError (27), self (227), set (35), Shape (26)
+#   show() (27), sleep() (39), sorted() (32), start() (35), str (300)
+#   sum() (28), super() (42), supply() (46), time (32), total (39)
+#   True (181), try (65), tuple (72), ty (85), type (197)
+#   TypeError (95), typing (192), value (92), ValueError (66)
+#   values (30), with (133), yield (80)
+
+# Italic spans that are emphasis, not terms.
+stop = ["enable", "every", "exact", "first", "Foundations", "Functional", "how", "include", "inside", "is", "n", "Patterns", "s", "Techniques", "what", "whether", "which"]
+
+# ------------------------------------------------------------------
+# Definitions: italic terms
+# ------------------------------------------------------------------
+
+[[entry]]
+term = "Ability"
+kind = "concept"
+match = ["re:(?<=\\*)Ability(?=\\*)", "re:(?<=\\*)Abilities(?=\\*)"]
+
+[[entry]]
+term = "abstract coupling"
+kind = "concept"
+match = ["abstract coupling", "abstract couplings"]
+
+[[entry]]
+term = "abstract syntax tree"
+kind = "concept"
+match = ["abstract syntax tree", "abstract syntax trees"]
+
+[[entry]]
+term = "accessors"
+kind = "concept"
+match = ["accessors"]
+
+[[entry]]
+term = "Active Object"
+kind = "concept"
+match = ["Active Object", "Active Objects"]
+
+[[entry]]
+term = "Active Record"
+kind = "concept"
+match = ["Active Record", "Active Records"]
+
+[[entry]]
+term = "ad-hoc polymorphism"
+kind = "concept"
+match = ["ad-hoc polymorphism", "ad-hoc polymorphisms"]
+
+[[entry]]
+term = "Aggregator"
+kind = "concept"
+match = ["Aggregator", "Aggregators"]
+
+[[entry]]
+term = "algebraic effect tracking"
+kind = "concept"
+match = ["algebraic effect tracking", "algebraic effect trackings"]
+
+[[entry]]
+term = "algebraic effects"
+kind = "concept"
+match = ["algebraic effects"]
+
+[[entry]]
+term = "Ambassador"
+kind = "concept"
+match = ["Ambassador", "Ambassadors"]
+
+[[entry]]
+term = "Amdahl's Law"
+kind = "concept"
+match = ["Amdahl's Law", "Amdahl's Laws"]
+
+[[entry]]
+term = "answer"
+kind = "concept"
+match = ["re:(?<=\\*)answer(?=\\*)", "re:(?<=\\*)answers(?=\\*)"]
+
+[[entry]]
+term = "API Gateway"
+kind = "concept"
+match = ["API Gateway", "API Gateways"]
+
+[[entry]]
+term = "argument"
+kind = "concept"
+match = ["re:(?<=\\*)argument(?=\\*)", "re:(?<=\\*)arguments(?=\\*)"]
+
+[[entry]]
+term = "asynchrony"
+kind = "concept"
+match = ["asynchrony", "asynchronies"]
+
+[[entry]]
+term = "Atomic Kotlin"
+kind = "concept"
+match = ["Atomic Kotlin", "Atomic Kotlins"]
+
+[[entry]]
+term = "awaitable"
+kind = "concept"
+match = ["awaitable", "awaitables"]
+
+[[entry]]
+term = "Balking"
+kind = "concept"
+match = ["Balking", "Balkings"]
+
+[[entry]]
+term = "bare annotation"
+kind = "concept"
+match = ["bare annotation", "bare annotations"]
+
+[[entry]]
+term = "base case"
+kind = "concept"
+match = ["base case", "base cases"]
+
+[[entry]]
+term = "Behavioral"
+kind = "concept"
+match = ["Behavioral", "Behaviorals"]
+
+[[entry]]
+term = "Biased reference counting"
+kind = "concept"
+match = ["Biased reference counting", "Biased reference countings"]
+
+[[entry]]
+term = "black-box"
+kind = "concept"
+match = ["black-box", "black-boxes"]
+
+[[entry]]
+term = "blackboard"
+kind = "concept"
+match = ["blackboard", "blackboards"]
+
+[[entry]]
+term = "blocked"
+kind = "concept"
+match = ["blocked", "blockeds"]
+
+[[entry]]
+term = "body"
+kind = "concept"
+match = ["re:(?<=\\*)body(?=\\*)", "re:(?<=\\*)bodies(?=\\*)"]
+
+[[entry]]
+term = "bottom"
+kind = "concept"
+match = ["bottom", "bottoms"]
+
+[[entry]]
+term = "bottom type"
+kind = "concept"
+match = ["bottom type", "bottom types"]
+
+[[entry]]
+term = "bound"
+kind = "concept"
+match = ["re:(?<=\\*)bound(?=\\*)", "re:(?<=\\*)bounds(?=\\*)"]
+
+[[entry]]
+term = "bound method"
+kind = "concept"
+match = ["bound method", "bound methods"]
+
+[[entry]]
+term = "Broker"
+kind = "concept"
+match = ["Broker", "Brokers"]
+
+[[entry]]
+term = "Bulkhead"
+kind = "concept"
+match = ["Bulkhead", "Bulkheads"]
+
+[[entry]]
+term = "C3 linearization"
+kind = "concept"
+match = ["C3 linearization", "C3 linearizations"]
+
+[[entry]]
+term = "C++"
+kind = "concept"
+match = ["C++", "C++s"]
+
+[[entry]]
+term = "capture pattern"
+kind = "concept"
+match = ["capture pattern", "capture patterns"]
+
+[[entry]]
+term = "caretaker"
+kind = "concept"
+match = ["caretaker", "caretakers"]
+
+[[entry]]
+term = "checked exceptions"
+kind = "concept"
+match = ["checked exceptions"]
+
+[[entry]]
+term = "circle method"
+kind = "concept"
+match = ["circle method", "circle methods"]
+
+[[entry]]
+term = "Circuit Breaker"
+kind = "concept"
+match = ["Circuit Breaker", "Circuit Breakers"]
+
+[[entry]]
+term = "class adapter"
+kind = "concept"
+match = ["class adapter", "class adapters"]
+
+[[entry]]
+term = "class attribute"
+kind = "concept"
+match = ["re:(?<=\\*)class\\s+attribute(?=\\*)", "re:(?<=\\*)class\\s+attributes(?=\\*)"]
+
+[[entry]]
+term = "class decorators"
+kind = "concept"
+match = ["class decorators"]
+
+[[entry]]
+term = "classes"
+kind = "concept"
+match = ["re:(?<=\\*)classes(?=\\*)"]
+
+[[entry]]
+term = "closed"
+kind = "concept"
+match = ["re:(?<=\\*)closed(?=\\*)", "re:(?<=\\*)closeds(?=\\*)"]
+
+[[entry]]
+term = "closure"
+kind = "concept"
+match = ["closure", "closures"]
+
+[[entry]]
+term = "cohesion"
+kind = "concept"
+match = ["cohesion", "cohesions"]
+
+[[entry]]
+term = "Command Query Responsibility Segregation"
+kind = "concept"
+match = ["Command Query Responsibility Segregation", "Command Query Responsibility Segregations"]
+
+[[entry]]
+term = "comprehension"
+kind = "concept"
+match = ["re:(?<=\\*)comprehension(?=\\*)", "re:(?<=\\*)comprehensions(?=\\*)"]
+
+[[entry]]
+term = "concurrency"
+kind = "concept"
+match = ["re:(?<=\\*)concurrency(?=\\*)", "re:(?<=\\*)concurrencies(?=\\*)"]
+
+[[entry]]
+term = "conditional expression"
+kind = "concept"
+match = ["conditional expression", "conditional expressions"]
+
+[[entry]]
+term = "consistency"
+kind = "concept"
+match = ["consistency", "consistencies"]
+
+[[entry]]
+term = "constraint"
+kind = "concept"
+match = ["constraint", "constraints"]
+
+[[entry]]
+term = "constructor"
+kind = "concept"
+match = ["re:(?<=\\*)constructor(?=\\*)", "re:(?<=\\*)constructors(?=\\*)"]
+
+[[entry]]
+term = "constructor function"
+kind = "concept"
+match = ["constructor function", "constructor functions"]
+
+[[entry]]
+term = "Content-Based Router"
+kind = "concept"
+match = ["Content-Based Router", "Content-Based Routers"]
+
+[[entry]]
+term = "context"
+kind = "concept"
+match = ["re:(?<=\\*)context(?=\\*)", "re:(?<=\\*)contexts(?=\\*)"]
+
+[[entry]]
+term = "context manager"
+kind = "concept"
+match = ["context manager", "context managers"]
+
+[[entry]]
+term = "context switching"
+kind = "concept"
+match = ["context switching", "context switchings"]
+
+[[entry]]
+term = "continuation"
+kind = "concept"
+match = ["continuation", "continuations"]
+
+[[entry]]
+term = "copy-on-write"
+kind = "concept"
+match = ["copy-on-write", "copy-on-writes"]
+
+[[entry]]
+term = "coroutine function"
+kind = "concept"
+match = ["coroutine function", "coroutine functions"]
+
+[[entry]]
+term = "coroutine object"
+kind = "concept"
+match = ["coroutine object", "coroutine objects"]
+
+[[entry]]
+term = "coroutines"
+kind = "concept"
+match = ["coroutines"]
+
+[[entry]]
+term = "covariant"
+kind = "concept"
+match = ["covariant", "covariants"]
+
+[[entry]]
+term = "CPU-bound"
+kind = "concept"
+match = ["CPU-bound", "CPU-bounds"]
+
+[[entry]]
+term = "Creational"
+kind = "concept"
+match = ["Creational", "Creationals"]
+
+[[entry]]
+term = "cross-cutting concerns"
+kind = "concept"
+match = ["cross-cutting concerns"]
+
+[[entry]]
+term = "Curiously Recurring Template Pattern"
+kind = "concept"
+match = ["Curiously Recurring Template Pattern", "Curiously Recurring Template Patterns"]
+
+[[entry]]
+term = "data class"
+kind = "concept"
+match = ["re:(?<=\\*)data\\s+class(?=\\*)"]
+
+[[entry]]
+term = "data descriptor"
+kind = "concept"
+match = ["data descriptor", "data descriptors"]
+
+[[entry]]
+term = "Data Mapper"
+kind = "concept"
+match = ["Data Mapper", "Data Mappers"]
+
+[[entry]]
+term = "Dead Letter Channel"
+kind = "concept"
+match = ["Dead Letter Channel", "Dead Letter Channels"]
+
+[[entry]]
+term = "deadlock"
+kind = "concept"
+match = ["deadlock", "deadlocks"]
+
+[[entry]]
+term = "debug specifier"
+kind = "concept"
+match = ["debug specifier", "debug specifiers"]
+
+[[entry]]
+term = "declarative"
+kind = "concept"
+match = ["declarative", "declaratives"]
+
+[[entry]]
+term = "decorator"
+kind = "concept"
+match = ["re:(?<=\\*)decorator(?=\\*)", "re:(?<=\\*)decorators(?=\\*)"]
+
+[[entry]]
+term = "defect"
+kind = "concept"
+match = ["defect", "defects"]
+
+[[entry]]
+term = "delayed binding"
+kind = "concept"
+match = ["delayed binding", "delayed bindings"]
+
+[[entry]]
+term = "dependency injection"
+kind = "concept"
+match = ["dependency injection", "dependency injections"]
+
+[[entry]]
+term = "description"
+kind = "concept"
+match = ["re:(?<=\\*)description(?=\\*)", "re:(?<=\\*)descriptions(?=\\*)"]
+
+[[entry]]
+term = "descriptor"
+kind = "concept"
+match = ["descriptor", "descriptors"]
+
+[[entry]]
+term = "Design by Contract"
+kind = "concept"
+match = ["Design by Contract", "Design by Contracts"]
+
+[[entry]]
+term = "design patterns"
+kind = "concept"
+match = ["re:(?<=\\*)design\\s+patterns(?=\\*)"]
+
+[[entry]]
+term = "diamond problem"
+kind = "concept"
+match = ["diamond problem", "diamond problems"]
+
+[[entry]]
+term = "director"
+kind = "concept"
+match = ["director", "directors"]
+
+[[entry]]
+term = "discriminated"
+kind = "concept"
+match = ["discriminated", "discriminateds"]
+
+[[entry]]
+term = "Dispatcher"
+kind = "concept"
+match = ["Dispatcher", "Dispatchers"]
+
+[[entry]]
+term = "docstring"
+kind = "concept"
+match = ["docstring", "docstrings"]
+
+[[entry]]
+term = "document"
+kind = "concept"
+match = ["document", "documents"]
+
+[[entry]]
+term = "Document-View"
+kind = "concept"
+match = ["Document-View", "Document-Views"]
+
+[[entry]]
+term = "Domain Model"
+kind = "concept"
+match = ["Domain Model", "Domain Models"]
+
+[[entry]]
+term = "Double Dispatch"
+kind = "concept"
+match = ["Double Dispatch", "Double Dispatches"]
+
+[[entry]]
+term = "double dispatching"
+kind = "concept"
+match = ["double dispatching", "double dispatchings"]
+
+[[entry]]
+term = "double-checked locking"
+kind = "concept"
+match = ["double-checked locking", "double-checked lockings"]
+
+[[entry]]
+term = "Draining"
+kind = "concept"
+match = ["Draining", "Drainings"]
+
+[[entry]]
+term = "driver"
+kind = "concept"
+match = ["re:(?<=\\*)driver(?=\\*)", "re:(?<=\\*)drivers(?=\\*)"]
+
+[[entry]]
+term = "duck typing"
+kind = "concept"
+match = ["duck typing", "duck typings"]
+
+[[entry]]
+term = "dunder"
+kind = "concept"
+match = ["dunder", "dunders"]
+
+[[entry]]
+term = "dynamic typing"
+kind = "concept"
+match = ["dynamic typing", "dynamic typings"]
+
+[[entry]]
+term = "eagerly"
+kind = "concept"
+match = ["eagerly", "eagerlies"]
+
+[[entry]]
+term = "Effect"
+kind = "concept"
+match = ["re:(?<=\\*)Effect(?=\\*)", "re:(?<=\\*)Effects(?=\\*)"]
+
+[[entry]]
+term = "Effect Management System"
+kind = "concept"
+match = ["Effect Management System", "Effect Management Systems"]
+
+[[entry]]
+term = "Effect polymorphism"
+kind = "concept"
+match = ["Effect polymorphism", "Effect polymorphisms"]
+
+[[entry]]
+term = "Effect row"
+kind = "concept"
+match = ["Effect row", "Effect rows"]
+
+[[entry]]
+term = "Effect tracking"
+kind = "concept"
+match = ["Effect tracking", "Effect trackings"]
+
+[[entry]]
+term = "Effect variable"
+kind = "concept"
+match = ["Effect variable", "Effect variables"]
+
+[[entry]]
+term = "Effective Java"
+kind = "concept"
+match = ["Effective Java", "Effective Javas"]
+
+[[entry]]
+term = "Ellipsis"
+kind = "concept"
+match = ["Ellipsis"]
+
+[[entry]]
+term = "emergence"
+kind = "concept"
+match = ["emergence", "emergences"]
+
+[[entry]]
+term = "Enterprise Integration Patterns"
+kind = "concept"
+match = ["Enterprise Integration Patterns"]
+
+[[entry]]
+term = "enumeration"
+kind = "concept"
+match = ["enumeration", "enumerations"]
+
+[[entry]]
+term = "event bus"
+kind = "concept"
+match = ["event bus"]
+
+[[entry]]
+term = "event loop"
+kind = "concept"
+match = ["re:(?<=\\*)event\\s+loop(?=\\*)", "re:(?<=\\*)event\\s+loops(?=\\*)"]
+
+[[entry]]
+term = "Event Sourcing"
+kind = "concept"
+match = ["Event Sourcing", "Event Sourcings"]
+
+[[entry]]
+term = "exception group"
+kind = "concept"
+match = ["exception group", "exception groups"]
+
+[[entry]]
+term = "exception specifications"
+kind = "concept"
+match = ["exception specifications"]
+
+[[entry]]
+term = "exhaustive"
+kind = "concept"
+match = ["exhaustive", "exhaustives"]
+
+[[entry]]
+term = "expression problem"
+kind = "concept"
+match = ["expression problem", "expression problems"]
+
+[[entry]]
+term = "extrinsic state"
+kind = "concept"
+match = ["extrinsic state", "extrinsic states"]
+
+[[entry]]
+term = "f-strings"
+kind = "concept"
+match = ["f-strings"]
+
+[[entry]]
+term = "factory"
+kind = "concept"
+match = ["re:(?<=\\*)factory(?=\\*)", "re:(?<=\\*)factories(?=\\*)"]
+
+[[entry]]
+term = "factory object"
+kind = "concept"
+match = ["factory object", "factory objects"]
+
+[[entry]]
+term = "fallback"
+kind = "concept"
+match = ["fallback", "fallbacks"]
+
+[[entry]]
+term = "finding"
+kind = "concept"
+match = ["finding", "findings"]
+
+[[entry]]
+term = "first-class"
+kind = "concept"
+match = ["first-class"]
+
+[[entry]]
+term = "fixed point"
+kind = "concept"
+match = ["fixed point", "fixed points"]
+
+[[entry]]
+term = "fixtures"
+kind = "concept"
+match = ["fixtures"]
+
+[[entry]]
+term = "Fluent Interface"
+kind = "concept"
+match = ["Fluent Interface", "Fluent Interfaces"]
+
+[[entry]]
+term = "forward reference"
+kind = "concept"
+match = ["forward reference", "forward references"]
+
+[[entry]]
+term = "fragile base class"
+kind = "concept"
+match = ["fragile base class"]
+
+[[entry]]
+term = "free-threaded"
+kind = "concept"
+match = ["free-threaded", "free-threadeds"]
+
+[[entry]]
+term = "Front Controller"
+kind = "concept"
+match = ["Front Controller", "Front Controllers"]
+
+[[entry]]
+term = "function"
+kind = "concept"
+match = ["re:(?<=\\*)function(?=\\*)", "re:(?<=\\*)functions(?=\\*)"]
+
+[[entry]]
+term = "Function Composition"
+kind = "concept"
+match = ["Function Composition", "Function Compositions"]
+
+[[entry]]
+term = "function object"
+kind = "concept"
+match = ["function object", "function objects"]
+
+[[entry]]
+term = "function overloading"
+kind = "concept"
+match = ["function overloading", "function overloadings"]
+
+[[entry]]
+term = "Future/Promise"
+kind = "concept"
+match = ["Future/Promise", "Future/Promises"]
+
+[[entry]]
+term = "Gateway"
+kind = "concept"
+match = ["Gateway", "Gateways"]
+
+[[entry]]
+term = "generator"
+kind = "concept"
+match = ["re:(?<=\\*)generator(?=\\*)", "re:(?<=\\*)generators(?=\\*)"]
+
+[[entry]]
+term = "generator expression"
+kind = "concept"
+match = ["generator expression", "generator expressions"]
+
+[[entry]]
+term = "Global Interpreter Lock"
+kind = "concept"
+match = ["Global Interpreter Lock", "Global Interpreter Locks"]
+
+[[entry]]
+term = "GoF Design Patterns"
+kind = "concept"
+match = ["re:(?<=\\*)GoF\\s+Design\\s+Patterns(?=\\*)"]
+
+[[entry]]
+term = "gradual typing"
+kind = "concept"
+match = ["gradual typing", "gradual typings"]
+
+[[entry]]
+term = "Guarded Suspension"
+kind = "concept"
+match = ["Guarded Suspension", "Guarded Suspensions"]
+
+[[entry]]
+term = "Half-Sync/Half-Async"
+kind = "concept"
+match = ["Half-Sync/Half-Async", "Half-Sync/Half-Asyncs"]
+
+[[entry]]
+term = "handler"
+kind = "concept"
+match = ["re:(?<=\\*)handler(?=\\*)", "re:(?<=\\*)handlers(?=\\*)"]
+
+[[entry]]
+term = "hash"
+kind = "concept"
+match = ["hash", "hashes"]
+
+[[entry]]
+term = "hashable"
+kind = "concept"
+match = ["hashable", "hashables"]
+
+[[entry]]
+term = "heap"
+kind = "concept"
+match = ["heap", "heaps"]
+
+[[entry]]
+term = "higher-order function"
+kind = "concept"
+match = ["higher-order function", "higher-order functions"]
+
+[[entry]]
+term = "Hollywood Principle"
+kind = "concept"
+match = ["Hollywood Principle", "Hollywood Principles"]
+
+[[entry]]
+term = "hook"
+kind = "concept"
+match = ["hook", "hooks"]
+
+[[entry]]
+term = "hot"
+kind = "concept"
+match = ["hot", "hots"]
+
+[[entry]]
+term = "I/O-bound"
+kind = "concept"
+match = ["I/O-bound", "I/O-bounds"]
+
+[[entry]]
+term = "idempotence"
+kind = "concept"
+match = ["idempotence", "idempotences"]
+
+[[entry]]
+term = "Identity Map"
+kind = "concept"
+match = ["Identity Map", "Identity Maps"]
+
+[[entry]]
+term = "immortal"
+kind = "concept"
+match = ["immortal", "immortals"]
+
+[[entry]]
+term = "immutable"
+kind = "concept"
+match = ["re:(?<=\\*)immutable(?=\\*)", "re:(?<=\\*)immutables(?=\\*)"]
+
+[[entry]]
+term = "imperative"
+kind = "concept"
+match = ["imperative", "imperatives"]
+
+[[entry]]
+term = "imports"
+kind = "concept"
+match = ["re:(?<=\\*)imports(?=\\*)"]
+
+[[entry]]
+term = "inclusion polymorphism"
+kind = "concept"
+match = ["inclusion polymorphism", "inclusion polymorphisms"]
+
+[[entry]]
+term = "independence"
+kind = "concept"
+match = ["independence", "independences"]
+
+[[entry]]
+term = "infinite"
+kind = "concept"
+match = ["infinite", "infinites"]
+
+[[entry]]
+term = "initializer"
+kind = "concept"
+match = ["initializer", "initializers"]
+
+[[entry]]
+term = "interning"
+kind = "concept"
+match = ["interning", "internings"]
+
+[[entry]]
+term = "intrinsic state"
+kind = "concept"
+match = ["intrinsic state", "intrinsic states"]
+
+[[entry]]
+term = "invariant"
+kind = "concept"
+match = ["invariant", "invariants"]
+
+[[entry]]
+term = "Inversion of Control"
+kind = "concept"
+match = ["Inversion of Control", "Inversion of Controls"]
+
+[[entry]]
+term = "iterable"
+kind = "concept"
+match = ["re:(?<=\\*)iterable(?=\\*)", "re:(?<=\\*)iterables(?=\\*)"]
+
+[[entry]]
+term = "iterator"
+kind = "concept"
+match = ["re:(?<=\\*)iterator(?=\\*)", "re:(?<=\\*)iterators(?=\\*)"]
+
+[[entry]]
+term = "iterator protocol"
+kind = "concept"
+match = ["iterator protocol", "iterator protocols"]
+
+[[entry]]
+term = "Java"
+kind = "concept"
+match = ["re:(?<=\\*)Java(?=\\*)", "re:(?<=\\*)Javas(?=\\*)"]
+
+[[entry]]
+term = "keyword-only"
+kind = "concept"
+match = ["keyword-only", "keyword-onlies"]
+
+[[entry]]
+term = "Kirkman's schoolgirl problem"
+kind = "concept"
+match = ["Kirkman's schoolgirl problem", "Kirkman's schoolgirl problems"]
+
+[[entry]]
+term = "lambda"
+kind = "concept"
+match = ["lambda", "lambdas"]
+
+[[entry]]
+term = "lapsed listener"
+kind = "concept"
+match = ["lapsed listener", "lapsed listeners"]
+
+[[entry]]
+term = "Law of Demeter"
+kind = "concept"
+match = ["Law of Demeter", "Law of Demeters"]
+
+[[entry]]
+term = "Layers"
+kind = "concept"
+match = ["Layers"]
+
+[[entry]]
+term = "lazily initialized"
+kind = "concept"
+match = ["lazily initialized", "lazily initializeds"]
+
+[[entry]]
+term = "lazy"
+kind = "concept"
+match = ["re:(?<=\\*)lazy(?=\\*)", "re:(?<=\\*)lazies(?=\\*)"]
+
+[[entry]]
+term = "lazy evaluation"
+kind = "concept"
+match = ["lazy evaluation", "lazy evaluations"]
+
+[[entry]]
+term = "Lazy Initialization"
+kind = "concept"
+match = ["Lazy Initialization", "Lazy Initializations"]
+
+[[entry]]
+term = "Lazy Load"
+kind = "concept"
+match = ["Lazy Load", "Lazy Loads"]
+
+[[entry]]
+term = "Leader/Followers"
+kind = "concept"
+match = ["Leader/Followers"]
+
+[[entry]]
+term = "library"
+kind = "concept"
+match = ["re:(?<=\\*)library(?=\\*)", "re:(?<=\\*)libraries(?=\\*)"]
+
+[[entry]]
+term = "Liskov Substitution Principle"
+kind = "concept"
+match = ["Liskov Substitution Principle", "Liskov Substitution Principles"]
+
+[[entry]]
+term = "listener"
+kind = "concept"
+match = ["listener", "listeners"]
+
+[[entry]]
+term = "livelock"
+kind = "concept"
+match = ["livelock", "livelocks"]
+
+[[entry]]
+term = "lock"
+kind = "concept"
+match = ["re:(?<=\\*)lock(?=\\*)", "re:(?<=\\*)locks(?=\\*)"]
+
+[[entry]]
+term = "main guard"
+kind = "concept"
+match = ["main guard", "main guards"]
+
+[[entry]]
+term = "Managed Coupling"
+kind = "concept"
+match = ["Managed Coupling", "Managed Couplings"]
+
+[[entry]]
+term = "mark"
+kind = "concept"
+match = ["re:(?<=\\*)mark(?=\\*)", "re:(?<=\\*)marks(?=\\*)"]
+
+[[entry]]
+term = "marker"
+kind = "concept"
+match = ["marker", "markers"]
+
+[[entry]]
+term = "Marker Interface"
+kind = "concept"
+match = ["Marker Interface", "Marker Interfaces"]
+
+[[entry]]
+term = "maze"
+kind = "concept"
+match = ["maze", "mazes"]
+
+[[entry]]
+term = "Mealy machine"
+kind = "concept"
+match = ["Mealy machine", "Mealy machines"]
+
+[[entry]]
+term = "memento"
+kind = "concept"
+match = ["memento", "mementos"]
+
+[[entry]]
+term = "Memoization"
+kind = "concept"
+match = ["Memoization", "Memoizations"]
+
+[[entry]]
+term = "memoizes"
+kind = "concept"
+match = ["memoizes"]
+
+[[entry]]
+term = "Message"
+kind = "concept"
+match = ["re:(?<=\\*)Message(?=\\*)", "re:(?<=\\*)Messages(?=\\*)"]
+
+[[entry]]
+term = "Message Channel"
+kind = "concept"
+match = ["Message Channel", "Message Channels"]
+
+[[entry]]
+term = "Message Endpoint"
+kind = "concept"
+match = ["Message Endpoint", "Message Endpoints"]
+
+[[entry]]
+term = "Message Router"
+kind = "concept"
+match = ["Message Router", "Message Routers"]
+
+[[entry]]
+term = "Message Translator"
+kind = "concept"
+match = ["Message Translator", "Message Translators"]
+
+[[entry]]
+term = "metaclasses"
+kind = "concept"
+match = ["metaclasses"]
+
+[[entry]]
+term = "metadata"
+kind = "concept"
+match = ["metadata", "metadatas"]
+
+[[entry]]
+term = "metamethods"
+kind = "concept"
+match = ["metamethods"]
+
+[[entry]]
+term = "method resolution order"
+kind = "concept"
+match = ["method resolution order", "method resolution orders"]
+
+[[entry]]
+term = "Microkernel"
+kind = "concept"
+match = ["Microkernel", "Microkernels"]
+
+[[entry]]
+term = "mirrored machinery"
+kind = "concept"
+match = ["mirrored machinery", "mirrored machineries"]
+
+[[entry]]
+term = "mix-in"
+kind = "concept"
+match = ["mix-in", "mix-ins"]
+
+[[entry]]
+term = "Mixin"
+kind = "concept"
+match = ["Mixin", "Mixins"]
+
+[[entry]]
+term = "mocks"
+kind = "concept"
+match = ["mocks"]
+
+[[entry]]
+term = "model"
+kind = "concept"
+match = ["re:(?<=\\*)model(?=\\*)", "re:(?<=\\*)models(?=\\*)"]
+
+[[entry]]
+term = "Model-View-Controller"
+kind = "concept"
+match = ["Model-View-Controller", "Model-View-Controllers"]
+
+[[entry]]
+term = "module"
+kind = "concept"
+match = ["re:(?<=\\*)module(?=\\*)", "re:(?<=\\*)modules(?=\\*)"]
+
+[[entry]]
+term = "monad"
+kind = "concept"
+match = ["monad", "monads"]
+
+[[entry]]
+term = "Money"
+kind = "concept"
+match = ["Money", "Moneys"]
+
+[[entry]]
+term = "Monitor Object"
+kind = "concept"
+match = ["Monitor Object", "Monitor Objects"]
+
+[[entry]]
+term = "Moore machine"
+kind = "concept"
+match = ["Moore machine", "Moore machines"]
+
+[[entry]]
+term = "mutable"
+kind = "concept"
+match = ["re:(?<=\\*)mutable(?=\\*)", "re:(?<=\\*)mutables(?=\\*)"]
+
+[[entry]]
+term = "name mangling"
+kind = "concept"
+match = ["name mangling", "name manglings"]
+
+[[entry]]
+term = "namespace"
+kind = "concept"
+match = ["namespace", "namespaces"]
+
+[[entry]]
+term = "namespace package"
+kind = "concept"
+match = ["namespace package", "namespace packages"]
+
+[[entry]]
+term = "narrows"
+kind = "concept"
+match = ["narrows"]
+
+[[entry]]
+term = "native"
+kind = "concept"
+match = ["native", "natives"]
+
+[[entry]]
+term = "nodal lines"
+kind = "concept"
+match = ["nodal lines"]
+
+[[entry]]
+term = "nominal"
+kind = "concept"
+match = ["nominal", "nominals"]
+
+[[entry]]
+term = "non-data descriptor"
+kind = "concept"
+match = ["non-data descriptor", "non-data descriptors"]
+
+[[entry]]
+term = "object adapter"
+kind = "concept"
+match = ["object adapter", "object adapters"]
+
+[[entry]]
+term = "observer"
+kind = "concept"
+match = ["observer", "observers"]
+
+[[entry]]
+term = "once and once only"
+kind = "concept"
+match = ["once and once only", "once and once onlies"]
+
+[[entry]]
+term = "open"
+kind = "concept"
+match = ["re:(?<=\\*)open(?=\\*)", "re:(?<=\\*)opens(?=\\*)"]
+
+[[entry]]
+term = "operations"
+kind = "concept"
+match = ["re:(?<=\\*)operations(?=\\*)"]
+
+[[entry]]
+term = "oracle"
+kind = "concept"
+match = ["oracle", "oracles"]
+
+[[entry]]
+term = "originator"
+kind = "concept"
+match = ["originator", "originators"]
+
+[[entry]]
+term = "Orthogonality"
+kind = "concept"
+match = ["Orthogonality", "Orthogonalities"]
+
+[[entry]]
+term = "packages"
+kind = "concept"
+match = ["packages"]
+
+[[entry]]
+term = "panics"
+kind = "concept"
+match = ["panics"]
+
+[[entry]]
+term = "parameter"
+kind = "concept"
+match = ["re:(?<=\\*)parameter(?=\\*)", "re:(?<=\\*)parameters(?=\\*)"]
+
+[[entry]]
+term = "parameter specification"
+kind = "concept"
+match = ["parameter specification", "parameter specifications"]
+
+[[entry]]
+term = "parametric polymorphism"
+kind = "concept"
+match = ["parametric polymorphism", "parametric polymorphisms"]
+
+[[entry]]
+term = "parse, don't validate"
+kind = "concept"
+match = ["parse, don't validate", "parse, don't validates"]
+
+[[entry]]
+term = "Partial Application"
+kind = "concept"
+match = ["Partial Application", "Partial Applications"]
+
+[[entry]]
+term = "Pattern-Oriented Software Architecture"
+kind = "concept"
+match = ["Pattern-Oriented Software Architecture", "Pattern-Oriented Software Architectures"]
+
+[[entry]]
+term = "perfect maze"
+kind = "concept"
+match = ["perfect maze", "perfect mazes"]
+
+[[entry]]
+term = "persistent"
+kind = "concept"
+match = ["persistent", "persistents"]
+
+[[entry]]
+term = "pickling"
+kind = "concept"
+match = ["pickling", "picklings"]
+
+[[entry]]
+term = "Pipes and Filters"
+kind = "concept"
+match = ["Pipes and Filters"]
+
+[[entry]]
+term = "pluggable adapter"
+kind = "concept"
+match = ["pluggable adapter", "pluggable adapters"]
+
+[[entry]]
+term = "Plugin"
+kind = "concept"
+match = ["Plugin", "Plugins"]
+
+[[entry]]
+term = "Point-to-Point Channel"
+kind = "concept"
+match = ["Point-to-Point Channel", "Point-to-Point Channels"]
+
+[[entry]]
+term = "Pointer to Implementation"
+kind = "concept"
+match = ["Pointer to Implementation", "Pointer to Implementations"]
+
+[[entry]]
+term = "positional-only"
+kind = "concept"
+match = ["positional-only", "positional-onlies"]
+
+[[entry]]
+term = "premature optimization"
+kind = "concept"
+match = ["premature optimization", "premature optimizations"]
+
+[[entry]]
+term = "Presentation-Abstraction-Control"
+kind = "concept"
+match = ["Presentation-Abstraction-Control", "Presentation-Abstraction-Controls"]
+
+[[entry]]
+term = "principle of least astonishment"
+kind = "concept"
+match = ["principle of least astonishment", "principle of least astonishments"]
+
+[[entry]]
+term = "Proactor"
+kind = "concept"
+match = ["Proactor", "Proactors"]
+
+[[entry]]
+term = "process"
+kind = "concept"
+match = ["re:(?<=\\*)process(?=\\*)"]
+
+[[entry]]
+term = "Producer-Consumer"
+kind = "concept"
+match = ["Producer-Consumer", "Producer-Consumers"]
+
+[[entry]]
+term = "profiler"
+kind = "concept"
+match = ["profiler", "profilers"]
+
+[[entry]]
+term = "proper"
+kind = "concept"
+match = ["proper", "propers"]
+
+[[entry]]
+term = "property-based"
+kind = "concept"
+match = ["property-based", "property-baseds"]
+
+[[entry]]
+term = "property-based testing"
+kind = "concept"
+match = ["property-based testing", "property-based testings"]
+
+[[entry]]
+term = "protection proxy"
+kind = "concept"
+match = ["protection proxy", "protection proxies"]
+
+[[entry]]
+term = "Protocol"
+kind = "concept"
+match = ["re:(?<=\\*)Protocol(?=\\*)", "re:(?<=\\*)Protocols(?=\\*)"]
+
+[[entry]]
+term = "Publish-Subscribe Channel"
+kind = "concept"
+match = ["Publish-Subscribe Channel", "Publish-Subscribe Channels"]
+
+[[entry]]
+term = "pull"
+kind = "concept"
+match = ["pull", "pulls"]
+
+[[entry]]
+term = "pure function"
+kind = "concept"
+match = ["pure function", "pure functions"]
+
+[[entry]]
+term = "push"
+kind = "concept"
+match = ["push", "pushes"]
+
+[[entry]]
+term = "qualify"
+kind = "concept"
+match = ["qualify", "qualifies"]
+
+[[entry]]
+term = "raising"
+kind = "concept"
+match = ["re:(?<=\\*)raising(?=\\*)", "re:(?<=\\*)raisings(?=\\*)"]
+
+[[entry]]
+term = "rat"
+kind = "concept"
+match = ["rat", "rats"]
+
+[[entry]]
+term = "Reactor"
+kind = "concept"
+match = ["Reactor", "Reactors"]
+
+[[entry]]
+term = "Read-Write Lock"
+kind = "concept"
+match = ["Read-Write Lock", "Read-Write Locks"]
+
+[[entry]]
+term = "record"
+kind = "concept"
+match = ["re:(?<=\\*)record(?=\\*)", "re:(?<=\\*)records(?=\\*)"]
+
+[[entry]]
+term = "recursion"
+kind = "concept"
+match = ["recursion", "recursions"]
+
+[[entry]]
+term = "recursive"
+kind = "concept"
+match = ["recursive", "recursives"]
+
+[[entry]]
+term = "recursive case"
+kind = "concept"
+match = ["recursive case", "recursive cases"]
+
+[[entry]]
+term = "Refactoring"
+kind = "concept"
+match = ["Refactoring", "Refactorings"]
+
+[[entry]]
+term = "reference counting"
+kind = "concept"
+match = ["reference counting", "reference countings"]
+
+[[entry]]
+term = "referentially transparent"
+kind = "concept"
+match = ["referentially transparent", "referentially transparents"]
+
+[[entry]]
+term = "reflected"
+kind = "concept"
+match = ["reflected", "reflecteds"]
+
+[[entry]]
+term = "Reflection"
+kind = "concept"
+match = ["Reflection", "Reflections"]
+
+[[entry]]
+term = "Reflexivity"
+kind = "concept"
+match = ["Reflexivity", "Reflexivities"]
+
+[[entry]]
+term = "Registry"
+kind = "concept"
+match = ["re:(?<=\\*)Registry(?=\\*)", "re:(?<=\\*)Registries(?=\\*)"]
+
+[[entry]]
+term = "relative import"
+kind = "concept"
+match = ["relative import", "relative imports"]
+
+[[entry]]
+term = "remote proxy"
+kind = "concept"
+match = ["remote proxy", "remote proxies"]
+
+[[entry]]
+term = "Repository"
+kind = "concept"
+match = ["Repository", "Repositories"]
+
+[[entry]]
+term = "request"
+kind = "concept"
+match = ["re:(?<=\\*)request(?=\\*)", "re:(?<=\\*)requests(?=\\*)"]
+
+[[entry]]
+term = "Resource Acquisition Is Initialization"
+kind = "concept"
+match = ["Resource Acquisition Is Initialization", "Resource Acquisition Is Initializations"]
+
+[[entry]]
+term = "Retry"
+kind = "concept"
+match = ["Retry", "Retries"]
+
+[[entry]]
+term = "root"
+kind = "concept"
+match = ["root", "roots"]
+
+[[entry]]
+term = "roundtrip"
+kind = "concept"
+match = ["roundtrip", "roundtrips"]
+
+[[entry]]
+term = "run-time type identification"
+kind = "concept"
+match = ["run-time type identification", "run-time type identifications"]
+
+[[entry]]
+term = "Saga"
+kind = "concept"
+match = ["Saga", "Sagas"]
+
+[[entry]]
+term = "scenario"
+kind = "concept"
+match = ["scenario", "scenarios"]
+
+[[entry]]
+term = "schema migration"
+kind = "concept"
+match = ["schema migration", "schema migrations"]
+
+[[entry]]
+term = "semaphore"
+kind = "concept"
+match = ["semaphore", "semaphores"]
+
+[[entry]]
+term = "sentinel"
+kind = "concept"
+match = ["sentinel", "sentinels"]
+
+[[entry]]
+term = "Service Discovery"
+kind = "concept"
+match = ["Service Discovery", "Service Discoveries"]
+
+[[entry]]
+term = "Service Layer"
+kind = "concept"
+match = ["Service Layer", "Service Layers"]
+
+[[entry]]
+term = "Service Locator"
+kind = "concept"
+match = ["Service Locator", "Service Locators"]
+
+[[entry]]
+term = "setter"
+kind = "concept"
+match = ["setter", "setters"]
+
+[[entry]]
+term = "shadows"
+kind = "concept"
+match = ["shadows"]
+
+[[entry]]
+term = "shallow"
+kind = "concept"
+match = ["shallow", "shallows"]
+
+[[entry]]
+term = "shape"
+kind = "concept"
+match = ["re:(?<=\\*)shape(?=\\*)", "re:(?<=\\*)shapes(?=\\*)"]
+
+[[entry]]
+term = "side cause"
+kind = "concept"
+match = ["side cause", "side causes"]
+
+[[entry]]
+term = "side effect"
+kind = "concept"
+match = ["side effect", "side effects"]
+
+[[entry]]
+term = "Sidecar"
+kind = "concept"
+match = ["Sidecar", "Sidecars"]
+
+[[entry]]
+term = "simplicity before generality"
+kind = "concept"
+match = ["simplicity before generality", "simplicity before generalities"]
+
+[[entry]]
+term = "simula"
+kind = "concept"
+match = ["simula", "simulas"]
+
+[[entry]]
+term = "slice"
+kind = "concept"
+match = ["slice", "slices"]
+
+[[entry]]
+term = "Smalltalk"
+kind = "concept"
+match = ["Smalltalk", "Smalltalks"]
+
+[[entry]]
+term = "smart reference"
+kind = "concept"
+match = ["smart reference", "smart references"]
+
+[[entry]]
+term = "soft keywords"
+kind = "concept"
+match = ["soft keywords"]
+
+[[entry]]
+term = "Special Case"
+kind = "concept"
+match = ["Special Case", "Special Cases"]
+
+[[entry]]
+term = "Specification"
+kind = "concept"
+match = ["Specification", "Specifications"]
+
+[[entry]]
+term = "Splitter"
+kind = "concept"
+match = ["Splitter", "Splitters"]
+
+[[entry]]
+term = "stable hash"
+kind = "concept"
+match = ["stable hash", "stable hashes"]
+
+[[entry]]
+term = "State effect"
+kind = "concept"
+match = ["State effect", "State effects"]
+
+[[entry]]
+term = "Strangler Fig"
+kind = "concept"
+match = ["Strangler Fig", "Strangler Figs"]
+
+[[entry]]
+term = "strategy"
+kind = "concept"
+match = ["strategy", "strategies"]
+
+[[entry]]
+term = "strong reference"
+kind = "concept"
+match = ["strong reference", "strong references"]
+
+[[entry]]
+term = "structural"
+kind = "concept"
+match = ["structural", "structurals"]
+
+[[entry]]
+term = "structural typing"
+kind = "concept"
+match = ["structural typing", "structural typings"]
+
+[[entry]]
+term = "Structured Concurrency"
+kind = "concept"
+match = ["Structured Concurrency", "Structured Concurrencies"]
+
+[[entry]]
+term = "stub"
+kind = "concept"
+match = ["stub", "stubs"]
+
+[[entry]]
+term = "subject"
+kind = "concept"
+match = ["subject", "subjects"]
+
+[[entry]]
+term = "submodule"
+kind = "concept"
+match = ["submodule", "submodules"]
+
+[[entry]]
+term = "Subtraction"
+kind = "concept"
+match = ["Subtraction", "Subtractions"]
+
+[[entry]]
+term = "subtracts"
+kind = "concept"
+match = ["subtracts"]
+
+[[entry]]
+term = "subtype polymorphism"
+kind = "concept"
+match = ["subtype polymorphism", "subtype polymorphisms"]
+
+[[entry]]
+term = "sum type"
+kind = "concept"
+match = ["sum type", "sum types"]
+
+[[entry]]
+term = "suppresses"
+kind = "concept"
+match = ["suppresses"]
+
+[[entry]]
+term = "suspends"
+kind = "concept"
+match = ["suspends"]
+
+[[entry]]
+term = "syntactic sugar"
+kind = "concept"
+match = ["syntactic sugar", "syntactic sugars"]
+
+[[entry]]
+term = "t-string"
+kind = "concept"
+match = ["t-string", "t-strings"]
+
+[[entry]]
+term = "Table Module"
+kind = "concept"
+match = ["Table Module", "Table Modules"]
+
+[[entry]]
+term = "tagged"
+kind = "concept"
+match = ["tagged", "taggeds"]
+
+[[entry]]
+term = "tail-call optimization"
+kind = "concept"
+match = ["tail-call optimization", "tail-call optimizations"]
+
+[[entry]]
+term = "tail-resumptive"
+kind = "concept"
+match = ["tail-resumptive", "tail-resumptives"]
+
+[[entry]]
+term = "task"
+kind = "concept"
+match = ["re:(?<=\\*)task(?=\\*)", "re:(?<=\\*)tasks(?=\\*)"]
+
+[[entry]]
+term = "telescoping constructor"
+kind = "concept"
+match = ["telescoping constructor", "telescoping constructors"]
+
+[[entry]]
+term = "Thinking in C++"
+kind = "concept"
+match = ["Thinking in C++", "Thinking in C++s"]
+
+[[entry]]
+term = "Thinking in Java"
+kind = "concept"
+match = ["Thinking in Java", "Thinking in Javas"]
+
+[[entry]]
+term = "thread"
+kind = "concept"
+match = ["re:(?<=\\*)thread(?=\\*)", "re:(?<=\\*)threads(?=\\*)"]
+
+[[entry]]
+term = "thread of execution"
+kind = "concept"
+match = ["thread of execution", "thread of executions"]
+
+[[entry]]
+term = "Thread Pool"
+kind = "concept"
+match = ["Thread Pool", "Thread Pools"]
+
+[[entry]]
+term = "Thread-Specific Storage"
+kind = "concept"
+match = ["Thread-Specific Storage", "Thread-Specific Storages"]
+
+[[entry]]
+term = "tight coupling"
+kind = "concept"
+match = ["tight coupling", "tight couplings"]
+
+[[entry]]
+term = "time-sharing"
+kind = "concept"
+match = ["time-sharing", "time-sharings"]
+
+[[entry]]
+term = "Timeout"
+kind = "concept"
+match = ["Timeout", "Timeouts"]
+
+[[entry]]
+term = "Total Function"
+kind = "concept"
+match = ["Total Function", "Total Functions"]
+
+[[entry]]
+term = "Transaction Script"
+kind = "concept"
+match = ["Transaction Script", "Transaction Scripts"]
+
+[[entry]]
+term = "truthiness"
+kind = "concept"
+match = ["truthiness"]
+
+[[entry]]
+term = "tuple"
+kind = "concept"
+match = ["re:(?<=\\*)tuple(?=\\*)", "re:(?<=\\*)tuples(?=\\*)"]
+
+[[entry]]
+term = "two real semantics"
+kind = "concept"
+match = ["two real semantics"]
+
+[[entry]]
+term = "two-way adapter"
+kind = "concept"
+match = ["two-way adapter", "two-way adapters"]
+
+[[entry]]
+term = "type"
+kind = "concept"
+match = ["re:(?<=\\*)type(?=\\*)", "re:(?<=\\*)types(?=\\*)"]
+
+[[entry]]
+term = "type hints"
+kind = "concept"
+match = ["type hints"]
+
+[[entry]]
+term = "Type Object"
+kind = "concept"
+match = ["Type Object", "Type Objects"]
+
+[[entry]]
+term = "type parameter"
+kind = "concept"
+match = ["re:(?<=\\*)type\\s+parameter(?=\\*)", "re:(?<=\\*)type\\s+parameters(?=\\*)"]
+
+[[entry]]
+term = "type statement"
+kind = "concept"
+match = ["type statement", "type statements"]
+
+[[entry]]
+term = "uncollectable"
+kind = "concept"
+match = ["uncollectable", "uncollectables"]
+
+[[entry]]
+term = "Unit of Work"
+kind = "concept"
+match = ["Unit of Work", "Unit of Works"]
+
+[[entry]]
+term = "Value Object"
+kind = "concept"
+match = ["Value Object", "Value Objects"]
+
+[[entry]]
+term = "value pattern"
+kind = "concept"
+match = ["value pattern", "value patterns"]
+
+[[entry]]
+term = "vector of change"
+kind = "concept"
+match = ["vector of change", "vector of changes"]
+
+[[entry]]
+term = "view"
+kind = "concept"
+match = ["view", "views"]
+
+[[entry]]
+term = "virtual proxy"
+kind = "concept"
+match = ["virtual proxy", "virtual proxies"]
+
+[[entry]]
+term = "walkers"
+kind = "concept"
+match = ["walkers"]
+
+[[entry]]
+term = "walrus operator"
+kind = "concept"
+match = ["walrus operator", "walrus operators"]
+
+[[entry]]
+term = "weak reference"
+kind = "concept"
+match = ["weak reference", "weak references"]
+
+[[entry]]
+term = "white-box"
+kind = "concept"
+match = ["white-box", "white-boxes"]
+
+[[entry]]
+term = "Wind, Sand and Stars"
+kind = "concept"
+match = ["Wind, Sand and Stars"]
+
+# ------------------------------------------------------------------
+# Design patterns
+# ------------------------------------------------------------------
+
+[[entry]]
+term = "Abstract Factory"
+kind = "pattern"
+match = ["Abstract Factory"]
+
+[[entry]]
+term = "Adapter"
+kind = "pattern"
+match = ["Adapter"]
+
+[[entry]]
+term = "Blackboard"
+kind = "pattern"
+match = ["Blackboard"]
+
+[[entry]]
+term = "Borg"
+kind = "pattern"
+match = ["Borg"]
+
+[[entry]]
+term = "Bridge"
+kind = "pattern"
+match = ["Bridge"]
+
+[[entry]]
+term = "Builder"
+kind = "pattern"
+match = ["Builder"]
+
+[[entry]]
+term = "Chain of Responsibility"
+kind = "pattern"
+match = ["Chain of Responsibility"]
+
+[[entry]]
+term = "Command"
+kind = "pattern"
+match = ["Command"]
+
+[[entry]]
+term = "Composite"
+kind = "pattern"
+match = ["Composite"]
+
+[[entry]]
+term = "Data Transfer Object"
+kind = "pattern"
+match = ["Data Transfer Object"]
+
+[[entry]]
+term = "Decorator"
+kind = "pattern"
+match = ["Decorator"]
+
+[[entry]]
+term = "Event Bus"
+kind = "pattern"
+match = ["Event Bus"]
+
+[[entry]]
+term = "Façade"
+kind = "pattern"
+match = ["Façade", "Facade"]
+
+[[entry]]
+term = "Factory Method"
+kind = "pattern"
+match = ["Factory Method"]
+
+[[entry]]
+term = "Flyweight"
+kind = "pattern"
+match = ["Flyweight"]
+
+[[entry]]
+term = "Interpreter"
+kind = "pattern"
+match = ["Interpreter"]
+
+[[entry]]
+term = "Iterator"
+kind = "pattern"
+match = ["Iterator"]
+
+[[entry]]
+term = "Mediator"
+kind = "pattern"
+match = ["Mediator"]
+
+[[entry]]
+term = "Memento"
+kind = "pattern"
+match = ["Memento"]
+
+[[entry]]
+term = "Messenger"
+kind = "pattern"
+match = ["Messenger"]
+
+[[entry]]
+term = "Multiple Dispatching"
+kind = "pattern"
+match = ["Multiple Dispatching"]
+
+[[entry]]
+term = "Multiton"
+kind = "pattern"
+match = ["Multiton"]
+
+[[entry]]
+term = "Null Object"
+kind = "pattern"
+match = ["Null Object"]
+
+[[entry]]
+term = "Object Pool"
+kind = "pattern"
+match = ["Object Pool"]
+
+[[entry]]
+term = "Observer"
+kind = "pattern"
+match = ["Observer"]
+
+[[entry]]
+term = "Prototype"
+kind = "pattern"
+match = ["Prototype"]
+
+[[entry]]
+term = "Proxy"
+kind = "pattern"
+match = ["Proxy"]
+
+[[entry]]
+term = "Singleton"
+kind = "pattern"
+match = ["Singleton"]
+
+[[entry]]
+term = "State"
+kind = "pattern"
+match = ["State"]
+
+[[entry]]
+term = "State Machine"
+kind = "pattern"
+match = ["State Machine"]
+
+[[entry]]
+term = "Strategy"
+kind = "pattern"
+match = ["Strategy"]
+
+[[entry]]
+term = "Surrogate"
+kind = "pattern"
+match = ["Surrogate"]
+
+[[entry]]
+term = "Template Method"
+kind = "pattern"
+match = ["Template Method"]
+
+[[entry]]
+term = "Visitor"
+kind = "pattern"
+match = ["Visitor"]
+
+# ------------------------------------------------------------------
+# Python names
+# ------------------------------------------------------------------
+
+[[entry]]
+term = "ABC"
+kind = "python"
+match = ["ABC"]
+code = true
+
+[[entry]]
+term = "abc.ABCMeta"
+kind = "python"
+match = ["abc.ABCMeta"]
+code = true
+
+[[entry]]
+term = "@abstractmethod"
+kind = "python"
+match = ["abstractmethod"]
+code = true
+
+[[entry]]
+term = "__abstractmethods__"
+kind = "python"
+match = ["__abstractmethods__"]
+code = true
+
+[[entry]]
+term = "accept()"
+kind = "python"
+match = ["accept"]
+code = true
+
+[[entry]]
+term = "accumulate()"
+kind = "python"
+match = ["accumulate"]
+code = true
+
+[[entry]]
+term = "action"
+kind = "python"
+match = ["action"]
+code = true
+
+[[entry]]
+term = "add()"
+kind = "python"
+match = ["add"]
+code = true
+
+[[entry]]
+term = "__add__()"
+kind = "python"
+match = ["__add__"]
+code = true
+
+[[entry]]
+term = "__aenter__()"
+kind = "python"
+match = ["__aenter__"]
+code = true
+
+[[entry]]
+term = "__aexit__()"
+kind = "python"
+match = ["__aexit__"]
+code = true
+
+[[entry]]
+term = "all"
+kind = "python"
+match = ["all"]
+code = true
+
+[[entry]]
+term = "__all__"
+kind = "python"
+match = ["__all__"]
+code = true
+
+[[entry]]
+term = "__annotate__"
+kind = "python"
+match = ["__annotate__"]
+code = true
+
+[[entry]]
+term = "__annotate_func__"
+kind = "python"
+match = ["__annotate_func__"]
+code = true
+
+[[entry]]
+term = "Annotated"
+kind = "python"
+match = ["Annotated"]
+code = true
+
+[[entry]]
+term = "annotationlib"
+kind = "python"
+match = ["annotationlib"]
+code = true
+
+[[entry]]
+term = "annotationlib.ForwardRef"
+kind = "python"
+match = ["annotationlib.ForwardRef"]
+code = true
+
+[[entry]]
+term = "__annotations__"
+kind = "python"
+match = ["__annotations__"]
+code = true
+
+[[entry]]
+term = "__annotations_cache__"
+kind = "python"
+match = ["__annotations_cache__"]
+code = true
+
+[[entry]]
+term = "announce()"
+kind = "python"
+match = ["announce"]
+code = true
+
+[[entry]]
+term = "any()"
+kind = "python"
+match = ["any"]
+code = true
+
+[[entry]]
+term = "area()"
+kind = "python"
+match = ["area"]
+code = true
+
+[[entry]]
+term = "argparse.ArgumentParser"
+kind = "python"
+match = ["argparse.ArgumentParser"]
+code = true
+
+[[entry]]
+term = "array"
+kind = "python"
+match = ["array"]
+code = true
+
+[[entry]]
+term = "asdict()"
+kind = "python"
+match = ["asdict"]
+code = true
+
+[[entry]]
+term = "Ask"
+kind = "python"
+match = ["Ask"]
+code = true
+
+[[entry]]
+term = "ask()"
+kind = "python"
+match = ["ask"]
+code = true
+
+[[entry]]
+term = "assert_never()"
+kind = "python"
+match = ["assert_never"]
+code = true
+
+[[entry]]
+term = "AssertionError"
+kind = "python"
+match = ["AssertionError"]
+code = true
+
+[[entry]]
+term = "ast"
+kind = "python"
+match = ["ast"]
+code = true
+
+[[entry]]
+term = "ast.Call"
+kind = "python"
+match = ["ast.Call"]
+code = true
+
+[[entry]]
+term = "ast.NodeVisitor"
+kind = "python"
+match = ["ast.NodeVisitor"]
+code = true
+
+[[entry]]
+term = "ast.walk()"
+kind = "python"
+match = ["ast.walk"]
+code = true
+
+[[entry]]
+term = "astuple()"
+kind = "python"
+match = ["astuple"]
+code = true
+
+[[entry]]
+term = "asynccontextmanager"
+kind = "python"
+match = ["asynccontextmanager"]
+code = true
+
+[[entry]]
+term = "asyncio.Barrier"
+kind = "python"
+match = ["asyncio.Barrier"]
+code = true
+
+[[entry]]
+term = "asyncio.BoundedSemaphore"
+kind = "python"
+match = ["asyncio.BoundedSemaphore"]
+code = true
+
+[[entry]]
+term = "asyncio.CancelledError"
+kind = "python"
+match = ["asyncio.CancelledError"]
+code = true
+
+[[entry]]
+term = "asyncio.Future"
+kind = "python"
+match = ["asyncio.Future"]
+code = true
+
+[[entry]]
+term = "asyncio.Lock"
+kind = "python"
+match = ["asyncio.Lock"]
+code = true
+
+[[entry]]
+term = "asyncio.open_connection()"
+kind = "python"
+match = ["asyncio.open_connection"]
+code = true
+
+[[entry]]
+term = "asyncio.start_server()"
+kind = "python"
+match = ["asyncio.start_server"]
+code = true
+
+[[entry]]
+term = "asyncio.timeout()"
+kind = "python"
+match = ["asyncio.timeout"]
+code = true
+
+[[entry]]
+term = "asyncio.to_thread()"
+kind = "python"
+match = ["asyncio.to_thread"]
+code = true
+
+[[entry]]
+term = "asyncio.wait_for()"
+kind = "python"
+match = ["asyncio.wait_for"]
+code = true
+
+[[entry]]
+term = "atexit"
+kind = "python"
+match = ["atexit"]
+code = true
+
+[[entry]]
+term = "auto()"
+kind = "python"
+match = ["auto"]
+code = true
+
+[[entry]]
+term = "Awaitable"
+kind = "python"
+match = ["Awaitable"]
+code = true
+
+[[entry]]
+term = "balance"
+kind = "python"
+match = ["balance"]
+code = true
+
+[[entry]]
+term = "BaseException"
+kind = "python"
+match = ["BaseException"]
+code = true
+
+[[entry]]
+term = "batched"
+kind = "python"
+match = ["batched"]
+code = true
+
+[[entry]]
+term = "bin()"
+kind = "python"
+match = ["bin"]
+code = true
+
+[[entry]]
+term = "bisect"
+kind = "python"
+match = ["bisect"]
+code = true
+
+[[entry]]
+term = "__bool__()"
+kind = "python"
+match = ["__bool__"]
+code = true
+
+[[entry]]
+term = "break"
+kind = "python"
+match = ["break"]
+code = true
+
+[[entry]]
+term = "BufferError"
+kind = "python"
+match = ["BufferError"]
+code = true
+
+[[entry]]
+term = "built"
+kind = "python"
+match = ["built"]
+code = true
+
+[[entry]]
+term = "builtins"
+kind = "python"
+match = ["builtins"]
+code = true
+
+[[entry]]
+term = "builtins.dir.rmdir"
+kind = "python"
+match = ["builtins.dir.rmdir"]
+code = true
+
+[[entry]]
+term = "builtins.Start"
+kind = "python"
+match = ["builtins.Start"]
+code = true
+
+[[entry]]
+term = "builtins.str.read_text"
+kind = "python"
+match = ["builtins.str.read_text"]
+code = true
+
+[[entry]]
+term = "builtins.str.upper"
+kind = "python"
+match = ["builtins.str.upper"]
+code = true
+
+[[entry]]
+term = "__builtins__"
+kind = "python"
+match = ["__builtins__"]
+code = true
+
+[[entry]]
+term = "bytearray"
+kind = "python"
+match = ["bytearray"]
+code = true
+
+[[entry]]
+term = "bytes"
+kind = "python"
+match = ["bytes"]
+code = true
+
+[[entry]]
+term = "cached_property"
+kind = "python"
+match = ["cached_property"]
+code = true
+
+[[entry]]
+term = "__call__()"
+kind = "python"
+match = ["__call__"]
+code = true
+
+[[entry]]
+term = "callable"
+kind = "python"
+match = ["callable"]
+code = true
+
+[[entry]]
+term = "cast()"
+kind = "python"
+match = ["cast"]
+code = true
+
+[[entry]]
+term = "__cause__"
+kind = "python"
+match = ["__cause__"]
+code = true
+
+[[entry]]
+term = "celsius"
+kind = "python"
+match = ["celsius"]
+code = true
+
+[[entry]]
+term = "chain"
+kind = "python"
+match = ["chain"]
+code = true
+
+[[entry]]
+term = "__class__"
+kind = "python"
+match = ["__class__"]
+code = true
+
+[[entry]]
+term = "@classmethod"
+kind = "python"
+match = ["classmethod"]
+code = true
+
+[[entry]]
+term = "close()"
+kind = "python"
+match = ["close"]
+code = true
+
+[[entry]]
+term = "cls.__name__"
+kind = "python"
+match = ["cls.__name__"]
+code = true
+
+[[entry]]
+term = "cmp_to_key"
+kind = "python"
+match = ["cmp_to_key"]
+code = true
+
+[[entry]]
+term = "Collection"
+kind = "python"
+match = ["Collection"]
+code = true
+
+[[entry]]
+term = "Color"
+kind = "python"
+match = ["Color"]
+code = true
+
+[[entry]]
+term = "combinations()"
+kind = "python"
+match = ["combinations"]
+code = true
+
+[[entry]]
+term = "combinations_with_replacement()"
+kind = "python"
+match = ["combinations_with_replacement"]
+code = true
+
+[[entry]]
+term = "complex"
+kind = "python"
+match = ["complex"]
+code = true
+
+[[entry]]
+term = "compress"
+kind = "python"
+match = ["compress"]
+code = true
+
+[[entry]]
+term = "concurrent.futures.Future"
+kind = "python"
+match = ["concurrent.futures.Future"]
+code = true
+
+[[entry]]
+term = "console"
+kind = "python"
+match = ["console"]
+code = true
+
+[[entry]]
+term = "__contains__()"
+kind = "python"
+match = ["__contains__"]
+code = true
+
+[[entry]]
+term = "__context__"
+kind = "python"
+match = ["__context__"]
+code = true
+
+[[entry]]
+term = "ContextDecorator"
+kind = "python"
+match = ["ContextDecorator"]
+code = true
+
+[[entry]]
+term = "contextlib"
+kind = "python"
+match = ["contextlib"]
+code = true
+
+[[entry]]
+term = "contextlib.redirect_stdout"
+kind = "python"
+match = ["contextlib.redirect_stdout"]
+code = true
+
+[[entry]]
+term = "@contextmanager"
+kind = "python"
+match = ["contextmanager"]
+code = true
+
+[[entry]]
+term = "ContextVar"
+kind = "python"
+match = ["ContextVar"]
+code = true
+
+[[entry]]
+term = "contextvars.copy_context()"
+kind = "python"
+match = ["contextvars.copy_context"]
+code = true
+
+[[entry]]
+term = "continue"
+kind = "python"
+match = ["continue"]
+code = true
+
+[[entry]]
+term = "Coord"
+kind = "python"
+match = ["Coord"]
+code = true
+
+[[entry]]
+term = "copy"
+kind = "python"
+match = ["copy"]
+code = true
+
+[[entry]]
+term = "Counter"
+kind = "python"
+match = ["Counter"]
+code = true
+
+[[entry]]
+term = "cProfile"
+kind = "python"
+match = ["cProfile"]
+code = true
+
+[[entry]]
+term = "current"
+kind = "python"
+match = ["current"]
+code = true
+
+[[entry]]
+term = "current_item()"
+kind = "python"
+match = ["current_item"]
+code = true
+
+[[entry]]
+term = "cycle"
+kind = "python"
+match = ["cycle"]
+code = true
+
+[[entry]]
+term = "__dataclass_fields__"
+kind = "python"
+match = ["__dataclass_fields__"]
+code = true
+
+[[entry]]
+term = "__dataclass_params__"
+kind = "python"
+match = ["__dataclass_params__"]
+code = true
+
+[[entry]]
+term = "@dataclass_transform"
+kind = "python"
+match = ["dataclass_transform"]
+code = true
+
+[[entry]]
+term = "date"
+kind = "python"
+match = ["date"]
+code = true
+
+[[entry]]
+term = "datetime"
+kind = "python"
+match = ["datetime"]
+code = true
+
+[[entry]]
+term = "datetime.fromisoformat()"
+kind = "python"
+match = ["datetime.fromisoformat"]
+code = true
+
+[[entry]]
+term = "deepcopy()"
+kind = "python"
+match = ["deepcopy"]
+code = true
+
+[[entry]]
+term = "__deepcopy__()"
+kind = "python"
+match = ["__deepcopy__"]
+code = true
+
+[[entry]]
+term = "default_factory"
+kind = "python"
+match = ["default_factory"]
+code = true
+
+[[entry]]
+term = "defaultdict"
+kind = "python"
+match = ["defaultdict"]
+code = true
+
+[[entry]]
+term = "__defaults__"
+kind = "python"
+match = ["__defaults__"]
+code = true
+
+[[entry]]
+term = "del"
+kind = "python"
+match = ["del"]
+code = true
+
+[[entry]]
+term = "__del__()"
+kind = "python"
+match = ["__del__"]
+code = true
+
+[[entry]]
+term = "__delete__()"
+kind = "python"
+match = ["__delete__"]
+code = true
+
+[[entry]]
+term = "DeprecationWarning"
+kind = "python"
+match = ["DeprecationWarning"]
+code = true
+
+[[entry]]
+term = "deque"
+kind = "python"
+match = ["deque"]
+code = true
+
+[[entry]]
+term = "describe()"
+kind = "python"
+match = ["describe"]
+code = true
+
+[[entry]]
+term = "difflib"
+kind = "python"
+match = ["difflib"]
+code = true
+
+[[entry]]
+term = "dir()"
+kind = "python"
+match = ["dir"]
+code = true
+
+[[entry]]
+term = "display"
+kind = "python"
+match = ["display"]
+code = true
+
+[[entry]]
+term = "display_object()"
+kind = "python"
+match = ["display_object"]
+code = true
+
+[[entry]]
+term = "__doc__"
+kind = "python"
+match = ["__doc__"]
+code = true
+
+[[entry]]
+term = "double()"
+kind = "python"
+match = ["double"]
+code = true
+
+[[entry]]
+term = "draw()"
+kind = "python"
+match = ["draw"]
+code = true
+
+[[entry]]
+term = "drive()"
+kind = "python"
+match = ["drive"]
+code = true
+
+[[entry]]
+term = "dropwhile()"
+kind = "python"
+match = ["dropwhile"]
+code = true
+
+[[entry]]
+term = "elif"
+kind = "python"
+match = ["elif"]
+code = true
+
+[[entry]]
+term = "__enter__()"
+kind = "python"
+match = ["__enter__"]
+code = true
+
+[[entry]]
+term = "Enum"
+kind = "python"
+match = ["Enum"]
+code = true
+
+[[entry]]
+term = "enum.EnumType"
+kind = "python"
+match = ["enum.EnumType"]
+code = true
+
+[[entry]]
+term = "enumerate()"
+kind = "python"
+match = ["enumerate"]
+code = true
+
+[[entry]]
+term = "__eq__()"
+kind = "python"
+match = ["__eq__"]
+code = true
+
+[[entry]]
+term = "Err"
+kind = "python"
+match = ["Err"]
+code = true
+
+[[entry]]
+term = "eval()"
+kind = "python"
+match = ["eval"]
+code = true
+
+[[entry]]
+term = "Exception"
+kind = "python"
+match = ["Exception"]
+code = true
+
+[[entry]]
+term = "ExceptionGroup"
+kind = "python"
+match = ["ExceptionGroup"]
+code = true
+
+[[entry]]
+term = "exec()"
+kind = "python"
+match = ["exec"]
+code = true
+
+[[entry]]
+term = "Executor"
+kind = "python"
+match = ["Executor"]
+code = true
+
+[[entry]]
+term = "exit"
+kind = "python"
+match = ["exit"]
+code = true
+
+[[entry]]
+term = "__exit__()"
+kind = "python"
+match = ["__exit__"]
+code = true
+
+[[entry]]
+term = "ExitStack"
+kind = "python"
+match = ["ExitStack"]
+code = true
+
+[[entry]]
+term = "extend()"
+kind = "python"
+match = ["extend"]
+code = true
+
+[[entry]]
+term = "fetch()"
+kind = "python"
+match = ["fetch"]
+code = true
+
+[[entry]]
+term = "fields"
+kind = "python"
+match = ["fields"]
+code = true
+
+[[entry]]
+term = "FileNotFoundError"
+kind = "python"
+match = ["FileNotFoundError"]
+code = true
+
+[[entry]]
+term = "filter()"
+kind = "python"
+match = ["filter"]
+code = true
+
+[[entry]]
+term = "filterfalse()"
+kind = "python"
+match = ["filterfalse"]
+code = true
+
+[[entry]]
+term = "@final"
+kind = "python"
+match = ["final"]
+code = true
+
+[[entry]]
+term = "__final__"
+kind = "python"
+match = ["__final__"]
+code = true
+
+[[entry]]
+term = "finalize()"
+kind = "python"
+match = ["finalize"]
+code = true
+
+[[entry]]
+term = "finally"
+kind = "python"
+match = ["finally"]
+code = true
+
+[[entry]]
+term = "fnmatch()"
+kind = "python"
+match = ["fnmatch"]
+code = true
+
+[[entry]]
+term = "fnmatchcase()"
+kind = "python"
+match = ["fnmatchcase"]
+code = true
+
+[[entry]]
+term = "fork()"
+kind = "python"
+match = ["fork"]
+code = true
+
+[[entry]]
+term = "format()"
+kind = "python"
+match = ["format"]
+code = true
+
+[[entry]]
+term = "__format__()"
+kind = "python"
+match = ["__format__"]
+code = true
+
+[[entry]]
+term = "__forward_arg__"
+kind = "python"
+match = ["__forward_arg__"]
+code = true
+
+[[entry]]
+term = "frozendict"
+kind = "python"
+match = ["frozendict"]
+code = true
+
+[[entry]]
+term = "FrozenInstanceError"
+kind = "python"
+match = ["FrozenInstanceError"]
+code = true
+
+[[entry]]
+term = "frozenset"
+kind = "python"
+match = ["frozenset"]
+code = true
+
+[[entry]]
+term = "func"
+kind = "python"
+match = ["func"]
+code = true
+
+[[entry]]
+term = "functools._lru_cache_wrapper"
+kind = "python"
+match = ["functools._lru_cache_wrapper"]
+code = true
+
+[[entry]]
+term = "functools.WRAPPER_ASSIGNMENTS"
+kind = "python"
+match = ["functools.WRAPPER_ASSIGNMENTS"]
+code = true
+
+[[entry]]
+term = "gather()"
+kind = "python"
+match = ["gather"]
+code = true
+
+[[entry]]
+term = "gc.collect()"
+kind = "python"
+match = ["gc.collect"]
+code = true
+
+[[entry]]
+term = "gc.disable()"
+kind = "python"
+match = ["gc.disable"]
+code = true
+
+[[entry]]
+term = "gc.enable()"
+kind = "python"
+match = ["gc.enable"]
+code = true
+
+[[entry]]
+term = "gc.garbage"
+kind = "python"
+match = ["gc.garbage"]
+code = true
+
+[[entry]]
+term = "gc.get_referrers()"
+kind = "python"
+match = ["gc.get_referrers"]
+code = true
+
+[[entry]]
+term = "__ge__"
+kind = "python"
+match = ["__ge__"]
+code = true
+
+[[entry]]
+term = "GeneratorExit"
+kind = "python"
+match = ["GeneratorExit"]
+code = true
+
+[[entry]]
+term = "Generic"
+kind = "python"
+match = ["Generic"]
+code = true
+
+[[entry]]
+term = "__get__()"
+kind = "python"
+match = ["__get__"]
+code = true
+
+[[entry]]
+term = "get_annotations()"
+kind = "python"
+match = ["get_annotations"]
+code = true
+
+[[entry]]
+term = "get_close_matches()"
+kind = "python"
+match = ["get_close_matches"]
+code = true
+
+[[entry]]
+term = "get_type_hints()"
+kind = "python"
+match = ["get_type_hints"]
+code = true
+
+[[entry]]
+term = "getattr()"
+kind = "python"
+match = ["getattr"]
+code = true
+
+[[entry]]
+term = "__getattr__()"
+kind = "python"
+match = ["__getattr__"]
+code = true
+
+[[entry]]
+term = "__getattribute__()"
+kind = "python"
+match = ["__getattribute__"]
+code = true
+
+[[entry]]
+term = "__getitem__()"
+kind = "python"
+match = ["__getitem__"]
+code = true
+
+[[entry]]
+term = "__getstate__()"
+kind = "python"
+match = ["__getstate__"]
+code = true
+
+[[entry]]
+term = "global"
+kind = "python"
+match = ["global"]
+code = true
+
+[[entry]]
+term = "globals()"
+kind = "python"
+match = ["globals"]
+code = true
+
+[[entry]]
+term = "groupby()"
+kind = "python"
+match = ["groupby"]
+code = true
+
+[[entry]]
+term = "__gt__"
+kind = "python"
+match = ["__gt__"]
+code = true
+
+[[entry]]
+term = "handle()"
+kind = "python"
+match = ["handle"]
+code = true
+
+[[entry]]
+term = "Handler"
+kind = "python"
+match = ["Handler"]
+code = true
+
+[[entry]]
+term = "hasattr()"
+kind = "python"
+match = ["hasattr"]
+code = true
+
+[[entry]]
+term = "hash()"
+kind = "python"
+match = ["hash"]
+code = true
+
+[[entry]]
+term = "__hash__"
+kind = "python"
+match = ["__hash__"]
+code = true
+
+[[entry]]
+term = "heapify()"
+kind = "python"
+match = ["heapify"]
+code = true
+
+[[entry]]
+term = "heapq"
+kind = "python"
+match = ["heapq"]
+code = true
+
+[[entry]]
+term = "help()"
+kind = "python"
+match = ["help"]
+code = true
+
+[[entry]]
+term = "history"
+kind = "python"
+match = ["history"]
+code = true
+
+[[entry]]
+term = "__iadd__()"
+kind = "python"
+match = ["__iadd__"]
+code = true
+
+[[entry]]
+term = "id()"
+kind = "python"
+match = ["id"]
+code = true
+
+[[entry]]
+term = "index()"
+kind = "python"
+match = ["index"]
+code = true
+
+[[entry]]
+term = "IndexError"
+kind = "python"
+match = ["IndexError"]
+code = true
+
+[[entry]]
+term = "__init_subclass__()"
+kind = "python"
+match = ["__init_subclass__"]
+code = true
+
+[[entry]]
+term = "inner()"
+kind = "python"
+match = ["inner"]
+code = true
+
+[[entry]]
+term = "input()"
+kind = "python"
+match = ["input"]
+code = true
+
+[[entry]]
+term = "inspect"
+kind = "python"
+match = ["inspect"]
+code = true
+
+[[entry]]
+term = "inspect.getattr_static()"
+kind = "python"
+match = ["inspect.getattr_static"]
+code = true
+
+[[entry]]
+term = "inspect.getclosurevars()"
+kind = "python"
+match = ["inspect.getclosurevars"]
+code = true
+
+[[entry]]
+term = "inspect.getdoc()"
+kind = "python"
+match = ["inspect.getdoc"]
+code = true
+
+[[entry]]
+term = "inspect.getgeneratorstate()"
+kind = "python"
+match = ["inspect.getgeneratorstate"]
+code = true
+
+[[entry]]
+term = "inspect.getmembers_static()"
+kind = "python"
+match = ["inspect.getmembers_static"]
+code = true
+
+[[entry]]
+term = "inspect.getsource()"
+kind = "python"
+match = ["inspect.getsource"]
+code = true
+
+[[entry]]
+term = "inspect.isclass()"
+kind = "python"
+match = ["inspect.isclass"]
+code = true
+
+[[entry]]
+term = "inspect.isfunction()"
+kind = "python"
+match = ["inspect.isfunction"]
+code = true
+
+[[entry]]
+term = "inspect.ismethod()"
+kind = "python"
+match = ["inspect.ismethod"]
+code = true
+
+[[entry]]
+term = "inspect.signature()"
+kind = "python"
+match = ["inspect.signature"]
+code = true
+
+[[entry]]
+term = "intern()"
+kind = "python"
+match = ["intern"]
+code = true
+
+[[entry]]
+term = "Interpolation"
+kind = "python"
+match = ["Interpolation"]
+code = true
+
+[[entry]]
+term = "InterpreterPoolExecutor"
+kind = "python"
+match = ["InterpreterPoolExecutor"]
+code = true
+
+[[entry]]
+term = "interview()"
+kind = "python"
+match = ["interview"]
+code = true
+
+[[entry]]
+term = "IO"
+kind = "python"
+match = ["IO"]
+code = true
+
+[[entry]]
+term = "_io"
+kind = "python"
+match = ["_io"]
+code = true
+
+[[entry]]
+term = "io.IOBase"
+kind = "python"
+match = ["io.IOBase"]
+code = true
+
+[[entry]]
+term = "is_dataclass()"
+kind = "python"
+match = ["is_dataclass"]
+code = true
+
+[[entry]]
+term = "islice()"
+kind = "python"
+match = ["islice"]
+code = true
+
+[[entry]]
+term = "issubclass()"
+kind = "python"
+match = ["issubclass"]
+code = true
+
+[[entry]]
+term = "iter()"
+kind = "python"
+match = ["iter"]
+code = true
+
+[[entry]]
+term = "__iter__()"
+kind = "python"
+match = ["__iter__"]
+code = true
+
+[[entry]]
+term = "Iterable"
+kind = "python"
+match = ["Iterable"]
+code = true
+
+[[entry]]
+term = "itertools.chain.from_iterable()"
+kind = "python"
+match = ["itertools.chain.from_iterable"]
+code = true
+
+[[entry]]
+term = "json.dumps()"
+kind = "python"
+match = ["json.dumps"]
+code = true
+
+[[entry]]
+term = "KeyboardInterrupt"
+kind = "python"
+match = ["KeyboardInterrupt"]
+code = true
+
+[[entry]]
+term = "kind"
+kind = "python"
+match = ["kind"]
+code = true
+
+[[entry]]
+term = "KW_ONLY"
+kind = "python"
+match = ["KW_ONLY"]
+code = true
+
+[[entry]]
+term = "label"
+kind = "python"
+match = ["label"]
+code = true
+
+[[entry]]
+term = "__le__()"
+kind = "python"
+match = ["__le__"]
+code = true
+
+[[entry]]
+term = "__len__()"
+kind = "python"
+match = ["__len__"]
+code = true
+
+[[entry]]
+term = "Literal"
+kind = "python"
+match = ["Literal"]
+code = true
+
+[[entry]]
+term = "Log"
+kind = "python"
+match = ["Log"]
+code = true
+
+[[entry]]
+term = "logging.NullHandler"
+kind = "python"
+match = ["logging.NullHandler"]
+code = true
+
+[[entry]]
+term = "LookupError"
+kind = "python"
+match = ["LookupError"]
+code = true
+
+[[entry]]
+term = "lru_cache"
+kind = "python"
+match = ["lru_cache"]
+code = true
+
+[[entry]]
+term = "__lt__()"
+kind = "python"
+match = ["__lt__"]
+code = true
+
+[[entry]]
+term = "make()"
+kind = "python"
+match = ["make"]
+code = true
+
+[[entry]]
+term = "map()"
+kind = "python"
+match = ["map"]
+code = true
+
+[[entry]]
+term = "Mapping"
+kind = "python"
+match = ["Mapping"]
+code = true
+
+[[entry]]
+term = "MappingProxyType"
+kind = "python"
+match = ["MappingProxyType"]
+code = true
+
+[[entry]]
+term = "__match_args__"
+kind = "python"
+match = ["__match_args__"]
+code = true
+
+[[entry]]
+term = "math.isclose()"
+kind = "python"
+match = ["math.isclose"]
+code = true
+
+[[entry]]
+term = "math.prod()"
+kind = "python"
+match = ["math.prod"]
+code = true
+
+[[entry]]
+term = "max()"
+kind = "python"
+match = ["max"]
+code = true
+
+[[entry]]
+term = "memoize()"
+kind = "python"
+match = ["memoize"]
+code = true
+
+[[entry]]
+term = "MemoryError"
+kind = "python"
+match = ["MemoryError"]
+code = true
+
+[[entry]]
+term = "memoryview"
+kind = "python"
+match = ["memoryview"]
+code = true
+
+[[entry]]
+term = "__metadata__"
+kind = "python"
+match = ["__metadata__"]
+code = true
+
+[[entry]]
+term = "min()"
+kind = "python"
+match = ["min"]
+code = true
+
+[[entry]]
+term = "__missing__()"
+kind = "python"
+match = ["__missing__"]
+code = true
+
+[[entry]]
+term = "Mock"
+kind = "python"
+match = ["Mock"]
+code = true
+
+[[entry]]
+term = "__module__"
+kind = "python"
+match = ["__module__"]
+code = true
+
+[[entry]]
+term = "ModuleNotFoundError"
+kind = "python"
+match = ["ModuleNotFoundError"]
+code = true
+
+[[entry]]
+term = "__mro__"
+kind = "python"
+match = ["__mro__"]
+code = true
+
+[[entry]]
+term = "mul()"
+kind = "python"
+match = ["mul"]
+code = true
+
+[[entry]]
+term = "__mul__()"
+kind = "python"
+match = ["__mul__"]
+code = true
+
+[[entry]]
+term = "multiprocessing"
+kind = "python"
+match = ["multiprocessing"]
+code = true
+
+[[entry]]
+term = "multiprocessing.Manager"
+kind = "python"
+match = ["multiprocessing.Manager"]
+code = true
+
+[[entry]]
+term = "Name"
+kind = "python"
+match = ["Name"]
+code = true
+
+[[entry]]
+term = "NamedTuple"
+kind = "python"
+match = ["NamedTuple"]
+code = true
+
+[[entry]]
+term = "namedtuple"
+kind = "python"
+match = ["namedtuple"]
+code = true
+
+[[entry]]
+term = "NameError"
+kind = "python"
+match = ["NameError"]
+code = true
+
+[[entry]]
+term = "names"
+kind = "python"
+match = ["names"]
+code = true
+
+[[entry]]
+term = "__neg__()"
+kind = "python"
+match = ["__neg__"]
+code = true
+
+[[entry]]
+term = "Never"
+kind = "python"
+match = ["Never"]
+code = true
+
+[[entry]]
+term = "__new__()"
+kind = "python"
+match = ["__new__"]
+code = true
+
+[[entry]]
+term = "NewType"
+kind = "python"
+match = ["NewType"]
+code = true
+
+[[entry]]
+term = "__next__()"
+kind = "python"
+match = ["__next__"]
+code = true
+
+[[entry]]
+term = "nonlocal"
+kind = "python"
+match = ["nonlocal"]
+code = true
+
+[[entry]]
+term = "__notes__"
+kind = "python"
+match = ["__notes__"]
+code = true
+
+[[entry]]
+term = "notify()"
+kind = "python"
+match = ["notify"]
+code = true
+
+[[entry]]
+term = "NotImplemented"
+kind = "python"
+match = ["NotImplemented"]
+code = true
+
+[[entry]]
+term = "NotImplementedError"
+kind = "python"
+match = ["NotImplementedError"]
+code = true
+
+[[entry]]
+term = "NotRequired"
+kind = "python"
+match = ["NotRequired"]
+code = true
+
+[[entry]]
+term = "now"
+kind = "python"
+match = ["now"]
+code = true
+
+[[entry]]
+term = "nt"
+kind = "python"
+match = ["nt"]
+code = true
+
+[[entry]]
+term = "nullcontext"
+kind = "python"
+match = ["nullcontext"]
+code = true
+
+[[entry]]
+term = "numbers"
+kind = "python"
+match = ["numbers"]
+code = true
+
+[[entry]]
+term = "nums"
+kind = "python"
+match = ["nums"]
+code = true
+
+[[entry]]
+term = "obj"
+kind = "python"
+match = ["obj"]
+code = true
+
+[[entry]]
+term = "object.__setattr__()"
+kind = "python"
+match = ["object.__setattr__"]
+code = true
+
+[[entry]]
+term = "Ok"
+kind = "python"
+match = ["Ok"]
+code = true
+
+[[entry]]
+term = "open()"
+kind = "python"
+match = ["open"]
+code = true
+
+[[entry]]
+term = "operator"
+kind = "python"
+match = ["operator"]
+code = true
+
+[[entry]]
+term = "operator.attrgetter()"
+kind = "python"
+match = ["operator.attrgetter"]
+code = true
+
+[[entry]]
+term = "operator.itemgetter()"
+kind = "python"
+match = ["operator.itemgetter"]
+code = true
+
+[[entry]]
+term = "operator.or_()"
+kind = "python"
+match = ["operator.or_"]
+code = true
+
+[[entry]]
+term = "Operators"
+kind = "python"
+match = ["Operators"]
+code = true
+
+[[entry]]
+term = "or"
+kind = "python"
+match = ["or"]
+code = true
+
+[[entry]]
+term = "os.path.join"
+kind = "python"
+match = ["os.path.join"]
+code = true
+
+[[entry]]
+term = "os.process_cpu_count()"
+kind = "python"
+match = ["os.process_cpu_count"]
+code = true
+
+[[entry]]
+term = "os.remove"
+kind = "python"
+match = ["os.remove"]
+code = true
+
+[[entry]]
+term = "OSError"
+kind = "python"
+match = ["OSError"]
+code = true
+
+[[entry]]
+term = "OverflowError"
+kind = "python"
+match = ["OverflowError"]
+code = true
+
+[[entry]]
+term = "@overload"
+kind = "python"
+match = ["overload"]
+code = true
+
+[[entry]]
+term = "__override__"
+kind = "python"
+match = ["__override__"]
+code = true
+
+[[entry]]
+term = "Pair"
+kind = "python"
+match = ["Pair"]
+code = true
+
+[[entry]]
+term = "pairwise"
+kind = "python"
+match = ["pairwise"]
+code = true
+
+[[entry]]
+term = "parse()"
+kind = "python"
+match = ["parse"]
+code = true
+
+[[entry]]
+term = "partial()"
+kind = "python"
+match = ["partial"]
+code = true
+
+[[entry]]
+term = "partialmethod"
+kind = "python"
+match = ["partialmethod"]
+code = true
+
+[[entry]]
+term = "Path"
+kind = "python"
+match = ["Path"]
+code = true
+
+[[entry]]
+term = "pathlib"
+kind = "python"
+match = ["pathlib"]
+code = true
+
+[[entry]]
+term = "pathlib.Path.read_text"
+kind = "python"
+match = ["pathlib.Path.read_text"]
+code = true
+
+[[entry]]
+term = "pathlib.Path.with_suffix.write_text"
+kind = "python"
+match = ["pathlib.Path.with_suffix.write_text"]
+code = true
+
+[[entry]]
+term = "peak"
+kind = "python"
+match = ["peak"]
+code = true
+
+[[entry]]
+term = "PermissionError"
+kind = "python"
+match = ["PermissionError"]
+code = true
+
+[[entry]]
+term = "permutations"
+kind = "python"
+match = ["permutations"]
+code = true
+
+[[entry]]
+term = "pickle"
+kind = "python"
+match = ["pickle"]
+code = true
+
+[[entry]]
+term = "pickle.dumps()"
+kind = "python"
+match = ["pickle.dumps"]
+code = true
+
+[[entry]]
+term = "pickle.loads()"
+kind = "python"
+match = ["pickle.loads"]
+code = true
+
+[[entry]]
+term = "Placeholder"
+kind = "python"
+match = ["Placeholder"]
+code = true
+
+[[entry]]
+term = "Point"
+kind = "python"
+match = ["Point"]
+code = true
+
+[[entry]]
+term = "pop()"
+kind = "python"
+match = ["pop"]
+code = true
+
+[[entry]]
+term = "posix"
+kind = "python"
+match = ["posix"]
+code = true
+
+[[entry]]
+term = "__prepare__()"
+kind = "python"
+match = ["__prepare__"]
+code = true
+
+[[entry]]
+term = "PriorityQueue"
+kind = "python"
+match = ["PriorityQueue"]
+code = true
+
+[[entry]]
+term = "ProcessPoolExecutor"
+kind = "python"
+match = ["ProcessPoolExecutor"]
+code = true
+
+[[entry]]
+term = "product()"
+kind = "python"
+match = ["product"]
+code = true
+
+[[entry]]
+term = "profile"
+kind = "python"
+match = ["profile"]
+code = true
+
+[[entry]]
+term = "profiling"
+kind = "python"
+match = ["profiling"]
+code = true
+
+[[entry]]
+term = "profiling.sampling"
+kind = "python"
+match = ["profiling.sampling"]
+code = true
+
+[[entry]]
+term = "profiling.tracing"
+kind = "python"
+match = ["profiling.tracing"]
+code = true
+
+[[entry]]
+term = "PYTHONPATH"
+kind = "python"
+match = ["PYTHONPATH"]
+code = true
+
+[[entry]]
+term = "__qualname__"
+kind = "python"
+match = ["__qualname__"]
+code = true
+
+[[entry]]
+term = "Queue"
+kind = "python"
+match = ["Queue"]
+code = true
+
+[[entry]]
+term = "queue.Empty"
+kind = "python"
+match = ["queue.Empty"]
+code = true
+
+[[entry]]
+term = "__radd__()"
+kind = "python"
+match = ["__radd__"]
+code = true
+
+[[entry]]
+term = "random"
+kind = "python"
+match = ["random"]
+code = true
+
+[[entry]]
+term = "random.randint()"
+kind = "python"
+match = ["random.randint"]
+code = true
+
+[[entry]]
+term = "random.Random"
+kind = "python"
+match = ["random.Random"]
+code = true
+
+[[entry]]
+term = "re.escape()"
+kind = "python"
+match = ["re.escape"]
+code = true
+
+[[entry]]
+term = "re.search()"
+kind = "python"
+match = ["re.search"]
+code = true
+
+[[entry]]
+term = "read()"
+kind = "python"
+match = ["read"]
+code = true
+
+[[entry]]
+term = "readline()"
+kind = "python"
+match = ["readline"]
+code = true
+
+[[entry]]
+term = "RecursionError"
+kind = "python"
+match = ["RecursionError"]
+code = true
+
+[[entry]]
+term = "reduce()"
+kind = "python"
+match = ["reduce"]
+code = true
+
+[[entry]]
+term = "ref()"
+kind = "python"
+match = ["ref"]
+code = true
+
+[[entry]]
+term = "ReferenceError"
+kind = "python"
+match = ["ReferenceError"]
+code = true
+
+[[entry]]
+term = "register()"
+kind = "python"
+match = ["register"]
+code = true
+
+[[entry]]
+term = "registry"
+kind = "python"
+match = ["registry"]
+code = true
+
+[[entry]]
+term = "render()"
+kind = "python"
+match = ["render"]
+code = true
+
+[[entry]]
+term = "repeat()"
+kind = "python"
+match = ["repeat"]
+code = true
+
+[[entry]]
+term = "replace()"
+kind = "python"
+match = ["replace"]
+code = true
+
+[[entry]]
+term = "__replace__()"
+kind = "python"
+match = ["__replace__"]
+code = true
+
+[[entry]]
+term = "Report"
+kind = "python"
+match = ["Report"]
+code = true
+
+[[entry]]
+term = "repr()"
+kind = "python"
+match = ["repr"]
+code = true
+
+[[entry]]
+term = "__repr__()"
+kind = "python"
+match = ["__repr__"]
+code = true
+
+[[entry]]
+term = "ResourceWarning"
+kind = "python"
+match = ["ResourceWarning"]
+code = true
+
+[[entry]]
+term = "retry()"
+kind = "python"
+match = ["retry"]
+code = true
+
+[[entry]]
+term = "reveal_type()"
+kind = "python"
+match = ["reveal_type"]
+code = true
+
+[[entry]]
+term = "__rmul__()"
+kind = "python"
+match = ["__rmul__"]
+code = true
+
+[[entry]]
+term = "rng"
+kind = "python"
+match = ["rng"]
+code = true
+
+[[entry]]
+term = "round()"
+kind = "python"
+match = ["round"]
+code = true
+
+[[entry]]
+term = "row"
+kind = "python"
+match = ["row"]
+code = true
+
+[[entry]]
+term = "__rsub__()"
+kind = "python"
+match = ["__rsub__"]
+code = true
+
+[[entry]]
+term = "__rtruediv__()"
+kind = "python"
+match = ["__rtruediv__"]
+code = true
+
+[[entry]]
+term = "ruff"
+kind = "python"
+match = ["ruff"]
+code = true
+
+[[entry]]
+term = "@runtime_checkable"
+kind = "python"
+match = ["runtime_checkable"]
+code = true
+
+[[entry]]
+term = "RuntimeWarning"
+kind = "python"
+match = ["RuntimeWarning"]
+code = true
+
+[[entry]]
+term = "@safe"
+kind = "python"
+match = ["safe"]
+code = true
+
+[[entry]]
+term = "score()"
+kind = "python"
+match = ["score"]
+code = true
+
+[[entry]]
+term = "second"
+kind = "python"
+match = ["second"]
+code = true
+
+[[entry]]
+term = "select()"
+kind = "python"
+match = ["select"]
+code = true
+
+[[entry]]
+term = "Self"
+kind = "python"
+match = ["Self"]
+code = true
+
+[[entry]]
+term = "self.__dict__"
+kind = "python"
+match = ["self.__dict__"]
+code = true
+
+[[entry]]
+term = "self.close"
+kind = "python"
+match = ["self.close"]
+code = true
+
+[[entry]]
+term = "__self__"
+kind = "python"
+match = ["__self__"]
+code = true
+
+[[entry]]
+term = "send()"
+kind = "python"
+match = ["send"]
+code = true
+
+[[entry]]
+term = "sentinel()"
+kind = "python"
+match = ["sentinel"]
+code = true
+
+[[entry]]
+term = "Sequence"
+kind = "python"
+match = ["Sequence"]
+code = true
+
+[[entry]]
+term = "__set__()"
+kind = "python"
+match = ["__set__"]
+code = true
+
+[[entry]]
+term = "__set_name__()"
+kind = "python"
+match = ["__set_name__"]
+code = true
+
+[[entry]]
+term = "setattr()"
+kind = "python"
+match = ["setattr"]
+code = true
+
+[[entry]]
+term = "__setattr__()"
+kind = "python"
+match = ["__setattr__"]
+code = true
+
+[[entry]]
+term = "__setitem__()"
+kind = "python"
+match = ["__setitem__"]
+code = true
+
+[[entry]]
+term = "__setstate__()"
+kind = "python"
+match = ["__setstate__"]
+code = true
+
+[[entry]]
+term = "shout()"
+kind = "python"
+match = ["shout"]
+code = true
+
+[[entry]]
+term = "ShutDown"
+kind = "python"
+match = ["ShutDown"]
+code = true
+
+[[entry]]
+term = "SimpleNamespace"
+kind = "python"
+match = ["SimpleNamespace"]
+code = true
+
+[[entry]]
+term = "singledispatch"
+kind = "python"
+match = ["singledispatch"]
+code = true
+
+[[entry]]
+term = "singledispatchmethod"
+kind = "python"
+match = ["singledispatchmethod"]
+code = true
+
+[[entry]]
+term = "size"
+kind = "python"
+match = ["size"]
+code = true
+
+[[entry]]
+term = "__slots__"
+kind = "python"
+match = ["__slots__"]
+code = true
+
+[[entry]]
+term = "slow"
+kind = "python"
+match = ["slow"]
+code = true
+
+[[entry]]
+term = "socket.socket"
+kind = "python"
+match = ["socket.socket"]
+code = true
+
+[[entry]]
+term = "source"
+kind = "python"
+match = ["source"]
+code = true
+
+[[entry]]
+term = "spawn()"
+kind = "python"
+match = ["spawn"]
+code = true
+
+[[entry]]
+term = "Square"
+kind = "python"
+match = ["Square"]
+code = true
+
+[[entry]]
+term = "square"
+kind = "python"
+match = ["square"]
+code = true
+
+[[entry]]
+term = "squares()"
+kind = "python"
+match = ["squares"]
+code = true
+
+[[entry]]
+term = "starmap"
+kind = "python"
+match = ["starmap"]
+code = true
+
+[[entry]]
+term = "Stars"
+kind = "python"
+match = ["Stars"]
+code = true
+
+[[entry]]
+term = "stat()"
+kind = "python"
+match = ["stat"]
+code = true
+
+[[entry]]
+term = "@staticmethod"
+kind = "python"
+match = ["staticmethod"]
+code = true
+
+[[entry]]
+term = "step()"
+kind = "python"
+match = ["step"]
+code = true
+
+[[entry]]
+term = "StopIteration"
+kind = "python"
+match = ["StopIteration"]
+code = true
+
+[[entry]]
+term = "__str__()"
+kind = "python"
+match = ["__str__"]
+code = true
+
+[[entry]]
+term = "StrEnum"
+kind = "python"
+match = ["StrEnum"]
+code = true
+
+[[entry]]
+term = "Sub"
+kind = "python"
+match = ["Sub"]
+code = true
+
+[[entry]]
+term = "__sub__()"
+kind = "python"
+match = ["__sub__"]
+code = true
+
+[[entry]]
+term = "__subclasses__()"
+kind = "python"
+match = ["__subclasses__"]
+code = true
+
+[[entry]]
+term = "suppress"
+kind = "python"
+match = ["suppress"]
+code = true
+
+[[entry]]
+term = "__suppress_context__"
+kind = "python"
+match = ["__suppress_context__"]
+code = true
+
+[[entry]]
+term = "switch"
+kind = "python"
+match = ["switch"]
+code = true
+
+[[entry]]
+term = "SyntaxError"
+kind = "python"
+match = ["SyntaxError"]
+code = true
+
+[[entry]]
+term = "SyntaxWarning"
+kind = "python"
+match = ["SyntaxWarning"]
+code = true
+
+[[entry]]
+term = "sys"
+kind = "python"
+match = ["sys"]
+code = true
+
+[[entry]]
+term = "sys._jit"
+kind = "python"
+match = ["sys._jit"]
+code = true
+
+[[entry]]
+term = "sys._jit.is_active()"
+kind = "python"
+match = ["sys._jit.is_active"]
+code = true
+
+[[entry]]
+term = "sys.getsizeof()"
+kind = "python"
+match = ["sys.getsizeof"]
+code = true
+
+[[entry]]
+term = "sys.lazy_modules"
+kind = "python"
+match = ["sys.lazy_modules"]
+code = true
+
+[[entry]]
+term = "sys.modules"
+kind = "python"
+match = ["sys.modules"]
+code = true
+
+[[entry]]
+term = "sys.monitoring"
+kind = "python"
+match = ["sys.monitoring"]
+code = true
+
+[[entry]]
+term = "sys.path"
+kind = "python"
+match = ["sys.path"]
+code = true
+
+[[entry]]
+term = "sys.setrecursionlimit()"
+kind = "python"
+match = ["sys.setrecursionlimit"]
+code = true
+
+[[entry]]
+term = "sys.settrace()"
+kind = "python"
+match = ["sys.settrace"]
+code = true
+
+[[entry]]
+term = "sys.stderr"
+kind = "python"
+match = ["sys.stderr"]
+code = true
+
+[[entry]]
+term = "sys.stdout"
+kind = "python"
+match = ["sys.stdout"]
+code = true
+
+[[entry]]
+term = "SystemExit"
+kind = "python"
+match = ["SystemExit"]
+code = true
+
+[[entry]]
+term = "TabError"
+kind = "python"
+match = ["TabError"]
+code = true
+
+[[entry]]
+term = "takewhile()"
+kind = "python"
+match = ["takewhile"]
+code = true
+
+[[entry]]
+term = "tally()"
+kind = "python"
+match = ["tally"]
+code = true
+
+[[entry]]
+term = "TaskGroup"
+kind = "python"
+match = ["TaskGroup"]
+code = true
+
+[[entry]]
+term = "tee()"
+kind = "python"
+match = ["tee"]
+code = true
+
+[[entry]]
+term = "Tell"
+kind = "python"
+match = ["Tell"]
+code = true
+
+[[entry]]
+term = "tell()"
+kind = "python"
+match = ["tell"]
+code = true
+
+[[entry]]
+term = "tempfile.TemporaryDirectory()"
+kind = "python"
+match = ["tempfile.TemporaryDirectory"]
+code = true
+
+[[entry]]
+term = "Template"
+kind = "python"
+match = ["Template"]
+code = true
+
+[[entry]]
+term = "textwrap.fill()"
+kind = "python"
+match = ["textwrap.fill"]
+code = true
+
+[[entry]]
+term = "threading"
+kind = "python"
+match = ["threading"]
+code = true
+
+[[entry]]
+term = "threading.Barrier"
+kind = "python"
+match = ["threading.Barrier"]
+code = true
+
+[[entry]]
+term = "threading.concurrent_tee()"
+kind = "python"
+match = ["threading.concurrent_tee"]
+code = true
+
+[[entry]]
+term = "threading.Event"
+kind = "python"
+match = ["threading.Event"]
+code = true
+
+[[entry]]
+term = "threading.local"
+kind = "python"
+match = ["threading.local"]
+code = true
+
+[[entry]]
+term = "threading.Lock"
+kind = "python"
+match = ["threading.Lock"]
+code = true
+
+[[entry]]
+term = "threading.serialize_iterator()"
+kind = "python"
+match = ["threading.serialize_iterator"]
+code = true
+
+[[entry]]
+term = "threading.stack_size()"
+kind = "python"
+match = ["threading.stack_size"]
+code = true
+
+[[entry]]
+term = "threading.synchronized_iterator()"
+kind = "python"
+match = ["threading.synchronized_iterator"]
+code = true
+
+[[entry]]
+term = "ThreadPoolExecutor"
+kind = "python"
+match = ["ThreadPoolExecutor"]
+code = true
+
+[[entry]]
+term = "throw()"
+kind = "python"
+match = ["throw"]
+code = true
+
+[[entry]]
+term = "@throws"
+kind = "python"
+match = ["throws"]
+code = true
+
+[[entry]]
+term = "time.monotonic()"
+kind = "python"
+match = ["time.monotonic"]
+code = true
+
+[[entry]]
+term = "time.perf_counter()"
+kind = "python"
+match = ["time.perf_counter"]
+code = true
+
+[[entry]]
+term = "timedelta"
+kind = "python"
+match = ["timedelta"]
+code = true
+
+[[entry]]
+term = "timeit"
+kind = "python"
+match = ["timeit"]
+code = true
+
+[[entry]]
+term = "TimeoutError"
+kind = "python"
+match = ["TimeoutError"]
+code = true
+
+[[entry]]
+term = "tkinter"
+kind = "python"
+match = ["tkinter"]
+code = true
+
+[[entry]]
+term = "total_ordering"
+kind = "python"
+match = ["total_ordering"]
+code = true
+
+[[entry]]
+term = "trace()"
+kind = "python"
+match = ["trace"]
+code = true
+
+[[entry]]
+term = "traceback.format_exception_only()"
+kind = "python"
+match = ["traceback.format_exception_only"]
+code = true
+
+[[entry]]
+term = "__traceback__"
+kind = "python"
+match = ["__traceback__"]
+code = true
+
+[[entry]]
+term = "tracemalloc"
+kind = "python"
+match = ["tracemalloc"]
+code = true
+
+[[entry]]
+term = "Trash"
+kind = "python"
+match = ["Trash"]
+code = true
+
+[[entry]]
+term = "__truediv__()"
+kind = "python"
+match = ["__truediv__"]
+code = true
+
+[[entry]]
+term = "TYPE_CHECKING"
+kind = "python"
+match = ["TYPE_CHECKING"]
+code = true
+
+[[entry]]
+term = "__type_params__"
+kind = "python"
+match = ["__type_params__"]
+code = true
+
+[[entry]]
+term = "TypedDict"
+kind = "python"
+match = ["TypedDict"]
+code = true
+
+[[entry]]
+term = "TypeFailure"
+kind = "python"
+match = ["TypeFailure"]
+code = true
+
+[[entry]]
+term = "TypeIs"
+kind = "python"
+match = ["TypeIs"]
+code = true
+
+[[entry]]
+term = "types"
+kind = "python"
+match = ["types"]
+code = true
+
+[[entry]]
+term = "TypeVar"
+kind = "python"
+match = ["TypeVar"]
+code = true
+
+[[entry]]
+term = "UnboundLocalError"
+kind = "python"
+match = ["UnboundLocalError"]
+code = true
+
+[[entry]]
+term = "unittest"
+kind = "python"
+match = ["unittest"]
+code = true
+
+[[entry]]
+term = "unittest.mock"
+kind = "python"
+match = ["unittest.mock"]
+code = true
+
+[[entry]]
+term = "Unknown"
+kind = "python"
+match = ["Unknown"]
+code = true
+
+[[entry]]
+term = "Unpack"
+kind = "python"
+match = ["Unpack"]
+code = true
+
+[[entry]]
+term = "update()"
+kind = "python"
+match = ["update"]
+code = true
+
+[[entry]]
+term = "update_wrapper()"
+kind = "python"
+match = ["update_wrapper"]
+code = true
+
+[[entry]]
+term = "urlopen()"
+kind = "python"
+match = ["urlopen"]
+code = true
+
+[[entry]]
+term = "uv"
+kind = "python"
+match = ["uv"]
+code = true
+
+[[entry]]
+term = "val"
+kind = "python"
+match = ["val"]
+code = true
+
+[[entry]]
+term = "vars()"
+kind = "python"
+match = ["vars"]
+code = true
+
+[[entry]]
+term = "warnings.deprecated()"
+kind = "python"
+match = ["warnings.deprecated"]
+code = true
+
+[[entry]]
+term = "warnings.warn()"
+kind = "python"
+match = ["warnings.warn"]
+code = true
+
+[[entry]]
+term = "WeakMethod"
+kind = "python"
+match = ["WeakMethod"]
+code = true
+
+[[entry]]
+term = "weakref.proxy()"
+kind = "python"
+match = ["weakref.proxy"]
+code = true
+
+[[entry]]
+term = "__weakref__"
+kind = "python"
+match = ["__weakref__"]
+code = true
+
+[[entry]]
+term = "WeakValueDictionary"
+kind = "python"
+match = ["WeakValueDictionary"]
+code = true
+
+[[entry]]
+term = "Weapon"
+kind = "python"
+match = ["Weapon"]
+code = true
+
+[[entry]]
+term = "while"
+kind = "python"
+match = ["while"]
+code = true
+
+[[entry]]
+term = "withdraw()"
+kind = "python"
+match = ["withdraw"]
+code = true
+
+[[entry]]
+term = "__wrapped__"
+kind = "python"
+match = ["__wrapped__"]
+code = true
+
+[[entry]]
+term = "wrapper()"
+kind = "python"
+match = ["wrapper"]
+code = true
+
+[[entry]]
+term = "wraps"
+kind = "python"
+match = ["wraps"]
+code = true
+
+[[entry]]
+term = "ZeroDivisionError"
+kind = "python"
+match = ["ZeroDivisionError"]
+code = true
+
+[[entry]]
+term = "zip()"
+kind = "python"
+match = ["zip"]
+code = true
+
+[[entry]]
+term = "zip_longest"
+kind = "python"
+match = ["zip_longest"]
+code = true
+
+# ------------------------------------------------------------------
+# PEPs
+# ------------------------------------------------------------------
+
+[[entry]]
+term = "PEP 8"
+kind = "pep"
+match = ["PEP 8"]
+
+[[entry]]
+term = "PEP 442"
+kind = "pep"
+match = ["PEP 442"]
+
+[[entry]]
+term = "PEP 448"
+kind = "pep"
+match = ["PEP 448"]
+
+[[entry]]
+term = "PEP 479"
+kind = "pep"
+match = ["PEP 479"]
+
+[[entry]]
+term = "PEP 562"
+kind = "pep"
+match = ["PEP 562"]
+
+[[entry]]
+term = "PEP 593"
+kind = "pep"
+match = ["PEP 593"]
+
+[[entry]]
+term = "PEP 614"
+kind = "pep"
+match = ["PEP 614"]
+
+[[entry]]
+term = "PEP 649"
+kind = "pep"
+match = ["PEP 649"]
+
+[[entry]]
+term = "PEP 661"
+kind = "pep"
+match = ["PEP 661"]
+
+[[entry]]
+term = "PEP 669"
+kind = "pep"
+match = ["PEP 669"]
+
+[[entry]]
+term = "PEP 684"
+kind = "pep"
+match = ["PEP 684"]
+
+[[entry]]
+term = "PEP 692"
+kind = "pep"
+match = ["PEP 692"]
+
+[[entry]]
+term = "PEP 703"
+kind = "pep"
+match = ["PEP 703"]
+
+[[entry]]
+term = "PEP 744"
+kind = "pep"
+match = ["PEP 744"]
+
+[[entry]]
+term = "PEP 750"
+kind = "pep"
+match = ["PEP 750"]
+
+[[entry]]
+term = "PEP 779"
+kind = "pep"
+match = ["PEP 779"]
+
+[[entry]]
+term = "PEP 798"
+kind = "pep"
+match = ["PEP 798"]
+
+[[entry]]
+term = "PEP 799"
+kind = "pep"
+match = ["PEP 799"]
+
+[[entry]]
+term = "PEP 810"
+kind = "pep"
+match = ["PEP 810"]
+
+[[entry]]
+term = "PEP 814"
+kind = "pep"
+match = ["PEP 814"]
+
+[[entry]]
+term = "PEP 836"
+kind = "pep"
+match = ["PEP 836"]
