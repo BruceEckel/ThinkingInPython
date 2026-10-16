@@ -149,10 +149,10 @@ print(plugged.tags)
 #: ['a', 'b']
 ```
 
-**Isolate the internal list.** The `tags` property now returns `self._tags.copy()`,
-as `numbers` returns a copy of its list and `bob` returns a `deepcopy()`.
-The caller now mutates a throwaway copy, and `plugged`'s real `_tags` keeps the
-items it had.
+**Isolate the internal list.** The `tags` property now returns
+`self._tags.copy()`, as `numbers` returns a copy of its list and `bob`
+returns a `deepcopy()`. The caller mutates a throwaway copy.
+`plugged`'s real `_tags` keeps the items it had.
 
 Every new mutable field needs its own defensive copy. That repetition
 is the tedium that motivates freezing the data instead.
@@ -211,23 +211,23 @@ not to the object to which `bob` refers.
 That object is now a mutable `Bob`. The assignment to `name` sets a field of `Bob`,
 so the `__setattr__()` that `frozen=True` generated for `Immutable` never runs.
 
-**Check hashability.** The `hash()` failure is a second symptom of the same shallowness.
-`frozen=True` generates a `__hash__()` that hashes the tuple of field
-values, so hashing an `Immutable` hashes its `Bob`.
-`Bob` is a mutable data class that compares by value,
-and on such a class `@dataclass` sets `__hash__` to `None`.
-If a field changed after the object went into a dict,
-the object's hash would change while the dict kept the old one.
-A lookup would then search the wrong slot.
-With `Bob.__hash__` set to `None`, `hash()` raises a `TypeError` when it reaches `Bob`.
+**Check hashability.** The `hash()` failure is a second symptom of the
+same shallowness. `frozen=True` generates a `__hash__()` that hashes
+the tuple of field values, so hashing an `Immutable` hashes its `Bob`.
+`Bob` is a mutable data class that compares by value. On such a class,
+`@dataclass` sets `__hash__` to `None`. If a field of a `Bob` changed
+after that `Bob` went into a dict, its hash would change while the
+dict kept the old one. A lookup would then search the wrong slot. With
+`Bob.__hash__` set to `None`, `hash()` raises a `TypeError` when it
+reaches `Bob`.
 
 Restoring `frozen=True` on `Bob` removes the mutation and the hash
 failure together.
 They are one problem: a frozen wrapper around a mutable value.
 `frozen_leaky.py` shows the same two symptoms for a `list` field.
 
-The author must make immutability go all the way down, one field at a time,
-because nothing enforces deep immutability.
+The author of each class must make immutability go all the way down,
+one field at a time, because nothing enforces deep immutability.
 Declare `tuple` rather than `list`, `frozenset` rather than `set`,
 `frozendict` rather than `dict`, and a frozen data class rather than a
 mutable one for any nested value.
@@ -336,17 +336,18 @@ info:     └── incompatible return types: `Weight` is not assignable to `Pr
 The comment lets the listing pass the book's type check while the call
 still runs and prints `4.5`.
 
-**Give each meaning its own type.** At runtime, `Package` still matches the shape of `Priced`.
-`Package.total()` takes no arguments and returns a float at runtime,
-as before. The two `NewType` declarations make the two return types distinct,
-so the type checker now rejects a weight where `Priced` declares a price.
+**Give each meaning its own type.** At runtime, `Package` still matches
+the shape of `Priced`. `Package.total()` takes no arguments and returns
+a float, as before. The two `NewType` declarations make the two return
+types distinct, so the type checker now rejects a weight where `Priced`
+declares a price.
 
 If someone deletes the annotations, the program behaves as it does
 now. It prints `4.5` and charges the customer for a number of kilograms.
 `NewType` exists only for the type checker. `Weight(2.5)` returns its
 argument, the `float` `2.5`, so at runtime a weight is an ordinary float.
 The distinction is real in the source and absent in the process.
-The chapter describes that split.
+[What the Shape Does Not Say](../../Chapters/20_Patterns--Rethinking_Objects.md#what-the-shape-does-not-say) describes that split.
 
 </details>
 </details>
@@ -445,9 +446,9 @@ print(distance(TripleCoord(Triple(3, 0, 99)),
 #: 5.0
 ```
 
-`Triple` names its fields `a`, `b`, and `c`, and a 2D distance uses
-two of them. `TripleCoord` wraps a `Triple` and exposes its `a` as `x`
-and its `b` as `y`, the two properties `distance()` reads.
+`Triple` names its fields `a`, `b`, and `c`. A 2D distance uses two of
+them. `TripleCoord` wraps a `Triple` and exposes its `a` as `x` and its
+`b` as `y`, the two properties `distance()` reads.
 `TripleCoord` supplies the `Coord` shape for `Triple`, the same way `PairCoord` supplies it for `Pair`.
 `distance()` stays as it is, because it reads `.x` and `.y` alone.
 
@@ -719,7 +720,7 @@ class CountingBox:
 <summary>Solution</summary>
 
 If you write `CountingBox.extend()` as `self._items.extend(more)`, the box prints `3 1 1`.
-The held list's own `extend()` adds the two elements, and `appends` stays at 1.
+The held list's own `extend()` adds the two elements, so `appends` stays at 1.
 As [Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) notes,
 composition still allows the bug and moves it into a class you can read.
 The solution's `extend()` calls `append()` for each element, so `appends` counts every element.
@@ -804,10 +805,10 @@ Each of those methods updates a counter.
 
 `CountingList` gets `sort()`, `index()`, `__len__()`, slicing, and
 everything else `list` offers, and gets the counting wrong.
-`CountingBox` gets only the methods you write for it, and a caller who
-needs `sort()` waits until you write one.
-With composition, you decide which `list` methods `CountingBox` offers.
-With inheritance, `list` decides, and you discover later which of its methods go past your counters.
+`CountingBox` gets only the methods you write for it. A caller who
+needs `sort()` waits until you write one. With composition, you decide
+which `list` methods `CountingBox` offers. With inheritance, `list`
+decides. You discover later which of its methods go past your counters.
 
 </details>
 </details>
@@ -827,8 +828,7 @@ With inheritance, `list` decides, and you discover later which of its methods go
 
 [The Liskov Substitution Principle](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution) shows `fill()` relying on a base `push()` that always succeeds.
 Keep that guarantee.
-Have `push()` accept every item and enforce the limit another way.
-Then add a `full()` method that callers can ask.
+Have `push()` accept every item and enforce the limit another way, and add a `full()` method that callers can ask.
 Then decide whether the weaker guarantee is acceptable, and whether a subclass is the right relationship.
 
 <details>
@@ -940,8 +940,9 @@ either weaken the guarantee until it fits the base contract, or admit
 that "a stack that can refuse" is a different type. A separate class
 states that difference, with its own `push()` returning `bool` or
 raising an exception. The type checker then rejects any call that
-hands that class to a `fill()` written for a different contract. Inheritance is a claim about
-substitutability, and for `BoundedStack` that claim is false.
+hands that class to a `fill()` written for a different contract.
+Inheritance is a claim about substitutability. For `BoundedStack`,
+that claim is false.
 
 </details>
 </details>
