@@ -129,9 +129,9 @@ for the pieces they cover.
 exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and `Plastic` is
 now a fifth entry. That failure is correct. The test exists to prove
 that defining a subclass registers it, so a new material changes the
-set the assertion compares. If the test still passed,
-`__init_subclass__()` would have stopped registering subclasses. Once
-you update the expected set, the test checks registration again.
+set the assertion compares. A passing test would mean that
+`__init_subclass__()` had stopped registering subclasses. Once you
+update the expected set, the test checks registration again.
 
 </details>
 </details>
@@ -237,7 +237,7 @@ Neither `price()` nor `heaviest()` needs `singledispatch`. `price()`
 reads `t.weight` and `t.value`, and `heaviest()` reads `t.weight`
 alone. Every `Trash` subclass carries both attributes, so the same
 code runs for `Aluminum`, `Plastic`, or any future material.
-Like `sum_value()`, each one is a single function that handles every material.
+Each is a single function, like `sum_value()`.
 
 `singledispatch` is for behavior that differs by type, such as
 `recycling_note()` giving `Aluminum` and `Glass` their own wording.
@@ -384,8 +384,9 @@ for cls in Trash.registry.values():
 function version. `singledispatchmethod` routes on the type of the
 first argument after `self`.
 
-**Move the operation onto an object.** What changes is where you define the operation. `recycling_note()`
-is now a method you call as `sorter.recycling_note(t)`.
+**Move the operation onto an object.** What changes is where you
+define the operation. `recycling_note()` is now a method you call as
+`sorter.recycling_note(t)`.
 
 The method form matters if `Sorter` holds state of its own alongside the dispatch:
 a log of notes issued, a configuration, statistics.
@@ -528,22 +529,24 @@ print(sorted(k.__name__ for k in shared))
 probe on the exact class, so `CrushedAluminum` is a new key and gets a
 bin of its own.
 
-**Resolve the note through the MRO.** `singledispatch` resolves through the MRO instead.
-It walks from `CrushedAluminum` to `Aluminum` and uses `Aluminum`'s registration.
+**Resolve the note through the MRO.** `singledispatch` resolves
+through the MRO instead. It walks from `CrushedAluminum` to
+`Aluminum` and uses `Aluminum`'s registration.
 
 Both behaviors are deliberate, and neither is a fallback. The sorter must
-know the exact class that arrived, and the note uses the nearest
+know the exact class that arrived. The note uses the nearest
 registration along the MRO.
 
-**Give each class a default bin.** To share a parent's bin without naming a material in the loop, choose
-your own key instead of accepting `type(t)`. A `bin` class variable
-supplies that key. `__init_subclass__()` defaults each class to
-itself, so by default every material keeps a bin of its own.
+**Give each class a default bin.** To share a parent's bin without
+naming a material in the loop, choose your own key instead of
+accepting `type(t)`. A `bin` class variable supplies that key.
+`__init_subclass__()` sets each class's `bin` to that class by
+default, so every material keeps a bin of its own.
 
-**Let a subclass share its parent's bin.** `CrushedAluminum` opts in by setting `bin` to `Aluminum`.
-It restates the `ClassVar` annotation the way the chapter's
-subclasses restate `value`'s annotation.
-The type checker treats that restatement as optional.
+**Let a subclass share its parent's bin.** `CrushedAluminum` opts in
+by setting `bin` to `Aluminum`. It restates the `ClassVar` annotation
+the way the chapter's subclasses restate `value`'s annotation. The
+type checker treats that restatement as optional.
 
 **Sort by the declared key.** The sorting loop becomes
 `shared[t.bin].append(t)` and still names no material.
@@ -681,12 +684,13 @@ expect(NotImplementedError, strict_hazard, Plastic(1.0))
 #: [NotImplementedError] no hazard rule for Plastic
 ```
 
-**Fall back to a default answer.** `hazard()` returns `"none"` for the plastic. That answer is wrong and
-looks like every correct `"none"` beside it. The forgotten registration
-produces no exception and no report from the type checker.
+**Fall back to a default answer.** `hazard()` returns `"none"` for
+the plastic. That answer is wrong and looks like every correct
+`"none"` beside it. The forgotten registration produces no exception
+and no report from the type checker.
 
-**Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the
-material at the first call.
+**Refuse an unregistered type.** `strict_hazard()` raises a
+`NotImplementedError` that names the material at the first call.
 
 **Register every material.** The strict form requires one registration
 for every material, including each one whose answer is `"none"`.
