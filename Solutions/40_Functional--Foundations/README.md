@@ -335,8 +335,10 @@ and leaves `low` and `value` to the caller.
 
 **Suppress the type checker's report.** The `# type: ignore` silences `ty`, which finds the mistake earlier
 than the runtime does. `ty` reports `positional-only-parameter-as-kwarg`
-on `partial(clamp, high=100)`, the line that builds the partial,
-while the runtime raises its `TypeError` at the call.
+on `partial(clamp, high=100)`, where the partial is built, and
+`missing-argument` on the `expect()` call that passes it `0, 5` with no
+`high`. Both reports fall on one line, so one comment covers them,
+while the runtime raises its `TypeError` only at the call.
 
 </details>
 </details>
