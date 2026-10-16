@@ -966,7 +966,7 @@ and carries its name with it.
 
 `StrEnum` is `str` mixed in by the standard library,
 so a member answers every `str` method.
-It makes one addition: its `__str__()` is `str.__str__()`,
+Its `__str__()` is `str.__str__()`,
 so an f-string shows `info` rather than `Level.INFO`.
 A class written as `(str, Enum)` by hand keeps `Enum`'s `__str__()` and prints `Level.INFO`;
 ruff's `UP042` rewrites that form to `StrEnum`.
