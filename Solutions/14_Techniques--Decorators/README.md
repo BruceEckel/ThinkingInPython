@@ -746,7 +746,7 @@ the `TypeError` to the caller.
 </details>
 </details>
 
-## 7. Two class-based decorators on methods
+## 7. Two class-form decorators on methods
 
 > Decorate one method of a small class with the class-form `repeat` from `repeat_class.py`,
 > and a second method with `logged` from `method_decoration.py`.
