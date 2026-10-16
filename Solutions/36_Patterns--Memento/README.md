@@ -331,8 +331,8 @@ which takes the newest state from the right end. A list would need
 a length check after every append and a `pop(0)`, which shifts every
 remaining element.
 
-**Report what the past still holds.** `can_undo()` keeps the chapter's body. It
-asks whether `_past` still holds a state. A bounded history empties
+**Report what the past still holds.** `can_undo()` asks whether
+`_past` still holds a state. A bounded history empties
 `_past` sooner: after at most `max_depth` undos, however many `do()`
 calls the program made. So `can_undo()` can report `False` while
 the program has made more `do()` calls than it has undone. Once the
@@ -463,9 +463,9 @@ class Sketch:
         self.strokes = memento.strokes    # Also no copy
 ```
 
-All three existing tests fail against this version, and pytest
-reports them in the order they appear in the file, so
-`test_restore_rewinds_state` is the first failure:
+All three existing tests fail against this version. They fail in
+the order they appear in the file, so `test_restore_rewinds_state`
+is the first failure pytest reports:
 
 ```
 FAILED test_sketch.py::test_restore_rewinds_state
@@ -483,8 +483,8 @@ before pytest reaches `test_drawing_after_restore_spares_memento`,
 the test the chapter wrote for the sharing bug.
 
 Making `Memento` a record freezes which list `strokes` names after
-construction.
-The list inside stays mutable, and every later `draw()` changes it. So `save()` must copy into a `tuple`, an
+construction. The list inside stays mutable. Every later `draw()`
+changes that list, so `save()` must copy into a `tuple`, an
 immutable container, instead of wrapping a mutable list in a record.
 
 `test_memento_ignores_later_drawing` and `test_drawing_after_restore_spares_memento`
@@ -616,9 +616,9 @@ print(h.present)
 #: 3
 ```
 
-**Step back through `undo()`.** `goto()` reuses the existing `undo()`, calling it
-repeatedly, and each `undo()` pushes the state it leaves onto
-`_future`. Redo therefore works as if you had called `undo()`
+**Step back through `undo()`.** `goto()` calls the existing `undo()`
+repeatedly. Each `undo()` pushes the state it leaves onto
+`_future`, so redo works as if you had called `undo()`
 `steps_back` times. After `goto(2)`, `h.redo()` returns `2`, then `3`,
 the states `goto()` undid, in the order `do()` recorded them. Jumping several states back
 "in one call" is a convenience for the caller.
