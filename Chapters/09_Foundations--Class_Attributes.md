@@ -19,7 +19,8 @@ that instance attribute *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 so a programmer from those languages expects per-object storage here too.
 A Python class attribute corresponds to a C++ or Java `static` field.
-No syntax in a Python class body allocates a per-object field.
+Apart from `__slots__`, which comes up below,
+no syntax in a Python class body allocates a per-object field.
 An assignment through `self` inside a method,
 such as `self.x = x` in a constructor, creates that storage instead.
 
@@ -273,7 +274,8 @@ so both names appear at the top of the class,
 instead of `label` appearing first inside the constructor.
 [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
 shows the case that requires the annotation.
-There, code outside the class sets the attribute,
+There, code outside the class makes the first assignment,
+and the assignment inside `move()` reads the attribute it sets,
 so the bare annotation is the type checker's one source for its type.
 
 ### A `ClassVar` With No Value Declares Too
@@ -676,4 +678,4 @@ Try each exercise before opening its [solution](../Solutions/09_Foundations--Cla
 10. In `classvar_fork.py`,
     print `vars(Sub).get("total")` before the first `Sub()` call and after each one,
     and use the three values to say which class's dictionary supplies each `Sub.total` the listing prints.
-    Then change the increment to `Base.total += 1` and predict all four lines before running.
+    Then change the increment to `Base.total += 1` and predict every line before running.
