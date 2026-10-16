@@ -332,7 +332,7 @@ which puts the smallest element at index 0 and leaves the order of the rest open
 
 `heappop()` maintains that weaker property in O(log n) comparisons.
 The last element moves to index 0,
-then moves down the tree past each smaller child until the heap property holds again.
+then moves down the tree past each smaller child until the heap ordering holds again.
 Sorting the whole list on every pop does far more work,
 and the extra order goes unused, since callers read only the front element.
 
