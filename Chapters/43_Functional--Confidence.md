@@ -430,9 +430,9 @@ so this book gets the same answer on every run.
 so every run searches from scratch.
 A real test keeps the defaults.
 
-`roundtrip()` exists to fail, and a failing `test_` function fails the build.
-`roundtrip()` therefore drops the `test_` prefix from its name,
-and the listing calls it inside a `try`.
+`roundtrip()` exists to fail, so the listing calls it inside a `try`.
+Its name drops the `test_` prefix,
+since it is a demonstration rather than a test for pytest to collect.
 
 ### A Family of Property Shapes
 
