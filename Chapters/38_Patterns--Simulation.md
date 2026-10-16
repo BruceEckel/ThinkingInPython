@@ -1431,7 +1431,7 @@ the same endless counter that numbered the rats.
 
 ## The Less the Agents Know
 
-The chapter begins by defining a simulation as objects that act on their own and interact through shared state.
+A simulation is a set of objects that act on their own and interact through shared state.
 The grains are the limiting case of that definition.
 The shared state is the plate,
 and a grain's whole interaction with it is one read of the field at its own position.
