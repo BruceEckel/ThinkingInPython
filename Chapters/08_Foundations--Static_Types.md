@@ -282,8 +282,8 @@ print(MAX_RETRIES, GREETING, HISTORY)
 #: 3 hello ['first']
 ```
 
-`Final` invites a misconception.
-The word suggests immutability, but `Final` blocks rebinding the name,
+The word `Final` suggests immutability,
+but the qualifier blocks rebinding the name,
 not mutation of the object the name holds.
 `HISTORY.append("first")` checks and runs, the same as it does on any list.
 The type checker refuses an assignment to the name `HISTORY` and accepts every call that changes the list.
@@ -361,8 +361,7 @@ The type checker rejects that class where an annotation names `Drawable`.
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
 the type checker rejects the call.
-`Blob` is the case worth watching.
-It draws, in the everyday sense, but the method's name is `paint()`.
+`Blob` draws, in the everyday sense, but its method's name is `paint()`.
 A protocol matches on names and signatures rather than on intent.
 A protocol accepts any class with the right methods, as dynamic typing does,
 and reports a mismatch before the program runs, as static type checking does.
@@ -753,7 +752,7 @@ print(label("ok", width=6, fill="*"))
 ```
 
 Inside `label()`, `style` is a `Style` dictionary.
-`width` is required, so `label()` reads `style['width']`.
+`Style` requires `width`, so `label()` reads `style['width']`.
 `NotRequired` makes `fill` optional,
 so `label()` reads it with `.get()` and a default.
 
