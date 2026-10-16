@@ -294,7 +294,7 @@ and no library code runs in between.
 A library acts only on objects handed to it,
 so the request for a `Console` must be an object the function hands out.
 Driving `greet()` by hand shows that object,
-the way [Generators](45_Effects--Generators.md#a-generator-is-a-description)
+the way [Generators](45_Effects--Generators.md#annotating-a-generator)
 drove `interview()`:
 
 ```python
@@ -318,7 +318,8 @@ a frozen data class whose `t` field holds the requested class.
 `yield from` passes that `Need` out of `greet()`'s body.
 `next()` runs `greet()` up to that request and produces it.
 Nothing has printed at that point,
-because `greet()` has suspended at the `yield` inside `need()`.
+because `greet()` has suspended inside `need()`,
+at the `yield` its `yield from` reaches.
 `send(Console())` answers the request and resumes the function,
 which prints its greeting and finishes, raising `StopIteration`.
 
