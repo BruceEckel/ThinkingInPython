@@ -490,7 +490,7 @@ Two calls that share one
 `Random` get different schedules, because `shuffle()` advances that
 object's state.
 
-The `rng` parameter lets the caller choose the seed,
+The `rng` parameter lets the caller choose the random source,
 which makes reproducibility the caller's responsibility. The
 `seed: int = 0` version accepts only an integer. A caller who needs
 two different schedules must pass two different integers.
