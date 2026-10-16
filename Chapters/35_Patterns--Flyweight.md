@@ -468,7 +468,6 @@ and [`slots=True`](18_Techniques--Performance.md#slots)
 cuts the size of each one, so the two are worth combining when memory matters.
 `Tile` combines them by being a record.
 
-The combination has one catch.
 A weak reference needs a `__weakref__` slot,
 and a slotted class has one only if it declares it.
 With `slots=True` alone, `_pool[text] = found` therefore raises a `TypeError`.
@@ -637,9 +636,8 @@ Third, can you freeze what remains?
 Sharing a mutable object lets one use's change appear in every use
 (see exercise 3).
 
-When all three answers are yes, the remaining choice is the pool.
-The chapter shows four pools.
-The question that decides between them is how much you know about the set of values.
+When all three answers are yes, the remaining choice is among the four pools.
+How much you know about the set of values decides it.
 If you know the set as you write the program,
 use an `Enum` and let the language hold the pool.
 If callers must keep writing `C(...)`,
