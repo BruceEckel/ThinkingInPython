@@ -82,8 +82,9 @@ def create_shape(kind: str) -> Shape:
 If you add the `_Triangle` class to `shape_factory_method.py` and stop there, the type checker accepts the file,
 but with the chapter's seed the demo stops with an exception.
 `shape_name()` draws from `Shape.__subclasses__()`, which lists `_Triangle` as soon as its `class` statement runs,
-so the demo asks for a `"Triangle"` that `Shape.factory()` cannot build,
-and `Shape.factory()` raises `ValueError: Bad shape: Triangle`.
+so the demo asks for a `"Triangle"`.
+`Shape.factory()` cannot build one and raises
+`ValueError: Bad shape: Triangle`.
 `shape_factory_objects.py` names its shapes in a literal list,
 so its demo asks for `"Triangle"` once you add the name to that list.
 Without a `FACTORIES` entry, `create_shape()` then raises `KeyError: 'Triangle'`.
@@ -135,8 +136,9 @@ s.draw()
 `shape_factory_objects.py`'s factory-object version instead needs a `_Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`.
-Here, `exercise_2.py` shows the new shape alone. In the chapter file its entry joins
-the entries for `_Circle` and `_Square`, and `"Triangle"` joins the demo's list:
+In the chapter file the `_Triangle` entry joins the entries for
+`_Circle` and `_Square`, and `"Triangle"` joins the demo's list.
+`exercise_2.py` shows the new shape alone:
 
 ```python
 # exercise_2.py
@@ -340,11 +342,11 @@ GameEnvironment(GnomesAndFairies()).play()
 `Kitty`, `Warrior`, `Puzzle`, or `Weapon`. It calls
 `make_character()` and `make_obstacle()` on whatever
 `GameElementFactory` it receives.
-A third concrete factory joins `KittiesAndPuzzles` and `WarriorsAndWeapons`,
-and `GameEnvironment` stays as it was.
+`GameEnvironment` stays as it was while a third concrete factory
+joins `KittiesAndPuzzles` and `WarriorsAndWeapons`.
 
-`abstract_factory_protocol.py` asks for the same factory without a base class.
-In the second half you leave `make_obstacle()` out at first, then add it back:
+In `abstract_factory_protocol.py` the same factory declares no base class.
+In this second half you leave `make_obstacle()` out at first, then add it back:
 
 ```python
 # exercise_3_protocol.py
@@ -408,8 +410,8 @@ If you run the program without fixing it, Python raises a `TypeError` at that co
 before the game runs.
 In `abstract_factory_protocol.py` no class declares that it satisfies
 the protocol, so constructing the factory is legal.
-The type checker reports the call that needs the protocol instead,
-and the diagnostic names the missing method.
+The type checker reports the call that needs the protocol instead.
+Its diagnostic names the missing method.
 At runtime that version fails later, inside the game.
 `GameEnvironment.__init__()` raises an `AttributeError` when it calls
 `make_obstacle()`.
@@ -671,9 +673,8 @@ print(pb.build().toppings)
 `Pizza` carries four toppings or fewer, at every moment. `__post_init__()` runs
 immediately after the constructor assigns every field, and raises a
 `ValueError` before that constructor call returns. The rejection is
-therefore atomic.
-The constructor call ends in the exception before it
-hands any code a reference to a `Pizza` carrying five toppings. That guarantee is
+therefore atomic: the constructor call ends in the exception before
+it hands any code a reference to a `Pizza` carrying five toppings. That guarantee is
 [A Type Is a Set of Values](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 again: illegal values are unrepresentable.
 
@@ -688,7 +689,6 @@ so a window opens between the fifth `.topping()` call and that `build()` call.
 During that window the builder's internal state violates the
 rule the finished `Pizza` must guarantee, while every `Pizza` object
 obeys it.
-The window stays open for as long as the caller keeps adding toppings.
 
 That window is the hazard `stars_class.py` shows. A mutable object
 that checks its rule after the change keeps the illegal value when the
@@ -757,8 +757,8 @@ class Square(Shape):
 
 If you add `import extra_shapes` to `registry_demo.py` without a `noqa` comment,
 `ruff check` reports it as `F401`, an unused import, and offers to fix it by removing the line.
-Running `ruff check --fix` deletes the import,
-and the demo then prints `[]` and raises `KeyError: 'Circle'` at its first `make()` call.
+Running `ruff check --fix` deletes the import.
+The demo then prints `[]` and raises `KeyError: 'Circle'` at its first `make()` call.
 The solution keeps the import and marks it `# noqa: F401`, because the import exists for its side effect.
 
 ```python
@@ -822,7 +822,7 @@ so that import is the one trigger for the registration.
 Importing `registry` leaves `extra_shapes` unloaded.
 The dependency runs the other way, since `extra_shapes` imports `registry`.
 Until some other module imports `extra_shapes`, `Shape.registry` stays empty,
-and every `make()` call raises a `KeyError`.
+so every `make()` call raises a `KeyError`.
 
 The empty registry is the plugin failure the chapter describes, reproduced in
 miniature. The registry is correct, the subclass is correct, and the
@@ -835,7 +835,7 @@ directory with `importlib`, or declare entry points that the
 packaging system imports for them.
 
 `registry_demo.py` has the same dependency. It imports
-`Shape` and `make` from `registry`, and every subclass now lives in `extra_shapes`.
+`Shape` and `make` from `registry`, but every subclass now lives in `extra_shapes`.
 The unchanged demo therefore prints `[]`, and its first `make()`
 call raises a `KeyError`. One added import restores the output:
 
@@ -953,7 +953,7 @@ print(shallow_spawn("hydra").parts)
 ```
 
 `exercise_7.py` shows the bug in a function of its own, `shallow_spawn()`.
-The `pytest` results below come from `prototype_registry.py` with
+The `pytest` runs described next use `prototype_registry.py` with
 `parts` added and `spawn()` changed to `copy.copy()`.
 
 With `copy.copy()`, `test_spawn_is_independent()` fails first.
@@ -1120,10 +1120,11 @@ and can load any module through `__import__()`.
 **Look the name up as a key.** `create_shape()` is the chapter's version,
 which looks `kind` up in a dictionary keyed on the same names.
 A `kind` missing from the table raises a `KeyError`
-naming the string, and nothing evaluates that string.
+that names the string. Nothing evaluates the string.
 
 The type checker verifies that every value in the table is a `ShapeMaker`,
 but it accepts the annotation on `maker` as written, because `eval()` returns `Any`.
+
 Whenever `kind` can come from a configuration file, a
 request, or a command line, the table is the only acceptable version
 of the two.
@@ -1191,9 +1192,10 @@ def shape_name(n: int) -> Iterator[str]:
 <details>
 <summary>Solution</summary>
 
-If you call `all_subclasses(sub)` without `yield from`, the call builds a generator and nothing iterates over it.
-`names(all_subclasses(Shape))` then prints `['Circle', 'Square']`, the same list as `Shape.__subclasses__()`,
-and the demo draws no `Oval`.
+If you call `all_subclasses(sub)` without `yield from`, the call builds a generator and discards it,
+so its body never runs.
+`names(all_subclasses(Shape))` then prints `['Circle', 'Square']`, the same list as `Shape.__subclasses__()`.
+The demo draws no `Oval`.
 Neither the type checker nor ruff reports the dropped keyword.
 The solution's `yield from` runs each inner generator and yields every class that generator yields.
 
@@ -1270,9 +1272,8 @@ when you call `Shape.factory("Oval")`, but the demo never makes that call.
 and recurses into it before moving to the next one. The walk is depth first,
 so `Oval` comes out between `Circle` and `Square`.
 
-The generic `T` keeps the
-yielded classes typed as `type[Shape]` when the argument is `Shape`,
-and `names()` requires that type.
+The generic `T` keeps the yielded classes typed as `type[Shape]`
+when the argument is `Shape`, the type `names()` requires.
 
 **Choose from the full list.** `random.choice()` takes a
 sequence, so `shape_name()` materializes the generator with `list()`.
@@ -1405,8 +1406,8 @@ print(unregistered(globals()))
 ```
 
 **Leave one class unregistered.** `Hexagon` is a complete `Shape`, and `Hexagon().draw()` works.
-The type checker accepts `Hexagon` wherever code takes a `Shape`,
-and both the checker and ruff accept the module, since `Hexagon` is an ordinary class definition.
+The type checker accepts `Hexagon` wherever code takes a `Shape`.
+Both the checker and ruff accept the module, since `Hexagon` is an ordinary class definition.
 `make("Hexagon")` raises a `KeyError`
 because the table has no entry for `Hexagon`.
 The error names the key rather than the class or the missing line.
@@ -1416,19 +1417,19 @@ The error names the key rather than the class or the missing line.
 `@runtime_checkable` allows the `issubclass()` call. The
 `obj is not Shape` guard drops the Protocol, which passes its own
 test. Calling `unregistered(globals())` at the end of the module, or
-from a test, prints the name of each class the registry lacks.
+from a test, returns the names of the classes the registry lacks.
 
 The runtime test is weaker than the type checker's test. `issubclass()` checks
 for an attribute named `draw` and ignores its signature, so a
 class whose `draw()` takes an extra parameter passes here.
 The type checker rejects that class at `@make.register`.
-The checker rejects a decorated class that does not fit, and
+The checker rejects a decorated class that does not fit.
 `unregistered()` reports a fitting class that is not decorated.
 
 `unregistered()` has two further limits.
 `issubclass()` against a Protocol works only when every member is a method.
 If the Protocol has a data attribute, `issubclass()` raises a
-`TypeError`, and `isinstance()` on an instance is the fallback.
+`TypeError`. `isinstance()` on an instance is then the fallback.
 And `unregistered()` reads one namespace at a time, so a plugin module
 must run it over its own `globals()`.
 
@@ -1550,7 +1551,7 @@ time `spawn()` runs, because each `@prototype` line executes as the
 module loads. The chapter's `registry.py` relies on the same timing.
 
 **Take the key as an argument.** The name is an argument because the type checker rejects
-`__name__` on a `Builder`. `Builder` is a `Callable`, and a
+`__name__` on a `Builder`. `Builder` is a `Callable`. A
 `Callable` declares how you call it, not that it carries a
 `__name__`. Writing `PROTOTYPES[build.__name__] = build()` draws:
 
@@ -1559,10 +1560,11 @@ error[unresolved-attribute]: Object of type `Builder` has no attribute `__name__
 ```
 
 The chapter's `ShapeFactory.register()` in `shape_registry.py` reads
-`__name__` safely because it receives a class, and `type[S]` has a `__name__`.
+`__name__` safely because it receives a class, a `type[S]`, which has
+a `__name__`.
 Pyright accepts `build.__name__`, since it gives every function
-object's attributes to a `Callable`. `ty` rejects it, and the book
-checks with `ty`.
+object's attributes to a `Callable`. `ty`, the checker the book
+uses, rejects it.
 
 Passing the name also frees the key from the
 function's name, so you can call the builder `make_goblin()` while
@@ -1570,9 +1572,9 @@ the key stays `"goblin"`.
 
 The decorated form gains the same openness the registries gain. Any
 module can define a prototype, with its name beside its definition, and
-`PROTOTYPES` needs no edit. The key type widens from the chapter's
-`Kind` to `str` for the same reason.
-An open table cannot list its names in advance. The builder is also a function, so `goblin()` still produces
+leave `PROTOTYPES` as it was. The key type widens from the chapter's
+`Kind` to `str`, because an open table cannot list its names in
+advance. The builder is also a function, so `goblin()` still produces
 a fresh prototype on demand when a test needs one that nothing has
 touched.
 
