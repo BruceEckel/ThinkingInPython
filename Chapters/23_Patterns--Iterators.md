@@ -766,8 +766,8 @@ The language calls both on your behalf.
 Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` require from a source.
 The listing renames GoF's `Next()` to `advance()`,
 to keep the name distinct from Python's `next()`.
-Over a list the four are unremarkable.
-`first()` resets an index, `is_done()` compares it to `len()`,
+Over a list the four are unremarkable: `first()` resets an index,
+`is_done()` compares it to `len()`,
 and `current_item()` reads at the index and leaves the index where it is.
 Over a generator, writing all four means keeping everything the traversal has seen:
 
@@ -849,9 +849,8 @@ Supporting the four methods takes more than a small lookahead buffer.
 The GoF interface hides that rebuild.
 `first()` and `current_item()` require a collection you can re-read and inspect in place,
 so implementing them over a stream means recreating one, item by item.
-The chapter has now reached that conclusion three times: here,
-in `tee()`'s buffering,
-and in the advice to collect into a list when you must walk data twice.
+The same rebuild appears twice more: in `tee()`'s buffer,
+and in the list you collect when you must walk data twice.
 Python dropped `first()` and `current_item()` rather than make every iterator buffer its stream.
 That leaves `advance()` to return the value it reached.
 That method is `__next__()`.
