@@ -698,8 +698,7 @@ of these small, composable pieces.
 
 ## Putting the Pieces Together
 
-Every section above shows one construct on its own.
-Here they work together:
+`pipeline.py` combines several of the chapter's constructs in one program:
 
 ```python
 # pipeline.py
@@ -736,7 +735,7 @@ Five of the chapter's ideas work at once: a record for the value,
 two pure functions, `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
 
-The `print()` at `[1]` shows what the discipline gives you.
+The `print()` at `[1]` shows that the pipeline leaves `data` as it was.
 Sensor `"b"` passed through `to_fahrenheit()` and appears as 77.0 in the report,
 yet its record in `data` still holds 25.0 Celsius.
 Because the input list stays as built, you can recompute the whole report,
