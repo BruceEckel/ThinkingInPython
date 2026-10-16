@@ -166,7 +166,7 @@ that declares `visit()` removes the `Any`:
         def accept(self, visitor: Visits) -> None:
             visitor.visit(self)
 
-The chapter keeps the empty `Visitor` base and the `Any` in `accept()`,
+`flower_visitors.py` keeps the empty `Visitor` base and the `Any` in `accept()`,
 to show what the `Any` gives up: every check on the visitor side.
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
 In [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods),
@@ -175,7 +175,6 @@ The `Any` in `accept()` is a choice,
 unlike the one in [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger),
 where a bag of attributes named at runtime leaves no precise type to write.
 
-Notice which hierarchy holds the behavior.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
 so `accept()` is the one method the pattern adds to the primary hierarchy.
 Python has no method overloading,
@@ -292,7 +291,6 @@ Nothing registers `Ranunculus`,
 so `Ranunculus` resolves to the same implementation `Flower` does,
 the one stored under `object`.
 
-The default is also the risk.
 A new `Flower` subclass gets the default answer until someone registers it.
 Both the runtime and the checker accept the `nectar()` call on that subclass,
 so a forgotten registration produces a wrong result rather than a failure.
