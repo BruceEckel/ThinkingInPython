@@ -183,7 +183,7 @@ is a file rather than a fragment.
 A long file can span several blocks.
 Each later block begins `# tracer.py (continued)`,
 and the parts join in order into one file.
-Most run on their own.
+Most of these files run on their own.
 Some are modules that another listing imports.
 The `test_*.py` files hold tests that `pytest` runs.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
@@ -260,7 +260,7 @@ They usually ask you to copy a small, working example from their chapter,
 change it, and observe the result: add a class, break an invariant on purpose,
 extend a table, rewrite one function two ways.
 The point is to edit the code, predict what it does, then run it and check.
-A few chapters in the Patterns part keep larger exercises,
+A few chapters in the Patterns part have larger exercises,
 because a pattern shows its value only in a program you build yourself.
 
 Solutions live in the `Solutions/` directory of the source repository.
