@@ -654,9 +654,8 @@ The `cache` parameter of `render()` has the type `Cache`, not
 `Cache | None`.
 It defaults to the shared `NO_CACHE`, the way
 `total()` defaults to `SILENT`, so `render()` has no `is None` branch on the
-cache. The `None` that `get()` returns is a different matter. A miss
-is information on which the caller acts, so `None` stays in the return
-type.
+cache. The `None` that `get()` returns stays in its return type,
+because a miss is information on which the caller acts.
 `render()` tests `cached` before using it.
 
 </details>
