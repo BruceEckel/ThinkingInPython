@@ -137,7 +137,7 @@ Two later tests use the same pattern to check other runtime guarantees:
 `test_plugged.py` confirms that a getter's copy holds,
 and `test_immutable.py` confirms that a frozen field refuses assignment.
 
-Substitutability is one thing OOP promised that no tool can check.
+Substitutability is the part of polymorphism that no tool can check.
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.
