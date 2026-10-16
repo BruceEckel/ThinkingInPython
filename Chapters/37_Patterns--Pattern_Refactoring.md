@@ -123,7 +123,7 @@ so each piece answers `value` from its own class.
 `report()` prints one line per bin, the material's name beside its total.
 A dictionary keeps its keys in insertion order,
 so the material that appears first in the data prints first.
-Each sorter in the chapter ends with `report(bins)`.
+Each recycling script in the chapter prints its bins with `report()`.
 
 The tests confirm that each subclass registers itself,
 `create()` builds an instance by name,
