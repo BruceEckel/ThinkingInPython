@@ -210,8 +210,7 @@ then calls `run()` on the new state, the one the machine has just entered.
 each transition arrives in a state and calls that state's `run()`.
 The constructor calls the initial state's `run()` for the same reason.
 
-`run_all()`, a convenience outside the class,
-feeds any iterable of inputs to `step()`, one at a time.
+`run_all()` is a convenience function that feeds an iterable of inputs to the machine.
 
 A `StateMachine[I]` holds `State[I]` states, and its `step()` takes an `I`.
 The type checker infers `I` from the initial state,
