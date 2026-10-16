@@ -1472,7 +1472,7 @@ if __name__ == "__main__":
 **Declare the first dispatch on the base.**
 `Weapon` declares `compete()` so that `battle()` can call it on the `Weapon` that `get_weapon()` returns.
 The `eval_*()` methods live in the subclasses alone,
-and their `item` parameters take `Any`, as the chapter's `item` parameters do.
+and their `item` parameters take `Any`, as the chapter's `opponent` and `caller` parameters do.
 
 **Answer for the original caller.**
 As in `paper_scissors_rock.py`,
@@ -1730,7 +1730,7 @@ and a new `Item` leaves it untouched.
 <details>
 <summary>Where to look</summary>
 
-[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) replaces the `eval_*()` methods with one dictionary keyed on `type(self)` and `type(item)`.
+[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) replaces the `eval_*()` methods with one dictionary keyed on `type(self)` and `type(opponent)`.
 Keep `get_weapon()` and the inhabitant classes as they are, and shrink the weapons to empty classes.
 Write the 36 answers as a grid whose rows and columns follow one `ORDER`, and build `OUTCOME` from it with a comprehension.
 
