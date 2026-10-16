@@ -235,9 +235,9 @@ A factory turns data, such as a name, into an object,
 so constructor calls stay in one place.
 A class is a first-class object.
 You can store it in a variable and call it to construct an instance.
-You saw this in [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
-and [`field(default_factory=list)`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
-Both take a class where a function would do,
+[`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
+and [`field(default_factory=list)`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared)
+both take a class where a function would do,
 and call it whenever they need a fresh value.
 
 Thus, the simplest factory is a dictionary that maps names to classes:
@@ -1291,8 +1291,8 @@ The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
 and `parse_args()` is the `build()`.
 
-The smallest builder is easy to overlook.
-Appending parts to a list and finishing with `"".join(parts)` builds an immutable string through a mutable intermediate.
+The smallest builder appends parts to a list and finishes with `"".join(parts)`,
+building an immutable string through a mutable intermediate.
 `PizzaBuilder` has the same shape.
 It collects toppings in a list and freezes them into a tuple at `build()`.
 That shape is everywhere,
