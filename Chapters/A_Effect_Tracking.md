@@ -68,7 +68,7 @@ Every approach in the Effects chapters fills those three roles:
 | Stateless | The generator's yield type | You | The type checker, at every `yield from` |
 | Koka | The Effect row | The compiler | The compiler |
 
-As you read down the table, the work moves from you to the compiler.
+Down the table, the work moves from you to the compiler.
 The open question is how far `Annotated` can move that work toward the compiler.
 
 ## Why a Native System Tracks Best
