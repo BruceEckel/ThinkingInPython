@@ -19,8 +19,8 @@ Immutable state removes the need.
 ## A Snapshot Is Not a Reference
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
-shows a getter handing out a reference where the caller expects a copy,
-and a memento depends on that difference.
+shows a getter handing out a reference where the caller expects a copy.
+A memento depends on that difference.
 A memento works when it is a copy and fails when it is an alias.
 The beginner's memento is an assignment, and an assignment aliases:
 
@@ -144,8 +144,7 @@ The caretaker's side of the contract is to store `checkpoint` and return it,
 leaving `checkpoint.strokes` alone.
 Languages with access control enforce that rule.
 In Python the rule is a convention,
-though a frozen memento raises an exception on an accidental edit.
-Assigning different strokes to the memento raises a `FrozenInstanceError`.
+though a frozen memento raises a `FrozenInstanceError` on an accidental edit.
 
 ### Why `Memento` Is a Class
 
@@ -379,8 +378,8 @@ A record holding a list therefore lets that list change,
 as `frozen_leaky.py` in that chapter shows.
 
 [*Flyweight*](35_Patterns--Flyweight.md)
-shares immutable values among objects that exist at once,
-and *Memento* shares them among successive states.
+shares immutable values among objects that exist at once.
+*Memento* shares them among successive states.
 
 Two kinds of state still need the classic form.
 Because freezing rebuilds the changed field on every edit,
