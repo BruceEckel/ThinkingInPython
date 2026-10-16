@@ -250,8 +250,7 @@ The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
 The type checker reports a misread `Result`.
 Noticing an ignored one is up to you.
-The listing shows each limit once,
-one on the author's side and one on the caller's side:
+The listing shows both limits:
 
 ```python
 # totality_gap.py
