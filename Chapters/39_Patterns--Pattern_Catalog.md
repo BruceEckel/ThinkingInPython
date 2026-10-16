@@ -25,8 +25,7 @@ The client chooses each new state.
 The client supplies the inputs.
 The machine chooses each next state.
 
-The tables follow each source's own grouping,
-so each name sits where its source puts it.
+The tables follow each source's own grouping.
 One of those groupings is GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
 which [Design Patterns](21_Patterns--Design_Patterns.md)
 accepts for *Creational* and questions for *Structural* and *Behavioral*.
@@ -257,7 +256,7 @@ built on the operating system's I/O completion ports.
 | [*Fluent Interface*](27_Patterns--Factory.md#builder) | Return the receiver from each method so calls chain into one expression. |
 | [*Function Object*](28_Patterns--Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
 | [*Lazy Initialization*](07_Foundations--Classes.md#cached-property) | Create a value on first use. |
-| [*Messenger*](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) | Bundle values into one object with named attributes; the in-process form of *Data Transfer Object*. |
+| [*Messenger*](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) | Bundle values into one object with named attributes. *Messenger* is the in-process form of *Data Transfer Object*. |
 | [*Multiton*](35_Patterns--Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
 | [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [*Object Pool*](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
