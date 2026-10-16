@@ -88,7 +88,7 @@ creates a subclass of it.
 **Drop a base that gains a child.** Creating `Gold` adds it and removes its base, `Yellow`.
 Creating `PhthaloBlue` removes `Blue` the same way.
 `__init_subclass__()` runs for every new subclass, so each new
-generation adds itself and prunes its parent automatically.
+generation adds itself and prunes its parent.
 The `Color` class stays as written.
 
 </details>
@@ -380,10 +380,9 @@ no-op.
 any ancestor declared itself final.
 
 `A.__init_subclass__()` refuses the first subclass of a final class as
-Python creates that subclass, so a deeper descendant has no parent to
-extend.
-A check of the direct bases in `cls.__bases__` would therefore also
-refuse every descendant. The `__mro__` walk
+Python creates that subclass, so the hierarchy below a final class
+stays empty. A check of the direct bases in `cls.__bases__` would
+therefore also refuse every descendant. The `__mro__` walk
 stays because it states the rule as written, "no final class anywhere
 above," in one line.
 
@@ -524,8 +523,7 @@ Running the same file prints
 
 The diagnostic and the exception describe one collision. `ty`'s summary
 line names the consequence, "Class will raise `TypeError` at runtime."
-The diagnostic's `info` block states the rule, which the interpreter enforces
-silently.
+The diagnostic's `info` block states the rule behind the collision.
 `type` and `dict` are both implemented in C, each with its
 own instance layout, so no single object can be both. CPython discovers
 that conflict while executing the `class` statement and reports it as
@@ -536,8 +534,9 @@ bases to show which pair conflicts.
 The runtime message tells you something collided. The static diagnostic tells
 you which two bases collided and why, at the moment you type the
 header rather than the moment Python first imports the module.
-The chapter's `metaclass_layout_conflict.py` still carries the `# type: ignore`,
-because that listing exists to show the `TypeError`.
+
+The chapter's `metaclass_layout_conflict.py` still carries the
+`# type: ignore`, because that listing exists to show the `TypeError`.
 
 </details>
 </details>
@@ -596,9 +595,10 @@ print(c + 0.5, isinstance(c, float))
 #: 22.0 True
 ```
 
-**Define the method as a function.** `describe()` is a module-level function,
-and the class that carries `unit` comes into existence later, when `type()` runs.
-The annotation on `self` therefore names `Any`, so the type checker accepts `self.unit`.
+**Define the method as a function.** `describe()` is a module-level
+function, defined before `type()` creates the class that carries
+`unit`. The annotation on `self` therefore names `Any`, so the type
+checker accepts `self.unit`.
 
 **Assemble the class from data.** The three arguments are the name,
 the bases, and the namespace, the same three a `class` statement
@@ -691,11 +691,12 @@ and computes its `__mro__` from those bases. The `bases` parameter of
 class as it was too, since `type.__init__()` checks its arguments and then
 ignores them.
 
-`new_vs_init.py` shows the same limit for the namespace: its
-`__init__()` writes an `added_in_init` key into `namespace`, and
-`hasattr()` reports `False` for that attribute on the class. `__new__()` must make every decision that
-goes through the arguments: the name, the bases, and the namespace from
-which `type` builds the class. `__init__()` receives the completed class object and can change
+`new_vs_init.py` shows the same limit for the namespace. Its
+`__init__()` writes an `added_in_init` key into `namespace`.
+`hasattr()` then reports `False` for that attribute on the class.
+`__new__()` must make every decision that goes through the arguments:
+the name, the bases, and the namespace from which `type` builds the
+class. `__init__()` receives the completed class object and can change
 it in place, which is why `setattr(cls, ...)` still works there.
 
 </details>
@@ -817,8 +818,9 @@ compiles, and the injected `print()` runs once the class body finishes.
 **Catch the failed lookup.** The `KeyError` afterward is a side effect of the payload, not a defense.
 `namespace[class_name]` looks for a class named after the whole
 payload, while the spliced source defines a class named `X`. The
-injected statement ran before that lookup, so the lookup fails too late
-to stop it.
+injected statement runs before that lookup, so the lookup fails too
+late to stop it.
+
 Restoring the `if class_name not in cls.KNOWN_COMMANDS` check rejects
 the payload at the one point where a check stops the injection:
 before `make_class()` builds the string.
@@ -903,16 +905,16 @@ Handlers().on_open()
 #: first on_open
 ```
 
-**Discard a repeated name.** `NoDuplicates` raises an exception on a repeated key,
-and `KeepFirst.__setitem__()` returns early instead.
-Python still builds the second `on_open` function and passes it to `__setitem__()`,
-and the early return discards it.
-The name `on_open` still refers to the first function when the body finishes,
+**Discard a repeated name.** `NoDuplicates` raises an exception on a
+repeated key. `KeepFirst.__setitem__()` returns early instead. Python
+still builds the second `on_open` function and passes it to
+`__setitem__()`, where the early return discards it. The name
+`on_open` still refers to the first function when the body finishes,
 as `Handlers().on_open()` proves.
 
 No class decorator can keep the first definition, and neither can
 `__init_subclass__()` or `__set_name__()`. All three receive the class
-after its body has finished executing, and by then the body has run
+after its body has finished executing. By then the body has run
 `on_open = <second function>` as an ordinary assignment into the
 namespace mapping. That assignment dropped the last reference to the
 first function, so that function has disappeared before any of the three runs. Among
