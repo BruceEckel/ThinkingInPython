@@ -69,7 +69,8 @@ The scan for an average target walks about half the `list`,
 far more work than one hash lookup.
 The `set`'s O(1) lookup therefore still beats the `list`'s O(n) scan by a wide margin,
 thousands of times faster in this run.
-The worst case and the average case diverge when most real lookups cluster near the front of the list.
+A worst-case measurement misrepresents a program whose lookups cluster near the front of the list,
+where a scan finds them quickly.
 
 </details>
 </details>
@@ -107,8 +108,8 @@ for size in (1, 2, 5, 10, 20, 50, 100, 200, 500):
 
 On this machine, the `list` is faster at size `1`, by a small margin.
 The `set` wins from size `2` on,
-and its advantage grows steadily as `size` increases,
-as the different growth rates (`O(1)` vs. `O(n)`) predict.
+and its advantage grows with `size`,
+as the growth rates (`O(1)` vs. `O(n)`) predict.
 
 The crossover point depends on the machine, the Python build, and the values you store,
 because the timing compares one hash computation against a short linear scan
@@ -270,8 +271,8 @@ A cache assumes its stored answer can stand in for a repeat call,
 because the same argument gives the same answer
 and computing that answer is all the call does.
 An impure function breaks that assumption.
-It prints, writes a file, or increments a counter on the first call with a given argument,
-and the cache silently skips that side effect on every repeat.
+It prints, writes a file, or increments a counter on the first call with a given argument.
+The cache silently skips that side effect on every repeat.
 
 </details>
 </details>
@@ -333,8 +334,8 @@ which puts the smallest element at index 0 and leaves the order of the rest open
 `heappop()` maintains that weaker property in O(log n) comparisons.
 The last element moves to index 0,
 then moves down the tree past each smaller child until the heap ordering holds again.
-Sorting the whole list on every pop does far more work,
-and the extra order goes unused, since callers read only the front element.
+Sorting the whole list on every pop does far more work.
+The extra order goes unused, since callers read only the front element.
 
 </details>
 </details>
@@ -500,8 +501,8 @@ and the module's own frame starts before the tool attaches.
 CPython implements `print()` in C, so it starts no Python frame.
 A program this small has no other candidates.
 
-The two local attachments above produce the same `Counter`,
-and that agreement is an artifact of the example's size.
+The two local attachments above produce the same `Counter`.
+That agreement is an artifact of the example's size.
 In a real program `set_events()` reports every Python function the process runs,
 so library code fills the `Counter` beside your own functions,
 and the callback runs on every call to each of those functions.
@@ -637,7 +638,8 @@ print(f"array is slower to iterate: {t_array > t_list}")
 #: array is slower to iterate: True
 ```
 
-Not faster: on one machine the `array` took about 1.4 times as long as the `list`.
+Not faster.
+On one machine the `array` took about 1.4 times as long as the `list`.
 The memory saving is real (the chapter measures 325,176 bytes against 80,080),
 but the `array` is the slower of the two.
 
@@ -866,14 +868,13 @@ Run the file with the `True False` build's `python` instead, from the chapter di
 
 The measured work runs in C, not in bytecode.
 `target in as_list` and `target in as_set` both do their work in the interpreter's C code.
-Work done in C runs no bytecode,
-and the JIT compiles only the bytecode the interpreter runs,
-so the JIT could speed up almost none of the time the listing reports.
+The JIT compiles only the bytecode the interpreter runs,
+so it could speed up almost none of the time the listing reports.
 The advice in [Write Idiomatic Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python) speeds a program up for the same reason.
 
 The program is too short to get hot.
 The JIT compiles a code path after the path has run enough times to cross a threshold,
-and the JIT spends time tracing and compiling whatever code crosses that threshold.
+and it spends time tracing and compiling every path that gets that far.
 `membership.py` starts, times two kinds of lookup,
 and exits before the compiled code has saved as much time as the compiling took.
 
