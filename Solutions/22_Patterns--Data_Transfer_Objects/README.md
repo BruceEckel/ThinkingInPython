@@ -538,7 +538,7 @@ The wider annotation lets `p + (1.0, 1.0)` type-check as well as `Point + Point`
 
 **What stays a tuple.** Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone, so `p[:1]` is the plain `(4.0,)`.
 A tuple on the left of `+` is the other gap: `(1.0, 1.0) + p` runs `tuple.__add__()` first and concatenates to a four-element tuple, since `Point` defines no `__radd__()`.
-Each tuple operation a `Point` must survive is one more override, which is why a `NamedTuple` or a record is the better choice when positional tuple behavior is a feature rather than a surface to defend.
+Each tuple operation a `Point` must survive is one more override, which is why a `NamedTuple` is the better choice when positional tuple behavior is a feature, and a record is the better choice when that behavior is a surface to defend.
 
 </details>
 </details>
