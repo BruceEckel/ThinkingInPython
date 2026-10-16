@@ -16,8 +16,7 @@ A case study then puts several of the pieces to work on one problem.
 
 ## The `functools` Toolkit
 
-The standard library provides the building blocks of functional Python under `functools`,
-from a single `reduce()` call to an alternate dispatch mechanism.
+The standard library provides the building blocks of functional Python under `functools`.
 Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy,
 and a dispatch table each have an edge case that's easy to get wrong on the first attempt.
@@ -93,7 +92,7 @@ That is fifty-nine calls in all, against 2,692,537 for the undecorated version,
 where every branch recomputes the whole subtree beneath it.
 [Caching](18_Techniques--Performance.md#caching)
 runs both versions side by side.
-[Recursion](#recursion) comes back to why the recursive form is worth keeping.
+[Recursion](#recursion) explains why `fib()` keeps its recursive form.
 
 An iterative Fibonacci, `a, b = b, a + b` in a loop,
 needs neither recursion nor a cache.
@@ -440,10 +439,6 @@ print(d.describe("hi"), "|", d.describe(5))
 not on `self`, so the type of `value` selects the implementation,
 just as it does for the plain `describe()` in `functools_singledispatch.py`.
 
-`itertools` does for iteration what `functools` does for functions.
-It supplies ready-made pieces you compose,
-in place of loops you write and test again.
-
 ## The `itertools` Toolkit
 
 Each `itertools` function produces values on demand instead of building a list up front.
@@ -730,8 +725,7 @@ expect(ValueError, list,  # [2]
 Python offers three ways to zip inputs of different lengths,
 and the one you choose records what a mismatch means.
 Plain `zip()` (`[1]`) stops at the shortest, drops the `3`,
-and raises no exception,
-the right choice when the extra elements are genuinely surplus.
+and raises no exception, the right choice when the extra elements are surplus.
 `zip(a, b, strict=True)` (`[2]`) raises a `ValueError`,
 which for the same two lists reads `zip() argument 2 is shorter than argument 1`.
 `strict=True` is the right choice when equal lengths are an invariant you want checked.
@@ -800,7 +794,9 @@ Two cautions apply.
 After `tee()`, use the returned iterators and leave the source alone.
 Advancing the original source consumes values that the copies then miss.
 The second case advances `source` once at `[1]`, so both copies start at `2`.
-And `tee()` buffers every value one copy has consumed and the other has yet to read.
+
+The second caution concerns memory.
+`tee()` buffers every value one copy has consumed and the other has yet to read.
 Each case drains `a` completely before touching `b`,
 so `tee()` stores the whole sequence.
 When one consumer runs far ahead of the other,
