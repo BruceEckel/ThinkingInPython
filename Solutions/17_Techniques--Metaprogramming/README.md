@@ -207,6 +207,8 @@ class Singleton(type):
 
 class ASingleton(metaclass=Singleton):
     pass
+class BSingleton(metaclass=Singleton):
+    pass
 class CSingleton(metaclass=Singleton):
     pass
 ```
@@ -238,6 +240,8 @@ class Singleton(type):
 
 class ASingleton(metaclass=Singleton):
     pass
+class BSingleton(metaclass=Singleton):
+    pass
 class CSingleton(metaclass=Singleton):
     pass
 
@@ -263,7 +267,7 @@ for `cls._instances`, so the body reads the cache through the class name,
 **Keep one instance per class.** `Singleton._instances` is a dictionary keyed by the class, so
 each class using the `Singleton` metaclass gets its own entry.
 The chapter's `singleton.py` stores one entry for `ASingleton` and one for `BSingleton`.
-This solution keeps `ASingleton` and adds an entry for `CSingleton`.
+This solution keeps both and adds an entry for `CSingleton`.
 Calling `CSingleton()` twice returns the same object both times.
 `ASingleton` is a separate key in that dictionary, so its instance
 is a separate object.
@@ -385,8 +389,8 @@ above," in one line.
 
 **Confirm a sibling stays open.** `Open` and `Sub` show that the
 rest of the hierarchy still subclasses freely. `A.__init_subclass__()`
-raises a `TypeError` only for a class whose `__mro__` holds one of the
-classes in `A._final`.
+refuses only a class whose `__mro__` holds one of the classes in
+`A._final`.
 
 </details>
 </details>
@@ -689,9 +693,9 @@ ignores them.
 
 `new_vs_init.py` shows the same limit for the namespace: its
 `__init__()` writes an `added_in_init` key into `namespace`, and
-`hasattr()` reports `False` for that attribute on the class. `__new__()` must make every decision about what
-the class is: its name, its bases, and the namespace from which `type`
-builds it. `__init__()` receives the completed class object and can change
+`hasattr()` reports `False` for that attribute on the class. `__new__()` must make every decision that
+goes through the arguments: the name, the bases, and the namespace from
+which `type` builds the class. `__init__()` receives the completed class object and can change
 it in place, which is why `setattr(cls, ...)` still works there.
 
 </details>

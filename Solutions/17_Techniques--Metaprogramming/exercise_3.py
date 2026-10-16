@@ -13,6 +13,8 @@ class Singleton(type):
 
 class ASingleton(metaclass=Singleton):
     pass
+class BSingleton(metaclass=Singleton):
+    pass
 class CSingleton(metaclass=Singleton):
     pass
 
