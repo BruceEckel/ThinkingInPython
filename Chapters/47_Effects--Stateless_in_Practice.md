@@ -1892,6 +1892,8 @@ Three sit outside the tables.
 The accessors for the library's own dependencies
 (`print_line()`, `read_line()`, and `read_file()`)
 each call `need()` for one class, so `need()`'s row covers them.
+`read_file()` also carries `@throws(FileNotFoundError, PermissionError)`,
+so the `@throws` row applies to it as well.
 
 Five build a description:
 
@@ -1915,7 +1917,7 @@ rewriting the type that function declares:
 | `retry(schedule)` | Adds `Need[Time]` and `Async`; the error becomes `RetryError[E]` |
 | `repeat(schedule)` | Same additions; the result becomes a tuple of every run |
 | `memoize` | Type unchanged; the result caches by argument |
-| `fork` | Adds `Need[Executor]`; the result becomes `Task[R]` |
+| `fork` | Replaces the channel with `Need[Executor]` and drops any declared error; the result becomes `Task[R]` |
 | `@throws(*E)` | Adds each `E` to the error channel |
 
 Three rows carry a caveat.
