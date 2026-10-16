@@ -187,12 +187,13 @@ print(field[3][5].label(3, 5))
 #: water at (3, 5)
 ```
 
-Twenty-four cells, three objects.
+The twenty-four cells share three `Tile` objects.
 Because `@cache` returns the same `Tile` for the same symbol every time,
 the object count stays at the number of tile kinds however large the grid grows.
 
 `[*row for row in field]` uses [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
 to flatten the grid into one list of cells.
+
 The listing counts `id(t)` rather than `len(set(cells))` on purpose.
 Because `Tile` is a record, its generated `__eq__()` compares field values.
 A set of cells therefore collapses to three with or without sharing.
@@ -220,7 +221,7 @@ The decorated `tile` is a `functools._lru_cache_wrapper`,
 whose call accepts any hashable arguments.
 The type checker therefore accepts `tile("?")`.
 The call then raises a `KeyError` at runtime when it indexes `SPECS`.
-The boundary is therefore `to_symbol()`,
+That leaves `to_symbol()` as the boundary,
 the one function that takes a `str` and returns a `Symbol`.
 
 `to_symbol()` guards on membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
@@ -347,13 +348,11 @@ print(len(Color._pool))
 #: 1
 ```
 
-The construction syntax stays the same,
-so a caller sees an ordinary constructor call and receives a shared object.
-`int("256")` works the same way:
-an ordinary constructor call returns a shared object.
+A caller writes an ordinary constructor call and receives a shared object,
+as with `int("256")`.
 
-You write the bookkeeping yourself,
-and it must account for the way Python calls `__init__()` after `__new__()`.
+You write the bookkeeping yourself.
+It must account for the way Python calls `__init__()` after `__new__()`.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 as [*Singleton*](24_Patterns--Singleton.md#one-instance-in-a-class-variable)
