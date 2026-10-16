@@ -12,8 +12,7 @@ that the account refuses an overdraft.
 Tests report the behavior a change breaks.
 With them you can refactor boldly, change designs, and clean up code.
 
-Perhaps more importantly,
-tests tell you immediately if a change you've made causes a failure.
+Tests report a failure immediately, as soon as a change you've made causes it.
 Immediate feedback saves an enormous amount of time.
 If you discover the problem after multiple changes,
 any one of them could have caused the bug.
@@ -84,7 +83,7 @@ The test written first stays the same.
 Only the code changes to satisfy it.
 The test defines what "done" means before any implementation exists to shape that definition.
 
-That said, TDD requires that you know what you are creating.
+But TDD requires that you know what you are creating.
 It assumes you are confident the design is correct,
 so that only implementation remains.
 Often, however, you are still experimenting to find out what the program should do.
