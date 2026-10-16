@@ -19,8 +19,7 @@ so some of those patterns become unnecessary.
 The example is a trash sorting simulation, and it evolves across the chapter.
 A first design works until a new requirement makes it leave trash out of its report.
 A reshaping confines that change to one new class.
-Then a second vector of change appears.
-The reshaped design leaves it unsolved.
+Then a second vector of change appears, one the reshaped design leaves unsolved.
 Read that evolution as a template for your own designs,
 which can start as an adequate fit for one problem and become a flexible fit for a class of problems.
 
@@ -291,7 +290,7 @@ warns against this shape: a `match` over an open set.
 
 A `case _:` wildcard could catch a new material.
 `case _: raise ValueError(f"unsorted {type(piece).__name__}")` turns the silent drop into a `ValueError`.
-The wildcard is worth adding, but the flaw remains.
+The wildcard helps, but the flaw remains.
 Every new material means editing this `match`.
 A sorter over an open set must compute each piece's bin from the piece's own class,
 and [`bins[type(piece)]`](#let-a-dictionary-do-the-sorting)
@@ -574,13 +573,12 @@ for material in Trash.registry.values():
 Each implementation above takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
 
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
-Three materials register a note.
+Three materials get a registered note.
 `Paper`, the fourth, falls through to the base function.
 
 A forgotten material gets the default answer,
 with no exception at runtime and no report from the type checker.
-Here "no special handling" is a genuine answer for `Paper`,
-so the fallback is correct.
+`Paper` needs no special handling, so here the fallback answer is correct.
 When the default answer would be wrong for an unregistered material,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call (see exercise 5).
@@ -660,7 +658,7 @@ and choosing the lightest construct that isolates it.
 
 This chapter meets two vectors, each through a concrete requirement:
 plastic for new types, and the disposal hazard for new operations.
-Each vector now touches one place.
+Each kind of change now touches one place.
 `bins[type(piece)]` bins a new material with no edit,
 one `@recycling_note.register` adds that material's answer to an existing operation,
 and a new operation is one `singledispatch` function in its own file.
