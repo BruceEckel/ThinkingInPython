@@ -1217,7 +1217,7 @@ method name describe one shape under two names.
 The solution renames the recording method to `record()`, so `Terminal`
 no longer satisfies `Recorder`.
 
-Three implementations have six orderings, and the prediction is short.
+Three implementations have six orderings, and one rule predicts them all.
 `supply()` scans its arguments and takes the first that satisfies the
 request, so whichever implementation comes first answers it. Two of
 the six orderings put `Terminal` first and send the greeting to the
