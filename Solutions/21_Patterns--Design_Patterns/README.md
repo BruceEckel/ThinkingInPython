@@ -2,10 +2,10 @@
 
 The first three exercises ask about your own experience, so no answer
 here can be the answer. Each of those solutions works a single example
-through instead. The method is the transferable part: name the axis, subtract
-Python's share, then take away one more thing and see whether anything
-breaks. The last exercise has an answer you can check against the chapter's
-figure.
+through instead. The method is the transferable part: name the axis,
+subtract Python's share, then take away one more thing and see whether
+anything breaks. The last exercise has an answer you can check against
+the chapter's figure.
 
 ## 1. Naming a vector of change
 
@@ -61,8 +61,8 @@ def render(rows: list[Row], style: str) -> str:
 
 The example is a small report writer. It prints plain text, then must
 emit CSV for a spreadsheet, then JSON for a web front end. All three
-formats run along one axis, the output format. Everything else stays the same
-through all three: the rows, their source, what the numbers mean.
+formats run along one axis, the output format. Everything else stays the
+same through all three: the rows, their source, what the numbers mean.
 
 Here is the version that holds the first two formats:
 
@@ -92,16 +92,15 @@ print(render(rows, "csv"))
 #: paper,7
 ```
 
-**Branch on the format.** Nothing absorbs the change. Each new format means opening `render()`
-and adding a `case`, so the third request edits the same function the
-first two did.
-The branching shape survives as long as it does because the `match` reads well.
-The shape works, but every new
-format is an edit you make by hand.
+**Branch on the format.** Nothing absorbs the change. Each new format
+means opening `render()` and adding a `case`, so the third request edits
+the same function the first two did. The branching shape survives as
+long as it does because the `match` reads well, but every new format is
+an edit you make by hand.
 
-Naming the axis says what to do about those hand edits. If the format varies, the
-format must become a value the program can hold, rather than a
-branch in a function:
+Naming the axis says what to do about those hand edits. If the format
+varies, the format must become a value the program can hold, rather
+than a branch in a function:
 
 ```python
 # exercise_1b.py
@@ -132,21 +131,22 @@ print(render(rows, "json"))
 #: {"name": "paper", "amount": 7}
 ```
 
-**Hold each format as data.** Adding the third format takes one assignment, and `render()` stays as it was.
-`STYLES` absorbs the change because a format is now data.
-The assignment that adds the format can sit in any module that imports
-`STYLES`.
+**Hold each format as data.** Adding the third format takes one
+assignment. `render()` stays as it was. `STYLES` absorbs the change
+because a format is now data. The assignment that adds the format can
+sit in any module that imports `STYLES`.
 
 Everything outside the axis still needs hand edits. Printing a new
-field of `Row` means editing every entry in `STYLES`.
-`STYLES` absorbs the format, and a field is a different vector of change.
+field of `Row` means editing every entry in `STYLES`. `STYLES` absorbs
+the format. A field is a different vector of change.
 
 Two things generalize from the example. First, the axis is visible in
 the history rather than in the code. When the same function appears in
-three consecutive commits, the history names the axis for you. Second, absorbing one
-vector says nothing about the others. In this design a new format is
-one assignment and a new field is an edit to every format,
-so the design is the right answer only if formats are what keep changing.
+three consecutive commits, the history names the axis for you. Second,
+absorbing one vector says nothing about the others. In this design a
+new format is one assignment. A new field is an edit to every format,
+so the design is the right answer only if formats are what keep
+changing.
 
 </details>
 </details>
@@ -231,18 +231,16 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 #: 25.0 23.0
 ```
 
-Five constructs become one parameter, and the type checker still knows
-what the parameter accepts. `Callable[[float], float]` rejects a
+Five constructs become one parameter. The type checker still knows
+what the parameter accepts: `Callable[[float], float]` rejects a
 function taking the wrong arguments as surely as an interface rejects
 a class that does not implement it.
 
-The sentence that remains is the pattern.
-The subtraction keeps the pattern's intent and removes the supporting code.
-Everything crossed out
-serves a language where a method belongs to a class.
-In such a language, passing a behavior means passing an object,
-and the crossed-out parts build that object.
-Python has had the
+The sentence that remains is the pattern. The subtraction keeps the
+pattern's intent and removes the supporting code. Everything crossed
+out serves a language where a method belongs to a class. In such a
+language, passing a behavior means passing an object. The crossed-out
+parts build that object. Python has had the
 [missing piece](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 all along, since a function is a value you can pass.
 
@@ -326,28 +324,28 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 
 If you remove the abstract base and turn both subclasses into
 functions, you have exercise 2's version. What stops working? Nothing.
-The numbers are identical, the type checker still rejects a wrongly-shaped argument,
-and adding a third rule is still one new definition. `Flat` and
-`ByWeight` each carry a single method and no state, so each class is a
-wrapper around one function. By the rule that a design
-is complete when you cannot take anything else away, the class version
-has three classes left to take away.
+The numbers are identical, the type checker still rejects a wrongly
+shaped argument, and adding a third rule is still one new definition.
+`Flat` and `ByWeight` each carry a single method and no state, so each
+class is a wrapper around one function. By the rule that a design is
+complete when you cannot take anything else away, the class version has
+three classes left to take away.
 
-Taking away one more thing changes the answer.
-Removing `checkout()`'s `shipping` parameter means inlining `5.0` where the call through `shipping` was
-and dropping the second argument from each call.
-The program still runs and still prints a number. What stops working is
-the requirement. Charging by weight now means editing
-`checkout()`. Subtraction stops at the parameter. The parameter is the
+Taking away one more thing changes the answer. Removing `checkout()`'s
+`shipping` parameter means inlining `5.0` where the call through
+`shipping` was and dropping the second argument from each call. The
+program still runs and still prints a number. What stops working is the
+requirement. Charging by weight now means editing `checkout()`.
+Subtraction stops at the parameter. The parameter is the
 last piece that expresses the design's intent, so removing it removes
 the design rather than its supporting code.
 
-Both outcomes, a removal that broke nothing and one that broke the requirement,
-are the exercise working correctly. Subtraction is a test
-you run, not a rule to remove as much as you can.
-Take something away, run the program, and read the result. If nothing broke, the piece was
-supporting code. If something broke, the piece you removed expresses the
-design, and that piece is worth keeping and worth naming.
+Both outcomes, a removal that broke nothing and one that broke the
+requirement, are the exercise working correctly. Subtraction is a test
+you run, not a rule to remove as much as you can. Take something away,
+run the program, and read the result. If nothing broke, the piece was
+supporting code. If something broke, the piece you removed expresses
+the design, and that piece is worth keeping and worth naming.
 
 </details>
 </details>
@@ -436,16 +434,14 @@ def main(kind: str) -> None:
 <details>
 <summary>Solution</summary>
 
-If you add `MdWriter` to the `AnyWriter` alias and to `main()` but leave `Report.render()` as it was,
-`main("md")` prints `None`.
-The writer falls through every `case`,
-and `render()` reaches its end, where Python returns `None` implicitly.
-`ty` reports that path as `invalid-return-type`,
-since `render()` declares that it returns `str`.
-The first version below makes all three edits.
-In the second version,
-`Report.render()` calls `write()` on every writer,
-so `Report` stays the same when you add a writer.
+If you add `MdWriter` to the `AnyWriter` alias and to `main()` but
+leave `Report.render()` as it was, `main("md")` prints `None`. The
+writer falls through every `case`, and `render()` reaches its end, where
+Python returns `None` implicitly. `ty` reports that path as
+`invalid-return-type`, since `render()` declares that it returns `str`.
+The first version below edits all three: the alias, `main()`, and
+`render()`. In the second version, `Report.render()` calls `write()` on
+every writer, so `Report` stays the same when you add a writer.
 
 The first version gives each writer its own method name, which is the
 usual reason a class like `Report` ends up naming every writer. The
@@ -501,13 +497,13 @@ main("md")
 #: **Q3 sales**
 ```
 
-`MdWriter` is new code, so it stays out of the count. Adding it edits three
-existing things: the `AnyWriter` alias gains a member, `Report.render()`
-gains a `case`, and `main()` gains a `case`. Two of those edits belong to
-`Report`.
-`render()` is its method, and the alias lists the writers `Report` accepts.
-The change therefore reaches two parts,
-as the left half of the chapter's figure shows: `Report` and `main`.
+`MdWriter` is new code, so it stays out of the count. Adding it edits
+three existing things: the `AnyWriter` alias gains a member,
+`Report.render()` gains a `case`, and `main()` gains a `case`. Two of
+those edits belong to `Report`. `render()` is its method, and the alias
+lists the writers `Report` accepts. The change therefore reaches two
+parts, `Report` and `main`, as the left half of the chapter's figure
+shows.
 
 The second version gives every writer the same method and lets
 `Report` name that method through a protocol:
@@ -559,16 +555,16 @@ main("md")
 ```
 
 Here adding `MdWriter` edits one existing thing, the `case` that
-`main()` gains. `Report` and `Writer` keep their source, and no writer names
+`main()` gains. `Report` and `Writer` keep their source. No writer names
 `Writer`. The type checker matches each class to the protocol when
 `main()` assigns an instance to `writer`.
 
 The count gives the answer: three edits in two parts against one edit in
 one part. The places matter more than the number, though. In the first
 version a new format means editing `Report`, a class whose subject is
-the report's content. In the second, the one edit is in `main()`,
-the part whose job is to assemble the pieces. The `match` in `main()`
-names every writer class, so `main()`'s heavy edges are the ones that remain.
+the report's content. In the second, the one edit is in `main()`, the
+part whose job is to assemble the pieces. The `match` in `main()` names
+every writer class, so `main()`'s heavy edges are the ones that remain.
 A [registry](../../Chapters/27_Patterns--Factory.md#self-registration)
 moves them out of `main()` as well.
 
