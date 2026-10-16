@@ -137,7 +137,7 @@ print(total(Countdown(5)))  # and a custom iterable
 ```
 
 `total(numbers: Iterable[int]) -> int` accepts any `Iterable`,
-so it works equally well on the generator, the list, and the custom `Countdown`.
+so it works on the generator, the list, and the custom `Countdown`.
 The figure follows one loop over `nums` through the protocol,
 then puts `total()` in the loop's place:
 
@@ -852,7 +852,7 @@ so implementing them over a stream means recreating one, item by item.
 The same rebuild appears twice more: in `tee()`'s buffer,
 and in the list you collect when you must walk data twice.
 Python dropped `first()` and `current_item()` rather than make every iterator buffer its stream.
-That leaves `advance()` to return the value it reached.
+With those two gone, `advance()` returns the value it reached.
 That method is `__next__()`.
 
 ### Asking Consumes an Item
