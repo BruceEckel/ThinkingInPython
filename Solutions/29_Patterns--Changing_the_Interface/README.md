@@ -14,7 +14,8 @@
 
 [*Adapter* in Python](../../Chapters/29_Patterns--Changing_the_Interface.md#adapter-in-python) shows `__getattr__()` forwarding every attribute the adapter does not define.
 Add `__getitem__()` to the class for the lookup, then try `len()` on the adapter.
-Python finds special methods on the class, not through `__getattr__()`, and that rule explains what `len()` does.
+Python finds special methods on the class, not through `__getattr__()`.
+That rule explains what `len()` does.
 
 <details>
 <summary>The shape</summary>
@@ -82,10 +83,11 @@ and forwards everything else to the wrapped list through
 The adapter defines no `append()`, so the lookup falls through to
 the list.
 
-**Grow the shared list.** Both the adapter and the original `pairs` name see the new entry.
+**Grow the shared list.** Both the adapter and the original `pairs`
+name see the new entry.
 The record is frozen, but the list it holds stays mutable.
-`append()` changes the list,
-and the adapter's `pairs` field refers to the same list as before.
+`append()` changes the list.
+The adapter's `pairs` field refers to the same list as before.
 
 **Show what `__getattr__()` cannot forward.** `len(adapter)` raises a `TypeError` although the list has a `__len__()`.
 Python looks up a special method on the class, not on the instance,
@@ -277,7 +279,7 @@ print([name for name in vars(shop)
 Inside the module, `start_car()` holds the assembly order:
 `_Ignition(_FuelPump(_Engine()))`.
 `shop._Engine` and `shop._FuelPump` still reach the classes, because
-Python enforces no privacy. The underscore marks them as private, and
+Python enforces no privacy. The underscore marks them as private, so
 `from shop import *` skips them.
 
 **List what a caller can see.** The listing prints the module's
@@ -296,8 +298,8 @@ call site, but the class version adds a `class` statement and a
 None of these functions uses `self`,
 so `@staticmethod` makes Python call each one with the caller's arguments alone.
 A module is a namespace as soon as Python creates it.
-It supports the underscore convention and `__all__`,
-and Python runs its top-level code once, on the first import.
+It supports the underscore convention and `__all__`.
+Python runs its top-level code once, on the first import.
 
 A caller of `facade.py` sees `Engine`, `FuelPump`, `Ignition`, and
 `Facade` as public names.
@@ -336,8 +338,8 @@ is the *Decorator* row: same interface, added behavior, and the
 behavior disappears.
 
 **The `read()` wrapper is an *Adapter*.** Its interface differs from
-the wrapped object's interface. The caller asks for `read()`, and the wrapped object
-offers `next_chunk()` instead.
+the wrapped object's interface. The caller asks for `read()`.
+The wrapped object offers `next_chunk()` instead.
 The wrapper exists to translate the caller's `read()` into a `next_chunk()` call.
 If you remove it, you lose that translation.
 The caller's `read()` then raises an `AttributeError`,
@@ -345,8 +347,8 @@ because the wrapped object has no `read()`.
 
 An *Adapter* adds no behavior,
 which separates the *Adapter* from the *Decorator*.
-Both wrappers forward, and only the *Adapter*
-changes the name the caller uses.
+Both wrappers forward.
+Only the *Adapter* changes the name the caller uses.
 
 **The flag-checking wrapper is a *Proxy*.** Its interface is the
 wrapped object's interface, and it adds no behavior to a call that goes through.
@@ -356,8 +358,8 @@ the proxy refuses.
 What you lose is control over when and whether a call proceeds. This wrapper is the
 [protection proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy).
 
-None of the three is a *Façade*, because a *Façade* narrows many objects
-to a few names and each of these wraps one object.
+None of the three is a *Façade*, because a *Façade* narrows many
+objects to a few names, while each of these wraps one object.
 
 Purpose, not code, decides the classification. All three could be the
 same `__getattr__()` forwarder. What separates them is the answer to
@@ -533,14 +535,15 @@ info: This violates the Liskov Substitution Principle
 what the checker prevents. `run()` accepts any `WhatIUse`.
 A `Renamed` is a `WhatIUse`, so the type checker reports nothing about the call
 inside `run()`. At runtime `Renamed.op()` has no parameter named
-`what_i_want`, and the call raises a `TypeError`. The override breaks
+`what_i_want`, so the call raises a `TypeError`. The override breaks
 `run()`, a caller written against `WhatIUse` alone.
 
-**Keep the base parameter's name.** The fix keeps the base class's parameter name, `what_i_want`.
-`WhatIUse2.op()` still widens
-the type to the union, which an override may do.
-It also accepts the keyword every `WhatIUse` caller uses. `WhatIUse2().op(what_i_want=WhatIHave())` passes a
-`WhatIHave` by that keyword and reaches the adapter.
+**Keep the base parameter's name.** `WhatIUse2.op()` names its
+parameter `what_i_want`, as the base class does, so it accepts the
+keyword every `WhatIUse` caller may pass.
+It still widens the type to the union, which an override may do.
+`WhatIUse2().op(what_i_want=WhatIHave())` passes a `WhatIHave` by
+that keyword and reaches the adapter.
 
 With the `/` in place, as in `adapter.py`, every caller must pass
 the parameter by position, so the override is free to call it `item`.
