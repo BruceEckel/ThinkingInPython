@@ -117,7 +117,7 @@ The listing needs no `# type: ignore` comment.
 
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values,
-and the type checker removes `None` from the element type.
+so the type checker removes `None` from the element type.
 
 ### Scope and the Walrus Operator
 
@@ -137,7 +137,8 @@ so the outer `e` keeps its value.
 A `for` loop behaves the opposite way.
 Its loop variable remains bound in the enclosing scope after the loop ends.
 
-The scope works like a function scope, and that matters in a class body.
+The scope works like a function scope,
+which limits a comprehension in a class body.
 Python skips the class body when it looks up a name from a scope nested inside the class,
 so a comprehension there cannot read the class's other attributes.
 With `base = 3` in the class body,
@@ -316,7 +317,7 @@ write each in its own position: `[x if a else b for x in xs if c]`.
 Nesting one comprehension inside another builds a list of lists.
 Writing two `for` clauses in one comprehension flattens instead,
 producing a single list.
-Those clauses *do* read left to right,
+Unlike the clauses of a nested comprehension, these clauses read left to right,
 in the order the equivalent nested loops appear:
 
 ```python
@@ -497,8 +498,8 @@ for line in report:
 Reading the `report` comprehension means answering several questions at once:
 which items qualify, how the warehouses flatten together,
 how `sorted()` orders the qualifying items, and how each line renders.
-The outer comprehension iterates over `sorted()` of an inner comprehension,
-and that one expression does four jobs.
+The outer comprehension iterates over `sorted()` of an inner comprehension.
+That one expression does four jobs.
 Giving each stage a name gives each question its own statement:
 
 ```python
