@@ -20,8 +20,8 @@ so the type checker reports a node kind that no case handles.
 
 A file system is the canonical composite.
 A directory holds entries, and each entry is a file or another directory.
-The point is uniformity.
-One call works on a file, a directory, or the whole tree.
+The point is uniformity: one call works on a file, a directory,
+or the whole tree.
 
 ![Each directory adds up what its entries return](_images/composite_tree)
 
@@ -281,7 +281,7 @@ Python's parser builds them only for sentences written as Python source in which
 A GoF *Interpreter* more often parses a rules file, a configuration value,
 or a query a user types at runtime.
 Those arrive as text, and text needs a real parser.
-Here is the complete grammar for a small arithmetic language:
+`expr.py` holds the complete grammar for a small arithmetic language:
 
 ```python
 # expr.py
@@ -723,7 +723,6 @@ Three walkers over one set of nodes is the pattern pair in full.
 Python expresses the pair with records, a union,
 operator methods that build nodes, and `match` functions that walk them.
 
-One practical limit applies.
 Every function here recurses once per level of tree.
 Python's default recursion limit of 1000 frames therefore caps how deep a tree these functions can walk.
 Realistic expressions stay far below it.
@@ -827,7 +826,6 @@ Iterating over any one `Template` stays flat.
 `to_query()` uses the walk to keep user values out of the query text.
 `name` holds an injection attempt,
 and it comes out as a value in the parameter list rather than as text in the query.
-The reason is structural rather than clever.
 `to_query()` receives the literal pieces and the values separately,
 so values stay out of the `sql` list.
 Written as an f-string,
