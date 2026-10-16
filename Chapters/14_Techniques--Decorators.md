@@ -1274,7 +1274,6 @@ and `__eq__()` to the same object it received.
 and `@functools.lru_cache` wrap a function the way `add_behavior` does,
 in a wrapper that holds `func` and calls it,
 storing results in a memo dictionary instead of printing around the call.
-You can read any of these with the syntax this chapter covers.
 
 The one piece of machinery left for later is the descriptor protocol that `@property`,
 `@cached_property`, `@staticmethod`, and `@classmethod` implement.
