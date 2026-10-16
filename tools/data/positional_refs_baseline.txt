@@ -177,7 +177,6 @@ Solutions/35_Patterns--Flyweight/README.md	the first `tracemalloc.stop()`	If you
 Solutions/37_Patterns--Pattern_Refactoring/README.md	the first call	**Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the material at the first call.
 Solutions/38_Patterns--Simulation/README.md	The `while` loop	The `while` loop's `is not None` test then ends the loop once the robot has eaten the last food.
 Solutions/40_Functional--Foundations/README.md	the first `tally()`	Running the program raises an `UnboundLocalError` at the first `tally()` call: "cannot access local variable 'count' where it is not associated with a value." The type checker points at the assignment that went wrong.
-Solutions/40_Functional--Foundations/README.md	the line that	`ty` reports `positional-only-parameter-as-kwarg` on `partial(clamp, high=100)`, the line that builds the partial, while the runtime raises its `TypeError` at the call.
 Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` group replaces the first under the same key, so the result holds one of the two `"b"` items.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` evicts nothing and the second `square(1)` becomes a hit.

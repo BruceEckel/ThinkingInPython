@@ -49,6 +49,7 @@ Solutions/04_Foundations--Control_Flow/README.md	**Let an unmatched exception th
 Solutions/11_Techniques--Testing/README.md	**Pass the dependency in
 Solutions/14_Techniques--Decorators/README.md	so work out which layer prints before and which after
 Solutions/16_Techniques--Comprehensions/README.md	Stopping there leaves the generator part-way through
+Solutions/18_Techniques--Performance/README.md	one machine measured CODE about 20% faster with the JIT on
 Solutions/21_Patterns--Design_Patterns/README.md	a CODE to pass in
 Solutions/23_Patterns--Iterators/README.md	before iterating or after
 Solutions/28_Patterns--Function_Objects/README.md	now receives more events than before
