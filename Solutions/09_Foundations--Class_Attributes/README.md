@@ -304,12 +304,16 @@ a = A()
 a.x = 1
 print(vars(a), a.x)
 #: {'x': 1} 1
+print(vars(A)["x"])
+#: 100
 del a.x  # [1]
 print(vars(a), a.x)
 #: {} 100
 with expected(AttributeError):
     del a.x  # [2]
 #: [AttributeError] 'A' object has no attribute 'x'
+print(vars(A)["x"])
+#: 100
 ```
 
 **Remove the shadow.** `del a.x` (`[1]`) removes the entry from the
@@ -469,6 +473,8 @@ print(Base.shared, Left.shared, Right.shared)
 #: [1, 2] [1, 2] [1, 2]
 print(Left.shared is Base.shared)
 #: True
+print(Right.shared is Base.shared)
+#: True
 
 class Base2:
     shared: ClassVar[list[int]] = []
@@ -483,18 +489,21 @@ Left2.shared.append(1)
 Right2.shared.append(2)
 print(Base2.shared, Left2.shared, Right2.shared)
 #: [1] [1] [2]
+print(Right2.shared is Base2.shared)
+#: False
 ```
 
 **Share one list across the hierarchy.** `Base.shared` holds `[1, 2]`, and so do both subclasses, because all
 three names share one list. `Left` and `Right` both inherit `shared`,
 so both names read through to `Base`, and `.append()` mutates
-the list stored there. `Left.shared is Base.shared` proves they are one
-object, not three equal lists.
+the list stored there. `Left.shared is Base.shared` and
+`Right.shared is Base.shared` together prove that the three names share
+one object, not three equal lists.
 
 This listing combines the shared mutable value of `shared_mutable.py`
-with the inheritance lookup of `class_var_inheritance.py`. Each is
-safe on its own.
-A mutable `ClassVar` in a single class keeps the sharing visible.
+with the inheritance lookup of `class_var_inheritance.py`.
+A mutable `ClassVar` in a single class declares its sharing, so the
+sharing stays visible.
 A subclass changes an inherited immutable `ClassVar` by assignment,
 which creates the subclass's own entry.
 Combined, the mutable value and the inheritance lookup produce one list, declared on the base class,
@@ -645,16 +654,20 @@ class Sub(Base):
     pass
 
 Base()
+print(Base.total, Sub.total)
+#: 1 1
 print(vars(Sub).get("total"))
 #: None
 Sub()  # [1]
+print(Base.total, Sub.total)
+#: 1 2
 print(vars(Sub).get("total"))
 #: 2
 Sub()  # [2]
-print(vars(Sub).get("total"))
-#: 3
 print(Base.total, Sub.total)
 #: 1 3
+print(vars(Sub).get("total"))
+#: 3
 
 class Counted:
     total: ClassVar[int] = 0
@@ -666,16 +679,20 @@ class SubCounted(Counted):
     pass
 
 Counted()
+print(Counted.total, SubCounted.total)
+#: 1 1
 print(vars(SubCounted).get("total"))
 #: None
 SubCounted()
+print(Counted.total, SubCounted.total)
+#: 2 2
 print(vars(SubCounted).get("total"))
 #: None
 SubCounted()
-print(vars(SubCounted).get("total"))
-#: None
 print(Counted.total, SubCounted.total)
 #: 3 3
+print(vars(SubCounted).get("total"))
+#: None
 ```
 
 **Watch the subclass fork the counter.** Before the first `Sub()`
@@ -688,7 +705,8 @@ own counter, and the second `Sub()` (`[2]`) moves it to `3` while
 
 **Keep one counter for the hierarchy.** `Counted` names the class on the left, so every construction reads
 and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`
-at any point, and both names report the one shared count of `3`.
+at any point, and both names report the one shared count, so the three
+lines read `1 1`, `2 2`, and `3 3`.
 
 </details>
 </details>

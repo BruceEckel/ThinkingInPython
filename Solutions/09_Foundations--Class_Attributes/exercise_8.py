@@ -16,6 +16,8 @@ print(Base.shared, Left.shared, Right.shared)
 #: [1, 2] [1, 2] [1, 2]
 print(Left.shared is Base.shared)
 #: True
+print(Right.shared is Base.shared)
+#: True
 
 class Base2:
     shared: ClassVar[list[int]] = []
@@ -30,3 +32,5 @@ Left2.shared.append(1)
 Right2.shared.append(2)
 print(Base2.shared, Left2.shared, Right2.shared)
 #: [1] [1] [2]
+print(Right2.shared is Base2.shared)
+#: False

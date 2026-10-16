@@ -8,9 +8,13 @@ a = A()
 a.x = 1
 print(vars(a), a.x)
 #: {'x': 1} 1
+print(vars(A)["x"])
+#: 100
 del a.x  # [1]
 print(vars(a), a.x)
 #: {} 100
 with expected(AttributeError):
     del a.x  # [2]
 #: [AttributeError] 'A' object has no attribute 'x'
+print(vars(A)["x"])
+#: 100
