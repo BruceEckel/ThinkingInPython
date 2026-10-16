@@ -289,7 +289,7 @@ and the cache silently skips that side effect on every repeat.
 
 [Heap](../../Chapters/18_Techniques--Performance.md#heap) shows `list.pop(0)` breaking the heap ordering that `heappop()` maintains.
 Call `heapify()`, then pop three times with `heappop()`, printing the heap and a check of `heap[0]` against `min()` each time.
-For the last question, compare the invariant with what "sorted" requires.
+For the last question, compare the heap ordering with what "sorted" requires.
 
 <details>
 <summary>Solution</summary>
