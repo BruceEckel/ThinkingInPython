@@ -514,9 +514,9 @@ The per-state design (exercise 3) puts each state's rules with that
 state, and reads well when a
 state does more than look a word up. The single-table design puts
 every rule for the whole machine in one dictionary, and is easier to
-audit and edit as a unit. The chapter's own
-[table-driven state machine](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
-makes the same trade-off over the per-state `trap_states.py`.
+audit and edit as a unit. The chapter's
+[Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
+section makes the same trade-off over the per-state `trap_states.py`.
 
 </details>
 </details>
