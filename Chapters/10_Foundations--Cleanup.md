@@ -44,9 +44,9 @@ print("End of delete loop")
 It unbinds the name `c` and drops the one reference that name held.
 The `counters` list still references each `Counter`,
 so every `Counter`'s reference count stays above zero during the loop.
-That is why no `deleted` lines appear while the loop runs,
-why `Counter.count` still reads `3` after the loop,
-and why `End of delete loop` prints before any deletion.
+So no `deleted` lines appear while the loop runs,
+`Counter.count` still reads `3` after the loop,
+and `End of delete loop` prints before any deletion.
 
 Python destroys the objects later, at interpreter shutdown,
 when it tears down the global `counters` list.
