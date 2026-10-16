@@ -487,7 +487,6 @@ construction.
 The list inside stays mutable, and every later `draw()` changes it. So `save()` must copy into a `tuple`, an
 immutable container, instead of wrapping a mutable list in a record.
 
-Two of those failures prove less than they seem.
 `test_memento_ignores_later_drawing` and `test_drawing_after_restore_spares_memento`
 compare `checkpoint.strokes` with a tuple.
 A `list` always compares unequal to a `tuple`, so a `Memento` holding a copied list
