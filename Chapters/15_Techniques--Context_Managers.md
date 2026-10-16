@@ -1244,7 +1244,8 @@ Try each exercise before opening its [solution](../Solutions/15_Techniques--Cont
     Test it with a block that raises a `KeyError` and a block that raises a `ValueError`.
 7.  Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,
     run it with no arguments and with three,
-    and confirm the close order reverses the open order in both cases.
+    and confirm that with three names the close order reverses the open order,
+    and that with none the stack opens nothing.
 8.  Wrap the `yield` in `careless()` from `no_finally.py` in `try`/`finally`,
     with the `exit` line in the `finally`.
     Before running it, predict where `exit A` appears relative to `caught: boom`.

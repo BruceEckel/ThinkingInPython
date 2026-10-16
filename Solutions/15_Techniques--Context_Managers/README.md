@@ -460,7 +460,8 @@ The class uses a lowercase name because you use it like a function.
 
 > Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,
 > run it with no arguments and with three,
-> and confirm the close order reverses the open order in both cases.
+> and confirm that with three names the close order reverses the open order,
+> and that with none the stack opens nothing.
 
 <details>
 <summary>Where to look</summary>
