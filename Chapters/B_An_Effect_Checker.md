@@ -22,7 +22,6 @@ With that rule the tool stays small, and every unresolved call shows in a row.
 A row that reads `Unknown` says the checker [could not resolve a call](#what-the-checker-resolves-and-what-it-cannot-see),
 and where.
 
-Name resolution covers more calls than you might expect.
 Of the roughly 6,600 calls in this book's chapter listings,
 nearly four in five resolve by name alone: a built-in, an imported name,
 or a function or class defined in the same file.
