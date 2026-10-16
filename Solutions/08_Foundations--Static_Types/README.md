@@ -514,7 +514,7 @@ argument because `list` is invariant.
 
 **Give up the write operations.** `shapes.append(...)` draws a
 diagnostic for the reason the widening works.
-`Sequence` is a read-only abstract base class, so it has no `append()`.
+`Sequence` is a read-only container type, so it has no `append()`.
 The diagnostic is therefore `unresolved-attribute` rather than an
 argument-type error. The type checker does not say "you may not
 append a `Square` here." It says the type you declared has no such
