@@ -6,7 +6,7 @@
 The Solutions file for chapter 45 has no Tier 1A or Tier 2 vocabulary,
 no signposting, no curly quotes, and no staccato runs. Its watch-list
 hits are three restrictive "only"s in ruled-fine shapes and one "want"
-addressed to the reader. The twelve changes below split "and" joins
+addressed to the reader. The thirteen changes below split "and" joins
 whose clauses change subject (most of them hiding a "but" or a "so"),
 cut one signpost sentence and one word echo, and turn a repeated
 subject into a pronoun. Each touched sentence was checked against its
@@ -36,12 +36,12 @@ of the direct edits.
 ## Considered and declined
 
 - The bold step labels in every exercise (§15/§16 by shape): the Solutions files' convention for a labeled step, not emphasis.
-- Long or ragged lines in paragraphs this run left untouched (for example lines 83-89's neighbors, 240, 352, 418-420): hand-wrapping leaves the rendered page unchanged, so only edited paragraphs were rewrapped.
+- Long or ragged lines in paragraphs this run left untouched (for example lines 240, 352, and 418-420): hand-wrapping leaves the rendered page unchanged, so only edited paragraphs were rewrapped.
 - Lines 87-89, "The return value arrives as `StopIteration`'s `value` rather than as the result of `send()`." A restatement of line 42 by shape, but it completes the four-call walkthrough, and the opening paragraph serves a different purpose (the failure the solution guards against).
 - Lines 268-269, "`None` is wrong twice over. The interview stopped ..., and `None` is not a `Result` in any case." The "and" joins the two items "twice over" announces, so it is additive.
 - Lines 277-278, "Keeping the two meanings apart is a one-line discipline: put inside the `try` only the call ...": the colon delivers the discipline it names ("namely" fits), and "only the X" is a ruled-fine shape.
 - Line 424, "The type checker told you more.": past tense for the reader's own run of the two tools, an event on the page.
-- Lines 531, "The count `12` therefore reaches `summarize()` through two returns.": a summary of the chain above it, kept because it sets up the contrast with `'(12 characters)'` in the next sentence.
+- Line 531, "The count `12` therefore reaches `summarize()` through two returns.": a summary of the chain above it, kept because it sets up the contrast with `'(12 characters)'` in the next sentence.
 - Lines 536-537, "The choice decides which code receives the number: a yielded value goes to the driver, and a returned value goes to the delegating generator.": two clauses after a colon, but they are the parallel pair the lead-in announces, so the colon delivers one thing.
 - Line 583, "The mismatch is real rather than a type checker limitation.": §34, with the contrast named in the sentence (recurring keep).
 - Lines 590-591, "So the first call is special in both directions, and `None` is the only value it accepts.": both clauses hang on the one "So"; "the only X" is a ruled-fine shape.
