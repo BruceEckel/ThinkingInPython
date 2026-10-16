@@ -285,7 +285,7 @@ binds `log`.
 ## 3. Classifying three Effects
 
 > Classify every Effect in `slope_catch.py`,
-> `withdraw()` from [Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions),
+> `withdraw()` from [Functional Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions),
 > and the `Thermometer` that keeps a `_celsius` from [*Observer*](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer):
 > side effect, side cause, or exception.
 > Which of the three conversions from [Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
@@ -332,7 +332,7 @@ The read makes the function's result depend on the global `balance` rather than 
 The write changes `balance`, which lies outside both the arguments and the return value.
 Because each call rewrites the global,
 `withdraw(30)` returns `70` the first time and `40` the second.
-The [Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions)
+The [Functional Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions)
 chapter uses that pair of calls to show purity failing.
 [Confidence](../../Chapters/43_Functional--Confidence.md#referential-transparency)
 reuses `withdraw()` to show referential transparency failing.

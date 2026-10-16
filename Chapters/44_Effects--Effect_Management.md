@@ -12,7 +12,7 @@ Every signature on the path hides the read and the write.
 
 This book has emphasized the benefits of pure functions in many places:
 
-- [Foundations](40_Functional--Foundations.md#pure-functions)
+- [Functional Foundations](40_Functional--Foundations.md#pure-functions)
   contrasts `double()`, a pure function, with `withdraw()`,
   which depends on state left over from earlier calls.
 - [Performance](18_Techniques--Performance.md#caching)
@@ -73,7 +73,7 @@ For example, the function might:
 - Acquire a lock, or coordinate with another thread
 
 A side effect is easy to spot in the function that performs it,
-because the side effect changes something outside that function.
+because the operation that changes the environment sits in that function's body.
 One call up, the side effect is invisible.
 
 The second is a *side cause*, the counterpart of a side effect:
@@ -1045,7 +1045,7 @@ Try each exercise before opening its [solution](../Solutions/44_Effects--Effect_
     Say how many of the five use the `Log` they name,
     and then what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
-    `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),
+    `withdraw()` from [Functional Foundations](40_Functional--Foundations.md#pure-functions),
     and the `Thermometer` that keeps a `_celsius` from [*Observer*](30_Patterns--Observer.md#the-pythonic-observer):
     side effect, side cause, or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)
