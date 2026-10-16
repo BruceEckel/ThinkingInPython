@@ -15,9 +15,10 @@ and perhaps some should even be mathematically provable.
 This seems to me to be the broader challenge that functional programming tackles.
 
 The preceding chapters build the machinery.
-[Foundations](40_Functional--Foundations.md)
+[Functional Foundations](40_Functional--Foundations.md)
 establishes pure functions and immutable values,
-[Toolkits](41_Functional--Toolkits.md) supplies the standard library's support,
+[Functional Toolkits](41_Functional--Toolkits.md)
+supplies the standard library's support,
 and [Error Handling](42_Functional--Error_Handling.md)
 makes failure an ordinary value.
 This chapter asks what that machinery lets you claim about your code,
@@ -502,7 +503,7 @@ Try each exercise before opening its [solution](../Solutions/43_Functional--Conf
     deleting the `.hypothesis/` directory before each run,
     to see which characters Hypothesis reports.
     Then explain what those characters reveal about Unicode case mapping.
-5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
+5.  Write a property test for `group_rounds()` from [Functional Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
     for any roster and any positive group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.

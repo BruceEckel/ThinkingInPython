@@ -335,7 +335,7 @@ The generated strings include characters nobody thinks to type.
 
 ## 5. A property test for `group_rounds()`
 
-> Write a property test for `group_rounds()` from [Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size):
+> Write a property test for `group_rounds()` from [Functional Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size):
 > for any roster and any positive group size,
 > every student appears in exactly one group per round.
 > Use a strategy that generates rosters of distinct names.
@@ -436,7 +436,7 @@ unevenly, folding the leftovers into existing groups. By that rule,
 the answer for a roster of two and a size of five is one group of
 two. Crashing is the one answer that contradicts what the function
 does everywhere else. The `group_rounds()` in
-[Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size)
+[Functional Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size)
 includes the guard, so `test_group_rounds.py` passes with no
 `assume()`.
 
