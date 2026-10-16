@@ -19,7 +19,6 @@ Often people decide ahead of time, based on biases,
 that runtime performance will be insufficient.
 They then build elaborate designs that solve nonexistent problems.
 
-Python can be surprising.
 A program coded in the most straightforward way,
 without concern for performance, can often run fast enough for your needs.
 Before assuming that a simply written program will be too slow, try it out.
@@ -461,7 +460,7 @@ Since 3.14, a CPython build can instead make each instruction a small C function
 The C compiler turns each of those calls into a jump,
 so the loop that runs Python bytecode gets faster.
 The tail call is in C, inside the interpreter.
-It is unrelated to [tail-call optimization of Python functions](41_Functional--Toolkits.md#recursion),
+It is a separate mechanism from [tail-call optimization of Python functions](41_Functional--Toolkits.md#recursion),
 which CPython does not do.
 
 The tail-calling interpreter changes nothing in your program,
@@ -503,8 +502,8 @@ The same file runs, and the interpreter runs its busiest paths as machine code.
 
 Your program runs that machine code only when three conditions hold:
 
-1. The interpreter must be *built* with the JIT,
-   through the `--enable-experimental-jit` configuration option.
+1. The interpreter must *include* the JIT,
+   compiled in through the `--enable-experimental-jit` configuration option.
    Building it needs LLVM.
    Running the result does not.
 2. The process must *enable* it, through the `PYTHON_JIT` environment variable.
@@ -675,7 +674,7 @@ The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
 so a claim about a small difference is a claim about the noise.
 A hoist worth writing speeds the loop up by more than that margin.
-The measurement proves the point because it catches a "classic" optimization that no longer works,
+The measurement catches a "classic" optimization that no longer works,
 just as readily as it catches one that does.
 
 ## Choose Better Algorithms and Data Structures
