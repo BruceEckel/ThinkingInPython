@@ -12,7 +12,8 @@
 
 [Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) names the three parameters of `Generator`: what it yields, what it receives, and what it returns.
 Give each channel its own type so that a swap is a type error.
-After the third `send()`, the generator finishes, and the total is the `value` of the `StopIteration` that `send()` raises.
+After the third `send()`, the generator finishes.
+The total is the `value` of the `StopIteration` that `send()` raises.
 
 <details>
 <summary>The shape</summary>
@@ -80,9 +81,9 @@ returns a `Total`. Three `NewType` definitions over `str`, `int`, and
 `SendType` and the `ReturnType` is a type checker error.
 With bare `int` on both channels, the checker would accept the swap.
 
-**Drive the conversation by hand.** Driving `tally()` takes four calls: one `next()` and three
-sends. `next(t)` runs the body up to the first `yield` and produces the
-first prompt. Each `send()` resumes at that suspended `yield`, whose
+**Drive the conversation by hand.** `tally()` needs four calls: one
+`next()` and three sends. `next(t)` runs the body up to the first
+`yield` and produces the first prompt. Each `send()` resumes at that suspended `yield`, whose
 value becomes `amount`, then runs to the next one. The third `send()`
 resumes the last `yield`, so the loop ends and `tally()` returns. The
 return value arrives as `StopIteration`'s `value` rather than as the
@@ -148,12 +149,12 @@ def drive_in_order(
 
 If you put `next(answers)` inside the `try`, as `drive_naive()` does, a
 short answer source ends the run quietly. Given one answer for three
-questions, `drive_naive()` returns `None`, and the type checker reports
-nothing. The `except StopIteration` meant for the conversation
-catches the one from
-the exhausted answers and treats it as a finished interview. The
-solution's `drive_in_order()` fetches each reply outside the `try`, so
-the `StopIteration` from the answers reaches the caller.
+questions, `drive_naive()` returns `None`. The type checker reports
+nothing. The `except StopIteration` meant for the conversation catches
+the one from the exhausted answers and treats it as a finished
+interview. The solution's `drive_in_order()` fetches each reply
+outside the `try`, so the `StopIteration` from the answers reaches the
+caller.
 
 ```python
 # exercise_2.py
@@ -239,7 +240,7 @@ print(repr(drive_naive(interview(),
 
 **Reuse the generator unchanged.** Nothing in `interview()` changes, and nothing could have. It yields a
 `Question` and receives an `Answer`, whatever the answer's source.
-The generator describes the conversation, and the driver interprets it.
+The generator describes the conversation. The driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
 **Find the answer for each request.** The two drivers differ in the
@@ -252,17 +253,18 @@ Both drivers take a `conversation` of the same type, `Generator[Question, Answer
 That type declares that a `Question` goes out
 and an `Answer` comes back, and leaves open how the driver chooses each answer.
 
-**Keep the two endings apart.** One detail in `drive_in_order()` needs its comment. `next(answers)` sits
-outside the `try` because the `except StopIteration` meant for the
-conversation otherwise catches a `StopIteration` raised by an
-exhausted answer list. Two iterators that raise the same exception
-type are a hazard for a driver that holds both.
+**Keep the two endings apart.** In `drive_in_order()`, `next(answers)`
+sits outside the `try`, as its comment says, because the
+`except StopIteration` meant for the conversation otherwise catches a
+`StopIteration` raised by an exhausted answer list. Two iterators
+that raise the same exception type are a hazard for a driver that
+holds both.
 
 **Test a short answer source.** The last two runs show that hazard. Given one answer and three
 questions, `drive_in_order()` lets the `StopIteration` propagate, so the
 caller's `except` reports that the answer source ran out.
 `drive_naive()` puts `next(answers)` and the `print()` after it inside the `try`.
-`drive_naive()` therefore catches that same exception, treats it as "the conversation
+It therefore catches that same exception, treats it as "the conversation
 finished," and returns `stop.value`, which is `None`.
 
 `None` is wrong twice over. The interview stopped after one
@@ -344,9 +346,9 @@ except StopIteration:
 #: both() is exhausted
 ```
 
-**Count the values the collectors need.** Each `collect()` consumes two values, so
-the three collectors need six, and the loop supplies five. `gamma`
-stays suspended at its second `yield` after the loop ends,
+**Count the values the collectors need.** Each `collect()` consumes two
+values, so the three collectors need six. The loop supplies five.
+`gamma` stays suspended at its second `yield` after the loop ends,
 until `send(6)` completes it.
 
 **Read the output in pairs.** The two-line responses mark where one collector ends and the next begins. A send that supplies a collector's
@@ -486,7 +488,8 @@ the script still runs, and the printed list ends with `'total: None'`.
 `report()` returns `None`,
 and the `yield from` in `summarize()` delivers that `None` into `counted`.
 `ty` reports an `invalid-return-type` on the annotation,
-because `report()` with no `return` statement returns `None`, and its annotation declares an `int`.
+because `report()` declares an `int` and, with no `return` statement,
+returns `None`.
 The solution returns `size` from `report()`, so the count reaches `summarize()` through a second return.
 
 ```python
@@ -519,9 +522,9 @@ needs the long form. Under `Iterator[str]` a generator must return
 `None`, so `ty` rejects `report()`'s `return size` with an
 `invalid-return-type`: expected `None`, found `int`.
 
-**Keep the strings and the count apart.** The strings and the count travel by different channels, and the listing
-shows both at once. Every string that `emit()` or `report()` yields
-travels through the `YieldType` and comes out in the list. The count
+**Keep the strings and the count apart.** The strings and the count
+travel by different channels. The listing shows both at once. Every
+string that `emit()` or `report()` yields travels through the `YieldType` and comes out in the list. The count
 travels through the `ReturnType`: `emit()` returns it, `yield from`
 delivers it into `report()`'s `size`, `report()` returns it again, and
 the second `yield from` delivers it into `summarize()`'s `counted`. The
@@ -557,7 +560,7 @@ Then ask what `next()` accepts, and where a generator that has yet to run would 
 <details>
 <summary>Solution</summary>
 
-`next(g)` and `g.send(None)` do the same thing at runtime, and the
+`next(g)` and `g.send(None)` do the same thing at runtime. The
 `SendType` tells them apart.
 
 `send()`'s signature is
@@ -736,20 +739,20 @@ waits for a second. `amount`, `row`, and
 `stock` are locals that keep their values between sends because the
 suspended frame holds them.
 
-**Report the state reached.** The `yield` in `machine()` runs the opposite direction from the one in
-`interview()`, and neither signature says so. Both yield strings, but
-`interview()` yields a request the driver must satisfy, while
-`machine()` yields a report the driver may ignore. `send(Coin(25))`
-delivers an event and answers no question, and the `COLLECTING` it
-returns reports the state that event produced. A generator's type
-declares what each channel carries and leaves open whether a yielded
-value is a request or a report.
+**Report the state reached.** The `yield` in `machine()` runs the
+opposite direction from the one in `interview()`. Neither signature
+says so. Both yield strings, but `interview()` yields a request the
+driver must satisfy, while `machine()` yields a report the driver may
+ignore. `send(Coin(25))` delivers an event and answers no question.
+The `COLLECTING` it returns reports the state that event produced. A
+generator's type declares what each channel carries and leaves open
+whether a yielded value is a request or a report.
 
 For another state, take the table. The generator stays compact
 because the states form a line, so control flow can express the
 sequence. The two states here that break the line need extra control
-flow. An `if` chain reaches `UNAVAILABLE` and `NEED_MONEY`, and from
-each one the machine loops back to the top, a `goto` written as a
+flow. An `if` chain reaches `UNAVAILABLE` and `NEED_MONEY`. From each
+one, the machine loops back to the top, a `goto` written as a
 `while True`.
 Suppose you add a state reachable from several others,
 the way the table handles `Quit` from every state but `QUIESCENT`.
