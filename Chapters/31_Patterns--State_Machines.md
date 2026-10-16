@@ -42,6 +42,8 @@ class State[I]:
 `next` and `action` are functions stored in fields, not methods,
 so neither receives `self`.
 `state.next(input_)` passes the input alone.
+The name is `input_`, with a trailing underscore,
+because a bare `input` shadows the builtin `input()`.
 The state plus input decides the next state.
 
 `State` is generic in `I`, the type of input the machine reads.
@@ -177,7 +179,9 @@ with `message` and `next` as attributes.
 `HOLDING`'s tuple has a third element, so its `action` becomes `chime()`,
 which sounds when the trap catches a mouse.
 
-The `StateMachine` holds the current state and advances it on each input:
+The `StateMachine` holds the current state and advances it on each input.
+This is the *State* pattern combined with automated transitions,
+producing *State Machine*:
 
 ```python
 # state_machine.py
@@ -200,28 +204,26 @@ def run_all[I](machine: StateMachine[I],
         machine.step(input_)
 ```
 
-The `step()` parameter is `input_`, with a trailing underscore,
-because a bare `input` shadows the builtin `input()`.
 `step()` prints the transition (the old state, the input, and the new state),
 then calls `run()` on the new state, the one the machine has just entered.
 `run()` is an entry action:
 each transition arrives in a state and calls that state's `run()`.
 The constructor calls the initial state's `run()` for the same reason.
-A state prints as its name, through the `__str__()` that `TrapState` defines.
+
 `run_all()`, a convenience outside the class,
 feeds any iterable of inputs to `step()`, one at a time.
-`StateMachine` is generic in the same `I`.
-The type checker infers `I` from the initial state,
-so `StateMachine(TrapState.WAITING)` is a `StateMachine[Mouse]` whose `step()` accepts a `Mouse` alone.
-Passing a string is a type error.
-This is the *State* pattern combined with automated transitions,
-producing *State Machine*.
 
-What `run()` does depends on the current state.
-Every state prints its message, and `Holding` also sounds its chime.
+A `StateMachine[I]` holds `State[I]` states, and its `step()` takes an `I`.
+The type checker infers `I` from the initial state,
+so `StateMachine(TrapState.WAITING)` is a `StateMachine[Mouse]` whose `step()` accepts only a `Mouse`.
+
+`run()`'s behavior depends on the current state.
+Every state prints its message, and `Holding` also calls `chime()`.
 `step()` defines the flow,
-while each `State`'s fields supply the varying behavior:
-`next` chooses the next state, and `action` does what that state alone does.
+while each `State`'s fields supply the varying behavior.
+`next` chooses the next state,
+and `action` holds the behavior particular to one state,
+such as `Holding`'s chime.
 
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
 then feeds a fresh trap an input that `waiting()`'s `case _` alone matches:
@@ -266,10 +268,6 @@ trap.step(Mouse.ESCAPES)
 
 `StateMachine`'s constructor runs the initial state,
 so constructing the machine starts the engine.
-[*Template Method* discourages that choice](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
-Two facts make that choice safe here:
-the call is the constructor's last statement,
-and a state's `run()` reads the state's own fields alone.
 
 `test_trap_states.py` checks two facts:
 the nine moves bring the trap back to `Waiting`, as the trace shows,
@@ -293,20 +291,8 @@ def test_every_state_answers_every_move() -> None:
             assert state.next(move) in TrapState
 ```
 
-The second test iterates the enum,
-so a member added to `TrapState` is tested as soon as it exists.
-
-Two consequences follow from the mix-in.
-`Enum` folds members with equal values into one,
-and a record's equality compares its fields,
-so two members with the same message, the same function,
-and the same action collapse into a single member with two names.
-Two states that share a transition function must differ in their message or their action.
-The type checker reads `next` from the record's field and checks the engine's call `state.next(input_)` against it.
-It leaves a member's tuple uncompared with the fields.
-A tuple holding the message alone, or the two in the wrong order,
-passes `ty` and fails at import or at run time.
-Pyright reports both.
+The second test iterates over the enum,
+so a new member added to `TrapState` is tested as soon as it exists.
 
 ## Table-Driven State Machine
 
