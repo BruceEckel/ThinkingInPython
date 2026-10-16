@@ -188,7 +188,7 @@ Underscores group digits for readability,
 so `10_000_000` is the same literal as `10000000`.
 Floating point is the usual IEEE double.
 
-The operators are what you expect, with two worth noting:
+The operators are what you expect, with two differences:
 `/` on integers always produces a `float`, and `//` is floor division
 (divide, then round down to a whole number).
 The result's type follows the operands, so `7.0 // 2` is `3.0`.
@@ -573,7 +573,7 @@ A *t-string* produces a `Template` instead.
 The `Template` keeps the literal pieces and the interpolated values apart for a consumer to assemble.
 Python 3.14 added t-strings ([PEP 750](https://peps.python.org/pep-0750/)).
 
-The reason to care is safety.
+T-strings exist for safety.
 A consumer receives the literal text and the values as separate pieces,
 so it can quote, escape,
 or reject the values before they become part of the result.
