@@ -160,7 +160,7 @@ print(TOTAL_SUM, bin(FLAG_BITS))
 ```
 
 All three forms run, since Python accepts any valid identifier as a name.
-What differs is what a reader infers.
+The forms differ in what a reader infers from each.
 `total` and `flags` say "an ordinary variable that changes,"
 which describes both variables.
 `TOTAL_SUM` and `FLAG_BITS` say "a constant, the same for the life of the program,"
@@ -170,7 +170,7 @@ so the name misleads every reader who trusts it.
 `totalSum` and `flagBits` say nothing about the value.
 They say the author came from Java or JavaScript.
 
-The camelCase form is the one a linter flags.
+A linter flags the camelCase form.
 Ruff's pep8-naming rules report `N816` for a mixed-case global.
 Ruff leaves those rules off by default,
 and this book's `pyproject.toml` turns them on with the `N` in its `select` list.
