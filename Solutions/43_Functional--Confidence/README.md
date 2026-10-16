@@ -2,7 +2,7 @@
 
 ## 1. Which process ran each call
 
-> Change `count_primes()` to return `(count, os.getpid())` and print the distinct process IDs alongside the counts.
+> Change `count_primes()` to return `(count, os.getpid())` and print how many distinct process IDs appear alongside the counts.
 > Narrow `assert parallel == serial` to compare only the counts,
 > since the serial run now carries the parent's ID and the parallel one carries the workers' IDs.
 > Compare the number of distinct IDs to `os.process_cpu_count()`,
@@ -213,8 +213,8 @@ A function that ignores its argument and returns `[]` passes
 the first element alone. "Ordered" says nothing about the elements
 being the same ones you supplied.
 
-**Check that repeating changes nothing.** Idempotence is weaker still
-on its own. The same `[]`-returning function passes it too.
+**Check that repeating changes nothing.** Idempotence on its own
+catches little more. The same `[]`-returning function passes it too.
 Idempotence adds a different kind of check, one about the operation
 rather than the output. It catches a sort that drops the last element.
 That sort's output is always ordered, so the invariant passes.

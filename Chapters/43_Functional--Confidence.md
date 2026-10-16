@@ -488,7 +488,7 @@ and the chapters after it build a checked system on that idea.
 
 Try each exercise before opening its [solution](../Solutions/43_Functional--Confidence/).
 
-1.  Change `count_primes()` to return `(count, os.getpid())` and print the distinct process IDs alongside the counts.
+1.  Change `count_primes()` to return `(count, os.getpid())` and print how many distinct process IDs appear alongside the counts.
     Narrow `assert parallel == serial` to compare only the counts,
     since the serial run now carries the parent's ID and the parallel one carries the workers' IDs.
     Compare the number of distinct IDs to `os.process_cpu_count()`,
