@@ -32,7 +32,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from tools import listing_links, search_index
+from tools import book_index, listing_links, search_index
 from tools.config import BUILD_SITE_DIR as DEFAULT_OUT
 from tools.config import ROOT
 from tools.markdown import Document
@@ -58,6 +58,9 @@ CHAPTER_TOC = True
 CHAPTER_TOC_DEPTH = 3
 
 FRONT_STEM = "00_Front"
+# The book's index (tools/book_index.py). Not index.html, which is the
+# contents page.
+INDEX_PAGE = "book-index.html"
 BOOK_TITLE = "Thinking in Python"
 BOOK_SUBTITLE = "Fluency, Types, and Design"
 BOOK_AUTHOR = "Bruce Eckel"
@@ -383,7 +386,7 @@ def check_pandoc(minimum: tuple[int, ...] = (3, 0)) -> None:
                  f"build needs. Install a current one: {install_hint('pandoc')}")
 
 
-def render_toc_menu(chapters: list[Chapter], current: Chapter) -> str:
+def render_toc_menu(chapters: list[Chapter], current: Chapter | None) -> str:
     """The Contents link's drop-down: the index page's list, on one line.
 
     Pandoc inserts a variable's value as given, so this is HTML; it
@@ -479,7 +482,10 @@ def part_anchor(roman: str, title: str) -> str:
     return f"part-{(roman or title).lower()}"
 
 
-def render_index(chapters: list[Chapter]) -> str:
+def render_index(chapters: list[Chapter], book_index_page: bool = False
+                 ) -> str:
+    """The contents page; `book_index_page` adds the index as its last
+    row."""
     items: list[str] = []
     for ch in chapters:
         part = PARTS.get(ch.number)
@@ -496,6 +502,10 @@ def render_index(chapters: list[Chapter]) -> str:
         items.append(
             f'    <li><span class="toc-num">{ch.number}</span>'
             f'<a href="{ch.out_name}">{ch.title}</a>{answers}</li>')
+    if book_index_page:
+        items.append('    <li class="toc-part">Back Matter</li>')
+        items.append('    <li><span class="toc-num"></span>'
+                     f'<a href="{INDEX_PAGE}">Index</a></li>')
     rows = "\n".join(items)
     # Art mode (make_cover.py) emits a JPEG; drawn mode an SVG.
     cover_art = ("cover-art.jpg"
@@ -623,18 +633,26 @@ def listing_targets(chapters: list[Chapter]
 def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
                img_map: dict[str, str], missing: set[str],
                chapter_toc: bool,
-               targets: dict[str, listing_links.Target] | None = None
+               targets: dict[str, listing_links.Target] | None = None,
+               located: book_index.BookIndex | None = None
                ) -> set[str]:
     """Render one chapter into out_dir; return the images it references.
 
     With `targets` (see `listing_targets()`), each listing's block gets
     an id and each `name.py` mention in the prose becomes a link to it,
-    on this page or another chapter's.
+    on this page or another chapter's. With `located`, each paragraph
+    the book's index points at gets its `#ix-` id, the target of the
+    index page's links (`BookIndex.inject_anchors()`), and the last
+    chapter links forward to the index page.
     """
     i = chapters.index(ch)
     prev = chapters[i - 1] if i > 0 else None
     nxt = chapters[i + 1] if i + 1 < len(chapters) else None
+    if nxt is None and located is not None:
+        nxt = index_chapter()
     _, body = load_chapter(ch.md, site=solutions_file(ch.md).exists())
+    if located is not None:
+        body = located.inject_anchors(body, ch.md.stem)
     used = {m.group(2) for m in IMG_REF.finditer(body)}
     body = rewrite_images(body, img_map, missing)
     body = rewrite_md_links(body)
@@ -678,6 +696,29 @@ def write_solutions_page(ch: Chapter, chapters: list[Chapter],
     return True
 
 
+def index_chapter() -> Chapter:
+    """The index page's place in the navigation, as a `Chapter`."""
+    return Chapter(book_index.TERMS_FILE, INDEX_PAGE, "", "Index",
+                   BOOK_TITLE)
+
+
+def write_index_page(chapters: list[Chapter], out_dir: Path,
+                     located: book_index.BookIndex) -> None:
+    """Render `INDEX_PAGE` through template.html, like a chapter.
+
+    The entries are HTML from `book_index.render_html()`, handed to
+    pandoc in a raw block: read as Markdown, a heading such as
+    `__init__()` would turn into emphasis.
+    """
+    body = ("```{=html}\n"
+            f"{book_index.render_html(located)}\n"
+            "```\n")
+    page = render_chapter(body, index_chapter(),
+                          chapters[-1] if chapters else None, None,
+                          False, render_toc_menu(chapters, None))
+    (out_dir / INDEX_PAGE).write_text(page, encoding="utf-8")
+
+
 def search_sources(chapters: list[Chapter]) -> list[search_index.Source]:
     """The chapters, then each Solutions file, as search index sources.
 
@@ -696,22 +737,32 @@ def search_sources(chapters: list[Chapter]) -> list[search_index.Source]:
     return sources
 
 
-def write_shared(chapters: list[Chapter], out_dir: Path) -> int:
-    """Write the index page and the search index. Returns sections indexed."""
-    (out_dir / "index.html").write_text(render_index(chapters), encoding="utf-8")
+def write_shared(chapters: list[Chapter], out_dir: Path,
+                 located: book_index.BookIndex | None = None) -> int:
+    """Write the contents page, the book's index page when `located`
+    is given, and the search index. Returns sections indexed."""
+    (out_dir / "index.html").write_text(
+        render_index(chapters, located is not None), encoding="utf-8")
+    if located is not None:
+        write_index_page(chapters, out_dir, located)
     return search_index.write(search_sources(chapters), out_dir)
 
 
 def rebuild_chapter(md: Path, out_dir: Path,
                     chapter_toc: bool = CHAPTER_TOC,
-                    listing_links_on: bool = True) -> bool:
+                    listing_links_on: bool = True,
+                    index_on: bool = True) -> bool:
     """Re-render one chapter page, plus the index and search index.
 
     This is the incremental path `serve.py --watch` takes: one pandoc run
     instead of the ~46 a full build spends. The index and search index are
     rewritten too, since editing a heading changes both, and neither costs
     a pandoc run. Returns False when `md` is not a book chapter or the site
-    has not been built yet, leaving the caller to do a full build.
+    has not been built yet, leaving the caller to do a full build. The
+    book's index page is recomputed and rewritten as well, one more
+    pandoc run, since an edit moves locators. A chapter's locators
+    depend on its own text and the term file alone, so the other
+    chapters' pages keep the right `#ix-` ids.
     """
     if not out_dir.is_dir():
         return False
@@ -724,8 +775,9 @@ def rebuild_chapter(md: Path, out_dir: Path,
         return False
     img_map = build_image_map()
     targets = listing_targets(chapters) if listing_links_on else None
+    located = book_index.book_index(chapters) if index_on else None
     used = write_page(ch, chapters, out_dir, img_map, set(), chapter_toc,
-                      targets)
+                      targets, located)
     write_solutions_page(ch, chapters, out_dir, img_map, set(),
                          chapter_toc, targets)
     images_out = out_dir / "images"
@@ -734,18 +786,19 @@ def rebuild_chapter(md: Path, out_dir: Path,
         if filename and not (images_out / filename).exists():
             images_out.mkdir(parents=True, exist_ok=True)
             shutil.copy2(IMAGES_SRC / filename, images_out / filename)
-    write_shared(chapters, out_dir)
+    write_shared(chapters, out_dir, located)
     return True
 
 
 def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
-          listing_links_on: bool = True) -> int:
+          listing_links_on: bool = True, index_on: bool = True) -> int:
     check_pandoc()
     if not TEMPLATE.exists():
         sys.exit(f"error: template not found at {TEMPLATE}")
     chapters = discover()
     img_map = build_image_map()
     targets = listing_targets(chapters) if listing_links_on else None
+    located = book_index.book_index(chapters) if index_on else None
 
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -758,13 +811,13 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
     solutions_pages = 0
     for ch in chapters:
         used_images |= write_page(ch, chapters, out_dir, img_map, missing,
-                                  chapter_toc, targets)
+                                  chapter_toc, targets, located)
         solutions_pages += write_solutions_page(
             ch, chapters, out_dir, img_map, missing, chapter_toc, targets)
 
     (out_dir / "style.css").write_text(render_css(), encoding="utf-8")
 
-    sections = write_shared(chapters, out_dir)
+    sections = write_shared(chapters, out_dir, located)
     for name in STATIC_FILES:
         shutil.copy2(STATIC_SRC / name, out_dir / name)
 
@@ -780,8 +833,9 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
         if (STATIC_SRC / asset).exists():
             shutil.copy2(STATIC_SRC / asset, out_dir / asset)
 
+    extra = " + book index" if located is not None else ""
     print(f"Built {len(chapters)} pages + {solutions_pages} solutions "
-          f"pages + index into {out_dir}")
+          f"pages + contents{extra} into {out_dir}")
     print(f"Copied {copied} image(s).")
     print(f"Indexed {sections} sections for search "
           f"({(out_dir / search_index.INDEX_NAME).stat().st_size / 1024:.0f}"
@@ -808,8 +862,13 @@ def main(argv: list[str] | None = None) -> int:
                     action=argparse.BooleanOptionalAction, default=True,
                     help="link each `name.py` mention in the prose to "
                          "that listing (default: on)")
+    ap.add_argument("--index",
+                    action=argparse.BooleanOptionalAction, default=True,
+                    help=f"write {INDEX_PAGE}, the book's index, from "
+                         "tools/data/index_terms.toml (default: on)")
     args = ap.parse_args(argv)
-    return build(args.out, args.chapter_toc, args.listing_links)
+    return build(args.out, args.chapter_toc, args.listing_links,
+                 args.index)
 
 
 if __name__ == "__main__":

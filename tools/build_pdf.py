@@ -25,6 +25,13 @@ heading text ("3. Containers"), so section numbering stays off. That
 preamble also sets a running footer (chapter name, page number, and on
 a release build the release stamp); see FOOTER_TYPST.
 
+The index is the last chapter (tools/book_index.py): raw typst whose
+page numbers come from `counter(page).at(label)`, each label an
+`#ix-` span or heading id that the assembly placed. Pandoc's typst
+writer keeps an empty span's id as a label on a zero-width space, and
+a fenced div's id as a label on a `#block`, so a locator in a listing
+or a table resolves too.
+
 Usage:
     python -m tools.build_pdf               # build/pdf/ThinkingInPython.pdf
     python -m tools.build_pdf -o DIR        # build somewhere else
@@ -291,7 +298,7 @@ def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
 
 
 def build(out_dir: Path, keep_source: bool = False,
-          release: str | None = None) -> int:
+          release: str | None = None, index_on: bool = True) -> int:
     build_site.check_pandoc(build_epub.PANDOC_MINIMUM)
     check_typst()
     chapters = build_site.discover()
@@ -311,7 +318,8 @@ def build(out_dir: Path, keep_source: bool = False,
                                     hang_code=False,
                                     ornament=False,
                                     listing_links_on=False,
-                                    typst_epigraph=True)
+                                    typst_epigraph=True,
+                                    index_form="typst" if index_on else None)
 
     src = src_dir / "book.md"
     meta = src_dir / "metadata.yaml"
@@ -361,8 +369,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--release", metavar="VERSION",
                     help="stamp the title page with this release number "
                          "and today's date (used by `tip release`)")
+    ap.add_argument("--index",
+                    action=argparse.BooleanOptionalAction, default=True,
+                    help="add the index chapter from "
+                         "tools/data/index_terms.toml (default: on)")
     args = ap.parse_args(argv)
-    return build(args.out, args.keep_source, args.release)
+    return build(args.out, args.keep_source, args.release, args.index)
 
 
 if __name__ == "__main__":

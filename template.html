@@ -70,6 +70,14 @@
       transition: color 0.2s;
     }
     .toc-toggle:hover { color: var(--accent); border-color: var(--accent); }
+    /* The book's index, left of Contents; search.css moves Search
+       left of both. */
+    .index-toggle {
+      position: fixed;
+      top: 1.5rem;
+      right: 7.5rem;
+      z-index: 100;
+    }
     /* The padding bridges the gap below the link, so the pointer can
        travel down into the list without the hover ending. */
     .toc-drop {
@@ -426,6 +434,7 @@
   </style>
 </head>
 <body>
+  <a class="toc-toggle index-toggle" href="book-index.html">Index</a>
   <div class="toc-menu">
     <a class="toc-toggle" href="index.html">Contents</a>
     $if(toc-menu)$

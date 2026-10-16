@@ -85,7 +85,7 @@ import zipfile
 from html import escape
 from pathlib import Path
 
-from tools import build_site, check_tools
+from tools import book_index, build_site, check_tools
 from tools.build_site import Chapter
 from tools import listing_links
 from tools.heading_links import ATTR_BLOCK, EXPLICIT_ID, LINK, pandoc_anchor
@@ -166,6 +166,11 @@ CHAR_EM = 0.72
 # Indents deeper than this share the deepest hang rule. The book's
 # listings reach 27, and a rule per column past that buys nothing.
 MAX_HANG_INDENT = 28
+
+# The index chapter's heading. EPUB 3 marks an index section with
+# `epub:type="index"`; pandoc writes the attribute onto the chapter's
+# section, and a reader that ignores it (Kindle) loses nothing.
+INDEX_HEADING = "# Index {#book-index epub:type=index}"
 
 HEADING_LINE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
 CODE_SPAN = re.compile(r"(`[^`]*`)")
@@ -645,8 +650,16 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
                   hang_code: bool = True,
                   ornament: bool = True,
                   listing_links_on: bool = True,
-                  typst_epigraph: bool = False) -> str:
+                  typst_epigraph: bool = False,
+                  index_form: str | None = None) -> str:
     """Every chapter as one Markdown stream, ids namespaced and links rewritten.
+
+    `index_form` adds the book's index (tools/book_index.py): "epub" or
+    "typst" says which form of the index chapter follows the last
+    chapter, and either one also injects an `#ix-` id at each located
+    paragraph, so the index's links and page lookups have a target.
+    The injection runs on `load_chapter()`'s body before anything else
+    touches it, since the paragraph numbers are counted on that text.
 
     `listing_links_on` also turns each `name.py` mention in the prose
     into a link to that listing's `<pre>` (see listing_links.py). It
@@ -672,10 +685,17 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
     if img_map is None:
         img_map = build_site.build_image_map()
 
+    if index_form not in (None, "epub", "typst"):
+        raise ValueError(
+            f"index_form must be epub or typst, not {index_form!r}")
+    located = book_index.book_index(chapters) if index_form else None
+
     prepared: list[tuple[Chapter, Document, list[str]]] = []
     known: set[str] = set()
     for ch in chapters:
         _, body = build_site.load_chapter(ch.md)
+        if located is not None:
+            body = located.inject_anchors(body, ch.md.stem)
         doc = Document.from_text(body, ch.md)
         lines = list(doc.lines)
         prefix = prefixes[ch.md.stem]
@@ -751,6 +771,11 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
             orn += ("\n\n![](chapter-ornament.png)"
                     "{.chapter-ornament width=1.6in}\\")
         parts.append(f"{head}{orn}\n\n{text.strip()}\n")
+    if located is not None and index_form == "typst":
+        parts.append(book_index.render_typst(located))
+    elif located is not None:
+        parts.append(book_index.render_markdown(
+            located, heading=INDEX_HEADING))
     return "\n".join(parts)
 
 
@@ -929,6 +954,13 @@ def epub_css(variant: str) -> str:
     reads as a quotation from somewhere else. Italic inside it (a
     pattern name) sets roman, as typst's toggling `emph` does in the
     PDF. The reader's own blockquote indent and margins stay.
+
+    `.book-index` is the index chapter (tools/book_index.py), a nested
+    list. A bullet before each of a thousand entries is noise, a
+    justified entry stretches its spaces around the links, and an
+    entry that wraps reads as the next entry unless it hangs, so the
+    three rules drop the bullet, set the entries ragged right, and
+    hang every line after the first.
     """
     return f"""pre {{
   white-space: pre-wrap; overflow-wrap: break-word;
@@ -957,6 +989,10 @@ th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 #toc .toc-chapter {{ margin-top: 0.4em; }}
 #toc .toc-part {{ margin-top: 1.2em; font-weight: bold;
   letter-spacing: 0.05em; }}
+.book-index ul {{ list-style: none; padding-left: 0; }}
+.book-index ul ul {{ padding-left: 1.2em; }}
+.book-index li {{ text-align: left; padding-left: 1.2em;
+  text-indent: -1.2em; }}
 """
 
 
@@ -1072,7 +1108,7 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
 
 def build(out_dir: Path, keep_source: bool = False,
           keep_svg: bool = False, release: str | None = None,
-          listing_links_on: bool = True) -> int:
+          listing_links_on: bool = True, index_on: bool = True) -> int:
     build_site.check_pandoc(PANDOC_MINIMUM)
     chapters = build_site.discover()
     if not chapters:
@@ -1093,7 +1129,8 @@ def build(out_dir: Path, keep_source: bool = False,
     missing: set[str] = set()
     unresolved: set[str] = set()
     text = book_markdown(chapters, missing, unresolved, img_map,
-                         listing_links_on=listing_links_on)
+                         listing_links_on=listing_links_on,
+                         index_form="epub" if index_on else None)
 
     src = src_dir / "book.md"
     meta = src_dir / "metadata.yaml"
@@ -1162,9 +1199,13 @@ def main(argv: list[str] | None = None) -> int:
                     action=argparse.BooleanOptionalAction, default=True,
                     help="link each `name.py` mention in the prose to "
                          "that listing (default: on)")
+    ap.add_argument("--index",
+                    action=argparse.BooleanOptionalAction, default=True,
+                    help="add the index chapter from "
+                         "tools/data/index_terms.toml (default: on)")
     args = ap.parse_args(argv)
     return build(args.out, args.keep_source, args.keep_svg, args.release,
-                 args.listing_links)
+                 args.listing_links, args.index)
 
 
 if __name__ == "__main__":
