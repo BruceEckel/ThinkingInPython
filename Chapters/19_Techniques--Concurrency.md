@@ -1014,7 +1014,7 @@ although the event loop keeps both tasks busy the whole time.
 A real livelock repeats these rounds forever.
 `range(3)` stops the listing after three rounds so it can report `resolved: False`.
 
-A real livelock looks busy on a monitor,
+A livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
 A deadlock looks idle, with tasks suspended and waiting.
 In both cases, nothing finishes.
@@ -1120,7 +1120,8 @@ asyncio.run(handle("req-7"))
 
 Leaving the `with` block calls `reset()` on the token,
 and `reset()` puts back whatever the variable held before, not the default.
-That distinction matters when scopes nest.
+So when scopes nest,
+leaving an inner `with` block restores the value the outer one set.
 
 Before 3.14 you wrote `token = var.set(x)` and a matching `var.reset(token)` in a `finally`.
 The context manager now makes that same pair of calls for you.
@@ -1369,7 +1370,7 @@ Exact timings shift with load and hardware, but the shape holds.
 Wall time drops sharply up to the core count, then flattens or reverses past it,
 as doubling from 32 to 64 tasks did here.
 
-`TOTAL` and `CORE_MULTIPLIER` are the two constants worth changing.
+`TOTAL` and `CORE_MULTIPLIER` are the two constants to adjust.
 Increase `TOTAL` for a slower, more dramatic slope on your own machine,
 or lower `CORE_MULTIPLIER` to stop the sweep at the core count instead of past it.
 
@@ -1390,7 +1391,7 @@ As *n* → ∞, that ceiling approaches 1 / *s* and stops climbing.
 A job that spends 10 percent of its time in serial overhead speeds up at most tenfold,
 on 16 cores or 1,600.
 
-Splitting into more, smaller tasks yields real gains up to a point,
+Splitting into more, smaller tasks yields gains up to a point,
 since finer chunks even out the load across workers.
 Past that point, though,
 each additional task adds its own slice of the same serial overhead:
@@ -2076,7 +2077,7 @@ and that is where these three wrappers put it.
 Every section so far has kept threads, processes, subinterpreters,
 and `asyncio` apart.
 Blending them before you know which parts are compatible produces races and pickling errors.
-Two real points of convergence exist in the standard library, though,
+Two points of convergence exist in the standard library, though,
 not because the models are secretly the same,
 but because two small pieces of them genuinely are.
 
@@ -2620,7 +2621,7 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
     Haskell's `Control.Concurrent.STM` and Clojure's `ref`/`dosync`
     are where STM succeeded as a practical, widely used tool.
 
-[^libraries]: Libraries worth exploring:
+[^libraries]: Libraries to explore:
 
     - [BOCPY](https://microsoft.github.io/bocpy/):
       Behavior-Oriented Concurrency.
