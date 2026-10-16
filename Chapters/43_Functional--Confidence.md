@@ -375,10 +375,9 @@ The framework automates falsification.
 
 ### Shrinking a Failure
 
-`property_check.py` and `test_property.py` both pass.
-Shrinking needs a failure.
-The next codec has a bug.
-Hypothesis exposes it with [unusual Unicode](#the-same-law-in-hypothesis):
+Shrinking needs a failure,
+but `property_check.py` and `test_property.py` both pass.
+The next codec has a bug that Hypothesis exposes with [unusual Unicode](#the-same-law-in-hypothesis):
 
 ```python
 # shrinking.py
@@ -420,8 +419,7 @@ the smallest code point on which the two decodings disagree.
 Decoding those two bytes as Latin-1 returns two characters where one went in
 (`[1]`), so the round trip returns `'Â\x80'` instead of `'\x80'`.
 That code point is the unusual Unicode the hand-written loop's alphabet excludes.
-Hypothesis finds it by drawing from a wider alphabet,
-treating `decode()` as opaque throughout.
+Hypothesis finds it while treating `decode()` as opaque throughout.
 
 `derandomize=True` seeds the search from a hash of the test function,
 so this book gets the same answer on every run.
@@ -470,8 +468,7 @@ Second, most functional code stays well below the top rung.
 Haskell programmers rely on types and on reasoning by substitution,
 and write a full proof for the few places that need one.
 
-The claim these chapters share is not that functions are special.
-It is that purity, immutability,
+The claim these chapters share is that purity, immutability,
 and referential transparency reduce the work of turning "I believe this is correct" into "I can show why."
 A full proof does all of that work.
 The everyday gain comes from doing part of it: code you can read, check,
