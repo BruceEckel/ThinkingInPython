@@ -495,8 +495,8 @@ so it closes the file whether the read succeeds or raises an exception.
 
 > In `mutating_while_looping.py`, change the list to `[2, 2, 1, 3]`,
 > so a `2` sits in the first slot.
-> Use the shifting-slots explanation to predict what the loop leaves in `scores`,
-> then run it to check.
+> Use the shifting-slots explanation in [Two List Traps](../../Chapters/03_Foundations--Containers.md#two-list-traps)
+> to predict what the loop leaves in `scores`, then run it to check.
 
 <details>
 <summary>Where to look</summary>

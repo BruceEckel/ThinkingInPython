@@ -337,10 +337,8 @@ so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 
-A comprehension builds a list, dictionary,
-or set from an iterable in one expression.
-[The last section of this chapter](#comprehensions) shows its three forms.
-A comprehension can use `:=` the same way.
+A [comprehension](#comprehensions), the subject of this chapter's last section,
+can use `:=` the same way.
 [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
 ### Mutating a Container While Looping
@@ -376,13 +374,11 @@ except RuntimeError as e:
 #: dictionary changed size during iteration
 ```
 
-The list loop walks by position.
-Removing an item shifts the next one down into the slot the loop has passed,
-so the loop skips that item.
-One of the two `2`s survives.
-No exception reports the skip.
-Adding a key while the loop walks `ages` changes the dictionary's size,
-so the dictionary raises a `RuntimeError` instead of skipping silently.
+One of the two `2`s survives,
+for the reason [Two List Traps](03_Foundations--Containers.md#two-list-traps)
+explains.
+Adding a key changes the size of `ages` just as deleting one does,
+so the dictionary raises the same `RuntimeError`.
 
 The same three fixes work for both containers.
 Build a new container with a comprehension,
@@ -778,8 +774,8 @@ Try each exercise before opening its [solution](../Solutions/04_Foundations--Con
     and when that matters.
 9.  In `mutating_while_looping.py`, change the list to `[2, 2, 1, 3]`,
     so a `2` sits in the first slot.
-    Use the shifting-slots explanation to predict what the loop leaves in `scores`,
-    then run it to check.
+    Use the shifting-slots explanation in [Two List Traps](03_Foundations--Containers.md#two-list-traps)
+    to predict what the loop leaves in `scores`, then run it to check.
 10. In `eafp.py`, predict what `look_first()` and `int()` each return for `" 42 "`
     (with a space on each side) and for `"4_2"`, then run both.
     Say what the results tell you about adding more tests to `look_first()`.
