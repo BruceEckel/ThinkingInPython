@@ -148,10 +148,9 @@ The comprehension awaits one coroutine at a time.
 `await` waits for that coroutine to finish, so `b` starts once `a` finishes. The later coroutines stay unscheduled
 while the current one waits.
 
-The timing follows from the trace. `gather()` finishes in about the
-longest delay, 0.03 seconds, because all three waits overlap. This
-version takes their sum, about 0.06 seconds, because the waits run one
-after another.
+`gather()` finishes in about the longest delay, 0.03 seconds,
+because all three waits overlap. This version takes their sum,
+about 0.06 seconds, because the waits run one after another.
 
 The slowdown comes from when each coroutine starts, not from the list comprehension.
 Calling `fetch()` builds a coroutine object, and the coroutine runs when something awaits it.
@@ -824,8 +823,7 @@ returns `"E"`, and has finished by the time the group starts
 cancelling. `f` still sleeps for `0.3`, so the group cancels it
 during that sleep and its task ends cancelled.
 
-**Cancel what is still running.** The difference between `e` and `f` shows what a
-`TaskGroup` can and cannot undo. A
+**Cancel what is still running.** A
 `TaskGroup` cancels what is still running, which is why the original
 `FETCHES` has both `e` and `f` cancelled. The group cannot cancel a task
 that has returned, and it cannot unprint `e: fetched` or undo
@@ -1219,12 +1217,12 @@ ticket, as they do without the lock.
 
 **See what the lock does cover.** It covers `out.append(item)`, which
 needs no lock. `out` is a local list, one per worker, so the worker's own
-thread is the one that touches it.
+thread alone touches it.
 
 Serializing an iterator means putting the lock where the mutation is,
 inside `__next__()`, where `threading.serialize_iterator()` puts it.
-The lesson generalizes past iterators. A lock protects the statements
-it encloses, and a `for` loop calls `next()` in its header, outside them.
+A lock protects the statements it encloses,
+and a `for` loop calls `next()` in its header, outside them.
 
 </details>
 </details>
