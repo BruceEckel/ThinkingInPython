@@ -1030,6 +1030,9 @@ Everything deep in the call chain needs them.
 Nothing in the middle uses them.
 Threading such a value through as a parameter adds it to the signature of every function in the middle,
 and every new caller must remember to pass it along.
+[Testing](11_Techniques--Testing.md#the-clock)
+meets the same problem with its `now` and `rng` parameters,
+and solves it by injection.
 
 A module-level global is the obvious shortcut,
 and it fails as soon as two tasks overlap.
