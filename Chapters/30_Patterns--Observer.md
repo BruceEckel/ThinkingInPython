@@ -1769,7 +1769,7 @@ Three designs in this chapter separate the notification code from the measuring 
 - `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
   so one method covers every attribute.
 - `broadcasting.py` holds the list and the loop like `Broadcaster`,
-  and its generated properties make the `announce()` call as well,
+  and its generated properties call `announce()` as well,
   so the `Thermometer` body is a single annotation.
 
 In each design, the responders receive announcements from the object whose state changes.
@@ -1892,7 +1892,7 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
     which `Subject` supplies as `Self`.
     Say what each version adds.
 3.  Make `Broadcaster.announce()` survive a responder that raises an exception:
-    every other responder is still notified,
+    every other responder still receives the announcement,
     and `announce()` re-raises the failures afterward, together,
     as an [`ExceptionGroup`](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
     (which you build yourself here: `raise ExceptionGroup("message", failures)`).
