@@ -20,5 +20,5 @@ This file holds no live block, so it is the applied-directly record.
 - Line 447, "worth writing only to show how `SimpleNamespace` works underneath": the `readability_db.md` "worth" keep names this sentence.
 - Line 444-446 and 453-462, the "Use X for... Choose Y when..." run: a decision table written as prose, covered by the parallel-decision-table convention.
 - Line 463, link text "cannot validate itself": reflexive and load-bearing, and it echoes the target heading.
-- Line 468, "the data stays a real dict": "real" contrasts with a class that only looks like a dict to the checker (§34 carve-out, named contrast).
+- Line 468, "the data stays a real dict": "real" contrasts the dict at runtime with the key names that exist for the type checker alone (§34 carve-out, named contrast).
 - Line 372, "sets that order implicitly": the word marks the contrast with `order=True`'s explicit request two sentences later.
