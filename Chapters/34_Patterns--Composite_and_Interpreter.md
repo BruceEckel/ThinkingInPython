@@ -332,8 +332,7 @@ The four node classes are the grammar.
 An expression is a number, a variable, a sum, or a product.
 `Add` and `Mul` hold other expressions, so the tree is a composite.
 
-`Operators` is a base class but not a member of `Expr`,
-and the split is on purpose.
+`Operators` is a base class but, on purpose, not a member of `Expr`.
 Every node shares the operator methods,
 so those live on a base and each node inherits them.
 Each node means something different, so meaning lives in the *walkers*,
@@ -429,8 +428,9 @@ SQLAlchemy's `col == 5` builds a node,
 so its column classes define their own `__eq__()` and give up `==` as a structural comparison.
 A data class that builds a node from `==` sets `eq=False`,
 so the class keeps the `__eq__()` it inherits.
+A class can have structural comparison or an `==` that builds a node,
+but not both.
 This chapter keeps structural comparison.
-A class gets either that or an `==` that builds a node, not both.
 
 Python's grammar sets a harder limit.
 `and`, `or`, and `not` have no special methods of their own,
@@ -555,8 +555,8 @@ Each makes one call per node, leaf or group.
 The call for each node returns its result to the call for that node's parent.
 Only the value a node returns differs,
 an `int` in one walk and a `str` in the other.
-The tree holds the structure and each walker supplies the meaning,
-so a new operation is one more walker.
+The tree holds the structure.
+Each walker supplies the meaning, so a new operation is one more walker.
 
 [*Visitor*](33_Patterns--Visitor.md)
 exists to add new operations to an existing hierarchy from outside it.
