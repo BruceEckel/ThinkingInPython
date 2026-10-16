@@ -441,8 +441,8 @@ failed case bound.
 
 A failed guard always leaves its bindings,
 because the pattern matched and made them before the guard ran.
-A pattern that fails partway is different.
-The language reference lets each implementation decide whether the captures made before the failure stay bound.
+For a pattern that fails partway,
+the language reference lets each implementation decide whether the captures made before the failure stay bound.
 Use a captured name only in the `case` that captured it.
 
 A pattern tests shape and equality,
@@ -456,8 +456,8 @@ so an equal-elements test is also a guard, `case [x, y] if x == y:`.
 A guard that compares one capture to a constant is a literal pattern written the long way.
 The exception is a constant with a bare name,
 such as `DEFAULT` in `value_patterns.py`.
-A bare name in a pattern captures,
-so `case s if s == DEFAULT:` is how a `case` tests for it.
+A bare name in a pattern captures, so a `case` tests for it with a guard,
+`case s if s == DEFAULT:`.
 
 ## Mapping Patterns
 
