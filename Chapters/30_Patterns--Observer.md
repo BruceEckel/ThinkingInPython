@@ -280,8 +280,8 @@ The type checker rejects a responder that returns a value,
 because the author of that responder likely expected someone to use the value.
 The alternative alias `Callable[[T], object]` accepts any callable that takes a `T`,
 since every return type, `None` included, is assignable to `object`.
-That alternative accepts more callables, including mistaken ones.
-If a responder returns a value, `announce()` quietly drops it.
+That alternative also accepts a responder that returns a value by mistake.
+`announce()` quietly drops the value.
 The strict `Responder`, which returns `None`,
 lets the type checker report that mistake.
 
@@ -353,7 +353,7 @@ so it can publish more than one kind of change.
 [Notifying Without a Base Class](#notifying-without-a-base-class)
 drops the base class and the properties together.
 Event-heavy programs have mature libraries (signal/slot systems),
-but for most cases the *Observer* pattern is only a list of responders.
+but in most cases the *Observer* pattern is only a list of responders.
 
 Connected callables react to every `celsius` assignment:
 
@@ -580,8 +580,7 @@ When the program finishes with `plot`, it drops its other references to `plot`.
 A `plot.redraw` that is still connected keeps `plot` in memory.
 Every announcement still calls `redraw()`.
 A responder the program stops using but leaves connected is a *lapsed listener*.
-Over a long run the broadcaster accumulates lapsed listeners,
-creating a memory leak.
+Lapsed listeners that accumulate over a long run are a memory leak.
 
 Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 which let Python collect the object a responder calls.
@@ -1492,7 +1491,8 @@ When the window opens,
 
 `draw()` starts with `canvas.delete("all")` to clear the canvas before repainting.
 Otherwise, each notification adds another `size * size` rectangles on top of the previous ones.
-The window looks the same but the canvas's list of items grows with every notification,
+The window looks the same,
+but the canvas's list of items grows with every notification,
 the same quiet accumulation as a [lapsed listener](#lapsed-listeners).
 
 `canvas.bind()` registers the lambda as the responder for `"<Button-1>"`,
