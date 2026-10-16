@@ -34,7 +34,7 @@ def classify(value: object) -> str:
 
 If you drop the parentheses and write `case Point:`, the script stops at compile time.
 A bare `Point` is a capture pattern that matches any value,
-and Python rejects the `case _` after it with `SyntaxError: name capture 'Point' makes remaining patterns unreachable`.
+so Python rejects the `case _` after it with `SyntaxError: name capture 'Point' makes remaining patterns unreachable`.
 The solution writes `case Point():`, a class pattern that tests the type.
 
 ```python
@@ -79,12 +79,14 @@ print(classify((1,)))
 `[_, *_]` matches one or more elements.
 The first `_` matches the first element, and `*_` collects the rest,
 including an empty rest.
-So `[_, *_]` also fits a singleton, and `[_]` must come before it.
-Otherwise `[_, *_]` matches the one-element list first and the "singleton" case is unreachable.
+So `[_, *_]` also fits a singleton.
+`[_]` must come before it, or `[_, *_]` matches the one-element list
+first, leaving the "singleton" case unreachable.
 
 **Test the type alone.** `Point()` matches any `Point`
-instance and checks its type alone,
-since `classify()` returns the same string whatever `x` and `y` hold.
+instance and checks its type alone.
+That suits `classify()`, which returns the same string whatever `x`
+and `y` hold.
 
 The string `"hi"` is a sequence of two characters, but a sequence
 pattern excludes `str`, so `classify()` returns "other" for it.
@@ -145,11 +147,12 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
 info: `Never` and `Rectangle & ~Circle & ~Square` are not equivalent types
 ```
 
-Once `Rectangle` joins the `Shape` union, the type checker proves that a
-`Rectangle` value falls through both `case`s and reaches `case _`.
-The checker therefore infers that `shape` can be a `Rectangle` at the `assert_never()` call.
-`assert_never()` requires an argument of type `Never`, meaning "this code is unreachable,"
-and `Rectangle` differs from `Never`, so the checker reports an error.
+Once `Rectangle` joins the `Shape` union, the type checker finds that a
+`Rectangle` value falls through both `case`s and reaches `case _`,
+so `shape` can be a `Rectangle` at the `assert_never()` call.
+`assert_never()` requires an argument of type `Never`, meaning "this
+code is unreachable."
+`Rectangle` differs from `Never`, so the checker reports an error.
 
 The `type-assertion-failure` is the check the chapter describes.
 The missing case becomes a type error at check time,
@@ -217,7 +220,7 @@ print(handle({"type": "key", "key": "Enter"}))
 that has `"x"` and `"y"` keys, binding both in one step.
 
 **Accept both click shapes.** The two click cases return the same string,
-and each one matches a different shape of click event.
+but each one matches a different shape of click event.
 A flat event keeps `"x"` and `"y"` at the top level,
 where the flat `{"type": "click", "x": x, "y": y}` case finds them.
 A nested event keeps them under `"at"`,
@@ -433,8 +436,8 @@ The six cases cover all nine pairs of signs,
 but the type checker knows `sign()` by its declared return type, `int`,
 so it allows a pair such as `(2, 5)`.
 That pair falls through all six cases.
-The solution keeps
-an unreachable `case _` so every path returns a `str`.
+The solution keeps an unreachable `case _` so every path returns a
+`str`.
 
 ```python
 # exercise_5.py
@@ -507,8 +510,8 @@ print(quadrant(Point(0, 7)))
 The second version reads better. A guard hides the shape of the
 dispatch. You must read four nearly identical `if` clauses one at a
 time to see that they enumerate sign combinations. Once the subject is
-`sign(p.x), sign(p.y)`, the cases are literals in a two-column table,
-and a missing combination is visible at a glance. The `|` alternation
+`sign(p.x), sign(p.y)`, the cases are literals in a two-column table.
+A missing combination is visible at a glance. The `|` alternation
 then handles both axis cases in one line,
 more briefly than any arrangement of guards.
 
@@ -617,7 +620,7 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 #: brake fallback
 ```
 
-**Demonstrate the accidental capture.** `act()` returns "fallback" for `Signal.STOP`,
+**Demonstrate the accidental capture.** `act()` takes the fallback case for `Signal.STOP`,
 although the fallback value is `Signal.CAUTION`.
 `case FALLBACK:` holds a bare name, so the pattern captures.
 The pattern matches `Signal.STOP`, binds that value to a local named `FALLBACK` inside `act()`,
@@ -625,8 +628,8 @@ and compares nothing. The module-level constant
 holds `Signal.CAUTION` before and after the call,
 so printing `FALLBACK` shows the expected value and hides the mistake.
 
-Python accepts `case FALLBACK:` because it is the last case.
-Python rejects another case after it with a `SyntaxError`.
+Python accepts `case FALLBACK:` because it is the last case,
+and rejects any case after it with a `SyntaxError`.
 
 **Compare through a dotted name.** The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
