@@ -96,8 +96,8 @@ The work the Effect describes waits for a call to `run()`.
 A synchronous program calls it once, at the outermost edge.
 
 `success()` and `Success` differ only in case.
-`success()` is a function that builds an Effect,
-and `Success` is the alias from the table, the type of that Effect.
+`success()` is a function that builds an Effect.
+`Success` is the alias from the table, the type of that Effect.
 `Success[int]` says `double()` is pure.
 `double()` cannot read anything, and it cannot fail.
 
@@ -196,7 +196,8 @@ becomes:
 Generator[Need[Console] | KeyError, Any, None]
 ```
 
-`A` and `E` share the first type parameter, and `R` is the third.
+`A` and `E` share the first type parameter.
+`R` is the third.
 Nothing in the union tells a request from a failure.
 Two bounds on the library's type variables do that instead.
 `A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`.
@@ -204,8 +205,8 @@ Two bounds on the library's type variables do that instead.
 states the `A` bound as the rule for `Depend`.
 
 At runtime, `run()`'s driver tells a request from a failure with `case Exception() as error`.
-Whatever the generator yields that matches `Exception` is a failure,
-and everything else is an Ability request.
+Whatever the generator yields that matches `Exception` is a failure.
+Everything else is an Ability request.
 The two bounds overlap.
 A class that subclasses both would satisfy each at once,
 and at runtime it would count as a failure.
@@ -405,8 +406,8 @@ A second `supply()` wrapped around the first answers what the inner one re-yield
 declares two Abilities.
 `supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
 and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
-You can bind some Abilities near the Effect and the others at the edge,
-and the type records which Abilities each layer leaves open.
+You can bind some Abilities near the Effect and the others at the edge.
+The type records which Abilities each layer leaves open.
 
 A dependency injection container often lets you register a fallback for a type nobody else provides.
 Stateless has no such registration, and `need()` takes no default argument.
@@ -437,7 +438,7 @@ run(fallback(chosen)("Bob"))
 ```
 
 `fallback` is an ordinary handler, applied at the edge.
-`chosen` is a second handler already applied to `greet`.
+`chosen` is `greet` with a second handler applied.
 The first run has `fallback` as its one handler, so the default answers.
 The second run wraps `greet()` in its own `supply()` first,
 and that inner `supply()` empties the Ability channel before any request reaches `fallback`.
@@ -1125,8 +1126,8 @@ greet("Alice")  # [2]
 #: Hello, Alice!
 ```
 
-`register()` puts an instance in, and `get()` looks up an instance by type,
-at the point where the program needs it.
+`register()` puts an instance in.
+`get()` looks up an instance by type, at the point where the program needs it.
 The type is the registration key,
 so `register(Console, Recorder())` binds an implementation to the type the caller requests.
 A dictionary matches the key exactly,
@@ -1265,7 +1266,8 @@ writes an Ability from scratch and explains what that type bound rejects.
 An `Async` request carries an awaitable and asks the driver to await it.
 `run()` does that with the event loop it starts.
 So nothing supplies `Async`.
-The driver answers it, and `supply()` handles only a `Need`.
+The driver answers it.
+`supply()` answers `Need` requests and passes every other Ability outward.
 
 `report()` is not an `async def` and contains no `await`,
 yet its result comes from a coroutine.
@@ -1805,7 +1807,8 @@ Each failure reaches the `match` in `all_handled()` as a value.
 `all_handled()` returns `Success[str]`.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
-The caught error moves to the result and the uncaught one remains.
+The caught error moves to the result.
+The uncaught one remains in the channel.
 `one_unhandled()` leaves `ValueError` in the channel,
 so its signature must declare that failure.
 Calling it on `"Bob"` propagates that failure to the `run()` call at the program's edge,
@@ -1840,7 +1843,8 @@ A failure leaves the error channel in one of two ways:
 
 ## Emptying the Channels
 
-Emptying a channel takes one of two vocabularies, and a third case needs none:
+A channel empties in one of three ways,
+two of which take a vocabulary of their own:
 
 1. A dependency is an object created elsewhere.
    `need()` records the request as a `Need` in the type,
@@ -1851,9 +1855,8 @@ Emptying a channel takes one of two vocabularies, and a third case needs none:
    `Async` sits in the same channel as a `Need`,
    and `run()` answers it by awaiting the request's awaitable in the event loop it starts.
 
-The vocabularies differ.
-The operation underneath them is the same.
-Both subtract from the type.
+The vocabularies differ, but the operation underneath them is the same:
+each subtracts from the type.
 `supply()` removes an Ability from the union,
 and the channel reads `Never` once a handler answers the last Ability.
 `catch()` removes an error and moves it into the result,
