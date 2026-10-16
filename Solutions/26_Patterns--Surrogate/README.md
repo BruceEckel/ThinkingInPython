@@ -560,6 +560,10 @@ instead of one.
 `ConnectionProxy` in place of a `Connection`.
 The proxy forwards `query()` through `__getattr__()`
 and adds one action of its own: returning that connection to the pool.
+[*Singleton*](../../Chapters/24_Patterns--Singleton.md)'s exercise 2
+builds [the same pool](../24_Patterns--Singleton/README.md#a-pool-of-connections-instead-of-one-instance)
+without a proxy, so each caller there must remember to call
+`release()`. Here the proxy takes over that step.
 
 **Return the connection on exit.** The proxy is also a
 [context manager](../../Chapters/15_Techniques--Context_Managers.md).
