@@ -643,7 +643,9 @@ That split is the chapter's point stated from the other side. `@final`
 protects the shape of the algorithm, and `@abstractmethod` protects the
 presence of a step, because both are properties of the class structure
 that a base class can declare. What a step does once called is
-behavior, and Liskov substitution is a rule about behavior.
+behavior, and
+[Liskov substitution](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution)
+is a rule about behavior.
 No tool checks substitution, so the chapter leaves that check to your discipline.
 
 </details>
