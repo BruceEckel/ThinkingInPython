@@ -179,7 +179,10 @@ until [Static Types](08_Foundations--Static_Types.md) introduces the syntax.
 Every chapter afterward uses them consistently.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
-is a complete file rather than a fragment.
+is a file rather than a fragment.
+A long file can span several blocks.
+Each later block begins `# tracer.py (continued)`,
+and the parts join in order into one file.
 Most run on their own.
 Some are modules that another listing imports.
 The `test_*.py` files hold tests that `pytest` runs.
