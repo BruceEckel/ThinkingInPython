@@ -90,9 +90,9 @@ passed, 27 of 27.
   exceptions, such as `latest()`." The decorator sits on `fetch()`,
   which wraps `latest()`; the example names the raising code, so it
   stays.
-- Lines 1583-1597 (exercise 12's prose) and lines 2035-2038, "already
-  an object with a type": "already" marks work the reader does not have
-  to do.
+- Lines 1965 and 2037, "already have the same signature", "already an
+  object with a type": each "already" marks work the reader does not
+  have to do.
 - Lines 2069-2072, "The same distribution is why the chapter uses a
   factory function rather than more `supply()` arguments." The reason
   that follows is the nine-actor ceiling, not the distribution, so the
