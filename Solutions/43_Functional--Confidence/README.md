@@ -60,12 +60,11 @@ fenced block executed in place has no file for a worker to import.
 `[17984, 33860, 49098, 63951]`. The same pure function gives the same
 answers wherever it runs, which is the point of `parallel_pure.py`.
 
-**Count the processes that answered.** The interesting number is the second
-line. Three consecutive runs on one 32-core machine reported `4`
-distinct process IDs each time.
+**Count the processes that answered.** Three consecutive runs on one
+32-core machine reported `4` distinct process IDs each time.
 
-Two things follow, and neither is the one most people predict. The
-number is greater than one, so some of the work ran outside the main process.
+The number is greater than one,
+so some of the work ran outside the main process.
 `assert parallel == serial` alone could not show where the work ran.
 But the number is also far below thirty-two. `ProcessPoolExecutor`
 allows one worker per core, but it starts workers on demand. A
@@ -208,8 +207,8 @@ def test_agrees_with_insertion_sort(xs: list[int]) -> None:
     assert sorted(xs) == insertion_sort(xs)
 ```
 
-**State a fact about every output.** The invariant is the weakest of the three, and the interesting part is
-how weak. A function that ignores its argument and returns `[]` passes
+**State a fact about every output.** The invariant is the weakest of the three.
+A function that ignores its argument and returns `[]` passes
 `test_output_is_ordered()` on every input, and so does one that returns
 the first element alone. "Ordered" says nothing about the elements
 being the same ones you supplied.
@@ -292,7 +291,7 @@ stops at a failing character other than the smallest.
 Once a run fails, Hypothesis stores the counterexample in
 `.hypothesis/` and replays it first, so later runs report the same
 character until you delete that directory.
-`ß` breaks the law for a different reason, covered below.
+`ß` breaks the law for a different reason.
 
 ```python
 # test_case_mapping.py
@@ -422,8 +421,8 @@ def test_every_student_appears_once_per_round(
         assert sorted(placed) == sorted(names)
 ```
 
-**Handle a roster smaller than a group.** The two lines guarding an empty `groups` are the interesting part,
-because the property test finds the need for them. Against the
+**Handle a roster smaller than a group.** The property test finds the
+need for the two lines guarding an empty `groups`. Against the
 version without them, Hypothesis reports a two-name roster with
 `size=3`, such as `names=['a', 'b']`, and a
 `ValueError: min() iterable argument is empty`. With fewer students
