@@ -1868,7 +1868,8 @@ so each responder that acts on one attribute filters by name,
 and all of them write the same filter.
 
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-removes the repeated name filter with a dictionary of responder lists keyed by event type.
+removes the repeated name filter with a dictionary of handler lists keyed by event type.
+A handler is that chapter's name for a responder.
 An announcement carries its type,
 and each responder connects to the type it handles.
 Instead of deciding which responders need an announcement,
