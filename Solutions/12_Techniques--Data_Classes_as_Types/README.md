@@ -31,7 +31,7 @@ and 2100 is a common year.
 `Year` gains an `is_leap()` method using the standard rule (divisible
 by 4, and not by 100 unless also by 400). `Month.check_day()` takes
 the `Year` as a second argument so it can raise February's cap to 29
-only when the year is leap:
+only in a leap year:
 
 ```python
 # test_ch12_leap_year.py
@@ -131,8 +131,7 @@ def test_feb_30_always_rejected() -> None:
 `BirthDate(Month(2), Day(29), Year(2020))` succeeds because 2020 is
 divisible by 4 and not by 100.
 2000 is divisible by 100 and also by 400,
-so it is a leap year too,
-and it is the one century year that `Year` accepts.
+so it is a leap year too.
 
 **Reject a day past the cap.** `Year(2021)` is a common year, so
 `check_day()` rejects February 29. February 30 fails in every year,
@@ -240,11 +239,12 @@ print(EmailAddress("grace@example.com"))
 
 **Require a single `@`.**
 The original check, `"@" in self.text`, confirms that an `@`
-appears somewhere and accepts any number of them. `count("@") == 1` also rejects two-`@`
-strings like `"b@@x.com"`.
+appears somewhere and accepts any number of them.
+`count("@") == 1` also rejects two-`@` strings like `"b@@x.com"`.
 
-**Require text on both halves.** The `partition()` check splits on `@` and requires text on both
-sides, so it rejects `"@x.com"` and `"b@"`.
+**Require text on both halves.** The `partition()` check splits on
+`@` and requires text on both sides, so it rejects `"@x.com"` and
+`"b@"`.
 
 </details>
 </details>
@@ -486,9 +486,9 @@ expect(TypeFailure, from_json, bad_json)
 ```
 
 **Let the field types validate.**
-`from_json()` leaves the email check to `EmailAddress`. It passes the raw
-JSON value to `EmailAddress(...)`, and `EmailAddress`'s own
-`__post_init__()` runs the same check it runs for any other caller.
+`from_json()` leaves the email check to `EmailAddress`. It passes the
+raw JSON value to `EmailAddress(...)`. `EmailAddress`'s own
+`__post_init__()` then runs the same check it runs for any other caller.
 One check, inside `EmailAddress`, protects every path that constructs
 a `Person`, and the path from untrusted JSON input is one of those.
 
@@ -715,7 +715,7 @@ expect(Exception, Wrong, 1)
 `@dataclass` reads the annotation, sees `ClassVar`, and leaves `built`
 alone as an ordinary class attribute, so `built` stays out of
 `__init__()`. `number` is the one field that `dataclasses.fields()`
-reports and the one parameter that the generated signature takes.
+reports and the one parameter after `self` in the generated signature.
 
 **Count on the class.**
 `frozen=True` installs a `__setattr__()` that rejects assignment to
@@ -729,7 +729,8 @@ store is the assignment `frozen=True` refuses.
 
 The type checker rejects `self.built += 1` before the program runs
 and reports `built` as read-only on a frozen instance.
-The listing carries a `# type: ignore` so it can demonstrate the runtime failure.
+The listing carries a `# type: ignore` so it can demonstrate the
+runtime failure.
 
 </details>
 </details>
@@ -839,8 +840,9 @@ and rejects a mismatched one.
 
 **Give the checker a return type.**
 `dict[str, Month]` is callable too, and its return type is concrete.
-The type checker therefore reports `field(default_factory=dict[int, int])` on
-this field as an error before the program runs.
+The type checker therefore reports
+`field(default_factory=dict[int, int])` on this field as an error
+before the program runs.
 
 The bare form is fine where a reader
 can see that the factory and the annotation agree.
@@ -953,14 +955,14 @@ and an `isinstance()` test accepts `True` as the rating 1.
 `type(self.number) is int` compares the class of the value with `int`
 and rejects a `bool` along with a `float` and a `str`.
 
-**Test the type before the range.** The type test runs first. Comparing `"five"` with `1` raises a
-`TypeError`, so if the range check ran first, a `str` would end in that
-`TypeError` instead of a `TypeFailure`.
+**Test the type before the range.** Comparing `"five"` with `1`
+raises a `TypeError`, so if the range check ran first, a `str` would
+end in that `TypeError` instead of a `TypeFailure`.
 
 **Feed values the checker refuses.** The type checker rejects `5.5`
 and `"five"` as arguments before the program runs.
-The `# type: ignore` silences that report so the listing can show what the
-constructor does with each value at runtime.
+The `# type: ignore` silences that report so the listing can show
+what the constructor does with each value at runtime.
 
 The type checker accepts `Stars(True)`,
 because a `bool` is an `int` to the checker for the same subclass reason.
