@@ -258,7 +258,6 @@ built outside the cache.
 
 3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
    is the other fix for that race.
-   Where the lock goes matters.
    A `threading.Lock` around the constructor function's body changes nothing,
    because every thread misses the cache before reaching the lock.
    The threads serialize, but each still builds an object.
@@ -529,7 +528,6 @@ so `Any` is the one annotation that fits.
 Delegation gives up static knowledge to forward every name,
 as it does throughout [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr).
 
-The laziness is a choice.
 When the inner object needs nothing from that first call,
 you can create it eagerly in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
