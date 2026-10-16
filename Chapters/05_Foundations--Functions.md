@@ -116,6 +116,8 @@ which the caller usually unpacks:
     low, high = minmax([3, 1, 4])
 
 The commas build the tuple, so the function returns one object.
+`min_max()` in [Containers](03_Foundations--Containers.md#tuples-and-unpacking)
+returns its pair the same way.
 
 ## Default Parameter Values
 
