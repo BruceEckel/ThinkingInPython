@@ -318,7 +318,7 @@ each observer must name the type of the subject it watches.
 ## 3. An `announce()` that survives a failing responder
 
 > Make `Broadcaster.announce()` survive a responder that raises an exception:
-> every other responder is still notified,
+> every other responder still receives the announcement,
 > and `announce()` re-raises the failures afterward, together,
 > as an [`ExceptionGroup`](../../Chapters/19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
 > (which you build yourself here: `raise ExceptionGroup("message", failures)`).
