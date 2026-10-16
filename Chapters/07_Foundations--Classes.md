@@ -297,7 +297,8 @@ Python runs the constructor the derived class inherits from the base class.
 
 Python accepts any method name in a subclass.
 If you misspell the name of a method you mean to override,
-you define a new method instead, and Python reports nothing.
+you define a new method instead.
+Python reports nothing.
 Renaming or removing the base method later has the same effect.
 Either bug is easy to miss.
 
@@ -378,7 +379,7 @@ print(c.area)  # Properties don't use parentheses
 #: 314.159
 ```
 
-Here `radius` is a plain attribute and `area` is a computation.
+Here `radius` is a plain attribute, while `area` is a computation.
 The call site reads both the same way.
 Writing `c.area()` reads the property and then calls the `float` it produced,
 which raises a `TypeError`.
@@ -537,8 +538,8 @@ That entry also gives every instance the per-instance dictionary that slots exis
 Because `cached_property` keeps returning the stored value,
 `total` becomes stale when `n.values` changes.
 The appended `20` in `cached_property_demo.py` leaves the printed sum at `30`.
-`del n.total` removes the stored value from `__dict__`,
-and reading `n.total` again runs the method.
+`del n.total` removes the stored value from `__dict__`.
+Reading `n.total` again then runs the method.
 Because a plain `@property` recomputes every time, its answer is always current.
 Cache only answers whose inputs stay the same.
 
@@ -549,7 +550,7 @@ as in `<__main__.Point object at 0x7f2dd669cd70>`.
 That display says nothing about the value the object holds.
 Two dunder methods control how an object displays.
 `__str__()` is the readable form for users,
-and `__repr__()` is the unambiguous form for developers:
+while `__repr__()` is the unambiguous form for developers:
 
 ```python
 # representation.py
