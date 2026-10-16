@@ -715,7 +715,11 @@ its output.
 
 The tools stay silent because the code follows every rule they check. Building a value and
 discarding it is legal Python, and `greet(name)`'s value is a
-generator like any other. The declared `Need[Console]` in the return
+generator like any other.
+[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
+and its exercise 4 show the same silence for a generator with no
+Effect in it.
+The declared `Need[Console]` in the return
 type still holds, since a declaration says what the function may
 request, not what it must. The chapter warns about this deletion.
 A bare `greet(name)` passes every check and prints no greeting.
