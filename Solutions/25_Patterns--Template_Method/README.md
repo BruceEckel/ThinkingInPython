@@ -374,8 +374,8 @@ The reorder asks every future
 subclass author to invert the convention they have used everywhere
 else, which is to call `super().__init__()` first.
 The signature of `Framework.__init__()` is silent on the order, and every type checker accepts the usual one.
-Python reports the failure as an `AttributeError` raised inside a
-base class someone else wrote.
+Python reports the failure as an `AttributeError` from the subclass's
+own `step()`, which a base class someone else wrote called.
 The reorder turns safety into a rule the next author must remember,
 and that author may not have read this chapter.
 A rule to remember is not a repair.
