@@ -61,10 +61,10 @@ def render(rows: list[Row], style: str) -> str:
 
 The example is a small report writer. It prints plain text, then must
 emit CSV for a spreadsheet, then JSON for a web front end. All three
-changes run along one axis, the output format. Everything else stays the same
+formats run along one axis, the output format. Everything else stays the same
 through all three: the rows, their source, what the numbers mean.
 
-Here is the version that survived the first two changes:
+Here is the version that holds the first two formats:
 
 ```python
 # exercise_1a.py
