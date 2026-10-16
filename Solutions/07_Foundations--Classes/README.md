@@ -268,7 +268,8 @@ MoreDerived("x").show_twice()
 ```
 
 This solution copies `Simple` and `Derived` without their constructor
-`print()` calls, so the trace shows only the `show()` chain. If you add
+`print()` calls and without `display()`, so the trace shows only the
+`show()` chain. If you add
 `MoreDerived` to `simple_subclass.py`, as the exercise says, the two
 constructor lines print first.
 
