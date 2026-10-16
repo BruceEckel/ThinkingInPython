@@ -4,7 +4,7 @@
 Readability review of `Solutions/13_Techniques--Pattern_Matching/README.md`,
 2026-10-16.
 The prose had few AI tells; most findings were clause joins that hid a
-consequence or a contrast behind "and". Nine fixes went in directly,
+consequence or a contrast behind "and". Ten fixes went in directly,
 and no finding needed Bruce's judgment, so this file holds no live block
 and serves as the applied-directly record.
 The claims touched were checked against the listings: six cases covering
