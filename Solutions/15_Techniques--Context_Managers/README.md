@@ -347,7 +347,7 @@ each `@banner(...)` line builds one manager object. A generator manager is singl
 that `ContextDecorator` supplies reads that object's generator function
 and arguments. On each call of `quarterly()` the wrapper builds a fresh
 manager from them and enters the fresh one. A hand-written
-class-based manager decorating a function re-enters the same instance
+class-form manager decorating a function re-enters the same instance
 on every call instead, so every call shares any state the instance
 holds.
 
