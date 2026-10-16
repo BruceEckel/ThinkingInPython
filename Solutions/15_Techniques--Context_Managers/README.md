@@ -517,12 +517,11 @@ using []
 
 **Close in reverse order of opening.** `enter_context()` pushes each manager onto the stack as the
 comprehension iterates over the list left to right. Leaving the `with` unwinds
-that stack, so the `close` lines print in reverse. The exercise asks
-you to confirm that the reversal holds for any number of names,
-and it does, zero included.
+that stack, so the `close` lines print in reverse. The reversal holds
+for any number of names, zero included.
 
-The empty run is the more interesting one. Nothing opens, so nothing
-closes. `with ExitStack() as stack:` still enters and exits
+In the empty run, nothing opens, so nothing closes.
+`with ExitStack() as stack:` still enters and exits
 around a body whose stack stays empty. That degenerate case
 shows why `ExitStack` exists.
 A written-out `with a, b, c:` line settles its count in the source.
