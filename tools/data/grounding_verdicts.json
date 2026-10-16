@@ -1,7 +1,7 @@
 {
  "6476eb4778e6007d": {
   "file": "02_Foundations--Tour.md",
-  "line": 357,
+  "line": 359,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "Bucket"
@@ -10,20 +10,31 @@
   "p_terms": 0.02,
   "asked": "2026-10-06"
  },
- "13b2b6ac69779a36": {
-  "file": "06_Foundations--Modules_and_Packages.md",
-  "line": 498,
-  "target": "23_Patterns--Singleton.md",
+ "40269c5a2d110ef4": {
+  "file": "04_Foundations--Control_Flow.md",
+  "line": 777,
+  "target": "03_Foundations--Containers.md",
   "terms": [
-   "__all__"
+   "scores"
   ],
-  "sentence": "The underscore and `__all__` both say which names a caller should use, and that stated boundary lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade) over its internals or as a shared single instance ([*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton)).",
+  "sentence": "Use the shifting-slots explanation in [Two List Traps](03_Foundations--Containers.md#two-list-traps) to predict what the loop leaves in `scores`, then run it to check.",
+  "p_terms": 0.01,
+  "asked": "2026-10-16"
+ },
+ "a800f43efa7e5b09": {
+  "file": "07_Foundations--Classes.md",
+  "line": 692,
+  "target": "08_Foundations--Static_Types.md",
+  "terms": [
+   "Derived"
+  ],
+  "sentence": "Run the program and confirm it still prints `Derived.show`, then run the type checker ([Static Types](08_Foundations--Static_Types.md#the-type-checker-ty) sets one up) and read what it reports.",
   "p_terms": 0.0,
-  "asked": "2026-10-13"
+  "asked": "2026-10-16"
  },
  "6105b531c2441ebb": {
   "file": "11_Techniques--Testing.md",
-  "line": 107,
+  "line": 106,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Account"
@@ -34,7 +45,7 @@
  },
  "58b756be3c8da8fa": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 239,
+  "line": 240,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "depth"
@@ -56,7 +67,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1053,
+  "line": 1054,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -67,7 +78,7 @@
  },
  "7c9a753f95d1c66a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1257,
+  "line": 1259,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace_class"
@@ -78,7 +89,7 @@
  },
  "9d74798f33eb179b": {
   "file": "15_Techniques--Context_Managers.md",
-  "line": 486,
+  "line": 487,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "exc_type"
@@ -89,7 +100,7 @@
  },
  "a6f80d7775b0cbcd": {
   "file": "16_Techniques--Comprehensions.md",
-  "line": 301,
+  "line": 303,
   "target": "03_Foundations--Containers.md",
   "terms": [
    "SIZE"
@@ -100,7 +111,7 @@
  },
  "0c738529ede5867a": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 249,
+  "line": 250,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
@@ -109,32 +120,20 @@
   "p_terms": 0.0,
   "asked": "2026-10-05"
  },
- "0bfdf37ac6c6f194": {
+ "6203333350c5fed9": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1451,
+  "line": 1457,
   "target": "28_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
   ],
   "sentence": "`Times` [names them](28_Patterns--Data_Transfer_Objects.md#returning-multiple-values).",
-  "p_terms": 0.04,
-  "asked": "2026-10-05"
- },
- "19283748bd6927e4": {
-  "file": "28_Patterns--Data_Transfer_Objects.md",
-  "line": 425,
-  "target": "09_Foundations--Class_Attributes.md",
-  "terms": [
-   "messenger_idiom.py",
-   "Messenger"
-  ],
-  "sentence": "1.  In `messenger_idiom.py`, create a second `Messenger` with different keyword arguments and confirm each instance keeps its own attributes (unlike a [class attribute](09_Foundations--Class_Attributes.md)).",
-  "p_terms": 0.0,
-  "asked": "2026-10-13"
+  "p_terms": 0.03,
+  "asked": "2026-10-16"
  },
  "04acbadd1165eaba": {
   "file": "22_Patterns--Iterators.md",
-  "line": 758,
+  "line": 760,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
    "__iter__",
@@ -146,7 +145,7 @@
  },
  "1121029ae76447a0": {
   "file": "22_Patterns--Iterators.md",
-  "line": 828,
+  "line": 830,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "GoFIterator"
@@ -157,7 +156,7 @@
  },
  "674efb071da3872a": {
   "file": "22_Patterns--Iterators.md",
-  "line": 892,
+  "line": 893,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -168,7 +167,7 @@
  },
  "f149830ef146ed79": {
   "file": "23_Patterns--Singleton.md",
-  "line": 198,
+  "line": 196,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
@@ -177,16 +176,16 @@
   "p_terms": 0.0,
   "asked": "2026-10-13"
  },
- "a51f08d6349a2b99": {
+ "a0536caddc59da86": {
   "file": "23_Patterns--Singleton.md",
-  "line": 722,
+  "line": 720,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "__call__"
   ],
   "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the *type* of `obj`](25_Patterns--Surrogate.md#special-methods-bypass-getattr).",
-  "p_terms": 0.07,
-  "asked": "2026-10-05"
+  "p_terms": 0.09,
+  "asked": "2026-10-16"
  },
  "c358c8813c054976": {
   "file": "24_Patterns--Template_Method.md",
@@ -210,18 +209,18 @@
   "p_terms": 0.0,
   "asked": "2026-10-13"
  },
- "2e71dc56c76b481b": {
+ "264fd0270346ae0f": {
   "file": "25_Patterns--Surrogate.md",
-  "line": 785,
+  "line": 778,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
   ],
-  "sentence": "Here the client programmer calls `change_to()`, but in a [*State Machine*](31_Patterns--State_Machines.md), each implementation chooses its own successor, so the surrogate advances without the client asking.",
+  "sentence": "Here the client programmer calls `change_to()`, but in a [*State Machine*](31_Patterns--State_Machines.md), the client supplies an input and the machine chooses the next implementation, so the client never names one.",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-16"
  },
- "3711bb4c386a5bfa": {
+ "17a44941abf94c5d": {
   "file": "26_Patterns--Factory.md",
   "line": 168,
   "target": "22_Patterns--Iterators.md",
@@ -230,11 +229,11 @@
   ],
   "sentence": "`shape_name()` is a [*generator*](22_Patterns--Iterators.md#generators).",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-16"
  },
  "b61d0d217d395284": {
   "file": "27_Patterns--Function_Objects.md",
-  "line": 164,
+  "line": 165,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "Repeat"
@@ -245,7 +244,7 @@
  },
  "0f1b2d7a09ebf4e9": {
   "file": "27_Patterns--Function_Objects.md",
-  "line": 437,
+  "line": 438,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "partial",
@@ -255,7 +254,19 @@
   "p_terms": 0.01,
   "asked": "2026-10-13"
  },
- "69e6c2b3e73ff7e7": {
+ "19283748bd6927e4": {
+  "file": "28_Patterns--Data_Transfer_Objects.md",
+  "line": 476,
+  "target": "09_Foundations--Class_Attributes.md",
+  "terms": [
+   "messenger_idiom.py",
+   "Messenger"
+  ],
+  "sentence": "1.  In `messenger_idiom.py`, create a second `Messenger` with different keyword arguments and confirm each instance keeps its own attributes (unlike a [class attribute](09_Foundations--Class_Attributes.md)).",
+  "p_terms": 0.0,
+  "asked": "2026-10-13"
+ },
+ "31578fe8230578ce": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 78,
   "target": "25_Patterns--Surrogate.md",
@@ -264,24 +275,11 @@
   ],
   "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](25_Patterns--Surrogate.md#proxy)\" loosely.",
   "p_terms": 0.0,
-  "asked": "2026-10-05"
- },
- "f132a66521cef1cb": {
-  "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 186,
-  "target": "20_Patterns--Rethinking_Objects.md",
-  "terms": [
-   "WhatIUse2",
-   "WhatIWant",
-   "WhatIUse"
-  ],
-  "sentence": "A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts, and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).",
-  "p_terms": 0.0,
-  "asked": "2026-10-05"
+  "asked": "2026-10-16"
  },
  "c8b45c3e67ecadbb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 292,
+  "line": 293,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "PairCoord",
@@ -294,7 +292,7 @@
  },
  "4910c32d94273207": {
   "file": "30_Patterns--Observer.md",
-  "line": 586,
+  "line": 585,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "disconnect"
@@ -302,17 +300,6 @@
   "sentence": "Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them), which let Python collect the object a responder calls.",
   "p_terms": 0.0,
   "asked": "2026-10-13"
- },
- "fa774505d1fd8381": {
-  "file": "30_Patterns--Observer.md",
-  "line": 648,
-  "target": "10_Foundations--Cleanup.md",
-  "terms": [
-   "announce"
-  ],
-  "sentence": "An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them), such as PyPy, collects the object when its collector runs, and the `gc.collect()` call runs that collector before `announce(30.0)`.",
-  "p_terms": 0.01,
-  "asked": "2026-10-08"
  },
  "a4f132fd61a9bf31": {
   "file": "30_Patterns--Observer.md",
@@ -328,7 +315,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1937,
+  "line": 1939,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -338,20 +325,9 @@
   "p_terms": 0.02,
   "asked": "2026-09-27"
  },
- "2c2aacae87fc2524": {
-  "file": "31_Patterns--State_Machines.md",
-  "line": 88,
-  "target": "12_Techniques--Data_Classes_as_Types.md",
-  "terms": [
-   "MouseAction"
-  ],
-  "sentence": "Each mouse move is a `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).",
-  "p_terms": 0.03,
-  "asked": "2026-10-13"
- },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 440,
+  "line": 333,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -360,9 +336,9 @@
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
- "e8596ef215d9870a": {
+ "174f9c2a8b0e1a24": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 900,
+  "line": 818,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -371,19 +347,19 @@
   ],
   "sentence": "1.  Using [*State*](25_Patterns--Surrogate.md#state), make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-10-16"
  },
- "8b236a72729572a5": {
+ "919cfd41be150204": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 912,
+  "line": 833,
   "target": "22_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
-   "MouseAction"
+   "Mouse"
   ],
-  "sentence": "5.  Write a `mouse_move_generator()`, a [generator](22_Patterns--Iterators.md#generators) that yields valid `MouseAction` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
+  "sentence": "5.  Write a `mouse_move_generator()`, a [generator](22_Patterns--Iterators.md#generators) that yields valid `Mouse` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-16"
  },
  "6e7bf0b5ce335367": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
@@ -410,7 +386,7 @@
  },
  "9605b1d03cb08ac2": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 115,
+  "line": 114,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "Aluminum"
@@ -443,7 +419,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 645,
+  "line": 644,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -456,7 +432,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 704,
+  "line": 702,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -467,7 +443,7 @@
  },
  "b0dc91a7cce04574": {
   "file": "42_Functional--Error_Handling.md",
-  "line": 226,
+  "line": 229,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Result"
@@ -478,7 +454,7 @@
  },
  "73da2fe803454604": {
   "file": "44_Effects--Effect_Management.md",
-  "line": 892,
+  "line": 894,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "greet"
@@ -487,20 +463,9 @@
   "p_terms": 0.01,
   "asked": "2026-10-05"
  },
- "709ba98f5b49d11a": {
-  "file": "46_Effects--Stateless.md",
-  "line": 1343,
-  "target": "44_Effects--Effect_Management.md",
-  "terms": [
-   "Need"
-  ],
-  "sentence": "Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect), and `Need[Time]` moves that into the Ability channel.",
-  "p_terms": 0.0,
-  "asked": "2026-09-27"
- },
  "66259d22eeb4fc05": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 448,
+  "line": 453,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Flip"
@@ -511,7 +476,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1348,
+  "line": 1352,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
