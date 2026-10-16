@@ -279,7 +279,7 @@ expect(AttributeError, lambda: a_package.module1)  # type: ignore
 Reading `a_package.module1` raises an `AttributeError`,
 so `a_package.module1.function1()` fails here too.
 The submodule becomes an attribute of the package only when something imports it by name.
-The type checker warns that `module1` might not be imported,
+The type checker flags `a_package.module1` as a `possibly-missing-submodule`,
 the same fact the marker shows.
 The `# type: ignore` silences that warning.
 
