@@ -3,7 +3,7 @@
 
 Readability pass over chapter 04, 2026-10-16.
 The chapter had few AI-writing tells, so this file holds no live block.
-It records the seven edits applied directly, mostly an "and" joining two claims, one past-tense slip, and one italic used for emphasis.
+It records the eight edits applied directly, mostly an "and" joining two claims, one past-tense slip, and one italic used for emphasis.
 `tip verify-ch CH=04` passes.
 
 ## Applied directly
