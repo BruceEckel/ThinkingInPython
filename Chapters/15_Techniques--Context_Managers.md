@@ -179,7 +179,7 @@ In generator terms, `__enter__()` is the portion before the `yield`.
 
 `Trace` is also reusable.
 The demo enters the same `manager` in two `with` statements,
-and both print `enter B` and `exit B`, because `__enter__()` just runs again.
+and both print `enter B` and `exit B`, because `__enter__()` runs again.
 In `trace_gen.py` the second of those statements raises an `AttributeError`,
 because a generator manager is single-use.
 A class manager that stores per-`with` state stays reusable only if `__enter__()` resets that state.
@@ -972,8 +972,8 @@ The *Object Pool* pattern creates a set number of these objects up front and len
 Lending is the dangerous half.
 Every borrower must return the object on every path out of their code,
 including the exception path.
-Each missed return removes an object from the pool for good,
-until a borrower waits forever on an empty pool.
+Each missed return removes an object from the pool for good.
+Enough missed returns empty the pool, so the next borrower waits forever.
 A context manager can return every borrowed object to the pool.
 In Python, a pool is a queue plus a `@contextmanager` method:
 
@@ -1065,7 +1065,7 @@ In an `asyncio` program a blocking `get()` blocks the whole event loop,
 so an async pool holds an `asyncio.Queue`, awaits its `get()`,
 and builds `lease()` with `asynccontextmanager`.
 
-`pool_contention.py` puts the pool under real contention.
+`pool_contention.py` puts the pool under contention.
 Eight threads share a pool of two connections and lease and return a connection two hundred times each.
 
 ```python
@@ -1160,7 +1160,7 @@ validate an item before lending it out, or give `get()` a timeout,
 so a borrower facing an empty pool gets a `queue.Empty` exception instead of waiting forever.
 
 Those refinements all guard the pool's side.
-The opposite mistake is on the borrower's side.
+The borrower's side has a mistake of its own.
 `Pool` lets a borrower keep a reference after the `with` block ends,
 then use it after the pool has lent the object to another borrower.
 The pool hands out the same object again, not a copy,
@@ -1213,15 +1213,15 @@ Try them in this order.
 Use a `contextlib` manager when one fits, since `suppress`, `closing`,
 `nullcontext`, and `ExitStack` cover most of what people write by hand.
 Otherwise write a generator with `@contextmanager`,
-which is the shortest thing that can express setup, teardown,
+which is the shortest form that can express setup, teardown,
 and a `try`/`finally` between them.
 Write a class with `__enter__()` and `__exit__()` when the manager needs state beyond one setup and teardown,
 methods beyond the two protocol ones, or reuse across several `with` statements.
 A generator provides none of those.
 Add `ContextDecorator` only when the same bracket should also wrap whole functions.
 
-Whichever form you choose, the borrower's side contains two lines,
-and every change you make later goes inside the manager.
+Whichever form you choose, the borrower's side contains two lines.
+Every change you make later goes inside the manager.
 
 ## Exercises
 
