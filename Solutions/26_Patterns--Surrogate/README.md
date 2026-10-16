@@ -46,10 +46,10 @@ class Lazy:
 <summary>Solution</summary>
 
 If you store `description` as an ordinary instance attribute,
-normal lookup finds it, and the three reads build nothing.
+normal lookup finds it, so the three reads build nothing.
 Each read returns the stored string, though, so the counter stays at zero.
 The first `query()` then reports `0 answered before build`.
-A property also ends the lookup before `__getattr__()`, at the class,
+A property also stops the lookup at the class, before `__getattr__()`,
 and it runs a method on each read,
 so the solution counts inside that method.
 
@@ -105,9 +105,9 @@ again, finds `_real` set, and forwards the lookup with no report and
 no build.
 
 The counter records how much work the proxy saved.
-The proxy served three requests from a string it held from the start
-and deferred the slow construction until the first `query()`. GoF's image proxy is the
-same design.
+The proxy serves three requests from a string it holds from the start
+and defers the slow construction until the first `query()`.
+GoF's image proxy is the same design.
 It answers an image's size from stored numbers and loads
 the pixels when something first draws the image.
 
@@ -307,11 +307,12 @@ print(a._box is b._box)
 `owners` counts the `CowList`s that point at that `Box`.
 `share()` copies a reference to the `Box` and increments `owners`.
 
-**Copy before a shared write.** `append()` copies the data only when `owners > 1`. `b.append(4)`
-decrements the shared `Box`'s count, since `b` stops referring to that `Box`.
-Then `append()` points `b` at a private `Box` holding a fresh copy of the
-data and appends to that private copy. `a` still points at the
-original `Box`, whose list still holds `[1, 2, 3]`.
+**Copy before a shared write.** `append()` copies the data only when
+`owners > 1`. `b.append(4)` decrements the shared `Box`'s count, since
+`b` stops referring to that `Box`. Then `append()` points `b` at a
+private `Box` holding a fresh copy of the data and appends to that
+private copy. `a` keeps the original `Box`, whose list still holds
+`[1, 2, 3]`.
 
 </details>
 </details>
@@ -550,15 +551,15 @@ with expected(RuntimeError):
 #: [RuntimeError] connection already released
 ```
 
-**Limit who creates connections.** `Pool` builds every `Connection` in its constructor, and nothing else
-creates one. `Pool` controls creation as a *Singleton* class does, with
-the limit set at `POOL_SIZE` objects instead of one.
+**Limit who creates connections.** `Pool` alone creates `Connection`
+objects, all of them in its constructor. `Pool` controls creation as a
+*Singleton* class does, with the limit set at `POOL_SIZE` objects
+instead of one.
 
 **Hand out a stand-in.** `acquire()` hands the client a
 `ConnectionProxy` in place of a `Connection`.
 The proxy forwards `query()` through `__getattr__()`
-and adds one action of its own: returning
-that connection to the pool.
+and adds one action of its own: returning that connection to the pool.
 
 **Return the connection on exit.** The proxy is also a
 [context manager](../../Chapters/15_Techniques--Context_Managers.md).
@@ -622,10 +623,10 @@ class Proxy:
 <summary>Solution</summary>
 
 If `Proxy` forwards through `__getattr__()` alone,
-`p.__len__()` returns 2 through `__getattr__()`,
-but `len(p)` raises a `TypeError`: `object of type 'Proxy' has no len()`. The type checker
-reports the call as `invalid-argument-type`, since `Proxy` does not
-match `Sized`. The solution defines `__len__()` on the class, where
+`p.__len__()` returns 2,
+but `len(p)` raises a `TypeError`: `object of type 'Proxy' has no len()`.
+The type checker reports the call as `invalid-argument-type`, since
+`Proxy` does not match `Sized`. The solution defines `__len__()` on the class, where
 `len()` looks for it.
 
 ```python
@@ -661,8 +662,9 @@ which Python calls after a failed lookup on the instance. Python's operators and
 built-in functions look up an implicitly invoked special method this
 way, so the method must exist on the proxy's class.
 
-**Forward the special method explicitly.** `__len__()` here delegates with `len(self.__implementation)` rather
-than `self.__implementation.__len__()`. Both give the same answer, and
+**Forward the special method explicitly.** `__len__()` here delegates
+with `len(self.__implementation)` rather than
+`self.__implementation.__len__()`. Both give the same answer.
 `len()` reads better.
 
 To forward many dunders, you write one forwarding method per dunder,
