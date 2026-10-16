@@ -97,6 +97,25 @@ def test_load_solutions_takes_the_title_and_relinks_chapters(
     assert rewrite_md_links(f"[here]({NAME}#x)") == f"[here]({STEM}.html#x)"
 
 
+def test_load_solutions_links_a_sibling_solutions_page(
+        tmp_path: Path) -> None:
+    folder = tmp_path / "Solutions" / STEM
+    folder.mkdir(parents=True)
+    md = folder / "README.md"
+    other = "04_Foundations--Other"
+    md.write_text("# Demo: Solutions\n\n## 1. First\n\n"
+                  f"See [the pool](../{other}/README.md#a-pool) and "
+                  f"[that file](../{other}/README.md).\n\n"
+                  f"```text\n](../{other}/README.md#a-pool)\n```\n",
+                  encoding="utf-8")
+    _, body = load_solutions(md)
+    page = solutions_page_name(other)
+    assert f"[the pool]({page}#a-pool)" in body
+    assert f"[that file]({page})" in body
+    assert f"](../{other}/README.md#a-pool)" in body
+    assert rewrite_md_links(f"[x]({page}#a-pool)") == f"[x]({page}#a-pool)"
+
+
 def test_url_survives_rewrite_md_links() -> None:
     text = f"[solutions]({URL}#x)"
     assert rewrite_md_links(text) == text

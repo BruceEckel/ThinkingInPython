@@ -204,6 +204,11 @@ def load_chapter(md: Path, site: bool = False) -> tuple[str, str]:
 # A Solutions file's links to the chapters, written from two directories
 # below the book root. On the site the chapters are pages beside it.
 CHAPTERS_LINK = re.compile(r"\]\(\.\./\.\./Chapters/")
+# A Solutions file linking a sibling Solutions file by its relative
+# path, `](../<stem>/README.md#anchor)`, which GitHub resolves. The site
+# renders that file as `<stem>.solutions.html`, so the link goes there.
+SIBLING_SOLUTIONS_LINK = re.compile(
+    r"\]\(\.\./([\w.-]+)/README\.md(#[\w-]+)?\)")
 
 
 def load_solutions(md: Path) -> tuple[str, str]:
@@ -211,7 +216,11 @@ def load_solutions(md: Path) -> tuple[str, str]:
 
     The leading `#` heading is the title. Links into `../../Chapters/`
     lose that prefix, so `rewrite_md_links()` then points them at the
-    chapter pages, which sit beside the Solutions page.
+    chapter pages, which sit beside the Solutions page. A link to a
+    sibling Solutions file, `](../<stem>/README.md#anchor)`, becomes
+    that file's site page, `<stem>.solutions.html#anchor`; the anchor
+    is the pandoc slug the gate checks, which GitHub, whose slug keeps
+    the heading's leading number, resolves to the top of the file.
     """
     text = md.read_text(encoding="utf-8")
     title = f"{derive_label(chapter_stem(md))}: Solutions"
@@ -229,7 +238,10 @@ def load_solutions(md: Path) -> tuple[str, str]:
     fenced = Document.from_text(body).in_fence()
     for i, line in enumerate(out):
         if not fenced[i]:
-            out[i] = CHAPTERS_LINK.sub("](", line)
+            line = CHAPTERS_LINK.sub("](", line)
+            out[i] = SIBLING_SOLUTIONS_LINK.sub(
+                lambda m: f"]({solutions_page_name(m.group(1))}"
+                          f"{m.group(2) or ''})", line)
     return title, "\n".join(out)
 
 
