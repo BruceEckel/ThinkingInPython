@@ -996,6 +996,20 @@ def cover(v: Vars) -> None:
     py("tools.make_cover")
 
 
+@task("Write the book's index to build/index/index.md and print its "
+      "counts, without a full build")
+def index(v: Vars) -> None:
+    """The index the site, EPUB, and PDF builds add, as one Markdown
+    file whose links reach the chapter files and their sections, plus
+    the counts: entries by kind, locators, principal locators, injected
+    anchors, and entries over eight locators. The entries live in
+    tools/data/index_terms.toml, and tools/book_index.py's docstring has
+    the matching rules. Run it for a quick look after editing the term
+    file, and run `index-report` to see what to edit next.
+    """
+    py("tools.book_index", "--markdown", "build/index/index.md")
+
+
 section("Publishing a release")
 
 
@@ -1533,6 +1547,20 @@ def exercise_coverage(v: Vars) -> None:
     reported section by eye. ARGS=18 for one chapter, ARGS=--deep for ###.
     """
     py("tools.exercise_coverage", *v.words("ARGS"))
+
+
+@task("Report on the index's term file: untracked italic terms, dead "
+      "entries, broken cross-references (advisory)")
+def index_report(v: Vars) -> None:
+    """Advisory, and outside verify, gate, sweep, and ci until the entry
+    list settles (INDEXING.md, Decision 5). Lists five things about
+    tools/data/index_terms.toml: italic spans in Chapters/ that no entry
+    matches (a term the book introduced since the file was last
+    edited), entries whose patterns match nothing, `see`, `see_also`,
+    and `under` targets that name no entry, entries that differ only by
+    case or plural, and entries over eight locators. Always exits 0.
+    """
+    py("tools.book_index", "--report")
 
 
 @task("List listing comments added since a git ref (SINCE=ref, default "

@@ -1,9 +1,21 @@
 # Generating an Index: the Possibilities
 
 A survey, written 2026-09-18.
-Nothing here is built.
 The one thing tested is the Typst page-number lookup described under
 [PDF](#pdf), because every PDF option depends on it.
+
+**Built 2026-10-16:** packages 1 and 2 of the [Recommendation](#recommendation),
+with paragraph-level locators, as one merged index over `Chapters/`.
+The entries are `tools/data/index_terms.toml`,
+seeded once by `tools/index_seed.py` for you to prune.
+`tools/book_index.py` matches them on every build.
+The site (`book-index.html`), the EPUB (an Index chapter),
+and the PDF (an Index chapter with typst page numbers) render the same locators.
+`tip index` writes `build/index/index.md`.
+`tip index-report` lists untracked italic terms and the term file's faults,
+and runs outside `verify`.
+The `tools/README.md` section "Index" has the details.
+The survey and the decisions below are unchanged.
 
 ## What an index must fit into
 

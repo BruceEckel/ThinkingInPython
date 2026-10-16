@@ -1572,6 +1572,36 @@ center. The template's page numbering stays on even though the footer
 replaces its output, because the outline formats the TOC's page
 numbers through it.
 
+## Index: book_index.py and index_seed.py
+
+The book's index is data plus code, with no markers in `Chapters/`
+(`INDEXING.md` has the survey and the decisions).
+The entries live in `tools/data/index_terms.toml`,
+one `[[entry]]` table each:
+the heading, its `kind` (`concept`, `pattern`, `python`, `pep`),
+the `match` patterns that count as a mention,
+and optional `under`, `see`, `see_also`, and `code`.
+`index_seed.py` wrote the first version of the file on 2026-10-16
+from the book's conventions (italic terms, pattern names,
+Python names in code spans, PEP numbers).
+It is a one-time seed: from then on the file is edited by hand.
+
+`book_index.py` matches the entries against the chapters on every build.
+An entry gets one locator per `##` or `###` section,
+principal (first, and bold) when the section's heading holds the term
+or the section italicizes it where it defines it.
+A locator names a paragraph.
+The builds inject an id at the start of that paragraph in the text in memory,
+`[]{#ix-12-34}` for chapter 12's paragraph 34.
+The site writes `book-index.html`, linked from the header and the contents page;
+the EPUB adds an Index chapter of links;
+the PDF adds the same chapter as typst, which looks up each id's page number.
+`tip index` writes `build/index/index.md` and prints the counts.
+`tip index-report` lists italic terms with no entry, dead entries,
+broken cross-references, near-duplicate entries, and entries over eight locators.
+Neither is in a gate. The module docstring has the matching rules.
+Tests live in `tools/tests/test_book_index.py`.
+
 ## release.py
 
 Publishes a GitHub release whose uploaded assets are exactly the fresh
