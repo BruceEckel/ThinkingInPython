@@ -101,7 +101,6 @@ Chapters/14_Techniques--Decorators.md	cost: then print its cost and description
 Chapters/14_Techniques--Decorators.md	never: The original body of CODE never runs
 Chapters/14_Techniques--Decorators.md	only: A read-only CODE in a CODE requires that reading the name produce the property's return type
 Chapters/14_Techniques--Decorators.md	only: CODE runs with CODE as its only argument
-Chapters/14_Techniques--Decorators.md	only: Python binds a class attribute to an instance only when that attribute is a *descriptor*
 Chapters/14_Techniques--Decorators.md	only: adds a description only under some condition
 Chapters/14_Techniques--Decorators.md	only: so a function arrives as the only argument
 Chapters/14_Techniques--Decorators.md	price: Changing the price of a topping means changing one number
@@ -220,7 +219,6 @@ Chapters/20_Patterns--Rethinking_Objects.md	promise: The first OOP promise is en
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The fourth OOP promise is polymorphism
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The second OOP promise is behavior inside the object
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The third OOP promise is reuse through inheritance
-Chapters/20_Patterns--Rethinking_Objects.md	promised: Substitutability is one thing OOP promised that no tool can check
 Chapters/20_Patterns--Rethinking_Objects.md	promises: OOP made four promises
 Chapters/20_Patterns--Rethinking_Objects.md	want: I want to question how much of that machinery you need
 Chapters/21_Patterns--Design_Patterns.md	already: but [*Singleton* shows that a Python module already is one.]
@@ -231,8 +229,6 @@ Chapters/21_Patterns--Design_Patterns.md	itself: once each subclass registers it
 Chapters/21_Patterns--Design_Patterns.md	only: *Once and once only*
 Chapters/21_Patterns--Design_Patterns.md	only: This listing shows only the shape
 Chapters/21_Patterns--Design_Patterns.md	only: This usually appears only after you apply a standard design several times
-Chapters/28_Patterns--Data_Transfer_Objects.md	only: The hand-rolled CODE is worth writing only to show how CODE works underneath
-Chapters/28_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
 Chapters/22_Patterns--Iterators.md	cost: What has CODE cost you on an infinite source
 Chapters/22_Patterns--Iterators.md	itself: Its CODE returns itself
 Chapters/22_Patterns--Iterators.md	only: CODE shows only the stream version
@@ -264,6 +260,7 @@ Chapters/25_Patterns--Surrogate.md	even: even when the implementation defines a 
 Chapters/25_Patterns--Surrogate.md	expensive: Provides "lazy initialization" to create expensive objects on demand
 Chapters/25_Patterns--Surrogate.md	itself: CODE calls itself when the name it reads is also missing
 Chapters/25_Patterns--Surrogate.md	itself: so a CODE that reads CODE calls itself forever
+Chapters/25_Patterns--Surrogate.md	never: so the client never names one
 Chapters/25_Patterns--Surrogate.md	only: A guest reaches only the names in CODE
 Chapters/25_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a set number of connections at a time
 Chapters/25_Patterns--Surrogate.md	only: Only the surrogate's current implementation changes
@@ -286,6 +283,8 @@ Chapters/27_Patterns--Function_Objects.md	exactly: When each type needs exactly 
 Chapters/27_Patterns--Function_Objects.md	never: The type checker reads the source and never runs it
 Chapters/27_Patterns--Function_Objects.md	only: and the type checker rejects CODE as an assignment to a read-only property
 Chapters/27_Patterns--Function_Objects.md	want: or do you now want an object
+Chapters/28_Patterns--Data_Transfer_Objects.md	only: The hand-rolled CODE is worth writing only to show how CODE works underneath
+Chapters/28_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
 Chapters/29_Patterns--Changing_the_Interface.md	itself: so CODE calls itself until Python raises a CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: A function that now takes a CODE in place of a string can then warn only the callers still passing a string
 Chapters/29_Patterns--Changing_the_Interface.md	only: An adapter's only job is to produce the interface you need from the one you have
@@ -356,9 +355,7 @@ Chapters/38_Patterns--Simulation.md	only: The third example gives you only half 
 Chapters/38_Patterns--Simulation.md	only: and a plate of vibrating sand runs on grains that hold only a position
 Chapters/39_Patterns--Pattern_Catalog.md	only: and several exist only to work around limits of a particular language
 Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the preset ones
-Chapters/40_Functional--Foundations.md	already: CODE and CODE are a better choice when the function already exists
 Chapters/40_Functional--Foundations.md	already: each with one argument already supplied
-Chapters/40_Functional--Foundations.md	already: use the higher-order form when the function already exists
 Chapters/40_Functional--Foundations.md	exactly: a closure is one way to let exactly one function change it
 Chapters/40_Functional--Foundations.md	is what: which is what *first-class* means
 Chapters/40_Functional--Foundations.md	itself: and it changes nothing outside itself
@@ -493,6 +490,7 @@ Solutions/05_Foundations--Functions/README.md	only: `describe() got some positio
 Solutions/05_Foundations--Functions/README.md	only: and Positional-Only and Keyword-Only Parameters shows how a parameter becomes keyword-only
 Solutions/05_Foundations--Functions/README.md	only: as keyword-only
 Solutions/05_Foundations--Functions/README.md	only: so it is keyword-only
+Solutions/07_Foundations--Classes/README.md	never: The program never calls CODE
 Solutions/07_Foundations--Classes/README.md	only: so the trace shows only the CODE chain
 Solutions/07_Foundations--Classes/README.md	want: the form you want in a traceback or a debugger
 Solutions/07_Foundations--Classes/README.md	want: the form you want in output a user reads
@@ -536,7 +534,6 @@ Solutions/20_Patterns--Rethinking_Objects/README.md	only: Write CODE to hold a C
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes only the copy
 Solutions/20_Patterns--Rethinking_Objects/README.md	price: so the type checker now rejects a weight where CODE declares a price
 Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the same shipping calculation
-Solutions/28_Patterns--Data_Transfer_Objects/README.md	only: 'list')CODERecipe` is hashable only when every field is
 Solutions/22_Patterns--Iterators/README.md	have to: and what CODE would have to do to learn a count
 Solutions/22_Patterns--Iterators/README.md	only: A log is an append-only record that many processes write
 Solutions/22_Patterns--Iterators/README.md	only: CODE stops only when CODE reports the end
@@ -567,7 +564,9 @@ Solutions/26_Patterns--Factory/README.md	only: That test works on a CODE only wh
 Solutions/26_Patterns--Factory/README.md	only: and only when something mutates them in place
 Solutions/26_Patterns--Factory/README.md	only: the table is the only acceptable version of the two
 Solutions/27_Patterns--Function_Objects/README.md	never: A CODE is never a root
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	only: 'list')CODERecipe` is hashable only when every field is
 Solutions/29_Patterns--Changing_the_Interface/README.md	already: A module is already a namespace
+Solutions/29_Patterns--Changing_the_Interface/README.md	even: even through an instance
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: CODE reports CODE because the parameter is positional-only
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: import only that function elsewhere
 Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE

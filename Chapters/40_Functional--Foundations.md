@@ -416,7 +416,7 @@ which reorders the list in place and returns `None`.
 `sorted()` builds a new list and leaves its input as it was.
 
 Prefer the comprehension when you would write a fresh lambda,
-and `map()` or `filter()` when the function already exists,
+and `map()` or `filter()` when the function exists,
 as [Comprehensions](16_Techniques--Comprehensions.md#the-map-and-filter-equivalent)
 explains.
 `sorted()`'s `key` has no comprehension equivalent,

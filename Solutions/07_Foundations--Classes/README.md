@@ -501,9 +501,9 @@ Derived().show()
 
 **Rename the base-class method.** The program prints `Derived.show`.
 `Derived` defines `show()` itself, so `Derived().show()` finds it there
-and never looks in `Base`. The rename turns the override into an
-unrelated new method. Python accepts any method name in a subclass and
-keeps no record of which ones you meant as overrides.
+and the lookup stops before reaching `Base`. The rename turns the
+override into an unrelated new method. Python accepts any method name
+in a subclass and keeps no record of which ones you meant as overrides.
 
 **Declare the intended override.** With `from typing import override` added and the decorator
 uncommented, the program still prints `Derived.show`,

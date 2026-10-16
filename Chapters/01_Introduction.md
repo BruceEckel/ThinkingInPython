@@ -129,7 +129,7 @@ Every chapter after Static Types annotates its examples,
 so Static Types is the chapter in Part I that the rest of the book assumes you have read.
 [Class Attributes](09_Foundations--Class_Attributes.md)
 and [Cleanup](10_Foundations--Cleanup.md)
-are the two others worth reading even if you know Python,
+are the two others that a reader who knows Python should still read,
 since later chapters build on `ClassVar`, bare annotations, and weak references.
 
 Part II, *Techniques*,
