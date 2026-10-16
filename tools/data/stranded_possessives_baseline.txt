@@ -10,4 +10,4 @@
 Chapters/17_Techniques--Metaprogramming.md	which is CODE's do-nothing default
 Chapters/25_Patterns--Template_Method.md	CODE ('s' instead of 'z') adds a new method and leaves the base's do-nothing version in place
 Solutions/32_Patterns--Multiple_Dispatching/README.md	keyed on the player's and opponent's class names
-Solutions/42_Functional--Error_Handling/README.md	The CODE library's do-notation reads better here
+Solutions/42_Functional--Error_Handling/README.md	The CODE library's do-notation reads better

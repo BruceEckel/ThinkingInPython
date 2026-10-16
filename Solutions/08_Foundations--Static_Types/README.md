@@ -283,7 +283,7 @@ because Python starts method lookup at the object's own class.
 </details>
 </details>
 
-## 5. What a missing type parameter default costs
+## 5. What a missing type parameter default loses
 
 > Run `ty check` on `type_defaults.py` and read what it reports for `reveal_type(words.top())`.
 > Remove the `= str` default and run it again.

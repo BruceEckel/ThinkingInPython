@@ -63,6 +63,9 @@ dataclasses
 dataframe
 deallocates
 debuggability
+decodings
+dedented
+deserialize
 deserializer
 destructure
 destructured
@@ -127,6 +130,7 @@ initializer
 inlines
 inlining
 inspectable
+instantiable
 int
 interoperates
 ints
@@ -152,6 +156,7 @@ matchings
 matchups
 maturin
 mebibyte
+memoization
 memoize
 memoized
 memoizer
@@ -166,6 +171,7 @@ metaprogram
 metaprogramming
 microbenchmark
 microgrid
+misdescribe
 misdescribes
 mixin
 mixins
@@ -318,6 +324,7 @@ unconstructable
 undoable
 undos
 unescaped
+unexecuted
 unfindable
 unflattened
 unhashable
@@ -365,7 +372,3 @@ wildcard
 workaround
 workarounds
 worklist
-decodings
-instantiable
-misdescribe
-unexecuted

@@ -53,7 +53,7 @@ Chapters/16_Techniques--Comprehensions.md	the second `for`	In the `py_paths` com
 Chapters/17_Techniques--Metaprogramming.md	The last call	The last call drops that row, for the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes) passes `exclude=("__hash__",)`.
 Chapters/17_Techniques--Metaprogramming.md	The next lookup	The next lookup of that name finds the stored class, so `__missing__()` builds each class once.
 Chapters/17_Techniques--Metaprogramming.md	the first call	`__new__()` and `__init__()` run once per class, on the first call.
-Chapters/17_Techniques--Metaprogramming.md	the first lookup	On the first lookup of an event type, `EventMakers` builds the class and registers it under its name.
+Chapters/17_Techniques--Metaprogramming.md	the first lookup	On the first lookup of an event type, `EventMakers` builds the class and registers it under its name, so `LightOn` gets one `Creating` line though `SCHEDULE` names it twice.
 Chapters/17_Techniques--Metaprogramming.md	the lines that	The type checker never runs the metaclass, so it reports the lines that use those changes as errors.
 Chapters/18_Techniques--Performance.md	The first call	The first call stops to compile.
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
@@ -121,7 +121,7 @@ Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finall
 Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` shifts down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
 Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in automatically.
 Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the two lines of output come from `finally` and from the caller.
-Solutions/05_Foundations--Functions/README.md	The first call	The first call that omits `target` therefore raises an `AttributeError`.
+Solutions/05_Foundations--Functions/README.md	the first call	A tuple has no `append()`, so the first call that omits `target` raises an `AttributeError`.
 Solutions/08_Foundations--Static_Types/README.md	the second line	**Narrow a name the function owns.** `reset()` still runs and still sets the attribute to `None`, as the second line of output shows.
 Solutions/10_Foundations--Cleanup/README.md	The `with` statement	The `with` statement calls `__exit__()` only for a block it has entered, and it enters the block only after `__enter__()` returns.
 Solutions/10_Foundations--Cleanup/README.md	the last `Counter`	**Abandon the old list.** `counters.clear()` empties the existing list in place, dropping its reference to the last `Counter` object.
@@ -130,8 +130,7 @@ Solutions/12_Techniques--Data_Classes_as_Types/README.md	the first `@`	`partitio
 Solutions/13_Techniques--Pattern_Matching/README.md	The first `_`	The first `_` matches the first element, and `*_` collects the rest, including an empty rest.
 Solutions/13_Techniques--Pattern_Matching/README.md	at line 43	The second is the same diagnostic at line 43, in `cost()`.
 Solutions/13_Techniques--Pattern_Matching/README.md	the final `case _`	If you delete the final `case _` from the second version, the script prints the same two lines, but `ty` reports `invalid-return-type`.
-Solutions/13_Techniques--Pattern_Matching/README.md	the last case	Python accepts `case FALLBACK:` because it is the last case.
-Solutions/14_Techniques--Decorators/README.md	The last call	**Make the last attempt unguarded.** The last call, outside the `try`, satisfies both requirements at once.
+Solutions/13_Techniques--Pattern_Matching/README.md	the last case	Python accepts `case FALLBACK:` because it is the last case, and rejects any case after it with a `SyntaxError`.
 Solutions/14_Techniques--Decorators/README.md	The outermost decorator	The outermost decorator prints first and last, and each inner layer's output appears nested in between.
 Solutions/14_Techniques--Decorators/README.md	the final `print()`	Both `decorating` lines still print, but the final `print()` raises an `AttributeError`, since `None` has no `__name__`.
 Solutions/14_Techniques--Decorators/README.md	the first call	If you key the cache on `(args, kwargs)`, the first call, `square(4)`, raises a `TypeError`.
@@ -143,10 +142,10 @@ Solutions/16_Techniques--Comprehensions/README.md	The later `factor = 10`	The la
 Solutions/16_Techniques--Comprehensions/README.md	the line where	**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`, because the generator expression there also calls `source()` on the line where it appears.
 Solutions/16_Techniques--Comprehensions/README.md	the line where	The last line changes from `[10, 20, 30]` to `[2, 4, 6]`, because a list comprehension does all its work on the line where it appears.
 Solutions/17_Techniques--Metaprogramming/README.md	the first definition	No class decorator can keep the first definition, and neither can `__init_subclass__()` or `__set_name__()`.
-Solutions/17_Techniques--Metaprogramming/README.md	the second `on_open`	Python still builds the second `on_open` function and passes it to `__setitem__()`, and the early return discards it.
+Solutions/17_Techniques--Metaprogramming/README.md	the second `on_open`	Python still builds the second `on_open` function and passes it to `__setitem__()`, where the early return discards it.
 Solutions/18_Techniques--Performance/README.md	The last line	**Expose the inherited `__slots__`.** The last line shows why the subclass's `__dict__` is easy to miss.
 Solutions/18_Techniques--Performance/README.md	The last line	**Measure the remaining gap.** The last line shows that the lazy peak is under one percent of the one-list peak.
-Solutions/18_Techniques--Performance/README.md	the first call	It prints, writes a file, or increments a counter on the first call with a given argument, and the cache silently skips that side effect on every repeat.
+Solutions/18_Techniques--Performance/README.md	the first call	It prints, writes a file, or increments a counter on the first call with a given argument.
 Solutions/18_Techniques--Performance/README.md	the first call	The `"computing noisy(3)"` message prints once, on the first call.
 Solutions/19_Techniques--Concurrency/README.md	the `for` statement	**Take each item unguarded.** `for item in source:` is the `for` statement calling `source.__next__()`, and that call runs before control reaches the indented block.
 Solutions/19_Techniques--Concurrency/README.md	the line before	`ty` rejects the line before anything runs:
@@ -158,10 +157,9 @@ Solutions/23_Patterns--Iterators/README.md	The following `next(it)`	The followin
 Solutions/23_Patterns--Iterators/README.md	the line that	With the version that raises a `TypeError`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
 Solutions/23_Patterns--Iterators/README.md	the next `yield`	Each time something asks a generator for a value, its body runs to the next `yield` and pauses there.
 Solutions/23_Patterns--Iterators/README.md	the next call	A generator pauses inside its `for` loop at each `yield` and resumes there on the next call, so the loop that skips is the loop that yields.
-Solutions/24_Patterns--Singleton/README.md	the second `ThreadPoolExecutor`	By the time the second `ThreadPoolExecutor` starts its workers, every call to `primed()` is a cache hit.
 Solutions/26_Patterns--Surrogate/README.md	The final `print()`	The final `print()` shows `f` called twice and `g` once.
 Solutions/26_Patterns--Surrogate/README.md	The first `query()`	The first `query()` then reports `0 answered before build`.
-Solutions/26_Patterns--Surrogate/README.md	the first `query()`	The proxy served three requests from a string it held from the start and deferred the slow construction until the first `query()`.
+Solutions/26_Patterns--Surrogate/README.md	the first `query()`	The proxy serves three requests from a string it holds from the start and defers the slow construction until the first `query()`.
 Solutions/27_Patterns--Factory/README.md	The fifth `.topping()`	The fifth `.topping()` call raises a `ValueError` before appending, so `self._toppings` holds at most four.
 Solutions/27_Patterns--Factory/README.md	The outer call	The outer call takes the name and returns `register()`, which runs the builder once, stores the result, and returns the builder unchanged.
 Solutions/27_Patterns--Factory/README.md	the fifth `.topping()`	That builder checks the count when `build()` runs, so a window opens between the fifth `.topping()` call and that `build()` call.
@@ -171,9 +169,7 @@ Solutions/28_Patterns--Function_Objects/README.md	the first `@handler`	**Refuse 
 Solutions/28_Patterns--Function_Objects/README.md	the first handler	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 Solutions/31_Patterns--State_Machines/README.md	the following call	Each time `list()` calls `next()` on the generator, the generator picks a legal successor and remembers it for the following call.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	the first `next()`	Calling a generator function returns a generator object, and the body starts at the first `next()`.
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	the last line	The f-string on the last line produces a `<script>` tag that a browser runs.
 Solutions/35_Patterns--Flyweight/README.md	the first `make_color()`	If you keep `@record` on `Color`, the first `make_color()` call raises a `TypeError` at `_pool[key] = found`, because the `WeakValueDictionary` cannot create a weak reference to a slotted `Color` with no `__weakref__` slot.
-Solutions/35_Patterns--Flyweight/README.md	the first `tracemalloc.stop()`	If you leave out the first `tracemalloc.stop()`, tracing runs straight through both builds, and the ratio comes out larger at every size.
 Solutions/37_Patterns--Pattern_Refactoring/README.md	the first call	**Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the material at the first call.
 Solutions/38_Patterns--Simulation/README.md	The `while` loop	The `while` loop's `is not None` test then ends the loop once the robot has eaten the last food.
 Solutions/40_Functional--Foundations/README.md	the first `tally()`	Running the program raises an `UnboundLocalError` at the first `tally()` call: "cannot access local variable 'count' where it is not associated with a value." The type checker points at the assignment that went wrong.

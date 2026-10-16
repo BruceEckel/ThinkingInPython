@@ -205,7 +205,7 @@ def make_map(size: int) -> str:
 <details>
 <summary>Solution</summary>
 
-If you leave out the first `tracemalloc.stop()`,
+If you leave out the `tracemalloc.stop()` after the shared build,
 tracing runs straight through both builds.
 The unshared peak then counts the shared field, which is still
 alive, on top of its own, so the ratio comes out larger at every size.

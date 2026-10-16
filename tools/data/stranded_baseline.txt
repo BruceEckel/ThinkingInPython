@@ -65,6 +65,6 @@ Solutions/38_Patterns--Simulation/README.md	so any class with the right methods 
 Solutions/41_Functional--Toolkits/README.md	A caller who wants this function to share a program-wide random stream cannot pass that stream in
 Solutions/43_Functional--Confidence/README.md	which leaves one student over
 Solutions/44_Effects--Effect_Management/README.md	CODE rejects negatives but lets zero through
-Solutions/44_Effects--Effect_Management/README.md	and the CODE catches zero but lets negatives through
+Solutions/44_Effects--Effect_Management/README.md	The CODE catches zero but lets negatives through
 Solutions/47_Effects--Stateless_in_Practice/README.md	**Show the mismatch getting through
 Solutions/47_Effects--Stateless_in_Practice/README.md	and CODE after the CODE goes through

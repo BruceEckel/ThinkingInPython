@@ -474,7 +474,7 @@ class ConnectionProxy:
 If you leave out the line in `__exit__()` that sets `_connection` to `None`,
 the pool gets each connection back, but the proxy keeps its reference.
 After both blocks end, `c1.query()` still answers through connection 0.
-When a later `acquire()` lends connection 0 to another client,
+When a later `acquire()` lends that connection to another client,
 both proxies query through it.
 The solution clears the reference, so a released proxy raises a `RuntimeError` instead.
 
