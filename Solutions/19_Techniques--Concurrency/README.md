@@ -400,10 +400,10 @@ async def increment(count: int) -> None:
 
 async def main() -> None:
     await asyncio.gather(*(increment(50) for _ in range(8)))
-    print(counter)
+    print(f"counter: {counter} of {8 * 50}")
 
 asyncio.run(main())
-#: 400
+#: counter: 400 of 400
 ```
 
 **Admit one holder at a time.** A semaphore holds a count of how many holders it admits at once.
@@ -434,10 +434,10 @@ async def increment(count: int) -> None:
 async def main() -> None:
     semaphore.release()  # Nothing was acquired
     await asyncio.gather(*(increment(50) for _ in range(8)))
-    print(counter)
+    print(f"counter: {counter} of {8 * 50}")
 
 asyncio.run(main())
-#: 200
+#: counter: 200 of 400
 ```
 
 **Admit a second holder.** Exactly half the increments survive. Two tasks now sit inside the

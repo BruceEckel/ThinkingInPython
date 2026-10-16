@@ -15,7 +15,7 @@ async def increment(count: int) -> None:
 async def main() -> None:
     semaphore.release()  # Nothing was acquired
     await asyncio.gather(*(increment(50) for _ in range(8)))
-    print(counter)
+    print(f"counter: {counter} of {8 * 50}")
 
 asyncio.run(main())
-#: 200
+#: counter: 200 of 400
