@@ -511,6 +511,11 @@ so finding the rules takes one dictionary lookup rather than an `isinstance()` t
 The same lookup excludes a subclass:
 an input whose class derives from `Money` matches none of `Money`'s rules,
 because the key is the input's exact class.
+The [event bus](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
+keys its handlers the same way,
+and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
+and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting)
+reuse the lookup.
 
 `VendingMachine` holds the table, its conditions, and its actions:
 
