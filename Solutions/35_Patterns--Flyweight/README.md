@@ -206,9 +206,9 @@ def make_map(size: int) -> str:
 <summary>Solution</summary>
 
 If you leave out the first `tracemalloc.stop()`,
-tracing runs straight through both builds,
-and the ratio comes out larger at every size.
-The unshared peak then counts the shared field, which is still alive, on top of its own.
+tracing runs straight through both builds.
+The unshared peak then counts the shared field, which is still
+alive, on top of its own, so the ratio comes out larger at every size.
 The solution stops tracing after each build,
 so each peak measures that build's allocations alone.
 
@@ -281,8 +281,8 @@ cells, because both versions build the same nested list of references.
 The two versions differ in the memory one cell takes. A cell in the
 shared field takes one reference into a pool of three `Tile` objects,
 while a cell in the unshared field takes a reference plus a new
-`Tile`, roughly six times as much memory. The flyweight's saving is
-therefore per cell, so the bytes saved grow with the map.
+`Tile`, roughly six times as much memory. That difference repeats in
+every cell, so the bytes saved grow with the map.
 
 `Tile` is a record, so each unshared `Tile` is a slotted instance
 with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record`, the
@@ -568,8 +568,9 @@ references. That mapping keeps the extrinsic position separate from
 the intrinsic color-and-kind that `@cache` shares.
 
 **Capture by replacing a reference.** Capturing leaves every `Piece` object alive.
-`board[dst] = ...` replaces the captured piece's reference at `dst` with the moving piece's reference,
-so a capture removes one entry from the board.
+`move()` pops the moving piece's reference from `src` and writes it
+over the captured piece's reference at `dst`,
+so a capture leaves the board one entry shorter.
 The captured piece's flyweight stays in the cache,
 because it represents "a black knight" in the abstract rather than any particular knight on a square.
 The twelve `Piece` objects therefore remain however many captures follow.
@@ -678,8 +679,8 @@ writes the `dataclass` call in full, because a weak reference needs
 
 **Empty the pool on release.** Once `del` drops the last
 references to the fifty-shade palette and both crimson names, Python
-frees those `Color` objects, and the `WeakValueDictionary` drops their
-entries on its own.
+frees those `Color` objects. The `WeakValueDictionary` then drops
+their entries on its own.
 
 The rewrite gives up the constructor syntax, and with it the guarantee
 that every `Color(...)` call returns the pooled object.
@@ -1012,7 +1013,7 @@ If you put the lock inside `tile()`, around the sleep and the
 build, the listing's last line prints `4` instead of `1`.
 `@cache` checks the key before the body runs, so all four threads
 miss and then take turns building their own `Tile`.
-The lock orders the builds, and all four still run.
+The lock puts the builds in order, but all four still run.
 The solution wraps the call to `tile()`, so the lookup, the build,
 and the store all run under one lock.
 
@@ -1091,7 +1092,7 @@ print(len({id(t) for t in gather(locked_tile, "~")}))
 ```
 
 **Expose the cold-key race.** `@cache` looks up the key, misses, calls the
-function, and stores the result, and no lock spans those steps.
+function, and stores the result. No lock spans those steps.
 Four threads that miss on the same cold key therefore all run the body.
 Each thread keeps the `Tile` it built, so the four results are four distinct objects.
 Each store overwrites the one before it, so the cache keeps the last thread's `Tile`.
@@ -1108,8 +1109,8 @@ to make `tile("^") is tile("^")` hold.
 
 **Fill the pool eagerly.** Only a miss can start a race.
 The eager fix builds every value before any thread exists,
-so every lookup hits,
-and each lookup is one `dict` index, with no lock to take.
+so every lookup hits.
+Each lookup is one `dict` index and takes no lock.
 Eager filling is the better answer whenever the whole value set fits in one small table.
 An `Enum` works under the same condition.
 
