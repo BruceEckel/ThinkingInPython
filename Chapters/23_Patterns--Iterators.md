@@ -661,7 +661,7 @@ so `TypedIterator` defines `__next__()` and inherits `__iter__()`.
 The `dataclass` decoration carries `eq=False`.
 A data class that generates `__eq__()` sets `__hash__` to `None`,
 so the wrapper can no longer go in a set or serve as a dict key,
-as every other iterator can.
+as a built-in iterator or a generator can.
 Field-by-field comparison is also the wrong question to ask about an iterator.
 Two wrappers over one source compare equal as soon as their counts agree,
 though each has delivered different items.
