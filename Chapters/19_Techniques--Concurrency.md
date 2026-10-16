@@ -613,7 +613,6 @@ since more than one task can fail at once.
 The `except*` form catches members of a group by type,
 and iterating through `group.exceptions` reaches every member.
 
-The `except*` form matters.
 A `TaskGroup` wraps what it re-raises whether one task failed or several,
 so the `ExceptionGroup` propagates straight past a plain `except ValueError:` around the `async with` block.
 
@@ -1759,7 +1758,7 @@ Arguments and results cross that boundary by copying.
 Because a subinterpreter needs no separate build and no separate install,
 it is the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
-The one compatibility check mirrors the check for free threading.
+The one compatibility check mirrors the free-threading check.
 Pure Python always works,
 but a C extension must support per-interpreter isolation before a subinterpreter can import it.
 
@@ -2017,7 +2016,6 @@ so `outcome()` counts the failed workers and sums the lists the others returned.
 not a generator, and returns a function that serializes every generator it creates.
 `synchronized_iterator()` also works as a decorator on the `def`,
 the right form when the serializing belongs to the function rather than to each caller.
-Keep the pairing straight.
 `serialize_iterator()` wraps one existing iterator,
 and `synchronized_iterator()` wraps the callable that makes them.
 
@@ -2052,7 +2050,6 @@ with ThreadPoolExecutor(max_workers=READERS) as pool:
 Each of the four threads sees all one hundred values.
 The underlying generator advances once per value, not four times.
 
-One caution carries over.
 A `concurrent_tee()` iterator is safe to hand to one thread.
 That is why the listing makes four of them.
 Sharing a single one across several threads needs `serialize_iterator()` on top.
