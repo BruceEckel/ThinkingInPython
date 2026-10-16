@@ -446,8 +446,7 @@ The chapter's `finalize(self, print, name, "closed")` avoids the trap
 by passing the pieces the callback needs rather than the object that
 has them. `name` is a `str` the `Connection` also holds. The
 finalizer's reference to `name` keeps a string alive, not a connection.
-The rule generalizes.
-A finalizer's callback and arguments may
+The rule holds for any finalizer: its callback and arguments may
 reference any object except the finalizer's own object, directly or
 through a chain of references.
 
