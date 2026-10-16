@@ -281,16 +281,19 @@ recomputing.
 The list's second pass reads the stored values back.
 The list holds every value for as long as the name lives,
 so a million items is a million items in memory.
-`Squares` holds one integer, `n`, and each pass recomputes from scratch.
+`Squares` holds one integer, `n`.
+Each pass recomputes the values from scratch.
 
 For a stream of a million items, choose `Squares`.
 As [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators) describes,
 memory is the resource that fails catastrophically.
-A data set that fits runs at full speed,
-and one that outgrows memory swaps pages to disk or fails with a `MemoryError`.
-Recomputation, by contrast, takes longer in proportion to the work. The list is a better choice only when a pass is
-slow and you know the data is small, or when the source delivers
-its data once, as a network response does.
+A data set that fits runs at full speed.
+A data set that outgrows memory forces the operating system to swap
+pages to disk, or the process fails with a `MemoryError`.
+Recomputation, by contrast, takes longer in proportion to the work.
+The list is a better choice only when a pass is slow and you know the
+data is small, or when the source delivers its data once, as a network
+response does.
 
 </details>
 </details>
@@ -368,7 +371,7 @@ The buffer grows in proportion to `k`. `tee()` buffers every item the leading
 branch consumes until the trailing branch catches up, so a gap of `k` items
 is a buffer of `k` items, whatever the length of the stream. The two
 measurements in `tee.py` are this rule at its limits. Draining one
-branch first stretches the gap to the whole stream, and lockstep
+branch first stretches the gap to the whole stream. Lockstep
 consumption shrinks it to a single item.
 
 **Hold the gap at `k` items.** `islice(ahead, k)` opens the gap, and the `zip()` loop holds it there.
@@ -377,7 +380,7 @@ size through the rest of the run.
 
 **Compare two gap widths.** One machine measured about
 9,300 bytes at `k` of 100 and about 416,000 at `k` of 10,000.
-A gap a hundred times wider takes roughly forty times the memory rather than a hundred,
+A gap a hundred times wider takes roughly forty-five times the memory rather than a hundred,
 because the smaller figure includes overhead that stays the same at every `k`,
 and a short gap uses more bytes per item than a long one.
 The difference between the two figures tracks `k`:
@@ -530,7 +533,8 @@ def traverse(it: GoFIterator[int]) -> list[int]:
 
 If you pass the endless `OverStream` to `traverse()`,
 the call runs forever.
-`traverse()` stops only when `is_done()` reports the end, and `count(1)` has none.
+`traverse()` stops only when `is_done()` reports the end.
+`count(1)` counts forever.
 `seen` gains an item on every step for as long as the call runs.
 The solution calls `is_done()`, `current_item()`, and `advance()` in a loop of 50,000 steps instead,
 so the run ends and the listing prints `len(endless.seen)`.
@@ -622,7 +626,7 @@ Defining the protocol's four methods satisfies it.
 holds every value. A caller can index that sequence
 repeatedly, in any order, and every value stays in place.
 The GoF interface assumes every collection allows that kind of access,
-and `OverStream` builds `seen` to imitate a stored sequence.
+so `OverStream` builds `seen` to imitate a stored sequence.
 
 **Measure what rewinding needs.** The endless source shows the memory that imitation takes.
 After 50,000 steps `seen` holds 50,000 items, and after a million steps it holds a million.
@@ -630,7 +634,8 @@ After 50,000 steps `seen` holds 50,000 items, and after a million steps it holds
 on an endless source takes unbounded memory.
 Python's iterator protocol has no `first()`,
 so `itertools.count()` holds one number, the next value it returns.
-Iterating over `count()` takes constant memory, and rewinding it is impossible.
+Iterating over `count()` takes constant memory.
+Rewinding it is impossible.
 
 </details>
 </details>
@@ -839,11 +844,11 @@ widens to `Iterator[int | str]` to say so.
 `if isinstance(item, int | str)` test in the same place,
 and the `for x in flatten_loop(item)` branch stays as it is.
 The bug is in the test each version applies, not in the delegation,
-so `yield from` and the explicit `for` loop fail alike and take the same repair.
+so `yield from` and the explicit `for` loop fail alike.
 
 `ty` accepts the list that triggers the bug. `Nested` reads as though a leaf must
-be an `int`, and `ty` enforces that much.
-`ty` rejects a `float` in the same list.
+be an `int`. `ty` enforces that much and rejects a `float` in the
+same list.
 But `ty` accepts `"ab"`, because a `str` is a
 `Sequence[str]`, and each of those strings is again a
 `Sequence[str]`. The string satisfies the alias's second arm by the
@@ -982,7 +987,7 @@ When `typed_skipping()` reaches
 an item of the wrong type, it skips the `yield` and its `for` loop moves on.
 A generator pauses inside its `for` loop at each `yield` and resumes there on the next call,
 so the loop that skips is the loop that yields.
-A class resumes at the top of `__next__()` on every call,
+A class's `__next__()` starts over at the top on every call,
 and every call must return a value or raise `StopIteration`,
 so `SkippingIterator` needs a loop written into the method
 to keep pulling until a match arrives.
