@@ -12,7 +12,8 @@ a single robot walks a maze where each object it meets handles the robot's arriv
 and a plate of vibrating sand runs on grains that hold only a position.
 The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture.
-The formula determines its shape, and the grains gather on it.
+The formula determines its shape.
+The grains gather on it.
 
 The first example, the pack of rats,
 combines [`asyncio` tasks](19_Techniques--Concurrency.md#asyncio-mechanics),
