@@ -66,11 +66,12 @@ answers wherever it runs, which is the point of `parallel_pure.py`.
 The number is greater than one,
 so some of the work ran outside the main process.
 `assert parallel == serial` alone could not show where the work ran.
-But the number is also far below thirty-two. `ProcessPoolExecutor`
-allows one worker per core, but it starts workers on demand. A
-submitted task goes to an idle worker when one exists and starts a
-new worker otherwise. Four tasks therefore start at most four processes, not
-thirty-two.
+
+The number is also far below thirty-two. `ProcessPoolExecutor`
+allows one worker per core but starts workers on demand. The pool
+hands a submitted task to an idle worker when one exists and starts a
+new worker otherwise. For four tasks it therefore starts at most four
+processes, not thirty-two.
 
 The number can also fall below four. With limits twenty times smaller,
 `[10_000, 20_000, 30_000, 40_000]`, the same machine reported `3` on
@@ -133,14 +134,14 @@ if __name__ == "__main__":
 
 The thread pool reports `1`. Threads share their process, so
 `os.getpid()` returns the same value in every one of them. Counting
-distinct process IDs revealed process parallelism in the previous
-exercise but says nothing about thread parallelism.
+distinct process IDs reveals process parallelism, as in the previous
+exercise, but says nothing about thread parallelism.
 For threads, the equivalent is `threading.get_ident()`.
 
 `ProcessPoolExecutor` and `ThreadPoolExecutor` share
 [one `map()` interface](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
-Underneath, `ProcessPoolExecutor` runs the calls in separate processes
-and `ThreadPoolExecutor` runs them in threads of one process.
+Underneath, `ProcessPoolExecutor` runs the calls in separate
+processes. `ThreadPoolExecutor` runs them in threads of one process.
 
 </details>
 </details>
@@ -291,7 +292,6 @@ stops at a failing character other than the smallest.
 Once a run fails, Hypothesis stores the counterexample in
 `.hypothesis/` and replays it first, so later runs report the same
 character until you delete that directory.
-`ß` breaks the law for a different reason.
 
 ```python
 # test_case_mapping.py
@@ -321,6 +321,7 @@ different Unicode block from the one where it started.
 Unicode case mapping is not a pair of inverse functions. It is a
 many-to-one mapping in each direction.
 Some characters, like `µ`, are lowercase without being the lowercase of anything.
+
 `ß` breaks the same law from the other side. `"ß".upper()` is `"SS"`,
 two characters, so uppercasing can change a string's length.
 For case-insensitive comparison Python provides `str.casefold()` rather than `str.lower()`.
@@ -328,7 +329,6 @@ For case-insensitive comparison Python provides `str.casefold()` rather than `st
 
 A hand-written loop over `"abcde"` never tests `µ`.
 The generated strings include characters nobody thinks to type.
-That coverage is the argument for property testing in one example.
 
 </details>
 </details>
@@ -421,35 +421,36 @@ def test_every_student_appears_once_per_round(
         assert sorted(placed) == sorted(names)
 ```
 
-**Handle a roster smaller than a group.** The property test finds the
-need for the two lines guarding an empty `groups`. Against the
-version without them, Hypothesis reports a two-name roster with
-`size=3`, such as `names=['a', 'b']`, and a
+**Handle a roster smaller than a group.** The property test shows
+that `group_rounds()` needs the two lines guarding an empty `groups`.
+Against the version without them, Hypothesis reports a two-name
+roster with `size=3`, such as `names=['a', 'b']`, and a
 `ValueError: min() iterable argument is empty`. With fewer students
-than the group size, the `while len(pool) >= size` loop runs zero times
-and `groups` stays empty. The leftover loop then calls `min()` on the
-empty `groups`, and that call raises the `ValueError`.
+than the group size, the `while len(pool) >= size` loop runs zero
+times, so `groups` stays empty. The leftover loop then calls `min()`
+on the empty `groups`, and that call raises the `ValueError`.
 
 The crash is a real defect rather than an unstated precondition.
-`group_rounds()` keeps
-everyone in a group when a roster divides unevenly, folding the
-leftovers into existing groups.
-By that rule, the answer for a roster of two and a size of five is one group of two. Crashing is the one answer
-that contradicts what the function does everywhere else. The
-`group_rounds()` in [Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size) includes the guard, so
-`test_group_rounds.py` passes with no `assume()`.
+`group_rounds()` keeps everyone in a group when a roster divides
+unevenly, folding the leftovers into existing groups. By that rule,
+the answer for a roster of two and a size of five is one group of
+two. Crashing is the one answer that contradicts what the function
+does everywhere else. The `group_rounds()` in
+[Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size)
+includes the guard, so `test_group_rounds.py` passes with no
+`assume()`.
 
 Finding the defect takes no cleverness and no thought about edge
-cases. Hypothesis prefers small examples,
-so it soon generates a roster of `2` against a size of `3`. The property states what holds for every
-roster, and Hypothesis finds the roster that breaks it.
+cases. Hypothesis prefers small examples, so it soon generates a
+roster of `2` against a size of `3`. The property states what holds
+for every roster. Hypothesis finds the roster that breaks it.
 
 **State the precondition in the strategy.** The `unique=True` on the roster strategy does real work.
 The property passes on a roster with a repeated name,
 because every student still appears in one group.
 But `group_rounds()` keys its history by `frozenset` of names,
-so it records both students' meetings under the same keys,
-and when it avoids repeat meetings it treats the two students as one.
+so it records both students' meetings under the same keys.
+When it avoids repeat meetings, it treats the two students as one.
 Generating distinct names writes `group_rounds()`'s precondition into
 the test.
 
@@ -476,15 +477,16 @@ E           )
 
 Because two students cannot fill a group of three, the guard adds an empty group.
 With the leftover loop deleted, that group stays empty,
-and the left side of the assertion is `[]`.
+so the left side of the assertion is `[]`.
 
 The report shows the shrunk case rather than whatever wide
-random roster failed first, and its names vary from run to run. Hypothesis
+random roster failed first. When each run starts with an empty
+`.hypothesis/` directory, its names vary from run to run. Hypothesis
 shrinks a generated string toward a longer run of `a` before it
-tries a second letter, so the report shows `'aa'` as often as `'b'`. Now
-and then a run stops at a different shape: three students in groups
-of two, such as `names=['a', 'b', 'c'], size=2`, which leaves one
-student over.
+tries a second letter, so the report shows `'aa'` as often as `'b'`.
+Now and then a run stops at a different shape: three students in
+groups of two, such as `names=['a', 'b', 'c'], size=2`, which leaves
+one student over.
 
 A second run reports the identical counterexample, and reports it
 noticeably faster. Hypothesis writes each failing case into
@@ -591,8 +593,9 @@ problem first. One test that sets the variable changes the answer for
 every test after it.
 No argument list records the dependency.
 
-**Make the hidden input a parameter.** The repair is the same for `stale()` and `timeout()`, and it is the one this part of the
-book keeps making. Move the hidden input into the parameter list.
+**Make the hidden input a parameter.** The repair is the same for
+`stale()` and `timeout()`, and it is the one this part of the book
+keeps making.
 `stale_pure()` takes the current time, and `timeout_pure()` takes the
 mapping to read. Both are now referentially transparent, and both are
 testable without a clock or a monkeypatched environment.
@@ -696,11 +699,12 @@ one description of four shapes while the `isinstance()` version reads
 as four separate questions. The difference shows in what each version
 repeats. `result.error` appears three times in `describe_isinstance.py`
 and nowhere in the `match`, because each `case` pattern destructures
-the `Err` and matches the error inside it. The `return` at `[1]` is also
-weaker than the `match`'s `case Err(error)`. That `return` is a fallthrough that
-happens to be correct rather than a branch stating what it matches, so
-a reader must deduce that `result` is an `Err` by ruling out the `Ok`
-branch above.
+the `Err` and matches the error inside it.
+
+The `return` at `[1]` is also weaker than the `match`'s
+`case Err(error)`. That `return` is a fallthrough rather than a
+branch stating what it matches, so a reader must deduce that
+`result` is an `Err` by ruling out the `Ok` branch above.
 
 In the error branches,
 the `isinstance()` version narrows `result.error` to
@@ -710,17 +714,19 @@ Inside the `Ok`, `ty` knows `float` either way.
 
 **Rule out a shared subclass.** The precision behind that agreement
 depends on one decorator: both `Ok` and `Err` carry `@final`, in
-`describe_isinstance.py` and in `utils/result.py`. Without that decorator `ty`
-0.0.87 allows for a class inheriting from both, so it keeps the
-intersection of the two as a possible type.
-The value in the `Ok` then comes back as
-`float | Unknown` rather than plain `float`. The `match` and the
-`isinstance()` tests lose that precision together. `result.answer`
-after a positive `isinstance()` and `answer` in `case Ok(answer)` read
-`float | Unknown` alike. Pyright and mypy do not build that
-intersection and report `float` with or without the decorator.
-The exercise's comparison therefore comes out even at either precision.
-The decorator's effect is a more useful finding than a win for either version.
+`describe_isinstance.py` and in `utils/result.py`. Without that
+decorator `ty` 0.0.87 allows for a class inheriting from both, so it
+keeps the intersection of the two as a possible type. The value in
+the `Ok` then comes back as `float | Unknown` rather than plain
+`float`. Pyright and mypy do not build that intersection and report
+`float` with or without the decorator.
+
+Under `ty`, the `match` and the `isinstance()` tests lose that
+precision together. `result.answer` after a positive `isinstance()`
+and `answer` in `case Ok(answer)` read `float | Unknown` alike. The
+exercise's comparison therefore comes out even at either precision.
+The decorator's effect is a more useful finding than a win for
+either version.
 
 The choice is about reading, not about proving. Neither form tells
 the type checker anything the other cannot, so pick the one that
