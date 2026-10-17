@@ -39,6 +39,12 @@ def render(shape: Drawable) -> str:
 ```
 
 <details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your `protocols.py` with `render(Triangle())` in it, and the program prints your triangle's string as a third line.
+Renaming `Triangle`'s method to `paint()`, as `Blob` names its method, makes the check report `invalid-argument-type` on that call.
+
+<details>
 <summary>Solution</summary>
 
 If you name `Triangle`'s method `paint()`, as the chapter's `Blob` does,
@@ -88,6 +94,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Removing `# type: ignore` from `area.py`
 
@@ -100,6 +107,12 @@ a different design, a detail, or an equivalent alternative.
 [Catching Mistakes](../../Chapters/08_Foundations--Static_Types.md#catching-mistakes) shows the comment silencing the error on a call that passes `area()` a `str`.
 Remove the comment, run `ty check` on the file, and read which argument and which parameter the diagnostic marks.
 Then consider what Python does with the call at run time.
+
+<details>
+<summary>Done when</summary>
+
+with the comment removed, `ty check` reports `invalid-argument-type` on `area.py`, marking `"3"` with ``Expected `int`, found `Literal["3"]` ``, and you can say what `area("3", 4)` returns at run time.
+With the comment restored, the check passes again.
 
 <details>
 <summary>Solution</summary>
@@ -140,6 +153,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. A second generic function, `last()`
 
@@ -165,6 +179,12 @@ def first[T](items: list[T]) -> T:
 def last[T](items: list[T]) -> T:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `generics.py` prints the final element of each list and `uv run ty check` passes.
+Adding `.upper()` to the `last()` call on the `list[int]` makes the check report `unresolved-attribute`, as `n.upper()` does for `first()`.
 
 <details>
 <summary>Solution</summary>
@@ -201,6 +221,7 @@ returns a `str`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -243,6 +264,12 @@ class LoudTally(NamedTally):
     def report(self) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with `t = LoudTally("clicks")`, `print(t.bump().bump().report())` prints `CLICKS: 2` and `uv run ty check` passes.
+Changing `bump()`'s return annotation from `Self` to `Tally` makes the check report `unresolved-attribute` for `report` on the chained call.
 
 <details>
 <summary>Solution</summary>
@@ -294,6 +321,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. What a missing type parameter default loses
 
@@ -327,6 +355,12 @@ class Stack[T = str]:
     def top(self) -> T:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you can name the type `ty` reveals for `words.top()` with and without `= str`, and you predict, before running it, whether `ty check` flags `words.top().no_such_method()` in each version.
+Run both versions to confirm your prediction; your statement about a bare `Stack` follows from the result.
 
 <details>
 <summary>Solution</summary>
@@ -371,6 +405,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A `Literal` that does not admit `"purple"`
 
@@ -400,6 +435,12 @@ type Color = Literal[
 def paint(grid: Grid, cell: Coord, color: Color) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+before the widening, `ty check` reports `invalid-argument-type` on the `paint()` call with ``Expected `Color`, found `Literal["purple"]` ``.
+After you add `"purple"` to `Color`, the check passes and `print(grid)` shows `{(2, 3): 'purple'}`.
 
 <details>
 <summary>Solution</summary>
@@ -454,6 +495,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. Widening `add_square()` to `Sequence[Shape]`
 
@@ -492,6 +534,12 @@ def add_square(shapes: Sequence[Shape]) -> None:
     # shapes.append(Square())
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on `variance.py` with `add_square(circles)` uncommented, and a body that still calls `shapes.append(Square())` makes it report `unresolved-attribute` on `Sequence[Shape]`.
+Your explanation names the variance of `Sequence` and of `list`.
 
 <details>
 <summary>Solution</summary>
@@ -549,6 +597,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. Truthiness in place of `is not None`
 
@@ -570,6 +619,12 @@ Call the function with `None`, a normal string, and the empty string, and compar
 def shout(text: str | None) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on both versions of `narrowing.py`, and `shout("")` prints `(nothing)` with `if text:` and an empty line with `is not None`, while `shout("hi")` and `shout(None)` print the same in both.
+You can name the values each test sends to the fallback.
 
 <details>
 <summary>Solution</summary>
@@ -616,6 +671,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Narrowing a local copy of an attribute
 
@@ -647,6 +703,12 @@ class Box:
 def show(b: Box) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+for `box = Box("hi")`, `print(show(box))` prints `HI`, `print(box.val)` prints `None`, and `uv run ty check` passes on `narrowing_attribute.py`.
+Calling `upper()` on `b.val` inside the `if` instead makes the check report `unresolved-attribute`.
 
 <details>
 <summary>Solution</summary>
@@ -695,6 +757,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. A `Final` tuple
 
@@ -710,6 +773,12 @@ a different design, a detail, or an equivalent alternative.
 [Constants with Final](../../Chapters/08_Foundations--Static_Types.md#constants-with-final) separates rebinding a name from changing the object the name holds.
 A tuple has no `append()`, and `Final` forbids rebinding `HISTORY`,
 so consider where a tuple's contents get set.
+
+<details>
+<summary>Done when</summary>
+
+with `HISTORY` empty, `ty check` reports `unresolved-attribute` for the `append()` call, and your final `final_constants.py` passes the check and prints `3 hello ('first',)`.
+Adding `"first"` later with `HISTORY = HISTORY + ("first",)` instead draws `invalid-assignment`.
 
 <details>
 <summary>Solution</summary>
@@ -748,5 +817,6 @@ looks for the value there too.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
