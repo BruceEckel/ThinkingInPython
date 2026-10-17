@@ -19,6 +19,12 @@ Make `claim()` return values from an iterator you script, and have `spawn()` app
 After `asyncio.run(rat.run())`, assert on the rat's position and on that list.
 
 <details>
+<summary>Done when</summary>
+
+your test passes against the chapter's `Rat`.
+Scripting `claim()` as `[False, True, False, True]` leaves the rat at `(0, -1)` with one spawn at `(1, 0)`, and the run ends cleanly on the rat's second turn, after your script runs out, instead of raising a `RuntimeError`.
+
+<details>
 <summary>Solution</summary>
 
 If you call `next(self.claim_results)` without the `False` default,
@@ -124,6 +130,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. Reporting unreached cells
 
@@ -202,6 +209,12 @@ class Blackboard:
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your script prints a nonempty set of open cells, every printed cell lies in a region that walls separate from the cell `Maze.entry()` returns, and opening a doorway in that wall makes the printed set empty.
+You can say why every rat starts inside the entry's region.
 
 <details>
 <summary>Solution</summary>
@@ -355,6 +368,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Breaking `claim()`'s atomicity
 
@@ -449,6 +463,11 @@ class Blackboard:
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+on the seven-by-nine maze from `test_rats_and_mazes.py`, your count of `True` returns exceeds `len(blackboard.visited)` (the solution prints 25 against 24), `amaze.txt` gives equal counts, and taking the `await asyncio.sleep(0)` back out of `claim()` makes the counts agree again.
 
 <details>
 <summary>Solution</summary>
@@ -617,6 +636,7 @@ guarantee.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -816,6 +836,12 @@ class Coin(Item):
 ```
 
 <details>
+<summary>Done when</summary>
+
+walking the robot over the `$` cells you placed prints that many coins, and `item_factory("$")` returns a `Coin`.
+With two `$` cells, deriving `Coin` from `Food` instead makes `item_factory("$")` return a `Teleport` and leaves the count at `0`.
+
+<details>
 <summary>Solution</summary>
 
 If you derive `Coin` from `Food`, the program prints `0`,
@@ -883,6 +909,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Sending the robot somewhere other than the `!`
 
@@ -936,6 +963,11 @@ def end(room: Room) -> bool:
 
 MAZE: Final[str] = ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+on the chapter's `MAZE`, your tour prints `16 meals, 282 moves`, `game.robot.finished` is `True` at the end, and the search for food returns `None` once the last `Food` is eaten, so the script reaches the walk to the `!`.
 
 <details>
 <summary>Solution</summary>
@@ -1076,6 +1108,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6, 7, and 8: the Chladni plate
 
@@ -1182,6 +1215,11 @@ For the diagonal, swap `x` and `y` and compare the sign of the difference inside
 Then ask what that implies where `x == y`.
 
 <details>
+<summary>Done when</summary>
+
+`amplitude()` returns `0.0` at any point for mode `(2, 2)`, a `Plate` in that mode reports agitation `0.000` with every grain at its starting position after 1200 steps, and `amplitude()` returns `0.0` wherever `x == y`, for every mode you try.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -1233,6 +1271,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. Changing the physics
 
@@ -1249,6 +1288,12 @@ a different design, a detail, or an equivalent alternative.
 Pass a second field function to `Plate` and compare the figures.
 Write the new field as a product of a function of `x` and a function of `y`.
 A product is zero when either factor is zero, so find where each `sin` factor vanishes.
+
+<details>
+<summary>Done when</summary>
+
+you wrote your prediction before running the view, and for mode `(2, 3)` the rendered plate shows one vertical and two horizontal interior lines plus the four edges, with agitation falling toward zero as in `chladni_demo.py`.
+You can name the `sin` factor that draws each line.
 
 <details>
 <summary>Solution</summary>
@@ -1329,6 +1374,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 8. Tuning the noise
 
@@ -1347,6 +1393,11 @@ a different design, a detail, or an equivalent alternative.
 Loop over the three kick values with a fresh `Plate` for each, and print agitation at the same checkpoints.
 For the large kick, compare a grain's maximum single step with the size of the plate.
 [The Model](../../Chapters/38_Patterns--Simulation.md#the-model) shows `render()`'s figure, which is the check that agitation cannot make.
+
+<details>
+<summary>Done when</summary>
+
+after 1200 steps `kick=0.005` still reads far above zero (the solution, with mode `(2, 3)` and `seed=42`, prints `0.38`), `kick=0.5` reads `0.00` like the default, and rendering the `kick=0.5` plate shows nearly every grain heaped in the corners at `(0, 0)` and `(1, 1)`, off the nodal lines.
 
 <details>
 <summary>Solution</summary>
@@ -1417,5 +1468,6 @@ and vanishingly small once a grain arrives.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
