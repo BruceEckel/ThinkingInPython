@@ -62,6 +62,11 @@ def walkable_neighbors(
 ```
 
 <details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your file (it reports `invalid-assignment` on `SPECS` while `Symbol` lags behind), a map using all five kinds prints five distinct tile objects however many cells it has, and on an all-grass 3x3 map `walkable_neighbors()` returns 2 at a corner, 3 on an edge, and 4 in the center.
+
+<details>
 <summary>Solution</summary>
 
 If you add `"+"` and `"T"` to `SPECS` but leave `Symbol` listing three kinds,
@@ -151,6 +156,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. `tracemalloc`, shared vs. unshared tiles
 
@@ -204,6 +210,12 @@ def to_symbol(char: str) -> Symbol:
 def make_map(size: int) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file prints one unshared-to-shared peak ratio per map size, and with the record `Tile` each ratio lands between about six and seven (the solution prints `6.2` at 50x50 and `6.9` at 200x200).
+A ratio well above that means one peak counted both builds.
 
 <details>
 <summary>Solution</summary>
@@ -298,6 +310,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Replacing `@record` with `@dataclass` exposes the sharing bug
 
@@ -338,6 +351,12 @@ class MutableTile:
 def mutable_tile(symbol: str) -> MutableTile:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your test passes with `@dataclass` on `Tile`, fails with a `FrozenInstanceError` at the assignment once `@record` is back, and also fails if you remove `@cache` from `tile()`.
+That last check shows the test detects sharing, not just the assignment it made.
 
 <details>
 <summary>Solution</summary>
@@ -429,6 +448,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Modeling chess
 
@@ -491,6 +511,11 @@ def promote(
 ) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the opening position holds 32 board entries that refer to 12 distinct `Piece` objects, a capture leaves 31 entries and still 12 objects, and a promoted pawn reports the new kind while every other pawn of its color still reports pawn.
 
 <details>
 <summary>Solution</summary>
@@ -595,6 +620,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `interned_color.py`, rewritten on a weak pool
 
@@ -631,6 +657,11 @@ class Color:
 def make_color(red: int, green: int, blue: int) -> Color:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file prints the pool's length as `50` after building a fifty-color palette and `0` after `del` drops it, two requests for the same components return the same object (`is` prints `True`), and you can show with one line a guarantee of `interned_color.py` that your version lacks.
 
 <details>
 <summary>Solution</summary>
@@ -714,6 +745,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Constraining `interned_color.py`'s components
 
@@ -751,6 +783,11 @@ class Color:
     ) -> Color:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your test passes, `Color(256, 0, 0)` and `Color(0, -1, 0)` each raise a `ValueError` naming the bad component, `Color(255, 255, 255)` still succeeds, and `len(Color._pool)` reads the same after a rejected call as before it.
 
 <details>
 <summary>Solution</summary>
@@ -846,6 +883,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. `tile_map.py` rebuilt on the enum
 
@@ -882,6 +920,12 @@ class Tile(Enum):
 def parse_map(text: str) -> list[list[Tile]]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`tile_map_demo.py`'s map prints `24 3`, `parse_map("?")` raises `ValueError: '?' is not a valid Tile`, and `uv run ty check` reports `unresolved-attribute` on a member you never defined, such as `Tile.DOOR`.
+You can then say which wrong-symbol mistakes the type checker catches in each version and which stay runtime failures in both.
 
 <details>
 <summary>Solution</summary>
@@ -960,6 +1004,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. Four threads on a cold key
 
@@ -1026,6 +1071,12 @@ def eager_tile(symbol: Symbol) -> Tile:
 def locked_tile(symbol: Symbol) -> Tile:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+four threads calling the slow `tile()` on a cold symbol print `4 4` (four results, four distinct objects), and each fixed version leaves the four threads holding 1 distinct object.
+Give each fix a symbol no earlier call has used, since a warm cache entry hides the race.
 
 <details>
 <summary>Solution</summary>
@@ -1145,6 +1196,7 @@ since another thread may have filled that entry while this one waited.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
