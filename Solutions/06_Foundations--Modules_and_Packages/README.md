@@ -27,6 +27,12 @@ def function5():
 ```
 
 <details>
+<summary>Done when</summary>
+
+a script holding all three imports prints `importing module5 in a_package` once, after `initializing a_package`, and then the result of `function5()` through each of the three names.
+You can also name the cache that keeps the second and third imports from rerunning the module's top-level code.
+
+<details>
 <summary>Solution</summary>
 
 The package's `__init__.py` is the one from the chapter:
@@ -78,6 +84,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A nested module, and a badly named package
 
@@ -104,6 +111,11 @@ from a_package.module5 import function5
 def function6():
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your script outside `a_package` prints `function6 calls function5 in module5 in a_package` after four loading messages, the same script runs again with the directory renamed to `bPackage` and the import updated, and you can cite the rule in File Names that the capital letter breaks.
 
 <details>
 <summary>Solution</summary>
@@ -174,6 +186,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Lazy imports load in use order, not declaration order
 
@@ -205,6 +218,11 @@ def announce():
 def announce():
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your script prints `noisy2 module loaded` before `noisy module loaded`, each directly ahead of the output of that module's first use, while the `lazy import noisy` line still sits above `lazy import noisy2` in the file.
 
 <details>
 <summary>Solution</summary>
@@ -259,6 +277,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Renaming `module.py` to `Module.py`
 
@@ -278,6 +297,12 @@ a different design, a detail, or an equivalent alternative.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names) explains how Python compares an import name with the file name on disk.
 The filesystem may treat the two names as one file, but the import system reads the directory listing and makes its own comparison.
 The `PYTHONCASEOK` environment variable switches that comparison off, so setting it tests your explanation.
+
+<details>
+<summary>Done when</summary>
+
+you wrote a prediction before each run, the `import Module` version prints `I'm being useful!`, and you have the result of the `import module` run against `Module.py` on your own machine.
+You can also say why the effect of setting `PYTHONCASEOK` shows which program compares the two names.
 
 <details>
 <summary>Solution</summary>
@@ -326,6 +351,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. Absolute imports and running a package module as a script
 
@@ -343,6 +369,12 @@ A file run as a script has none.
 An absolute import needs the project root on `sys.path`.
 The command you run decides the path's first entry.
 Compare what `python file.py` and `python -m package.module` put there.
+
+<details>
+<summary>Done when</summary>
+
+with the absolute import, `use_module4.py` still prints `function4 calls function1 in module1 in a_package`, you have a different error from `python a_package/module4.py` for each import form, and `python -m a_package.module4` prints the two loading messages with either form.
+You can tie each error to one thing a script run lacks.
 
 <details>
 <summary>Solution</summary>
@@ -392,6 +424,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 6. Star import without `__all__`
 
@@ -423,6 +456,12 @@ def _internal():
 def undeclared():
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you wrote your prediction before running, `star_import.py` without the line prints a list that matches it and differs from `['_helper', 'public']` by two names, and after you restore the line it prints `['_helper', 'public']` again.
+You can name the rule that admitted or excluded each name.
 
 <details>
 <summary>Solution</summary>
@@ -470,6 +509,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. A `from` import shares the object, not the name
 
@@ -486,6 +526,12 @@ a different design, a detail, or an equivalent alternative.
 In [Importing Names with `from` and `as`](../../Chapters/06_Foundations--Modules_and_Packages.md#importing-names-with-from-and-as), `from_snapshot.py` shows an imported name keeping the value it had at import time.
 A `from` import binds your name to the object, not to the module's name.
 Compare mutating the list with rebinding the module's attribute, and use `is` to check whether the two names still share one object.
+
+<details>
+<summary>Done when</summary>
+
+after the first `append()` your script's `plugins` shows the new item, an `is` comparison of the two names prints `True` before the rebinding and `False` after it, and the script's `plugins` keeps only the first item once the module's new list grows.
+Your explanation says which step changes an object and which changes a name.
 
 <details>
 <summary>Solution</summary>
@@ -534,5 +580,6 @@ time, as in `plugin_list.plugins`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
