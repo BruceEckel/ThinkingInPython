@@ -2578,7 +2578,7 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
     Explain both, using [The GIL and Free Threading](#the-gil-and-free-threading).
 13. In `shared_iterator.py`,
     drop `threading.serialize_iterator()` and give each worker a function that loops over the shared iterator,
-    holding a `threading.Lock` around the loop *body*,
+    holding a `threading.Lock` around the loop body,
     the tempting fix in [Sharing an Iterator Between Threads](#sharing-an-iterator-between-threads).
     Predict whether `duplicates` becomes `False` before running it,
     and explain which call the lock does and does not cover.

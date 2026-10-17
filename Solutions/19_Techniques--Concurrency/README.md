@@ -1115,7 +1115,7 @@ so its ordinary threads run on several processors at once.
 
 > In `shared_iterator.py`,
 > drop `threading.serialize_iterator()` and give each worker a function that loops over the shared iterator,
-> holding a `threading.Lock` around the loop *body*,
+> holding a `threading.Lock` around the loop body,
 > the tempting fix in [Sharing an Iterator Between Threads](../../Chapters/19_Techniques--Concurrency.md#sharing-an-iterator-between-threads).
 > Predict whether `duplicates` becomes `False` before running it,
 > and explain which call the lock does and does not cover.
