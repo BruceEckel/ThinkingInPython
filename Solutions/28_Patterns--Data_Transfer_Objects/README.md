@@ -26,6 +26,12 @@ class Messenger:
 ```
 
 <details>
+<summary>Done when</summary>
+
+each `Messenger` prints the values of its own keyword arguments, and `hasattr()` reports `False` on each instance for a name passed to the other instance alone.
+You can say where each instance keeps its attributes and why a class attribute behaves differently.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -60,6 +66,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A third field on `Point`
 
@@ -73,6 +80,12 @@ a different design, a detail, or an equivalent alternative.
 [`@dataclass`](../../Chapters/28_Patterns--Data_Transfer_Objects.md#dataclass) shows that the decorator builds the methods from the annotated fields in the class body.
 Declare the new field with an annotation like the other two.
 Then check how `repr()` and `==` change on their own.
+
+<details>
+<summary>Done when</summary>
+
+your `point_dataclass.py` prints `Point(x=1.0, y=2.0, z=...)` with your third value, and `uv run ty check` passes on it.
+Leaving any `Point(...)` call at two arguments makes the type checker report `missing-argument` for `z`.
 
 <details>
 <summary>Solution</summary>
@@ -112,6 +125,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. A `NamedTuple` holding a list
 
@@ -126,6 +140,12 @@ a different design, a detail, or an equivalent alternative.
 Call a mutating method on the `list` field.
 That call assigns nothing to the `Recipe`.
 For the `dict` key, ask what hashing a tuple does with each of its elements.
+
+<details>
+<summary>Done when</summary>
+
+printing your `Recipe` after the mutation shows the new step inside `steps`, and using it as a `dict` key raises a `TypeError` ending `(unhashable type: 'list')`.
+You can name the one cause behind both results.
 
 <details>
 <summary>Solution</summary>
@@ -180,6 +200,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. A fourth attribute, by keyword and by assignment
 
@@ -195,6 +216,12 @@ a different design, a detail, or an equivalent alternative.
 [`SimpleNamespace`](../../Chapters/28_Patterns--Data_Transfer_Objects.md#simplenamespace) shows `vars()` reading the instance's `__dict__`.
 Build one namespace with the extra keyword and another by assigning it afterward, then compare `list(vars(m))` for both.
 A `dict` keeps its keys in insertion order, so consider when each namespace inserts the new name.
+
+<details>
+<summary>Done when</summary>
+
+`list(vars(m))` puts your new attribute third, before `more`, in the constructor version and last in the assignment version, while `==` on the two `vars()` dicts prints `True`.
+You can say which `dict` property produces each result.
 
 <details>
 <summary>Solution</summary>
@@ -240,6 +267,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. Returning a bare `tuple[float, int]`
 
@@ -265,6 +293,12 @@ To see what the type checker still catches, try unpacking into the wrong number 
 def summarize(data: list[float]) -> tuple[float, int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your repaired file, and restoring the broken line makes it report `unresolved-attribute` for `mean`.
+The swapped `count, mean = summarize(...)` still type-checks and prints `mean=2 count=3.0`, and you can name two mistakes the checker still reports.
 
 <details>
 <summary>Solution</summary>
@@ -331,6 +365,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Structural equality across three-field types
 
@@ -345,6 +380,11 @@ a different design, a detail, or an equivalent alternative.
 [A `NamedTuple` Is Still a Tuple](../../Chapters/28_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple) explains that `NamedTuple` equality is `tuple` equality.
 Compare two `NamedTuple` classes with the same values, then a frozen data class with a tuple.
 For the second case, consider which class's `__eq__()` runs first and what it returns for an operand of another type.
+
+<details>
+<summary>Done when</summary>
+
+your file prints `True` for `Color(1, 2, 3) == Point3(1, 2, 3)` and `False` for `FrozenColor(1, 2, 3) == (1, 2, 3)`, you wrote both predictions down before running it, and you can explain each answer from the `__eq__()` each side carries.
 
 <details>
 <summary>Solution</summary>
@@ -404,6 +444,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. Choosing a type for three scenarios
 
@@ -419,6 +460,12 @@ a different design, a detail, or an equivalent alternative.
 [Which Should You Use?](../../Chapters/28_Patterns--Data_Transfer_Objects.md#which-should-you-use) lists what each type offers and when to choose it.
 For each scenario, find the one requirement that rules out the others: keys that first appear at runtime, a hashable value, or code that checks fields on construction.
 Consider also what `json.dumps()` does with each type.
+
+<details>
+<summary>Done when</summary>
+
+each scenario has one type and a reason that rules out each of the others.
+Using an instance of your grid type as a `dict` key succeeds, and passing an instance of your JSON type to `json.dumps()` gives the result your answer predicts for the field names.
 
 <details>
 <summary>Solution</summary>
@@ -476,6 +523,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 8. A `Point` that survives addition
 
@@ -517,6 +565,11 @@ class Point(tuple[float, float]):
     def __repr__(self) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`Point(1.0, 2.0) + Point(3.0, 4.0)` prints `Point(4.0, 6.0)` and its `type()` is `Point`, slicing it with `[:1]` prints the tuple `(4.0,)`, and `uv run ty check` passes on your file with no `invalid-method-override` on `__add__()`.
 
 <details>
 <summary>Solution</summary>
@@ -572,6 +625,7 @@ So a `NamedTuple` is the better choice when positional tuple behavior is a featu
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
