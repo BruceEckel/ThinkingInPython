@@ -33,6 +33,12 @@ class Trace:
 ```
 
 <details>
+<summary>Done when</summary>
+
+you wrote your six-line prediction before running, and your edited `trace_cm.py` prints `enter C` right after `inside A` and `exit C` right before `exit A`, the last line.
+If your prediction differed, you can say which block had to finish first.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -77,6 +83,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Suppressing a second exception type
 
@@ -91,6 +98,12 @@ a different design, a detail, or an equivalent alternative.
 In [The `expected` Manager](../../Chapters/15_Techniques--Context_Managers.md#the-expected-manager), `__exit__()` decides what to suppress by testing the exception type against the manager's `types` argument.
 Look at which kinds of value `issubclass()` accepts as its second argument.
 Then pass a tuple of classes at the call site and watch for the extra pair of parentheses.
+
+<details>
+<summary>Done when</summary>
+
+your edited `demo_exceptions.py` prints `before`, then a line starting `[TypeError]`, then `survived`, and `uv run ty check` passes on it.
+A block that still divides by zero under the same `expected(...)` call prints `[ZeroDivisionError] division by zero`, so the original type stays covered.
 
 <details>
 <summary>Solution</summary>
@@ -145,6 +158,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. A third manager on one `with` line
 
@@ -171,6 +185,11 @@ from contextlib import contextmanager
 def tag(name: str) -> Generator[str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `multiple.py` prints `<ul>`, `<li>`, `<li>` before the body line and `</li>`, `</li>`, `</ul>` after it, matching the closing order you predicted before running it.
 
 <details>
 <summary>Solution</summary>
@@ -210,6 +229,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Both pool connections leased at once
 
@@ -223,6 +243,12 @@ a different design, a detail, or an equivalent alternative.
 [Testing the Lease](../../Chapters/15_Techniques--Context_Managers.md#testing-the-lease) shows a test that leases a connection with `pool.lease()` and checks `pool.available()`.
 Nest a second `with pool.lease()` inside the first and assert on `available()` while the test holds both connections.
 Check the count again after both blocks exit.
+
+<details>
+<summary>Done when</summary>
+
+`uv run pytest` on your `test_object_pool.py` passes with four tests, and your new test asserts `pool.available() == 0` inside the inner `with` and `2` after both blocks exit.
+Changing the expected `0` to `1` makes that test fail.
 
 <details>
 <summary>Solution</summary>
@@ -280,6 +306,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. Two `banner` decorators stacked on one function
 
@@ -309,6 +336,11 @@ def banner(title: str) -> Generator[None]:
 def quarterly() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you wrote your prediction before running, and your function prints `=== outer ===` first and `=== outer ends ===` last, with the two `inner` lines nested inside them around the body line.
 
 <details>
 <summary>Solution</summary>
@@ -364,6 +396,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. `ignore_missing`, which suppresses only `KeyError`
 
@@ -399,6 +432,12 @@ class ignore_missing:
     ) -> bool:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `KeyError` block lets the line after the `with` print, and your `ValueError` block, wrapped in the chapter's `expected()`, prints `[ValueError]` with your message.
+A third `with ignore_missing():` block that finishes cleanly runs without an exception, and `uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -468,6 +507,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. `exit_stack.py` driven from the command line
 
@@ -498,6 +538,11 @@ def tag(name: str) -> Generator[str]:
 def wrap(names: list[str]) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run python exit_stack.py x y z` prints `<x>`, `<y>`, `<z>`, the `using` line, then `</z>`, `</y>`, `</x>`, and `uv run python exit_stack.py` prints `using []` as its one line.
 
 <details>
 <summary>Solution</summary>
@@ -586,6 +631,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. `careless()` with its `try`/`finally` restored
 
@@ -612,6 +658,11 @@ from contextlib import contextmanager
 def careful(name: str) -> Generator[str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you wrote your prediction before running, and your edited generator prints `enter A`, `exit A`, `caught: boom` in that order, so `exit A` now appears and comes before `caught: boom`.
 
 <details>
 <summary>Solution</summary>
@@ -655,6 +706,7 @@ listings.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
