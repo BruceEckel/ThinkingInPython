@@ -1817,12 +1817,6 @@ and runs the comparison in `demo.py`, printing your machine's own numbers.
 The main book build skips this step and requires no Rust toolchain.
 Building `rust/` is a separate, opt-in step.
 
-<!-- TODO(py315-deps): NumPy and Numba are both dependencies since
-2026-10-13, though the crate's own environment installs neither.
-Extend rust/fastcount/demo.py (and this listing)
-to also time the NumPy+Numba collatz_lengths version from Combine NumPy and Numba above,
-so this compares Rust against that combination too, not just plain Python. -->
-
 ## Concurrency
 
 Sometimes the fix is not a faster function but a different architecture.
