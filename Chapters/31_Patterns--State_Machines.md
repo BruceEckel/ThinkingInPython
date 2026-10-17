@@ -295,8 +295,8 @@ so a new member added to `TrapState` is tested as soon as it exists.
 
 ## Table-Driven State Machine
 
-The each-state-decides design keeps each state's transitions with that state,
-in its `next` function.
+The first design, [Each State Decides](#each-state-decides),
+keeps each state's transitions with that state, in its `next` function.
 A fully table-driven design represents the entire machine as a single transition table.
 All the behavior is then in one place,
 so you can build and maintain the table from a state-transition diagram.
@@ -758,7 +758,8 @@ def test_no_transition_raises() -> None:
 The two designs answer the same question, which state comes next,
 and put the answer in different places.
 
-Each-state-decides suits a machine whose states do something and have few transitions apiece.
+The first design, [Each State Decides](#each-state-decides),
+suits a machine whose states do something and have few transitions apiece.
 The row holds the action and its function holds the transitions,
 so reading `trap_states.py`'s `LURING` and `luring()` tells you what luring does and which states can follow it.
 Adding a state is one row and one function.
@@ -770,7 +771,8 @@ written once.
 and no other row mentions it.
 That is the Moore shape: the action belongs to the state.
 
-Table-driven suits a machine you build from a diagram, whose inputs carry data,
+The second design, the [Table-Driven *State Machine*](#table-driven-state-machine),
+suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram.
 Adding a state or an input is a rule in the list and a method or two.
