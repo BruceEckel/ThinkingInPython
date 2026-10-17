@@ -1084,6 +1084,11 @@ replaces a class with a callable object that stands in for it.
 The name that follows `class` then refers to that callable object,
 not to a class.
 
+Before Python 3.9, the expression after `@` had to be a dotted name,
+optionally followed by one call,
+as in `@config.decorator` or `@repeat(times=3)`.
+A decorator looked up by subscript, as in `@handlers["json"]`,
+was a syntax error.
 Since Python 3.9 (PEP 614), the expression after `@` can be any expression,
 so you can write `run_once` inline as `@lambda`:
 
