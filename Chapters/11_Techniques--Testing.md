@@ -200,6 +200,12 @@ runs them, and reports successes and failures.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
 
+When you do need one, a `breakpoint()` call,
+in the test or in the code it checks, pauses the run at that line in `pdb`.
+`breakpoint()` calls `sys.breakpointhook()`,
+which reads the `PYTHONBREAKPOINT` environment variable,
+so that variable can turn every `breakpoint()` off with `0` or name another debugger in place of `pdb`.
+
 `pytest -k overdraft` runs only the tests whose names contain "overdraft",
 `pytest -x` stops at the first failure,
 and `pytest --lf` reruns the tests that failed last time.
@@ -569,6 +575,32 @@ random number generation, clock, and network.
 `tmp_path` gives each test a private temporary directory.
 `monkeypatch` sets and restores environment variables and attributes,
 undoing every change when the test ends.
+
+A function that prints writes to the terminal,
+which is part of the world as well.
+`contextlib.redirect_stdout()` is a context manager that points `sys.stdout` at another file object until its block ends,
+so a test can collect the printed text in an `io.StringIO` and compare it:
+
+```python
+# test_printed_balance.py
+import io
+from contextlib import redirect_stdout
+from account import Account
+
+def report(account: Account) -> None:
+    print(f"balance: {account.balance:.2f}")
+
+def test_report_prints_balance() -> None:
+    buffer = io.StringIO()
+    with redirect_stdout(buffer):
+        report(Account(100))
+    assert buffer.getvalue() == "balance: 100.00\n"
+```
+
+`pytest`'s built-in `capsys` fixture captures the output of a whole test instead.
+`capsys.readouterr().out` returns the text the test has printed so far.
+`redirect_stdout()` limits the capture to its block,
+and it works outside `pytest` as well.
 
 ### Filesystem and Environment
 
