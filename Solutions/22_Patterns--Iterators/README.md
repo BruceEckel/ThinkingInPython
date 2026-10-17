@@ -27,6 +27,11 @@ def evens(n: int) -> Iterator[int]:
 ```
 
 <details>
+<summary>Done when</summary>
+
+`list(evens(5))` prints `[0, 2, 4, 6, 8]` and `total(evens(5))` prints `20`, with `total()` copied from `iterators.py` unchanged.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -56,6 +61,7 @@ so it sums `evens(5)` with no change, as it sums `fibonacci(8)` and `Countdown(5
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -90,6 +96,12 @@ class Countdown:
     def __len__(self) -> int:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`len(c)` prints `5` for `Countdown(5)` both before and after `list(c)`, and `len(Countdown(-1))` and `list(Countdown(-1))` both finish without a `ValueError`.
+You can also say what `len()` would have to do to a generator to learn its count.
 
 <details>
 <summary>Solution</summary>
@@ -151,6 +163,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. The first ten values of `fibonacci(1_000_000)`
 
@@ -174,6 +187,12 @@ from itertools import islice
 def fibonacci(n: int) -> Iterator[int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file prints `[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]` at once, and `uv run ty check` passes on it.
+Slicing the generator with `[:10]` instead makes the type checker report `not-subscriptable`.
 
 <details>
 <summary>Solution</summary>
@@ -214,6 +233,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Two fixes for a spent generator
 
@@ -249,6 +269,12 @@ class Squares:
     def __iter__(self) -> Iterator[int]:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+each fix prints `[0, 1, 4, 9, 16]` on two passes in a row, where `generator_lifecycle.py` printed an empty list the second time.
+You can also name what each fix keeps in memory for a million items, and what each one recomputes.
 
 <details>
 <summary>Solution</summary>
@@ -312,6 +338,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `tee` with the branches `k` items apart
 
@@ -349,6 +376,12 @@ N: Final[int] = 100_000
 def peak_at_gap(k: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file prints `the wider gap buffers more: True`, and the two peaks `traced()` reports differ by roughly the change in `k` times a constant bytes per item (about 41 on one machine).
+You can explain that constant with the rule in What `tee()` Buffers.
 
 <details>
 <summary>Solution</summary>
@@ -410,6 +443,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A test for `filter()`
 
@@ -424,6 +458,12 @@ a different design, a detail, or an equivalent alternative.
 [Reusable Algorithms](../../Chapters/22_Patterns--Iterators.md#reusable-algorithms) pairs the generator expression's `if` clause with `filter()` and contrasts both with `takewhile()`.
 Copy the shape of the existing test for the `if` clause, but call `filter()`.
 Feed it an endless source that raises an exception after too many pulls, and use `pytest.raises()` to confirm the filter keeps asking.
+
+<details>
+<summary>Done when</summary>
+
+`uv run pytest` passes your new test, and replacing `filter()` with `takewhile()` in it makes the test fail with `DID NOT RAISE Tripwire`.
+You can name the existing test in `test_endless.py` that fails the same way under that swap.
 
 <details>
 <summary>Solution</summary>
@@ -472,6 +512,7 @@ Its predicate receives one value at a time and answers "keep" or "skip" for that
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 
@@ -547,6 +588,12 @@ class OverStream[T]:
 def traverse(it: GoFIterator[int]) -> list[int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`traverse()` returns `[2, 4, 6]` for an `OverSequence` over `[2, 4, 6]`, and again after `first()`, with `traverse()` unchanged; your 50,000-step loop over `OverStream(count(1))` prints `50000` for `len(stream.seen)`.
+You can say how that number grows with the step count.
 
 <details>
 <summary>Solution</summary>
@@ -663,6 +710,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. A peekable iterator
 
@@ -698,6 +746,12 @@ class Peekable[T](Iterator[T]):
     def __next__(self) -> T:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+over `(x * 2 for x in [1, 2, 3])`, three calls to `peek()` print `2 2 2`, the next `next()` still returns `2`, `list()` of the rest gives `[4, 6]`, and `peek()` then reports the end.
+You can name the one piece of state your `Peekable` adds.
 
 <details>
 <summary>Solution</summary>
@@ -772,6 +826,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. A string that never bottoms out
 
@@ -806,6 +861,13 @@ def flatten_str(
 ) -> Iterator[int | str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the original `flatten()` raises a `RecursionError` on `[1, "ab", 2]`, your fixed version prints `[1, 'ab', 2]`, and `uv run ty check` passes on your file.
+A return type left as `Iterator[int]` draws `invalid-yield`.
+You can say which line of `flatten_loop()` changes.
 
 <details>
 <summary>Solution</summary>
@@ -888,6 +950,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. Skipping instead of raising
 
@@ -934,6 +997,12 @@ class SkippingIterator[T](Iterator[T]):
     def __next__(self) -> T:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+over `[1, "two", 3, None, 4]` with `int`, `typed()` raises a `TypeError` naming `str`, while `typed_skipping()` and your class version both give `[1, 3, 4]`.
+`uv run ty check` passes; a class version that can fall off the end of `__next__()` draws `invalid-return-type`.
 
 <details>
 <summary>Solution</summary>
@@ -1026,6 +1095,7 @@ It reads one item and either returns that item or raises the exception.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
