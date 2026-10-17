@@ -1575,7 +1575,7 @@ The GIL can move to another thread between instructions.
 When two threads both read before either writes, they compute the same result,
 and one increment vanishes.
 
-Since 3.10 the interpreter switches threads only at a function call or at the jump that closes a loop iteration,
+The interpreter switches threads only at a function call or at the jump that closes a loop iteration,
 so in practice this particular sequence runs as one unit.
 That is scheduling luck, not safety.
 
