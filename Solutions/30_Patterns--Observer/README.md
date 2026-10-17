@@ -38,6 +38,12 @@ class Broadcaster[T]:
 ```
 
 <details>
+<summary>Done when</summary>
+
+one change reaches every connected responder once, in the order you connected them, each with the same value.
+Connecting two `lambda`s that record a tag and the value, then announcing `42`, gives `[('A', 42), ('B', 42)]`, and a third `connect()` adds a third entry with no change to your `Broadcaster`.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -77,6 +83,7 @@ in connection order.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -180,6 +187,13 @@ class Display:
     ) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both versions print `display: 25C`, `uv run ty check` passes on each with `t.attach(Display())` in place, and only the second declares `subject: Thermometer` in `Display.update()`.
+Making that change in the first version draws `invalid-argument-type` at `t.attach()`.
+You can say what each version adds.
 
 <details>
 <summary>Solution</summary>
@@ -319,6 +333,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. An `announce()` that survives a failing responder
 
@@ -359,6 +374,12 @@ class Broadcaster[T]:
 def broken(data: int) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your test passes against your `Broadcaster`: the first responder raises an exception, `announce()` raises an `ExceptionGroup` holding it, and the second responder has recorded the value.
+If `announce()` discards each exception instead, the test fails with `DID NOT RAISE`.
 
 <details>
 <summary>Solution</summary>
@@ -454,6 +475,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. The same rescue, for the async fan-out
 
@@ -502,6 +524,13 @@ async def record(data: int) -> None:
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your test passes: `announce()` raises an exception group and the second responder has recorded the value.
+Removing `return_exceptions=True` fails it, since a bare `RuntimeError` escapes `pytest.raises(ExceptionGroup)`.
+A first responder that raises `asyncio.CancelledError` also ends up in the group, with the second value still recorded.
 
 <details>
 <summary>Solution</summary>
@@ -654,6 +683,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Failures returned as values
 
@@ -701,6 +731,12 @@ def succeeds[T](
 def checked(data: int) -> Result[None, str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your test passes: the first responder returns an `Err`, `announce()` returns a list holding that `Err`, and `received.append`, connected through your adapter, has recorded the value.
+An announcement every responder handles returns `[]`, and `uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -793,6 +829,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Turning `grid_observer.py` into a flood-fill game
 
@@ -857,6 +894,12 @@ class FloodGame:
     def is_complete(self) -> bool:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+on a 4x4 `new_grid()` field, repeatedly selecting the first cell outside your patch, in the grid's key order, completes the field in 6 moves.
+Your neighbor test is true for `(0, 0)` and `(1, 1)` and false for a cell paired with itself, and you can describe what a second player adds to the state.
 
 <details>
 <summary>Solution</summary>
@@ -982,6 +1025,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. A new selection rule, and the same view
 
@@ -1029,6 +1073,12 @@ def recolored(grid: Grid, selected: Coord) -> Grid:
 def initials(grid: Grid, size: int) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+selecting column 1, row 2 of a 4x4 `new_grid()` advances the seven cells of that column and row one color each and leaves the other nine as they were.
+`grid_view.py` runs unedited under the new rule, and you can say what `draw()` receives and why that keeps the rule out of the view.
 
 <details>
 <summary>Solution</summary>
@@ -1108,6 +1158,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. Two views on one model
 
@@ -1180,6 +1231,12 @@ def letters(grid: Grid) -> None:
 def tally(grid: Grid) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+one `select((1, 1))` on a 3x3 `GridModel` prints both views, the letter grid and the counts, in connection order.
+The counts come to 2 `skyblue`, 3 `palegreen`, and 4 `khaki`, and your `GridModel` matches `grid_observer.py` unchanged.
 
 <details>
 <summary>Solution</summary>
@@ -1300,6 +1357,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Which colors a grid can reach
 
@@ -1352,6 +1410,13 @@ def solvable(rows: list[Row]) -> bool:
 def reachable(size: int) -> list[Color]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your script prints one line per size from 3 through 8.
+`5x5` reaches nothing, `8x8` reaches `palegreen` alone, and 3x3, 4x4, 6x6, and 7x7 each reach all three colors.
+Every entry your elimination produces stays in `0`, `1`, or `2`.
 
 <details>
 <summary>Solution</summary>
@@ -1474,6 +1539,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. A descriptor per watched attribute
 
@@ -1538,6 +1604,12 @@ class Thermometer:
                  humidity: float) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+assigning `celsius` twice and `humidity` once on one `Thermometer` leaves two readings in the `celsius` responder's list and one in the `humidity` responder's list.
+`uv run ty check` passes on a file that holds both `Thermometer.celsius.connect(t, readings.append)` and `t.celsius * 2`.
 
 <details>
 <summary>Solution</summary>
@@ -1648,6 +1720,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 11. Responders registered at load time
 
@@ -1702,6 +1775,12 @@ def display(celsius: float) -> None:
 def alarm(celsius: float) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+an assignment to either thermometer's `celsius` reaches every decorated responder, a decorated function still runs when called by name, and `uv run ty check` passes.
+You can name three runtime problems the load-time form removes, two it keeps, and three it brings that `Broadcaster` avoids.
 
 <details>
 <summary>Solution</summary>
@@ -1822,6 +1901,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 12. A name with each announcement
 
@@ -1885,6 +1965,12 @@ station = Station(20.0, 0.4)
 def report(change: tuple[str, float]) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+after you attach your responder, assigning `celsius` and then `humidity` calls it twice, first with `('celsius', <value>)` and then with `('humidity', <value>)`, and it reports the first alone.
+`uv run ty check` passes with the responder's parameter declared `tuple[str, float]`.
 
 <details>
 <summary>Solution</summary>
@@ -1994,6 +2080,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 13. A second view on the counter
 
@@ -2075,6 +2162,12 @@ class Controller:
     def key(self, char: str) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+feeding `k`, `k`, `j` to your `Controller` prints six lines, each count beside a bar of that many asterisks, ending at a count of 1.
+You can say what `Counter`, each view, and `Controller` hold a reference to, and which existing class a third view would change.
 
 <details>
 <summary>Solution</summary>
@@ -2187,6 +2280,7 @@ so a second view either duplicates `key()` or has no input of its own.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
