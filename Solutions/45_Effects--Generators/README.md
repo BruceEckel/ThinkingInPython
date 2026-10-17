@@ -32,6 +32,12 @@ def tally() -> Generator[Prompt, Amount, Total]:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your script prints the three prompts and then the sum of your three sent amounts, read from the `StopIteration`'s `value`, and `uv run ty check` passes.
+If you swap the second and third type parameters of your annotation, `ty` reports errors on your `send()` calls.
+
+<details>
 <summary>Solution</summary>
 
 If you read the total as the result of the last `send()`,
@@ -98,6 +104,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A driver that answers from an iterator
 
@@ -146,6 +153,12 @@ def drive_in_order(
         answers: Iterator[Answer]) -> Result:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`interview()` runs unchanged under both drivers and each returns `Alice of Wonderland, friend Rabbit` from the chapter's three answers.
+Given one answer for three questions, your iterator driver lets the answers' `StopIteration` reach the caller instead of returning `None`.
 
 <details>
 <summary>Solution</summary>
@@ -288,6 +301,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A third delegation in `yield_from_send.py`
 
@@ -314,6 +328,11 @@ def collect(name: str) -> Generator[str, int]:
 def both() -> Generator[str, int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you wrote the full sequence of lines before running the modified `yield_from_send.py`, and it matches the run line for line, including which sends print two lines and what the final `send()` after the loop prints.
 
 <details>
 <summary>Solution</summary>
@@ -378,6 +397,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Removing the `yield from`
 
@@ -393,6 +413,12 @@ a different design, a detail, or an equivalent alternative.
 [Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting) shows `survey()` delegating to `interview()` with `yield from`.
 Without `yield from`, the call to `interview()` builds a generator object, and nothing drives it.
 Compare the declared type of `profile` with what the call produces, then compare the type checker's report with the script's output.
+
+<details>
+<summary>Done when</summary>
+
+your explanation accounts for both results: `ty` reports an `invalid-assignment` on the `profile` line, and the script runs and prints `<generator object interview at ...>, color blue`.
+It says which result locates the mistake and why, and you have confirmed that `ty check` passes once the annotation is gone.
 
 <details>
 <summary>Solution</summary>
@@ -459,6 +485,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. `report()` with a return value
 
@@ -491,6 +518,12 @@ def report(items: list[str]) -> Generator[str, None, int]:
 def summarize(items: list[str]) -> Generator[str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes, and your caller's output for the chapter's `["red", "green", "blue"]` ends with a line carrying `12`.
+Changing `report()`'s annotation back to `Iterator[str]` makes `ty` report `invalid-return-type`, and you can name the type parameter through which each of your two values travels.
 
 <details>
 <summary>Solution</summary>
@@ -557,6 +590,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Why a driver primes with `next()`
 
@@ -571,6 +605,11 @@ a different design, a detail, or an equivalent alternative.
 [Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) defines the `SendType`, and `send_none_is_next.py` calls `send(None)` on a generator whose `SendType` is `Answer`.
 Read the signature of `send()` and ask what it accepts for `interview()`.
 Then ask what `next()` accepts, and where a generator that has yet to run would put a sent value.
+
+<details>
+<summary>Done when</summary>
+
+your explanation predicts what `ty` reports if you delete the `# type: ignore` in `send_none_is_next.py` (an `invalid-argument-type` on `None`), states the parameter type of `send()` in terms of the `SendType`, and says why priming with `next()` type-checks for any generator.
 
 <details>
 <summary>Solution</summary>
@@ -625,6 +664,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. A vending machine as a single generator
 
@@ -674,6 +714,12 @@ STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
 def machine() -> Generator[Report, Event]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes, and one driven run reports `COLLECTING` after a coin, `SELECTING` after a first digit, `UNAVAILABLE` for an item out of stock, a refusal for too little money, and a sale once the money suffices.
+A second, fresh machine starts with the full stock after the first one sells.
 
 <details>
 <summary>Solution</summary>
@@ -791,6 +837,7 @@ anywhere.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
