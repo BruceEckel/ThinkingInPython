@@ -73,6 +73,12 @@ class Plugged:
 ```
 
 <details>
+<summary>Done when</summary>
+
+in your `Leaky` version, appending `"z"` to what `leaky.tags` returns and printing `leaky.tags` shows `['a', 'b', 'z']` for a `Leaky` built with `["a", "b"]`.
+The same steps on your `Plugged` version print `['a', 'b']`.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -163,6 +169,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A mutable `Bob` in a frozen data class
 
@@ -180,6 +187,12 @@ a different design, a detail, or an equivalent alternative.
 [The Immutability Solution](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution) shows `frozen=True` on a class with a `list` field.
 Consider which of two operations `frozen=True` blocks: rebinding a field, or changing the object to which the field refers.
 The generated `__hash__()` hashes the field values, so look at what it must hash when one value is mutable.
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your file, printing `immutable` after the assignment shows `bob=Bob(name='Ralph')`, and `hash(immutable)` raises a `TypeError` whose message is `unhashable type: 'Bob'`.
+You can also name who must make immutability go all the way down, and why no tool does it.
 
 <details>
 <summary>Solution</summary>
@@ -242,6 +255,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. `NewType` at the protocol boundary
 
@@ -287,6 +301,12 @@ class Package:
 def charge(item: Priced) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` reports `invalid-argument-type` on `charge(package)`, ending in ``incompatible return types: `Weight` is not assignable to `Price` ``, with no other diagnostic in your file.
+Running the file still prints `4.5`, and you can say what `Weight(2.5)` returns at runtime.
 
 <details>
 <summary>Solution</summary>
@@ -361,6 +381,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. A `Triple`, adapted by composition
 
@@ -415,6 +436,11 @@ class TripleCoord:
 ```
 
 <details>
+<summary>Done when</summary>
+
+`distance(TripleCoord(Triple(3, 0, 99)), TripleCoord(Triple(0, 4, -1)))` prints `5.0`, `uv run ty check` passes on your file, and `distance()` reads the same as it does in `distance_protocol.py`.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -467,6 +493,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Adding `Square` to the closed `Shape` union
 
@@ -510,6 +537,12 @@ type Shape = Rectangle | Circle | Square
 def area(shape: Shape) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes with your `Square` case in place, and `Square(5.0)` gets an area of `25.0`.
+With that case commented out, the checker reports `type-assertion-failure` at `assert_never(shape)`, with the inferred type `Square & ~Rectangle & ~Circle`.
 
 <details>
 <summary>Solution</summary>
@@ -590,6 +623,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A `NullCache`, following `NullLogger`'s shape
 
@@ -627,6 +661,11 @@ NO_CACHE: Final[NullCache] = NullCache()
 def render(key: str, cache: Cache = NO_CACHE) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+calling `set("a", "apple")` on a `NullCache` and then `get("a")` prints `None`, and `uv run ty check` passes when you hand a `NullCache` to a function whose parameter is a protocol declaring `get()` and `set()`, with no `is None` test on that parameter.
 
 <details>
 <summary>Solution</summary>
@@ -677,6 +716,7 @@ because a miss is information on which the caller acts.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -733,6 +773,12 @@ class CountingBox:
     def __setitem__(self, index: int, value: int) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your inheriting `CountingList` ends with more elements than its `append()` and `__setitem__()` counts account for, after a call to a `list` method you found that goes past both.
+Your composed `CountingBox`, after `append(1)`, `extend([2, 3])`, and `box[0] = 99`, prints `3 3 1` for its length, appends, and sets.
 
 <details>
 <summary>Solution</summary>
@@ -834,6 +880,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. `BoundedStack` without breaking the contract
 
@@ -882,6 +929,12 @@ class BoundedStack(Stack):
 def fill(stack: Stack, count: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`fill(BoundedStack(), 5)` returns `2` and raises no exception, `fill(Stack(), 5)` still returns `5`, a caller can ask your `BoundedStack` whether it is full, and `uv run ty check` passes.
+You can also name the guarantee you gave up and decide whether `BoundedStack` should stay a subclass of `Stack`.
 
 <details>
 <summary>Solution</summary>
@@ -968,6 +1021,7 @@ that claim is false.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
