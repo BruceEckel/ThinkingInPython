@@ -730,6 +730,49 @@ A machine-generated chain of thousands of nested nodes exceeds the limit.
 The alternative is an iterative walk with an explicit stack of pending nodes
 (see exercise 8).
 
+The walkers also assume that each node has one parent.
+`expr.py` lets two parents share a node.
+After `s = x + 1`, the `Mul` that `s * s` builds holds the same `s` twice,
+so `evaluate()` walks `s` once for each parent.
+A dependency graph shares nodes as a rule.
+Several build targets depend on one library,
+so a recursive walk from each target builds that library again.
+
+Such a structure is a *directed acyclic graph*, or DAG, rather than a tree.
+Processing a DAG means visiting each node once, after all of its dependencies.
+`graphlib.TopologicalSorter`, in the standard library since Python 3.9,
+computes that order from a mapping of each node to its dependencies:
+
+```python
+# build_order.py
+from graphlib import CycleError, TopologicalSorter
+from exceptions import expected
+
+deps: dict[str, tuple[str, ...]] = {
+    "app": ("ui", "db"),
+    "ui": ("core",),
+    "db": ("core",),
+}
+print(list(TopologicalSorter(deps).static_order()))
+#: ['core', 'ui', 'db', 'app']
+deps["core"] = ("app",)
+with expected(CycleError):
+    list(TopologicalSorter(deps).static_order())
+#: [CycleError] ('nodes are in a cycle', ['app', 'core',
+#: 'ui', 'app'])
+```
+
+`static_order()` lists `core` first and `app` last.
+`core` appears once, although both `ui` and `db` depend on it.
+
+A build that runs targets in parallel calls `prepare()` once,
+then alternates `get_ready()` and `done()` in place of `static_order()`.
+`get_ready()` returns every node whose dependencies have all finished,
+so `ui` and `db` come back together after `core` finishes.
+
+Making `core` depend on `app` closes a loop.
+`static_order()` then raises a `CycleError` whose message lists the nodes around the cycle.
+
 ## A Template Is a Tree {#a-template-is-a-tree}
 
 Python has a composite of its own.
