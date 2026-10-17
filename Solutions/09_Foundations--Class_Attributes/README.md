@@ -427,8 +427,10 @@ holds `0`.
 form expands to an assignment through `self`.
 The type checker treats that assignment as a write to a `ClassVar` through an instance,
 the same as `a.total = 99`, the commented-out line in `class_var.py`.
-For such a write it reports
-"Cannot assign to ClassVar `total` from an instance of type `Tally`".
+For the line in `__init__()` it reports
+"Cannot assign to ClassVar `total` from an instance of type `Self@__init__`",
+where `Self@__init__` is its name for the type of `self` inside that method.
+For `a.total = 99` the message names `Tally`, the type of `a`.
 The `ClassVar` declaration catches the mistake at check time.
 The listing suppresses the report so it can demonstrate
 what the write does at runtime.
