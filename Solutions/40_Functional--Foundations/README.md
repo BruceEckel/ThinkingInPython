@@ -23,6 +23,12 @@ def deposit(amount: int) -> int:
 ```
 
 <details>
+<summary>Done when</summary>
+
+starting from a `balance` of `100`, `print(deposit(30), deposit(30))` prints `130 160`.
+You can also name both halves of the chapter's definition of a pure function that `deposit()` breaks, and say what you must know to predict a call's result.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -51,6 +57,7 @@ The chapter names that tracking as the problem with `withdraw()`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -85,6 +92,12 @@ def mul(a: int, b: int) -> int:
 def floordiv(a: int, b: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`operations["*"](6, 4)` returns `24`, and a loop that calls each symbol the same way prints `* 24` beside the unchanged `+ 10`, `- 2`, `// 1`, and `% 2`.
+`operations["^"]` still raises a `KeyError`, and no calling code changed.
 
 <details>
 <summary>Solution</summary>
@@ -136,6 +149,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A third independent closure
 
@@ -159,6 +173,11 @@ from collections.abc import Callable
 def multiplier(factor: int) -> Callable[[int], int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`print(double(10), triple(10), quadruple(10))` prints `20 30 40`, and you can say where each of the three functions keeps its own `factor`.
 
 <details>
 <summary>Solution</summary>
@@ -187,6 +206,7 @@ are independent of each other.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -223,6 +243,12 @@ def double(n: int) -> int:
 def square(n: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you wrote a prediction before running, and `increment_then_double_then_square(3)` prints `64`.
+If you predicted `20`, you can say which of the two functions passed to `compose()` runs first, and why.
 
 <details>
 <summary>Solution</summary>
@@ -274,6 +300,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Presetting a leading argument, and why the trailing one differs
 
@@ -301,6 +328,13 @@ from exceptions import expect
 def clamp(low: int, value: int, high: int, /) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`at_least_ten(3, 100)` returns `10` and `at_least_ten(50, 100)` returns `50`.
+Building `partial(clamp, high=100)` succeeds, and calling it with `0, 5` raises a `TypeError` naming `'high'` as positional-only.
+You can say why passing `high` by position defeats the goal.
 
 <details>
 <summary>Solution</summary>
@@ -360,6 +394,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. `Final` locks the name, not the object
 
@@ -377,6 +412,13 @@ a different design, a detail, or an equivalent alternative.
 `Final` constrains a name's binding, and the object's type decides which methods you can call.
 To make the append an error, annotate with an immutable type such as `tuple[int, ...]` and assign a tuple.
 A `Sequence` annotation is not enough: the checker keeps the assigned list's own type for a `Final` name, so the append still passes.
+
+<details>
+<summary>Done when</summary>
+
+`ty` reports `invalid-assignment` on `MAX_SIZE = 200` and nothing on `CONFIG.append(3)`, and you can say why.
+After your annotation change, `ty` reports `unresolved-attribute` on the append.
+If `ty` still passes the append, your annotation leaves the value's type mutable.
 
 <details>
 <summary>Solution</summary>
@@ -443,6 +485,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. Comprehensions, a different `key`, and a bare `map` object
 
@@ -459,6 +502,13 @@ a different design, a detail, or an equivalent alternative.
 [Higher-Order Functions](../../Chapters/40_Functional--Foundations.md#higher-order-functions) shows `map()`, `filter()`, and `sorted()` with a `key` function.
 A comprehension with a condition replaces `filter()`, and a `lambda` taking a word and returning its last letter replaces `len`.
 For the bare `map` object, print it, then consume it twice with `list()` and compare the two results.
+
+<details>
+<summary>Done when</summary>
+
+your comprehensions print `[1, 4, 9, 16, 25]` and `[2, 4]`, and the last-letter sort prints `['banana', 'pie', 'kiwi', 'watermelon']`.
+You can say why that is the input order.
+The bare `map()` result prints as `<map object at 0x...>`, and a second `list()` over it gives `[]`.
 
 <details>
 <summary>Solution</summary>
@@ -519,6 +569,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 8. Only the assigned name needs `nonlocal`
 
@@ -545,6 +596,13 @@ from collections.abc import Callable
 def make_counter(step: int = 1) -> Callable[[], int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`make_counter(10)` gives a counter whose three calls print `10 20 30`.
+With `nonlocal` deleted, `ty` reports `unresolved-reference` on `count += step`, and the first call raises an `UnboundLocalError`.
+You can say why assigning `count` makes it local while reading `step` does not.
 
 <details>
 <summary>Solution</summary>
@@ -586,6 +644,7 @@ names the local variable that assignment created by accident.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -636,6 +695,12 @@ def converted_first(
 ) -> list[str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`report(data)` on the chapter's three readings returns `['b 77.0']`, and your second version, with `map(to_fahrenheit, ...)` first, returns `[]`.
+You can say which field the predicates read and what unit it holds after the `map()`.
 
 <details>
 <summary>Solution</summary>
@@ -716,6 +781,7 @@ answer.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
