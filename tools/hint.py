@@ -8,6 +8,7 @@ and works in a terminal gets the same steps here:
 
     tip hint CH=30 N=3          # the first step: where to look
     tip hint CH=30 N=3          # the next: the shape of the listing
+    tip hint CH=30 N=3          # the next: done when (if authored)
     tip hint CH=30 N=3          # the next: the solution
     tip hint CH=30 N=3 ARGS=--reset   # start over
     tip hint CH=30 N=3 ARGS=--all     # every step at once
@@ -15,7 +16,8 @@ and works in a terminal gets the same steps here:
 Each run prints the next step and remembers where it got to, in
 `build/hints.json` (derived, gitignored), keyed by chapter and
 exercise. An exercise with no `Hint:` paragraph has one step, the
-solution itself. The exercise statement prints every time, above the
+solution. In a ladder, the solution step ends with the line asking
+you to name what separates your attempt from the model one. The exercise statement prints every time, above the
 step, so the question is always in view.
 
 Usage:

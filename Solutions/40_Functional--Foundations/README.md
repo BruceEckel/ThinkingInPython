@@ -48,6 +48,9 @@ both times. To predict either result, you must track the history of
 every prior call.
 The chapter names that tracking as the problem with `withdraw()`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -127,6 +130,9 @@ takes one function and one row in the table.
 `expected()` from the shared `exceptions` helper catches the missing-key
 `KeyError`, as it does in the chapter's `dispatch.py`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -177,6 +183,9 @@ Each call to `multiplier()` creates a new `multiply` closure with its
 own private `factor`. `quadruple` holds `4` independently of
 `double`'s `2` and `triple`'s `3`, the same way `double` and `triple`
 are independent of each other.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -258,6 +267,9 @@ first, which computes `(3 + 1) * 2 = 8`, then passes that `8` to
 `square`, giving `8 * 8 = 64`. `compose()` supports a third stage as
 it stands. Wrapping one composed function inside another
 `compose()` call extends the pipeline.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -342,6 +354,9 @@ reports `positional-only-parameter-as-kwarg` on
 `missing-argument` on the `expect()` call that passes it `0, 5` with
 no `high`. Both reports fall on one line, so one comment covers them.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -422,6 +437,9 @@ That split is the chapter's point: `Final` makes the checker reject a
 rebinding of the name, and the value's own type makes it reject a
 change to the contents. You need both.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -495,6 +513,9 @@ so every later pass gets an empty result. A comprehension, by contrast,
 returns a complete list, which you can walk as many times as you
 like.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -560,6 +581,9 @@ line before the program runs. Running the program raises an
 variable 'count' where it is not associated with a value." The type
 checker points at the assignment that went wrong. The runtime message
 names the local variable that assignment created by accident.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -687,6 +711,9 @@ old meaning.
 read `data` and leave it as it was. The Celsius values stay the same
 after both calls, so running either function again gives the same
 answer.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

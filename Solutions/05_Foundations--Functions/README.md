@@ -68,6 +68,9 @@ An immutable default suits a parameter the function reads, as in
 the `None` sentinel. `good_append()` tests for `None` and builds a new
 list inside the function body on every call that omits `target`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -141,6 +144,9 @@ The built-in `getattr()` makes the same distinction. `getattr(obj, "x")`
 raises an `AttributeError` when `obj` has no `x`, and
 `getattr(obj, "x", None)` returns `None`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -199,6 +205,9 @@ The new `*` marks `label`, the one parameter after it, as keyword-only.
 Calling `divide(10, 2, "half")` passes three positional arguments to
 a function that accepts two, so Python raises a `TypeError` before
 the function body runs.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -259,6 +268,9 @@ and any other keywords go to `**options`. With the flag
 added, `report()` collects its positional and keyword
 arguments as before.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -307,6 +319,9 @@ which squares to `81`.
 A function that takes another function as an argument declares that
 parameter like any other. `func` has one requirement: it must be
 callable with one argument.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -361,6 +376,9 @@ three positional arguments, so `"point"` fills `label` and the
 remaining two collect into `values`.
 `**opts` spreads the dictionary
 into keyword arguments, which `**options` collects again.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -447,6 +465,9 @@ The `/` also lets `**facts` collect a keyword called `name`,
 so `describe("Bob", name="Robert")` stores a fact called `name`.
 Without the `/`, the same call fails with two values for `name`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -523,6 +544,9 @@ each flag both mistakes before the code runs.
 The offending lines therefore carry `# type: ignore` and `# noqa` markers
 saying the misuse is deliberate, the way `param_markers.py` marks its two bad calls.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -589,6 +613,9 @@ Because both names stay bound to that list,
 `clear_by_assignment()` works like `rebind()` in `mutating_arguments.py`,
 and `clear_by_method()` works like `append_all()`.
 Here both functions attempt the same operation, emptying a list.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -667,6 +694,9 @@ before the code runs.
 After the `/`, a caller must fill `func` by position, so the keyword `func="f"` is a leftover.
 `**kwargs` collects it, `positional_trace()` forwards it, and `report()`'s
 `**options` collects it again.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

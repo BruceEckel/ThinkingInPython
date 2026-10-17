@@ -97,6 +97,9 @@ When "singleton" must mean a `list` alone, wrap the pattern in a
 class pattern. `case list([_]):` first tests for a `list`, then
 matches the one-element shape.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -157,6 +160,9 @@ code is unreachable."
 The `type-assertion-failure` is the check the chapter describes.
 The missing case becomes a type error at check time,
 instead of an `AssertionError` that `assert_never()` raises when a `Rectangle` reaches `area()` at runtime.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -231,6 +237,9 @@ so the order of the cases matters.
 `match` tries cases top to bottom and stops
 at the first one that fits, so `{"type": kind}` sits after the specific
 click and key cases.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -373,6 +382,9 @@ so the checker flags that call.
 One new channel produces two diagnostics because adding a type to the match version
 requires a new `case` in every function that matches on the union,
 as the chapter describes.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -520,6 +532,9 @@ The `match` tests two derived signs in place of the `Point`.
 Matching on the signs helps when the guards all test the same handful of derived facts.
 When each guard tests a different condition, keep the guards.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -646,6 +661,9 @@ pattern. `case other if other is FALLBACK:` is longer than the
 dotted name, and more flexible. A value pattern always compares with `==`, while a
 guard holds any expression:
 an `is` test like this one, a membership test, or a call. Choose the guard when the test needs one of those.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

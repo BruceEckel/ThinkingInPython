@@ -107,6 +107,9 @@ the same result in `weak_value.py` because that list has a single
 reference. With two references, rebinding leaves the last `Counter`
 object alive, and `live_count()` still returns `1`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -183,6 +186,9 @@ so `cls._instances.values()` yields the live `Counter` objects it currently trac
 The generator expression reads each object's `.name`.
 Iterating over a dictionary follows insertion order, which is the creation order,
 so the names need `sorted()` to come out in alphabetical order.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -261,6 +267,9 @@ name `c` and leaves the list alone.
 However you build the list, it keeps its contents alive until interpreter shutdown.
 The `deleted` messages therefore appear there, as before,
 after `End of delete loop` has printed.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -343,6 +352,9 @@ reports how many `Counter` objects the program has created,
 because the registry keeps them all alive. A
 `WeakValueDictionary` holds its values weakly, so it counts the
 objects and leaves their lifetimes as they were.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -450,6 +462,9 @@ The rule holds for any finalizer: its callback and arguments may
 reference any object except the finalizer's own object, directly or
 through a chain of references.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -543,6 +558,9 @@ The chapter's listing calls `gc.disable()` to get a deterministic transcript
 for a demonstration about unpredictable timing.
 The call is a device for the demonstration, not advice,
 so the listing turns the collector back on right after `gc.collect()`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -666,6 +684,9 @@ Moving the acquisition leaves the guard just as necessary, though.
 Whichever method acquires a resource,
 a step that can fail after the acquisition must release the resource
 before the exception propagates.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

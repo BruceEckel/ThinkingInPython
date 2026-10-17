@@ -142,6 +142,9 @@ clock bug, since two readings of a changing value are two facts.
 Naming the clock as an Ability makes the failure reproducible.
 Deriving both strings from a single reading removes it.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -274,6 +277,9 @@ raising it, so the exception reaches `catch()` as a value yielded on the error c
 `run(fixed())` returns the `KeyError` rather than raising it.
 
 `success()` is for a value you already have. `@throws` is for work that can fail.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -488,6 +494,9 @@ Making a `Blackout` catchable means giving the Ability a failure type.
 The handler then returns a value rather than raising an exception,
 and `plug()` declares the failure it can produce.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -594,6 +603,9 @@ producer untested.
 one. `controller()` builds an ordinary function from an `Outlet` to a
 `Source`, so a test can call that function with an `Outlet` and check
 which `Source` it returns.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -906,6 +918,9 @@ signature still says it returns a `str`.
 Both versions run.
 Only in the Effect version does a tool report that the set of failures changed.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -970,6 +985,9 @@ before it raises the exception, so `feed: fetching` appears.
 so the run prints only the message.
 The trace shows how far each supplied implementation got before it failed.
 The value `report()` returns is the same for both.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1075,6 +1093,9 @@ narrowing the channel first.
 so they leave the error channel as values.
 Then apply `retry()` to what remains. That narrowing takes more machinery than a predicate,
 and it changes the result type.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1191,6 +1212,9 @@ before the fork. Supply it first and fork the bound function. The type
 system enforces a rule about where a handler can answer a request.
 That rule is the guarantee on which [Stateless](../../Chapters/46_Effects--Stateless.md) and [Stateless in Practice](../../Chapters/47_Effects--Stateless_in_Practice.md) rely, applied
 to a boundary between threads or processes.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1312,6 +1336,9 @@ The scripted test checks the Effect's shape: which requests the Effect makes, in
 which order, with which payloads.
 The `Cell` test checks that the requests compose into correct arithmetic.
 Each test checks what the other leaves unchecked, so a suite needs both.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1448,6 +1475,9 @@ That difference decides which one to use. Use `throw()` when the Effect
 chooses to fail, so the type checker verifies the failure. Keep
 `@throws` for ordinary code that raises exceptions, such as `latest()`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1573,6 +1603,9 @@ Exercise 4 of
 [Generators](../../Chapters/45_Effects--Generators.md) needs a declared type to
 catch a missing `yield from` for the same reason.
 A type checker verifies claims. An inferred type is not a claim.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1716,6 +1749,9 @@ The accessor's annotation serves the type checker.
 The handler's annotation is data the library reads at runtime.
 The accessor's annotation is the optional one,
 though the handler's annotation looks more like bookkeeping.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1880,6 +1916,9 @@ The two diagnostics divide the work. `invalid-yield` catches an
 under-declared signature at the delegation that breaks it. `invalid-argument-type`
 at `run()` catches an under-supplied environment at the program's edge.
 In both, the type checker reads what depends on what from the types.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -2070,6 +2109,9 @@ scene stays the same. The same distribution is why the chapter uses a
 factory function rather than more `supply()` arguments. One `supply()`
 call can type-check at most nine actors, and a wide cast is what a positional interface
 handles worst.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

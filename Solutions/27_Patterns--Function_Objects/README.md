@@ -140,6 +140,9 @@ and `amount`, keep the values they receive at construction. The
 record freezes its fields and leaves the dictionary in `account`
 mutable, so `__call__()` and `undo()` can still update the balance.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -343,6 +346,9 @@ satisfies both.
 The listing copies the finders from `algorithms.py` rather than
 importing them, because each solution runs on its own.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -385,6 +391,9 @@ scores, or names. Passing a different `key` swaps the ordering
 strategy the same way the chapter's classic *Strategy* form swaps
 the algorithm its Context holds. Here the Context holding the
 current strategy is the call to `sorted()`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -526,6 +535,9 @@ it works here because the caller can supply `tolerance` by keyword.
 You need a closure when the function has no parameter for the setting.
 `partial()` binds arguments. A closure's body can use the setting
 in any expression.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -688,6 +700,9 @@ still changes how existing code behaves. Any handler that assumes
 `type(event) is Deposit`, or that counts events, now receives more
 events than before.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -823,6 +838,9 @@ The late-binding trap and late binding as a feature are the same
 mechanism. Which one you have depends on whether the name you close
 over still refers to the value you wanted when the command finally runs.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -936,6 +954,9 @@ so `handler()` raises `TypeError: Announce: not an @event`, although
 `Deposit` went through `@event` a few lines earlier. If something else created
 the handlers, `publish()` would raise a `TypeError` on every event,
 since `type(event)` is the returned class too.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

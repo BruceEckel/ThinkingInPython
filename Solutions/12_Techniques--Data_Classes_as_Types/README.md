@@ -137,6 +137,9 @@ so it is a leap year too.
 `check_day()` rejects February 29. February 30 fails in every year,
 because February's cap is 29 at most.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -245,6 +248,9 @@ appears somewhere and accepts any number of them.
 **Require text on both halves.** The `partition()` check splits on
 `@` and requires text on both sides, so it rejects `"@x.com"` and
 `"b@"`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -361,6 +367,9 @@ because the type now looks like it guarantees its values.
 A frozen data class checks every replacement.
 On a frozen data class, `copy.replace()` calls the constructor,
 the constructor calls `__post_init__()`, and the check runs.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -492,6 +501,9 @@ raw JSON value to `EmailAddress(...)`. `EmailAddress`'s own
 One check, inside `EmailAddress`, protects every path that constructs
 a `Person`, and the path from untrusted JSON input is one of those.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -596,6 +608,9 @@ The rebuild goes through `__init__()`, so the validation runs.
 A frozen data class stays validated across a replacement for the same reason.
 A `__replace__()` skips the check if it copies `__dict__` into a new
 object, the way `copy.copy()` does.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -732,6 +747,9 @@ and reports `built` as read-only on a frozen instance.
 The listing carries a `# type: ignore` so it can demonstrate the
 runtime failure.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -847,6 +865,9 @@ before the program runs.
 The bare form is fine where a reader
 can see that the factory and the annotation agree.
 Subscript the factory when you want the checker to confirm the agreement.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -967,6 +988,9 @@ what the constructor does with each value at runtime.
 The type checker accepts `Stars(True)`,
 because a `bool` is an `int` to the checker for the same subclass reason.
 The runtime test is therefore the one check that rejects `True`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

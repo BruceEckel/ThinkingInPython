@@ -59,7 +59,8 @@ HTML_TAG = re.compile(r"<[^>]+>")
 # labels are not text a reader searches for, and every exercise carries
 # them, so they would match every query that named one.
 STEP_SUMMARY = re.compile(
-    r"^<summary>(?:Where to look|The shape|Solution)</summary>\s*$",
+    r"^<summary>(?:Where to look|The shape|Done when|Solution)"
+    r"</summary>\s*$",
     re.MULTILINE)
 # Underscores survive: `__post_init__` and `snake_case` names are exactly what
 # a reader searches for. The book writes emphasis with `*`, not `_`.

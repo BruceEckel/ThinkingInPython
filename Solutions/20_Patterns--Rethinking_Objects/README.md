@@ -157,6 +157,9 @@ returns a `deepcopy()`. The caller mutates a throwaway copy.
 Every new mutable field needs its own defensive copy. That repetition
 is the tedium that motivates freezing the data instead.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -233,6 +236,9 @@ Declare `tuple` rather than `list`, `frozenset` rather than `set`,
 mutable one for any nested value.
 You choose those declarations.
 Once you write them, the type checker rejects code that mutates the values they describe.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -349,6 +355,9 @@ argument, the `float` `2.5`, so at runtime a weight is an ordinary float.
 The distinction is real in the source and absent in the process.
 [What the Shape Does Not Say](../../Chapters/20_Patterns--Rethinking_Objects.md#what-the-shape-does-not-say) describes that split.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -451,6 +460,9 @@ them. `TripleCoord` wraps a `Triple` and exposes its `a` as `x` and its
 `b` as `y`, the two properties `distance()` reads.
 `TripleCoord` supplies the `Coord` shape for `Triple`, the same way `PairCoord` supplies it for `Pair`.
 `distance()` stays as it is, because it reads `.x` and `.y` alone.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -572,6 +584,9 @@ mismatch. That report is the
 exhaustiveness check that a closed union makes possible. The checker
 reports a forgotten case before the program runs.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -658,6 +673,9 @@ It defaults to the shared `NO_CACHE`, the way
 cache. The `None` that `get()` returns stays in its return type,
 because a miss is information on which the caller acts.
 `render()` tests `cached` before using it.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -810,6 +828,9 @@ needs `sort()` waits until you write one. With composition, you decide
 which `list` methods `CountingBox` offers. With inheritance, `list`
 decides. You discover later which of its methods go past your counters.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -943,6 +964,9 @@ raising an exception. The type checker then rejects any call that
 hands that class to a `fill()` written for a different contract.
 Inheritance is a claim about substitutability. For `BoundedStack`,
 that claim is false.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

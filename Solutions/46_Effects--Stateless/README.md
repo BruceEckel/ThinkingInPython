@@ -104,6 +104,9 @@ At runtime the wrapper returns the same `scripted` object.
 `supply()` still finds it, because `Console` is `@runtime_checkable`
 and `isinstance()` matches `Scripted` on shape.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -211,6 +214,9 @@ the signature of every function between the one that uses the `Console`
 and the one that supplies it.
 The type checker reports an error at any of those functions that leaves
 the requirement out.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -329,6 +335,9 @@ Both functions have handled every error `read_score()` declares. Only
 failure into a value, and a `match` turns that value into a result.
 Skipping the `match` leaves the caught error in the return type.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -435,6 +444,9 @@ the greeting and `write()` received the log entry, with no capture of
 stdout and no temporary file. Each `need()` yields a request that the
 supplied object answers, so the test chooses what printing and logging do.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -523,6 +535,9 @@ and the test body is the driver that runs the Effect in each one. Six
 rows share one assertion. A version constructing its own `Material`
 inside `holds()` needs three copies of the function, one per material,
 and a version that also constructs its own `Nailer` needs all six.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -659,6 +674,9 @@ lives in the annotation, where the type checker reads it.
 A handler like `default()` handles more than its type says.
 A handler that assumes `ability.t` is a `Console` receives a `Clock` unchecked.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -763,6 +781,9 @@ Assigning `need(Console)` binds a generator to `console`,
 and the next line calls `print()` on it as if it were a `Console`.
 The type checker evaluates that call and rejects it. A type checker verifies how a program uses its values,
 so a value nobody uses is a value nobody checks.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -896,6 +917,9 @@ queue, or a cache.
 The stored Effect looks fine until something runs it twice. Store the
 function, and apply the arguments where you need the Effect.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1003,6 +1027,9 @@ A `run()` inside a coroutine therefore passes the type checker and fails
 at runtime, with the `RuntimeError` above. The rule is positional rather than
 type-based: `run()` at the outermost edge of a synchronous program,
 `run_async()` anywhere inside an asynchronous one.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1149,6 +1176,9 @@ That statement is the useful place for the diagnostic. The diagnostic
 names both the undeclared failure and the delegation that yields it,
 so the fix is either to declare the failure or to catch
 it, right there.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1315,6 +1345,9 @@ Because `supply()` resolves a request by scanning its arguments at runtime, a
 duplicate is a fact about the call rather than about the types. ZIO's
 compile-time rejection of this case is the difference that section
 names.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

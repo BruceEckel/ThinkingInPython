@@ -111,6 +111,9 @@ GoF's image proxy is the same design.
 It answers an image's size from stored numbers and loads
 the pixels when something first draws the image.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -196,6 +199,9 @@ this one keeps a `Counter` keyed by method name.
 `__getattr__()` receives the name of the attribute,
 so the wrapper adds one to that name's entry before forwarding the call.
 The final `print()` shows `f` called twice and `g` once.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -314,6 +320,9 @@ private `Box` holding a fresh copy of the data and appends to that
 private copy. `a` keeps the original `Box`, whose list still holds
 `[1, 2, 3]`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -398,6 +407,9 @@ The chapter's working version is safe because `__init__()` assigns `self._impl`,
 so normal lookup finds `_impl` on the instance and returns it.
 A proxy built through `object.__new__()` skips `__init__()`,
 so it fails the same way on its first lookup that falls through to `__getattr__()`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -580,6 +592,9 @@ The call to `c1.query()` after both blocks shows that error.
 once. It controls access, and it adds an action (the check-in) around
 each loan of the connection.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -674,6 +689,9 @@ with `len(self.__implementation)` rather than
 To forward many dunders, you write one forwarding method per dunder,
 or generate the methods in a loop over a list of names and
 assign them onto the class.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -787,6 +805,9 @@ one shape that every implementation must meet. A
 `Protocol` cannot express "at least what the last implementation had,"
 because that comparison relates two runtime values rather than two
 declarations.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

@@ -91,6 +91,9 @@ Creating `PhthaloBlue` removes `Blue` the same way.
 generation adds itself and prunes its parent.
 The `Color` class stays as written.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -173,6 +176,9 @@ Python calls `__set_name__()` separately for `x`, `y`, and `z`, passing each
 descriptor its own attribute name. The `Field` instance bound to `z`
 receives the name `"z"` and stores the value of `p.z` under `"_z"`, apart from
 `"_x"` and `"_y"`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -271,6 +277,9 @@ This solution keeps both and adds an entry for `CSingleton`.
 Calling `CSingleton()` twice returns the same object both times.
 `ASingleton` is a separate key in that dictionary, so its instance
 is a separate object.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -391,6 +400,9 @@ rest of the hierarchy still subclasses freely. `A.__init_subclass__()`
 refuses only a class whose `__mro__` holds one of the classes in
 `A._final`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -462,6 +474,9 @@ describe(lambda x: x * 2)
 
 Every `lambda` carries the name `"<lambda>"`, so `func.__name__` works
 the same way on a `def` function and on a `lambda`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -537,6 +552,9 @@ header rather than the moment Python first imports the module.
 
 The chapter's `metaclass_layout_conflict.py` still carries the
 `# type: ignore`, because that listing exists to show the `TypeError`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -615,6 +633,9 @@ arithmetic, so `c + 0.5` works. Because `float.__add__()` builds its
 result from `float`, the sum is a `float` rather than a `Celsius`.
 A numeric subclass therefore usually overrides every operator whose result
 should keep the subclass's type.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -698,6 +719,9 @@ ignores them.
 the name, the bases, and the namespace from which `type` builds the
 class. `__init__()` receives the completed class object and can change
 it in place, which is why `setattr(cls, ...)` still works there.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -825,6 +849,9 @@ Restoring the `if class_name not in cls.KNOWN_COMMANDS` check rejects
 the payload at the one point where a check stops the injection:
 before `make_class()` builds the string.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -921,6 +948,9 @@ first function, so that function has disappeared before any of the three runs. A
 the class-creation steps, `__prepare__()` alone supplies the mapping
 that receives the assignments one at a time, as the body makes them.
 That is why the chapter says `__prepare__()` has no simpler substitute.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

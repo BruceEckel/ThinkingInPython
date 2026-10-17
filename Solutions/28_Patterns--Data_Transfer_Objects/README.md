@@ -54,6 +54,9 @@ A [class attribute](../../Chapters/09_Foundations--Class_Attributes.md)
 works the other way.
 Every instance shares that one object until something shadows it.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -103,6 +106,9 @@ generates `__init__()`, `__repr__()`, and `__eq__()` to match. Adding
 `z: float` extends the constructor to three positional arguments, the
 `repr()` to three fields, and the equality comparison to three values,
 all from that one line.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -169,6 +175,9 @@ the silent `append()` and the `TypeError` at once. The contents
 freeze, and the `Recipe` becomes hashable. One declaration fixing
 both is the clue that they are one problem.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -225,6 +234,9 @@ so `note` comes last.
 end with the same four attributes.
 Dict equality ignores order, so the two dicts compare equal,
 and so do the namespaces.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -313,6 +325,9 @@ rejects a hand-built tuple in either order, because a
 A position tells the type checker an element's type and tells a
 reader nothing. A name tells both of them what the element is.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -384,6 +399,9 @@ its own class and answers `False` for everything else.
 Which one is right depends on whether your three numbers should be
 interchangeable with any tuple of the same values.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -452,6 +470,9 @@ and names the keys for the type checker, but at runtime it is a
 `dict`, which stores whatever values `json.loads()` gives it. A
 `SimpleNamespace` accepts any name with any value, at runtime and under
 the type checker, so the record holds whatever the JSON held.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -547,6 +568,9 @@ At runtime, the unpacking `x, y = other` raises a `ValueError` for a tuple of an
 A tuple on the left of `+` is the other gap: `(1.0, 1.0) + p` runs `tuple.__add__()` first and concatenates to a four-element tuple, since `Point` defines no `__radd__()`.
 Each tuple operation a `Point` must survive is one more override.
 So a `NamedTuple` is the better choice when positional tuple behavior is a feature, and a record is the better choice when that behavior is a liability.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

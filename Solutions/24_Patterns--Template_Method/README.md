@@ -232,6 +232,9 @@ the local variable `words`. In both, `run()` and `run_file_framework()`
 stay the same. A new policy is a new step. The algorithm that calls
 the step belongs to the framework.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -391,6 +394,9 @@ The same reasoning favors eager creation in
 Eager creation builds the object at import time, before any thread can read a
 half-built one.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -504,6 +510,9 @@ the chapter's `near_miss.py`, which reads `__final__` from each
 method a subclass replaces. The check raises a `TypeError` at the
 subclass's `class` statement, as soon as the class body has run, long
 before anyone constructs an instance.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -647,6 +656,9 @@ behavior, and
 [Liskov substitution](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution)
 is a rule about behavior.
 No tool checks substitution, so the chapter leaves that check to your discipline.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -874,6 +886,9 @@ If `Audited` meant to override `report()`, its
 it. `Audited`'s author must catch that misspelling,
 using the protection the chapter recommends for steps:
 `@override` on the method, and a type checker in the build.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

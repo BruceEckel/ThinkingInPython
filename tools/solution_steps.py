@@ -27,21 +27,36 @@ sees the exercise alone and opens one step at a time:
     ```
 
     <details>
+    <summary>Done when</summary>
+
+    `test_exercise_3.py` passes.
+
+    <details>
     <summary>Solution</summary>
 
     (the approach, the listing, and the discussion, as authored)
 
+    Before you move on, name what separates your attempt from this one:
+    a different design, a detail, or an equivalent alternative.
+
+    </details>
     </details>
     </details>
     </details>
 
-Nesting enforces the order: the "Solution" toggle is not visible until
-"The shape" is open. Without JavaScript the site shows the same native
+Nesting enforces the order: each toggle stays hidden until the step
+above it is open. Without JavaScript the site shows the same native
 elements; `resources/static/solutions.js` adds progress memory on top.
 
 The authored form is flat. After the generated exercise quote, a
 paragraph whose first word is `Hint:` is the "where to look" step, and
-everything after it is the solution. Only an exercise with such a
+everything after it is the solution. A paragraph beginning `Done when:`
+directly after the hint is a criterion: what you can check to know your
+attempt is finished (a test file to run, the output to match, a `ty`
+diagnostic that must disappear). It becomes a "Done when" step between
+"The shape" and "Solution". The criterion is authored, never generated.
+A `Done when:` paragraph anywhere else is ordinary prose, and a
+solution without one gets the three-step ladder. Only an exercise with such a
 paragraph gets a ladder; the rest of the file is left as it is. The
 tags are generated, and every run rewrites them in full, the way
 `exercise_statements.py` rewrites the quote:
@@ -52,7 +67,16 @@ tags are generated, and every run rewrites them in full, the way
 
     Hint: One or two sentences naming the section and the mechanism.
 
+    Done when: `test_exercise_3.py` passes.
+
     (the approach, the listing, and the discussion)
+
+The last paragraph of every "Solution" step is `DIAGNOSIS`, a fixed
+request to name what separates your attempt from the model solution.
+Readers handed a model solution match its surface features unless
+something forces a judgment, and its three categories (a different
+design, a detail, an equivalent alternative) are the ones `AGENTS.md`
+gives a reviewing agent.
 
 "The shape" is generated too, from the solution's own listings. Each
 listing named `# path.py` on its first line, except a `test_*.py` file,
@@ -76,17 +100,21 @@ it.
 
 Which lines the tool owns. In a numbered section (one whose heading
 matches `check_solutions.ANSWER`), the `<details>` lines, the
-`<summary>` lines carrying one of the three labels, the `</details>`
-lines, and every fenced block whose first line is `# The shape of ...`
-are generated. A run removes them, restores the `Hint:` prefix on the
-first paragraph the "Where to look" step held, and nests the section
-again from the flat form that remains. Every other line is kept, so
+`<summary>` lines carrying one of the four labels, the `</details>`
+lines, the `DIAGNOSIS` paragraph (matched by its exact text), and
+every fenced block whose first line is `# The shape of ...` are
+generated. A run removes them and restores the `Hint:` prefix on the
+first paragraph the "Where to look" step held. When a "Done when" step
+was present, it also restores the `Done when:` prefix on the paragraph
+after the hint. Then it nests the section again from the flat form
+that remains. Every other line is kept, so
 the authored prose and listings round-trip byte for byte. A check run
 (the default) reports each section whose ladder differs from what a
 run would write.
 
 `steps()` returns one exercise's steps in order, for `hint.py`, which
-prints them one at a time at the command line.
+prints them one at a time at the command line. Its "Solution" step
+ends with the `DIAGNOSIS` paragraph, as the rendered ladder does.
 
 Usage:
     python -m tools.solution_steps              # report drift
@@ -98,7 +126,7 @@ import argparse
 import ast
 import re
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools.check_solutions import SOLUTIONS_DIR, selected
@@ -109,10 +137,17 @@ from tools.report import Finding, report
 
 WHERE = "Where to look"
 SHAPE = "The shape"
+DONE = "Done when"
 SOLUTION = "Solution"
-LABELS = (WHERE, SHAPE, SOLUTION)
+LABELS = (WHERE, SHAPE, DONE, SOLUTION)
 
 HINT_PREFIX = "Hint:"
+DONE_PREFIX = "Done when:"
+DIAGNOSIS = (
+    "Before you move on, name what separates your attempt from this one:",
+    "a different design, a detail, or an equivalent alternative.",
+)
+"""The paragraph that closes every "Solution" step, one entry per line."""
 SHAPE_PREFIX = "# The shape of "
 MAX_WIDTH = 60
 LONG_LITERAL = 3
@@ -332,7 +367,9 @@ class Flat:
     hint: list[str]
     """The hint paragraph, `Hint:` prefix removed; empty when none."""
     rest: list[str]
-    """Everything after the hint paragraph (or after the quote)."""
+    """Everything after the hint and done paragraphs (or the quote)."""
+    done: list[str] = field(default_factory=list)
+    """The `Done when:` paragraph after the hint, prefix removed."""
 
 
 def _blocks(lines: Sequence[str]) -> list[tuple[int, int]]:
@@ -375,7 +412,8 @@ def unwrap(body: Sequence[str]) -> Flat:
         if is_shape_block(body, i):
             for k in range(i, min(j + 1, len(body))):
                 owned[k] = True
-    had_hint = False
+    _own_diagnosis(body, fenced, owned)
+    had_hint = had_done = False
     for k, line in enumerate(body):
         if fenced[k] or owned[k]:
             continue
@@ -383,15 +421,46 @@ def unwrap(body: Sequence[str]) -> Flat:
         m = SUMMARY.match(stripped)
         if stripped in (OPEN, CLOSE) or (m and m.group(1) in LABELS):
             owned[k] = True
-            had_hint = had_hint or (m is not None and m.group(1) == WHERE)
+            label = m.group(1) if m else None
+            had_hint = had_hint or label == WHERE
+            had_done = had_done or label == DONE
     kept = [line for k, line in enumerate(body) if not owned[k]]
     kept = _squeeze(kept)
-    if had_hint:
-        first = next((k for k, line in enumerate(kept) if line.strip()),
-                     None)
-        if first is not None and not kept[first].startswith(HINT_PREFIX):
+    first = _paragraph_start(kept, 0) if had_hint else None
+    if first is not None:
+        if not kept[first].startswith(HINT_PREFIX):
             kept[first] = f"{HINT_PREFIX} {kept[first]}"
+        second = _paragraph_start(kept, _paragraph_end(kept, first))
+        if (had_done and second is not None
+                and not kept[second].startswith(DONE_PREFIX)):
+            kept[second] = f"{DONE_PREFIX} {kept[second]}"
     return split_hint(kept)
+
+
+def _paragraph_start(lines: Sequence[str], start: int) -> int | None:
+    """Index of the first nonblank line at or after `start`, or None."""
+    return next((k for k in range(start, len(lines)) if lines[k].strip()),
+                None)
+
+
+def _paragraph_end(lines: Sequence[str], start: int) -> int:
+    """One past the last line of the paragraph opening at `start`."""
+    end = start
+    while end < len(lines) and lines[end].strip():
+        end += 1
+    return end
+
+
+def _own_diagnosis(body: Sequence[str], fenced: list[bool],
+                   owned: list[bool]) -> None:
+    """Mark each unfenced run of lines that is the `DIAGNOSIS` text."""
+    size = len(DIAGNOSIS)
+    for k in range(len(body) - size + 1):
+        if any(fenced[k:k + size]):
+            continue
+        if tuple(line.strip() for line in body[k:k + size]) == DIAGNOSIS:
+            for j in range(k, k + size):
+                owned[j] = True
 
 
 def _squeeze(lines: list[str]) -> list[str]:
@@ -408,17 +477,35 @@ def _squeeze(lines: list[str]) -> list[str]:
     return out
 
 
+def _paragraph(lines: Sequence[str], start: int | None,
+               prefix: str) -> tuple[list[str], int] | None:
+    """(the paragraph opening at `start` less `prefix`, one past its end).
+
+    None when there is no paragraph at `start` or its first line does
+    not begin with `prefix`.
+    """
+    if start is None or not lines[start].startswith(prefix):
+        return None
+    end = _paragraph_end(lines, start)
+    found = list(lines[start:end])
+    found[0] = found[0].removeprefix(prefix).lstrip()
+    return found, end
+
+
 def split_hint(lines: list[str]) -> Flat:
-    """Separate the `Hint:` paragraph that opens `lines`, if one does."""
-    first = next((k for k, line in enumerate(lines) if line.strip()), None)
-    if first is None or not lines[first].startswith(HINT_PREFIX):
+    """Separate the `Hint:` paragraph that opens `lines`, if one does.
+
+    A `Done when:` paragraph directly after the hint is set apart too.
+    """
+    hint = _paragraph(lines, _paragraph_start(lines, 0), HINT_PREFIX)
+    if hint is None:
         return Flat([], lines)
-    end = first
-    while end < len(lines) and lines[end].strip():
-        end += 1
-    hint = list(lines[first:end])
-    hint[0] = hint[0].removeprefix(HINT_PREFIX).lstrip()
-    return Flat(hint, _squeeze(lines[end:]))
+    hint_lines, end = hint
+    done = _paragraph(lines, _paragraph_start(lines, end), DONE_PREFIX)
+    if done is None:
+        return Flat(hint_lines, _squeeze(lines[end:]))
+    done_lines, end = done
+    return Flat(hint_lines, _squeeze(lines[end:]), done_lines)
 
 
 def shapes(rest: list[str]) -> list[list[str]]:
@@ -454,10 +541,18 @@ def wrap(flat: Flat) -> list[str]:
         for block in blocks:
             out += [*block, ""]
         depth += 1
-    out += [OPEN, summary_line(SOLUTION), "", *flat.rest, ""]
+    if flat.done:
+        out += [OPEN, summary_line(DONE), "", *flat.done, ""]
+        depth += 1
+    out += [OPEN, summary_line(SOLUTION), "", *_solution(flat), ""]
     depth += 1
     out += [CLOSE] * depth
     return out
+
+
+def _solution(flat: Flat) -> list[str]:
+    """The "Solution" step's lines: the authored rest, then `DIAGNOSIS`."""
+    return [*flat.rest, "", *DIAGNOSIS] if flat.rest else list(DIAGNOSIS)
 
 
 # --------------------------------------------------------------------------- #
@@ -478,7 +573,9 @@ def steps(flat: Flat) -> list[Step]:
     if blocks:
         found.append(Step(SHAPE, [line for block in blocks
                                   for line in [*block, ""]][:-1]))
-    found.append(Step(SOLUTION, list(flat.rest)))
+    if flat.done:
+        found.append(Step(DONE, list(flat.done)))
+    found.append(Step(SOLUTION, _solution(flat)))
     return found
 
 

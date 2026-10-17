@@ -85,6 +85,9 @@ touching `self.balance`, so an overdrafting transfer stops before the
 Writing the overdraft test first makes this ordering a
 deliberate decision rather than an accident.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -148,6 +151,9 @@ the two sides are bit-identical, so `==` passes just as well.
 The assertion needs the tolerance for a rate such as `0.1`,
 where the two sides differ by one bit,
 or for interest applied more than once.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -226,6 +232,9 @@ body returns control to the fixture.
 **Share the check across tests.**
 Both tests get the same invariant check
 from one assertion in the fixture.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -316,6 +325,9 @@ Injection moves the environment lookup out of the function and into a caller.
 That caller must read `APP_CONFIG` and pass in the directory.
 It is usually one function at the program's edge,
 and that function is the one place a patching test is worth writing.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -435,6 +447,9 @@ The function then receives what it needs from its caller.
 A function that is [hard to test](../../Chapters/11_Techniques--Testing.md#making-code-testable) usually does the opposite.
 It fetches a dependency instead of accepting it as a parameter.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -515,6 +530,9 @@ so the type checker checks it against `Callable[[str], None]`
 and reports a type error when the two stop matching.
 A `Mock` accepts any call.
 `create_autospec()`, which the chapter introduces, builds a mock that checks each call against the real function's signature.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

@@ -74,6 +74,9 @@ collects them in a list.
 each responder in turn, so every connected responder sees the same update,
 in connection order.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -310,6 +313,9 @@ Both versions print the same line, and both ignore `arg`. Under
 pull, each observer's own code selects what to read from the subject, so
 each observer must name the type of the subject it watches.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -441,6 +447,9 @@ can fail on a single notification, and the caller needs every failure,
 not the first. `except*` then lets a caller handle one kind of failure
 and re-raise the rest.
 A plain `except` receives a single exception, with no group to split.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -639,6 +648,9 @@ The two versions differ in where a `BaseException` goes.
 In the synchronous version it propagates out of the loop and stops the notification, which is right for a `KeyboardInterrupt`.
 Here `gather()` has turned it into a value, and a filter that drops the value hides the failure.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -774,6 +786,9 @@ An exception the callable does raise propagates out of `announce()` as it does i
 Returning errors as values works when you write the responders.
 For a broadcaster that accepts arbitrary callables,
 exercise 3's catch-and-collect keeps the loop running when a responder someone else wrote raises an exception.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -961,6 +976,9 @@ Widening the annotation lets the same view draw either model.
 The wider type can be a Protocol,
 or `Broadcaster[Grid]` plus `size`, `grid`, and `select()`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1083,6 +1101,9 @@ model, so the view stays correct under any rule.
 `recolored()` holds the rule, `GridModel.select()` calls it, and
 `announce()` delivers the result. `initials()` shows the same separation.
 It is a second view of a `Grid`, and it prints whatever `Grid` the rule produces.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1273,6 +1294,9 @@ Adding a third view means one more `connect()` call. `grid_view.py`'s
 report the same grid. `show()` ends in `root.mainloop()`,
 which runs the window's event loop until the window closes, so call `show()` last.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1443,6 +1467,9 @@ selections turns that board one color.
 `Color` is a `StrEnum`, so its members are strings and go straight into
 `", ".join(reachable(size))`.
 String members also let `grid_view.py` pass a `Color` to `tkinter`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1615,6 +1642,9 @@ to that attribute.
 rather than declaring it on the class, where every instance would share
 one list.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1786,6 +1816,9 @@ The import problem stays.
 A responder registers when Python runs its `def`,
 so a responder in a module nothing imports still registers nothing.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1954,6 +1987,9 @@ The generated `__init__()` assigns both fields through their properties,
 so constructing `station` announces twice.
 The responder list is still empty then,
 so `calls` holds the two assignments that follow `@station.respond`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -2147,6 +2183,9 @@ A third view leaves every existing class as it is.
 The new view connects in its own `__post_init__()`.
 In `document_view.py` the controller is a method of the one view,
 so a second view either duplicates `key()` or has no input of its own.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

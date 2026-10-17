@@ -72,6 +72,9 @@ and then binds the names it requests.
 The package's `__init__.py` runs once for the same
 reason.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -165,6 +168,9 @@ case-insensitive filesystem the shell and the editor accept `bpackage`
 as well, but Python's import check compares case and rejects `bpackage`.
 Exercise 4 examines that check.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -247,6 +253,9 @@ load. The module's top-level code runs at the first use of that name,
 so use order, not declaration order, decides which module loads
 first.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -312,6 +321,9 @@ Following the naming convention prevents the mismatch.
 recommends `snake_case` for modules. With an all-lowercase name, an
 import and its file always match in case.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -374,6 +386,9 @@ by its path, so `__package__` holds `a_package` and the dot resolves.
 A module inside a package works only as a member of that package,
 so run it with `-m`. A file you intend to run with `python file.py`
 belongs at the top level, outside any package.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -449,6 +464,9 @@ leading underscore or not, and leaves every other name in the module. Without
 `__all__`, the underscore is the one way to keep a name out of a star
 import.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -512,6 +530,9 @@ After the module rebinds its own name, the script's name still
 references the original object. When a module may rebind a name to a new
 list or dict, import the module and read the name through it each
 time, as in `plugin_list.plugins`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

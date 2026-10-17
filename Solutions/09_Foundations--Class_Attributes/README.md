@@ -38,6 +38,9 @@ reading `c.rating` falls back to the class attribute, which is now
 The line `a.rating = 1` gave `a` its own instance attribute,
 and that attribute shadows the class attribute when you read `a.rating`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -93,6 +96,9 @@ assigns to `Left.shared` or `Middle.shared`. In the last step,
 `Right` holds `100` throughout, because its class body creates its
 own class attribute with `shared = 100`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -135,6 +141,9 @@ the way each `A()` in `real_defaults.py` holds its own `x`.
 A constructor default creates one value per instance,
 unlike a class-body attribute,
 which creates one value shared by all instances until something shadows it.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -204,6 +213,9 @@ This shadow is the bug `ClassVar` exists to catch. With
 `a.total = 99` as an error before the line runs, because the
 assignment writes to a `ClassVar` through an instance.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -271,6 +283,9 @@ because it inspects every default before generating the constructor.
 so Python runs its body as written and `Cart` gets its shared list silently.
 The `ValueError` message ends with the remedy: `use default_factory`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -324,6 +339,9 @@ the class the way it did before any assignment.
 `del` acts on the instance dictionary alone, the way assignment does, so
 `vars(A)["x"]` keeps its `100`.
 Deleting the class attribute takes `del A.x`, naming the class.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -427,6 +445,9 @@ Constructing an empty subclass twice after `c` and `d` leaves
 `Counting.total` at `2` and gives the subclass its own `total` of
 `4`. Naming the class sends every write to one dictionary.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -522,6 +543,9 @@ each instance its own list, and `__init_subclass__()`, which
 [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 introduces, gives each subclass its own.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -589,6 +613,9 @@ against the declared `str`.
 A bare annotation is safe when the code that assigns the attribute
 runs before any code that reads it. The type checker cannot confirm
 that order, so the class depends on its callers to keep it.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -704,6 +731,9 @@ own counter, and the second `Sub()` (`[2]`) moves it to `3` while
 and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`
 at any point. Both names report the one shared count, so the three
 lines read `1 1`, `2 2`, and `3 3`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

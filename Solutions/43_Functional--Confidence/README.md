@@ -85,6 +85,9 @@ The number depends on the core count, the task sizes, and scheduling,
 so it is reproducible on your machine and nowhere else.
 Because of that dependence, the listing has no `#:` marker for it.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -142,6 +145,9 @@ For threads, the equivalent is `threading.get_ident()`.
 [one `map()` interface](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
 Underneath, `ProcessPoolExecutor` runs the calls in separate
 processes. `ThreadPoolExecutor` runs them in threads of one process.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -236,6 +242,9 @@ useful, and makes `assert sorted(xs) == sorted(xs)` worthless.
 Capping the list length keeps the quadratic oracle fast, since the
 bugs it catches appear in short inputs.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -329,6 +338,9 @@ For case-insensitive comparison Python provides `str.casefold()` rather than `st
 
 A hand-written loop over `"abcde"` never tests `µ`.
 The generated strings include characters nobody thinks to type.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -499,6 +511,9 @@ that Hypothesis wrote for you.
 The case keeps failing until you fix the bug. The first run after the fix replays the case
 once more, finds that it passes, and deletes it from the database.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -604,6 +619,9 @@ The read of the real clock or the real `os.environ` moves out of the middle of t
 into one line at its edge, in the caller.
 [Testing](../../Chapters/11_Techniques--Testing.md#random-numbers)
 makes the same move for a random source.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -732,6 +750,9 @@ either version.
 The choice is about reading, not about proving. Neither form tells
 the type checker anything the other cannot, so pick the one that
 states the shapes you expect: the `match`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

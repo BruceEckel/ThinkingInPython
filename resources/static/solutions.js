@@ -1,9 +1,10 @@
 // Progress memory for a Solutions page's step ladders.
 //
 // tools/solution_steps.py folds each exercise's answer into nested
-// <details> elements: "Where to look", then "The shape", then
-// "Solution". The nesting is what orders the steps, and the browser
-// renders it with no script, so this file adds only what HTML cannot:
+// <details> elements: "Where to look", then "The shape", then an
+// optional "Done when", then "Solution". The nesting is what orders
+// the steps, and the browser renders it with no script, so this file
+// adds only what HTML cannot:
 //
 //   - each step a reader opens stays open on the next visit, kept in
 //     localStorage under this page's path and the exercise's heading id;
@@ -17,7 +18,9 @@
 (function () {
   "use strict";
 
-  var LABELS = { "Where to look": 1, "The shape": 1, "Solution": 1 };
+  var LABELS = {
+    "Where to look": 1, "The shape": 1, "Done when": 1, "Solution": 1
+  };
   var KEY = "tip-steps:" + location.pathname;
 
   function load() {

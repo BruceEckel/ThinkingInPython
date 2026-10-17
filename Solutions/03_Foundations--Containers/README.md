@@ -75,6 +75,9 @@ though by `n = 2_000` the `deque` finishes several times faster.
 At large `n` the list's quadratic term dominates,
 so the list falls further behind the `deque` as `n` grows.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -117,6 +120,9 @@ The `0` that `defaultdict(int)` supplies for a missing key comes from
 That default lets `counts[kind] += 1` work with no "does this key exist yet" check.
 `defaultdict(list)` removes the same check before appending to a fresh list.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -150,6 +156,9 @@ print(a.intersection(b, d))
 the `|` and `&` operators, which take two operands at a time.
 The three-way intersection is empty because no single value is a
 member of all three sets.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -188,6 +197,9 @@ be hashable. `frozenset` is hashable because it is immutable.
 Its contents stay the same after creation, so its hash stays valid.
 A `list` is mutable, so the `list` class sets `__hash__` to `None`.
 A set member or a dictionary key needs a hash, so a `list` can be neither.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -233,6 +245,9 @@ forms: slice, then reverse the copy, or count the indices down with a
 negative `step`. The one-slice form is harder to read because the
 bounds swap roles. `3` is now the first index visited and `0` is the
 stop, so the slice ends at index `1`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -290,6 +305,9 @@ the tally. `most_common()` becomes a `sorted()` call with a key
 function and a slice, and the `Counter({...})` repr becomes a `dict()`
 conversion.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -333,6 +351,9 @@ Line `[1]` reads fields by name.
 Unpacking and `person[0]` still work beside the names,
 so a heterogeneous tuple that passes between functions
 is usually better as a `namedtuple` or a data class.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -390,6 +411,9 @@ Letting the right operand win makes `|` on dictionaries depend on operand order.
 On sets, `a | b` and `b | a` are the same set.
 The two uses share one operator because both mean "combine,"
 but the set version alone commutes.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -460,6 +484,9 @@ the rest, zero or more, for `b`. So the assignment accepts a
 five-item list, a one-item list, and everything between.
 Only an empty list has too few items. The star turns a fixed-shape assertion into a flexible one.
 The same flexibility lets `*args` work in a function signature.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -539,6 +566,9 @@ The immutability is shallow, as it is for the `tuple` in `shallow_immutability.p
 Because a `frozendict` is hashable when its values are,
 keep its values immutable whenever you use the mapping as a key:
 a `tuple` here instead of a `list`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

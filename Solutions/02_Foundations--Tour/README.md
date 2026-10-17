@@ -38,6 +38,9 @@ print(a, c)
 `c = a[:]` makes a new list with the same elements,
 so `c.append(99)` changes `c` and leaves `a` alone.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -76,6 +79,9 @@ An empty dictionary is falsy, the same as an empty list or an empty string.
 A dictionary with one or more entries is truthy.
 The rule is the same for every container: falsy when empty, truthy otherwise.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -109,6 +115,9 @@ print(f"{score = }")
 zero included. `{score = }` prints both the expression's source text
 and its value,
 so one field replaces a debugging `print("score", score)`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -176,6 +185,9 @@ This book's `pyproject.toml` turns them on with the `N` in its `select` list.
 The uppercase form passes the linter and still violates
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions),
 which reserves uppercase for constants and CapWords for class names.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -261,6 +273,9 @@ Quoting is a harmless demonstration, but the same reasoning covers
 escaping a value before it enters SQL or HTML, where a wrong guess is a
 security hole rather than a typo.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -297,6 +312,9 @@ The identity `a == (a // b) * b + a % b` then forces the remainder to `3`.
 The result of `%` takes the sign of the divisor.
 With a positive divisor the remainder is zero or positive, which is why
 `index % len(items)` wraps to a valid index in either direction.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

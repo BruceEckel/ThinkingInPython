@@ -79,6 +79,9 @@ a single element and loops forever on it.
 The recursive version is safe from all three mistakes,
 because its `for` loop and the call stack make those choices for it.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -147,6 +150,9 @@ so `square(3)` evicts nothing and the second `square(1)` becomes a hit.
 The comment on the `square(3)` call in `functools_lru_cache.py` says "Evicts 1, the least
 recently used," which is true of `maxsize=2` alone.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -214,6 +220,9 @@ and `islice()` then pulls five totals, so
 `count()` yields exactly fifteen integers in all. The first total is
 `1 + 2 + 3`, and each later one is nine larger, since every batch
 advances the source by three.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -294,6 +303,9 @@ Whenever the input fits in memory, `grouped()` is the better answer.
 `grouped()` also loses the input's order. `groupby()` reports groups
 as they occur, while `grouped()` reports them in first-appearance
 order and drops the interleaving between them.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -382,6 +394,9 @@ function can meet either one alone.
 
 `deep_sum()` is pure, so the exception comes from the argument type alone,
 and caching `deep_sum()` would be correct once its argument is hashable.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -504,6 +519,9 @@ Passing the `rng` is dependency injection applied to a source of
 nondeterminism, the same technique
 [Random Numbers](../../Chapters/11_Techniques--Testing.md#random-numbers)
 recommends for testing.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

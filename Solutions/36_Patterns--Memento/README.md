@@ -239,6 +239,9 @@ so any `History` holding `before` as a past state still holds both strokes.
 that claim. After `do(before.erase())`, the stored past state `is`
 the original object, still carrying both strokes.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -339,6 +342,9 @@ the program has made more `do()` calls than it has undone. Once the
 bound discards state `0`, no undo can return to it, so `False` is the
 correct answer.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -426,6 +432,9 @@ language-neutral format.
 JSON loses. It wraps `data["strokes"]` back in `tuple(...)` before
 passing it to `Drawing`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -506,6 +515,9 @@ def test_memento_is_a_snapshot() -> None:
 **Isolate the sharing bug.** Against the shared-list version, `checkpoint.strokes` is `["a", "b"]`
 when the assertion runs, because `draw("b")` appended to the one list
 `sketch` and `checkpoint` share.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -622,6 +634,9 @@ repeatedly. Each `undo()` pushes the state it leaves onto
 `steps_back` times. After `goto(2)`, `h.redo()` returns `2`, then `3`,
 the states `goto()` undid, in the order `do()` recorded them. Jumping several states back
 "in one call" is a convenience for the caller.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -775,6 +790,9 @@ One undo takes back the whole restore.
 stack keeps its states, and `redo()` replays states that a recorded
 action would have discarded.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -901,6 +919,9 @@ as soon as code derives a new state from the invalid one.
 In general, a constructor validates the value that enters your
 program through it, while a deserializer like `pickle` writes the value into the instance and skips the constructor.
 `msgspec` and `pydantic` exist to validate a value as they deserialize it.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

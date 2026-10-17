@@ -148,6 +148,9 @@ new format is one assignment. A new field is an edit to every format,
 so the design is the right answer only if formats are what keep
 changing.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -243,6 +246,9 @@ language, passing a behavior means passing an object. The crossed-out
 parts build that object. Python has had the
 [missing piece](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 all along, since a function is a value you can pass.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -346,6 +352,9 @@ you run, not a rule to remove as much as you can. Take something away,
 run the program, and read the result. If nothing broke, the piece was
 supporting code. If something broke, the piece you removed expresses
 the design, and that piece is worth keeping and worth naming.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -567,6 +576,9 @@ part whose job is to assemble the pieces. The `match` in `main()` names
 every writer class, so `main()`'s heavy edges are the ones that remain.
 A [registry](../../Chapters/26_Patterns--Factory.md#self-registration)
 moves them out of `main()` as well.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

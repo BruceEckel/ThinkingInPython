@@ -12,11 +12,12 @@ Every fenced Python code block whose first line is a `# name.py` comment is a li
 A chapter's exercises sit at its end.
 
 `Solutions/<chapter>/README.md` holds the answers, numbered to match the exercise list.
-Each answer opens with the exercise, quoted from the chapter, then a collapsible ladder of three steps:
+Each answer opens with the exercise, quoted from the chapter, then a collapsible ladder of steps:
 
 - *Where to look*: a hint that points into the chapter.
 - *The shape*: the solution's skeleton, with the bodies elided.
-- *Solution*: the full listing, with an explanation of its design choices.
+- *Done when*: the check that tells the reader their attempt is finished, where the solution carries one.
+- *Solution*: the full listing, with an explanation of its design choices. It ends by asking the reader to name what separates their attempt from it: a different design, a detail, or an equivalent alternative.
 
 `uv run tip hint CH=30 N=3` prints the same steps one at a time, one more on each run.
 The `.py` files beside a `README.md` are generated from it.

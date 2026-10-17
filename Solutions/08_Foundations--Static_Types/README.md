@@ -82,6 +82,9 @@ It qualifies because it has a `draw() -> str` method,
 and that method is all `Drawable` requires.
 `Drawable` and `render()` accept a `Triangle` as written.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -131,6 +134,9 @@ the call returns `"3333"`, because `"3" * 4` is valid string repetition.
 In the book, the `# type: ignore` comment on the `area("3", 4)` line
 lets a deliberately wrong example pass the book's build. Removing the
 comment restores the error.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -191,6 +197,9 @@ and a call on a `list[str]` binds `T` to `str`.
 The type checker therefore infers that
 `last([10, 20, 30])` returns an `int` and `last(["a", "b", "c"])`
 returns a `str`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -279,6 +288,9 @@ since `report()` first appears on `NamedTally`.
 At run time, the `.report()` call resolves to `LoudTally.report()`,
 because Python starts method lookup at the object's own class.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -352,6 +364,9 @@ With the default removed, so does `words.top().no_such_method()`.
 A default turns a bare annotation that accepts every operation
 into one that checks each operation against `str`.
 So give a default to a class whose parameter is usually the same type.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -432,6 +447,9 @@ and puts the allowed set in one place to change.
 **Widen the set at its definition.** Adding `"purple"` to the alias removes the error at every
 call. `grid[cell] = color` works as written, since `Grid`'s values are
 `str` and every `Color` is a `str`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -525,6 +543,9 @@ invariant. A read-only type is covariant. The practical rule follows:
 annotate a parameter with the weakest type the body needs, because
 each caller's argument must supply every capability you declare.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -588,6 +609,9 @@ default](../../Chapters/05_Foundations--Functions.md#sentinel-values).
 The same answer applies: test for the condition you mean. Use
 `is None` when you mean "was anything supplied," and truthiness when
 an empty value belongs with the missing one.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -665,6 +689,9 @@ holds through the call, and the type checker's verdict matches what
 the program does. In the chapter's version the verdict concerns
 `b.val`, which the call changes after the test.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -717,6 +744,9 @@ as the definition sets them. `Final` stops a rebinding, and the tuple
 type has no method that changes its contents. The definition is
 therefore the one place to put a value into the constant. A reader
 looks for the value there too.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

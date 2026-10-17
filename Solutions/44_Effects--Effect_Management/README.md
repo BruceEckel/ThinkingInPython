@@ -107,6 +107,9 @@ at the `greet(...)` call, not at the class definition.
 The checker compares `Console` with `Tell` where `greet()` receives the `Console` as `tell`,
 the one place the class meets the protocol.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -278,6 +281,9 @@ Effect therefore leaves the signatures of `greet()`, `session()`,
 of their rows. You write the new helper and the one handler that
 binds `log`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -366,6 +372,9 @@ Across `withdraw()` and `Thermometer`, the classification depends on
 what the code does, not on the language feature it uses. A global, an instance
 attribute, and a responder list are three storage mechanisms for one
 idea: something outside the call participates in the result.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -464,6 +473,9 @@ one at the construction site instead of one in every function that uses the valu
 Every function downstream of a `PositiveInt` is pure with respect to this failure.
 Its signature says which values it accepts,
 instead of leaving that to a docstring.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -605,6 +617,9 @@ implementation set at the call site. Setting the implementation there also expla
 feels like a nuisance rather than a benefit. You do the bookkeeping
 of Effect tracking, an `await` and an `async def` in every caller,
 without the delayed binding that makes that bookkeeping useful.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

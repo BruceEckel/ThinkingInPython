@@ -72,6 +72,9 @@ thousands of times faster in this run.
 A worst-case measurement misrepresents a program whose lookups cluster near the front of the list,
 where a scan finds them quickly.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -117,6 +120,9 @@ that stays fast until the list grows long.
 Run the same loop yourself and expect a different number,
 though the trend should look similar.
 The `set` should win within the first few sizes.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -211,6 +217,9 @@ because an eager version computes every value up front.
 The lazy generator pipeline stops when `islice()` has its five values,
 so it computes nine squares and stores the five even ones it returns.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -274,6 +283,9 @@ An impure function breaks that assumption.
 It prints, writes a file, or increments a counter on the first call with a given argument.
 The cache silently skips that side effect on every repeat.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -336,6 +348,9 @@ The last element moves to index 0,
 then moves down the tree past each smaller child until the heap ordering holds again.
 Sorting the whole list on every pop does far more work.
 The extra order goes unused, since callers read only the front element.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -409,6 +424,9 @@ while it still carries a `__dict__`.
 Every instance holds both the two slots and a dictionary.
 A subclass of a slotted class must declare `__slots__`,
 using an empty tuple when it inherits all its fields.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -512,6 +530,9 @@ Global monitoring answers "what ran."
 Local monitoring answers "how often did this run,"
 which is the question you had when you opened `sys.monitoring` instead of a profiler.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -581,6 +602,9 @@ The two columns hold the same value only for a leaf function, one that calls not
 The top of the `cumtime` ranking is the outermost frame,
 which calls everything and does almost none of the work,
 so the two rankings usually open on different functions.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -654,6 +678,9 @@ A compact layout saves time when the loop over it reads raw values instead of Py
 `sum()` over an `array` works on Python objects and boxes every element.
 NumPy's `sum()` adds the same raw doubles in a C loop,
 which is why vectorizing is faster and `array` alone is not.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -746,6 +773,9 @@ resizing in place instead of copying.
 That optimization is an implementation detail.
 CPython stops applying it as soon as a second name refers to the string the loop is building.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -811,6 +841,9 @@ or an `IndexError` when the target is the largest element in the list.
 **Recover the whole run.** `left` and `right` together answer a third question, one the chapter leaves unasked.
 `xs[left:right]` is the run of equal values,
 and `right - left` counts them, both in O(log n) with no scan.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -891,6 +924,9 @@ at its full `limit`, timed with `min(timeit.repeat(...))`.
 On a python.org 3.15 build, one machine measured `count_primes()` about 20% faster with the JIT on, against run-to-run noise of a few percent.
 Run-to-run noise is why `pyperformance` reports a geometric mean over dozens of benchmarks
 instead of one number from one program.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

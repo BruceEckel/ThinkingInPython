@@ -104,6 +104,9 @@ For a long list and frequent lookups, convert the list once with
 `dict(pairs)`.
 Keep the adapter when some other caller needs the list to stay a list.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -177,6 +180,9 @@ Python issues the subclass warning when the `class` statement runs,
 so for a module-level subclass the warning appears at import, before any call. A library that subclasses a
 deprecated class emits the warning as soon as Python imports that
 library.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -308,6 +314,9 @@ A caller of `shop` sees `start_car`.
 Both also see `record`.
 Neither version enforces privacy.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -366,6 +375,9 @@ Purpose, not code, decides the classification. All three could be the
 same `__getattr__()` forwarder. What separates them is the answer to
 "what breaks if I delete this."
 A name chosen from that answer tells the next reader why the wrapper is there.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -548,6 +560,9 @@ that keyword and reaches the adapter.
 
 With the `/` in place, as in `adapter.py`, every caller must pass
 the parameter by position, so the override is free to call it `item`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

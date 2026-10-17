@@ -73,6 +73,9 @@ The returned list follows the argument order, not the finishing order.
 `gather()` fills each position from the coroutine passed in that
 position, so `'D'` is last in the list although `d` finished first.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -156,6 +159,9 @@ The slowdown comes from when each coroutine starts, not from the list comprehens
 Calling `fetch()` builds a coroutine object, and the coroutine runs when something awaits it.
 `gather()` and a `TaskGroup` schedule every coroutine as a task before waiting on any,
 so all three sleeps start together.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -246,6 +252,9 @@ task suspended there counts as active. If you remove the
 on whether an `await` sits inside the measured span, not on where it
 sits relative to the computation.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -334,6 +343,9 @@ it has no `await` to reach.
 The total run time shows the blocking tasks running in turn. Five blocking
 sleeps of 0.05 seconds take about a quarter second, while five awaited
 ones take about 0.05.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -457,6 +469,9 @@ That second holder reintroduces the race the lock is there to prevent.
 so the stray `release()` raises
 `ValueError: BoundedSemaphore released too many times`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -527,6 +542,9 @@ Windows and macOS default to `spawn`, and since 3.14
 Linux defaults to `forkserver`.
 Every platform's default therefore requires the guard.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -596,6 +614,9 @@ because the read-modify-write sequence is still not atomic.
 A free-threaded interpreter has no GIL,
 so its threads run at the same moment and can interleave any read and write.
 The fix is a lock around the read and the write.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -692,6 +713,9 @@ before `3`, then alphabetically by the description within a priority
 `"zzz"`, and `"aaa"` before `"backup"`.
 The final order is the same whichever thread submits a job first,
 because `consume()` starts after all three producers finish.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -842,6 +866,9 @@ Undoing those writes is the job of your own code, not of the `TaskGroup`.
 pairs an action with its cleanup.
 That cleanup releases resources, but it cannot reverse a write that succeeded.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -930,6 +957,9 @@ That combination, results discarded and siblings left running, is why
 `return_exceptions=True` keeps every outcome, so partial success stays
 visible. A `TaskGroup` guarantees that every task has ended when the block exits.
 Bare `gather()` gives you neither.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1021,6 +1051,9 @@ every task, so the last writer wins and the other two tasks read a
 value another task set. A `ContextVar` is per-task storage
 reachable by one name.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1106,6 +1139,9 @@ has its own GIL. The work spreads across processors instead of
 time-slicing on one. A free-threaded build reaches the same end by
 removing the GIL instead of multiplying it,
 so its ordinary threads run on several processors at once.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1229,6 +1265,9 @@ inside `__next__()`, where `threading.serialize_iterator()` puts it.
 A lock protects the statements it encloses.
 A `for` loop calls `next()` in its header, outside them.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1324,6 +1363,9 @@ locks in one global order makes such a cycle impossible. Every lock a
 task waits for comes later in the order than every lock it holds.
 "Later" never loops back to "earlier."
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1393,6 +1435,9 @@ the failure wrapped in an `ExceptionGroup`.
 `mixed_await.py`'s `main()` has no `except*`, so the `ExceptionGroup`
 propagates out of `asyncio.run()` and prints as the grouped traceback
 above.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

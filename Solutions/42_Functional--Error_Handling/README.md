@@ -111,6 +111,9 @@ so `3` fails in `func_c()`. Inputs `1` through `4` each fail
 at a different step. A chain short-circuits at the first step that fails,
 so the order of the steps decides where the chain stops.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -267,6 +270,9 @@ you call `result.map_error(prefix)` once,
 at the boundary where you report the error,
 instead of adding the prefix inside every function that might produce an error.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -374,6 +380,9 @@ anything, the type checker rejects a later `a.answer`.
 It cannot infer that an empty error list means all three succeeded. The tuple pattern
 states that condition in the `case`, so the listing needs no `assert`
 to restate it.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -501,6 +510,9 @@ other exception. The chapter's `@safe` returns the `TypeError`
 as `Err(TypeError(...))`, the same shape a bad-input failure
 takes.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -594,6 +606,9 @@ the next step. Here it sequences the two calls while the lambda
 discards the answer. The `returns` library's
 [do-notation](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
 reads better.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -695,6 +710,9 @@ Use `| None` when the caller needs
 to know whether a step succeeded. Use a `Result` when the caller may need to act on
 which failure occurred, or when a person reading a bug report needs
 to know which of three steps went wrong.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

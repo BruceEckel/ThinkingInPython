@@ -293,12 +293,19 @@ paragraph beginning `Hint:` is folded by `tools/solution_steps.py`
 (`tip steps`, in `gate` and `verify-ch` since 2026-10-02) into nested
 `<details>`: "Where to look" (the hint), "The shape" (each listing
 with its function bodies elided, generated), then "Solution" (the
-rest, as authored). GitHub and the site render the ladder collapsed,
-so a reader opens one step at a time; `tip hint CH=30 N=3` prints the
-same steps one per run. The `<details>` lines, the three `<summary>`
-labels, and every block starting `# The shape of` are tool-owned and
-rewritten on every run; edit the hint, the prose, and the listings
-inside the ladder, never the tags. A solution without a `Hint:`
+rest, as authored). A paragraph beginning `Done when:` directly after
+the hint (since 2026-10-17) adds a "Done when" step between "The
+shape" and "Solution": an authored criterion the reader checks before
+opening the solution. Every "Solution" step ends with a generated
+self-diagnosis paragraph (`DIAGNOSIS` in the tool): name what
+separates your attempt from this one, a different design, a detail,
+or an equivalent alternative. GitHub and the site render the ladder
+collapsed, so a reader opens one step at a time; `tip hint CH=30 N=3`
+prints the same steps one per run. The `<details>` lines, the four
+`<summary>` labels, the diagnosis paragraph, and every block starting
+`# The shape of` are tool-owned and rewritten on every run; edit the
+hint, the `Done when:` criterion, the prose, and the listings inside
+the ladder, never the tags. A solution without a `Hint:`
 paragraph is left flat. Chapter 30 is the prototype; the other 44
 files have no hints yet. The site renders each Solutions file as
 `<stem>.solutions.html` beside its chapter (`tools/build_site.py`,

@@ -53,6 +53,9 @@ iterator rather than running the body immediately.
 `total()` passes whatever iterable it receives to `sum()`,
 so it sums `evens(5)` with no change, as it sums `fibonacci(8)` and `Countdown(5)` in the chapter.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -142,6 +145,9 @@ so to learn how many values remain, you must consume them.
 produces a generator on demand. The container keeps the value
 `len()` reads, and reading that value consumes nothing.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -201,6 +207,9 @@ ten iterations and leaves the other 999,990 uncomputed.
 [Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#generator-expressions) and
 [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
 both rely on the same laziness.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -297,6 +306,9 @@ The list is a better choice only when a pass is slow and you know the
 data is small, or when the source delivers its data once, as a network
 response does.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -392,6 +404,9 @@ about 41 bytes per buffered item.
 sizes shift between machines and Python builds while their ordering
 holds. Pass `--numbers` to see the figures your machine reports.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -453,6 +468,9 @@ reader might reasonably guess that `filter()`, being a function rather
 than a clause, can stop early.
 But `filter()` stops only when its source stops.
 Its predicate receives one value at a time and answers "keep" or "skip" for that value, not "stop."
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -639,6 +657,9 @@ so `itertools.count()` holds one number, the next value it returns.
 Iterating over `count()` takes constant memory.
 Rewinding it is impossible.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -744,6 +765,9 @@ pulls early the same way.
 Its `is_done()` reads the next item before
 `current_item()` asks for it.
 Answering a question about the next item means fetching that item.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -857,6 +881,9 @@ But `ty` accepts `"ab"`, because a `str` is a
 same endless descent that breaks `flatten()`. Pyright rejects the
 string. Under `ty` the failure is a `RecursionError` at
 runtime rather than an error at the assignment.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -995,6 +1022,9 @@ so `SkippingIterator` needs a loop written into the method
 to keep pulling until a match arrives.
 A `__next__()` that raises a `TypeError` is straight-line code.
 It reads one item and either returns that item or raises the exception.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

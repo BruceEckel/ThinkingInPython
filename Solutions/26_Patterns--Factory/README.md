@@ -181,6 +181,9 @@ Every shape in that version carries a nested `Factory` and an entry in the table
 The chapter's `registry.py` drops both the nested class and the entry.
 Each class registers itself, so adding a shape means writing its class.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -416,6 +419,9 @@ At runtime that version fails later, inside the game.
 `GameEnvironment.__init__()` raises an `AttributeError` when it calls
 `make_obstacle()`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -562,6 +568,9 @@ accepts any object with those two methods, so you switch a whole
 family of shapes from thick to thin by passing a different factory
 object, not by editing every call site that creates a shape.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -695,6 +704,9 @@ that checks its rule after the change keeps the illegal value when the
 check fails. `damaged` still prints `Stars(13)` after `f1()` raises a
 `TypeFailure`. A builder that checks in `build()` raises its
 `ValueError` and still holds five toppings.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -866,6 +878,9 @@ A `lazy import` defers the module body, and with it the two `class` statements,
 until the first use of `extra_shapes`.
 The demo makes no such use, so the classes would stay unregistered.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1004,6 +1019,9 @@ The first checks that the prototype survived,
 but a user of the registry depends on the next spawn being correct.
 The second assertion tests that spawn, the one `copy.copy()` corrupts.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1128,6 +1146,9 @@ but it accepts the annotation on `maker` as written, because `eval()` returns `A
 Whenever `kind` can come from a configuration file, a
 request, or a command line, the table is the only acceptable version
 of the two.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1284,6 +1305,9 @@ With the same seed the sequence differs from the chapter's sequence, because
 intermediate ones. A factory that should build leaf classes alone
 needs a further filter, `not cls.__subclasses__()`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1432,6 +1456,9 @@ If the Protocol has a data attribute, `issubclass()` raises a
 `TypeError`. `isinstance()` on an instance is then the fallback.
 And `unregistered()` reads one namespace at a time, so a plugin module
 must run it over its own `globals()`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1587,6 +1614,9 @@ so `spawn()` raises a `KeyError` that names the key and not the builder.
 And a builder's decorator runs only when something imports its module.
 For two monsters in one file, the table
 literal says the same thing in fewer lines.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

@@ -42,6 +42,9 @@ so the comprehension drops it before `int()` can raise a `ValueError` on it.
 `"4"` is the only element that is both a string and all digits,
 so `result` holds its square, `16`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -82,6 +85,9 @@ for row in matrix:
 The one change is the literal in the conditional expression, from `1` to `2`.
 The two nested comprehensions still produce a list of lists,
 now with `2` on the diagonal.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -129,6 +135,9 @@ The comprehension builds a `dict`,
 so the later value replaces the earlier one under the shared key.
 Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry, not two.
 Its value comes from whichever of the two names appears later in the list.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -179,6 +188,9 @@ The filter exists to drop the initial `"J"` as noise.
 Removing the filter shows what the set does on its own.
 The set collapses exact duplicates of the normalized form,
 so a `"J"` that abbreviates `"John"` stays a separate entry.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -258,6 +270,9 @@ still deserves a second look when it returns something useful.
 `show()` does two jobs.
 A reader must open it to learn that one of them is printing.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -296,6 +311,9 @@ but its position from the first.
 The result orders keys by first insertion,
 so `"a"` prints first, ahead of `"b"` and `"c"`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -331,6 +349,9 @@ reports `True`, and stops. Stopping there leaves the generator part-way
 through, not empty. `sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
 giving `230` of the full range's `285`.
 By then `sum()` has consumed every value, so `list()` returns an empty list.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -386,6 +407,9 @@ The comprehension calls `source()`, reads `factor` while `factor` is still `2`,
 and stores the three products in `built`.
 The later `factor = 10` leaves `built` as it was,
 because `built` holds computed numbers rather than code that reads `factor`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -461,6 +485,9 @@ Six plus three makes nine calls for the same three cubes.
 `cube_if_even()` returns in a moment, but for a function that reads a
 file or queries a server, the walrus halves the calls for every
 element that passes.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

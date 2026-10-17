@@ -71,6 +71,9 @@ Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-ma
 you write the nesting as two separate `with` statements or as one
 comma-separated line.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -137,6 +140,9 @@ so it accepts them as separate arguments.
 A version of `expected` taking `*types` would accept
 `expected(ZeroDivisionError, TypeError)` the same way.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -197,6 +203,9 @@ with (tag("ul") as outer, tag("li") as inner1,
 All three managers enter left to right (`ul`, then `li`, then `li`
 again) and exit in reverse order. The reversal holds for any number
 of managers on the line.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -265,6 +274,9 @@ thread waiting for it.
 **Check that both connections come back.** Exiting the inner `with` (`[2]`) puts `second`
 back, then exiting the outer `with` (`[1]`) puts `first` back,
 restoring `pool.available()` to `2`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -345,6 +357,9 @@ manager from them and enters the fresh one. A hand-written
 class-form manager decorating a function re-enters the same instance
 on every call instead, so every call shares any state the instance
 holds.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -446,6 +461,9 @@ first also lets the type checker narrow `exc_type` to
 
 The class uses a lowercase name because you use it like a function.
 `contextlib.suppress` is lowercase for the same reason.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -562,6 +580,9 @@ wrap(["x", "y", "z"])
 #: </x>
 ```
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -630,6 +651,9 @@ In `no_finally.py` the same exception propagates out of the generator at a
 `yield` with no `try` around it, so the `print()` after the `yield` does not run. Apart from the
 function's name, the `finally` is the one difference between the two
 listings.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

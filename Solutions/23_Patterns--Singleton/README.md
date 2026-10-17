@@ -100,6 +100,9 @@ In the chapter's version, two threads racing the first construction could each s
 sentinel and each build an inner object. The class body runs once,
 during the import, so no first call remains to race.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -230,6 +233,9 @@ hand one connection to two callers.
 returns one `ConnectionPool` object (`p1 is p2`), because `@cache` stores its first result.
 `singleton_cached_factory.py` uses the same technique for `Settings`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -292,6 +298,9 @@ The class-based versions are a better choice when the singleton must be a class:
 when it must satisfy an interface other code expects,
 or when it needs `__new__()`-level control over construction.
 Everywhere else, the module is the simpler tool.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -371,6 +380,9 @@ so every later read of `config.settings` returns the new dict.
 A name and the object it refers to are different things, and every
 singleton built on module state depends on that difference. Mutate
 through any name, rebind only through the module.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -508,6 +520,9 @@ anything uses it. For `Settings`, an object that sits idle is fine.
 A database connection, though, would open at import, before any caller asks for it.
 For a connection, the hand-written lock is the answer.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -626,6 +641,9 @@ its attributes into the shared dict by design. Any subclass that
 leaves `_shared_state` alone writes into `Borg`'s dict, beside every
 other such subclass.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -717,6 +735,9 @@ The metaclass form in
 [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation)
 runs `__init__()` once. Its `__call__()` runs before `__new__()` and `__init__()`.
 After the first construction, `__call__()` returns the stored instance from `_instances`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

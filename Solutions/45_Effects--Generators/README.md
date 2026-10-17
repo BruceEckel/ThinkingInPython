@@ -92,6 +92,9 @@ result of `send()`.
 `total` is a local of the generator, and it keeps its value across three
 suspensions because the generator's frame holds it. The frame is the state.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -279,6 +282,9 @@ far from the driver that returned it.
 Keeping the two meanings apart is a one-line discipline: put inside the
 `try` only the call whose `StopIteration` you mean to interpret.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -366,6 +372,9 @@ forwarding to them. `yield from`
 relays in both directions on its own: prompts up to the driver, numbers
 down to whichever `yield` is currently suspended, two frames below.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -444,6 +453,9 @@ A generator object's `str()` is its repr, so the output shows the repr.
 The annotation alone gives the checker a declared type to compare.
 So annotate a local whenever you want the checker to verify
 the type of the call that produces its value.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -539,6 +551,9 @@ A generator can yield a number or return it.
 The choice decides which code receives the number:
 a yielded value goes to the driver, and a returned value goes to the delegating generator.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -604,6 +619,9 @@ what it receives into an f-string, which formats a `None` as readily
 as an `Answer`, so `interview()` passes the check either way. Priming
 with `next()` keeps the `SendType` at `Answer`. The one call that cannot
 carry a value comes from the one function that cannot pass one.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -769,6 +787,9 @@ The generator is the better choice for a conversation with a
 beginning and an end, like `interview()`. The table is the better
 choice for a machine that runs forever and can go anywhere from
 anywhere.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

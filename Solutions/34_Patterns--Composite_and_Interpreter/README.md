@@ -107,6 +107,9 @@ The call at `[1]` shows a simpler duplication. `root` holds two
 separate directories named `"src"`, and both come back as
 `root/src`, so a path alone does not say which one matched.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -244,6 +247,9 @@ Adding the target's size again double-counts those bytes.
 `name -> target`, and stops there.
 If `walk()` followed a link back to one of its own ancestors,
 it would re-enter that ancestor until Python raised a `RecursionError`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -531,6 +537,9 @@ runs.
 Python treats `1 / 0` in source the same way. The compiler accepts
 it. Python raises the `ZeroDivisionError` when the line executes.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -690,6 +699,9 @@ The rule can print one redundant pair of parentheses
 around a right-hand child at the same precedence as its parent,
 as in `x + (x + 1)` where `x + x + 1` would do.
 It still keeps every pair that the expression's meaning requires.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -903,6 +915,9 @@ squared denominator beyond what `simplify()`'s current rules
 handle, so this solution leaves differentiating a `Div` for a
 further exercise.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1087,6 +1102,9 @@ The runtime check matters when a program builds the expression from data
 it reads while running, after the type checker has finished.
 An interpreter exists to handle that case.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1171,6 +1189,9 @@ because by the time a function receives that string,
 the tag and the paragraph markup are the same kind of text. The template
 version keeps the distinction, so escaping is a decision the
 renderer can still make.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1412,6 +1433,9 @@ behavior of every other module in the process. The iterative
 walk keeps its pending work in one list and leaves every global
 setting as it was.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1562,6 +1586,9 @@ rather than helpfully extended. The `assert_never()` that reads as an
 obstacle in the file system reads as the point here. When the grammar
 does grow a `Neg`, the type checker reports each walker that
 needs a case for it.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

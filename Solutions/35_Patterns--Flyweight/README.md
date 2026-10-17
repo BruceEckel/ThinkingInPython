@@ -145,6 +145,9 @@ distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
 The count stays at five however large the map grows,
 because `@cache` keys on the symbol alone.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -289,6 +292,9 @@ with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record`, the
 same run reports a ratio near ten, because every unshared `Tile`
 then carries a dictionary too.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -416,6 +422,9 @@ If you restore `@record`, this test fails at its assignment.
 because a record rejects assignment to every attribute.
 The bug depends on that assignment,
 so every cell can share one record safely.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -580,6 +589,9 @@ so `promote()` changes what the square refers to.
 `piece(current.color, kind)` looks up (or builds) the shared `Piece` for the new kind,
 and the square now points at that one.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -695,6 +707,9 @@ A `Color` that interns in `__new__()` keeps its constructor syntax
 and needs the same
 `@dataclass(frozen=True, slots=True, weakref_slot=True)` line as
 `exercise_5.py`'s `Color`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -825,6 +840,9 @@ Every `Color` that `__new__()` pools or returns has in-range components.
 makes the same *parse, don't validate* move with `__post_init__()`. Here the class validates in `__new__()`
 instead, because `__post_init__()` runs after `__new__()` has pooled the instance.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -935,6 +953,9 @@ The enum gives up a named place to fail. `to_symbol()` raises a
 from deep inside `parse_map()`'s comprehension.
 If the boundary matters, keep a `to_tile()` wrapper that catches the
 `ValueError` and re-raises it with the offending line and column.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1120,6 +1141,9 @@ the overwhelming majority once the pool is warm. If that serialization
 matters, write the pool by hand and lock only on the miss path.
 Check the key again inside the lock,
 since another thread may have filled that entry while this one waited.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

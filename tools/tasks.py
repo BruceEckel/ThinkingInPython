@@ -1340,7 +1340,9 @@ def steps(v: Vars) -> None:
     """Rewrite the `<details>` ladder under each `## N.` heading in
     Solutions/ whose section carries a `Hint:` paragraph: "Where to look"
     (the hint), "The shape" (each listing with its function bodies
-    elided, generated), then "Solution" (the rest, as authored). GitHub
+    elided, generated), "Done when" (an authored `Done when:` paragraph
+    right after the hint, when there is one), then "Solution" (the rest,
+    as authored, closed by a generated self-diagnosis line). GitHub
     and the site render the ladder collapsed, so a reader opens one step
     at a time; `tip hint` prints the same steps at the command line. The
     tags and the shape blocks are generated and replaced on every run,

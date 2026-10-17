@@ -133,6 +133,9 @@ set the assertion compares. A passing test would mean that
 `__init_subclass__()` had stopped registering subclasses. Once you
 update the expected set, the test checks registration again.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -243,6 +246,9 @@ Each is a single function, like `sum_value()`.
 `recycling_note()` giving `Aluminum` and `Glass` their own wording.
 When a calculation has the same form for every type and varies only
 in the numbers each type carries, write an ordinary function.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -401,6 +407,9 @@ describes. A subclass of `Sorter` shares this one dispatcher, so a
 registration made through the subclass changes what `Sorter`'s
 method returns too.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -555,6 +564,9 @@ type checker treats that restatement as optional.
 declares its own key can express groupings the type hierarchy leaves
 out.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -702,6 +714,9 @@ default is right when it is a true answer for most types and a
 forgotten registration does little harm. A base function that raises
 an exception is right when a wrong answer is worse than a stopped
 program, as it is for a safety report.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

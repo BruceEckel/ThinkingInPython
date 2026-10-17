@@ -3,6 +3,7 @@ from pathlib import Path
 
 from tools.markdown import Document
 from tools.solution_steps import (
+    DIAGNOSIS,
     Flat,
     apply,
     shape,
@@ -202,6 +203,9 @@ def test_f() -> None:
 
 Discussion.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -259,6 +263,95 @@ def test_steps_follow_the_ladder() -> None:
     assert ladder[1].lines[1] == "# The shape of exercise_3.py"
     assert steps(Flat([], ["Answer."])) == [
         type(ladder[0])("Solution", ["Answer."])]
+
+
+def test_the_solution_step_ends_with_the_diagnosis() -> None:
+    lines = rendered(FLAT).split("\n")
+    close = lines.index("</details>")
+    assert tuple(lines[close - 3:close - 1]) == DIAGNOSIS
+    assert lines[close - 1] == ""
+    assert rendered(FLAT).count(DIAGNOSIS[0]) == 1
+
+
+def test_steps_end_the_solution_with_the_diagnosis() -> None:
+    body = NESTED.split("> Do the thing.\n")[1].split("## 4.")[0]
+    solution = steps(unwrap(body.split("\n")))[-1]
+    assert tuple(solution.lines[-2:]) == DIAGNOSIS
+    assert solution.lines[-4:-2] == ["Discussion.", ""]
+
+
+FLAT_DONE = FLAT.replace(
+    "Use `connect()`.\n\n",
+    "Use `connect()`.\n\nDone when: `test_f.py` passes.\n\n", 1)
+
+NESTED_DONE = NESTED.replace(
+    "<details>\n<summary>Solution</summary>",
+    "<details>\n<summary>Done when</summary>\n\n"
+    "`test_f.py` passes.\n\n"
+    "<details>\n<summary>Solution</summary>", 1).replace(
+    "</details>\n</details>\n</details>\n",
+    "</details>\n</details>\n</details>\n</details>\n", 1)
+
+
+def test_a_done_when_paragraph_becomes_a_step() -> None:
+    assert rendered(FLAT_DONE) == NESTED_DONE
+
+
+def test_the_done_when_step_nests_between_shape_and_solution() -> None:
+    lines = NESTED_DONE.split("\n")
+    summaries = [line for line in lines if line.startswith("<summary>")]
+    assert summaries == ["<summary>Where to look</summary>",
+                         "<summary>The shape</summary>",
+                         "<summary>Done when</summary>",
+                         "<summary>Solution</summary>"]
+    assert lines.count("<details>") == lines.count("</details>") == 4
+
+
+def test_the_done_when_form_is_a_fixed_point() -> None:
+    assert rendered(NESTED_DONE) == NESTED_DONE
+    _, changed = apply(doc(NESTED_DONE))
+    assert changed == []
+
+
+def test_unwrap_restores_the_done_when_prefix() -> None:
+    body = NESTED_DONE.split("> Do the thing.\n")[1].split("## 4.")[0]
+    flat = unwrap(body.split("\n"))
+    assert flat.done == ["`test_f.py` passes."]
+    assert flat.rest[0] == "The approach."
+    assert flat.rest[-1] == "Discussion."
+    head = FLAT_DONE.split("> Do the thing.\n")[1].split("The approach.")[0]
+    assert "Done when: `test_f.py` passes." in head
+
+
+def test_steps_put_done_when_before_the_solution() -> None:
+    body = NESTED_DONE.split("> Do the thing.\n")[1].split("## 4.")[0]
+    ladder = steps(unwrap(body.split("\n")))
+    assert [s.label for s in ladder] == ["Where to look", "The shape",
+                                         "Done when", "Solution"]
+    assert ladder[2].lines == ["`test_f.py` passes."]
+
+
+def test_no_done_when_step_without_the_paragraph() -> None:
+    assert "<summary>Done when</summary>" not in rendered(FLAT)
+    body = NESTED.split("> Do the thing.\n")[1].split("## 4.")[0]
+    assert unwrap(body.split("\n")).done == []
+
+
+def test_a_done_when_paragraph_elsewhere_is_prose() -> None:
+    text = FLAT.replace("The approach.\n",
+                        "The approach.\n\nDone when: it prints.\n", 1)
+    out = rendered(text)
+    assert "<summary>Done when</summary>" not in out
+    assert "Done when: it prints." in out
+    assert rendered(out) == out
+    flat = split_hint(["Hint: Look.", "", "Rest.", "", "Done when: x."])
+    assert flat.done == []
+    assert flat.rest == ["Rest.", "", "Done when: x."]
+
+
+def test_a_done_when_paragraph_without_a_hint_is_prose() -> None:
+    flat = split_hint(["Done when: x.", "", "Rest."])
+    assert flat.hint == [] and flat.done == []
 
 
 def test_split_hint_strips_the_prefix() -> None:

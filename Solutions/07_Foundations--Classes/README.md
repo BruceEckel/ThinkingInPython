@@ -89,6 +89,9 @@ every method that changes the radius this way.
 to `5.0`, so it computes `5.0 / -2 == -2.5`.
 The setter rejects `-2.5`, just as it rejects `c.radius = -2.5` written by hand.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -170,6 +173,9 @@ For these inputs the unrounded values compare equal,
 but other inputs produce a floating-point rounding error. `from_kelvin(300.15)` stores `27.0`, while
 `from_fahrenheit(80.6)`, the same temperature, stores `26.999999999999996`.
 Rounded to two places, both print `27.0`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -286,6 +292,9 @@ again, which runs `Simple.show()`.
 `Simple.show()` finally prints `x`. Each `super()` call runs the `show()` of the class one step
 closer to `Simple`, so the messages appear in derived-to-base order, twice.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -362,6 +371,9 @@ message appears once, because the `n.total` access computes and
 caches `total` before `average` reads it. If you access `average`
 first, its read of `self.total` computes and caches `total` at that
 moment. `"summing"` still appears once.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -442,6 +454,9 @@ The two forms serve different readers. `Temperature(21.0)` is the
 expression that rebuilds this object, the form you want in a traceback or a
 debugger. `21.0C` is the value with its unit, the form you want
 in output a user reads.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -527,6 +542,9 @@ different files, so a rename slips past a reader. With `@override` on
 every overriding method, the type checker reports each one the rename
 left matching nothing. A decorator that
 changes no behavior at run time is worth writing when a tool reads it.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

@@ -119,6 +119,9 @@ and spawns a rat at every open cell after that, here `(1, 0)` alone.
 `claim()` returns `False` for every cell, so the rat dead-ends on its
 second turn and `run()` returns.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -345,6 +348,9 @@ The first rat starts there,
 and every later rat starts on an open cell next to one that a rat occupies.
 The rats therefore stay inside the region of open cells joined to the entry,
 however many of them spawn.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -608,6 +614,9 @@ not between them. Adding the `await` lets the event loop run another
 rat between the test and the add. That interleaving breaks the
 guarantee.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -868,6 +877,9 @@ should hold a coin, so `game.robot.coins` stays `0`. A one-word
 change to a class header moves `Coin` out of the factory's search.
 The factory then silently substitutes a different `Item`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1058,6 +1070,9 @@ tour does guarantee that every leg is a shortest path, which is all
 breadth-first search guarantees.
 <!-- vale proselint.GenderBias = YES -->
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1213,6 +1228,9 @@ The one number equal to its own negation is zero. Every mode in which this plate
 has a nodal line straight down the main diagonal, so the figures all
 share that one feature whichever `(m, n)` produced them.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -1306,6 +1324,9 @@ grains, same random walk, same rule that a grain moves in proportion
 to the vibration under it. Only the field changes, and with it every
 pattern the model produces.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -1392,6 +1413,9 @@ in which it was settling.
 With the default `0.05`, both halves work.
 A step is at most a tenth of the plate where the amplitude peaks,
 and vanishingly small once a grain arrives.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

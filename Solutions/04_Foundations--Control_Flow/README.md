@@ -44,6 +44,9 @@ and so runs to the end of its `range()` without reaching `break`.
 A `for` loop's `else` clause runs when the loop ends that way,
 so the `else` clause prints `97 is prime`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -109,6 +112,9 @@ and one of them (`5 -> 16`) starts from an odd `n`.
 `odd_count` increments in the `else` branch,
 which computes `3 * n + 1` and runs only when `n` is odd.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -149,6 +155,9 @@ Each block's outcome therefore stays the same whichever runs first.
 Order matters only when one value satisfies both conditions
 and the two blocks do different things with it,
 as when one ends the loop and the other skips to the next iteration.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -227,6 +236,9 @@ Above that last line, the traceback lists the calls the
 exception passed on its way out, from your call at the top down to the `/` in
 `checked_divide()`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -294,6 +306,9 @@ could both match the same value.
 The two `go` patterns match lists of different lengths,
 so either arrangement works here.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -333,6 +348,9 @@ The loop version is a better choice when the body grows past one
 condition and one expression, since a comprehension with two filters
 and a nested loop is harder to read than the nested `for` loops it
 replaces.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -431,6 +449,9 @@ this," and `from` alone fills that one in.
 `from None` leaves `__cause__` as `None` and sets `__suppress_context__`,
 so the traceback omits the `__context__` exception.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -488,6 +509,9 @@ Both forms guarantee the close.
 `read_text()` opens the file in a `with` block of its own,
 so it closes the file whether the read succeeds or raises an exception.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 
@@ -534,6 +558,9 @@ A prediction of each shifted item's new position therefore holds for one list at
 The chapter's three fixes hold for every list.
 Each one keeps the list the loop walks as it was,
 so the loop sees every item.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -589,6 +616,9 @@ That parser is right only where it repeats `int()`'s rules.
 `parse_int()` calls `int()` and catches the `ValueError`, so
 it agrees with `int()` on every string, including strings you have
 not tried.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

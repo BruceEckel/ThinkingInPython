@@ -145,6 +145,9 @@ The chapter keeps the method version's demonstration in a separate
 file, `methods_demo.py`, so importing `paper_scissors_rock.py` runs
 nothing.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -360,6 +363,9 @@ default, and reserves the method version for behavior that belongs to
 the class: a combination that reads the object's own state, or one a
 subclass should override while inheriting the rest.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -490,6 +496,9 @@ but the assertion still rejects a version that returns the bare string `"win"`.
 `test_versions_match_expected()` takes its cases from `EXPECTED`.
 `pytest` parametrizes it with the keys of that mapping, so the test
 reports sixteen cases per module where it reported nine.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -672,6 +681,9 @@ for every pair it produces, one increment per item, so the caller can
 read `counts["Lizard"]` during or after the loop. With the same seed,
 `random_pairs()` yields the same pairs whether or not it counts them.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -782,6 +794,9 @@ Returning `NotImplemented`, rather than raising an exception,
 lets Python report both operand types. An exception raised
 inside `__rsub__()` carries the message `Meters` wrote, in place of
 Python's message naming the pair of types that has no defined subtraction.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -966,6 +981,9 @@ competitor or a variation on an existing one. `Origami` really is
 paper for the purposes of this game. A `WetPaper` that loses to
 everything is a new competitor.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1078,6 +1096,9 @@ Exercise 8 adds that dependence.
 
 **Stage the meetings.** `Project` creates the inhabitants in `gather()` and makes neighbors
 interact in `meet()`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1506,6 +1527,9 @@ each case the draw. Across two hundred seeds, each of the three kinds
 wins `meeting(5)` at least once, so the outcome depends on the random
 draws each round, as it does in a real rock-paper-scissors tournament.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1719,6 +1743,9 @@ Each recovers `Paper` with an `isinstance()` test,
 the kind the chapter's ladder version repeats in every class.
 Here each test sits inside one cell, so you write it once,
 and a new `Item` leaves it untouched.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1979,6 +2006,9 @@ Exercise 8's version keeps one advantage.
 Its `eval_*()` methods receive the competing objects,
 so a weapon whose result depends on its own state fits there,
 while this grid would need exercise 9's callable cells.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

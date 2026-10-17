@@ -113,6 +113,9 @@ A `dict[str, Callable[[Flower, str], str]]` keyed by operation name
 lets a program choose an operation at runtime, as a `Visitor`
 hierarchy does, without the classes.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -281,6 +284,9 @@ Methods on a class keep a new type in one place.
 Functions over a hierarchy keep a new operation in one place.
 No arrangement does both at once.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -423,6 +429,9 @@ empty. Two fixes restore the checks that `Any` turns off on the
 visitor side:
 declaring `visit()` abstract on that base, as the classic pattern does,
 or annotating the parameter with the `Visits` protocol, as this solution does.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

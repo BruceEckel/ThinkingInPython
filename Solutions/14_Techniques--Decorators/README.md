@@ -84,6 +84,9 @@ returns a different object, a callable that returns one cached
 instance. Two things decide which kind you have written:
 what the decorator does to its argument, and what it returns.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -200,6 +203,9 @@ line. Control then returns outward to `trace`'s wrapper, which prints
 the `<-` line last. The output order follows the wrapping order. The
 outermost decorator prints first and last, and each inner layer's
 output appears nested in between.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -334,6 +340,9 @@ Here, adding a fourth extra means writing one class with one number in it.
 The extras compose in any order,
 since each layer reads `cost` and `description` from the one drink it wraps.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -460,6 +469,9 @@ The two counters show the
 `self.count` lives on each instance, one per decorated function.
 `total_calls` lives on the class, one value that every decorated function shares,
 and `__call__()` reads and writes it through the class name.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -621,6 +633,9 @@ key makes `memo` a first-in-first-out cache rather than the
 least-recently-used cache `functools.lru_cache` gives you.
 A real implementation should choose the eviction policy that fits its callers.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -740,6 +755,9 @@ types to retry as an argument, because some failures repeat on every attempt.
 A `TypeError` from a bad call signature fails the same way each time,
 so retrying it repeats the failure until the last attempt raises
 the `TypeError` to the caller.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -885,6 +903,9 @@ so each `print()` shows the object the class stores.
 
 The class form fails on a method only when an instance of the
 decorator class replaces the method.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>

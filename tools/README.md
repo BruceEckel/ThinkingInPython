@@ -824,9 +824,22 @@ exercise quote) into a ladder of nested HTML `<details>`, which GitHub and
 the site render collapsed: "Where to look" (the hint), then "The shape"
 (each listing reduced to its imports, aliases, constants, classes, and
 signatures, every function body replaced by `...`), then "Solution"
-(everything else, as authored). Nesting is what orders the steps: the
-"Solution" toggle is not visible until "The shape" is open. A solution
-with no `Hint:` paragraph is left as it is.
+(everything else, as authored). Nesting orders the steps: each toggle
+stays hidden until the step above it is open. A solution with no
+`Hint:` paragraph is left as it is.
+
+A paragraph beginning `Done when:` directly after the hint adds a fourth
+step, "Done when", between "The shape" and "Solution". It states what you
+can check to know your attempt is finished: a test file to run, the
+output to match, a `ty` diagnostic that must disappear. The criterion is
+authored; a `Done when:` paragraph anywhere else is ordinary prose.
+
+Every "Solution" step ends with a generated paragraph, `DIAGNOSIS`, that
+asks you to name what separates your attempt from the model solution: a
+different design, a detail, or an equivalent alternative. Readers handed
+a model solution match its surface features unless something forces a
+judgment, and the three categories are the ones `AGENTS.md` gives a
+reviewing agent.
 
 ```
 tip steps                      # rewrite every Solutions file
@@ -838,8 +851,9 @@ tip hint CH=30 N=3             # the next step, at the command line
 The tags and the shape blocks are generated and replaced on every run,
 the way `exercise_statements.py` replaces the quote; `gate` and
 `verify-ch` run it, so they self-heal. The authored prose and listings
-round-trip byte for byte: a run strips the tags and the shape blocks,
-restores the `Hint:` prefix, and nests the section again. A shape block's
+round-trip byte for byte: a run strips the tags, the shape blocks, and
+the diagnosis paragraph, restores the `Hint:` and `Done when:` prefixes,
+and nests the section again. A shape block's
 first line is `# The shape of <path>`, which no extractor reads as a path,
 and it carries no `#:` marker, so `extract_solutions.py` and
 `validate_output.py` leave it alone; a `test_*.py` listing gets no shape.

@@ -143,6 +143,9 @@ no code in `UnpredictablePerson`.
 [*State* surrogate](../../Chapters/25_Patterns--Surrogate.md#state),
 applied to a new domain.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -317,6 +320,9 @@ Exercise 1's classes can carry that state per instance, and a mood whose behavio
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood` object through `change_to()`, this machine reaches the same moods by returning the next member from a transition function.
 Both model a thing that changes behavior over time.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -428,6 +434,9 @@ Reading the words
 from a file, one per line, takes one line of code:
 `words = Path("moves.txt").read_text().split()`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -517,6 +526,9 @@ every rule for the whole machine in one dictionary, and is easier to
 audit and edit as a unit. The chapter's
 [Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
 section makes the same trade-off over the per-state `trap_states.py`.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -642,6 +654,9 @@ sequence this generator produces is legal by construction.
 `trap_states.py` accepts any move in any state and lets each
 `case _` absorb the moves that make no sense there, so the generator's
 table is the stricter of the two.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -833,6 +848,9 @@ exception is still the right default for the engine. A caller can
 turn an exception into a no-op, and cannot turn a silent no-op into
 a report.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1006,6 +1024,9 @@ Under `(DOORS_CLOSING, DoorSensor)`, the first rule reopens the doors
 when `obstructed()` passes, and the unconditional rule below it
 finishes the close in `IDLE`.
 
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
 </details>
 </details>
 </details>
@@ -1137,6 +1158,9 @@ Every
 decision in the machine is a condition on the one input type. Every
 rule here keeps the default `None` action, and the fall-through rules
 keep the default `None` condition too, so both fields are optional per rule.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
@@ -1287,6 +1311,9 @@ number the existing action reads. The two fixes illustrate a
 general rule: under exact-type dispatch, a class is a dispatch key,
 so create one when you want a separate rule and not when you want a
 separate value.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
