@@ -884,7 +884,7 @@ def local(v: Vars) -> None:
     to the build code (any tools/ module the server imports) restarts
     the server, which rebuilds the whole site with the new code first.
     --copy-on-select makes a mouse selection copy itself to the clipboard
-    as «text» (Chapter › Section), for lifting passages out of the
+    as «text» (NN Chapter › Section #anchor), for lifting passages out of the
     rendered book. Both scripts are added
     to pages as they are served; build/site/ and the published site never
     carry them. `tip serve` is the same server without the build first

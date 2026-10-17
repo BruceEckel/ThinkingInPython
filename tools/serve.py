@@ -35,9 +35,10 @@ With `--copy-on-select`, each served page also carries a script that
 copies a mouse selection to the clipboard as soon as the button is
 released, for pulling passages out of the rendered book. The copied
 text is wrapped in guillemets and followed by its source, so a pasted
-passage reads `«...» (Function Objects › Strategy: Choosing the
-Algorithm at Runtime)`; neither « nor » occurs in the book, so the
-marks cannot be mistaken for quoted text. `tip local` passes it. Both scripts are added to the response as it is served, so
+passage reads `«...» (31 State Machines › Table-Driven State Machine
+#table-driven-state-machine)`: the chapter number and title, the
+section title, and the section's anchor. Neither « nor » occurs in the
+book, so the marks cannot be mistaken for quoted text. `tip local` passes it. Both scripts are added to the response as it is served, so
 the files in `build/site/`, the ones the published site is built from,
 never contain either.
 
@@ -104,9 +105,12 @@ RELOAD_SCRIPT = """
 
 # Copies the selection when the mouse button comes up. mouseup is the
 # user gesture the clipboard API requires; selectionchange alone is not
-# one. The text goes out as «text» (Chapter › Section): the chapter is
-# the page's <h1>, the section the last <h2>/<h3> before the selection
-# starts. The execCommand fallback covers a page served over plain http
+# one. The text goes out as «text» (NN Chapter › Section #anchor): the
+# chapter is the page's <h1>, prefixed with the number that opens the
+# page's file name (31 for 31_Patterns--State_Machines.html; no prefix
+# when the name has no underscore). The section is the last <h2>/<h3>
+# before the selection starts, and the anchor is that heading's id. The
+# execCommand fallback covers a page served over plain http
 # on a LAN address, where navigator.clipboard is absent; it copies the
 # bare selection, since it cannot see the wrapped text. The toast makes
 # the copy visible, since every drag-select overwrites the clipboard.
@@ -127,11 +131,15 @@ COPY_SCRIPT = """
   };
   const source = (range) => {
     const h1 = document.querySelector("h1");
-    const parts = [h1 ? h1.textContent.trim() : document.title];
+    const title = h1 ? h1.textContent.trim() : document.title;
+    const file = location.pathname.split("/").pop();
+    const number = file.includes("_") ? file.split("_")[0] : "";
+    const parts = [number ? number + " " + title : title];
     let section = null;
     for (const h of document.querySelectorAll("h2, h3")) {
       if (range.comparePoint(h, 0) > 0) break;
       section = h.textContent.trim();
+      if (h.id) section += " #" + h.id;
     }
     if (section) parts.push(section);
     return parts.join(" › ");
