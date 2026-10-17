@@ -62,6 +62,12 @@ class Drawing:
 ```
 
 <details>
+<summary>Done when</summary>
+
+in each version, your tests save or keep a state holding two strokes, call `erase()`, and assert that the earlier state and its `History` entry still have both strokes while the present has one.
+In the mutable version, drawing `a` and `b`, saving, and erasing leaves `['a']` in the sketch and `('a', 'b')` in the checkpoint.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -245,6 +251,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A bounded `History`
 
@@ -279,6 +286,12 @@ class History[S]:
     def can_undo(self) -> bool:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a `History` bounded at 2 that records three `do()` calls keeps the two newest past states, two `undo()` calls succeed, and `can_undo()` then agrees with whether a third `undo()` would succeed.
+You can say why that answer is right even though the program made more `do()` calls than undos.
 
 <details>
 <summary>Solution</summary>
@@ -348,6 +361,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Serializing a `Drawing` to JSON
 
@@ -380,6 +394,11 @@ class Drawing:
     def draw(self, stroke: str) -> Drawing:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your reconstructed `Drawing` compares equal to the original with `==` and `hash()` accepts it, and you can name the field whose type `json.loads()` changed, the type it came back as, and the line of your reconstruction that converts it back.
 
 <details>
 <summary>Solution</summary>
@@ -438,6 +457,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. `Memento` holding the list itself
 
@@ -454,6 +474,12 @@ a different design, a detail, or an equivalent alternative.
 Change `Memento` and `restore()` so the sketch and the memento hold the same list object.
 Run the existing tests with `pytest` and read the order of the failures.
 Then write a test that draws after `save()` and compares the memento's contents as a list, so the test can fail for one reason: the shared list.
+
+<details>
+<summary>Done when</summary>
+
+`pytest` against your shared-list `sketch.py` shows which `test_sketch.py` tests fail and in what order, and you can say why the first failure comes before the chapter's sharing test.
+Your new test fails against the shared list and passes against any copying memento, the chapter's tuple or a copied list.
 
 <details>
 <summary>Solution</summary>
@@ -521,6 +547,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. `goto(steps_back)`
 
@@ -563,6 +590,11 @@ class History[S]:
     def goto(self, steps_back: int) -> S:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with states `0` through `3` recorded, `goto(2)` returns `1`, two `redo()` calls then return `2` and `3`, and `goto(4)` raises an `IndexError` after which `present` is still `3`.
 
 <details>
 <summary>Solution</summary>
@@ -641,6 +673,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Restoring one named field
 
@@ -691,6 +724,11 @@ def restore_field(
 ) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+after a rename to `"Goose"` and three strokes, `restore_field(history, "strokes", past)` makes `history.present` a `Drawing` titled `'Goose'` holding the past state's strokes, and one `undo()` returns the state from before the restore, with all three strokes.
 
 <details>
 <summary>Solution</summary>
@@ -796,6 +834,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. What pickle skips on load
 
@@ -834,6 +873,11 @@ class DrawingV2:
     def __post_init__(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the old bytes load into the changed class, the new field reads as its default while the instance's `__dict__` lacks it, the blank title loads as `''` with no error, and `copy.replace()` on that loaded object runs your `__post_init__()` check and raises its exception.
 
 <details>
 <summary>Solution</summary>
@@ -923,6 +967,7 @@ program through it, while a deserializer like `pickle` writes the value into the
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
