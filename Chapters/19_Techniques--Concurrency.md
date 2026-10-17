@@ -1733,8 +1733,10 @@ so two threads contend only when they touch the same container.
 
 Biased counting, immortality,
 and per-container locks slow single-threaded code slightly.
-On the `pyperformance` benchmark suite the average overhead runs from about one percent to about eight,
-depending on the platform.
+In 3.14, the [free-threading HOWTO](https://docs.python.org/3.14/howto/free-threading-python.html)
+puts the average overhead on the `pyperformance` benchmark suite at about one percent on macOS aarch64 and about eight on x86-64 Linux.
+The 3.14 What's New page gives roughly 5-10%,
+depending on the platform and C compiler.
 
 Removing the lock also removes three decades of accidental protection for C extensions,
 whose authors assumed that threads run one at a time.
