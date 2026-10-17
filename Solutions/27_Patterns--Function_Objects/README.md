@@ -52,6 +52,11 @@ class Macro:
 ```
 
 <details>
+<summary>Done when</summary>
+
+running your macro and then undoing it returns the state your commands changed to its starting value, with the commands reversed last to first, and `uv run ty check` passes on your file, including the line that calls each command's `undo()`.
+
+<details>
 <summary>Solution</summary>
 
 `command.py`'s commands print a line.
@@ -146,6 +151,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. `chain.py`, reporting every attempt
 
@@ -208,6 +214,12 @@ def f(x: float) -> float:
 def g(x: float) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+for `x * x - 2` on `[1.0, 1.3]` with the chain `[bisection, secant, newton]`, your `first_root()` prints a line naming `bisection` with its reason, then `secant: 1.414214`, and a chain in which every finder fails prints each reason plus a final line saying so.
+`uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -352,6 +364,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. `sorted()` with a compound key, and why `key` is *Strategy*
 
@@ -365,6 +378,11 @@ a different design, a detail, or an equivalent alternative.
 [*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) shows a caller supplying the interchangeable part of an algorithm as a function.
 Have the `key` function return a tuple, since Python compares tuples element by element.
 For the explanation, ask what `sorted()` keeps constant and what the caller supplies.
+
+<details>
+<summary>Done when</summary>
+
+sorting `[("Bob", 85), ("Amy", 92), ("Cid", 85), ("Amy", 70)]` prints `[('Amy', 70), ('Bob', 85), ('Cid', 85), ('Amy', 92)]`, and you can say which part of the work `sorted()` keeps and which part your `key` supplies.
 
 <details>
 <summary>Solution</summary>
@@ -395,6 +413,7 @@ current strategy is the call to `sorted()`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 
@@ -442,6 +461,12 @@ def first_root(f: Fn, a: float, b: float,
 def f(x: float) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+for `x * x - 2` on `[0.0, 2.0]`, the unchanged `first_root()` returns `1.500000` from both your closure and your `partial()` finder at a tolerance of `0.6`, and `1.414214` at `1e-12`.
+`uv run ty check` passes with the `partial()` finder assigned to a variable annotated `RootFinder`.
 
 <details>
 <summary>Solution</summary>
@@ -542,6 +567,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. An event bus that walks the MRO, and can unsubscribe
 
@@ -601,6 +627,12 @@ def on_deposit(event: Deposit) -> None:
 def on_big(event: BigDeposit) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with one handler on `Deposit` and one on a subclass, publishing a subclass event runs the subclass handler and then the `Deposit` handler, and after you unsubscribe the `Deposit` handler the same event reaches the subclass handler alone.
+You can also name the change that alters what an existing caller receives.
 
 <details>
 <summary>Solution</summary>
@@ -706,6 +738,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Three fixes for late binding, and what none of them fix
 
@@ -740,6 +773,11 @@ def make(n: int) -> Command:
 def report() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your loop of lambdas prints `2` three times, each of your three fixed lists prints `0`, `1`, `2`, and you can say which of the three fixes, if any, still reads `n` when the command runs, with a run that shows it.
 
 <details>
 <summary>Solution</summary>
@@ -844,6 +882,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. `event()` registering `cls`
 
@@ -887,6 +926,11 @@ class Announce:
     def __call__(self, event: Deposit) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+importing `bank_events.py` against your changed `tagged_bus.py` stops with `TypeError: Announce: not an @event`, raised at the `@handler` above `Announce`, and you can say which class `EVENTS` holds and which class the name `Deposit` refers to.
 
 <details>
 <summary>Solution</summary>
@@ -958,6 +1002,7 @@ since `type(event)` is the returned class too.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
