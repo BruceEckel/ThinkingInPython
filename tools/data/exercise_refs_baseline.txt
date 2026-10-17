@@ -73,13 +73,18 @@ Solutions/Modules_and_Packages	Modules_and_Packages	4	Renaming `module.py` to `M
 Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
 Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
 Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
+Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
+Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
 Solutions/Multiple_Dispatching	Multiple_Dispatching	10	Exercise 8, rebuilt on a table
+Solutions/Multiple_Dispatching	Multiple_Dispatching	2	Adding `Lizard` to the double-dispatch version
 Solutions/Multiple_Dispatching	Multiple_Dispatching	2	Adding `Lizard` to the double-dispatch version
 Solutions/Multiple_Dispatching	Multiple_Dispatching	2	Adding `Lizard` to the double-dispatch version
 Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	7	A business-modeling environment
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
 Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
 Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
 Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
@@ -99,6 +104,7 @@ Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` 
 Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
 Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
 Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
+Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
 Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
 Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
 Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
