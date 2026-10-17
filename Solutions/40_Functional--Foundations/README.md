@@ -375,7 +375,8 @@ a different design, a detail, or an equivalent alternative.
 
 [Immutability in Annotations](../../Chapters/40_Functional--Foundations.md#immutability-in-annotations) contrasts `Final` with a read-only type such as `Sequence`.
 `Final` constrains a name's binding, and the object's type decides which methods you can call.
-To make the append an error, choose a read-only type for the annotation.
+To make the append an error, annotate with an immutable type such as `tuple[int, ...]` and assign a tuple.
+A `Sequence` annotation is not enough: the checker keeps the assigned list's own type for a `Final` name, so the append still passes.
 
 <details>
 <summary>Solution</summary>
