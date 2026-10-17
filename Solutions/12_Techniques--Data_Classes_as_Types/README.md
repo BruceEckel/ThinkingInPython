@@ -15,6 +15,12 @@ Write the `pytest` tests first, covering a leap year, a common year, the leap ce
 `Year` accepts 1901 through the current year, so it rejects 1900 and 2100, the common century years.
 
 <details>
+<summary>Done when</summary>
+
+your `pytest` tests pass and cover four cases: February 29 accepted in 2020 and in 2000, February 29 rejected in 2021 with a `TypeFailure`, and February 30 rejected in 2020.
+If you delete the divisible-by-400 part of your leap rule, the 2000 test fails.
+
+<details>
 <summary>Solution</summary>
 
 If you drop the `% 400` clause from `is_leap()`,
@@ -142,6 +148,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. A stricter `EmailAddress`
 
@@ -183,6 +190,12 @@ class EmailAddress:
     def __post_init__(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `exercise_2.py` raises a `TypeFailure` for `"grace"`, `"b@@x.com"`, `"@x.com"`, `"b@"`, and `""`, and still prints `EmailAddress(text='grace@example.com')` for a valid address.
+Watch `"b@@x.com"`: it has text on both sides of its first `@`.
 
 <details>
 <summary>Solution</summary>
@@ -255,6 +268,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. The `NamedTuple` subclass workaround, and the hole it leaves
 
@@ -300,6 +314,12 @@ class Stars(_Stars):
     def __new__(cls, number: int) -> Stars:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `exercise_3.py` prints `Stars(number=5)`, shows `Stars(11)` raising a `TypeFailure`, and prints `Stars(number=99)` for `copy.replace(Stars(5), number=99)`.
+You can also name the method `copy.replace()` calls on a `NamedTuple` and say why that call skips your `__new__()`.
 
 <details>
 <summary>Solution</summary>
@@ -374,6 +394,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. `from_json()` rejects a bad email
 
@@ -433,6 +454,12 @@ class Person:
 def from_json(text: str) -> Person:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`from_json()` on your JSON string raises a `TypeFailure` reading `EmailAddress('no-at-sign') needs an @` (with your email text).
+Uncaught, its traceback ends in `EmailAddress.__post_init__()`, outside `from_json()`.
 
 <details>
 <summary>Solution</summary>
@@ -507,6 +534,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `__replace__()` on an ordinary class
 
@@ -554,6 +582,11 @@ class Stars:
     def __replace__(self, **changes: int) -> Self:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`copy.replace()` on your `Stars(4)` with `number=9` returns a `Stars` holding 9, and with `number=99` raises a `TypeFailure` from your `__init__()` check.
 
 <details>
 <summary>Solution</summary>
@@ -615,6 +648,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A `ClassVar` counter on a frozen `Stars`
 
@@ -670,6 +704,12 @@ class Wrong:
     def __post_init__(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `exercise_6.py` prints `(self, number: int) -> None` for `inspect.signature(Stars.__init__)` and a count of 3 after building three `Stars`.
+A second frozen class that increments through `self` fails with `[FrozenInstanceError] cannot assign to field 'built'`, and you can say which object that store targets.
 
 <details>
 <summary>Solution</summary>
@@ -753,6 +793,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. A `dict` field default, three ways
 
@@ -797,6 +838,12 @@ class Subscripted:
     index: dict[str, Month] = field(
         default_factory=dict[str, Month])
 ```
+
+<details>
+<summary>Done when</summary>
+
+the `= {}` version fails at the class definition with `mutable default <class 'dict'> for field index is not allowed: use default_factory`, and both fixed versions build an empty index.
+Changing the subscripted factory to `dict[int, int]` makes `uv run ty check` report `invalid-assignment`; swapping the bare `dict` for `list` draws no report.
 
 <details>
 <summary>Solution</summary>
@@ -872,6 +919,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. A type test in the check
 
@@ -917,6 +965,12 @@ class Stars:
     def __post_init__(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `exercise_8.py` raises a `TypeFailure` from the type test for `Stars(5.5)`, `Stars(True)`, and `Stars("five")`, and `Stars(5)` still builds.
+`Stars("five")` must end in a `TypeFailure`, not a `TypeError` from the range comparison.
 
 <details>
 <summary>Solution</summary>
@@ -992,6 +1046,7 @@ The runtime test is therefore the one check that rejects `True`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
