@@ -311,7 +311,7 @@ The moods alone hold the transition rules, which distinguishes this design from 
 `list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`, and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 constructs.
 Exercise 1's `UnpredictablePerson` accepts any object with a `hello()`, so the set of moods there is open and nothing lists it.
 
-**What a mood loses.** A member is one frozen record shared by every machine in the program, so a mood that keeps data of its own, such as a count of the `ANNOY` inputs it has received, has nowhere to put it.
+**What a mood loses.** A member is one object shared by every machine in the program, so a count of the `ANNOY` inputs a mood has received, stored on the member, counts every machine's inputs together.
 Exercise 1's classes can carry that state per instance, and a mood whose behavior needs more than a message, a successor, and an action is a class in either design.
 
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood` object through `change_to()`, this machine reaches the same moods by returning the next member from a transition function.
