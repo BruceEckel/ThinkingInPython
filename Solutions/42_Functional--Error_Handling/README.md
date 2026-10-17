@@ -39,6 +39,12 @@ def composed(i: int) -> Result[int, str]:
 ```
 
 <details>
+<summary>Done when</summary>
+
+for the input that `func_d()` rejects, your run prints the `Err` from `func_d()` and the later step's trace line is missing, while every input that passes `func_d()` still prints that line.
+The other inputs give the same results as `composing_with_bind.py`.
+
+<details>
 <summary>Solution</summary>
 
 If you append `func_d()` at the end of the chain,
@@ -117,6 +123,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. `Err.map_error()`
 
@@ -180,6 +187,12 @@ type Result[A, E] = Ok[A] | Err[E]
 def prefix(msg: str) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`Err("boom").map_error(prefix)` prints an `Err` holding the prefixed message, `Ok(5).map_error(prefix)` prints `Ok(answer=5)` unchanged, and `uv run ty check` passes on a `map_error()` call on a parameter annotated `Result[int, str]`.
+If `Ok` lacks the method, that call draws `unresolved-attribute`.
 
 <details>
 <summary>Solution</summary>
@@ -276,6 +289,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. `combined()` that collects every failure
 
@@ -291,6 +305,12 @@ The three calls take independent inputs, so `combined()` can make all three.
 Call all three first, then `match` on the three results together.
 One `case` takes three `Ok`s, and any other combination gathers the `.error` of each `Err` into a list.
 Write the three tests before the function.
+
+<details>
+<summary>Done when</summary>
+
+your tests pass and check three calls: `combined(1, 2)` returns an `Err` listing all three failures in step order, `combined(1, 5)` an `Err` holding `["func_a(1)"]` alone, and `combined(7, 5)` the same `Ok(answer='add(7 + 5 + 12): 24')` that `combining.py` prints.
+`uv run ty check` passes with no `assert` in `combined()`.
 
 <details>
 <summary>Solution</summary>
@@ -386,6 +406,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. `@safe(ValueError)`, catching only what you name
 
@@ -425,6 +446,11 @@ def safe(*catch: type[Exception]) -> SafeDecorator:
 def parse(text: str) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a `parse()` decorated with `@safe(ValueError)` returns `Ok(answer=42)` for `"42"`, a `TypeError` raised inside it propagates out of the call instead of coming back as an `Err`, and `reveal_type(parse)` under `uv run ty check` shows `(text: str) -> Result[int, Exception]`.
 
 <details>
 <summary>Solution</summary>
@@ -516,6 +542,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Notes that survive as data
 
@@ -546,6 +573,12 @@ def load_setting(name: str,
 def report(result: Result[int, Exception]) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a chain whose first load fails prints a note naming the first setting and its text, a chain whose second load fails prints the second setting's note, and no run prints a traceback.
+You can answer the question by pointing to the path a successful call takes through `load_setting()`.
 
 <details>
 <summary>Solution</summary>
@@ -613,6 +646,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. `int | None` collapses the three failures into one
 
@@ -645,6 +679,11 @@ def func_c(i: int) -> int | None:
 def composed(i: int) -> int | None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+for inputs `0` through `4` your run prints `0 0` and `4 4`, with the same `None` for `1`, `2`, and `3`, and you can name what those three lines lose compared with `composing.py`'s output for the same inputs.
 
 <details>
 <summary>Solution</summary>
@@ -714,6 +753,7 @@ to know which of three steps went wrong.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
