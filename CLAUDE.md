@@ -249,8 +249,8 @@ lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
 accepted, 610 watch words fixed and 220 accepted (a `want` with a
 human subject, an arithmetic `even`, a `never` that is the claim, a
-heading echoed in link text). Chapter 30's hits were left for its open
-editing pass and are kept out of the watch-words and positional
+heading echoed in link text). Chapter 31's hits are left for its open
+editing pass and are kept out of the stranded, watch-words, and positional
 baselines, so they stay NEW until that pass closes.
 
 ## Exercise statements in Solutions/ are generated
