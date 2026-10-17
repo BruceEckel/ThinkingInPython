@@ -57,6 +57,12 @@ def render(rows: list[Row], style: str) -> str:
 ```
 
 <details>
+<summary>Done when</summary>
+
+you can state the axis in a few words, name the part that absorbed each change (or say that none did), and list the hand edits each change required.
+You can also name one change off that axis and the parts it would force you to edit.
+
+<details>
 <summary>Solution</summary>
 
 The example is a small report writer. It prints plain text, then must
@@ -154,6 +160,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Subtracting a pattern
 
@@ -187,6 +194,11 @@ def checkout(
 ) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your list covers every interface, class, method, and call-site construct the usual form requires, each crossed-out part has the Python feature that supplies it written beside it, and the remainder fits in one sentence that states the pattern's intent and names none of its classes.
 
 <details>
 <summary>Solution</summary>
@@ -253,6 +265,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Applying *Subtraction*
 
@@ -295,6 +308,12 @@ class ByWeight(Shipping):
 def checkout(weight: float, shipping: Shipping) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you have removed one piece, run the program and `uv run ty check`, and written down what changed in the output and in the requirement the program meets.
+If nothing changed, you can say what the removed piece wrapped; if something broke, you can name the requirement that piece expresses.
 
 <details>
 <summary>Solution</summary>
@@ -356,6 +375,7 @@ the design, and that piece is worth keeping and worth naming.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -439,6 +459,11 @@ class Report:
 def main(kind: str) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both files pass `uv run ty check`, asking each `main` for the Markdown writer prints your Markdown text rather than `None`, and your edit lists match the chapter's figure: `Report` and `main` in the first version, `main` alone in the second.
 
 <details>
 <summary>Solution</summary>
@@ -580,6 +605,7 @@ moves them out of `main()` as well.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
