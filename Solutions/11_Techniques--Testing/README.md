@@ -14,6 +14,12 @@ The order of those two calls decides whether the other account keeps its balance
 The overdraft test checks the failing transfer with `pytest.raises()`, as in [Testing for Exceptions](../../Chapters/11_Techniques--Testing.md#testing-for-exceptions).
 
 <details>
+<summary>Done when</summary>
+
+both tests fail with `AttributeError` before you write `transfer()`, and `uv run pytest` passes them after.
+A `transfer()` that changes `other` before it checks the balance fails your overdraft test on `other.balance`.
+
+<details>
 <summary>Solution</summary>
 
 If you deposit first and withdraw second,
@@ -90,6 +96,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. Parametrized interest rates
 
@@ -102,6 +109,12 @@ a different design, a detail, or an equivalent alternative.
 [Parametrizing Tests](../../Chapters/11_Techniques--Testing.md#parametrizing-tests) shows `@pytest.mark.parametrize` running one test body once per value.
 Pass the rates as a list and take `rate` as a test parameter.
 Compare the balance using `pytest.approx()`, which [Comparing Floating-Point Values](../../Chapters/11_Techniques--Testing.md#comparing-floating-point-values) introduces.
+
+<details>
+<summary>Done when</summary>
+
+`uv run pytest -v` lists one passing test per rate, each ID ending in its rate, such as `[0.05]`.
+Adding `0.1` to your rates still passes, and that `0.1` case fails if you replace `pytest.approx()` with a bare `==`.
 
 <details>
 <summary>Solution</summary>
@@ -157,6 +170,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. A fixture asserting an invariant after the test
 
@@ -170,6 +184,11 @@ a different design, a detail, or an equivalent alternative.
 [Fixtures Replace Setup and Teardown](../../Chapters/11_Techniques--Testing.md#fixtures-replace-setup-and-teardown) shows a fixture that `yield`s its value, with teardown code after the `yield`.
 Create and fund the `Account` before the `yield`, and put the `assert` on its balance after the `yield`.
 Annotate the fixture as returning an `Iterator[Account]`, then name it as a parameter in two tests.
+
+<details>
+<summary>Done when</summary>
+
+both tests pass, and a third test that sets the account's `balance` to `-1` appears in the `pytest` report as `ERROR at teardown`, rather than as a failure, with your fixture's balance assertion as the cause.
 
 <details>
 <summary>Solution</summary>
@@ -238,6 +257,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. The environment variable, patched and then injected
 
@@ -268,6 +288,12 @@ def settings_path() -> Path:
 def settings_path_in(directory: Path) -> Path:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both tests pass, and renaming `APP_CONFIG` inside `settings_path()` fails one of them with a `KeyError` that names the new variable while the other still passes.
+You can say which fact about the implementation the failing test depends on.
 
 <details>
 <summary>Solution</summary>
@@ -332,6 +358,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Stubbing a boundary, patched and then injected
 
@@ -366,6 +393,12 @@ def current_temp_with(
 ) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both tests pass with the network disconnected.
+Renaming `urlopen` to `fetch` in your `weather` module fails the `monkeypatch` test with `AttributeError: ... has no attribute 'urlopen'` and leaves the injected test passing.
 
 <details>
 <summary>Solution</summary>
@@ -453,6 +486,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. The branch that sends nothing
 
@@ -469,6 +503,12 @@ a different design, a detail, or an equivalent alternative.
 Test a balance of zero as well as a positive one, since zero is where the boundary lies.
 Use `parametrize` to cover both.
 A hand-written stub needs somewhere to keep what it receives, so the test has something to inspect afterward.
+
+<details>
+<summary>Done when</summary>
+
+your `Mock` test and your stub test each pass at balances `0` and `50`.
+Changing `balance < 0` to `balance <= 0` in `notify_negative_balance()` fails the zero case of both tests, and a version that sends on every call fails your stub test too.
 
 <details>
 <summary>Solution</summary>
@@ -534,5 +574,6 @@ A `Mock` accepts any call.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
