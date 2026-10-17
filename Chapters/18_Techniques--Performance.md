@@ -342,6 +342,11 @@ When you time code by hand, use that clock and repeat the run.
 
     uv run python -m timeit -s "s = set(range(100_000))" "99_999 in s"
 
+The command-line form chooses its own `number`, trying 1, 2, 5, 10, 20, 50,
+and so on until one batch takes at least 0.2 seconds.
+Since 3.15, `--target-time` (`-t`) sets that threshold,
+so `-t 1` picks a `number` large enough for each batch to run about a second.
+
 `timeit` also turns the garbage collector off while it measures,
 so its runs stay repeatable.
 For a benchmark that allocates heavily,
@@ -446,6 +451,12 @@ For a parallel, CPU-bound workload,
 the [free-threaded build](19_Techniques--Concurrency.md#free-threading)
 is the largest platform-level speedup available in 3.15,
 since it removes the lock that otherwise serializes Python bytecode across threads.
+
+Since 3.14, the free-threaded build runs the specializing adaptive interpreter
+([PEP 659](https://peps.python.org/pep-0659/)),
+which the 3.13 free-threaded build had switched off.
+That change cut the build's single-threaded penalty to roughly 5-10% in 3.14,
+so a single-threaded timing still depends on which build took it.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less,
@@ -1349,6 +1360,11 @@ The same is true of weak references,
 as [Cleanup](10_Foundations--Cleanup.md#slotted-class-needs-weakref) shows.
 Add `"__weakref__"` to `__slots__` if some other object needs to hold one
 (`weakref_slot=True` adds it to a data class).
+Since 3.15, `"__dict__"` and `"__weakref__"` work in the `__slots__` of any class,
+including subclasses of `int`, `bytes`, and `tuple`,
+which raised a `TypeError` for every non-empty `__slots__` through 3.14.
+A subclass of `tuple`, or of a `namedtuple()` class,
+goes further and accepts slots of any name.
 
 Multiple inheritance is more restrictive than `cached_property` or weak references.
 Python lays out a slotted instance as a block of storage with a set layout.
