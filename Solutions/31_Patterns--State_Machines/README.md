@@ -93,6 +93,12 @@ class UnpredictablePerson:
 ```
 
 <details>
+<summary>Done when</summary>
+
+one `UnpredictablePerson` in your `exercise_1.py` gives three different `hello()` replies in a row, the last from `Prozac`.
+Adding `Prozac` changed no line of `UnpredictablePerson`.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -146,6 +152,7 @@ applied to a new domain.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -212,6 +219,13 @@ class Mood(State[Input], Enum):
     def __str__(self) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your trace interleaves greetings with transition lines in the form of `trap_states_demo.py`'s `Waiting mouse appears -> Luring`, the input printed as a word, and `uv run ty check` passes.
+A transition function that can finish without returning a `Mood` draws `invalid-return-type`.
+You can name one gain and one loss of a member over a class.
 
 <details>
 <summary>Solution</summary>
@@ -326,6 +340,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A word-driven state machine with per-state transition tables
 
@@ -368,6 +383,12 @@ class Turnstile(WordRow, Enum):
     def __str__(self) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file runs a list of words through the machine and prints the state after each one, and each member's row holds that state's whole `dict`.
+A word missing from the current state's `dict` gets the behavior you chose, not a `KeyError`.
 
 <details>
 <summary>Solution</summary>
@@ -440,6 +461,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Configuring the machine from one transition table
 
@@ -474,6 +496,12 @@ class TableController:
     def process(self, word: str) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+one `dict` holds every transition, and editing one entry changes the printed run with no edit anywhere else.
+Fed the same words, your file prints the same sequence of states as your exercise 3 solution.
 
 <details>
 <summary>Solution</summary>
@@ -533,6 +561,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `mouse_move_generator()`
 
@@ -585,6 +614,12 @@ def mouse_move_generator(
 ) -> Iterator[Mouse]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`list(mouse_move_generator(8))` holds eight `Mouse` members, starting with `Mouse.APPEARS`, and every adjacent pair is a move that makes sense after the one before it in `trap_states.py`.
+Across repeated runs you never see `RUNS_AWAY` before an `APPEARS`, or two `ESCAPES` in a row.
 
 <details>
 <summary>Solution</summary>
@@ -661,6 +696,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A washing machine, table-driven
 
@@ -726,6 +762,12 @@ class WashingMachine(StateMachine):
             self, msg: str) -> Callable[[object], None]:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a heavy and a light load take different spins through two rules under one `(state, input)` key, and swapping those two rules gives both loads the same spin.
+A mid-cycle `Start` raises `NoTransition` and leaves the state and the load as they were, and you can defend ignoring or stopping.
 
 <details>
 <summary>Solution</summary>
@@ -854,6 +896,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. An elevator, table-driven
 
@@ -916,6 +959,12 @@ class Elevator(StateMachine):
     def obstructed(self, sensor: DoorSensor) -> bool:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+closing the doors with the sensor blocked reopens them, and closing them again unblocked leaves the car idle, through two rules under one `(state, input)` key.
+A call for the floor the car is on opens the doors instead of raising `NoTransition`.
 
 <details>
 <summary>Solution</summary>
@@ -1030,6 +1079,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. A heating/air-conditioning system, table-driven
 
@@ -1073,6 +1123,12 @@ class HVAC(StateMachine):
     def too_hot(self, r: TemperatureReading) -> bool:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+from idle, readings below, inside, and above the target band lead to heating, idle, and cooling, all under one `(state, TemperatureReading)` key.
+Moving that group's unconditional rule to the top makes every reading land on that rule's state.
 
 <details>
 <summary>Solution</summary>
@@ -1165,6 +1221,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. A `Nickel` with No Rule
 
@@ -1215,6 +1272,12 @@ class Machine(StateMachine):
 
 NICKEL = Money("nickel", 5)
 ```
+
+<details>
+<summary>Done when</summary>
+
+your unmodified machine raises `NoTransition` on a `Nickel`, with `Nickel` named in the message, and each fix then adds 5 to the amount.
+You can explain why a `Nickel` key misses a `Money` rule, and how many rules each fix needs as coins and states multiply.
 
 <details>
 <summary>Solution</summary>
@@ -1315,6 +1378,7 @@ separate value.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
