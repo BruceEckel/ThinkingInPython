@@ -621,6 +621,12 @@ def load(name: str) -> str:
     return (data_dir() / name).read_text(encoding="utf-8")
 ```
 
+Python 3.15 makes UTF-8 the default encoding for `open()`, `Path.read_text()`,
+and `Path.write_text()`, whatever the system locale,
+so a test that writes and reads text gives the same result on every machine.
+`storage.py` still passes `encoding="utf-8"` for code that must also run on Python 3.14 and earlier,
+where the locale decides the encoding.
+
 `Path()` keeps a leading `~` as written,
 so a variable that may hold `~/data` needs `.expanduser()` on the result.
 
