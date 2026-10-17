@@ -10,10 +10,17 @@ The Python runtime checks types only when an operation runs.
 The examples so far have used few type declarations.
 On a small program you may not miss them.
 
-Python 3.5 (2015) introduced *type hints*,
+Python 3.0 let you annotate parameters and return values (PEP 3107)
+but left the meaning of those annotations to third-party libraries.
+Python 3.5 (2015) introduced *type hints* (PEP 484),
 which look like the type declarations of statically typed languages.
 The Python runtime never acts on a type hint.
 It stores the hint and evaluates it only when something reads the annotations.
+
+Older code often begins with a `__future__` import of `annotations` (PEP 563),
+an earlier form of postponed evaluation that stores each annotation as a string.
+Deferred evaluation, the default since Python 3.14 (PEP 649), supersedes it,
+so the book's listings leave that import out.
 
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool.
@@ -413,6 +420,15 @@ The type checker and the runtime give different answers for `shape`.
 because the type checker reads `make()`'s `-> Shape` return annotation,
 while `type(shape)` finds the `Circle` that `kind()` built.
 
+A `type[...]` parameter accepts a class.
+It rejects a *type expression* such as `int | None`,
+which can appear in an annotation but is a union rather than a class,
+so passing it draws `invalid-argument-type`.
+A function that validates or converts data against an arbitrary annotation takes a type expression as its argument.
+Python 3.15 (PEP 747) adds `TypeForm[T]` to annotate that parameter.
+Given `def convert[T](form: TypeForm[T], raw: object) -> T`,
+the call `convert(int | None, 3)` has the type `int | None`.
+
 ## Naming Types: The `type` Statement {#the-type-statement}
 
 An annotation can grow to the point of obscurity.
@@ -763,6 +779,13 @@ Inside `label()`, `style` is a `Style` dictionary.
 `NotRequired` makes `fill` optional,
 so `label()` reads it with `.get()` and a default.
 
+`ReadOnly`, added in Python 3.13 (PEP 705), is another per-key qualifier.
+The type checker accepts a read of a `ReadOnly` key and rejects an assignment to it.
+If `Style` declares `width: ReadOnly[int]`,
+`style['width'] = 8` inside `label()` draws `invalid-assignment`,
+with the message that the key "is marked read-only."
+At runtime the assignment succeeds, since every `TypedDict` value is a `dict`.
+
 The type checker checks the keywords at each call.
 A call that passes `width="6"` draws `invalid-argument-type` from `ty`,
 the same diagnostic a wrongly typed ordinary parameter draws.
@@ -774,6 +797,14 @@ Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
 but `ty` 0.0.87 accepts that call silently.
 At runtime `fil` becomes an extra key in `style`.
 `label()` ignores that key, so the fill stays a space.
+
+A `TypedDict` is open by default.
+It lists the keys a dictionary must have,
+so a `TypedDict` with more keys still satisfies it.
+Python 3.15 (PEP 728) adds *closed* `TypedDict`s,
+which permit only their declared keys.
+Declaring `class Style(TypedDict, closed=True):` makes `ty` reject `fil="*"` with `unknown-argument`.
+Writing `extra_items=str` instead of `closed=True` admits undeclared keys and requires a `str` for each of their values.
 
 A `TypedDict` helps most when several functions accept the same options.
 One `TypedDict` declares them once,
@@ -862,6 +893,7 @@ The abstract container types come from `collections.abc`.
 | `Generator[Y, S, R]` | A generator's yield, send, and return types; `Iterator[T]` is enough when it only produces values, see [Generators](45_Effects--Generators.md#annotating-a-generator) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C`, not an instance of it, see [Classes as Values](#classes-as-values-type) |
+| `TypeForm[T]` | A type expression passed as a value, such as a union, see [Classes as Values](#classes-as-values-type) |
 
 ### Unions, Optionals, and Literals
 
@@ -922,7 +954,8 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `TypedDict` | A dict with specific keys and value types; `**kwargs: Unpack[TD]` types keyword arguments with one, see [Typing `**kwargs` with a `TypedDict`](#typed-kwargs) |
-| `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
+| `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict`, see [Typing `**kwargs` with a `TypedDict`](#typed-kwargs) |
+| `closed=True`, `extra_items=T` | Class arguments that limit a `TypedDict` to its declared keys, or type the values of the others, see [Typing `**kwargs` with a `TypedDict`](#typed-kwargs) |
 | `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#namedtuple) |
 
 ### Type Narrowing
