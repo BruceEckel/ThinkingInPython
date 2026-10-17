@@ -46,6 +46,12 @@ def _(flower: Chrysanthemum, eater: str) -> str:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your file prints the `flower_visitors.py` lines for each flower you run, with `Chrysanthemum is toxic to Worm` coming from a registered implementation of `eat()`, and `uv run ty check` passes on it.
+You can also list every class and method of `flower_visitors.py` that your file no longer has, and say why each one has no job left.
+
+<details>
 <summary>Solution</summary>
 
 If you make `pollinate()` a `singledispatch` function too, the program
@@ -116,6 +122,7 @@ hierarchy does, without the classes.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -191,6 +198,12 @@ def thorns(flower: Flower) -> str:
 def _(flower: Rose) -> str:  # 3 lines
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file prints `Rose: abundant nectar` from `nectar()`, `strong` from `fragrance()`, and a `thorns()` answer for the rose that differs from the answer the other three flowers share.
+You can also state, for each change, how many lines and how many `register` calls it adds.
 
 <details>
 <summary>Solution</summary>
@@ -290,6 +303,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. The `Visits` protocol in place of `Any`
 
@@ -344,6 +358,12 @@ class Bee(Pollinator):
 class Beetle(Bug):  # Inherits no visit()
     pass
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `Bee` call prints `Gladiolus pollinated by Bee`, and `uv run ty check` reports `invalid-argument-type` on your `Beetle` call to `accept()`.
+Under the chapter's `Any` version, the checker accepts the same call and running it raises an `AttributeError`: `'Beetle' object has no attribute 'visit'`.
 
 <details>
 <summary>Solution</summary>
@@ -433,6 +453,7 @@ or annotating the parameter with the `Visits` protocol, as this solution does.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
