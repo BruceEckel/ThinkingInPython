@@ -51,6 +51,12 @@ def sum_value(contents: list[Trash]) -> float:
 ```
 
 <details>
+<summary>Done when</summary>
+
+`recycle_dict.py` on `plastic.dat` prints `Plastic: 9.00` beside the `Glass` and `Aluminum` totals, with `dict_sorter.py` and `parse_trash.py` as they were, and you can trace that 9.00 to the pieces `plastic_dropped.py` omits.
+`uv run pytest test_trash.py` shows one failing test, and you can say why its failure is correct.
+
+<details>
 <summary>Solution</summary>
 
 The listing bins a two-piece sample. On `plastic.dat`, the same binning
@@ -139,6 +145,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. `price()` and `heaviest()`
 
@@ -186,6 +193,12 @@ def price(items: list[Trash]) -> float:
 def heaviest(items: list[Trash]) -> Trash:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+for a 10-pound `Plastic` and a 2-pound `Aluminum`, `price()` returns `4.84` and `heaviest()` returns the `Plastic` object, not the number `10.0`.
+`uv run ty check` passes on your file, and you can say for each function whether its body reads anything that differs by class.
 
 <details>
 <summary>Solution</summary>
@@ -253,6 +266,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. `recycling_note()` as a `singledispatchmethod`
 
@@ -316,6 +330,13 @@ class Sorter:
     def _(self, t: Cardboard) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+looping over `Trash.registry` and calling your `Sorter`'s `recycling_note()` prints the four notes `recycling_note.py` prints, plus `Plastic: no special handling` if you define `Plastic`.
+If `Aluminum` gets `no special handling`, your dispatch is keying on the `Sorter` instance.
+You can say when the method form improves on the function.
 
 <details>
 <summary>Solution</summary>
@@ -413,6 +434,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Exact-type bins against MRO dispatch
 
@@ -467,6 +489,12 @@ def recycling_note(t: Trash) -> str:
 def _(t: Aluminum) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`recycle_dict.py` reports a `CrushedAluminum:` total of its own while `recycling_note.py` prints `CrushedAluminum: crush and bale`, and you can name the lookup behind each.
+After your change, the `CrushedAluminum:` line is gone, its weight adds to the `Aluminum` total, every other material keeps its own bin, and the sorting loop names no material.
 
 <details>
 <summary>Solution</summary>
@@ -570,6 +598,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. A base function that refuses to answer
 
@@ -632,6 +661,12 @@ def _(t: Aluminum) -> str:
 def _(t: Paper) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`hazard()` returns `none` for a `Plastic` piece, and `strict_hazard()` on the same piece raises a `NotImplementedError` whose message names `Plastic`.
+Your `strict_hazard()` returns `"none"` for `Paper` and `sharp edges` for `Aluminum`, and you can say what your file needed for `Paper` that `hazard()` gets from its base function.
 
 <details>
 <summary>Solution</summary>
@@ -718,6 +753,7 @@ program, as it is for a safety report.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
