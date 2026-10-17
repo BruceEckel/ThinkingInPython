@@ -267,6 +267,12 @@ The point is to edit the code, predict what it does, then run it and check.
 A few chapters in the Patterns part have larger exercises,
 because a pattern shows its value only in a program you build yourself.
 
+When a change breaks the code, read the traceback closely.
+It underlines the failing part of the line,
+down to the one operation in a long expression,
+and ends with a suggestion such as `Did you mean: 'count'?` when you misspell a name,
+an attribute, or a keyword argument.
+
 Solutions live in the `Solutions/` directory of the source repository.
 Each solution opens in steps, so you can take as little help as you need:
 a hint first, then the full answer.
