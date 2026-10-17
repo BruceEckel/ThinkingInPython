@@ -35,6 +35,11 @@ def deque_left_ops():
 ```
 
 <details>
+<summary>Done when</summary>
+
+your modified `deque_timing.py` prints `True` at `n = 2_000` and again at `n = 200_000`, and your explanation says how many elements one left-end operation moves in each container as `n` grows, and what that does to the gap between the two times.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -81,6 +86,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. `defaultdict(int)` for counting
 
@@ -94,6 +100,11 @@ a different design, a detail, or an equivalent alternative.
 [`defaultdict`](../../Chapters/03_Foundations--Containers.md#defaultdict) shows a factory called to create a missing value.
 The factory here is `int`, so ask what `int()` returns when called with no arguments.
 That default lets the loop add to a key before it exists.
+
+<details>
+<summary>Done when</summary>
+
+your file prints `{'dog': 2, 'cat': 1}` (or `defaultdict(<class 'int'>, {'dog': 2, 'cat': 1})` if you print the `defaultdict` directly), and your loop increments each count with no check for whether the key exists yet.
 
 <details>
 <summary>Solution</summary>
@@ -125,6 +136,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. Set operations across three sets
 
@@ -137,6 +149,11 @@ a different design, a detail, or an equivalent alternative.
 [Sets](../../Chapters/03_Foundations--Containers.md#sets) lists the set operators, and `set_methods.py` shows the method forms of the same operations.
 The methods `union()` and `intersection()` take several arguments at once.
 Pass `b` and `d` in a single call to each.
+
+<details>
+<summary>Done when</summary>
+
+your file prints `{1, 2, 3, 4, 5, 9}` and then `set()`, each from a single method call that receives both `b` and `d`, and you can say why the intersection is empty.
 
 <details>
 <summary>Solution</summary>
@@ -162,6 +179,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. Why a `list` cannot join a set of `frozenset`s
 
@@ -176,6 +194,11 @@ a different design, a detail, or an equivalent alternative.
 [Immutability](../../Chapters/03_Foundations--Containers.md#immutability) explains that a `frozenset` is hashable, so it works as a set member or a dictionary key.
 A `set` must hash each element when it adds it.
 Wrap the `groups.add()` call in a `try`, catch `TypeError`, and relate the message to what a `list` allows you to do after creation.
+
+<details>
+<summary>Done when</summary>
+
+your `except` clause catches a `TypeError` whose message is `cannot use 'list' as a set element (unhashable type: 'list')`, and your explanation ties the hash a set computes at insertion to what a `list` lets you do after creation and a `frozenset` does not.
 
 <details>
 <summary>Solution</summary>
@@ -203,6 +226,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. Four slices of one list
 
@@ -216,6 +240,12 @@ a different design, a detail, or an equivalent alternative.
 [Indexing and Slicing](../../Chapters/03_Foundations--Containers.md#indexing-and-slicing) covers `start`, `stop`, and `step`, and the way negative values count from the end.
 You can slice a slice to reverse a copy.
 A negative `step` also reverses in a single slice, but then `start` and `stop` swap roles.
+
+<details>
+<summary>Done when</summary>
+
+three single expressions on `xs` print `[40, 50]`, `[20, 30, 40]`, and `[40, 30, 20]`, none of them uses `len()`, and `xs` prints `[10, 20, 30, 40, 50]` afterward.
+For a further check, produce `[40, 30, 20]` with one slice that has a negative `step`.
 
 <details>
 <summary>Solution</summary>
@@ -251,6 +281,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 6. `defaultdict(int)` in place of `Counter`
 
@@ -263,6 +294,11 @@ a different design, a detail, or an equivalent alternative.
 [`Counter`](../../Chapters/03_Foundations--Containers.md#counter) lists what `Counter` provides beyond a tally, and [`defaultdict`](../../Chapters/03_Foundations--Containers.md#defaultdict) shows the factory that creates missing entries.
 Write the counting loop with `defaultdict(int)`.
 Then reproduce `most_common()` with `sorted()` and a `key` function, and notice what reading a missing key does to each container.
+
+<details>
+<summary>Done when</summary>
+
+your file, with no `Counter` import, prints `{'a': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}` and `[('a', 3), ('cat', 2)]`, matching `counter.py`'s `most_common(2)`; `counts["dog"]` prints `0`; and you can say how your container differs from a `Counter` after that read.
 
 <details>
 <summary>Solution</summary>
@@ -310,6 +346,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. `heterogeneous.py` as a `namedtuple`
 
@@ -322,6 +359,11 @@ a different design, a detail, or an equivalent alternative.
 [`namedtuple`](../../Chapters/03_Foundations--Containers.md#namedtuple) builds a tuple subclass with named fields.
 Because each instance is still a tuple, the unpacking from [Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking) works by position.
 Create the class with `namedtuple()`, keep the unpacking line as it was, and add a line that reads a field by name.
+
+<details>
+<summary>Done when</summary>
+
+the line `name, age, height = person` appears in your file unchanged from `heterogeneous.py` and still prints `Alice 30 1.65`, and another line reads a field by name rather than by position and prints its value, such as `Alice`.
 
 <details>
 <summary>Solution</summary>
@@ -357,6 +399,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 8. Building and merging a `dict`
 
@@ -372,6 +415,11 @@ a different design, a detail, or an equivalent alternative.
 The `dict()` constructor accepts an iterable of pairs.
 The `|` operator builds a new `dict`.
 To decide which operand supplies the value when both hold the same key, compare `|` with `update()`, which writes its argument's entries over the dictionary's own.
+
+<details>
+<summary>Done when</summary>
+
+your merge prints `{'a': 1, 'b': 2, 'c': 30, 'd': 4}`, your keys and values hold `['a', 'b', 'c']` and `[1, 2, 3]`, and your answer says which operand supplies `30` and what the merge gives if you swap the two operands.
 
 <details>
 <summary>Solution</summary>
@@ -417,6 +465,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 9. Unpacking without indexing
 
@@ -431,6 +480,11 @@ a different design, a detail, or an equivalent alternative.
 [Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking) shows a starred target collecting the leftover items into a `list`.
 Put the star on the target that should collect the middle, or at either end.
 For the explanation, compare how many items an unstarred target list requires with how many a starred one allows.
+
+<details>
+<summary>Done when</summary>
+
+your file subscripts `row` nowhere, its assignments print `1 [2, 3, 4, 5]`, `[1, 2, 3, 4] 5`, and `1 [2, 3, 4] 5`, catching the exception from `a, b = row` prints `too many values to unpack (expected 2, got 5)`, and your explanation says how many items each of the two target lists accepts.
 
 <details>
 <summary>Solution</summary>
@@ -490,6 +544,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 10. A `frozendict` as a dictionary key
 
@@ -507,6 +562,11 @@ a different design, a detail, or an equivalent alternative.
 [`frozendict`](../../Chapters/03_Foundations--Containers.md#frozendict) shows construction, equality, and the error on assignment, and [Shallow Immutability](../../Chapters/03_Foundations--Containers.md#shallow-immutability) shows how far immutability reaches.
 A dictionary finds a key by hash and equality, so a separately built, equal `frozendict` locates the same entry.
 For the last part, ask what `hash()` must do with each value, and what a `list` value does to that.
+
+<details>
+<summary>Done when</summary>
+
+the lookup with your separately built `frozendict` prints the connection name, the caught assignment prints `'frozendict' object does not support item assignment`, and hashing the list-valued `frozendict` raises a `TypeError` that prints `unhashable type: 'list'`, which your explanation connects to shallow immutability.
 
 <details>
 <summary>Solution</summary>
@@ -570,5 +630,6 @@ a `tuple` here instead of a `list`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
