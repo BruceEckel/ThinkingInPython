@@ -1650,7 +1650,7 @@ Try each exercise before opening its [solution](../Solutions/12_Techniques--Data
     Write the tests first.
 2.  Give `EmailAddress` a stricter check
     (a single `@`, with text on both sides).
-    Add tests for the values the check should now reject.
+    Show the values the check now rejects.
 3.  Take `test_namedtuple_no_hook.py`'s `Stars` and build the subclass workaround:
     a `_Stars(NamedTuple)` holding the field,
     and a `Stars(_Stars)` whose `__new__()` runs the check.

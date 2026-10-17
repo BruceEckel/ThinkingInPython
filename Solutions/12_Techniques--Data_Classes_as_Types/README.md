@@ -144,14 +144,14 @@ because February's cap is 29 at most.
 
 > Give `EmailAddress` a stricter check
 > (a single `@`, with text on both sides).
-> Add tests for the values the check should now reject.
+> Show the values the check now rejects.
 
 <details>
 <summary>Where to look</summary>
 
 [Composing Types from Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#composing-types-from-types) puts the check for `EmailAddress` in `__post_init__()`.
 Strengthen it there with two calls to `check()`: one that counts the `@` characters, and one that splits the text with `str.partition()` and tests both halves.
-The tests feed `EmailAddress` each shape the new check should reject.
+The demo feeds `EmailAddress` each shape the new check rejects.
 
 <details>
 <summary>The shape</summary>
