@@ -15,7 +15,7 @@
 [Adding a Setter](../../Chapters/07_Foundations--Classes.md#adding-a-setter) shows the `@radius.setter` that validates every assignment to `radius`.
 Write `shrink()` so it assigns to the public `radius` property instead of the underscore attribute.
 The setter then runs on the computed value.
-The test catches the setter's `ValueError`.
+`expect()` catches the setter's `ValueError`.
 
 <details>
 <summary>The shape</summary>
