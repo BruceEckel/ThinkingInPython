@@ -70,6 +70,11 @@ OUTCOME: Final[Table] = {
 ```
 
 <details>
+<summary>Done when</summary>
+
+`Lizard().compete(Paper())` and `Rock().compete(Lizard())` both return `win`, and `compete()` returns an `Outcome` for all sixteen ordered pairs of the four items, with no `KeyError`.
+
+<details>
 <summary>Solution</summary>
 
 If you write one order of a mixed pair,
@@ -148,6 +153,7 @@ nothing.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -247,6 +253,11 @@ class Lizard(Item):
     def eval_lizard(self, caller: Any) -> Outcome:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`Lizard().compete()` returns `win`, `win`, `lose`, `draw` against `Paper`, `Scissors`, `Rock`, and `Lizard`, each reversed duel returns the opposite result (a draw stays a draw), and you can state how many methods you added against exercise 1's seven rows.
 
 <details>
 <summary>Solution</summary>
@@ -369,6 +380,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Sixteen matchups in `EXPECTED`
 
@@ -418,6 +430,11 @@ def compete(module: ModuleType, player: str,
             opponent: str) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run pytest` on your `test_paper_scissors.py`, run against your exercise 1 and exercise 2 versions, reports 32 passed: sixteen `EXPECTED` cases for each version.
 
 <details>
 <summary>Solution</summary>
@@ -503,6 +520,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Counting how often each item type appears
 
@@ -585,6 +603,12 @@ def random_pairs[T](base: type[T], n: int,
                     ) -> Iterator[tuple[T, T]]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+after your loop over `random_pairs(Item, 100, counts)`, the four counts sum to 200, two per pair, and `counts["Lizard"]` lands near 50.
+Printing `counts["Lizard"]` before the loop shows `0`.
 
 <details>
 <summary>Solution</summary>
@@ -687,6 +711,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `__sub__()` and `__rsub__()` on `Meters`
 
@@ -724,6 +749,11 @@ class Meters:
     def __rsub__(self, other: object) -> Meters:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`10 - Meters(3)` prints `Meters(n=7)`, as do `Meters(10) - Meters(3)` and `Meters(10) - 3`, and `"ten" - Meters(3)` raises a `TypeError` whose message reads `unsupported operand type(s) for -: 'str' and 'Meters'`.
 
 <details>
 <summary>Solution</summary>
@@ -801,6 +831,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Making the table tolerate subclasses
 
@@ -865,6 +896,12 @@ class TolerantRock(TolerantItem):
 class TolerantOrigami(TolerantPaper):
     pass
 ```
+
+<details>
+<summary>Done when</summary>
+
+`Origami().compete(Rock())` first reproduces the `KeyError ['Origami', 'Rock']` line from `exact_match.py`.
+After your change it returns `win`, `Rock().compete(Origami())` returns `lose`, and a new direct subclass of `Item` with no rows still raises a `KeyError` at its first duel.
 
 <details>
 <summary>Solution</summary>
@@ -987,6 +1024,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. A business-modeling environment
 
@@ -1040,6 +1078,11 @@ class Project:
     def meet(self, n: int) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `Project` prints one line per `interact()` call, and each line's wording comes from the calling inhabitant's type: a `Troll` addresses a `Dwarf` the same way it addresses an `Elf`, and swapping the two inhabitants of a pair changes the line.
 
 <details>
 <summary>Solution</summary>
@@ -1100,6 +1143,7 @@ interact in `meet()`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -1283,6 +1327,11 @@ class Project2:
     def meeting(self, group_size: int) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+for each of the 36 ordered pairs of your six weapons, the two orders give opposite results (a draw stays a draw), `meeting()` returns one group's name, more than one group wins across many seeds, and `uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -1533,6 +1582,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. A table of callables
 
@@ -1615,6 +1665,12 @@ OUTCOME: Final[
     (Rock, Rock): always(Outcome.DRAW),
 }
 ```
+
+<details>
+<summary>Done when</summary>
+
+a dry `Paper` beats `Rock`, a wet `Paper` draws with `Rock` whichever of the two calls `compete()`, the other seven pairs return the chapter's answers, and `uv run ty check` passes on your file.
+You can also name the chapter's reason the callable cells answer, and the reason that survives.
 
 <details>
 <summary>Solution</summary>
@@ -1750,6 +1806,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. Exercise 8, rebuilt on a table
 
@@ -1846,6 +1903,11 @@ def by_methods(a: type[Weapon],
                b: type[Weapon]) -> Outcome:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your table holds 36 entries, each matching what your exercise 8 weapons return for the same ordered pair, and with the same seed `meeting()` names the same winning group as your exercise 8.
 
 <details>
 <summary>Solution</summary>
@@ -2010,6 +2072,7 @@ while this grid would need exercise 9's callable cells.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
