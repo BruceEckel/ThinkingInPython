@@ -30,6 +30,12 @@ def classify(value: object) -> str:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your `classify()` returns `"empty list"` for `[]`, `"singleton"` for a one-element list, `"longer list"` for `[1, 2, 3]`, `"point"` for `Point(1, 2)`, and `"other"` for `"hi"`.
+If `classify([1])` returns `"longer list"`, a wider case sits above a narrower one.
+
+<details>
 <summary>Solution</summary>
 
 If you drop the parentheses and write `case Point:`, the script stops at compile time.
@@ -103,6 +109,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Adding `Rectangle` without its `case`
 
@@ -115,6 +122,11 @@ a different design, a detail, or an equivalent alternative.
 [Exhaustive Matching](../../Chapters/13_Techniques--Pattern_Matching.md#exhaustive-matching) ends the `match` with `assert_never()`.
 Add the new data class and include it in the `Shape` union, but leave `area()` alone.
 The type checker's message shows the type left after the `case`s above `assert_never()` narrow `shape`.
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` on your edited `exhaustive.py` reports a `type-assertion-failure` at the `assert_never()` call, with the inferred type `Rectangle & ~Circle & ~Square`, and you can say why that type reaches the call.
 
 <details>
 <summary>Solution</summary>
@@ -166,6 +178,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. Matching a nested shape
 
@@ -188,6 +201,11 @@ Put a mapping pattern inside the `"at"` entry, and keep the flat click case so b
 def handle(event: dict[str, object]) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `handle()` returns `Click at (10, 20)` for both `{"type": "click", "at": {"x": 10, "y": 20}}` and `{"type": "click", "x": 10, "y": 20}`, and the four calls in `mapping_patterns.py` still print their original lines.
 
 <details>
 <summary>Solution</summary>
@@ -244,6 +262,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. A `Webhook` channel added to the union
 
@@ -292,6 +311,12 @@ def render(note: Notification, recipient: str) -> str:
 def cost(note: Notification) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+before you add the cases, `uv run ty check` reports two `type-assertion-failure` diagnostics, one at the `assert_never()` in `render()` and one in `cost()`, each naming `Webhook & ~Email & ~Sms & ~Push`.
+After you add both cases, it prints `All checks passed!` and `render()` and `cost()` accept a `Webhook`.
 
 <details>
 <summary>Solution</summary>
@@ -389,6 +414,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Quadrants with guards, and without them
 
@@ -435,6 +461,12 @@ def sign(n: int) -> int:
 def quadrant(p: Point) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both versions print `Third quadrant Fourth quadrant` for `Point(-3, -4)` and `Point(3, -4)`, and `On an axis` for `Point(0, 7)`.
+`uv run ty check` passes on the version that matches on `sign(p.x), sign(p.y)`, and you can say which version reads better and why.
 
 <details>
 <summary>Solution</summary>
@@ -538,6 +570,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A constant that captures, and two ways to fix it
 
@@ -580,6 +613,12 @@ def dotted(s: Signal) -> str:
 def guarded(s: Signal) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`act(Signal.STOP)` takes your `FALLBACK` case while `print(FALLBACK)` afterward still shows the third member.
+Each fixed version takes the fallback case for the third member and sends `Signal.STOP` to a different case.
 
 <details>
 <summary>Solution</summary>
@@ -665,6 +704,7 @@ an `is` test like this one, a membership test, or a call. Choose the guard when 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
