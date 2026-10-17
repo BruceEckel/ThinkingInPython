@@ -43,6 +43,12 @@ class Lazy:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your `exercise_1.py` prints the `description` three times before any build message appears, and the first `query()` then prints `3 answered before build` ahead of `Expensive built`.
+A second `query()` prints its result with no count and no build.
+
+<details>
 <summary>Solution</summary>
 
 If you store `description` as an ordinary instance attribute,
@@ -117,6 +123,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A per-method tally in the counting proxy
 
@@ -149,6 +156,12 @@ class CountingProxy:
     def __getattr__(self, name: str) -> Any:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+after calling `f()`, `g()`, and `f()` through your proxy, `print(p.calls["f"], p.calls["g"])` prints `2 1`.
+Reading `p.f` twice without calling it leaves both entries where they were, since the tally counts calls, not lookups.
 
 <details>
 <summary>Solution</summary>
@@ -206,6 +219,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A simple copy-on-write list
 
@@ -251,6 +265,12 @@ class CowList:
     def __repr__(self) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+after `b = a.share()` on a list `a` holding `[1, 2, 3]`, an `is` test shows `a` and `b` sharing one data object, with a reference count of 2.
+After `b.append(4)`, printing both gives `[1, 2, 3] [1, 2, 3, 4]` and the same `is` test reports `False`.
 
 <details>
 <summary>Solution</summary>
@@ -326,6 +346,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Why the typo reports as `RecursionError`
 
@@ -358,6 +379,12 @@ class BrokenProxy:
     def __getattr__(self, name: str) -> Any:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `exercise_4.py` catches the failure with `expected(RecursionError)` and prints `[RecursionError] maximum recursion depth exceeded`.
+You can also name the attribute every nested `__getattr__()` call looks up, and say why normal lookup never finds it.
 
 <details>
 <summary>Solution</summary>
@@ -411,6 +438,7 @@ so it fails the same way on its first lookup that falls through to `__getattr__(
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -479,6 +507,12 @@ class ConnectionProxy:
     def __exit__(self, *exception: object) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with a limit of two, your program lends two connections and refuses a third with an exception, and the free count climbs back to 1 and then 2 as each client finishes.
+Using a proxy after its client finished raises an exception instead of reaching a connection the pool may have lent again.
 
 <details>
 <summary>Solution</summary>
@@ -598,6 +632,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Forwarding `__len__()` explicitly
 
@@ -637,6 +672,13 @@ class Proxy:
     def __len__(self) -> int:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `exercise_6.py` prints `2` for `len(p)` and `uv run ty check` passes on it.
+If you delete the proxy's `__len__()`, the checker reports `invalid-argument-type` on `len(p)`.
+You can also say where `len()` looks for `__len__()` and why that lookup skips `__getattr__()`.
 
 <details>
 <summary>Solution</summary>
@@ -696,6 +738,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. A `change_to()` that refuses a narrower implementation
 
@@ -738,6 +781,12 @@ class Full:
 class Lacking:
     def f(self) -> None: ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+swapping to an implementation that lacks one of the current one's methods raises a `TypeError` naming that method, a call afterward still reaches the old implementation, and the chapter's `test_state.py` still passes against your `Surrogate`.
+You can also name the type the checker sees for both implementations.
 
 <details>
 <summary>Solution</summary>
@@ -809,6 +858,7 @@ declarations.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
