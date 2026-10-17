@@ -41,6 +41,12 @@ class Circle:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your `Circle(10)` prints `5.0` after `shrink(2)`, and `shrink(-2)` on that same circle raises the setter's `ValueError`, `radius cannot be negative`.
+Reading `radius` after the failed call still gives `5.0`.
+
+<details>
 <summary>Solution</summary>
 
 If you write `shrink()` to assign `self._radius`,
@@ -95,6 +101,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A second alternative constructor, `from_kelvin()`
 
@@ -132,6 +139,12 @@ class Temperature:
     def is_freezing(celsius):
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`Temperature.from_fahrenheit(212)` and `Temperature.from_kelvin(373.15)` both print `100.0` when you round each `celsius` to two places.
+A second pair, `from_fahrenheit(80.6)` and `from_kelvin(300.15)`, prints `27.0` both ways after rounding, though the unrounded values differ.
 
 <details>
 <summary>Solution</summary>
@@ -180,6 +193,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A third override in the chain, `MoreDerived`
 
@@ -224,6 +238,12 @@ class MoreDerived(Derived):
     def show(self, msg=""):
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`MoreDerived("x").show_twice()` prints `MoreDerived show() method`, `Overridden show() method`, and `x`, then the same three lines again, and the run matches the prediction you wrote first.
+In `simple_subclass.py` the two constructor lines print ahead of those six.
 
 <details>
 <summary>Solution</summary>
@@ -298,6 +318,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. A second `cached_property` that reads the first
 
@@ -331,6 +352,11 @@ class Numbers:
     def average(self):
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+accessing `n.total` and then `n.average` on `Numbers([5, 10, 15])` prints `30` and then `10.0`, and the `summing 3 values` line appears once in the whole run, before the `30`.
 
 <details>
 <summary>Solution</summary>
@@ -378,6 +404,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `__repr__()` and `__str__()` on `Temperature`
 
@@ -407,6 +434,12 @@ class Temperature:
     def __str__(self):
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with `__repr__()` alone, `print(t)` and the printed list both show `Temperature(21.0)`.
+After you add `__str__()`, `print(t)` shows `21.0C` while the list keeps the `Temperature(21.0)` form for each element.
 
 <details>
 <summary>Solution</summary>
@@ -461,6 +494,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A renamed base method, with and without the decorator
 
@@ -494,6 +528,12 @@ class Derived(Base):
     def show(self):
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your renamed program prints `Derived.show` at every step, and `uv run ty check` on your file reports `invalid-explicit-override` on `Derived.show()` while `@override` is present.
+With the decorator removed, `uv run ty check` prints `All checks passed!`.
 
 <details>
 <summary>Solution</summary>
@@ -546,6 +586,7 @@ changes no behavior at run time is worth writing when a tool reads it.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
