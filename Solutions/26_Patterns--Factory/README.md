@@ -77,6 +77,12 @@ def create_shape(kind: str) -> Shape:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your edited `shape_factory_method.py` runs its seeded demo with no `ValueError`, and with your class defined after the other two, its fourth line reads `Triangle.draw`.
+Your edited `shape_factory_objects.py` prints `Triangle.draw` for a `"Triangle"` in its demo list, with no `KeyError`.
+
+<details>
 <summary>Solution</summary>
 
 If you add the `_Triangle` class to `shape_factory_method.py` and stop there, the type checker accepts the file,
@@ -187,6 +193,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. `GnomesAndFairies`
 
@@ -286,6 +293,12 @@ class GnomesAndFairies:  # Declares no base class
     def make_character(self) -> Gnome: ...
     def make_obstacle(self) -> Fairy: ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both versions play a game with your new factory through the unchanged `GameEnvironment`.
+In the Protocol version without `make_obstacle()`, `uv run ty check` reports `invalid-argument-type` at the `GameEnvironment(...)` call and names `make_obstacle` as the missing protocol member.
 
 <details>
 <summary>Solution</summary>
@@ -425,6 +438,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. An Abstract Factory for "thick" and "thin" shapes
 
@@ -492,6 +506,12 @@ class ThinShapeFactory:
 def build_shapes(factory: ShapeFactory) -> list[Shape]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your demo draws each shape twice, first thick and then thin (the solution prints `thick Circle.draw` and later `thin Circle.draw`).
+The code that creates the shapes is the same for both families; the factory object you pass is the one thing that differs.
 
 <details>
 <summary>Solution</summary>
@@ -574,6 +594,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. A four-topping limit, in both pizza styles
 
@@ -622,6 +643,12 @@ class PizzaBuilder:
     def build(self) -> Pizza:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a `Pizza` with five toppings raises a `ValueError` from `__post_init__()`, and your builder raises a `ValueError` for a five-topping pizza.
+You can say, for a check in `topping()` and for one in `build()`, what the builder's list holds right after a fifth `topping()` call.
 
 <details>
 <summary>Solution</summary>
@@ -711,6 +738,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A registry whose classes live somewhere else
 
@@ -763,6 +791,13 @@ class Square(Shape):
     @override
     def draw(self) -> None: ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+before anything imports `extra_shapes`, `make("Circle")` raises `KeyError: 'Circle'`, and your `registry_demo.py` prints `['Circle', 'Square']` and its old draw lines again.
+`uv run ruff check` passes on it with the new import in place.
+You can name the line that registers `Circle` and when it runs.
 
 <details>
 <summary>Solution</summary>
@@ -884,6 +919,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. What `copy.copy()` breaks in a prototype registry
 
@@ -929,6 +965,12 @@ PROTOTYPES: Final[dict[str, Monster]] = {
 def shallow_spawn(kind: str) -> Monster:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with `copy.copy()` in `spawn()`, `pytest` fails both `test_spawn_is_independent()` and `test_prototype_untouched()`, and you can say why the second test passes its `hp` assertion first.
+Your new test, which mutates `parts`, fails under `copy.copy()` and passes beside the original two once `deepcopy()` is back.
 
 <details>
 <summary>Solution</summary>
@@ -1025,6 +1067,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. What the `eval()` dispatcher accepts
 
@@ -1077,6 +1120,11 @@ FACTORIES: Final[dict[str, ShapeMaker]] = {
 def create_shape(kind: str) -> Shape:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+for a `kind` that is an expression rather than a shape name, your `eval()` version prints the side effect's output before the shape's `draw()` line, and the `FACTORIES` version raises a `KeyError` whose message quotes that whole string.
 
 <details>
 <summary>Solution</summary>
@@ -1153,6 +1201,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Recursing through `__subclasses__()`
 
@@ -1209,6 +1258,13 @@ def names(classes: Iterable[type[Shape]]) -> list[str]:
 def shape_name(n: int) -> Iterator[str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`Shape.__subclasses__()` lists two classes while `list(all_subclasses(Shape))` lists three, `_Oval` among them.
+With the chapter's `random.seed(4)` and four draws, your demo prints `Oval.draw` at least once.
+You can say where `_Oval` sits relative to the classes `Shape.__subclasses__()` returns.
 
 <details>
 <summary>Solution</summary>
@@ -1311,6 +1367,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. Finding the class that forgot `@make.register`
 
@@ -1368,6 +1425,12 @@ class Hexagon:
 def unregistered(namespace: dict[str, object]) -> list[str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`Hexagon().draw()` works while `make("Hexagon")` raises `KeyError: 'Hexagon'`, and your check, run on the module's `globals()`, reports `Hexagon` and leaves out `Circle` and `Square`.
+Adding `@make.register` to `Hexagon` empties the report.
 
 <details>
 <summary>Solution</summary>
@@ -1463,6 +1526,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 11. Prototypes registered by decoration
 
@@ -1515,6 +1579,13 @@ def troll() -> Monster:
 def spawn(name: str) -> Monster:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your decorated `prototype_registry.py` fills `PROTOTYPES` with `'goblin'` and `'troll'`, and `spawn_demo.py` prints its two chapter lines unchanged.
+Keying the table on the decorated function's `__name__` makes `uv run ty check` report `unresolved-attribute`.
+You can name one gain and one loss against the table literal.
 
 <details>
 <summary>Solution</summary>
@@ -1618,6 +1689,7 @@ literal says the same thing in fewer lines.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
