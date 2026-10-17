@@ -32,6 +32,12 @@ class Empty:
 ```
 
 <details>
+<summary>Done when</summary>
+
+each of your two classes prints its name once, as its `class` statement finishes and before any later line runs, and printing each class's `__name__` afterward gives the names back.
+`uv run ty check` passes, and deleting the `return` from `announce` makes it report `invalid-return-type`.
+
+<details>
 <summary>Solution</summary>
 
 If you leave out `return cls`, `announce` returns `None`.
@@ -90,6 +96,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A `timing` decorator stacked with `@trace`
 
@@ -130,6 +137,12 @@ def timing[**P, R](func: Callable[P, R]) -> Callable[P, R]:
 def add(a: int, b: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with `@trace` above `@timing`, one call prints `trace`'s `->` line, then your timing line, then `trace`'s `<-` line showing the real return value rather than `None`.
+Swapping the two decorators moves your timing line after the `<-` line.
 
 <details>
 <summary>Solution</summary>
@@ -210,6 +223,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A coffee shop, object *Decorator* pattern
 
@@ -270,6 +284,12 @@ class Decaf(Extra):
 class ExtraShot(Extra):
     add_cost = 0.90
 ```
+
+<details>
+<summary>Done when</summary>
+
+your espresso with an extra shot and whipped cream prints a description naming all three, innermost first, and a cost equal to the espresso's price plus both extras' prices.
+Wrapping the two extras in the other order changes the description and leaves the cost alone, and `uv run ty check` passes.
 
 <details>
 <summary>Solution</summary>
@@ -346,6 +366,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. A class-level counter shared across every decorated function
 
@@ -389,6 +410,12 @@ def f(x: int) -> int:
 def g(x: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+after two calls to one decorated function and one call to another, the two per-function counts read `2` and `1`, the class-level total reads `3`, and every call prints its `->` and `<-` trace lines.
+`uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -476,6 +503,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. A `memo` that works with and without parentheses
 
@@ -526,6 +554,13 @@ def square(n: int) -> int:
 def add(a: int, b: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a function under `@memo` and another under `@memo(maxsize=2)` print when their bodies run.
+A repeated call prints nothing, a third distinct call evicts the first so repeating the first call prints again, a call with a keyword argument works, and both functions keep their `__name__`.
+`uv run ty check` passes.
 
 <details>
 <summary>Solution</summary>
@@ -639,6 +674,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. `retry(times)` in the function form
 
@@ -675,6 +711,13 @@ def flaky() -> str:
 def always_fails() -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+under `retry(times=3)`, a function that raises an exception on its first two calls returns its result on the third.
+Under `retry(times=2)`, a function that always fails runs twice and its last exception reaches the caller, as `expect()` shows.
+`__name__` reports the original name, and `uv run ty check` passes.
 
 <details>
 <summary>Solution</summary>
@@ -762,6 +805,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. Two class-form decorators on methods
 
@@ -816,6 +860,12 @@ class Counter:
     def peek(self) -> int:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+one call to the `repeat`-decorated method through an instance runs its body `times` times with that instance as `self`, and your printout shows a `function` under one name and a `logged` instance under the other.
+You can say which of the two objects has `__get__()` and why that decides whether `self` binds.
 
 <details>
 <summary>Solution</summary>
@@ -907,6 +957,7 @@ decorator class replaces the method.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
