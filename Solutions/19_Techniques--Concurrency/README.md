@@ -30,6 +30,11 @@ async def main() -> None:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your edited `async_mechanics.py` prints `d: started` as the fourth `started` line and `d: resumed` as the first `resumed` line, and the final list reads `['A', 'B', 'C', 'D']`, in argument order.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -79,6 +84,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Awaiting in a comprehension
 
@@ -109,6 +115,12 @@ async def fetch(item: str, delay: float) -> str:
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `async_mechanics.py` prints each `started` line directly above its own `resumed` line, `a` then `b` then `c`, and ends with `['A', 'B', 'C']`.
+A timing around the comprehension shows about 0.06 seconds, where the `gather()` version takes about 0.03.
 
 <details>
 <summary>Solution</summary>
@@ -166,6 +178,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A task that mixes waiting and computing
 
@@ -202,6 +215,12 @@ async def run(price_task: PriceTask,
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+running `mixed_price()` through `run()` in your edited `peak_concurrency.py` reports a `meter.peak` of `5`, with prices `[10, 20, 30, 40, 50]`.
+You can say why moving the loop above the `await`, still inside the `with meter:` block, leaves the peak at `5`.
 
 <details>
 <summary>Solution</summary>
@@ -258,6 +277,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Blocking inside a coroutine
 
@@ -294,6 +314,12 @@ async def run(price_task: PriceTask,
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `peak_concurrency.py` reports `peak=1` for `io_price()`, the figure `cpu_price()` reports, with the prices unchanged, and the five calls take about a quarter second instead of about 0.05.
+You can say which thread `time.sleep()` holds and why the other tasks wait for it.
 
 <details>
 <summary>Solution</summary>
@@ -350,6 +376,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. A semaphore of one, and a stray release
 
@@ -392,6 +419,12 @@ async def increment(count: int) -> None:
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your semaphore version of `async_locks.py` prints `counter: 400 of 400`, and with the stray `semaphore.release()` before `gather()` it prints `counter: 200 of 400` and runs to the end with no error.
+You can say why `asyncio.Lock` raises a `RuntimeError` for the same stray release.
 
 <details>
 <summary>Solution</summary>
@@ -475,6 +508,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Removing the `__main__` guard
 
@@ -490,6 +524,12 @@ a different design, a detail, or an equivalent alternative.
 [What a Process Pool Requires](../../Chapters/19_Techniques--Concurrency.md#what-a-process-pool-requires) describes how a worker process finds the function it must run.
 The worker imports your module, and importing executes every top-level statement.
 Read the `RuntimeError` traceback for what a worker tries to do during that import, and for the name `__mp_main__` that the guard tests.
+
+<details>
+<summary>Done when</summary>
+
+running `parallel_cpu.py` without its guard prints at least one `RuntimeError` traceback beginning `An attempt has been made to start a new process`, above a `BrokenProcessPool` at the bottom.
+You can say which top-level statement each worker runs during its import, and what `__name__` holds in a worker.
 
 <details>
 <summary>Solution</summary>
@@ -547,6 +587,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. Removing the `sleep` from `gil_race.py`
 
@@ -572,6 +613,11 @@ from concurrent.futures import ThreadPoolExecutor
 def increment(count: int) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `gil_race.py` prints `lost updates: False` on each of several runs on the standard build, and you can name the kind of statement that, placed between the read and the write, makes it print `lost updates: True` again.
 
 <details>
 <summary>Solution</summary>
@@ -621,6 +667,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. A third thread submitting jobs
 
@@ -652,6 +699,11 @@ def enqueue(jobs: list[Job]) -> None:
 def consume() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `priority_queue.py` prints six tuples in the same order on every run, opening with `(1, 'alert')`, `(1, 'page oncall')`, `(1, 'zzz')` and closing with `(3, 'aaa')`, `(3, 'backup')`.
 
 <details>
 <summary>Solution</summary>
@@ -720,6 +772,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. A task that finishes before the failures arrive
 
@@ -771,6 +824,12 @@ async def fetch(job: Fetch, t0: float) -> str:
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`task_group.py` with the changed `FETCHES` prints `e: fetched` before `a: fetched`, reports `e: E` among its final lines, and shows `f: cancelled` as the one cancelled task.
+You can name an effect of `e` that the group's cancellation leaves in place, and `FETCHES` holds `Fetch("e", 0.2)` again afterward.
 
 <details>
 <summary>Solution</summary>
@@ -872,6 +931,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. `gather()` without `return_exceptions`
 
@@ -898,6 +958,12 @@ from fetch_demo import FETCHES, fetch
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `gather_with_exceptions.py` prints two `fetched` lines, `a` and `b`, then your handler's line naming `fetch('c') failed`, and nothing more from `e` or `f`.
+You can say what becomes of `e` and `f` after the `ValueError` reaches your handler.
 
 <details>
 <summary>Solution</summary>
@@ -964,6 +1030,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 11. Setting the `ContextVar` in the parent
 
@@ -995,6 +1062,12 @@ async def main() -> None:
     # Set once, before any task exists
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `context_var.py` prints `context main` on all four lines, the `after:` line included, with `global req-3` on each.
+You can say why the `after:` line now reads `main` where the chapter's version reads `-`.
 
 <details>
 <summary>Solution</summary>
@@ -1057,6 +1130,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 12. Threads in place of subinterpreters
 
@@ -1086,6 +1160,12 @@ from pricing import cpu_price
 def sequential(orders: list[int]) -> list[int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `subinterpreters.py` runs with the assertion passing and prints `False` for the parallel check, where the chapter's version prints `True`.
+You can say which of the two comparisons depends on how many GILs the workers share, and why the other comparison stays the same.
 
 <details>
 <summary>Solution</summary>
@@ -1146,6 +1226,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 13. A lock around the loop body, not around `next()`
 
@@ -1194,6 +1275,12 @@ def drain(source: Iterator[int]) -> list[int]:
 def distribute(source: Iterator[int]) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `shared_iterator.py`, with the lock around the loop body, still reports `200 distinct, duplicates True`.
+You can name the call the `for` header makes outside the lock, and say what the lock covers instead.
 
 <details>
 <summary>Solution</summary>
@@ -1271,6 +1358,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 14. Both tasks acquiring in the same order
 
@@ -1303,6 +1391,12 @@ async def worker(
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `async_deadlock.py` prints `task 1: holds both` before `task 2: holds its first lock`, ends with your line saying both workers finished, and returns in about 20 milliseconds, well inside the 0.5-second timeout.
+You can draw who waits for whom and show the arrows form no loop.
 
 <details>
 <summary>Solution</summary>
@@ -1369,6 +1463,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 15. Awaiting `pool.submit()` directly
 
@@ -1387,6 +1482,12 @@ a different design, a detail, or an equivalent alternative.
 Check what type `pool.submit()` returns and whether that type defines `__await__`.
 The bridge is `loop.run_in_executor()`.
 The `ExceptionGroup` comes from the `TaskGroup` that runs `process_price()`.
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` on your edited `mixed_await.py` reports `invalid-await` on the `await`, and running the file ends in an `ExceptionGroup` whose one sub-exception is `TypeError: 'Future' object can't be awaited`.
+You can name what `loop.run_in_executor()` returns and which construct wraps the `TypeError`.
 
 <details>
 <summary>Solution</summary>
@@ -1439,5 +1540,6 @@ above.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
