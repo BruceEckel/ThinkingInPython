@@ -29,6 +29,13 @@ def tuple_append(item, target=()):
 ```
 
 <details>
+<summary>Done when</summary>
+
+the third `bad_append(3)` prints `[1, 2, 3]`, matching the prediction you wrote down first.
+With the default changed to `()`, a call that omits `target` raises an `AttributeError`: `'tuple' object has no attribute 'append'`.
+You can also say why a function that mutates its parameter needs the `None` sentinel from `good_append()`.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -74,6 +81,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A `get()` that re-raises, and why `None` cannot be its sentinel
 
@@ -101,6 +109,12 @@ MISSING = sentinel("MISSING")
 def get(data, key, default=MISSING):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`get(prefs, "theme")` raises a `KeyError` for `'theme'` and `get(prefs, "theme", None)` prints `None`.
+You can also say what `get()` receives as `default` in each of those two calls if `default=None` were the sentinel, and why that makes the two calls indistinguishable.
 
 <details>
 <summary>Solution</summary>
@@ -150,6 +164,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A keyword-only `label` parameter
 
@@ -176,6 +191,12 @@ from exceptions import expect
 def divide(a, b, /, *, label="result"):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`print(divide(10, 2, label="half"))` prints `half: 5.0`, and `divide(10, 2, "half")` raises a `TypeError`: `divide() takes 2 positional arguments but 3 were given`.
+If that second call returns `half: 5.0` instead, `label` is still positional-or-keyword.
 
 <details>
 <summary>Solution</summary>
@@ -212,6 +233,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. `report()` with an optional total
 
@@ -234,6 +256,12 @@ Put `total` there, ahead of `**options`, and test it in the body.
 def report(label, *values, total=False, **options):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`report("nums", 1, 2, 3, total=True)` prints `nums (1, 2, 3) {}` and then `6`, so `total` appears in neither the tuple nor the dictionary.
+A `TypeError` about multiple values for argument `'total'` means `total` sits in the wrong place in the parameter list.
 
 <details>
 <summary>Solution</summary>
@@ -274,6 +302,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `apply_twice()` with a lambda
 
@@ -296,6 +325,11 @@ Trace the string through the lambda twice before running the call.
 def apply_twice(func, value):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`apply_twice(lambda s: s + "!", "hi")` returns `hi!!`, matching the prediction you wrote down before running it, and the same `apply_twice()` called with a squaring lambda on `3` returns `81`.
 
 <details>
 <summary>Solution</summary>
@@ -326,6 +360,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Unpacking both containers at a call site
 
@@ -349,6 +384,12 @@ The first element of the tuple fills `label`, and the rest collect into `values`
 def report(label, *values, **options):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+one call to `report()` prints `point (3, 4) {'color': 'red'}`, and that call names only `args` and `opts`, never `"point"`, `3`, `4`, or `"color"`.
+If the output shows `(3, 4, {'color': 'red'}) {}`, the dictionary arrived as one more positional argument.
 
 <details>
 <summary>Solution</summary>
@@ -383,6 +424,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. `describe(name, /, **facts)`
 
@@ -409,6 +451,12 @@ from exceptions import expect
 def describe(name, /, **facts):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`describe("Bob", role="editor", years=12)` prints `Bob`, `role=editor`, and `years=12` on three lines, and `describe(name="Bob")` raises a `TypeError` reading `describe() missing 1 required positional argument: 'name'`.
+You can also say which parameter received the keyword `name="Bob"`.
 
 <details>
 <summary>Solution</summary>
@@ -471,6 +519,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. `UnboundLocalError` from both directions
 
@@ -500,6 +549,12 @@ def writes_global():
 def rebinds():
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+each edit makes its call raise an `UnboundLocalError` reading `cannot access local variable 'count' where it is not associated with a value`, and `rebinds()` raises it before printing anything.
+You can name the line that makes `count` local in each function.
 
 <details>
 <summary>Solution</summary>
@@ -550,6 +605,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Rebinding a parameter against mutating it
 
@@ -576,6 +632,11 @@ def clear_by_assignment(target):
 def clear_by_method(target):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+printing your list after `clear_by_assignment()` shows its original contents, printing it after `clear_by_method()` shows `[]`, and both results match the prediction you wrote down before running them.
 
 <details>
 <summary>Solution</summary>
@@ -620,6 +681,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. A positional-only `func` in `trace()`
 
@@ -650,6 +712,13 @@ def trace(func, *args, **kwargs):
 def positional_trace(func, /, *args, **kwargs):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+without the `/`, the call raises a `TypeError`, `trace() got multiple values for argument 'func'`, and `calling report` never prints.
+With the `/`, it prints `calling report` and then `point () {'func': 'f'}`.
+You can name the two parameters that collect `func="f"` on its way to that output.
 
 <details>
 <summary>Solution</summary>
@@ -698,6 +767,7 @@ After the `/`, a caller must fill `func` by position, so the keyword `func="f"` 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
