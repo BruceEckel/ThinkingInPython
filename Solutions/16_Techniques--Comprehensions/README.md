@@ -17,6 +17,12 @@ Combine two tests in that clause with `and`.
 The `and` operator stops at the first false operand, so the second test runs only on the elements the first one accepted.
 
 <details>
+<summary>Done when</summary>
+
+your comprehension prints a one-element list holding `16`, and `uv run ty check` passes on your file.
+If you swap the two tests in the filter, `ty` reports `unresolved-attribute` on `isdigit`, which confirms that the order of the tests matters.
+
+<details>
 <summary>Solution</summary>
 
 If you test `e.isdigit()` alone, or before the type test,
@@ -47,6 +53,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. A `2` on the diagonal instead of `1`
 
@@ -60,6 +67,11 @@ a different design, a detail, or an equivalent alternative.
 [Nested Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#nested-comprehensions) builds the matrix with an inner comprehension inside an outer one.
 The diagonal comes from a conditional expression in the output position, which chooses between two values.
 Change what that expression yields, and leave the loops alone.
+
+<details>
+<summary>Done when</summary>
+
+your `identity_matrix.py` prints six rows with `2` on the diagonal, from `[2, 0, 0, 0, 0, 0]` to `[0, 0, 0, 0, 0, 2]`, and `matrix` comes straight from the comprehension, with no statement that changes it afterward.
 
 <details>
 <summary>Solution</summary>
@@ -91,6 +103,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. Adding `"Galahad"` to `names`
 
@@ -105,6 +118,12 @@ a different design, a detail, or an equivalent alternative.
 The filter runs on the loop variable, before either expression runs.
 The comprehension builds a `dict`, which holds one value per key.
 A later name whose key matches an earlier one replaces that entry.
+
+<details>
+<summary>Done when</summary>
+
+you wrote down the entries before running, and the edited `dict_comprehension.py` prints the keys and values you wrote.
+You can also say why `"Ni"` drops out, and what happens to the entry count when two names upper-case to the same key.
 
 <details>
 <summary>Solution</summary>
@@ -141,6 +160,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. Dropping the length filter from `set_comprehension.py`
 
@@ -154,6 +174,12 @@ a different design, a detail, or an equivalent alternative.
 [Set Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#set-comprehensions) normalizes each name and lets the set discard repeats.
 Work out the normalized form of every name, including the one-character name, and count the distinct results.
 Two entries collide only if their normalized strings are equal.
+
+<details>
+<summary>Done when</summary>
+
+you predicted the count before running, and the edited `set_comprehension.py`, with a `print(len(unique))` added, prints that number.
+You can also say what `"J"` becomes after `capitalize()`, and why that string differs from what `"JOHN"` becomes.
 
 <details>
 <summary>Solution</summary>
@@ -194,6 +220,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. A comprehension that produces something worth keeping
 
@@ -216,6 +243,12 @@ Decide the shape by asking whether anyone uses the resulting list.
 def show(n: int) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your version prints `item 1` through `item 3`, then a list of three usable values in place of `[None, None, None]`, and `uv run ty check` passes on your file.
+You can also name the shape, comprehension or `for` loop, that suits each version, and the question that decides it.
 
 <details>
 <summary>Solution</summary>
@@ -276,6 +309,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Predicting a merge where a key repeats
 
@@ -289,6 +323,12 @@ a different design, a detail, or an equivalent alternative.
 [Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions) shows `**d` inside a dictionary display, merging each `d` in the order the loop produces it.
 A repeated key keeps the value written last.
 A key keeps the position of its first insertion, which decides the print order.
+
+<details>
+<summary>Done when</summary>
+
+you wrote the whole printed dictionary, keys in order, before running, and the edited `unpacking_comprehensions.py` prints what you wrote.
+You can also say where the key `"a"` gets its value and where it gets its position.
 
 <details>
 <summary>Solution</summary>
@@ -316,6 +356,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. Running `any()` before `sum()`
 
@@ -329,6 +370,12 @@ a different design, a detail, or an equivalent alternative.
 [A Generator Expression Runs Once](../../Chapters/16_Techniques--Comprehensions.md#a-generator-expression-runs-once) shows consumers sharing one generator, each taking what remains.
 `any()` stops at its first true value, so the generator keeps its position when `any()` returns.
 Trace which values each later consumer receives.
+
+<details>
+<summary>Done when</summary>
+
+you wrote down all three printed values before running, and the edited `spent_generator.py` prints them in that order.
+You can also name the first value `sum()` receives and say why it differs from the chapter's run.
 
 <details>
 <summary>Solution</summary>
@@ -355,6 +402,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 8. Closing the gap with brackets
 
@@ -378,6 +426,12 @@ Ask when the comprehension calls `source()` and when it reads `factor`, then com
 def source() -> list[int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `genexp_timing.py` builds `built` with a list comprehension and prints its three lines in the order you predicted.
+You can also say which value of `factor`, `2` or `10`, the products use, and at which line the comprehension reads it.
 
 <details>
 <summary>Solution</summary>
@@ -414,6 +468,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Counting the calls the walrus saves
 
@@ -438,6 +493,12 @@ Count the elements that pass the filter, and add that number to the length of `d
 def cube_if_even(n: int) -> int | None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both comprehensions print `[0, 8, 64]`, and the recorded arguments match the call count you predicted for each one.
+You can also name the arguments that appear twice in the second run and say why the rest appear once.
 
 <details>
 <summary>Solution</summary>
@@ -489,6 +550,7 @@ element that passes.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
