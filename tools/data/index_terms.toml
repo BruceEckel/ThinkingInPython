@@ -162,11 +162,6 @@ kind = "concept"
 match = ["blocked", "blockeds"]
 
 [[entry]]
-term = "bottom"
-kind = "concept"
-match = ["bottom", "bottoms"]
-
-[[entry]]
 term = "bottom type"
 kind = "concept"
 match = ["bottom type", "bottom types"]
