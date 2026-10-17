@@ -16,6 +16,11 @@ A new instance starts with an empty dictionary, so its read falls through to wha
 Compare the order of the three steps: shadow on `a`, change the class, create `c`.
 
 <details>
+<summary>Done when</summary>
+
+printing `c.rating` gives `9` while `a.rating` still gives `1`, and you can name the dictionary in which each of the two reads finds `rating`.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -43,6 +48,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. A third subclass with no override
 
@@ -58,6 +64,11 @@ a different design, a detail, or an equivalent alternative.
 [ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance) walks one class attribute down a hierarchy.
 A subclass that declares nothing reads through to its base.
 Add `Middle` as a second subclass like `Left`, print `Middle.shared` beside the others at each step, and check which classes move together.
+
+<details>
+<summary>Done when</summary>
+
+at each step `Middle.shared` prints the same value as `Left.shared` until `Left.shared = 5`, and your last line reads `9 5 9 100` for `Base`, `Left`, `Middle`, and `Right`.
 
 <details>
 <summary>Solution</summary>
@@ -101,6 +112,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. Each `B()` instance keeps its own `x`
 
@@ -114,6 +126,11 @@ a different design, a detail, or an equivalent alternative.
 [Real Per-Object Defaults](../../Chapters/09_Foundations--Class_Attributes.md#real-per-object-defaults) shows a constructor default giving each instance its own value.
 For a `@dataclass` field with a default, the generated `__init__()` assigns `self.x` on every call.
 Assign to `b.x`, build `b2`, and print both.
+
+<details>
+<summary>Done when</summary>
+
+printing `b.x` and `b2.x` together shows `-1 100`, so the assignment to `b.x` leaves the second instance's `x` at the constructor default.
 
 <details>
 <summary>Solution</summary>
@@ -147,6 +164,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. A plain class attribute masquerading as shared state
 
@@ -174,6 +192,12 @@ class Tally:
     def __init__(self, label: str) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+after `a.total = 99`, `vars(a)` shows a `total` entry of `99` beside `label`, while `Tally.total` still prints `2`.
+Restoring `ClassVar[int]` on `total` makes `uv run ty check` report `invalid-attribute-access` on the `a.total = 99` line.
 
 <details>
 <summary>Solution</summary>
@@ -219,6 +243,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. A per-instance list, via `default_factory`
 
@@ -236,6 +261,12 @@ a different design, a detail, or an equivalent alternative.
 [A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) shows two `Cart` objects sharing one list, so an append through one object changes the list both objects hold.
 The fix builds the list per instance with `field(default_factory=list)` from `dataclasses`.
 For the second half, write the bare `[]` default and see whether the `class` statement finishes, and when.
+
+<details>
+<summary>Done when</summary>
+
+after the `append()` through `a`, printing both lists shows `['apple'] []`.
+With the bare `[]` default, the `class` statement fails before any `Cart` exists, raising a `ValueError` whose message ends with `use default_factory`.
 
 <details>
 <summary>Solution</summary>
@@ -288,6 +319,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 6. `del` unshadows, once
 
@@ -303,6 +335,12 @@ a different design, a detail, or an equivalent alternative.
 [Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup) shows that assignment writes to the instance dictionary and a read falls back to the class.
 Use `del a.x` on that same dictionary and print `vars(a)` and `a.x` afterward.
 For the second `del`, compare what `vars(a)` and `vars(A)` each hold.
+
+<details>
+<summary>Done when</summary>
+
+after the first `del a.x`, `vars(a)` prints `{}` and `a.x` prints `100`.
+The second `del a.x` raises an `AttributeError` (`'A' object has no attribute 'x'`), and `vars(A)["x"]` still prints `100` afterward.
 
 <details>
 <summary>Solution</summary>
@@ -345,6 +383,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. Why `self.total += 1` leaves the class counter at zero
 
@@ -381,6 +420,12 @@ class Counting:
     def __init__(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`vars(a)` shows `{'total': 1}` while `vars(Tally)["total"]` shows `0`, and your fixed class prints `2 2 2` for two instances and the class.
+Removing the `# type: ignore` makes `uv run ty check` report `invalid-attribute-access` on `self.total += 1`.
 
 <details>
 <summary>Solution</summary>
@@ -453,6 +498,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. A mutable `ClassVar` shared down the hierarchy
 
@@ -470,6 +516,12 @@ A mutable `ClassVar` on the base is a single object that every subclass reaches 
 An assignment in a subclass body makes a new entry
 in that subclass's dictionary.
 Compare the two runs with `is`.
+
+<details>
+<summary>Done when</summary>
+
+the first run prints `[1, 2]` for `Base.shared` and both subclasses, and `Right.shared is Base.shared` prints `True`.
+After you give `Right` its own `shared = []`, the same appends print `[1] [1] [2]` for `Base`, `Left`, and `Right`, and the `is` test prints `False`.
 
 <details>
 <summary>Solution</summary>
@@ -550,6 +602,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 9. A declared attribute that no method assigns
 
@@ -577,6 +630,12 @@ class Ticket:
     def __init__(self, holder: str) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your file, the first `vars()` shows `holder` alone, and the read inside `expected(AttributeError)` reports `'Ticket' object has no attribute 'seat'`.
+After the outside assignment, `vars()` shows both `holder` and `seat`.
 
 <details>
 <summary>Solution</summary>
@@ -622,6 +681,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. Watching `Sub` get its own counter
 
@@ -662,6 +722,12 @@ class Counted:
 class SubCounted(Counted):
     pass
 ```
+
+<details>
+<summary>Done when</summary>
+
+`vars(Sub).get("total")` prints `None` before the first `Sub()`, then `2` and `3` after each call, while `Base.total` stays at `1`.
+With `Base.total += 1` as the increment, every `vars(Sub).get("total")` prints `None` and the two counts move together.
 
 <details>
 <summary>Solution</summary>
@@ -737,6 +803,7 @@ lines read `1 1`, `2 2`, and `3 3`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
