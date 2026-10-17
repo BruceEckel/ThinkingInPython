@@ -38,6 +38,12 @@ class Counter:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your edited `weak_value.py` prints `3`, `2`, `1`, `0`, and a short script that binds a second name to the list prints `[1, 2, 3]` through that name after rebinding and `[]` after `clear()`.
+You can then say why `live_count()` would stay at `1` if that second name existed.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -113,6 +119,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Listing the names of every live instance
 
@@ -146,6 +153,11 @@ class Counter:
     def live_names(cls) -> list[str]:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+creating `Counter` objects named `"Charlie"`, `"Alpha"`, and `"Bravo"`, in that order, and printing `Counter.live_names()` gives `['Alpha', 'Bravo', 'Charlie']`, not the creation order, and `uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -193,6 +205,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Building the `list` with a comprehension instead of a loop
 
@@ -223,6 +236,11 @@ class Counter:
     def __del__(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `cleanup.py` prints the same five lines the chapter's version prints, ending with `3` and `End of delete loop`, and the three `deleted` lines appear only after `End of delete loop`, when you run the file as a script.
 
 <details>
 <summary>Solution</summary>
@@ -274,6 +292,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. A strong registry that never lets go
 
@@ -305,6 +324,11 @@ class Counter:
     def live_count(cls) -> int:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `weak_value.py` prints `3` four times, after each `pop()` and after `clear()`, and you can say which container holds the reference that keeps each `Counter` alive.
 
 <details>
 <summary>Solution</summary>
@@ -359,6 +383,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `finalize(self, self.close)` and what it keeps alive
 
@@ -390,6 +415,12 @@ class Connection:
     def close(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+running your file as a script prints `End of program` and then `B closed` as its last line, where the chapter's `finalizer.py` prints `B closed` at the `del b`.
+You can name the object that still references the `Connection` after `del b`, and the mechanism that runs the callback at shutdown.
 
 <details>
 <summary>Solution</summary>
@@ -468,6 +499,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A two-object cycle, with and without the collector
 
@@ -503,6 +535,12 @@ class Node:
 def self_link() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `cycle.py` prints `a finalized` and `b finalized` between `unreachable, but still alive` and `after collect`.
+You can say what makes the collector run once `gc.disable()` is gone, and why the explicit `gc.collect()` still keeps this run's transcript the same.
 
 <details>
 <summary>Solution</summary>
@@ -565,6 +603,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. An `__enter__()` that fails, unguarded and guarded
 
@@ -608,6 +647,12 @@ class Guarded:
     def __exit__(self, *exc: object) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the unguarded version prints `C opened` then `caught boom`, with no `closed` line, and the guarded version prints `C opened`, `C closed`, `caught boom`, with `C closed` printed once.
+`uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -688,6 +733,7 @@ before the exception propagates.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
