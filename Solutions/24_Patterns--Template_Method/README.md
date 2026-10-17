@@ -87,6 +87,12 @@ def demo() -> None:
 ```
 
 <details>
+<summary>Done when</summary>
+
+given input files holding `hello` and `world`, both your subclass and your function form write `'HELLO WORLD '` to the last file.
+Given search words `spam`, `eggs`, and `ham`, and inputs `spam and eggs` and `green eggs and ham`, both forms write `'spam eggs eggs ham '`, one line per input file.
+
+<details>
 <summary>Solution</summary>
 
 The framework anchors the shape: read every file but the last, run the
@@ -238,6 +244,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Two fixes for the premature engine
 
@@ -300,6 +307,12 @@ class Greeter(Framework):
     def step(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+both your files print `Hello, Brian!` (with your name) where `premature_engine.py` raises an `AttributeError`, and in the redesign, constructing a `Greeter` prints nothing until the client calls `run()`.
+You can answer the closing question by naming what a later subclass author must remember under each repair.
 
 <details>
 <summary>Solution</summary>
@@ -400,6 +413,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Who objects to a replaced `run()`
 
@@ -444,6 +458,12 @@ class Reversed(ApplicationFramework):
     def customize2(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file runs and prints `two`, `one`, `two`, `one` with no error, and `uv run ty check` on it, with no `# type: ignore` on the override, reports `override-of-final-method` at your `run()`.
+You can then say which of the two reads `@final`, and what that means for a build that skips the type checker.
 
 <details>
 <summary>Solution</summary>
@@ -517,6 +537,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Two faithless substitutes the type checker accepts
 
@@ -563,6 +584,12 @@ class HalfDone(ApplicationFramework):
     def customize1(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your file; `run()` on the first subclass lets your exception propagate out of `run()`, and `run()` on the second returns normally while printing evidence that `customize2()` never did its share.
+You can name a base-class change that makes the type checker report one subclass, and say why nothing reports the other.
 
 <details>
 <summary>Solution</summary>
@@ -663,6 +690,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Which names the misspelling check compares
 
@@ -738,6 +766,13 @@ class MyApp(CheckedFramework):
 class Audited(MyApp):
     def reports(self) -> None: ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your subclass of `MyApp` with `reports()` fails at its `class` statement with a `TypeError` ending `did you mean report?`.
+Under your narrowed check the same class completes, while a subclass defining `customise2()` still fails with `did you mean customize2?`.
+You can say which misspelling now passes unreported.
 
 <details>
 <summary>Solution</summary>
@@ -890,6 +925,7 @@ using the protection the chapter recommends for steps:
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
