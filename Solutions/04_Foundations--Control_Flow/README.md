@@ -23,6 +23,11 @@ def find_factor(n):
 ```
 
 <details>
+<summary>Done when</summary>
+
+you have written your prediction down, `find_factor(97)` prints `97 is prime`, and you can say how the loop ended so that its `else` clause ran.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -50,6 +55,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Counting odd steps in the Collatz sequence
 
@@ -71,6 +77,12 @@ Return both counts together so the caller can print them side by side.
 def collatz_sequence(n):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `exercise_2.py` prints the chapter's six values for `collatz_sequence(10)` and then `(6, 1)`, with the step count first.
+If you see `(6, 2)`, your count includes the `1` that ends the sequence.
 
 <details>
 <summary>Solution</summary>
@@ -118,6 +130,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Swapped order of `continue` and `break`
 
@@ -132,6 +145,11 @@ a different design, a detail, or an equivalent alternative.
 [Loops](../../Chapters/04_Foundations--Control_Flow.md#loops) shows `break` leaving the loop and `continue` skipping to the next iteration.
 Compare the values of `n` that each `if` tests.
 Ask whether any single `n` can satisfy both tests, since that decides whether their order matters.
+
+<details>
+<summary>Done when</summary>
+
+your prediction is written down, the swapped `break_continue.py` prints `0 1 2 4 5`, and you can say what a single value of `n` would have to do for the order of the two `if` blocks to change the output.
 
 <details>
 <summary>Solution</summary>
@@ -161,6 +179,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. An exception that escapes the handler
 
@@ -186,6 +205,12 @@ def checked_divide(a, b):
 def divide_and_report(a, b):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your run prints `finally always runs`, then a traceback ending in `TypeError: unsupported operand type(s) for /: 'int' and 'str'`, with neither `caught:` nor `no exception` in the output.
+You can follow the traceback from your call down to the `/` in `checked_divide()`.
 
 <details>
 <summary>Solution</summary>
@@ -242,6 +267,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. A three-item `case` in `pattern_matching.py`
 
@@ -264,6 +290,11 @@ Put the three-item pattern where Python tries it before any `case` that also mat
 def run(command):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the file runs without a `SyntaxError`, `run("go north 3")` returns `unknown command` before your change and a string holding both `north` and `3` after it, and `run("go north")` still returns `moving north`.
 
 <details>
 <summary>Solution</summary>
@@ -312,6 +343,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. The comprehension written as a loop
 
@@ -324,6 +356,11 @@ a different design, a detail, or an equivalent alternative.
 [Comprehensions](../../Chapters/04_Foundations--Control_Flow.md#comprehensions) introduces the list comprehension with a filter.
 Start from an empty list, loop over `range()`, test the condition with an `if`, and call `append()`.
 Then compare what each version tells the reader about the finished list.
+
+<details>
+<summary>Done when</summary>
+
+your loop version prints `[0, 2, 4, 6, 8]`, the same list the comprehension prints, and your preference comes with a reason you can point to in the two versions of the code.
 
 <details>
 <summary>Solution</summary>
@@ -352,6 +389,7 @@ replaces.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 
@@ -386,6 +424,11 @@ def substituted(text):
 def joining_line(e):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your prediction is written down, the traceback shows `The above exception was the direct cause of the following exception:` above `BadNumber`, and printing the classes of `e.__cause__` and `e.__context__` names two different exceptions: the one you constructed and `ValueError`.
 
 <details>
 <summary>Solution</summary>
@@ -455,6 +498,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. `read_text()` in place of the reading `with`
 
@@ -468,6 +512,11 @@ a different design, a detail, or an equivalent alternative.
 [Context Managers](../../Chapters/04_Foundations--Control_Flow.md#context-managers) explains what the `with` block does on entry and exit, and names `read_text()` and `write_text()` for reading or writing a whole file in one call.
 Call `read_text()` on the `Path` and split the result into lines.
 To compare the two forms, consider what the file object lets you do between the open and the close.
+
+<details>
+<summary>Done when</summary>
+
+your rewritten reading half prints `one` and `two`, as the chapter's version does, and you can name one thing the open file object lets you do between the open and the close, plus a kind of file where that matters.
 
 <details>
 <summary>Solution</summary>
@@ -514,6 +563,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 9. Adjacent `2`s in `mutating_while_looping.py`
 
@@ -528,6 +578,11 @@ a different design, a detail, or an equivalent alternative.
 [Mutating a Container While Looping](../../Chapters/04_Foundations--Control_Flow.md#mutating-a-container-while-looping) explains how `remove()` shifts later items into slots the loop has passed.
 Walk the loop by index over `[2, 2, 1, 3]`, noting which item `remove()` deletes and which item moves into the current position.
 Then predict the final list before you run it.
+
+<details>
+<summary>Done when</summary>
+
+your prediction is written down, the run prints `[2, 1, 3]`, and you can say which slot the surviving `2` occupies and why the loop skipped it.
 
 <details>
 <summary>Solution</summary>
@@ -564,6 +619,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 10. Strings `isdigit()` rejects and `int()` accepts
 
@@ -586,6 +642,11 @@ For each string, ask whether `look_first()` would need a new test to agree with 
 def look_first(text):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your four predictions match the run, where `look_first()` returns `None` for both strings and `int()` returns `42` for both, and you can name the test `look_first()` would need for each string and say why `parse_int()` needs none.
 
 <details>
 <summary>Solution</summary>
@@ -620,6 +681,7 @@ not tried.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
