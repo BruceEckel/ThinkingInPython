@@ -16,6 +16,12 @@ Have `count_primes()` return `os.getpid()` with the count, and collect the IDs i
 Compare its size to `os.process_cpu_count()`, and ask when the pool starts a worker.
 
 <details>
+<summary>Done when</summary>
+
+`parallel_pure.py` runs to the end with your change and still prints the counts `[17984, 33860, 49098, 63951]`.
+It also reports more than one distinct process ID, and you can explain why that number stays well below `os.process_cpu_count()`.
+
+<details>
 <summary>Solution</summary>
 
 If you keep `assert parallel == serial` from `parallel_pure.py`,
@@ -90,6 +96,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. Which thread ran each call
 
@@ -102,6 +109,12 @@ In [Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-inter
 Swap in `ThreadPoolExecutor`.
 The serial comparison and the core count can go, and smaller limits keep the run short.
 Think about what threads share that processes do not, and which function reports an identity per thread.
+
+<details>
+<summary>Done when</summary>
+
+your `ThreadPoolExecutor` version prints the same counts as the process version for the same limits and reports one distinct process ID.
+You can say why `os.getpid()` cannot tell the pool's workers apart.
 
 <details>
 <summary>Solution</summary>
@@ -151,6 +164,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. Three property shapes for `sorted()`
 
@@ -165,6 +179,12 @@ a different design, a detail, or an equivalent alternative.
 [A Family of Property Shapes](../../Chapters/43_Functional--Confidence.md#a-family-of-property-shapes) names the invariant, idempotence, and oracle shapes.
 Write each as its own `@given` test over `strategies.lists(strategies.integers())`.
 For the oracle, write an insertion sort slow and simple enough to check by reading, and cap the list length.
+
+<details>
+<summary>Done when</summary>
+
+your three properties pass under `uv run pytest`.
+When you swap in a sort that returns `[]`, the oracle fails while the invariant and idempotence pass; a sort that drops the last element fails idempotence and the oracle and passes the invariant.
 
 <details>
 <summary>Solution</summary>
@@ -247,6 +267,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. A law that is false
 
@@ -264,6 +285,12 @@ a different design, a detail, or an equivalent alternative.
 [Shrinking a Failure](../../Chapters/43_Functional--Confidence.md#shrinking-a-failure) shows Hypothesis reducing a failing input to a minimal one.
 Put `s.upper().lower() == s.lower()` under `@given(strategies.text())` and read the shrunk string.
 Print its code points with `unicodedata.name()`, since the two sides of the failed assertion look alike.
+
+<details>
+<summary>Done when</summary>
+
+Hypothesis shrinks the failure to a one-character `s`, and printing the code points of both sides of the assertion shows they differ where they look alike.
+With `.hypothesis/` deleted between runs you see one of two characters, and your explanation covers both.
 
 <details>
 <summary>Solution</summary>
@@ -344,6 +371,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. A property test for `group_rounds()`
 
@@ -361,6 +389,12 @@ a different design, a detail, or an equivalent alternative.
 [The Same Law in Hypothesis](../../Chapters/43_Functional--Confidence.md#the-same-law-in-hypothesis) shows how `@given` turns a law into a test.
 Build rosters with `strategies.lists(..., unique=True)`, and check that the sorted students in each round equal the sorted roster.
 To break the function, remove the step that places leftover students, then rerun to see Hypothesis replay the failure from `.hypothesis/`.
+
+<details>
+<summary>Done when</summary>
+
+your property passes under `uv run pytest` against the chapter's `group_rounds()`.
+With the `for extra in pool` loop deleted it fails on a shrunk roster of two or three names, and a second run, with `.hypothesis/` kept, reports the same `names` and `size`.
 
 <details>
 <summary>Solution</summary>
@@ -516,6 +550,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 6. Two impure functions with no `global` in sight
 
@@ -555,6 +590,12 @@ def stale_pure(
 def timeout_pure(env: Mapping[str, str]) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+each rewritten function names every input it reads in its signature, so the same arguments give the same answer at any time of day and with any `TIMEOUT` set.
+For each original, you can name a call whose recorded answer goes wrong when substituted later.
 
 <details>
 <summary>Solution</summary>
@@ -626,6 +667,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. `match` against `isinstance()` on the same function
 
@@ -666,6 +708,11 @@ def compute(text: str) -> Result[float, Exception]:
 def describe(result: Result[float, Exception]) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `isinstance()` version prints the chapter's three `#:` lines, its `describe()` is two lines shorter than the `match` version, and `reveal_type()` on the value inside the `Ok` shows `float` in both versions under `uv run ty check`.
 
 <details>
 <summary>Solution</summary>
@@ -754,6 +801,7 @@ states the shapes you expect: the `match`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
