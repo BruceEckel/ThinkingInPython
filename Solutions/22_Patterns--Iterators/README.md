@@ -276,6 +276,8 @@ print(list(sq))
 #: [0, 1, 4, 9, 16]
 ```
 
+This `squares()` leaves out the chapter's trace line,
+since the exercise is about the second pass.
 Both fixes produce the values again on a second pass, one by storing and one by
 recomputing.
 The list's second pass reads the stored values back.
