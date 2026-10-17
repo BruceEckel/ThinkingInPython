@@ -886,6 +886,20 @@ A day count cannot serve as the member's value,
 because `Enum` treats members with equal values as aliases of one another.
 Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`.
 
+`Enum` accepts that alias silently.
+The `verify()` decorator checks the finished class against the constraints you pass it,
+and raises a `ValueError` at class creation when one fails.
+`UNIQUE` rejects an alias.
+`CONTINUOUS` rejects a gap in the integer values.
+Decorating `Month` with `@verify(UNIQUE, CONTINUOUS)` catches a repeated or skipped month number.
+
+`DAYS` sits outside the class for a related reason.
+Inside the class body,
+`DAYS = (31, 28, ...)` would make the tuple a thirteenth member,
+because `Enum` treats a value assigned there as one more member.
+Wrapping the tuple in `nonmember()` keeps it an ordinary class attribute,
+so `DAYS = nonmember((31, 28, ...))` puts the table inside `Month` and leaves twelve members.
+
 The tests confirm that `Month(7)` finds `JULY` in a legal date,
 that a day past the end of its month raises `TypeFailure`,
 and that a month number outside the twelve raises the `Enum`'s `ValueError`:
