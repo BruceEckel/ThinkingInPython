@@ -557,6 +557,9 @@ The reflected call is how a type written decades after `int` can sit to the righ
 Every binary arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
+`@` dispatches the same way, through `__matmul__()` and `__rmatmul__()`.
+Python 3.5 added the operator for array libraries such as NumPy.
+No built-in type implements either method, so `2 @ 3` raises a `TypeError`.
 The in-place forms, `__iadd__()` and its siblings, are a separate family.
 They serve `+=`, not `a + b`.
 `radd_dispatch.py` traces each dispatch:
