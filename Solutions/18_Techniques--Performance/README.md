@@ -30,6 +30,12 @@ def set_lookups() -> None:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your file times a seeded list of random targets against both the `list` and the `set` and prints `True` for the `set` total being smaller.
+The conclusion of `membership.py` survives: the solution's run still finds the `set` thousands of times faster.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -78,6 +84,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Finding the crossover size
 
@@ -89,6 +96,12 @@ a different design, a detail, or an equivalent alternative.
 [Benchmark Alternatives with `timeit`](../../Chapters/18_Techniques--Performance.md#benchmark-alternatives-with-timeit) compares a `list` against a `set` at one large size.
 Repeat that comparison in a loop over a ladder of small sizes, building both collections at each size.
 Print the faster one per size and look for where the winner changes.
+
+<details>
+<summary>Done when</summary>
+
+your loop prints one winner for each size in a ladder that starts at `1`, and you can name the smallest size at which the `set` wins.
+Expect a small number: on the book's machine the `list` wins at size `1` and the `set` wins from `2` on.
 
 <details>
 <summary>Solution</summary>
@@ -126,6 +139,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. `eager_first_evens()` as one list comprehension
 
@@ -160,6 +174,12 @@ def lazy() -> list[int]:  # The chapter's lazy version
 def peak_of(func: Callable[[], list[int]]) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your single comprehension returns `[0, 4, 16, 36, 64]`, equal to both of the chapter's versions, and its `tracemalloc` peak is about half of `eager_first_evens()`'s, a ratio near `0.5`.
+The lazy version's peak still comes in under 1% of yours.
 
 <details>
 <summary>Solution</summary>
@@ -223,6 +243,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Caching a function with a side effect
 
@@ -248,6 +269,12 @@ from functools import cache
 def noisy(n: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+three calls with the same argument print your function's message once, before the first result, and print the result three times.
+You can say what else, besides the computation, a cached function skips on a repeat call.
 
 <details>
 <summary>Solution</summary>
@@ -289,6 +316,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. Popping a heap correctly
 
@@ -303,6 +331,12 @@ a different design, a detail, or an equivalent alternative.
 [Heap](../../Chapters/18_Techniques--Performance.md#heap) shows `list.pop(0)` breaking the heap ordering that `heappop()` maintains.
 Call `heapify()`, then pop three times with `heappop()`, printing the heap and a check of `heap[0]` against `min()` each time.
 For the last question, compare the heap ordering with what "sorted" requires.
+
+<details>
+<summary>Done when</summary>
+
+your three `heappop()` calls return `3`, `4`, and `5`, `heap[0] == min(heap)` prints `True` after each one, and the heap ends as `[6, 7, 8, 9, 10]`.
+You can state the rule the heap ordering enforces between an element and the positions below it.
 
 <details>
 <summary>Solution</summary>
@@ -354,6 +388,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 6. A subclass that forgets `__slots__`
 
@@ -382,6 +417,12 @@ class Point:
 class Point3D(Point):  # Declares no __slots__ of its own
     pass
 ```
+
+<details>
+<summary>Done when</summary>
+
+`p.z = 3` on a `Point3D` succeeds and `vars(p)` prints `{'z': 3}`, while `hasattr(Point(1, 2), "__dict__")` prints `False`.
+You can explain why `Point3D.__slots__` still reads `('x', 'y')` although the subclass stores `z`.
 
 <details>
 <summary>Solution</summary>
@@ -431,6 +472,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. Global monitoring versus two local attachments
 
@@ -470,6 +512,12 @@ def fib(n: int) -> int:
 def square(n: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the `set_events()` run prints `Counter({'fib': 177, 'square': 1})`, and your version with two `set_local_events()` attachments prints the same `Counter`, switching both off before `free_tool_id()`.
+You can say which functions a larger program adds to the global count.
 
 <details>
 <summary>Solution</summary>
@@ -536,6 +584,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. Reading `tottime` against `cumtime`
 
@@ -561,6 +610,12 @@ def inner() -> int:
 def outer() -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you can name, from your own `cProfile -s cumulative` report, the function with the largest `cumtime` and the one with the largest `tottime`, and they differ.
+You can also say why a caller that does little work of its own still ranks high on `cumtime`.
 
 <details>
 <summary>Solution</summary>
@@ -609,6 +664,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. A compact `array` is not a faster `array`
 
@@ -637,6 +693,12 @@ from benchmark import report
 def best(f: Callable[[], float]) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file times `sum()` over each container with the `min()` of several `timeit.repeat()` rounds and prints `True` for the `array` taking longer; the solution's run measured about 1.4 times as long.
+You can say what Python hands your code for each element of each container.
 
 <details>
 <summary>Solution</summary>
@@ -685,6 +747,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. `"".join()` against `+=`, at two sizes
 
@@ -714,6 +777,12 @@ def build_join(parts: list[str]) -> str:
 def build_concat(parts: list[str]) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your timings show `join()` ahead at both 10,000 and 100 parts, and at 100 parts both versions take under 50 microseconds per call.
+You can say which version you would write at either size, and why the ratio alone does not decide whether the difference matters.
 
 <details>
 <summary>Solution</summary>
@@ -779,6 +848,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 11. `bisect()` and `bisect_left()` against duplicates
 
@@ -793,6 +863,12 @@ a different design, a detail, or an equivalent alternative.
 [Bisect](../../Chapters/18_Techniques--Performance.md#bisect) uses `bisect()` to find a position in a sorted list.
 Build a list in which one value repeats three times, and print the index each of `bisect_left()` and `bisect()` returns for it.
 Index the list at both positions to see which one is the target's first copy and which one is one past its last.
+
+<details>
+<summary>Done when</summary>
+
+on a list such as `[1, 3, 5, 5, 5, 7, 9]`, `bisect_left()` and `bisect()` return `2` and `5` for the value `5`, and the slice between those indices is `[5, 5, 5]`.
+You can say which index reads the first `5` and which one inserts after the last.
 
 <details>
 <summary>Solution</summary>
@@ -847,6 +923,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 12. Which build am I running, and does the JIT show up?
 
@@ -862,6 +939,12 @@ a different design, a detail, or an equivalent alternative.
 [The CPython JIT](../../Chapters/18_Techniques--Performance.md#the-cpython-jit) describes the three states that `sys._jit.is_available()` and `sys._jit.is_enabled()` report.
 Print both flags, then run `membership.py` with `--numbers` under each setting of the `PYTHON_JIT` environment variable.
 For the last question, consider where the measured work runs, how long the program lives, and what the `ratio` line compares.
+
+<details>
+<summary>Done when</summary>
+
+you can name the state `jit_status.py` prints on your interpreter (the book's build prints `no JIT in this build`), and on a `JIT built in, switched off` build you have compared the two `ratio` lines.
+You can give three reasons the two runs differ by about run-to-run noise.
 
 <details>
 <summary>Solution</summary>
@@ -928,5 +1011,6 @@ instead of one number from one program.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
