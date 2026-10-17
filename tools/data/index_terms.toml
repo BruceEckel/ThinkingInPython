@@ -54,7 +54,7 @@ match = ["abstract coupling", "abstract couplings"]
 [[entry]]
 term = "abstract syntax tree"
 kind = "concept"
-match = ["abstract syntax tree", "abstract syntax trees"]
+match = ["abstract syntax tree", "abstract syntax trees", "AST"]
 
 [[entry]]
 term = "accessors"
@@ -102,11 +102,6 @@ kind = "concept"
 match = ["Amdahl's Law", "Amdahl's Laws"]
 
 [[entry]]
-term = "answer"
-kind = "concept"
-match = ["re:(?<=\\*)answer(?=\\*)", "re:(?<=\\*)answers(?=\\*)"]
-
-[[entry]]
 term = "API Gateway"
 kind = "concept"
 match = ["API Gateway", "API Gateways"]
@@ -120,11 +115,6 @@ match = ["re:(?<=\\*)argument(?=\\*)", "re:(?<=\\*)arguments(?=\\*)"]
 term = "asynchrony"
 kind = "concept"
 match = ["asynchrony", "asynchronies"]
-
-[[entry]]
-term = "Atomic Kotlin"
-kind = "concept"
-match = ["Atomic Kotlin", "Atomic Kotlins"]
 
 [[entry]]
 term = "awaitable"
@@ -227,11 +217,6 @@ kind = "concept"
 match = ["checked exceptions"]
 
 [[entry]]
-term = "circle method"
-kind = "concept"
-match = ["circle method", "circle methods"]
-
-[[entry]]
 term = "Circuit Breaker"
 kind = "concept"
 match = ["Circuit Breaker", "Circuit Breakers"]
@@ -292,11 +277,6 @@ kind = "concept"
 match = ["conditional expression", "conditional expressions"]
 
 [[entry]]
-term = "consistency"
-kind = "concept"
-match = ["consistency", "consistencies"]
-
-[[entry]]
 term = "constraint"
 kind = "concept"
 match = ["constraint", "constraints"]
@@ -315,11 +295,6 @@ match = ["constructor function", "constructor functions"]
 term = "Content-Based Router"
 kind = "concept"
 match = ["Content-Based Router", "Content-Based Routers"]
-
-[[entry]]
-term = "context"
-kind = "concept"
-match = ["re:(?<=\\*)context(?=\\*)", "re:(?<=\\*)contexts(?=\\*)"]
 
 [[entry]]
 term = "context manager"
@@ -422,11 +397,6 @@ kind = "concept"
 match = ["re:(?<=\\*)decorator(?=\\*)", "re:(?<=\\*)decorators(?=\\*)"]
 
 [[entry]]
-term = "defect"
-kind = "concept"
-match = ["defect", "defects"]
-
-[[entry]]
 term = "delayed binding"
 kind = "concept"
 match = ["delayed binding", "delayed bindings"]
@@ -435,11 +405,6 @@ match = ["delayed binding", "delayed bindings"]
 term = "dependency injection"
 kind = "concept"
 match = ["dependency injection", "dependency injections"]
-
-[[entry]]
-term = "description"
-kind = "concept"
-match = ["re:(?<=\\*)description(?=\\*)", "re:(?<=\\*)descriptions(?=\\*)"]
 
 [[entry]]
 term = "descriptor"
@@ -480,11 +445,6 @@ match = ["Dispatcher", "Dispatchers"]
 term = "docstring"
 kind = "concept"
 match = ["docstring", "docstrings"]
-
-[[entry]]
-term = "document"
-kind = "concept"
-match = ["document", "documents"]
 
 [[entry]]
 term = "Document-View"
@@ -572,11 +532,6 @@ kind = "concept"
 match = ["Effect variable", "Effect variables"]
 
 [[entry]]
-term = "Effective Java"
-kind = "concept"
-match = ["Effective Java", "Effective Javas"]
-
-[[entry]]
 term = "Ellipsis"
 kind = "concept"
 match = ["Ellipsis"]
@@ -622,11 +577,6 @@ kind = "concept"
 match = ["exception specifications"]
 
 [[entry]]
-term = "exhaustive"
-kind = "concept"
-match = ["exhaustive", "exhaustives"]
-
-[[entry]]
 term = "expression problem"
 kind = "concept"
 match = ["expression problem", "expression problems"]
@@ -657,24 +607,9 @@ kind = "concept"
 match = ["fallback", "fallbacks"]
 
 [[entry]]
-term = "finding"
-kind = "concept"
-match = ["finding", "findings"]
-
-[[entry]]
 term = "first-class"
 kind = "concept"
 match = ["first-class"]
-
-[[entry]]
-term = "fixed point"
-kind = "concept"
-match = ["fixed point", "fixed points"]
-
-[[entry]]
-term = "fixtures"
-kind = "concept"
-match = ["fixtures"]
 
 [[entry]]
 term = "Fluent Interface"
@@ -700,11 +635,6 @@ match = ["free-threaded", "free-threadeds"]
 term = "Front Controller"
 kind = "concept"
 match = ["Front Controller", "Front Controllers"]
-
-[[entry]]
-term = "function"
-kind = "concept"
-match = ["re:(?<=\\*)function(?=\\*)", "re:(?<=\\*)functions(?=\\*)"]
 
 [[entry]]
 term = "Function Composition"
@@ -797,16 +727,6 @@ kind = "concept"
 match = ["Hollywood Principle", "Hollywood Principles"]
 
 [[entry]]
-term = "hook"
-kind = "concept"
-match = ["hook", "hooks"]
-
-[[entry]]
-term = "hot"
-kind = "concept"
-match = ["hot", "hots"]
-
-[[entry]]
 term = "I/O-bound"
 kind = "concept"
 match = ["I/O-bound", "I/O-bounds"]
@@ -845,16 +765,6 @@ match = ["re:(?<=\\*)imports(?=\\*)"]
 term = "inclusion polymorphism"
 kind = "concept"
 match = ["inclusion polymorphism", "inclusion polymorphisms"]
-
-[[entry]]
-term = "independence"
-kind = "concept"
-match = ["independence", "independences"]
-
-[[entry]]
-term = "infinite"
-kind = "concept"
-match = ["infinite", "infinites"]
 
 [[entry]]
 term = "initializer"
@@ -897,11 +807,6 @@ kind = "concept"
 match = ["iterator protocol", "iterator protocols"]
 
 [[entry]]
-term = "Java"
-kind = "concept"
-match = ["re:(?<=\\*)Java(?=\\*)", "re:(?<=\\*)Javas(?=\\*)"]
-
-[[entry]]
 term = "keyword-only"
 kind = "concept"
 match = ["keyword-only", "keyword-onlies"]
@@ -937,11 +842,6 @@ kind = "concept"
 match = ["lazily initialized", "lazily initializeds"]
 
 [[entry]]
-term = "lazy"
-kind = "concept"
-match = ["re:(?<=\\*)lazy(?=\\*)", "re:(?<=\\*)lazies(?=\\*)"]
-
-[[entry]]
 term = "lazy evaluation"
 kind = "concept"
 match = ["lazy evaluation", "lazy evaluations"]
@@ -960,11 +860,6 @@ match = ["Lazy Load", "Lazy Loads"]
 term = "Leader/Followers"
 kind = "concept"
 match = ["Leader/Followers"]
-
-[[entry]]
-term = "library"
-kind = "concept"
-match = ["re:(?<=\\*)library(?=\\*)", "re:(?<=\\*)libraries(?=\\*)"]
 
 [[entry]]
 term = "Liskov Substitution Principle"
@@ -1012,11 +907,6 @@ kind = "concept"
 match = ["Marker Interface", "Marker Interfaces"]
 
 [[entry]]
-term = "maze"
-kind = "concept"
-match = ["maze", "mazes"]
-
-[[entry]]
 term = "Mealy machine"
 kind = "concept"
 match = ["Mealy machine", "Mealy machines"]
@@ -1035,11 +925,6 @@ match = ["Memoization", "Memoizations"]
 term = "memoizes"
 kind = "concept"
 match = ["memoizes"]
-
-[[entry]]
-term = "Message"
-kind = "concept"
-match = ["re:(?<=\\*)Message(?=\\*)", "re:(?<=\\*)Messages(?=\\*)"]
 
 [[entry]]
 term = "Message Channel"
@@ -1127,11 +1012,6 @@ kind = "concept"
 match = ["monad", "monads"]
 
 [[entry]]
-term = "Money"
-kind = "concept"
-match = ["Money", "Moneys"]
-
-[[entry]]
 term = "Monitor Object"
 kind = "concept"
 match = ["Monitor Object", "Monitor Objects"]
@@ -1167,16 +1047,6 @@ kind = "concept"
 match = ["narrows"]
 
 [[entry]]
-term = "native"
-kind = "concept"
-match = ["native", "natives"]
-
-[[entry]]
-term = "nodal lines"
-kind = "concept"
-match = ["nodal lines"]
-
-[[entry]]
 term = "nominal"
 kind = "concept"
 match = ["nominal", "nominals"]
@@ -1195,21 +1065,6 @@ match = ["object adapter", "object adapters"]
 term = "observer"
 kind = "concept"
 match = ["observer", "observers"]
-
-[[entry]]
-term = "once and once only"
-kind = "concept"
-match = ["once and once only", "once and once onlies"]
-
-[[entry]]
-term = "open"
-kind = "concept"
-match = ["re:(?<=\\*)open(?=\\*)", "re:(?<=\\*)opens(?=\\*)"]
-
-[[entry]]
-term = "operations"
-kind = "concept"
-match = ["re:(?<=\\*)operations(?=\\*)"]
 
 [[entry]]
 term = "oracle"
@@ -1252,11 +1107,6 @@ kind = "concept"
 match = ["parametric polymorphism", "parametric polymorphisms"]
 
 [[entry]]
-term = "parse, don't validate"
-kind = "concept"
-match = ["parse, don't validate", "parse, don't validates"]
-
-[[entry]]
 term = "Partial Application"
 kind = "concept"
 match = ["Partial Application", "Partial Applications"]
@@ -1265,16 +1115,6 @@ match = ["Partial Application", "Partial Applications"]
 term = "Pattern-Oriented Software Architecture"
 kind = "concept"
 match = ["Pattern-Oriented Software Architecture", "Pattern-Oriented Software Architectures"]
-
-[[entry]]
-term = "perfect maze"
-kind = "concept"
-match = ["perfect maze", "perfect mazes"]
-
-[[entry]]
-term = "persistent"
-kind = "concept"
-match = ["persistent", "persistents"]
 
 [[entry]]
 term = "pickling"
@@ -1347,11 +1187,6 @@ kind = "concept"
 match = ["profiler", "profilers"]
 
 [[entry]]
-term = "proper"
-kind = "concept"
-match = ["proper", "propers"]
-
-[[entry]]
 term = "property-based"
 kind = "concept"
 match = ["property-based", "property-baseds"]
@@ -1377,34 +1212,14 @@ kind = "concept"
 match = ["Publish-Subscribe Channel", "Publish-Subscribe Channels"]
 
 [[entry]]
-term = "pull"
-kind = "concept"
-match = ["pull", "pulls"]
-
-[[entry]]
 term = "pure function"
 kind = "concept"
 match = ["pure function", "pure functions"]
 
 [[entry]]
-term = "push"
-kind = "concept"
-match = ["push", "pushes"]
-
-[[entry]]
 term = "qualify"
 kind = "concept"
 match = ["qualify", "qualifies"]
-
-[[entry]]
-term = "raising"
-kind = "concept"
-match = ["re:(?<=\\*)raising(?=\\*)", "re:(?<=\\*)raisings(?=\\*)"]
-
-[[entry]]
-term = "rat"
-kind = "concept"
-match = ["rat", "rats"]
 
 [[entry]]
 term = "Reactor"
@@ -1487,39 +1302,14 @@ kind = "concept"
 match = ["Repository", "Repositories"]
 
 [[entry]]
-term = "request"
-kind = "concept"
-match = ["re:(?<=\\*)request(?=\\*)", "re:(?<=\\*)requests(?=\\*)"]
-
-[[entry]]
-term = "Resource Acquisition Is Initialization"
-kind = "concept"
-match = ["Resource Acquisition Is Initialization", "Resource Acquisition Is Initializations"]
-
-[[entry]]
 term = "Retry"
 kind = "concept"
 match = ["Retry", "Retries"]
 
 [[entry]]
-term = "root"
-kind = "concept"
-match = ["root", "roots"]
-
-[[entry]]
-term = "roundtrip"
-kind = "concept"
-match = ["roundtrip", "roundtrips"]
-
-[[entry]]
 term = "run-time type identification"
 kind = "concept"
 match = ["run-time type identification", "run-time type identifications"]
-
-[[entry]]
-term = "Saga"
-kind = "concept"
-match = ["Saga", "Sagas"]
 
 [[entry]]
 term = "scenario"
@@ -1572,11 +1362,6 @@ kind = "concept"
 match = ["shallow", "shallows"]
 
 [[entry]]
-term = "shape"
-kind = "concept"
-match = ["re:(?<=\\*)shape(?=\\*)", "re:(?<=\\*)shapes(?=\\*)"]
-
-[[entry]]
 term = "side cause"
 kind = "concept"
 match = ["side cause", "side causes"]
@@ -1592,24 +1377,9 @@ kind = "concept"
 match = ["Sidecar", "Sidecars"]
 
 [[entry]]
-term = "simplicity before generality"
-kind = "concept"
-match = ["simplicity before generality", "simplicity before generalities"]
-
-[[entry]]
-term = "simula"
-kind = "concept"
-match = ["simula", "simulas"]
-
-[[entry]]
 term = "slice"
 kind = "concept"
 match = ["slice", "slices"]
-
-[[entry]]
-term = "Smalltalk"
-kind = "concept"
-match = ["Smalltalk", "Smalltalks"]
 
 [[entry]]
 term = "smart reference"
@@ -1620,16 +1390,6 @@ match = ["smart reference", "smart references"]
 term = "soft keywords"
 kind = "concept"
 match = ["soft keywords"]
-
-[[entry]]
-term = "Special Case"
-kind = "concept"
-match = ["Special Case", "Special Cases"]
-
-[[entry]]
-term = "Specification"
-kind = "concept"
-match = ["Specification", "Specifications"]
 
 [[entry]]
 term = "Splitter"
@@ -1647,11 +1407,6 @@ kind = "concept"
 match = ["State effect", "State effects"]
 
 [[entry]]
-term = "Strangler Fig"
-kind = "concept"
-match = ["Strangler Fig", "Strangler Figs"]
-
-[[entry]]
 term = "strategy"
 kind = "concept"
 match = ["strategy", "strategies"]
@@ -1660,11 +1415,6 @@ match = ["strategy", "strategies"]
 term = "strong reference"
 kind = "concept"
 match = ["strong reference", "strong references"]
-
-[[entry]]
-term = "structural"
-kind = "concept"
-match = ["structural", "structurals"]
 
 [[entry]]
 term = "structural typing"
@@ -1677,29 +1427,9 @@ kind = "concept"
 match = ["Structured Concurrency", "Structured Concurrencies"]
 
 [[entry]]
-term = "stub"
-kind = "concept"
-match = ["stub", "stubs"]
-
-[[entry]]
-term = "subject"
-kind = "concept"
-match = ["subject", "subjects"]
-
-[[entry]]
 term = "submodule"
 kind = "concept"
 match = ["submodule", "submodules"]
-
-[[entry]]
-term = "Subtraction"
-kind = "concept"
-match = ["Subtraction", "Subtractions"]
-
-[[entry]]
-term = "subtracts"
-kind = "concept"
-match = ["subtracts"]
 
 [[entry]]
 term = "subtype polymorphism"
@@ -1712,34 +1442,14 @@ kind = "concept"
 match = ["sum type", "sum types"]
 
 [[entry]]
-term = "suppresses"
-kind = "concept"
-match = ["suppresses"]
-
-[[entry]]
 term = "suspends"
 kind = "concept"
 match = ["suspends"]
 
 [[entry]]
-term = "syntactic sugar"
-kind = "concept"
-match = ["syntactic sugar", "syntactic sugars"]
-
-[[entry]]
 term = "t-string"
 kind = "concept"
 match = ["t-string", "t-strings"]
-
-[[entry]]
-term = "Table Module"
-kind = "concept"
-match = ["Table Module", "Table Modules"]
-
-[[entry]]
-term = "tagged"
-kind = "concept"
-match = ["tagged", "taggeds"]
 
 [[entry]]
 term = "tail-call optimization"
@@ -1760,16 +1470,6 @@ match = ["re:(?<=\\*)task(?=\\*)", "re:(?<=\\*)tasks(?=\\*)"]
 term = "telescoping constructor"
 kind = "concept"
 match = ["telescoping constructor", "telescoping constructors"]
-
-[[entry]]
-term = "Thinking in C++"
-kind = "concept"
-match = ["Thinking in C++", "Thinking in C++s"]
-
-[[entry]]
-term = "Thinking in Java"
-kind = "concept"
-match = ["Thinking in Java", "Thinking in Javas"]
 
 [[entry]]
 term = "thread"
@@ -1825,16 +1525,6 @@ match = ["truthiness"]
 term = "tuple"
 kind = "concept"
 match = ["re:(?<=\\*)tuple(?=\\*)", "re:(?<=\\*)tuples(?=\\*)"]
-
-[[entry]]
-term = "two real semantics"
-kind = "concept"
-match = ["two real semantics"]
-
-[[entry]]
-term = "two-way adapter"
-kind = "concept"
-match = ["two-way adapter", "two-way adapters"]
 
 [[entry]]
 term = "type"
@@ -1897,11 +1587,6 @@ kind = "concept"
 match = ["virtual proxy", "virtual proxies"]
 
 [[entry]]
-term = "walkers"
-kind = "concept"
-match = ["walkers"]
-
-[[entry]]
 term = "walrus operator"
 kind = "concept"
 match = ["walrus operator", "walrus operators"]
@@ -1915,15 +1600,6 @@ match = ["weak reference", "weak references"]
 term = "white-box"
 kind = "concept"
 match = ["white-box", "white-boxes"]
-
-[[entry]]
-term = "Wind, Sand and Stars"
-kind = "concept"
-match = ["Wind, Sand and Stars"]
-
-# ------------------------------------------------------------------
-# Design patterns
-# ------------------------------------------------------------------
 
 [[entry]]
 term = "Abstract Factory"
@@ -2136,18 +1812,6 @@ match = ["accumulate"]
 code = true
 
 [[entry]]
-term = "action"
-kind = "python"
-match = ["action"]
-code = true
-
-[[entry]]
-term = "add()"
-kind = "python"
-match = ["add"]
-code = true
-
-[[entry]]
 term = "__add__()"
 kind = "python"
 match = ["__add__"]
@@ -2163,12 +1827,6 @@ code = true
 term = "__aexit__()"
 kind = "python"
 match = ["__aexit__"]
-code = true
-
-[[entry]]
-term = "all"
-kind = "python"
-match = ["all"]
 code = true
 
 [[entry]]
@@ -2220,24 +1878,6 @@ match = ["__annotations_cache__"]
 code = true
 
 [[entry]]
-term = "announce()"
-kind = "python"
-match = ["announce"]
-code = true
-
-[[entry]]
-term = "any()"
-kind = "python"
-match = ["any"]
-code = true
-
-[[entry]]
-term = "area()"
-kind = "python"
-match = ["area"]
-code = true
-
-[[entry]]
 term = "argparse.ArgumentParser"
 kind = "python"
 match = ["argparse.ArgumentParser"]
@@ -2253,18 +1893,6 @@ code = true
 term = "asdict()"
 kind = "python"
 match = ["asdict"]
-code = true
-
-[[entry]]
-term = "Ask"
-kind = "python"
-match = ["Ask"]
-code = true
-
-[[entry]]
-term = "ask()"
-kind = "python"
-match = ["ask"]
 code = true
 
 [[entry]]
@@ -2394,12 +2022,6 @@ match = ["Awaitable"]
 code = true
 
 [[entry]]
-term = "balance"
-kind = "python"
-match = ["balance"]
-code = true
-
-[[entry]]
 term = "BaseException"
 kind = "python"
 match = ["BaseException"]
@@ -2526,12 +2148,6 @@ match = ["__cause__"]
 code = true
 
 [[entry]]
-term = "celsius"
-kind = "python"
-match = ["celsius"]
-code = true
-
-[[entry]]
 term = "chain"
 kind = "python"
 match = ["chain"]
@@ -2574,12 +2190,6 @@ match = ["Collection"]
 code = true
 
 [[entry]]
-term = "Color"
-kind = "python"
-match = ["Color"]
-code = true
-
-[[entry]]
 term = "combinations()"
 kind = "python"
 match = ["combinations"]
@@ -2607,12 +2217,6 @@ code = true
 term = "concurrent.futures.Future"
 kind = "python"
 match = ["concurrent.futures.Future"]
-code = true
-
-[[entry]]
-term = "console"
-kind = "python"
-match = ["console"]
 code = true
 
 [[entry]]
@@ -2826,12 +2430,6 @@ match = ["dir"]
 code = true
 
 [[entry]]
-term = "display"
-kind = "python"
-match = ["display"]
-code = true
-
-[[entry]]
 term = "display_object()"
 kind = "python"
 match = ["display_object"]
@@ -2841,18 +2439,6 @@ code = true
 term = "__doc__"
 kind = "python"
 match = ["__doc__"]
-code = true
-
-[[entry]]
-term = "double()"
-kind = "python"
-match = ["double"]
-code = true
-
-[[entry]]
-term = "draw()"
-kind = "python"
-match = ["draw"]
 code = true
 
 [[entry]]
@@ -2901,12 +2487,6 @@ code = true
 term = "__eq__()"
 kind = "python"
 match = ["__eq__"]
-code = true
-
-[[entry]]
-term = "Err"
-kind = "python"
-match = ["Err"]
 code = true
 
 [[entry]]
@@ -3072,12 +2652,6 @@ match = ["frozenset"]
 code = true
 
 [[entry]]
-term = "func"
-kind = "python"
-match = ["func"]
-code = true
-
-[[entry]]
 term = "functools._lru_cache_wrapper"
 kind = "python"
 match = ["functools._lru_cache_wrapper"]
@@ -3222,12 +2796,6 @@ match = ["__gt__"]
 code = true
 
 [[entry]]
-term = "handle()"
-kind = "python"
-match = ["handle"]
-code = true
-
-[[entry]]
 term = "Handler"
 kind = "python"
 match = ["Handler"]
@@ -3303,18 +2871,6 @@ code = true
 term = "__init_subclass__()"
 kind = "python"
 match = ["__init_subclass__"]
-code = true
-
-[[entry]]
-term = "inner()"
-kind = "python"
-match = ["inner"]
-code = true
-
-[[entry]]
-term = "input()"
-kind = "python"
-match = ["input"]
 code = true
 
 [[entry]]
@@ -3480,21 +3036,9 @@ match = ["KeyboardInterrupt"]
 code = true
 
 [[entry]]
-term = "kind"
-kind = "python"
-match = ["kind"]
-code = true
-
-[[entry]]
 term = "KW_ONLY"
 kind = "python"
 match = ["KW_ONLY"]
-code = true
-
-[[entry]]
-term = "label"
-kind = "python"
-match = ["label"]
 code = true
 
 [[entry]]
@@ -3513,12 +3057,6 @@ code = true
 term = "Literal"
 kind = "python"
 match = ["Literal"]
-code = true
-
-[[entry]]
-term = "Log"
-kind = "python"
-match = ["Log"]
 code = true
 
 [[entry]]
@@ -3543,12 +3081,6 @@ code = true
 term = "__lt__()"
 kind = "python"
 match = ["__lt__"]
-code = true
-
-[[entry]]
-term = "make()"
-kind = "python"
-match = ["make"]
 code = true
 
 [[entry]]
@@ -3678,12 +3210,6 @@ match = ["multiprocessing.Manager"]
 code = true
 
 [[entry]]
-term = "Name"
-kind = "python"
-match = ["Name"]
-code = true
-
-[[entry]]
 term = "NamedTuple"
 kind = "python"
 match = ["NamedTuple"]
@@ -3699,12 +3225,6 @@ code = true
 term = "NameError"
 kind = "python"
 match = ["NameError"]
-code = true
-
-[[entry]]
-term = "names"
-kind = "python"
-match = ["names"]
 code = true
 
 [[entry]]
@@ -3786,45 +3306,15 @@ match = ["nullcontext"]
 code = true
 
 [[entry]]
-term = "numbers"
-kind = "python"
-match = ["numbers"]
-code = true
-
-[[entry]]
-term = "nums"
-kind = "python"
-match = ["nums"]
-code = true
-
-[[entry]]
-term = "obj"
-kind = "python"
-match = ["obj"]
-code = true
-
-[[entry]]
 term = "object.__setattr__()"
 kind = "python"
 match = ["object.__setattr__"]
 code = true
 
 [[entry]]
-term = "Ok"
-kind = "python"
-match = ["Ok"]
-code = true
-
-[[entry]]
 term = "open()"
 kind = "python"
 match = ["open"]
-code = true
-
-[[entry]]
-term = "operator"
-kind = "python"
-match = ["operator"]
 code = true
 
 [[entry]]
@@ -3843,12 +3333,6 @@ code = true
 term = "operator.or_()"
 kind = "python"
 match = ["operator.or_"]
-code = true
-
-[[entry]]
-term = "Operators"
-kind = "python"
-match = ["Operators"]
 code = true
 
 [[entry]]
@@ -3903,12 +3387,6 @@ code = true
 term = "pairwise"
 kind = "python"
 match = ["pairwise"]
-code = true
-
-[[entry]]
-term = "parse()"
-kind = "python"
-match = ["parse"]
 code = true
 
 [[entry]]
@@ -3987,12 +3465,6 @@ code = true
 term = "Placeholder"
 kind = "python"
 match = ["Placeholder"]
-code = true
-
-[[entry]]
-term = "Point"
-kind = "python"
-match = ["Point"]
 code = true
 
 [[entry]]
@@ -4116,12 +3588,6 @@ match = ["re.search"]
 code = true
 
 [[entry]]
-term = "read()"
-kind = "python"
-match = ["read"]
-code = true
-
-[[entry]]
 term = "readline()"
 kind = "python"
 match = ["readline"]
@@ -4149,30 +3615,6 @@ code = true
 term = "ReferenceError"
 kind = "python"
 match = ["ReferenceError"]
-code = true
-
-[[entry]]
-term = "register()"
-kind = "python"
-match = ["register"]
-code = true
-
-[[entry]]
-term = "registry"
-kind = "python"
-match = ["registry"]
-code = true
-
-[[entry]]
-term = "render()"
-kind = "python"
-match = ["render"]
-code = true
-
-[[entry]]
-term = "repeat()"
-kind = "python"
-match = ["repeat"]
 code = true
 
 [[entry]]
@@ -4242,12 +3684,6 @@ match = ["round"]
 code = true
 
 [[entry]]
-term = "row"
-kind = "python"
-match = ["row"]
-code = true
-
-[[entry]]
 term = "__rsub__()"
 kind = "python"
 match = ["__rsub__"]
@@ -4284,18 +3720,6 @@ match = ["safe"]
 code = true
 
 [[entry]]
-term = "score()"
-kind = "python"
-match = ["score"]
-code = true
-
-[[entry]]
-term = "second"
-kind = "python"
-match = ["second"]
-code = true
-
-[[entry]]
 term = "select()"
 kind = "python"
 match = ["select"]
@@ -4323,12 +3747,6 @@ code = true
 term = "__self__"
 kind = "python"
 match = ["__self__"]
-code = true
-
-[[entry]]
-term = "send()"
-kind = "python"
-match = ["send"]
 code = true
 
 [[entry]]
@@ -4410,12 +3828,6 @@ match = ["singledispatchmethod"]
 code = true
 
 [[entry]]
-term = "size"
-kind = "python"
-match = ["size"]
-code = true
-
-[[entry]]
 term = "__slots__"
 kind = "python"
 match = ["__slots__"]
@@ -4434,45 +3846,15 @@ match = ["socket.socket"]
 code = true
 
 [[entry]]
-term = "source"
-kind = "python"
-match = ["source"]
-code = true
-
-[[entry]]
 term = "spawn()"
 kind = "python"
 match = ["spawn"]
 code = true
 
 [[entry]]
-term = "Square"
-kind = "python"
-match = ["Square"]
-code = true
-
-[[entry]]
-term = "square"
-kind = "python"
-match = ["square"]
-code = true
-
-[[entry]]
-term = "squares()"
-kind = "python"
-match = ["squares"]
-code = true
-
-[[entry]]
 term = "starmap"
 kind = "python"
 match = ["starmap"]
-code = true
-
-[[entry]]
-term = "Stars"
-kind = "python"
-match = ["Stars"]
 code = true
 
 [[entry]]
@@ -4485,12 +3867,6 @@ code = true
 term = "@staticmethod"
 kind = "python"
 match = ["staticmethod"]
-code = true
-
-[[entry]]
-term = "step()"
-kind = "python"
-match = ["step"]
 code = true
 
 [[entry]]
@@ -4662,18 +4038,6 @@ match = ["tee"]
 code = true
 
 [[entry]]
-term = "Tell"
-kind = "python"
-match = ["Tell"]
-code = true
-
-[[entry]]
-term = "tell()"
-kind = "python"
-match = ["tell"]
-code = true
-
-[[entry]]
 term = "tempfile.TemporaryDirectory()"
 kind = "python"
 match = ["tempfile.TemporaryDirectory"]
@@ -4806,12 +4170,6 @@ match = ["total_ordering"]
 code = true
 
 [[entry]]
-term = "trace()"
-kind = "python"
-match = ["trace"]
-code = true
-
-[[entry]]
 term = "traceback.format_exception_only()"
 kind = "python"
 match = ["traceback.format_exception_only"]
@@ -4908,12 +4266,6 @@ match = ["Unpack"]
 code = true
 
 [[entry]]
-term = "update()"
-kind = "python"
-match = ["update"]
-code = true
-
-[[entry]]
 term = "update_wrapper()"
 kind = "python"
 match = ["update_wrapper"]
@@ -4929,12 +4281,6 @@ code = true
 term = "uv"
 kind = "python"
 match = ["uv"]
-code = true
-
-[[entry]]
-term = "val"
-kind = "python"
-match = ["val"]
 code = true
 
 [[entry]]
@@ -4989,12 +4335,6 @@ code = true
 term = "while"
 kind = "python"
 match = ["while"]
-code = true
-
-[[entry]]
-term = "withdraw()"
-kind = "python"
-match = ["withdraw"]
 code = true
 
 [[entry]]
