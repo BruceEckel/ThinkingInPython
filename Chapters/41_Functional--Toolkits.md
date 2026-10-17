@@ -45,6 +45,9 @@ On two dictionaries `|` is a union that keeps the right operand's value for a ke
 so the later `"a": 3` replaces `"a": 1`.
 The `operator` module supplies a named function for each operator,
 ready to pass to a fold in place of `lambda a, b: a | b`.
+A function call has one too.
+`operator.call(f, x)` is `f(x)`,
+so `map(call, funcs, args)` applies each function in `funcs` to the matching argument in `args`.
 
 For addition, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
@@ -54,6 +57,8 @@ On an empty iterable `reduce()` raises `TypeError: reduce() of empty iterable wi
 because it has nothing to return.
 The third argument, `{}` in the listing, supplies a starting value,
 so `reduce(or_, [], {})` returns `{}`.
+Since Python 3.14 you can pass the starting value by keyword,
+as `reduce(or_, [], initial={})`, so the call names the role of the `{}`.
 
 ### `cache`
 
@@ -602,6 +607,9 @@ print(list(accumulate([1, 2, 3, 4], mul)))
 
 `accumulate()` is `reduce()` with the intermediate results kept.
 The last value it yields is the value `reduce()` returns.
+Like `reduce()`, `accumulate()` accepts a starting value,
+through the keyword-only argument `initial`, and yields that value first.
+`accumulate([1, 2, 3], initial=10)` yields `10`, `11`, `13`, and `16`.
 
 ### `compress`
 
@@ -676,6 +684,11 @@ from itertools import filterfalse
 print(list(filterfalse(lambda n: n % 2 == 0, range(6))))
 #: [1, 3, 5]
 ```
+
+Since Python 3.14 the `operator` module names the `None` tests,
+`is_none()` and `is_not_none()`, so a `None` filter needs no lambda.
+`filterfalse(is_none, data)` drops each `None` and keeps a `0` or an empty string,
+which `filter(None, data)` discards along with the `None`.
 
 ### `starmap`
 
@@ -856,6 +869,10 @@ Keeping one is right when you want each pair of distinct elements once.
 It draws from the full input each time, so `AA` and `BB` appear too.
 `product()` with `repeat=` is the fourth combination of answers.
 Order matters and elements repeat, so it yields all four pairs.
+
+`math.perm(n, r)` and `math.comb(n, r)` compute how many tuples `permutations()` and `combinations()` yield from `n` elements,
+so you can size a draw before you run it.
+`math.comb(20, 3)` is `1140`, the number of three-element draws from twenty.
 
 ### Composing the Pieces
 
