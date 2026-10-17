@@ -372,6 +372,18 @@ When a key might be missing, use `dict.get()`,
 which returns a default where `[]` raises a `KeyError`.
 
 Iterating over a `dict` follows insertion order, which the language guarantees.
+CPython 3.6 first kept that order, as an implementation detail.
+Python 3.7 made the order part of the language.
+Since Python 3.8, `reversed()` walks a `dict`, or any of its views,
+from the newest entry back to the oldest.
+
+`collections.OrderedDict`, added in Python 3.1,
+kept insertion order before `dict` did.
+It keeps two features that `dict` lacks.
+Two `OrderedDict`s compare equal when they hold the same entries in the same order,
+where `dict` equality ignores order.
+`move_to_end()` moves a key to either end,
+the step a least-recently-used cache takes each time it reads an entry.
 
 `keys()`, `values()`, and `items()` each return a *view*:
 an object that reads the `dict`'s current contents each time you use it,
@@ -466,6 +478,36 @@ with ordinary `key: value` entries among them.
 pairs up two sequences element by element,
 so `zip("abc", [1, 2, 3])` yields `("a", 1)`, `("b", 2)`, and `("c", 3)`.
 `dict()` accepts any iterable of `(key, value)` pairs and builds a `dict` from them.
+
+A merge copies entries into a new `dict`,
+so a later change to `a` or `b` leaves the merged `dict` as it was.
+A `ChainMap`, from the `collections` module,
+keeps its dictionaries separate and searches them in order:
+
+```python
+# chain_map.py
+from collections import ChainMap
+
+defaults = {"theme": "light", "zoom": 100}
+user = {"zoom": 125}
+prefs = ChainMap(user, defaults)
+print(prefs["zoom"], prefs["theme"])
+#: 125 light
+user["theme"] = "dark"
+print(prefs["theme"])  # It reads the live dicts
+#: dark
+prefs["zoom"] = 150  # Writes go to the first dict
+print(user["zoom"], defaults["zoom"])
+#: 150 100
+```
+
+A lookup tries `user` first and falls back to `defaults`,
+so `"zoom"` comes from `user`,
+and `"theme"` comes from `defaults` until `user` gains its own.
+Python looks up a variable name the same way,
+through a chain of scopes that ends at the builtins.
+Assignment and `del` act on the first dictionary,
+so `defaults` keeps its values.
 
 The `list` in `remove_while_iterating.py` skips elements and reports nothing.
 Changing the size of a `dict` or a `set` while iterating over it raises a `RuntimeError`:
@@ -654,6 +696,8 @@ A missing key counts as zero rather than raising a `KeyError`.
 They are the operators from [Sets](#sets), here meaning multiset difference,
 minimum, and maximum.
 A fourth operator, `+`, sums the counts of both counters.
+Python 3.15 adds `^`, the multiset symmetric difference,
+which gives each item the larger of its two counts minus the smaller.
 
 ### `defaultdict`
 
