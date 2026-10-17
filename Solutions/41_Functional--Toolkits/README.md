@@ -27,6 +27,12 @@ def deep_sum(items: list[Nested]) -> int:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your loop version of `deep_sum()` returns `21` for `[1, [2, [3, 4], 5], 6]`, and printing that list after the call shows it unchanged.
+You can also name at least two choices the loop makes that the recursive version leaves to its `for` loop and the call stack.
+
+<details>
 <summary>Solution</summary>
 
 If you seed the stack with `items` instead of `list(items)`,
@@ -85,6 +91,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. `lru_cache` with `maxsize=3`
 
@@ -110,6 +117,11 @@ from functools import lru_cache
 def square(n: int) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your run prints three `computing` lines and `CacheInfo(hits=2, misses=3, maxsize=3, currsize=3)`, and you can name the one call that is a miss under `maxsize=2` and a hit under `maxsize=3`.
 
 <details>
 <summary>Solution</summary>
@@ -156,6 +168,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. `batch_totals()` stays lazy
 
@@ -183,6 +196,11 @@ def batch_totals(source: Iterable[int],
                  n: int) -> Iterator[int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`print(list(islice(batch_totals(count(1), 3), 5)))` returns at once and prints `[6, 15, 24, 33, 42]`, and `uv run ty check` passes on your file with `batch_totals()` annotated to return `Iterator[int]`.
 
 <details>
 <summary>Solution</summary>
@@ -227,6 +245,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. `grouped()` cannot repeat a key
 
@@ -254,6 +273,12 @@ def grouped[V, K: Hashable](
 ) -> dict[K, list[V]]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`grouped(["b", "a", "b"], str.upper)` returns `{'B': ['b', 'b'], 'A': ['a']}`, with both `"b"` items under one key.
+You can also name a kind of input that `groupby()` handles and `grouped()` cannot.
 
 <details>
 <summary>Solution</summary>
@@ -310,6 +335,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `@cache` on `deep_sum()`
 
@@ -338,6 +364,12 @@ type Nested = int | list[Nested]
 def deep_sum(items: list[Nested]) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your decorated `deep_sum()` raises `TypeError: unhashable type: 'list'` on `[1, [2, [3, 4], 5], 6]`, and you can say why.
+With your revised `Nested` alias, the cached `deep_sum()` returns `21` on the same nesting, and `uv run ty check` passes with no `# type: ignore`.
 
 <details>
 <summary>Solution</summary>
@@ -401,6 +433,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Injecting the random source
 
@@ -434,6 +467,12 @@ def group_rounds(
 ) -> Iterator[Round]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with the chapter's eight students in groups of two, two calls given separate `random.Random(0)` objects produce the same first round, `Gia-Eve Hal-Bo Di-Fi Ana-Cy`, the first round `pair_rounds.py` prints.
+Two calls that share one `Random` produce different first rounds.
 
 <details>
 <summary>Solution</summary>
@@ -523,6 +562,7 @@ recommends for testing.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
