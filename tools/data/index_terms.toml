@@ -172,11 +172,6 @@ kind = "concept"
 match = ["blocked", "blockeds"]
 
 [[entry]]
-term = "body"
-kind = "concept"
-match = ["re:(?<=\\*)body(?=\\*)", "re:(?<=\\*)bodies(?=\\*)"]
-
-[[entry]]
 term = "bottom"
 kind = "concept"
 match = ["bottom", "bottoms"]
@@ -3713,12 +3708,6 @@ match = ["names"]
 code = true
 
 [[entry]]
-term = "__neg__()"
-kind = "python"
-match = ["__neg__"]
-code = true
-
-[[entry]]
 term = "Never"
 kind = "python"
 match = ["Never"]
@@ -3872,12 +3861,6 @@ code = true
 term = "os.path.join"
 kind = "python"
 match = ["os.path.join"]
-code = true
-
-[[entry]]
-term = "os.process_cpu_count()"
-kind = "python"
-match = ["os.process_cpu_count"]
 code = true
 
 [[entry]]
@@ -4535,12 +4518,6 @@ match = ["Sub"]
 code = true
 
 [[entry]]
-term = "__sub__()"
-kind = "python"
-match = ["__sub__"]
-code = true
-
-[[entry]]
 term = "__subclasses__()"
 kind = "python"
 match = ["__subclasses__"]
@@ -4856,12 +4833,6 @@ code = true
 term = "Trash"
 kind = "python"
 match = ["Trash"]
-code = true
-
-[[entry]]
-term = "__truediv__()"
-kind = "python"
-match = ["__truediv__"]
 code = true
 
 [[entry]]
