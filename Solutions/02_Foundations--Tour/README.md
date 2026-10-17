@@ -15,6 +15,11 @@ A slice builds a new list object, so `a` and `c` name different lists.
 Check which of `b` and `c` names the same list as `a` before you explain the difference.
 
 <details>
+<summary>Done when</summary>
+
+your edited `references.py` prints `[1, 2, 3, 4] [1, 2, 3, 4, 99]` for `print(a, c)`, and you can say which of `b` and `c` names the same list object as `a`, and how `a is c` shows it.
+
+<details>
 <summary>Solution</summary>
 
 If you write `c = a` instead of `c = a[:]`, the program prints
@@ -43,6 +48,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. Truthiness of empty and non-empty containers
 
@@ -56,6 +62,11 @@ a different design, a detail, or an equivalent alternative.
 [Booleans, None, and Truthiness](../../Chapters/02_Foundations--Tour.md#booleans-none-and-truthiness) lists which values `bool()` reports as false.
 Add the two dictionaries to the loop's list and write your predictions down first.
 Then ask whether the rule you see for lists and strings extends to a `dict`.
+
+<details>
+<summary>Done when</summary>
+
+you wrote a prediction for both dictionaries before running, the loop prints nine lines with your two dictionaries last, and you can state one rule that predicts `bool()` for every container in the list.
 
 <details>
 <summary>Solution</summary>
@@ -84,6 +95,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 3. f-string precision and the debug specifier
 
@@ -97,6 +109,11 @@ a different design, a detail, or an equivalent alternative.
 [f-Strings](../../Chapters/02_Foundations--Tour.md#f-strings) covers the format spec after the colon in a replacement field.
 Change the digit after the `.` in `.0f` to set the precision.
 A trailing `=` inside the braces makes the field print its own source text before the value.
+
+<details>
+<summary>Done when</summary>
+
+your first new line shows the score as `91.50`, and your second prints `score = 91.5`.
 
 <details>
 <summary>Solution</summary>
@@ -121,6 +138,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. What a name signals
 
@@ -139,6 +157,11 @@ a different design, a detail, or an equivalent alternative.
 Rename the variables in both styles and run each version to confirm the interpreter accepts every form.
 The book's `pyproject.toml` turns on ruff's naming rules,
 so run `ruff check` on the camelCase file inside the book's repository and see which rule code ruff reports.
+
+<details>
+<summary>Done when</summary>
+
+all three versions print `5 0b1010`, `ruff check` in the book's repository reports `N816` on the camelCase file and passes the uppercase one, and you can say what each form tells a reader about whether the value changes.
 
 <details>
 <summary>Solution</summary>
@@ -191,6 +214,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. A third `Template` consumer
 
@@ -216,6 +240,11 @@ from string.templatelib import Interpolation, Template
 def quoted(template: Template) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`print(quoted(message))` prints `'Alice' scored '92'%`, and you can say what an f-string's finished `str` no longer records that `quoted()` relies on.
 
 <details>
 <summary>Solution</summary>
@@ -279,6 +308,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Negative floor division and modulo
 
@@ -294,6 +324,11 @@ a different design, a detail, or an equivalent alternative.
 [Numbers and Arithmetic](../../Chapters/02_Foundations--Tour.md#numbers-and-arithmetic) describes `//` and `%` on integers.
 Work the C or Java answer by truncating toward zero, then the Python answer by flooring.
 Use the identity relating `//`, `%`, and the divisor to see what the remainder must be.
+
+<details>
+<summary>Done when</summary>
+
+your rule for the sign of `%` predicts what `print(-9 % -4, 9 % -4)` prints before you run it, and your C or Java answers satisfy `a == (a / b) * b + a % b` with `/` truncating toward zero.
 
 <details>
 <summary>Solution</summary>
@@ -316,5 +351,6 @@ With a positive divisor the remainder is zero or positive, which is why
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
