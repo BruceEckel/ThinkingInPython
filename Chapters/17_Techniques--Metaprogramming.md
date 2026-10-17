@@ -398,6 +398,15 @@ and `namespace[class_name]` is an `object`.
 Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
 `cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
+The explicit `namespace` also keeps the generated class within reach.
+Called inside a function with no namespace argument,
+`exec()` writes into a snapshot of the function's local variables.
+Since Python 3.13 (PEP 667), each `locals()` call in a function returns a new,
+independent snapshot,
+so a later `locals()` call misses a class that `exec()` defines there.
+A frame's `f_locals` attribute returns a write-through proxy instead,
+the supported way for a debugger to change a function's variables.
+
 `EventMakers` stores each class it builds.
 `make_class()` builds a fresh class on every call.
 Calling `make_class("Start")` twice produces two distinct classes.
@@ -571,6 +580,17 @@ The registries built on it fail in two ways that have nothing to do with `__init
 [Factory](26_Patterns--Factory.md#hazards-of-self-registration) covers both:
 a class in a module nobody imports stays out of the registry,
 and keying on `cls.__name__` lets two same-named classes overwrite each other.
+
+Functions and classes carry two names.
+`__name__` is the bare name from the `def` or `class` header.
+`__qualname__`, the *qualified name* from PEP 3155,
+prefixes that name with the classes and functions that enclose the definition.
+A class `Inner` defined in the body of `Outer` has the qualified name `Outer.Inner`.
+`init()` in `events.py` has the qualified name `make.<locals>.init`,
+where `<locals>` marks a definition inside a function body.
+A registry or a decorator that keys on a name usually needs the qualified one,
+combined with `__module__`.
+Pickle finds a class or function again through that same pair.
 
 ## Attributes on a Function
 
@@ -1363,6 +1383,13 @@ At check time, its `instance-layout-conflict` check reports the very `TypeError`
 The comment suppresses the diagnostic only because provoking that crash is educational.
 <!-- vale proselint.Very = YES -->
 
+Python 3.15 adds the `@typing.disjoint_base` marker (PEP 800),
+which tells the type checker that a class of your own follows the same rule as `type` and `dict`:
+no class can inherit from it and from another unrelated disjoint base.
+The type checker reports a class that inherits from two such bases as an `instance-layout-conflict`,
+and it treats an `isinstance()` branch that requires both bases as unreachable,
+since no object can be an instance of both.
+
 A metaclass can multiply inherit like any other class,
 as long as the extra class is a mix-in with no competing layout:
 
@@ -1495,6 +1522,10 @@ and skips every underscore-prefixed name.
 For `Color` those names are the dunder bookkeeping every class carries,
 so `__iter__()` yields the three values the body assigned: `"red"`, `"green"`,
 `"blue"`.
+The values come out in source order because a class's namespace keeps the order in which the body defines its names,
+a guarantee since Python 3.6 (PEP 520).
+A metaclass, a class decorator,
+or `__init_subclass__()` that walks `vars(cls)` sees the members in the order the source lists them.
 
 A class decorator cannot make `for c in Color` work.
 Python looks up a special method such as `__iter__()` on the object's type and skips the object's own namespace,
@@ -1565,6 +1596,22 @@ The case for a metaclass rests on that limit.
 The class object needs behavior,
 and nothing that runs after the class exists can give it any.
 
+Subscripting a class is the exception.
+For a class `Box`, `Box[int]` uses the metaclass's `__getitem__()` if the metaclass defines one,
+and otherwise calls `Box.__class_getitem__(int)`,
+a method PEP 560 added in Python 3.7.
+`__class_getitem__()` is implicitly a class method, as `__init_subclass__()` is,
+so a class that defines it becomes subscriptable without a metaclass.
+`list`, `dict`, and the other built-in containers define it to return a `types.GenericAlias`,
+which is how `list[int]` works at runtime.
+`typing.Generic` defines it for the classes you write with type parameters.
+
+When a class header names a `GenericAlias` as a base,
+as `dict[str, EventMaker]` does for `EventMakers` in `greenhouse.py`,
+Python records the plain `dict` in `__bases__`.
+`types.get_original_bases(EventMakers)`, new in Python 3.12,
+returns the bases as the header wrote them, with `dict[str, EventMaker]` intact.
+
 ## The `inspect` Module
 
 Up to now, you've modified classes.
@@ -1632,6 +1679,12 @@ returning a class's declared annotations in a `dict`.
 `display_object()`'s source and its display options are reference material,
 collected in [`display_object()` Reference](#display_object-reference)
 at the end of this chapter.
+
+The `typing` module adds two functions for a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
+class, both new in Python 3.13.
+`typing.is_protocol(cls)` reports whether `cls` is a `Protocol`.
+`typing.get_protocol_members(cls)` returns the `frozenset` of attribute and method names that a structural match requires,
+and raises a `TypeError` for a class that is not a `Protocol`.
 
 ### Sorting Members into Attributes and Methods
 
