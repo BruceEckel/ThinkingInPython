@@ -119,7 +119,7 @@ match = ["asynchrony", "asynchronies"]
 [[entry]]
 term = "awaitable"
 kind = "concept"
-match = ["re:(?<=\\*)awaitable(?=\\*)", "re:\\b(?:an|any)\\s+awaitable\\b", "awaitables"]
+match = ["re:(?<=\\*)awaitable(?=\\*)", "re:\\b(?:an|any)\\s+awaitable\\b", "awaitables", "Awaitable"]
 
 [[entry]]
 term = "Balking"
@@ -223,7 +223,7 @@ under = "C++"
 [[entry]]
 term = "exceptions"
 kind = "concept"
-match = ["re:C\\+\\+[^.\\n]*\\bexceptions?\\b", "re:\\bexceptions?\\b[^.\\n]*C\\+\\+", "re:C\\+\\+ reduced its version"]
+match = ["re:C\\+\\+[^.\\n]*\\bexceptions?\\b", "re:\\bexceptions?\\b[^.\\n]*C\\+\\+", "re:C\\+\\+ reduced its version", "re:(?<![\\w.@])Exception(?= |\\[[^\\]\\n]*\\] )"]
 under = "C++"
 
 [[entry]]
@@ -485,7 +485,7 @@ match = ["declarative", "declaratives"]
 [[entry]]
 term = "decorator"
 kind = "concept"
-match = ["re:(?<=\\*)(?-i:decorators?)(?=\\*)", "re:A decorator is a callable", "re:To apply a decorator"]
+match = ["re:(?<=\\*)(?-i:decorators?)(?=\\*)", "re:A decorator is a callable", "re:To apply a decorator", "re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Class-Form )(?<!Class )\\bDecorator\\b(?! for the Default)(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bDecorator\\b", "re:(?<=\\| \\[\\*)Decorator(?=\\*\\s+\\| same)"]
 
 [[entry]]
 term = "taking arguments"
@@ -652,7 +652,7 @@ match = ["Effect polymorphism", "Effect polymorphisms"]
 [[entry]]
 term = "Effect row"
 kind = "concept"
-match = ["Effect row", "Effect rows"]
+match = ["Effect row", "Effect rows", "re:makes the rule recursive", "re:Tracking\\s+is recursive"]
 
 [[entry]]
 term = "Effect tracking"
@@ -868,12 +868,12 @@ match = ["Half-Sync/Half-Async", "Half-Sync/Half-Asyncs"]
 [[entry]]
 term = "handler"
 kind = "concept"
-match = ["re:(?<=\\*)handler(?=\\*)", "re:(?<=\\*)handlers(?=\\*)"]
+match = ["re:(?<=\\*)handler(?=\\*)", "re:(?<=\\*)handlers(?=\\*)", "Handler"]
 
 [[entry]]
 term = "hash"
 kind = "concept"
-match = ["re:(?<=\\*)hash(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bHash\\b[^\\n.]*$"]
+match = ["re:(?<=\\*)hash(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bHash\\b[^\\n.]*$", "hash"]
 
 [[entry]]
 term = "in dictionary and set lookup"
@@ -1005,12 +1005,12 @@ match = ["Inversion of Control", "Inversion of Controls"]
 [[entry]]
 term = "iterable"
 kind = "concept"
-match = ["re:(?<=\\*)iterable(?=\\*)", "re:(?<=\\*)iterables(?=\\*)"]
+match = ["re:(?<=\\*)iterable(?=\\*)", "re:(?<=\\*)iterables(?=\\*)", "re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*Iterable(?!\\w)"]
 
 [[entry]]
 term = "iterator"
 kind = "concept"
-match = ["re:(?<=\\*)(?-i:iterators?)(?=\\*)", "re:(?-i:Python builds iterators)", "re:(?m)^Sharing an Iterator Between Threads$"]
+match = ["re:(?<=\\*)(?-i:iterators?)(?=\\*)", "re:(?-i:Python builds iterators)", "re:(?m)^Sharing an Iterator Between Threads$", "re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bIterator\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bIterator\\b"]
 
 [[entry]]
 term = "iterator protocol"
@@ -1149,7 +1149,7 @@ match = ["Mealy machine", "Mealy machines"]
 [[entry]]
 term = "memento"
 kind = "concept"
-match = ["re:(?<=\\*)(?-i:memento)(?=\\*)", "re:(?-i:A memento (?:depends|works))", "re:(?-i:every state is a memento)", "re:(?-i:all a memento needs)", "re:(?-i:mementos scoped|produces mementos)", "re:(?-i:memento saved before)"]
+match = ["re:(?<=\\*)(?-i:memento)(?=\\*)", "re:(?-i:A memento (?:depends|works))", "re:(?-i:every state is a memento)", "re:(?-i:all a memento needs)", "re:(?-i:mementos scoped|produces mementos)", "re:(?-i:memento saved before)", "re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bMemento\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bMemento\\b"]
 
 [[entry]]
 term = "Memoization"
@@ -1157,9 +1157,9 @@ kind = "concept"
 match = ["Memoization", "Memoizations"]
 
 [[entry]]
-term = "memoizes"
+term = "memoize"
 kind = "concept"
-match = ["memoizes"]
+match = ["memoizes", "memoize"]
 
 [[entry]]
 term = "Message Channel"
@@ -1234,9 +1234,9 @@ kind = "concept"
 match = ["Mixin", "Mixins"]
 
 [[entry]]
-term = "mocks"
+term = "mock"
 kind = "concept"
-match = ["mocks"]
+match = ["mocks", "Mock"]
 
 [[entry]]
 term = "model"
@@ -1323,7 +1323,7 @@ match = ["object adapter", "object adapters"]
 [[entry]]
 term = "observer"
 kind = "concept"
-match = ["re:(?-i:observers?)"]
+match = ["re:(?-i:observers?)", "re:(?!\\bObserver(?=\\* \"defines a looser))(?!\\bObserver(?=\\* has one, and it points))(?!\\bObserver(?=\\*'s \\[\\*lapsed listener))(?!(?<=\\(\\*)Observer(?=\\* calls the subject a broadcaster))(?!(?<=The subscription half of \\*)Observer\\b)(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bObserver\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bObserver\\b"]
 
 [[entry]]
 term = "oracle"
@@ -1571,12 +1571,6 @@ match = ["re:recursive functions? (?:that|give)", "re:recursive call where", "re
 under = "recursive"
 
 [[entry]]
-term = "Effect rows"
-kind = "concept"
-match = ["re:makes the rule recursive", "re:Tracking\\s+is recursive"]
-under = "recursive"
-
-[[entry]]
 term = "recursive case"
 kind = "concept"
 match = ["recursive case", "recursive cases"]
@@ -1632,9 +1626,9 @@ kind = "concept"
 match = ["Repository", "Repositories"]
 
 [[entry]]
-term = "Retry"
+term = "retry"
 kind = "concept"
-match = ["re:(?<=\\*)Retry(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bRetry\\b[^\\n.]*$", "re:Retry is the one to study", "re:adding retry", "re:whether a retry is safe"]
+match = ["re:(?<=\\*)Retry(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bRetry\\b[^\\n.]*$", "re:Retry is the one to study", "re:adding retry", "re:whether a retry is safe", "retry"]
 
 [[entry]]
 term = "run-time type identification"
@@ -1793,7 +1787,7 @@ match = ["State effect", "State effects"]
 [[entry]]
 term = "strategy"
 kind = "concept"
-match = ["re:(?<=\\*)(?-i:strategy)(?=\\*)", "re:(?-i:chooses the strategy|list of strategies)"]
+match = ["re:(?<=\\*)(?-i:strategy)(?=\\*)", "re:(?-i:chooses the strategy|list of strategies)", "re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Choosing a )\\bStrategy\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bStrategy\\b"]
 
 [[entry]]
 term = "strong reference"
@@ -1913,7 +1907,7 @@ match = ["re:(?<=\\*)tuple(?=\\*)", "re:(?<=\\*)tuples(?=\\*)"]
 [[entry]]
 term = "type"
 kind = "concept"
-match = ["re:(?<=\\*)type(?=\\*)", "re:(?<=\\*)types(?=\\*)"]
+match = ["re:(?<=\\*)type(?=\\*)", "re:(?<=\\*)types(?=\\*)", "re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )types(?=\\.)(?!\\w)", "re:(?m)^(?=[^\\n]*(?:MappingProxyType|TracebackType))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )types(?![\\w.])(?!\\w)"]
 
 [[entry]]
 term = "type hints"
@@ -2044,11 +2038,6 @@ match = ["re:(?<=is an \\*)Adapter(?=\\*, the pattern)"]
 under = "Adapter"
 
 [[entry]]
-term = "Blackboard"
-kind = "pattern"
-match = ["Blackboard"]
-
-[[entry]]
 term = "Borg"
 kind = "pattern"
 match = ["Borg"]
@@ -2084,16 +2073,6 @@ kind = "pattern"
 match = ["Data Transfer Object"]
 
 [[entry]]
-term = "Decorator"
-kind = "pattern"
-match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Class-Form )(?<!Class )\\bDecorator\\b(?! for the Default)(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bDecorator\\b", "re:(?<=\\| \\[\\*)Decorator(?=\\*\\s+\\| same)"]
-
-[[entry]]
-term = "Event Bus"
-kind = "pattern"
-match = ["Event Bus"]
-
-[[entry]]
 term = "Façade"
 kind = "pattern"
 match = ["Façade", "Facade"]
@@ -2114,19 +2093,9 @@ kind = "pattern"
 match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Tail-Calling )(?<!\\[\\*Composite\\* and \\*)\\bInterpreter\\b(?! Lock)(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bInterpreter\\b", "re:(?<=\\| \\*Composite\\*, \\*)Interpreter\\b"]
 
 [[entry]]
-term = "Iterator"
-kind = "pattern"
-match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bIterator\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bIterator\\b"]
-
-[[entry]]
 term = "Mediator"
 kind = "pattern"
 match = ["Mediator"]
-
-[[entry]]
-term = "Memento"
-kind = "pattern"
-match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bMemento\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bMemento\\b"]
 
 [[entry]]
 term = "Messenger"
@@ -2154,33 +2123,28 @@ kind = "pattern"
 match = ["Object Pool"]
 
 [[entry]]
-term = "Observer"
-kind = "pattern"
-match = ["re:(?!\\bObserver(?=\\* \"defines a looser))(?!\\bObserver(?=\\* has one, and it points))(?!\\bObserver(?=\\*'s \\[\\*lapsed listener))(?!(?<=\\(\\*)Observer(?=\\* calls the subject a broadcaster))(?!(?<=The subscription half of \\*)Observer\\b)(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bObserver\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bObserver\\b"]
-
-[[entry]]
 term = "its coupling"
 kind = "pattern"
 match = ["re:\\bObserver(?=\\* \"defines a looser)", "re:\\bObserver(?=\\* has one, and it points)"]
-under = "Observer"
+under = "observer"
 
 [[entry]]
 term = "lapsed listener leak"
 kind = "pattern"
 match = ["re:\\bObserver(?=\\*'s \\[\\*lapsed listener)"]
-under = "Observer"
+under = "observer"
 
 [[entry]]
 term = "as an event bus"
 kind = "pattern"
 match = ["re:(?<=\\(\\*)Observer(?=\\* calls the subject a broadcaster)"]
-under = "Observer"
+under = "observer"
 
 [[entry]]
 term = "in a simulation"
 kind = "pattern"
 match = ["re:(?<=The subscription half of \\*)Observer\\b"]
-under = "Observer"
+under = "observer"
 
 [[entry]]
 term = "Prototype"
@@ -2230,11 +2194,6 @@ match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Mutable )\\bState\\b(?
 term = "State Machine"
 kind = "pattern"
 match = ["State Machine"]
-
-[[entry]]
-term = "Strategy"
-kind = "pattern"
-match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Choosing a )\\bStrategy\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bStrategy\\b"]
 
 [[entry]]
 term = "Surrogate"
@@ -2494,12 +2453,6 @@ match = ["auto"]
 code = true
 
 [[entry]]
-term = "Awaitable"
-kind = "python"
-match = ["Awaitable"]
-code = true
-
-[[entry]]
 term = "BaseException"
 kind = "python"
 match = ["BaseException"]
@@ -2610,7 +2563,7 @@ code = true
 [[entry]]
 term = "callable"
 kind = "python"
-match = ["callable"]
+match = ["callable", "re:(?<=[ \\n] )Callable\\[\\[[^\\n]{0,20}?\\], \\w+\\](?=  (?! *#)| \\n)"]
 code = true
 
 [[entry]]
@@ -2968,11 +2921,6 @@ match = ["eval"]
 code = true
 
 [[entry]]
-term = "Exception"
-kind = "python"
-match = ["re:(?<![\\w.@])Exception(?= |\\[[^\\]\\n]*\\] )"]
-
-[[entry]]
 term = "ExceptionGroup"
 kind = "python"
 match = ["ExceptionGroup"]
@@ -3043,11 +2991,6 @@ term = "filterfalse()"
 kind = "python"
 match = ["filterfalse"]
 code = true
-
-[[entry]]
-term = "@final"
-kind = "python"
-match = ["re:(?<![\\w.@])@final(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "__final__"
@@ -3239,13 +3182,7 @@ code = true
 [[entry]]
 term = "global"
 kind = "python"
-match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )global(?!\\w)"]
-code = true
-
-[[entry]]
-term = "globals()"
-kind = "python"
-match = ["globals"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )global(?!\\w)", "globals"]
 code = true
 
 [[entry]]
@@ -3261,21 +3198,9 @@ match = ["__gt__"]
 code = true
 
 [[entry]]
-term = "Handler"
-kind = "python"
-match = ["Handler"]
-code = true
-
-[[entry]]
 term = "hasattr()"
 kind = "python"
 match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )hasattr(?!\\w)"]
-code = true
-
-[[entry]]
-term = "hash()"
-kind = "python"
-match = ["hash"]
 code = true
 
 [[entry]]
@@ -3449,13 +3374,7 @@ code = true
 [[entry]]
 term = "IO"
 kind = "python"
-match = ["IO"]
-code = true
-
-[[entry]]
-term = "_io"
-kind = "python"
-match = ["_io"]
+match = ["IO", "_io"]
 code = true
 
 [[entry]]
@@ -3492,12 +3411,6 @@ code = true
 term = "__iter__()"
 kind = "python"
 match = ["__iter__"]
-code = true
-
-[[entry]]
-term = "Iterable"
-kind = "python"
-match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*Iterable(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3615,12 +3528,6 @@ match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n
 code = true
 
 [[entry]]
-term = "memoize()"
-kind = "python"
-match = ["memoize"]
-code = true
-
-[[entry]]
 term = "MemoryError"
 kind = "python"
 match = ["MemoryError"]
@@ -3648,12 +3555,6 @@ code = true
 term = "__missing__()"
 kind = "python"
 match = ["__missing__"]
-code = true
-
-[[entry]]
-term = "Mock"
-kind = "python"
-match = ["Mock"]
 code = true
 
 [[entry]]
@@ -3699,21 +3600,15 @@ match = ["multiprocessing.Manager"]
 code = true
 
 [[entry]]
-term = "NamedTuple"
-kind = "python"
-match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )NamedTuple(?!\\w)", "re:(?m)^(?: *NamedTuple)+ *$", "re:(?m)^(?=[^\\n]*(?:@dataclass|@record|namedtuple))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*NamedTuple(?!\\w)"]
-code = true
-
-[[entry]]
 term = "as a tuple"
 kind = "concept"
 match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:A NamedTuple Is Still a Tuple|^Subclassing +Directly)"]
-under = "NamedTuple"
+under = "namedtuple"
 
 [[entry]]
 term = "namedtuple"
 kind = "python"
-match = ["namedtuple"]
+match = ["namedtuple", "re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )NamedTuple(?!\\w)", "re:(?m)^(?: *NamedTuple)+ *$", "re:(?m)^(?=[^\\n]*(?:@dataclass|@record|namedtuple))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*NamedTuple(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4203,12 +4098,6 @@ match = ["ResourceWarning"]
 code = true
 
 [[entry]]
-term = "retry()"
-kind = "python"
-match = ["retry"]
-code = true
-
-[[entry]]
 term = "reveal_type()"
 kind = "python"
 match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )reveal_type\\(\\)(?!\\w)"]
@@ -4296,12 +4185,6 @@ code = true
 term = "__self__"
 kind = "python"
 match = ["__self__"]
-code = true
-
-[[entry]]
-term = "sentinel()"
-kind = "python"
-match = ["sentinel"]
 code = true
 
 [[entry]]
@@ -4815,12 +4698,6 @@ match = ["TypeIs"]
 code = true
 
 [[entry]]
-term = "types"
-kind = "python"
-match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )types(?=\\.)(?!\\w)", "re:(?m)^(?=[^\\n]*(?:MappingProxyType|TracebackType))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )types(?![\\w.])(?!\\w)"]
-code = true
-
-[[entry]]
 term = "TypeVar"
 kind = "python"
 match = ["TypeVar"]
@@ -5054,7 +4931,7 @@ under = "@override"
 [[entry]]
 term = "Final"
 kind = "python"
-match = ["re:(?<=[ \\n] )Final(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )Final\\[T\\](?=  (?! *#)| \\n)", "re:(?<=[ \\n] )typing\\.Final(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )Final\\[tuple\\[int, \\.\\.\\.\\]\\](?=  (?! *#)| \\n)"]
+match = ["re:(?<=[ \\n] )Final(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )Final\\[T\\](?=  (?! *#)| \\n)", "re:(?<=[ \\n] )typing\\.Final(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )Final\\[tuple\\[int, \\.\\.\\.\\]\\](?=  (?! *#)| \\n)", "re:(?<![\\w.@])@final(?= |\\[[^\\]\\n]*\\] )"]
 code = true
 
 [[entry]]
@@ -5079,37 +4956,31 @@ under = "Final"
 code = false
 
 [[entry]]
-term = "Callable"
-kind = "python"
-match = ["re:(?<=[ \\n] )Callable\\[\\[[^\\n]{0,20}?\\], \\w+\\](?=  (?! *#)| \\n)"]
-code = true
-
-[[entry]]
 term = "Callable[P, R]"
 kind = "python"
 match = ["re:(?<![\\w.@])Callable\\[P, [^\\n]{0,60}?\\](?=  (?! *#)| \\n)"]
-under = "Callable"
+under = "callable"
 code = true
 
 [[entry]]
 term = "in place of an interface"
 kind = "python"
 match = ["re:(?<=[ \\n] )Callable(?=  (?! *#)| \\n)"]
-under = "Callable"
+under = "callable"
 code = false
 
 [[entry]]
 term = "named by a type alias"
 kind = "python"
 match = ["re:(?<=[ \\n] )type \\w+ = Callable[^\\n]{0,30}?(?=  (?! *#)| \\n)"]
-under = "Callable"
+under = "callable"
 code = false
 
 [[entry]]
 term = "declares no __name__"
 kind = "python"
 match = ["re:(?:(?<![\\w.@])Callable(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<=[ \\n] )__name__(?=  (?! *#)| \\n))|(?:(?<=[ \\n] )__name__(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])Callable(?=  (?! *#)| \\n))"]
-under = "Callable"
+under = "callable"
 code = false
 
 [[entry]]
