@@ -249,6 +249,43 @@ If you call `use(WhatIHave())`, the type checker rejects the argument,
 because `WhatIHave` defines no `f()`.
 `ObjectAdapter` keeps the check that inheritance provides in `adapter.py` and drops the base class.
 
+The standard library declares a target interface of this kind for file paths
+(PEP 519, Python 3.6).
+`open()`, `pathlib.Path()`,
+and the `os` and `os.path` functions accept any object whose `__fspath__()` method returns a `str` or `bytes`.
+Defining that one method makes a type of your own acceptable to all of them:
+
+```python
+# path_adapter.py
+import os
+from pathlib import Path
+from record import record
+
+@record
+class Asset:
+    folder: str
+    name: str
+
+    def __fspath__(self) -> str:
+        return f"{self.folder}/{self.name}"
+
+logo = Asset("images", "logo.svg")
+print(isinstance(logo, os.PathLike))
+#: True
+print(os.path.basename(logo))
+#: logo.svg
+print(Path(logo).suffix)
+#: .svg
+```
+
+`Asset` inherits from nothing,
+yet `isinstance()` reports it as an `os.PathLike`.
+At runtime, `os.PathLike` is an abstract base class whose `__subclasshook__()` accepts any class that defines `__fspath__()`.
+The type checker treats `os.PathLike` as a `Protocol`,
+so `Path(logo)` passes the check.
+Each path-taking function calls `os.fspath()` on its argument,
+which returns a `str` or `bytes` argument as it is and calls `__fspath__()` on anything else.
+
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
 `__getattr__()` forwards the rest, so the adapter is tiny:
