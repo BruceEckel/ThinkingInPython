@@ -38,6 +38,12 @@ class PairsAdapter:
 ```
 
 <details>
+<summary>Done when</summary>
+
+`adapter["name"]` returns the value, `adapter.append(...)` makes the original list one entry longer, and `adapter["missing"]` raises a `KeyError`.
+`len(adapter)` raises `TypeError: object of type 'PairsAdapter' has no len()`, and you can say why `__getattr__()` never sees that call.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -110,6 +116,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Deprecating the class instead of the method
 
@@ -136,6 +143,12 @@ class Report:
     def render(self) -> str:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+inside `warnings.catch_warnings(record=True)`, constructing a `Report` adds one `DeprecationWarning` carrying your message, and calling `render()` on that instance prints `report` and leaves the recorded count unchanged.
+`uv run ty check` reports `deprecated` on the construction until you mark it `# type: ignore`.
 
 <details>
 <summary>Solution</summary>
@@ -187,6 +200,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. `facade.py` as a module
 
@@ -231,6 +245,12 @@ class _Ignition:
 def start_car() -> _Ignition:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+running your second file prints the three calls in `facade.py`'s order, ignition, pump, engine, under underscore names, and then the assembled object.
+Listing the module's names without a leading underscore through `vars()` shows your builder function, and you can explain each other name that appears.
 
 <details>
 <summary>Solution</summary>
@@ -320,6 +340,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Classifying three wrappers
 
@@ -336,6 +357,12 @@ a different design, a detail, or an equivalent alternative.
 [Distinguishing the Wrappers](../../Chapters/29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers) gives the table that separates *Proxy*, *Decorator*, *Adapter*, and *Façade*.
 For each wrapper, imagine deleting it and ask what breaks.
 Check whether the wrapper changes the interface, adds behavior to each call, or controls whether the call proceeds.
+
+<details>
+<summary>Done when</summary>
+
+you have one pattern per wrapper, no two the same, and none is *Façade*.
+For each, you can finish "deleting it loses..." with one thing: the log, the translation from `read()` to `next_chunk()`, or the decision whether a call proceeds.
 
 <details>
 <summary>Solution</summary>
@@ -379,6 +406,7 @@ A name chosen from that answer tells the next reader why the wrapper is there.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 
@@ -445,6 +473,12 @@ class WhatIUse2(WhatIUse):
 def run(user: WhatIUse) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+before your fix, `uv run ty check` reports `invalid-method-override` on `WhatIUse2.op()` (the parameter `item` does not match `what_i_want`), and the keyword call raises a `TypeError` for `what_i_want`.
+After it, `ty` passes, and `WhatIUse2().op(what_i_want=WhatIHave())` prints `WhatIUse2.op() wraps it` then the adapter's three lines.
 
 <details>
 <summary>Solution</summary>
@@ -564,6 +598,7 @@ the parameter by position, so the override is free to call it `item`.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
