@@ -138,6 +138,11 @@ so the outer `e` keeps its value.
 A `for` loop behaves the opposite way.
 Its loop variable remains bound in the enclosing scope after the loop ends.
 
+Before Python 3.12, CPython gave a comprehension its scope by compiling it into a hidden function and calling that function each time the comprehension ran.
+Since 3.12, [PEP 709](https://peps.python.org/pep-0709/) inlines list, set,
+and dict comprehensions into the surrounding code,
+which removes the call and makes them faster while keeping the loop variable private.
+
 The scope works like a function scope,
 which limits a comprehension in a class body.
 Python skips the class body when it looks up a name from a scope nested inside the class,
@@ -369,6 +374,10 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 
 `zip()` stops at the end of the shorter iterable.
 Pass `strict=True` to make a length mismatch raise a `ValueError` instead of silently truncating.
+`map()` called with several iterables passes one element from each to its function and stops at the shortest in the same way.
+Since Python 3.14, `map()` accepts `strict=True` too.
+A dropped element leaves no trace in the output,
+so pass `strict=True` to either function whenever the inputs must have equal lengths.
 
 The `for` clause's target can unpack a nested tuple.
 Here `zip()` pairs each `(name, function)` tuple with a value,
