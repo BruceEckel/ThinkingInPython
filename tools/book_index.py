@@ -12,7 +12,7 @@ has the survey and Bruce's decisions of 2026-09-29). The data is
     under = "functions"         # optional: a subentry of that entry
     see = []                    # optional: entry names
     see_also = ["nonlocal"]     # optional: entry names
-    code = false                # true sets the heading in code font
+    code = false                # code font: true or false (default by kind)
 
 A `match` item is a plain string, matched case-insensitively on word
 boundaries (a space matches any run of whitespace), or a regular
@@ -158,7 +158,7 @@ class Term:
     under: str | None = None
     see: tuple[str, ...] = ()
     see_also: tuple[str, ...] = ()
-    code: bool = False
+    code: bool | None = None
 
     def patterns(self) -> list[re.Pattern[str]]:
         return [compile_match(m, self.kind != "python")
@@ -241,8 +241,8 @@ def parse_terms(text: str, source: str = "index_terms.toml") -> TermFile:
             raise TermFileError(
                 f"{where}: kind must be one of {', '.join(KINDS)}, "
                 f"not {kind!r}")
-        code = table.get("code", False)
-        if not isinstance(code, bool):
+        code = table.get("code")
+        if code is not None and not isinstance(code, bool):
             raise TermFileError(f"{where}: `code` must be true or false")
         under = table.get("under")
         if under is not None and not (isinstance(under, str) and under):
@@ -582,7 +582,9 @@ class Entry:
 
     @property
     def code(self) -> bool:
-        return self.term.code or self.term.kind == "python"
+        if self.term.code is not None:
+            return self.term.code
+        return self.term.kind == "python"
 
 
 @dataclass(frozen=True)

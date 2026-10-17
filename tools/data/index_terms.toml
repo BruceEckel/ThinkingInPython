@@ -11,28 +11,28 @@
 # match):
 #   and (56), Any (65), append() (95), as (96), assert (102)
 #   async (49), asyncio (51), AttributeError (57), await (41)
-#   bool (45), @cache (28), Callable (60), case (57), check() (28)
+#   bool (45), @cache (28),, case (57), check() (28)
 #   Circle (26), class (281), ClassVar (32), cls (42)
 #   collections (102), collections.abc (91), Console (40), count (36)
-#   data (32), @dataclass (86), dataclasses (79), def (457), dict (93)
+#   data (32),, dataclasses (79), def (457), dict (93)
 #   __dict__ (45), else (47), except (58), expect() (48), expected (65)
-#   False (82), field() (35), Final (67), first() (36), float (81)
+#   False (82), field() (35),, first() (36), float (81)
 #   for (246), from (486), functools (60), Generator (29), get() (35)
-#   greet() (43), if (194), import (489), in (255), __init__() (138)
-#   int (261), is (137), isinstance() (72), item (34), items() (42)
+#   greet() (43), if (194), import (489), in (255),
+#   int (261), is (137),, item (34), items() (42)
 #   Iterator (26), itertools (41), key() (37), KeyError (37)
 #   lambda (46), len() (72), list (210), main() (31), __main__ (62)
 #   match (76), name (165), __name__ (125), Need (42), next() (41)
 #   None (331), not (111), number (32), object (104), one (29)
-#   @override (38), pass (54), __post_init__() (27), print() (499)
-#   @property (28), Protocol (42), pytest (55), raise (63), range (86)
+#, pass (54), __post_init__() (27), print() (499)
+#,, pytest (55), raise (63), range (86)
 #   @record (65), report() (50), Result (33), result (45), return (336)
 #   run() (111), RuntimeError (27), self (227), set (35), Shape (26)
 #   show() (27), sleep() (39), sorted() (32), start() (35), str (300)
-#   sum() (28), super() (42), supply() (46), time (32), total (39)
+#   sum() (28),, supply() (46), time (32), total (39)
 #   True (181), try (65), tuple (72), ty (85), type (197)
 #   TypeError (95), typing (192), value (92), ValueError (66)
-#   values (30), with (133), yield (80)
+#   values (30), with (133),
 
 # Italic spans that are emphasis, not terms.
 stop = ["enable", "every", "exact", "first", "Foundations", "Functional", "how", "include", "inside", "is", "n", "Patterns", "s", "Techniques", "what", "whether", "which"]
@@ -119,7 +119,7 @@ match = ["asynchrony", "asynchronies"]
 [[entry]]
 term = "awaitable"
 kind = "concept"
-match = ["awaitable", "awaitables"]
+match = ["re:(?<=\\*)awaitable(?=\\*)", "re:\\b(?:an|any)\\s+awaitable\\b", "awaitables"]
 
 [[entry]]
 term = "Balking"
@@ -129,7 +129,7 @@ match = ["Balking", "Balkings"]
 [[entry]]
 term = "bare annotation"
 kind = "concept"
-match = ["bare annotation", "bare annotations"]
+match = ["re:(?<=\\*)bare annotations?(?=\\*)", "re:(?-i:Bare Annotation)", "re:\\b(?:A|a|The|the) bare annotation (?:is|adds|declares|in a protocol|with no value)\\b", "re:\\bis a bare annotation\\b"]
 
 [[entry]]
 term = "base case"
@@ -174,7 +174,25 @@ match = ["re:(?<=\\*)bound(?=\\*)", "re:(?<=\\*)bounds(?=\\*)"]
 [[entry]]
 term = "bound method"
 kind = "concept"
-match = ["bound method", "bound methods"]
+match = ["re:(?<=\\*)bound methods?(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bBound Method\\b[^\\n.]*$"]
+
+[[entry]]
+term = "compared for equality"
+kind = "concept"
+match = ["re:bound methods? (?:compare|equals)\\b", "re:\\bA bound method is different"]
+under = "bound method"
+
+[[entry]]
+term = "keeping its instance alive"
+kind = "concept"
+match = ["re:bound method (?:holds|stores|is a small object)"]
+under = "bound method"
+
+[[entry]]
+term = "built on each attribute lookup"
+kind = "concept"
+match = ["re:\\b(?:building no|rebuilds the) bound method", "re:\\bnot bound methods\\b"]
+under = "bound method"
 
 [[entry]]
 term = "Broker"
@@ -194,7 +212,37 @@ match = ["C3 linearization", "C3 linearizations"]
 [[entry]]
 term = "C++"
 kind = "concept"
-match = ["C++", "C++s"]
+match = ["re:Thinking in C\\+\\+", "re:(?<=\\*)C\\+\\+(?=\\*)", "re:from C\\+\\+ or Java"]
+
+[[entry]]
+term = "classes and fields"
+kind = "concept"
+match = ["re:C\\+\\+[^.\\n]*\\b(?:fields?|storage|base[- ]class(?:es)?|class with)\\b", "re:\\b(?:fields?|inheritance)\\b[^.\\n]*C\\+\\+"]
+under = "C++"
+
+[[entry]]
+term = "exceptions"
+kind = "concept"
+match = ["re:C\\+\\+[^.\\n]*\\bexceptions?\\b", "re:\\bexceptions?\\b[^.\\n]*C\\+\\+", "re:C\\+\\+ reduced its version"]
+under = "C++"
+
+[[entry]]
+term = "syntax"
+kind = "concept"
+match = ["re:C\\+\\+[^.\\n]*\\b(?:braces|comments|parentheses|operator)\\b", "re:C or C\\+\\+ compiler"]
+under = "C++"
+
+[[entry]]
+term = "static typing"
+kind = "concept"
+match = ["re:C\\+\\+ and Java require type declarations", "re:overloading in C\\+\\+", "re:the C\\+\\+ name for"]
+under = "C++"
+
+[[entry]]
+term = "in GoF Design Patterns"
+kind = "concept"
+match = ["re:typically in C\\+\\+", "re:examples in C\\+\\+ and Smalltalk", "re:the C\\+\\+ of that book"]
+under = "C++"
 
 [[entry]]
 term = "capture pattern"
@@ -244,7 +292,19 @@ match = ["re:(?<=\\*)closed(?=\\*)", "re:(?<=\\*)closeds(?=\\*)"]
 [[entry]]
 term = "closure"
 kind = "concept"
-match = ["closure", "closures"]
+match = ["re:(?<=\\*)closures?(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bClosures?\\b[^\\n.]*$"]
+
+[[entry]]
+term = "carrying configuration"
+kind = "concept"
+match = ["re:closures?[^.\\n]*\\b(?:callable object|an instance)\\b", "re:(?:use a \\[?|whose )closure", "re:closure (?:supplies|holds|variable)"]
+under = "closure"
+
+[[entry]]
+term = "late binding in a loop"
+kind = "concept"
+match = ["re:closure\\s+mistake"]
+under = "closure"
 
 [[entry]]
 term = "cohesion"
@@ -294,7 +354,43 @@ match = ["Content-Based Router", "Content-Based Routers"]
 [[entry]]
 term = "context manager"
 kind = "concept"
-match = ["context manager", "context managers"]
+match = ["re:(?<=\\*)context managers?(?=\\*)", "re:(?m)^Context Managers$", "re:\\bcan be a context manager\\b"]
+
+[[entry]]
+term = "from a generator"
+kind = "concept"
+match = ["re:(?m)^A Basic Context Manager$", "re:simplest way to write a context manager"]
+under = "context manager"
+
+[[entry]]
+term = "as a decorator"
+kind = "concept"
+match = ["re:(?m)^Context Manager as Decorator$", "re:context managers?\\W*(?:can )?also (?:decorate|work as a decorator)", "re:both as a context manager and as a decorator"]
+under = "context manager"
+
+[[entry]]
+term = "combining several"
+kind = "concept"
+match = ["re:(?m)^Combining Context Managers$", "re:(?-i:Combining Context Managers)"]
+under = "context manager"
+
+[[entry]]
+term = "returning to a pool"
+kind = "concept"
+match = ["re:context manager can return every borrowed object"]
+under = "context manager"
+
+[[entry]]
+term = "a temporary directory"
+kind = "concept"
+match = ["re:context manager deletes the directory"]
+under = "context manager"
+
+[[entry]]
+term = "for tracing a span"
+kind = "concept"
+match = ["re:(?:as a context manager, writing|also works as a context manager)"]
+under = "context manager"
 
 [[entry]]
 term = "context switching"
@@ -324,7 +420,7 @@ match = ["coroutine object", "coroutine objects"]
 [[entry]]
 term = "coroutines"
 kind = "concept"
-match = ["coroutines"]
+match = ["re:(?<=\\*)coroutines(?=\\*)", "re:\\b(?:create|are|become|other) coroutines\\b", "re:rewriting them as coroutines"]
 
 [[entry]]
 term = "covariant"
@@ -334,7 +430,7 @@ match = ["covariant", "covariants"]
 [[entry]]
 term = "CPU-bound"
 kind = "concept"
-match = ["CPU-bound", "CPU-bounds"]
+match = ["re:(?<=\\*)CPU-bound(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bCPU-Bound\\b[^\\n.]*$", "re:(?:[Ff]or|handle|parallelize) CPU-bound work", "re:CPU-bound (?:task|workload)"]
 
 [[entry]]
 term = "Creational"
@@ -389,7 +485,37 @@ match = ["declarative", "declaratives"]
 [[entry]]
 term = "decorator"
 kind = "concept"
-match = ["re:(?<=\\*)decorator(?=\\*)", "re:(?<=\\*)decorators(?=\\*)"]
+match = ["re:(?<=\\*)(?-i:decorators?)(?=\\*)", "re:A decorator is a callable", "re:To apply a decorator"]
+
+[[entry]]
+term = "taking arguments"
+kind = "concept"
+match = ["re:(?m)^Decorators That Take Arguments$", "re:(?m)^Decorators With Optional Parentheses$", "re:(?m)^A Class-Form Decorator with Arguments$"]
+under = "decorator"
+
+[[entry]]
+term = "stacking"
+kind = "concept"
+match = ["re:(?m)^Stacking Decorators$"]
+under = "decorator"
+
+[[entry]]
+term = "written as a class"
+kind = "concept"
+match = ["re:(?m)^Decorators as Classes$", "re:(?m)^A Stateless Class-Form Decorator$", "re:(?m)^A Class-Form Decorator with State$", "re:(?m)^Function Form or Class Form\\?$"]
+under = "decorator"
+
+[[entry]]
+term = "keeping the wrapped interface"
+kind = "concept"
+match = ["re:(?m)^Maintaining the Wrapped Interface$"]
+under = "decorator"
+
+[[entry]]
+term = "in the standard library"
+kind = "concept"
+match = ["re:(?m)^Decorators You Already Know$"]
+under = "decorator"
 
 [[entry]]
 term = "delayed binding"
@@ -404,7 +530,19 @@ match = ["dependency injection", "dependency injections"]
 [[entry]]
 term = "descriptor"
 kind = "concept"
-match = ["descriptor", "descriptors"]
+match = ["re:(?<=\\*)descriptors?(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bDescriptor\\b[^\\n.]*$"]
+
+[[entry]]
+term = "functions as"
+kind = "concept"
+match = ["re:function is a \\[?descriptor", "re:returns a descriptor", "re:(?:instances are|object is a) descriptors?"]
+under = "descriptor"
+
+[[entry]]
+term = "skipped by inspection"
+kind = "concept"
+match = ["re:(?:running|invoking) (?:properties or other )?descriptors", "re:properties or descriptors"]
+under = "descriptor"
 
 [[entry]]
 term = "Design by Contract"
@@ -484,7 +622,7 @@ match = ["duck typing", "duck typings"]
 [[entry]]
 term = "dunder"
 kind = "concept"
-match = ["dunder", "dunders"]
+match = ["re:(?<=\\*)dunders?(?=\\*)", "re:\\(a dunder\\)", "re:\\bis a dunder\\b", "re:make it a dunder", "re:looks up dunders", "re:defines the dunder", "dunder methods"]
 
 [[entry]]
 term = "dynamic typing"
@@ -504,7 +642,7 @@ match = ["re:(?<=\\*)Effect(?=\\*)", "re:(?<=\\*)Effects(?=\\*)"]
 [[entry]]
 term = "Effect Management System"
 kind = "concept"
-match = ["Effect Management System", "Effect Management Systems"]
+match = ["re:(?<=\\*)Effect Management System(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bEffect Management Systems\\b[^\\n.]*$", "re:Effect Management System \\(EMS\\)", "re:core of every Effect Management System", "re:(?:implements|has) (?:an|no) Effect Management System"]
 
 [[entry]]
 term = "Effect polymorphism"
@@ -519,7 +657,7 @@ match = ["Effect row", "Effect rows"]
 [[entry]]
 term = "Effect tracking"
 kind = "concept"
-match = ["Effect tracking", "Effect trackings"]
+match = ["re:(?<!\\[)(?<!algebraic )\\bEffect tracking\\b"]
 
 [[entry]]
 term = "Effect variable"
@@ -599,7 +737,19 @@ match = ["factory object", "factory objects"]
 [[entry]]
 term = "fallback"
 kind = "concept"
-match = ["fallback", "fallbacks"]
+match = ["re:(?<=\\*)fallbacks?(?=\\*)"]
+
+[[entry]]
+term = "in attribute lookup"
+kind = "concept"
+match = ["re:by (?:the same )?fallback", "re:as (?:the|a) fallback", "re:fallback runs"]
+under = "fallback"
+
+[[entry]]
+term = "as a default value"
+kind = "concept"
+match = ["re:(?:supply|register|Use) a fallback", "re:fallback (?:string|answer|combinator)", "re:(?:gets|produces) the fallback"]
+under = "fallback"
 
 [[entry]]
 term = "first-class"
@@ -639,7 +789,13 @@ match = ["Function Composition", "Function Compositions"]
 [[entry]]
 term = "function object"
 kind = "concept"
-match = ["function object", "function objects"]
+match = ["re:(?<=\\*)function objects?(?=\\*)", "re:(?:chosen|are) function objects"]
+
+[[entry]]
+term = "at runtime"
+kind = "concept"
+match = ["re:(?-i:(?:the|same|decorated|a) function object)\\b"]
+under = "function object"
 
 [[entry]]
 term = "function overloading"
@@ -664,7 +820,7 @@ match = ["re:(?<=\\*)generator(?=\\*)", "re:(?<=\\*)generators(?=\\*)"]
 [[entry]]
 term = "generator expression"
 kind = "concept"
-match = ["generator expression", "generator expressions"]
+match = ["re:(?<=\\*)generator expressions?(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bGenerator Expressions?\\b[^\\n.]*$", "re:generator expression (?:evaluates|keeps|defers|is not re-iterable|that produces)", "re:Creating a generator expression", "re:clause of a generator expression", "re:comprehension or generator expression"]
 
 [[entry]]
 term = "Global Interpreter Lock"
@@ -674,7 +830,25 @@ match = ["Global Interpreter Lock", "Global Interpreter Locks"]
 [[entry]]
 term = "GoF Design Patterns"
 kind = "concept"
-match = ["re:(?<=\\*)GoF\\s+Design\\s+Patterns(?=\\*)"]
+match = ["re:(?<=that book as \\*)GoF\\s+Design\\s+Patterns(?=\\*)", "re:GoF\\s+Design\\s+Patterns(?=\\* shows 23)"]
+
+[[entry]]
+term = "its classification"
+kind = "concept"
+match = ["re:GoF\\s+Design\\s+Patterns(?=\\*(?: discusses 23| classification| categories))", "re:(?<=creational patterns of \\*)GoF\\s+Design\\s+Patterns(?=\\*)"]
+under = "GoF Design Patterns"
+
+[[entry]]
+term = "on coupling"
+kind = "concept"
+match = ["re:(?<=in \\*)GoF\\s+Design\\s+Patterns(?=\\* answers one question)", "re:GoF\\s+Design\\s+Patterns(?=\\* has a name for)", "re:GoF\\s+Design\\s+Patterns(?=\\* repeats the saying)"]
+under = "GoF Design Patterns"
+
+[[entry]]
+term = "as workarounds for static languages"
+kind = "concept"
+match = ["re:GoF\\s+Design\\s+Patterns(?=\\*[^.\\n]*(?:examples in C\\+\\+|workaround|work around|forms of))"]
+under = "GoF Design Patterns"
 
 [[entry]]
 term = "gradual typing"
@@ -699,12 +873,42 @@ match = ["re:(?<=\\*)handler(?=\\*)", "re:(?<=\\*)handlers(?=\\*)"]
 [[entry]]
 term = "hash"
 kind = "concept"
-match = ["hash", "hashes"]
+match = ["re:(?<=\\*)hash(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bHash\\b[^\\n.]*$"]
+
+[[entry]]
+term = "in dictionary and set lookup"
+kind = "concept"
+match = ["re:\\bhash(?:es|ing)?\\b[^.\\n]*\\b(?:bucket|slot|membership)\\b", "re:\\b(?:bucket|slot|membership)\\b[^.\\n]*\\bhash\\b"]
+under = "hash"
+
+[[entry]]
+term = "of equal values"
+kind = "concept"
+match = ["re:\\bhash(?:es)? (?:alike|the same|by identity|under the same rule|its contents)", "re:\\ba hash at the same time", "re:container's hash"]
+under = "hash"
 
 [[entry]]
 term = "hashable"
 kind = "concept"
-match = ["hashable", "hashables"]
+match = ["re:(?<=\\*)hashable(?=\\*)"]
+
+[[entry]]
+term = "as a dictionary key or set member"
+kind = "concept"
+match = ["re:\\bhashable\\b[^.\\n]*\\b(?:key|keys|set member)\\b", "re:\\b(?:key|keys)\\b[^.\\n]*\\bhashable\\b"]
+under = "hashable"
+
+[[entry]]
+term = "frozen data classes"
+kind = "concept"
+match = ["re:frozen[^.\\n]*\\bhashable\\b", "re:field must be hashable", "re:instances hashable"]
+under = "hashable"
+
+[[entry]]
+term = "cache arguments"
+kind = "concept"
+match = ["re:argument(?:s)? must be hashable", "re:accepts any hashable"]
+under = "hashable"
 
 [[entry]]
 term = "heap"
@@ -779,7 +983,19 @@ match = ["intrinsic state", "intrinsic states"]
 [[entry]]
 term = "invariant"
 kind = "concept"
-match = ["invariant", "invariants"]
+match = ["re:(?<=\\*)invariants?(?=\\*)"]
+
+[[entry]]
+term = "in variance"
+kind = "concept"
+match = ["re:type is \\[?invariant", "re:\\binvariant, so\\b", "re:stays invariant"]
+under = "invariant"
+
+[[entry]]
+term = "condition that must hold"
+kind = "concept"
+match = ["re:(?:class|final|an?|the) invariant (?:that|after|the program|you want|across|the container)", "re:invariant broke", "re:break an invariant", "re:invariant is the part"]
+under = "invariant"
 
 [[entry]]
 term = "Inversion of Control"
@@ -794,7 +1010,7 @@ match = ["re:(?<=\\*)iterable(?=\\*)", "re:(?<=\\*)iterables(?=\\*)"]
 [[entry]]
 term = "iterator"
 kind = "concept"
-match = ["re:(?<=\\*)iterator(?=\\*)", "re:(?<=\\*)iterators(?=\\*)"]
+match = ["re:(?<=\\*)(?-i:iterators?)(?=\\*)", "re:(?-i:Python builds iterators)", "re:(?m)^Sharing an Iterator Between Threads$"]
 
 [[entry]]
 term = "iterator protocol"
@@ -814,7 +1030,19 @@ match = ["Kirkman's schoolgirl problem", "Kirkman's schoolgirl problems"]
 [[entry]]
 term = "lambda"
 kind = "concept"
-match = ["lambda", "lambdas"]
+match = ["re:(?<=\\*)lambdas?(?=\\*)", "re:(?m)^Lambdas$"]
+
+[[entry]]
+term = "late binding"
+kind = "concept"
+match = ["re:lambdas? (?:written inline in the comprehension|created in a loop)", "re:lambdas close over", "re:when it creates the lambda"]
+under = "lambda"
+
+[[entry]]
+term = "disconnecting"
+kind = "concept"
+match = ["re:lambda equals only itself", "re:disconnect a lambda", "re:lambda written inline in\\s+has no name"]
+under = "lambda"
 
 [[entry]]
 term = "lapsed listener"
@@ -894,7 +1122,19 @@ match = ["re:(?<=\\*)mark(?=\\*)", "re:(?<=\\*)marks(?=\\*)"]
 [[entry]]
 term = "marker"
 kind = "concept"
-match = ["marker", "markers"]
+match = ["re:(?<=\\*)markers?(?=\\*)", "re:\\bare markers\\b", "re:rule each marker names"]
+
+[[entry]]
+term = "output lines in listings"
+kind = "concept"
+match = ["re:(?:output|group of) markers?", "re:markers? (?:below )?shows?\\b", "re:marker captures", "re:line of output per marker"]
+under = "marker"
+
+[[entry]]
+term = "in a parameter list"
+kind = "concept"
+match = ["re:markers? in a parameter list", "re:keyword-only\\s+marker", "re:marker limits that to the fields", "re:marker also lets"]
+under = "marker"
 
 [[entry]]
 term = "Marker Interface"
@@ -909,7 +1149,7 @@ match = ["Mealy machine", "Mealy machines"]
 [[entry]]
 term = "memento"
 kind = "concept"
-match = ["memento", "mementos"]
+match = ["re:(?<=\\*)(?-i:memento)(?=\\*)", "re:(?-i:A memento (?:depends|works))", "re:(?-i:every state is a memento)", "re:(?-i:all a memento needs)", "re:(?-i:mementos scoped|produces mementos)", "re:(?-i:memento saved before)"]
 
 [[entry]]
 term = "Memoization"
@@ -949,7 +1189,19 @@ match = ["metaclasses"]
 [[entry]]
 term = "metadata"
 kind = "concept"
-match = ["metadata", "metadatas"]
+match = ["re:(?<=\\*)metadata(?=\\*)"]
+
+[[entry]]
+term = "copied by wraps"
+kind = "concept"
+match = ["re:cop(?:y|ies) (?:the original function's |the |the same |'s )?metadata", "re:wrapper's metadata", "re:copies the metadata"]
+under = "metadata"
+
+[[entry]]
+term = "in an annotation"
+kind = "concept"
+match = ["re:pieces? of metadata", "re:carrying extra metadata", "re:(?:carried in|inside|goes in) metadata", "re:Metadata is data", "re:the metadata says", "re:No metadata"]
+under = "metadata"
 
 [[entry]]
 term = "metamethods"
@@ -1029,7 +1281,19 @@ match = ["name mangling", "name manglings"]
 [[entry]]
 term = "namespace"
 kind = "concept"
-match = ["namespace", "namespaces"]
+match = ["re:(?<=\\*)namespaces?(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bNamespace\\b[^\\n.]*$", "re:(?:the current|module's) namespace", "re:forms its own namespace"]
+
+[[entry]]
+term = "of a class being built"
+kind = "concept"
+match = ["re:namespace dict(?:ionary)?", "re:bases,? and (?:a )?namespace", "re:the namespace mapping", "re:or the namespace\\b"]
+under = "namespace"
+
+[[entry]]
+term = "against name collisions"
+kind = "concept"
+match = ["re:global namespace", "re:separate namespaces", "re:automatically a namespace", "re:single-instance namespace", "re:clean namespace"]
+under = "namespace"
 
 [[entry]]
 term = "namespace package"
@@ -1039,7 +1303,7 @@ match = ["namespace package", "namespace packages"]
 [[entry]]
 term = "narrows"
 kind = "concept"
-match = ["narrows"]
+match = ["re:(?<=\\*)narrows(?=\\*)", "re:narrows (?:a|the) (?:type|element type)", "re:narrows only", "re:subclass that narrows", "re:checker narrows", "re:narrows when", "re:narrows a\\s+to one side"]
 
 [[entry]]
 term = "nominal"
@@ -1059,7 +1323,7 @@ match = ["object adapter", "object adapters"]
 [[entry]]
 term = "observer"
 kind = "concept"
-match = ["observer", "observers"]
+match = ["re:(?-i:observers?)"]
 
 [[entry]]
 term = "oracle"
@@ -1079,7 +1343,7 @@ match = ["Orthogonality", "Orthogonalities"]
 [[entry]]
 term = "packages"
 kind = "concept"
-match = ["packages"]
+match = ["re:(?<=\\*)packages(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bPackages\\b[^\\n.]*$"]
 
 [[entry]]
 term = "panics"
@@ -1114,7 +1378,7 @@ match = ["Pattern-Oriented Software Architecture", "Pattern-Oriented Software Ar
 [[entry]]
 term = "pickling"
 kind = "concept"
-match = ["pickling", "picklings"]
+match = ["re:(?<=\\*)pickling(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bPickling\\b[^\\n.]*$", "re:pickling (?:boundary|errors?)", "re:by pickling", "re:names pickling"]
 
 [[entry]]
 term = "Pipes and Filters"
@@ -1129,7 +1393,7 @@ match = ["pluggable adapter", "pluggable adapters"]
 [[entry]]
 term = "Plugin"
 kind = "concept"
-match = ["Plugin", "Plugins"]
+match = ["re:(?<=\\*)Plugin(?=\\* \\| Select)", "re:plugin (?:class|module|registries)", "re:registry of plugins", "re:a plugin that", "re:(?:A plugin writes|plugins or other packages)"]
 
 [[entry]]
 term = "Point-to-Point Channel"
@@ -1199,7 +1463,30 @@ match = ["protection proxy", "protection proxies"]
 [[entry]]
 term = "Protocol"
 kind = "concept"
-match = ["re:(?<=\\*)Protocol(?=\\*)", "re:(?<=\\*)Protocols(?=\\*)"]
+match = ["re:(?<=\\n)(?-i:Structural Typing with Protocols)(?=\\n)", "re:(?<=\\n)(?-i:Protocols)(?=\\n)", "re:(?<=\\n)(?-i:Protocols Generalize, Composition Adapts)(?=\\n)", "re:(?<=\\n)(?-i:Explicit Registration with a Protocol)(?=\\n)", "re:(?<=\\*)Protocol(?=\\*)", "re:(?<=\\*)Protocols(?=\\*)"]
+see_also = ["structural typing"]
+code = true
+
+[[entry]]
+term = "checked at runtime"
+kind = "python"
+match = ["re:(?:(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<![\\w.@])@runtime_checkable(?=  (?! *#)| \\n))|(?:(?<![\\w.@])@runtime_checkable(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))"]
+under = "Protocol"
+code = false
+
+[[entry]]
+term = "versus an ABC"
+kind = "python"
+match = ["re:(?:(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<=[ \\n] )ABC(?=  (?! *#)| \\n))|(?:(?<=[ \\n] )ABC(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))"]
+under = "Protocol"
+code = false
+
+[[entry]]
+term = "declaring __call__()"
+kind = "python"
+match = ["re:(?:(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<![\\w.@])__call__\\(\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])__call__\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))"]
+under = "Protocol"
+code = false
 
 [[entry]]
 term = "Publish-Subscribe Channel"
@@ -1209,12 +1496,30 @@ match = ["Publish-Subscribe Channel", "Publish-Subscribe Channels"]
 [[entry]]
 term = "pure function"
 kind = "concept"
-match = ["pure function", "pure functions"]
+match = ["re:(?<=\\*)pure functions?(?=\\*)", "re:(?m)^Pure Functions$"]
+
+[[entry]]
+term = "caching"
+kind = "concept"
+match = ["re:\\bcach\\w*[^.\\n]*pure functions?", "re:call a \\[?pure function\\s+repeatedly", "re:works correctly only for pure functions", "re:pure functions?[^.\\n]*\\bcach"]
+under = "pure function"
+
+[[entry]]
+term = "and parallelism"
+kind = "concept"
+match = ["re:pure functions?[^.\\n]*parallel", "re:parallel\\w*[^.\\n]*pure functions?"]
+under = "pure function"
+
+[[entry]]
+term = "needing no test setup"
+kind = "concept"
+match = ["re:pure function needs no"]
+under = "pure function"
 
 [[entry]]
 term = "qualify"
 kind = "concept"
-match = ["qualify", "qualifies"]
+match = ["re:(?<=\\*)qualify(?=\\*)", "re:qualify it with", "re:name alone qualifies"]
 
 [[entry]]
 term = "Reactor"
@@ -1234,12 +1539,42 @@ match = ["re:(?<=\\*)record(?=\\*)", "re:(?<=\\*)records(?=\\*)"]
 [[entry]]
 term = "recursion"
 kind = "concept"
-match = ["recursion", "recursions"]
+match = ["re:(?<=\\*)recursion(?=\\*)", "re:(?m)^Recursion$"]
+
+[[entry]]
+term = "in attribute forwarding"
+kind = "concept"
+match = ["re:(?:avoid that|reports the) recursion", "re:recursion trap"]
+under = "recursion"
+
+[[entry]]
+term = "over trees and unions"
+kind = "concept"
+match = ["re:needs recursion", "re:union's recursion", "re:flattens the recursion", "re:recursion limit", "re:rather than a recursion", "re:recursion for deeper"]
+under = "recursion"
 
 [[entry]]
 term = "recursive"
 kind = "concept"
-match = ["recursive", "recursives"]
+match = ["re:(?<=\\*)recursive(?=\\*)", "re:Each recursive function needs"]
+
+[[entry]]
+term = "Fibonacci"
+kind = "concept"
+match = ["re:recursive Fibonacci", "re:recursive one stays", "re:keeps its recursive form", "re:Because\\s+is recursive"]
+under = "recursive"
+
+[[entry]]
+term = "tree walkers"
+kind = "concept"
+match = ["re:recursive functions? (?:that|give)", "re:recursive call where", "re:walkers\\*?, the recursive", "re:is a recursive function", "re:Every recursive call passes"]
+under = "recursive"
+
+[[entry]]
+term = "Effect rows"
+kind = "concept"
+match = ["re:makes the rule recursive", "re:Tracking\\s+is recursive"]
+under = "recursive"
 
 [[entry]]
 term = "recursive case"
@@ -1299,7 +1634,7 @@ match = ["Repository", "Repositories"]
 [[entry]]
 term = "Retry"
 kind = "concept"
-match = ["Retry", "Retries"]
+match = ["re:(?<=\\*)Retry(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bRetry\\b[^\\n.]*$", "re:Retry is the one to study", "re:adding retry", "re:whether a retry is safe"]
 
 [[entry]]
 term = "run-time type identification"
@@ -1344,12 +1679,24 @@ match = ["Service Locator", "Service Locators"]
 [[entry]]
 term = "setter"
 kind = "concept"
-match = ["setter", "setters"]
+match = ["re:(?<=\\*)setters?(?=\\*)", "re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bSetter\\b[^\\n.]*$", "re:calls its setter", "re:validating setter", "re:each setter returns", "re:a setter runs on every", "re:setter returns early", "re:property setter cannot"]
 
 [[entry]]
 term = "shadows"
 kind = "concept"
-match = ["shadows"]
+match = ["re:(?<=\\*)shadows(?=\\*)"]
+
+[[entry]]
+term = "a class attribute"
+kind = "concept"
+match = ["re:shadows (?:the|a) (?:class (?:attribute|entry|list)|method)", "re:(?:assignment|attribute) that shadows", "re:shadows\\s+at class-definition", "re:object therefore shadows"]
+under = "shadows"
+
+[[entry]]
+term = "a built-in name"
+kind = "concept"
+match = ["re:shadows (?:the builtin|a built-in|no keyword)"]
+under = "shadows"
 
 [[entry]]
 term = "shallow"
@@ -1359,12 +1706,54 @@ match = ["shallow", "shallows"]
 [[entry]]
 term = "side cause"
 kind = "concept"
-match = ["side cause", "side causes"]
+match = ["re:(?<=\\*)side causes?(?=\\*)", "re:reading one as a side cause", "re:and the side cause"]
+
+[[entry]]
+term = "examples of"
+kind = "concept"
+match = ["re:\\bis (?:a|another) \\[?side cause", "re:\\bare (?:both )?side causes"]
+under = "side cause"
+
+[[entry]]
+term = "made replaceable"
+kind = "concept"
+match = ["re:side causes\\*\\* become", "re:side causes also have a by-hand", "re:relocates a \\[?side cause", "re:moves that side cause"]
+under = "side cause"
 
 [[entry]]
 term = "side effect"
 kind = "concept"
-match = ["side effect", "side effects"]
+match = ["re:(?<=\\*)side effects?(?=\\*)", "re:alongside the side effect"]
+
+[[entry]]
+term = "in a comprehension"
+kind = "concept"
+match = ["re:comprehension[^.\\n]*side effect", "re:side effect rather than the collection"]
+under = "side effect"
+
+[[entry]]
+term = "skipped by a cache"
+kind = "concept"
+match = ["re:\\bcach\\w*[^.\\n]*side effects?", "re:side effects?[^.\\n]*\\bcach", "re:skipped side effect"]
+under = "side effect"
+
+[[entry]]
+term = "of registration"
+kind = "concept"
+match = ["re:exists for (?:the|its) side effect"]
+under = "side effect"
+
+[[entry]]
+term = "in tests"
+kind = "concept"
+match = ["re:Side effects\\*\\* become", "re:side effects and side causes also", "re:\\bis a side effect(?: rather| so|,)"]
+under = "side effect"
+
+[[entry]]
+term = "declared to Stateless"
+kind = "concept"
+match = ["re:a side effect the signature", "re:stands in for a side effect", "re:so it is a side effect"]
+under = "side effect"
 
 [[entry]]
 term = "Sidecar"
@@ -1404,12 +1793,12 @@ match = ["State effect", "State effects"]
 [[entry]]
 term = "strategy"
 kind = "concept"
-match = ["strategy", "strategies"]
+match = ["re:(?<=\\*)(?-i:strategy)(?=\\*)", "re:(?-i:chooses the strategy|list of strategies)"]
 
 [[entry]]
 term = "strong reference"
 kind = "concept"
-match = ["strong reference", "strong references"]
+match = ["re:(?<!last )strong references?"]
 
 [[entry]]
 term = "structural typing"
@@ -1439,7 +1828,7 @@ match = ["sum type", "sum types"]
 [[entry]]
 term = "suspends"
 kind = "concept"
-match = ["suspends"]
+match = ["re:(?<=\\*)suspends(?=\\*)", "re:suspends (?:itself|the coroutine|a computation|only the current task|a task instead|the calling task)", "re:yields a request, suspends"]
 
 [[entry]]
 term = "t-string"
@@ -1529,7 +1918,7 @@ match = ["re:(?<=\\*)type(?=\\*)", "re:(?<=\\*)types(?=\\*)"]
 [[entry]]
 term = "type hints"
 kind = "concept"
-match = ["type hints"]
+match = ["re:(?<!\\[)\\btype hints\\b"]
 
 [[entry]]
 term = "Type Object"
@@ -1574,7 +1963,25 @@ match = ["vector of change", "vector of changes"]
 [[entry]]
 term = "view"
 kind = "concept"
-match = ["view", "views"]
+match = ["re:(?<=\\*)view(?=\\*)"]
+
+[[entry]]
+term = "of memory"
+kind = "concept"
+match = ["re:zero-copy view", "re:(?m)^Memory View$", "re:through a view", "re:view shares"]
+under = "view"
+
+[[entry]]
+term = "in a model-view design"
+kind = "concept"
+match = ["re:(?m)^The View$", "re:view (?:draws|edits the model|connects to the model|records the order|is the one module)", "re:graphical view", "re:names no part of the view", "re:In Smalltalk's MVC, a view"]
+under = "view"
+
+[[entry]]
+term = "onto live contents"
+kind = "concept"
+match = ["re:is a view onto", "re:Like the\\s+views"]
+under = "view"
 
 [[entry]]
 term = "virtual proxy"
@@ -1589,7 +1996,19 @@ match = ["walrus operator", "walrus operators"]
 [[entry]]
 term = "weak reference"
 kind = "concept"
-match = ["weak reference", "weak references"]
+match = ["re:(?<=\\*)weak references?(?=\\*)", "re:creates a weak reference of your own"]
+
+[[entry]]
+term = "and slots"
+kind = "concept"
+match = ["re:weak references?[^.\\n]*\\bslots?\\b", "re:\\bslot[^.\\n]*weak references?", "re:supports weak references", "re:(?:or for a|or) weak references?"]
+under = "weak reference"
+
+[[entry]]
+term = "removing registry entries"
+kind = "concept"
+match = ["re:weak reference's callback removes", "re:weak responder holds", "re:holds weak references"]
+under = "weak reference"
 
 [[entry]]
 term = "white-box"
@@ -1604,7 +2023,25 @@ match = ["Abstract Factory"]
 [[entry]]
 term = "Adapter"
 kind = "pattern"
-match = ["Adapter"]
+match = ["re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bAdapter\\b[^\\n.]*$", "re:Adapter(?=\\* takes one type)"]
+
+[[entry]]
+term = "among the wrappers"
+kind = "pattern"
+match = ["re:Adapter(?=\\*, and \\*Façade\\* wrap)", "re:(?<=from \\*)Adapter", "re:(?<=from an \\*)Adapter", "re:Adapter(?=\\* and \\*Façade\\* complete)"]
+under = "Adapter"
+
+[[entry]]
+term = "moving a coupling edge"
+kind = "pattern"
+match = ["re:Adapter(?=\\* moves the heavy edge)"]
+under = "Adapter"
+
+[[entry]]
+term = "from structural typing"
+kind = "pattern"
+match = ["re:(?<=is an \\*)Adapter(?=\\*, the pattern)"]
+under = "Adapter"
 
 [[entry]]
 term = "Blackboard"
@@ -1629,17 +2066,17 @@ match = ["Builder"]
 [[entry]]
 term = "Chain of Responsibility"
 kind = "pattern"
-match = ["Chain of Responsibility"]
+match = ["re:(?m)^(?![-*+] |\\d+[.)] )(?=[^\\n]{0,90}$)[^\\n.]*?\\bChain of Responsibility\\b[^\\n.]*$", "re:Chain of Responsibility(?=\\* (?:defers|keeps its handlers|tries a sequence|as one function-passing|all start at number 5|each decouple))"]
 
 [[entry]]
 term = "Command"
 kind = "pattern"
-match = ["Command"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bCommand\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bCommand\\b"]
 
 [[entry]]
 term = "Composite"
 kind = "pattern"
-match = ["Composite"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bComposite\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bComposite\\b"]
 
 [[entry]]
 term = "Data Transfer Object"
@@ -1649,7 +2086,7 @@ match = ["Data Transfer Object"]
 [[entry]]
 term = "Decorator"
 kind = "pattern"
-match = ["Decorator"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Class-Form )(?<!Class )\\bDecorator\\b(?! for the Default)(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bDecorator\\b", "re:(?<=\\| \\[\\*)Decorator(?=\\*\\s+\\| same)"]
 
 [[entry]]
 term = "Event Bus"
@@ -1669,17 +2106,17 @@ match = ["Factory Method"]
 [[entry]]
 term = "Flyweight"
 kind = "pattern"
-match = ["Flyweight"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bFlyweight\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bFlyweight\\b"]
 
 [[entry]]
 term = "Interpreter"
 kind = "pattern"
-match = ["Interpreter"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Tail-Calling )(?<!\\[\\*Composite\\* and \\*)\\bInterpreter\\b(?! Lock)(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bInterpreter\\b", "re:(?<=\\| \\*Composite\\*, \\*)Interpreter\\b"]
 
 [[entry]]
 term = "Iterator"
 kind = "pattern"
-match = ["Iterator"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bIterator\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bIterator\\b"]
 
 [[entry]]
 term = "Mediator"
@@ -1689,7 +2126,7 @@ match = ["Mediator"]
 [[entry]]
 term = "Memento"
 kind = "pattern"
-match = ["Memento"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bMemento\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bMemento\\b"]
 
 [[entry]]
 term = "Messenger"
@@ -1699,7 +2136,7 @@ match = ["Messenger"]
 [[entry]]
 term = "Multiple Dispatching"
 kind = "pattern"
-match = ["Multiple Dispatching"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bMultiple\\s+Dispatching\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bMultiple\\s+Dispatching\\b"]
 
 [[entry]]
 term = "Multiton"
@@ -1719,7 +2156,31 @@ match = ["Object Pool"]
 [[entry]]
 term = "Observer"
 kind = "pattern"
-match = ["Observer"]
+match = ["re:(?!\\bObserver(?=\\* \"defines a looser))(?!\\bObserver(?=\\* has one, and it points))(?!\\bObserver(?=\\*'s \\[\\*lapsed listener))(?!(?<=\\(\\*)Observer(?=\\* calls the subject a broadcaster))(?!(?<=The subscription half of \\*)Observer\\b)(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bObserver\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bObserver\\b"]
+
+[[entry]]
+term = "its coupling"
+kind = "pattern"
+match = ["re:\\bObserver(?=\\* \"defines a looser)", "re:\\bObserver(?=\\* has one, and it points)"]
+under = "Observer"
+
+[[entry]]
+term = "lapsed listener leak"
+kind = "pattern"
+match = ["re:\\bObserver(?=\\*'s \\[\\*lapsed listener)"]
+under = "Observer"
+
+[[entry]]
+term = "as an event bus"
+kind = "pattern"
+match = ["re:(?<=\\(\\*)Observer(?=\\* calls the subject a broadcaster)"]
+under = "Observer"
+
+[[entry]]
+term = "in a simulation"
+kind = "pattern"
+match = ["re:(?<=The subscription half of \\*)Observer\\b"]
+under = "Observer"
 
 [[entry]]
 term = "Prototype"
@@ -1729,17 +2190,41 @@ match = ["Prototype"]
 [[entry]]
 term = "Proxy"
 kind = "pattern"
-match = ["Proxy"]
+match = ["re:(?!(?<=Virtual )Proxy\\b)(?!(?<=Protection )Proxy\\b)(?!\\bProxy(?=\\* and \\*State\\*))(?!(?<=\\*State\\* appears beside \\*)Proxy\\b)(?!(?<=implementations to \\*)Proxy\\b)(?!(?<=alone is a \\*)Proxy\\b)(?!\\bProxy(?=\\* and \\*Decorator\\* do))(?!(?<=requires a \\*)Proxy\\b)(?!(?<=\\| \\[\\*)Proxy(?=\\*\\s+\\| same))(?!\\bProxy(?=\\* whether or not the interfaces))(?!(?<=separates \\*)Proxy(?=\\* from \\*Adapter))(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bProxy\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bProxy\\b"]
+
+[[entry]]
+term = "virtual"
+kind = "pattern"
+match = ["re:(?<=Virtual )Proxy\\b"]
+under = "Proxy"
+
+[[entry]]
+term = "protection"
+kind = "pattern"
+match = ["re:(?<=Protection )Proxy\\b"]
+under = "Proxy"
+
+[[entry]]
+term = "and State"
+kind = "pattern"
+match = ["re:\\bProxy(?=\\* and \\*State\\*)", "re:(?<=\\*State\\* appears beside \\*)Proxy\\b", "re:(?<=implementations to \\*)Proxy\\b", "re:(?<=alone is a \\*)Proxy\\b"]
+under = "Proxy"
+
+[[entry]]
+term = "and Adapter"
+kind = "pattern"
+match = ["re:\\bProxy(?=\\* and \\*Decorator\\* do)", "re:(?<=requires a \\*)Proxy\\b", "re:(?<=\\| \\[\\*)Proxy(?=\\*\\s+\\| same)", "re:\\bProxy(?=\\* whether or not the interfaces)", "re:(?<=separates \\*)Proxy(?=\\* from \\*Adapter)"]
+under = "Proxy"
 
 [[entry]]
 term = "Singleton"
 kind = "pattern"
-match = ["Singleton"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bSingleton\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bSingleton\\b", "re:(?<=\\*Object Pool\\*, \\*)Singleton\\b"]
 
 [[entry]]
 term = "State"
 kind = "pattern"
-match = ["State"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Mutable )\\bState\\b(?!\\s+(?:Machine|effect))(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bState\\b"]
 
 [[entry]]
 term = "State Machine"
@@ -1749,32 +2234,33 @@ match = ["State Machine"]
 [[entry]]
 term = "Strategy"
 kind = "pattern"
-match = ["Strategy"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)(?<!Choosing a )\\bStrategy\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bStrategy\\b"]
 
 [[entry]]
 term = "Surrogate"
 kind = "pattern"
-match = ["Surrogate"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bSurrogate\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bSurrogate\\b"]
 
 [[entry]]
 term = "Template Method"
 kind = "pattern"
-match = ["Template Method"]
+match = ["re:(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bTemplate\\s+Method\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bTemplate\\s+Method\\b"]
 
 [[entry]]
 term = "Visitor"
 kind = "pattern"
-match = ["Visitor"]
+match = ["re:(?!(?<=The Pythonic )Visitor(?=: singledispatch))(?!(?<=from outside, as \\*)Visitor\\b)(?!(?<=the \\*)Visitor(?=\\* chapter advises))(?!(?<=alternative to the \\*)Visitor\\b)(?<!\\[\\*)(?<!\\*, \\*)(?<!\\*, and \\*)\\bVisitor\\b(?!\\*,\\s+(?:and\\s+)?\\*)", "re:(?<=\\| \\*)\\bVisitor\\b"]
 
-# ------------------------------------------------------------------
-# Python names
-# ------------------------------------------------------------------
+[[entry]]
+term = "with singledispatch"
+kind = "pattern"
+match = ["re:(?<=The Pythonic )Visitor(?=: singledispatch)", "re:(?<=from outside, as \\*)Visitor\\b", "re:(?<=the \\*)Visitor(?=\\* chapter advises)", "re:(?<=alternative to the \\*)Visitor\\b"]
+under = "Visitor"
 
 [[entry]]
 term = "ABC"
 kind = "python"
-match = ["ABC"]
-code = true
+match = ["re:(?<![\\w.@])ABC(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "abc.ABCMeta"
@@ -1785,8 +2271,7 @@ code = true
 [[entry]]
 term = "@abstractmethod"
 kind = "python"
-match = ["abstractmethod"]
-code = true
+match = ["re:(?<![\\w.@])@abstractmethod(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "__abstractmethods__"
@@ -1845,8 +2330,7 @@ code = true
 [[entry]]
 term = "Annotated"
 kind = "python"
-match = ["Annotated"]
-code = true
+match = ["re:(?<![\\w.@])Annotated(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "annotationlib"
@@ -1893,8 +2377,7 @@ code = true
 [[entry]]
 term = "assert_never()"
 kind = "python"
-match = ["assert_never"]
-code = true
+match = ["re:(?<![\\w.])assert_never\\(\\)(?= )"]
 
 [[entry]]
 term = "AssertionError"
@@ -2133,8 +2616,7 @@ code = true
 [[entry]]
 term = "cast()"
 kind = "python"
-match = ["cast"]
-code = true
+match = ["re:(?<![\\w.])(?:typing\\.)?cast\\(\\)(?= )", "re:(?<![\\w.])cast\\(T, x\\)"]
 
 [[entry]]
 term = "__cause__"
@@ -2157,20 +2639,23 @@ code = true
 [[entry]]
 term = "@classmethod"
 kind = "python"
-match = ["classmethod"]
-code = true
+match = ["re:(?<![\\w.@])@classmethod(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "close()"
 kind = "python"
-match = ["close"]
-code = true
+match = ["re:(?<![\\w.])close\\(\\)(?= )(?<!throw\\(\\)\\s{7}close\\(\\))(?<!throw\\(\\)\\s{8}close\\(\\))(?<!throw\\(\\)\\s{9}close\\(\\))"]
+
+[[entry]]
+term = "generator.close()"
+kind = "python"
+match = ["re:throw\\(\\)\\s{7,9}close\\(\\)", "re:(?<![\\w.])g\\.close\\(\\)(?= )"]
+under = "close()"
 
 [[entry]]
 term = "cls.__name__"
 kind = "python"
-match = ["cls.__name__"]
-code = true
+match = ["re:(?<![\\w.@])cls\\.__name__(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "cmp_to_key"
@@ -2247,8 +2732,7 @@ code = true
 [[entry]]
 term = "@contextmanager"
 kind = "python"
-match = ["contextmanager"]
-code = true
+match = ["re:(?<![\\w.@])@contextmanager(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "ContextVar"
@@ -2265,8 +2749,7 @@ code = true
 [[entry]]
 term = "continue"
 kind = "python"
-match = ["continue"]
-code = true
+match = ["re:(?<![\\w.@])continue(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "Coord"
@@ -2277,8 +2760,8 @@ code = true
 [[entry]]
 term = "copy"
 kind = "python"
-match = ["copy"]
-code = true
+match = ["re:(?<![\\w.])copy\\.copy\\b", "re:(?<![\\w.])copy(?= )(?! =)"]
+see_also = ["deepcopy()", "replace()"]
 
 [[entry]]
 term = "Counter"
@@ -2337,8 +2820,7 @@ code = true
 [[entry]]
 term = "datetime"
 kind = "python"
-match = ["datetime"]
-code = true
+match = ["re:(?<![\\w.@])datetime(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "datetime.fromisoformat()"
@@ -2361,14 +2843,12 @@ code = true
 [[entry]]
 term = "default_factory"
 kind = "python"
-match = ["default_factory"]
-code = true
+match = ["re:(?<![\\w.@])default_factory(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "defaultdict"
 kind = "python"
-match = ["defaultdict"]
-code = true
+match = ["re:(?<![\\w.@])defaultdict(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "__defaults__"
@@ -2409,8 +2889,7 @@ code = true
 [[entry]]
 term = "describe()"
 kind = "python"
-match = ["describe"]
-code = true
+match = ["re:(?<![\\w.])describe\\(\\)(?= )"]
 
 [[entry]]
 term = "difflib"
@@ -2427,8 +2906,7 @@ code = true
 [[entry]]
 term = "display_object()"
 kind = "python"
-match = ["display_object"]
-code = true
+match = ["re:(?<![\\w.])display_object\\(\\)(?= )"]
 
 [[entry]]
 term = "__doc__"
@@ -2481,8 +2959,7 @@ code = true
 [[entry]]
 term = "__eq__()"
 kind = "python"
-match = ["__eq__"]
-code = true
+match = ["re:(?<![\\w.])__eq__\\(\\)(?= )"]
 
 [[entry]]
 term = "eval()"
@@ -2493,8 +2970,7 @@ code = true
 [[entry]]
 term = "Exception"
 kind = "python"
-match = ["Exception"]
-code = true
+match = ["re:(?<![\\w.@])Exception(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "ExceptionGroup"
@@ -2571,8 +3047,7 @@ code = true
 [[entry]]
 term = "@final"
 kind = "python"
-match = ["final"]
-code = true
+match = ["re:(?<![\\w.@])@final(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "__final__"
@@ -2589,8 +3064,7 @@ code = true
 [[entry]]
 term = "finally"
 kind = "python"
-match = ["finally"]
-code = true
+match = ["re:(?<![\\w.@])finally(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "fnmatch()"
@@ -2637,14 +3111,12 @@ code = true
 [[entry]]
 term = "FrozenInstanceError"
 kind = "python"
-match = ["FrozenInstanceError"]
-code = true
+match = ["re:(?<![\\w.@])FrozenInstanceError(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "frozenset"
 kind = "python"
-match = ["frozenset"]
-code = true
+match = ["re:(?<![\\w.@])frozenset(?= |\\[[^\\]\\n]*\\] )"]
 
 [[entry]]
 term = "functools._lru_cache_wrapper"
@@ -2661,8 +3133,7 @@ code = true
 [[entry]]
 term = "gather()"
 kind = "python"
-match = ["gather"]
-code = true
+match = ["re:(?<![\\w.])gather\\(\\)(?= )"]
 
 [[entry]]
 term = "gc.collect()"
@@ -2739,8 +3210,7 @@ code = true
 [[entry]]
 term = "getattr()"
 kind = "python"
-match = ["getattr"]
-code = true
+match = ["re:(?<![\\w.])getattr\\(\\)(?= )", "re:(?<=  )getattr\\((?=[^\\n]*  )"]
 
 [[entry]]
 term = "__getattr__()"
@@ -2769,7 +3239,7 @@ code = true
 [[entry]]
 term = "global"
 kind = "python"
-match = ["global"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )global(?!\\w)"]
 code = true
 
 [[entry]]
@@ -2799,7 +3269,7 @@ code = true
 [[entry]]
 term = "hasattr()"
 kind = "python"
-match = ["hasattr"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )hasattr(?!\\w)"]
 code = true
 
 [[entry]]
@@ -2811,8 +3281,14 @@ code = true
 [[entry]]
 term = "__hash__"
 kind = "python"
-match = ["__hash__"]
+match = ["re:(?m)^(?![^\\n]*(?:\\bNone\\b))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )__hash__(?!\\w)"]
 code = true
+
+[[entry]]
+term = "__hash__ = None"
+kind = "python"
+match = ["re:(?m)^(?=[^\\n]*(?:\\bNone\\b))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )__hash__(?!\\w)"]
+under = "__hash__"
 
 [[entry]]
 term = "heapify()"
@@ -2865,13 +3341,25 @@ code = true
 [[entry]]
 term = "__init_subclass__()"
 kind = "python"
-match = ["__init_subclass__"]
+match = ["re:(?m)^(?: *__init_subclass__\\(\\))+ *$"]
 code = true
+
+[[entry]]
+term = "registering subclasses"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:^Self Registration *$|Hazards of Self Registration|^The +Hierarchy *$|Explicit Registration with a)"]
+under = "__init_subclass__()"
+
+[[entry]]
+term = "checking overrides"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:Misspelled Override|Anchors the Algorithm|^The Anchored Algorithm)"]
+under = "__init_subclass__()"
 
 [[entry]]
 term = "inspect"
 kind = "python"
-match = ["inspect"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )inspect(?![\\w.])(?!\\w)"]
 code = true
 
 [[entry]]
@@ -2985,7 +3473,7 @@ code = true
 [[entry]]
 term = "islice()"
 kind = "python"
-match = ["islice"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*islice(?!\\w)"]
 code = true
 
 [[entry]]
@@ -2997,7 +3485,7 @@ code = true
 [[entry]]
 term = "iter()"
 kind = "python"
-match = ["iter"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )iter(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3009,7 +3497,7 @@ code = true
 [[entry]]
 term = "Iterable"
 kind = "python"
-match = ["Iterable"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*Iterable(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3051,7 +3539,7 @@ code = true
 [[entry]]
 term = "Literal"
 kind = "python"
-match = ["Literal"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*Literal(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3081,8 +3569,14 @@ code = true
 [[entry]]
 term = "map()"
 kind = "python"
-match = ["map"]
+match = ["re:(?m)^(?![^\\n]*(?:pool|Executor|Ok\\(|bind))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )map\\(\\)(?!\\w)"]
 code = true
+
+[[entry]]
+term = "pool.map()"
+kind = "python"
+match = ["re:(?m)^(?=[^\\n]*(?:pool|Executor))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:pool\\.)?map(?!\\w)"]
+under = "map()"
 
 [[entry]]
 term = "Mapping"
@@ -3117,7 +3611,7 @@ code = true
 [[entry]]
 term = "max()"
 kind = "python"
-match = ["max"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )max(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3147,7 +3641,7 @@ code = true
 [[entry]]
 term = "min()"
 kind = "python"
-match = ["min"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )min(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3207,8 +3701,14 @@ code = true
 [[entry]]
 term = "NamedTuple"
 kind = "python"
-match = ["NamedTuple"]
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )NamedTuple(?!\\w)", "re:(?m)^(?: *NamedTuple)+ *$", "re:(?m)^(?=[^\\n]*(?:@dataclass|@record|namedtuple))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*NamedTuple(?!\\w)"]
 code = true
+
+[[entry]]
+term = "as a tuple"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:A NamedTuple Is Still a Tuple|^Subclassing +Directly)"]
+under = "NamedTuple"
 
 [[entry]]
 term = "namedtuple"
@@ -3219,20 +3719,50 @@ code = true
 [[entry]]
 term = "NameError"
 kind = "python"
-match = ["NameError"]
+match = ["re:(?m)^(?![^\\n]*(?:annotationlib|get_annotations|ForwardRef))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )NameError(?!\\w)"]
 code = true
+
+[[entry]]
+term = "from an annotation"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:Reading Annotations Before Their Names Exist|Sorting Members into Attributes and Methods|Nothing Keeps the Class Private)"]
+under = "NameError"
 
 [[entry]]
 term = "Never"
 kind = "python"
-match = ["Never"]
+match = ["re:(?m)^(?![^\\n]*(?:supply|catch|Try|Effect|throw|fork|Async|greet))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )Never(?!\\w)"]
 code = true
+
+[[entry]]
+term = "in an Effect's error channel"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:^The Effect Type|Emptying the Channels|Turning an Error Into a Value|Catching the Whole Channel|Failing from Inside an Effect|decides what survives handling)"]
+under = "Never"
 
 [[entry]]
 term = "__new__()"
 kind = "python"
-match = ["__new__"]
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )__new__(?!\\w)", "re:(?m)^(?: *__new__\\(\\))+ *$", "re:(?m)^(?=[^\\n]*(?:(?<![.\\w])__call__\\(\\)))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )__new__\\(\\)(?!\\w)"]
 code = true
+
+[[entry]]
+term = "for a Singleton"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:One Instance in a Class Variable|Singleton by Class Decorator)"]
+under = "__new__()"
+
+[[entry]]
+term = "for interning"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:Interning in the Constructor|^A Known Set: Enum|Choosing a Flyweight and Its Pool)"]
+under = "__new__()"
+
+[[entry]]
+term = "in an immutable subclass"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:^Subclassing +Directly|Cannot Validate Itself)"]
+under = "__new__()"
 
 [[entry]]
 term = "NewType"
@@ -3309,7 +3839,7 @@ code = true
 [[entry]]
 term = "open()"
 kind = "python"
-match = ["open"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )open(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3333,7 +3863,7 @@ code = true
 [[entry]]
 term = "or"
 kind = "python"
-match = ["or"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )or(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3387,7 +3917,7 @@ code = true
 [[entry]]
 term = "partial()"
 kind = "python"
-match = ["partial"]
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )partial(?!\\w)", "re:(?m)^(?![^\\n]*(?:reduce\\(\\)|Placeholder))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:functools\\.)?partial\\(\\)(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3399,13 +3929,13 @@ code = true
 [[entry]]
 term = "Path"
 kind = "python"
-match = ["Path"]
+match = ["re:(?m)^(?![^\\n]*(?:pathlib\\.Path|p = Path))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*Path(?!\\w)"]
 code = true
 
 [[entry]]
 term = "pathlib"
 kind = "python"
-match = ["pathlib"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )pathlib(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3465,7 +3995,7 @@ code = true
 [[entry]]
 term = "pop()"
 kind = "python"
-match = ["pop"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*pop(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3555,7 +4085,7 @@ code = true
 [[entry]]
 term = "random"
 kind = "python"
-match = ["random"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )random(?![\\w.])(?!\\w)", "re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )random\\.seed(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3615,8 +4145,20 @@ code = true
 [[entry]]
 term = "replace()"
 kind = "python"
-match = ["replace"]
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )replace\\(\\)(?!\\w)", "re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )replace\\(\\)(?!\\w)"]
 code = true
+
+[[entry]]
+term = "copy.replace()"
+kind = "python"
+match = ["re:(?m)^(?![^\\n]*(?:__post_init__|tuple\\.__new__|copy\\.copy|_replace\\(\\)))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )copy\\.replace(?!\\w)"]
+under = "replace()"
+
+[[entry]]
+term = "dataclasses.replace()"
+kind = "python"
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )dataclasses\\.replace(?!\\w)"]
+under = "replace()"
 
 [[entry]]
 term = "__replace__()"
@@ -3633,14 +4175,26 @@ code = true
 [[entry]]
 term = "repr()"
 kind = "python"
-match = ["repr"]
+match = ["re:(?m)^(?![^\\n]*(?:!r))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )repr\\(\\)(?!\\w)"]
 code = true
+
+[[entry]]
+term = "!r"
+kind = "python"
+match = ["re:(?m)^(?=[^\\n]*(?:!r))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )repr\\(\\)(?!\\w)"]
+under = "repr()"
 
 [[entry]]
 term = "__repr__()"
 kind = "python"
-match = ["__repr__"]
+match = ["re:(?m)^(?![^\\n]*(?:@dataclass|@record))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )__repr__\\(\\)(?!\\w)"]
 code = true
+
+[[entry]]
+term = "generated by a data class"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:^Data Classes *$|^Slots *$|A Hand-Rolled Messenger)"]
+under = "__repr__()"
 
 [[entry]]
 term = "ResourceWarning"
@@ -3657,7 +4211,7 @@ code = true
 [[entry]]
 term = "reveal_type()"
 kind = "python"
-match = ["reveal_type"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )reveal_type\\(\\)(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3753,7 +4307,7 @@ code = true
 [[entry]]
 term = "Sequence"
 kind = "python"
-match = ["Sequence"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*Sequence(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3771,14 +4325,20 @@ code = true
 [[entry]]
 term = "setattr()"
 kind = "python"
-match = ["setattr"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )setattr(?!\\w)"]
 code = true
 
 [[entry]]
 term = "__setattr__()"
 kind = "python"
-match = ["__setattr__"]
+match = ["re:(?m)^(?![^\\n]*(?:[Ff]rozen))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*__setattr__(?!\\w)"]
 code = true
+
+[[entry]]
+term = "on a frozen data class"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:Normalizing a Frozen Field|Frozen and Plain Data Classes Do Not Mix|A Class That Changes After the Save)"]
+under = "__setattr__()"
 
 [[entry]]
 term = "__setitem__()"
@@ -3813,8 +4373,14 @@ code = true
 [[entry]]
 term = "singledispatch"
 kind = "python"
-match = ["singledispatch"]
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )singledispatch(?!\\w)", "re:(?m)^(?: *singledispatch)+ *$"]
 code = true
+
+[[entry]]
+term = "for Visitor"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:The Pythonic Visitor: singledispatch|^One Dispatch Is Enough)"]
+under = "singledispatch"
 
 [[entry]]
 term = "singledispatchmethod"
@@ -3825,8 +4391,20 @@ code = true
 [[entry]]
 term = "__slots__"
 kind = "python"
-match = ["__slots__"]
+match = ["re:(?m)^(?![^\\n]*(?:cached_property|__weakref__|= \\(\\)))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )__slots__(?!\\w)"]
 code = true
+
+[[entry]]
+term = "__slots__ = ()"
+kind = "python"
+match = ["re:(?m)^(?=[^\\n]*(?:= \\(\\)))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )__slots__(?!\\w)"]
+under = "__slots__"
+
+[[entry]]
+term = "where slots do not fit"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:When Slots Does Not Fit|A Slotted Class Needs)"]
+under = "__slots__"
 
 [[entry]]
 term = "slow"
@@ -3867,13 +4445,19 @@ code = true
 [[entry]]
 term = "StopIteration"
 kind = "python"
-match = ["StopIteration"]
+match = ["re:(?m)^(?![^\\n]*(?:value|return|send|yield from))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )StopIteration(?!\\w)"]
 code = true
+
+[[entry]]
+term = "StopIteration.value"
+kind = "python"
+match = ["re:(?m)^(?=[^\\n]*(?:value|return|send|yield from))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )StopIteration(?!\\w)"]
+under = "StopIteration"
 
 [[entry]]
 term = "__str__()"
 kind = "python"
-match = ["__str__"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*__str__(?!\\w)"]
 code = true
 
 [[entry]]
@@ -3915,8 +4499,14 @@ code = true
 [[entry]]
 term = "SyntaxError"
 kind = "python"
-match = ["SyntaxError"]
+match = ["re:(?m)^(?![^\\n]*(?:case|match|pattern))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )SyntaxError(?!\\w)"]
 code = true
+
+[[entry]]
+term = "in match patterns"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:^Alternatives and Capture|A Bare Name Captures|^Built-in Types and Subclasses|^Guards *$|^Patterns Nest)"]
+under = "SyntaxError"
 
 [[entry]]
 term = "SyntaxWarning"
@@ -3927,7 +4517,7 @@ code = true
 [[entry]]
 term = "sys"
 kind = "python"
-match = ["sys"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )sys(?![\\w.])(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4023,7 +4613,7 @@ code = true
 [[entry]]
 term = "TaskGroup"
 kind = "python"
-match = ["TaskGroup"]
+match = ["re:(?m)^(?![^\\n]*(?:gather))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*TaskGroup(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4053,7 +4643,7 @@ code = true
 [[entry]]
 term = "threading"
 kind = "python"
-match = ["threading"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )threading(?![\\w.])(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4107,19 +4697,25 @@ code = true
 [[entry]]
 term = "ThreadPoolExecutor"
 kind = "python"
-match = ["ThreadPoolExecutor"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*ThreadPoolExecutor(?!\\w)"]
 code = true
 
 [[entry]]
 term = "throw()"
 kind = "python"
-match = ["throw"]
+match = ["re:(?m)^(?![^\\n]*(?:success|Try|reason|need\\(|catch))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )throw(?!\\w)"]
 code = true
+
+[[entry]]
+term = "stateless.throw()"
+kind = "python"
+match = ["re:(?m)^(?=[^\\n]*(?:success|Try|reason|need\\(|catch))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )throw(?!\\w)"]
+under = "throw()"
 
 [[entry]]
 term = "@throws"
 kind = "python"
-match = ["throws"]
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )@throws(?!\\w)", "re:(?m)^(?: *@?throws)+ *$"]
 code = true
 
 [[entry]]
@@ -4131,7 +4727,7 @@ code = true
 [[entry]]
 term = "time.perf_counter()"
 kind = "python"
-match = ["time.perf_counter"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )time\\.perf_counter(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4143,7 +4739,7 @@ code = true
 [[entry]]
 term = "timeit"
 kind = "python"
-match = ["timeit"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )(?:\\w+\\.)*timeit(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4221,7 +4817,7 @@ code = true
 [[entry]]
 term = "types"
 kind = "python"
-match = ["types"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )types(?=\\.)(?!\\w)", "re:(?m)^(?=[^\\n]*(?:MappingProxyType|TracebackType))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )types(?![\\w.])(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4251,8 +4847,14 @@ code = true
 [[entry]]
 term = "Unknown"
 kind = "python"
-match = ["Unknown"]
+match = ["re:(?m)^(?=[^\\n]*(?:\\bty\\b|list\\[|Generator\\[))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )Unknown(?!\\w)"]
 code = true
+
+[[entry]]
+term = "in the effect checker"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:Decide What Untracked Code Performs|^Find a Place to Run|^The Restriction *$|^Effect Names and the Table|^The Check *$|Code You Don't Own|^The Checker Checks Itself|What the Checker Resolves)"]
+under = "Unknown"
 
 [[entry]]
 term = "Unpack"
@@ -4281,7 +4883,7 @@ code = true
 [[entry]]
 term = "vars()"
 kind = "python"
-match = ["vars"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )vars(?!\\((?:cls|base|set_name|x\\)))(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4329,7 +4931,7 @@ code = true
 [[entry]]
 term = "while"
 kind = "python"
-match = ["while"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )while(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4341,25 +4943,31 @@ code = true
 [[entry]]
 term = "wrapper()"
 kind = "python"
-match = ["wrapper"]
+match = ["re:(?m)^(?![^\\n]*(?:Result|Err|Ok|@safe))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )wrapper\\(\\)(?!\\w)"]
 code = true
 
 [[entry]]
 term = "wraps"
 kind = "python"
-match = ["wraps"]
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )wraps(?!\\w)", "re:(?m)^(?: *@?(?:functools\\.)?wraps(?:\\(\\))?)+ *$", "re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )functools\\.wraps(?!\\w)"]
 code = true
 
 [[entry]]
 term = "ZeroDivisionError"
 kind = "python"
-match = ["ZeroDivisionError"]
+match = ["re:(?m)^(?![^\\n]*(?:\\bErr\\b|Result|@safe|slope|steps\\.py))[^\\n]*?(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )ZeroDivisionError(?!\\w)"]
 code = true
+
+[[entry]]
+term = "as a Result"
+kind = "concept"
+match = ["re:(?m)^(?=[^\\n]{0,100}$)[^\\n]*?(?:^Composing by Hand|Turning Exceptions into Results|^Matching on the Error|^Return a Result Type|^Combine the First and Third|^Catch the Exception You Expect)"]
+under = "ZeroDivisionError"
 
 [[entry]]
 term = "zip()"
 kind = "python"
-match = ["zip"]
+match = ["re:(?<=[ \\n] )(?<!\\n    )(?<!\\n        )(?<!\\n            )(?<!\\n                )zip(?!\\w)"]
 code = true
 
 [[entry]]
@@ -4367,3 +4975,302 @@ term = "zip_longest"
 kind = "python"
 match = ["zip_longest"]
 code = true
+
+[[entry]]
+term = "@dataclass"
+kind = "python"
+match = ["re:(?<=\\n)[ ]{0,60}(?<![\\w.@])@dataclass(?= )[ ]{0,60}(?=\\n)", "re:(?<![\\w.@])@dataclass(?:\\([^\\n]{0,40}?\\))?(?=  (?! *#)| \\n)[^\\n]{0,60}?(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n)"]
+see_also = ["data class", "record"]
+code = true
+
+[[entry]]
+term = "@dataclass(frozen=True)"
+kind = "python"
+match = ["re:(?<=[ \\n] )(?:@dataclass\\()?frozen=True\\)?(?=  (?! *#)| \\n)"]
+under = "@dataclass"
+code = true
+
+[[entry]]
+term = "@dataclass(slots=True)"
+kind = "python"
+match = ["re:(?<![\\w.@])slots=True\\)?(?=  (?! *#)| \\n)"]
+under = "@dataclass"
+code = true
+
+[[entry]]
+term = "@dataclass(order=True)"
+kind = "python"
+match = ["re:(?<![\\w.@])order=True\\)?(?=  (?! *#)| \\n)"]
+under = "@dataclass"
+code = true
+
+[[entry]]
+term = "@dataclass(kw_only=True)"
+kind = "python"
+match = ["re:(?<![\\w.@])kw_only(?:=True)?\\)?(?=  (?! *#)| \\n)"]
+under = "@dataclass"
+code = true
+
+[[entry]]
+term = "dataclasses.field()"
+kind = "python"
+match = ["re:(?<![\\w.@])field\\([^\\n]{0,50}?\\)(?=  (?! *#)| \\n)"]
+under = "@dataclass"
+code = true
+
+[[entry]]
+term = "__post_init__()"
+kind = "python"
+match = ["re:(?:(?<=[ \\n] )__post_init__\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n)|(?<![\\w.@])FrozenInstanceError(?=  (?! *#)| \\n)|(?<![\\w.@])check\\(\\)(?=  (?! *#)| \\n)|(?<![\\w.@])super\\(\\)\\.__init__\\(\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n)|(?<![\\w.@])FrozenInstanceError(?=  (?! *#)| \\n)|(?<![\\w.@])check\\(\\)(?=  (?! *#)| \\n)|(?<![\\w.@])super\\(\\)\\.__init__\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<=[ \\n] )__post_init__\\(\\)(?=  (?! *#)| \\n))"]
+under = "@dataclass"
+code = true
+
+[[entry]]
+term = "@dataclass(eq=False)"
+kind = "python"
+match = ["re:(?<![\\w.@])eq=False\\)?(?=  (?! *#)| \\n)"]
+under = "@dataclass"
+code = true
+
+[[entry]]
+term = "@override"
+kind = "python"
+match = ["re:(?<![\\w.@])@override(?=  (?! *#)| \\n)"]
+see_also = ["__override__"]
+code = true
+
+[[entry]]
+term = "and substitutability"
+kind = "concept"
+match = ["re:(?<=\\n)(?-i:The Liskov Substitution Principle)(?=\\n)", "re:(?<=\\n)(?-i:Substitutability)(?=\\n)"]
+under = "@override"
+
+[[entry]]
+term = "catching a misspelled hook"
+kind = "concept"
+match = ["re:(?<=\\n)(?-i:Hooks and the Misspelled Override)(?=\\n)"]
+under = "@override"
+
+[[entry]]
+term = "Final"
+kind = "python"
+match = ["re:(?<=[ \\n] )Final(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )Final\\[T\\](?=  (?! *#)| \\n)", "re:(?<=[ \\n] )typing\\.Final(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )Final\\[tuple\\[int, \\.\\.\\.\\]\\](?=  (?! *#)| \\n)"]
+code = true
+
+[[entry]]
+term = "on a mutable value"
+kind = "python"
+match = ["re:(?<=[ \\n] )\\w+: Final[^\\n]{0,20}? = \\[[^\\n]{0,4}\\](?=  (?! *#)| \\n)"]
+under = "Final"
+code = false
+
+[[entry]]
+term = "beside ClassVar"
+kind = "python"
+match = ["re:(?<=[ \\n] )Final\\[int\\](?=  (?! *#)| \\n)"]
+under = "Final"
+code = false
+
+[[entry]]
+term = "resolved by the effect checker"
+kind = "python"
+match = ["re:(?<=[ \\n] )Final\\[\\.\\.\\.\\](?=  (?! *#)| \\n)"]
+under = "Final"
+code = false
+
+[[entry]]
+term = "Callable"
+kind = "python"
+match = ["re:(?<=[ \\n] )Callable\\[\\[[^\\n]{0,20}?\\], \\w+\\](?=  (?! *#)| \\n)"]
+code = true
+
+[[entry]]
+term = "Callable[P, R]"
+kind = "python"
+match = ["re:(?<![\\w.@])Callable\\[P, [^\\n]{0,60}?\\](?=  (?! *#)| \\n)"]
+under = "Callable"
+code = true
+
+[[entry]]
+term = "in place of an interface"
+kind = "python"
+match = ["re:(?<=[ \\n] )Callable(?=  (?! *#)| \\n)"]
+under = "Callable"
+code = false
+
+[[entry]]
+term = "named by a type alias"
+kind = "python"
+match = ["re:(?<=[ \\n] )type \\w+ = Callable[^\\n]{0,30}?(?=  (?! *#)| \\n)"]
+under = "Callable"
+code = false
+
+[[entry]]
+term = "declares no __name__"
+kind = "python"
+match = ["re:(?:(?<![\\w.@])Callable(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<=[ \\n] )__name__(?=  (?! *#)| \\n))|(?:(?<=[ \\n] )__name__(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])Callable(?=  (?! *#)| \\n))"]
+under = "Callable"
+code = false
+
+[[entry]]
+term = "isinstance()"
+kind = "python"
+match = ["re:(?<=\\n)[ ]{0,60}(?<![\\w.@])isinstance\\(\\)(?= )[ ]{0,60}(?=\\n)", "re:(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<=[ \\n] )TypeIs(?=  (?! *#)| \\n))|(?:(?<=[ \\n] )TypeIs(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))"]
+code = true
+
+[[entry]]
+term = "narrowing with"
+kind = "concept"
+match = ["re:(?<=\\n)(?-i:Narrowing)(?=\\n)"]
+under = "isinstance()"
+
+[[entry]]
+term = "versus type()"
+kind = "python"
+match = ["re:(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])type\\([^\\n]{0,10}?\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])type\\([^\\n]{0,10}?\\)(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))"]
+under = "isinstance()"
+code = false
+
+[[entry]]
+term = "against a Protocol"
+kind = "python"
+match = ["re:(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])@runtime_checkable(?=  (?! *#)| \\n)|(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))|(?:(?<![\\w.@])@runtime_checkable(?=  (?! *#)| \\n)|(?<=[ \\n] )Protocol(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))"]
+under = "isinstance()"
+code = false
+
+[[entry]]
+term = "on a surrogate"
+kind = "python"
+match = ["re:(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<![\\w.@])__getattr__\\(\\)(?=  (?! *#)| \\n)|(?<=[ \\n] )__class__(?=  (?! *#)| \\n))|(?:(?<![\\w.@])__getattr__\\(\\)(?=  (?! *#)| \\n)|(?<=[ \\n] )__class__(?=  (?! *#)| \\n))[^\\n]{0,90}?(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))", "re:(?<=[ \\n] )isinstance\\(p, Service\\)(?=  (?! *#)| \\n)"]
+under = "isinstance()"
+code = false
+
+[[entry]]
+term = "in class patterns"
+kind = "concept"
+match = ["re:(?<=\\n)(?-i:Built-in Types and Subclasses)(?=\\n)", "re:(?<=\\n)(?-i:\\s+with Class Patterns)(?=\\n)"]
+under = "isinstance()"
+
+[[entry]]
+term = "in supply()"
+kind = "python"
+match = ["re:(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])supply\\(\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])supply\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])isinstance\\([^\\n]{0,40}?\\)(?=  (?! *#)| \\n))", "re:(?<=[ \\n] )isinstance\\(instance, ability\\.t\\)(?=  (?! *#)| \\n)"]
+under = "isinstance()"
+code = false
+
+[[entry]]
+term = "super()"
+kind = "python"
+match = ["re:(?<=[ \\n] )super\\(\\)(?=  (?! *#)| \\n)"]
+see_also = ["method resolution order"]
+code = true
+
+[[entry]]
+term = "super().__init__()"
+kind = "python"
+match = ["re:(?<![\\w.@])super\\(\\)\\.__init__\\([^\\n]{0,10}?\\)(?=  (?! *#)| \\n)"]
+under = "super()"
+code = true
+
+[[entry]]
+term = "super().__init_subclass__()"
+kind = "python"
+match = ["re:(?<![\\w.@])super\\(\\)\\.__init_subclass__\\([^\\n]{0,10}?\\)(?=  (?! *#)| \\n)"]
+under = "super()"
+code = true
+
+[[entry]]
+term = "in __new__() or a metaclass"
+kind = "python"
+match = ["re:(?<![\\w.@])super\\(\\)\\.__(?:new|call)__\\([^\\n]{0,10}?\\)(?=  (?! *#)| \\n)"]
+under = "super()"
+code = false
+
+[[entry]]
+term = "__init__()"
+kind = "python"
+match = ["re:(?:(?<=[ \\n] )Simple(?=  (?! *#)| \\n))[^\\n]{0,30}?(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,30}?(?:(?<=[ \\n] )Simple(?=  (?! *#)| \\n))", "re:(?<=\\n)[ ]{0,60}(?<![\\w.@])__init__\\(\\)(?= )[ ]{0,60}(?=\\n)"]
+see_also = ["initializer", "constructor"]
+code = true
+
+[[entry]]
+term = "generated by @dataclass"
+kind = "python"
+match = ["re:(?:(?<![\\w.@])@dataclass(?:\\([^\\n]{0,40}?\\))?(?=  (?! *#)| \\n))[^\\n]{0,30}?(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,30}?(?:(?<![\\w.@])@dataclass(?:\\([^\\n]{0,40}?\\))?(?=  (?! *#)| \\n))"]
+under = "__init__()"
+code = false
+
+[[entry]]
+term = "called through super()"
+kind = "python"
+match = ["re:(?<![\\w.@])super\\(\\)\\.__init__\\([^\\n]{0,10}?\\)(?=  (?! *#)| \\n)"]
+under = "__init__()"
+code = false
+
+[[entry]]
+term = "versus __new__()"
+kind = "python"
+match = ["re:(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,40}?(?:(?<![\\w.@])__new__\\(\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])__new__\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,40}?(?:(?<![\\w.@])__init__\\(\\)(?=  (?! *#)| \\n))"]
+under = "__init__()"
+code = false
+
+[[entry]]
+term = "skipped by copy()"
+kind = "concept"
+match = ["re:(?<=\\n)[ ]*and[ ]+Skip the Constructor(?=\\n)"]
+under = "__init__()"
+
+[[entry]]
+term = "@property"
+kind = "python"
+match = ["re:(?<![\\w.@])@property(?=  (?! *#)| \\n)"]
+see_also = ["setter", "cached_property", "descriptor"]
+code = true
+
+[[entry]]
+term = "with a setter"
+kind = "python"
+match = ["re:(?<![\\w.@])@\\w+\\.setter(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )property\\(fset=\\.\\.\\.\\)(?=  (?! *#)| \\n)"]
+under = "@property"
+code = false
+
+[[entry]]
+term = "property() as a class"
+kind = "python"
+match = ["re:(?<=[ \\n] )property(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )property\\(\\)(?=  (?! *#)| \\n)"]
+under = "@property"
+code = false
+
+[[entry]]
+term = "yield"
+kind = "python"
+match = ["re:(?:(?<=[ \\n] )yield(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<![\\w.@])next\\(\\)(?=  (?! *#)| \\n))|(?:(?<![\\w.@])next\\(\\)(?=  (?! *#)| \\n))[^\\n]{0,120}?(?:(?<=[ \\n] )yield(?=  (?! *#)| \\n))"]
+see_also = ["generator"]
+code = true
+
+[[entry]]
+term = "yield from"
+kind = "python"
+match = ["re:(?<=\\n)[ ]{0,60}(?<![\\w.@])yield from(?= )[ ]{0,60}(?=\\n)", "re:(?<=[ \\n] )yield from(?=  (?! *#)| \\n)(?=[^\\n]{0,80}?(?<=  )yield(?=  ))"]
+under = "yield"
+code = true
+
+[[entry]]
+term = "as an expression (send)"
+kind = "concept"
+match = ["re:(?<=\\n)(?-i:The Send Channel)(?=\\n)", "re:(?<=\\n)(?-i:The Return Channel)(?=\\n)", "re:(?<=\\n)(?-i:All Three Channels)(?=\\n)"]
+under = "yield"
+
+[[entry]]
+term = "in a context manager"
+kind = "python"
+match = ["re:(?:(?<=[ \\n] )yield(?=  (?! *#)| \\n))[^\\n]{0,160}?(?:(?<![\\w.@])@contextmanager(?=  (?! *#)| \\n))|(?:(?<![\\w.@])@contextmanager(?=  (?! *#)| \\n))[^\\n]{0,160}?(?:(?<=[ \\n] )yield(?=  (?! *#)| \\n))"]
+under = "yield"
+code = false
+
+[[entry]]
+term = "in an Effect signature"
+kind = "python"
+match = ["re:(?<=[ \\n] )yield (?:from )?(?:Need|Ask|need)\\([^\\n]{0,20}?\\)(?=  (?! *#)| \\n)", "re:(?<=[ \\n] )invalid-yield(?=  (?! *#)| \\n)"]
+under = "yield"
+code = false
