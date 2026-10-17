@@ -40,6 +40,12 @@ def find(entry: Node, name: str,
 ```
 
 <details>
+<summary>Done when</summary>
+
+over the chapter's `TREE` from `test_filesystem.py`, `find(TREE, "sub")` yields `['top/sub']` and `find(TREE, "b")` yields `['top/sub/b']`.
+A directory named `"src"` holding a file named `"src"` yields both paths, `'src'` and then `'src/src'`.
+
+<details>
 <summary>Solution</summary>
 
 If you copy `walk()` and add a name test to the `File` case alone,
@@ -113,6 +119,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A `Symlink` node
 
@@ -162,6 +169,12 @@ def disk_usage(entry: Node) -> int:
 def walk(entry: Node, prefix: str = "") -> Iterator[str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your file, and deleting the `Symlink` case from either `disk_usage()` or `walk()` brings back a `type-assertion-failure` at that function's `assert_never()`.
+Both functions also return normally on a tree holding `Symlink("up", "/root")`, a link to its own root.
 
 <details>
 <summary>Solution</summary>
@@ -254,6 +267,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. `Neg` and `Div`
 
@@ -343,6 +357,12 @@ def to_infix(e: Expr) -> str:
 def simplify(e: Expr) -> Expr:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes, `evaluate((2 * x + 1) / -x, {"x": 3})` returns `-2.3333333333333335`, `1 / x` builds a `Div` as `x / 2` does, and `simplify(Neg(Neg(x)) + Num(0))` renders as `x`.
+You can say which function reports division by `Num(0)`, and why there.
 
 <details>
 <summary>Solution</summary>
@@ -543,6 +563,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Precedence-aware `to_infix()`
 
@@ -609,6 +630,12 @@ PRECEDENCE: Final[dict[type[Expr], int]] = {
 def to_infix(e: Expr, parent_prec: int = 0) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your `to_infix()` prints `2 * x + 1` and `(x + 1) * (x + 2)` for the exercise's two expressions, and `2 * (x + 1)` keeps its parentheses while `x * x + 1` gets none.
+One redundant pair on a right-hand operand of equal precedence, as in `x + (x + 1)`, is acceptable.
 
 <details>
 <summary>Solution</summary>
@@ -706,6 +733,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. `derivative(e, name)`
 
@@ -776,6 +804,12 @@ def simplify(e: Expr) -> Expr:
 def derivative(e: Expr, name: str) -> Expr:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`to_infix(simplify(derivative(x * x, "x")))` prints `(x + x)`, while the raw result shows both product-rule terms, `(1 * x)` and `(x * 1)`.
+With `simplify()` applied, the derivative of `2 * x + 1` renders as `2`, and the derivative of `x * x` with respect to `"y"` renders as `0`.
 
 <details>
 <summary>Solution</summary>
@@ -921,6 +955,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Declining with `NotImplemented`
 
@@ -984,6 +1019,12 @@ type Expr = Num | Var | Add | Mul
 def wrap(value: Expr | int) -> Expr:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`"a" + x` raises a `TypeError` reading `can only concatenate str (not "Var") to str`, and `x + "a"` raises one reading `unsupported operand type(s) for +: 'Var' and 'str'`.
+`2 * x + 1` still builds an `Add` whose `right` is `Num(value=1)`.
 
 <details>
 <summary>Solution</summary>
@@ -1108,6 +1149,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. A third walker: `to_html()`
 
@@ -1134,6 +1176,12 @@ from string.templatelib import Interpolation, Template
 def to_html(template: Template) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with `comment = "<script>steal()</script> & run"`, `to_html(t"<p>{comment}</p>")` prints `<p>&lt;script&gt;steal()&lt;/script&gt; &amp; run</p>`.
+The author's `<p>` tags come through as typed, and every `<`, `>`, and `&` from the value becomes an entity.
 
 <details>
 <summary>Solution</summary>
@@ -1193,6 +1241,7 @@ renderer can still make.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -1274,6 +1323,12 @@ def evaluate_iterative(e: Expr,
                        env: Mapping[str, int]) -> int:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`evaluate()` on a `+` fold of `Num(0)` through `Num(2000)` raises a `RecursionError`, while your `evaluate_iterative()` returns `2001000` for the same tree and `7` for `2 * x + 1` with `x` at `3`.
+You can name at least two drawbacks of raising the limit instead.
 
 <details>
 <summary>Solution</summary>
@@ -1439,6 +1494,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Reopening the set of node types
 
@@ -1497,6 +1553,12 @@ class Symlink(Entry):
     def disk_usage(self) -> int:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a node type written below your existing classes, with none of them edited, adds its share to `disk_usage()` for a directory that holds it, and `uv run ty check` passes.
+For each of `filesystem.py` and `expr.py`, you can say who owns the list of node types and how that decides your choice.
 
 <details>
 <summary>Solution</summary>
@@ -1590,6 +1652,7 @@ needs a case for it.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
