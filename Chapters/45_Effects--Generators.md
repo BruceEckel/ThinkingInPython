@@ -854,6 +854,49 @@ and the `await` expression evaluates to that result.
 Every request must travel up to that loop,
 so an `await` in a function makes every caller `async` in turn.
 
+A function can contain both `async def` and `yield`.
+The result is an *asynchronous generator*, which talks to two drivers at once.
+Each `await` sends a request up to the event loop,
+while each `yield` hands a value to the `async for` loop that consumes it:
+
+```python
+# async_generator.py
+import asyncio
+from collections.abc import AsyncGenerator
+
+async def countdown(n: int) -> AsyncGenerator[int]:
+    while n > 0:
+        await asyncio.sleep(0)
+        yield n
+        n -= 1
+
+async def main() -> None:
+    async for n in countdown(3):
+        print(f"{n = }")
+    print([n * n async for n in countdown(3)])
+
+asyncio.run(main())
+#: n = 3
+#: n = 2
+#: n = 1
+#: [9, 4, 1]
+```
+
+`asyncio.sleep(0)` stands in for real I/O.
+In `countdown()`, the `await` goes to the event loop.
+The `yield` goes to `main()`.
+On each pass, `async for` awaits the generator's `__anext__()`,
+so the loop must sit inside an `async def`.
+The *asynchronous comprehension* `[n * n async for n in countdown(3)]` collects the values the same way,
+and it also requires an enclosing `async def`.
+
+`AsyncGenerator[YieldType, SendType]` takes two parameters,
+where `Generator` takes three.
+An asynchronous generator has no return channel.
+Writing `return` with a value in one is a `SyntaxError`, as is `yield from`.
+The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
+Each of the three returns an awaitable for the caller to `await`.
+
 Once you see a program that way,
 the question stops being what a function does and becomes what it requests.
 The next chapter writes those requests into a function's return type.
