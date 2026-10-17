@@ -322,7 +322,7 @@ The mousetrap's inputs are `Mouse` members, bare names.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
 Each input becomes an object of its own class.
-The table keys on that class rather than on a value.
+The table looks up a rule by the input's class, not by its value.
 
 This design reuses two names with new meanings.
 `table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
