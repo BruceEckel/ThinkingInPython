@@ -55,6 +55,12 @@ SECOND: Final[timedelta] = timedelta(seconds=1)
 ```
 
 <details>
+<summary>Done when</summary>
+
+your handler, started at `LATE` with a one-second step, makes the chapter's `archive()` return `('log-2026-01-01.txt', '[2026-01-02] ok')` for the entry `"ok"`.
+Under a fresh handler with the same start, your rewritten `archive()` puts `2026-01-01` in both strings, and your explanation counts the clock readings in each version.
+
+<details>
 <summary>Solution</summary>
 
 If you leave out `nonlocal`, `moment += step` makes `moment` a local name of `advancing()`,
@@ -148,6 +154,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A leak the type checker cannot see
 
@@ -191,6 +198,13 @@ def declared_size(name: str) -> int:
 def fixed() -> Success[int | KeyError]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your file, yet `run()` raises a `KeyError` for a missing key despite the `catch(KeyError)` around your function.
+Adding `@throws(KeyError)` makes `run()` return the `KeyError` as a value.
+Your review rule flags the `print()` line in `leaky_effect.py` and accepts a body that holds the `return` alone.
 
 <details>
 <summary>Solution</summary>
@@ -281,6 +295,7 @@ raising it, so the exception reaches `catch()` as a value yielded on the error c
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -418,6 +433,12 @@ Add a source class with the same two methods and place it in the tuple that `con
 For the blackout, trace which frames the handler's `Blackout` unwinds, and whether any `yield` lies between the handler's `raise` and `run()`.
 
 <details>
+<summary>Done when</summary>
+
+`run_load()` is unchanged and your `sun_first` trace shows the turbine's hours between `Solar offline` and `Battery online`.
+With every source shortened, `run()` raises a `Blackout` for the first uncovered hour, with or without `catch(Blackout)` around `run_load()`, and you can say which function raises it and why that function sits outside the Effect.
+
+<details>
 <summary>Solution</summary>
 
 If you wrap `run_load()` in `catch(Blackout)` to turn the blackout into a value,
@@ -499,6 +520,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. A scripted outlet
 
@@ -537,6 +559,13 @@ class Dead:  # Never available, so every draw fails
     def deplete(self) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with two never-available sources scripted ahead of `Solar()`, `run_load(10, 2)` prints an online and offline pair for each failing source, then `Solar online`, `10:00`, `11:00`, and `Solar offline`.
+The run makes three requests for two hours.
+You can name a decision `controller()` makes by the hour that your test leaves unchecked.
 
 <details>
 <summary>Solution</summary>
@@ -607,6 +636,7 @@ which `Source` it returns.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
@@ -795,6 +825,13 @@ def research_and_report(
 ```
 
 <details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your Effect version and on `report()`, which has a branch for `TooLong`.
+Taking `TooLong` back out of `research()`'s error parameter makes `ty` report `invalid-yield` at your new `yield from`.
+`ty` passes on your by-hand version whether or not it handles `TooLong`, and your edit list says which tool named each line.
+
+<details>
 <summary>Solution</summary>
 
 If you write `within_limit()` without `@throws`, an article over the
@@ -924,6 +961,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. A stale wire
 
@@ -951,6 +989,12 @@ from stateless import run, supply
 def outcome(feed: Feed, book: Encyclopedia) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+you wrote your prediction before running, and the run prints `feed: fetching` and then `no headline today`, with no `library:` line.
+Your explanation says what the extra trace line tells you about how far `latest()` got, and why the value `report()` returns matches `DeadWire`'s.
 
 <details>
 <summary>Solution</summary>
@@ -992,6 +1036,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. Retrying the wrong failure
 
@@ -1025,6 +1070,12 @@ def attempt(
     # Named, so ty follows it
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+under `WEATHER` your run prints `feed: fetching` once per attempt and ends in a `RetryError` whose failures all read `NotInteresting: mild and cloudy`.
+Your explanation says why a later attempt cannot give a different answer, and names what the retry would have to know about each failure to try `Unavailable` again and stop on `NotInteresting`.
 
 <details>
 <summary>Solution</summary>
@@ -1100,6 +1151,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. Processes instead of threads
 
@@ -1118,6 +1170,12 @@ a different design, a detail, or an equivalent alternative.
 [Running Effects in Parallel](../../Chapters/47_Effects--Stateless_in_Practice.md#running-effects-in-parallel) forks work onto an `Executor`.
 Swap in a `ProcessPoolExecutor`, and protect the driver with the `__main__` guard because each worker re-imports the module.
 For the `Need`, consider where the forked work runs and whether a handler can answer its requests there.
+
+<details>
+<summary>Done when</summary>
+
+your process-pool version prints `[0, 1, 4, 9, 16]` with `squares()` unchanged character for character, and removing the `__main__` guard makes `run()` fail with a `BrokenProcessPool`.
+Decorating an Effect that still declares a `Need` with `@fork` makes `ty` report `no-matching-overload`.
 
 <details>
 <summary>Solution</summary>
@@ -1218,6 +1276,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 9. A scripted wallet
 
@@ -1234,6 +1293,12 @@ a different design, a detail, or an equivalent alternative.
 [State as an Ability](../../Chapters/47_Effects--Stateless_in_Practice.md#state-as-an-ability) reads and writes the balance through `Get` and `Put` requests.
 Write one handler factory that reads from an iterator of balances and another that appends each `Put` to a list, then `handle()` both around `spree()`.
 Check the list, check that the balance iterator has run out, and compare what the scripted answers share with each other.
+
+<details>
+<summary>Done when</summary>
+
+`uv run pytest` passes on your test, which runs `spree()` on `(60, 50, 30, 20)` from a scripted start of `100`, asserts it returns `2` and records the writes `[40, 10]`, and checks that every scripted balance gets read.
+Dropping the last price from the call makes that last check fail.
 
 <details>
 <summary>Solution</summary>
@@ -1342,6 +1407,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 10. `throw()` and `@throws` side by side
 
@@ -1391,6 +1457,12 @@ def thrown() -> Effect[
 def lifted() -> Effect[Need[Ticker], Unavailable, str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes and both versions return the same results for a non-empty and an empty headline under `catch(Unavailable, Empty)`.
+Changing `throw(Empty())` to `throw(ValueError())` makes `ty` report `invalid-yield` on that line, while the same change to the `raise` passes `ty` and the `ValueError` escapes `run()`.
 
 <details>
 <summary>Solution</summary>
@@ -1481,6 +1553,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 11. A fourth failure, with `catch_all()`
 
@@ -1529,6 +1602,12 @@ def outcome(
       | TooLong):
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+before you widen the annotation, `ty` reports `invalid-return-type` on `outcome()`'s `return` line; after you add `TooLong`, it passes and a too-long article returns a `TooLong`.
+With the return annotation deleted, `ty` passes and `reveal_type(outcome)` shows the return type as `Unknown`.
 
 <details>
 <summary>Solution</summary>
@@ -1610,6 +1689,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 12. A `Random` Ability
 
@@ -1658,6 +1738,13 @@ def scripted_from(
 ) -> Callable[[Random], int]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+one `game()` runs under both handlers, and the scripted run reports your scripted values.
+With the accessor's `low` annotation in place, `ty` reports `roll("a", 6)` as `invalid-argument-type`; with it deleted, `ty` accepts that call.
+With the handler's annotation deleted, `handle()` raises a `ValueError` before any Effect runs.
 
 <details>
 <summary>Solution</summary>
@@ -1756,6 +1843,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## Shared code: the bakery
 
@@ -1837,6 +1925,13 @@ def buttered() -> Depend[
 ]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the `Need[Butter]`-only signature makes `ty` report `invalid-yield` at `yield from toast()`, naming `Need[Dough] | Need[Oven] | Need[Toaster]`.
+With the full union, the run prints the chapter's bread and toast lines and then your butter line.
+Dropping `Toaster(3)` makes `ty` report `invalid-argument-type` at `run()`, naming `Need[Toaster]`.
 
 <details>
 <summary>Solution</summary>
@@ -1923,6 +2018,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 14. A shared signature for a cast
 
@@ -1997,6 +2093,12 @@ type Cast = Callable[[Narrator], None]
 def run_season(casts: list[Cast]) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a caller annotated with your named shape accepts both factories and `ty` passes, and `play(Loud(), Kitty(), Weapon())` still type-checks and prints `and bats at the nasty weapon`.
+Your fourth-actor count puts the most edits in `casts.py`, fewer in `quest.py`, two in `two_games.py`, and none in the named shape.
 
 <details>
 <summary>Solution</summary>
@@ -2113,6 +2215,7 @@ handles worst.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
