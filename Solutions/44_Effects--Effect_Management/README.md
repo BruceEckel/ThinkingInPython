@@ -44,6 +44,13 @@ class Scripted:
 ```
 
 <details>
+<summary>Done when</summary>
+
+`greet(Console(), Console())` prompts `What is your name?
+` and prints `Hello, ` plus the name you type, with `greet()` identical to the one in `ask_tell.py`.
+`uv run ty check` passes, and changing `Console.tell()` to return a `str` makes it report `invalid-argument-type` at the `greet(...)` call.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -113,6 +120,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. Threading a `Log` Effect through by hand
 
@@ -177,6 +185,12 @@ class Capture:
     def log(self, message: str) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`main(Scripted(), ...)` prints your log messages and then `Hello, Alice!`, and `uv run ty check` passes.
+You can sort the five signatures into those that call `log()` and those that only pass `log` along, and say which of your edits an EMS would remove.
 
 <details>
 <summary>Solution</summary>
@@ -287,6 +301,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Classifying three Effects
 
@@ -305,6 +320,12 @@ a different design, a detail, or an equivalent alternative.
 [Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure) covers the exception Effects, and [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) covers the rest.
 For each piece of code, ask whether it writes something outside its result (a side effect), reads something that can change (a side cause), or signals failure with an exception.
 Then match each kind to the conversion or technique that manages it.
+
+<details>
+<summary>Done when</summary>
+
+every Effect in `slope_catch.py`, `withdraw()`, and `Thermometer` carries one of the three labels, `withdraw()` and `Thermometer` each carry two, and every exception points to a conversion from Converting Effectful to Pure.
+Each remaining Effect points to the technique from Effects by Hand.
 
 <details>
 <summary>Solution</summary>
@@ -378,6 +399,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 4. `PositiveInt` in place of both checks
 
@@ -412,6 +434,13 @@ class PositiveInt:
 def slope(rise: int, run: PositiveInt) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`slope(10, PositiveInt(2))` prints `5.0`, and `expect(ValueError, PositiveInt, bad)` prints a `[ValueError]` line for both `0` and `-1`.
+Your `slope()` body is the division alone: no `try`, no call to `validate()`.
+`uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
@@ -480,6 +509,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. What `async` tracks, and what it does not
 
@@ -518,6 +548,13 @@ async def price_of_async(item: str) -> float:
 async def total_price_async(items: list[str]) -> float:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`total_price()` and `asyncio.run()` on its `async` version print the same total, and `uv run ty check` passes.
+Deleting the `await` in front of the helper call makes `ty` report an error.
+You can name the two items of the three-item list in Tracking and Management that `async` lacks.
 
 <details>
 <summary>Solution</summary>
@@ -621,6 +658,7 @@ without the delayed binding that makes that bookkeeping useful.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
