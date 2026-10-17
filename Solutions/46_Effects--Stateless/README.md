@@ -19,6 +19,12 @@ Add `read()` to the protocol, then write `ask_and_greet()` as a generator that g
 In the test, pass `supply()` a scripted object that returns a canned answer, and in the demo, an object wrapping `input()`.
 
 <details>
+<summary>Done when</summary>
+
+`uv run pytest` passes your test, which asserts that a scripted `Console` printed the greeting built from its canned answer, and your demo greets the name it reads.
+`uv run ty check` reports nothing at either `run()` call, and `ask_and_greet()` is the same text in both.
+
+<details>
 <summary>Solution</summary>
 
 If you pass `scripted` to `supply()` without `as_type(Console)`,
@@ -109,6 +115,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 2. An undeclared need, declared
 
@@ -143,6 +150,12 @@ def greet_all(names: list[str]) -> Depend[
 ]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes on your file with the `# type: ignore` gone and only the annotation of `greet_all()` changed, and running it with a `Console` supplied prints `Hello, Alice!` and `Hello, Bob!`.
+A caller that hands `greet_all()` to `run()` with no `Console` supplied draws an `invalid-argument-type`.
 
 <details>
 <summary>Solution</summary>
@@ -221,6 +234,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. Catching an error that is already handled
 
@@ -255,6 +269,11 @@ def all_handled(name: str) -> Success[str]:
 def one_unhandled(name: str) -> Try[ValueError, str]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`ty check` reveals `(name: str) -> Generator[Never, Any, str | ValueError]` for `catch(ValueError)(one_unhandled)`, and your explanation says which channel `catch()` moves the `ValueError` into and what in `all_handled()` leaves its return type a bare `str`.
 
 <details>
 <summary>Solution</summary>
@@ -341,6 +360,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. A `Log` protocol, and a test that records both
 
@@ -353,6 +373,12 @@ a different design, a detail, or an equivalent alternative.
 [Retrofitting an Effect](../../Chapters/46_Effects--Stateless.md#retrofitting-an-effect) builds `Log` as an Ability alongside `Console`, and [Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface) shows how a `Protocol` replaces a concrete class.
 Declare `Log` with a `write()` method, and write a recording class for each protocol.
 Pass both instances to `supply()` in one call, run the Effect, and assert on each recorder's list.
+
+<details>
+<summary>Done when</summary>
+
+`uv run pytest` passes your test, which runs `greet_all()` under one `supply()` call and asserts both the greetings (`Hello, Alice!`, `Hello, Bob!`) and the log entries (`greeted Alice`, `greeted Bob`).
+`uv run ty check` reports nothing on the file, and `Log` is a `Protocol`.
 
 <details>
 <summary>Solution</summary>
@@ -449,6 +475,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. A third material in the table
 
@@ -462,6 +489,12 @@ a different design, a detail, or an equivalent alternative.
 [One Effect, Many Environments](../../Chapters/46_Effects--Stateless.md#one-effect-many-environments) shows `parametrize` running `holds()` against a table of materials and nailers.
 Define a `Metal` value whose strength exceeds the robotic nailer's force, and add one row for each nailer.
 Consider what `holds()` asks for by type, and whether a new instance of that type changes the request.
+
+<details>
+<summary>Done when</summary>
+
+`uv run pytest` collects six `test_holds` cases and all pass, including your `Metal` against `ROBOTIC` with `True` expected, and the body of `test_holds()` is unchanged.
+You can say what in `holds()` makes a new row enough.
 
 <details>
 <summary>Solution</summary>
@@ -541,6 +574,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 6. A handler that builds what the request names
 
@@ -592,6 +626,12 @@ def stamped(
 def default(ability: Need[Console]) -> Console:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your handler, wrapped with `handle()`, makes `greeter.py`'s `greet()` print its greeting, and an Effect that also requests a second Ability runs to completion, with a `print()` in the handler showing it answered both requests.
+`ty` reports an `invalid-argument-type` at that second `run()`, naming the leftover `Need`.
 
 <details>
 <summary>Solution</summary>
@@ -680,6 +720,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. Two ways to drop a `yield from`
 
@@ -699,6 +740,12 @@ a different design, a detail, or an equivalent alternative.
 [Nothing Runs Yet](../../Chapters/46_Effects--Stateless.md#nothing-runs-yet) shows that calling a generator function builds an Effect without running its body, and [Why `yield from`](../../Chapters/46_Effects--Stateless.md#why-yield-from) explains what the keyword does.
 Ask whether a discarded generator breaks any rule `ty` or `ruff` checks.
 For the second case, read both diagnostics and ask what the function has become once it loses its only `yield from`, and whether the next line uses the dropped value.
+
+<details>
+<summary>Done when</summary>
+
+for the first deletion your record shows `ty check` and `ruff check` silent and the script printing `['greeted Alice', 'greeted Bob']` with no greetings, and for the second it shows `invalid-return-type` and `unresolved-attribute`.
+You can say which line makes the second break visible to the type checker.
 
 <details>
 <summary>Solution</summary>
@@ -787,6 +834,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 8. A registry of Effects, and why `retry()` takes a function
 
@@ -830,6 +878,12 @@ NAMES: Final[list[str]] = ["Alice", "Bob"]
 def make(name: str) -> Success[None]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your four passes print `Hello, Alice!` and `Hello, Bob!` three times: the first pass over the stored Effects prints them, the second prints nothing, and both passes over the functions print them.
+You can say why a retry needs something it can call once per attempt.
 
 <details>
 <summary>Solution</summary>
@@ -923,6 +977,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Three reports, one Effect
 
@@ -963,6 +1018,11 @@ def report_all(urls: list[str]) -> Depend[Async, list[str]]:
 async def main() -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes with your annotation on `report_all()`, and inside your `async def` the `run()` call raises a `RuntimeError` (`asyncio.run() cannot be called from a running event loop`) while `await run_async()` returns three reports, one per URL, in order.
 
 <details>
 <summary>Solution</summary>
@@ -1034,6 +1094,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. A second failure in the channel
 
@@ -1085,6 +1146,12 @@ def announce(
 ) -> Effect[Need[Console], KeyError | ValueError, None]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` passes, and three names (one with a positive score, one with a negative score, one missing from `SCORES`) print one line and raise a `ValueError` and a `KeyError` out of `run()`.
+With `ValueError` deleted from `announce()`'s annotation, `ty` reports `invalid-yield` at your helper's `yield from`.
 
 <details>
 <summary>Solution</summary>
@@ -1183,6 +1250,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 11. Making the ambiguity a type error
 
@@ -1239,6 +1307,12 @@ def to_screen(name: str) -> Depend[Need[Screen], None]:
 def to_log(name: str) -> Depend[Need[Recorder], None]:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your six predictions match six runs with the third implementation added.
+With separate `Protocol`s, handing `Terminal` to the recording Effect draws an `invalid-argument-type` that names the missing method, and you can name the case that two `Protocol`s still leave to argument order.
 
 <details>
 <summary>Solution</summary>
@@ -1349,6 +1423,7 @@ names.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
