@@ -159,6 +159,11 @@ which picks the next task that is ready to run.
    Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`.
    Inside an `async def`,
    `await` the coroutine instead of passing it to `asyncio.run()`.
+   `asyncio.Runner` (3.11)
+   serves a program that needs several top-level calls on one event loop.
+   Inside `with asyncio.Runner() as runner:`,
+   each `runner.run()` call runs one coroutine to completion on the same loop,
+   which closes when the block exits.
 
 ```python
 # async_mechanics.py
@@ -639,6 +644,47 @@ do the cleanup, and re-raise it.
 You can also stop a `TaskGroup` deliberately.
 `tg.cancel()` (3.15) cancels every task in the group,
 for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
+
+`TaskGroup` is where most programs meet an exception group,
+but `ExceptionGroup` and `except*` (both added in 3.11) work in any code.
+You build a group from a message and a list of exceptions,
+and raise it like any other exception.
+This listing raises a group of four exceptions into two `except*` clauses:
+
+```python
+# except_star.py
+group = ExceptionGroup("batch", [
+    ValueError(1), TypeError(2),
+    ValueError(3), KeyError(4)])
+try:
+    try:
+        raise group
+    except* ValueError as values:
+        print(f"ValueError: {values.exceptions}")
+    except* TypeError as types:
+        print(f"TypeError: {types.exceptions}")
+except ExceptionGroup as rest:
+    print(f"{rest.message}: {rest.exceptions}")
+#: ValueError: (ValueError(1), ValueError(3))
+#: TypeError: (TypeError(2),)
+#: batch: (KeyError(4),)
+```
+
+Both `except*` clauses run,
+whereas a chain of `except` clauses stops at its first match.
+Each clause runs once,
+with a new group holding every member that matches its type,
+so the `ValueError` clause receives `ValueError(1)` and `ValueError(3)` together.
+The clauses claim members in order.
+If an `except* Exception` comes first, it claims all four,
+and the clauses below it never run.
+The members no clause matches propagate as a new group that keeps the original message,
+so the outer `except ExceptionGroup` catches the `KeyError` alone.
+
+`except*` also wraps a lone exception.
+A bare `ValueError` raised into an `except* ValueError` clause arrives as a group of one,
+so an `except*` handler always reads its exceptions from `.exceptions`,
+whether the `try` block raised a group or a single exception.
 
 ### Failures as Values with `gather()`
 
