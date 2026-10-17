@@ -435,6 +435,15 @@ which computes its values as `*` consumes them.
 yet `f(**d)` prints the values in parameter order,
 because `**` binds each value to the parameter its key names.
 
+A call can use several `*` and `**` operands, mixed with ordinary arguments:
+`f(*[1], *(2, 3))` and `f(1, **{"b": 2}, **{"c": 3})` each print `1 2 3`.
+[Containers](03_Foundations--Containers.md)
+uses the same stars to spread iterables into a list, `[*evens, *odds]`,
+and to merge dictionaries, `{**a, **b}`.
+A call is stricter than a dictionary display about a repeated key.
+`{**a, **b}` keeps the later value,
+while a call whose two `**` operands share a key raises a `TypeError`.
+
 Because collecting and unpacking are inverses,
 a function can collect arguments beyond its named parameters and pass them on as they arrived.
 `trace()` has the standard shape of a wrapper:
@@ -568,6 +577,11 @@ With `def trace(func, /, *args, **kwargs)`,
 and `trace()` passes it on to the wrapped function.
 Without the `/`, the same keyword gives `trace()`'s own `func` a second value,
 so the call raises a `TypeError`.
+
+Among the built-ins, `max()` and `min()` take a keyword-only `default`,
+which they return for an empty iterable in place of raising a `ValueError`.
+With `max(scores, default=0)`, the call covers an empty `scores`,
+so the code needs no `try`/`except` around it.
 
 ## Lambdas
 
