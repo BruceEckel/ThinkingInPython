@@ -172,7 +172,7 @@ class TrapState(State[Mouse], Enum):
 ```
 
 `TrapState` [mixes `State[Mouse]` into `Enum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins).
-Each member's value is a tuple,
+Each member is assigned a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
 so `TrapState.WAITING` is both a `TrapState` member and a `State`,
 with `message` and `next` as attributes.
@@ -501,7 +501,9 @@ class Slot:
 
 `Money` is a record, a value the machine reads and leaves as it is.
 `Row` and `Column` are `Enum`s whose members name the rows and the columns,
-so a selection outside the grid is a type error at the call rather than an index error inside `_slot()`.
+so a selection outside the grid fails where you name it,
+`Row.E` as a type error and `Column(4)` as a `ValueError`,
+rather than as an index error inside `_slot()`.
 `Column(1)` looks up the member whose value is 1.
 `Slot` stays a mutable `@dataclass`,
 because `dispense()` decrements its `quantity` in place.
@@ -788,8 +790,7 @@ In both designs the states are `Enum` members.
 `list(TrapState)` enumerates every state,
 and a parameter typed `TrapState` accepts a member and rejects anything else.
 A member is one object shared by every machine that uses it,
-and in the first design a frozen record besides,
-so a state that keeps data of its own has nowhere to put it.
+so data a state keeps for one machine has nowhere to go.
 Such a state is a class with a `run()` and a `next()` of its own.
 To drive both a class and a record,
 an engine annotates its parameter with a Protocol naming those two methods.
