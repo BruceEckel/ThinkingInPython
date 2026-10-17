@@ -994,6 +994,56 @@ A class of your own can be the mix-in too.
 `Enum` passes the assigned value to its `__init__()`,
 so `Enum` builds each member the way a constructor call builds an ordinary instance.
 
+An `Enum` member is one value from the set.
+A `Flag` value holds any combination of its members,
+the way a file's permissions combine read, write, and execute.
+The `|` operator combines members into one `Flag` value.
+The `in` operator tests whether a member belongs to that value:
+
+```python
+# enum_flags.py
+from enum import Flag, IntFlag, auto
+
+class Perm(Flag):
+    READ = auto()
+    WRITE = auto()
+    EXECUTE = auto()
+
+rw = Perm.READ | Perm.WRITE
+print(repr(rw))
+#: <Perm.READ|WRITE: 3>
+print(Perm.WRITE in rw, Perm.EXECUTE in rw)
+#: True False
+print(list(rw))
+#: [<Perm.READ: 1>, <Perm.WRITE: 2>]
+
+class Mode(IntFlag):
+    R = 4
+    W = 2
+    X = 1
+
+print(repr(Mode(6)), Mode(6) == 6, Mode.W in Mode(6))
+#: <Mode.R|W: 6> True True
+print(repr(Mode(9)))
+#: <Mode.X|8: 9>
+```
+
+`auto()` gives each `Perm` member its own bit, so `READ` is 1, `WRITE` is 2,
+and `EXECUTE` is 4.
+The combination `rw` is a `Perm` with the value 3.
+Its `repr()` joins the member names with `|`.
+Iterating over a combined value yields the members it contains,
+in definition order.
+A `Flag` is still a closed set.
+`Perm(8)` raises a `ValueError`, because no member holds that bit.
+
+`IntFlag` mixes in `int`, the way `IntEnum` does,
+so a member is an `int` and compares equal to its number.
+That suits the bit patterns a library or an operating system returns as integers.
+`Mode(6)` turns the integer into `R|W`.
+`IntFlag` also keeps bits that no member names,
+so `Mode(9)` holds `X` plus a bare 8 where `Perm(8)` raises an exception.
+
 ## When an `Enum` Beats a Data Class
 
 You can build `Month` as a data class instead of an `Enum`.
