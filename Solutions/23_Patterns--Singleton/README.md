@@ -41,6 +41,12 @@ class OnlyOne:
 ```
 
 <details>
+<summary>Done when</summary>
+
+your file prints the same accumulated `val` list and `False True` that the chapter's `singleton_pattern.py` prints, and `uv run ty check` passes on it with the sentinel and the guard gone.
+You can also name what the change gives up and the failure that no longer occurs.
+
+<details>
 <summary>Solution</summary>
 
 If you remove the guard but keep the annotation `ClassVar[__OnlyOne | None]`,
@@ -106,6 +112,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A pool of connections instead of one instance
 
@@ -149,6 +156,12 @@ def pool() -> ConnectionPool:
     "Always returns the same ConnectionPool instance."
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+two calls to your factory return the same pool, and with a pool of two a third request raises an exception while both connections are out.
+Releasing one makes the next request return that same connection, and releasing a connection twice raises an exception rather than adding it back.
 
 <details>
 <summary>Solution</summary>
@@ -239,6 +252,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A class-based singleton rewritten as a module
 
@@ -260,6 +274,12 @@ For the argument, weigh the code each form needs against what only a class can o
 def add(arg: str) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+a second file imports your module, adds `"sausage"` and `"eggs"` through it, and prints `['sausage', 'eggs']`, and your module defines no class.
+You can also name one situation in which the class form is the better choice.
 
 <details>
 <summary>Solution</summary>
@@ -305,6 +325,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Rebinding instead of mutating
 
@@ -319,6 +340,12 @@ a different design, a detail, or an equivalent alternative.
 [A Module Is Already a *Singleton*](../../Chapters/23_Patterns--Singleton.md#a-module-is-already-a-singleton) distinguishes mutating a shared object from rebinding a name.
 `from config import settings` creates a second name for the same dict in your module's namespace.
 Ask which name an assignment changes, and which names a mutation reaches.
+
+<details>
+<summary>Done when</summary>
+
+you write both predictions down first, and the run prints `{'theme': 'dark'}` for `settings` and `{}` for `config.settings`.
+You can say which name the assignment changes, and why the original mutation reached both names.
 
 <details>
 <summary>Solution</summary>
@@ -386,6 +413,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 5. A lock in the wrong place
 
@@ -428,6 +456,12 @@ def settings() -> Settings:
 def primed() -> Settings:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with your lock inside `settings()`, `singleton_cached_race.py` still prints `True` for `distinct_objects(settings) > 1`, and your lock-free version builds one object across eight threads, a count of `1`.
+You can name the step of a cached call that runs before your lock.
 
 <details>
 <summary>Solution</summary>
@@ -526,6 +560,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. Two Borg subclasses share one namespace
 
@@ -568,6 +603,12 @@ class Separate(Borg):
     def __init__(self, arg: str) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+one instance of each subclass shows the second construction's `val` from both, and their `__dict__` attributes are the same object.
+After your change, each subclass's instance shows its own `val`, and the `__dict__` identity test prints `False`.
 
 <details>
 <summary>Solution</summary>
@@ -647,6 +688,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 7. `__init__()` runs on every construction
 
@@ -680,6 +722,12 @@ class SingletonClassVar:
     def __init__(self, arg: str) -> None:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file prints `sausage`, `eggs`, and `spam` from `__init__()`, then `['spam'] True` for `x.val` and `x is y is z`.
+You can say what `__new__()` returns and why that makes Python call `__init__()` on every construction.
 
 <details>
 <summary>Solution</summary>
@@ -739,6 +787,7 @@ After the first construction, `__call__()` returns the stored instance from `_in
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
