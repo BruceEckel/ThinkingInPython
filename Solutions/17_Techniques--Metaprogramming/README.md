@@ -44,6 +44,12 @@ class Gold(Yellow):
 ```
 
 <details>
+<summary>Done when</summary>
+
+your edited `init_subclass.py` prints the sorted registry after `Yellow` and again after `Gold`, and both lists match the predictions you wrote down first.
+The second list reads `['CeruleanBlue', 'Gold', 'Green', 'PhthaloBlue', 'Red']`.
+
+<details>
 <summary>Solution</summary>
 
 ```python
@@ -97,6 +103,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 2. A third `Field` descriptor
 
@@ -133,6 +140,11 @@ class Point:
     y = Field()
     z = Field()
 ```
+
+<details>
+<summary>Done when</summary>
+
+after `p.z = 9`, printing `p.__dict__` shows `'_z': 9` beside the `_x` and `_y` entries, and the `Field` class reads the same as in `set_name.py`.
 
 <details>
 <summary>Solution</summary>
@@ -183,6 +195,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 3. A third independent singleton class
 
@@ -218,6 +231,11 @@ class BSingleton(metaclass=Singleton):
 class CSingleton(metaclass=Singleton):
     pass
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `singleton.py` prints `True` for `c1 is c2` and `False` for `c1 is a`, and its trace shows `building CSingleton` once, followed by `reusing CSingleton` on the second call.
 
 <details>
 <summary>Solution</summary>
@@ -284,6 +302,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 4. Declaring finality with a keyword in the class header
 
@@ -323,6 +342,11 @@ class Open(A):  # A sibling that says nothing
 class Sub(Open):
     pass
 ```
+
+<details>
+<summary>Done when</summary>
+
+`class B(A, final=True):` builds, a subclass of `B` fails with `[TypeError] B is final; you cannot subclass it`, and a sibling of `B` written with no keyword in its header accepts a subclass of its own, for which `issubclass()` against `A` prints `True`.
 
 <details>
 <summary>Solution</summary>
@@ -406,6 +430,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 5. A small `inspect`-based `describe()` helper
 
@@ -437,6 +462,11 @@ def greet(name: str, loud: bool = False) -> str:
 def describe(func: FunctionType) -> None:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+`describe(greet)` prints `greet (name: str, loud: bool = False) -> str` and then `Return a greeting.`, and `describe(lambda x: x * 2)` prints `<lambda> (x)` and then `(no docstring)` in place of `None`.
 
 <details>
 <summary>Solution</summary>
@@ -481,6 +511,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 6. The static diagnostic beside the runtime `TypeError`
 
@@ -494,6 +525,11 @@ a different design, a detail, or an equivalent alternative.
 [Multiple Inheritance and Metaclasses](../../Chapters/17_Techniques--Metaprogramming.md#multiple-inheritance-and-metaclasses) introduces the instance layout conflict in `metaclass_layout_conflict.py`.
 Remove the `# type: ignore` comment and run `uv run ty check` on the file.
 Read both the summary line and the `info` block of the diagnostic, and compare them with the message the `TypeError` carries.
+
+<details>
+<summary>Done when</summary>
+
+`uv run ty check` on your edited `metaclass_layout_conflict.py` reports `instance-layout-conflict` with bases `type` and `dict`, and you can name two facts the diagnostic states that the runtime `[TypeError] multiple bases have instance lay-out conflict` leaves out.
 
 <details>
 <summary>Solution</summary>
@@ -558,6 +594,7 @@ a different design, a detail, or an equivalent alternative.
 
 </details>
 </details>
+</details>
 
 ## 7. Building a `float` subclass with `type()`
 
@@ -583,6 +620,11 @@ from typing import Any
 def describe(self: Any) -> str:
     ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+your file contains no `class` statement, `Celsius(21.5).describe()` returns `21.5 degrees C`, and `type(Celsius) is type` prints `True`.
 
 <details>
 <summary>Solution</summary>
@@ -640,6 +682,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 8. Moving `bases += (Tag,)` into `__init__()`
 
@@ -673,6 +716,11 @@ class Meta(type):
 class Demo(metaclass=Meta):
     pass
 ```
+
+<details>
+<summary>Done when</summary>
+
+your edited `new_vs_init.py` runs with no exception and prints `has Tag base: False`, the outcome matches the prediction you wrote first, and you can say what already exists when the metaclass `__init__()` starts.
 
 <details>
 <summary>Solution</summary>
@@ -726,6 +774,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 9. Removing the `KNOWN_COMMANDS` check
 
@@ -768,6 +817,12 @@ class Command:
         # The KNOWN_COMMANDS check has been removed:
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+with the check removed, your payload makes `commander.py` print the injected statement's output, with no `SyntaxError`, before the final lookup fails with a `KeyError`.
+With the check restored, the same payload raises a `ValueError` starting `Unknown command:` and the injected output disappears.
 
 <details>
 <summary>Solution</summary>
@@ -855,6 +910,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+</details>
 
 ## 10. Keeping the first definition instead of raising an exception
 
@@ -894,6 +950,11 @@ class Handlers(metaclass=First):
     def on_open(self) -> None:  # noqa: F811
         ...
 ```
+
+<details>
+<summary>Done when</summary>
+
+the `Handlers` class statement completes with no exception, `Handlers().on_open()` prints the first body's message, and you can name the class-creation step that runs before the class body and say why no class decorator can stand in for it.
 
 <details>
 <summary>Solution</summary>
@@ -952,6 +1013,7 @@ That is why the chapter says `__prepare__()` has no simpler substitute.
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
+</details>
 </details>
 </details>
 </details>
