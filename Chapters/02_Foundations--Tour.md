@@ -549,6 +549,10 @@ print(f"|{name:>10}|{score:<8.1f}|")
 
 The format spec after a colon controls width, precision, and alignment.
 `>` right-aligns and `<` left-aligns within the given width.
+A comma or an underscore in the spec groups the digits by thousands,
+so `f"{1234567:,}"` produces `1,234,567`.
+Since Python 3.14, a separator after the precision groups the fractional digits as well,
+so `f"{3.14159265:.6_f}"` produces `3.141_593`.
 A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
 An `=` after the expression, as in `{name = }`, is the *debug specifier*.
@@ -557,6 +561,11 @@ and then the value.
 By default the value appears as its `repr()`,
 so the output shows `'Alice'` in quotes.
 Use `=` to label values in your own exploring and debugging code.
+
+Since Python 3.12 ([PEP 701](https://peps.python.org/pep-0701/)),
+the expression inside the braces can reuse the string's own quote character,
+as in `f"{d["key"]}"`, hold a backslash, and span several lines.
+Older code avoids all three because earlier versions rejected them.
 
 Existing code also uses two older styles: the `%` operator,
 as in `"val: %d" % val`, and the `str.format()` method,
