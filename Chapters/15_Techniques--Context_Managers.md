@@ -743,7 +743,8 @@ which works on every version.
 ## Combining Context Managers
 
 A single `with` can include several managers, separated by commas.
-They enter left to right and exit in reverse:
+Python 3.1 added that form as shorthand for one `with` nested inside another.
+The managers enter left to right and exit in reverse:
 
 ```python
 # multiple.py
@@ -774,6 +775,9 @@ and the behavior stays the same:
     with (tag("ul") as outer,
           tag("li") as inner):
         ...
+
+Python 3.10 added the parenthesized form.
+Before it, a `with` too long for one line continued with a backslash.
 
 When the number of managers depends on data available at runtime,
 `contextlib.ExitStack` holds a dynamic set of managers and unwinds them in reverse when the block ends:
@@ -863,6 +867,7 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
   without `expected`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers.
+- `chdir(path)` changes the current working directory on entry and changes back to the previous one on exit.
 - `ExitStack` manages a [dynamic or conditional set of managers](#combining-context-managers).
 - `ContextDecorator` lets a context manager also work as a decorator,
   as `banner` shows.
@@ -919,6 +924,22 @@ Exiting a `nullcontext` does nothing,
 so the same `with` block closes the file in the `Path` branch and leaves `sys.stdout` and the caller's stream open,
 as the caller expects.
 
+`chdir()` makes a useful contrast with the hand-written managers earlier in the chapter.
+It is a class manager like `Trace`,
+a few lines long in the standard library's source.
+Its `__enter__()` appends `os.getcwd()` to a list and calls `os.chdir()`.
+Its `__exit__()` pops the saved directory off the list and changes back to it.
+
+The list makes one `chdir` instance reentrant.
+A `with` nested inside another `with` on the same instance saves a second directory.
+Each exit restores the directory that its own entry saved.
+A `@contextmanager` version would keep the saved directory in a local variable and restore it in a `finally`.
+Like every generator manager, it would be single-use.
+
+The working directory belongs to the whole process,
+so a `chdir()` block in one thread moves the relative paths of every thread.
+The class's docstring calls it a "Non thread-safe context manager" for that reason.
+
 ## The Async Protocol
 
 `with` calls `__enter__()` and `__exit__()`.
@@ -963,6 +984,11 @@ The Concurrency chapter uses `async with` throughout, for `asyncio.TaskGroup`,
 locks, and semaphores.
 Each of those is an object with the two `a`-prefixed methods.
 `AsyncExitStack` is the `ExitStack` equivalent for holding several async managers.
+`aclosing(obj)` awaits `obj.aclose()` on exit,
+the async counterpart of `closing()`.
+Every manager `@asynccontextmanager` builds inherits from `AsyncContextDecorator`,
+so it also decorates a coroutine function,
+the way `banner` decorates `quarterly()`.
 
 ## An Object Pool
 
