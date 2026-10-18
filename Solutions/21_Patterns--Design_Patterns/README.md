@@ -468,15 +468,6 @@ both files pass `uv run ty check`, asking each `main` for the Markdown writer pr
 <details>
 <summary>Solution</summary>
 
-If you add `MdWriter` to the `AnyWriter` alias and to `main()` but
-leave `Report.render()` as it was, `main("md")` prints `None`. The
-writer falls through every `case`, and `render()` reaches its end, where
-Python returns `None` implicitly. `ty` reports that path as
-`invalid-return-type`, since `render()` declares that it returns `str`.
-The first version below edits all three: the alias, `main()`, and
-`render()`. In the second version, `Report.render()` calls `write()` on
-every writer, so `Report` stays the same when you add a writer.
-
 The first version gives each writer its own method name, which is the
 usual reason a class like `Report` ends up naming every writer. The
 class must know which method to call on which writer.
@@ -538,6 +529,12 @@ those edits belong to `Report`. `render()` is its method, and the alias
 lists the writers `Report` accepts. The change therefore reaches two
 parts, `Report` and `main`, as the left half of the chapter's figure
 shows.
+
+If you add `MdWriter` to the `AnyWriter` alias and to `main()` but
+leave `Report.render()` as it was, `main("md")` prints `None`. The
+writer falls through every `case`, and `render()` reaches its end, where
+Python returns `None` implicitly. `ty` reports that path as
+`invalid-return-type`, since `render()` declares that it returns `str`.
 
 The second version gives every writer the same method and lets
 `Report` name that method through a protocol:
