@@ -199,16 +199,6 @@ either on `Item` as abstract methods or in a `Protocol`.
 Declaring the four methods restores the checking,
 but the declaration repeats every class's method names.
 
-The table version keeps the checking and repeats no method names.
-Its `Item` declares the one method the dispatch needs,
-so `compete()` takes its opponent as an `Item`:
-`compete(self, opponent: Item) -> Outcome`.
-Its answers are rows in one dictionary,
-so a new class inherits `compete()` and needs rows instead of methods.
-The type checker accepts a table that lacks a row, though,
-the way it accepts a class that lacks a method.
-A table that holds eight of the nine answers fails at the first duel that needs the ninth.
-
 ## One Lookup in a Table
 
 In `paper_scissors_rock.py`,
@@ -249,6 +239,16 @@ OUTCOME: Final[Table] = {
     (Rock, Rock): Outcome.DRAW,
 }
 ```
+
+The table version keeps the checking and repeats no method names.
+Its `Item` declares the one method the dispatch needs,
+so `compete()` takes its opponent as an `Item`:
+`compete(self, opponent: Item) -> Outcome`.
+Its answers are rows in one dictionary,
+so a new class inherits `compete()` and needs rows instead of methods.
+The type checker accepts a table that lacks a row, though,
+the way it accepts a class that lacks a method.
+A table that holds eight of the nine answers fails at the first duel that needs the ninth.
 
 A tuple works as a dictionary key, the same as a single object,
 so each key in `OUTCOME` is a pair of classes.
