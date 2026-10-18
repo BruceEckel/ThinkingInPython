@@ -244,7 +244,7 @@ def quoted(template: Template) -> str:
 <details>
 <summary>Done when</summary>
 
-`print(quoted(message))` prints `'Alice' scored '92'%`, and you can say what an f-string's finished `str` no longer records that `quoted()` relies on.
+`print(quoted(message))` prints `'Alice' scored '92'%`, and you can name the information `quoted()` needs that an f-string's finished `str` no longer records.
 
 <details>
 <summary>Solution</summary>

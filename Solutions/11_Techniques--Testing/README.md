@@ -293,7 +293,7 @@ def settings_path_in(directory: Path) -> Path:
 <summary>Done when</summary>
 
 both tests pass, and renaming `APP_CONFIG` inside `settings_path()` fails one of them with a `KeyError` that names the new variable while the other still passes.
-You can say which fact about the implementation the failing test depends on.
+You can name the fact about the implementation on which the failing test depends.
 
 <details>
 <summary>Solution</summary>
