@@ -407,12 +407,6 @@ Binding an implementation and satisfying the type checker are the same act.
 
 A handler answers the Abilities `supply()` gave it and re-yields the rest to the next handler out.
 A second `supply()` wrapped around the first answers what the inner one re-yielded.
-`greet_all()` in [Retrofitting an Effect](#retrofitting-an-effect)
-declares two Abilities.
-`supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
-and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
-You can bind some Abilities near the Effect and the others at the edge.
-The type records which Abilities each layer leaves open.
 
 A dependency injection container often lets you register a fallback for a type nobody else provides.
 Stateless has no such registration, and `need()` takes no default argument.
@@ -784,6 +778,12 @@ Multiple Abilities combine with `|` because the union describes one request at a
 Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`.
 Over the whole run, `greet_all()` makes both kinds of request,
 so `supply()` must provide a `Console` and a `Log`.
+
+`supply()` can also provide them one layer at a time.
+`supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
+and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
+You can bind some Abilities near the Effect and the others at the edge.
+The type records which Abilities each layer leaves open.
 
 The repeated union is the shape a `type` alias normally shortens.
 Elsewhere the book writes one.
@@ -1594,8 +1594,6 @@ The `KeyError` stays in the channel,
 so the signature keeps declaring a failure that can no longer escape.
 `catch()` alone moves an error in the type.
 A `catch()` further out changes the outcome again.
-It matches the yielded value before the driver sees it and returns that value as the result,
-so the inner `except` never runs.
 One listing shows an `except`, a `catch()`,
 and a `catch()` wrapped around an `except`:
 
@@ -1634,7 +1632,8 @@ if __name__ == "__main__":
 `guarded()` must keep declaring a `KeyError` it can no longer emit,
 while `moved()` is a `Success`.
 Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
-because `catch()` matches the yielded value before the driver gets it and never resumes the inner generator.
+because `catch()` matches the yielded value before the driver gets it,
+returns that value as the result, and never resumes the inner generator.
 
 `supply()` returns a [`Handler`](#supplying-the-dependency),
 and that `Handler` breaks the condition that no handler sits between `run()` and the Effect.
@@ -1657,12 +1656,6 @@ expect(KeyError, run, supply(Console())(guarded)("Carol"))
 This `guarded()` is the one that returned `Carol: unknown` in `except_vs_catch.py`.
 It requests no `Console`, so the `supply(Console())` around it answers nothing.
 Wrapping `guarded()` in that `supply()` is enough to keep the `KeyError` out of its `except` clause.
-
-`catch_score.py` in [Turning an Error Into a Value](#turning-an-error-into-a-value)
-has the same shape.
-`supply()` wraps a function `run()` drives.
-The `catch()` there still works,
-because it matches the yielded value rather than relying on the driver to throw it back in.
 
 ## Turning an Error Into a Value
 
@@ -1721,6 +1714,11 @@ as its `Callable[[str], Success[None]]` annotation states.
 Given a `str`, `reporter` produces an Effect that needs nothing and cannot fail.
 `run()` drives that Effect,
 so `reporter("Alice")` comes first and `run()` second.
+
+`catch_score.py` has the same shape as `handler_blocks_except.py`.
+`supply()` wraps a function `run()` drives.
+The `catch()` here still works,
+because it matches the yielded value rather than relying on the driver to throw it back in.
 
 Moving the error into the result forces every caller to match on it.
 If you drop the `match` and use `value` as a number,
