@@ -305,7 +305,9 @@ a different design, a detail, or an equivalent alternative.
 
 ## 3. A third delegation in `yield_from_send.py`
 
-> Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
+> Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()`,
+> extending the loop to `[1, 2, 3, 4, 5]`,
+> and changing the final `g.send(4)` after the loop to `g.send(6)`.
 > Write down the sequence of printed lines before running it.
 
 <details>

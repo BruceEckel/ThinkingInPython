@@ -916,7 +916,9 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     Give your driver fewer answers than questions and say what it returns.
     `StopIteration` now means two different things in the same loop.
     Keep them apart.
-3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
+3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()`,
+    extending the loop to `[1, 2, 3, 4, 5]`,
+    and changing the final `g.send(4)` after the loop to `g.send(6)`.
     Write down the sequence of printed lines before running it.
 4.  Remove `yield from` in `yield_from_nested.py`,
     leaving `profile: Result = interview()`.
