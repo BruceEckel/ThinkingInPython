@@ -1807,6 +1807,55 @@ The interpreters share the process's memory,
 but each keeps its own isolated objects.
 Arguments and results cross that boundary by copying.
 
+The pool builds on the `concurrent.interpreters` module
+([PEP 734](https://peps.python.org/pep-0734/), added in 3.14),
+which gives you one interpreter at a time.
+`create()` starts an interpreter, `call()` and `exec()` run code in it,
+and `close()` shuts it down:
+
+```python
+# one_interpreter.py
+from concurrent import interpreters
+
+def grow(orders: list[int]) -> list[int]:
+    orders.append(4)
+    return orders
+
+orders = [1, 2, 3]
+interp = interpreters.create()
+print(interp.call(grow, orders), orders)
+#: [1, 2, 3, 4] [1, 2, 3]
+queue = interpreters.create_queue()
+interp.prepare_main(queue=queue)
+interp.exec("queue.put(sum(range(10)))")
+print(queue.get())
+#: 45
+interp.exec("queue.put('orders' in globals())")
+print(queue.get())
+#: False
+interp.close()
+```
+
+`call()` copies `orders` into the new interpreter.
+`grow()` appends to that copy, so the original list keeps its three items.
+`exec()` runs a string of source code in the interpreter's own fresh `__main__` module.
+`prepare_main()` puts `queue` into that module.
+`orders` stays behind in the main interpreter.
+The `Queue` from `create_queue()` carries values from one interpreter to another.
+
+Each interpreter is as isolated as a process pool's worker.
+It imports its own copy of every module and shares no objects with the other interpreters,
+so data crosses by copying or through a `Queue`.
+All the interpreters live in one operating-system process, though,
+so starting an interpreter takes a fraction of the time that starting a process takes.
+
+Most code uses `InterpreterPoolExecutor` instead of the module.
+`call()` blocks the calling thread until the result comes back,
+so running several interpreters in parallel needs a thread for each one.
+The pool gives each of its worker threads an interpreter,
+reuses those interpreters across calls, hands back a `Future` for each call,
+and closes every interpreter when the pool shuts down.
+
 Because a subinterpreter needs no separate build and no separate install,
 it is the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
