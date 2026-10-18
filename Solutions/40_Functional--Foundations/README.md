@@ -339,14 +339,7 @@ You can say why passing `high` by position defeats the goal.
 <details>
 <summary>Solution</summary>
 
-If you build `at_least_ten` as
-`partial(clamp, 10, Placeholder, Placeholder)`, the `partial()` call
-raises a `TypeError` before you call the result: "trailing
-Placeholders are not allowed." A placeholder at the end marks a
-position the call's arguments would fill on their own, because
-`partial()` appends them after the bound ones. The library rejects
-that placeholder as redundant, as the chapter says. The solution
-passes `10` alone.
+The solution presets `low` with one positional argument:
 
 ```python
 # exercise_5.py
@@ -368,6 +361,14 @@ expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
 `Placeholder`. `low` is the first parameter, and `partial()` fills
 positional arguments from the left, so `value` and `high` stay open in
 order.
+
+If you build `at_least_ten` as
+`partial(clamp, 10, Placeholder, Placeholder)`, the `partial()` call
+raises a `TypeError` before you call the result: "trailing
+Placeholders are not allowed." A placeholder at the end marks a
+position the call's arguments would fill on their own, because
+`partial()` appends them after the bound ones. The library rejects
+that placeholder as redundant, as the chapter says.
 
 **Show where the keyword fails.** Presetting `high` alone needs a
 `Placeholder`. `partial()` stores its arguments, and the signature
