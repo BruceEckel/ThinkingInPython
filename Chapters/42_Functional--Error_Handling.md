@@ -457,9 +457,7 @@ or annotate the chain with the union each step can produce.
 Because failures are values,
 the tests assert on them with ordinary comparisons in place of `pytest.raises()`.
 The tests check that `unwrap()` returns the answer,
-and that `bind()` chains a success and short-circuits a failure.
-The last assertion uses `is`,
-proving `bind()` returns the original `Err` object rather than an equal copy:
+and that `bind()` chains a success and short-circuits a failure:
 
 ```python
 # test_result.py
@@ -475,6 +473,9 @@ def test_bind_short_circuits_a_failure() -> None:
     failure: Err[str] = Err("boom")
     assert failure.bind(lambda x: Ok(x + 1)) is failure
 ```
+
+The assertion in `test_bind_short_circuits_a_failure()` uses `is`,
+proving `bind()` returns the original `Err` object rather than an equal copy.
 
 `test_composing.py` confirms that the hand-written and `bind()` versions agree on the five inputs the demos use:
 
