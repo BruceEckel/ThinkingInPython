@@ -873,6 +873,10 @@ Order matters and elements repeat, so it yields all four pairs.
 `math.perm(n, r)` and `math.comb(n, r)` compute how many tuples `permutations()` and `combinations()` yield from `n` elements,
 so you can size a draw before you run it.
 `math.comb(20, 3)` is `1140`, the number of three-element draws from twenty.
+Python 3.15 also groups both under `math.integer`,
+a namespace that holds the integer-only functions: `gcd()`, `lcm()`, `isqrt()`,
+`factorial()`, `perm()`, and `comb()`.
+`math.integer.comb is math.comb` is `True`, so either name works.
 
 ### Composing the Pieces
 
