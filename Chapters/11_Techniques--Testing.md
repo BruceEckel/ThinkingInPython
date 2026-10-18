@@ -643,16 +643,7 @@ so a test that changes the file afterward needs a fresh `Path`.
 
 The `app_data()` fixture points `APP_DATA` at a throwaway directory before each test,
 so each test works in its own empty directory,
-apart from real data and from every other test.
-A fixture requests other fixtures the way a test does,
-by naming them as parameters.
-`app_data()` names the built-in `tmp_path` and `monkeypatch`.
-
-The value of `app_data()` is a side effect,
-so `@pytest.fixture(autouse=True)` applies the fixture to both tests in `test_storage.py`,
-whose parameter lists stay empty.
-`test_round_trip()` loads back what it saved,
-and `test_missing_file_raises()` confirms that loading an absent file raises a `FileNotFoundError`:
+apart from real data and from every other test:
 
 ```python
 # test_storage.py
@@ -674,6 +665,16 @@ def test_missing_file_raises() -> None:
     with pytest.raises(FileNotFoundError):
         storage.load("absent.txt")
 ```
+
+A fixture requests other fixtures the way a test does,
+by naming them as parameters.
+`app_data()` names the built-in `tmp_path` and `monkeypatch`.
+
+The value of `app_data()` is a side effect,
+so `@pytest.fixture(autouse=True)` applies the fixture to both tests in `test_storage.py`,
+whose parameter lists stay empty.
+`test_round_trip()` loads back what it saved,
+and `test_missing_file_raises()` confirms that loading an absent file raises a `FileNotFoundError`.
 
 `data_dir()` reads `APP_DATA` on every call,
 so the fixture's `monkeypatch.setenv()` can change the directory `data_dir()` returns.
