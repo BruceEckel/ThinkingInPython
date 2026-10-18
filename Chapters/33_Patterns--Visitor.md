@@ -24,12 +24,6 @@ The `accept()` requirement limits where *Visitor* applies.
 The hierarchy's author must write `accept()` in advance,
 because you cannot add it to a vendor's classes yourself.
 
-A new `Visitor` subclass such as `Fly` reuses an existing operation,
-so it leaves the primary hierarchy as it is.
-In this Python form of the pattern,
-a new operation whose behavior varies by flower type also needs a new method on `Flower`.
-[Two Departures from the Classic Shape](#two-departures-from-the-classic-shape)
-explains why.
 Here, bugs visit flowers:
 
 ```python
@@ -82,6 +76,13 @@ class Fly(Pollinator):
 class Worm(Predator):
     pass
 ```
+
+A new `Visitor` subclass such as `Fly` reuses an existing operation,
+so it leaves the primary hierarchy as it is.
+In this Python form of the pattern,
+a new operation whose behavior varies by flower type also needs a new method on `Flower`.
+[Two Departures from the Classic Shape](#two-departures-from-the-classic-shape)
+explains why.
 
 `bug_visits.py` sends each bug to each flower:
 
