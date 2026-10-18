@@ -398,28 +398,15 @@ so `Any` is the one type argument that admits every entry.
 The engine calls each condition and action with whatever input arrived.
 The checker matched each input class to its methods where the rule was built.
 
-The listing writes `StateMachine` by hand rather than as a `@dataclass`.
-A generated `__init__()` names each parameter after its field and stores it unchanged.
-This constructor takes `rules` and stores `table`,
-and its parameter is `initial` while the attribute `handle()` updates is `state`.
-
-This `StateMachine` is a different class from the one in `state_machine.py`.
-Its file is named `table_machine.py` on purpose.
-Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md),
-so a program that imports two files named `state_machine.py` gets the first one both times,
-with no error.
-
 Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
-The engine tries them in the order the list gives them,
+The engine tries them in order,
 so a single input can lead to different states depending on a condition.
 A rule whose condition is `None` matches every time,
-so it belongs last in its group, as the `else` for the rules above it.
+so it belongs last in its group.
 
 When every condition in a group returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
-`NoTransition` derives from `RuntimeError`,
-so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
 ### A Vending Machine
 
@@ -438,8 +425,7 @@ A `Column` moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
 The vending machine's states carry no data,
-and the demo prints a state by its `name`,
-so a plain `Enum` with `auto()` values is enough:
+and the demo prints a state by its `name`:
 
 ```python
 # vending_machine.py
@@ -456,13 +442,8 @@ class State(Enum):
     WANT_MORE = auto()
 ```
 
-`State` reuses a name from the first design with a new meaning.
-The mousetrap's `State` is a record holding a message, a transition function,
-and an action; this one is an `Enum` of labels,
-because the table holds all the behavior.
-
-Each kind of input has its own class,
-and a `Slot` holds one item's price and quantity:
+Each kind of input has its own class.
+A `Slot` holds one item's price and quantity:
 
 ```python
 # vending_machine.py (continued)
@@ -675,23 +656,19 @@ for input_ in inputs:
 #: SELECTING col 0 -> COLLECTING: Cleared: 25c, 0 left
 ```
 
-The sold-out and too-expensive clears both start from `SELECTING` on a column,
-both print `Cleared`, and end in different states.
-Too expensive returns to `COLLECTING` with the money still inserted,
-while sold out goes to `UNAVAILABLE`.
+The two `Cleared` lines end in different states,
+`COLLECTING` for too expensive and `UNAVAILABLE` for sold out.
 The state after the arrow names the condition;
 the message alone would leave you to infer it from the `left` count.
 
-The last three inputs insert a dime and pick the same sold-out slot again,
-this time with too little money for it as well.
-Both conditions are now true.
+The last input picks the sold-out slot again with a dime inserted,
+so both conditions are true.
 `too_expensive()` comes first in the `(State.SELECTING, Column)` list,
-so the engine takes the `too_expensive()` rule.
-The machine reports `COLLECTING`, as though more money would sell the item,
-although the slot is empty and no amount of money would.
-If you swap the rule order, the same input reports `UNAVAILABLE` instead.
-Both results follow from the engine's [ordering rule](#the-engine).
-The engine runs the first rule whose condition passes,
+so the engine takes that rule and reports `COLLECTING`,
+as though more money would sell an item the machine has run out of.
+If you swap the rule order, the same input reports `UNAVAILABLE`.
+By the engine's [ordering rule](#the-engine),
+the first rule whose condition passes wins,
 whether or not a later rule matters more.
 
 ### Testing the Vending Machine
