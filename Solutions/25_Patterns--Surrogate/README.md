@@ -166,12 +166,7 @@ Reading `p.f` twice without calling it leaves both entries where they were, sinc
 <details>
 <summary>Solution</summary>
 
-If you increment `self.calls[name]` in `__getattr__()` before the `callable()` test,
-the demo still prints `2 1`, because each lookup there leads to one call.
-That version counts lookups rather than calls,
-so evaluating `p.f is p.f` adds two to `f`'s tally.
-The solution counts inside `counted()`,
-so the tally advances at the call, as it does in the chapter's `CountingProxy`.
+`CountingProxy` with a `Counter` in place of the single total:
 
 ```python
 # exercise_2.py
@@ -206,6 +201,14 @@ p.f()
 print(p.calls["f"], p.calls["g"])
 #: 2 1
 ```
+
+If you increment `self.calls[name]` in `__getattr__()`
+before the `callable()` test,
+the demo still prints `2 1`, because each lookup there leads to one call.
+That version counts lookups rather than calls,
+so evaluating `p.f is p.f` adds two to `f`'s tally.
+The solution counts inside `counted()`,
+so the tally advances at the call, as it does in the chapter's `CountingProxy`.
 
 **Tally each call by name.** Where the chapter's `CountingProxy` keeps one total in an integer `calls`,
 this one keeps a `Counter` keyed by method name.
@@ -275,13 +278,7 @@ After `b.append(4)`, printing both gives `[1, 2, 3] [1, 2, 3, 4]` and the same `
 <details>
 <summary>Solution</summary>
 
-If you build the private `Box` around `self._box.data` without the `list(...)` copy,
-`b` gets a `Box` of its own that holds the same list.
-`b.append(4)` then changes `a` too.
-The demo prints `[1, 2, 3, 4] [1, 2, 3, 4]`
-while `a._box is b._box` reports `False`.
-A new `Box` gives `b` its own owner count and leaves the data shared,
-so the solution copies the list before the write.
+`CowList` and the shared `Box` that holds its data:
 
 ```python
 # exercise_3.py
@@ -328,6 +325,15 @@ print(a, b)
 print(a._box is b._box)
 #: False
 ```
+
+If you build the private `Box` around `self._box.data`
+without the `list(...)` copy,
+`b` gets a `Box` of its own that holds the same list.
+`b.append(4)` then changes `a` too.
+The demo prints `[1, 2, 3, 4] [1, 2, 3, 4]`
+while `a._box is b._box` reports `False`.
+A new `Box` gives `b` its own owner count and leaves the data shared,
+so the solution copies the list before the write.
 
 **Share the data and count its owners.** `a` and `b` start out sharing one `Box`, and through it one list.
 `owners` counts the `CowList`s that point at that `Box`.
@@ -517,12 +523,7 @@ Using a proxy after its client finished raises an exception instead of reaching 
 <details>
 <summary>Solution</summary>
 
-If you leave out the line in `__exit__()` that sets `_connection` to `None`,
-the pool gets each connection back, but the proxy keeps its reference.
-After both blocks end, `c1.query()` still answers through connection 0.
-When a later `acquire()` lends that connection to another client,
-both proxies query through it.
-The solution clears the reference, so a released proxy raises a `RuntimeError` instead.
+The pool, its connections, and the proxy that `acquire()` returns:
 
 ```python
 # exercise_5.py
@@ -596,6 +597,14 @@ with expected(RuntimeError):
     c1.query("select 3")
 #: [RuntimeError] connection already released
 ```
+
+If you leave out the line in `__exit__()` that sets `_connection` to `None`,
+the pool gets each connection back, but the proxy keeps its reference.
+After both blocks end, `c1.query()` still answers through connection 0.
+When a later `acquire()` lends that connection to another client,
+both proxies query through it.
+The solution clears the reference,
+so a released proxy raises a `RuntimeError` instead.
 
 **Limit who creates connections.** `Pool` alone creates `Connection`
 objects, all of them in its constructor. `Pool` controls creation as a
