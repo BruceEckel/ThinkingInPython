@@ -473,7 +473,7 @@ file, so the file runs on its own.
 To add the test to `test_endless.py`, copy the test function alone.
 
 ```python
-# test_ch23_filter.py
+# test_ch22_filter.py
 from collections.abc import Iterator
 from itertools import count
 from typing import Final
