@@ -649,10 +649,7 @@ Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow tha
 
 *Borg* has no `cache_clear()`,
 so whatever one test leaves in `_shared_state` stays there for the next.
-A pytest fixture that clears the dict before each test gives every test empty shared state.
-`test_borg_shares_state_but_not_identity` confirms that the objects differ but share one set of state.
-`test_leaves_an_attribute_behind` writes an attribute into the shared dict,
-and `test_fixture_clears_shared_state` confirms that the next test finds it gone:
+A pytest fixture that clears the dict before each test gives every test empty shared state:
 
 ```python
 # test_singleton_borg.py
@@ -677,6 +674,10 @@ def test_fixture_clears_shared_state() -> None:
     y = Singleton("second")
     assert not hasattr(y, "extra")  # Reset ran
 ```
+
+`test_borg_shares_state_but_not_identity` confirms that the objects differ but share one set of state.
+`test_leaves_an_attribute_behind` writes an attribute into the shared dict,
+and `test_fixture_clears_shared_state` confirms that the next test finds it gone.
 
 ### Singleton by Class Decorator
 
