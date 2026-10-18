@@ -314,11 +314,12 @@ The rules are a list, which the engine groups into a `dict`.
 
 The action on a rule takes the input,
 so what the machine does depends on the state and the input together.
-That is a *Mealy machine*, the other classical shape.
+That is a *Mealy machine*, the other classical state machine.
 The first design's `action` acts per state and sees no input,
 while a rule's `action` acts per transition and reads the input that fired it.
 
-The mousetrap's inputs are `Mouse` members, bare names.
+The mousetrap's inputs are `Mouse` members.
+The member that arrived is the whole input.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
 Each input becomes an object of its own class.
@@ -326,7 +327,7 @@ The table looks up a rule by the input's class, not by its value.
 
 This design reuses two names with new meanings.
 `table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
-`State` is now an `Enum` of bare names rather than the record the mousetrap's states are.
+`State` is now an `Enum` of labels rather than the record the mousetrap's states are.
 The table holds all the behavior.
 
 The name `table_machine.py` differs from the first engine's `state_machine.py` on purpose.
@@ -779,7 +780,7 @@ or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram.
 Adding a state or an input is a rule in the list and a method or two.
 
-In the table-driven design the states are `Enum` members, bare names,
+In the table-driven design a state is an `Enum` member, a label,
 so an action that runs on every entry into one state must go in the table.
 You repeat the action on every rule that leads to that state,
 or write a helper that those rules call.
