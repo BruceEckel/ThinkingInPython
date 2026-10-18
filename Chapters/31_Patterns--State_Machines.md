@@ -322,7 +322,7 @@ The mousetrap's inputs are `Mouse` members.
 The member that arrived is the whole input.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
-Each input becomes an object of its own class.
+Each kind of input has a class of its own.
 The table looks up a rule by the input's class, not by its value.
 
 This design reuses two names with new meanings.
