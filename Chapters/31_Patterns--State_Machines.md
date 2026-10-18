@@ -318,8 +318,8 @@ That is a *Mealy machine*, the other classical state machine.
 The first design's `action` acts per state and sees no input,
 while a rule's `action` acts per transition and reads the input that fired it.
 
-The mousetrap's inputs are `Mouse` members.
-The member that arrived is the whole input.
+The mousetrap's inputs are `Mouse` members, each naming one event.
+A transition function matches on which member arrived.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
 Each kind of input has a class of its own.
