@@ -89,8 +89,8 @@ def demo() -> None:
 <details>
 <summary>Done when</summary>
 
-given input files holding `hello` and `world`, both your subclass and your function form write `'HELLO WORLD '` to the last file.
-Given search words `spam`, `eggs`, and `ham`, and inputs `spam and eggs` and `green eggs and ham`, both forms write `'spam eggs eggs ham '`, one line per input file.
+given input files holding `hello` and `world`, both your subclass and your function form write `'HELLO\nWORLD\n'` to the last file.
+Given search words `spam`, `eggs`, and `ham`, and inputs `spam and eggs` and `green eggs and ham`, both forms write `'spam eggs\neggs ham\n'`, one line per input file.
 
 <details>
 <summary>Solution</summary>
