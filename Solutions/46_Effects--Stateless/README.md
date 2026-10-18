@@ -27,12 +27,7 @@ In the test, pass `supply()` a scripted object that returns a canned answer, and
 <details>
 <summary>Solution</summary>
 
-If you pass `scripted` to `supply()` without `as_type(Console)`,
-the demo still prints `['Hello, Bob!']`,
-but `ty` reports an `invalid-argument-type` at each `run()` call.
-`supply(scripted)` handles `Need[Scripted]`,
-so the `Need[Console]` that `ask_and_greet()` requests stays in the type of the Effect passed to `run()`.
-The solution wraps each supplied object in `as_type(Console)`.
+The solution wraps each supplied object in `as_type(Console)`:
 
 ```python
 # test_ch46_ask_and_greet.py
@@ -110,6 +105,13 @@ At runtime the wrapper returns the same `scripted` object.
 `supply()` still finds it, because `Console` is `@runtime_checkable`
 and `isinstance()` matches `Scripted` on shape.
 
+If you pass `scripted` to `supply()` without `as_type(Console)`,
+the demo still prints `['Hello, Bob!']`,
+but `ty` reports an `invalid-argument-type` at each `run()` call.
+`supply(scripted)` handles `Need[Scripted]`,
+so the `Need[Console]` that `ask_and_greet()` requests
+stays in the type of the Effect passed to `run()`.
+
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
@@ -159,13 +161,6 @@ A caller that hands `greet_all()` to `run()` with no `Console` supplied draws an
 
 <details>
 <summary>Solution</summary>
-
-If you fix the annotation but keep a caller that runs `greet_all()` with no environment,
-as `run(greet_all(["Alice", "Bob"]))` does,
-`ty` reports an `invalid-argument-type` at that `run()` call.
-The run raises a `MissingAbilityError` before the first greeting prints.
-Under the new annotation, every caller must supply a `Console` or declare `Need[Console]` itself,
-so the solution wraps `greet_all()` in `supply(Console())` before calling `run()`.
 
 Removing the `# type: ignore` from `undeclared_need.py` produces:
 
@@ -227,6 +222,13 @@ the signature of every function between the one that uses the `Console`
 and the one that supplies it.
 The type checker reports an error at any of those functions that leaves
 the requirement out.
+
+If you fix the annotation but keep a caller that runs `greet_all()`
+with no environment, as `run(greet_all(["Alice", "Bob"]))` does,
+`ty` reports an `invalid-argument-type` at that `run()` call.
+The run raises a `MissingAbilityError` before the first greeting prints.
+The solution therefore wraps `greet_all()` in `supply(Console())`
+before calling `run()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1317,15 +1319,6 @@ With separate `Protocol`s, handing `Terminal` to the recording Effect draws an `
 <details>
 <summary>Solution</summary>
 
-If you keep `print()` on both implementations and declare it in both
-`Protocol`s, each implementation satisfies both, and the type checker
-accepts `as_type(Recorder)(Terminal())`. Handing that object to `to_log()`
-prints `Hello, Carol!` to the screen while `capture.messages` stays
-`['Hello, Bob!']`, with no diagnostic. Two `Protocol`s that share one
-method name describe one shape under two names.
-The solution renames the recording method to `record()`, so `Terminal`
-no longer satisfies `Recorder`.
-
 Three implementations have six orderings, and one rule predicts them all.
 `supply()` scans its arguments and takes the first that satisfies the
 request, so whichever implementation comes first answers it. Two of
@@ -1403,6 +1396,13 @@ In the second `info` line, the type checker names the missing
 method rather than the missing type.
 That is what structural typing means: `Terminal` fails for the method it
 lacks, not for the class it is.
+
+If you keep `print()` on both implementations and declare it in both
+`Protocol`s, each implementation satisfies both, and the type checker
+accepts `as_type(Recorder)(Terminal())`. Handing that object to `to_log()`
+prints `Hello, Carol!` to the screen while `capture.messages` stays
+`['Hello, Bob!']`, with no diagnostic. Two `Protocol`s that share one
+method name describe one shape under two names.
 
 One limit remains. Distinct method names remove the ambiguity between
 Abilities. They leave two implementations of the same Ability
