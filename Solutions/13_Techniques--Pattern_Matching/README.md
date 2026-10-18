@@ -471,17 +471,8 @@ both versions print `Third quadrant Fourth quadrant` for `Point(-3, -4)` and `Po
 <details>
 <summary>Solution</summary>
 
-If you delete the final `case _` from the second version,
-the script prints the same two lines,
-but `ty` reports `invalid-return-type`.
-The type checker finds a path that falls off the end of the function and returns `None`,
-which conflicts with the declared return type, `str`.
-The six cases cover all nine pairs of signs,
-but the type checker knows `sign()` by its declared return type, `int`,
-so it allows a pair such as `(2, 5)`.
-That pair falls through all six cases.
-The solution keeps an unreachable `case _` so every path returns a
-`str`.
+The first version adds a guarded `case` for each of the third and
+fourth quadrants:
 
 ```python
 # exercise_5.py
@@ -550,6 +541,18 @@ print(quadrant(Point(-3, -4)), quadrant(Point(3, -4)))
 print(quadrant(Point(0, 7)))
 #: On an axis
 ```
+
+If you delete the final `case _` from the second version,
+the script prints the same two lines,
+but `ty` reports `invalid-return-type`.
+The type checker finds a path that falls off the end of the function and returns `None`,
+which conflicts with the declared return type, `str`.
+The six cases cover all nine pairs of signs,
+but the type checker knows `sign()` by its declared return type, `int`,
+so it allows a pair such as `(2, 5)`.
+That pair falls through all six cases.
+The solution keeps an unreachable `case _` so every path returns a
+`str`.
 
 The second version reads better. A guard hides the shape of the
 dispatch. You must read four nearly identical `if` clauses one at a
