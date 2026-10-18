@@ -303,12 +303,8 @@ your file, with no `Counter` import, prints `{'a': 3, 'cat': 2, 'sat': 1, 'on': 
 <details>
 <summary>Solution</summary>
 
-If you leave the minus sign out of the `key` function,
-`sorted()` ranks the lowest counts first,
-so the slice prints `[('dog', 0), ('sat', 1)]`.
-Reading `counts["dog"]` earlier stored that `0` under `'dog'`.
-The minus sign negates each count, so `sorted()` puts the largest count first,
-matching `most_common()`, which ranks from the highest count down.
+The solution counts with `defaultdict(int)`
+and rebuilds `most_common()` with `sorted()`:
 
 ```python
 # exercise_6.py
@@ -340,6 +336,13 @@ so their contents differ after the `counts["dog"]` line.
 the tally. `most_common()` becomes a `sorted()` call with a key
 function and a slice, and the `Counter({...})` repr becomes a `dict()`
 conversion.
+
+If you leave the minus sign out of the `key` function,
+`sorted()` ranks the lowest counts first,
+so the slice prints `[('dog', 0), ('sat', 1)]`.
+Reading `counts["dog"]` earlier stored that `0` under `'dog'`.
+The minus sign negates each count, so `sorted()` puts the largest count first,
+matching `most_common()`, which ranks from the highest count down.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
