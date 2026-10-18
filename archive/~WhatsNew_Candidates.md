@@ -47,15 +47,6 @@ The book's target version, so everything here is available to every listing with
 `frozendict`, lazy imports, comprehension unpacking, `sentinel`, and the `profiling` package
 are all in use in the book already and are not repeated below.
 
-- **`math.integer` (PEP 791).** **Mention.**
-  The integer-only functions (`gcd`, `lcm`, `isqrt`, `comb`, `perm`, `factorial`) now live
-  in one namespace.
-  Worth a clause anywhere the book uses one of them, since the old `math` names still work.
-- **`re.prefixmatch()`, with `re.match()` soft deprecated.** **Mention.**
-  The rename exists because `re.match()` matching only at the start surprises everyone,
-  and the confusion with the `match` statement makes the old name worse.
-  One sentence wherever regular expressions appear.
-
 One task rather than a candidate:
 **3.15 removes a batch of long-deprecated APIs** across `ast`, `collections.abc`, `ctypes`,
 `datetime`, `glob`, `http.server`, `importlib.resources`, `pathlib`, `platform`,
@@ -68,17 +59,6 @@ Worth one grep pass over `Chapters/` against the removal list before release.
 ## Python 3.14
 
 The release with the most that the book has no equivalent for.
-
-- **`concurrent.interpreters`, PEP 734.** **Consider.**
-  Chapter 19 mentions `InterpreterPoolExecutor` once.
-  The underlying module is now the third real concurrency model in the stdlib,
-  alongside threads and processes, and the chapter's comparison table is incomplete without it.
-  A short section contrasting its isolation with a process pool's cost would fit the existing structure.
-  The 3.12 per-interpreter GIL (PEP 684) is the groundwork for this and belongs in the same passage.
-  *Rechecked 2026-09-29: partly covered (Chapters/19_Techniques--Concurrency.md:1533-1576 (Subinterpreters section, InterpreterPoolExecutor, PEP 684 at 1541)); missing: concurrent.interpreters module and PEP 734 not covered.*
-- **`pathlib.Path.copy()`, `copy_into()`, `move()`, `move_into()`, and `Path.info`.** **Mention.**
-  The book uses `pathlib` in eight chapters; a reader who would otherwise use `shutil`
-  should know these exist.
 
 ## Python 3.13
 
@@ -102,11 +82,6 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.3
 
-- **Implicit namespace packages (PEP 420).** Chapter 6 mentions namespace packages.
-  **Verify** it says why they exist and what goes wrong when a directory silently becomes one,
-  which is a common confusion.
-  *Rechecked 2026-09-29: partly covered (Chapters/06_Foundations--Modules_and_Packages.md:191-193); missing: says a directory can be imported; does not say why they exist or what goes wrong.*
-
 ## Python 3.2
 
 ## Python 3.1
@@ -114,20 +89,15 @@ The release with the most that the book has no equivalent for.
 ## Python 3.0
 
 Almost everything here is simply Python now, and the Python 2 comparison would only date the text.
-The value is historical framing on three items:
+Its three historical-framing items went to chapters 3, 8, and 17.
 
 ---
 
-## One structural suggestion
+## Worked through, 2026-10-17
 
-Several of these items are historical rather than instructional:
-when annotations got meaning, why `OrderedDict` still exists, why `TypeAlias` gave way to `type`,
-why the future import for annotations is no longer needed.
-Scattering them through chapters adds noise to each one.
-
-An alternative is a short appendix, roughly "How Python Got Here,"
-tracing the features the book depends on back to the release that introduced them.
-It would give you one place for the version-history sentences,
-let each chapter stay focused on the current form,
-and give a reader a map for the older code they will meet outside the book.
-It also ages well: a new release adds a row rather than forcing edits in ten chapters.
+Every entry was decided: the nine Add entries on 2026-09-29, and the
+rest on the Loose Ends page of 2026-10-17 (50 added, 8 declined) and in
+chat the same day (the last five added). The "How Python Got Here"
+appendix this file once suggested was declined: the version-history
+sentences stay in the chapters that use the features. Each addition's
+commit names the chapter and the feature.

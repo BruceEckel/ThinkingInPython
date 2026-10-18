@@ -13,12 +13,13 @@ A review file arrives with a leading `~`, the same completion marker the
 What lives here is a record, not a queue. When a document still has open
 items in it, it belongs in the root where it will be seen. The
 distillates that later rounds must still read (`deep_review_db.md`,
-`readability_db.md`, `bruce_edit_db.md`) therefore stay at the root, and
-so does `WhatsNew_Candidates.md`, which is a worklist nobody has worked
-through yet.
+`readability_db.md`, `bruce_edit_db.md`) therefore stay at the root.
 
 ## Contents
 
+- `~WhatsNew_Candidates.md` — the CPython "What's New" pass (3.0 to
+  3.15) filtered against the book. Every entry was decided by
+  2026-10-17; its closing section says where the decisions were made.
 - `~correctness_review.md` — the decision queue from the 2026-09-02
   whole-book correctness sweep. All ten blocks applied in `e4a4e6cd`.
   Its "Applied directly" section is the record of the 56 errors that
