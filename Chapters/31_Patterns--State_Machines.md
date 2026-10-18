@@ -328,7 +328,7 @@ The table looks up a rule by the input's class, not by its value.
 
 For the current state and the type of the incoming input,
 the engine tries the candidate rules in order.
-It takes the first whose condition passes (or has no condition),
+It takes the first rule whose condition passes (or has no condition),
 runs that rule's action, and moves to the next state:
 
 ```python
@@ -378,8 +378,6 @@ A `Rule` reads as a sentence: from `state`, on an input of `input_type`,
 go to `next_state`, running `action` if the rule has one,
 provided `condition` passes if the rule has one.
 A state is an `Enum` member, so a misspelled state is a type error.
-A misspelled string would pass the checker,
-so the machine would raise `NoTransition` at the first input the rule was written to handle.
 `Rule` is generic in `I`, the input class, and `input_type` is `type[I]`,
 so a rule's `action` and `condition` must accept the class its `input_type` names.
 
