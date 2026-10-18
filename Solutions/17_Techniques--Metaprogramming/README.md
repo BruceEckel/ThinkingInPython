@@ -47,7 +47,7 @@ class Gold(Yellow):
 <summary>Done when</summary>
 
 your edited `init_subclass.py` prints the sorted registry after `Yellow` and again after `Gold`, and both lists match the predictions you wrote down first.
-The second list reads `['CeruleanBlue', 'Gold', 'Green', 'PhthaloBlue', 'Red']`.
+The two lists are the same length, and you can say why adding `Gold` changes the registry's contents and not its size.
 
 <details>
 <summary>Solution</summary>
