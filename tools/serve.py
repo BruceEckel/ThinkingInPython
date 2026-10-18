@@ -18,7 +18,12 @@ an exception prints its traceback in the server's terminal and leaves
 the page as it was; the next save tries again. Each served page carries
 a small script that polls `/__reload` and reloads once the rebuild
 lands, so an edit in the editor becomes a refreshed browser page with
-nothing to press.
+nothing to press. The book's index page is the one page a save leaves
+alone: matching every term against the whole book takes about ten
+seconds, which made each save a ten-second wait after the index arrived
+on 2026-10-16. The chapter rebuild matches the edited chapter alone,
+which keeps the page's `#ix-` anchors right, and marks the index page
+stale; the server rebuilds it when the page is next requested.
 
 A change to the build code needs more than a rebuild. The server
 imports `build_site` once, so a rebuild after an edit to it, or to any
@@ -209,6 +214,9 @@ class Watcher:
         self.token = f"{os.getpid()}-0"
         self._counter = 0
         self._seen = snapshot()
+        # Set by a chapter rebuild, cleared when the index page is
+        # rebuilt on request or by a full build.
+        self.index_stale = False
 
     def start(self) -> None:
         threading.Thread(target=self._loop, daemon=True).start()
@@ -228,6 +236,19 @@ class Watcher:
             print("Rebuild failed; the page was not updated. "
                   "Save again to retry.")
 
+    def refresh_index(self) -> None:
+        """Rebuild the index page if a save has made it stale.
+
+        Called with `lock` held, from the handler, when the page is
+        requested; the request waits the ten seconds the rebuild takes.
+        """
+        if not self.index_stale:
+            return
+        print("Rebuilding the index page...")
+        build_site.rebuild_index_page(self.out_dir)
+        self.index_stale = False
+        self._seen = snapshot()
+
     def _check(self) -> None:
         now = snapshot()
         changed = [p for p, m in now.items() if self._seen.get(p) != m]
@@ -243,13 +264,16 @@ class Watcher:
             if full or not chapters:
                 print("Rebuilding the whole site...")
                 build_site.build(self.out_dir, self.chapter_toc)
+                self.index_stale = False
             else:
                 for md in chapters:
                     if not build_site.rebuild_chapter(md, self.out_dir,
                                                       self.chapter_toc):
                         build_site.build(self.out_dir, self.chapter_toc)
+                        self.index_stale = False
                         break
                     print(f"Rebuilt {md.name}")
+                    self.index_stale = True
             self._counter += 1
             self.token = f"{os.getpid()}-{self._counter}"
         # A rebuild's own writes must not look like a new edit.
@@ -292,6 +316,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             path = self.translate_path(self.path)
             if os.path.isdir(path):
                 path = os.path.join(path, "index.html")
+            if (watcher and os.path.basename(path) == build_site.INDEX_PAGE
+                    and os.path.isfile(path)):
+                watcher.refresh_index()
             if path.endswith(".html") and os.path.isfile(path):
                 self.reply_page(path)
             else:

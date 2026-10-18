@@ -750,31 +750,62 @@ def search_sources(chapters: list[Chapter]) -> list[search_index.Source]:
 
 
 def write_shared(chapters: list[Chapter], out_dir: Path,
-                 located: book_index.BookIndex | None = None) -> int:
+                 located: book_index.BookIndex | None = None,
+                 index_page: bool | None = None) -> int:
     """Write the contents page, the book's index page when `located`
-    is given, and the search index. Returns sections indexed."""
+    is given, and the search index. Returns sections indexed.
+
+    The contents page links the index page when `index_page` is true,
+    by default when `located` is given; `rebuild_chapter()` passes
+    whether the page is already on disk, since it leaves that page as
+    it is.
+    """
+    if index_page is None:
+        index_page = located is not None
     (out_dir / "index.html").write_text(
-        render_index(chapters, located is not None), encoding="utf-8")
+        render_index(chapters, index_page), encoding="utf-8")
     if located is not None:
         write_index_page(chapters, out_dir, located)
     return search_index.write(search_sources(chapters), out_dir)
+
+
+def rebuild_index_page(out_dir: Path) -> bool:
+    """Recompute the book's index over every chapter and rewrite its
+    page alone.
+
+    This is the whole-book matching `rebuild_chapter()` skips, about
+    ten seconds, so `serve.py --watch` runs it on demand: when the
+    index page is requested after a Markdown edit, not after every
+    save. Returns False when the site has not been built yet.
+    """
+    if not out_dir.is_dir():
+        return False
+    chapters = discover()
+    write_index_page(chapters, out_dir, book_index.book_index(chapters))
+    return True
 
 
 def rebuild_chapter(md: Path, out_dir: Path,
                     chapter_toc: bool = CHAPTER_TOC,
                     listing_links_on: bool = True,
                     index_on: bool = True) -> bool:
-    """Re-render one chapter page, plus the index and search index.
+    """Re-render one chapter page, plus the contents and search index.
 
     This is the incremental path `serve.py --watch` takes: one pandoc run
-    instead of the ~46 a full build spends. The index and search index are
-    rewritten too, since editing a heading changes both, and neither costs
-    a pandoc run. Returns False when `md` is not a book chapter or the site
-    has not been built yet, leaving the caller to do a full build. The
-    book's index page is recomputed and rewritten as well, one more
-    pandoc run, since an edit moves locators. A chapter's locators
-    depend on its own text and the term file alone, so the other
-    chapters' pages keep the right `#ix-` ids.
+    instead of the ~46 a full build spends. The contents page and the
+    search index are rewritten too, since editing a heading changes
+    both, and neither costs a pandoc run. Returns False when `md` is not
+    a book chapter or the site has not been built yet, leaving the
+    caller to do a full build.
+
+    The book's index is matched against this chapter alone. A chapter's
+    locators depend on its own text and the term file, so the rebuilt
+    page carries the same `#ix-` ids a whole-book build gives it, in a
+    quarter of a second instead of the ten the whole book takes (the
+    `re:` match items scan the full text). The index page is left as it
+    was, so its locators into this chapter can be stale until
+    `rebuild_index_page()` runs; the server does that when the page is
+    requested.
     """
     if not out_dir.is_dir():
         return False
@@ -787,7 +818,7 @@ def rebuild_chapter(md: Path, out_dir: Path,
         return False
     img_map = build_image_map()
     targets = listing_targets(chapters) if listing_links_on else None
-    located = book_index.book_index(chapters) if index_on else None
+    located = book_index.book_index([ch]) if index_on else None
     used = write_page(ch, chapters, out_dir, img_map, set(), chapter_toc,
                       targets, located)
     write_solutions_page(ch, chapters, out_dir, img_map, set(),
@@ -798,7 +829,8 @@ def rebuild_chapter(md: Path, out_dir: Path,
         if filename and not (images_out / filename).exists():
             images_out.mkdir(parents=True, exist_ok=True)
             shutil.copy2(IMAGES_SRC / filename, images_out / filename)
-    write_shared(chapters, out_dir, located)
+    write_shared(chapters, out_dir, None,
+                 index_page=(out_dir / INDEX_PAGE).exists())
     return True
 
 

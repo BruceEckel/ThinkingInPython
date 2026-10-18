@@ -880,7 +880,9 @@ section("Book builds (site, EPUB, PDF)")
       deps=("site",))
 def local(v: Vars) -> None:
     """--watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
-    not a full site build), then the open page reloads itself. An edit
+    not a full site build), then the open page reloads itself. The
+    book's index page is rebuilt on demand, when it is next requested
+    after a save, since matching the whole book takes ten seconds. An edit
     to the build code (any tools/ module the server imports) restarts
     the server, which rebuilds the whole site with the new code first.
     --copy-on-select makes a mouse selection copy itself to the clipboard

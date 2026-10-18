@@ -4,8 +4,12 @@ The watcher polls both Markdown trees. A solutions edit rebuilds its
 chapter (whose one pandoc run also rewrites the solutions page), a
 chapter and its solutions file changed in one tick rebuild once, and a
 rebuild that raises an exception is reported in the terminal instead of
-disappearing, which is what it did before 2026-10-10.
+disappearing, which is what it did before 2026-10-10. A chapter rebuild
+leaves the book's index page stale, and the first request for that page
+rebuilds it (since 2026-10-18, when the ten-second whole-book match had
+made every save a ten-second wait).
 """
+from itertools import chain, repeat
 from pathlib import Path
 
 import pytest
@@ -38,7 +42,7 @@ def make_watcher(monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
                  ) -> tuple[serve.Watcher, list[Path]]:
     """A Watcher that sees `before` at construction and `after` on its
     next poll, with the rebuild replaced by a recorder."""
-    snapshots = iter([before, after, after])
+    snapshots = chain([before], repeat(after))
     monkeypatch.setattr(serve, "snapshot", lambda: next(snapshots))
     rebuilt: list[Path] = []
 
@@ -89,3 +93,22 @@ def test_a_failed_rebuild_is_reported_and_polling_goes_on(
     assert "pandoc said no" in out.err
     assert "Rebuild failed" in out.out
     assert watcher.token == token
+
+
+def test_a_chapter_rebuild_leaves_the_index_page_for_its_next_request(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    before = {CHAPTER: 1.0}
+    watcher, _ = make_watcher(monkeypatch, tmp_path, before,
+                              {CHAPTER: 2.0})
+    index_rebuilds: list[Path] = []
+    monkeypatch.setattr(build_site, "rebuild_index_page",
+                        lambda out_dir: index_rebuilds.append(out_dir))
+    assert not watcher.index_stale
+    watcher.tick()
+    assert watcher.index_stale
+    assert index_rebuilds == []
+    watcher.refresh_index()
+    assert index_rebuilds == [tmp_path]
+    assert not watcher.index_stale
+    watcher.refresh_index()
+    assert index_rebuilds == [tmp_path]
