@@ -773,10 +773,11 @@ def rebuild_index_page(out_dir: Path) -> bool:
     """Recompute the book's index over every chapter and rewrite its
     page alone.
 
-    This is the whole-book matching `rebuild_chapter()` skips, about
-    ten seconds, so `serve.py --watch` runs it on demand: when the
-    index page is requested after a Markdown edit, not after every
-    save. Returns False when the site has not been built yet.
+    This is the whole-book matching `rebuild_chapter()` skips, the
+    slowest step of a build (about two seconds), so `serve.py --watch`
+    runs it on demand: when the index page is requested after a
+    Markdown edit, not after every save. Returns False when the site
+    has not been built yet.
     """
     if not out_dir.is_dir():
         return False
@@ -801,9 +802,8 @@ def rebuild_chapter(md: Path, out_dir: Path,
     The book's index is matched against this chapter alone. A chapter's
     locators depend on its own text and the term file, so the rebuilt
     page carries the same `#ix-` ids a whole-book build gives it, in a
-    quarter of a second instead of the ten the whole book takes (the
-    `re:` match items scan the full text). The index page is left as it
-    was, so its locators into this chapter can be stale until
+    fraction of the time the whole book takes. The index page is left as
+    it was, so its locators into this chapter can be stale until
     `rebuild_index_page()` runs; the server does that when the page is
     requested.
     """

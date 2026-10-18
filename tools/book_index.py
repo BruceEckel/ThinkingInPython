@@ -89,6 +89,8 @@ import html
 import re
 import tomllib
 import unicodedata
+import re._constants as sre  # ty: ignore[unresolved-import]
+import re._parser as sre_parse  # ty: ignore[unresolved-import]
 from bisect import bisect_right
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator
@@ -435,15 +437,235 @@ class Place:
     section: Unit | None  # the H2/H3 heading over it, None if none
 
 
+# --------------------------------------------------------------------------- #
+# Seeding a regex search
+# --------------------------------------------------------------------------- #
+# The `re` module searches for a pattern by trying it at every offset,
+# with one shortcut: a pattern that opens with a literal is found by a
+# fast scan for that literal. Nearly every `re:` item in the term file
+# opens with a lookbehind, so each one walked the whole book (about 3 MB
+# over the two channels), and the 858 of them took ten seconds a build;
+# seeded, they take about one.
+#
+# A seed is a literal word every match of the pattern contains, found
+# by walking the pattern's parse tree, with the most text a match can
+# consume before it. The search lists the word's occurrences with
+# `str.find()` and tries the pattern anchored at each offset from which
+# a match could reach one. Two facts make the result the same matches
+# `finditer()` returns, in the same order: every match contains the
+# word, so every match start is tried; and the candidates are bounded,
+# either because the text a match consumes before the word has a known
+# most (the word sits after lookarounds alone, say), or because no
+# consuming element of the pattern can match a newline, so a match stays
+# on the line of its occurrence and the line start bounds them. A
+# pattern the walk cannot prove a bound for takes the full scan as
+# before. An alternation of unrelated titles has no word in every match
+# but one in every alternative, so a seed is a set of words, each with
+# its bound, and the occurrences of all of them are merged in order.
+# `seed_words()` lists a pattern's usable words by alternative; the
+# channel picks the one with the fewest occurrences from each.
+# A word -> the most text a match consumes before it (None: unbounded).
+type Words = dict[str, int | None]
+
+
+@dataclass(frozen=True)
+class _Shape:
+    """What the walk knows about one node of the parse tree."""
+
+    width: int | None     # most chars it consumes; None: unbounded
+    required: Words       # literal words in every match
+    newline: bool         # a consuming element can match "\n"
+    # When `required` is empty: one Words per alternative of a branch
+    # every match goes through, so every match holds a word of one of
+    # them. Empty when there is no such branch.
+    choices: tuple[Words, ...] = ()
+
+    def seeds(self) -> tuple[Words, ...]:
+        """The alternatives a match must contain a word of."""
+        return (self.required,) if self.required else self.choices
+
+
+class _Unsupported(Exception):
+    """A construct the walk does not model; the pattern takes the scan."""
+
+
+_NEWLINE = ord("\n")
+# Character categories that include a newline, and those that exclude it.
+_CATEGORIES_WITH_NEWLINE = frozenset({
+    sre.CATEGORY_SPACE, sre.CATEGORY_NOT_WORD, sre.CATEGORY_NOT_DIGIT,
+    sre.CATEGORY_LINEBREAK,
+})
+_CATEGORIES_WITHOUT_NEWLINE = frozenset({
+    sre.CATEGORY_WORD, sre.CATEGORY_DIGIT, sre.CATEGORY_NOT_SPACE,
+    sre.CATEGORY_NOT_LINEBREAK,
+})
+_WORD_CHAR = re.compile(r"\w")
+
+
+def _add(a: int | None, b: int | None) -> int | None:
+    return None if a is None or b is None else a + b
+
+
+def _widest(widths: Iterable[int | None]) -> int | None:
+    """The largest of several widths; None (unbounded) if any is."""
+    found = list(widths)
+    bounded = [w for w in found if w is not None]
+    return max(bounded) if len(bounded) == len(found) else None
+
+
+def _shifted(words: Words, by: int | None) -> Words:
+    return {name: _add(by, before) for name, before in words.items()}
+
+
+def _set_has_newline(items: list) -> bool:
+    negate = False
+    hit = False
+    for op, av in items:
+        if op is sre.NEGATE:
+            negate = True
+        elif op is sre.LITERAL:
+            hit = hit or av == _NEWLINE
+        elif op is sre.RANGE:
+            hit = hit or av[0] <= _NEWLINE <= av[1]
+        elif op is sre.CATEGORY:
+            if av in _CATEGORIES_WITH_NEWLINE:
+                hit = True
+            elif av not in _CATEGORIES_WITHOUT_NEWLINE:
+                raise _Unsupported(av)
+        else:
+            raise _Unsupported(op)
+    return hit != negate
+
+
+def _walk(seq, flags: int) -> _Shape:
+    """The shape of a parsed sequence, with its literal words."""
+    width: int | None = 0
+    required: Words = {}
+    newline = False
+    choices: tuple[Words, ...] = ()
+    word: list[str] = []
+    word_before: int | None = 0
+
+    def merge(inner: _Shape) -> None:
+        nonlocal choices
+        for name, before in inner.required.items():
+            required.setdefault(name, _add(width, before))
+        if not choices and not inner.required:
+            choices = tuple(_shifted(w, width) for w in inner.choices)
+
+    def close_word() -> None:
+        nonlocal word
+        if word:
+            required.setdefault("".join(word), word_before)
+            word = []
+
+    for op, av in seq:
+        if op is sre.LITERAL and _WORD_CHAR.fullmatch(chr(av)):
+            if not word:
+                word_before = width
+            word.append(chr(av))
+            width = _add(width, 1)
+            continue
+        close_word()
+        if op is sre.LITERAL:
+            newline = newline or av == _NEWLINE
+            width = _add(width, 1)
+        elif op is sre.NOT_LITERAL:
+            newline = newline or av != _NEWLINE
+            width = _add(width, 1)
+        elif op is sre.ANY:
+            newline = newline or bool(flags & re.DOTALL)
+            width = _add(width, 1)
+        elif op is sre.IN:
+            newline = newline or _set_has_newline(av)
+            width = _add(width, 1)
+        elif op is sre.AT or op in (sre.ASSERT, sre.ASSERT_NOT):
+            pass  # zero-width: consumes nothing
+        elif op is sre.SUBPATTERN:
+            _, add_flags, del_flags, sub = av
+            inner = _walk(sub, (flags | add_flags) & ~del_flags)
+            # A word under a local `(?i:...)` is searched for by the
+            # pattern's own flags, which would miss its other casings.
+            if not (add_flags & re.IGNORECASE and not flags & re.IGNORECASE):
+                merge(inner)
+            newline = newline or inner.newline
+            width = _add(width, inner.width)
+        elif op is sre.ATOMIC_GROUP:
+            inner = _walk(av, flags)
+            merge(inner)
+            newline = newline or inner.newline
+            width = _add(width, inner.width)
+        elif op in (sre.MAX_REPEAT, sre.MIN_REPEAT, sre.POSSESSIVE_REPEAT):
+            lo, hi, sub = av
+            inner = _walk(sub, flags)
+            if hi > 0:
+                newline = newline or inner.newline
+            if lo >= 1:
+                merge(inner)  # the first repetition's words
+            if hi == sre.MAXREPEAT or inner.width is None:
+                width = None
+            else:
+                width = _add(width, hi * inner.width)
+        elif op is sre.BRANCH:
+            shapes = [_walk(alt, flags) for alt in av[1]]
+            common = set.intersection(*(set(sh.required) for sh in shapes))
+            branch_words: Words = {}
+            for name in sorted(common):
+                branch_words[name] = _widest(sh.required[name] for sh in shapes)
+            alternatives: list[Words] = []
+            for sh in shapes:
+                if not sh.seeds():
+                    alternatives = []
+                    break
+                alternatives.extend(sh.seeds())
+            merge(_Shape(None, branch_words, False, tuple(alternatives)))
+            newline = newline or any(sh.newline for sh in shapes)
+            width = _add(width, _widest(sh.width for sh in shapes))
+        else:
+            raise _Unsupported(op)
+    close_word()
+    return _Shape(width, required, newline, choices)
+
+
+def _usable(words: Words, newline: bool) -> Words:
+    """The words of one alternative the search can be bounded by.
+
+    A word with a bounded `before` needs no line bound; without one
+    the line bound holds only when no element can match a newline.
+    """
+    bounded: Words = {w: b for w, b in words.items() if b is not None}
+    return bounded or ({} if newline else dict(words))
+
+
+@cache
+def seed_words(pattern: re.Pattern[str]) -> tuple[Words, ...]:
+    """The words a match of `pattern` must contain one of, grouped by
+    alternative, each with the most text a match consumes before it
+    (None: unbounded), when that bound can be used. Every match holds
+    a word from every group. Empty when the full scan is needed."""
+    try:
+        shape = _walk(sre_parse.parse(pattern.pattern, pattern.flags),
+                      pattern.flags)
+    except _Unsupported:
+        return ()
+    groups = tuple(_usable(words, shape.newline) for words in shape.seeds())
+    return groups if groups and all(groups) else ()
+
+
+# Case-insensitive matching equates these with ASCII letters: the Kelvin
+# sign (k), the long s, and the dotted and dotless capital and small I.
+# A channel holding one cannot be searched through a lowercased copy.
+_CASE_TRAPS = re.compile("[\u212a\u017f\u0130\u0131]")
+
+
 class Channel:
     """Every paragraph's text in one channel, joined for fast search.
 
     A plain `match` item is found through a word index rather than a
     scan: its first word's occurrences are the only places it can
-    start, so the pattern is tried there alone. A regex that opens with
-    a lookbehind defeats the `re` module's literal-prefix search, and
-    one scan of the whole book per entry made the matcher take tens of
-    seconds.
+    start, so the pattern is tried there alone. A `re:` item is found
+    through its `Seed` (see above) when the walk finds one, and by a
+    scan of the whole channel otherwise.
     """
 
     def __init__(self, texts: list[str]) -> None:
@@ -456,6 +678,8 @@ class Channel:
             pos += len(text) + 1
         self.text = "\n".join(parts)
         self._words: dict[str, list[int]] | None = None
+        self._lines: list[int] | None = None
+        self._lower: str | None = None
 
     def at(self, pos: int) -> int:
         """The paragraph holding offset `pos`."""
@@ -470,17 +694,112 @@ class Channel:
             self._words = dict(found)
         return self._words
 
+    def line_start(self, pos: int) -> int:
+        """The offset of the line holding `pos`."""
+        if self._lines is None:
+            self._lines = [0] + [m.end() for m in re.finditer("\n", self.text)]
+        return self._lines[bisect_right(self._lines, pos) - 1]
+
     def finditer(self, item: str,
                  pattern: re.Pattern[str]) -> Iterator[re.Match[str]]:
         """The matches of `pattern`, compiled from `match` item `item`."""
         first = WORD.match(item)
         if item.startswith("re:") or first is None:
-            yield from pattern.finditer(self.text)
+            yield from self.seeded(pattern)
             return
         for pos in self.words().get(first.group(0).lower(), ()):
             m = pattern.match(self.text, pos)
             if m is not None:
                 yield m
+
+    def occurrences(self, word: str, flags: int) -> Iterator[int]:
+        """Every offset where `word` occurs as a literal under `flags`.
+
+        `str.find()` is a fast scan; `re` has one too, but only for a
+        case-sensitive literal, and most items fold case. A lowercased
+        copy of the channel stands in when lowercasing changes no
+        length and the text has none of `_CASE_TRAPS`; otherwise, or
+        for a word outside ASCII, `re` does the folding.
+        """
+        if flags & re.IGNORECASE:
+            if self._lower is None:
+                lower = self.text.lower()
+                self._lower = lower if (
+                    len(lower) == len(self.text)
+                    and not _CASE_TRAPS.search(self.text)) else ""
+            if not self._lower or not word.isascii():
+                for m in re.compile(re.escape(word), flags).finditer(
+                        self.text):
+                    yield m.start()
+                return
+            haystack, needle = self._lower, word.lower()
+        else:
+            haystack, needle = self.text, word
+        at = haystack.find(needle)
+        while at >= 0:
+            yield at
+            at = haystack.find(needle, at + 1)
+
+    def seeded(self, pattern: re.Pattern[str]) -> Iterator[re.Match[str]]:
+        """`pattern.finditer(self.text)`, through the pattern's seed.
+
+        Candidate starts are tried in increasing order, and `done` is
+        the first offset not yet ruled out: an offset already tried, or
+        one inside a match, is never a match start, which is
+        `finditer()`'s own rule, so the matches come out the same.
+        """
+        groups = seed_words(pattern)
+        if not groups:
+            yield from pattern.finditer(self.text)
+            return
+        # From each group the rarest word, by its whole-word count; the
+        # longest on a tie.
+        index = self.words()
+        chosen = [min(words, key=lambda w: (len(index.get(w.lower(), ())),
+                                            -len(w), w))
+                  for words in groups]
+        text = self.text
+        done = 0
+        if len(groups) == 1:
+            # One word: its occurrences come in order, and once the
+            # range below one is tried nothing before it can start a
+            # match that reaches a later occurrence without reaching
+            # this one.
+            word, before = chosen[0], groups[0][chosen[0]]
+            for at in self.occurrences(word, pattern.flags):
+                start = max(self.candidate_low(at, before), done)
+                while start <= at:
+                    m = pattern.match(text, start)
+                    if m is None:
+                        start += 1
+                        continue
+                    yield m
+                    start = done = max(m.end(), start + 1)
+                done = max(done, at + 1)
+            return
+        # Several words: their ranges overlap out of order, so every
+        # candidate is listed first and the list walked once.
+        candidates: set[int] = set()
+        for word, words in zip(chosen, groups):
+            before = words[word]
+            for at in self.occurrences(word, pattern.flags):
+                candidates.update(range(self.candidate_low(at, before),
+                                        at + 1))
+        for start in sorted(candidates):
+            if start < done:
+                continue
+            m = pattern.match(text, start)
+            if m is not None:
+                yield m
+                done = max(m.end(), start + 1)
+
+    def candidate_low(self, at: int, before: int | None) -> int:
+        """The first offset a match holding the word at `at` can start.
+
+        A bounded `before` is the bound; an unbounded one means the word
+        was usable because a match stays on one line.
+        """
+        return self.line_start(at) if before is None else at - before
 
 
 def _spans_in(spans: list[tuple[int, int]], starts: list[int],

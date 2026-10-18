@@ -19,11 +19,12 @@ the page as it was; the next save tries again. Each served page carries
 a small script that polls `/__reload` and reloads once the rebuild
 lands, so an edit in the editor becomes a refreshed browser page with
 nothing to press. The book's index page is the one page a save leaves
-alone: matching every term against the whole book takes about ten
-seconds, which made each save a ten-second wait after the index arrived
-on 2026-10-16. The chapter rebuild matches the edited chapter alone,
-which keeps the page's `#ix-` anchors right, and marks the index page
-stale; the server rebuilds it when the page is next requested.
+alone: matching every term against the whole book is the slowest step
+of a build (ten seconds when the index arrived on 2026-10-16, about two
+since the seeded search of the same day), and it made each save wait
+that long. The chapter rebuild matches the edited chapter alone, which
+keeps the page's `#ix-` anchors right, and marks the index page stale;
+the server rebuilds it when the page is next requested.
 
 A change to the build code needs more than a rebuild. The server
 imports `build_site` once, so a rebuild after an edit to it, or to any
@@ -240,7 +241,7 @@ class Watcher:
         """Rebuild the index page if a save has made it stale.
 
         Called with `lock` held, from the handler, when the page is
-        requested; the request waits the ten seconds the rebuild takes.
+        requested; the request waits the seconds the rebuild takes.
         """
         if not self.index_stale:
             return

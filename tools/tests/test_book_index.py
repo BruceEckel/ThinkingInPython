@@ -6,8 +6,11 @@ listed twice, a principal locator buried, a listing counted for a
 concept, or an `#ix-` id that moves between builds and breaks a
 link in a published EPUB. The rules are pinned here on a synthetic
 chapter, along with the term file's load errors and one smoke test
-per output.
+per output. The seeded regex search (2026-10-18) must return what
+`finditer()` returns, so its walk is pinned on the shapes the term
+file uses and its matches are compared with the scan's.
 """
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -17,6 +20,7 @@ import pytest
 from tools import book_index
 from tools.book_index import (
     ChapterSource,
+    Channel,
     Term,
     TermFile,
     TermFileError,
@@ -28,6 +32,7 @@ from tools.book_index import (
     render_html,
     render_markdown,
     render_typst,
+    seed_words,
     sort_key,
 )
 
@@ -375,3 +380,87 @@ def test_book_markdown_adds_the_index_chapter(
                           index_form="typst")
     assert '(label("ix-07-0"), false)' in typst
     assert "Index" not in book_markdown(chapters, set(), set())
+
+
+# --------------------------------------------------------------------------- #
+# The seeded regex search
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("regex, flags, groups", [
+    # A word after lookarounds alone: bounded at 0.
+    (r"(?<!\[\*)\bProxy\b(?!\*)", re.I, ({"Proxy": 0},)),
+    # An optional dotted prefix makes the distance unbounded; nothing
+    # can match a newline, so the line bounds the search.
+    (r"(?<=[ \n] )(?:\w+\.)*Path(?!\w)", 0, ({"Path": None},)),
+    # `\s+` can match a newline, so only the bounded first word serves.
+    (r"A\s+data\s+class", re.I, ({"A": 0},)),
+    # Nothing bounded and a newline possible: the full scan.
+    (r"\s+can carry the row", re.I, ()),
+    # Two orderings of the same words: each word in both alternatives,
+    # with the larger distance.
+    (r"(?:isinstance\([^\n]{0,40}?\)[^\n]{0,20}?Protocol"
+     r"|Protocol[^\n]{0,20}?isinstance\()", 0,
+     ({"isinstance": 28, "Protocol": 72},)),
+    # Unrelated alternatives: one group per alternative.
+    (r"(?:A plugin writes|plugins or other packages)", re.I,
+     ({"A": 0, "plugin": 2, "writes": 9},
+      {"plugins": 0, "or": 8, "other": 11, "packages": 17})),
+    # A word in every alternative of a title list, after an unbounded
+    # line prefix.
+    (r"(?m)^(?=[^\n]{0,100}$)[^\n]*?(?:Self Registration|Hazards of Self)",
+     re.I, ({"Self": None},)),
+    # A word under a local `(?i:...)` is dropped: the pattern's flags
+    # would search for one casing of it.
+    (r"(?i:x)abc", 0, ({"abc": 1},)),
+    # A backreference is not modeled.
+    (r"(?P<n>ab)(?P=n)", 0, ()),
+])
+def test_seed_words_follow_the_parse_tree(regex: str, flags: int,
+                                          groups: tuple) -> None:
+    assert seed_words(re.compile(regex, flags)) == groups
+
+
+SEED_TEXT = [
+    "nap the cat sat down nap",
+    "A plugin writes a line.  plugins or other packages read it",
+    "    isinstance(x, Proxy)  # a *Proxy* here,  pathlib.Path there",
+    "Proxies and a proxy and PROXY; A  data\nclass",
+    "Self Registration",
+    "the Hazards of Self",
+]
+
+
+@pytest.mark.parametrize("regex, flags", [
+    (r"(?<!\[\*)\bProxy\b(?!\*)", re.I),
+    (r"(?<=[ \n] )(?:\w+\.)*Path(?!\w)", 0),
+    (r"A\s+data\s+class", re.I),
+    (r"(?:A plugin writes|plugins or other packages)", re.I),
+    (r"(?m)^(?=[^\n]{0,100}$)[^\n]*?(?:Self Registration|Hazards of Self)",
+     re.I),
+    # The group-two match starts before a failed group-one occurrence.
+    (r"(?:cat nap|the cat sat down)", 0),
+])
+def test_seeded_search_matches_the_scan(regex: str, flags: int) -> None:
+    channel = Channel(SEED_TEXT)
+    pattern = re.compile(regex, flags)
+    expected = [m.span() for m in pattern.finditer(channel.text)]
+    assert expected, "the fixture must exercise the pattern"
+    assert [m.span() for m in channel.seeded(pattern)] == expected
+
+
+@pytest.mark.book
+def test_seeded_search_matches_the_scan_on_a_chapter() -> None:
+    """Every `re:` item of the term file, against one real chapter."""
+    from tools.pattern_names import default_names, split_names
+    chapters = [c for c in book_index.book_chapters()
+                if c.stem.startswith("30_")]
+    corpus = book_index.Corpus(chapters, split_names(default_names())[1])
+    seeded = 0
+    for term in book_index.load_terms().entries:
+        channel = corpus.code if term.kind == "python" else corpus.prose
+        for item, pattern in zip(term.match, term.patterns()):
+            if not item.startswith("re:"):
+                continue
+            seeded += bool(seed_words(pattern))
+            assert ([m.span() for m in channel.seeded(pattern)]
+                    == [m.span() for m in pattern.finditer(channel.text)]), item
+    assert seeded > 500
