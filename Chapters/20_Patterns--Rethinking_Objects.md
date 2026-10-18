@@ -832,7 +832,6 @@ Because protocol membership is structural,
 one class can satisfy any number of protocols at once,
 with no inheritance graph connecting them.
 Each protocol names only the shape it needs.
-`Invoice` below names none of `Priced`, `Serializable`, or `Describable`.
 
 Classic multiple inheritance has the *diamond problem*.
 If two base classes trace back to a common ancestor,
@@ -893,7 +892,8 @@ print(audit(invoice))
 #: Invoice for Ada
 ```
 
-`Invoice` inherits from `object` alone, yet `charge()`, `persist()`,
+`Invoice` inherits from `object` alone and names none of `Priced`,
+`Serializable`, or `Describable`, yet `charge()`, `persist()`,
 and `audit()` each accept it,
 because each function's parameter names the one method it needs.
 
