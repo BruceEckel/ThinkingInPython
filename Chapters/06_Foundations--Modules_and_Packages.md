@@ -202,6 +202,16 @@ callers write `from a_package import function1`.
 The submodule that defines `function1` then stays a detail inside the package.
 
 You can also import a directory without `__init__.py` as a *namespace package*.
+Namespace packages let one package span several directories,
+such as separately installed distributions that each supply part of the package.
+The import system merges every directory with the package's name on [`sys.path`](#pythonpath)
+into one package.
+
+A directory can also become a namespace package by accident.
+If you forget `__init__.py`,
+the import still succeeds and hides the missing file.
+A module or an `__init__.py` package with the same name anywhere on `sys.path` then takes precedence over your package,
+including one in a directory later in the search.
 This book uses an explicit `__init__.py` by default,
 because it makes the package's identity and boundary clear.
 
