@@ -203,10 +203,8 @@ for a 10-pound `Plastic` and a 2-pound `Aluminum`, `price()` returns `4.84` and 
 <details>
 <summary>Solution</summary>
 
-If you call `max(items)` without the `key=` argument,
-`heaviest()` raises a `TypeError`: `'>' not supported between instances of 'Aluminum' and 'Plastic'`.
-`ty` reports the same call as an `invalid-argument-type`, because a record defines no ordering for `max()` to use.
-The solution passes `key=lambda t: t.weight`, so `max()` compares the weights and returns the whole piece.
+The solution writes `price()` and `heaviest()` as functions over a
+list of `Trash`:
 
 ```python
 # exercise_2.py
@@ -248,6 +246,11 @@ h = heaviest(items)
 print(type(h).__name__, h.weight)
 #: Plastic 10.0
 ```
+
+If you call `max(items)` without the `key=` argument,
+`heaviest()` raises a `TypeError`: `'>' not supported between instances of 'Aluminum' and 'Plastic'`.
+`ty` reports the same call as an `invalid-argument-type`, because a record defines no ordering for `max()` to use.
+The solution passes `key=lambda t: t.weight`, so `max()` compares the weights and returns the whole piece.
 
 Neither `price()` nor `heaviest()` needs `singledispatch`. `price()`
 reads `t.weight` and `t.value`, and `heaviest()` reads `t.weight`
@@ -341,12 +344,7 @@ You can say when the method form improves on the function.
 <details>
 <summary>Solution</summary>
 
-If you decorate the `Sorter` methods with `@singledispatch` instead of `@singledispatchmethod`,
-the loop prints "no special handling" for all five materials, `Aluminum` included,
-and the type checker reports nothing.
-`singledispatch` dispatches on the first argument, which in a method call is the `Sorter` instance.
-The one registration that matches a `Sorter` is the base method's registration, so the base method handles every call.
-`singledispatchmethod` dispatches on the argument after `self`, the piece of trash.
+The solution moves `recycling_note()` onto a `Sorter` class:
 
 ```python
 # exercise_3.py
@@ -406,6 +404,12 @@ for cls in Trash.registry.values():
 #: Cardboard: flatten and bundle
 #: Plastic: no special handling
 ```
+
+If you decorate the `Sorter` methods with `@singledispatch` instead of `@singledispatchmethod`,
+the loop prints "no special handling" for all five materials, `Aluminum` included,
+and the type checker reports nothing.
+`singledispatch` dispatches on the first argument, which in a method call is the `Sorter` instance.
+The one registration that matches a `Sorter` is the base method's registration, so the base method handles every call.
 
 **Route each piece by its type.** The dispatch is the same as in the
 function version. `singledispatchmethod` routes on the type of the
@@ -499,11 +503,8 @@ After your change, the `CrushedAluminum:` line is gone, its weight adds to the `
 <details>
 <summary>Solution</summary>
 
-If you set `cls.bin = cls` in `__init_subclass__()` without checking `cls.__dict__` first,
-the shared sort still prints three bins, `['Aluminum', 'CrushedAluminum', 'Glass']`.
-`__init_subclass__()` runs after the class body,
-so the assignment overwrites the `bin = Aluminum` that `CrushedAluminum` declares.
-The `"bin" not in cls.__dict__` test leaves a declared `bin` in place and fills in the default for every other class.
+The listing sorts three pieces by exact class, prints a note, and
+then sorts the pieces again by a declared `bin`:
 
 ```python
 # exercise_4.py
@@ -561,6 +562,12 @@ for t in pieces:
 print(sorted(k.__name__ for k in shared))
 #: ['Aluminum', 'Glass']
 ```
+
+If you set `cls.bin = cls` in `__init_subclass__()` without checking `cls.__dict__` first,
+the shared sort still prints three bins, `['Aluminum', 'CrushedAluminum', 'Glass']`.
+`__init_subclass__()` runs after the class body,
+so the assignment overwrites the `bin = Aluminum` that `CrushedAluminum` declares.
+The `"bin" not in cls.__dict__` test leaves a declared `bin` in place and fills in the default for every other class.
 
 **Key the bins on the exact class.** `exact[type(t)]` is a dictionary
 probe on the exact class, so `CrushedAluminum` is a new key and gets a
@@ -671,14 +678,8 @@ Your `strict_hazard()` returns `"none"` for `Paper` and `sharp edges` for `Alumi
 <details>
 <summary>Solution</summary>
 
-If you register `Aluminum` for `strict_hazard()` and skip `Paper`,
-`strict_hazard(Paper(1.0))` raises a
-`NotImplementedError` reading `no hazard rule for Paper`.
-The program stops before it reaches the plastic.
-The strict base function raises an exception for every unregistered type,
-including a harmless one like `Paper`, whose answer is `"none"`.
-The solution registers `Paper` to return `"none"`,
-and that registration settles the exercise's last question.
+The listing runs both forms, the default `hazard()` first and then
+`strict_hazard()`:
 
 ```python
 # exercise_5.py
@@ -730,6 +731,15 @@ print(strict_hazard(Paper(1.0)))
 expect(NotImplementedError, strict_hazard, Plastic(1.0))
 #: [NotImplementedError] no hazard rule for Plastic
 ```
+
+If you register `Aluminum` for `strict_hazard()` and skip `Paper`,
+`strict_hazard(Paper(1.0))` raises a
+`NotImplementedError` reading `no hazard rule for Paper`.
+The program stops before it reaches the plastic.
+The strict base function raises an exception for every unregistered type,
+including a harmless one like `Paper`, whose answer is `"none"`.
+The solution registers `Paper` to return `"none"`,
+and that registration settles the exercise's last question.
 
 **Fall back to a default answer.** `hazard()` returns `"none"` for
 the plastic. That answer is wrong and looks like every correct
