@@ -559,11 +559,6 @@ You can name the two items of the three-item list in Tracking and Management tha
 <details>
 <summary>Solution</summary>
 
-If you leave out the `await` in the list comprehension,
-`sum()` receives a list of coroutines rather than prices.
-`ty` reports `no-matching-overload` at the `sum()` call.
-The `asyncio.run()` call raises a `TypeError` for adding an `int` and a `coroutine`,
-with a `RuntimeWarning` that `price_of_async` was never awaited.
 Because calling an `async` function builds a coroutine
 that runs its body when awaited,
 the solution awaits each call to get its `float`.
@@ -598,6 +593,12 @@ print(type(description).__name__)  # [1]
 #: coroutine
 description.close()  # Never awaited, so close it explicitly
 ```
+
+If you leave out the `await` in the list comprehension,
+`sum()` receives a list of coroutines rather than prices.
+`ty` reports `no-matching-overload` at the `sum()` call.
+The `asyncio.run()` call raises a `TypeError` for adding an `int` and a `coroutine`,
+with a `RuntimeWarning` that `price_of_async` was never awaited.
 
 Making the helper `async` forces four changes.
 
