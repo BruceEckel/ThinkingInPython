@@ -27,12 +27,7 @@ Scripting `claim()` as `[False, True, False, True]` leaves the rat at `(0, -1)` 
 <details>
 <summary>Solution</summary>
 
-If you call `next(self.claim_results)` without the `False` default,
-the fake works for the rat's first turn and fails on its second.
-The fifth `claim()` finds the script empty, so `next()` raises a `StopIteration` inside the coroutine,
-and Python turns it into a `RuntimeError` ("coroutine raised StopIteration") that fails the test.
-The default lets the fake return `False` once the script runs out,
-so the rat dead-ends the way it would against walls.
+The test drives a copy of the chapter's `Rat` with a scripted fake:
 
 ```python
 # test_ch38_fake_blackboard.py
@@ -123,7 +118,12 @@ and spawns a rat at every open cell after that, here `(1, 0)` alone.
 
 **Stop the rat when the script ends.** Once the script runs out,
 `claim()` returns `False` for every cell, so the rat dead-ends on its
-second turn and `run()` returns.
+second turn, the way it would against walls, and `run()` returns.
+The `False` default in `next(self.claim_results, False)` supplies those returns.
+If you call `next(self.claim_results)` without the `False` default,
+the fake works for the rat's first turn and fails on its second.
+The fifth `claim()` finds the script empty, so `next()` raises a `StopIteration` inside the coroutine,
+and Python turns it into a `RuntimeError` ("coroutine raised StopIteration") that fails the test.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
