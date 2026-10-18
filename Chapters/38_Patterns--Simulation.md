@@ -172,15 +172,6 @@ rather than an `Enum`, so each member is also a `str`.
 and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell.
 
 The blackboard holds everything the rats share.
-`claim()` holds the rule on which the whole program depends.
-It tests and marks a cell in one step with no `await` in between,
-so each cell goes to one rat, however many reach it.
-The missing `await`, not a lock, makes `claim()` atomic.
-The [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
-needs a suspension point inside the update,
-but `claim()` runs from its test to its `add()` as one synchronous stretch
-(see exercise 3).
-
 `next_number()` hands out rat numbers from `itertools.count()`,
 the [endless counter](22_Patterns--Iterators.md#reusable-algorithms).
 `explore()` claims the entry and creates the first rat's task inside an `asyncio.TaskGroup`,
@@ -245,6 +236,15 @@ class Blackboard:
             lines.append("".join(row))
         return "\n".join(lines)
 ```
+
+`claim()` holds the rule on which the whole program depends.
+It tests and marks a cell in one step with no `await` in between,
+so each cell goes to one rat, however many reach it.
+The missing `await`, not a lock, makes `claim()` atomic.
+The [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
+needs a suspension point inside the update,
+but `claim()` runs from its test to its `add()` as one synchronous stretch
+(see exercise 3).
 
 The `async with` block of a `TaskGroup` waits until every task in the group has finished,
 including tasks created after the block began.
@@ -583,10 +583,6 @@ or inherits `Item`'s default, which lets the robot into the room.
 ### Rooms, Robots, and the Item Factory
 
 The occupants are `Item`s.
-`Room.enter()` calls `occupant.interact()` and returns the room in which the robot ends up.
-A wall returns the robot's current room,
-food replaces itself with `Empty` and returns its own room,
-and a teleport returns its paired room.
 No `if` or `elif` on the type of occupant appears in the movement code:
 
 ```python
@@ -700,6 +696,11 @@ def item_factory(symbol: str) -> Item:
     # Anything else is a teleport target
     return Teleport(symbol)
 ```
+
+Each occupant's `interact()` returns the room in which the robot ends up.
+A wall returns the robot's current room,
+food replaces itself with `Empty` and returns its own room,
+and a teleport returns its paired room.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
