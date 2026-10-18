@@ -253,10 +253,6 @@ You can also name the shape, comprehension or `for` loop, that suits each versio
 <details>
 <summary>Solution</summary>
 
-If you leave `return line` out of `show()`,
-the function returns `None` implicitly.
-`lines` then prints as `[None, None, None]`, the list `comprehension_side_effects.py` builds.
-`ty` reports the omission as `invalid-return-type`, because `show()` declares a `str` return type.
 The solution returns the line it printed, so the comprehension collects strings.
 
 ```python
@@ -279,6 +275,11 @@ for n in [1, 2, 3]:  # Printing alone stays a loop
 #: item 2
 #: item 3
 ```
+
+If you leave `return line` out of `show()`,
+the function returns `None` implicitly.
+`lines` then prints as `[None, None, None]`, the list `comprehension_side_effects.py` builds.
+`ty` reports the omission as `invalid-return-type`, because `show()` declares a `str` return type.
 
 **Give the output expression a value.** The original comprehension collects `print()`'s return value,
 which is always `None`.
