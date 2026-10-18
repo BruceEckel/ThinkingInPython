@@ -63,11 +63,8 @@ Under a fresh handler with the same start, your rewritten `archive()` puts `2026
 <details>
 <summary>Solution</summary>
 
-If you leave out `nonlocal`, `moment += step` makes `moment` a local name of `advancing()`,
-so `current = moment` raises an `UnboundLocalError` at the first request.
-`ty` reports the mistake before any run, as an `unresolved-reference` on both lines that use `moment`.
-The solution declares `moment` nonlocal, so each request rebinds the enclosing variable
-and the stored moment carries over to the next request.
+The handler keeps the stored moment in the enclosing scope
+and updates it with `nonlocal`:
 
 ```python
 # advancing_clock.py
@@ -129,6 +126,15 @@ Where `crossing` in `midnight.py` walks a two-element list and stops there,
 so the same handler serves an Effect that reads the clock three times or thirty.
 Each call to `ticking()` builds a fresh handler with its own stored moment,
 so both runs in the listing start at 23:59:59.
+
+If you leave out `nonlocal`, `moment += step` makes `moment`
+a local name of `advancing()`,
+so `current = moment` raises an `UnboundLocalError` at the first request.
+`ty` reports the mistake before any run,
+as an `unresolved-reference` on both lines that use `moment`.
+The solution declares `moment` nonlocal,
+so each request rebinds the enclosing variable
+and the stored moment carries over to the next request.
 
 **Reproduce the bug under the new handler.** `archive_twice()` is the original function.
 The first request names the file for January 1 and the second stamps the entry January 2,
@@ -441,11 +447,8 @@ With every source shortened, `run()` raises a `Blackout` for the first uncovered
 <details>
 <summary>Solution</summary>
 
-If you wrap `run_load()` in `catch(Blackout)` to turn the blackout into a value,
-the program type-checks and the run prints the same trace through `Turbine offline`.
-Then the `Blackout` escapes `run()`, and the traceback ends with `grid.Blackout: 20`.
-The wrapper changes nothing, so the solution drops it
-and uses `expect()` to show the `Blackout` arriving at `run()`.
+The listing runs the `sun_first` order with the turbine added,
+then a shortened order that leaves an hour with no source:
 
 ```python
 # exercise_3.py
@@ -506,6 +509,14 @@ A handler answers each request from inside the driver.
 No `yield` sits between the `raise` and `run()`'s own stack frame,
 so the exception unwinds the driver's frames in the ordinary Python way.
 The driver never throws it into the suspended Effect.
+
+If you wrap `run_load()` in `catch(Blackout)` to turn the blackout
+into a value, the program type-checks and the run prints the same
+trace through `Turbine offline`.
+Then the `Blackout` escapes `run()`,
+and the traceback ends with `grid.Blackout: 20`.
+The wrapper changes nothing, so the solution drops it
+and uses `expect()` to show the `Blackout` arriving at `run()`.
 
 Exercise 2 draws the same distinction from the other side.
 A failure is part of the Effect only if the Effect yields it as a value.
@@ -834,14 +845,9 @@ Taking `TooLong` back out of `research()`'s error parameter makes `ty` report `i
 <details>
 <summary>Solution</summary>
 
-If you write `within_limit()` without `@throws`, an article over the
-limit raises a `TooLong` that escapes `catch()` and `run()` as an
-ordinary exception, the way `size()`'s `KeyError` does in exercise 2.
-`ty` flags the mistake first, as an `invalid-yield` at
-`yield from within_limit(article)`, because the undecorated function
-returns a `str` rather than an Effect. The solution decorates
-`within_limit()` with `@throws(TooLong)`, which moves the raised
-exception into the error channel, where `catch()` handles it.
+The solution decorates `within_limit()` with `@throws(TooLong)`,
+which moves the raised exception into the error channel,
+where `catch()` handles it:
 
 ```python
 # research_long.py
@@ -887,6 +893,13 @@ which the type checker names. `report()` needs three more.
 5. `report()`'s `catch()` call, widened to include `TooLong`.
 6. The `found:` annotation, widened to include `TooLong`.
 7. A new `case TooLong():` branch in `report()`'s `match`.
+
+If you write `within_limit()` without `@throws`, an article over the
+limit raises a `TooLong` that escapes `catch()` and `run()` as an
+ordinary exception, the way `size()`'s `KeyError` does in exercise 2.
+`ty` flags the mistake first, as an `invalid-yield` at
+`yield from within_limit(article)`, because the undecorated function
+returns a `str` rather than an Effect.
 
 **Widen the signature to match.** If you make edit 3 without edit 4, `ty` reports an `invalid-yield` at the
 new line rather than at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
@@ -1180,11 +1193,8 @@ Decorating an Effect that still declares a `Need` with `@fork` makes `ty` report
 <details>
 <summary>Solution</summary>
 
-If you leave out the `__main__` guard, each worker re-imports the module,
-reaches the `with` block, and tries to start a pool of its own before it has finished starting.
-The workers die with a `RuntimeError` about their bootstrapping phase,
-and the driver's `run()` fails with a `BrokenProcessPool` instead of printing the squares.
-Under the guard, the driver runs in the main process alone, so a worker loads `slow_square()` without running the driver.
+The solution swaps in a `ProcessPoolExecutor`
+and puts the driver under the `__main__` guard:
 
 ```python
 import time
@@ -1232,7 +1242,15 @@ outside the Effect: the executor class, the timing the chapter's version
 prints, and the `__main__` guard.
 The guard is now required, because a process pool starts workers by
 re-importing the module.
-Without the guard, each worker builds another pool.
+
+If you leave out the `__main__` guard, each worker re-imports the module,
+reaches the `with` block,
+and tries to start a pool of its own before it has finished starting.
+The workers die with a `RuntimeError` about their bootstrapping phase,
+and the driver's `run()` fails with a `BrokenProcessPool`
+instead of printing the squares.
+Under the guard, the driver runs in the main process alone,
+so a worker loads `slow_square()` without running the driver.
 
 `slow_square()` stays as it was.
 `fork()` checks for a `ProcessPoolExecutor` and serializes the function and
@@ -1303,12 +1321,8 @@ Dropping the last price from the call makes that last check fail.
 <details>
 <summary>Solution</summary>
 
-If you script three balances, `[100, 40, 10]`, and forget that the
-refused `50` still reads one, the script runs out at the fourth price.
-`handle()` reads the `StopIteration` as the end of the Effect, so
-`run()` returns `None` and the test fails on `assert None == 2`. Every
-attempt reads a balance, whether the purchase succeeds or fails, so
-the solution scripts four balances, with `40` twice.
+Every attempt reads a balance, whether the purchase succeeds or fails,
+so the solution scripts four balances, with `40` twice:
 
 ```python
 # test_ch47_wallet.py
@@ -1385,6 +1399,11 @@ as the end of the Effect, the silent failure the chapter describes, so
 `run()` would return `None` and the first assertion would fail on
 `None == 2`. Stopping early would leave a balance unread, which the
 final assertion catches by checking that the iterator has run out.
+
+If you script three balances, `[100, 40, 10]`, and forget that the
+refused `50` still reads one, the script runs out at the fourth price.
+The test then fails on `assert None == 2`,
+as it does when a fifth request exhausts the script.
 
 **Record each write.** `written` records one entry per successful purchase, `[40, 10]`, so the
 assertions together say that `spree()` tries every price and writes only the
@@ -1749,12 +1768,8 @@ With the handler's annotation deleted, `handle()` raises a `ValueError` before a
 <details>
 <summary>Solution</summary>
 
-If you declare `Random` as an empty class, the way the chapter declares
-`Flip`, the request has nowhere to carry the range. `roll()` fails at
-`Random(low, high)` with a `TypeError`, and `ty` reports
-`too-many-positional-arguments` there and `unresolved-attribute` where
-the handler reads `request.low`. The solution gives `Random` the fields
-`low` and `high`, so the handler reads the range off the request.
+The solution gives `Random` the fields `low` and `high`,
+so the handler reads the range off the request:
 
 ```python
 # exercise_12.py
@@ -1800,6 +1815,12 @@ print(run(handle(scripted_from(iter([3, 4])))(game)()))
 the request. That is why this Ability is a record with fields, where the
 chapter's `Flip` is an empty class. The fields are the parameters of the
 question.
+
+If you declare `Random` as an empty class, the way the chapter declares
+`Flip`, the request has nowhere to carry the range. `roll()` fails at
+`Random(low, high)` with a `TypeError`, and `ty` reports
+`too-many-positional-arguments` there and `unresolved-attribute` where
+the handler reads `request.low`.
 
 **Run one game under two handlers.** You write `game()` once, and it runs under both handlers unchanged. The scripted handler is the testable one.
 It is a closure over an iterator rather than a class,
