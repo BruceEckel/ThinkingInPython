@@ -214,7 +214,7 @@ def make_map(size: int) -> str:
 <details>
 <summary>Done when</summary>
 
-your file prints one unshared-to-shared peak ratio per map size, and with the record `Tile` each ratio lands between about six and seven (the solution prints `6.2` at 50x50 and `6.9` at 200x200).
+your file prints one unshared-to-shared peak ratio per map size, and with the record `Tile` each ratio falls between about six and seven (the solution prints `6.2` at 50x50 and `6.9` at 200x200).
 A ratio well above that means one peak counted both builds.
 
 <details>
@@ -924,7 +924,7 @@ def parse_map(text: str) -> list[list[Tile]]:
 <details>
 <summary>Done when</summary>
 
-`tile_map_demo.py`'s map prints `24 3`, `parse_map("?")` raises `ValueError: '?' is not a valid Tile`, and `uv run ty check` reports `unresolved-attribute` on a member you never defined, such as `Tile.DOOR`.
+`tile_map_demo.py`'s map prints `24 3`, `parse_map("?")` raises `ValueError: '?' is not a valid Tile`, and `uv run ty check` reports `unresolved-attribute` on a member missing from the enum, such as `Tile.DOOR`.
 You can then say which wrong-symbol mistakes the type checker catches in each version and which stay runtime failures in both.
 
 <details>

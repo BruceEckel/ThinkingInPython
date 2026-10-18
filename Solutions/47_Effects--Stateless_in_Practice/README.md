@@ -574,7 +574,7 @@ class Dead:  # Never available, so every draw fails
 <details>
 <summary>Done when</summary>
 
-with two never-available sources scripted ahead of `Solar()`, `run_load(10, 2)` prints an online and offline pair for each failing source, then `Solar online`, `10:00`, `11:00`, and `Solar offline`.
+with two failing sources scripted ahead of `Solar()`, `run_load(10, 2)` prints an online and offline pair for each failing source, then `Solar online`, `10:00`, `11:00`, and `Solar offline`.
 The run makes three requests for two hours.
 You can name a decision `controller()` makes by the hour that your test leaves unchecked.
 
@@ -1007,7 +1007,7 @@ def outcome(feed: Feed, book: Encyclopedia) -> str:
 <summary>Done when</summary>
 
 you wrote your prediction before running, and the run prints `feed: fetching` and then `no headline today`, with no `library:` line.
-Your explanation says what the extra trace line tells you about how far `latest()` got, and why the value `report()` returns matches `DeadWire`'s.
+Your explanation says what the extra trace line tells you about how far `latest()` got, and why the value `report()` returns matches the value `DeadWire` returns.
 
 <details>
 <summary>Solution</summary>

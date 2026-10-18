@@ -607,7 +607,7 @@ def random_pairs[T](base: type[T], n: int,
 <details>
 <summary>Done when</summary>
 
-after your loop over `random_pairs(Item, 100, counts)`, the four counts sum to 200, two per pair, and `counts["Lizard"]` lands near 50.
+after your loop over `random_pairs(Item, 100, counts)`, the four counts sum to 200, two per pair, and `counts["Lizard"]` is near 50.
 Printing `counts["Lizard"]` before the loop shows `0`.
 
 <details>

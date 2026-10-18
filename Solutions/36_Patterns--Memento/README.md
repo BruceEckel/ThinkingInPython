@@ -291,7 +291,7 @@ class History[S]:
 <summary>Done when</summary>
 
 a `History` bounded at 2 that records three `do()` calls keeps the two newest past states, two `undo()` calls succeed, and `can_undo()` then agrees with whether a third `undo()` would succeed.
-You can say why that answer is right even though the program made more `do()` calls than undos.
+You can say why that answer is right although the program made more `do()` calls than undos.
 
 <details>
 <summary>Solution</summary>

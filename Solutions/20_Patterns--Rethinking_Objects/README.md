@@ -777,7 +777,7 @@ class CountingBox:
 <details>
 <summary>Done when</summary>
 
-your inheriting `CountingList` ends with more elements than its `append()` and `__setitem__()` counts account for, after a call to a `list` method you found that goes past both.
+your inheriting `CountingList` ends with more elements than its `append()` and `__setitem__()` counts explain, after a call to a `list` method you found that goes past both.
 Your composed `CountingBox`, after `append(1)`, `extend([2, 3])`, and `box[0] = 99`, prints `3 3 1` for its length, appends, and sets.
 
 <details>

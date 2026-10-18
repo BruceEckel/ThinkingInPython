@@ -1006,7 +1006,7 @@ If you repaint the patch and stop there, `owned` stays `{(0, 0)}`,
 which the demo's first move recolors to match the first unowned cell.
 Every later `select()` picks that same cell,
 finds that its color matches the patch, and returns `False`,
-so the `while` loop runs forever.
+so the demo's `while not game.is_complete()` loop runs forever.
 
 **Score the game.** `game.moves` gives the
 single-player scoring the exercise asks for:
@@ -2187,7 +2187,7 @@ class Controller:
 <summary>Done when</summary>
 
 feeding `k`, `k`, `j` to your `Controller` prints six lines, each count beside a bar of that many asterisks, ending at a count of 1.
-You can say what `Counter`, each view, and `Controller` hold a reference to, and which existing class a third view would change.
+You can say which objects `Counter`, each view, and `Controller` each reference, and which existing class a third view would change.
 
 <details>
 <summary>Solution</summary>

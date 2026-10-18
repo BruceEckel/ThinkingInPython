@@ -178,7 +178,7 @@ def peak_of(func: Callable[[], list[int]]) -> int:
 <details>
 <summary>Done when</summary>
 
-your single comprehension returns `[0, 4, 16, 36, 64]`, equal to both of the chapter's versions, and its `tracemalloc` peak is about half of `eager_first_evens()`'s, a ratio near `0.5`.
+your single comprehension returns `[0, 4, 16, 36, 64]`, equal to both of the chapter's versions, and its `tracemalloc` peak is about half the peak of `eager_first_evens()`, a ratio near `0.5`.
 The lazy version's peak still comes in under 1% of yours.
 
 <details>

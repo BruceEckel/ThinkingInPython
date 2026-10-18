@@ -720,7 +720,7 @@ class Demo(metaclass=Meta):
 <details>
 <summary>Done when</summary>
 
-your edited `new_vs_init.py` runs with no exception and prints `has Tag base: False`, the outcome matches the prediction you wrote first, and you can say what already exists when the metaclass `__init__()` starts.
+your edited `new_vs_init.py` runs with no exception and prints `has Tag base: False`, the outcome matches the prediction you wrote first, and you can say what exists by the time the metaclass `__init__()` starts.
 
 <details>
 <summary>Solution</summary>

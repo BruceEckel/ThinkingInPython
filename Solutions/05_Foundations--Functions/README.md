@@ -388,7 +388,7 @@ def report(label, *values, **options):
 <details>
 <summary>Done when</summary>
 
-one call to `report()` prints `point (3, 4) {'color': 'red'}`, and that call names only `args` and `opts`, never `"point"`, `3`, `4`, or `"color"`.
+one call to `report()` prints `point (3, 4) {'color': 'red'}`, and that call names `args` and `opts`, not `"point"`, `3`, `4`, or `"color"`.
 If the output shows `(3, 4, {'color': 'red'}) {}`, the dictionary arrived as one more positional argument.
 
 <details>

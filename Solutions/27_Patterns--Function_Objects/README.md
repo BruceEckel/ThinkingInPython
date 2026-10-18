@@ -927,7 +927,7 @@ class Announce:
 <details>
 <summary>Done when</summary>
 
-importing `bank_events.py` against your changed `tagged_bus.py` stops with `TypeError: Announce: not an @event`, raised at the `@handler` above `Announce`, and you can say which class `EVENTS` holds and which class the name `Deposit` refers to.
+importing `bank_events.py` against your changed `tagged_bus.py` stops with `TypeError: Announce: not an @event`, raised at the `@handler` above `Announce`, and you can say which class `EVENTS` holds and to which class the name `Deposit` refers.
 
 <details>
 <summary>Solution</summary>
