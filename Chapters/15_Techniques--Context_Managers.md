@@ -821,10 +821,7 @@ A comma-separated `with` sets its count when you write it.
 `ExitStack` makes a second guarantee, for a later entry that fails:
 the stack unwinds the managers that entered earlier.
 `exit_stack_fails.py` enters two `tag()` managers from `multiple.py`,
-then a third manager, `broken()`,
-which raises a `RuntimeError` before its `yield` and so fails to enter.
-The first two unwind.
-`ExitStack` registers nothing for the third:
+then a third manager, `broken()`, that fails to enter:
 
 ```python
 # exit_stack_fails.py
@@ -852,8 +849,9 @@ with expected(RuntimeError):
 #: [RuntimeError] c failed to open
 ```
 
-`ExitStack` registers a manager's exit after its `__enter__()` returns.
-The `__enter__()` of `broken("c")` raises a `RuntimeError` instead.
+`broken()` raises a `RuntimeError` before its `yield` and so fails to enter.
+`ExitStack` registers a manager's exit after its `__enter__()` returns,
+so it registers nothing for `broken("c")`.
 Because `a` and `b` entered first, both unwind in reverse,
 the same rule a comma-separated `with` follows.
 
