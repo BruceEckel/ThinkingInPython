@@ -429,9 +429,8 @@ Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs
 Chapters/46_Effects--Stateless.md	never: A test can then supply a clock that never waits
 Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
-Chapters/46_Effects--Stateless.md	never: because CODE matches the yielded value before the driver gets it and never resumes the inner generator
+Chapters/46_Effects--Stateless.md	never: and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
-Chapters/46_Effects--Stateless.md	never: so the inner CODE never runs
 Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
 Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
 Chapters/46_Effects--Stateless.md	only: A library acts only on objects handed to it
