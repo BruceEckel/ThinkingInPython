@@ -1336,14 +1336,6 @@ for each of the 36 ordered pairs of your six weapons, the two orders give opposi
 <details>
 <summary>Solution</summary>
 
-If you leave `compete()` out of `Weapon`,
-the program prints the same two lines, since every weapon class defines its own.
-The type checker rejects the change.
-`ty` reports an `invalid-explicit-override` at each of the six `@override` decorators,
-and an `unresolved-attribute` at `battle()`'s call, because `get_weapon()` returns a `Weapon`.
-The solution declares `compete()` on the base,
-which gives that call and every `@override` a method to name.
-
 Each `Inhabitant` kind holds two of six weapon types,
 ranked around a cycle. Each weapon beats the previous two in the
 ranking and loses to the next two. Six is an even number, so each
@@ -1545,6 +1537,14 @@ if __name__ == "__main__":
 The `eval_*()` methods live in the subclasses alone,
 and their `item` parameters take `Any`, as the chapter's `opponent` and `caller` parameters do.
 
+If you leave `compete()` out of `Weapon`,
+the program prints the same two lines, since every weapon class defines its own.
+The type checker rejects the change.
+`ty` reports an `invalid-explicit-override` at each of the six `@override` decorators,
+and an `unresolved-attribute` at `battle()`'s call, because `get_weapon()` returns a `Weapon`.
+The solution declares `compete()` on the base,
+which gives that call and every `@override` a method to name.
+
 **Answer for the original caller.**
 As in `paper_scissors_rock.py`,
 each `eval_*()` method answers for the caller its name identifies,
@@ -1675,13 +1675,8 @@ You can also name the chapter's reason the callable cells answer, and the reason
 <details>
 <summary>Solution</summary>
 
-If you delete the `isinstance()` tests in `paper_vs_rock()` and `rock_vs_paper()` and read `wet`,
-the demo prints the same five lines,
-because the lookup reaches each cell with a `Paper` in the position it reads.
-The type checker rejects the access.
-`ty` reports an `unresolved-attribute` in each cell,
-since a cell's parameters are `Item`s and `Item` has no `wet`.
-The solution keeps the tests so that the type checker narrows the operand to `Paper` before the attribute access.
+Every `OUTCOME` cell in the solution holds a callable,
+which `compete()` calls after the lookup:
 
 ```python
 # exercise_9.py
@@ -1800,6 +1795,14 @@ the kind the chapter's ladder version repeats in every class.
 Here each test sits inside one cell, so you write it once,
 and a new `Item` leaves it untouched.
 
+If you delete the `isinstance()` tests in `paper_vs_rock()` and `rock_vs_paper()` and read `wet`,
+the demo prints the same five lines,
+because the lookup reaches each cell with a `Paper` in the position it reads.
+The type checker rejects the access.
+`ty` reports an `unresolved-attribute` in each cell,
+since a cell's parameters are `Item`s and `Item` has no `wet`.
+The solution keeps the tests so that the type checker narrows the operand to `Paper` before the attribute access.
+
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
@@ -1912,13 +1915,8 @@ your table holds 36 entries, each matching what your exercise 8 weapons return f
 <details>
 <summary>Solution</summary>
 
-If you drop `strict=True` and a row of `GRID` comes up one cell short,
-the comprehension builds 35 entries and raises no exception.
-The check then prints `35 pairs agree with exercise 8: True`,
-since it plays only the pairs the table holds,
-and the seeded meeting raises a `KeyError` for the missing `(Jargon, Schedule)`.
-The solution passes `strict=True` to both `zip()` calls,
-so the short row raises a `ValueError` when the module loads, before any duel.
+The solution replaces the weapons' `eval_*()` methods with a grid
+of answers:
 
 ```python
 # exercise_10.py
@@ -2057,6 +2055,14 @@ so the seeded meeting draws the same weapons and `Troll` wins again.
 **Check against the method version.**
 `by_methods()` plays each pair through exercise 8's classes,
 finding them by name as exercise 3 does.
+
+If you drop `strict=True` and a row of `GRID` comes up one cell short,
+the comprehension builds 35 entries and raises no exception.
+The check then prints `35 pairs agree with exercise 8: True`,
+since it plays only the pairs the table holds,
+and the seeded meeting raises a `KeyError` for the missing `(Jargon, Schedule)`.
+The solution passes `strict=True` to both `zip()` calls,
+so the short row raises a `ValueError` when the module loads, before any duel.
 
 The grid holds in six lines the answers that exercise 8 spreads across 42 methods.
 A seventh weapon adds an empty class, a row, and a column,
