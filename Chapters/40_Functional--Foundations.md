@@ -595,9 +595,7 @@ position is the only way to bind an argument.
 Because `partial()` fills positional arguments from the left,
 presetting the third argument before 3.14 meant presetting the first two as well.
 `functools.Placeholder` (Python 3.14 and later)
-is a marker that reserves a position for the caller.
-The type checker treats `Placeholder` as an ordinary argument value,
-so the listing declares the type of the function it builds and carries one `# type: ignore` on the construction:
+is a marker that reserves a position for the caller:
 
 ```python
 # placeholder.py
