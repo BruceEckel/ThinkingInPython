@@ -384,10 +384,6 @@ If `announce()` discards each exception instead, the test fails with `DID NOT RA
 <details>
 <summary>Solution</summary>
 
-If you catch each exception and discard it,
-every responder runs, but `announce()` returns normally.
-The demo's `print()` sits inside its `except*` block, so the script prints nothing,
-and the test's `pytest.raises(ExceptionGroup)` fails with `DID NOT RAISE`.
 The solution keeps each exception in a list and raises the list as one `ExceptionGroup` once the loop ends.
 
 ```python
@@ -463,6 +459,13 @@ A responder that fails silently is worse than one that stops the loop.
 The stopped loop raises an exception the caller sees;
 the silent failure leaves the caller believing every responder succeeded.
 
+If you catch each exception and discard it,
+every responder runs, but `announce()` returns normally.
+The demo's `print()` sits inside its `except*` block,
+so the script prints nothing,
+and the test's `pytest.raises(ExceptionGroup)` fails with
+`DID NOT RAISE`.
+
 **Report every failure together.** `ExceptionGroup` is the right container because more than one responder
 can fail on a single notification, and the caller needs every failure,
 not the first. `except*` then lets a caller handle one kind of failure
@@ -535,14 +538,8 @@ A first responder that raises `asyncio.CancelledError` also ends up in the group
 <details>
 <summary>Solution</summary>
 
-If you leave out `return_exceptions=True`,
-`gather()` re-raises the first failure as a bare `RuntimeError`.
-`pytest.raises(ExceptionGroup)` lets that `RuntimeError` propagate, which fails the test.
-The demo still prints `1 [7]`.
-`except*` wraps a bare exception in a group,
-and `record()` finishes before `main()` resumes.
-A slower responder, though, keeps running with nothing awaiting it, as [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows.
-The solution passes the keyword, so `gather()` waits for every responder.
+The solution passes `return_exceptions=True`,
+so `gather()` waits for every responder.
 
 ```python
 # exercise_4.py
@@ -647,6 +644,16 @@ def test_a_cancelled_responder_is_reported() -> None:
 failure immediately" to "run everything and return a list."
 The synchronous version needs a `try` inside its loop to keep going past a failure.
 Here that one keyword does the same job, because `gather()` runs the loop over the responders.
+
+If you leave out `return_exceptions=True`,
+`gather()` re-raises the first failure as a bare `RuntimeError`.
+`pytest.raises(ExceptionGroup)` lets that `RuntimeError` propagate,
+which fails the test.
+The demo still prints `1 [7]`.
+`except*` wraps a bare exception in a group,
+and `record()` finishes before `main()` resumes.
+A slower responder, though, keeps running with nothing awaiting it,
+as [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows.
 
 **Pick out the failures.** The results come back in argument order, so the list shows
 which responder produced what. This version needs the failures alone,
@@ -904,10 +911,6 @@ Your neighbor test is true for `(0, 0)` and `(1, 1)` and false for a cell paired
 <details>
 <summary>Solution</summary>
 
-If you repaint the patch and stop there, `owned` stays `{(0, 0)}`,
-which the demo's first move recolors to match the first unowned cell.
-Every later `select()` picks that same cell, finds that its color matches the patch, and returns `False`,
-so the `while` loop runs forever.
 The patch grows because `select()` searches again from the origin after repainting.
 
 ```python
@@ -998,6 +1001,12 @@ It starts at `origin` and walks from each cell to every neighbor
 It repaints every cell in the currently owned patch to the selected cell's color,
 then re-runs `_flood()`, which absorbs the neighbors that now match the
 new color.
+
+If you repaint the patch and stop there, `owned` stays `{(0, 0)}`,
+which the demo's first move recolors to match the first unowned cell.
+Every later `select()` picks that same cell,
+finds that its color matches the patch, and returns `False`,
+so the `while` loop runs forever.
 
 **Score the game.** `game.moves` gives the
 single-player scoring the exercise asks for:
@@ -1421,12 +1430,8 @@ Every entry your elimination produces stays in `0`, `1`, or `2`.
 <details>
 <summary>Solution</summary>
 
-If you leave the `% MOD` off the subtraction, as ordinary elimination would,
-an entry can become a nonzero multiple of three.
-`next()` accepts such an entry as a pivot, since it is not zero.
-`pow(x, -1, MOD)` then raises a `ValueError` ("base is not invertible for the given modulus"),
-so the script stops at 3x3 before printing a line.
-Reducing every result mod 3 keeps each entry in `0`, `1`, or `2`, where every nonzero value has an inverse.
+Reducing every product and difference mod 3 keeps each entry in `0`, `1`, or `2`,
+where every nonzero value has an inverse.
 
 ```python
 # exercise_9.py
@@ -1513,6 +1518,14 @@ which is all the question asks: which colors are reachable, not how.
 It is Gaussian elimination, with two changes for arithmetic mod 3.
 Dividing by a pivot is multiplying by its inverse, which `pow(x, -1,
 MOD)` supplies, and every subtraction ends in `% MOD`.
+
+If you leave the `% MOD` off the subtraction,
+as ordinary elimination would,
+an entry can become a nonzero multiple of three.
+`next()` accepts such an entry as a pivot, since it is not zero.
+`pow(x, -1, MOD)` then raises a `ValueError`
+("base is not invertible for the given modulus"),
+so the script stops at 3x3 before printing a line.
 
 **Check the zero rows.** Elimination either finds a pivot in a column or leaves that column free.
 The rows whose coefficients are all zero after elimination determine the answer.
@@ -1614,11 +1627,6 @@ assigning `celsius` twice and `humidity` once on one `Thermometer` leaves two re
 <details>
 <summary>Solution</summary>
 
-If `__get__()` always returns the stored value, as a validating descriptor's `__get__()` does,
-`Thermometer.celsius` runs `getattr(None, "_celsius")`
-and raises an `AttributeError` before the call to `connect()`.
-The type checker passes that version, since the overloads still declare that class access returns the descriptor.
-The failure appears only when the program runs.
 The solution tests for `obj is None` and returns the descriptor.
 
 ```python
@@ -1691,6 +1699,14 @@ the whole object; a descriptor keeps one per attribute.
 **Return the descriptor on class access.** Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`.
 Returning the descriptor there lets `Thermometer.celsius.connect()` call the descriptor's method.
+
+If `__get__()` always returns the stored value,
+as a validating descriptor's `__get__()` does,
+`Thermometer.celsius` runs `getattr(None, "_celsius")`
+and raises an `AttributeError` before the call to `connect()`.
+The type checker passes that version,
+since the overloads still declare that class access returns the descriptor.
+The failure appears only when the program runs.
 
 **Type each kind of access.** The two `@overload` declarations tell the type checker which result each
 access gets: `Notifying[T]` from the class, `T` from an instance. If you
@@ -1785,19 +1801,7 @@ You can name three runtime problems the load-time form removes, two it keeps, an
 <details>
 <summary>Solution</summary>
 
-If `responds()` appends the function and returns nothing,
-the demo still prints its three lines, because `RESPONDERS` holds each function.
-The decorator's result replaces the name, though,
-so the name `display` refers to `None`.
-Calling `display(5.0)` then raises a `TypeError`.
-The type checker catches the mistake before any run.
-With `-> Responder` declared, it reports an `invalid-return-type` on `responds()`.
-Returning `fn` keeps each decorated name bound to its function.
-
-The return value also separates `Broadcasting.respond()` from the chapter's `Broadcaster.connect()`.
-`connect()` appends and returns `None`,
-so `@thermometer.connect` above a `def` would bind that name to `None`.
-`respond()` exists to return the function.
+The registry is a module-level list that `responds()` fills:
 
 ```python
 # exercise_11.py
@@ -1850,6 +1854,22 @@ so the registry is complete before any thermometer exists.
 
 **Keep the function callable.** `responds()` returns `fn` unchanged,
 so `display` is still a function you can call by name.
+
+If `responds()` appends the function and returns nothing,
+the demo still prints its three lines,
+because `RESPONDERS` holds each function.
+The decorator's result replaces the name, though,
+so the name `display` refers to `None`.
+Calling `display(5.0)` then raises a `TypeError`.
+The type checker catches the mistake before any run.
+With `-> Responder` declared,
+it reports an `invalid-return-type` on `responds()`.
+
+The return value also separates `Broadcasting.respond()`
+from the chapter's `Broadcaster.connect()`.
+`connect()` appends and returns `None`,
+so `@thermometer.connect` above a `def` would bind that name to `None`.
+`respond()` exists to return the function.
 
 The load-time form removes three of the runtime problems:
 
