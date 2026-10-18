@@ -194,8 +194,6 @@ A record freezes the binding of the field.
 As [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates, a list in that field keeps its `append()`.
 With the tuple, sharing a subtree is safe.
-`test_filesystem.py` builds `SUB` first, then places it inside `TREE`,
-and `SUB` stays as built.
 
 The test file confirms that:
 
@@ -232,6 +230,9 @@ def test_empty_directory() -> None:
     assert disk_usage(Directory("empty", ())) == 0
     assert list(walk(Directory("empty", ()))) == []
 ```
+
+`test_filesystem.py` shares a subtree.
+It builds `SUB` first, then places it inside `TREE`, and `SUB` stays as built.
 
 The classic version is a better choice when the set of node types is open.
 If plugins or other packages must add new node types,
@@ -792,11 +793,6 @@ A walker that needs the pieces at every level must therefore also recurse into a
 Everything else follows this chapter's walkers: one branch per node kind,
 and a recursive call where a node holds more nodes.
 
-Iterating over a `Template` produces `str | Interpolation`,
-a closed union like `Node` with two members,
-so an `isinstance()` test narrows it as well as a `match` does.
-The `else` paired with `isinstance(piece, Interpolation)` is the `str` case.
-
 Iteration skips the empty literal pieces,
 so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
 When a walker needs the pieces to alternate,
@@ -854,6 +850,11 @@ print(sql2)
 print(values2)
 #: [18]
 ```
+
+Iterating over a `Template` produces `str | Interpolation`,
+a closed union like `Node` with two members,
+so an `isinstance()` test narrows it as well as a `match` does.
+The `else` paired with `isinstance(piece, Interpolation)` is the `str` case.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure that mentions neither of them.
