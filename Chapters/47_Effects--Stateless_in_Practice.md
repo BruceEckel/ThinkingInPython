@@ -1419,16 +1419,6 @@ or disappears.
 As [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-effect)
 recommends, the union appears in full rather than as an alias.
 
-Each requested type needs a shape of its own.
-You could rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
-`Hero` would stay distinct, since it also declares `approach()`.
-But every hero then satisfies `Obstacle` as well.
-`play()` supplies the hero first,
-so the hero answers the request for an obstacle.
-When two Protocols have matching methods,
-argument order decides which request each implementation answers.
-That is the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match).
-
 The cast is a set of ordinary classes that inherit nothing:
 
 ```python
@@ -1471,6 +1461,16 @@ Its annotations do the upcasting,
 so each actor reaches `supply()` as its Protocol type,
 the job `as_type()` does elsewhere.
 Its body is the one place in the program that binds an implementation to an Ability.
+
+Each requested type needs a shape of its own.
+You could rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
+`Hero` would stay distinct, since it also declares `approach()`.
+But every hero then satisfies `Obstacle` as well.
+`play()` supplies the hero first,
+so the hero answers the request for an obstacle.
+When two Protocols have matching methods,
+argument order decides which request each implementation answers.
+That is the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match).
 
 `kitties_and_puzzles()` and `warriors_and_weapons()` are what the two concrete factories became.
 Each was a class with a method per product.
