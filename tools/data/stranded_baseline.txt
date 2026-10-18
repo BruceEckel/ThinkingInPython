@@ -27,10 +27,10 @@ Chapters/18_Techniques--Performance.md	so the first question is not "is the JIT 
 Chapters/19_Techniques--Concurrency.md	and CODE puts back whatever the variable held before
 Chapters/19_Techniques--Concurrency.md	one call in
 Chapters/20_Patterns--Rethinking_Objects.md	and show that the counts are now correct for every route in
-Chapters/28_Patterns--Data_Transfer_Objects.md	The *Messenger* passes a package of information around
 Chapters/23_Patterns--Singleton.md	People can create as many objects as they like
 Chapters/27_Patterns--Function_Objects.md	Each handler holds a reference to the next and decides whether to pass the request along
 Chapters/27_Patterns--Function_Objects.md	Publishing an unhandled event leaves no stray entry behind
+Chapters/28_Patterns--Data_Transfer_Objects.md	The *Messenger* passes a package of information around
 Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
 Chapters/30_Patterns--Observer.md	set before CODE and cleared after
 Chapters/31_Patterns--State_Machines.md	and the state after
@@ -59,6 +59,7 @@ Solutions/30_Patterns--Observer/README.md	CODE gives the single-player scoring t
 Solutions/30_Patterns--Observer/README.md	CODE reuses CODE from CODE unchanged and adds the CODE the exercise asks for
 Solutions/30_Patterns--Observer/README.md	so the demo's CODE and the first test still see the group the exercise asks for
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	CODE passes the string through
+Solutions/35_Patterns--Flyweight/README.md	CODE passes on your file (it reports CODE on CODE while CODE lags behind)
 Solutions/35_Patterns--Flyweight/README.md	one with CODE and one without
 Solutions/35_Patterns--Flyweight/README.md	so CODE changes what the square refers to
 Solutions/38_Patterns--Simulation/README.md	so any class with the right methods can stand in

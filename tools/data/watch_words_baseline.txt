@@ -174,6 +174,7 @@ Chapters/19_Techniques--Concurrency.md	itself: Loading an extension that has not
 Chapters/19_Techniques--Concurrency.md	itself: not just itself
 Chapters/19_Techniques--Concurrency.md	itself: suspends itself and yields control
 Chapters/19_Techniques--Concurrency.md	never: **Never call a blocking function inside a coroutine
+Chapters/19_Techniques--Concurrency.md	never: and the clauses below it never run
 Chapters/19_Techniques--Concurrency.md	never: its body never runs
 Chapters/19_Techniques--Concurrency.md	only: "concurrency is not parallelism" (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def] As this chapter shows
 Chapters/19_Techniques--Concurrency.md	only: **More cores speed up only the parallel fraction of the work
@@ -188,7 +189,6 @@ Chapters/19_Techniques--Concurrency.md	only: Independent processes that communic
 Chapters/19_Techniques--Concurrency.md	only: It is a suspended function that runs only when the event loop resumes it
 Chapters/19_Techniques--Concurrency.md	only: It starts essentially empty and grows only as the program asks for more
 Chapters/19_Techniques--Concurrency.md	only: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency
-Chapters/19_Techniques--Concurrency.md	only: Since 3.10 the interpreter switches threads only at a function call or at the jump that closes a loop iteration
 Chapters/19_Techniques--Concurrency.md	only: Tasks run one at a time and switch only at an CODE
 Chapters/19_Techniques--Concurrency.md	only: The only difference between one run and another is how finely the listing splits the total work
 Chapters/19_Techniques--Concurrency.md	only: This chapter makes concurrency look (somewhat) easy because it has touched only the surface of shared mutable state problems
@@ -428,8 +428,8 @@ Chapters/46_Effects--Stateless.md	happens: so you need no test that exercises th
 Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs
 Chapters/46_Effects--Stateless.md	never: A test can then supply a clock that never waits
-Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
 Chapters/46_Effects--Stateless.md	never: and never resumes the inner generator
+Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
 Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
 Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
 Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
@@ -480,6 +480,7 @@ Solutions/04_Foundations--Control_Flow/README.md	only: A list pattern matches on
 Solutions/04_Foundations--Control_Flow/README.md	only: Order matters only between patterns that could both match the same value
 Solutions/04_Foundations--Control_Flow/README.md	only: and increment it only in the branch that handles an odd CODE
 Solutions/04_Foundations--Control_Flow/README.md	only: so CODE matches only a list of two items
+Solutions/05_Foundations--Functions/README.md	never: and CODE never prints
 Solutions/05_Foundations--Functions/README.md	only: Any parameter that follows CODE is keyword-only
 Solutions/05_Foundations--Functions/README.md	only: CODE is positional-only
 Solutions/05_Foundations--Functions/README.md	only: Only CODE empties the caller's list
@@ -506,10 +507,14 @@ Solutions/12_Techniques--Data_Classes_as_Types/README.md	itself: A CODE Cannot V
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: If you keep only the CODE check
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	want: Subscript the factory when you want the checker to confirm the agreement
 Solutions/13_Techniques--Pattern_Matching/README.md	only: CODE matches only an empty sequence
+Solutions/14_Techniques--Decorators/README.md	cost: Wrapping the two extras in the other order changes the description and leaves the cost alone
+Solutions/14_Techniques--Decorators/README.md	cost: and a cost equal to the espresso's price plus both extras' prices
 Solutions/14_Techniques--Decorators/README.md	only: Give CODE a CODE parameter that defaults to CODE and a keyword-only CODE
 Solutions/14_Techniques--Decorators/README.md	price: Each extra adds its own price and name to what the inner drink reports
+Solutions/14_Techniques--Decorators/README.md	price: and a cost equal to the espresso's price plus both extras' prices
 Solutions/14_Techniques--Decorators/README.md	price: keep the price
 Solutions/14_Techniques--Decorators/README.md	price: so CODE changes the description and leaves the price alone
+Solutions/14_Techniques--Decorators/README.md	prices: and a cost equal to the espresso's price plus both extras' prices
 Solutions/16_Techniques--Comprehensions/README.md	only: Two entries collide only if their normalized strings are equal
 Solutions/16_Techniques--Comprehensions/README.md	want: The right shape depends on whether you want the list
 Solutions/16_Techniques--Comprehensions/README.md	want: and a loop when you want the side effect alone
@@ -525,6 +530,8 @@ Solutions/19_Techniques--Concurrency/README.md	never: "Later" never loops back t
 Solutions/19_Techniques--Concurrency/README.md	only: Only CODE reports CODE now
 Solutions/19_Techniques--Concurrency/README.md	only: the interpreter considers switching threads only at a function call or at the jump that closes a loop iteration
 Solutions/19_Techniques--Concurrency/README.md	price: At runtime the line raises a CODE before any price comes back
+Solutions/19_Techniques--Concurrency/README.md	prices: with prices CODE
+Solutions/19_Techniques--Concurrency/README.md	prices: with the prices unchanged
 Solutions/20_Patterns--Rethinking_Objects/README.md	never: so the CODE that CODE generated for CODE never runs
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE exists only for the type checker
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE gets only the methods you write for it
@@ -549,8 +556,10 @@ Solutions/23_Patterns--Singleton/README.md	only: so it orders only the second st
 Solutions/23_Patterns--Singleton/README.md	only: weigh the code each form needs against what only a class can offer
 Solutions/23_Patterns--Singleton/README.md	want: When You Want a Class
 Solutions/24_Patterns--Template_Method/README.md	hooks: Hooks and the Misspelled Override builds the set of known names inside CODE from the classes in CODE
+Solutions/24_Patterns--Template_Method/README.md	never: and CODE on the second returns normally while printing evidence that CODE never did its share
 Solutions/24_Patterns--Template_Method/README.md	only: Only discipline
 Solutions/24_Patterns--Template_Method/README.md	only: and only when you run that tool
+Solutions/25_Patterns--Surrogate/README.md	never: and say why normal lookup never finds it
 Solutions/25_Patterns--Surrogate/README.md	only: CODE runs only when normal lookup fails
 Solutions/25_Patterns--Surrogate/README.md	only: Let only a CODE class create the CODE objects
 Solutions/25_Patterns--Surrogate/README.md	only: The Recursion Trap and Forwarding with CODE describe a method that Python calls only after normal lookup fails
@@ -566,6 +575,7 @@ Solutions/27_Patterns--Function_Objects/README.md	never: A CODE is never a root
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	only: 'list')CODERecipe` is hashable only when every field is
 Solutions/29_Patterns--Changing_the_Interface/README.md	already: A module is already a namespace
 Solutions/29_Patterns--Changing_the_Interface/README.md	even: even through an instance
+Solutions/29_Patterns--Changing_the_Interface/README.md	never: and you can say why CODE never sees that call
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: CODE reports CODE because the parameter is positional-only
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: import only that function elsewhere
 Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE
@@ -644,6 +654,7 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	only: a function whose ret
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the run prints only the message
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: **Prove the loop tries every price
+Solutions/47_Effects--Stateless_in_Practice/README.md	price: Dropping the last price from the call makes that last check fail
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: the script runs out at the fourth price
 Solutions/47_Effects--Stateless_in_Practice/README.md	prices: The test proves from both sides that CODE attempts all four prices
