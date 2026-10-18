@@ -249,11 +249,7 @@ def quoted(template: Template) -> str:
 <details>
 <summary>Solution</summary>
 
-If you build each value with `str(piece.value)`, the way the chapter's `safe()` does,
-the output reads `'Alice' scored '91.5'%`.
-The template's `:.0f` stays behind in `piece.format_spec`,
-because `str()` receives the value alone.
-The solution passes the value and its spec to `format()`, as `shout()` does, so `score` still prints as `'92'`.
+`quoted()` and the `message` it formats:
 
 ```python
 # exercise_5.py
@@ -276,6 +272,14 @@ def quoted(template: Template) -> str:
 print(quoted(message))
 #: 'Alice' scored '92'%
 ```
+
+If you build each value with `str(piece.value)`,
+the way the chapter's `safe()` does,
+the output reads `'Alice' scored '91.5'%`.
+The template's `:.0f` stays behind in `piece.format_spec`,
+because `str()` receives the value alone.
+The solution passes the value and its spec to `format()`, as `shout()` does,
+so `score` still prints as `'92'`.
 
 **Tell values from literal text.** `quoted()` reverses the roles of
 `shout()`'s two branches.
