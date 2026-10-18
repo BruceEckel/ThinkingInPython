@@ -108,14 +108,8 @@ A block that still divides by zero under the same `expected(...)` call prints `[
 <details>
 <summary>Solution</summary>
 
-If you write `expected(ZeroDivisionError, TypeError)` without the
-inner parentheses, the script stops before printing `before`, with a
-`TypeError` saying that `expected.__init__()` takes from 1 to 2
-positional arguments but 3 were given. Python makes that call before
-the `with` statement enters the manager, so the `TypeError` propagates
-straight out of the script. `ty` flags the call as
-`too-many-positional-arguments`. The solution wraps the two classes
-in a tuple, so `expected` receives one `types` argument.
+The solution wraps the two classes in a tuple,
+so `expected` receives one `types` argument:
 
 ```python
 # ch15_expected_types.py
@@ -147,6 +141,14 @@ same form the `ZeroDivisionError` block printed before the change.
 
 **Check that the original type still matches.** The second block shows that the tuple still covers the original
 exception.
+
+If you write `expected(ZeroDivisionError, TypeError)` without the
+inner parentheses, the script stops before printing `before`, with a
+`TypeError` saying that `expected.__init__()` takes from 1 to 2
+positional arguments but 3 were given. Python makes that call before
+the `with` statement enters the manager, so the `TypeError` propagates
+straight out of the script. `ty` flags the call as
+`too-many-positional-arguments`.
 
 `contextlib.suppress` takes its exception classes as `*exceptions`,
 so it accepts them as separate arguments.
@@ -442,13 +444,7 @@ A third `with ignore_missing():` block that finishes cleanly runs without an exc
 <details>
 <summary>Solution</summary>
 
-If you return `issubclass(exc_type, KeyError)` without the `None` test,
-the demo prints the same two lines, because both of its blocks raise an exception.
-In that version a block that finishes cleanly fails.
-`__exit__()` receives `None`, so `issubclass()` raises a `TypeError`.
-`ty` reports an `invalid-argument-type` at the `issubclass()` call,
-so the type checker catches the mistake that the demo's output hides.
-The solution tests `exc_type is not None` first.
+The solution tests `exc_type is not None` before calling `issubclass()`:
 
 ```python
 # ignore_missing.py
@@ -497,6 +493,13 @@ and passes `None` for all three arguments.
 Without the test, `issubclass(None, KeyError)` would raise a `TypeError`. Checking for `None`
 first also lets the type checker narrow `exc_type` to
 `type[BaseException]`, a class, as `issubclass()` requires.
+
+If you return `issubclass(exc_type, KeyError)` without the `None` test,
+the demo prints the same two lines,
+because both of its blocks raise an exception.
+In that version a block that finishes cleanly fails.
+`ty` reports an `invalid-argument-type` at the `issubclass()` call,
+so the type checker catches the mistake that the demo's output hides.
 
 The class uses a lowercase name because you use it like a function.
 `contextlib.suppress` is lowercase for the same reason.
