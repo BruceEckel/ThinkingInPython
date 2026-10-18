@@ -1664,14 +1664,6 @@ and Python evaluates them when code first reads them.
 `signature()` reads that stored data (not the original source text)
 to build the `Signature` object.
 
-The `ALL_DUNDERS` listing in [The Tool in Use](#the-tool-in-use)
-shows that machinery on a class.
-`__annotate_func__` is the code that computes the annotations,
-and `__annotations_cache__` holds the result after the first request.
-`__annotate__`, the name PEP 649 gives the function,
-is a descriptor on `type` that reads `__annotate_func__`,
-so it lives on the metaclass rather than in the class's own namespace.
-
 `display_object()` relies on `inspect` functions.
 `getmembers_static()` finds the members, `signature()` renders each method,
 and `get_annotations()` supplies the declared types,
@@ -2241,6 +2233,13 @@ and `__repr__()` give `Fraggle` a constructor, equality,
 and a `repr()` that you did not write.
 
 The rest is the bookkeeping every class carries.
+
+The output also shows the deferred evaluation of PEP 649 at work on a class.
+`__annotate_func__` is the code that computes the annotations,
+and `__annotations_cache__` holds the result after the first request.
+`__annotate__`, the name PEP 649 gives the function,
+is a descriptor on `type` that reads `__annotate_func__`,
+so it lives on the metaclass rather than in the class's own namespace.
 
 ## Exercises
 
