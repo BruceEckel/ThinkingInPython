@@ -35,12 +35,7 @@ You can also name at least two choices the loop makes that the recursive version
 <details>
 <summary>Solution</summary>
 
-If you seed the stack with `items` instead of `list(items)`,
-`deep_sum()` still returns `21`,
-but afterward the caller's list prints as `[]`. The stack and the argument are
-one list, so every `pop()` removes an element from the caller's list. The solution copies
-`items` with `list()`, which gives the loop a list of its own to
-consume.
+The loop version pops from a stack it manages:
 
 ```python
 # exercise_1.py
@@ -69,9 +64,13 @@ In the loop version you allocate the stack, seed it with a copy of `items`, choo
 `pop()` over `pop(0)`, and choose `extend()` over `append()`. Three of
 those choices are places to be wrong.
 
-**Protect the caller's list.** Seeding with `items`
-instead of `list(items)` mutates the caller's list as the loop pops its
-elements.
+**Protect the caller's list.** If you seed the stack with `items`
+instead of `list(items)`, `deep_sum()` still returns `21`,
+but afterward the caller's list prints as `[]`.
+The stack and the argument are one list,
+so every `pop()` removes an element from the caller's list.
+The solution copies `items` with `list()`,
+which gives the loop a list of its own to consume.
 
 **Pick which item comes next.** The pop end decides the visiting
 order, and both ends depart from the recursive version's left-to-right
@@ -205,14 +204,7 @@ def batch_totals(source: Iterable[int],
 <details>
 <summary>Solution</summary>
 
-If you build the totals with a list comprehension, `[sum(b) for b in batched(source, n)]`,
-`ty` reports an `invalid-return-type`.
-A `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
-If you change the annotation to `list[int]` to match,
-the demo's call hangs.
-The comprehension sums batches from the infinite `count(1)` forever,
-so `islice()` waits forever for its argument.
-The solution's generator expression, by contrast, computes each total only when `islice()` requests it.
+The solution returns a generator expression over `batched()`:
 
 ```python
 # exercise_3.py
@@ -238,6 +230,16 @@ and `islice()` then pulls five totals, so
 `count()` yields exactly fifteen integers in all. The first total is
 `1 + 2 + 3`, and each later one is nine larger, since every batch
 advances the source by three.
+
+If you build the totals with a list comprehension,
+`[sum(b) for b in batched(source, n)]`, `ty` reports an `invalid-return-type`.
+A `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
+If you change the annotation to `list[int]` to match,
+the demo's call hangs.
+The comprehension sums batches from the infinite `count(1)` forever,
+so `islice()` waits forever for its argument.
+The solution's generator expression, by contrast,
+computes each total only when `islice()` requests it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -283,13 +285,7 @@ You can also name a kind of input that `groupby()` handles and `grouped()` canno
 <details>
 <summary>Solution</summary>
 
-If you wrap `groupby()` in a dictionary comprehension, `{k: list(g) for k, g in groupby(data, key)}`,
-the demo prints `{'B': ['b'], 'A': ['a']}`.
-The second `"b"` group replaces the first under the same key,
-so the result holds one of the two `"b"` items.
-Python raises no exception, and the type checker accepts the function.
-The solution's `defaultdict` appends each item to the list stored under its key,
-so a key that appears again adds its item to the existing group instead of replacing it.
+The solution accumulates into a `defaultdict(list)`:
 
 ```python
 # exercise_4.py
@@ -314,6 +310,16 @@ whatever the input's order. The two `"b"` entries go into the same
 list however far apart they arrive.
 The caller passes the data as it comes,
 where `groupby()` needs it sorted first.
+
+If you wrap `groupby()` in a dictionary comprehension,
+`{k: list(g) for k, g in groupby(data, key)}`,
+the demo prints `{'B': ['b'], 'A': ['a']}`.
+The second `"b"` group replaces the first under the same key,
+so the result holds one of the two `"b"` items.
+Python raises no exception, and the type checker accepts the function.
+The solution's `defaultdict` appends each item to the list stored under its key,
+so a key that appears again adds its item to the existing group
+instead of replacing it.
 
 `grouped()` loses the streaming that `groupby()` provides. It reads
 the whole input before returning anything, so an infinite source makes
