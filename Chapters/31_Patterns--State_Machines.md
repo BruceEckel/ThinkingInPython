@@ -319,27 +319,16 @@ The first design's `action` acts per state and sees no input,
 while a rule's `action` acts per transition and reads the input that fired it.
 
 The mousetrap's inputs are `Mouse` members, each naming one event.
-A transition function tests the input against the members in its `case` clauses.
 The vending machine's inputs carry values: what a coin is worth,
 which row or column the user pressed.
 Each kind of input has a class of its own.
 The table looks up a rule by the input's class, not by its value.
 
-This design reuses two names with new meanings.
-`table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
-`State` is now an `Enum` of labels rather than the record the mousetrap's states are.
-The table holds all the behavior.
-
-The name `table_machine.py` differs from the first engine's `state_machine.py` on purpose.
-Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md),
-so a program that imports two files named `state_machine.py` gets the first one both times,
-with no error.
-
 ### The Engine
 
 For the current state and the type of the incoming input,
-the engine tries the candidate rules in order,
-takes the first whose condition passes (or has no condition),
+the engine tries the candidate rules in order.
+It takes the first whose condition passes (or has no condition),
 runs that rule's action, and moves to the next state:
 
 ```python
@@ -412,6 +401,12 @@ A generated `__init__()` names each parameter after its field and stores it unch
 This constructor takes `rules` and stores `table`,
 and its parameter is `initial` while the attribute `handle()` updates is `state`.
 
+This `StateMachine` is a different class from the one in `state_machine.py`.
+Its file is named `table_machine.py` on purpose.
+Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md),
+so a program that imports two files named `state_machine.py` gets the first one both times,
+with no error.
+
 Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
 The engine tries them in the order the list gives them,
@@ -458,6 +453,11 @@ class State(Enum):
     UNAVAILABLE = auto()
     WANT_MORE = auto()
 ```
+
+`State` reuses a name from the first design with a new meaning.
+The mousetrap's `State` is a record holding a message, a transition function,
+and an action; this one is an `Enum` of labels,
+because the table holds all the behavior.
 
 Each kind of input has its own class,
 and a `Slot` holds one item's price and quantity:
