@@ -120,13 +120,6 @@ your script outside `a_package` prints `function6 calls function5 in module5 in 
 <details>
 <summary>Solution</summary>
 
-If you write the import as `from module5 import function5`, dropping the `a_package.` prefix,
-both packages initialize and then `use_module6.py` stops with `ModuleNotFoundError: No module named 'module5'`.
-Python looks for a top-level `module5` on `sys.path`,
-but `module5.py` sits one level down, inside the `a_package` directory.
-The full dotted path names `module5` through the package that contains it,
-so the solution writes `from a_package.module5 import function5`.
-
 `b_package` keeps the chapter's `__init__.py` too:
 
 ```python
@@ -161,6 +154,15 @@ print(function6())
 `a_package`, its parent, so the absolute form is the right choice here. The
 relative equivalent, `from ..module5 import function5`, works too.
 Keep the relative form for siblings within one package.
+
+If you write the import as `from module5 import function5`,
+dropping the `a_package.` prefix, both packages initialize and then
+`use_module6.py` stops with
+`ModuleNotFoundError: No module named 'module5'`.
+Python looks for a top-level `module5` on `sys.path`,
+but `module5.py` sits one level down, inside the `a_package` directory.
+The full dotted path names `module5` through the package that contains
+it, so the solution writes `from a_package.module5 import function5`.
 
 **Trace the load order.** Python initializes both packages before it runs `module6`. `module5`
 then loads before `module6` finishes loading, because the import at
