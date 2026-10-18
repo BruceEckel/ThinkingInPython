@@ -737,9 +737,6 @@ def test_no_transition_raises() -> None:
 
 ## Which Design Should You Use?
 
-The two designs answer the same question, which state comes next,
-and put the answer in different places.
-
 The first design, [Each State Decides](#each-state-decides),
 suits a machine whose states do something and have few transitions apiece.
 The row holds the action and its function holds the transitions,
@@ -766,7 +763,7 @@ or write a helper that those rules call.
 That is the Mealy shape: the action belongs to the transition.
 In return, the action can read the input that caused the transition.
 
-In both designs the states are `Enum` members.
+In both designs the states are `Enum` members because a state machine works with a fix set of states.
 `list(TrapState)` enumerates every state,
 and a parameter typed `TrapState` accepts a member and rejects anything else.
 A member is one object shared by every machine that uses it,
@@ -780,19 +777,17 @@ but the constructor in `table_machine.py` stores `initial` and returns.
 In the table-driven design,
 an action the machine needs at startup is a call you make before the first input.
 
-The deciding question is which you would rather read: one state's transitions,
+The deciding question is which is easier to maintain: one state's transitions,
 gathered in that state's function, or the whole machine's transitions,
 gathered in one table.
 A machine with a few states works in either.
-A machine you drew as a diagram first belongs in the table.
+A machine designed as a diagram belongs in the table.
 
-With either design you write for yourself what a library supplies.
 Mature libraries such as `transitions` and `python-statemachine` offer guards,
 callbacks, and hierarchical states.
-Using a library adds a dependency.
-Choose one of the designs here when you cannot take that dependency,
+Choose one of the designs here when you don't want that dependency,
 or want the mechanism visible in your own code.
-Choose a library once the machine needs more than a page of code.
+Choose a library if the machine needs more than a page of code.
 
 ## Exercises
 
