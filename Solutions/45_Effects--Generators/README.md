@@ -530,14 +530,8 @@ Changing `report()`'s annotation back to `Iterator[str]` makes `ty` report `inva
 <details>
 <summary>Solution</summary>
 
-If you change `report()`'s annotation but leave out `return size`,
-the script still runs, and the printed list ends with `'total: None'`.
-`report()` returns `None`,
-and the `yield from` in `summarize()` delivers that `None` into `counted`.
-`ty` reports an `invalid-return-type` on the annotation,
-because `report()` declares an `int` and, with no `return` statement,
-returns `None`.
-The solution returns `size` from `report()`, so the count reaches `summarize()` through a second return.
+The solution returns the count from `report()`,
+so the count reaches `summarize()` through a second return:
 
 ```python
 # exercise_5.py
@@ -568,6 +562,14 @@ print(list(summarize(["red", "green", "blue"])))
 needs the long form. Under `Iterator[str]` a generator must return
 `None`, so `ty` rejects `report()`'s `return size` with an
 `invalid-return-type`: expected `None`, found `int`.
+
+If you change `report()`'s annotation but leave out `return size`,
+the script still runs, and the printed list ends with `'total: None'`.
+`report()` returns `None`,
+and the `yield from` in `summarize()` delivers that `None` into `counted`.
+`ty` reports an `invalid-return-type` on the annotation,
+because `report()` declares an `int` and, with no `return` statement,
+returns `None`.
 
 **Keep the strings and the count apart.** The strings and the count
 travel by different channels. The listing shows both at once. Every
