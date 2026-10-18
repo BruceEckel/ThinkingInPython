@@ -267,8 +267,6 @@ The secant method reads them as two starting points.
 Newton's method averages them into one.
 The secant and Newton methods are *open*: they need somewhere to start,
 not a bracket.
-`chain_demo.py`, under *Chain of Responsibility*,
-falls back on them when the two hints lie on the same side of the root.
 
 All three share one signature, so they are interchangeable,
 and `solve()` runs whichever one the caller passes:
@@ -754,17 +752,7 @@ Each `subscribe()` call repeats the event type that the handler's annotation nam
 A second version reads the annotation, so a handler names its event once.
 
 The second version gives each side a decorator.
-Both decorators produce records.
-`@event` registers its class in `EVENTS`.
-`@handler` makes a class whose instances are function objects,
-with fields that hold their configuration.
-It also records in `HANDLES` the event type that the class's `__call__()` accepts.
-
-`Handler` keeps its `Callable` definition,
-which accepts a callable object as `Command` accepts `Repeat` in `callable_command.py`.
-`subscribe()` then takes one argument, a handler,
-and looks up the handler's event type in `HANDLES`.
-`publish()` checks that each event's class is in `EVENTS`:
+Both decorators produce records:
 
 ```python
 # tagged_bus.py
@@ -818,6 +806,17 @@ class EventBus:
         for handler in self._handlers.get(type(event), []):
             handler(event)
 ```
+
+`@event` registers its class in `EVENTS`.
+`@handler` makes a class whose instances are function objects,
+with fields that hold their configuration.
+It also records in `HANDLES` the event type that the class's `__call__()` accepts.
+
+`Handler` keeps its `Callable` definition,
+which accepts a callable object as `Command` accepts `Repeat` in `callable_command.py`.
+`subscribe()` then takes one argument, a handler,
+and looks up the handler's event type in `HANDLES`.
+`publish()` checks that each event's class is in `EVENTS`.
 
 `handler()` looks for `__call__()` in `vars(cls)`, the class's own namespace.
 `hasattr(cls, "__call__")` cannot make that test,
