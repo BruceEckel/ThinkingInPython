@@ -64,13 +64,6 @@ A printed line has nothing to undo.
 The solution therefore swaps in `Deposit`, a command that changes state,
 and borrows `command_pattern.py`'s `Macro` to hold the list.
 
-If you keep `command.py`'s `Command` alias as the type of the macro's list,
-the script still prints `15` and `0`,
-but `ty` reports `unresolved-attribute` on `c.undo()`,
-because an object of type `Command` has no attribute `undo`.
-`Command` describes one call,
-so the solution gives the list a `Protocol` that declares both operations.
-
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -123,6 +116,13 @@ A bare function is no longer enough. The reason is undo, not state.
 the macro still calls it with `()`, so a callable handles state.
 Undo needs more, because a command now answers two requests,
 `__call__()` and `undo()`, while a callable answers one.
+
+If you keep `command.py`'s `Command` alias as the type of the macro's list,
+the script still prints `15` and `0`,
+but `ty` reports `unresolved-attribute` on `c.undo()`,
+because an object of type `Command` has no attribute `undo`.
+`Command` describes one call,
+so the solution gives the list a `Protocol` that declares both operations.
 
 **Name both requests in one type.** A list of undoable commands
 needs a type with two members, `__call__()` and `undo()`.
@@ -224,13 +224,8 @@ for `x * x - 2` on `[1.0, 1.3]` with the chain `[bisection, secant, newton]`, yo
 <details>
 <summary>Solution</summary>
 
-If you annotate `chain` with a `Callable` type, as the chapter's
-`RootFinder` is, the script runs and prints the same report,
-but `ty` reports `unresolved-attribute` on both reads of
-`finder.__name__`.
-A `Callable` describes a call and declares no `__name__`,
-so the solution types `chain` with the `Finder` protocol, which
-declares `__name__`.
+The solution gives each finder a failure value that holds a reason
+and has `first_root()` report every attempt:
 
 ```python
 # exercise_2.py
@@ -349,9 +344,12 @@ the handler that ran, with no extra bookkeeping.
 
 Reading `finder.__name__` is why `chain` needs a `Protocol` here
 instead of an alias like the chapter's `RootFinder`.
-`ty` rejects `finder.__name__` on a handler annotated as a `Callable`,
-as the opening paragraph shows.
-Pyright allows it, inferring the attributes of a function object.
+If you annotate `chain` with a `Callable` type, as `RootFinder` is,
+the script runs and prints the same report,
+but `ty` reports `unresolved-attribute` on both reads of
+`finder.__name__`.
+A `Callable` describes a call and declares no `__name__`.
+Pyright allows the reads, inferring the attributes of a function object.
 `Finder` declares `__name__` alongside `__call__()`, and a function
 satisfies both.
 
@@ -637,13 +635,7 @@ You can also name the change that alters what an existing caller receives.
 <details>
 <summary>Solution</summary>
 
-If you index `self._handlers[cls]` inside the MRO walk, the program
-prints the same four lines, but each read of a missing class inserts an
-empty list.
-After the demo, `bus._handlers` holds a third key, `object`,
-beside the `Deposit` and `BigDeposit` keys the solution's bus holds.
-The solution reads with `.get(cls, [])`, which returns an empty
-list and leaves `_handlers` as it was.
+The solution walks the MRO in `publish()` and adds `unsubscribe()`:
 
 ```python
 # exercise_5.py
@@ -718,9 +710,14 @@ in order calls the most specific handlers first and the inherited ones
 after. That order meets the "parents last" requirement.
 
 **Look up handlers read-only.** `publish()` keeps using `.get()` for
-the same reason the chapter gives. Indexing a `defaultdict` on a read
-inserts an empty list for every class in every published event's MRO,
-`object` included.
+the same reason the chapter gives.
+If you index `self._handlers[cls]` inside the MRO walk, the program
+prints the same four lines, but each read of a missing class inserts an
+empty list.
+After the demo, `bus._handlers` holds a third key, `object`,
+beside the `Deposit` and `BigDeposit` keys the solution's bus holds.
+The solution reads with `.get(cls, [])`, which returns an empty
+list and leaves `_handlers` as it was.
 
 Adding `unsubscribe()` cannot break an existing caller, since no
 existing caller calls it. The MRO walk can.
