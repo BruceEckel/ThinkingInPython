@@ -1025,8 +1025,10 @@ call `self.announce(self.grid)` at the end of a successful `select()`.
 drawing code needs no change, but `show()`'s parameter annotation does.
 That annotation names `GridModel`, which a `FloodGame` is not.
 Widening the annotation lets the same view draw either model.
-The wider type can be a Protocol,
-or `Broadcaster[Grid]` plus `size`, `grid`, and `select()`.
+The wider type can be a Protocol that names `connect()`, `size`,
+`grid`, and `select()`. It can also be a base class that both models
+inherit, one that extends `Broadcaster[Grid]` with `size`, `grid`, and
+`select()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
