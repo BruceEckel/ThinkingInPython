@@ -1511,6 +1511,40 @@ sightings (C19 -> R39).
 
 **Home.** this file only.
 
+### R40. "if" or "when" for a condition, "once" for a step in time
+
+**Test.** "once X" where X is a standing property or a condition ("the
+machine needs more than a page of code", "the hierarchy belongs to
+someone else", "more than one thread is borrowing"), so the sentence
+reads as a point in time when it states a condition. Write "if" for a
+condition and "when" for a recurring circumstance; keep "once" for a
+step that follows another in time.
+
+**Keep when.** X is an event with a before and an after: "Once the code
+works", "Once you discover a hot spot", "once you decide you want one"
+(a decision is an event; Bruce restored that "once" where the proposal
+said "after you have decided"). The adverb "once" meaning one time
+("a pair used once, in one place") is a different word and stays.
+
+**Sightings.** 22, 19 chapters. Promoted 2026-10-19 on the fix-triage
+page's decisions (C37 -> R40).
+- `31_Patterns--State_Machines` 2026-10-19, Bruce's hand: "Choose a
+  library once the machine needs more than a page of code." -> "Choose
+  a library if the machine needs more than a page of code."
+- The 2026-10-19 page searched that pair over the book: of 24 hits
+  Bruce applied 21, six of them ones the proposing agent had doubted as
+  events, and kept three (the two events and the adverb above). Among
+  the applied: `15_Techniques--Context_Managers` "Write a manager once
+  you want the `with` syntax at the call site, or once several places
+  need the same setup and teardown" -> "when ... or when";
+  `36_Patterns--Memento` "Switch to *Command* once the `O(k^2)` pointer
+  total ... grows too large to hold" -> "if"; `20_Patterns--
+  Rethinking_Objects` "A subclass becomes instantiable once it defines
+  `area()`" -> "when".
+
+**Home.** this file only; the global `CLAUDE.md` watch list (consider
+rewriting) is Bruce's call.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -1991,23 +2025,6 @@ clause stating it.
   its group."
 
 **Home.** this file.
-
-### C37. "if" for a condition, "once" for a step in time
-
-**Test.** "once X" where X is a standing property ("the machine needs
-more than a page of code") rather than an event that completes. Write
-"if" when the clause states a condition; keep "once" for a step that
-follows another in time.
-
-**Keep when.** X is an event with a before and after ("once the pool is
-primed").
-
-**Sightings.** 1 (`31_Patterns--State_Machines`, 2026-10-19): "Choose a
-library once the machine needs more than a page of code." -> "Choose a
-library if the machine needs more than a page of code."
-
-**Home.** this file; the global `CLAUDE.md` watch list (consider
-rewriting) if promoted.
 
 ### C38. Name and link the rule a sentence applies (additive)
 

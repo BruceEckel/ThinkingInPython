@@ -1145,7 +1145,9 @@
   "check": {
    "before": 0.92,
    "after": 0.05
-  }
+  },
+  "direct": true,
+  "direct_basis": "set 2026-10-19: the 2026-10-19 page applied all 5 proposals unchanged and skipped none"
  },
  "48a859efa85da645": {
   "file": "31_Patterns--State_Machines.md",
