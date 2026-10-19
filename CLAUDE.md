@@ -296,6 +296,17 @@ diagnostic, a naming convention ("is called *Multiton*"), a state
 adjective, and a parser misread of a compound or a possessive.
 `ARGS=--calibrate` compares the two rules over the book and lists the
 hits that both flag, that only Vale flags, and that only the parse flags.
+`tip pointers` (`tools/pointer_words.py`, 2026-10-19) is a survey tool
+that runs outside `tip prose`, reads the same parse, and keeps no
+baseline. `[THIS]` is a sentence-opening demonstrative pronoun ("This is
+the fast path"). `[IT]` is an opening "it" or "they" whose previous
+sentence holds two or more nouns of the matching number (subjects,
+objects, or complements), listed on the line as the candidates, or that
+opens its paragraph. The calibration found it fires on the author's
+rewrites about as often as on his originals ([THIS] 1 before-only, 0
+both, 2 after-only; [IT] 1, 0, 1, of 72 pairs). The `antecedents` skill
+reads its list per chapter (`tip pointers CH=NN`), and each hit is a
+judgment that pass makes.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
 `tip trailing-accept`, `tip subject-gap-accept`,

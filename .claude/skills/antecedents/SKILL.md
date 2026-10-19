@@ -27,6 +27,14 @@ copied there by `tip statements`,
 so an edit to it is overwritten on the next verify.
 A pointer that needs fixing in a quoted statement gets fixed in the chapter's exercise instead.
 
+Start a chapter with `tip pointers CH=NN`.
+Read its lines as mechanical candidates:
+a sentence-opening demonstrative pronoun,
+or "it" or "they" with two or more same-number nouns in the sentence before,
+named on the line.
+A listed sentence is not a fault by itself.
+The test below decides.
+
 ## The test
 
 Cover the sentence before the pointer with your hand.

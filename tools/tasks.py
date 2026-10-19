@@ -560,6 +560,24 @@ def passive_accept(v: Vars) -> None:
     py("tools.passive_voice", "--accept")
 
 
+@task("Survey sentences that open with a pointer pronoun, for the "
+      "antecedents pass")
+def pointers(v: Vars) -> None:
+    """Survey sentences that open with a pointer pronoun, found with the
+    cached spaCy parse (tools/parsed_prose.py). [THIS] opens with a
+    demonstrative pronoun ("This is the fast path"); [IT] opens with it
+    or they and fires when the previous sentence holds two or more nouns
+    the pronoun could mean, named on the line, or when the pronoun opens
+    the paragraph. It prints every hit and keeps no baseline, since the
+    calibration shows the author's rewrites fire as often as his
+    originals; each hit is a judgment the antecedents pass makes. Run
+    `tip pointers CH=NN` at the start of that pass. CH= picks one
+    chapter and its Solutions file; ARGS=--calibrate compares the check
+    with tools/data/edit_pairs.json and runs the built-in examples.
+    """
+    py("tools.pointer_words", *prose_files(v), *v.words("ARGS"))
+
+
 @task("Report public class names that only their class uses "
       "(report-only; accept with `tip internal-names-accept`)")
 def internal_names(v: Vars) -> None:
