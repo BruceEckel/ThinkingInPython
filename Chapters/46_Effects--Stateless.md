@@ -13,8 +13,8 @@ Stateless encodes an Effect's dependencies and failures into the return type of 
 A type checker then verifies that every caller either handles each Effect or declares it in its own signature.
 If you forget to declare a dependency, the check fails.
 If you forget to supply one, the check fails.
-Those two checks are the Effect tracking and delayed binding of a full EMS,
-performed by the type checker.
+Those two checks are the Effect tracking and delayed binding of a full EMS.
+In Stateless, the type checker performs both.
 
 Stateless builds on generators.
 [Generators](45_Effects--Generators.md)
@@ -1181,7 +1181,7 @@ You bind the dependency once, at the endpoint or the constructor.
 Every function that boundary calls passes the dependency onward as a parameter,
 the same parameter an EMS replaces with a channel in the return type.
 
-An EMS requires more.
+An EMS requires more than the service locator does.
 The dependency must appear in the signature so the type checker can verify it.
 That is why the EMS `greet()` returns `Depend[Need[Console], None]` while `dependency_injection.py`'s `greet()` returns `None`.
 An EMS tracks every dependency,
@@ -1486,8 +1486,8 @@ It needs nothing, can fail with a `KeyError`, and produces an `int`.
 The `Generator`'s first parameter carries [`A | E`](#the-effect-definition).
 `Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`.
 
-`Try` carries the same idea as the [`Result` type](42_Functional--Error_Handling.md#a-result-type),
-built differently.
+`Try` carries the same idea as the [`Result` type](42_Functional--Error_Handling.md#a-result-type)
+in a different form.
 A `Result` is a wrapper the function returns at once,
 and the caller matches on it.
 A `Try` is a description that runs when something drives it,
