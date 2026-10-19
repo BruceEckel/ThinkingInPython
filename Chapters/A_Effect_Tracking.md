@@ -175,7 +175,9 @@ The `isinstance()` test in `row()` does that.
 `Annotated` stores the metadata in its `__metadata__` tuple.
 
 Python annotates two places in a function, its parameters and its return value.
-A row describes a call, and every call produces the return value,
+A row describes a call.
+A function with no parameters, such as `greet()`,
+has no parameter annotation to hold the row, but every function returns a value,
 so `row()` reads the row from the return annotation.
 Stateless and ZIO put their rows in the return type too.
 A Stateless `Depend[A, R]` is a `Generator`,
