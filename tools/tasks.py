@@ -28,6 +28,7 @@ import os
 import shutil
 
 from tools.config import ROOT
+from tools.parse_check import PROSE_CHECKS
 from tools.skip_stamps import FULL_ENV
 from tools.tip import (
     StepFailed, Vars, also, invoke, py, run, section, task, tool)
@@ -400,8 +401,8 @@ def prose(v: Vars) -> None:
     the report-only stranded-preposition, stranded-possessive,
     watch-word, positional-reference, trailing-tag, subject-gap,
     sentence-shape, passive-voice, past-tense, expletive, and internal-name
-    scans (the last reads the whole book; subject-gap, sentence-shapes,
-    passive, past-tense, and expletives share one spaCy parse, run in a throwaway
+    scans (the last reads the whole book; the parse-based ones, listed in
+    `parse_check.PROSE_CHECKS`, share one spaCy parse, run in a throwaway
     Python 3.12 environment uv caches and kept under build/parses/).
     Run one chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
@@ -417,11 +418,8 @@ def prose(v: Vars) -> None:
     py("tools.watch_words", *prose_files(v))
     py("tools.positional_refs", *prose_files(v))
     py("tools.trailing_tags", *prose_files(v))
-    py("tools.subject_gap", *prose_files(v))
-    py("tools.sentence_shapes", *prose_files(v))
-    py("tools.passive_voice", *prose_files(v))
-    py("tools.past_tense", *prose_files(v))
-    py("tools.expletives", *prose_files(v))
+    for module in PROSE_CHECKS:
+        py(module, *prose_files(v))
     py("tools.internal_names")
 
 

@@ -109,6 +109,14 @@ from tools.report import Finding
 from tools.stranded_prepositions import display
 
 EDIT_PAIRS: Final = DATA_DIR / "edit_pairs.json"
+PROSE_CHECKS: Final[tuple[str, ...]] = (
+    "tools.subject_gap", "tools.sentence_shapes", "tools.passive_voice",
+    "tools.past_tense", "tools.expletives",
+)
+"""The baselined parse checks `tip prose` runs, in order, after the regex
+checks. The two surveys, `tools.pointer_words` and
+`tools.negation_density`, stay out by design: they list hundreds of
+judgment items and keep no baseline to quiet a run."""
 SKIPPED_LABELS: Final = ("Hint:", "Done when:")
 """Openers of the Solutions label paragraphs that the checks skip."""
 

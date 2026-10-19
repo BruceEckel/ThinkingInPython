@@ -8,6 +8,7 @@ refusal, the unavailable-parser path, and the edit-pairs grouping on a
 tiny in-memory pairs dict.
 """
 
+import importlib
 from collections.abc import Callable
 from pathlib import Path
 import pytest
@@ -305,3 +306,11 @@ def test_calibrate_edit_pairs_prints_previous_and_summary(
         "Summary (before-only/both/after-only, of 3 pairs): "
         "OLD 1/1/0; NEW 0/0/2")
     assert sides["ex0.md"] == {"OLD"}
+
+
+@pytest.mark.parametrize("name", parse_check.PROSE_CHECKS)
+def test_prose_checks_are_importable_baselined_checks(name: str) -> None:
+    module = importlib.import_module(name)
+    assert callable(module.main)
+    assert isinstance(module.BASELINE, Path)
+    assert isinstance(module.HEADER, str)
