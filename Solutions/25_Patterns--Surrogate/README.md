@@ -438,7 +438,7 @@ call `__getattr__()` again.
 
 The chapter's working version is safe because `__init__()` assigns `self._impl`,
 so normal lookup finds `_impl` on the instance and returns it.
-A proxy built through `object.__new__()` skips `__init__()`,
+A proxy that `copy.copy()` or `pickle` rebuilds skips `__init__()`,
 so it fails the same way on its first lookup that falls through to `__getattr__()`.
 
 Before you move on, name what separates your attempt from this one:
