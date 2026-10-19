@@ -757,10 +757,10 @@ Adding a state or an input is a rule in the list and a method or two.
 
 In the first design a member is also a `State` record with an `action` field.
 In the table-driven design a member is a bare name with no fields,
-so every action sits on a rule,
-and an action that must run on every entry into a state sits on every rule that leads there.
+so every action is the `action` field of a rule.
+An action that must run on every entry into a state is the `action` of every rule whose `next_state` is that state.
 `refund()` runs on every transition into `QUIESCENT`,
-so each of the four `Quit` rules carries it, from one comprehension.
+so one comprehension writes it into all four `Quit` rules.
 That is the Mealy shape: the action belongs to the transition.
 A rule's action reads the input that caused the transition,
 where a state's `action` takes no arguments:
