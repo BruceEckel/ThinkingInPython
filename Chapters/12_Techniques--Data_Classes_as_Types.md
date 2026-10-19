@@ -8,7 +8,7 @@ The type `int` is the set of whole numbers.
 A type you define, like a rating from one to ten, is a smaller set:
 the allowed values.
 Programmers have historically been bad at keeping objects inside that set.
-It's too easy to construct or mutate an object in an illegal state.
+Constructing or mutating an object in an illegal state is too easy.
 Defensive checks then spread through your code.
 
 Frozen data classes offer a better approach.

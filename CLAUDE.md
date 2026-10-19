@@ -217,7 +217,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Ten report-only
+Eleven report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -313,6 +313,17 @@ verb inside double quotes, a `Hint:` or `Done when:` paragraph, a
 main-clause past whose subject is "I" or "we", and an "If" or "When"
 sentence with "were". The baseline holds the keeps: a narrated run, a
 measurement, and history without a year.
+`tip expletives` (`tools/expletives.py`, 2026-10-19) enforces the style
+rule of no "there is" and no empty "it is" frame, from the same parse.
+`[THERE]` is the existential "there" (a token with dep `expl` whose verb
+has no subject of its own), including the negated "there is no X".
+`[IT-IS]` is the extraposed "it is easy to add" or "it is true that"
+frame. There is no cleft rule, because the parse cannot tell "it is X
+that" from "it is a NOUN that" with an antecedent. Vale's write-good `ThereIs` rule matches "There is/are" by word
+pattern; `ARGS=--calibrate` compares it with the `[THERE]` hits, lists the
+ones that both flag, that only Vale flags, and that only the parse flags,
+and runs the built-in examples. The baseline holds the keeps: a quotation
+the quote count missed, and an `[IT-IS]` "it" with a real antecedent.
 `tip pointers` (`tools/pointer_words.py`, 2026-10-19) is a survey tool
 that runs outside `tip prose`, reads the same parse, and keeps no
 baseline. `[THIS]` is a sentence-opening demonstrative pronoun ("This is
@@ -327,8 +338,8 @@ judgment that pass makes.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
 `tip trailing-accept`, `tip subject-gap-accept`,
-`tip sentence-shapes-accept`, `tip passive-accept`, and
-`tip past-tense-accept` add the current
+`tip sentence-shapes-accept`, `tip passive-accept`,
+`tip past-tense-accept`, and `tip expletives-accept` add the current
 new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84

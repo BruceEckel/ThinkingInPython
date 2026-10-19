@@ -27,8 +27,10 @@ Run `tip prose CH=NN` (one chapter) or `tip prose` (whole book);
 it needs the standalone `vale` binary.
 Collect the `tip passive` hits (`[PASSIVE]` and `[PASSIVE+BY]`, from the
 dependency parse; Vale's `write-good.Passive` is off since 2026-10-19,
-since it flagged adjectives and missed most passives) and the
-`write-good.ThereIs` hits,
+since it flagged adjectives and missed most passives), the
+`write-good.ThereIs` hits, and the `tip expletives` hits
+(`[THERE]` for a mid-sentence existential Vale's sentence-initial
+pattern misses, `[IT-IS]` for an "it is easy to" frame),
 plus the three House rules this skill added:
 `House.WeakVerb` (is used to, serves to, is responsible for, acts as),
 `House.Nominalization` (weak verb + article + a curated noun list,

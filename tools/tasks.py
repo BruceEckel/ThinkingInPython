@@ -399,9 +399,9 @@ def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
     the report-only stranded-preposition, stranded-possessive,
     watch-word, positional-reference, trailing-tag, subject-gap,
-    sentence-shape, passive-voice, past-tense, and internal-name scans
-    (the last reads the whole book; subject-gap, sentence-shapes,
-    passive, and past-tense share one spaCy parse, run in a throwaway
+    sentence-shape, passive-voice, past-tense, expletive, and internal-name
+    scans (the last reads the whole book; subject-gap, sentence-shapes,
+    passive, past-tense, and expletives share one spaCy parse, run in a throwaway
     Python 3.12 environment uv caches and kept under build/parses/).
     Run one chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
@@ -421,6 +421,7 @@ def prose(v: Vars) -> None:
     py("tools.sentence_shapes", *prose_files(v))
     py("tools.passive_voice", *prose_files(v))
     py("tools.past_tense", *prose_files(v))
+    py("tools.expletives", *prose_files(v))
     py("tools.internal_names")
 
 
@@ -588,6 +589,31 @@ def past_tense(v: Vars) -> None:
       secondary=True)
 def past_tense_accept(v: Vars) -> None:
     py("tools.past_tense", "--accept")
+
+
+@task("Report new expletive frames: there is, it is easy to "
+      "(report-only; accept with `tip expletives-accept`)")
+def expletives(v: Vars) -> None:
+    """Report expletive frames, found with the cached spaCy parse
+    (tools/parsed_prose.py). [THERE] is the existential "there is", a
+    "there" whose verb has no subject of its own; [IT-IS] is the
+    extraposed "it is easy to add" or "it is true that" frame. The style rule is a
+    real actor in the subject and the action in the verb. It reports and
+    never gates; `tip prose` runs it after the past-tense scan. CH=
+    picks one chapter and its Solutions file. Hits judged keeps live in
+    tools/data/expletives_baseline.txt, so the run prints only new ones;
+    ARGS=--all lists every hit. ARGS=--calibrate compares the check with
+    tools/data/edit_pairs.json, runs the built-in examples, and compares
+    the [THERE] hits with Vale's write-good ThereIs rule (it runs vale
+    over the book).
+    """
+    py("tools.expletives", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new expletive hits to the baseline and drop stale entries",
+      secondary=True)
+def expletives_accept(v: Vars) -> None:
+    py("tools.expletives", "--accept")
 
 
 @task("Survey sentences that open with a pointer pronoun, for the "

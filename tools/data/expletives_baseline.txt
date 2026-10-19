@@ -1,0 +1,19 @@
+# Expletive frames a human read and judged keeps: a quotation
+# the quote count missed, a place adverb the parser mislabeled,
+# an "it" with a real antecedent. An entry is not an exemption
+# from the rule.
+# path<TAB>[LABEL] message, with whitespace normalized and no
+# line number, so a reflow leaves an entry alone and an edit to
+# the sentence retires it. Rewritten by `tip expletives-accept`;
+# read the delta with `tip expletives` before accepting.
+# See tools/expletives.py.
+Chapters/06_Foundations--Modules_and_Packages.md	[IT-IS] it might have been better: In hindsight, it might have been better to name the file CODE.]
+Chapters/07_Foundations--Classes.md	[THERE] there makes: An CODE inside a class body binds the imported name like any other assignment, so importing a module-level function there makes it a method of the class.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[IT-IS] it is easy: The validation lives in one place, the constructor, so it is easy to change.
+Chapters/16_Techniques--Comprehensions.md	[THERE] there read: Python skips the class body when it looks up a name from a scope nested inside the class, so a comprehension there cannot read the class's other attributes.
+Chapters/17_Techniques--Metaprogramming.md	[IT-IS] it is heavier: The metaclass version works, but it is heavier than the problem usually requires.
+Chapters/44_Effects--Effect_Management.md	[IT-IS] it is safe: A pure function reads and writes nothing shared, so it is safe to run in parallel.
+Chapters/44_Effects--Effect_Management.md	[IT-IS] it is safe: With it you know what a function does: whether it is safe to run in parallel with another, and what it does when you call it twice in a row.
+Chapters/46_Effects--Stateless.md	[THERE] there produces: CODE there produces a CODE where the signature expects an CODE, so the type checker rejects it.
+Solutions/05_Foundations--Functions/README.md	[IT-IS] it must be callable: CODE has one requirement: it must be callable with one argument.
+Solutions/05_Foundations--Functions/README.md	[THERE] there runs: There CODE runs, and the clash is in the arguments CODE passes to CODE.
