@@ -743,9 +743,10 @@ Reading `trap_states.py`'s `LURING` and `luring()` tells you what luring does an
 Adding a state is one row and one function.
 The design reads best when the transitions are obvious from the state's own name.
 
-An action that must run on every entry into a state belongs in that state's row,
-written once. [[awkward, unclear]]
-For example, `HOLDING`'s `chime()` is only specified in one place.
+A state's row holds its action,
+so an action that must run on every entry into that state appears once.
+`chime()` sounds on every entry into `HOLDING` and appears in one place,
+`HOLDING`'s row.
 That is the Moore shape: the action belongs to the state.
 
 The second design, the [Table-Driven *State Machine*](#table-driven-state-machine),
@@ -754,21 +755,25 @@ or whose transitions need conditions.
 Everything is in one table, in the same order as the diagram.
 Adding a state or an input is a rule in the list and a method or two.
 
-In the table-driven design a state is an `Enum` member [[states are Enums in the other design too]], a label,
-so an action that runs on every entry into one state must go in the table. [[ all the actions go into the table regardless]]
-You repeat the action on every rule that leads to that state,
-or write a helper that those rules call. [[garbled]]
+In the first design a member is also a `State` record with an `action` field.
+In the table-driven design a member is a bare name with no fields,
+so every action sits on a rule,
+and an action that must run on every entry into a state sits on every rule that leads there.
+`refund()` runs on every transition into `QUIESCENT`,
+so each of the four `Quit` rules carries it, from one comprehension.
 That is the Mealy shape: the action belongs to the transition.
-In return[[??? in the return value?]], the action can read the input that caused the transition.
+A rule's action reads the input that caused the transition,
+where a state's `action` takes no arguments:
+`add_money()` reads the coin's `value`.
 
-In both designs the states are `Enum` members because a state machine works with a fix set of states.
-`list(TrapState)` enumerates every state, [[why is this important?]]
-and a parameter typed `TrapState` accepts a member and rejects anything else. [[Yes, typing is good, is that an essential here?]]
+In both designs the states are `Enum` members because a state machine works with a closed set of states.
+Iterating over the enum reaches every member of that set:
+`test_trap_states.py` checks each state against each move,
+and `VendingMachine` builds its `Quit` and `Row` rules from a comprehension over `State`.
 A member is one object shared by every machine that uses it,
-so data a [[state keeps for one machine has nowhere to go]][[garbled, incomprehensible]].
-Such a state is a class with a `run()` and a `next()` of its own. [[no idea what this is supposed to be saying]]
-To drive both a class and a record, [[why do we care whether it's a class or a record?]]
-an engine annotates its parameter with a Protocol naming those two methods. [[what?]]
+so a value stored on a member is shared by every machine too (see exercise 2).
+Data that belongs to one machine lives on the machine,
+as `VendingMachine`'s `amount` and `row` do.
 
 The deciding question is which is easier to maintain: one state's transitions,
 gathered in that state's function, or the whole machine's transitions,
