@@ -916,7 +916,9 @@ or an `IndexError` when the target is the largest element in the list.
 
 **Recover the whole run.** `left` and `right` together answer a third question, one the chapter leaves unasked.
 `xs[left:right]` is the run of equal values,
-and `right - left` counts them, both in O(log n) with no scan.
+and `right - left` counts them.
+Finding the two bounds takes O(log n) with no scan;
+the slice then copies the k values it names.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
