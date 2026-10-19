@@ -155,7 +155,7 @@ which picks the next task that is ready to run.
 3. `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
    and shuts the loop down.
-   `asyncio.run()` is the entry point, called once to run the program.
+   A program calls `asyncio.run()` once, as its entry point.
    Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`.
    Inside an `async def`,
    `await` the coroutine instead of passing it to `asyncio.run()`.
@@ -1856,8 +1856,10 @@ The pool gives each of its worker threads an interpreter,
 reuses those interpreters across calls, hands back a `Future` for each call,
 and closes every interpreter when the pool shuts down.
 
-Because a subinterpreter needs no separate build and no separate install,
-it is the first thing to try for CPU-bound work,
+A subinterpreter runs on the standard build,
+where free threading needs a separate install.
+It also starts in a fraction of the time a worker process takes.
+Those two differences make it the first thing to try for CPU-bound work,
 before a process pool or a free-threaded interpreter.
 The one compatibility check mirrors the free-threading check.
 Pure Python always works,
