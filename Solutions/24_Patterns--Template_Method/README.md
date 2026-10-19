@@ -135,7 +135,8 @@ def run_file_framework(
 **Let a subclass be a record.** The empty `__slots__` lets a subclass
 that carries data be a record, as
 [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#abstract-base-classes)
-explains.
+explains. `Search`, which stores its word list in a field, is such a
+record.
 
 The uppercase policy needs no data. The subclass overrides
 `process()`. The function form passes `str.upper`, which has the
