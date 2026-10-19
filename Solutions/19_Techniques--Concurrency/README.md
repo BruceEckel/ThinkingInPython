@@ -495,8 +495,9 @@ because `release()` adds one to the count whether or not an `acquire()` came fir
 That missing error is the difference between a semaphore and a lock.
 `asyncio.Lock` checks for a matching acquire,
 and a release without one raises
-`RuntimeError: Lock is not acquired.` A semaphore keeps a count and
-no record of who acquired it, so the same mistake silently admits a second holder.
+`RuntimeError: Lock is not acquired.` A semaphore's count has no
+upper limit, so the same mistake lifts the count to two and silently
+admits a second holder.
 That second holder reintroduces the race the lock is there to prevent.
 `asyncio.BoundedSemaphore(1)` checks the count against its initial value,
 so the stray `release()` raises
