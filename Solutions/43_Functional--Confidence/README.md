@@ -794,9 +794,11 @@ exercise's comparison therefore comes out even at either precision.
 The decorator's effect is a more useful finding than a win for
 either version.
 
-The choice is about reading, not about proving. Neither form tells
-the type checker anything the other cannot, so pick the one that
-states the shapes you expect: the `match`.
+The choice is about reading, not about proving. Either form can
+tell the type checker what the other does: a
+`case Err(ValueError() as error)` narrows the error as the
+`isinstance()` test does. So pick the one that states the shapes
+you expect: the `match`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
