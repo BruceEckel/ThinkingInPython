@@ -179,7 +179,9 @@ In generator terms, `__enter__()` is the portion before the `yield`.
 
 `Trace` is also reusable.
 The demo enters the same `manager` in two `with` statements,
-and both print `enter B` and `exit B`, because `__enter__()` runs again.
+and both print `enter B` and `exit B`,
+because `Trace.__enter__()` prints `self.name`,
+which the first `with` leaves in place.
 In `trace_gen.py` the second of those statements raises an `AttributeError`,
 because a generator manager is single-use.
 A class manager that stores per-`with` state stays reusable only if `__enter__()` resets that state.
@@ -207,8 +209,8 @@ except ValueError as error:
 ```
 
 `exit A` prints before `caught`, so the cleanup runs on the exception path.
-That ordering is the same guarantee a `try`/`finally` gives,
-packaged as a reusable object.
+That ordering is the same guarantee a `try`/`finally` gives.
+`Trace` packages it as a reusable object.
 
 The guarantee covers the block, not the setup:
 
