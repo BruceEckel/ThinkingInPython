@@ -1286,8 +1286,8 @@ The forked work runs in a worker,
 outside the driver and the handler stack that answers requests. So you must remove the requirement
 before the fork. Supply it first and fork the bound function. The type
 system enforces a rule about where a handler can answer a request.
-That rule is the guarantee on which [Stateless](../../Chapters/46_Effects--Stateless.md) and [Stateless in Practice](../../Chapters/47_Effects--Stateless_in_Practice.md) rely, applied
-to a boundary between threads or processes.
+That rule is the guarantee on which [Stateless](../../Chapters/46_Effects--Stateless.md) and [Stateless in Practice](../../Chapters/47_Effects--Stateless_in_Practice.md) rely.
+`fork()` extends that guarantee to a boundary between threads or processes.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -2228,10 +2228,7 @@ factories.
 
 That distribution is the argument for the factory. The functions that name a
 whole cast take the edits, and the code that calls a factory to stage a
-scene stays the same. The same distribution is why the chapter uses a
-factory function rather than more `supply()` arguments. One `supply()`
-call can type-check at most nine actors, and a wide cast is what a positional interface
-handles worst.
+scene stays the same.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
