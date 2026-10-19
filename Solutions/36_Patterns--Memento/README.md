@@ -808,7 +808,8 @@ through `do()`. The rename to `"Goose"` survives the restore because
 `copy.replace()` copies every other field from `history.present`.
 
 **Narrow the history's state type.** `restore_field()` takes a `History[Drawing]`,
-a concrete state type.
+whose `Drawing` states carry the `__replace__()` method that
+`dataclass()` generates.
 `copy.replace()` requires a `__replace__()` method, and a bare
 type variable `S` declares none.
 A generic version would need
