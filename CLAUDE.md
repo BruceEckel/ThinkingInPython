@@ -335,6 +335,18 @@ rewrites about as often as on his originals ([THIS] 1 before-only, 0
 both, 2 after-only; [IT] 1, 0, 1, of 72 pairs). The `antecedents` skill
 reads its list per chapter (`tip pointers CH=NN`), and each hit is a
 judgment that pass makes.
+`tip negatives` (`tools/negation_density.py`, 2026-10-19) is a second
+survey tool outside `tip prose`, with no baseline.
+It counts, per paragraph, the style rule's family of negatives: the
+parse's `neg` dependency, no/none/nothing/never/without/unless, verbs
+like omit, lack, and fail, un-/non- and -less words, with the
+restrictive `only` shown apart.
+A paragraph at three or more (`--threshold N`) prints as `[NEG n +k only]
+word, word x2: text`, and a per-file table of negatives per 1000 words
+and the line `N paragraphs at >= 3 in F files` follow;
+`--top N` keeps the N densest paragraphs.
+The `positive` skill reads it per chapter (`tip negatives CH=NN`), and a
+listed paragraph is a candidate for that skill's test, not a fault.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
 `tip trailing-accept`, `tip subject-gap-accept`,

@@ -634,6 +634,25 @@ def pointers(v: Vars) -> None:
     py("tools.pointer_words", *prose_files(v), *v.words("ARGS"))
 
 
+@task("Survey paragraphs dense with negation, for the positive pass")
+def negatives(v: Vars) -> None:
+    """Survey paragraphs dense with negation, found with the cached
+    spaCy parse (tools/parsed_prose.py). It counts the style rule's
+    family per paragraph: not, no, never, nothing, un-/non-/-less words,
+    without, verbs like omit and lack, with the restrictive only shown
+    apart. A paragraph is listed at THRESHOLD negatives (default 3;
+    ARGS="--threshold 4" raises it), and a per-file table of negatives
+    per 1000 words follows. ARGS="--top 20" prints only the 20 densest
+    paragraphs. It keeps no baseline and is not part of `tip prose`; a
+    listed paragraph is a candidate for the positive pass, which keeps
+    the negations that carry the claim. Run `tip negatives CH=NN` at the
+    start of that pass. CH= picks one chapter and its Solutions file;
+    ARGS=--calibrate compares the count with tools/data/edit_pairs.json
+    and runs the built-in examples.
+    """
+    py("tools.negation_density", *prose_files(v), *v.words("ARGS"))
+
+
 @task("Report public class names that only their class uses "
       "(report-only; accept with `tip internal-names-accept`)")
 def internal_names(v: Vars) -> None:

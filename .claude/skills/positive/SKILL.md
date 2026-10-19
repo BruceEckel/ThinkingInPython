@@ -27,6 +27,13 @@ negation with a positive form turns around too.
 It edits `Chapters/NN_*.md` prose only;
 code blocks, `#:` output markers, and quoted material stay untouched.
 
+Start a chapter with `tip negatives CH=NN`, and use
+`tip negatives ARGS="--top 20"` for the whole book.
+The tool counts the family below per paragraph and lists the dense
+ones, so read those first.
+A listed paragraph is a candidate for the test, not a fault:
+many of its negations may be the claim.
+
 ## The test
 
 Read a paragraph and count its negations.
