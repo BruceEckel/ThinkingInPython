@@ -247,9 +247,9 @@ Together they provide confidence at every level.
 Style contributes before the first rung.
 *Declarative* code states the result you want.
 *Imperative* code spells out each step to produce it.
-A [comprehension](16_Techniques--Comprehensions.md) names the result,
+A [comprehension](16_Techniques--Comprehensions.md) describes the result,
 "the squares of the even numbers."
-[`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
+[`match`](13_Techniques--Pattern_Matching.md) describes the shapes you expect,
 the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
 takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,

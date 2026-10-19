@@ -17,7 +17,7 @@ the chapter's figure.
 <details>
 <summary>Where to look</summary>
 
-[The Vector of Change](../../Chapters/21_Patterns--Design_Patterns.md#the-vector-of-change) names the one axis along which a design keeps shifting.
+[The Vector of Change](../../Chapters/21_Patterns--Design_Patterns.md#the-vector-of-change) describes the one axis along which a design keeps shifting.
 Look at your history for the same function edited again and again, since that function marks the axis.
 Then ask which part absorbed each change and which parts you edited by hand.
 
@@ -149,7 +149,7 @@ the format. A field is a different vector of change.
 
 Two things generalize from the example. First, the axis is visible in
 the history rather than in the code. When the same function appears in
-three consecutive commits, the history names the axis for you. Second,
+three consecutive commits, the history shows the axis for you. Second,
 absorbing one vector says nothing about the others. In this design a
 new format is one assignment. A new field is an edit to every format,
 so the design is the right answer only if formats are what keep

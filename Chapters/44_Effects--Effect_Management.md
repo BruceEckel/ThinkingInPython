@@ -224,7 +224,8 @@ so an exception introduced three levels down meant editing every signature above
 Programmers usually avoided that work by widening the specification until it permitted every exception.
 The specifications exposed implementation details.
 Most people now count them a failure.
-C++ reduced its version to a single bit: whether a function can throw an exception.
+C++ reduced its version to a single bit:
+whether a function can throw an exception.
 
 ### Make the Bad Value Impossible
 
@@ -266,23 +267,22 @@ with expected(ValueError):
 
 The check runs once, in `__post_init__()`,
 when `NonZero(...)` builds the instance.
-Every function that takes a `NonZero`, including `slope()`,
-gets that guarantee with the argument.
+Every function that takes a `NonZero` gets that guarantee with the argument.
 Because `slope()` cannot divide by zero,
 it returns `rise / run.value` as a `float` rather than a `Result`.
 
 ### Combine the First and Third
 
 All three approaches keep a division by zero from escaping `slope()` as an exception,
-but each puts the handling in a different place.
+but each handles it in a different place.
 A `Result` makes every caller handle failure explicitly, at every call site.
 `@safe` catches `Exception`,
 so `slope_result.py`'s `Result[float, Exception]` cannot distinguish `ZeroDivisionError` from a bug.
 [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
-names the same limitation.
+describes the same limitation.
 Catching by hand puts the fix inside `slope()`,
 where the `try` catches the exceptions it names and lets the rest propagate.
-A restrictive type checks once, at construction.
+A restrictive type runs the check once, when `NonZero(...)` builds the instance.
 Every function downstream is pure because it receives the type,
 not because its author remembered a check.
 

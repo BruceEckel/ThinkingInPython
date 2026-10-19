@@ -831,7 +831,7 @@ the way you can search for subclasses of a base class.
 Because protocol membership is structural,
 one class can satisfy any number of protocols at once,
 with no inheritance graph connecting them.
-Each protocol names only the shape it needs.
+Each protocol describes only the shape it needs.
 
 Classic multiple inheritance has the *diamond problem*.
 If two base classes trace back to a common ancestor,

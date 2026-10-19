@@ -1463,7 +1463,7 @@ print(type(D).__name__)
 ```
 
 The `expected()` helper wraps the message across three lines to fit the page.
-Python reports it as a single line, and that line names the fix.
+Python reports it as a single line, and that line states the fix.
 `D`'s metaclass, `MetaC`, must be a subclass of every base's metaclass,
 `MetaA` and `MetaB` both.
 Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.

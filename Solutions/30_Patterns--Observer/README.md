@@ -1342,7 +1342,7 @@ returns `None`, the shape `connect()` requires, so each is a
 responder the same way `draw()` is. `letters()` prints the first
 character of each color, one row per line, and `tally()` counts the
 colors with a `Counter`.
-Neither one names the other, and neither names the model's rule.
+Neither one names the other, and neither contains the model's rule.
 
 **Update both views from one change.** `model.select((1, 1))` calls `recolored()` once and `announce()` once,
 and `announce()` calls both views in connection order. They read the

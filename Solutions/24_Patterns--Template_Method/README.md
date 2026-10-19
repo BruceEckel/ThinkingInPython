@@ -313,7 +313,7 @@ class Greeter(Framework):
 <summary>Done when</summary>
 
 both your files print `Hello, Brian!` (with your name) where `premature_engine.py` raises an `AttributeError`, and in the redesign, constructing a `Greeter` prints nothing until the client calls `run()`.
-You can answer the closing question by naming what a later subclass author must remember under each repair.
+You can answer the closing question by stating what a later subclass author must remember under each repair.
 
 <details>
 <summary>Solution</summary>

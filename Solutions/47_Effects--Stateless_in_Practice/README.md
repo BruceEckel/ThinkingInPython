@@ -1088,7 +1088,7 @@ def attempt(
 <summary>Done when</summary>
 
 under `WEATHER` your run prints `feed: fetching` once per attempt and ends in a `RetryError` whose failures all read `NotInteresting: mild and cloudy`.
-Your explanation says why a later attempt cannot give a different answer, and names what the retry would have to know about each failure to try `Unavailable` again and stop on `NotInteresting`.
+Your explanation says why a later attempt cannot give a different answer, and describes what the retry would have to know about each failure to try `Unavailable` again and stop on `NotInteresting`.
 
 <details>
 <summary>Solution</summary>

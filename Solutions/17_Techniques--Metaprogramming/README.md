@@ -573,7 +573,7 @@ Running the same file prints
 `[TypeError] multiple bases have instance lay-out conflict`.
 
 The diagnostic and the exception describe one collision. `ty`'s summary
-line names the consequence, "Class will raise `TypeError` at runtime."
+line states the consequence, "Class will raise `TypeError` at runtime."
 The diagnostic's `info` block states the rule behind the collision.
 `type` and `dict` are both implemented in C, each with its
 own instance layout, so no single object can be both. CPython discovers

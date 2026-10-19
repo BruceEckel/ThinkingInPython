@@ -10,7 +10,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) names the three parameters of `Generator`: what it yields, what it receives, and what it returns.
+[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) describes the three parameters of `Generator`: what it yields, what it receives, and what it returns.
 Give each channel its own type so that a swap is a type error.
 After the third `send()`, the generator finishes.
 The total is the `value` of the `StopIteration` that `send()` raises.

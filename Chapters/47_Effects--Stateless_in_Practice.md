@@ -2281,7 +2281,7 @@ not a platform for building distributed systems.
 ### 6. `fork()` drops the error channel
 
 [Running Effects in Parallel](#running-effects-in-parallel)
-names the one restriction the type checker enforces on a forked function:
+states the one restriction the type checker enforces on a forked function:
 nothing left to supply.
 The checker enforces nothing about how that function can fail.
 Two of `fork()`'s four overloads accept an Effect that still declares an error,

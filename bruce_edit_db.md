@@ -1545,6 +1545,50 @@ page's decisions (C37 -> R40).
 **Home.** the global `CLAUDE.md` watch list (consider rewriting, with
 the test under the tiers), since 2026-10-19; this file.
 
+### R41. "names" takes an identifier; "describes" takes a thing with parts
+
+**Test.** "X names Y" where Y is something the sentence could not put
+in a code span or write as a proper noun: a limitation, a problem, a
+shape, a condition, a kind of work, a consequence, an axis, or a clause
+("what the retry would have to know"). The subject lays Y out rather
+than refers to Y by its name, so "names" understates what it does and
+"describes" says it. The usual subjects are a chapter, a section link,
+a sentence, a record, a protocol, or a diagnostic line that spells Y
+out. Where a more specific verb fits, use it: a line that quotes Y
+"states" it, a record "holds" its fields, a pair of tests
+"distinguishes" three states.
+
+**Keep when.** Y is a name: an identifier, a type, a parameter, a
+member, a key, a file, an exception, an Ability ("the `except` clause
+names `ZeroDivisionError`", "a call that names its arguments", "the
+message names `Tally`", "`Need` names what the function requires"). Keep
+it too when the subject gives Y its name (an alias "names the shape"
+`dict[type[Trash], list[Trash]]`; "Responder" names the action) or
+picks Y out by name from alternatives ("the type checker names each
+place that needs changing"). "name" as the reader's act of identifying
+("name what separates your attempt from this one", "name its
+drawbacks") stays.
+
+**Sightings.** 1 chapter, Bruce's hand. Promoted by Bruce on that
+evidence, 2026-10-19 ("you often say 'names' rather than 'describes',
+when the latter is clearer").
+- `44_Effects--Effect_Management` 2026-10-19, was Claude-written:
+  "[Error Handling](...#turning-exceptions-into-results) names the same
+  limitation." -> "describes the same limitation."
+- The sweep that day read 497 verb uses of "name" over `Chapters/` and
+  `Solutions/` and changed 21, among them
+  `20_Patterns--Rethinking_Objects` "Each protocol names only the shape
+  it needs" -> "describes"; `21_Patterns--Design_Patterns` "That names
+  the problem the pattern exists to solve" -> "describes";
+  `43_Functional--Confidence` "A comprehension names the result" ->
+  "describes"; `17_Techniques--Metaprogramming` "that line names the
+  fix" -> "states"; `19_Techniques--Concurrency` "Each `Fetch` record
+  names an item, its delay, and whether it fails" -> "holds". The 476
+  keeps are identifiers, aliases, and diagnostics that print a name.
+
+**Home.** the global `CLAUDE.md` style rules, since 2026-10-19; this
+file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different

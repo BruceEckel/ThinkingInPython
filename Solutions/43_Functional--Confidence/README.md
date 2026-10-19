@@ -176,7 +176,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Family of Property Shapes](../../Chapters/43_Functional--Confidence.md#a-family-of-property-shapes) names the invariant, idempotence, and oracle shapes.
+[A Family of Property Shapes](../../Chapters/43_Functional--Confidence.md#a-family-of-property-shapes) describes the invariant, idempotence, and oracle shapes.
 Write each as its own `@given` test over `strategies.lists(strategies.integers())`.
 For the oracle, write an insertion sort slow and simple enough to check by reading, and cap the list length.
 

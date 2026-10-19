@@ -514,7 +514,7 @@ The rest are here for your own designs.
     Alan Kay, on the purpose of object orientation:
     "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message's second paragraph begins "The big idea is 'messaging'."]
     A `Protocol` is that design made literal.
-    It names what a caller needs from the object on the other side of a call,
+    It describes what a caller needs from the object on the other side of a call,
     and says nothing about what that object is.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
     builds on this.
@@ -554,7 +554,7 @@ The rest are here for your own designs.
 Most of the chapters ahead take a pattern,
 or a family of patterns that share a structure, and ask three questions of it.
 What changes and what stays the same?
-That names the problem the pattern exists to solve.
+That describes the problem the pattern exists to solve.
 How much of the answer does Python supply on its own?
 That decides how much remains for you to write.
 What remains after you subtract Python's share?

@@ -774,7 +774,7 @@ print(round(sum(n.cost() for n in notes), 4))
 #: 0.0215
 ```
 
-`Notification` names the shape every channel must have.
+`Notification` describes the shape every channel must have.
 `@abstractmethod` forces `Email`, `Sms`,
 and `Push` to define both `render()` and `cost()`.
 If a subclass leaves out either method, that subclass stays abstract.

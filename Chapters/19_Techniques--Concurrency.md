@@ -533,7 +533,7 @@ async def fetch(job: Fetch, t0: float) -> str:
     return job.item.upper()
 ```
 
-Each `Fetch` record in `FETCHES` names an item, its delay, and whether it fails.
+Each `Fetch` record in `FETCHES` holds an item, its delay, and whether it fails.
 Each delay is an offset from `t0`,
 one reading of the event loop's clock that the caller takes before it starts any task.
 `fetch()` adds the two,

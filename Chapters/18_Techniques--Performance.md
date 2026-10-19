@@ -547,7 +547,7 @@ print(jit_state())
 ```
 
 `is_enabled()` implies `is_available()`,
-so testing `is_available()` first and `is_enabled()` second names a build's three possible states.
+so testing `is_available()` first and `is_enabled()` second distinguishes a build's three possible states.
 The `assert` checks that implication, which holds on every build.
 
 Most listings in this book print the same line on every machine.

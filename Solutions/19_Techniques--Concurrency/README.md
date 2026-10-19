@@ -190,7 +190,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Overlapping the Waits](../../Chapters/19_Techniques--Concurrency.md#overlapping-the-waits) measures overlap with `meter.peak`, and [I/O-Bound vs CPU-Bound](../../Chapters/19_Techniques--Concurrency.md#io-bound-vs-cpu-bound) names the two kinds of work `mixed_price()` combines.
+[Overlapping the Waits](../../Chapters/19_Techniques--Concurrency.md#overlapping-the-waits) measures overlap with `meter.peak`, and [I/O-Bound vs CPU-Bound](../../Chapters/19_Techniques--Concurrency.md#io-bound-vs-cpu-bound) describes the two kinds of work `mixed_price()` combines.
 A task counts as active while it sits inside the `with meter:` block, including while it waits at an `await` there.
 Look at where the `await` falls relative to that block, and whether the other four tasks get a chance to start at that `await`.
 
