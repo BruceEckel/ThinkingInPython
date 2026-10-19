@@ -636,7 +636,8 @@ For an operation that belongs on an object and still varies by type,
 provides the same dispatch in method form.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#the-singledispatchmethod-trap)
 shows `singledispatchmethod` in use, along with the one mistake it makes easy.
-A `@singledispatchmethod` on a shared base gives every subclass the same dispatcher.
+A `@singledispatchmethod` on a shared base gives every subclass the same dispatcher,
+so a registration made through one subclass can overwrite the entry another subclass made for the same argument type.
 
 The chapter now holds two kinds of dispatch that treat subclasses differently.
 `bins[type(piece)]` keys on the exact class,
