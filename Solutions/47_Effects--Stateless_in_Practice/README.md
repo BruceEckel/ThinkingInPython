@@ -1817,7 +1817,7 @@ chapter's `Flip` is an empty class. The fields are the parameters of the
 question.
 
 If you declare `Random` as an empty class, the way the chapter declares
-`Flip`, the request has nowhere to carry the range. `roll()` fails at
+`Flip`, the request has no field to carry the range. `roll()` fails at
 `Random(low, high)` with a `TypeError`, and `ty` reports
 `too-many-positional-arguments` there and `unresolved-attribute` where
 the handler reads `request.low`.

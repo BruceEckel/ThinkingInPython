@@ -430,7 +430,8 @@ is the comprehension's lazy form, and removes that difference.
 
 Higher-order functions separate the iteration from the operation.
 `map()`, `filter()`,
-and `sorted()` each contain the loop that iterates over the data, written once.
+and `sorted()` each contain the loop that iterates over the data,
+so that loop is written once, inside the function.
 You supply only the part that differs from one use to the next.
 You stop rewriting the same loop,
 and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.

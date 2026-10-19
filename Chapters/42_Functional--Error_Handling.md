@@ -395,7 +395,7 @@ whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
 ## Composing With bind
 
-`bind()` is the sequence `composing.py` repeats at every step, written once.
+`bind()` is one copy of the sequence that `composing.py` repeats at every step.
 Look again at the two `bind()` methods in `result.py`.
 On an `Ok`, `bind()` passes the answer to the next function.
 On an `Err`, `bind()` skips the function and returns the `Err` unchanged.

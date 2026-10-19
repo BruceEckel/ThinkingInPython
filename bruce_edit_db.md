@@ -428,6 +428,12 @@ already stated nearby, as in a summary sentence that closes a section.
   the mark, nothing tells them."; "someone decided to retire this" ->
   "this should no longer be called" (both `f5a7b213`, Claude-written)
 
+- `31_Patterns--State_Machines` 2026-10-18, Bruce's note "garbled,
+  incomprehensible": "so data a state keeps for one machine has nowhere
+  to go" -> "so a value stored on a member is shared by every machine
+  too"; Solutions 47 the same day: "the request has nowhere to carry
+  the range" -> "the request has no field to carry the range"
+
 **Home.** literal (Accrued patterns), the pass that owns figures.
 Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
 
@@ -1257,6 +1263,167 @@ rule and a standing record, he applied the rule at 14 sites (chapters
 08, 11, 18, 20 x2, 22 x2, 27 x2, 28, 35, 42, 46, 47) and kept 12; the
 retired keeps are noted in `readability_db.md` and `deep_review_db.md`
 beside the records they override.
+
+### R32. Give a trailing participle tag its own clause
+
+**Test.** A sentence ends with a comma and a past participle plus a
+measure or a place ("belongs in that state's row, written once";
+"contain the loop that iterates over the data, written once"). The tag
+is a second claim (how many times, where), and the reader cannot tell
+which noun it modifies: the action, the row, or the loop. Give the
+claim a subject and a verb ("so the action appears once"), or fold it
+into the main verb ("`bind()` is one copy of the sequence that
+`composing.py` repeats").
+
+**Keep when.** The participle describes the noun it follows ("a
+parameter typed `TrapState`"), or two parallel tags set up a contrast
+("one state's transitions, gathered in that state's function, or the
+whole machine's, gathered in one table").
+
+**Sightings.** 3 (3 chapters). Promoted by Bruce on the first,
+2026-10-18 ("capture grammatical descriptions of the problems ...
+and apply those descriptions to a sweep of the book").
+- `31_Patterns--State_Machines` 2026-10-18, Bruce's note "awkward,
+  unclear": "An action that must run on every entry into a state
+  belongs in that state's row, written once." -> "A state's row holds
+  its action, so an action that must run on every entry into that
+  state appears once."
+- `40_Functional--Foundations` 2026-10-18, the sweep: "`map()`,
+  `filter()`, and `sorted()` each contain the loop that iterates over
+  the data, written once." -> "... each contain the loop that iterates
+  over the data, so that loop is written once, inside the function."
+- `42_Functional--Error_Handling` 2026-10-18, the sweep: "`bind()` is
+  the sequence `composing.py` repeats at every step, written once." ->
+  "`bind()` is one copy of the sequence that `composing.py` repeats at
+  every step."
+
+**Home.** straighten (Accrued patterns).
+
+### R33. In a contrast, the reason names a difference
+
+**Test.** A passage compares two designs, tools, or forms, and a
+sentence in it reads "X is P, so Y" where P holds of the other side as
+well. The consequence then follows from nothing the reader can see,
+and Bruce's note was "states are Enums in the other design too". State
+the property the other side lacks: not "a state is an `Enum` member, a
+label, so the action must go in the table" but "a member is a bare
+name with no fields, so every action sits on a rule", set against "a
+member is also a `State` record with an `action` field".
+
+**Keep when.** The sentence is not drawing the contrast: a shared
+property stated for its own sake, in a paragraph about one side alone.
+
+**Sightings.** 1 chapter. Promoted by Bruce on that evidence,
+2026-10-18.
+- `31_Patterns--State_Machines` 2026-10-18: "In the table-driven design
+  a state is an `Enum` member, a label, so an action that runs on every
+  entry into one state must go in the table." -> "In the first design a
+  member is also a `State` record with an `action` field. In the
+  table-driven design a member is a bare name with no fields, so every
+  action sits on a rule, and an action that must run on every entry
+  into a state sits on every rule that leads there."
+
+**Home.** deep-review (editing pass), this file.
+
+### R34. Cut an "or" alternative that restates the first option
+
+**Test.** "X, or Y" offers two ways to do one thing, and Y is X by
+another name: "repeat the action on every rule that leads to that
+state, or write a helper that those rules call", where a rule's action
+is the helper. The reader hunts for the difference between the options
+and finds none. Keep the one option and give it the chapter's concrete
+instance ("`refund()` runs on every transition into `QUIESCENT`, so
+each of the four `Quit` rules carries it").
+
+**Keep when.** The options differ in what the reader would observe or
+write: two mechanisms, two syntaxes, two places in the file.
+
+**Sightings.** 1 chapter. Promoted by Bruce on that evidence,
+2026-10-18 (his note: "garbled").
+- `31_Patterns--State_Machines` 2026-10-18: "You repeat the action on
+  every rule that leads to that state, or write a helper that those
+  rules call." -> "`refund()` runs on every transition into
+  `QUIESCENT`, so each of the four `Quit` rules carries it, from one
+  comprehension."
+
+**Home.** this file.
+
+### R35. Replace a transactional connective with the contrast it stands for
+
+**Test.** "In return", "in exchange", "as a trade", "the trade-off
+is", "what you get back", or "on the plus side" opens a sentence that
+sets an advantage against a drawback just stated. The connective
+treats the two as an exchange and says nothing about either; next to
+code, "In return" also reads as the `return` statement, which is what
+Bruce asked ("in the return value?"). Write the advantage as a clause
+with its mechanism, and name what the other side does instead: "A
+rule's action reads the input that caused the transition, where a
+state's `action` takes no arguments." R2 covers the commerce nouns
+(cost, price, pay); this rule covers the connective.
+
+**Keep when.** The sentence names a real exchange or a named
+trade-off that is the subject (the expression problem in chapters 13
+and 20).
+
+**Sightings.** 1 chapter. Promoted by Bruce on that evidence,
+2026-10-18. The 2026-10-18 grep found no second "in return" in the
+book; the three "trade-off" hits all name the expression problem.
+- `31_Patterns--State_Machines` 2026-10-18: "In return, the action can
+  read the input that caused the transition." -> "A rule's action reads
+  the input that caused the transition, where a state's `action` takes
+  no arguments: `add_money()` reads the coin's `value`."
+
+**Home.** CLAUDE.md watch list (with the commerce family), this file.
+
+### R36. A capability names its use
+
+**Test.** A sentence states what a construct permits ("`list(TrapState)`
+enumerates every state", "a parameter typed `TrapState` accepts a
+member and rejects anything else") and neither it nor its neighbors say
+what the chapter does with that. The reader asks "and?" (Bruce: "why is
+this important?", "is that an essential here?"). Name the use in the
+chapter's own listings (the test that iterates over the enum, the
+comprehension that builds rules from it), or cut the capability.
+
+**Keep when.** The capability is the claim, in a section that teaches
+the construct, and the use is in the listing under discussion.
+
+**Sightings.** 1 chapter. Promoted by Bruce on that evidence,
+2026-10-18.
+- `31_Patterns--State_Machines` 2026-10-18: "`list(TrapState)`
+  enumerates every state, and a parameter typed `TrapState` accepts a
+  member and rejects anything else." -> "Iterating over the enum
+  reaches every member of that set: `test_trap_states.py` checks each
+  state against each move, and `VendingMachine` builds its `Quit` and
+  `Row` rules from a comprehension over `State`."
+
+**Home.** deep-review (teaching pass), this file.
+
+### R37. Cut a sentence whose antecedent the chapter no longer sets up
+
+**Test.** "Such a X", "those two methods", "that class", or a claim
+about the chapter's own code names a construct that no listing in the
+chapter holds, because a listing rewrite moved on and the sentence
+stayed: "Such a state is a class with a `run()` and a `next()` of its
+own. To drive both a class and a record, an engine annotates its
+parameter with a Protocol naming those two methods", in a chapter
+whose states are enum rows and whose engine takes `State[I]`. Cut it,
+or re-anchor it to the current listing. Check: the construct named
+appears in a fenced block of the chapter.
+
+**Keep when.** The antecedent is in the paragraph, or the construct is
+in a listing the sentence names. R12 covers a pointer with two live
+candidates; this rule covers a pointer with none.
+
+**Sightings.** 1 chapter. Promoted by Bruce on that evidence,
+2026-10-18 (his notes: "no idea what this is supposed to be saying",
+"what?").
+- `31_Patterns--State_Machines` 2026-10-18: the two sentences above
+  were cut; the per-machine data point they trailed became "Data that
+  belongs to one machine lives on the machine, as `VendingMachine`'s
+  `amount` and `row` do."
+
+**Home.** deep-review (editing pass), the claims sweeps.
 
 ## Candidates
 
