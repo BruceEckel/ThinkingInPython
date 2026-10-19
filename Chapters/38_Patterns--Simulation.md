@@ -1428,6 +1428,9 @@ if __name__ == "__main__":
 
 `itertools.cycle()` constructs an infinite iterator from any nonempty finite iterable.
 It yields the source's elements in sequence and starts over when it reaches the end.
+After `(3, 5)`, `modes` returns to `(1, 2)`,
+so the view keeps changing modes for as long as it runs.
+`palette` assigns the five `COLORS` to the dots in rotation.
 `itertools.count(1)` numbers the frames,
 the same endless counter that numbered the rats.
 
