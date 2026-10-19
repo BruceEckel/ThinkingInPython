@@ -400,8 +400,9 @@ The checker matched each input class to its methods where the rule was built.
 
 Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
-The engine tries them in order,
-so a single input can lead to different states depending on a condition.
+The engine tries them in order and the first whose condition passes handles the input,
+the [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+shape, so a single input can lead to different states depending on a condition.
 A rule whose condition is `None` matches every time,
 so it belongs last in its group.
 
@@ -483,22 +484,21 @@ class Slot:
     quantity: int
 ```
 
-`Money` is a record, a value the machine reads and leaves as it is.
-`Row` and `Column` are `Enum`s whose members name the rows and the columns,
+`Row` and `Column` are `Enum`s,
 so a selection outside the grid fails where you name it,
 `Row.E` as a type error and `Column(4)` as a `ValueError`,
 rather than as an index error inside `_slot()`.
-`Column(1)` looks up the member whose value is 1.
 `Slot` stays a mutable `@dataclass`,
 because `dispense()` decrements its `quantity` in place.
 
-The engine's lookup keys on the exact `type(input_)`,
-so finding the rules takes one dictionary lookup rather than an `isinstance()` test against each rule.
-The same lookup excludes a subclass:
-an input whose class derives from `Money` matches none of `Money`'s rules,
-because the key is the input's exact class.
+The engine looks up rules by the exact `type(input_)`,
+so finding them takes one dictionary lookup rather than an `isinstance()` test against each rule.
+The lookup is by class identity.
+An instance of a subclass of `Money` has a different `type()`,
+so it finds the rules filed under that subclass, if any,
+and passes over the rules filed under `Money` (see exercise 9).
 The [event bus](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-keys its handlers the same way,
+stores its handlers under the event class the same way,
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting)
 reuse the lookup.
