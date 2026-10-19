@@ -315,7 +315,7 @@ If you want callers to construct objects with an ordinary class call such as `Co
 hide the pool inside `__new__()` instead.
 [*Singleton*](23_Patterns--Singleton.md#the-classic-implementations)
 keeps its pool in `__new__()` the same way.
-Here the pool keys on the constructor arguments instead of a single constant key.
+Here the pool stores each instance under its constructor arguments instead of a single constant key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
 A *Multiton*'s objects can be mutable.
 A flyweight must be immutable, so `Color` is a record:
@@ -377,7 +377,8 @@ not a `defaultdict`.
 A `defaultdict` calls its `default_factory` with no arguments.
 `super().__new__(cls)` needs the class that asked.
 
-`_pool` keys on the components alone, and every subclass shares the one dict.
+`_pool` stores each object under its components alone,
+and every subclass shares the one dict.
 The first request for a set of components builds the object,
 and every later request receives that object,
 whether `Color` or a subclass asks.
