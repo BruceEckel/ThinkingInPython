@@ -182,8 +182,8 @@ def test_tier_1_words() -> None:
         "She had to go. It runs exactly once, itself. "
         "The record fixes the field.")]
     assert sorted(words) == sorted([
-        "happen", "is what", "used to", "had to", "exactly", "itself",
-        "fixes"])
+        "happen", "is what", "used to", "had to", "exactly", "once",
+        "itself", "fixes"])
 
 
 @pytest.mark.parametrize("text", [
@@ -212,12 +212,12 @@ def test_tier_1_hidden_by_default_shown_with_all_and_tier_1(
     assert "0 new (0 T3, 0 T2), 0 accepted" in out
     assert main([str(path), "--all"]) == 0
     out = capsys.readouterr().out
-    assert "[T1] only" in out
-    assert "1 new (0 T3, 0 T2, 1 T1), 0 accepted" in out
+    assert "[T1] only" in out and "[T1] once" in out
+    assert "2 new (0 T3, 0 T2, 2 T1), 0 accepted" in out
     assert main([str(path), "--tier", "1"]) == 0
     out = capsys.readouterr().out
-    assert "[T1] only" in out
-    assert "1 new (0 T3, 0 T2, 1 T1), 0 accepted" in out
+    assert "[T1] only" in out and "[T1] once" in out
+    assert "2 new (0 T3, 0 T2, 2 T1), 0 accepted" in out
 
 
 def test_fail_ignores_tier_1(tmp_path: Path) -> None:
