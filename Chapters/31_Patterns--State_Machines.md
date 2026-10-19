@@ -745,8 +745,8 @@ The design reads best when the transitions are obvious from the state's own name
 
 A state's row holds its action,
 so an action that must run on every entry into that state appears once.
-`chime()` sounds on every entry into `HOLDING` and appears in one place,
-`HOLDING`'s row.
+`chime()` sounds whenever the trap reaches `HOLDING`,
+and `HOLDING`'s row alone names it.
 That is the Moore shape: the action belongs to the state.
 
 The second design, the [Table-Driven *State Machine*](#table-driven-state-machine),
