@@ -7,8 +7,8 @@ Some programs need fine-grained objects in enormous numbers:
 the characters in a document, the tiles in a game map,
 or the strings in a compiler's symbol table.
 The uses of such objects far outnumber their distinct values.
-Sharing replaces the many objects with one per distinct value,
-referenced many times.
+Sharing replaces the many objects with one object per distinct value,
+which every use references.
 
 Two ideas make sharing work.
 
@@ -371,8 +371,6 @@ Because every caller that asks for the same components receives the same `Color`
 a caller that set `crimson.red` would change every crimson in the program.
 The record's frozen fields reject that assignment,
 which makes sharing a `Color` safe for the same reason sharing a `Tile` is safe.
-The record also generates `__repr__()`, `__eq__()`, and `__hash__()`,
-so a `Color` prints its components and works as a dict key.
 
 `_pool` stays a plain dict with an explicit membership test,
 not a `defaultdict`.
@@ -619,7 +617,8 @@ the member the `match` leaves out.
 Adding that case clears the diagnostic.
 
 The enum version cannot load its tile kinds at runtime.
-`tile()` could load `SPECS` from a file, but `Tile.GRASS` is source code.
+`tile()` reads `SPECS`, a dict that a program could fill from a file at runtime,
+while each `Tile` member is an assignment in the `class` statement.
 
 Both designs in [State Machines](31_Patterns--State_Machines.md#which-design-should-you-use)
 also use an `Enum` as a flyweight pool, with its members serving as shared,
