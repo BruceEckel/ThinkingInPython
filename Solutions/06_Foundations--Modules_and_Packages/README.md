@@ -204,7 +204,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Watching the Deferral](../../Chapters/06_Foundations--Modules_and_Packages.md#watching-the-deferral) runs a `lazy import` of a module that prints when it loads.
 A `lazy import` binds the name and defers running the module.
-The body runs when the name is first used, so order your uses and your `print()` calls to watch the messages appear.
+The body runs at the name's first use, so order your uses and your `print()` calls to watch the messages appear.
 
 <details>
 <summary>The shape</summary>

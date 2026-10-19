@@ -1011,7 +1011,7 @@ a different design, a detail, or an equivalent alternative.
 > Make `tile()`'s body slow,
 > with a `time.sleep(0.05)` before it builds the `Tile`,
 > and call it from four threads with the same, previously unseen symbol.
-> How many `Tile` objects get built,
+> How many `Tile` objects does the run build,
 > and how many distinct objects do the four threads hold?
 > Fix it two ways: populate the pool eagerly at import,
 > and guard the factory with a `threading.Lock`.

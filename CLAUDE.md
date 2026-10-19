@@ -217,7 +217,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Eight report-only
+Nine report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -282,10 +282,24 @@ the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
 pass. `ARGS=--calibrate` runs all four rules over
 `tools/data/edit_pairs.json` and the style rules' own examples.
+`tip passive` (`tools/passive_voice.py`, 2026-10-19) reads the same
+parse for passive clauses: a verb with a passive auxiliary and a passive
+subject. `[PASSIVE]` names no actor, and `[PASSIVE+BY]` writes the actor
+out in a by-phrase, the form most often worth turning around. Vale's
+write-good `Passive` rule matched by word pattern and flagged an adjective
+after "be" ("is unchanged"), which the parse skips, so `.vale.ini` turns
+it off since 2026-10-19: of its 29 alerts the parse confirmed 19 and the
+other 10 were adjectives, and the parse found 50 passives Vale missed.
+The 2026-10-19 read fixed 13 and the baseline holds the keeps: a passive
+whose actor is unknown ("Java is statically compiled"), a quoted
+diagnostic, a naming convention ("is called *Multiton*"), a state
+adjective, and a parser misread of a compound or a possessive.
+`ARGS=--calibrate` compares the two rules over the book and lists the
+hits that both flag, that only Vale flags, and that only the parse flags.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
-`tip trailing-accept`, `tip subject-gap-accept`, and
-`tip sentence-shapes-accept` add the current
+`tip trailing-accept`, `tip subject-gap-accept`,
+`tip sentence-shapes-accept`, and `tip passive-accept` add the current
 new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84

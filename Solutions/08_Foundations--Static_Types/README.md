@@ -772,7 +772,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Constants with Final](../../Chapters/08_Foundations--Static_Types.md#constants-with-final) separates rebinding a name from changing the object the name holds.
 A tuple has no `append()`, and `Final` forbids rebinding `HISTORY`,
-so consider where a tuple's contents get set.
+so consider when a tuple receives its contents.
 
 <details>
 <summary>Done when</summary>

@@ -1,0 +1,55 @@
+# Passive clauses a human read and judged keeps: an actor that
+# is unknown or irrelevant, a quoted diagnostic, a naming
+# convention. An entry is not an exemption from the rule.
+# path<TAB>[LABEL] message, with whitespace normalized and no
+# line number, so a reflow leaves an entry alone and an edit to
+# the sentence retires it. Rewritten by `tip passive-accept`;
+# read the delta with `tip passive` before accepting.
+# See tools/passive_voice.py.
+Chapters/03_Foundations--Containers.md	[PASSIVE] is read: CODE, from the CODE module, is read-only without being immutable.
+Chapters/03_Foundations--Containers.md	[PASSIVE] is set: CODE is also set-like, and so is CODE when every value is hashable.
+Chapters/04_Foundations--Control_Flow.md	[PASSIVE+BY] is followed: In Python, a handler is CODE followed by the exception type it handles.
+Chapters/07_Foundations--Classes.md	[PASSIVE] is initialized: CODE is *lazily initialized*, created on first use, so the method runs at the first read rather than when the constructor runs.
+Chapters/08_Foundations--Static_Types.md	[PASSIVE] is marked: If CODE declares CODE, CODE inside CODE draws CODE, with the message that the key "is marked read-only."
+Chapters/12_Techniques--Data_Classes_as_Types.md	[PASSIVE] is decorated: CODE is CODE decorated with CODE:
+Chapters/17_Techniques--Metaprogramming.md	[PASSIVE] are called: Such methods are sometimes called *metamethods*.
+Chapters/17_Techniques--Metaprogramming.md	[PASSIVE] gets built: Decide whether an instance gets built: a metaclass CODE.
+Chapters/18_Techniques--Performance.md	[PASSIVE] 're done: Once you're done, you import a module that looks from the outside like any other Python module, except that it runs faster.
+Chapters/18_Techniques--Performance.md	[PASSIVE] was reached: The question is "was this reached," so a second report from the same location adds nothing, and after the first hit the monitored code runs at full speed again.
+Chapters/19_Techniques--Concurrency.md	[PASSIVE] are suspended: The CODE responds by cancelling CODE and CODE, which are still suspended with far more sleep to go, so both stop before their CODE print.
+Chapters/20_Patterns--Rethinking_Objects.md	[PASSIVE] is compiled: Java is statically compiled, so substitutability matters.
+Chapters/21_Patterns--Design_Patterns.md	[PASSIVE] is reached: A design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".
+Chapters/26_Patterns--Factory.md	[PASSIVE] 's bound: A generic factory would need CODE's bound to name the factory's own type parameter.
+Chapters/30_Patterns--Observer.md	[PASSIVE] are connected: Use a weak responder only when a long-lived broadcaster holds short-lived responders that the program drops while they are still connected.
+Chapters/30_Patterns--Observer.md	[PASSIVE] is connected: A CODE that is still connected keeps CODE in memory.
+Chapters/30_Patterns--Observer.md	[PASSIVE] is decoupled: A broadcaster that receives its responders at construction is decoupled but not dynamic:
+Chapters/35_Patterns--Flyweight.md	[PASSIVE] is called: A pool of singletons keyed this way is sometimes called *Multiton*.
+Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: That name is now bound to CODE.
+Chapters/40_Functional--Foundations.md	[PASSIVE] is associated: The runtime message names a local variable instead of the missing declaration: "cannot access local variable 'count' where it is not associated with a value."
+Chapters/44_Effects--Effect_Management.md	[PASSIVE] gets delayed: In a language not designed for Effects, a library gets delayed binding by deferring execution.
+Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
+Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
+Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] 's named: When CODE gains a fourth error, CODE's named CODE leaves it in the channel, so CODE's declared type no longer matches and the type checker reports an error at the CODE.
+Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] is prepackaged: CODE is CODE with a type lookup in place of the dictionary, CODE is that loop applied after the last handler, and CODE is CODE prepackaged for CODE: a handler whose answer to CODE is whichever supplied instance is a CODE.
+Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the run prints CODE, and you can say which slot the surviving CODE occupies and why the loop skipped it.
+Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the swapped CODE prints CODE, and you can say what a single value of CODE would have to do for the order of the two CODE blocks to change the output.
+Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the traceback shows CODE above CODE, and printing the classes of CODE and CODE names two different exceptions: the one you constructed and CODE.
+Solutions/05_Foundations--Functions/README.md	[PASSIVE] is associated: ** Both calls raise `UnboundLocalError: cannot access local variable 'count' where it is not associated with a value`.
+Solutions/08_Foundations--Static_Types/README.md	[PASSIVE] is defined: If you name CODE's method CODE, as the chapter's CODE does, CODE rejects CODE with an CODE, reporting that protocol member CODE is not defined on type CODE.
+Solutions/10_Foundations--Cleanup/README.md	[PASSIVE] is gone: You can say what makes the collector run once CODE is gone, and why the explicit CODE still keeps this run's transcript the same.
+Solutions/15_Techniques--Context_Managers/README.md	[PASSIVE] sits nested: CODE's whole lifetime, enter and exit, sits nested inside CODE's lifetime.
+Solutions/15_Techniques--Context_Managers/README.md	[PASSIVE] were given: If you write CODE without the inner parentheses, the script stops before printing CODE, with a CODE saying that CODE takes from 1 to 2 positional arguments but 3 were given.
+Solutions/17_Techniques--Metaprogramming/README.md	[PASSIVE] are implemented: CODE and CODE are both implemented in C, each with its own instance layout, so no single object can be both.
+Solutions/19_Techniques--Concurrency/README.md	[PASSIVE] is luck: That reliability is luck rather than a guarantee.
+Solutions/24_Patterns--Template_Method/README.md	[PASSIVE] is anchored: The anchored algorithm is no longer anchored.
+Solutions/26_Patterns--Factory/README.md	[PASSIVE] is decorated: CODE reports a fitting class that is not decorated.
+Solutions/27_Patterns--Function_Objects/README.md	[PASSIVE] is subscribed: **Ignore a handler that is not subscribed.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PASSIVE] are known: It reports passing CODE to a parameter declared CODE, since the element types are still known positionally.
+Solutions/38_Patterns--Simulation/README.md	[PASSIVE] is eaten: on the chapter's CODE, your tour prints CODE, CODE is CODE at the end, and the search for food returns CODE once the last CODE is eaten, so the script reaches the walk to the CODE.
+Solutions/40_Functional--Foundations/README.md	[PASSIVE] are allowed: If you build CODE as CODE, the CODE call raises a CODE before you call the result: "trailing Placeholders are not allowed."
+Solutions/40_Functional--Foundations/README.md	[PASSIVE] is associated: Running the program raises an CODE at the first CODE call: "cannot access local variable 'count' where it is not associated with a value."
+Solutions/43_Functional--Confidence/README.md	[PASSIVE] is SIGN: ** CODE is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the Greek letter it resembles.
+Solutions/43_Functional--Confidence/README.md	[PASSIVE] is ordered: That sort's output is always ordered, so the invariant passes.
+Solutions/44_Effects--Effect_Management/README.md	[PASSIVE] was awaited: The CODE call raises a CODE for adding an CODE and a CODE, with a CODE that CODE was never awaited.
+Solutions/45_Effects--Generators/README.md	[PASSIVE] is suspended: CODE relays in both directions on its own: prompts up to the driver, numbers down to whichever CODE is currently suspended, two frames below.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[PASSIVE] is required: The guard is now required, because a process pool starts workers by re-importing the module.

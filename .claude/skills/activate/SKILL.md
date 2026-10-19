@@ -25,7 +25,10 @@ code blocks, `#:` output markers, and quoted material stay untouched.
 
 Run `tip prose CH=NN` (one chapter) or `tip prose` (whole book);
 it needs the standalone `vale` binary.
-Collect the `write-good.Passive` and `write-good.ThereIs` hits,
+Collect the `tip passive` hits (`[PASSIVE]` and `[PASSIVE+BY]`, from the
+dependency parse; Vale's `write-good.Passive` is off since 2026-10-19,
+since it flagged adjectives and missed most passives) and the
+`write-good.ThereIs` hits,
 plus the three House rules this skill added:
 `House.WeakVerb` (is used to, serves to, is responsible for, acts as),
 `House.Nominalization` (weak verb + article + a curated noun list,
@@ -393,7 +396,7 @@ is a teaching addition for a deep review, not this pass.
 Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
 then `tip verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
-Re-run `tip prose CH=NN` and confirm the Passive/ThereIs count dropped;
+Re-run `tip prose CH=NN` and confirm the `tip passive` and ThereIs counts dropped;
 list any warning deliberately kept, with its reason.
 Bruce reviews the diff and commits himself.
 

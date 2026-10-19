@@ -1219,7 +1219,7 @@ so the listing prints a comparison that holds anywhere rather than numbers that 
 ### A Decorator for the Default {#record}
 
 `@dataclass(frozen=True, slots=True)` is a long line to repeat on every value class.
-`slots=True` is the half that gets dropped, because the class works either way.
+`slots=True` is the half you drop, because the class works either way.
 A decorator of your own can apply both.
 [`@dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
 tells the type checker that the result is a frozen data class:

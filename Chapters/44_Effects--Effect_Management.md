@@ -426,8 +426,8 @@ You must read the implementation, then trust that you found everything it needs,
 everything it changes, and everything that might go wrong.
 In a small codebase you can hold that knowledge in your head.
 In a large one you cannot.
-A function you understand today gets called by a function written next week,
-which gets called by code a colleague writes next month.
+A function written next week calls the function you understand today,
+and code a colleague writes next month calls that one.
 Each step adds dependencies the signatures hide,
 until the whole set exceeds what any one person knows.
 

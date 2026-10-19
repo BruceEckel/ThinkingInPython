@@ -171,7 +171,7 @@ WORKTREE_TARGETS: frozenset[str] = frozenset({
     "stranded-accept", "possessives-accept",
     "watch-words-accept", "internal-names-accept",
     "positional-accept", "trailing-accept", "subject-gap-accept",
-    "sentence-shapes-accept",
+    "sentence-shapes-accept", "passive-accept",
     "pyright-accept",
     "quoted-diagnostics-accept",
     "exercise-refs-accept",

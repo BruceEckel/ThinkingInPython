@@ -399,8 +399,9 @@ def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
     the report-only stranded-preposition, stranded-possessive,
     watch-word, positional-reference, trailing-tag, subject-gap,
-    sentence-shape, and internal-name scans (the last reads the whole
-    book; subject-gap and sentence-shapes share one spaCy parse, run in
+    sentence-shape, passive-voice, and internal-name scans (the last
+    reads the whole book; subject-gap, sentence-shapes, and passive
+    share one spaCy parse, run in
     a throwaway Python 3.12 environment uv caches and kept under
     build/parses/). Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
@@ -419,6 +420,7 @@ def prose(v: Vars) -> None:
     py("tools.trailing_tags", *prose_files(v))
     py("tools.subject_gap", *prose_files(v))
     py("tools.sentence_shapes", *prose_files(v))
+    py("tools.passive_voice", *prose_files(v))
     py("tools.internal_names")
 
 
@@ -532,6 +534,30 @@ def sentence_shapes(v: Vars) -> None:
       "entries", secondary=True)
 def sentence_shapes_accept(v: Vars) -> None:
     py("tools.sentence_shapes", "--accept")
+
+
+@task("Report new passive clauses (report-only; accept with "
+      "`tip passive-accept`)")
+def passive(v: Vars) -> None:
+    """Report passive clauses, found with the cached spaCy parse
+    (tools/parsed_prose.py): a verb with a passive auxiliary and a
+    passive subject. [PASSIVE] names no actor; [PASSIVE+BY] writes the
+    actor out in a by-phrase, the form most often worth turning around.
+    It reports and never gates; `tip prose` runs it after the
+    sentence-shape scan. CH= picks one chapter and its Solutions file.
+    Hits judged keeps live in tools/data/passive_voice_baseline.txt, so
+    the run prints only new ones; ARGS=--all lists every hit.
+    ARGS=--calibrate compares the check with tools/data/edit_pairs.json
+    and with Vale's write-good Passive rule (it runs vale over the
+    book), listing the hits both flag and the ones only one flags.
+    """
+    py("tools.passive_voice", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new passive-voice hits to the baseline and drop stale "
+      "entries", secondary=True)
+def passive_accept(v: Vars) -> None:
+    py("tools.passive_voice", "--accept")
 
 
 @task("Report public class names that only their class uses "

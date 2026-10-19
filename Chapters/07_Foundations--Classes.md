@@ -681,7 +681,7 @@ Try each exercise before opening its [solution](../Solutions/07_Foundations--Cla
     the full chain of prints from `MoreDerived("x").show_twice()`.
 4.  Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py` that returns `self.total / len(self.values)`.
     Access `n.total` and then `n.average`,
-    and confirm `total` is not recomputed when `average` uses it.
+    and confirm `average` reads the cached `total` instead of recomputing it.
 5.  Give `Temperature` in `class_methods.py` a `__repr__()` that returns `Temperature(21.0)` for a temperature of 21 degrees Celsius.
     Print a single `Temperature` and a list of two of them,
     and confirm the list shows the same form for each element.

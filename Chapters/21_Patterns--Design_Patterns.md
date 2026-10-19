@@ -476,7 +476,6 @@ The rest are here for your own designs.
 <!-- Several principles below quote their sources word for word (Saint-Exupery
      in the Subtraction footnote, Kevlin Henney under Simplicity before
      generality), so house style does not govern their wording. -->
-<!-- vale write-good.Passive = NO -->
 <!-- vale House.WeakVerb = NO -->
 
 -   *Principle of least astonishment* (don't be astonishing).
@@ -548,7 +547,6 @@ The rest are here for your own designs.
 -   *Make functions [pure](40_Functional--Foundations.md#pure-functions)
     whenever you can*.
 
-<!-- vale write-good.Passive = YES -->
 <!-- vale House.WeakVerb = YES -->
 
 ## Reading the Chapters Ahead

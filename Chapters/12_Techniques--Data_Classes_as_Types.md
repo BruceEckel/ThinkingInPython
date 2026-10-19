@@ -978,7 +978,7 @@ and `len(Direction)` counts four members.
 A member passes wherever code expects the mix-in type,
 and carries its name with it.
 
-`StrEnum` is `str` mixed in by the standard library,
+The standard library mixes `str` into `StrEnum`,
 so a member answers every `str` method.
 Its `__str__()` is `str.__str__()`,
 so an f-string shows `info` rather than `Level.INFO`.

@@ -1315,7 +1315,7 @@ Check the list, check that the balance iterator has run out, and compare what th
 <details>
 <summary>Done when</summary>
 
-`uv run pytest` passes on your test, which runs `spree()` on `(60, 50, 30, 20)` from a scripted start of `100`, asserts it returns `2` and records the writes `[40, 10]`, and checks that every scripted balance gets read.
+`uv run pytest` passes on your test, which runs `spree()` on `(60, 50, 30, 20)` from a scripted start of `100`, asserts it returns `2` and records the writes `[40, 10]`, and checks that the run reads every scripted balance.
 Dropping the last price from the call makes that last check fail.
 
 <details>
@@ -2203,7 +2203,7 @@ type. Saying so takes no abstract factory class.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other.
 The listing's last call is the proof: `play(Loud(), Kitty(), Weapon())`,
-the same line the chapter runs in `two_games.py`.
+which the chapter also runs in `two_games.py`.
 `play()` accepts a `Kitty` facing a `Weapon`.
 Both satisfy their `Protocol`s, so the type checker reports nothing. An *Abstract Factory* in a language with a family type expresses "these
 come from one world" in the type. Here the matching is in

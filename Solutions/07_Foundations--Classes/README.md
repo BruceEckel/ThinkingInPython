@@ -324,7 +324,7 @@ a different design, a detail, or an equivalent alternative.
 
 > Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py` that returns `self.total / len(self.values)`.
 > Access `n.total` and then `n.average`,
-> and confirm `total` is not recomputed when `average` uses it.
+> and confirm `average` reads the cached `total` instead of recomputing it.
 
 <details>
 <summary>Where to look</summary>

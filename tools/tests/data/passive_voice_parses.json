@@ -1,0 +1,1056 @@
+{
+ "The method is called by the loop.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "method",
+    "lemma": "method",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubjpass",
+    "head": 3,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "auxpass",
+    "head": 3,
+    "idx": 11,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "called",
+    "lemma": "call",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "ROOT",
+    "head": 3,
+    "idx": 14,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 4,
+    "text": "by",
+    "lemma": "by",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "agent",
+    "head": 3,
+    "idx": 21,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 5,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 6,
+    "idx": 24,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 6,
+    "text": "loop",
+    "lemma": "loop",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "pobj",
+    "head": 4,
+    "idx": 28,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 7,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 3,
+    "idx": 32,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "The value is written once.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "value",
+    "lemma": "value",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubjpass",
+    "head": 3,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "auxpass",
+    "head": 3,
+    "idx": 10,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "written",
+    "lemma": "write",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "ROOT",
+    "head": 3,
+    "idx": 13,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 4,
+    "text": "once",
+    "lemma": "once",
+    "pos": "ADV",
+    "tag": "RB",
+    "dep": "advmod",
+    "head": 3,
+    "idx": 21,
+    "punct": false,
+    "morph": "NumType=Mult"
+   },
+   {
+    "i": 5,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 3,
+    "idx": 25,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "A value that is read by two threads needs a lock.": [
+  [
+   {
+    "i": 0,
+    "text": "A",
+    "lemma": "a",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Ind|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "value",
+    "lemma": "value",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 8,
+    "idx": 2,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "that",
+    "lemma": "that",
+    "pos": "PRON",
+    "tag": "WDT",
+    "dep": "nsubjpass",
+    "head": 4,
+    "idx": 8,
+    "punct": false,
+    "morph": "PronType=Rel"
+   },
+   {
+    "i": 3,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "auxpass",
+    "head": 4,
+    "idx": 13,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 4,
+    "text": "read",
+    "lemma": "read",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "relcl",
+    "head": 1,
+    "idx": 16,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 5,
+    "text": "by",
+    "lemma": "by",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "agent",
+    "head": 4,
+    "idx": 21,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 6,
+    "text": "two",
+    "lemma": "two",
+    "pos": "NUM",
+    "tag": "CD",
+    "dep": "nummod",
+    "head": 7,
+    "idx": 24,
+    "punct": false,
+    "morph": "NumType=Card"
+   },
+   {
+    "i": 7,
+    "text": "threads",
+    "lemma": "thread",
+    "pos": "NOUN",
+    "tag": "NNS",
+    "dep": "pobj",
+    "head": 5,
+    "idx": 28,
+    "punct": false,
+    "morph": "Number=Plur"
+   },
+   {
+    "i": 8,
+    "text": "needs",
+    "lemma": "need",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 8,
+    "idx": 36,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 9,
+    "text": "a",
+    "lemma": "a",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 10,
+    "idx": 42,
+    "punct": false,
+    "morph": "Definite=Ind|PronType=Art"
+   },
+   {
+    "i": 10,
+    "text": "lock",
+    "lemma": "lock",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "dobj",
+    "head": 8,
+    "idx": 44,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 11,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 8,
+    "idx": 48,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "The list is unchanged.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "list",
+    "lemma": "list",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 2,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 2,
+    "idx": 9,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "unchanged",
+    "lemma": "unchanged",
+    "pos": "ADJ",
+    "tag": "JJ",
+    "dep": "acomp",
+    "head": 2,
+    "idx": 12,
+    "punct": false,
+    "morph": "Degree=Pos"
+   },
+   {
+    "i": 4,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 2,
+    "idx": 21,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "A value stored in the class stays there.": [
+  [
+   {
+    "i": 0,
+    "text": "A",
+    "lemma": "a",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Ind|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "value",
+    "lemma": "value",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 6,
+    "idx": 2,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "stored",
+    "lemma": "store",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "acl",
+    "head": 1,
+    "idx": 8,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 3,
+    "text": "in",
+    "lemma": "in",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "prep",
+    "head": 2,
+    "idx": 15,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 4,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 5,
+    "idx": 18,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 5,
+    "text": "class",
+    "lemma": "class",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "pobj",
+    "head": 3,
+    "idx": 22,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 6,
+    "text": "stays",
+    "lemma": "stay",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 6,
+    "idx": 28,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 7,
+    "text": "there",
+    "lemma": "there",
+    "pos": "ADV",
+    "tag": "RB",
+    "dep": "advmod",
+    "head": 6,
+    "idx": 34,
+    "punct": false,
+    "morph": "PronType=Dem"
+   },
+   {
+    "i": 8,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 6,
+    "idx": 39,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "The loop calls the method.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "loop",
+    "lemma": "loop",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 2,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "calls",
+    "lemma": "call",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 2,
+    "idx": 9,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 4,
+    "idx": 15,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 4,
+    "text": "method",
+    "lemma": "method",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "dobj",
+    "head": 2,
+    "idx": 19,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 5,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 2,
+    "idx": 25,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "The file got overwritten.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "file",
+    "lemma": "file",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 2,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "got",
+    "lemma": "get",
+    "pos": "VERB",
+    "tag": "VBD",
+    "dep": "ROOT",
+    "head": 2,
+    "idx": 9,
+    "punct": false,
+    "morph": "Tense=Past|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "overwritten",
+    "lemma": "overwrite",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "acomp",
+    "head": 2,
+    "idx": 13,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 4,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 2,
+    "idx": 24,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "Hint: the result is cached.": [
+  [
+   {
+    "i": 0,
+    "text": "Hint",
+    "lemma": "hint",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "dep",
+    "head": 5,
+    "idx": 0,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 1,
+    "text": ":",
+    "lemma": ":",
+    "pos": "PUNCT",
+    "tag": ":",
+    "dep": "punct",
+    "head": 5,
+    "idx": 4,
+    "punct": true,
+    "morph": ""
+   },
+   {
+    "i": 2,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 3,
+    "idx": 6,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 3,
+    "text": "result",
+    "lemma": "result",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubjpass",
+    "head": 5,
+    "idx": 10,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 4,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "auxpass",
+    "head": 5,
+    "idx": 17,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 5,
+    "text": "cached",
+    "lemma": "cache",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "ROOT",
+    "head": 5,
+    "idx": 20,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 6,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 5,
+    "idx": 26,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "The loop runs first. The value is written once.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "loop",
+    "lemma": "loop",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 2,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "runs",
+    "lemma": "run",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 2,
+    "idx": 9,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "first",
+    "lemma": "first",
+    "pos": "ADV",
+    "tag": "RB",
+    "dep": "advmod",
+    "head": 2,
+    "idx": 14,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 4,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 2,
+    "idx": 19,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 21,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "value",
+    "lemma": "value",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubjpass",
+    "head": 3,
+    "idx": 25,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "auxpass",
+    "head": 3,
+    "idx": 31,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "written",
+    "lemma": "write",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "ROOT",
+    "head": 3,
+    "idx": 34,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 4,
+    "text": "once",
+    "lemma": "once",
+    "pos": "ADV",
+    "tag": "RB",
+    "dep": "advmod",
+    "head": 3,
+    "idx": 42,
+    "punct": false,
+    "morph": "NumType=Mult"
+   },
+   {
+    "i": 5,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 3,
+    "idx": 46,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "The loop runs first, and the value is written once.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "loop",
+    "lemma": "loop",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 2,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "runs",
+    "lemma": "run",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 2,
+    "idx": 9,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "first",
+    "lemma": "first",
+    "pos": "ADV",
+    "tag": "RB",
+    "dep": "advmod",
+    "head": 2,
+    "idx": 14,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 4,
+    "text": ",",
+    "lemma": ",",
+    "pos": "PUNCT",
+    "tag": ",",
+    "dep": "punct",
+    "head": 2,
+    "idx": 19,
+    "punct": true,
+    "morph": "PunctType=Comm"
+   },
+   {
+    "i": 5,
+    "text": "and",
+    "lemma": "and",
+    "pos": "CCONJ",
+    "tag": "CC",
+    "dep": "cc",
+    "head": 2,
+    "idx": 21,
+    "punct": false,
+    "morph": "ConjType=Cmp"
+   },
+   {
+    "i": 6,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 7,
+    "idx": 25,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 7,
+    "text": "value",
+    "lemma": "value",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubjpass",
+    "head": 9,
+    "idx": 29,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 8,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "auxpass",
+    "head": 9,
+    "idx": 35,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 9,
+    "text": "written",
+    "lemma": "write",
+    "pos": "VERB",
+    "tag": "VBN",
+    "dep": "conj",
+    "head": 2,
+    "idx": 38,
+    "punct": false,
+    "morph": "Aspect=Perf|Tense=Past|VerbForm=Part"
+   },
+   {
+    "i": 10,
+    "text": "once",
+    "lemma": "once",
+    "pos": "ADV",
+    "tag": "RB",
+    "dep": "advmod",
+    "head": 9,
+    "idx": 46,
+    "punct": false,
+    "morph": "NumType=Mult"
+   },
+   {
+    "i": 11,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 9,
+    "idx": 50,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "Some prose.": [
+  [
+   {
+    "i": 0,
+    "text": "Some",
+    "lemma": "some",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 1,
+    "text": "prose",
+    "lemma": "prose",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "ROOT",
+    "head": 1,
+    "idx": 5,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 1,
+    "idx": 10,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ]
+}

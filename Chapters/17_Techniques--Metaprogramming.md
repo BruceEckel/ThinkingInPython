@@ -447,7 +447,7 @@ because pickle looks the class up as `builtins.Start` and does not find it.
 because a built-in class carries no source.
 
 `type()`-built classes fail differently.
-`LightOn` gets `__module__` set to `events`,
+`type()` sets `LightOn`'s `__module__` to `events`,
 the module where `make()` calls `type()`.
 But the `makers` dict holds the class,
 and `events` has no attribute named `LightOn`.
@@ -548,7 +548,7 @@ The base that declares the keyword names it as a parameter,
 so the keyword binds to `shade` and `kwargs` collects the rest.
 `super().__init_subclass__(**kwargs)` passes `kwargs` up the chain,
 so a base further up can take the keywords it declared.
-If a keyword is still left when the chain reaches `object.__init_subclass__()`,
+If a keyword remains when the chain reaches `object.__init_subclass__()`,
 that method raises a `TypeError`.
 
 Testing shows that each registry holds only its current leaf classes,

@@ -772,7 +772,7 @@ Iterating over the enum reaches every member of that set:
 `test_trap_states.py` checks each state against each move,
 and `VendingMachine` builds its `Quit` and `Row` rules from a comprehension over `State`.
 A member is one object shared by every machine that uses it,
-so a value stored on a member is shared by every machine too (see exercise 2).
+so a value stored on a member is shared by every machine (see exercise 2).
 Data that belongs to one machine lives on the machine,
 as `VendingMachine`'s `amount` and `row` do.
 

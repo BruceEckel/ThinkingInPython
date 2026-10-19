@@ -617,7 +617,7 @@ so the second rat explores nothing new.
 Here the shared cell is `(5, 5)`, where the loop closes, so both rats find every
 neighbor claimed and dead-end there.
 
-Every cell still gets explored.
+The exploration still reaches every cell.
 `visited` stays correct too, because adding a cell to a set a second time
 leaves the set as it was.
 `test_rats_and_mazes.py` asserts the set of cells reached,
