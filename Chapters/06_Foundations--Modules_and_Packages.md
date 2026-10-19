@@ -705,7 +705,7 @@ Keep an import eager when you import a module for what its body does rather than
 A module that registers a [plugin class](26_Patterns--Factory.md#hazards-of-self-registration),
 installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
-the module's body and its registration wait for the rest of the run.
+the module stays unloaded for the rest of the run, so that work never happens.
 The failure is silent: no error, just a table with a row missing.
 `all` defers ordinary `import` statements too,
 including the ones that exist to run a module's body.
