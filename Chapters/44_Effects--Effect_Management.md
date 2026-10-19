@@ -10,35 +10,35 @@ The function it calls computes a total price, and the math is right.
 Three calls down, a helper that formats currency reads a configuration service and writes to an audit log.
 Every signature on the path hides the read and the write.
 
-This book has emphasized the benefits of pure functions in many places:
+This book emphasizes the benefits of pure functions:
 
 - [Functional Foundations](40_Functional--Foundations.md#pure-functions)
   contrasts `double()`, a pure function, with `withdraw()`,
   which depends on state left over from earlier calls.
 - [Performance](18_Techniques--Performance.md#caching)
   turns naive recursive Fibonacci from 242,785 runs of its body into 26 with `functools.cache`.
-  Caching works only because the cached function is pure.
+  Caching works only when the cached function is pure.
 - [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
   turns shapes into immutable data,
   so one pure function replaces a method on each class.
-- [*Observer*](30_Patterns--Observer.md#the-model)
-  has `recolored()` return a new grid instead of mutating the one it received,
-  so a test checks the change with no GUI in sight.
+- [*Observer*'s](30_Patterns--Observer.md#the-model)
+  `recolored()` returns a new grid instead of mutating the one it receives,
+  so a test checks the change without a GUI.
 - [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
-  reduces competition between items to pure logic,
-  a dictionary lookup with nothing to mock.
-- [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree)
-  has `simplify()` return a new tree instead of editing the one it receives.
+  converts competition between items into a dictionary lookup.
+- [*Composite* and *Interpreter*'s](34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree)
+  `simplify()` returns a new tree instead of editing the one it receives.
 
-In every one of those cases you can settle the question of purity by reading one function.
-One reading stops being enough as soon as the function calls others.
-If any of them has a side effect, the calling function is impure too.
-To discover whether a function is impure,
+In each case, you can determine purity by reading a single function.
+This doesn't work if the function calls other functions.
+If any of those other functions interacts with the environment,
+it makes the calling function is impure.
+To determine if a function is impure,
 you must either trust the documentation or examine the code of every function it calls.
 
 Reading every callee soon becomes tedious and error-prone.
-A type system that verified purity would do that reading for you.
-A system that does so is an *Effect Management System*.
+A type system that verifies purity does the work for you.
+This is an *Effect Management System*.
 
 ## What Is an Effect?
 
@@ -49,10 +49,10 @@ your function writes to an audit log.
 If you call one that reads the time of day,
 your result depends on the time of day.
 If you call one that raises a `ValueError`, your function raises a `ValueError`.
-You inherit each of these by calling,
+Each of these passes to your function with the call,
 and ordinarily no signature on the path mentions any of them.
 
-That inheritance is the difficulty.
+That transfer is the difficulty.
 A behavior confined to one function needs no system to manage it,
 because one read of that function settles the question.
 An Effect passes from callee to caller instead, one call at a time.
@@ -267,8 +267,8 @@ with expected(ValueError):
 
 The check runs once, in `__post_init__()`,
 when `NonZero(...)` builds the instance.
-Every function that receives a `NonZero`, including `slope()`,
-inherits that guarantee.
+Every function that takes a `NonZero`, including `slope()`,
+gets that guarantee with the argument.
 Because `slope()` cannot divide by zero,
 it returns `rise / run.value` as a `float` rather than a `Result`.
 
@@ -464,7 +464,7 @@ A full EMS does three things:
 
 On its own, the first item is *Effect tracking*.
 Tracking alone tells you whether a function is pure,
-and names the kinds of impurity a caller inherits.
+and names the kinds of impurity a caller takes on.
 Effect management is tracking plus the second and third items.
 When an Effect is an interface and a caller binds the implementation later,
 you can replace what the Effect does and leave the function that performs it as written.
