@@ -693,8 +693,8 @@ namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
 compares against it and returns "brake" for `Signal.STOP`. Any dotted
 name works, including `Signal.CAUTION`.
 
-In a program the constant would live in `Defaults` alone, one
-definition for every use. The listing keeps the module-level copy
+In a program the constant would live in `Defaults` alone, so every
+use reads that one definition. The listing keeps the module-level copy
 because `act()` and `guarded()` need the bare name.
 
 **Compare in a guard.** The second fix keeps the bare constant and moves the comparison into a
