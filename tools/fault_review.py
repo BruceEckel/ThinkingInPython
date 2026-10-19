@@ -76,7 +76,13 @@ label. It writes `docs/proposals/<label>.json` with `order` (the list
 position), `decision` None, and `note` empty added, and appends those
 writes to the same batch files, after the cards. Without `--rules`,
 `seed` still clears `docs/proposals/`, so a previous pass's proposals
-do not linger. The page hides the collection when it is empty.
+do not linger. The page hides the collection when it is empty. `seed`
+clears `build/fault_review/read/` too, the folder `apply` reads: the
+`ArtifactData` read-back adds files there and deletes none, so on
+2026-10-19 chapter 31's apply found chapter 30's 52 cards and its P8
+beside the 14 new ones. Those were harmless (their pairs already held
+the same decisions), but a stale card for a pair that still exists
+would overwrite a newer decision.
 
 `apply --rules-dir DIR` reads the `proposals` collection back, saved
 the same way, and prints one line per proposal in `order`: `P1
@@ -134,9 +140,11 @@ def seed(since: str | None, span: str | None, proposals: Path | None,
         json.loads(proposals.read_text(encoding="utf-8"))
         if proposals else {})
     docs = OUT / "docs"
-    for sub in ("meta", "cards", "proposals"):
-        (docs / sub).mkdir(parents=True, exist_ok=True)
-        for old in (docs / sub).glob("*.json"):
+    read = OUT / "read"
+    for folder in (docs / "meta", docs / "cards", docs / "proposals",
+                   read / "cards", read / "proposals"):
+        folder.mkdir(parents=True, exist_ok=True)
+        for old in folder.glob("*.json"):
             old.unlink()
     source = span or since or ""
     writes: list[dict[str, str]] = []

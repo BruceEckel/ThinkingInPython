@@ -131,11 +131,17 @@ common verb used as an identifier (`run`, `order`, `one`, `first`,
 `times`, `group`, a capture named `only`) is a skip, since a reader
 does not confuse the English word with the identifier; the earlier
 sightings on `run()`/"runs" and `fix`/"fixes" stand as history.
+The chapter's subject vocabulary counts like an identifier's word
+(widened 2026-10-19, chapter 31): beside a chapter whose subject gives
+a word a technical sense (entering and leaving states; a set of
+actions; a lookup key), the ordinary sense of that word reads as the
+technical one, so "the message the action left" reads as leaving a
+state and "the message the action set" reads as a set of actions.
 
 **Keep when.** The prose word names the identifier itself ("`run()` runs
 the steps" is about `run()`).
 
-**Sightings.** 4 (additive), 2 chapters
+**Sightings.** 6 (additive), 3 chapters
 - `26_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written, in
   a chapter whose class is `Shape`: "the shape a factory-object design
   takes" -> "the form a factory-object design takes"
@@ -150,6 +156,17 @@ the steps" is about `run()`).
   Algorithm" -> "the quick repair" / "the anchored algorithm" / "What
   Anchors the Algorithm" (Bruce: "the word 'fix' seems to be used in
   both senses in this chapter")
+- `31_Patterns--State_Machines` 2026-10-19, Bruce's note on the
+  `vending_demo` lead-in, in a chapter about entering and leaving
+  states: "followed by the message the action left:" -> "then the
+  `message` that the rule's action wrote:" ("set" was tried first and
+  read as a set of actions)
+- `31_Patterns--State_Machines` 2026-10-19, beside a dictionary's
+  keys: "The engine's lookup keys on `type(event)` exactly, one
+  dictionary lookup rather than an `isinstance()` test against each
+  row." -> "The engine looks up rules by the exact `type(input_)`, so
+  finding them takes one dictionary lookup rather than an
+  `isinstance()` test against each rule."
 
 **Home.** this file only. Promoted at Bruce's call (2026-08-29).
 
@@ -1425,6 +1442,75 @@ candidates; this rule covers a pointer with none.
 
 **Home.** deep-review (editing pass), the claims sweeps.
 
+### R38. Open an example given in words with "Consider"
+
+**Test.** A sentence introduces an example or scenario whose material is
+the sentence (no listing follows yet, or the listing follows the
+description) and opens with "Here's", "Here is", or "Here are". Write
+"Consider a ...", drop a flourish adjective on the example ("a fancy
+mousetrap"), and do not add an aside saying that the material is
+described rather than listed.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 2, 2 chapters. Promoted 2026-10-19 on the second
+chapter's sighting (C25 -> R38).
+- `29_Patterns--Changing_the_Interface` 2026-09-17, was Claude-written,
+  Bruce's own edit: "Here are three wrappers: one logs each call ..." ->
+  (Claude) "Consider three wrappers, described in words rather than
+  code: one logs each call ..." -> (Bruce) "Consider three wrappers: one
+  logs each call ..."
+- `31_Patterns--State_Machines` 2026-10-19: "As an example, here's a
+  fancy mousetrap that can move through several states while trapping a
+  mouse." -> "As an example, consider a mousetrap that can move through
+  several states while trapping a mouse."
+
+**Home.** this file only.
+
+### R39. Name a type by its members and a design by its section title, never by a coined phrase
+
+**Test.** A hyphenated compound or a quoted paraphrase stands as the
+name of a design, a choice, or a type's shape ("One-table",
+"each-state-decides", "the construction-starts-the-engine choice", "a
+name for 'callable, plus `undo()`'"), and the book has a section title
+or a member list for it. Write the members the type has. Name a design
+by its section title, linked, or by a clause that says what it does
+("so constructing the machine starts the engine").
+
+**Keep when.** A compound the book defines as a term ("table-driven",
+"read-only").
+
+**Sightings.** 5 (additive), 2 chapters. Widened from a type's shape
+to a design's name and promoted 2026-10-19 on the second chapter's
+sightings (C19 -> R39).
+- `27_Patterns--Function_Objects` 2026-09-16, was Claude-written: "a
+  list of commands that also undo needs a name for "callable, plus
+  `undo()`". That name is a `Protocol` with both members." -> "an
+  undoable list of commands needs a type with two members,
+  `__call__()` and `undo()`, and that type is a `Protocol`."
+- `27_Patterns--Function_Objects` Solutions, same day: "needs a name
+  for "callable, plus `undo()`", and in Python that name is a `Protocol`
+  declaring both members." -> "needs a type with two members,
+  `__call__()` and `undo()`, and in Python that type is a `Protocol`."
+- `31_Patterns--State_Machines` 2026-10-19: "One-table suits a machine
+  you build from a diagram, whose inputs carry data, or whose
+  transitions need conditions." -> "The second design, the
+  [Table-Driven *State Machine*](#table-driven-state-machine), suits a
+  machine you build from a diagram, whose inputs carry data, or whose
+  transitions need conditions."
+- `31_Patterns--State_Machines` 2026-10-19: "The each-state-decides
+  design keeps each state's transitions with that state, in its
+  `next()` or in its table." -> "The first design, [Each State
+  Decides](#each-state-decides), keeps each state's transitions with
+  that state, in its `next` function."
+- `31_Patterns--State_Machines` 2026-10-19: "`StateMachine`'s
+  constructor runs the initial state, the construction-starts-the-engine
+  choice that [*Template Method* discourages](...)." ->
+  "`StateMachine`'s constructor runs the initial state, so constructing
+  the machine starts the engine."
+
+**Home.** this file only.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -1636,24 +1722,6 @@ match, so not yet promoted):
   name ... overwrite each other" -> "The registry keys on `cls.__name__`
   alone, so two classes that share a name ... overwrite each other"
 
-### C19. Name a type's members instead of a coined phrase for its shape
-
-**Test.** A quoted paraphrase standing in for a type or structure ("a
-name for 'callable, plus `undo()`'"). Write the members the type has.
-
-**Keep when.** None seen yet.
-
-**Sightings.** 2 (additive), both `27_Patterns--Function_Objects` 2026-09-16,
-was Claude-written (chapter and Solutions, so not yet independent):
-- "a list of commands that also undo needs a name for "callable, plus
-  `undo()`". That name is a `Protocol` with both members." -> "an
-  undoable list of commands needs a type with two members,
-  `__call__()` and `undo()`, and that type is a `Protocol`."
-- Solutions: "needs a name for "callable, plus `undo()`", and in Python
-  that name is a `Protocol` declaring both members." -> "needs a type
-  with two members, `__call__()` and `undo()`, and in Python that type
-  is a `Protocol`."
-
 ### C21. Cut the chapter roadmap paragraph; each sentence goes where its content is
 
 **Test.** An opening paragraph whose sentences each say what a later
@@ -1705,21 +1773,6 @@ takes "you" off a sentence about how the design behaves.
 **Sightings.** 1, `27_Patterns--Function_Objects` 2026-09-16, was Claude-written:
 - "Adding, removing, or reordering handlers means editing a list." ->
   "To add, remove, or reorder the handlers you edit the `chain` list."
-
-### C25. Open a scenario described in words with "Consider", and don't say that it is described
-
-**Test.** An exercise or example whose material is the sentence itself
-(no listing follows) opening with "Here are" / "Here is". Write
-"Consider ...". Do not add an aside explaining that the material is
-described rather than listed.
-
-**Keep when.** None seen yet.
-
-**Sightings.** 1, `29_Patterns--Changing_the_Interface` 2026-09-17, was
-Claude-written, Bruce's own edit:
-- "Here are three wrappers: one logs each call ..." -> (Claude) "Consider
-  three wrappers, described in words rather than code: one logs each
-  call ..." -> (Bruce) "Consider three wrappers: one logs each call ..."
 
 ### C26. In a heading, one verb rather than a split phrasal verb
 
@@ -1912,6 +1965,83 @@ already has its instances.
 thin): "a widget keeps a list of handlers and calls each one when its
 event arrives" -> "a widget (like a button) keeps a list of handlers
 and calls each one when its event (a button press) arrives"
+
+**Home.** this file.
+
+### C36. Cut a trailing restatement of the clause's own contrast
+
+**Test.** The sentence ends on "instead", "too", or an "as the X"
+comparison, and deleting it leaves the meaning unchanged because an
+earlier clause already carries the contrast: a closing "instead" after
+an "If you swap" clause, a trailing analogy "as the `else` for the rows
+above it" after "belongs last in its group". Kin to R32's trailing tag,
+which gets its own clause; this one is a repeat and is cut.
+
+**Keep when.** The tag carries the contrast on its own, with no earlier
+clause stating it.
+
+**Sightings.** 2, one chapter (`31_Patterns--State_Machines`,
+2026-10-19)
+- "If you swap the row order, the same input reports `UNAVAILABLE`
+  instead." -> "If you swap the rule order, the same input reports
+  `UNAVAILABLE`."
+- "A row whose condition is `None` matches every time, so it belongs
+  last in its group, as the `else` for the rows above it." -> "A rule
+  whose condition is `None` matches every time, so it belongs last in
+  its group."
+
+**Home.** this file.
+
+### C37. "if" for a condition, "once" for a step in time
+
+**Test.** "once X" where X is a standing property ("the machine needs
+more than a page of code") rather than an event that completes. Write
+"if" when the clause states a condition; keep "once" for a step that
+follows another in time.
+
+**Keep when.** X is an event with a before and after ("once the pool is
+primed").
+
+**Sightings.** 1 (`31_Patterns--State_Machines`, 2026-10-19): "Choose a
+library once the machine needs more than a page of code." -> "Choose a
+library if the machine needs more than a page of code."
+
+**Home.** this file; the global `CLAUDE.md` watch list (consider
+rewriting) if promoted.
+
+### C38. Name and link the rule a sentence applies (additive)
+
+**Test.** A sentence states a consequence that holds only because of a
+rule the chapter stated in an earlier section ("the first rule whose
+condition passes wins"), and nothing in the sentence points at that
+rule. Open with the rule's name, linked to the section that states it.
+
+**Keep when.** The rule was stated in the paragraph just above.
+
+**Sightings.** 1 (`31_Patterns--State_Machines`, 2026-10-19): "The
+first row whose condition passes wins, whether or not a lower row
+matters more." -> "By the engine's [ordering rule](#the-engine), the
+first rule whose condition passes wins, whether or not a later rule
+matters more."
+
+**Home.** this file.
+
+### C39. An effect names which way it cuts
+
+**Test.** A sentence reports a change in what a tool or program does
+("The `invalid-argument-type` report above disappears"), and a reader
+cannot tell from the paragraph whether the change is wanted (Bruce: "is
+this a good thing or not? unclear"). Say whether it is the gain or the
+loss by naming the consequence. Kin to R36, where a capability names
+its use.
+
+**Keep when.** The paragraph's next sentence states the consequence.
+
+**Sightings.** 1 (`31_Patterns--State_Machines`, 2026-10-19, A Vending
+Machine): "The `invalid-argument-type` report above disappears." ->
+"The `Column`/`choose_row()` mismatch above then passes the checker. At
+runtime `choose_row()` stores a `Column` in `self.row`, so the machine
+carries on with a wrong selection."
 
 **Home.** this file.
 
