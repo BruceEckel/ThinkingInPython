@@ -564,7 +564,7 @@ A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
 In `test_endless.py`, `counter()` stands in for `count(1)`.
 It counts up the same way,
-then raises an exception once something has pulled `LIMIT` values:
+then raises an exception after something has pulled `LIMIT` values:
 
 ```python
 # test_endless.py
