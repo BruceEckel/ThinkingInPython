@@ -527,8 +527,9 @@ plus a class statement and a `@staticmethod` on every function.
 
 `checkout.py` is one file.
 A façade too large for one file becomes a package.
-The package's `__init__.py` re-exports a curated set of names from private submodules,
-the same underscore convention, applied to modules instead of classes.
+The package's `__init__.py` re-exports a curated set of names from private submodules.
+A leading underscore marks each submodule private,
+as it marks the classes in `checkout.py`.
 That `__init__.py` is the idiomatic place for a façade to a subsystem of several modules,
 GoF's usual case for the pattern.
 
