@@ -1181,8 +1181,6 @@ Although `alarm` connects before `log_reading`,
 at 150 degrees the log prints first.
 Concurrency means each responder finishes as soon as its own wait ends,
 so the faster responder prints first.
-The results from `gather()` stay in argument order.
-Only the side effects interleave.
 Each `announced` line prints after every line its change produced,
 because `set_celsius()` returns when `gather()` has waited for both responders.
 
