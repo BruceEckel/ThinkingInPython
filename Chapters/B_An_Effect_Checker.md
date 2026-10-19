@@ -248,8 +248,11 @@ against `ast` nodes.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
 notes that the standard library walks these trees with `ast.NodeVisitor`,
 in the style of [*Visitor*](33_Patterns--Visitor.md).
-The node types are a closed set,
-so `match` does the same work with no class to subclass.
+`ast.NodeVisitor` looks up the method for a node by name,
+`visit_` plus the node's class name,
+so a walker subclasses `ast.NodeVisitor` and defines one such method for each node class it handles.
+A `match` names the node classes in its cases,
+so it does the same work with no class to subclass.
 
 `dotted()` is the smallest of these matches.
 It is recursive, as the tree is.
