@@ -52,15 +52,14 @@ If your function calls a function that raises a `ValueError`,
 your function raises a `ValueError`.
 The log write, the clock read,
 and the exception become your function's Effects too,
-and ordinarily no signature on the path mentions any of them.
+and no signature on the path mentions any of them.
 
-That transfer is the difficulty.
 A behavior confined to one function needs no system to manage it,
-because one read of that function settles the question.
-An Effect passes from callee to caller instead, one call at a time.
-Every signature on the path hides it until something in the types records it.
+because one read of that function tells you what's happening.
+But an Effect passes from callee to caller, one call at a time.
+Every signature on the path hides it.
 
-Three things pass from callee to caller that way.
+Three things pass from callee to caller.
 The first is a *side effect*:
 calling the function does something besides return a result,
 changing the environment outside the function.
@@ -82,15 +81,14 @@ The second is a *side cause*, the counterpart of a side effect:
 what the environment does to the function.
 Suppose your function reads the time of day.
 The read changes nothing in the environment,
-yet the result differs from one call to the next.
-Information a function uses beyond its arguments is a side cause whenever that information can change between calls.
-The usual sources are I/O: the time of day, a random number,
-a database or network read.
-Reading a global variable that something else can rebind is enough on its own.
-A [captured constant](40_Functional--Foundations.md#closures) is not.
+yet the result of your function differs from one call to the next.
+Information a function uses beyond its arguments is a side cause whenever that information changes between calls.
+The usual sources are I/O,
+such as the time of day or reading from a network connection.
+Your result is also affected by reading a global variable that something else can rebind.
 
-The third is an exception,
-which propagates from callee to caller the same way and appears in no signature either.
+The third kind of Effect is an exception,
+which propagates from callee to caller but doesn't appear in the function signature.
 
 ## Are Exceptions Impure?
 
@@ -105,7 +103,7 @@ def slope(rise: int, run: int) -> float:
 except when `run` is zero,
 where it raises an exception instead of returning a result.
 Does the exception break purity?
-The question has two answers:
+There are two answers:
 
 1.  **Pure.**
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
@@ -127,7 +125,7 @@ The question has two answers:
     A [*Total Function*](42_Functional--Error_Handling.md#total-functions)
     returns errors as data in explicit wrapper types instead of raising them.
 
-This chapter asks a different question:
+When considering Effects, a different question is more important:
 does the exception pass from callee to caller?
 If you write a function `a()` that calls a function `b()` that raises an exception,
 then `a()` raises that exception too, unless `a()` catches it.
@@ -145,7 +143,7 @@ You make `slope()` from `divide_by_zero_impurity.py` pure by transforming its ex
 Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
-If you decorate the original `slope()`, unchanged, with that chapter's `@safe`,
+If you decorate `slope()` with that chapter's `@safe`,
 every exception it raises becomes a value instead of a crash:
 
 ```python
@@ -167,9 +165,7 @@ for args in [(10, 2), (10, 0)]:
 #: slope(10, 0): ZeroDivisionError
 ```
 
-Because `@safe` catches whatever `slope()` raises, the fix is the decorator,
-not a change to the function it wraps.
-`slope()` is now total.
+Because `@safe` catches whatever `slope()` raises, `slope()` becomes total.
 Every call returns a `Result`,
 and the caller must unpack it to reach the number.
 
@@ -204,9 +200,10 @@ expect(ValueError, slope, 10, -1)
 ```
 
 Catching the exception works with the types you have.
-But it guards only the exceptions `slope()`'s `try` names.
+But an `except` clause catches the exception it names,
+and the one in `slope()` names `ZeroDivisionError`.
 `validate()` raises `ValueError` for a negative `run`.
-The `try` around that call catches `ZeroDivisionError` and lets `ValueError` propagate.
+The `try` around that call lets `ValueError` propagate.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
 
