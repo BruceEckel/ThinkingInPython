@@ -263,8 +263,10 @@ def test_overdraft_names_amount_keeps_balance() -> None:
 `pytest` applies the pattern with `re.search()`,
 so the pattern can match any part of the message.
 The full message here is `balance 100 is less than 250`.
-The function that anchors a pattern at the start of the string is `re.prefixmatch()`,
-new in Python 3.15.
+`re.prefixmatch()`, new in Python 3.15,
+anchors a pattern at the start of the string,
+so it would reject `less than 250` for this message,
+which starts with `balance`.
 Its old name, `re.match()`, is now soft-deprecated,
 since that name hides the anchoring and reads like the `match` statement.
 If the message holds `.`, `(`, or another regular-expression metacharacter,
@@ -634,11 +636,9 @@ where the locale decides the encoding.
 `Path()` keeps a leading `~` as written,
 so a variable that may hold `~/data` needs `.expanduser()` on the result.
 
-Python 3.14 gave `Path` the file operations that once needed `shutil`:
-`copy()` and `move()` to a destination path,
-and `copy_into()` and `move_into()` to a destination directory.
-`Path.info` answers `exists()`, `is_dir()`, `is_file()`, and `is_symlink()`,
-and caches each answer on the `Path` object the first time you ask,
+Python 3.14 added `Path.info`, which answers `exists()`, `is_dir()`,
+`is_file()`, and `is_symlink()`.
+`Path.info` caches each answer on the `Path` object the first time you ask,
 so a test that changes the file afterward needs a fresh `Path`.
 
 The `app_data()` fixture points `APP_DATA` at a throwaway directory before each test,
