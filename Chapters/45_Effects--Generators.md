@@ -264,7 +264,7 @@ the generator exists and waits to start its body.
 `next()` produces the first `Question`,
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
-The `answers` map keys on `Question` and holds `Answer`s.
+The `answers` map stores each `Answer` under its `Question`.
 
 The type checker verifies two of those three parameters.
 `StopIteration.value`'s type is `Any`,
