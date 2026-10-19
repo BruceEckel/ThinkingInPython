@@ -226,7 +226,8 @@ so `count_primes()` must sit at the top level of a module a worker can import.
 A `lambda` or a [closure](40_Functional--Foundations.md#closures)
 fails with a `PicklingError`.
 That rules out two shapes these chapters use often.
-By contrast, a `functools.partial` pickles as its wrapped function plus its bound arguments.
+By contrast, a `functools.partial` pickles as its wrapped function plus its bound arguments,
+so a `partial` of a top-level function carries to a worker the argument a closure would capture.
 
 The `if __name__ == "__main__"` guard follows from the same import.
 Each worker imports this module to find `count_primes()`.
