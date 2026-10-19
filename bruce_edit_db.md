@@ -1316,7 +1316,7 @@ and apply those descriptions to a sweep of the book").
 
 **Home.** straighten (Accrued patterns).
 
-### R33. In a contrast, the reason names a difference
+### R33. In a contrast, the reason states a difference
 
 **Test.** A passage compares two designs, tools, or forms, and a
 sentence in it reads "X is P, so Y" where P holds of the other side as
@@ -1392,7 +1392,7 @@ book; the three "trade-off" hits all name the expression problem.
 
 **Home.** CLAUDE.md watch list (with the commerce family), this file.
 
-### R36. A capability names its use
+### R36. A capability describes its use
 
 **Test.** A sentence states what a construct permits ("`list(TrapState)`
 enumerates every state", "a parameter typed `TrapState` accepts a
@@ -1586,8 +1586,9 @@ when the latter is clearer").
   names an item, its delay, and whether it fails" -> "holds". The 476
   keeps are identifiers, aliases, and diagnostics that print a name.
 
-**Home.** the global `CLAUDE.md` style rules, since 2026-10-19; this
-file.
+**Home.** the global `CLAUDE.md` style rules, since 2026-10-19; `tip
+watch-words` Tier 1 (`names` before a wh-word or an abstract noun,
+the 30 keeps baselined the same day); this file.
 
 ## Candidates
 
@@ -2093,7 +2094,7 @@ matters more."
 ("The `invalid-argument-type` report above disappears"), and a reader
 cannot tell from the paragraph whether the change is wanted (Bruce: "is
 this a good thing or not? unclear"). Say whether it is the gain or the
-loss by naming the consequence. Kin to R36, where a capability names
+loss by naming the consequence. Kin to R36, where a capability describes
 its use.
 
 **Keep when.** The paragraph's next sentence states the consequence.

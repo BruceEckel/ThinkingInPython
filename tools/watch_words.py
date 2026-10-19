@@ -22,8 +22,12 @@ the hyphenated compounds, and "fixed point" stay, the hold-constant
 sense goes, adjective included), `once` (since 2026-10-19, rule R40:
 "once X" where X is a standing condition reads as a point in time and
 takes "if" or "when"; a step after an event, and the adverb meaning
-one time, stay). A Tier 3 hit is a defect to fix unless a
-human reads it as literal ("a person wants a refund"); a Tier 2 hit is
+one time, stay), and `names` (since 2026-10-19, rule R41: "names"
+with an abstract object, a limitation, problem, shape, condition,
+kind, or consequence, or with a wh-clause, usually wants "describes",
+"states", or "holds"; an identifier object, which the check sees as
+`CODE`, stays, and so does the noun "names" after a determiner).
+A Tier 3 hit is a defect to fix unless a human reads it as literal ("a person wants a refund"); a Tier 2 hit is
 kept where the word changes the meaning; a Tier 1 hit is a prompt to
 try a rewrite, and most stay.
 
@@ -104,6 +108,33 @@ HEADER: Final = (
     "# `tip watch-words-accept`; read the delta with `tip watch-words`\n"
     "# before accepting. See tools/watch_words.py.\n"
 )
+NAMES_AFTER: Final = (
+    r"(?:the|a|an|its|that|this|each|every|one|two|three|both|no"
+    r"|neither|their|your|our)"
+)
+NAMES_ADJ: Final = (
+    "same|real|wrong|right|missing|other|first|second|third|whole"
+    "|full|one|only|hidden|underlying|actual"
+)
+NAMES_NOUNS: Final = "|".join(
+    n + r"(?:s|es)?" for n in (
+        "limitation problem shape condition kind consequence axis "
+        "difference reason split behavior mechanism trap distinction "
+        "result cause effect rule restriction requirement idea design "
+        "fault gap tension case contract role purpose intent change "
+        "situation property guarantee pattern approach step mistake "
+        "failure symptom lesson technique relationship trade-off "
+        "choice decision goal way place moment order outcome fact "
+        "principle concept category task responsibility constraint "
+        "boundary limit scope structure process meaning"
+    ).split()
+)
+NAMES_NOT_NOUN: Final = (
+    r"(?<!\bthe )(?<!\ba )(?<!\ban )(?<!\btwo )(?<!\bthree )"
+    r"(?<!\bits )(?<!\btheir )(?<!\bof )(?<!\bthese )(?<!\bthose )"
+    r"(?<!\bsome )(?<!\bmany )(?<!\bother )(?<!\bour )(?<!\byour )"
+    r"(?<!\bhis )(?<!\bher )(?<!\bboth )(?<!\bsame )(?<!ing )(?<!-)"
+)
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
@@ -123,6 +154,9 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (1, r"used to"),
         (1, r"fix(?:es|ed|ing)?"),
         (1, r"once"),
+        (1, NAMES_NOT_NOUN + r"names (?:what|how|why|which|whether)"),
+        (1, NAMES_NOT_NOUN + rf"names (?:{NAMES_AFTER} )?"
+            rf"(?:(?:{NAMES_ADJ}) )?(?:{NAMES_NOUNS})(?!-)"),
         (3, r"in the first place"),
         (3, r"ships?|shipped|shipping"),
         (3, r"lands?|landed|landing"),
