@@ -1542,8 +1542,8 @@ page's decisions (C37 -> R40).
   Rethinking_Objects` "A subclass becomes instantiable once it defines
   `area()`" -> "when".
 
-**Home.** this file only; the global `CLAUDE.md` watch list (consider
-rewriting) is Bruce's call.
+**Home.** the global `CLAUDE.md` watch list (consider rewriting, with
+the test under the tiers), since 2026-10-19; this file.
 
 ## Candidates
 
