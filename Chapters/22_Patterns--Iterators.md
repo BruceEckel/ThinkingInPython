@@ -946,7 +946,7 @@ The only way to find out whether the source has run out is to pull and receive `
 so an exhausted source and an empty one produce identical output.
 The protocol buffers nothing and reports nothing in advance.
 Each tool in this chapter that answers in advance holds a buffer to give that answer:
-`tee()`, `OverStream`, and a peekable wrapper.
+`tee()`, `OverStream`, and a `Peekable` wrapper (see exercise 8).
 
 ## Exercises
 
