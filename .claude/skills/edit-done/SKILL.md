@@ -60,7 +60,15 @@ docstring has the mechanics). While the tag still exists:
 
 1. Run `tip edit-patterns ARGS=--dry-run`. It lists every sentence
    the pass rewrote, from one before/after diff, and records each pair in
-   `tools/data/edit_pairs.json`.
+   `tools/data/edit_pairs.json`. Two filters keep the list to real
+   sentence edits. It drops each rewrite below the 0.6 similarity floor
+   and prints the count (`ARGS="--min-similarity 0.5"` lowers the floor
+   for one run). It also collapses each rename, a word that the pass
+   replaced by another in three or more sentences, and prints
+   `rename: "row" -> "rule" in 7 sentences`. Chapter 31's pass made 185
+   pairs before the filters: 128 at 0.3 to 0.5 were spurious, and eleven
+   of the real ones were one word moving. A seed repeats the same
+   filters.
 2. For each edit the capture step judged generalizable, propose a
    one-line fault: what the before-sentence got wrong, stated so it
    picks out that fault and not a shared word or shared punctuation
@@ -68,12 +76,15 @@ docstring has the mechanics). While the tag still exists:
    not "ends in a colon"). Name what the edit changed, not a nearby
    property: chapter 30's "generated" line first said "in a passage
    that does not name the mechanism" when Bruce's own sentence named
-   it. Propose a line for every card, including edits you judge local
-   (an exercise renumbering, a fact correction): give those as
-   `{"fault": "...", "local": true}` so the card says "I'd call this
-   local" and Bruce decides. A card with no line cannot be approved,
-   and on chapter 30's first page the four left blank read as broken;
-   he wanted all four approved. Write the proposals to
+   it. Propose a line for every pair. For an edit you judge local
+   (an exercise renumbering, a fact correction), give
+   `{"fault": "...", "local": true}`, with the reason it is local as
+   the `fault`. The seed applies that judgment: it makes no card, marks
+   the pair local, and the page shows the local edits in one collapsed
+   row with a Disagree button on each, so Bruce pulls one back only
+   when he disagrees. Every other pair becomes a card, and a card with
+   no line cannot be approved (on chapter 30's first page the four
+   left blank read as broken). Write the proposals to
    `build/fault_review/proposals.json` as a JSON object from pair key
    to fault line (or that object).
    The capture step's rule proposals (at most eight) go on the same
@@ -86,7 +97,11 @@ docstring has the mechanics). While the tag still exists:
    sentence pair) or `text` (a description).
 3. Run `uv run python -m tools.fault_review seed --since
    edit-start-NN --proposals build/fault_review/proposals.json
-   --rules build/fault_review/rules.json`.
+   --rules build/fault_review/rules.json`. It prints the dropped and
+   renamed counts, then `N cards, M local edits applied, K rule
+   proposals`. The page holds the generalizable cards and the
+   proposals, a header line with the floor and the renames, and the
+   one row of local edits.
 4. Copy `.claude/skills/edit-done/fault_review.html` to
    `build/fault_review/fault_review_NN.html` and publish the copy, with
    no `url`, `capabilities: {"db": {}}`, and icon `edit`. Each pass
@@ -100,7 +115,9 @@ docstring has the mechanics). While the tag still exists:
    build/fault_review/read/cards --rules-dir
    build/fault_review/read/proposals`. It writes each approved line
    (edited or not) into `edit_pairs.json`, clears the ones marked
-   Local edit, and lists the undecided.
+   Local edit, and lists the undecided. A card that Bruce made with
+   Disagree is read like any other; its decision replaces the
+   session's local mark.
    Read the rule proposals back the same way, with `ArtifactData`
    `list` on `proposals` and the same `out_dir`. The command prints
    one line per proposal with Bruce's decision and note. It never

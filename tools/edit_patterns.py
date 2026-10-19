@@ -45,6 +45,22 @@ whose own before-sentence scores under `REPORT` is `unclear`, since
 the fault line does not describe it well enough to search on; the one
 such pair, at 0.52, matched 123 unrelated sentences.
 
+Two filters keep a pass that rewrote whole sections from burying the
+pairs that matter. Chapter 31's pass (2026-10-19) paired old sentences
+with unrelated new ones and made 185 cards: 128 pairs scored 0.3 to
+0.5 (all spurious), 22 scored 0.6 (mixed), and 35 scored 0.7 or more
+(all real one-sentence edits). So a pair below `MIN_SIMILARITY` is not
+recorded, except a cut or an addition: the author's rules (R7, R19,
+R34) come from cuts more than from any other edit, and additions are
+the rarest and most valued, so a pair with an empty side is kept at
+any score and is never a rename. The count is printed as `N rewrites below the 0.6
+similarity floor dropped`. Eleven of the real pairs were the same word
+moving (row to rule, event to input, items to slots). A replacement of
+one word by another that appears in three or more pairs is a rename,
+and a pair whose every change is such a rename is not recorded either.
+`rename: "row" -> "rule" in 7 sentences` reports each one. A pair that
+carries a rename and another change stays a pair.
+
 Answers are cached in `build/edit_patterns.json`, keyed by the pair,
 the sentence with its neighbors, and the question's wording, so a
 rerun asks only about new pairs and changed sentences.
@@ -53,6 +69,7 @@ rerun asks only about new pairs and changed sentences.
     tip edit-patterns ARGS="--since edit-start-30"
     tip edit-patterns ARGS="--range a1b2c3d..HEAD"
     tip edit-patterns ARGS=--dry-run
+    tip edit-patterns ARGS="--min-similarity 0.5"   # one run's floor
     tip edit-patterns ARGS=--report            # from the cache only
     tip edit-patterns ARGS=--from-rules        # bruce_edit_db.md's rules
     tip edit-patterns ARGS="--pair 30_Patterns--Observer.md:643"  # one pair
@@ -60,12 +77,15 @@ rerun asks only about new pairs and changed sentences.
 
 import argparse
 import datetime
+import difflib
 import hashlib
 import json
 import re
 import subprocess
+import string
 import sys
 from collections.abc import Iterator
+from dataclasses import dataclass, field
 from typing import Any
 
 from tools import judgments, sentence_diff
@@ -87,10 +107,24 @@ above it are right, the higher floor on a tie. Ten labels per fault
 moved the floors from 0.62 (R21, nine of ten right) to 0.84 (R2, whose
 0.72-0.74 band was all wrong), and for three faults the score did not
 rank the right hits first at all, so a floor is a rough filter."""
+MIN_SIMILARITY = 0.6
+"""A rewrite scoring below this is not recorded as a pair. Evidence,
+chapter 31's pass of 2026-10-19: 128 pairs at 0.3 to 0.5 were all
+spurious (a section rewrite pairs an old sentence with an unrelated
+new one), 22 at 0.6 were mixed, and 35 at 0.7 and above were all real
+one-sentence edits. `--min-similarity X` overrides it for one run.
+A deletion (a pair whose `after` is empty, which `record_pass` stores
+when the score is below `DELETED`) is exempt, and so is an addition (a
+pair whose `before` is empty). `sentence_diff.diff` anchors every pair
+on an old sentence, so it emits deletions but never additions; the
+exemption covers an addition should a pair ever carry one."""
+RENAME_MIN = 3
+"""A word-for-word replacement in at least this many pairs is a rename."""
 DELETED = 0.3
 """Below this similarity the rewrite's nearest new sentence is not its
 successor, and the pair is treated as a deletion."""
 SHOWN = 12
+TRIM = string.punctuation + "\u201c\u201d\u2018\u2019"
 
 
 def example(pair: dict[str, Any]) -> dict[str, str]:
@@ -195,16 +229,96 @@ def rewrites(since: str | None, span: str | None
             yield path.split("/")[-1], r
 
 
+@dataclass
+class Recorded:
+    """What `record_pass` did: the kept pairs' keys, the number of
+    rewrites below the similarity floor, and the renames collapsed."""
+    keys: list[str]
+    dropped: int = 0
+    renames: list[dict[str, Any]] = field(default_factory=list)
+    floor: float = MIN_SIMILARITY
+
+    def lines(self) -> list[str]:
+        out = [f"{self.dropped} rewrites below the {self.floor:g} "
+               "similarity floor dropped (section rewrites, not "
+               "sentence edits)"]
+        out += [f'rename: "{r["old"]}" -> "{r["new"]}" in '
+                f'{r["count"]} sentences' for r in self.renames]
+        return out
+
+
+def tokens(text: str) -> list[str]:
+    """Lowercase words with punctuation and code ticks off their edges."""
+    words = (w.strip(TRIM).lower() for w in text.split())
+    return [w for w in words if w]
+
+
+def replacements(before: str, after: str
+                 ) -> tuple[set[tuple[str, str]], bool]:
+    """The word-for-word replacements between two sentences, and whether
+    any other change (an insertion, a deletion, a reshaped phrase)
+    remains."""
+    a, b = tokens(before), tokens(after)
+    found: set[tuple[str, str]] = set()
+    other = False
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(
+            None, a, b, autojunk=False).get_opcodes():
+        if op == "equal":
+            continue
+        if op == "replace" and i2 - i1 == j2 - j1:
+            found.update(zip(a[i1:i2], b[j1:j2]))
+        else:
+            other = True
+    return found, other
+
+
+def find_renames(rows: list[tuple[str, str]], minimum: int = RENAME_MIN
+                 ) -> tuple[list[dict[str, Any]], set[int]]:
+    """The renames among (before, after) rows, and the indexes of the
+    rows whose only changes are renames."""
+    changes = [replacements(b, a) for b, a in rows]
+    counts: dict[tuple[str, str], int] = {}
+    for found, _ in changes:
+        for pair in found:
+            counts[pair] = counts.get(pair, 0) + 1
+    chosen = {pair for pair, n in counts.items() if n >= minimum}
+    renames = [{"old": o, "new": n, "count": counts[(o, n)]}
+               for o, n in sorted(chosen, key=lambda p: (-counts[p], p))]
+    collapsed = {i for i, (found, other) in enumerate(changes)
+                 if found and not other and found <= chosen}
+    return renames, collapsed
+
+
+def cut_or_added(r: Rewrite) -> bool:
+    """A deletion or an addition: a pair with an empty side."""
+    return (not r.before.text or not r.after
+            or r.similarity < DELETED)
+
+
 def record_pass(pairs: dict[str, dict[str, Any]], since: str | None,
-                span: str | None) -> list[str]:
-    """Add the edit's rewrites to `pairs`; return their keys in order."""
+                span: str | None, min_similarity: float = MIN_SIMILARITY
+                ) -> Recorded:
+    """Add the edit's rewrites to `pairs`, minus those below the
+    similarity floor and those that only rename a word."""
     source = span or since or open_pass()
     today = datetime.date.today().isoformat()
-    keys = []
-    for f, r in rewrites(since, span):
+    found = list(rewrites(since, span))
+    kept = [(f, r) for f, r in found
+            if r.similarity >= min_similarity or cut_or_added(r)]
+    renames, collapsed = find_renames(
+        [(r.before.text, "" if cut_or_added(r) else r.after)
+         for _, r in kept])
+    result = Recorded([], len(found) - len(kept), renames, min_similarity)
+    survivors = {id(r) for i, (_, r) in enumerate(kept)
+                 if i not in collapsed}
+    stale = set()
+    for f, r in found:
         after = r.after if r.similarity >= DELETED else ""
         k = pair_key(r.before.text, after)
-        keys.append(k)
+        if id(r) not in survivors:
+            stale.add(k)
+            continue
+        result.keys.append(k)
         entry = pairs.setdefault(k, {
             "file": f, "line": r.before.line,
             "before": r.before.text, "after": after,
@@ -216,7 +330,13 @@ def record_pass(pairs: dict[str, dict[str, Any]], since: str | None,
         # existed gains them.
         entry["heading"] = r.before.heading
         entry["paragraph"] = r.before.paragraph
-    return keys
+    # An earlier run may have stored a pair that the filters now drop.
+    for k in stale - set(result.keys):
+        old = pairs.get(k)
+        if (old and old.get("source") == source and not old["fault"]
+                and old["status"] == "new" and not old.get("local")):
+            del pairs[k]
+    return result
 
 
 RULES_FILE = ROOT / "bruce_edit_db.md"
@@ -422,6 +542,9 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--since", help="compare REF with the working tree")
     ap.add_argument("--range", dest="span", help="compare A..B")
+    ap.add_argument("--min-similarity", type=float, default=MIN_SIMILARITY,
+                    help="drop rewrites scoring below this "
+                         f"(default {MIN_SIMILARITY})")
     ap.add_argument("--dry-run", action="store_true",
                     help="list the edit's rewrites and the cost; ask nothing")
     ap.add_argument("--pair", action="append", default=[],
@@ -477,7 +600,9 @@ def main(argv: list[str] | None = None) -> int:
             entry["fault"] = rp["fault"]  # the store is the authority
         cache.save()
     else:
-        keys = record_pass(pairs, args.since, args.span)
+        recorded = record_pass(pairs, args.since, args.span,
+                               args.min_similarity)
+        keys = recorded.keys
         if args.dry_run:
             # Recording the pairs asks nothing, and `/edit-done` step 3b
             # seeds its fault-line page from them.
@@ -487,6 +612,9 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"{p['file']}:{p['line']}  {p['similarity']:.2f}")
                 print(f"  - {p['before']}")
                 print(f"  + {p['after'] or '(deleted)'}")
+            print()
+            for line in recorded.lines():
+                print(line)
             n = len(book())
             chunks = -(-len(keys) // CHUNK)
             print(f"\n{len(keys)} rewrites; screening costs about "

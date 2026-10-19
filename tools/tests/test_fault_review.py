@@ -11,6 +11,7 @@ from typing import Any
 import pytest
 
 from tools import fault_review
+from tools.edit_patterns import Recorded
 
 PAIR = {"file": "30_A--B.md", "line": 3, "before": "Old.",
         "after": "New.", "fault": "A fault."}
@@ -31,7 +32,8 @@ def env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(fault_review, "ROOT", tmp_path)
     monkeypatch.setattr(fault_review, "PAIRS_FILE", pairs_file)
     monkeypatch.setattr(fault_review, "record_pass",
-                        lambda pairs, since, span: list(pairs))
+                        lambda pairs, since, span, floor=0.6:
+                        Recorded(list(pairs)))
     return tmp_path
 
 
@@ -109,3 +111,48 @@ def test_apply_prints_each_decision_and_spares_the_pairs(
 
 def test_apply_reports_a_missing_rules_dir(env: Path) -> None:
     assert fault_review.apply(env, env / "nope") == 1
+
+
+def test_seed_applies_local_proposals_without_a_card(env: Path) -> None:
+    pairs_file = env / "edit_pairs.json"
+    pairs_file.write_text(json.dumps({
+        "k1": PAIR, "k2": {**PAIR, "line": 9, "fault": ""}}),
+        encoding="utf-8")
+    props = env / "props.json"
+    props.write_text(json.dumps({
+        "k1": "A fault line.",
+        "k2": {"fault": "Renumbered exercise.", "local": True}}),
+        encoding="utf-8")
+    assert fault_review.seed("tag", None, props) == 0
+    out = env / "out"
+    assert [p.stem for p in (out / "docs/cards").glob("*.json")] == ["k1"]
+    meta = json.loads((out / "docs/meta/pass.json")
+                      .read_text(encoding="utf-8"))
+    assert [(l["key"], l["fault"]) for l in meta["locals"]] == [
+        ("k2", "Renumbered exercise.")]
+    assert meta["min_similarity"] == 0.6
+    assert meta["renames"] == [] and meta["dropped"] == 0
+    stored = json.loads(pairs_file.read_text(encoding="utf-8"))
+    assert stored["k2"]["fault"] == ""
+    assert stored["k2"]["local"] is True
+    assert stored["k2"]["local_basis"] == "session"
+    assert "local" not in stored["k1"]
+    writes = json.loads((out / "batch1.json").read_text(encoding="utf-8"))
+    assert [w["doc_id"] for w in writes] == ["pass", "k1"]
+
+
+def test_apply_reads_a_card_made_from_a_local_item(env: Path) -> None:
+    pairs_file = env / "edit_pairs.json"
+    pairs_file.write_text(json.dumps({"k2": {
+        **PAIR, "fault": "", "local": True, "local_basis": "session"}}),
+        encoding="utf-8")
+    cards = env / "cards"
+    cards.mkdir()
+    card = {**PAIR, "decision": "approve", "fault": "Real fault.",
+            "proposed": "Session reason."}
+    (cards / "k2.json").write_text(json.dumps({"data": card}),
+                                   encoding="utf-8")
+    assert fault_review.apply(cards) == 0
+    stored = json.loads(pairs_file.read_text(encoding="utf-8"))["k2"]
+    assert stored["fault"] == "Real fault."
+    assert "local" not in stored and "local_basis" not in stored

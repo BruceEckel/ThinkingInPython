@@ -121,6 +121,15 @@ section.block h2 { font-family: var(--serif); font-weight: 600; font-size: 1.25r
 .evidence .text { font-family: var(--serif); margin: 0; }
 button.narrow[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 button.reject[aria-pressed="true"] { background: var(--del-soft); border-color: var(--del); color: var(--del); font-weight: 600; }
+.floor { margin: 0; font-size: .85rem; color: var(--muted); }
+.floor[hidden] { display: none; }
+details.locals { background: var(--surface); border: 1px solid var(--local); border-radius: 8px; padding: 10px 16px; }
+details.locals > summary { color: var(--local); font-size: .95rem; font-weight: 500; }
+.locals ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 14px; }
+.locals li { border-top: 1px solid var(--rule); padding-top: 12px; display: grid; gap: 6px; }
+.locals .reason { margin: 0; font-family: var(--sans); font-size: .88rem; color: var(--muted); }
+.locals .diff { font-size: 1rem; }
+.locals li button { justify-self: start; }
 @media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
 </style>
 
@@ -133,8 +142,14 @@ button.reject[aria-pressed="true"] { background: var(--del-soft); border-color: 
       <div class="bar"><span id="fill"></span></div>
       <label><input type="checkbox" id="only-open"> Undecided only</label>
     </div>
+    <p class="floor" id="floor" hidden></p>
     <div class="status" id="status" role="status">Loading the pass…</div>
   </header>
+  <details class="locals" id="locals-block" hidden>
+    <summary id="locals-summary"></summary>
+    <p class="lede">I judged these edits local to their spot (a renumbering, a corrected fact, a rename), so they are applied with no fault line. If you think one has a fault worth searching for, press Disagree: it becomes a card below with my reason as the proposed line.</p>
+    <ul id="locals"></ul>
+  </details>
   <section class="block" id="proposals-block" hidden>
     <h2>Rule proposals</h2>
     <p class="lede">Each card is a change I propose to the rule store from this pass: a promotion, a widening, or a new candidate. Approve it as written, Narrow it and say how in the box, or Reject it and say why; a rejection goes to Retired with your reason, so it is never proposed again.</p>
@@ -368,6 +383,58 @@ function updateCard(el, id, c) {
   autosize(t);
 }
 
+let localsSig = "";
+
+function renderMeta() {
+  const m = state.meta || {};
+  const bits = [];
+  if (m.min_similarity !== undefined) {
+    bits.push(`Similarity floor ${m.min_similarity}: ${m.dropped || 0} rewrites dropped.`);
+  }
+  if ((m.renames || []).length) {
+    bits.push("Renames: " + m.renames.map((r) => `${esc(r.old)} -> ${esc(r.new)} (${r.count})`).join(", ") + ".");
+  }
+  const floor = $("#floor");
+  floor.innerHTML = bits.join(" ");
+  floor.hidden = !bits.length;
+  const items = (m.locals || []).filter((l) => !state.cards.has(l.key))
+    .sort((x, y) => x.order - y.order);
+  $("#locals-block").hidden = !items.length;
+  $("#locals-summary").textContent = `${items.length} local edit${items.length === 1 ? "" : "s"}, applied by the session`;
+  const sig = items.map((l) => l.key).join(",") + "|" + state.readOnly;
+  if (sig === localsSig) return;
+  localsSig = sig;
+  $("#locals").innerHTML = items.map((l) => `
+    <li data-key="${esc(l.key)}">
+      <div class="where"><span>${esc(l.file || "")}:${l.line}</span></div>
+      <p class="diff">${diffHtml(l.before, l.after)}</p>
+      <p class="reason">${esc(l.fault || "")}</p>
+      <button data-disagree="${esc(l.key)}"${state.readOnly ? " disabled" : ""}>Disagree</button>
+    </li>`).join("");
+}
+
+document.addEventListener("click", async (ev) => {
+  const btn = ev.target.closest("button[data-disagree]");
+  if (!btn || !state.db || state.readOnly) return;
+  const l = ((state.meta || {}).locals || []).find((x) => x.key === btn.dataset.disagree);
+  if (!l || state.cards.has(l.key)) return;
+  btn.disabled = true;
+  const card = {
+    order: l.order ?? 0, file: l.file || "", line: l.line || 0, heading: l.heading || "",
+    paragraph: l.paragraph || "", before: l.before, after: l.after,
+    proposed: l.fault || "", fault: l.fault || "", local_hint: false, decision: null };
+  state.cards.set(l.key, card);
+  render();
+  try {
+    await state.db.doc("cards/" + l.key).set(card);
+    $("#status").textContent = "Saved.";
+  } catch (e) {
+    state.cards.delete(l.key);
+    $("#status").textContent = "That change didn't save. Try again in a moment.";
+    render();
+  }
+});
+
 function render() {
   const focused = document.activeElement;
   const focusKey = focused && focused.matches("textarea")
@@ -392,6 +459,7 @@ function render() {
     + [...state.proposals.values()].filter((p) => p.decision).length;
   $("#count").textContent = `${done} of ${total} decided`;
   $("#fill").style.width = total ? `${(100 * done) / total}%` : "0";
+  renderMeta();
   if (state.meta) {
     const where = (state.meta.files || []).join(", ");
     $("h1").textContent = `Fault Line Review${where ? " · " + where.replace(/\.md$/, "") : ""}`;
