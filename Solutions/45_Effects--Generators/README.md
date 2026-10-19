@@ -830,7 +830,7 @@ Either one breaks the correspondence between position and state,
 the one thing that makes this version readable.
 
 With the table, adding any state means one new `Enum` member and a
-few new rows. Those rows sit next to the existing ones, where you can
+few new rules. Those rules sit next to the existing ones, where you can
 read the whole machine at once.
 
 The generator is the better choice for a conversation with a
