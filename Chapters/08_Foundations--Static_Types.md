@@ -477,7 +477,7 @@ The alias also documents the allowed values in one place,
 instead of scattering the literal list across every function that accepts a `Color`.
 
 A `Literal` union is the lightest way to close a set of values.
-Once those values need behavior or an identity of their own,
+If those values need behavior or an identity of their own,
 an `Enum` is the better fit.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 makes the case for an `Enum` whenever the set of values is small and closed,
