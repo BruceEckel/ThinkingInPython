@@ -398,8 +398,8 @@ def editor_pin(v: Vars) -> None:
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
     the report-only stranded-preposition, stranded-possessive,
-    watch-word, positional-reference, and internal-name scans (the last reads the
-    whole book). Run one
+    watch-word, positional-reference, trailing-tag, and internal-name
+    scans (the last reads the whole book). Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
     says how to install it). Its style packages (.vale.ini's Packages)
@@ -413,6 +413,7 @@ def prose(v: Vars) -> None:
     py("tools.stranded_possessives", *prose_files(v))
     py("tools.watch_words", *prose_files(v))
     py("tools.positional_refs", *prose_files(v))
+    py("tools.trailing_tags", *prose_files(v))
     py("tools.internal_names")
 
 
@@ -452,6 +453,26 @@ def possessives(v: Vars) -> None:
       "stale entries", secondary=True)
 def possessives_accept(v: Vars) -> None:
     py("tools.stranded_possessives", "--accept")
+
+
+@task("Report new trailing participle tags and transactional connectives "
+      "(report-only; accept with `tip trailing-accept`)")
+def trailing(v: Vars) -> None:
+    """Report prose clauses that end on a participle tag ("belongs in
+    that state's row, written once", rule R32) or hold a transactional
+    connective ("in return", "the trade-off", rule R35). It reports and
+    never gates; `tip prose` runs it after the positional-reference
+    scan. CH= picks one chapter and its Solutions file. Hits judged
+    keeps live in tools/data/trailing_tags_baseline.txt, so the run
+    prints only new ones; ARGS=--all lists every hit.
+    """
+    py("tools.trailing_tags", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new trailing-tag hits to the baseline and drop stale "
+      "entries", secondary=True)
+def trailing_accept(v: Vars) -> None:
+    py("tools.trailing_tags", "--accept")
 
 
 @task("Report public class names that only their class uses "

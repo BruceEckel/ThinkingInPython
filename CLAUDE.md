@@ -217,7 +217,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Five report-only
+Six report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -242,9 +242,17 @@ tag is skipped. Its baseline was seeded from the 2026-10-07 tag sweep,
 which read every hit, so a new hit is a pointer to tag or a false
 positive to accept (an ordinal naming an argument, a version, a
 runtime call, output, or data).
+`tip trailing` (`tools/trailing_tags.py`, 2026-10-18) lists two shapes
+Bruce marked in chapter 31, rules R32 and R35 in `bruce_edit_db.md`: a
+clause that ends on a comma, a participle, and a measure or place
+("belongs in that state's row, written once"), and a transactional
+connective ("in return", "the trade-off", "the cost of"). Its baseline
+holds the judged keeps (a participle that describes the noun it
+follows, a measured cost, a named trade-off), and chapter 31's hits
+stay out of it while its editing pass is open.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
-`tip internal-names-accept`, and `tip positional-accept` add the
-current new hits to the baseline after a human read; `ARGS=--all`
+`tip internal-names-accept`, `tip positional-accept`, and
+`tip trailing-accept` add the current new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
 accepted, 610 watch words fixed and 220 accepted (a `want` with a

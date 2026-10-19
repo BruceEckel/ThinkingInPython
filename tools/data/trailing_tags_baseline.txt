@@ -1,0 +1,10 @@
+# Trailing-tag and transactional-connective hits a human read
+# and judged keeps: a participle that describes the noun it
+# follows, a measured cost or price, a named trade-off. An
+# entry is not an exemption from the rule.
+# path<TAB>[Rnn] clause, with the clause's whitespace normalized
+# and no line number, so a reflow leaves an entry alone and an
+# edit to the clause retires it. Rewritten by
+# `tip trailing-accept`; read the delta with `tip trailing`
+# before accepting.
+# See tools/trailing_tags.py.
