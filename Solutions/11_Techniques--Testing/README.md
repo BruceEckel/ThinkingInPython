@@ -448,8 +448,8 @@ def test_injected() -> None:
 
 **Answer with a canned response.**
 Both tests pass, and neither opens a network connection. The stub is the same
-function in both: a fetcher returning a `BytesIO` that behaves enough
-like a response to satisfy the `with` block and `.read()`.
+function in both: a fetcher returning a `BytesIO`, which works in the
+`with` block and answers `.read()` as a response does.
 
 **Replace the dependency by name.**
 Renaming `urlopen` to `fetch` in `ch11_weather.py` makes one test fail
