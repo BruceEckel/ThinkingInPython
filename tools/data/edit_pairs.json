@@ -1176,13 +1176,13 @@
   "similarity": 0.71,
   "source": "edit-start-31",
   "added": "2026-10-19",
-  "fault": "The sentence applies a rule stated in an earlier section without naming or linking that rule.",
+  "fault": "A sentence states which of several rules, rows, or handlers takes effect (the first whose condition passes wins; a later one replaces an earlier one) as a bare fact, without naming the ordering or lookup rule that decides it, which the chapter stated in an earlier section.",
   "status": "searchable",
   "heading": "A Vending Machine",
   "paragraph": "The last three events insert a dime and pick the same sold-out slot again, this time with too little money for it as well. Both conditions are now true, and `too_expensive()` comes first in the `(State.SELECTING, SecondDigit)` list, so the engine takes the `too_expensive()` row. The machine reports `COLLECTING`, as though more money would sell the item, although the slot is empty and no amount of money would. If you swap the row order, the same input reports `UNAVAILABLE` instead. Both results follow from the engine's [ordering rule](#the-engine). The first row whose condition passes wins, whether or not a lower row matters more.",
   "check": {
-   "before": 0.77,
-   "after": 0.07
+   "before": 0.81,
+   "after": 0.05
   }
  },
  "0947aa0118ef4133": {
