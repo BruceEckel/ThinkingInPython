@@ -21,8 +21,8 @@ so a programmer from those languages expects per-object storage here too.
 A Python class attribute corresponds to a C++ or Java `static` field.
 Apart from `__slots__`, which comes up below,
 no syntax in a Python class body allocates a per-object field.
-An assignment through `self` inside a method,
-such as `self.x = x` in a constructor, creates that storage instead.
+Assigning through `self` inside a method creates that storage instead,
+as `self.x = x` in a constructor does.
 
 ```python
 # class_attribute_confusion.py
@@ -249,8 +249,8 @@ which creates a real `label` attribute on `a`, not on `Tally`.
 Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrates in `class_attribute_confusion.py`.
 The `total` that `a` reports is `Tally.total`.
-The `[CV]` tag (for "class variable," another name for a class attribute)
-marks an attribute the class stores.
+The `[CV]` tag marks an attribute the class stores.
+It stands for "class variable," another name for a class attribute.
 `label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,
 keeps it.
 

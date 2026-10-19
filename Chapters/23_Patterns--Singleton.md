@@ -435,8 +435,8 @@ The race needs laziness, and this listing gives it up on purpose.
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, as `singleton_class_variable.py` does.
 
-Modules and cached factories, primed at import time if threads are in play,
-should cover your singleton needs.
+Modules and cached factories should cover your singleton needs.
+Prime a cached factory at import time if threads are in play.
 
 ## The Classic Implementations
 

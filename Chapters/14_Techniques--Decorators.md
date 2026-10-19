@@ -465,8 +465,8 @@ With `func is None`, the same call raises a `TypeError` at decoration.
 `decorate("TAG")` wraps the string,
 and when Python applies that wrapper to the function,
 the wrapper calls `"TAG"` as if the string were the decorated function.
-A decorator whose own argument could be callable, such as a `key` function,
-has the same problem with either test.
+A decorator has the same problem with either test when its own argument could be callable,
+such as a `key` function.
 For that reason `label` makes its arguments keyword-only,
 so a caller must name them.
 
@@ -1218,9 +1218,9 @@ Changing the price of a topping means changing one number, in one place.
 Compare that with a class per combination,
 where a price change means editing every class that includes that topping.
 
-A `Pizza` with a `toppings: list[Topping]` field,
-summing each topping's `add_cost` and joining its name,
-solves the same combinatorial problem, with no wrapping and no `Protocol`.
+A `Pizza` with a `toppings: list[Topping]` field solves the same combinatorial problem,
+with no wrapping and no `Protocol`.
+It sums each topping's `add_cost` and joins its name.
 That list is the simpler design here, where a topping contributes data
 (a number and a name).
 The *Decorator* pattern becomes the simpler design when a topping needs behavior as well as data:

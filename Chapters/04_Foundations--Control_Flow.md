@@ -337,9 +337,9 @@ so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 
-A [comprehension](#comprehensions), the subject of this chapter's last section,
-can use `:=` the same way.
-[Comprehensions](16_Techniques--Comprehensions.md) covers that use.
+A [comprehension](#comprehensions) can use `:=` the same way.
+This chapter's last section introduces comprehensions,
+and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
 ### Mutating a Container While Looping
 

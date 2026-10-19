@@ -307,8 +307,7 @@ since mypy's built-in `singledispatch` plugin checks the call against the base f
 When the default answer would be wrong for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` in place of the fallback string.
 A forgotten registration then fails at its first call.
-A `match` over a union of types, with `assert_never()` in its `case _`,
-goes further.
+A `match` over a union of types goes further when `assert_never()` sits in its `case _`.
 The type checker [reports the omission](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)
 before anything runs.
 The set of types is then closed, since adding a type means editing the union.
@@ -438,8 +437,8 @@ In the first two frames `Flower.accept()` calls `visit()` on the worm,
 outside `Flower`, and `Predator.visit()` calls `eat()` back on the flower.
 The frames differ only in which `eat()` that second call reaches.
 In the third frame no method on `Flower` takes part.
-One lookup in `nectar()`'s table, keyed by the flower's type,
-finds the implementation.
+`nectar()`'s table, keyed by the flower's type,
+yields the implementation in one lookup.
 That one dispatch resolves everything *Visitor*'s two dispatches do.
 
 The dispatch on the visitor's type exists not because two types are unknown,

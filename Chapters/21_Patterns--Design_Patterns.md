@@ -6,9 +6,9 @@
 > with the shape of the solution and the reasons it takes that shape.
 
 The "design patterns" movement was an important step forward in object-oriented design.
-The 1994 book *Design Patterns* by Erich Gamma, Richard Helm, Ralph Johnson,
-and John Vlissides carried it into the mainstream.
-Its four authors became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
+Erich Gamma, Richard Helm, Ralph Johnson,
+and John Vlissides carried it into the mainstream with their 1994 book *Design Patterns*.
+The four became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
 I refer to that book as *GoF Design Patterns*,
 and use *design patterns* for the concept.
 

@@ -858,9 +858,9 @@ an object that forwards method calls to an implementation.
 Both are the same few lines of `__getattr__()` delegation,
 with *State* adding a method to change the implementation.
 
-The shared base that *GoF Design Patterns* gives *Proxy*,
-written in `proxy_interface.py` as the `Service` ABC,
-matters when other people write the implementations and you need that base to state which methods an implementation must supply.
+*GoF Design Patterns* gives *Proxy* a shared base,
+written in `proxy_interface.py` as the `Service` ABC.
+That base matters when other people write the implementations and you need it to state which methods an implementation must supply.
 When you write both sides,
 the single generic surrogate in `state_surrogate.py` is simpler and just as flexible.
 

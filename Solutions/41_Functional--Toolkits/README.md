@@ -554,9 +554,8 @@ The `rng` parameter lets the caller choose the random source,
 which makes reproducibility the caller's responsibility. The
 `seed: int = 0` version accepts only an integer. A caller who needs
 two different schedules must pass two different integers.
-A caller who
-wants this function to share a program-wide random stream cannot pass
-that stream in. The `rng` version serves both callers. It also lets a caller
+A caller cannot
+pass in a program-wide random stream for this function to share. The `rng` version serves both callers. It also lets a caller
 pass `random.Random()`, which seeds itself from the operating system,
 and get schedules that differ on every run.
 

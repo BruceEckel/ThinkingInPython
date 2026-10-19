@@ -125,8 +125,8 @@ Tuples, strings, `frozenset`, and records are immutable.
 Each freezes only its own top level.
 The tuple `([1], 2)` always holds that same list.
 Anyone can still append to the list.
-A value that is immutable all the way down, such as a tuple of strings,
-stays what you last read, whatever code ran in between.
+A tuple of strings, immutable all the way down, stays what you last read,
+whatever code ran in between.
 That guarantee is why removing shared mutable state is the practical core of the functional style.
 
 Instead of modifying an object, you build a new one from the old:

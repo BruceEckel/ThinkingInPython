@@ -241,8 +241,7 @@ one line of output per marker.
 A `print("affirmative")` above a line reading `#: affirmative` means the program prints `affirmative` at that point.
 A group of markers shows everything the code above it printed since the previous group,
 in order.
-Output from inside a loop, or from an `import`,
-therefore appears in the group of markers after the loop or the `import`,
+Output from inside a loop or an `import` therefore appears in the group of markers after the loop or the `import`,
 not next to the line that produced it.
 The build verifies these markers against a real run,
 so they always match what the code prints.

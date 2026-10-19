@@ -274,8 +274,8 @@ Nothing verifies it.
 
 Inside the `try`, `StopIteration` means the conversation finished,
 so only the `send()` call sits there.
-Any other call that can raise `StopIteration`,
-such as `next()` on an exhausted answer source, belongs outside the `try`.
+Any other call that can raise `StopIteration` belongs outside the `try`,
+such as `next()` on an exhausted answer source.
 
 `interview()` accepts its answers from any driver that calls `send()`.
 Its body is three questions and a `return`,

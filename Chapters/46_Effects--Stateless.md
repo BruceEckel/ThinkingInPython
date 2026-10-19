@@ -167,8 +167,7 @@ def greet(name: str) -> None:
 That signature is incomplete.
 `-> None` describes the return value.
 The body also writes to standard output, a side effect the signature leaves out.
-A caller who wants to redirect the output, or to test the function,
-must capture stdout.
+A caller must capture stdout to redirect the output or to test the function.
 
 `Depend[Need[Console], None]` states the dependency.
 A caller now has two options: supply a `Console`,
@@ -261,9 +260,8 @@ The `Console` in `greeter.py` is one this chapter defines.
 Stateless also provides three dependencies of its own:
 
 - `Console` in `stateless.console`,
-  whose `print_line()` and `read_line()` *accessors*
-  (small functions that each wrap one request and declare its answer type)
-  call its `print()` and `input()` methods,
+  whose `print_line()` and `read_line()` *accessors* call its `print()` and `input()` methods
+  (an accessor is a small function that wraps one request and declares its answer type),
 - `Files` in `stateless.files` that reads a whole file,
 - `Time` in `stateless.time`,
   which [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
@@ -448,7 +446,7 @@ The type records which handler answered.
 so `fallback(chosen)` keeps that type.
 
 A default removes the check that makes `Need` worth declaring.
-An Effect that would fail the type check for a missing `Console` now passes it and runs.
+An Effect missing its `Console` now passes the type check and runs.
 A forgotten binding then shows up as a wrong-looking result rather than an error.
 Use a fallback for a genuine default, a null logger or a no-op console,
 not to silence a type error that reports a missing binding.

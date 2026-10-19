@@ -113,9 +113,8 @@ The rest of the listing puts the returned list in place of the `add_item()` call
 Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
 A memoizer can return a stored result because the call is interchangeable with its value.
-Every optimization that skips or reuses work,
-from a cache to a database query planner,
-depends on the same interchangeability.
+Every optimization that skips or reuses work depends on the same interchangeability,
+from a cache to a database query planner.
 The more of your program is referentially transparent,
 the more of it a machine can optimize and a proof can cover.
 

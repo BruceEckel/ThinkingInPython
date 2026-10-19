@@ -281,8 +281,8 @@ but `Trash` is deliberately open.
 The registry exists to accept new subclasses.
 If you add `case _: assert_never(piece)`,
 the type checker reports the call although the `match` names all four materials.
-A `Trash` instance, or an instance of a subclass defined later,
-can still reach the wildcard.
+A `Trash` instance can still reach the wildcard,
+and so can an instance of a subclass defined later.
 Because the report appears for a complete `match` as well,
 it cannot point to a missing `case`.
 [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)

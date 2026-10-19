@@ -19,8 +19,8 @@ Often people decide ahead of time, based on biases,
 that runtime performance will be insufficient.
 They then build elaborate designs that solve nonexistent problems.
 
-A program coded in the most straightforward way,
-without concern for performance, can often run fast enough for your needs.
+A program coded in the most straightforward way can often run fast enough for your needs,
+with performance left out of the design.
 Before assuming that a simply written program will be too slow, try it out.
 It might be fine.
 

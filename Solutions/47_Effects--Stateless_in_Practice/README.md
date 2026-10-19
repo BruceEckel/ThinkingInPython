@@ -216,8 +216,8 @@ Your review rule flags the `print()` line in `leaky_effect.py` and accepts a bod
 <summary>Solution</summary>
 
 The rule that catches `leaky_effect.py` is a reading rule about one line:
-a function whose return type is an `Effect` and whose body is not a generator
-must contain only the expression it returns.
+when a function's return type is an `Effect` and its body is not a generator,
+the body must contain only the expression it returns.
 
 ```python
 def double(n: int) -> Success[int]:

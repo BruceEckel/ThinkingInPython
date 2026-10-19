@@ -307,9 +307,8 @@ A truthy value *suppresses* it: the `with` statement swallows the exception,
 and execution continues after the block.
 
 Any truthy value suppresses, not `True` alone.
-An `__exit__()` that returns the result of its last cleanup call,
-such as a count or a status string,
-suppresses the block's exception whenever that result is truthy.
+An `__exit__()` that returns the result of its last cleanup call suppresses the block's exception whenever that result is truthy,
+as a nonzero count or a nonempty status string is.
 Annotate `__exit__()` as `-> None`, the way `Trace` does,
 unless suppressing is the manager's job.
 The type checker then rejects any value the method returns.

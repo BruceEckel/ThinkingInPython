@@ -340,9 +340,8 @@ On a drawing with `n` strokes,
 `draw()` builds a new `Drawing` around a fresh tuple of `n + 1` pointers and reuses every existing string.
 
 Each `draw()` builds one such tuple.
-A caretaker that keeps every past state,
-such as the `History` class in `history.py`,
-keeps every one of those tuples alive.
+A caretaker that keeps every past state keeps every one of those tuples alive,
+as the `History` class in `history.py` does.
 When a field grows by one element per edit, the way `strokes` does,
 the `n`-th edit builds a tuple of `n` pointers,
 so `k` edits held in the history cost `O(k^2)` pointers in total, not `O(k)`.
@@ -363,8 +362,8 @@ print(sum(len(s.strokes) for s in states),
 Two thousand edits held in a `History` cost about two million pointers.
 The final `Drawing` alone costs two thousand.
 
-A field that stays small, or that each edit replaces instead of extends,
-keeps the total proportional to `k`.
+A field keeps the total proportional to `k` when it stays small,
+or when each edit replaces it instead of extending it.
 For a field that grows with every edit, bound the history's depth
 (see exercise 2), coalesce edits before `History` stores them,
 use a persistent structure that shares more than a flat tuple can,

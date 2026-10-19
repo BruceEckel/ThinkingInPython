@@ -69,9 +69,9 @@ There, Python finalizes the same three objects in the opposite order.
 The order in which the three `__del__()` methods run is an implementation detail.
 It depends on how the interpreter tears down the `counters` list at shutdown,
 and it can differ from one CPython build to the next.
-Another implementation, such as PyPy with a tracing garbage collector,
-could destroy the objects in a different order,
+Another implementation could destroy the objects in a different order,
 or skip the `__del__()` methods at exit.
+PyPy, with a tracing garbage collector, is one such implementation.
 
 So `__del__()` is fragile.
 The language specifies neither when it runs nor whether it runs.
@@ -140,8 +140,8 @@ In a `with` block, an exception from `close()` propagates to the caller instead.
 ## Reference Cycles Delay Destruction
 
 A reference cycle postpones `__del__()` too.
-An object that refers to itself, directly or through another object,
-stays alive after it becomes unreachable:
+An object that refers to itself stays alive after it becomes unreachable,
+whether the reference is direct or runs through another object:
 
 ```python
 # cycle.py

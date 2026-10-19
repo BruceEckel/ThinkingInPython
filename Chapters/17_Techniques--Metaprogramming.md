@@ -703,7 +703,7 @@ so the wrapper of a decorator written with `@wraps` also carries any mark applie
 
 A mark suits data that describes the function and that other code reads later,
 as `handlers` does here.
-State that changes with each call, such as a call count,
+A call count, or any state that changes with each call,
 belongs in a closure variable or on a [callable object](14_Techniques--Decorators.md#a-class-form-decorator-with-state),
 where the type checker checks its type.
 
@@ -761,9 +761,8 @@ At `B`'s creation, Python runs the version `B` inherits from `A`,
 which is `object`'s do-nothing default.
 Use the runtime version in the rare case where the interpreter must refuse the subclass too.
 
-A decorator like `@final`,
-which sets an attribute and leaves enforcement to the type checker,
-is a *marker*.
+A decorator like `@final` is a *marker*.
+It sets an attribute and leaves enforcement to the type checker.
 Testing confirms that the `@final` marker is present,
 the runtime-final class refuses subclassing,
 and its non-final base still allows it:
@@ -1700,9 +1699,8 @@ prints as `name = value`.
 The value is the member's `repr()`,
 truncated to keep the line within `max_width`.
 
-An attribute tagged `[CV]`
-(for "class variable," another name for a class attribute)
-lives on the class or a base class rather than in `obj`'s own `__dict__`.
+An attribute tagged `[CV]` lives on the class or a base class rather than in `obj`'s own `__dict__`.
+The tag is short for "class variable," another name for a class attribute.
 When `obj` is a class, every attribute lives on a class,
 so all of them carry the tag.
 In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),

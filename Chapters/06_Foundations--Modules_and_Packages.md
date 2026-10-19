@@ -210,8 +210,8 @@ into one package.
 A directory can also become a namespace package by accident.
 If you forget `__init__.py`,
 the import still succeeds and hides the missing file.
-A module or an `__init__.py` package with the same name anywhere on `sys.path` then takes precedence over your package,
-including one in a directory later in the search.
+Any module or `__init__.py` package of the same name then takes precedence over your package,
+wherever it sits on `sys.path`, including a directory later in the search.
 This book uses an explicit `__init__.py` by default,
 because it makes the package's identity and boundary clear.
 

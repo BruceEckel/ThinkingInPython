@@ -366,8 +366,8 @@ Subtraction stops at the parameter. The parameter is the
 last piece that expresses the design's intent, so removing it removes
 the design rather than its supporting code.
 
-Both outcomes, a removal that broke nothing and one that broke the
-requirement, are the exercise working correctly. Subtraction is a test
+Both outcomes are the exercise working correctly: a removal that broke
+nothing, and one that broke the requirement. Subtraction is a test
 you run, not a rule to remove as much as you can. Take something away,
 run the program, and read the result. If nothing broke, the piece was
 supporting code. If something broke, the piece you removed expresses

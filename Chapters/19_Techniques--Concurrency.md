@@ -1746,8 +1746,8 @@ Free threading delivers its speedup only when every extension you load declares 
 so check compatibility before switching a project.
 
 Free threading also suits a particular program shape.
-Threads that mostly work on their own data,
-like `thread_compare.py`'s `threaded()`, scale across cores.
+Threads that mostly work on their own data scale across cores,
+as `thread_compare.py`'s `threaded()` does.
 The same is true of threads that accumulate results locally and merge them once at the end,
 caches read far more often than written,
 and pipeline stages connected by queues.

@@ -1892,8 +1892,8 @@ Each one builds a description, rewrites a description's type, or executes one.
 Three sit outside the tables.
 `as_type()` relabels a value for the type checker and does nothing at runtime.
 `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
-The accessors for the library's own dependencies
-(`print_line()`, `read_line()`, and `read_file()`)
+`print_line()`, `read_line()`, and `read_file()`,
+the accessors for the library's own dependencies,
 each call `need()` for one class, so `need()`'s row covers them.
 `read_file()` also carries `@throws(FileNotFoundError, PermissionError)`,
 so the `@throws` row applies to it as well.

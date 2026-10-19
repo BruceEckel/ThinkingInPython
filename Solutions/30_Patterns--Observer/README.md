@@ -1754,7 +1754,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-A module-level list and a decorator that appends its function and returns it unchanged make every decorated `def` a registration.
+Two pieces make every decorated `def` a registration:
+a module-level list and a decorator that appends its function and returns it unchanged.
 For the comparison, reread the problems the runtime sections raise after [The Pythonic *Observer*](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer):
 disconnecting, a raised exception, lapsed listeners, and re-entrant notification.
 

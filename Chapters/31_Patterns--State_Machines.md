@@ -739,12 +739,12 @@ def test_no_transition_raises() -> None:
 
 The first design, [Each State Decides](#each-state-decides),
 suits a machine whose states have only a few transitions.
-Reading `trap_states.py`'s `LURING` and `luring()` tells you what luring does and which states can follow it.
+Reading `trap_states.py`'s `LURING` and `luring()` tells you what it does and which states can follow it.
 Adding a state is one row and one function.
 The design reads best when the transitions are obvious from the state's own name.
 
-A state's row holds its action,
-so an action that must run on every entry into that state appears once.
+A state's row holds its action, so the action appears once,
+however many transitions lead into that state.
 `chime()` sounds whenever the trap reaches `HOLDING`,
 and `HOLDING`'s row alone names it.
 That is the Moore shape: the action belongs to the state.
@@ -758,7 +758,8 @@ Adding a state or an input is a rule in the list and a method or two.
 In the first design a member is also a `State` record with an `action` field.
 In the table-driven design a member is a bare name with no fields,
 so every action is the `action` field of a rule.
-An action that must run on every entry into a state is the `action` of every rule whose `next_state` is that state.
+When an action must run on every entry into a state,
+it is the `action` of every rule whose `next_state` is that state.
 `refund()` runs on every transition into `QUIESCENT`,
 so one comprehension writes it into all four `Quit` rules.
 That is the Mealy shape: the action belongs to the transition.

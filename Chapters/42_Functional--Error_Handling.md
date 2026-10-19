@@ -726,7 +726,8 @@ An exception's message says what went wrong but not where.
 `invalid literal for int() with base 10: 'no'` is accurate and leaves the reader asking:
 which setting, which field, which row of the file?
 The frame that has that answer is usually a caller of the frame that raised the exception.
-A handler far enough up the stack to report the failure cannot read the locals that would explain it.
+When a handler sits far enough up the stack to report the failure,
+the locals that would explain it are out of reach.
 
 Most code catches the exception and raises a new one with a better message.
 The new exception replaces the original type.
