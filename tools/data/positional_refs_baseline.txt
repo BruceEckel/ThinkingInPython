@@ -75,6 +75,7 @@ Chapters/26_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` 
 Chapters/26_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/29_Patterns--Changing_the_Interface.md	The first line	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/30_Patterns--Observer.md	The second `announce()`	The second `announce()` copies the shortened list, so `always` receives both changes and `once` receives one.
+Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, and Python evaluates an annotation lazily, so by the first call the whole module has loaded and `TrapState` exists.
 Chapters/32_Patterns--Multiple_Dispatching.md	The last case	The last case shows why the sentinel exists.
 Chapters/33_Patterns--Visitor.md	the last line	In the last line of `bug_visits.py`'s output, both dispatches change the result, because `Chrysanthemum` overrides `eat()` (chrysanthemums really do produce a natural insecticide).
 Chapters/33_Patterns--Visitor.md	the next `def _`	`@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name, so every implementation stays in the table.

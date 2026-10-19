@@ -96,7 +96,7 @@ class UnpredictablePerson:
 <summary>Done when</summary>
 
 one `UnpredictablePerson` in your `exercise_1.py` gives three different `hello()` replies in a row, the last from `Prozac`.
-Adding `Prozac` changed no line of `UnpredictablePerson`.
+Adding `Prozac` changes no line of `UnpredictablePerson`.
 
 <details>
 <summary>Solution</summary>
@@ -865,8 +865,8 @@ print(busy.state.name, busy.load_kg)
 ```
 
 **Split one input on a condition.** The `(RINSING, RinseDone)` key
-holds the two rules the exercise requires, told apart by
-`too_heavy()`. A load over six kilograms takes the slow spin, and
+holds the two rules the exercise requires, and
+`too_heavy()` tells them apart. A load over six kilograms takes the slow spin, and
 anything lighter falls through to the unconditional fast-spin rule
 below it. The rest of the cycle is a straight line, one input type
 per state, and the machine is still the chapter's
@@ -907,7 +907,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) lets several rules share one `(state, input type)` key, tried in order.
+[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) lets several rules share one `(state, input type)` key and tries them in order.
 Under the doors-closing state and a sensor input, put the obstruction condition on the first rule and leave the second rule unconditional.
 The condition is a method that reads the input, so the table stays data.
 
@@ -1068,7 +1068,7 @@ passes wins. `above()` and `below()` pick `MOVING_UP` or
 conditions to open the doors with no travel.
 
 **Reopen the doors on an obstruction.** The "doors closing" state
-carries the two rules the exercise requires, the same idiom two wide.
+carries the two rules the exercise requires.
 Under `(DOORS_CLOSING, DoorSensor)`, the first rule reopens the doors
 when `obstructed()` passes, and the unconditional rule below it
 finishes the close in `IDLE`.
@@ -1128,7 +1128,7 @@ class HVAC(StateMachine):
 <summary>Done when</summary>
 
 from idle, readings below, inside, and above the target band lead to heating, idle, and cooling, all under one `(state, TemperatureReading)` key.
-Moving that group's unconditional rule to the top makes every reading land on that rule's state.
+Moving that group's unconditional rule to the top sends every reading to that rule's state.
 
 <details>
 <summary>Solution</summary>

@@ -168,6 +168,8 @@ Chapters/29_Patterns--Changing_the_Interface.md	[PAST] wrote: In a common case, 
 Chapters/30_Patterns--Observer.md	[PAST] declared: The checker still types CODE as the class the CODE statement declared, and rejects CODE.
 Chapters/30_Patterns--Observer.md	[PAST] included: CODE calls CODE where CODE calls CODE, so a responder is any callable, a function included, rather than an object with an CODE method.
 Chapters/30_Patterns--Observer.md	[PAST] raised: Redo exercise 3 with each failure returned as a value instead of raised as an exception.
+Chapters/31_Patterns--State_Machines.md	[PAST] decided: A single CODE input must be able to lead to heating, cooling, or idle, decided entirely by conditions on one CODE key.
+Chapters/31_Patterns--State_Machines.md	[PAST] pressed: The vending machine's inputs carry values: what a coin is worth, which row or column the user pressed.
 Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] closed: A CODE keeps every case together in one block, closed the way the table is, so adding an CODE means adding cases to that block.
 Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] cut: Scissors cut paper, so that is the outcome for the scissors that started the duel, not for the CODE whose code is running.
 Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] declared: A CODE declared on a shared base is one dispatcher that every subclass inherits.
@@ -321,6 +323,7 @@ Solutions/30_Patterns--Observer/README.md	[PAST-HEADING] returned: 5. Failures r
 Solutions/30_Patterns--Observer/README.md	[PAST] let: String members also let CODE pass a CODE to CODE.
 Solutions/30_Patterns--Observer/README.md	[PAST] read: They read the same CODE object, so the letters and the counts describe one state of the model.
 Solutions/30_Patterns--Observer/README.md	[PAST] split: The six sizes split three ways.
+Solutions/31_Patterns--State_Machines/README.md	[PAST] blocked: closing the doors with the sensor blocked reopens them, and closing them again unblocked leaves the car idle, through two rules under one CODE key.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] ranked: Each CODE kind holds two of six weapon types, ranked around a cycle.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] read: The CODE and CODE cells each read CODE from whichever item is the CODE.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] reversed: CODE returns CODE, CODE, CODE, CODE against CODE, CODE, CODE, and CODE, each reversed duel returns the opposite result (a draw stays a draw), and you can state how many methods you added against exercise 1's seven rows.

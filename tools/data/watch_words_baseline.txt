@@ -63,7 +63,6 @@ Chapters/09_Foundations--Class_Attributes.md	never: It never checks whether some
 Chapters/09_Foundations--Class_Attributes.md	only: The shadowing rule confines a change to one object only while the shared value is immutable
 Chapters/09_Foundations--Class_Attributes.md	only: This exercise needs only the one expression given here
 Chapters/09_Foundations--Class_Attributes.md	want: Decide which you want
-Chapters/10_Foundations--Cleanup.md	itself: An object that refers to itself
 Chapters/10_Foundations--Cleanup.md	never: Never release a resource in CODE
 Chapters/10_Foundations--Cleanup.md	only: That list holds the only remaining references
 Chapters/10_Foundations--Cleanup.md	only: The only referrer is CODE
@@ -286,17 +285,19 @@ Chapters/27_Patterns--Function_Objects.md	want: or do you now want an object
 Chapters/28_Patterns--Data_Transfer_Objects.md	only: The hand-rolled CODE is worth writing only to show how CODE works underneath
 Chapters/28_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
 Chapters/29_Patterns--Changing_the_Interface.md	itself: so CODE calls itself until Python raises a CODE
-Chapters/29_Patterns--Changing_the_Interface.md	only: A function that now takes a CODE in place of a string can then warn only the callers still passing a string
 Chapters/29_Patterns--Changing_the_Interface.md	only: An adapter's only job is to produce the interface you need from the one you have
 Chapters/29_Patterns--Changing_the_Interface.md	only: The CODE in CODE makes its parameter positional-only
 Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from a second file
 Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
 Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs more than the money inserted
+Chapters/31_Patterns--State_Machines.md	expensive: CODE for too expensive and CODE for sold out
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
 Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
 Chapters/31_Patterns--State_Machines.md	paid: and a CODE selects from every paid state but CODE
+Chapters/31_Patterns--State_Machines.md	price: A CODE holds one item's price and quantity
 Chapters/31_Patterns--State_Machines.md	price: decided by price and stock
+Chapters/31_Patterns--State_Machines.md	want: Choose one of the designs here when you don't want that dependency
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table (see exercise 9)
@@ -441,7 +442,6 @@ Chapters/46_Effects--Stateless.md	only: You can catch both errors or only one
 Chapters/46_Effects--Stateless.md	only: but an interface reaches CODE only through an implementation
 Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
-Chapters/46_Effects--Stateless.md	wants: A caller who wants to redirect the output
 Chapters/47_Effects--Stateless_in_Practice.md	already: CODE and CODE already share a signature
 Chapters/47_Effects--Stateless_in_Practice.md	already: On a function that already returns an Effect
 Chapters/47_Effects--Stateless_in_Practice.md	costs: CODE reuses the running loop and costs little beyond the Effect
@@ -577,6 +577,7 @@ Solutions/29_Patterns--Changing_the_Interface/README.md	only: CODE reports CODE 
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: import only that function elsewhere
 Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE
 Solutions/30_Patterns--Observer/README.md	never: Class access is the part a validating descriptor never needs
+Solutions/31_Patterns--State_Machines/README.md	never: Across repeated runs you never see CODE before an CODE
 Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a quarter only in a number the existing action reads
 Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate rule and not when you want a separate value
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
@@ -614,7 +615,6 @@ Solutions/41_Functional--Toolkits/README.md	exactly: so CODE yields exactly fift
 Solutions/41_Functional--Toolkits/README.md	only: Lazy Evaluation explains why CODE over an infinite CODE pulls only what it needs
 Solutions/41_Functional--Toolkits/README.md	only: The CODE version accepts only an integer
 Solutions/41_Functional--Toolkits/README.md	only: The chapter's CODE entry states that "CODE works correctly only for pure functions
-Solutions/41_Functional--Toolkits/README.md	wants: A caller who wants this function to share a program-wide random stream cannot pass that stream in
 Solutions/42_Functional--Error_Handling/README.md	never: A successful CODE returns its CODE from inside the CODE block and never reaches CODE
 Solutions/42_Functional--Error_Handling/README.md	never: so it never propagates to the top-level handler that prints a traceback
 Solutions/42_Functional--Error_Handling/README.md	only: **Catch only the named types
@@ -641,13 +641,11 @@ Solutions/46_Effects--Stateless/README.md	only: read both diagnostics and ask wh
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: CODE is for a value you already have
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: The two factories in CODE already have the same signature
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: because a function is already an object with a type
-Solutions/47_Effects--Stateless_in_Practice/README.md	is what: and a wide cast is what a positional interface handles worst
 Solutions/47_Effects--Stateless_in_Practice/README.md	itself: whether the battery reports itself unavailable once exhausted
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: CODE cannot catch what never entered the channel
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: The driver never throws it into the suspended Effect
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: CODE is the only addition
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: The accessor is the only place where the type checker checks a caller's arguments
-Solutions/47_Effects--Stateless_in_Practice/README.md	only: a function whose return type is an CODE and whose body is not a generator must contain only the expression it returns
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the run prints only the message
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: **Prove the loop tries every price

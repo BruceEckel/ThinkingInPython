@@ -63,7 +63,6 @@ Solutions/35_Patterns--Flyweight/README.md	CODE passes on your file (it reports 
 Solutions/35_Patterns--Flyweight/README.md	one with CODE and one without
 Solutions/35_Patterns--Flyweight/README.md	so CODE changes what the square refers to
 Solutions/38_Patterns--Simulation/README.md	so any class with the right methods can stand in
-Solutions/41_Functional--Toolkits/README.md	A caller who wants this function to share a program-wide random stream cannot pass that stream in
 Solutions/43_Functional--Confidence/README.md	which leaves one student over
 Solutions/44_Effects--Effect_Management/README.md	CODE rejects negatives but lets zero through
 Solutions/44_Effects--Effect_Management/README.md	The CODE catches zero but lets negatives through

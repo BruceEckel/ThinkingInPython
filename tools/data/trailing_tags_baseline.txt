@@ -23,7 +23,6 @@ Chapters/13_Techniques--Pattern_Matching.md	[R35] Rethinking Objects works throu
 Chapters/13_Techniques--Pattern_Matching.md	[R35] That is the open-set-versus-closed-set tradeoff from When Not to Match, which the two notification versions show in code
 Chapters/14_Techniques--Decorators.md	[R32] With CODE, the same call raises a CODE at decoration
 Chapters/14_Techniques--Decorators.md	[R35] Changing the price of a topping means changing one number, in one place
-Chapters/15_Techniques--Context_Managers.md	[R32] Because CODE and CODE entered first, both unwind in reverse, the same rule a comma-separated CODE follows
 Chapters/15_Techniques--Context_Managers.md	[R32] CODE builds such a manager from an async generator, the same way CODE builds the synchronous form
 Chapters/17_Techniques--Metaprogramming.md	[R32] For an instance, the tag says whether the value lives on the class or on the object, the same rule CODE demonstrates in Class Attributes
 Chapters/18_Techniques--Performance.md	[R32] CODE packs them into one contiguous block of C doubles, the same layout CODE uses in CODE
@@ -43,6 +42,7 @@ Chapters/28_Patterns--Data_Transfer_Objects.md	[R32] A CODE also equals the bare
 Chapters/28_Patterns--Data_Transfer_Objects.md	[R32] A CODE holding a list lets that list change, the same leak CODE has
 Chapters/30_Patterns--Observer.md	[R32] For CODE, which exists to record every reading, the same half degree is wrong
 Chapters/30_Patterns--Observer.md	[R32] The window looks the same, but the canvas's list of items grows with every notification, the same quiet accumulation as a lapsed listener
+Chapters/31_Patterns--State_Machines.md	[R32] If you swap the rule order, the same input reports CODE
 Chapters/38_Patterns--Simulation.md	[R32] CODE numbers the frames, the same endless counter that numbered the rats
 Chapters/41_Functional--Toolkits.md	[R32] Called with CODE, the same function schedules trios instead
 Chapters/41_Functional--Toolkits.md	[R32] The Cartesian product of the input iterables, the same pairs a nested CODE loop builds
@@ -65,6 +65,7 @@ Solutions/26_Patterns--Factory/README.md	[R32] CODE then prints CODE, the same l
 Solutions/29_Patterns--Changing_the_Interface/README.md	[R32] CODE is CODE from CODE, unchanged
 Solutions/29_Patterns--Changing_the_Interface/README.md	[R32] The adapter adds the one method the caller needs, CODE, and forwards everything else to the wrapped list through CODE, the same shape as CODE
 Solutions/30_Patterns--Observer/README.md	[R32] The protocol here is the one from CODE, unchanged
+Solutions/31_Patterns--State_Machines/README.md	[R35] The chapter's Table-Driven *State Machine* section makes the same trade-off over the per-state CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[R32] Sixteen entries cover the four types against each other (4 × 4), the same shape as the original nine (3 × 3)
 Solutions/41_Functional--Toolkits/README.md	[R32] Passing the CODE is dependency injection applied to a source of nondeterminism, the same technique Random Numbers recommends for testing
 Solutions/42_Functional--Error_Handling/README.md	[R32] The chapter's CODE returns the CODE as CODE, the same shape a bad-input failure takes

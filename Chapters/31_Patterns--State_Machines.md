@@ -57,13 +57,13 @@ This is a *Moore machine*, where what a state does depends on the state alone.
 A state that needs additional behavior supplies an `action` as the third constructor argument.
 
 Note that the form of `self.action()` looks like a method call.
-In a method call, `self` is automatically passed as the first argument.
+In a method call, Python passes `self` automatically as the first argument.
 However, Python supplies `self` only when the lookup finds the function on the class.
 Here, `next` and `action` are references to external (non-method) functions.
 `self.action()` therefore looks up and calls the stored function with no arguments.
 
 The annotation on `next` names `State[I]` inside the `State` class body,
-which works because annotations are [evaluated lazily](08_Foundations--Static_Types.md#self-and-forward-references).
+which works because Python [evaluates annotations lazily](08_Foundations--Static_Types.md#self-and-forward-references).
 
 As an example, consider a mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
@@ -145,16 +145,16 @@ def holding(input_: Mouse) -> TrapState:
             return TrapState.HOLDING
 ```
 
-Each transition function contains a `case` for every input its state cares about,
+Each transition function contains a `case` for every input that matters to its state,
 and produces the state the trap enters next.
 The default `case _` returns the current state, so the state stays the same.
 The four functions use `TrapState` before the file defines it.
-A function body runs at the call, and an annotation is evaluated lazily,
+A function body runs at the call, and Python evaluates an annotation lazily,
 so by the first call the whole module has loaded and `TrapState` exists.
 
-The file continues with `chime()`,
-the one non-empty `action` which is performed by `HOLDING`.
-`TrapState` is an enum because there are a fixed number of states:
+The file continues with `chime()`, the one non-empty `action`,
+which `HOLDING` performs.
+`TrapState` is an enum because the states form a closed set:
 
 ```python
 # trap_states.py (continued)
@@ -172,7 +172,7 @@ class TrapState(State[Mouse], Enum):
 ```
 
 `TrapState` [mixes `State[Mouse]` into `Enum`](12_Techniques--Data_Classes_as_Types.md#enum-mix-ins).
-Each member is assigned a tuple,
+Each member's definition assigns it a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
 so `TrapState.WAITING` is both a `TrapState` member and a `State`,
 with `message` and `next` as attributes.
@@ -291,7 +291,7 @@ def test_every_state_answers_every_move() -> None:
 ```
 
 The second test iterates over the enum,
-so a new member added to `TrapState` is tested as soon as it exists.
+so the test covers a new member of `TrapState` as soon as it exists.
 
 ## Table-Driven State Machine
 
@@ -396,7 +396,7 @@ One table holds `Rule[Money]` beside `Rule[Row]`.
 since `I` sits in both `type[I]` and `Callable[[I], ...]`,
 so `Any` is the one type argument that admits every entry.
 The engine calls each condition and action with whatever input arrived.
-The checker matched each input class to its methods where the rule was built.
+The checker matches each input class to its methods at the `Rule(...)` call.
 
 Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
@@ -670,7 +670,7 @@ The last input picks the sold-out slot again with a dime inserted,
 so both conditions are true.
 `too_expensive()` comes first in the `(State.SELECTING, Column)` list,
 so the engine takes that rule and reports `COLLECTING`,
-as though more money would sell an item the machine has run out of.
+as though more money would sell a sold-out item.
 If you swap the rule order, the same input reports `UNAVAILABLE`.
 By the engine's [ordering rule](#the-engine),
 the first rule whose condition passes wins,
@@ -773,11 +773,11 @@ where a state's `action` takes no arguments:
 `add_money()` reads the coin's `value`.
 
 In both designs the states are `Enum` members because a state machine works with a closed set of states.
-Iterating over the enum reaches every member of that set:
+Iterating over the enum reaches every member of that set.
 `test_trap_states.py` checks each state against each move,
 and `VendingMachine` builds its `Quit` and `Row` rules from a comprehension over `State`.
-A member is one object shared by every machine that uses it,
-so a value stored on a member is shared by every machine (see exercise 2).
+A member is one object that every machine using it shares,
+so every machine sees a value stored on a member (see exercise 2).
 Data that belongs to one machine lives on the machine,
 as `VendingMachine`'s `amount` and `row` do.
 
