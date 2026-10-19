@@ -1400,7 +1400,7 @@ and the pool starts a worker for each of the `cores` tasks.
 
 Wall time drops sharply as the split grows toward one task per core.
 Past that point the curve flattens,
-and can turn back upward once pickling one more chunk costs more than the better load balancing saves.
+and can turn back upward when pickling one more chunk costs more than what you get from load balancing.
 
 Task counts double from 1 up to `CORE_MULTIPLIER` times the core count,
 so the sweep covers well below, at, and beyond the number of cores available.
