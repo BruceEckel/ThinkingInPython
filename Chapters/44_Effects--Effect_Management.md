@@ -44,12 +44,14 @@ This is an *Effect Management System*.
 
 An *Effect* is anything a caller takes on by making a call,
 beyond receiving the return value.
-If you call a function that writes to an audit log,
+If your function calls a function that writes to an audit log,
 your function writes to an audit log.
-If you call one that reads the time of day,
-your result depends on the time of day.
-If you call one that raises a `ValueError`, your function raises a `ValueError`.
-Each of these passes to your function with the call,
+If your function calls a function that reads the time of day,
+the result depends on the time of day.
+If your function calls a function that raises a `ValueError`,
+your function raises a `ValueError`.
+The log write, the clock read,
+and the exception become your function's Effects too,
 and ordinarily no signature on the path mentions any of them.
 
 That transfer is the difficulty.
