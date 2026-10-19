@@ -264,7 +264,7 @@ Both `save()` and `restore()` must copy.
 
 All that copying exists because `Sketch` mutates its list.
 An immutable state needs no copy.
-Once the state is a record, every state is a memento:
+When the state is a record, every state is a memento:
 
 ```python
 # frozen_sketch.py
@@ -584,7 +584,7 @@ but needs an inverse written and tested for every action.
 Try snapshot-based undo first,
 since immutable states share every value an edit carries over,
 as `sharing.py` shows.
-Switch to *Command* once the `O(k^2)` pointer total that `growth_cost.py` counts grows too large to hold.
+Switch to *Command* if the `O(k^2)` pointer total that `growth_cost.py` counts grows too large to hold.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}
 
