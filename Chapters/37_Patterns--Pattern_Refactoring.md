@@ -527,8 +527,8 @@ This hierarchy is small and the book owns every subclass,
 so `note()` on each material is a fair choice here.
 The method is a better choice while you own the hierarchy and the operations stay few.
 Each subclass defines its own answer, so a new class brings its answers with it.
-The method is the worse choice once the hierarchy belongs to someone else,
-or once operations start to outnumber materials.
+The method is the worse choice when the hierarchy belongs to someone else,
+or when operations start to outnumber materials.
 
 ### One `singledispatch` Function per Operation
 
