@@ -140,7 +140,8 @@ print(render(rows, "json"))
 **Hold each format as data.** Adding the third format takes one
 assignment. `render()` stays as it was. `STYLES` absorbs the change
 because a format is now data. The assignment that adds the format can
-sit in any module that imports `STYLES`.
+sit in any module that imports `STYLES`, so adding a format can leave
+the module that defines `STYLES` and `render()` as it was.
 
 Everything outside the axis still needs hand edits. Printing a new
 field of `Row` means editing every entry in `STYLES`. `STYLES` absorbs
