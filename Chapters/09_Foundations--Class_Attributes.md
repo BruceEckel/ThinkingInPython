@@ -258,8 +258,7 @@ keeps it.
 
 A *bare annotation*, one with no assigned value,
 is a declaration rather than a placeholder.
-In `class_var.py`, `label: str` states that every `Tally` carries a `label` attribute of type `str`,
-set somewhere.
+In `class_var.py`, `label: str` states that every `Tally` carries a `label` attribute of type `str` and leaves the assignment to other code.
 If no method assigns `self.label`, no attribute exists,
 on the instance or the class.
 The type checker takes the annotation as the attribute's declaration.
