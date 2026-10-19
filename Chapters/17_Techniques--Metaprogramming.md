@@ -2026,7 +2026,7 @@ The `exclude` check runs before the `dunder` test,
 so an excluded name stays out of `[Attributes]` and `[Methods]` no matter which mode selects it.
 `display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
 minus `__hash__`.
-That form helps once an earlier listing has explained the `__hash__` row and repeating the row would add noise.
+That form helps when an earlier listing has explained the `__hash__` row and repeating the row would add noise.
 
 The rest of the file selects the members, formats each one,
 and prints the report:
