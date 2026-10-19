@@ -1005,8 +1005,9 @@ The tolerant version also gives up the `KeyError` that makes the exact
 version safe, for one kind of new type: a subclass of a concrete item.
 An `Origami(Paper)` whose rows you forgot to write silently inherits
 `Paper`'s answers and plays as paper.
-A `Lizard(Item)` still fails fast, since every row's key names two
-concrete items, and `Lizard`'s ancestors are `Item` and `object`.
+A `Lizard(TolerantItem)` still fails fast, since every row's key
+names two concrete items, and `Lizard`'s ancestors are
+`TolerantItem`, `Item`, and `object`.
 Tolerance lets you write fewer rows,
 but for a subclass of an existing item it drops the fail-fast policy
 the chapter recommends for a table under construction.
