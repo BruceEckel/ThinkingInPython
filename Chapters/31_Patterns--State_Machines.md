@@ -602,7 +602,9 @@ If you write the list inline as the argument,
 the parameter's `Sequence[Rule[Any]]` becomes its expected type.
 That `Any` reaches into every `Rule(...)` and makes its `I` `Any`,
 so the checker accepts any method on any rule.
-The `invalid-argument-type` report above disappears.
+The `Column`/`choose_row()` mismatch above then passes the checker.
+At runtime `choose_row()` stores a `Column` in `self.row`,
+so the machine carries on with a wrong selection.
 
 Adding a state or an input is now a local change:
 a rule in the list and a method or two.
