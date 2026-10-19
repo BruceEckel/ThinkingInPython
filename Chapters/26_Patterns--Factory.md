@@ -418,7 +418,7 @@ Running with `-X lazy_imports=all` makes ordinary imports lazy too,
 so the same failure can appear in a program with no `lazy` keyword in it.
 Import a plugin module eagerly when the import exists for its side effect.
 
-The registry keys on `cls.__name__` alone,
+The registry stores each class under `cls.__name__` alone,
 so when two classes from different modules share a name,
 the second to register silently replaces the first.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
