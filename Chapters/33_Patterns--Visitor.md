@@ -445,7 +445,7 @@ The dispatch on the visitor's type exists not because two types are unknown,
 but because the operation must be a method on some class.
 The visitor's type names the operation,
 so the language must resolve that type at runtime along with the flower's type.
-Once an operation can be a function defined outside the hierarchy,
+When an operation can be a function defined outside the hierarchy,
 the call site names the operation,
 so writing `nectar()` rather than `fragrance()` selects it before the program runs.
 The flower's type is the one thing left for runtime to resolve.
