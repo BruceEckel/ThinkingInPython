@@ -310,8 +310,8 @@ with expected(ValueError):
 
 **Fail at class definition.** `@dataclass` raises the `ValueError` at class-definition time, not at first use,
 because it inspects every default before generating the constructor.
-`shared_mutable.py`'s `Cart` is an ordinary class,
-so Python runs its body as written and `Cart` gets its shared list silently.
+`shared_mutable.py`'s `Cart` has no decorator to inspect its defaults,
+so `Cart` gets its shared list silently.
 The `ValueError` message ends with the remedy: `use default_factory`.
 
 Before you move on, name what separates your attempt from this one:
@@ -574,12 +574,12 @@ one object, not three equal lists.
 
 This listing combines the shared mutable value of `shared_mutable.py`
 with the inheritance lookup of `class_var_inheritance.py`.
-In a single class, a mutable `ClassVar` declares its sharing, so the
-sharing stays visible.
+In a single class, a mutable `ClassVar` declares its sharing in the
+body of the class that uses it, so the sharing stays visible.
 A subclass changes an inherited immutable `ClassVar` by assignment,
 which creates the subclass's own entry.
 Combined, the mutable value and the inheritance lookup produce one list, declared on the base class,
-that every subclass mutates.
+that every subclass mutates under its own name.
 
 **Give one subclass its own list.** Giving `Right2` its own `shared = []` changes `Right2` alone. The
 assignment in the class body creates a new entry in `Right2`'s own
