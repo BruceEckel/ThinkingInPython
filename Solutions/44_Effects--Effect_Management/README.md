@@ -3,8 +3,8 @@
 ## 1. Production bindings for `ask_tell.py`
 
 > Write the production bindings for `ask_tell.py`:
-> a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
-> and run `greet(Console(), Console())` interactively.
+> a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`.
+> Then run `greet(Console(), Console())` interactively.
 > Confirm `greet()` requires no change.
 > Serving a new context without edits is what delayed binding provides.
 

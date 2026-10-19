@@ -398,9 +398,11 @@ def editor_pin(v: Vars) -> None:
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
     the report-only stranded-preposition, stranded-possessive,
-    watch-word, positional-reference, trailing-tag, subject-gap, and
-    internal-name scans (the last reads the whole book; subject-gap
-    runs spaCy in a throwaway Python 3.12 environment uv caches). Run one
+    watch-word, positional-reference, trailing-tag, subject-gap,
+    sentence-shape, and internal-name scans (the last reads the whole
+    book; subject-gap and sentence-shapes share one spaCy parse, run in
+    a throwaway Python 3.12 environment uv caches and kept under
+    build/parses/). Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
     says how to install it). Its style packages (.vale.ini's Packages)
@@ -416,6 +418,7 @@ def prose(v: Vars) -> None:
     py("tools.positional_refs", *prose_files(v))
     py("tools.trailing_tags", *prose_files(v))
     py("tools.subject_gap", *prose_files(v))
+    py("tools.sentence_shapes", *prose_files(v))
     py("tools.internal_names")
 
 
@@ -485,8 +488,9 @@ def subject_gap(v: Vars) -> None:
     phrase, or a parenthetical ("an action that must run on every
     entry into that state appears once"). The parse is spaCy's, run
     in a throwaway Python 3.12 environment that uv caches (the first
-    run downloads it; later runs take a few seconds), so it reports
-    and never gates; `tip prose` runs it after the trailing-tag scan.
+    run downloads it) and kept under build/parses/ by
+    tools/parsed_prose.py, so a repeat run takes about a second. It
+    reports and never gates; `tip prose` runs it after the trailing-tag scan.
     CH= picks one chapter and its Solutions file. Hits judged keeps
     live in tools/data/subject_gap_baseline.txt, so the run prints
     only new ones; ARGS=--all lists every hit, ARGS="--gap 12" moves
@@ -499,6 +503,35 @@ def subject_gap(v: Vars) -> None:
       "entries", secondary=True)
 def subject_gap_accept(v: Vars) -> None:
     py("tools.subject_gap", "--accept")
+
+
+@task("Report new imperative-plus-consequence sentences, split-worthy "
+      "\"and\"s, and colon-led clauses (report-only; accept with "
+      "`tip sentence-shapes-accept`)")
+def sentence_shapes(v: Vars) -> None:
+    """Report sentence shapes from the style rules, found with the
+    cached spaCy parse (tools/parsed_prose.py). The default rules,
+    judged against a baseline: [IMP] a command plus its consequence
+    ("Remove `frozen=True` and the pattern fails"), and [COLON+AND] a
+    colon followed by a clause whose verb joins a second clause with
+    "and". The survey rules, printed only under ARGS=--survey and never
+    baselined: [AND] an "and" joining two clauses with different
+    subjects, and [COLON] a colon followed by an independent clause.
+    Run `tip sentence-shapes CH=31 ARGS=--survey` at the start of a
+    chapter pass. It reports and never gates; `tip prose` runs it after
+    the subject-gap scan. CH= picks one chapter and its Solutions file.
+    Hits judged keeps live in tools/data/sentence_shapes_baseline.txt,
+    so the run prints only new ones; ARGS=--all lists every default
+    hit, and ARGS=--calibrate runs all four rules over
+    tools/data/edit_pairs.json and the built-in examples.
+    """
+    py("tools.sentence_shapes", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new sentence-shape hits to the baseline and drop stale "
+      "entries", secondary=True)
+def sentence_shapes_accept(v: Vars) -> None:
+    py("tools.sentence_shapes", "--accept")
 
 
 @task("Report public class names that only their class uses "

@@ -287,8 +287,8 @@ lets the type checker report that mistake.
 
 Notification runs one way, from broadcaster to responders.
 *GoF Design Patterns* states the premise of broadcast communication:
-a notification goes to every connected responder,
-and each one decides whether to handle it.
+a notification goes to every connected responder.
+Each one decides whether to handle it.
 If responders could return values,
 one announcement would collect an unknown number of them.
 The broadcaster would then need a rule for combining those values.

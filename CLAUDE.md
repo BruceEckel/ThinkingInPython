@@ -217,7 +217,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Seven report-only
+Eight report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -257,17 +257,35 @@ parenthetical ("an action that must run on every entry into that
 state appears once", the chapter 31 sentence Bruce marked), the
 `straighten` skill's "subject held open". It is the one check that
 needs a parser: spaCy has no wheel for the pinned Python, so
-`tools/subject_gap_parse.py` runs under `uv run --no-project
+`tools/spacy_parse.py` runs under `uv run --no-project
 --python 3.12 --with spacy`, an environment uv caches after the
 first run, and the check exits 0 with a message when that
-environment cannot start. The sweep that day read 181 hits, fixed
+environment cannot start. `tools/parsed_prose.py` starts that
+parser, caches each file's parse under `build/parses/`, and hands
+the token table to the rules, so a whole-book parse (about 24
+seconds) happens once and a repeat run takes about a second. The sweep that day read 181 hits, fixed
 37 (commit 0fc6e04d), and the baseline holds the keeps: coordinated
 subjects, a short appositive, a relative clause that is the claim
 and reads once, a parser error. Chapter 31's hits stay out of it
 while its editing pass is open.
+`tip sentence-shapes` (`tools/sentence_shapes.py`, 2026-10-18) uses the
+same shared parse for four shapes from the style rules. The default
+rules have a baseline: `[IMP]`, a command plus its consequence
+("Remove `frozen=True` and the pattern fails"), and `[COLON+AND]`, a
+colon followed by a clause that joins a second clause with "and". A
+colon after a count or a demonstrative ("three parts:", "this
+shape:") is skipped. The survey rules print only under `ARGS=--survey`
+and never enter the baseline: `[AND]`, an "and" that joins two clauses
+with different subjects, and `[COLON]`, a colon followed by an
+independent clause. The author's own rewrites fire `[AND]` six times in
+the calibration, so the shape is a judgment made per sentence. Use
+`tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
+pass. `ARGS=--calibrate` runs all four rules over
+`tools/data/edit_pairs.json` and the style rules' own examples.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
-`tip trailing-accept`, and `tip subject-gap-accept` add the current
+`tip trailing-accept`, `tip subject-gap-accept`, and
+`tip sentence-shapes-accept` add the current
 new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84

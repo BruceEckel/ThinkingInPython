@@ -747,8 +747,8 @@ production code hands it a `random.Random()` seeded from the operating system,
 while the test hands it `Random(0)`.
 The randomness is now an input, not a hidden dependency.
 This technique is *dependency injection*:
-the caller hands the function its dependencies,
-and the function fetches nothing on its own.
+the caller hands the function its dependencies.
+The function fetches nothing on its own.
 
 The `4` in `test_dice_rng.py` is what `Random(0)` produces first.
 Its match with the stubbed value in `test_dice.py` is a coincidence.

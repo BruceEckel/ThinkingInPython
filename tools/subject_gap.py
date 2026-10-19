@@ -16,15 +16,13 @@ its own; commit 0fc6e04d has 37 examples.
 
 A hit is a nominal subject whose head verb follows it with at least
 `GAP` (9) non-punctuation words between, nearly all of them inside
-the subject's own subtree. The dependency parse comes from spaCy, run
-in a throwaway environment: the book pins a Python that spaCy has no
-wheel for, so this module writes the paragraphs to JSON and starts
-`tools/subject_gap_parse.py` under `uv run --no-project --python 3.12
---with spacy ...` (`PARSER_CMD`). uv caches that environment, so the
-first run downloads an interpreter, spaCy, and the small English model
-(a minute or so) and later runs start in a few seconds. When the
-parser cannot start (no network on a first run, no `uv`), the check
-says so and exits 0, since it is report-only.
+the subject's own subtree. The dependency parse is spaCy's, shared
+with the other parse-based checks: `tools/parsed_prose.py` runs
+`tools/spacy_parse.py` in a throwaway Python 3.12 environment (the book
+pins a Python that spaCy has no wheel for) and caches the result under
+`build/parses/`, and this module applies its rule to the token table in
+pure Python. When the parser cannot start (no network on a first run,
+no `uv`), the check says so and exits 0, since it is report-only.
 
 The check reads each paragraph's prose through the same reader as
 `tools/stranded_prepositions.py`: fenced listings, headings, block
@@ -77,35 +75,30 @@ read badly, and the rest seeded the baseline.
 """
 
 import argparse
-import json
-import subprocess
 import sys
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Final
 from tools.config import DATA_DIR, ROOT
 from tools.markdown import Document
+from tools.parsed_prose import (
+    Paragraph,
+    Parser,
+    ParserUnavailable,
+    Sentence,
+    children,
+    parse,
+    parsed,
+    subtree,
+)
 from tools.repo import add_paths_arg, md_files
 from tools.report import Finding
-from tools.stranded_prepositions import (
-    display,
-    joined,
-    paragraphs,
-)
+from tools.stranded_prepositions import display
 
 GAP: Final = 9
 """Fewest words between the subject head and its verb for a hit."""
-PARSER: Final = Path(__file__).with_name("subject_gap_parse.py")
-SPACY_MODEL: Final = (
-    "https://github.com/explosion/spacy-models/releases/download/"
-    "en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"
-)
-PARSER_CMD: Final[tuple[str, ...]] = (
-    "uv", "run", "--no-project", "--python", "3.12",
-    "--with", "spacy>=3.8,<3.9", "--with", SPACY_MODEL,
-    "python", str(PARSER),
-)
-"""The throwaway environment the spaCy half runs in."""
+PUNCT_SLACK: Final = 1
+"""Tokens in the gap allowed to lie outside the subject's subtree."""
 BASELINE: Final = DATA_DIR / "subject_gap_baseline.txt"
 HEADER: Final = (
     "# Subject-gap hits a human read and judged keeps: coordinated\n"
@@ -121,27 +114,6 @@ HEADER: Final = (
 )
 
 Hit = dict[str, Any]
-Parser = Callable[[list[str], int], list[list[Hit]]]
-
-
-class ParserUnavailable(Exception):
-    """The spaCy environment could not start or did not answer."""
-
-
-def parse(texts: list[str], gap: int) -> list[list[Hit]]:
-    """Run the spaCy half on these paragraphs; one hit list per text."""
-    request = json.dumps({"gap": gap, "texts": texts})
-    try:
-        done = subprocess.run(
-            list(PARSER_CMD), input=request, capture_output=True,
-            text=True, encoding="utf-8", cwd=ROOT, check=False,
-        )
-    except FileNotFoundError as exc:
-        raise ParserUnavailable(f"{PARSER_CMD[0]}: command not found") from exc
-    if done.returncode:
-        tail = done.stderr.strip().splitlines()[-1:] or ["no output"]
-        raise ParserUnavailable(f"exit {done.returncode}: {tail[0]}")
-    return json.loads(done.stdout)
 
 
 def message(hit: Hit) -> str:
@@ -151,22 +123,45 @@ def message(hit: Hit) -> str:
             f"{' '.join(hit['sentence'].split())}")
 
 
+def hits(paragraph: Paragraph, sentence: Sentence,
+         gap: int = GAP) -> Iterator[Hit]:
+    """The held-open subjects of one sentence, as hit dicts."""
+    tokens = sentence.tokens
+    for tok in tokens:
+        if tok.dep not in ("nsubj", "nsubjpass"):
+            continue
+        verb = tokens[tok.head]
+        if verb.i <= tok.i:
+            continue
+        words = [t for t in tokens
+                 if tok.i < t.i < verb.i and not t.punct]
+        if len(words) < gap:
+            continue
+        owned = subtree(tok, sentence)
+        if sum(t.i not in owned for t in words) > PUNCT_SLACK:
+            continue
+        kinds = sorted({c.dep for c in children(tok, sentence)
+                        if c.i > tok.i and not c.punct})
+        yield {
+            "offset": tok.idx,
+            "subject": tok.text,
+            "verb": verb.text,
+            "gap": len(words),
+            "kinds": kinds,
+            "sentence": paragraph.text[sentence.start:sentence.end],
+        }
+
+
 def find(docs: list[Document], parser: Parser = parse,
          gap: int = GAP) -> Iterator[Finding]:
     """A finding per held-open subject across these documents."""
-    texts: list[str] = []
-    places: list[tuple[Path, list[int]]] = []
-    for doc in docs:
-        for paragraph in paragraphs(doc):
-            text, lines = joined(paragraph)
-            texts.append(text)
-            places.append((doc.path, lines))
-    if not texts:
-        return
-    for (path, lines), hits in zip(places, parser(texts, gap), strict=True):
-        for hit in hits:
-            line = lines[min(hit["offset"], len(lines) - 1)]
-            yield Finding(path, line, message(hit))
+    for doc, paras in zip(docs, parsed(docs, parser), strict=True):
+        for paragraph in paras:
+            for sentence in paragraph.sentences:
+                for hit in hits(paragraph, sentence, gap):
+                    lines = paragraph.lines
+                    line = lines[min(hit["offset"], len(lines) - 1)]
+                    yield Finding(doc.path, line, message(hit))
 
 
 def key(shown: str, text: str) -> str:
