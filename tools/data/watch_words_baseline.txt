@@ -40,6 +40,7 @@ Chapters/05_Foundations--Functions.md	only: many built-in functions and methods 
 Chapters/05_Foundations--Functions.md	only: positional-only
 Chapters/06_Foundations--Modules_and_Packages.md	even: even on a filesystem that treats the two names as one
 Chapters/06_Foundations--Modules_and_Packages.md	ever: not names your program ever deferred
+Chapters/06_Foundations--Modules_and_Packages.md	never: so that work never happens
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
 Chapters/06_Foundations--Modules_and_Packages.md	only: When the cycle exists only in annotations
 Chapters/06_Foundations--Modules_and_Packages.md	only: a keyword only inside an CODE statement
@@ -89,7 +90,6 @@ Chapters/13_Techniques--Pattern_Matching.md	cost: Every channel also has a rough
 Chapters/13_Techniques--Pattern_Matching.md	only: The case matches only when the pattern fits and the guard is true
 Chapters/13_Techniques--Pattern_Matching.md	only: Use a captured name only in the CODE that captured it
 Chapters/13_Techniques--Pattern_Matching.md	only: Use it as a type-only check or a final catch-all
-Chapters/13_Techniques--Pattern_Matching.md	only: but only if you remember to end it with CODE
 Chapters/13_Techniques--Pattern_Matching.md	only: they act as keywords only inside this statement
 Chapters/13_Techniques--Pattern_Matching.md	price: CODE confirms that the two versions render and price each channel alike
 Chapters/13_Techniques--Pattern_Matching.md	want: Use CODE for a closed set of cases you want to handle in one place
@@ -293,12 +293,9 @@ Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from
 Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
 Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs more than the money inserted
-Chapters/31_Patterns--State_Machines.md	expensive: The sold-out and too-expensive clears both start from CODE on a column
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
-Chapters/31_Patterns--State_Machines.md	expensive: Too expensive returns to CODE with the money still inserted
 Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
 Chapters/31_Patterns--State_Machines.md	paid: and a CODE selects from every paid state but CODE
-Chapters/31_Patterns--State_Machines.md	price: and a CODE holds one item's price and quantity
 Chapters/31_Patterns--State_Machines.md	price: decided by price and stock
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table

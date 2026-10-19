@@ -180,8 +180,7 @@ In generator terms, `__enter__()` is the portion before the `yield`.
 `Trace` is also reusable.
 The demo enters the same `manager` in two `with` statements,
 and both print `enter B` and `exit B`,
-because `Trace.__enter__()` prints `self.name`,
-which the first `with` leaves in place.
+because `Trace.__enter__()` prints `self.name`, which a `with` leaves in place.
 In `trace_gen.py` the second of those statements raises an `AttributeError`,
 because a generator manager is single-use.
 A class manager that stores per-`with` state stays reusable only if `__enter__()` resets that state.

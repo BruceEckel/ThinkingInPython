@@ -12,7 +12,7 @@
  },
  "40269c5a2d110ef4": {
   "file": "04_Foundations--Control_Flow.md",
-  "line": 777,
+  "line": 781,
   "target": "03_Foundations--Containers.md",
   "terms": [
    "scores"
@@ -23,7 +23,7 @@
  },
  "a800f43efa7e5b09": {
   "file": "07_Foundations--Classes.md",
-  "line": 692,
+  "line": 691,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Derived"
@@ -67,7 +67,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1054,
+  "line": 1121,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -78,7 +78,7 @@
  },
  "7c9a753f95d1c66a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1259,
+  "line": 1265,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace_class"
@@ -89,7 +89,7 @@
  },
  "9d74798f33eb179b": {
   "file": "15_Techniques--Context_Managers.md",
-  "line": 487,
+  "line": 489,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "exc_type"
@@ -100,7 +100,7 @@
  },
  "a6f80d7775b0cbcd": {
   "file": "16_Techniques--Comprehensions.md",
-  "line": 303,
+  "line": 308,
   "target": "03_Foundations--Containers.md",
   "terms": [
    "SIZE"
@@ -111,7 +111,7 @@
  },
  "0c738529ede5867a": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 250,
+  "line": 255,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
@@ -122,7 +122,7 @@
  },
  "6203333350c5fed9": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1457,
+  "line": 1503,
   "target": "28_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -178,7 +178,7 @@
  },
  "a0536caddc59da86": {
   "file": "23_Patterns--Singleton.md",
-  "line": 720,
+  "line": 721,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -244,7 +244,7 @@
  },
  "0f1b2d7a09ebf4e9": {
   "file": "27_Patterns--Function_Objects.md",
-  "line": 438,
+  "line": 436,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "partial",
@@ -279,7 +279,7 @@
  },
  "c8b45c3e67ecadbb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 293,
+  "line": 330,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "PairCoord",
@@ -315,7 +315,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1939,
+  "line": 1937,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -325,20 +325,9 @@
   "p_terms": 0.02,
   "asked": "2026-09-27"
  },
- "e3c9c99b35195620": {
-  "file": "31_Patterns--State_Machines.md",
-  "line": 333,
-  "target": "06_Foundations--Modules_and_Packages.md",
-  "terms": [
-   "state_machine.py"
-  ],
-  "sentence": "Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md), so a program that imports two files named `state_machine.py` gets the first one both times, with no error.",
-  "p_terms": 0.01,
-  "asked": "2026-09-27"
- },
  "174f9c2a8b0e1a24": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 818,
+  "line": 794,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -351,7 +340,7 @@
  },
  "919cfd41be150204": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 833,
+  "line": 809,
   "target": "22_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -375,7 +364,7 @@
  },
  "78d9ea293b963dca": {
   "file": "36_Patterns--Memento.md",
-  "line": 411,
+  "line": 412,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "History"
@@ -419,7 +408,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 644,
+  "line": 645,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -432,7 +421,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 702,
+  "line": 715,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
