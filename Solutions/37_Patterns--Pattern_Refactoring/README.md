@@ -453,7 +453,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) keys each bin on `type(piece)`, an exact-class lookup, while `singledispatch` in [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) walks the MRO.
-To let a subclass share its parent's bin, give `Trash` a class variable that names the bin's key, defaulted for each class in `__init_subclass__()`.
+To let a subclass share its parent's bin, give `Trash` a class variable that names the bin's key, and have `__init_subclass__()` default that variable for each class.
 A subclass overrides it, and the loop indexes by that attribute instead of `type(t)`.
 
 <details>
@@ -596,8 +596,8 @@ type checker treats that restatement as optional.
 `shared[t.bin].append(t)` and still names no material.
 
 `type(t)` is a convenient key, not an inevitable one. A design that
-declares its own key can express groupings the type hierarchy leaves
-out.
+declares its own key can group classes that `type(t)` keeps apart, as
+`bin` puts `CrushedAluminum` in the `Aluminum` bin.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
