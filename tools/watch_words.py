@@ -19,7 +19,10 @@ legitimate uses that the author checks every time: `happen`, `is what`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
 `itself`, `was to`, `used to`, `fix` (every form; the repair sense,
 the hyphenated compounds, and "fixed point" stay, the hold-constant
-sense goes, adjective included). A Tier 3 hit is a defect to fix unless a
+sense goes, adjective included), `once` (since 2026-10-19, rule R40:
+"once X" where X is a standing condition reads as a point in time and
+takes "if" or "when"; a step after an event, and the adverb meaning
+one time, stay). A Tier 3 hit is a defect to fix unless a
 human reads it as literal ("a person wants a refund"); a Tier 2 hit is
 kept where the word changes the meaning; a Tier 1 hit is a prompt to
 try a rewrite, and most stay.
@@ -119,6 +122,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (1, r"was to"),
         (1, r"used to"),
         (1, r"fix(?:es|ed|ing)?"),
+        (1, r"once"),
         (3, r"in the first place"),
         (3, r"ships?|shipped|shipping"),
         (3, r"lands?|landed|landing"),
