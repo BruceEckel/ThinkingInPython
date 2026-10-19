@@ -299,7 +299,7 @@ adjustable through its `rel_tol` and `abs_tol` arguments.
 That test passes with `==` as well.
 `100.0 + 100.0 * 0.05` is exactly `105.0` on any IEEE double,
 and every other whole-percent rate on this starting balance gives an exact result too.
-The exact comparison fails once rounding error accumulates:
+The exact comparison fails when rounding error accumulates:
 
 ```python
 # test_compounding.py
