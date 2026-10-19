@@ -29,7 +29,7 @@ You may have seen and solved something like it before,
 but your solution probably lacks the completeness a pattern embodies.
 
 That completeness has a failure mode.
-Once you know a catalog of patterns,
+When you know a catalog of patterns,
 that catalog tempts you to treat it as a checklist,
 and to install patterns as proof of sophistication.
 A pattern belongs in your program only when you have the problem it solves.
