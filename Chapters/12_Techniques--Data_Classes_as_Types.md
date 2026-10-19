@@ -993,6 +993,9 @@ A month carries an `int` rather than being one.
 A class of your own can be the mix-in too.
 `Enum` passes the assigned value to its `__init__()`,
 so `Enum` builds each member the way a constructor call builds an ordinary instance.
+[State Machines](31_Patterns--State_Machines.md#mousetrap-states)
+mixes its `State` data class into `Enum` this way,
+so each `TrapState` member is also a `State` with `message` and `next` fields.
 
 An `Enum` member is one value from the set.
 A `Flag` value holds any combination of its members,
@@ -1625,7 +1628,8 @@ print(from_json(text) == original)  # Round-trip
 #: True
 ```
 
-JSON data typically arrives from outside the program, untrusted.
+JSON data typically arrives from outside the program,
+so the program treats it as untrusted.
 Rebuilding the value through `Person`, `FullName`,
 and `EmailAddress` runs each constructor's validation,
 so the boundary rejects an illegal value instead of passing it to the rest of the code.
