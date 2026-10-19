@@ -326,7 +326,6 @@ call each one with the caller's arguments alone, even through an
 instance.
 A module is a namespace as soon as Python creates it.
 It supports the underscore convention and `__all__`.
-Python runs its top-level code once, on the first import.
 
 A caller of `facade.py` sees `Engine`, `FuelPump`, `Ignition`, and
 `Facade` as public names.
