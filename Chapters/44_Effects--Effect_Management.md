@@ -200,7 +200,7 @@ expect(ValueError, slope, 10, -1)
 ```
 
 Catching the exception works with the types you have.
-But an `except` clause catches the exception it names,
+But an `except` clause catches only the exception(s) it names,
 and the one in `slope()` names `ZeroDivisionError`.
 `validate()` raises `ValueError` for a negative `run`.
 The `try` around that call lets `ValueError` propagate.
@@ -211,7 +211,7 @@ Because `slope()` calls `validate()`,
 so the uncaught `ValueError` is easy to spot.
 In a real call stack the `raise` is usually in another file, several calls down.
 Catching by hand covers only the exceptions you know a callee can raise.
-Knowing every one of them means reading every callee.
+Knowing every one of them means reading the code for every callee.
 An Effect Management System replaces that tedious, error-prone work.
 
 C++ and Java tried to track exceptions with *exception specifications*,
@@ -224,7 +224,7 @@ so an exception introduced three levels down meant editing every signature above
 Programmers usually avoided that work by widening the specification until it permitted every exception.
 The specifications exposed implementation details.
 Most people now count them a failure.
-C++ reduced its version to a single bit: whether a function can throw.
+C++ reduced its version to a single bit: whether a function can throw an exception.
 
 ### Make the Bad Value Impossible
 
