@@ -492,7 +492,7 @@ block finishes cleanly, Python still calls `__exit__()`
 and passes `None` for all three arguments.
 Without the test, `issubclass(None, KeyError)` would raise a `TypeError`. Checking for `None`
 first also lets the type checker narrow `exc_type` to
-`type[BaseException]`, a class, as `issubclass()` requires.
+`type[BaseException]`, as `issubclass()` requires.
 
 If you return `issubclass(exc_type, KeyError)` without the `None` test,
 the demo prints the same two lines,
