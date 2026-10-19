@@ -608,7 +608,8 @@ Adding a state or an input is now a local change:
 a rule in the list and a method or two.
 Nothing here needs a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
-The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
+The `dict` does the dispatch,
+and a bound method stored in a rule is the condition or the action.
 
 `vending_demo.py` feeds a `VendingMachine` a list of inputs.
 For each input it prints the transition in the mousetrap's form,
