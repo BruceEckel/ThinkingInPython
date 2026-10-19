@@ -379,7 +379,7 @@ values, so the three collectors need six. The loop supplies five.
 until `send(6)` completes it.
 
 **Read the output in pairs.** The two-line responses mark where one collector ends and the next begins. A send that supplies a collector's
-first value produces one line, the same collector's second prompt. A
+first value produces one line: that collector's second prompt. A
 send that supplies a collector's second value produces two: the
 completed collector's `print()`, then the first prompt of the next
 collector. The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
