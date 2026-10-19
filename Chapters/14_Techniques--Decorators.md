@@ -1043,7 +1043,8 @@ The `# type: ignore` in `report` silences `ty`'s diagnostic for the same hazard.
 `ty` rejects `func.__name__`,
 since a `Callable` need not have a `__name__` attribute,
 though every function does.
-Pyright and mypy both accept the attribute here.
+Pyright and mypy both accept the attribute here,
+because they give a `Callable` the attributes of a function object.
 `report` has no `wraps`, so `wrapper.__name__` is `wrapper`,
 and the name the trace prints must come from `func`.
 
