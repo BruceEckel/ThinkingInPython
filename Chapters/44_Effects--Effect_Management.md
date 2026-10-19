@@ -325,7 +325,7 @@ and the `except` turns either one into an `Err` its caller must unpack.
 Unlike `@safe`'s `Exception`,
 the return type names the failure the caller handles.
 A bug inside `parse_run()` still raises its own exception.
-Once the `match` unpacks an `Ok`, `slope()` checks nothing.
+After the `match` unpacks an `Ok`, `slope()` doesn't check anything.
 `NonZero` guarantees `run.value` isn't 0.
 
 ## A Program Can Never Be Pure
@@ -466,7 +466,7 @@ On its own, the first item is *Effect tracking*.
 Tracking alone tells you whether a function is pure,
 and names the kinds of impurity a caller inherits.
 Effect management is tracking plus the second and third items.
-Once an Effect is an interface and a caller binds the implementation later,
+When an Effect is an interface and a caller binds the implementation later,
 you can replace what the Effect does and leave the function that performs it as written.
 Tracking reports a function's Effects.
 Management lets you control them.
