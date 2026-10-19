@@ -485,7 +485,7 @@ so the checker rejects `Right().shared = 5` as it rejects `Left().shared = 5`.
 The mistake in `self_increment.py` has a subclass form.
 `class_var.py` increments `Tally.total` through the literal class name.
 Methods often write `type(self)` to name the instance's class.
-Writing the same increment through `type(self)` forks the counter once the base class has subclasses,
+Writing the same increment through `type(self)` forks the counter when the base class has subclasses,
 the same way `Right` forks `shared`:
 
 ```python
