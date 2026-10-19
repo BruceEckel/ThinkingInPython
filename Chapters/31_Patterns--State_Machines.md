@@ -738,44 +738,37 @@ def test_no_transition_raises() -> None:
 ## Which Design Should You Use?
 
 The first design, [Each State Decides](#each-state-decides),
-suits a machine whose states do something and have few transitions apiece.
-The row holds the action and its function holds the transitions,
-so reading `trap_states.py`'s `LURING` and `luring()` tells you what luring does and which states can follow it.
+suits a machine whose states have only a few transitions.
+Reading `trap_states.py`'s `LURING` and `luring()` tells you what luring does and which states can follow it.
 Adding a state is one row and one function.
 The design reads best when the transitions are obvious from the state's own name.
 
-An action that must run on every entry into one state belongs in that state's row,
-written once.
-`HOLDING`'s `chime()` sounds whenever the trap reaches that state,
-and no other row mentions it.
+An action that must run on every entry into a state belongs in that state's row,
+written once. [[awkward, unclear]]
+For example, `HOLDING`'s `chime()` is only specified in one place.
 That is the Moore shape: the action belongs to the state.
 
 The second design, the [Table-Driven *State Machine*](#table-driven-state-machine),
 suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
-Everything is in one place, in the same order as the diagram.
+Everything is in one table, in the same order as the diagram.
 Adding a state or an input is a rule in the list and a method or two.
 
-In the table-driven design a state is an `Enum` member, a label,
-so an action that runs on every entry into one state must go in the table.
+In the table-driven design a state is an `Enum` member [[states are Enums in the other design too]], a label,
+so an action that runs on every entry into one state must go in the table. [[ all the actions go into the table regardless]]
 You repeat the action on every rule that leads to that state,
-or write a helper that those rules call.
+or write a helper that those rules call. [[garbled]]
 That is the Mealy shape: the action belongs to the transition.
-In return, the action can read the input that caused the transition.
+In return[[??? in the return value?]], the action can read the input that caused the transition.
 
 In both designs the states are `Enum` members because a state machine works with a fix set of states.
-`list(TrapState)` enumerates every state,
-and a parameter typed `TrapState` accepts a member and rejects anything else.
+`list(TrapState)` enumerates every state, [[why is this important?]]
+and a parameter typed `TrapState` accepts a member and rejects anything else. [[Yes, typing is good, is that an essential here?]]
 A member is one object shared by every machine that uses it,
-so data a state keeps for one machine has nowhere to go.
-Such a state is a class with a `run()` and a `next()` of its own.
-To drive both a class and a record,
-an engine annotates its parameter with a Protocol naming those two methods.
-
-The first design's constructor calls the initial state's `run()`,
-but the constructor in `table_machine.py` stores `initial` and returns.
-In the table-driven design,
-an action the machine needs at startup is a call you make before the first input.
+so data a [[state keeps for one machine has nowhere to go]][[garbled, incomprehensible]].
+Such a state is a class with a `run()` and a `next()` of its own. [[no idea what this is supposed to be saying]]
+To drive both a class and a record, [[why do we care whether it's a class or a record?]]
+an engine annotates its parameter with a Protocol naming those two methods. [[what?]]
 
 The deciding question is which is easier to maintain: one state's transitions,
 gathered in that state's function, or the whole machine's transitions,
