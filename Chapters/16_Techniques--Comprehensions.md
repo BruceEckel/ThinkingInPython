@@ -264,7 +264,7 @@ print(name_at)
 Inverting assumes the values are unique.
 `Arthur` and `Robin` both sit at seat `1`.
 `Robin`, entered later, overwrites `Arthur` at key `1`,
-the same rule any duplicate dictionary key follows.
+because a dictionary keeps the last value it receives for a duplicate key.
 
 To keep both names, group instead of inverting.
 Grouping appends to lists that earlier elements created.
