@@ -616,7 +616,7 @@ and a bound method stored in a rule is the condition or the action.
 `vending_demo.py` feeds a `VendingMachine` a list of inputs.
 For each input it prints the transition in the mousetrap's form,
 the state before, the input, and the state after,
-then the `message` the action set:
+then the `message` that the rule's action wrote:
 
 ```python
 # vending_demo.py
