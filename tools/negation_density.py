@@ -55,7 +55,9 @@ A survey tool with no baseline, outside `tip prose`. Whether a negation
 is the claim, half of a real contrast, or an accident with a positive
 form is the `positive` skill's judgment, so a listed paragraph is a
 candidate and not a fault. `--fail` exits 1 when any paragraph is
-listed, for scripting.
+listed, for scripting. The command line, the paths default, and the
+parser-unavailable handling are `tools/parse_check.py`'s, shared with
+the other parse-based checks.
 
 `--calibrate` counts the markers (without `only`) in the `before` and
 `after` text of each pair in `tools/data/edit_pairs.json`, prints the
@@ -71,13 +73,19 @@ give.
 """
 
 import argparse
-import json
 import re
-import sys
 from pathlib import Path
 from typing import Final, NamedTuple
-from tools.config import DATA_DIR, ROOT
 from tools.markdown import Document
+from tools.parse_check import (
+    build_arg_parser,
+    load_edit_pairs,
+    parse_args,
+    prose_paths,
+    report_unavailable,
+    run_calibrate,
+    skipped,
+)
 from tools.parsed_prose import (
     Paragraph,
     Parser,
@@ -85,11 +93,8 @@ from tools.parsed_prose import (
     parse,
     parsed,
 )
-from tools.repo import add_paths_arg, md_files
-from tools.sentence_shapes import skipped
 from tools.stranded_prepositions import display
 
-EDIT_PAIRS: Final = DATA_DIR / "edit_pairs.json"
 DEFAULT_THRESHOLD: Final = 3
 PREVIEW: Final = 90
 NEG_WORDS: Final = frozenset({
@@ -255,8 +260,7 @@ DENSE: Final = ("Nothing objects: not the annotation, not the type "
 
 def calibrate(parser: Parser = parse) -> None:
     """Group the edit pairs by whether the rewrite cut negatives."""
-    pairs: dict[str, dict[str, str]] = json.loads(
-        EDIT_PAIRS.read_text(encoding="utf-8"))
+    pairs = load_edit_pairs()
     idents = list(pairs)
     texts = [pairs[i][side] for i in idents for side in ("before", "after")]
     got = counts(texts, parser)
@@ -293,35 +297,28 @@ def calibrate(parser: Parser = parse) -> None:
           f"{n >= DEFAULT_THRESHOLD}")
 
 
-def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
-    ap = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    add_paths_arg(ap)
+def add_density_args(ap: argparse.ArgumentParser) -> None:
     ap.add_argument("--threshold", type=int, default=DEFAULT_THRESHOLD,
                     help="list paragraphs with at least this many "
                          "negatives, without `only` (default 3)")
     ap.add_argument("--top", type=int, default=0, metavar="N",
                     help="print only the N densest paragraphs")
-    ap.add_argument("--fail", action="store_true",
-                    help="exit 1 when any paragraph is listed")
-    ap.add_argument("--calibrate", action="store_true",
-                    help="compare with tools/data/edit_pairs.json and "
-                         "run the built-in examples")
-    args = ap.parse_args(argv)
+
+
+def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
+    ap = build_arg_parser(
+        __doc__, baselined=False, leading=add_density_args,
+        fail_help="exit 1 when any paragraph is listed",
+        calibrate_help="compare with tools/data/edit_pairs.json and "
+                       "run the built-in examples")
+    args = parse_args(ap, argv)
     if args.calibrate:
-        try:
-            calibrate(parser)
-        except ParserUnavailable as exc:
-            print(f"negation_density: parser unavailable ({exc}); "
-                  f"nothing checked", file=sys.stderr)
-        return 0
-    paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
+        return run_calibrate("negation_density", calibrate, parser)
     try:
-        per_file = survey([Document.parse(p) for p in paths], parser)
+        per_file = survey([Document.parse(p) for p in prose_paths(args)],
+                          parser)
     except ParserUnavailable as exc:
-        print(f"negation_density: parser unavailable ({exc}); "
-              f"nothing checked", file=sys.stderr)
+        report_unavailable("negation_density", exc)
         return 0
     listed = [s for stats in per_file for s in stats
               if s.total >= args.threshold]

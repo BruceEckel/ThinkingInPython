@@ -22,7 +22,9 @@ with the other parse-based checks: `tools/parsed_prose.py` runs
 pins a Python that spaCy has no wheel for) and caches the result under
 `build/parses/`, and this module applies its rule to the token table in
 pure Python. When the parser cannot start (no network on a first run,
-no `uv`), the check says so and exits 0, since it is report-only.
+no `uv`), the check says so and exits 0, since it is report-only. The
+baseline file, the report, and the command line are
+`tools/parse_check.py`'s, shared with the other parse-based checks.
 
 The check reads each paragraph's prose through the same reader as
 `tools/stranded_prepositions.py`: fenced listings, headings, block
@@ -75,25 +77,25 @@ read badly, and the rest seeded the baseline.
 """
 
 import argparse
-import sys
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Final
-from tools.config import DATA_DIR, ROOT
+from tools import parse_check
+from tools.config import DATA_DIR
 from tools.markdown import Document
+from tools.parse_check import build_arg_parser, key, parse_args, run
 from tools.parsed_prose import (
     Paragraph,
     Parser,
-    ParserUnavailable,
+    ParserUnavailable,  # noqa: F401
     Sentence,
     children,
     parse,
     parsed,
     subtree,
 )
-from tools.repo import add_paths_arg, md_files
 from tools.report import Finding
-from tools.stranded_prepositions import display
+from tools.stranded_prepositions import display  # noqa: F401
 
 GAP: Final = 9
 """Fewest words between the subject head and its verb for a hit."""
@@ -164,80 +166,30 @@ def find(docs: list[Document], parser: Parser = parse,
                     yield Finding(doc.path, line, message(hit))
 
 
-def key(shown: str, text: str) -> str:
-    """The baseline line for a hit: path and message, no line number."""
-    return f"{shown}\t{' '.join(text.split())}"
-
-
 def load_baseline(path: Path | None = None) -> set[str]:
     """The accepted keys, without comments or blank lines."""
-    path = path or BASELINE
-    if not path.exists():
-        return set()
-    return {
-        line for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
-    }
+    return parse_check.load_baseline(path or BASELINE)
 
 
 def write_baseline(entries: set[str], path: Path | None = None) -> None:
     """The header plus the sorted entries, with LF line endings."""
-    path = path or BASELINE
-    body = "".join(f"{entry}\n" for entry in sorted(entries))
-    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+    parse_check.write_baseline(entries, path or BASELINE, HEADER)
 
 
-def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
-    ap = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    add_paths_arg(ap)
+def add_gap_arg(ap: argparse.ArgumentParser) -> None:
     ap.add_argument("--gap", type=int, default=GAP,
                     help=f"fewest words between subject and verb "
                          f"(default {GAP})")
-    ap.add_argument("--fail", action="store_true",
-                    help="exit 1 when any NEW sentence is found")
-    ap.add_argument("--all", action="store_true",
-                    help="print every hit, marked NEW or accepted")
-    ap.add_argument("--accept", action="store_true",
-                    help="add the NEW hits to the baseline and drop "
-                         "stale entries")
-    args = ap.parse_args(argv)
-    if args.paths and args.accept:
-        ap.error("--accept rewrites the whole baseline; give no paths")
-    paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
-    shown_paths = {display(p) for p in paths}
-    try:
-        findings = list(find([Document.parse(p) for p in paths],
-                             parser, args.gap))
-    except ParserUnavailable as exc:
-        print(f"subject_gap: parser unavailable ({exc}); nothing checked",
-              file=sys.stderr)
-        return 0
-    found = sorted({(display(f.path), f.line, f.message) for f in findings})
-    baseline = load_baseline()
-    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
-    current = {key(shown, text) for shown, _, text in found}
-    new = [(s, n, t) for s, n, t in found if key(s, t) not in baseline]
-    stale = sorted(scope - current)
-    if args.accept:
-        added = {key(s, t) for s, _, t in new}
-        write_baseline((baseline - set(stale)) | added)
-        print(f"Baseline: added {len(added)}, dropped {len(stale)} "
-              f"stale, in {display(BASELINE)}")
-        return 0
-    for shown, line, text in found:
-        accepted = key(shown, text) in baseline
-        if accepted and not args.all:
-            continue
-        mark = "accepted" if accepted else "NEW"
-        print(f"{mark:8} {shown}:{line}: {text}")
-    for entry in stale:
-        shown, text = entry.split("\t", 1)
-        print(f"stale    {shown}: {text}")
-    print(f"{len(new)} new, {len(found) - len(new)} accepted"
-          + (f", {len(stale)} stale" if stale else ""))
-    return 1 if args.fail and new else 0
+
+
+def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
+    ap = build_arg_parser(
+        __doc__, fail_help="exit 1 when any NEW sentence is found",
+        leading=add_gap_arg)
+    args = parse_args(ap, argv)
+    return run("subject_gap", args,
+               lambda docs: find(docs, parser, args.gap),
+               baseline=BASELINE, header=HEADER)
 
 
 if __name__ == "__main__":

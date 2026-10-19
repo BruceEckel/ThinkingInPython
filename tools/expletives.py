@@ -75,7 +75,9 @@ matches no hit any more, and ends with a summary (`N new, M accepted`).
 `--all` prints every hit, marked NEW or accepted. `--accept` appends
 every NEW hit to the baseline and drops the stale entries. A run given
 paths compares against those files' entries alone, and refuses
-`--accept`.
+`--accept`. The baseline file, the report, the command line, and the
+edit-pairs and Vale comparisons are `tools/parse_check.py`'s, shared
+with the other parse-based checks.
 
 `--calibrate` prints three things. First, against
 `tools/data/edit_pairs.json` (the sentences the author rewrote): per
@@ -101,32 +103,38 @@ and stops.
     uv run tip expletives-accept
 """
 
-import argparse
-import json
-import sys
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Final, NamedTuple
-from tools.config import DATA_DIR, ROOT
+from tools import parse_check
+from tools.config import DATA_DIR
 from tools.markdown import Document
+from tools.parse_check import (
+    build_arg_parser,
+    calibrate_edit_pairs,
+    calibrate_vale,
+    first_line,
+    inside_quotes,
+    key,  # noqa: F401
+    parse_args,
+    run,
+    run_calibrate,
+    sentence_text,
+    skipped,
+)
 from tools.parsed_prose import (
     Paragraph,
     Parser,
-    ParserUnavailable,
     Sentence,
     Token,
     children,
     parse,
     parsed,
 )
-from tools.passive_voice import Unit, first_line, last_line, vale_alerts
-from tools.repo import add_paths_arg, md_files
 from tools.report import Finding
-from tools.sentence_shapes import sentence_text, skipped
-from tools.stranded_prepositions import display
+from tools.stranded_prepositions import display  # noqa: F401
 
 BASELINE: Final = DATA_DIR / "expletives_baseline.txt"
-EDIT_PAIRS: Final = DATA_DIR / "edit_pairs.json"
 HEADER: Final = (
     "# Expletive frames a human read and judged keeps: a quotation\n"
     "# the quote count missed, a place adverb the parser mislabeled,\n"
@@ -186,7 +194,7 @@ def verb_group(verb: Token, sentence: Sentence) -> str:
 
 def quoted(text: str, token: Token) -> bool:
     """Is the token inside double quotes: an odd `"` count before it?"""
-    return text[:token.idx].count('"') % 2 == 1
+    return inside_quotes(text, token.idx)
 
 
 def frames(paragraph: Paragraph, sentence: Sentence,
@@ -236,27 +244,14 @@ def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
                               message(paragraph, hit))
 
 
-def key(shown: str, text: str) -> str:
-    """The baseline line for a hit: path and message, no line number."""
-    return f"{shown}\t{' '.join(text.split())}"
-
-
 def load_baseline(path: Path | None = None) -> set[str]:
     """The accepted keys, without comments or blank lines."""
-    path = path or BASELINE
-    if not path.exists():
-        return set()
-    return {
-        line for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
-    }
+    return parse_check.load_baseline(path or BASELINE)
 
 
 def write_baseline(entries: set[str], path: Path | None = None) -> None:
     """The header plus the sorted entries, with LF line endings."""
-    path = path or BASELINE
-    body = "".join(f"{entry}\n" for entry in sorted(entries))
-    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+    parse_check.write_baseline(entries, path or BASELINE, HEADER)
 
 
 EXAMPLES: Final[tuple[tuple[str, str | None], ...]] = (
@@ -273,66 +268,9 @@ EXAMPLES: Final[tuple[tuple[str, str | None], ...]] = (
 """Calibration sentences and the label each should give (None: no hit)."""
 
 
-def calibrate_pairs(parser: Parser) -> None:
-    """Per label, the edit pairs where it fires before, after, or both."""
-    pairs: dict[str, dict[str, str]] = json.loads(
-        EDIT_PAIRS.read_text(encoding="utf-8"))
-    docs: list[Document] = []
-    for ident, record in pairs.items():
-        previous = record.get("previous", "").strip()
-        docs.append(Document.from_text(
-            previous or "x", Path(f"calibrate/{ident}.prev.md")))
-        for side in ("before", "after"):
-            text = f"{previous} {record[side]}" if previous else record[side]
-            docs.append(Document.from_text(
-                text, Path(f"calibrate/{ident}.{side}.md")))
-    results = parsed(docs, parser, use_cache=False)
-    skip: dict[str, int] = {}
-    sides: dict[str, set[str]] = {}
-    for doc, paras in zip(docs, results, strict=True):
-        name = doc.path.name
-        if name.endswith(".prev.md"):
-            ident = name.removesuffix(".prev.md")
-            has_previous = bool(pairs[ident].get("previous", "").strip())
-            skip[ident] = (sum(len(p.sentences) for p in paras)
-                           if has_previous else 0)
-    for doc, paras in zip(docs, results, strict=True):
-        name = doc.path.name
-        if name.endswith(".prev.md"):
-            continue
-        ident = name.rsplit(".", 2)[0]
-        sides[name] = {h.label for p in paras for h in hits(p)
-                       if h.index >= skip[ident]}
-    totals: dict[str, tuple[int, int, int]] = {}
-    for label, meaning in LABELS.items():
-        before_only: list[str] = []
-        after_only: list[str] = []
-        both: list[str] = []
-        for ident in pairs:
-            b = label in sides[f"{ident}.before.md"]
-            a = label in sides[f"{ident}.after.md"]
-            if b and a:
-                both.append(ident)
-            elif b:
-                before_only.append(ident)
-            elif a:
-                after_only.append(ident)
-        print(f"== {label}: {meaning} ==")
-        for title, ids in (("before only", before_only),
-                           ("both", both), ("after only", after_only)):
-            for ident in ids:
-                print(f"{title}: {ident}")
-                print(f"  previous: {pairs[ident].get('previous', '')}")
-                print(f"  before:   {pairs[ident]['before']}")
-                print(f"  after:    {pairs[ident]['after']}")
-        totals[label] = (len(before_only), len(both), len(after_only))
-        print(f"{label}: before-only {len(before_only)}, "
-              f"both {len(both)}, after-only {len(after_only)}, "
-              f"of {len(pairs)} pairs\n")
-    summary = "; ".join(f"{label} {b}/{n}/{a}"
-                        for label, (b, n, a) in totals.items())
-    print(f"Summary (before-only/both/after-only, of {len(pairs)} "
-          f"pairs): {summary}\n")
+def labels_of(paras: list[Paragraph], skip: int = 0) -> set[str]:
+    """The labels earned by sentences after the first `skip`."""
+    return {h.label for p in paras for h in hits(p) if h.index >= skip}
 
 
 def calibrate_examples(parser: Parser) -> None:
@@ -349,138 +287,32 @@ def calibrate_examples(parser: Parser) -> None:
     print()
 
 
-def calibrate_vale(parser: Parser) -> None:
-    """CONFIRMED, VALE-ONLY, and PARSE-ONLY against write-good.ThereIs."""
-    alerts = vale_alerts()
-    if alerts is None:
-        return
-    names = {a["Check"] for found in alerts.values() for a in found}
-    kept = {path: [a for a in found if a["Check"] == VALE_CHECK]
-            for path, found in alerts.items()}
-    if not any(kept.values()):
-        print(f"vale: no {VALE_CHECK} alerts; checks seen: "
-              f"{sorted(names)}")
-        return
-    paths = md_files([ROOT / "Chapters", ROOT / "Solutions"])
-    docs = [Document.parse(p) for p in paths]
-    mine: dict[str, list[Unit]] = {}
-    sentences: dict[str, list[Unit]] = {}
-    for doc, paras in zip(docs, parsed(docs, parser), strict=True):
-        shown = display(doc.path).replace("\\", "/")
-        for paragraph in paras:
-            for sentence in paragraph.sentences:
-                sentences.setdefault(shown, []).append(Unit(
-                    first_line(paragraph, sentence),
-                    last_line(paragraph, sentence),
-                    sentence_text(paragraph, sentence)))
-            for hit in hits(paragraph):
-                if hit.label != "THERE":
-                    continue
-                mine.setdefault(shown, []).append(Unit(
-                    first_line(paragraph, hit.sentence),
-                    last_line(paragraph, hit.sentence),
-                    message(paragraph, hit)))
-    confirmed: list[str] = []
-    vale_only: list[str] = []
-    parse_only: list[str] = []
-    matched: set[tuple[str, int, int, str]] = set()
-    for path, found in kept.items():
-        units = mine.get(path, [])
-        for alert in found:
-            line = alert["Line"]
-            hit_units = [u for u in units if u.first <= line <= u.last]
-            if hit_units:
-                matched.update((path, u.first, u.last, u.text)
-                               for u in hit_units)
-                confirmed.append(f"{path}:{line}: {alert['Match']!r}: "
-                                 f"{hit_units[0].text}")
-                continue
-            near = [u for u in sentences.get(path, [])
-                    if u.first <= line <= u.last]
-            text = near[0].text if near else "(sentence not found)"
-            vale_only.append(f"{path}:{line}: {alert['Match']!r}: {text}")
-    for path, units in mine.items():
-        for u in units:
-            if (path, u.first, u.last, u.text) not in matched:
-                parse_only.append(f"{path}:{u.first}: {u.text}")
-    for title, items in (("CONFIRMED", confirmed), ("VALE-ONLY", vale_only),
-                         ("PARSE-ONLY", parse_only)):
-        print(f"== {title} ({len(items)}) ==")
-        for item in items:
-            print(item)
-        print()
-    total = sum(len(u) for u in mine.values())
-    print(f"Vale {sum(len(v) for v in kept.values())} alerts, parse "
-          f"{total} [THERE] hits: {len(confirmed)} confirmed alerts, "
-          f"{len(vale_only)} vale-only, {len(parse_only)} parse-only")
+def there_hits(paragraph: Paragraph) -> Iterator[tuple[Sentence, str]]:
+    """(sentence, message) for each [THERE] hit, which Vale also finds."""
+    for hit in hits(paragraph):
+        if hit.label == "THERE":
+            yield hit.sentence, message(paragraph, hit)
 
 
 def calibrate(parser: Parser = parse) -> None:
     """All three comparisons: edit pairs, examples, then Vale."""
-    calibrate_pairs(parser)
+    calibrate_edit_pairs(parser, LABELS, labels_of, previous=True,
+                         summary=True)
     calibrate_examples(parser)
-    calibrate_vale(parser)
+    calibrate_vale(parser, VALE_CHECK, there_hits, "[THERE] hits")
 
 
 def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
-    ap = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    add_paths_arg(ap)
-    ap.add_argument("--fail", action="store_true",
-                    help="exit 1 when any NEW expletive is found")
-    ap.add_argument("--all", action="store_true",
-                    help="print every hit, marked NEW or accepted")
-    ap.add_argument("--accept", action="store_true",
-                    help="add the NEW hits to the baseline and drop "
-                         "stale entries")
-    ap.add_argument("--calibrate", action="store_true",
-                    help="compare with tools/data/edit_pairs.json, run "
-                         "the built-in examples, and compare with Vale's "
-                         "write-good.ThereIs")
-    args = ap.parse_args(argv)
-    if args.paths and args.accept:
-        ap.error("--accept rewrites the whole baseline; give no paths")
+    ap = build_arg_parser(
+        __doc__, fail_help="exit 1 when any NEW expletive is found",
+        calibrate_help="compare with tools/data/edit_pairs.json, run "
+                       "the built-in examples, and compare with Vale's "
+                       "write-good.ThereIs")
+    args = parse_args(ap, argv)
     if args.calibrate:
-        try:
-            calibrate(parser)
-        except ParserUnavailable as exc:
-            print(f"expletives: parser unavailable ({exc}); "
-                  f"nothing checked", file=sys.stderr)
-        return 0
-    paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
-    shown_paths = {display(p) for p in paths}
-    try:
-        findings = list(find([Document.parse(p) for p in paths], parser))
-    except ParserUnavailable as exc:
-        print(f"expletives: parser unavailable ({exc}); "
-              f"nothing checked", file=sys.stderr)
-        return 0
-    found = sorted(
-        {(display(f.path), f.line, f.message) for f in findings})
-    baseline = load_baseline()
-    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
-    current = {key(shown, text) for shown, _, text in found}
-    new = [(s, n, t) for s, n, t in found if key(s, t) not in baseline]
-    stale = sorted(scope - current)
-    if args.accept:
-        added = {key(s, t) for s, _, t in new}
-        write_baseline((baseline - set(stale)) | added)
-        print(f"Baseline: added {len(added)}, dropped {len(stale)} "
-              f"stale, in {display(BASELINE)}")
-        return 0
-    for shown, line, text in found:
-        accepted = key(shown, text) in baseline
-        if accepted and not args.all:
-            continue
-        mark = "accepted" if accepted else "NEW"
-        print(f"{mark:8} {shown}:{line}: {text}")
-    for entry in stale:
-        shown, text = entry.split("\t", 1)
-        print(f"stale    {shown}: {text}")
-    print(f"{len(new)} new, {len(found) - len(new)} accepted"
-          + (f", {len(stale)} stale" if stale else ""))
-    return 1 if args.fail and new else 0
+        return run_calibrate("expletives", calibrate, parser)
+    return run("expletives", args, lambda docs: find(docs, parser),
+               baseline=BASELINE, header=HEADER)
 
 
 if __name__ == "__main__":

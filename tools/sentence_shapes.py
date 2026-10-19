@@ -75,6 +75,9 @@ check says so and exits 0.
 Report-only: it prints the hits and exits 0, because the parser is a
 statistical model and no gate runs it. `--fail` exits 1 when a NEW hit
 is found. It runs inside `tip prose` and alone as `tip sentence-shapes`.
+The baseline file, the report, the command line, and the edit-pairs half
+of `--calibrate` are `tools/parse_check.py`'s, shared with the other
+parse-based checks.
 
 A hit prints as `path:line: [RULE] sentence`, the line holding the
 sentence's first character. Every hit is read once by a human, and the
@@ -125,18 +128,25 @@ or introduces a list whose items hold relative clauses.
     uv run tip sentence-shapes-accept
 """
 
-import argparse
-import json
-import sys
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Final
-from tools.config import DATA_DIR, ROOT
+from tools import parse_check
+from tools.config import DATA_DIR
 from tools.markdown import Document
+from tools.parse_check import (
+    build_arg_parser,
+    calibrate_edit_pairs,
+    key,  # noqa: F401
+    parse_args,
+    run,
+    run_calibrate,
+    sentence_text,
+    skipped,
+)
 from tools.parsed_prose import (
     Paragraph,
     Parser,
-    ParserUnavailable,
     Sentence,
     Token,
     children,
@@ -148,12 +158,10 @@ from tools.parsed_prose import (
     subject_of,
     subtree,
 )
-from tools.repo import add_paths_arg, md_files
 from tools.report import Finding
-from tools.stranded_prepositions import clean, display
+from tools.stranded_prepositions import clean, display  # noqa: F401
 
 BASELINE: Final = DATA_DIR / "sentence_shapes_baseline.txt"
-EDIT_PAIRS: Final = DATA_DIR / "edit_pairs.json"
 HEADER: Final = (
     "# Sentence-shape hits a human read and judged keeps: a colon\n"
     "# that restates in other words, an \"and\" that is additive, an\n"
@@ -166,7 +174,6 @@ HEADER: Final = (
     "# `tip sentence-shapes` before accepting.\n"
     "# See tools/sentence_shapes.py.\n"
 )
-SKIPPED_LABELS: Final = ("Hint:", "Done when:")
 BARE_PRONOUNS: Final = frozenset(
     "it they he she this that which who these those".split())
 SUBJECT_DEPS: Final = ("nsubj", "nsubjpass")
@@ -387,11 +394,6 @@ def colon_clause(sentence: Sentence) -> str | None:
     return found
 
 
-def skipped(paragraph: Paragraph) -> bool:
-    """Is this a Solutions label paragraph (Hint: or Done when:)?"""
-    return paragraph.text.startswith(SKIPPED_LABELS)
-
-
 def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph."""
     if skipped(paragraph):
@@ -405,11 +407,6 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
         label = colon_clause(sentence)
         if label:
             yield label, sentence
-
-
-def sentence_text(paragraph: Paragraph, sentence: Sentence) -> str:
-    """The sentence's text from the paragraph, whitespace normalized."""
-    return " ".join(paragraph.text[sentence.start:sentence.end].split())
 
 
 def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
@@ -428,72 +425,29 @@ def rule_of(message: str) -> str:
     return message[1:message.index("]")]
 
 
-def key(shown: str, text: str) -> str:
-    """The baseline line for a hit: path and message, no line number."""
-    return f"{shown}\t{' '.join(text.split())}"
-
-
 def load_baseline(path: Path | None = None) -> set[str]:
     """The accepted keys, without comments or blank lines."""
-    path = path or BASELINE
-    if not path.exists():
-        return set()
-    return {
-        line for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
-    }
+    return parse_check.load_baseline(path or BASELINE)
 
 
 def write_baseline(entries: set[str], path: Path | None = None) -> None:
     """The header plus the sorted entries, with LF line endings."""
-    path = path or BASELINE
-    body = "".join(f"{entry}\n" for entry in sorted(entries))
-    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+    parse_check.write_baseline(entries, path or BASELINE, HEADER)
 
 
-def labels_of(paras: list[Paragraph]) -> set[str]:
+def labels_of(paras: list[Paragraph], skip: int = 0) -> set[str]:
     """The rule labels any paragraph of a text earns."""
     return {rule for p in paras for rule, _ in shapes(p)}
 
 
 def calibrate(parser: Parser = parse) -> None:
     """Run the rules over the recorded edit pairs and the examples."""
-    pairs: dict[str, dict[str, str]] = json.loads(
-        EDIT_PAIRS.read_text(encoding="utf-8"))
-    docs: list[Document] = []
-    for ident, record in pairs.items():
-        for side in ("before", "after"):
-            docs.append(Document.from_text(
-                record[side], Path(f"calibrate/{ident}.{side}.md")))
-    for number, (_, text, _) in enumerate(CALIBRATION_EXAMPLES):
-        docs.append(Document.from_text(
-            clean(text), Path(f"calibrate/example{number}.md")))
-    results = parsed(docs, parser, use_cache=False)
-    sides = {doc.path.name: labels_of(paras)
-             for doc, paras in zip(docs, results, strict=True)}
-    for rule in ALL_RULES:
-        before_only: list[str] = []
-        after_only: list[str] = []
-        both: list[str] = []
-        for ident in pairs:
-            b = rule in sides[f"{ident}.before.md"]
-            a = rule in sides[f"{ident}.after.md"]
-            if b and a:
-                both.append(ident)
-            elif b:
-                before_only.append(ident)
-            elif a:
-                after_only.append(ident)
-        print(f"== {rule} ==")
-        for title, ids in (("before only", before_only),
-                           ("both", both), ("after only", after_only)):
-            for ident in ids:
-                print(f"{title}: {ident}")
-                print(f"  before: {pairs[ident]['before']}")
-                print(f"  after:  {pairs[ident]['after']}")
-        print(f"{rule}: before-only {len(before_only)}, "
-              f"both {len(both)}, after-only {len(after_only)}, "
-              f"of {len(pairs)} pairs\n")
+    docs = [Document.from_text(clean(text),
+                               Path(f"calibrate/example{number}.md"))
+            for number, (_, text, _) in enumerate(CALIBRATION_EXAMPLES)]
+    sides = calibrate_edit_pairs(
+        parser, dict.fromkeys(ALL_RULES, ""), labels_of,
+        previous=False, meanings=False, extra_docs=docs)
     print("== built-in examples ==")
     for number, (rule, text, should) in enumerate(CALIBRATION_EXAMPLES):
         fired = rule in sides[f"example{number}.md"]
@@ -503,72 +457,18 @@ def calibrate(parser: Parser = parse) -> None:
 
 
 def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
-    ap = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    add_paths_arg(ap)
-    ap.add_argument("--fail", action="store_true",
-                    help="exit 1 when any NEW sentence is found")
-    ap.add_argument("--all", action="store_true",
-                    help="print every hit, marked NEW or accepted")
-    ap.add_argument("--accept", action="store_true",
-                    help="add the NEW hits to the baseline and drop "
-                         "stale entries")
-    ap.add_argument("--survey", action="store_true",
-                    help="also print the survey rules (AND, COLON), "
-                         "never baselined or counted")
-    ap.add_argument("--calibrate", action="store_true",
-                    help="run the rules over tools/data/edit_pairs.json "
-                         "and the built-in examples")
-    args = ap.parse_args(argv)
-    if args.paths and args.accept:
-        ap.error("--accept rewrites the whole baseline; give no paths")
+    ap = build_arg_parser(
+        __doc__, fail_help="exit 1 when any NEW sentence is found",
+        survey_help="also print the survey rules (AND, COLON), "
+                    "never baselined or counted",
+        calibrate_help="run the rules over tools/data/edit_pairs.json "
+                       "and the built-in examples")
+    args = parse_args(ap, argv)
     if args.calibrate:
-        try:
-            calibrate(parser)
-        except ParserUnavailable as exc:
-            print(f"sentence_shapes: parser unavailable ({exc}); "
-                  f"nothing checked", file=sys.stderr)
-        return 0
-    paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
-    shown_paths = {display(p) for p in paths}
-    try:
-        findings = list(find([Document.parse(p) for p in paths], parser))
-    except ParserUnavailable as exc:
-        print(f"sentence_shapes: parser unavailable ({exc}); "
-              f"nothing checked", file=sys.stderr)
-        return 0
-    everything = sorted(
-        {(display(f.path), f.line, f.message) for f in findings})
-    survey = [h for h in everything if rule_of(h[2]) in SURVEY_RULES]
-    found = [h for h in everything if rule_of(h[2]) in RULES]
-    baseline = load_baseline()
-    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
-    current = {key(shown, text) for shown, _, text in found}
-    new = [(s, n, t) for s, n, t in found if key(s, t) not in baseline]
-    stale = sorted(scope - current)
-    if args.accept:
-        added = {key(s, t) for s, _, t in new}
-        write_baseline((baseline - set(stale)) | added)
-        print(f"Baseline: added {len(added)}, dropped {len(stale)} "
-              f"stale, in {display(BASELINE)}")
-        return 0
-    for shown, line, text in found:
-        accepted = key(shown, text) in baseline
-        if accepted and not args.all:
-            continue
-        mark = "accepted" if accepted else "NEW"
-        print(f"{mark:8} {shown}:{line}: {text}")
-    for entry in stale:
-        shown, text = entry.split("\t", 1)
-        print(f"stale    {shown}: {text}")
-    if args.survey:
-        for shown, line, text in survey:
-            print(f"survey   {shown}:{line}: {text}")
-        print(f"{len(survey)} survey")
-    print(f"{len(new)} new, {len(found) - len(new)} accepted"
-          + (f", {len(stale)} stale" if stale else ""))
-    return 1 if args.fail and new else 0
+        return run_calibrate("sentence_shapes", calibrate, parser)
+    return run("sentence_shapes", args, lambda docs: find(docs, parser),
+               baseline=BASELINE, header=HEADER,
+               is_survey=lambda message: rule_of(message) in SURVEY_RULES)
 
 
 if __name__ == "__main__":

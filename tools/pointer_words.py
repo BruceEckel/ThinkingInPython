@@ -57,6 +57,8 @@ is the author writing "This governs" himself. Every hit is therefore a
 judgment the antecedents pass makes, and nothing is accepted or
 remembered. The check prints every hit and exits 0 (`--fail` exits 1
 when there is any hit, for scripting). It is not part of `tip prose`.
+The command line and the edit-pairs half of `--calibrate` are
+`tools/parse_check.py`'s, shared with the other parse-based checks.
 
 The intended use is `tip pointers CH=NN` at the start of an
 antecedents pass. Read each line as a mechanical candidate, with the
@@ -82,14 +84,21 @@ should give.
     uv run tip pointers CH=31
 """
 
-import argparse
-import json
-import sys
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Final, NamedTuple
-from tools.config import DATA_DIR, ROOT
 from tools.markdown import Document
+from tools.parse_check import (
+    build_arg_parser,
+    calibrate_edit_pairs,
+    first_line,
+    parse_args,
+    prose_paths,
+    report_unavailable,
+    run_calibrate,
+    sentence_text,
+    skipped,
+)
 from tools.parsed_prose import (
     Paragraph,
     Parser,
@@ -100,13 +109,9 @@ from tools.parsed_prose import (
     parse,
     parsed,
 )
-from tools.passive_voice import first_line
-from tools.repo import add_paths_arg, md_files
 from tools.report import Finding
-from tools.sentence_shapes import sentence_text, skipped
 from tools.stranded_prepositions import display
 
-EDIT_PAIRS: Final = DATA_DIR / "edit_pairs.json"
 LABELS: Final = {
     "THIS": "sentence opens with a demonstrative pronoun",
     "IT": "sentence opens with it/they and the target is ambiguous",
@@ -249,60 +254,14 @@ EXAMPLES: Final[tuple[tuple[str, str], ...]] = (
 """Calibration sentences and the result each should give."""
 
 
+def labels_of(paras: list[Paragraph], skip: int = 0) -> set[str]:
+    """The labels earned by sentences after the first `skip`."""
+    return {h.label for p in paras for h in hits(p) if h.index >= skip}
+
+
 def calibrate(parser: Parser = parse) -> None:
     """Per label, the edit pairs where it fires before, after, or both."""
-    pairs: dict[str, dict[str, str]] = json.loads(
-        EDIT_PAIRS.read_text(encoding="utf-8"))
-    docs: list[Document] = []
-    for ident, record in pairs.items():
-        previous = record.get("previous", "").strip()
-        docs.append(Document.from_text(
-            previous or "x", Path(f"calibrate/{ident}.prev.md")))
-        for side in ("before", "after"):
-            text = f"{previous} {record[side]}" if previous else record[side]
-            docs.append(Document.from_text(
-                text, Path(f"calibrate/{ident}.{side}.md")))
-    results = parsed(docs, parser, use_cache=False)
-    skip: dict[str, int] = {}
-    sides: dict[str, set[str]] = {}
-    for doc, paras in zip(docs, results, strict=True):
-        name = doc.path.name
-        if name.endswith(".prev.md"):
-            ident = name.removesuffix(".prev.md")
-            has_previous = bool(pairs[ident].get("previous", "").strip())
-            skip[ident] = (sum(len(p.sentences) for p in paras)
-                           if has_previous else 0)
-    for doc, paras in zip(docs, results, strict=True):
-        name = doc.path.name
-        if name.endswith(".prev.md"):
-            continue
-        ident = name.rsplit(".", 2)[0]
-        sides[name] = {h.label for p in paras for h in hits(p)
-                       if h.index >= skip[ident]}
-    for label, meaning in LABELS.items():
-        before_only: list[str] = []
-        after_only: list[str] = []
-        both: list[str] = []
-        for ident in pairs:
-            b = label in sides[f"{ident}.before.md"]
-            a = label in sides[f"{ident}.after.md"]
-            if b and a:
-                both.append(ident)
-            elif b:
-                before_only.append(ident)
-            elif a:
-                after_only.append(ident)
-        print(f"== {label}: {meaning} ==")
-        for title, ids in (("before only", before_only),
-                           ("both", both), ("after only", after_only)):
-            for ident in ids:
-                print(f"{title}: {ident}")
-                print(f"  previous: {pairs[ident].get('previous', '')}")
-                print(f"  before:   {pairs[ident]['before']}")
-                print(f"  after:    {pairs[ident]['after']}")
-        print(f"{label}: before-only {len(before_only)}, "
-              f"both {len(both)}, after-only {len(after_only)}, "
-              f"of {len(pairs)} pairs\n")
+    calibrate_edit_pairs(parser, LABELS, labels_of, previous=True)
     print("== built-in examples ==")
     example_docs = [Document.from_text(text, Path(f"calibrate/ex{n}.md"))
                     for n, (text, _) in enumerate(EXAMPLES)]
@@ -317,29 +276,19 @@ def calibrate(parser: Parser = parse) -> None:
 
 
 def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
-    ap = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    add_paths_arg(ap)
-    ap.add_argument("--fail", action="store_true",
-                    help="exit 1 when any pointer sentence is found")
-    ap.add_argument("--calibrate", action="store_true",
-                    help="compare with tools/data/edit_pairs.json and "
-                         "run the built-in examples")
-    args = ap.parse_args(argv)
+    ap = build_arg_parser(
+        __doc__, baselined=False,
+        fail_help="exit 1 when any pointer sentence is found",
+        calibrate_help="compare with tools/data/edit_pairs.json and "
+                       "run the built-in examples")
+    args = parse_args(ap, argv)
     if args.calibrate:
-        try:
-            calibrate(parser)
-        except ParserUnavailable as exc:
-            print(f"pointer_words: parser unavailable ({exc}); "
-                  f"nothing checked", file=sys.stderr)
-        return 0
-    paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
+        return run_calibrate("pointer_words", calibrate, parser)
     try:
-        findings = list(find([Document.parse(p) for p in paths], parser))
+        findings = list(find([Document.parse(p) for p in prose_paths(args)],
+                             parser))
     except ParserUnavailable as exc:
-        print(f"pointer_words: parser unavailable ({exc}); "
-              f"nothing checked", file=sys.stderr)
+        report_unavailable("pointer_words", exc)
         return 0
     found = sorted(
         {(display(f.path), f.line, f.message) for f in findings})

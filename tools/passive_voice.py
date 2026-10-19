@@ -52,7 +52,9 @@ matches no hit any more, and ends with a summary (`N new, M accepted`).
 `--all` prints every hit, marked NEW or accepted. `--accept` appends
 every NEW hit to the baseline and drops the stale entries. A run given
 paths compares against those files' entries alone, and refuses
-`--accept`.
+`--accept`. The baseline file, the report, the command line, and the
+edit-pairs and Vale comparisons are `tools/parse_check.py`'s, shared
+with the other parse-based checks.
 
 `--calibrate` prints two comparisons. First, against
 `tools/data/edit_pairs.json` (the sentences the author rewrote): per
@@ -74,33 +76,37 @@ When `vale` is missing, the second comparison prints one line and stops.
     uv run tip passive-accept
 """
 
-import argparse
-import json
-import shutil
-import subprocess
-import sys
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Final, NamedTuple
-from tools.config import DATA_DIR, ROOT
+from typing import Final, NamedTuple
+from tools import parse_check
+from tools.config import DATA_DIR
 from tools.markdown import Document
+from tools.parse_check import (
+    build_arg_parser,
+    calibrate_edit_pairs,
+    calibrate_vale,
+    first_line,
+    key,  # noqa: F401
+    parse_args,
+    run,
+    run_calibrate,
+    sentence_text,
+    skipped,
+)
 from tools.parsed_prose import (
     Paragraph,
     Parser,
-    ParserUnavailable,
     Sentence,
     Token,
     children,
     parse,
     parsed,
 )
-from tools.repo import add_paths_arg, md_files
 from tools.report import Finding
-from tools.sentence_shapes import sentence_text, skipped
-from tools.stranded_prepositions import display
+from tools.stranded_prepositions import display  # noqa: F401
 
 BASELINE: Final = DATA_DIR / "passive_voice_baseline.txt"
-EDIT_PAIRS: Final = DATA_DIR / "edit_pairs.json"
 HEADER: Final = (
     "# Passive clauses a human read and judged keeps: an actor that\n"
     "# is unknown or irrelevant, a quoted diagnostic, a naming\n"
@@ -186,16 +192,6 @@ def message(paragraph: Paragraph, hit: Hit) -> str:
             + sentence_text(paragraph, hit.sentence))
 
 
-def first_line(paragraph: Paragraph, sentence: Sentence) -> int:
-    lines = paragraph.lines
-    return lines[min(sentence.start, len(lines) - 1)]
-
-
-def last_line(paragraph: Paragraph, sentence: Sentence) -> int:
-    lines = paragraph.lines
-    return lines[min(max(sentence.end - 1, 0), len(lines) - 1)]
-
-
 def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
     """A finding per passive clause."""
     for doc, paras in zip(docs, parsed(docs, parser), strict=True):
@@ -210,217 +206,44 @@ def label_of(text: str) -> str:
     return text[1:text.index("]")]
 
 
-def key(shown: str, text: str) -> str:
-    """The baseline line for a hit: path and message, no line number."""
-    return f"{shown}\t{' '.join(text.split())}"
+def labels_of(paras: list[Paragraph], skip: int = 0) -> set[str]:
+    """The labels any paragraph of a text earns."""
+    return {h.label for p in paras for h in hits(p)}
 
 
 def load_baseline(path: Path | None = None) -> set[str]:
     """The accepted keys, without comments or blank lines."""
-    path = path or BASELINE
-    if not path.exists():
-        return set()
-    return {
-        line for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
-    }
+    return parse_check.load_baseline(path or BASELINE)
 
 
 def write_baseline(entries: set[str], path: Path | None = None) -> None:
     """The header plus the sorted entries, with LF line endings."""
-    path = path or BASELINE
-    body = "".join(f"{entry}\n" for entry in sorted(entries))
-    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+    parse_check.write_baseline(entries, path or BASELINE, HEADER)
 
 
-def calibrate_pairs(parser: Parser) -> None:
-    """Per label, the edit pairs where it fires before, after, or both."""
-    pairs: dict[str, dict[str, str]] = json.loads(
-        EDIT_PAIRS.read_text(encoding="utf-8"))
-    docs = [Document.from_text(record[side],
-                               Path(f"calibrate/{ident}.{side}.md"))
-            for ident, record in pairs.items()
-            for side in ("before", "after")]
-    results = parsed(docs, parser, use_cache=False)
-    sides = {doc.path.name: {h.label for p in paras for h in hits(p)}
-             for doc, paras in zip(docs, results, strict=True)}
-    for label in LABELS:
-        before_only: list[str] = []
-        after_only: list[str] = []
-        both: list[str] = []
-        for ident in pairs:
-            b = label in sides[f"{ident}.before.md"]
-            a = label in sides[f"{ident}.after.md"]
-            if b and a:
-                both.append(ident)
-            elif b:
-                before_only.append(ident)
-            elif a:
-                after_only.append(ident)
-        print(f"== {label} ==")
-        for title, ids in (("before only", before_only),
-                           ("both", both), ("after only", after_only)):
-            for ident in ids:
-                print(f"{title}: {ident}")
-                print(f"  before: {pairs[ident]['before']}")
-                print(f"  after:  {pairs[ident]['after']}")
-        print(f"{label}: before-only {len(before_only)}, "
-              f"both {len(both)}, after-only {len(after_only)}, "
-              f"of {len(pairs)} pairs\n")
-
-
-def vale_alerts() -> dict[str, list[dict[str, Any]]] | None:
-    """Vale's JSON for the book, or None (after saying why)."""
-    if shutil.which("vale") is None:
-        print("vale: not on PATH; skipping the Vale comparison")
-        return None
-    done = subprocess.run(
-        ["vale", "--output=JSON", "Chapters", "Solutions"],
-        capture_output=True, text=True, encoding="utf-8", cwd=ROOT,
-        check=False)
-    try:
-        data = json.loads(done.stdout)
-    except ValueError:
-        print(f"vale: no JSON (exit {done.returncode}); skipping the "
-              f"Vale comparison")
-        return None
-    return {str(k).replace("\\", "/"): v for k, v in data.items()}
-
-
-class Unit(NamedTuple):
-    first: int
-    last: int
-    text: str
-
-
-def calibrate_vale(parser: Parser) -> None:
-    """CONFIRMED, VALE-ONLY, and PARSE-ONLY against write-good.Passive."""
-    alerts = vale_alerts()
-    if alerts is None:
-        return
-    names = {a["Check"] for found in alerts.values() for a in found}
-    kept = {path: [a for a in found if a["Check"] == VALE_CHECK]
-            for path, found in alerts.items()}
-    if not any(kept.values()):
-        print(f"vale: no {VALE_CHECK} alerts; checks seen: "
-              f"{sorted(names)}")
-        return
-    paths = md_files([ROOT / "Chapters", ROOT / "Solutions"])
-    docs = [Document.parse(p) for p in paths]
-    mine: dict[str, list[Unit]] = {}
-    sentences: dict[str, list[Unit]] = {}
-    for doc, paras in zip(docs, parsed(docs, parser), strict=True):
-        shown = display(doc.path).replace("\\", "/")
-        for paragraph in paras:
-            for sentence in paragraph.sentences:
-                sentences.setdefault(shown, []).append(Unit(
-                    first_line(paragraph, sentence),
-                    last_line(paragraph, sentence),
-                    sentence_text(paragraph, sentence)))
-            for hit in hits(paragraph):
-                mine.setdefault(shown, []).append(Unit(
-                    first_line(paragraph, hit.sentence),
-                    last_line(paragraph, hit.sentence),
-                    message(paragraph, hit)))
-    confirmed: list[str] = []
-    vale_only: list[str] = []
-    parse_only: list[str] = []
-    matched: set[tuple[str, int, int, str]] = set()
-    for path, found in kept.items():
-        units = mine.get(path, [])
-        for alert in found:
-            line = alert["Line"]
-            hit_units = [u for u in units if u.first <= line <= u.last]
-            if hit_units:
-                matched.update((path, u.first, u.last, u.text)
-                               for u in hit_units)
-                confirmed.append(f"{path}:{line}: {alert['Match']!r}: "
-                                 f"{hit_units[0].text}")
-                continue
-            near = [u for u in sentences.get(path, [])
-                    if u.first <= line <= u.last]
-            text = near[0].text if near else "(sentence not found)"
-            vale_only.append(f"{path}:{line}: {alert['Match']!r}: {text}")
-    for path, units in mine.items():
-        for u in units:
-            if (path, u.first, u.last, u.text) not in matched:
-                parse_only.append(f"{path}:{u.first}: {u.text}")
-    for title, items in (("CONFIRMED", confirmed), ("VALE-ONLY", vale_only),
-                         ("PARSE-ONLY", parse_only)):
-        print(f"== {title} ({len(items)}) ==")
-        for item in items:
-            print(item)
-        print()
-    total = sum(len(u) for u in mine.values())
-    print(f"Vale {sum(len(v) for v in kept.values())} alerts, parse "
-          f"{total} hits: {len(confirmed)} confirmed alerts, "
-          f"{len(vale_only)} vale-only, {len(parse_only)} parse-only")
+def vale_hits(paragraph: Paragraph) -> Iterator[tuple[Sentence, str]]:
+    """(sentence, message) for each hit, for the Vale comparison."""
+    for hit in hits(paragraph):
+        yield hit.sentence, message(paragraph, hit)
 
 
 def calibrate(parser: Parser = parse) -> None:
     """Both comparisons: edit pairs, then Vale."""
-    calibrate_pairs(parser)
-    calibrate_vale(parser)
+    calibrate_edit_pairs(parser, LABELS, labels_of,
+                         previous=False, meanings=False)
+    calibrate_vale(parser, VALE_CHECK, vale_hits)
 
 
 def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
-    ap = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    add_paths_arg(ap)
-    ap.add_argument("--fail", action="store_true",
-                    help="exit 1 when any NEW passive is found")
-    ap.add_argument("--all", action="store_true",
-                    help="print every hit, marked NEW or accepted")
-    ap.add_argument("--accept", action="store_true",
-                    help="add the NEW hits to the baseline and drop "
-                         "stale entries")
-    ap.add_argument("--calibrate", action="store_true",
-                    help="compare with tools/data/edit_pairs.json and "
-                         "with Vale's write-good.Passive")
-    args = ap.parse_args(argv)
-    if args.paths and args.accept:
-        ap.error("--accept rewrites the whole baseline; give no paths")
+    ap = build_arg_parser(
+        __doc__, fail_help="exit 1 when any NEW passive is found",
+        calibrate_help="compare with tools/data/edit_pairs.json and "
+                       "with Vale's write-good.Passive")
+    args = parse_args(ap, argv)
     if args.calibrate:
-        try:
-            calibrate(parser)
-        except ParserUnavailable as exc:
-            print(f"passive_voice: parser unavailable ({exc}); "
-                  f"nothing checked", file=sys.stderr)
-        return 0
-    paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
-    shown_paths = {display(p) for p in paths}
-    try:
-        findings = list(find([Document.parse(p) for p in paths], parser))
-    except ParserUnavailable as exc:
-        print(f"passive_voice: parser unavailable ({exc}); "
-              f"nothing checked", file=sys.stderr)
-        return 0
-    found = sorted(
-        {(display(f.path), f.line, f.message) for f in findings})
-    baseline = load_baseline()
-    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
-    current = {key(shown, text) for shown, _, text in found}
-    new = [(s, n, t) for s, n, t in found if key(s, t) not in baseline]
-    stale = sorted(scope - current)
-    if args.accept:
-        added = {key(s, t) for s, _, t in new}
-        write_baseline((baseline - set(stale)) | added)
-        print(f"Baseline: added {len(added)}, dropped {len(stale)} "
-              f"stale, in {display(BASELINE)}")
-        return 0
-    for shown, line, text in found:
-        accepted = key(shown, text) in baseline
-        if accepted and not args.all:
-            continue
-        mark = "accepted" if accepted else "NEW"
-        print(f"{mark:8} {shown}:{line}: {text}")
-    for entry in stale:
-        shown, text = entry.split("\t", 1)
-        print(f"stale    {shown}: {text}")
-    print(f"{len(new)} new, {len(found) - len(new)} accepted"
-          + (f", {len(stale)} stale" if stale else ""))
-    return 1 if args.fail and new else 0
+        return run_calibrate("passive_voice", calibrate, parser)
+    return run("passive_voice", args, lambda docs: find(docs, parser),
+               baseline=BASELINE, header=HEADER)
 
 
 if __name__ == "__main__":
