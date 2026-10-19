@@ -1455,8 +1455,8 @@ def warriors_and_weapons(narrator: Narrator) -> None:
     play(narrator, Warrior(), Weapon())
 ```
 
-`play()` is the boundary function of [Composing a Program](#composing-a-program),
-grown from two parameters to three.
+`play()` is the boundary function of [Composing a Program](#composing-a-program).
+Where that section's `outcome()` takes two parameters, `play()` takes three.
 Its annotations do the upcasting,
 so each actor reaches `supply()` as its Protocol type,
 the job `as_type()` does elsewhere.
