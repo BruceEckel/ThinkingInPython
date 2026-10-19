@@ -394,8 +394,10 @@ subclass. The `namedtuple` unpacks by position like any other tuple.
 Line `[1]` reads fields by name.
 `person.height` names the field that `person[2]` reads by position.
 Unpacking and `person[0]` still work beside the names,
-so a heterogeneous tuple that passes between functions
-is usually better as a `namedtuple` or a data class.
+so code written for the tuple runs unchanged.
+A heterogeneous tuple that passes between functions
+is usually better as a `namedtuple` or a data class,
+because each function then reads a field by name instead of by position.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -443,8 +445,8 @@ print(counts)  # The merge built a new dict
 ```
 
 **Build the dictionary.** `dict()` accepts any iterable of two-item pairs, so a list of tuples
-becomes a dictionary in one call. `dict(zip(names, values))` is the
-same constructor fed from two parallel sequences.
+becomes a dictionary in one call. `dict_ops.py` feeds the same
+constructor from two parallel sequences, as `dict(zip("abc", [1, 2, 3]))`.
 
 **Resolve the collision.** `30` ends up under `"c"`, because `|` resolves a collision in favor of
 the right operand.
