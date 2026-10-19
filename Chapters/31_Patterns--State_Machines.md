@@ -596,11 +596,13 @@ If you pair `Column` with `choose_row()`, written for a `Row`,
 `ty` reports `invalid-argument-type` on that rule.
 `refund()` accepts `object`, so it pairs with any input type.
 
-The listing binds the list to `rules`, with no annotation, before the call.
-Written inline as the argument,
-the list would take the parameter's `Sequence[Rule[Any]]` as its expected type.
-That `Any` would reach into every `Rule(...)` and make its `I` `Any`,
-so the checker would accept any method on any rule.
+The listing binds the list to `rules`, with no annotation, before the call,
+and that binding keeps the check alive.
+If you write the list inline as the argument,
+the parameter's `Sequence[Rule[Any]]` becomes its expected type.
+That `Any` reaches into every `Rule(...)` and makes its `I` `Any`,
+so the checker accepts any method on any rule.
+The `invalid-argument-type` report above disappears.
 
 Adding a state or an input is now a local change:
 a rule in the list and a method or two.
