@@ -722,7 +722,7 @@ for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
 
 Inheriting from `ABC` and marking `area()` with `@abstractmethod` makes `Shape` abstract.
 Calling `Shape()` raises a `TypeError`.
-A subclass becomes instantiable once it defines `area()`.
+A subclass becomes instantiable when it defines `area()`.
 
 The empty `__slots__` on `Shape` is there for the records that inherit from it.
 A base class with no `__slots__` gives every instance of its subclasses a `__dict__`,
