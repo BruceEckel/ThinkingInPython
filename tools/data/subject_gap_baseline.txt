@@ -1,0 +1,93 @@
+# Subject-gap hits a human read and judged keeps: coordinated
+# subjects, a short appositive, a relative clause that is the
+# claim and reads once, a parser error. An entry is not an
+# exemption from the rule.
+# path<TAB>[kinds] subject .. verb: sentence, with whitespace
+# normalized and no line number, so a reflow leaves an entry
+# alone and an edit to the sentence retires it. Rewritten by
+# `tip subject-gap-accept`; read the delta with `tip subject-gap`
+# before accepting.
+# See tools/subject_gap.py.
+Chapters/02_Foundations--Tour.md	[appos,cc,prep] statements .. stays: An indented block groups statements inside the enclosing scope, so CODE, assigned inside the CODE, stays visible afterward.
+Chapters/02_Foundations--Tour.md	[cc,conj] CODE .. explain: Print CODE and CODE and confirm that CODE changed and CODE still holds CODE, then explain why CODE earlier changed the list bound to CODE, but appending to CODE does not.
+Chapters/05_Foundations--Functions.md	[cc,relcl] function .. does: A function that finishes without a CODE returns CODE, and so does a bare CODE.
+Chapters/06_Foundations--Modules_and_Packages.md	[appos,cc,conj,prep] Windows .. name: Windows and macOS default to case-insensitive filesystems, so CODE and CODE name the same file there.
+Chapters/06_Foundations--Modules_and_Packages.md	[prep] CODE .. finds: Every later CODE of that name, from any file in the program, finds the module there and binds the same object.
+Chapters/06_Foundations--Modules_and_Packages.md	[relcl] identifier .. is: Any identifier that begins and ends with double underscores (a dunder) is special in some way.
+Chapters/07_Foundations--Classes.md	[appos,cc,conj] Print .. shows: Print a single CODE and a list of two of them, and confirm the list shows the same form for each element.
+Chapters/07_Foundations--Classes.md	[cc,conj,relcl] method .. be: A method that needs the class rather than an instance can be a CODE.
+Chapters/08_Foundations--Static_Types.md	[cc,conj,relcl] CODE .. gives: A CODE that returns an CODE, or that requires an argument, gives its class a different shape.
+Chapters/08_Foundations--Static_Types.md	[relcl] function .. takes: A function that validates or converts data against an arbitrary annotation takes a type expression as its argument.
+Chapters/11_Techniques--Testing.md	[relcl] function .. needs: This book patches with CODE and prefers injection where you can change the code, because a function that takes its clock or its fetcher as an argument needs no patching library.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[acl,cc,conj] CODE .. is: A CODE made of a legal CODE and a legal CODE is legal by construction:
+Chapters/12_Techniques--Data_Classes_as_Types.md	[cc,dep,neg,prep] rebuilds .. produces: CODE rebuilds through CODE, not through your CODE, so CODE on a validated instance quietly produces an unvalidated one.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[prep,relcl] type .. is: A type you define, like a rating from one to ten, is a smaller set: the allowed values.
+Chapters/14_Techniques--Decorators.md	[cc,npadvmod,relcl] decorator .. binds: A decorator that forgets its CODE returns CODE instead, so Python binds CODE to CODE.
+Chapters/14_Techniques--Decorators.md	[prep] CODE .. is: CODE above a bare assignment, or above a CODE alias, is a syntax error rather than a decorator applied to something unusual.
+Chapters/15_Techniques--Context_Managers.md	[prep] defaults .. catch: The constructor's CODE parameter defaults to the CODE sentinel, which makes CODE with no argument catch everything.
+Chapters/16_Techniques--Comprehensions.md	[relcl] CODE .. deletes: That consumer is CODE, which runs after the CODE block exits and the context manager deletes the directory.
+Chapters/17_Techniques--Metaprogramming.md	[advmod,prep] stores .. returns: CODE stores CODE under the key CODE in the CODE of CODE, then returns CODE unchanged.
+Chapters/17_Techniques--Metaprogramming.md	[cc,conj] registry .. needs: A registry or a decorator that keys on a name usually needs the qualified one, combined with CODE.
+Chapters/17_Techniques--Metaprogramming.md	[relcl] body .. dict: Here, CODE holds that class body, which is easier to read and modify than a namespace dict:
+Chapters/18_Techniques--Performance.md	[prep] CODE .. repeat: Time CODE against CODE in a loop for 10,000 short strings, then repeat at 100 strings.
+Chapters/19_Techniques--Concurrency.md	[cc,conj,dobj,prep] catches .. reaches: The CODE form catches members of a group by type, and iterating through CODE reaches every member.
+Chapters/19_Techniques--Concurrency.md	[relcl] job .. speeds: A job that spends 10 percent of its time in serial overhead speeds up at most tenfold, on 16 cores or 1,600.
+Chapters/20_Patterns--Rethinking_Objects.md	[prep] Many .. arose: Many of the design patterns in this part of the book arose to work around limitations of older object-oriented languages.
+Chapters/21_Patterns--Design_Patterns.md	[appos] Kay .. was: "^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot".
+Chapters/21_Patterns--Design_Patterns.md	[dobj,prep] mapping .. is: A dictionary mapping one program's shape names to its shape classes is a specific design, stage two.
+Chapters/21_Patterns--Design_Patterns.md	[prep] change .. force: Read the heavy edges first, because a change to the class at the head of a heavy edge can force an edit in the part at its tail.
+Chapters/22_Patterns--Iterators.md	[relcl] way .. is: The only way to find out whether the body accepts its arguments is to pull a value and let the body run.
+Chapters/22_Patterns--Iterators.md	[relcl] way .. is: The only way to find out whether the source has run out is to pull and receive CODE.
+Chapters/24_Patterns--Template_Method.md	[appos,npadvmod] CODE .. redesign: Repair CODE both ways: first reorder the two lines in CODE, then redesign CODE instead, so clients construct the object and call CODE explicitly.
+Chapters/25_Patterns--Surrogate.md	[acl,appos] identifiers .. means: Mangling rewrites identifiers, not string literals, so storing a double-underscore name through CODE means writing the mangled form, CODE, by hand.
+Chapters/25_Patterns--Surrogate.md	[advcl,appos,prep] calls .. stay: The two calls to CODE print different verses, though CODE and CODE stay the same between them.
+Chapters/26_Patterns--Factory.md	[relcl] language .. wrap: CODE includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
+Chapters/27_Patterns--Function_Objects.md	[appos,cc,conj] Patterns .. start: The *GoF Design Patterns* forms of *Command*, *Strategy*, and *Chain of Responsibility* all start at number 5.
+Chapters/27_Patterns--Function_Objects.md	[prep] instance .. passes: An instance of an undecorated class with the right CODE therefore passes the type checker.
+Chapters/28_Patterns--Data_Transfer_Objects.md	[prep] CODE .. produce: When the data becomes a dict for output alone, CODE on a CODE and CODE on a data class each produce one.
+Chapters/29_Patterns--Changing_the_Interface.md	[appos] parameter .. raises: If an override renames a keyword-capable parameter, a call that passes the old name by keyword raises a CODE.
+Chapters/29_Patterns--Changing_the_Interface.md	[cc,conj] CODE .. look: CODE and CODE build the new instance without running CODE, then look up CODE on it.
+Chapters/30_Patterns--Observer.md	[cc,nummod,prep] exercise .. raised: Redo exercise 3 with each failure returned as a value instead of raised as an exception.
+Chapters/34_Patterns--Composite_and_Interpreter.md	[relcl] build .. alternates: A build that runs targets in parallel calls CODE once, then alternates CODE and CODE in place of CODE.
+Chapters/35_Patterns--Flyweight.md	[advmod,dep,dobj] names .. be: CODE names the closed set of valid map characters, so CODE and every key of CODE must be one of those characters.
+Chapters/40_Functional--Foundations.md	[appos,prep,relcl] Five .. requires: Five of the chapter's ideas work at once: a record for the value, CODE to state that CODE leaves its input unchanged, two pure functions, CODE to turn a two-argument predicate into the one-argument callable CODE requires, and CODE and CODE for the traversal.
+Chapters/40_Functional--Foundations.md	[conj] key .. is: Contents-based equality together with a stable hash is why a dictionary key, a cache entry, or a value shared across threads is normally a tuple or a record.
+Chapters/41_Functional--Toolkits.md	[relcl] CODE .. calls: The CODE that CODE supplies for CODE calls your CODE, then calls CODE too when CODE returns CODE.
+Chapters/42_Functional--Error_Handling.md	[prep] CODE .. become: A CODE from a bad number and a CODE from dividing by zero each become the CODE field of an ordinary CODE.
+Chapters/42_Functional--Error_Handling.md	[prep] prints .. paths: The listing prints with CODE, which renders the message and the notes and leaves out the file paths a full traceback carries.
+Chapters/44_Effects--Effect_Management.md	[prep] Which .. applies: Which of the three conversions from Converting Effectful to Pure applies to the exceptions, and which technique from Effects by Hand applies to the rest?
+Chapters/46_Effects--Stateless.md	[advmod,cc,conj] one .. believes: Then declare a second Ability and request that one too, and report which requests your handler answered at runtime and which ones the type checker believes it answered.
+Chapters/46_Effects--Stateless.md	[cc,conj,dobj,prep] Supply .. stays: Supply a scripted CODE in a test and a real one in a demo, and confirm CODE stays unchanged between them.
+Chapters/47_Effects--Stateless_in_Practice.md	[cc,conj,dobj,xcomp] Change .. stays: Change CODE to use a CODE instead of a CODE, and confirm CODE stays unchanged.
+Chapters/A_Effect_Tracking.md	[cc,relcl] Something .. rejects: **Something that compares the computed row with the declared one,** and rejects the program when they differ.
+Chapters/B_An_Effect_Checker.md	[acl,appos] CODE .. calls: CODE called CODE, a method on an imported constant, and now calls CODE.
+Chapters/B_An_Effect_Checker.md	[acl,appos] CODE .. tests: CODE called CODE, a method on a record's field, and now tests CODE in a pattern's guard.
+Chapters/B_An_Effect_Checker.md	[appos] resolution .. give: Name resolution, a table of the standard library, and a fixed point give every function in a program a row.
+Solutions/02_Foundations--Tour/README.md	[conj,prep] division .. is: C and Java truncate integer division toward zero, so their integer CODE is CODE and CODE is CODE.
+Solutions/07_Foundations--Classes/README.md	[advmod,cc,conj] CODE .. add: Define CODE first and print one object and a list, then add CODE and print both again.
+Solutions/09_Foundations--Class_Attributes/README.md	[dobj,prep] stores .. goes: The write then stores CODE in the instance dictionary, where every write through an instance goes.
+Solutions/11_Techniques--Testing/README.md	[acl] fetcher .. does: The stub is the same function in both: a fetcher returning a CODE, which works in the CODE block and answers CODE as a response does.
+Solutions/14_Techniques--Decorators/README.md	[advmod,cc,conj] prints .. appears: The outermost decorator prints first and last, and each inner layer's output appears nested in between.
+Solutions/14_Techniques--Decorators/README.md	[relcl] function .. returns: under CODE, a function that raises an exception on its first two calls returns its result on the third.
+Solutions/15_Techniques--Context_Managers/README.md	[appos,prep] prints .. matching: your edited CODE prints CODE, CODE, CODE before the body line and CODE, CODE, CODE after it, matching the closing order you predicted before running it.
+Solutions/16_Techniques--Comprehensions/README.md	[appos,prep] prints .. passes: your version prints CODE through CODE, then a list of three usable values in place of CODE, and CODE passes on your file.
+Solutions/23_Patterns--Singleton/README.md	[relcl] subclass .. gets: A subclass that binds its own CODE in its class body gets separate storage.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[appos,prep] Classes .. makes: [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values) makes CODE the place to check each value the JSON decoder produces.
+Solutions/30_Patterns--Observer/README.md	[advmod,appos,cc,conj] appends .. bind: CODE appends and returns CODE, so CODE above a CODE would bind that name to CODE.
+Solutions/30_Patterns--Observer/README.md	[cc,prep,relcl] responder .. reports: A responder in a module that nothing imports does not run, and nothing reports its absence.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[advmod,dep,dobj] Count .. rows: Count the methods you wrote, then compare with the seven dictionary rows the table version needs.
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	[acl] type .. adds: a node type written below your existing classes, with none of them edited, adds its share to CODE for a directory that holds it, and CODE passes.
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	[appos,cc,prep] prints .. keeps: your CODE prints CODE and CODE for the exercise's two expressions, and CODE keeps its parentheses while CODE gets none.
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	[conj,relcl] characters .. look: In a finished string, the characters the author typed and the characters the value supplied look the same.
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	[relcl] CODE .. reads: The CODE that reads as an obstacle in the file system reads as the point here.
+Solutions/35_Patterns--Flyweight/README.md	[appos,relcl] threads .. run: Four threads that miss on the same cold key therefore all run the body.
+Solutions/36_Patterns--Memento/README.md	[cc,conj,relcl] Class .. shows: A Class That Changes After the Save shows CODE loading old bytes into a changed class, and A Deleted Field Leaves a Ghost shows what CODE writes into the instance.
+Solutions/36_Patterns--Memento/README.md	[npadvmod,prep] Test .. holds: Test each by saving first, erasing, then checking the earlier state still holds both strokes.
+Solutions/42_Functional--Error_Handling/README.md	[appos,cc,conj] prints .. is: for the input that CODE rejects, your run prints the CODE from CODE and the later step's trace line is missing, while every input that passes CODE still prints that line.
+Solutions/43_Functional--Confidence/README.md	[prep] answer .. is: By that rule, the answer for a roster of two and a size of five is one group of two.
+Solutions/45_Effects--Generators/README.md	[cc,conj,prep] definitions .. is: Three CODE definitions over CODE, CODE, and CODE keep the two integer channels apart, so transposing the CODE and the CODE is a type checker error.
+Solutions/46_Effects--Stateless/README.md	[acl,relcl] caller .. draws: A caller that hands CODE to CODE with no CODE supplied draws an CODE.
+Solutions/46_Effects--Stateless/README.md	[appos,dobj,npadvmod] passes .. print: your four passes print CODE and CODE three times: the first pass over the stored Effects prints them, the second prints nothing, and both passes over the functions print them.
+Solutions/46_Effects--Stateless/README.md	[cc,conj,prep] split .. applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[appos,prep] all .. timing: The code around CODE did change, all of it outside the Effect: the executor class, the timing the chapter's version prints, and the CODE guard.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[appos] prints .. makes: your process-pool version prints CODE with CODE unchanged character for character, and removing the CODE guard makes CODE fail with a CODE.

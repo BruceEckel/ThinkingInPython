@@ -52,10 +52,50 @@ Put it in front and the sentence usually needs no other repair:
   and the checker reports `protocol member ... is not defined`."
 
 **The subject held open.**
-The subject arrives, then a relative clause, a parenthetical, or a
-citation, and only then the verb.
-Ten or so words of gap is the threshold; a parenthetical citation in the
-gap is the threshold on its own:
+The subject arrives, then a relative clause, a participle, a "such
+as" phrase, a parenthetical, or a citation, and only then the verb.
+Ten or so words of gap is the threshold (nine was enough for Bruce to
+mark "an action that must run on every entry into that state appears
+once" in chapter 31); a parenthetical citation in the gap is the
+threshold on its own.
+`tip subject-gap` (`tools/subject_gap.py`) lists the sentences at nine
+or more words, with a baseline of judged keeps.
+Three repairs, each putting the verb right after its subject:
+
+- Move the modifier after the verb, as a comparison or a trailing
+  "such as": "A caretaker that keeps every past state, such as the
+  `History` class in `history.py`, keeps every one of those tuples
+  alive" becomes "A caretaker that keeps every past state keeps every
+  one of those tuples alive, as the `History` class in `history.py`
+  does"; "Every optimization that skips or reuses work, from a cache
+  to a database query planner, depends on the same
+  interchangeability" becomes "Every optimization that skips or
+  reuses work depends on the same interchangeability, from a cache to
+  a database query planner".
+- Turn the modifier into a when-clause: "A handler far enough up the
+  stack to report the failure cannot read the locals that would
+  explain it" becomes "When a handler sits far enough up the stack to
+  report the failure, the locals that would explain it are out of
+  reach"; "A field that stays small, or that each edit replaces
+  instead of extends, keeps the total proportional to `k`" becomes "A
+  field keeps the total proportional to `k` when it stays small, or
+  when each edit replaces it instead of extending it".
+- Give the modifier its own sentence: "A decorator like `@final`,
+  which sets an attribute and leaves enforcement to the type checker,
+  is a *marker*" becomes "A decorator like `@final` is a *marker*. It
+  sets an attribute and leaves enforcement to the type checker"; a
+  parenthetical gloss moves the same way: "The `[CV]` tag (for "class
+  variable," another name for a class attribute) marks an attribute
+  the class stores" becomes "The `[CV]` tag marks an attribute the
+  class stores. It stands for "class variable," another name for a
+  class attribute".
+
+Leave alone a coordinated subject ("A module or a package with the
+same name"), a short appositive that names the subject, and a
+relative clause of nine or ten words that is the sentence's claim and
+reads once ("A method that needs the class rather than an instance
+can be a `classmethod`").
+The older examples:
 
 - "Letting each subclass register itself through `__init_subclass__()`
   (see [Metaprogramming](...)) removes that line too"

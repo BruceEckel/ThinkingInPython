@@ -398,8 +398,9 @@ def editor_pin(v: Vars) -> None:
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
     the report-only stranded-preposition, stranded-possessive,
-    watch-word, positional-reference, trailing-tag, and internal-name
-    scans (the last reads the whole book). Run one
+    watch-word, positional-reference, trailing-tag, subject-gap, and
+    internal-name scans (the last reads the whole book; subject-gap
+    runs spaCy in a throwaway Python 3.12 environment uv caches). Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
     says how to install it). Its style packages (.vale.ini's Packages)
@@ -414,6 +415,7 @@ def prose(v: Vars) -> None:
     py("tools.watch_words", *prose_files(v))
     py("tools.positional_refs", *prose_files(v))
     py("tools.trailing_tags", *prose_files(v))
+    py("tools.subject_gap", *prose_files(v))
     py("tools.internal_names")
 
 
@@ -473,6 +475,30 @@ def trailing(v: Vars) -> None:
       "entries", secondary=True)
 def trailing_accept(v: Vars) -> None:
     py("tools.trailing_tags", "--accept")
+
+
+@task("Report new sentences whose subject is held open from its verb "
+      "(report-only; accept with `tip subject-gap-accept`)")
+def subject_gap(v: Vars) -> None:
+    """Report sentences whose subject head sits nine or more words
+    from its verb behind a relative clause, a participle, a "such as"
+    phrase, or a parenthetical ("an action that must run on every
+    entry into that state appears once"). The parse is spaCy's, run
+    in a throwaway Python 3.12 environment that uv caches (the first
+    run downloads it; later runs take a few seconds), so it reports
+    and never gates; `tip prose` runs it after the trailing-tag scan.
+    CH= picks one chapter and its Solutions file. Hits judged keeps
+    live in tools/data/subject_gap_baseline.txt, so the run prints
+    only new ones; ARGS=--all lists every hit, ARGS="--gap 12" moves
+    the threshold for one run.
+    """
+    py("tools.subject_gap", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new subject-gap hits to the baseline and drop stale "
+      "entries", secondary=True)
+def subject_gap_accept(v: Vars) -> None:
+    py("tools.subject_gap", "--accept")
 
 
 @task("Report public class names that only their class uses "

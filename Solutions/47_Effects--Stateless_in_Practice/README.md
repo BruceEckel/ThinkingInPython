@@ -2202,8 +2202,8 @@ type. Saying so takes no abstract factory class.
 **Show the mismatch getting through.** The shared signature does not recover the guarantee that makes the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other.
-The listing's last call, `play(Loud(), Kitty(), Weapon())`,
-the same line the chapter runs in `two_games.py`, is the proof.
+The listing's last call is the proof: `play(Loud(), Kitty(), Weapon())`,
+the same line the chapter runs in `two_games.py`.
 `play()` accepts a `Kitty` facing a `Weapon`.
 Both satisfy their `Protocol`s, so the type checker reports nothing. An *Abstract Factory* in a language with a family type expresses "these
 come from one world" in the type. Here the matching is in

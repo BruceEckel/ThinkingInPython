@@ -217,7 +217,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Six report-only
+Seven report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -250,9 +250,25 @@ connective ("in return", "the trade-off", "the cost of"). Its baseline
 holds the judged keeps (a participle that describes the noun it
 follows, a measured cost, a named trade-off), and chapter 31's hits
 stay out of it while its editing pass is open.
+`tip subject-gap` (`tools/subject_gap.py`, 2026-10-18) lists a
+sentence whose subject head sits nine or more words from its verb
+behind a relative clause, a participle, a "such as" phrase, or a
+parenthetical ("an action that must run on every entry into that
+state appears once", the chapter 31 sentence Bruce marked), the
+`straighten` skill's "subject held open". It is the one check that
+needs a parser: spaCy has no wheel for the pinned Python, so
+`tools/subject_gap_parse.py` runs under `uv run --no-project
+--python 3.12 --with spacy`, an environment uv caches after the
+first run, and the check exits 0 with a message when that
+environment cannot start. The sweep that day read 181 hits, fixed
+37 (commit 0fc6e04d), and the baseline holds the keeps: coordinated
+subjects, a short appositive, a relative clause that is the claim
+and reads once, a parser error. Chapter 31's hits stay out of it
+while its editing pass is open.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
-`tip internal-names-accept`, `tip positional-accept`, and
-`tip trailing-accept` add the current new hits to the baseline after a human read; `ARGS=--all`
+`tip internal-names-accept`, `tip positional-accept`,
+`tip trailing-accept`, and `tip subject-gap-accept` add the current
+new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
 accepted, 610 watch words fixed and 220 accepted (a `want` with a
