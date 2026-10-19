@@ -728,7 +728,7 @@ def test_illegal_result_is_rejected() -> None:
 
 ## Composing Types from Types
 
-Once each small type guarantees its own values,
+When each small type guarantees its own values,
 you can safely build larger types out of them.
 A `Person` made of a legal `FullName` and a legal `EmailAddress` is legal by construction:
 
