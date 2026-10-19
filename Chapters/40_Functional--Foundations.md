@@ -267,7 +267,7 @@ Contents-based equality, not mutability alone, makes a type unhashable.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 `MutablePoint` and a `list` both compare by contents,
-so a dictionary that stored one as a key would lose the entry once the key's contents changed.
+so a dictionary that stores one as a key loses the entry if the key's contents change.
 Python therefore sets their `__hash__` to `None`.
 `hash([3, 4])` raises the same `TypeError` as `hash(MutablePoint(3, 4))`.
 
