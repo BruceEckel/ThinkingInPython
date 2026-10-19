@@ -32,7 +32,7 @@ This book emphasizes the benefits of pure functions:
 In each case, you can determine purity by reading a single function.
 This doesn't work if the function calls other functions.
 If any of those other functions interacts with the environment,
-it makes the calling function is impure.
+it makes the calling function impure.
 To determine if a function is impure,
 you must either trust the documentation or examine the code of every function it calls.
 
