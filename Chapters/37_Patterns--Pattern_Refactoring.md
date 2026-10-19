@@ -384,7 +384,7 @@ The loop has no list of materials to maintain and no case to forget.
 
 `bins[type(piece)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).
-That dispatch first appeared in an [event bus keyed by type](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
+That dispatch first appears in an [event bus keyed by type](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
 
 The key is the *exact* class.
 If you derive `CrushedAluminum` from `Aluminum`,

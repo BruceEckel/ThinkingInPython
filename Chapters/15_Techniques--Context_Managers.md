@@ -853,7 +853,7 @@ with expected(RuntimeError):
 `broken()` raises a `RuntimeError` before its `yield` and so fails to enter.
 `ExitStack` registers a manager's exit after its `__enter__()` returns,
 so it registers nothing for `broken("c")`.
-Because `a` and `b` entered first, both unwind in reverse,
+Because `a` and `b` enter first, both unwind in reverse,
 the same rule a comma-separated `with` follows.
 
 ## The `contextlib` Toolkit

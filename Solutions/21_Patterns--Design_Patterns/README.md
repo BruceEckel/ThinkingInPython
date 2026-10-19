@@ -281,7 +281,7 @@ a different design, a detail, or an equivalent alternative.
 [Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles) states *Subtraction*: a design is complete when you cannot take anything else away.
 Use *Subtraction* as a test: take one thing away and run the program.
 Choose a class or a level of inheritance that holds a single method and no state.
-If nothing breaks, the piece you removed was supporting code.
+If nothing breaks, the piece you removed is supporting code.
 If something breaks, you have found the part that expresses the design's intent.
 
 <details>
@@ -369,8 +369,8 @@ the design rather than its supporting code.
 Both outcomes are the exercise working correctly: a removal that broke
 nothing, and one that broke the requirement. Subtraction is a test
 you run, not a rule to remove as much as you can. Take something away,
-run the program, and read the result. If nothing broke, the piece was
-supporting code. If something broke, the piece you removed expresses
+run the program, and read the result. If nothing breaks, the piece is
+supporting code. If something breaks, the piece you removed expresses
 the design, and that piece is worth keeping and worth naming.
 
 Before you move on, name what separates your attempt from this one:

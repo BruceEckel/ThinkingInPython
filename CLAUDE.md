@@ -217,7 +217,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Nine report-only
+Ten report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -296,6 +296,23 @@ diagnostic, a naming convention ("is called *Multiton*"), a state
 adjective, and a parser misread of a compound or a possessive.
 `ARGS=--calibrate` compares the two rules over the book and lists the
 hits that both flag, that only Vale flags, and that only the parse flags.
+`tip past-tense` (`tools/past_tense.py`, 2026-10-19) enforces the style
+rule that standing behavior takes the present tense. It reads the same
+parse for a simple-past verb or a participle with a past auxiliary ("was
+built", "had loaded"). The default rules, held to a baseline, are
+`[PAST]`, the past verb of a main clause ("One design served three jobs
+in this chapter"), and `[PAST-HEADING]`, a past verb in a heading ("What
+Stayed Constant"), which the check reads from the document's own heading
+lines. The first run found 1283 hits, nearly all in subordinate clauses
+("the function the caller passed"), which refer back inside present
+narration and are not the drift. `[PAST-SUB]` therefore prints only under
+`ARGS=--survey`, for the activate pass, and is never baselined. Skips
+print nothing: a sentence with a year, a version number, or a PEP number
+(a dated event), a sentence with a modal (would, could, might, should), a
+verb inside double quotes, a `Hint:` or `Done when:` paragraph, a
+main-clause past whose subject is "I" or "we", and an "If" or "When"
+sentence with "were". The baseline holds the keeps: a narrated run, a
+measurement, and history without a year.
 `tip pointers` (`tools/pointer_words.py`, 2026-10-19) is a survey tool
 that runs outside `tip prose`, reads the same parse, and keeps no
 baseline. `[THIS]` is a sentence-opening demonstrative pronoun ("This is
@@ -310,7 +327,8 @@ judgment that pass makes.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
 `tip trailing-accept`, `tip subject-gap-accept`,
-`tip sentence-shapes-accept`, and `tip passive-accept` add the current
+`tip sentence-shapes-accept`, `tip passive-accept`, and
+`tip past-tense-accept` add the current
 new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84

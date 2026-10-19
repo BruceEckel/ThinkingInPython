@@ -998,7 +998,7 @@ keeps that guarantee. `BoundedStack.push()` accepts every item and
 discards the oldest to stay inside the limit. `fill()` now runs to
 completion on both classes.
 
-You gave up the refusal. The original `BoundedStack` guarantees that
+You give up the refusal. The original `BoundedStack` guarantees that
 it accepts at most two items. This version guarantees only that it
 keeps at most two.
 `fill()` returns 2 where a caller counting on `Stack` expects 5.

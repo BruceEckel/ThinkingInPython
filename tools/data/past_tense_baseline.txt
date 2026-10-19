@@ -1,0 +1,361 @@
+# Past-tense verbs a human read and judged keeps: a narrated run
+# whose output is on the page, a measurement, history without a
+# year, a subjunctive. An entry is not an exemption from the rule.
+# path<TAB>[LABEL] message, with whitespace normalized and no
+# line number, so a reflow leaves an entry alone and an edit to
+# the sentence retires it. Rewritten by `tip past-tense-accept`;
+# read the delta with `tip past-tense` before accepting.
+# See tools/past_tense.py.
+Chapters/01_Introduction.md	[PAST] allowed: Claude allowed me to create tooling for the book that I had imagined but never fully realized.
+Chapters/01_Introduction.md	[PAST] arose: Most arose to work around the limits of static, inheritance-heavy languages, so in Python many of them diminish or dissolve.
+Chapters/01_Introduction.md	[PAST] came: Many of these chapters came from presentations I've given, mostly at PyCon.
+Chapters/01_Introduction.md	[PAST] generated: Claude first translated and integrated my own work into the book, and generated the first versions of new material.
+Chapters/01_Introduction.md	[PAST] made: Using Claude made me realize how many compromises I've made on books in the past.
+Chapters/01_Introduction.md	[PAST] provided: Claude provided excellent support, but did not replace my own work.
+Chapters/01_Introduction.md	[PAST] put: The last two put Effect tracking and generators to work with Stateless, a library that builds Effect tracking on generators and brings it to Python today.
+Chapters/01_Introduction.md	[PAST] read: When a change breaks the code, read the traceback closely.
+Chapters/01_Introduction.md	[PAST] returned: Part IV, *Functional*, covers pure functions, the CODE and CODE toolkits, errors returned as values instead of raised exceptions, and a spectrum of confidence that runs from local reasoning up to machine-checked proof.
+Chapters/01_Introduction.md	[PAST] said: That said, it is still my work, derived from existing work, designed by me, checked and rewritten by me.
+Chapters/01_Introduction.md	[PAST] took: The process was much faster with Claude, but it still took time and effort.
+Chapters/01_Introduction.md	[PAST] translated: Claude first translated and integrated my own work into the book, and generated the first versions of new material.
+Chapters/01_Introduction.md	[PAST] was: The experience was amazing, and I began adding material from my blog posts and presentations.
+Chapters/01_Introduction.md	[PAST] was: The process was much faster with Claude, but it still took time and effort.
+Chapters/02_Foundations--Tour.md	[PAST] declared: In C++ or Java, a variable declared inside braces goes out of scope at the closing brace.
+Chapters/02_Foundations--Tour.md	[PAST] indented: Blocks can nest, each one indented further than the block that contains it.
+Chapters/02_Foundations--Tour.md	[PAST] replaced: F-strings replaced them.
+Chapters/02_Foundations--Tour.md	[PAST] typed: Iterating over a CODE produces the pieces in order, each either a CODE the author typed or an CODE.
+Chapters/05_Foundations--Functions.md	[PAST] let: Keyword arguments let callers pass arguments by name, in any order.
+Chapters/06_Foundations--Modules_and_Packages.md	[PAST] let: Namespace packages let one package span several directories, such as separately installed distributions that each supply part of the package.
+Chapters/06_Foundations--Modules_and_Packages.md	[PAST] put: To make a directory a package, you put a special file named CODE in it.
+Chapters/06_Foundations--Modules_and_Packages.md	[PAST] read: Documentation tools read it to report a module's public names.
+Chapters/06_Foundations--Modules_and_Packages.md	[PAST] was: The original solution was the CODE environment variable, which tells Python where to look for modules and packages.
+Chapters/07_Foundations--Classes.md	[PAST] began: CODE began as a plain attribute and is now a validated property.
+Chapters/09_Foundations--Class_Attributes.md	[PAST] declared: A field declared in the class body, outside any method, is a *class attribute*.
+Chapters/10_Foundations--Cleanup.md	[PAST] printed: CODE and CODE were still available, so each CODE printed its line.
+Chapters/10_Foundations--Cleanup.md	[PAST] was: That was one run on one machine.
+Chapters/11_Techniques--Testing.md	[PAST] happened: A line a test happened to execute differs from a line a test checks.
+Chapters/11_Techniques--Testing.md	[PAST] put: When several test files need the same fixture, put it in a file named CODE.
+Chapters/11_Techniques--Testing.md	[PAST] read: It prints CODE, so read the error to see which invariant broke.
+Chapters/11_Techniques--Testing.md	[PAST] read: They read CODE and call the public methods.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST-HEADING] Built: Defaults Built Fresh, Not Shared
+Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST] moved: Those calls are the same scattering of checks as before, but moved inside the class.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST] passed: A parameter annotated CODE states more than a type: the value passed the check.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST] read: Give CODE a second field, a CODE index written with a CODE default, and read the error CODE reports.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST] spread: Defensive checks then spread through your code.
+Chapters/13_Techniques--Pattern_Matching.md	[PAST] read: Run CODE before adding its CODE to CODE and CODE, and read the errors.
+Chapters/14_Techniques--Decorators.md	[PAST] computed: For anything simpler, a module-level constant computed the ordinary way reads better.
+Chapters/14_Techniques--Decorators.md	[PAST] let: The annotations let the type checker report the mistake either way, at the decoration rather than at the call.
+Chapters/14_Techniques--Decorators.md	[PAST] looked: A decorator looked up by subscript, as in CODE, was a syntax error.
+Chapters/14_Techniques--Decorators.md	[PAST] re: Write a CODE decorator in the function form that calls the wrapped function again when it raises an exception, up to CODE attempts, and re-raises the last exception when they all fail.
+Chapters/14_Techniques--Decorators.md	[PAST] read: The trace lines read CODE and print CODE.
+Chapters/14_Techniques--Decorators.md	[PAST] was: A decorator looked up by subscript, as in CODE, was a syntax error.
+Chapters/15_Techniques--Context_Managers.md	[PAST] defined: It treats every manager the same way, whether CODE built it from a generator or a class defined it.
+Chapters/15_Techniques--Context_Managers.md	[PAST] finished: Call the manager's CODE, however the block finished.
+Chapters/15_Techniques--Context_Managers.md	[PAST] included: Without the CODE/CODE, that exception leaves the generator at once, so the code after the CODE, CODE included, never runs.
+Chapters/15_Techniques--Context_Managers.md	[PAST] nested: A CODE nested inside another CODE on the same instance saves a second directory.
+Chapters/16_Techniques--Comprehensions.md	[PAST] adopted: The idea originated in mathematical set-builder notation, and functional programming languages adopted it.
+Chapters/16_Techniques--Comprehensions.md	[PAST] borrowed: Haskell had list comprehensions, and Python borrowed them.
+Chapters/16_Techniques--Comprehensions.md	[PAST] entered: CODE, entered later, overwrites CODE at key CODE, because a dictionary keeps the last value it receives for a duplicate key.
+Chapters/16_Techniques--Comprehensions.md	[PAST] had: Haskell had list comprehensions, and Python borrowed them.
+Chapters/16_Techniques--Comprehensions.md	[PAST] originated: The idea originated in mathematical set-builder notation, and functional programming languages adopted it.
+Chapters/17_Techniques--Metaprogramming.md	[PAST] declared: CODE checks each value before storing it, so every attribute declared with one enforces the same rule:
+Chapters/17_Techniques--Metaprogramming.md	[PAST] wrote: For the standard library, the checker's authors wrote those rules into the checker.
+Chapters/18_Techniques--Performance.md	[PAST] compiled: Rust offers something else: no warm-up call, no Numba dependency at runtime, and compiled code for functions
+Chapters/18_Techniques--Performance.md	[PAST] had capped: LLVM 19 had capped its tail-duplication pass, which collapsed the old interpreter's 332 dispatch jumps into 3, so the comparison was against a compiler regression rather than a fast interpreter.
+Chapters/18_Techniques--Performance.md	[PAST] included: Frozen blocks every attribute assignment, new fields included, so a frozen instance cannot gain attributes, the same restriction CODE gives you.
+Chapters/18_Techniques--Performance.md	[PAST] introduced: CODE introduced CODE, and CODE is the tool to use before hand-rolling either version here.
+Chapters/18_Techniques--Performance.md	[PAST] meant: Getting a max-heap meant negating every value going in and out.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured 344 bytes against 48, roughly seven to one.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured CODE at about 2,000 times faster than the scan, and hashing at about five times faster than CODE.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured CODE at about five times faster than the hand-written loop.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the CODE at about 14,000 times faster than the list scan.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the compiled CODE at about 12x faster than the loop.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the heap at about 3 times faster here.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the hoisted version five percent slower, another twenty.
+Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the vectorized pass at about 11x faster than the loop.
+Chapters/18_Techniques--Performance.md	[PAST] measured: The CODE holds an 8-byte pointer to a 24-byte CODE object per element, while the CODE uses 8 bytes per element total, roughly a four-to-one difference (one machine measured 325,176 bytes against 80,080).
+Chapters/18_Techniques--Performance.md	[PAST] ran: CODE ran 242,785 times for the same answer.
+Chapters/18_Techniques--Performance.md	[PAST] ran: CODE ran a thousand times.
+Chapters/18_Techniques--Performance.md	[PAST] ran: The callback ran for it once.
+Chapters/18_Techniques--Performance.md	[PAST] set: A million suits a microsecond snippet and is a long wait for anything slower, so always set CODE for a function you are timing for the first time.
+Chapters/18_Techniques--Performance.md	[PAST] tuned: An optimization tuned to toy input can behave badly in production.
+Chapters/18_Techniques--Performance.md	[PAST] was: LLVM 19 had capped its tail-duplication pass, which collapsed the old interpreter's 332 dispatch jumps into 3, so the comparison was against a compiler regression rather than a fast interpreter.
+Chapters/18_Techniques--Performance.md	[PAST] was: With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
+Chapters/19_Techniques--Concurrency.md	[PAST] adopted: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency.
+Chapters/19_Techniques--Concurrency.md	[PAST] appeared: Attempts kept failing to meet it, so workarounds appeared instead.
+Chapters/19_Techniques--Concurrency.md	[PAST] awaited: Five awaited sleeps finish together in about the time of one.
+Chapters/19_Techniques--Concurrency.md	[PAST] came: Later came a finer-grained unit of scheduling that lives inside a program: the *thread of execution*.
+Chapters/19_Techniques--Concurrency.md	[PAST] changed: The second changed who schedules parallel work.
+Chapters/19_Techniques--Concurrency.md	[PAST] distributed: Threads already distributed computing resources, so more CPUs simply meant more resources to distribute (of course, it wasn't quite that easy).
+Chapters/19_Techniques--Concurrency.md	[PAST] emerged: Another benefit of threads emerged when more CPUs became available on a single machine.
+Chapters/19_Techniques--Concurrency.md	[PAST] gave: Reference counting gave Python deterministic cleanup with no collector pauses.
+Chapters/19_Techniques--Concurrency.md	[PAST] had: Early machines had a single CPU, and early operating systems (OS) were little more than program loaders.
+Chapters/19_Techniques--Concurrency.md	[PAST] included: Both tasks wait forever, the event loop included, since nothing remains that can wake them.
+Chapters/19_Techniques--Concurrency.md	[PAST] included: CODE is the newer, composable form, scoping the deadline over an entire block, CODE included, instead of one call.
+Chapters/19_Techniques--Concurrency.md	[PAST] kept: Single-threaded code kept nearly all its speed.
+Chapters/19_Techniques--Concurrency.md	[PAST] learned: Engineers learned tricks to make programs run faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
+Chapters/19_Techniques--Concurrency.md	[PAST] left: Mapping every parallel task onto its own OS thread worked, but it left every scheduling decision to the OS and needed extra machinery (thread pools, pinning, tuning) to perform well.
+Chapters/19_Techniques--Concurrency.md	[PAST] let: Adapting the threading mechanism let threads also perform ad-hoc parallelism.
+Chapters/19_Techniques--Concurrency.md	[PAST] made: Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
+Chapters/19_Techniques--Concurrency.md	[PAST] made: Engineers learned tricks to make programs run faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
+Chapters/19_Techniques--Concurrency.md	[PAST] made: It made every count update, every dict and list mutation, and every existing extension safe at once.
+Chapters/19_Techniques--Concurrency.md	[PAST] made: That exposure also made reference counting part of the compiled binary interface.
+Chapters/19_Techniques--Concurrency.md	[PAST] meant: Threads already distributed computing resources, so more CPUs simply meant more resources to distribute (of course, it wasn't quite that easy).
+Chapters/19_Techniques--Concurrency.md	[PAST] needed: Mapping every parallel task onto its own OS thread worked, but it left every scheduling decision to the OS and needed extra machinery (thread pools, pinning, tuning) to perform well.
+Chapters/19_Techniques--Concurrency.md	[PAST] produced: Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
+Chapters/19_Techniques--Concurrency.md	[PAST] re: As it exits, it re-raises both failures wrapped in an exception group, since more than one task can fail at once.
+Chapters/19_Techniques--Concurrency.md	[PAST] re: The resulting CODE reaches the CODE, which cancels the slow task, its one child still running, and re-raises the cancellation as it exits.
+Chapters/19_Techniques--Concurrency.md	[PAST] read: Because each sleep releases the GIL between a read and its write, all eight threads read the same value, and their eight writes store the same result.
+Chapters/19_Techniques--Concurrency.md	[PAST] read: Eight threads read the same number and all eight receive it, so a ticket meant to go to one worker goes to several.
+Chapters/19_Techniques--Concurrency.md	[PAST] read: The same is true of threads that accumulate results locally and merge them once at the end, caches read far more often than written, and pipeline stages connected by queues.
+Chapters/19_Techniques--Concurrency.md	[PAST] spent: Then the per-task time spent pickling and reassembling outweighs the finer split, and the gains flatten (Amdahl's Law).
+Chapters/19_Techniques--Concurrency.md	[PAST] succeeded: CODE and CODE succeeded before the failures, and their results stay intact.
+Chapters/19_Techniques--Concurrency.md	[PAST] threaded: CODE runs a price function sequentially and threaded and confirms the two agree.
+Chapters/19_Techniques--Concurrency.md	[PAST] undid: Every alternative undid one of the earlier decisions.
+Chapters/19_Techniques--Concurrency.md	[PAST] was: Each was reasonable on its own.
+Chapters/19_Techniques--Concurrency.md	[PAST] was: Moving the context switch into the program was the first big shift.
+Chapters/19_Techniques--Concurrency.md	[PAST] was: One interpreter-wide lock was the simplest fix that fit the three earlier decisions.
+Chapters/19_Techniques--Concurrency.md	[PAST] was: The first step beyond that was *time-sharing*.
+Chapters/19_Techniques--Concurrency.md	[PAST] were: Early machines had a single CPU, and early operating systems (OS) were little more than program loaders.
+Chapters/19_Techniques--Concurrency.md	[PAST] were: It does, but not for the reason threads were once the default choice.
+Chapters/19_Techniques--Concurrency.md	[PAST] worked: Mapping every parallel task onto its own OS thread worked, but it left every scheduling decision to the OS and needed extra machinery (thread pools, pinning, tuning) to perform well.
+Chapters/19_Techniques--Concurrency.md	[PAST] wrote: Before that, you wrote the lock wrapper yourself.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] added: Cardelli and Wegner added the third, subtyping, in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where subtyping appears as *inclusion polymorphism*.].
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] arose: Many of the design patterns in this part of the book arose to work around limitations of older object-oriented languages.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] backed: Newer languages backed away from inheritance.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] brought: C++ brought object-oriented programming and exceptions into the mainstream.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] built: You built a program at runtime by finding the closest existing class and inheriting from it to add behavior.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] drew: *C++* drew from Simula.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] drew: *Java* drew from Smalltalk.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] encouraged: Yet Java encouraged reusing code by inheriting implementation.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] kept: Simula kept standalone functions alongside its objects.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] made: OOP made four promises: encapsulation, behavior bundled into the object as methods, reuse through inheritance, and polymorphism.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] named: It was a compiled, statically typed language, so the discipline later named the Liskov Substitution Principle (LSP) fit naturally.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] normalized: OOP also normalized the idea of types, which Data Classes as Types takes further.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] slotted: CODE declares an empty CODE too, so the chain stays slotted from CODE up to CODE.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] took: *Smalltalk* took the other path.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] typed: A parameter typed CODE reintroduces that check everywhere the parameter appears.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] was: Smalltalk was emphatically dynamic.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] were: Objects were optional.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] arrived: Many people have worked out all the angles of a problem and arrived at the most general, flexible solution.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] became known: The four became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] came: More often the language had the piece all along, and the pattern came from a language that didn't.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] counted: He counted for Lisp and Dylan, and a count for Python comes out differently.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] had: More often the language had the piece all along, and the pattern came from a language that didn't.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] inspired: Many of those examples inspired the ones in this part of the book.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] was: Stepping through a container is stage one in Python and was stage four in the *GoF Design Patterns* examples.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] was: The "design patterns" movement was an important step forward in object-oriented design.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] wrote: Programmers wrote the same supporting code often enough that it acquired a name.
+Chapters/22_Patterns--Iterators.md	[PAST-HEADING] Disappeared: The Pattern That Disappeared
+Chapters/22_Patterns--Iterators.md	[PAST] dropped: Python dropped CODE and CODE rather than make every iterator buffer its stream.
+Chapters/22_Patterns--Iterators.md	[PAST] found: On CODE it reports an CODE: expected CODE, found CODE.
+Chapters/22_Patterns--Iterators.md	[PAST] read: *GoF Design Patterns* gives *Iterator* a class of its own, with separate methods to start a traversal, advance it, test whether it has finished, and read the current item.
+Chapters/23_Patterns--Singleton.md	[PAST] called: He called that design the *Borg*.^[From the television show *Star Trek: The Next Generation*.
+Chapters/23_Patterns--Singleton.md	[PAST] returned: Without the sleep, the cached version below returned one object in each of twenty trials.
+Chapters/23_Patterns--Singleton.md	[PAST] run: After decoration, CODE is CODE, so the same parentheses run CODE instead.
+Chapters/23_Patterns--Singleton.md	[PAST] run: For an ordinary class CODE, CODE is CODE, so the parentheses run CODE, the machinery that invokes CODE and then CODE.
+Chapters/23_Patterns--Singleton.md	[PAST] wrote: Martelli wrote CODE instead of CODE to allow that override.
+Chapters/24_Patterns--Template_Method.md	[PAST] read: In frame 3 the arrow labels read CODE and CODE, with no CODE.
+Chapters/25_Patterns--Surrogate.md	[PAST] typed: Because it inherits CODE, code typed against CODE accepts it.
+Chapters/26_Patterns--Factory.md	[PAST] clone: Instead of a registry of classes, keep a registry of prototypical instances and clone the chosen one:
+Chapters/26_Patterns--Factory.md	[PAST] imported: The class is fine, the registry is fine, and nothing imported the module that defines the class.
+Chapters/26_Patterns--Factory.md	[PAST] read: Write that version and read what CODE reports.
+Chapters/27_Patterns--Function_Objects.md	[PAST] carried: A function pointer carried none, and closures did not exist yet.
+Chapters/27_Patterns--Function_Objects.md	[PAST] passed: The CODE argument passed to CODE, CODE, and CODE is a strategy.
+Chapters/29_Patterns--Changing_the_Interface.md	[PAST] included: Every caller of CODE can call every method of the adaptee, CODE and CODE included.
+Chapters/29_Patterns--Changing_the_Interface.md	[PAST] put: At module level, put the convenient functions and the few classes to expose.
+Chapters/29_Patterns--Changing_the_Interface.md	[PAST] wrote: In a common case, a third-party library names its methods CODE and CODE, you wrote your code against an CODE-calling interface, and you cannot change either one.
+Chapters/30_Patterns--Observer.md	[PAST] declared: The checker still types CODE as the class the CODE statement declared, and rejects CODE.
+Chapters/30_Patterns--Observer.md	[PAST] included: CODE calls CODE where CODE calls CODE, so a responder is any callable, a function included, rather than an object with an CODE method.
+Chapters/30_Patterns--Observer.md	[PAST] raised: Redo exercise 3 with each failure returned as a value instead of raised as an exception.
+Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] closed: A CODE keeps every case together in one block, closed the way the table is, so adding an CODE means adding cases to that block.
+Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] cut: Scissors cut paper, so that is the outcome for the scissors that started the duel, not for the CODE whose code is running.
+Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] declared: A CODE declared on a shared base is one dispatcher that every subclass inherits.
+Chapters/33_Patterns--Visitor.md	[PAST] added: The two operations, CODE and CODE, are new, each added independently of the other:
+Chapters/33_Patterns--Visitor.md	[PAST] built: CODE inspects the dispatch table the decorator built:
+Chapters/35_Patterns--Flyweight.md	[PAST] included: A first design gives each cell everything it knows about itself, its position included:
+Chapters/35_Patterns--Flyweight.md	[PAST] set: Replace CODE on CODE with CODE and set CODE on a parsed map.
+Chapters/35_Patterns--Flyweight.md	[PAST] split: First, split each object's state in two.
+Chapters/36_Patterns--Memento.md	[PAST] bound: For a field that grows with every edit, bound the history's depth (see exercise 2), coalesce edits before CODE stores them, use a persistent structure that shares more than a flat tuple can, or switch to *Command*-based undo, which stores an edit instead of a state.
+Chapters/36_Patterns--Memento.md	[PAST] had: CODE builds a bare CODE with CODE, skipping CODE, and copies in the fields the old bytes had.
+Chapters/36_Patterns--Memento.md	[PAST] let: The checker and the frozen field both let code holding a CODE read CODE, unpack that tuple, or build a CODE by hand.
+Chapters/36_Patterns--Memento.md	[PAST] read: All three read the bytes as data and run no code from them, which removes pickle's security risk.
+Chapters/36_Patterns--Memento.md	[PAST] scoped: Databases provide savepoints, mementos scoped to a transaction.
+Chapters/38_Patterns--Simulation.md	[PAST] adapted: This second example, adapted from my *Atomic Kotlin* book, walks a single robot through a maze.
+Chapters/38_Patterns--Simulation.md	[PAST] claimed: CODE is a set, so a cell claimed twice still counts once.
+Chapters/38_Patterns--Simulation.md	[PAST] drew: In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
+Chapters/38_Patterns--Simulation.md	[PAST] made: The bow made the plate ring.
+Chapters/38_Patterns--Simulation.md	[PAST] read: Independent agents read from and write to one common data structure instead of calling each other's methods.
+Chapters/38_Patterns--Simulation.md	[PAST] rejected: CODE tallies every CODE rejected on an open cell.
+Chapters/38_Patterns--Simulation.md	[PAST] sprinkled: In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
+Chapters/38_Patterns--Simulation.md	[PAST] steered: Nothing steered them there.
+Chapters/38_Patterns--Simulation.md	[PAST] wrote: Jeremy Meyer wrote the original Java version of this example.
+Chapters/40_Functional--Foundations.md	[PAST] kept: For such a value, a mutable structure kept private to one function is the right choice.
+Chapters/41_Functional--Toolkits.md	[PAST] consumed: CODE consumed the CODE on its way to the stop index, although it yielded nothing for it.
+Chapters/41_Functional--Toolkits.md	[PAST] found: CODE's first parameter is CODE, so CODE draws CODE: expected CODE, found CODE.
+Chapters/41_Functional--Toolkits.md	[PAST] kept: CODE is CODE with the intermediate results kept.
+Chapters/41_Functional--Toolkits.md	[PAST] was: CODE was the first value computed, so that miss proves the cache evicted it.
+Chapters/42_Functional--Error_Handling.md	[PAST] parameterized: CODE and CODE are both records, CODE parameterized over the answer type and CODE over the error type.
+Chapters/42_Functional--Error_Handling.md	[PAST] read: An exception from someone else's code may carry no notes, so read CODE with CODE.
+Chapters/42_Functional--Error_Handling.md	[PAST] read: The CODE branch reads CODE, and that read type-checks.
+Chapters/43_Functional--Confidence.md	[PAST] bound: Each test checks a single input against a single answer, so the examples you invent bound what you learn.
+Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place appends nothing.
+Chapters/44_Effects--Effect_Management.md	[PAST] added: OCaml 5 added the handler mechanism, though it does not yet track Effects in function types.
+Chapters/44_Effects--Effect_Management.md	[PAST] avoided: Programmers usually avoided that work by widening the specification until it permitted every exception.
+Chapters/44_Effects--Effect_Management.md	[PAST] became: Version control gave every state of the code a name to which you can return, so experimenting became safe.
+Chapters/44_Effects--Effect_Management.md	[PAST] committed: A team committed to Scala or TypeScript cannot use native Effects, so designers built *library* Effect systems on top of existing type systems.
+Chapters/44_Effects--Effect_Management.md	[PAST] declared: *Algebraic effects* is the name for this design: operations declared as an interface, plus handlers that receive the continuation.
+Chapters/44_Effects--Effect_Management.md	[PAST] delayed: Native systems deliver tracking, interface separation, and delayed binding while the code runs eagerly, with no description trees and no interpreter.
+Chapters/44_Effects--Effect_Management.md	[PAST] divided: The solution divided names among separate namespaces.
+Chapters/44_Effects--Effect_Management.md	[PAST] exposed: The specifications exposed implementation details.
+Chapters/44_Effects--Effect_Management.md	[PAST] faced: Gradual typing faced the same problem, and took a decade.
+Chapters/44_Effects--Effect_Management.md	[PAST] followed: A perfectly pure computation, followed to its logical end, is a space heater with extra steps.
+Chapters/44_Effects--Effect_Management.md	[PAST] gave: Version control gave every state of the code a name to which you can return, so experimenting became safe.
+Chapters/44_Effects--Effect_Management.md	[PAST] introduced: Neither language inferred the list from the functions a body called, so an exception introduced three levels down meant editing every signature above it by hand.
+Chapters/44_Effects--Effect_Management.md	[PAST] looked: Namespaces once looked like ceremony.
+Chapters/44_Effects--Effect_Management.md	[PAST] met: Each of these met resistance as unnecessary overhead, then won adoption, then faded as a question.
+Chapters/44_Effects--Effect_Management.md	[PAST] moved: Automated testing moved "does it still work?" from a manual ritual into the build.
+Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put every name in one global namespace, and the programmer prevented collisions by hand.
+Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++ reduced its version to a single bit: whether a function can throw.
+Chapters/44_Effects--Effect_Management.md	[PAST] succeeded: CODE succeeded because it arrived as part of the language.
+Chapters/44_Effects--Effect_Management.md	[PAST] took: Garbage collection took the tracking of memory ownership out of the programmer's head.
+Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
+Chapters/44_Effects--Effect_Management.md	[PAST] tried: C++ and Java tried to track exceptions with *exception specifications*, a list of exceptions written by hand on each function.
+Chapters/44_Effects--Effect_Management.md	[PAST] was: That was true of every solution to every previous barrier at this stage.
+Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
+Chapters/44_Effects--Effect_Management.md	[PAST] won: Each of these met resistance as unnecessary overhead, then won adoption, then faded as a question.
+Chapters/45_Effects--Generators.md	[PAST] resumed: A generator resumed from two threads at once raises CODE rather than interleaving.
+Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
+Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's parameter annotation to decide what it answers, so a function annotated CODE and returning CODE hands back a default-constructed instance of the requested class.
+Chapters/46_Effects--Stateless.md	[PAST] came: My understanding of Effects came from work with Bill Frasure and James Ward as we created Effect Oriented Programming.
+Chapters/46_Effects--Stateless.md	[PAST] let: Other Effect systems let you describe the work once and decide later how many times to perform it.
+Chapters/46_Effects--Stateless.md	[PAST] made: People made the same complaint against Java's checked exceptions, where an exception added three levels down meant editing every signature above it.
+Chapters/46_Effects--Stateless.md	[PAST] measured: On Windows, CODE measured about 650 microseconds (about 75 on Linux), three to four orders of magnitude above a plain function call.
+Chapters/46_Effects--Stateless.md	[PAST] provided: The driver throws a failure back into the generator, so an ordinary CODE/CODE around a CODE catches it, provided no handler sits between CODE and that Effect.
+Chapters/46_Effects--Stateless.md	[PAST] read: Both read CODE, and neither names the CODE it uses.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] got: Python got one Effect tracked into its type system with CODE.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] left: An CODE in a revealed type means CODE left the subtraction unfinished.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] put: Add a wind turbine to CODE that is available only during a set windy stretch of the evening, put it between solar and the battery in the CODE order, and confirm CODE needs no change.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] raised: Add a fourth failure to CODE: a CODE raised when an article exceeds some length.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] remained: Two purchases went through, and 10 remained.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] spread: The pipeline is in there, spread across three CODE blocks.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] was: Each was a class with a method per product.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] went: Two purchases went through, and 10 remained.
+Chapters/A_Effect_Tracking.md	[PAST] declared: ** Gradual typing declared them with stub files and typeshed.
+Chapters/A_Effect_Tracking.md	[PAST] delayed: Stateless gets tracking, interface separation, and delayed binding with no new tool.
+Chapters/A_Effect_Tracking.md	[PAST] put: Stateless and ZIO put their rows in the return type too.
+Chapters/B_An_Effect_Checker.md	[PAST] called: CODE called CODE inside a comprehension, and now calls CODE.
+Chapters/B_An_Effect_Checker.md	[PAST] improved: Each change is small, and two of them improved the code.
+Chapters/B_An_Effect_Checker.md	[PAST] included: A key is an CODE pattern, the wildcard notation of a shell, in which CODE matches any run of characters, dots included.
+Chapters/B_An_Effect_Checker.md	[PAST] passed: A function passed as an argument.
+Chapters/B_An_Effect_Checker.md	[PAST] required: The tool required all four.
+Chapters/B_An_Effect_Checker.md	[PAST] took: Reaching that output took four changes to the checker's own code.
+Solutions/03_Foundations--Containers/README.md	[PAST] stored: Reading CODE earlier stored that CODE under CODE.
+Solutions/04_Foundations--Control_Flow/README.md	[PAST] split: Call CODE on the CODE and split the result into lines.
+Solutions/05_Foundations--Functions/README.md	[PAST] arrived: If the output shows CODE, the dictionary arrived as one more positional argument.
+Solutions/05_Foundations--Functions/README.md	[PAST] read: The error message names the missing parameter, so read it closely.
+Solutions/05_Foundations--Functions/README.md	[PAST] thought: The message, CODE, names the parameter the caller thought they were filling.
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST-HEADING] imported: A fourth module, imported three ways
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] included: Changing the import back to CODE while the file is still CODE raises CODE on every platform, Windows and macOS included.
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] read: When a module may rebind a name to a new list or dict, import the module and read the name through it each time, as in CODE.
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] updated: your script outside CODE prints CODE after four loading messages, the same script runs again with the directory renamed to CODE and the import updated, and you can cite the rule in File Names that the capital letter breaks.
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote a prediction before each run, the CODE version prints CODE, and you have the result of the CODE run against CODE on your own machine.
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote your prediction before running, CODE without the line prints a list that matches it and differs from CODE by two names, and after you restore the line it prints CODE again.
+Solutions/07_Foundations--Classes/README.md	[PAST] removed: With the decorator removed, CODE prints CODE.
+Solutions/08_Foundations--Static_Types/README.md	[PAST] found: before the widening, CODE reports CODE on the CODE call with CODEExpected CODE, found CODE CODE.
+Solutions/08_Foundations--Static_Types/README.md	[PAST] found: with the comment removed, CODE reports CODE on CODE, marking CODE with CODEExpected CODE, found CODE CODE, and you can say what CODE returns at run time.
+Solutions/09_Foundations--Class_Attributes/README.md	[PAST-HEADING] shared: A mutable CODE shared down the hierarchy
+Solutions/09_Foundations--Class_Attributes/README.md	[PAST] declared: Combined, the mutable value and the inheritance lookup produce one list, declared on the base class, that every subclass mutates under its own name.
+Solutions/09_Foundations--Class_Attributes/README.md	[PAST] gave: The line CODE gave CODE its own instance attribute, and that attribute shadows the class attribute when you read CODE.
+Solutions/09_Foundations--Class_Attributes/README.md	[PAST] read: Both names report the one shared count, so the three lines read CODE, CODE, and CODE.
+Solutions/09_Foundations--Class_Attributes/README.md	[PAST] read: CODE and CODE both inherit CODE, so both names read through to CODE, and CODE mutates the list stored there.
+Solutions/10_Foundations--Cleanup/README.md	[PAST-HEADING] guarded: An CODE that fails, unguarded and guarded
+Solutions/11_Techniques--Testing/README.md	[PAST-HEADING] injected: 5. Stubbing a boundary, patched and then injected
+Solutions/11_Techniques--Testing/README.md	[PAST-HEADING] injected: The environment variable, patched and then injected
+Solutions/11_Techniques--Testing/README.md	[PAST] built: A CODE stub built that way gives the test nothing to inspect.
+Solutions/11_Techniques--Testing/README.md	[PAST] put: Create and fund the CODE before the CODE, and put the CODE on its balance after the CODE.
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	[PAST] Built: Defaults Built Fresh, Not Shared shows CODE rejecting a mutable default and CODE as the fix.
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	[PAST] put: A subclass is free to define one, so put the check there and call CODE afterward.
+Solutions/13_Techniques--Pattern_Matching/README.md	[PAST] put: CODE tries cases top to bottom, so put the narrow list shapes before the wider one.
+Solutions/13_Techniques--Pattern_Matching/README.md	[PAST] put: For the first fix, put the constant in a namespace so the pattern is a dotted name.
+Solutions/15_Techniques--Context_Managers/README.md	[PAST-HEADING] restored: CODE with its CODE/CODE restored
+Solutions/15_Techniques--Context_Managers/README.md	[PAST-HEADING] stacked: 5. Two CODE decorators stacked on one function
+Solutions/15_Techniques--Context_Managers/README.md	[PAST] entered: Combining Context Managers shows several managers on one CODE statement, entered left to right.
+Solutions/15_Techniques--Context_Managers/README.md	[PAST] included: CODE instead accepts a count settled at runtime, such as the number of names on a command line, zero included.
+Solutions/15_Techniques--Context_Managers/README.md	[PAST] wrote: you wrote your prediction before running, and your function prints CODE first and CODE last, with the two CODE lines nested inside them around the body line.
+Solutions/15_Techniques--Context_Managers/README.md	[PAST] wrote: you wrote your six-line prediction before running, and your edited CODE prints CODE right after CODE and CODE right before CODE, the last line.
+Solutions/16_Techniques--Comprehensions/README.md	[PAST] predicted: you predicted the count before running, and the edited CODE, with a CODE added, prints that number.
+Solutions/16_Techniques--Comprehensions/README.md	[PAST] wrote: you wrote down all three printed values before running, and the edited CODE prints them in that order.
+Solutions/16_Techniques--Comprehensions/README.md	[PAST] wrote: you wrote down the entries before running, and the edited CODE prints the keys and values you wrote.
+Solutions/16_Techniques--Comprehensions/README.md	[PAST] wrote: you wrote the whole printed dictionary, keys in order, before running, and the edited CODE prints what you wrote.
+Solutions/17_Techniques--Metaprogramming/README.md	[PAST] dropped: That assignment dropped the last reference to the first function, so that function has disappeared before any of the three runs.
+Solutions/17_Techniques--Metaprogramming/README.md	[PAST] put: Define CODE as an ordinary function, then put it in the dictionary beside CODE.
+Solutions/18_Techniques--Performance/README.md	[PAST] measured: One machine measured CODE about 19 times faster at 10,000 parts and about 7 times faster at 100.
+Solutions/18_Techniques--Performance/README.md	[PAST] read: CODE attaches the same event to every Python code object in the process, so read the CODE for entries beyond your two functions.
+Solutions/19_Techniques--Concurrency/README.md	[PAST] cancelled: CODE still sleeps for CODE, so the group cancels it during that sleep and its task ends cancelled.
+Solutions/19_Techniques--Concurrency/README.md	[PAST] read: Two threads can be inside CODE at the same moment, read the same CODE, and return the same ticket, as they do without the lock.
+Solutions/19_Techniques--Concurrency/README.md	[PAST] run: The read-modify-writes run one at a time, as with CODE, and all 400 increments survive.
+Solutions/20_Patterns--Rethinking_Objects/README.md	[PAST-HEADING] plugged: A leaking CODE list, then plugged
+Solutions/21_Patterns--Design_Patterns/README.md	[PAST] crossed: Everything crossed out serves a language where a method belongs to a class.
+Solutions/21_Patterns--Design_Patterns/README.md	[PAST] was: Removing CODE's CODE parameter means inlining CODE where the call through CODE was and dropping the second argument from each call.
+Solutions/21_Patterns--Design_Patterns/README.md	[PAST] written: you have removed one piece, run the program and CODE, and written down what changed in the output and in the requirement the program meets.
+Solutions/22_Patterns--Iterators/README.md	[PAST] dropped: That stored item restores the CODE that GoF had and Python dropped.
+Solutions/22_Patterns--Iterators/README.md	[PAST] measured: ** One machine measured about 9,300 bytes at CODE of 100 and about 416,000 at CODE of 10,000.
+Solutions/23_Patterns--Singleton/README.md	[PAST] gone: your file prints the same accumulated CODE list and CODE that the chapter's CODE prints, and CODE passes on it with the sentinel and the guard gone.
+Solutions/23_Patterns--Singleton/README.md	[PAST] included: The wrapper takes the lock on every call, cache hits included, because the cache lookup runs inside CODE, which the wrapper calls with the lock held.
+Solutions/23_Patterns--Singleton/README.md	[PAST] reached: You can say which name the assignment changes, and why the original mutation reached both names.
+Solutions/23_Patterns--Singleton/README.md	[PAST] set: CODE is CODE, the value CODE set.
+Solutions/24_Patterns--Template_Method/README.md	[PAST-HEADING] customized: A file-processing framework, customized both ways
+Solutions/26_Patterns--Factory/README.md	[PAST-HEADING] forgot: Finding the class that forgot CODE
+Solutions/26_Patterns--Factory/README.md	[PAST] changed: The CODE runs described next use CODE with CODE added and CODE changed to CODE.
+Solutions/27_Patterns--Function_Objects/README.md	[PAST-HEADING] applied: A configurable CODE, closed over and partially applied
+Solutions/27_Patterns--Function_Objects/README.md	[PAST-HEADING] closed: A configurable CODE, closed over and partially applied
+Solutions/27_Patterns--Function_Objects/README.md	[PAST] read: The two lambda forms run their body at the call, so CODE and the factory's lambda both read CODE when the command runs.
+Solutions/27_Patterns--Function_Objects/README.md	[PAST] read: They read the variable they name, at the moment of the call.
+Solutions/27_Patterns--Function_Objects/README.md	[PAST] returned: CODE reads the annotation on CODE and gets CODE, the class CODE returned.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] accepted: The CODE changed, and both Python and the type checker accepted the change.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] changed: The CODE changed, and both Python and the type checker accepted the change.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] checked: Freezing the data class makes that check final, since every field keeps the value CODE checked.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] wrote: your file prints CODE for CODE and CODE for CODE, you wrote both predictions down before running it, and you can explain each answer from the CODE each side carries.
+Solutions/30_Patterns--Observer/README.md	[PAST-HEADING] returned: 5. Failures returned as values
+Solutions/30_Patterns--Observer/README.md	[PAST] let: String members also let CODE pass a CODE to CODE.
+Solutions/30_Patterns--Observer/README.md	[PAST] read: They read the same CODE object, so the letters and the counts describe one state of the model.
+Solutions/30_Patterns--Observer/README.md	[PAST] split: The six sizes split three ways.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] ranked: Each CODE kind holds two of six weapon types, ranked around a cycle.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] read: The CODE and CODE cells each read CODE from whichever item is the CODE.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] reversed: CODE returns CODE, CODE, CODE, CODE against CODE, CODE, CODE, and CODE, each reversed duel returns the opposite result (a draw stays a draw), and you can state how many methods you added against exercise 1's seven rows.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] wrote: The method must put them back in the order the source wrote them.
+Solutions/35_Patterns--Flyweight/README.md	[PAST-HEADING] shared: 2. CODE, shared vs. unshared tiles
+Solutions/35_Patterns--Flyweight/README.md	[PAST] saved: That difference repeats in every cell, so the bytes saved grow with the map.
+Solutions/36_Patterns--Memento/README.md	[PAST] included: ** CODE copies the strokes into an immutable CODE, so each memento keeps the strokes it held when CODE returned it, through every later call, CODE included.
+Solutions/36_Patterns--Memento/README.md	[PAST] undid: After CODE, CODE returns CODE, then CODE, the states CODE undid, in the order CODE recorded them.
+Solutions/37_Patterns--Pattern_Refactoring/README.md	[PAST] included: If you decorate the CODE methods with CODE instead of CODE, the loop prints "no special handling" for all five materials, CODE included, and the type checker reports nothing.
+Solutions/38_Patterns--Simulation/README.md	[PAST] requested: The one requested change forces three more edits, because a caller must CODE an CODE to get its result.
+Solutions/38_Patterns--Simulation/README.md	[PAST] wrote: you wrote your prediction before running the view, and for mode CODE the rendered plate shows one vertical and two horizontal interior lines plus the four edges, with agitation falling toward zero as in CODE.
+Solutions/40_Functional--Foundations/README.md	[PAST] changed: CODE still raises a CODE, and no calling code changed.
+Solutions/40_Functional--Foundations/README.md	[PAST] consumed: The first CODE, at CODE, consumed the iterator, which stays exhausted, so every later pass gets an empty result.
+Solutions/40_Functional--Foundations/README.md	[PAST] read: ** CODE and CODE both read CODE and leave it as it was.
+Solutions/40_Functional--Foundations/README.md	[PAST] wrote: you wrote a prediction before running, and CODE prints CODE.
+Solutions/43_Functional--Confidence/README.md	[PAST-HEADING] ran: 1. Which process ran each call
+Solutions/43_Functional--Confidence/README.md	[PAST-HEADING] ran: 2. Which thread ran each call
+Solutions/43_Functional--Confidence/README.md	[PAST] ran: The number is greater than one, so some of the work ran outside the main process.
+Solutions/43_Functional--Confidence/README.md	[PAST] re: It therefore re-finds the failure you are in the middle of fixing instead of leaving it to chance.
+Solutions/43_Functional--Confidence/README.md	[PAST] reported: Three consecutive runs on one 32-core machine reported CODE distinct process IDs each time.
+Solutions/43_Functional--Confidence/README.md	[PAST] reported: With limits twenty times smaller, CODE, the same machine reported CODE on each of three runs.
+Solutions/45_Effects--Generators/README.md	[PAST] found: Under CODE a generator must return CODE, so CODE rejects CODE's CODE with an CODE: expected CODE, found CODE.
+Solutions/45_Effects--Generators/README.md	[PAST] stopped: The interview stopped after one question, before it built a CODE, and CODE is not a CODE in any case.
+Solutions/45_Effects--Generators/README.md	[PAST] told: The type checker told you more.
+Solutions/45_Effects--Generators/README.md	[PAST] wrote: you wrote the full sequence of lines before running the modified CODE, and it matches the run line for line, including which sends print two lines and what the final CODE after the loop prints.
+Solutions/46_Effects--Stateless/README.md	[PAST-HEADING] declared: 2. An undeclared need, declared
+Solutions/46_Effects--Stateless/README.md	[PAST] added: your six predictions match six runs with the third implementation added.
+Solutions/46_Effects--Stateless/README.md	[PAST] answered: At runtime the handler answered three requests across the two calls, two for CODE and one for CODE, although CODE annotates its parameter CODE.
+Solutions/46_Effects--Stateless/README.md	[PAST] applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.
+Solutions/46_Effects--Stateless/README.md	[PAST] declared: The CODE stays declared, as CODE says, so it is still in the yield channel when CODE wraps CODE.
+Solutions/46_Effects--Stateless/README.md	[PAST] described: Its signature described a different function.
+Solutions/46_Effects--Stateless/README.md	[PAST] did: CODE did the right thing all along.
+Solutions/46_Effects--Stateless/README.md	[PAST] put: Two of the six orderings put CODE first and send the greeting to the screen.
+Solutions/46_Effects--Stateless/README.md	[PAST] read: ** CODE at strength CODE exceeds the robotic nailer's force of CODE, so both its rows read CODE.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] read: Give the Ability fields for the range, and read them off the request in the handler.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] started: your handler, started at CODE with a one-second step, makes the chapter's CODE return CODE for the entry CODE.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] widened: CODE's error parameter, widened to include CODE.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] wrote: you wrote your prediction before running, and the run prints CODE and then CODE, with no CODE line.

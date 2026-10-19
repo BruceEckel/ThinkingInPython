@@ -552,7 +552,7 @@ The bound turns the decorator into a check:
 a decorated class must satisfy the Protocol.
 If a class lacks `draw()`, or its `draw()` takes an extra parameter,
 the checker reports `invalid-argument-type` at the class's `@make.register` line before the program runs.
-[Self Registration](#self-registration) left the same omission to runtime,
+[Self Registration](#self-registration) leaves the same omission to runtime,
 where a subclass that lacks `draw()` registers, fails at construction,
 and gets no report from the checker.
 

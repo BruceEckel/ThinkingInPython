@@ -784,7 +784,7 @@ and re-raises the cancellation as it exits.
 so it converts that `CancelledError` into a `TimeoutError` as it exits.
 The caller therefore sees an ordinary exception instead of a bare cancellation.
 The last two lines show the deadline's reach.
-`fast` finished before the deadline and keeps its result,
+`fast` finishes before the deadline and keeps its result,
 and `slow` reports `cancelled() == True`.
 
 `asyncio.wait_for()` bounds one awaitable the same way.

@@ -5,7 +5,7 @@
 > and the type checker checks every caller against them.
 
 [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
-introduced library Effect systems.
+introduces library Effect systems.
 [Stateless](https://github.com/suned/stateless)
 implements an Effect Management System (EMS).
 
@@ -18,7 +18,7 @@ In Stateless, the type checker performs both.
 
 Stateless builds on generators.
 [Generators](45_Effects--Generators.md)
-covered the three-parameter `Generator` annotation,
+covers the three-parameter `Generator` annotation,
 a driver that answers a generator's requests one `send()` at a time,
 and `yield from`, which composes generators and produces the inner generator's return value.
 Every Effect in this chapter is such a generator.
@@ -894,7 +894,7 @@ although `greet()`, one level further down, is the one function that uses it.
 ## Supplying an Interface
 
 [Swapping the Implementation](#swapping-the-implementation)
-substituted a `Recorder` for a `Console` but postponed the reason for using `as_type(Console)`.
+substitutes a `Recorder` for a `Console` but postpones the reason for using `as_type(Console)`.
 The substitution poses two questions,
 one for the type checker and one for the runtime check.
 
@@ -1255,7 +1255,7 @@ if __name__ == "__main__":
 ```
 
 `Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
-Every `Depend` signature so far read `Depend[Need[...], ...]`,
+Every `Depend` signature so far reads `Depend[Need[...], ...]`,
 while this one names the Ability bare.
 One rule covers both cases: the channel holds Abilities.
 `Async` is an Ability, so it sits there bare.
