@@ -209,8 +209,10 @@ a different design, a detail, or an equivalent alternative.
 
 [Abstract Factories](../../Chapters/26_Patterns--Factory.md#abstract-factories) shows `GameElementFactory` as a family of creation methods, once as an abstract base class and once as a `Protocol`.
 A new concrete factory implements both `make_character()` and `make_obstacle()`, returning a new `Character` and a new `Obstacle` that belong together.
-In the `Protocol` version the concrete factory declares no base class, so the type checker makes the check.
-The checker reports the missing `make_obstacle()` at the line where you pass the factory to `GameEnvironment`.
+In the `Protocol` version the concrete factory declares no base class,
+so constructing it succeeds at runtime.
+The type checker reports the missing `make_obstacle()`
+at the line where you pass the factory to `GameEnvironment`.
 
 <details>
 <summary>The shape</summary>
