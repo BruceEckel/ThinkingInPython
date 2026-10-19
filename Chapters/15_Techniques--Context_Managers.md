@@ -1141,7 +1141,7 @@ A thread that calls `lease()` while the pool is empty blocks in `get()` until an
 A pool with no limit would let all eight threads hold a lease together and print a peak of eight.
 
 `available()` is a snapshot for the demo, not a synchronization primitive.
-`Queue.qsize()` becomes approximate once more than one thread is borrowing,
+`Queue.qsize()` becomes approximate when more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
 
 ### Testing the Lease
@@ -1230,10 +1230,10 @@ before and after the `yield`, so every `with pool.lease()` stays the same.
 
 A setup and teardown pair used once, in one place,
 is often clearest as a `try`/`finally` written inline.
-Write a manager once you want the `with` syntax at the call site,
-or once several places need the same setup and teardown.
+Write a manager when you want the `with` syntax at the call site,
+or when several places need the same setup and teardown.
 
-Four forms give you a context manager, once you have decided you want one.
+Four forms give you a context manager, once you decide you want one.
 Try them in this order.
 Use a `contextlib` manager when one fits, since `suppress`, `closing`,
 `nullcontext`, and `ExitStack` cover most of what people write by hand.
