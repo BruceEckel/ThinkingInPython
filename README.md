@@ -368,6 +368,8 @@ I began going back through my Pycon presentations and blog posts and adding thos
 ## Edit checklist
 
 For my own bookkeeping.
+The unchecked boxes do not mean a chapter hasn't been edited,
+just that it hasn't gotten an edit *in this pass* (there are multiple edit passes).
 
 - ⬜ 01_Introduction.md
 - ⬜ 02_Foundations--Tour.md
@@ -399,7 +401,7 @@ For my own bookkeeping.
 - ⬜ 28_Patterns--Data_Transfer_Objects.md
 - ✅ 29_Patterns--Changing_the_Interface.md
 - ✅ 30_Patterns--Observer.md
-- 🚧 31_Patterns--State_Machines.md
+- ✅ 31_Patterns--State_Machines.md
 - ⬜ 32_Patterns--Multiple_Dispatching.md
 - ⬜ 33_Patterns--Visitor.md
 - ⬜ 34_Patterns--Composite_and_Interpreter.md
@@ -412,7 +414,7 @@ For my own bookkeeping.
 - ⬜ 41_Functional--Toolkits.md
 - ⬜ 42_Functional--Error_Handling.md
 - ⬜ 43_Functional--Confidence.md
-- ⬜ 44_Effects--Effect_Management.md
+- 🚧 44_Effects--Effect_Management.md
 - ⬜ 45_Effects--Generators.md
 - ⬜ 46_Effects--Stateless.md
 - ⬜ 47_Effects--Stateless_in_Practice.md
