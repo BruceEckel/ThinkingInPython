@@ -1,7 +1,7 @@
 # Effect Management
 
-> A function does more than its signature says: it reads a clock, writes a log,
-> opens a connection.
+> A function does more than its signature says: it might read a clock, write to a log,
+> or open a connection.
 > Effect Management makes the extra visible to a reader, a test,
 > and a type checker.
 
