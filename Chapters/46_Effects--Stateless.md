@@ -1257,7 +1257,7 @@ if __name__ == "__main__":
 ```
 
 `Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
-Every signature so far read `Depend[Need[...], ...]`,
+Every `Depend` signature so far read `Depend[Need[...], ...]`,
 while this one names the Ability bare.
 One rule covers both cases: the channel holds Abilities.
 `Async` is an Ability, so it sits there bare.
