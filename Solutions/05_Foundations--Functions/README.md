@@ -504,8 +504,9 @@ Without the `/`, `describe(name="Bob")` succeeds and `facts` stays empty.
 at the call site spreads a dictionary into separate keyword arguments.
 Here, `**facts` in the parameter list collects separate keyword
 arguments back into a dictionary. The two forms share the `**` and
-invert each other. That inversion lets a function that declares
-`**kwargs` pass them through to another call as `**kwargs`.
+invert each other. That inversion lets `trace()` in
+`unpacking_arguments.py` collect keywords in `**kwargs` and pass them
+on to `func` as `**kwargs`.
 
 The `/` has two more effects on `describe()`.
 Because callers pass `name` by position, a later rename of the parameter leaves every caller working.
