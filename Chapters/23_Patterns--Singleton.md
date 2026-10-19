@@ -180,7 +180,7 @@ print(len({id(settings()), id(settings("prod")),
 
 One parameter turns "one singleton" into one singleton per argument value.
 A default does not help.
-The cache keys on the arguments as the call writes them,
+The cache looks up its entry by the arguments as the call writes them,
 before Python fills in any default.
 The three calls in the listing therefore build three objects for one environment.
 Keep the constructor function's signature empty,
@@ -395,7 +395,7 @@ print(distinct_objects(settings))
 
 The inner test (`[2]`)
 is the check inside the lock from `singleton_locked_settings.py`.
-The outer test (`[1]`) exists to skip the lock once the object is there.
+The outer test (`[1]`) exists to skip the lock when the object is there.
 
 Double-checked locking works, but it depends on two details.
 If you drop the inner test,
