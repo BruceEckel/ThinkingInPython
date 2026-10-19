@@ -428,8 +428,7 @@ expect(ValueError, Circle, -1)
 
 `property_setter.py` completes the conversion.
 `radius` began as a plain attribute and is now a validated property.
-The two lines that read `c.radius` and `c.area` are the ones from `properties.py`,
-unchanged.
+The two lines that read `c.radius` and `c.area` are unchanged from `properties.py`.
 Because code outside the class reads both versions the same way,
 you can wait to convert an attribute into a property until you need the validation.
 
