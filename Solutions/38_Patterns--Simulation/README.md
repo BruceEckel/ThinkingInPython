@@ -1119,8 +1119,9 @@ The file makes two changes: `Plate`
 takes the field function as a constructor argument instead of calling
 the module-level `amplitude()`, and the module adds `membrane()`
 beside `amplitude()`. That argument makes exercise
-7's different physics a second function rather than an edit, so both
-functions can run side by side in one program.
+7's different physics a second function rather than an edit.
+The `Plate` there takes `field=membrane`,
+while the other two exercises keep the default `amplitude()`.
 
 ```python
 # chladni.py
