@@ -636,9 +636,10 @@ so a `match` that must produce a value goes inside a function that returns from 
 
 Python has no `sealed` keyword.
 `assert_never()` plus a type checker fills that role instead.
-An `if`/`isinstance()` chain can give the same guarantee,
-but only if you remember to end it with `assert_never()`.
-A `match` makes the form of the dispatch explicit.
+An `if`/`isinstance()` chain that ends with `assert_never()` gives the same guarantee.
+A `match` names the subject once and binds fields as it tests the type.
+`case Circle(radius)` in `area()` tests the type and binds `radius` in one pattern,
+where the chain tests `isinstance(shape, Circle)` and then reads `shape.radius`.
 
 `Shape` turns the classic OOP "shapes" example into a closed type union instead of a class hierarchy.
 
@@ -884,7 +885,7 @@ Inheritance confines a new type to one new subclass.
 Pattern matching confines a new operation to one new function.
 The other kind of change touches every existing subclass or every existing `match`.
 That is the open-set-versus-closed-set tradeoff from [When Not to Match](#when-not-to-match),
-worked out concretely.
+which the two notification versions show in code.
 It also has a name: the *expression problem*.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works through the same tradeoff with shapes,
