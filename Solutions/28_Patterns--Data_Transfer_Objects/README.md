@@ -434,8 +434,9 @@ identity, which is `False` for two distinct objects.
 
 A `NamedTuple` is a tuple with labels, so it works with any code that expects
 a tuple and compares equal to any tuple holding the same values. A frozen
-data class is a distinct type, so `==` matches it against instances of
-its own class and answers `False` for everything else.
+data class's `__eq__()` checks the class first, so `==` matches it
+against instances of its own class and answers `False` for everything
+else.
 Which one is right depends on whether your three numbers should be
 interchangeable with any tuple of the same values.
 
