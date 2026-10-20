@@ -335,7 +335,7 @@ for text in ["2", "0", "two"]:
 #: 'two': invalid literal for int() with base 10: 'two'
 ```
 
-`parse_run()` is the one function in `slope_edge.py` that sees bad input.
+`parse_run()` receives the bad input.
 `int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`.
 The `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
 Unlike `@safe`'s `Exception`,
