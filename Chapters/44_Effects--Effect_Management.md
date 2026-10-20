@@ -275,7 +275,17 @@ it returns `rise / run.value` as a `float` rather than a `Result`.
 
 All three approaches keep a division by zero from escaping `slope()` as an exception,
 but each handles it in a different place.
-A `Result` makes every caller handle failure explicitly, at every call site.
+With a `Result`, the place is every call site,
+where each caller unpacks the `Result` and decides what a failure means.
+With a `try`, the place is inside `slope()`,
+where the `except` clause handles `ZeroDivisionError`.
+Every other exception propagates through `slope()` to its caller.
+With `NonZero`, the place is `__post_init__()`, which runs once,
+when `NonZero(...)` builds the instance.
+`slope()`, and every other function that takes a `NonZero`,
+trusts the argument because the check ran when the caller built it.
+
+`slope_result.py`'s `Result` has a second drawback.
 `@safe` catches `Exception`,
 so `slope()` in `slope_result.py` returns `Result[float, Exception]`.
 That error type covers the `ZeroDivisionError` from a zero `run`,
@@ -286,22 +296,22 @@ Both arrive as an `Err` with the same static type,
 so the caller's `case Err(error)` must inspect the exception to tell a bad argument from a bug.
 [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 describes this limitation of `@safe` and the production fix,
-a version that catches the exception types you name and lets the rest propagate.
-Catching by hand puts the fix inside `slope()`,
-where the `try` catches the exceptions it specifies and lets the rest propagate.
-A restrictive type runs the check once, when `NonZero(...)` builds the instance.
-Every function downstream is pure because it receives the type,
-not because its author remembered a check.
+a version that catches the exception types you specify and lets the rest propagate.
 
 None of the three makes the failure disappear.
-A `Result` turns it into a value, a `try` catches it,
-and `NonZero` moves it to the one line that builds the `NonZero`.
-They differ in how many functions must know about it.
+A `Result` turns it into a value.
+A `try` catches it.
+`NonZero` moves it: `NonZero(0)` raises the `ValueError`,
+so the failure surfaces at the line that builds the argument,
+before `slope()` runs.
+The three differ in how many functions must know about the failure.
 
 Standard practice combines the first and third,
-the `Result` and the restrictive type.
-The boundary parses untrusted input into the restrictive type and reports a bad value as a `Result` instead of raising an exception.
-Every function past that boundary takes `NonZero` and stays total:
+the `Result` and the `NonZero` type.
+One function, where input arrives as text,
+parses the text into a `NonZero` and returns a `Result` instead of raising an exception.
+Every function beyond that one takes a `NonZero` and stays total.
+In `slope_edge.py` that function is `parse_run()`:
 
 ```python
 # slope_edge.py
