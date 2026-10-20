@@ -394,6 +394,8 @@ Everything a pure function touches lives in its arguments, its local variables,
 and its return value,
 so the function is safe to run in parallel with any other code.
 The same guarantee makes testing trivial.
+A test simply calls a pure function with arguments and checks the return value,
+and doesn't need to worry about Effects.
 
 ## Two Phases of Effect Analysis
 
