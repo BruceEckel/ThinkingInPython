@@ -630,7 +630,7 @@ list without anyone calling it an Effect system.
 
 `async` satisfies neither of the other two.
 
-It does not **separate the interface from the implementation**.
+`async` does not **separate the interface from the implementation**.
 `await price_of_async(item)` names no interface. It says "run this
 particular coroutine." The coroutine's body defines what awaiting
 it does. Compare `Ask` in `ask_tell.py`, where `greet()` names the
@@ -638,7 +638,7 @@ interface and leaves the implementation to the caller. `async`
 has no equivalent of writing a function against "something awaitable
 that yields a price" and choosing the implementation later.
 
-It does not **bind the implementation later**. `asyncio.run()` chooses
+`async` does not **bind the implementation later**. `asyncio.run()` chooses
 an event loop. That choice sounds like late binding until you ask
 what it lets you swap. A different loop runs the same awaits on a
 different schedule.

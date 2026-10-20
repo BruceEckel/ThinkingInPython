@@ -30,7 +30,7 @@ This book emphasizes the benefits of pure functions:
   `simplify()` returns a new tree instead of editing the one it receives.
 
 In each case, you can determine purity by reading a single function.
-This doesn't work if the function calls other functions.
+Reading a single function stops working when that function calls other functions.
 If any of those other functions interacts with the environment,
 it makes the calling function impure.
 To determine if a function is impure,
@@ -38,7 +38,7 @@ you must either trust the documentation or examine the code of every function it
 
 Reading every callee soon becomes tedious and error-prone.
 A type system that verifies purity does the work for you.
-This is an *Effect Management System*.
+That type system is an *Effect Management System*.
 
 ## What Is an Effect?
 
@@ -144,7 +144,7 @@ Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
 If you decorate `slope()` with that chapter's `@safe`,
-every exception it raises becomes a value instead of a crash:
+every exception `slope()` raises becomes a value instead of a crash:
 
 ```python
 # slope_result.py
@@ -201,9 +201,9 @@ expect(ValueError, slope, 10, -1)
 
 Catching the exception works with the types you have.
 But an `except` clause catches only the exception(s) it names,
-and the one in `slope()` names `ZeroDivisionError`.
+and `slope()`'s `except` names `ZeroDivisionError`.
 `validate()` raises `ValueError` for a negative `run`.
-The `try` around that call lets `ValueError` propagate.
+The `try` around the `validate()` call lets `ValueError` propagate.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
 
@@ -267,7 +267,7 @@ with expected(ValueError):
 
 The check runs once, in `__post_init__()`,
 when `NonZero(...)` builds the instance.
-Every function that takes a `NonZero` gets that guarantee with the argument.
+Every function that takes a `NonZero` gets a guaranteed nonzero value with the argument.
 Because `slope()` cannot divide by zero,
 it returns `rise / run.value` as a `float` rather than a `Result`.
 
@@ -285,10 +285,10 @@ which is a bug the caller cannot handle.
 Both arrive as an `Err` with the same static type,
 so the caller's `case Err(error)` must inspect the exception to tell a bad argument from a bug.
 [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
-describes this limitation of `@safe` and the production fix:
-take the exception types to catch as an argument and let the rest propagate.
+describes this limitation of `@safe` and the production fix,
+a version that catches the exception types you name and lets the rest propagate.
 Catching by hand puts the fix inside `slope()`,
-where the `try` catches the exceptions it names and lets the rest propagate.
+where the `try` catches the exceptions it specifies and lets the rest propagate.
 A restrictive type runs the check once, when `NonZero(...)` builds the instance.
 Every function downstream is pure because it receives the type,
 not because its author remembered a check.
@@ -327,7 +327,7 @@ for text in ["2", "0", "two"]:
 
 `parse_run()` is the only place that can fail.
 `int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`,
-and the `except` turns either one into an `Err` its caller must unpack.
+and the `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
 Unlike `@safe`'s `Exception`,
 the return type names the failure the caller handles.
 A bug inside `parse_run()` still raises its own exception.
@@ -433,7 +433,7 @@ everything it changes, and everything that might go wrong.
 In a small codebase you can hold that knowledge in your head.
 In a large one you cannot.
 A function written next week calls the function you understand today,
-and code a colleague writes next month calls that one.
+and code a colleague writes next month calls next week's function.
 Each step adds dependencies the signatures hide,
 until the whole set exceeds what any one person knows.
 
@@ -633,7 +633,8 @@ The body looks like ordinary sequential code.
 The compiler reads what the body calls and infers the Effects,
 the same way it tracks whether a value is an integer or a string.
 
-The examples in this section and the next come from my research,
+The examples in this section and in [Library Effect Management](#library-effect-management)
+come from my research,
 in which I build the same small programs in four Effect-managing languages.
 The first is [Koka](https://koka-lang.github.io/),
 a research language with native Effects.
@@ -781,8 +782,8 @@ The three type parameters of `ZIO[Tell, Nothing, Unit]` carry the Effect informa
 `Tell` is the environment the computation requires.
 `Nothing` is the error type, meaning `hello` cannot fail.
 `Unit` is what it produces on success.
-The signature does the same job as Koka's Effect row.
-It tells you what `hello` needs, what can go wrong, and what comes back.
+The signature does the same job as Koka's Effect row:
+it tells you what `hello` needs, what can go wrong, and what comes back.
 
 Everything else in the listing is machinery: a trait for the interface,
 a companion object to lift that interface into the `ZIO` type,
@@ -863,7 +864,7 @@ When the host supplies every implementation,
 it can guarantee what the generated code does.
 Generated code that rebinds an implementation would break that guarantee.
 
-Two go further.
+Two languages go further.
 In [Pact](https://github.com/KikotVit/pact-lang),
 a function declares a `needs` clause.
 A separate `using` clause rebinds each implementation,
@@ -1023,7 +1024,7 @@ comparing each callee's Effects with the caller's declaration at each call.
 
 The languages that track Effects today are young,
 and the libraries that retrofit Effect tracking are demanding.
-That was true of every solution to every previous barrier at this stage.
+Every solution to every previous barrier was young and demanding at this stage.
 Namespaces once looked like ceremony.
 Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
