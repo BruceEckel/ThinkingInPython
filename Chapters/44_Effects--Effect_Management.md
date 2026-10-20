@@ -277,9 +277,16 @@ All three approaches keep a division by zero from escaping `slope()` as an excep
 but each handles it in a different place.
 A `Result` makes every caller handle failure explicitly, at every call site.
 `@safe` catches `Exception`,
-so `slope_result.py`'s `Result[float, Exception]` cannot distinguish `ZeroDivisionError` from a bug.
+so `slope()` in `slope_result.py` returns `Result[float, Exception]`.
+That error type covers the `ZeroDivisionError` from a zero `run`,
+which the caller can handle,
+and a `NameError` from a misspelled name inside `slope()`,
+which is a bug the caller cannot handle.
+Both arrive as an `Err` with the same static type,
+so the caller's `case Err(error)` must inspect the exception to tell a bad argument from a bug.
 [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
-describes the same limitation.
+describes this limitation of `@safe` and the production fix:
+take the exception types to catch as an argument and let the rest propagate.
 Catching by hand puts the fix inside `slope()`,
 where the `try` catches the exceptions it names and lets the rest propagate.
 A restrictive type runs the check once, when `NonZero(...)` builds the instance.
