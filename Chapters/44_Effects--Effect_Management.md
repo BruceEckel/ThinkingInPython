@@ -288,7 +288,7 @@ trusts the argument because the check ran when the caller built it.
 None of the three makes the failure disappear.
 A `Result` turns it into a value.
 A `try` catches it.
-`NonZero` moves it: `NonZero(0)` raises the `ValueError`,
+`NonZero` moves it: `NonZero(0)` raises `ValueError`,
 so the failure surfaces at the line that builds the argument,
 before `slope()` runs.
 The three differ in how many functions must know about the failure.
@@ -335,7 +335,7 @@ for text in ["2", "0", "two"]:
 #: 'two': invalid literal for int() with base 10: 'two'
 ```
 
-`parse_run()` is the only place that can fail.
+`parse_run()` is the one function in `slope_edge.py` that sees bad input.
 `int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`.
 The `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
 Unlike `@safe`'s `Exception`,
