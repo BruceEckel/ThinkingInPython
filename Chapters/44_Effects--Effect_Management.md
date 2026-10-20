@@ -350,7 +350,7 @@ When the `match` unpacks an `Ok`, `slope()` doesn't check anything.
 A completely pure program computes a result and keeps it in the process's memory.
 It takes its inputs from its own source code and leaves its environment as it found it,
 so the result stays out of reach of every screen, file, and socket.
-The exit code the operating system checks is the same whatever the program computed.
+The exit code the operating system checks is the same regardless of what the program computed.
 From outside the process, that program looks the same as an empty program.
 
 ```python
