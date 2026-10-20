@@ -339,20 +339,19 @@ for text in ["2", "0", "two"]:
 `int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`.
 The `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
 Unlike `@safe`'s `Exception`,
-`parse_run()`'s return type names the failure the caller handles.
+`parse_run()`'s `Result` provides the failure for the caller.
 A bug inside `parse_run()` still raises its own exception.
 
-After the `match` unpacks an `Ok`, `slope()` doesn't check anything.
+When the `match` unpacks an `Ok`, `slope()` doesn't check anything.
 `NonZero` guarantees `run.value` isn't 0.
 
 ## A Program Can Never Be Pure
 
-A perfectly pure program computes something and writes the result nowhere.
-It reads nothing from its environment and changes nothing in its environment,
-so its result reaches no screen, file, or socket,
-not even the exit code the operating system checks.
-From outside the process,
-that program looks the same as one that computes nothing.
+A completely pure program computes a result and keeps it in the process's memory.
+It takes its inputs from its own source code and leaves its environment as it found it,
+so the result stays out of reach of every screen, file, and socket.
+The exit code the operating system checks is the same whatever the program computed.
+From outside the process, that program looks the same as an empty program.
 
 ```python
 # pure_and_pointless.py
