@@ -85,7 +85,7 @@ yet the result of your function differs from one call to the next.
 Information a function uses beyond its arguments is a side cause whenever that information changes between calls.
 The usual sources are I/O,
 such as the time of day or reading from a network connection.
-Your result is also affected by reading a global variable that something else can rebind.
+A global variable that something else can rebind is another source.
 
 The third kind of Effect is an exception,
 which propagates from callee to caller but doesn't appear in the function signature.
@@ -107,9 +107,9 @@ There are two answers:
 
 1.  **Pure.**
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
+    Purity says the outcome depends on the arguments alone.
     The same arguments still produce that same exception every time.
     The function reads nothing outside itself and changes nothing outside itself.
-    Purity says the outcome depends on the arguments alone.
 
     Computer science theory backs this view.
     Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
@@ -285,9 +285,17 @@ when `NonZero(...)` builds the instance.
 `slope()`, and every other function that takes a `NonZero`,
 trusts the argument because the check ran when the caller built it.
 
-`slope_result.py`'s `Result` has a second drawback.
+None of the three makes the failure disappear.
+A `Result` turns it into a value.
+A `try` catches it.
+`NonZero` moves it: `NonZero(0)` raises the `ValueError`,
+so the failure surfaces at the line that builds the argument,
+before `slope()` runs.
+The three differ in how many functions must know about the failure.
+
+`slope_result.py` has a drawback that `slope_catch.py` and `nonzero.py` avoid.
 `@safe` catches `Exception`,
-so `slope()` in `slope_result.py` returns `Result[float, Exception]`.
+so the decorated `slope()` returns `Result[float, Exception]`.
 That error type covers the `ZeroDivisionError` from a zero `run`,
 which the caller can handle,
 and a `NameError` from a misspelled name inside `slope()`,
@@ -297,14 +305,6 @@ so the caller's `case Err(error)` must inspect the exception to tell a bad argum
 [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 describes this limitation of `@safe` and the production fix,
 a version that catches the exception types you specify and lets the rest propagate.
-
-None of the three makes the failure disappear.
-A `Result` turns it into a value.
-A `try` catches it.
-`NonZero` moves it: `NonZero(0)` raises the `ValueError`,
-so the failure surfaces at the line that builds the argument,
-before `slope()` runs.
-The three differ in how many functions must know about the failure.
 
 Standard practice combines the first and third,
 the `Result` and the `NonZero` type.
@@ -336,11 +336,12 @@ for text in ["2", "0", "two"]:
 ```
 
 `parse_run()` is the only place that can fail.
-`int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`,
-and the `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
+`int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`.
+The `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
 Unlike `@safe`'s `Exception`,
-the return type names the failure the caller handles.
+`parse_run()`'s return type names the failure the caller handles.
 A bug inside `parse_run()` still raises its own exception.
+
 After the `match` unpacks an `Ok`, `slope()` doesn't check anything.
 `NonZero` guarantees `run.value` isn't 0.
 
@@ -617,7 +618,8 @@ The `ContextVar` supplies automatic propagation,
 but it removes the parameter along with the one benefit the parameter provided.
 `greet(ask, tell)` states its Effects in its signature.
 A `greet()` that reads two `ContextVar`s hides them.
-Setting the wrong one, or forgetting to set one,
+
+Setting the wrong `ContextVar`, or forgetting to set one,
 raises a `LookupError` at the read, in whatever frame reads it.
 A `ContextVar` created with a default returns that default instead,
 so the read succeeds and the mistake appears later,
@@ -837,9 +839,8 @@ rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
-A library must build descriptions.
-In a language not designed for Effects,
-a library gets delayed binding by deferring execution.
+A library must build descriptions,
+because in a language not designed for Effects it gets delayed binding by deferring execution.
 
 Deferring execution adds one question to every value you handle:
 is it a description or an action?
