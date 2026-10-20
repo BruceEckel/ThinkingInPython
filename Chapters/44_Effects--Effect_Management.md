@@ -308,10 +308,10 @@ The three differ in how many functions must know about the failure.
 
 Standard practice combines the first and third,
 the `Result` and the `NonZero` type.
-One function, where input arrives as text,
-parses the text into a `NonZero` and returns a `Result` instead of raising an exception.
-Every function beyond that one takes a `NonZero` and stays total.
-In `slope_edge.py` that function is `parse_run()`:
+In `slope_edge.py`, `parse_run()` receives input as text,
+parses the text into a `NonZero`,
+and returns a `Result` instead of raising an exception.
+`slope()` takes the `NonZero` that `parse_run()` built and stays total:
 
 ```python
 # slope_edge.py
