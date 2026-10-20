@@ -399,8 +399,7 @@ and doesn't need to worry about Effects.
 
 ## Two Phases of Effect Analysis
 
-Think of Effect analysis as two phases.
-The first phase separates pure from impure, and produces parallelism, caching,
+The first phase of Effect analysis separates pure from impure, and produces parallelism, caching,
 and easy testing for the pure part.
 
 The second phase divides the impure part by kind.
