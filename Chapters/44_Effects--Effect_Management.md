@@ -378,7 +378,7 @@ print(f"burned real CPU time for nothing: "
 
 Both functions return `None` and touch nothing outside themselves,
 so a caller sees the same thing from each.
-`compute_and_discard()` still takes measurably longer,
+`compute_and_discard()` takes measurably longer,
 because Python runs every loop you write, worthless or not.
 A perfectly pure computation, followed to its logical end,
 is a space heater with extra steps.
@@ -389,12 +389,11 @@ Effect Management keeps the Effects and isolates them,
 so the rest of the program can stay pure.
 People call this "pushing the Effects to the edges."
 
-The most obvious gain from keeping the rest pure is parallelism.
-A pure function reads and writes nothing shared,
-so it is safe to run in parallel.
+The most obvious gain from purity is parallelism.
+Everything a pure function touches lives in its arguments, its local variables,
+and its return value,
+so the function is safe to run in parallel with any other code.
 The same guarantee makes testing trivial.
-A pure function needs no setup or teardown, and nothing to mock.
-Call it with arguments and check the result.
 
 ## Two Phases of Effect Analysis
 
