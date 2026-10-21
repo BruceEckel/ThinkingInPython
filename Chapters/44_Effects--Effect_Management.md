@@ -483,11 +483,10 @@ An Effect Management System (EMS) does three things:
 When a hundred functions declare the storage Effect,
 one binding point supplies the implementation for all of them.
 A test binds an in-memory store, production binds the real database,
-and both run the same hundred functions.
+while the hundred functions remain untouched.
 
-Cross-cutting behavior binds at the same point.
 To add caching, tracing, or retries to every storage access,
-you insert a layer at the binding point instead of touching every call site.
+you insert a layer at the binding point instead of modifying every call site.
 Variation concentrates at the edge of the program.
 
 ### Effects by Hand
@@ -618,16 +617,16 @@ one that carries Effect information outside the argument list.
 
 Ideally, Effect tracking comes built into the language,
 as a *native* Effect system.
-In a native system, the type system holds Effects alongside ordinary types.
-A function's signature carries two pieces of information: what it returns,
-and what Effects it performs.
+In a native system, a function's signature carries two pieces of information:
+what it returns, and what Effects it performs.
 The body looks like ordinary sequential code.
 The compiler reads what the body calls and infers the Effects,
 the same way it tracks whether a value is an integer or a string.
+Thus, a native Effect type system tracks Effects together with ordinary types.
 
-The examples in this section and in [Library Effect Management](#library-effect-management)
-come from my research,
-in which I build the same small programs in four Effect-managing languages.
+This section and [Library Effect Management](#library-effect-management)
+build small programs in four Effect-managing languages: Koka and Flix,
+which have native Effects, and Scala and TypeScript, which use a library.
 The first is [Koka](https://koka-lang.github.io/),
 a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
@@ -709,13 +708,6 @@ which is how native systems express retries and backtracking as ordinary handler
 *Algebraic effects* is the name for this design:
 operations declared as an interface,
 plus handlers that receive the continuation.
-
-A Python generator suspends a computation,
-hands control to whoever is driving it, and resumes it with a value.
-That makes a suspended generator a continuation you can resume once or discard,
-but not resume twice, because nothing can copy a generator's paused frame.
-[Generators](45_Effects--Generators.md) covers the full two-way form,
-the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
 
 [Flix](https://flix.dev/) expresses the same model with different notation.
 The Effect row follows a backslash:
@@ -831,8 +823,12 @@ not when the runtime executes it.
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 polysemy and effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
-Stateless builds on generators, so [Generators](45_Effects--Generators.md)
-covers that mechanism first.
+Stateless builds on generators, as the TypeScript listing's `function*` does.
+A Python generator suspends a computation,
+hands control to whoever is driving it, and resumes it with a value.
+That makes a suspended generator a continuation you can resume once or discard,
+but not resume twice, because nothing can copy a generator's paused frame.
+[Generators](45_Effects--Generators.md) covers that mechanism first.
 [Stateless](46_Effects--Stateless.md)
 then writes these programs again in the language this book teaches.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
