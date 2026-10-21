@@ -689,7 +689,7 @@ Try each exercise before opening its [solution](../Solutions/37_Patterns--Patter
     then run `recycle_dict.py` and `recycling_note.py`.
     Explain why `CrushedAluminum` gets its own bin but not its own note.
     Then change `sort_by_type()` so a subclass shares its parent's bin,
-    without naming any material in the sorting loop.
+    without specifying any material in the sorting loop.
 5.  Define `Plastic`, whose disposal hazard is toxic fumes,
     and leave it out of `disposal_hazard.py`'s registrations.
     What does `hazard()` answer for a piece of plastic?

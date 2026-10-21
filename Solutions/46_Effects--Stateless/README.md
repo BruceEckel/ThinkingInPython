@@ -686,7 +686,7 @@ run(defaults(stamped)("Bob"))  # type: ignore
 #: [noon] Hello, Bob!
 ```
 
-**Build the class the request names.** `default()` names no `Console` in its body. It reads `ability.t`,
+**Build the class the request names.** `default()` specifies no `Console` in its body. It reads `ability.t`,
 the class the request carries, and calls that class, so `default()`
 answers a request by constructing the requested class. That is the
 other kind of default. `default_console.py` supplies one prepared

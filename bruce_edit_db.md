@@ -1610,13 +1610,23 @@ still declares `Need[Log]` in its type"). Where the plain verb is the
 mechanism, use it: a body "requests" or "calls", a `match` "covers",
 `@safe` "catches" `Exception`.
 
+The dependency sense Design Patterns builds on is this shape too,
+positive or negative: a construct that commits to a particular class,
+implementation, or driver, or leaves it open, "specifies" it or
+"specifies no" one ("the client specifies the target interface",
+"`Report` specifies no writer", "generators that do not specify their
+driver", "without specifying any material in the sorting loop"; Bruce,
+2026-10-20, on "a generator that does not name its driver": "it seems
+like 'specify' would work in cases like this"). A class line that
+carries a base "lists" it.
+
 **Keep when.** X gives Y its name (a parameter named `self`, "name the
 result `words`", an alias that names a shape, `checkpoint` names a past
-`Drawing`). X refers to Y in source, the dependency sense Design
-Patterns builds on ("every file that names it", "the caller names
-`Report`", "a generator that does not name its driver", "without naming
-any material in the sorting loop"). X is a message or a report that
-prints Y ("the error names the key", "the type checker names the
+`Drawing`). X contains Y's name, and the sentence is about the text
+("renaming or moving the interface means editing every file that names
+it", "two `import` statements name it", "the broadcaster names every
+responder, and *Observer* replaces those names"). X is a message or a
+report that prints Y ("the error names the key", "the type checker names the
 `Effect`"). The reader's own act ("name its drawbacks", "name the
 substitution"). A call that passes keyword arguments literally names
 them ("a call that names its arguments", "a caller must name them").
@@ -1625,7 +1635,7 @@ them ("a call that names its arguments", "a caller must name them").
 all) in the book, the word name or names is used where I think a word
 like specify or specifies would often work better." Promoted on that
 remark. The sweep that day read 296 verb uses of "name" in `Chapters/`
-and 587 in `Solutions/` and changed 70 and 12; the rest are the keeps
+and 587 in `Solutions/` and changed 96 and 18; the rest are the keeps
 above.
 - `44_Effects--Effect_Management` 2026-10-20, was Claude-written:
   "an `except` clause catches the exceptions it names" ->

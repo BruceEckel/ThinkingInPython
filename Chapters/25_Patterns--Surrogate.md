@@ -778,7 +778,7 @@ Only the surrogate's current implementation changes.
 Here the client programmer calls `change_to()`,
 but in a [*State Machine*](31_Patterns--State_Machines.md),
 the client supplies an input and the machine chooses the next implementation,
-so the client never names one.
+so the client never specifies one.
 
 `change_to()` reassigns `__implementation` with no lock.
 While one thread runs a multi-call sequence like `run()`,

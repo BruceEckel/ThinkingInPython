@@ -12,7 +12,7 @@ with no changes to existing code ... or so it seems.
 But something must still create an object of the new type,
 and that creation code names the concrete class.
 If your application creates objects in many places,
-adding a type means finding and editing every place that names a concrete class.
+adding a type means finding and editing every place that specifies a concrete class.
 
 Here `Triangle` has just joined the hierarchy.
 Two call sites build shapes by calling `Circle()` or `Square()`,

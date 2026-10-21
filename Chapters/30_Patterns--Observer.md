@@ -346,7 +346,7 @@ gets a generated `__init__()` and the list another way.
 not because the pattern requires a base class.
 A `Thermometer` could use composition, holding a `Broadcaster` as an attribute
 (`self.temperature_changed = Broadcaster[float]()`).
-Code that connects a responder would name that attribute
+Code that connects a responder would specify that attribute
 (`t.temperature_changed.connect(display)`).
 An object can hold several `Broadcaster` attributes,
 so it can publish more than one kind of change.

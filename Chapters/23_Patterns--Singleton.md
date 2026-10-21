@@ -225,8 +225,8 @@ Whatever reads the annotation searches the scope containing the function,
 while the class lives in the function's own locals.
 A type checker reports an unresolved reference,
 and `inspect.get_annotations()` raises a `NameError`.
-The signature must name something reachable,
-so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to name in its place.
+The signature must specify something reachable,
+so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to specify in its place.
 
 Privacy in Python is advice, not enforcement.
 An underscore marks a name as internal.

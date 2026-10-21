@@ -892,7 +892,7 @@ print(audit(invoice))
 #: Invoice for Ada
 ```
 
-`Invoice` inherits from `object` alone and names none of `Priced`,
+`Invoice` inherits from `object` alone and lists none of `Priced`,
 `Serializable`, or `Describable`, yet `charge()`, `persist()`,
 and `audit()` each accept it,
 because each function's parameter specifies the one method it needs.

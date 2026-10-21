@@ -356,7 +356,7 @@ GameEnvironment(GnomesAndFairies()).play()
 #: Gnome discovers a Fairy
 ```
 
-**Ask the factory for each product.** `GameEnvironment` does not name
+**Ask the factory for each product.** `GameEnvironment` does not specify
 `Kitty`, `Warrior`, `Puzzle`, or `Weapon`. It calls
 `make_character()` and `make_obstacle()` on whatever
 `GameElementFactory` it receives.

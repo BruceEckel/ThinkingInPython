@@ -19,7 +19,7 @@ It yields a request, suspends, and continues when a caller sends the answer.
 
 This chapter covers the full three-channel annotation, the *driver*
 (the loop that runs such a conversation), and `yield from`,
-which composes generators that do not name their driver.
+which composes generators that do not specify their driver.
 [Stateless](46_Effects--Stateless.md) builds an Effect system on the annotation,
 the loop, and `yield from`, but generators are useful on their own.
 
@@ -733,7 +733,7 @@ A generator function builds a description instead of doing work.
 `yield` makes that description two-way,
 so the description can ask for something.
 `yield from` composes those conversations,
-and no generator in the chain names its driver.
+and no generator in the chain specifies its driver.
 
 Those ideas are enough to build a task runner.
 A queue keeps the live generators.

@@ -385,15 +385,15 @@ a different design, a detail, or an equivalent alternative.
 
 > Write the `Report` design from [The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change)
 > twice, with a PDF writer and an HTML writer:
-> once where `Report` names each writer class,
-> and once where `Report` names a `Writer` protocol.
+> once where `Report` specifies each writer class,
+> and once where `Report` specifies a `Writer` protocol.
 > Add a Markdown writer to both versions.
 > For each version, list the existing classes and functions you edited.
 
 <details>
 <summary>Where to look</summary>
 
-[The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change) compares a design in which `Report` names each writer with one in which it names a protocol.
+[The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change) compares a design in which `Report` specifies each writer with one in which it specifies a protocol.
 In the first version give each writer its own method name.
 In the second give every writer the same method and declare that method in a `Protocol`.
 Add the Markdown writer to each, then count the existing definitions you opened.
@@ -538,7 +538,7 @@ Python returns `None` implicitly. `ty` reports that path as
 `invalid-return-type`, since `render()` declares that it returns `str`.
 
 The second version gives every writer the same method and lets
-`Report` name that method through a protocol:
+`Report` specify that method through a protocol:
 
 ```python
 # exercise_4b.py
@@ -587,8 +587,8 @@ main("md")
 ```
 
 Here adding `MdWriter` edits one existing thing, the `case` that
-`main()` gains. `Report` and `Writer` keep their source. No writer names
-`Writer`. The type checker matches each class to the protocol when
+`main()` gains. `Report` and `Writer` keep their source. No writer lists
+`Writer` as a base. The type checker matches each class to the protocol when
 `main()` assigns an instance to `writer`.
 
 The count gives the answer: three edits in two parts against one edit in

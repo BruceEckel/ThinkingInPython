@@ -118,7 +118,7 @@ piece. `Plastic` is a new key for the dictionary, and
 The one edit to `recycle_dict.py` is the filename, since the script hardcodes
 `parse("trash.dat")`. `parse_trash.py` needs no change because it
 calls `Trash.create(name, weight)` with a name read from the file and
-names no material.
+specifies no material.
 If `Plastic` needs special handling, an optional
 `@recycling_note.register` function provides it.
 
@@ -447,7 +447,7 @@ a different design, a detail, or an equivalent alternative.
 > then run `recycle_dict.py` and `recycling_note.py`.
 > Explain why `CrushedAluminum` gets its own bin but not its own note.
 > Then change `sort_by_type()` so a subclass shares its parent's bin,
-> without naming any material in the sorting loop.
+> without specifying any material in the sorting loop.
 
 <details>
 <summary>Where to look</summary>
@@ -498,7 +498,7 @@ def _(t: Aluminum) -> str:
 <summary>Done when</summary>
 
 `recycle_dict.py` reports a `CrushedAluminum:` total of its own while `recycling_note.py` prints `CrushedAluminum: crush and bale`, and you can name the lookup behind each.
-After your change, the `CrushedAluminum:` line is gone, its weight adds to the `Aluminum` total, every other material keeps its own bin, and the sorting loop names no material.
+After your change, the `CrushedAluminum:` line is gone, its weight adds to the `Aluminum` total, every other material keeps its own bin, and the sorting loop specifies no material.
 
 <details>
 <summary>Solution</summary>
@@ -593,7 +593,7 @@ the way the chapter's subclasses restate `value`'s annotation. The
 type checker treats that restatement as optional.
 
 **Sort by the declared key.** The sorting loop becomes
-`shared[t.bin].append(t)` and still names no material.
+`shared[t.bin].append(t)` and still specifies no material.
 
 `type(t)` is a convenient key, not an inevitable one. A design that
 declares its own key can group classes that `type(t)` keeps apart, as

@@ -283,7 +283,7 @@ extending by subclassing, and altering a class.
 The glossary defines coupling as "the degree to which software components depend on each other."
 Both of that first chapter's design principles tell you to loosen one particular dependence.
 "Program to an interface,
-not an implementation" says stop naming concrete classes.
+not an implementation" says stop specifying concrete classes.
 "Favor object composition over class inheritance" says stop inheriting implementations.
 *GoF Design Patterns* has a name for the result, *abstract coupling*.
 A class that holds a reference to an abstract class "refers to a *type* of object,
@@ -338,7 +338,7 @@ An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and no implementer inherits.
 A `Callable` annotation is not a class.
 Those two rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
-In a language where every implementer must name its interface,
+In a language where every implementer must specify its interface,
 a pattern exists to build a declared interface.
 In a language that supplies the `Protocol` and `Callable` rungs,
 that pattern has nothing left to build.
@@ -359,11 +359,11 @@ Read the heavy edges first,
 because a change to the class at the head of a heavy edge can force an edit in the part at its tail.
 
 *Strategy* has none.
-The context names an interface and each algorithm satisfies it,
+The context specifies an interface and each algorithm satisfies it,
 so adding an algorithm leaves every existing part as it was.
 
 *Observer* has one, and it points from the observer to the subject.
-An observer names its subject's class in `update()`,
+An observer specifies its subject's class in `update()`,
 whose `subject` parameter receives the subject that changed.
 The subject knows no concrete observer:
 "All a subject knows is that it has a list of observers,
@@ -372,13 +372,13 @@ The heavy edge points at the part that changes least,
 which is where a heavy edge belongs.
 
 *Factory Method* keeps a heavy edge too.
-Something must name a class to construct it.
-The pattern moves that name out of the client and into a creator.
+Something must specify a class to construct it.
+The pattern moves that choice out of the client and into a creator.
 Holding the name is the creator's whole job,
 and no other part depends on the creator.
 
 *Adapter* moves the heavy edge inside the adapter.
-The client names the target interface.
+The client specifies the target interface.
 The adapter alone knows the adaptee's real name,
 so a change to the adaptee reaches one file.
 
@@ -388,7 +388,7 @@ so it can wrap a pizza or another topping,
 knowing each one through that interface.
 
 *Visitor* is the reverse of the others.
-The visitor names every concrete element.
+The visitor specifies every concrete element.
 The pattern concentrates the heavy edges in one place on purpose.
 Adding an operation means writing one new visitor and changing nothing else,
 while adding an element type means changing every visitor.
@@ -406,19 +406,19 @@ coupling you can see and have placed on purpose.
 Coupling matters because of what it does when something changes.
 A `Report` renders itself through a writer, and `main` assembles the pieces.
 On the left, `Report` names each writer class and chooses between them.
-On the right, `Report` names a `Writer` protocol.
+On the right, `Report` specifies a `Writer` protocol.
 Then you add a Markdown writer.
 
 ![What adding a Markdown writer changes in two designs of Report](_images/coupling_reach)
 
 The dashed box is the new class.
 The shaded parts are the existing ones whose source changes when you add `MdWriter`.
-Each heavy edge into the dashed box is a new place that names `MdWriter`.
+Each heavy edge into the dashed box is a new place that specifies `MdWriter`.
 As in the gallery, the red box marks the part the change leaves alone.
 
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
-because the new writer satisfies the protocol and `Report` names no writer.
+because the new writer satisfies the protocol and `Report` specifies no writer.
 `main` still changes, since something must construct the new class.
 A [registry factory](26_Patterns--Factory.md#self-registration)
 removes that last change too,
@@ -437,19 +437,19 @@ and write the same dependence three ways.
 ![One dependence written three ways](_images/coupling_edges)
 
 With an abstract base class, two edges exist in source:
-the caller names `Shape`, and `Circle` names `Shape` in its `class` line.
+the caller specifies `Shape`, and `Circle` lists `Shape` in its `class` line.
 With a `Protocol`, one edge exists in source.
 `Circle` does not mention `Shape`.
 The type checker connects the two when it compares `Circle`'s members with the protocol's members.
 The figure draws that connection as a dashed edge with a hollow head.
 A dashed edge exists only at check time,
-and neither of its ends names the other.
+and neither of its ends specifies the other.
 With a `Callable`, the interface has no name and no file of its own.
 The caller's signature declares it,
 and any function whose parameters and return type match satisfies it.
 
 The edge a `Protocol` deletes is the one that a C++ base class or a Java interface makes mandatory.
-The implementer must name the interface.
+The implementer must specify the interface.
 That edge makes every implementer depend on the interface,
 so renaming or moving the interface means editing every file that names it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols)
@@ -520,7 +520,7 @@ The rest are here for your own designs.
     builds on this.
     [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
     moves the same declaration into a function's signature,
-    where `Need` names what the function requires of its surroundings.
+    where `Need` specifies what the function requires of its surroundings.
     Designing the communication gives Managed Coupling its target:
     not the least coupling, but coupling you can read.
 -   *Subtraction*.
@@ -597,7 +597,7 @@ Try each exercise before opening its [solution](../Solutions/21_Patterns--Design
     If nothing did, leave it out.
 4.  Write the `Report` design from [The Reach of a Change](#the-reach-of-a-change)
     twice, with a PDF writer and an HTML writer:
-    once where `Report` names each writer class,
-    and once where `Report` names a `Writer` protocol.
+    once where `Report` specifies each writer class,
+    and once where `Report` specifies a `Writer` protocol.
     Add a Markdown writer to both versions.
     For each version, list the existing classes and functions you edited.

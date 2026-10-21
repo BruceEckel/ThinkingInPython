@@ -1719,7 +1719,7 @@ so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
 
 ### Reading Annotations Before Their Names Exist
 
-Deferred evaluation lets an annotation name a class that the module defines later.
+Deferred evaluation lets an annotation specify a class that the module defines later.
 Python evaluates an annotation when code first reads it,
 so a class can declare a field whose type appears further down the module.
 A metaprogram reads annotations early.
@@ -1770,7 +1770,7 @@ print(get_annotations(Order)["buyer"] is Customer)
 #: True
 ```
 
-`Order` names `Customer` before `Customer` exists.
+`Order` specifies `Customer` before `Customer` exists.
 The `VALUE` request fails the same way it would inside a decorator applied to `Order`.
 `FORWARDREF` resolves `item` to the `str` class and puts a `ForwardRef` in place of `buyer`.
 The reference's `__forward_arg__` holds the missing name.
