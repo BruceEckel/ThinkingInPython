@@ -75,7 +75,7 @@ For example, the function might:
 
 A side effect is easy to spot in the function that performs it,
 because the operation that changes the environment sits in that function's body.
-One call up, the side effect is invisible.
+In the caller, the side effect is invisible.
 
 The second is a *side cause*, the counterpart of a side effect:
 what the environment does to the function.
@@ -103,7 +103,7 @@ def slope(rise: int, run: int) -> float:
 except when `run` is zero,
 where it raises an exception instead of returning a result.
 Does the exception break purity?
-There are two answers:
+The question has two answers:
 
 1.  **Pure.**
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
@@ -125,7 +125,7 @@ There are two answers:
     A [*Total Function*](42_Functional--Error_Handling.md#total-functions)
     returns errors as data in explicit wrapper types instead of raising them.
 
-When considering Effects, a different question is more important:
+For Effects, a different question matters more:
 does the exception pass from callee to caller?
 If you write a function `a()` that calls a function `b()` that raises an exception,
 then `a()` raises that exception too, unless `a()` catches it.
@@ -172,7 +172,7 @@ and the caller must unpack it to reach the number.
 ### Catch the Exception You Expect
 
 If you catch and handle the exception within the function,
-the exception stays inside that function, so it is not an Effect.
+the exception never propagates to the caller, so it is not an Effect.
 `slope()` can catch `ZeroDivisionError` and turn the failure into an ordinary `float`,
 its existing return type, instead of introducing a new type:
 
@@ -200,8 +200,8 @@ expect(ValueError, slope, 10, -1)
 ```
 
 Catching the exception works with the types you have.
-But an `except` clause catches only the exception(s) it names,
-and `slope()`'s `except` names `ZeroDivisionError`.
+But an `except` clause catches the exceptions it names and lets the rest propagate.
+`slope()`'s `except` names `ZeroDivisionError`.
 `validate()` raises `ValueError` for a negative `run`.
 The `try` around the `validate()` call lets `ValueError` propagate.
 Because `slope()` calls `validate()`,
@@ -210,7 +210,8 @@ Because `slope()` calls `validate()`,
 `slope_catch.py` puts `validate()` directly above `slope()`,
 so the uncaught `ValueError` is easy to spot.
 In a real call stack the `raise` is usually in another file, several calls down.
-Catching by hand covers only the exceptions you know a callee can raise.
+Catching by hand covers the exceptions you know a callee can raise.
+The rest reach the caller.
 Knowing every one of them means reading the code for every callee.
 An Effect Management System replaces that tedious, error-prone work.
 
@@ -233,7 +234,7 @@ The third approach removes the failure from `slope()` instead of handling it the
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes illegal values impossible to construct.
 If you give `run` a type that excludes zero,
-the check moves out of `slope()` and into the type:
+the type's `__post_init__()` runs the check instead of `slope()`:
 
 ```python
 # nonzero.py
@@ -267,13 +268,13 @@ with expected(ValueError):
 
 The check runs once, in `__post_init__()`,
 when `NonZero(...)` builds the instance.
-Every function that takes a `NonZero` gets a guaranteed nonzero value with the argument.
+Every function that takes a `NonZero` receives a value guaranteed to be nonzero.
 Because `slope()` cannot divide by zero,
 it returns `rise / run.value` as a `float` rather than a `Result`.
 
 ### Combine the First and Third
 
-All three approaches keep a division by zero from escaping `slope()` as an exception,
+All three approaches keep a division by zero from reaching `slope()`'s caller as an exception,
 but each handles it in a different place.
 With a `Result`, the place is every call site,
 where each caller unpacks the `Result` and decides what a failure means.
@@ -282,16 +283,16 @@ where the `except` clause handles `ZeroDivisionError`.
 Every other exception propagates through `slope()` to its caller.
 With `NonZero`, the place is `__post_init__()`, which runs once,
 when `NonZero(...)` builds the instance.
-`slope()`, and every other function that takes a `NonZero`,
-trusts the argument because the check ran when the caller built it.
+`slope()` trusts its argument,
+as does every other function that takes a `NonZero`,
+because the check ran when the caller built it.
 
 None of the three makes the failure disappear.
 A `Result` turns it into a value.
 A `try` catches it.
-`NonZero` moves it: `NonZero(0)` raises `ValueError`,
-so the failure surfaces at the line that builds the argument,
-before `slope()` runs.
-The three differ in how many functions must know about the failure.
+`NonZero` moves it to the line that builds the argument.
+`NonZero(0)` raises a `ValueError` before `slope()` runs.
+The three differ in how many functions contain code for the failure.
 
 `slope_result.py` has a drawback that `slope_catch.py` and `nonzero.py` avoid.
 `@safe` catches `Exception`,
@@ -300,7 +301,7 @@ That error type covers the `ZeroDivisionError` from a zero `run`,
 which the caller can handle,
 and a `NameError` from a misspelled name inside `slope()`,
 which is a bug the caller cannot handle.
-Both arrive as an `Err` with the same static type,
+The caller receives both as an `Err` with the same static type,
 so the caller's `case Err(error)` must inspect the exception to tell a bad argument from a bug.
 [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 describes this limitation of `@safe` and the production fix,
@@ -338,20 +339,23 @@ for text in ["2", "0", "two"]:
 `parse_run()` receives the bad input.
 `int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`.
 The `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
-Unlike `@safe`'s `Exception`,
-`parse_run()`'s `Result` provides the failure for the caller.
-A bug inside `parse_run()` still raises its own exception.
+The error type in `parse_run()`'s `Result` is `ValueError`,
+the one failure its caller can handle,
+rather than `@safe`'s catch-all `Exception`.
+A bug inside `parse_run()` raises some other exception,
+and that exception propagates to the caller.
 
-When the `match` unpacks an `Ok`, `slope()` doesn't check anything.
-`NonZero` guarantees `run.value` isn't 0.
+When the `match` unpacks an `Ok`, `slope()` divides at once,
+because `NonZero` guarantees that `run.value` is nonzero.
 
 ## A Program Can Never Be Pure
 
 A completely pure program computes a result and keeps it in the process's memory.
-It takes its inputs from its own source code and leaves its environment as it found it,
-so the result stays out of reach of every screen, file, and socket.
+It takes its inputs from its own source code and changes nothing in its environment,
+so no screen, file, or socket ever receives the result.
 The exit code the operating system checks is the same regardless of what the program computed.
-From outside the process, that program looks the same as an empty program.
+From outside the process,
+that program is indistinguishable from an empty program.
 
 ```python
 # pure_and_pointless.py
@@ -377,7 +381,7 @@ print(f"burned real CPU time for nothing: "
 ```
 
 Both functions return `None` and touch nothing outside themselves,
-so a caller sees the same thing from each.
+so a caller receives `None` from each.
 `compute_and_discard()` takes measurably longer,
 because Python runs every loop you write, worthless or not.
 A perfectly pure computation, followed to its logical end,
@@ -394,13 +398,12 @@ Everything a pure function touches lives in its arguments, its local variables,
 and its return value,
 so the function is safe to run in parallel with any other code.
 The same guarantee makes testing trivial.
-A test simply calls a pure function with arguments and checks the return value,
-and doesn't need to worry about Effects.
+A test of a pure function passes arguments and checks the return value.
 
 ## Two Phases of Effect Analysis
 
-The first phase of Effect analysis separates pure from impure, and produces parallelism, caching,
-and easy testing for the pure part.
+The first phase of Effect analysis separates pure from impure,
+and gives the pure part parallelism, caching, and easy testing.
 
 The second phase divides the impure part by kind.
 Each kind yields its own benefit:
@@ -430,7 +433,8 @@ An Effect Management System replaces it.
 
 The currency helper from the chapter's opening is the ordinary case.
 Most functions in most programs perform Effects their signatures leave out.
-The omission makes code hard to understand, and leaves these questions open:
+Those hidden Effects make code hard to understand,
+and leave these questions open:
 
 - Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
@@ -456,7 +460,7 @@ and composition is how programs grow large.
 
 ### Tracking and Management
 
-An Effect Management System (EMS) keeps track of Effects in functions.
+An Effect Management System (EMS) tracks the Effects of each function.
 If your function calls an effectful function,
 that Effect belongs in your function's type.
 If another function then calls yours,
@@ -553,7 +557,7 @@ class Capture:
 Its signature says so, because the parameters are the Effects.
 The bindings come later.
 `greet_demo.py` binds them to test stand-ins, `Scripted` and `Capture`,
-and checks the greeting with no console in sight:
+and checks the greeting without reading or writing the console:
 
 ```python
 # greet_demo.py
@@ -687,9 +691,9 @@ If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
 The by-hand version makes you add them yourself, one parameter per signature.
 Since the compiler does that work, you rarely write a row by hand.
-The listing writes out the rows of `greet()` and `main()` so you can read them.
 You annotate explicitly when you want a constraint,
 such as declaring that a function must remain Effect-free.
+The listing writes out the rows of `greet()` and `main()` so you can read them.
 
 Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.
@@ -793,8 +797,8 @@ The three type parameters of `ZIO[Tell, Nothing, Unit]` carry the Effect informa
 `Tell` is the environment the computation requires.
 `Nothing` is the error type, meaning `hello` cannot fail.
 `Unit` is what it produces on success.
-The signature does the same job as Koka's Effect row:
-it tells you what `hello` needs, what can go wrong, and what comes back.
+The signature does the same job as Koka's Effect row.
+It tells you what `hello` needs, what can go wrong, and what comes back.
 
 Everything else in the listing is machinery: a trait for the interface,
 a companion object to lift that interface into the `ZIO` type,
@@ -880,8 +884,8 @@ a function declares a `needs` clause.
 A separate `using` clause rebinds each implementation,
 so tests can swap Effects deterministically.
 [Lumen](https://alliecatowo.github.io/lumen/)
-writes source as markdown with algebraic effects,
-and its `bind effect` rebinds a handler separately from its use.
+writes source as markdown with algebraic effects.
+Its `bind effect` rebinds a handler separately from its use.
 Both separate an Effect's interface from its implementation and bind the implementation later,
 the second and third properties of a full EMS.
 
@@ -996,8 +1000,8 @@ and the programmer prevented collisions by hand.
 Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
 The solution divided names among separate namespaces.
-In Python, every module is automatically a namespace,
-and the practice is so settled that the Zen of Python ends by celebrating it:
+In Python, every module is automatically a namespace.
+The practice is so settled that the Zen of Python ends by celebrating it:
 <!-- vale House.EmDash = NO -->
 "Namespaces are one honking great idea -- let's do more of those!"
 <!-- vale House.EmDash = YES -->
@@ -1036,8 +1040,8 @@ The languages that track Effects today are young,
 and the libraries that retrofit Effect tracking are demanding.
 Every solution to every previous barrier was young and demanding at this stage.
 Namespaces once looked like ceremony.
-Effect tracking will look obvious in hindsight,
-and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
+Effect tracking will look obvious in hindsight.
+Future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
 Python offers no native Effect tracking beyond `async`, and will not soon.
 [Generators](45_Effects--Generators.md) supplies the mechanism a library needs,
