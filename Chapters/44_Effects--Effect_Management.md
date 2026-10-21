@@ -495,7 +495,8 @@ Every technique in [Converting Effectful to Pure](#converting-effectful-to-pure)
 manually manages one Effect, the exception.
 A `Result` tracks failure in the return type.
 A `try` binds the failure to a handler.
-A `NonZero` raises in `__post_init__()`, before the bad value reaches `slope()`.
+A `NonZero` raises a `ValueError` in `__post_init__()`,
+before the bad value reaches `slope()`.
 Each is a hand-built version of something an EMS automates.
 
 Side effects and side causes also have a by-hand technique:

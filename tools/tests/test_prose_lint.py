@@ -143,3 +143,58 @@ def test_set_fix_column_points_at_the_verb() -> None:
 def test_set_fix_in_a_fenced_block_is_skipped() -> None:
     text = "```python\n# This fixes the type of `x` to `int`.\n```\n"
     assert codes(text) == []
+
+
+# ── BARE-RAISE: "raises" takes an object ──────────────────────────────────────
+
+BARE_RAISE = [
+    "A `NonZero` raises in `__post_init__()`, before the value reaches it.",
+    "The function returns or raises.",
+    "It raises instead.",
+    "`slope()` raises when `run` is zero.",
+    "The call raises, and the caller catches.",
+    "Python raises on the next line.",
+    "- `check()` raises instead of returning.",
+]
+
+OBJECT_PRESENT = [
+    "It raises a `TypeError`.",
+    "`slope()` raises `ZeroDivisionError` when `run` is zero.",
+    "The constructor raises an exception on a bad value.",
+    "Add a line that tries `t[0] = 1` and catch the exception it raises.",
+    "Catch the `TypeError` that assigning to one of its entries raises.",
+    "It prints the exception that call raises.",
+    "Predict what a call raises before running it.",
+    "One whose `step()` raises an exception the base does not raise, and one",
+    "Nothing reports an exception the orphan raises.",
+    "`run()` raises the same `KeyError` a missing key raises.",
+    "The base class is the one type that covers whatever those functions raise.",
+    "Catching by hand covers the exceptions you know a callee can raise.",
+    "Both channels are empty, with no failure for `f()` to raise.",
+    "`lift` lifts what ordinary code raises, and `catch` takes errors out.",
+    "Not exceptions the body raises, so a failure goes past it untouched.",
+    "The same error `f()` raises in `g()`: a mismatch.",
+    "The loop stops with an `Overrun`, which `drive()` raises when the call returns.",
+    "So its code cannot list the exceptions they raise.",
+    "Reread the problems the runtime sections raise after that section.",
+    "The total is the `value` of the `StopIteration` that `next()` raises.",
+    "Catch the `SyntaxError` the final lookup raises",
+    "She got a raise.",
+    "The `raise` statement rethrows it.",
+    "Code is raised to the handler.",
+]
+
+@pytest.mark.parametrize("text", BARE_RAISE)
+def test_bare_raise_is_reported(text: str) -> None:
+    assert codes(text).count("BARE-RAISE") == 1
+
+@pytest.mark.parametrize("text", OBJECT_PRESENT)
+def test_raise_with_an_object_is_clean(text: str) -> None:
+    assert "BARE-RAISE" not in codes(text)
+
+def test_bare_raise_column_points_at_the_verb() -> None:
+    [(_, col, _, _)] = lint_text("- It raises instead.")
+    assert col == len("- It ") + 1
+
+def test_bare_raise_in_a_fenced_block_is_skipped() -> None:
+    assert codes("```python\n# This raises instead.\n```\n") == []

@@ -9,6 +9,7 @@ Checks the prose in `Chapters/*.md` for:
   QUOTE-PUNCT    a period or comma after a closing " (it belongs inside)
   TRAILING-WS    trailing whitespace (a two-space hard break is allowed)
   SET-FIX        "fix" meaning "set" or "determine", which reads as "repair"
+  BARE-RAISE     "raises" with no object ("raises instead", "returns or raises")
 
 QUOTE-PUNCT applies to quoted prose, where the book puts the mark inside the
 quote ("easier to ask forgiveness than permission,"). A quoted *literal* is the
@@ -31,6 +32,27 @@ few words by a noun the book used it with in that sense ("fixes the
 sequence", "fixes its maximum size"). The repair sense stays legal ("fix the
 loop", "fixes the leak", "Fix the algorithm"), and so do the adjective
 "fixed" and the noun ("the fix", "two fixes for").
+
+BARE-RAISE enforces the style rule that "raises" always takes an object:
+"raises a `TypeError`", "raises an exception", never "raises instead",
+"returns or raises", or "raises in `__post_init__()`" (Bruce, 2026-10-21,
+after the chapter 44 pass wrote the last of those). The verb (raise,
+raises, raising; "raised" is passive and has no object by nature) is a
+hit when what follows it on the line is clause punctuation or a word
+that cannot open an object (`_BARE_RAISE_NEXT`: in, on, when, instead,
+and so on), unless the object comes before the verb. Two shapes put it
+there and are excused: a clause with "that", "which", "what", "whatever",
+or "to" before the verb ("the exception that `f()` raises", "what the
+body raises", "no failure to raise"), and a contact relative clause,
+where the verb's subject follows a content word ("the exception it
+raises", "the exceptions a callee can raise"). The subject is the token
+before the verb past any modal or adverb (`_SKIP_BEFORE_SUBJECT`), and
+when a determiner precedes it the word before that is the head. A
+verb at the end of a line is not a hit, since the Solutions are
+hand-wrapped and its object may open the next line; in `Chapters/`
+reflow never ends a line on a verb. A code span counts as one token.
+A causative ("makes `parse()` raise at the first byte") has the
+contact-relative shape and is missed; the book has none.
 
 Code is skipped through the shared classifier in `tools.prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
@@ -80,6 +102,95 @@ _SET_FIX_NOUN = re.compile(
     re.IGNORECASE)
 _SET_FIX_MESSAGE = ('"fix" in the sense of "set" reads as "repair"; use '
                     "sets, binds, defines, determines, or presets")
+
+_RAISE_VERB = re.compile(r"\b(?:raises|raise|raising)\b")
+# Words after the verb that cannot open its object.
+_BARE_RAISE_NEXT = frozenset("""
+    in on at before after when if instead inside from for with without
+    rather and or but as to because so during there here again too
+    immediately early late later first once only anyway by until unless
+    where while like than yet still even also then up out
+""".split())
+# Words before the verb that are not its subject: modals and adverbs.
+_SKIP_BEFORE_SUBJECT = frozenset("""
+    can could would will may might must should shall do does did not
+    never always still also then already each both all
+""".split())
+_DETERMINERS = frozenset("""
+    the a an its their your our his her this that these those each
+    every no any some another one
+""".split())
+# A head in this set is no head: the subject opens its clause.
+_FUNCTION_WORDS = frozenset("""
+    the a an and or but nor yet so because when if unless until while
+    where as than since whether though although not in on at to of
+    for from with by into onto about over under after before through
+    then there here
+""".split())
+_FRONTED = frozenset("that which what whatever whichever to".split())
+_PRONOUNS = frozenset("""
+    it they he she you we i this these those one none each both
+""".split())
+_BARE_RAISE_MESSAGE = ('"raises" takes an object: "raises a `TypeError`", '
+                       '"raises an exception"')
+_WORD = re.compile(r"[A-Za-z][A-Za-z'’-]*")
+_CLAUSE_START = re.compile(r"[.,;:?!]")
+_SPAN_FILL = "\x00"
+
+
+def _tokens_before(masked: str, end: int) -> list[str]:
+    """The lowercased words of the clause that ends at `end`.
+
+    `masked` has each code span replaced by the one token "CODE".
+    """
+    clause_start = 0
+    for m in _CLAUSE_START.finditer(masked, 0, end):
+        clause_start = m.end()
+    return [w.lower() for w in _WORD.findall(masked, clause_start, end)]
+
+
+def _has_fronted_object(before: list[str]) -> bool:
+    """Does the clause put the verb's object before the verb?"""
+    if any(w in _FRONTED for w in before):
+        return True
+    words = list(before)
+    while words and words[-1] in _SKIP_BEFORE_SUBJECT:
+        words.pop()
+    if not words:
+        return False
+    subject = words.pop()
+    if subject in _FUNCTION_WORDS or subject in _DETERMINERS:
+        return False
+    if subject not in _PRONOUNS and subject != "code":
+        if words and words[-1] in _DETERMINERS:
+            words.pop()
+    head = words[-1] if words else None
+    return head is not None and head not in _FUNCTION_WORDS
+
+
+def bare_raises(body: str, spans: list[tuple[int, int]]) -> Iterator[int]:
+    """Column offsets of each "raises" with no object, outside code spans."""
+    masked = list(body)
+    for start, end in spans:
+        masked[start:end] = list("CODE".ljust(end - start, _SPAN_FILL))
+    text = "".join(masked).replace(_SPAN_FILL, " ")
+    for m in _RAISE_VERB.finditer(text):
+        if _in_span(m.start(), spans):
+            continue
+        after = text[m.end():].lstrip()
+        if not after:
+            continue
+        if after[0] not in ".,;:)!?":
+            nxt = _WORD.match(after)
+            word = nxt.group().lower() if nxt else ""
+            if word not in _BARE_RAISE_NEXT:
+                continue
+        before = _tokens_before(text, m.start())
+        if before and before[-1] in {"a", "an", "the"}:
+            continue  # the noun: "a raise"
+        if _has_fronted_object(before):
+            continue
+        yield m.start()
 
 Issue = tuple[int, int, str, str]  # line, column, code, message
 
@@ -243,6 +354,10 @@ def lint_text(text: str) -> list[Issue]:
                 flagged.add(m.start())
                 findings.append((lineno, offset + m.start() + 1, "SET-FIX",
                                  _SET_FIX_MESSAGE))
+
+        for col in bare_raises(body, spans):
+            findings.append((lineno, offset + col + 1, "BARE-RAISE",
+                             _BARE_RAISE_MESSAGE))
 
     findings.sort()
     return findings
