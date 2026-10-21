@@ -820,6 +820,7 @@ class Tell extends Context.Service<
 
 // Core logic: still just a description
 const greet = Effect.gen(function* () {
+  // Fetch each service object the layer supplied
   const ask = yield* Ask
   const tell = yield* Tell
   const name = yield* ask.ask("What is your name? ")
@@ -851,6 +852,8 @@ Effect.runPromise(greet.pipe(Effect.provide(Console)))
 
 Here `greet` reads as straight-line code because `Effect.gen` builds the description from a generator,
 and each `yield*` hands a sub-description to the library and receives its result back.
+The first two `yield*`s request the service objects from the environment,
+the records the layers supplied, and the next two call their methods.
 Koka's `main()` read a line with `readline()`.
 The `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
 close the interface,
