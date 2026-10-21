@@ -41,8 +41,8 @@ calls the hard part.
 Koka and the other native systems compute this rule as part of algebraic effects,
 the design [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 names.
-An algebraic effect is a set of operations declared as an interface.
-A handler gives those operations their meaning.
+In algebraic effects, each Effect is declared as an interface.
+A handler gives it its meaning.
 Handling removes the effect from the row.
 The design has two halves, the row and the handlers.
 A language can have one without the other.

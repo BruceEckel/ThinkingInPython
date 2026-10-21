@@ -674,7 +674,7 @@ The compiler rejects a program that performs an Effect with no handler in scope,
 so every Effect a program performs must have a handler.
 Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what the program does next.
-A handler intercepts any Effect operation and decides what it means.
+A handler intercepts an Effect and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler says that `ask` means "prompt the console and read a line."
 
 Handling an Effect also discharges it.
@@ -693,19 +693,18 @@ A test installs a handler that returns a known name,
 so `greet()` produces the same result for each test run.
 
 Handlers do more than `except` blocks.
-When an operation runs, the handler receives a *continuation*:
+When an Effect runs, the handler receives a *continuation*:
 the rest of the computation from that point forward.
 An `except` block has two options, catch or propagate,
 and both discard the continuation.
 A handler can resume the continuation once,
-and the operation then behaves like a normal function return.
+and the Effect then behaves like a normal function return.
 A handler can also discard the continuation,
-and the operation then behaves like an exception.
+and the Effect then behaves like an exception.
 A handler can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
 *Algebraic effects* is the name for this design:
-operations declared as an interface,
-plus handlers that receive the continuation.
+Effects declared as an interface, plus handlers that receive the continuation.
 
 [Flix](https://flix.dev/) expresses the same model with different notation.
 The Effect row follows a backslash:
