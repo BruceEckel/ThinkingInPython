@@ -473,7 +473,7 @@ An Effect Management System (EMS) does three things:
    and for an impure function it specifies the kinds of impurity.
 2. **Separates each Effect's interface from its implementation.**
    A function declares which Effects it uses, not how to fulfill them.
-   It says "I need something that can read from storage" and never names the database.
+   It says "I need something that can read from storage," not which database.
 3. **Binds the implementation later.**
    Some caller or context supplies the implementation at a point after the function's definition,
    usually the edge of the program.
