@@ -731,50 +731,72 @@ That encoding changes the mechanism.
 Instead of writing a computation and letting the compiler infer its Effects,
 you build a *description* of a computation, and execute the description later.
 [ZIO](https://zio.dev/) is such a library, for Scala.
-In ZIO, "Hello, World!" is a description first and a run second:
+Here is the greeting program again.
+In ZIO it is a description first and a run second:
 
 ```scala
 import zio.*
-import zio.Console.printLine
+import zio.Console.{print, printLine, readLine}
 
-// The Effect's interface
+// The Effects' interfaces
+trait Ask:
+  def ask(prompt: String): UIO[String]
+
 trait Tell:
   def tell(message: String): UIO[Unit]
 
-// Accessor: lifts the interface method into a ZIO description
+// Accessors: lift each method into a ZIO description
+object Ask:
+  def ask(prompt: String): ZIO[Ask, Nothing, String] =
+    ZIO.serviceWithZIO[Ask](_.ask(prompt))
+
 object Tell:
   def tell(message: String): ZIO[Tell, Nothing, Unit] =
     ZIO.serviceWithZIO[Tell](_.tell(message))
 
 // Core logic: a value, not an action; nothing runs here
-val hello: ZIO[Tell, Nothing, Unit] =
-  Tell.tell("Hello, World!")
+val greet: ZIO[Ask & Tell, Nothing, Unit] =
+  for
+    name <- Ask.ask("What is your name? ")
+    _ <- Tell.tell(s"Hello, $name!")
+  yield ()
 
-// The implementation, packaged for delayed binding
+// The implementations, packaged for delayed binding
+val consoleAsk: ULayer[Ask] = ZLayer.succeed(new Ask:
+  def ask(prompt: String): UIO[String] =
+    (print(prompt) *> readLine).orDie)
+
 val consoleTell: ULayer[Tell] = ZLayer.succeed(new Tell:
   def tell(message: String): UIO[Unit] =
     printLine(message).orDie)
 
-// Entry point: bind the implementation, then execute
+// Entry point: bind the implementations, then execute
 object Main extends ZIOAppDefault:
-  def run = hello.provide(consoleTell)
+  def run = greet.provide(consoleAsk, consoleTell)
 ```
 
-The three type parameters of `ZIO[Tell, Nothing, Unit]` carry the Effect information.
-`Tell` is the environment the computation requires.
-`Nothing` is the error type, meaning `hello` cannot fail.
+The three type parameters of `ZIO[Ask & Tell, Nothing, Unit]` carry the Effect information.
+`Ask & Tell` is the environment the computation requires,
+an intersection type that lists both Effects.
+`Nothing` is the error type, meaning `greet` cannot fail:
+each console layer turns the `IOException` a read or write can raise into a defect with `orDie`,
+so no error reaches the signature.
 `Unit` is what it produces on success.
 The signature does the same job as Koka's Effect row.
-It tells you what `hello` needs, what can go wrong, and what comes back.
+It tells you what `greet` needs, what can go wrong, and what comes back.
 
-Everything else in the listing is machinery: a trait for the interface,
-a companion object to lift that interface into the `ZIO` type,
-a `ZLayer` to package the implementation, and a `provide()` call to bind it.
-All of that, to print one string.
+Everything else in the listing is machinery, and each Effect pays for it again:
+a trait for each interface,
+a companion object to lift each interface into the `ZIO` type,
+a `ZLayer` to package each implementation, and a `provide()` call to bind them.
+Koka declared each Effect in two lines and handled it in one `with` clause.
+Even `greet()` grows: it cannot call `ask` and then `tell`,
+because each call produces a description, not a value,
+so a `for` comprehension chains the two descriptions into one.
 The machinery exists because the language cannot intercept an Effect at the point where it runs,
 the way a native handler does.
 A library works with values alone, so every Effect must become a value.
-`hello` is a data structure describing a program.
+`greet` is a data structure describing a program.
 Execution begins when the ZIO runtime interprets that structure at `run`,
 the edge between description and action.
 
@@ -782,27 +804,57 @@ The TypeScript [Effect](https://effect.website/) library works the same way:
 
 ```typescript
 import { Context, Effect, Layer } from "effect"
+import * as readline from "node:readline/promises"
+import { stdin, stdout } from "node:process"
 
-// The Effect's interface, as a service
+// The Effects' interfaces, as services
+class Ask extends Context.Service<
+  Ask,
+  { ask: (prompt: string) => Effect.Effect<string> }
+>()("Ask") {}
+
 class Tell extends Context.Service<
   Tell,
   { tell: (message: string) => Effect.Effect<void> }
 >()("Tell") {}
 
 // Core logic: still just a description
-const hello = Effect.gen(function* () {
+const greet = Effect.gen(function* () {
+  const ask = yield* Ask
   const tell = yield* Tell
-  yield* tell.tell("Hello, World!")
+  const name = yield* ask.ask("What is your name? ")
+  yield* tell.tell(`Hello, ${name}!`)
 })
 
-// The implementation, packaged for delayed binding
+// The implementations, packaged for delayed binding
+const ConsoleAsk = Layer.succeed(Ask, {
+  ask: (prompt) =>
+    Effect.promise(async () => {
+      const rl = readline.createInterface({
+        input: stdin,
+        output: stdout,
+      })
+      const answer = await rl.question(prompt)
+      rl.close()
+      return answer
+    }),
+})
+
 const ConsoleTell = Layer.succeed(Tell, {
   tell: (message) => Effect.sync(() => console.log(message)),
 })
 
 // The boundary: descriptions above, execution here
-Effect.runPromise(hello.pipe(Effect.provide(ConsoleTell)))
+const Console = Layer.merge(ConsoleAsk, ConsoleTell)
+Effect.runPromise(greet.pipe(Effect.provide(Console)))
 ```
+
+Here `greet` reads as straight-line code because `Effect.gen` builds the description from a generator,
+and each `yield*` hands a sub-description to the library and receives its result back.
+Koka's `main()` read a line with `readline()`.
+The `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
+close the interface,
+and wrap all of that in `Effect.promise` so the result is a description the library can track.
 
 The machinery does not stop at your own code.
 A library Effect system tracks Effects only in values of its own type,
@@ -810,8 +862,9 @@ so it cannot see an ordinary function that performs an Effect.
 Scala's `println` prints, and its signature promises only a `Unit`.
 The library therefore ships its own copy of every effectful standard-library call,
 each returning a description that carries the Effect signature.
-`printLine` in the ZIO listing is the wrapped `println`,
-and the TypeScript listing wraps `console.log` in `Effect.sync` by hand.
+`print`, `printLine`,
+and `readLine` in the ZIO listing are the wrapped versions of Scala's own console calls,
+and the TypeScript listing wraps `console.log` in `Effect.sync` and Node's `readline` in `Effect.promise` by hand.
 Console, file, clock, random, and network calls each get a wrapped version,
 and a third-party library with no wrapper must be wrapped before it fits.
 The parallel surface exists because the library tracks Effects without the compiler's help.
