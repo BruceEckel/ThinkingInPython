@@ -778,6 +778,21 @@ A library works with values alone, so every Effect must become a value.
 Execution begins when the ZIO runtime interprets that structure at `run`,
 the edge between description and action.
 
+The machinery does not stop at your own code.
+A library Effect system tracks Effects only in values of its own type,
+so an ordinary function that performs an Effect is invisible to it.
+Scala's `println` prints and returns `Unit`,
+and nothing in that signature says so.
+The library therefore ships its own copy of every effectful standard-library call,
+each returning a description that carries the Effect signature.
+`printLine` in the ZIO listing is the wrapped `println`,
+and the TypeScript listing wraps `console.log` in `Effect.sync` by hand.
+Console, file, clock, random, and network calls each get a wrapped version,
+and a third-party library with no wrapper must be wrapped before it fits.
+The parallel surface exists because the library tracks Effects without the compiler's help.
+A native system's standard library declares its Effects in its own signatures,
+written once, so no second copy exists.
+
 The TypeScript [Effect](https://effect.website/) library works the same way:
 
 ```typescript
