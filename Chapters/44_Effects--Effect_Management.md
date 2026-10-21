@@ -413,7 +413,7 @@ Each kind yields its own benefit:
 - **Failures** [become data](#converting-effectful-to-pure) in a `Result`.
   The failure appears in the return type,
   so the type checker sees it at every call site,
-  and a test compares a returned `Err` the way it compares an `Ok`.
+  and a test writes `assert result == Err(error)` the way it writes `assert result == Ok(value)`.
 - **Side causes** become replaceable inputs.
   A test substitutes a constant clock for the real one,
   or a seeded generator for true randomness,
