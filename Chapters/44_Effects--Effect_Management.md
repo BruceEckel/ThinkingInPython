@@ -456,7 +456,7 @@ With it you know what a function does:
 whether it is safe to run in parallel with another,
 and what it does when you call it twice in a row.
 That knowledge lets you compose functions,
-and composition is how programs grow large.
+and composition is how programs scale.
 
 ### Tracking and Management
 
@@ -466,9 +466,8 @@ that Effect belongs in your function's type.
 If another function then calls yours,
 the same Effect belongs in that function's type,
 and so on out to the edge of the program.
-A native system adds each Effect for you.
-A library like Stateless has you declare each one,
-and the type checker verifies each declaration.
+The system infers each Effect from the calls in the body,
+or has you declare it and verifies the declaration.
 With an EMS, the function signature tells you whether the function is pure,
 and for an impure function it specifies the kinds of impurity.
 
@@ -631,9 +630,8 @@ The bookkeeping stays.
 The type checker can no longer verify it.
 
 An EMS moves the bookkeeping into the type system.
-A native system maintains it for you.
-With a library like Stateless,
-you write the declarations and the type checker verifies each one.
+Either the system infers each Effect from the body,
+or you declare it and the type checker verifies the declaration.
 Moving the bookkeeping into the type system takes a second channel in the signature,
 one that carries Effect information outside the argument list.
 
