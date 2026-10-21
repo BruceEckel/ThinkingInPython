@@ -399,7 +399,10 @@ and its return value,
 so the function is safe to run in parallel with any other code.
 
 The same guarantee makes testing trivial.
-You call the function and check what it returns.
+The arguments are the whole input and the return value is the whole output,
+so a test builds the arguments, calls the function, and compares the result,
+and the same call gives the same result on every run.
+A test of an impure function also arranges the state the function reads and inspects the state it writes afterward.
 
 ## Two Phases of Effect Analysis
 
