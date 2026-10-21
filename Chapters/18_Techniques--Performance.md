@@ -1692,7 +1692,7 @@ Once you're done, you import a module that looks from the outside like any other
 except that it runs faster.
 
 [PyO3](https://pyo3.rs) generates the Python bindings,
-and [maturin](https://www.maturin.rs)
+and [Maturin](https://www.maturin.rs)
 builds and installs the result as an ordinary Python package.
 `maturin new --bindings pyo3 fastcount` scaffolds the project.
 In the crate, the `#[pyfunction]` attribute turns a Rust function into a Python function.

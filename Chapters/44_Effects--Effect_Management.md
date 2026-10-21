@@ -620,7 +620,7 @@ By examining the function calls made in the body,
 the compiler infers the Effects made by the function.
 Thus, a native Effect type system function signature tracks Effects together with ordinary arguments and return types.
 
-We'll examine different Effect management systems using the same small program in two languages with native Effects,
+We'll examine different Effect Management Systems using the same small program in two languages with native Effects,
 Koka and Flix, and two library Effect systems,
 ZIO for Scala and Effect for TypeScript.
 
@@ -924,7 +924,7 @@ a function declares a `needs` clause.
 A separate `using` clause rebinds each implementation,
 so tests can swap Effects deterministically.
 [Lumen](https://alliecatowo.github.io/lumen/)
-writes source as markdown with algebraic effects.
+writes source as Markdown with algebraic effects.
 Its `bind effect` rebinds a handler separately from its use.
 Both separate an Effect's interface from its implementation and bind the implementation later,
 the second and third properties of a full EMS.

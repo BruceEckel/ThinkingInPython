@@ -862,7 +862,7 @@ so the call passes the check and fails at runtime.
 This `model()` generates nothing, and `object`'s constructor takes no arguments.
 The declaration is a claim, and this one is false.
 
-Libraries like attrs and pydantic make the claim true by generating the methods their `@dataclass_transform` declares.
+Libraries like attrs and Pydantic make the claim true by generating the methods their `@dataclass_transform` declares.
 The declaration then gives their classes first-class checking in every checker that follows the typing specification.
 The shortest `model()` that makes its claim true delegates the generation:
 
