@@ -462,8 +462,8 @@ and composition is how programs scale.
 
 An Effect Management System (EMS) does three things:
 
-1. **Tracks Effects.**
-   The type system records which Effects a function may perform.
+1. **Effect tracking.**
+   The type system records the Effects a function performs.
    If your function calls an effectful function,
    that Effect belongs in your function's type.
    If another function then calls yours,
@@ -471,23 +471,19 @@ An Effect Management System (EMS) does three things:
    and so on out to the edge of the program.
    The signature then tells you whether the function is pure,
    and for an impure function it specifies the kinds of impurity.
-   This item alone is *Effect tracking*.
-   Most languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects)
-   stop there, and so does Python's `async`,
-   as [Effect Management for Python?](#effect-management-for-python) shows.
 2. **Separates each Effect's interface from its implementation.**
    A function declares which Effects it uses, not how to fulfill them.
-   It says "I need something that can read from storage," not which database.
+   It says "I need something that can read from storage" but doesn't specify a storage mechanism
+   (such as a database).
 3. **Binds the implementation later.**
-   Some caller or context supplies the implementation at a point after the function's definition,
+   A caller or context supplies the implementation at some point after the function's definition,
    usually the edge of the program.
-   The gap between the declaration and its supply is *delayed binding*.
+   The connection between the declaration and its supply is *delayed binding*.
 
-The second and third items turn tracking into *Effect management*.
 When a hundred functions declare the storage Effect,
 one binding point supplies the implementation for all of them.
 A test binds an in-memory store, production binds the real database,
-and the hundred functions stay as written.
+and both run the same hundred functions.
 
 Cross-cutting behavior binds at the same point.
 To add caching, tracing, or retries to every storage access,
