@@ -460,50 +460,44 @@ and composition is how programs scale.
 
 ### Tracking and Management
 
-An Effect Management System (EMS) tracks the Effects of each function.
-If your function calls an effectful function,
-that Effect belongs in your function's type.
-If another function then calls yours,
-the same Effect belongs in that function's type,
-and so on out to the edge of the program.
-The system infers each Effect from the calls in the body,
-or has you declare it and verifies the declaration.
-With an EMS, the function signature tells you whether the function is pure,
-and for an impure function it specifies the kinds of impurity.
-
-A full EMS does three things:
+An Effect Management System (EMS) does three things:
 
 1. **Tracks Effects.**
    The type system records which Effects a function may perform.
+   If your function calls an effectful function,
+   that Effect belongs in your function's type.
+   If another function then calls yours,
+   the same Effect belongs in that function's type,
+   and so on out to the edge of the program.
+   The signature then tells you whether the function is pure,
+   and for an impure function it specifies the kinds of impurity.
 2. **Separates each Effect's interface from its implementation.**
    A function declares which Effects it uses, not how to fulfill them.
+   It says "I need something that can read from storage" and never names the database.
 3. **Binds the implementation later.**
-   Some caller or context supplies the implementation,
-   at a point after the function's definition.
+   Some caller or context supplies the implementation at a point after the function's definition,
+   usually the edge of the program.
+   The gap between the declaration and its supply is *delayed binding*.
 
-On its own, the first item is *Effect tracking*.
-Tracking alone tells you whether a function is pure,
-and specifies the kinds of impurity a caller takes on.
-Effect management is tracking plus the second and third items.
-When an Effect is an interface and a caller binds the implementation later,
-you can replace what the Effect does and leave the function that performs it as written.
+The first item alone is *Effect tracking*.
+Effect management is tracking plus the other two.
 Tracking reports a function's Effects.
 Management lets you control them.
+Because an Effect is an interface and a caller binds the implementation later,
+you can replace what the Effect does and leave the function that performs it as written.
 Tracking alone appears twice later in this chapter:
 in most of the languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects),
 and in Python's `async`,
 which [Effect Management for Python?](#effect-management-for-python) examines.
 
-The third item names *delayed binding*.
-Delayed binding exists so that the same codebase can serve many contexts
+Delayed binding lets one codebase serve many contexts
 (test, production, retry-wrapped) without edits.
-When a hundred functions declare "I need something that can read from storage,"
-none of them specifies a storage implementation.
-Each declaration propagates to its caller, up to a single point,
-usually the edge of the program, where storage binds to an implementation.
-Changing that one binding changes the behavior of all hundred functions at once.
-A test provides an in-memory binding, production provides the real database,
-and the code of all hundred functions stays the same.
+When a hundred functions declare the storage Effect,
+each declaration propagates to its caller,
+up to the one point where storage binds to an implementation.
+Changing that binding changes the behavior of all hundred functions at once.
+A test binds an in-memory store, production binds the real database,
+and the hundred functions stay as written.
 
 Cross-cutting behavior binds at the same point.
 To add caching, tracing, or retries to every storage access,
