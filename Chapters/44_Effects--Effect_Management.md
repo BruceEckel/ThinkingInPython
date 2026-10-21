@@ -411,33 +411,30 @@ The second phase divides the impure part by kind.
 Each kind yields its own benefit:
 
 - **Failures** [become data](#converting-effectful-to-pure) in a `Result`.
-  The failure appears in the return type,
-  so the type checker sees it at every call site,
-  and a test writes `assert result == Err(error)` the way it writes `assert result == Ok(value)`.
+  They are treated as ordinary return values rather than managing an exception-handling mechanism.
 - **Side causes** become replaceable inputs.
   A test substitutes a constant clock for the real one,
-  or a seeded generator for true randomness,
-  and the function under test becomes repeatable.
+  or a seeded generator for true randomness.
+  The function under test becomes repeatable.
 - **Side effects** become replaceable outputs.
   A test swaps the real database or console for a stand-in that records the writes,
-  then inspects the recording.
+  then inspects that recording.
 
-Each of those benefits is a testing benefit, for one reason.
 A test must run in an environment it controls.
-An untracked Effect is part of the environment outside that control.
+An untracked Effect is outside that control.
 Every Effect you isolate is one your tests can control.
 
-Every one of those benefits depends on knowing where the Effects are.
-In a small program you find them by inspection.
+Each benefit depends on knowing where the Effects are.
+In a small program you find Effects through inspection.
 As programs grow, inspection stops scaling.
-An Effect Management System replaces it.
+An Effect Management System scales.
 
 ## Effect Management Systems
 
 The currency helper from the chapter's opening is the ordinary case.
-Most functions in most programs perform Effects their signatures leave out.
-Those hidden Effects make code hard to understand,
-and leave these questions open:
+Most functions in most programs perform Effects,
+and their signatures show only the arguments and the return type.
+The hidden Effects make code hard to understand, and leave these questions open:
 
 - Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
