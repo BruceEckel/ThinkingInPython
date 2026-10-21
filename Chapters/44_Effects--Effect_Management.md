@@ -823,6 +823,7 @@ const greet = Effect.gen(function* () {
   // Fetch each service object the layer supplied
   const ask = yield* Ask
   const tell = yield* Tell
+  // Each call builds a description; yield* runs it
   const name = yield* ask.ask("What is your name? ")
   yield* tell.tell(`Hello, ${name}!`)
 })
