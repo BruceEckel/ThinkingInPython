@@ -471,6 +471,10 @@ An Effect Management System (EMS) does three things:
    and so on out to the edge of the program.
    The signature then tells you whether the function is pure,
    and for an impure function it specifies the kinds of impurity.
+   This item alone is *Effect tracking*.
+   Most of the languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects)
+   go no further, and neither does Python's `async`,
+   as [Effect Management for Python?](#effect-management-for-python) shows.
 2. **Separates each Effect's interface from its implementation.**
    A function declares which Effects it uses, not how to fulfill them.
    It says "I need something that can read from storage," not which database.
@@ -479,23 +483,9 @@ An Effect Management System (EMS) does three things:
    usually the edge of the program.
    The gap between the declaration and its supply is *delayed binding*.
 
-The first item alone is *Effect tracking*.
-Effect management is tracking plus the other two.
-Tracking reports a function's Effects.
-Management lets you control them.
-Because an Effect is an interface and a caller binds the implementation later,
-you can replace what the Effect does and leave the function that performs it as written.
-Tracking alone appears twice later in this chapter:
-in most of the languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects),
-and in Python's `async`,
-which [Effect Management for Python?](#effect-management-for-python) examines.
-
-Delayed binding lets one codebase serve many contexts
-(test, production, retry-wrapped) without edits.
+The second and third items turn tracking into *Effect management*.
 When a hundred functions declare the storage Effect,
-each declaration propagates to its caller,
-up to the one point where storage binds to an implementation.
-Changing that binding changes the behavior of all hundred functions at once.
+one binding point supplies the implementation for all of them.
 A test binds an in-memory store, production binds the real database,
 and the hundred functions stay as written.
 
@@ -503,7 +493,6 @@ Cross-cutting behavior binds at the same point.
 To add caching, tracing, or retries to every storage access,
 you insert a layer at the binding point instead of touching every call site.
 Variation concentrates at the edge of the program.
-The functions below it stay simple and uniform.
 
 ### Effects by Hand
 
