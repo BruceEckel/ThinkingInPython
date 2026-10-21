@@ -403,7 +403,8 @@ A test of a pure function passes arguments and checks the return value.
 ## Two Phases of Effect Analysis
 
 The first phase of Effect analysis separates pure from impure,
-and gives the pure part parallelism, caching, and easy testing.
+and the pure part is then safe to run in parallel, to cache,
+and to test with a plain call.
 
 The second phase divides the impure part by kind.
 Each kind yields its own benefit:
