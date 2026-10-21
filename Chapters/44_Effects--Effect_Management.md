@@ -780,9 +780,8 @@ the edge between description and action.
 
 The machinery does not stop at your own code.
 A library Effect system tracks Effects only in values of its own type,
-so an ordinary function that performs an Effect is invisible to it.
-Scala's `println` prints and returns `Unit`,
-and nothing in that signature says so.
+so it cannot see an ordinary function that performs an Effect.
+Scala's `println` prints, and its signature promises only a `Unit`.
 The library therefore ships its own copy of every effectful standard-library call,
 each returning a description that carries the Effect signature.
 `printLine` in the ZIO listing is the wrapped `println`,
