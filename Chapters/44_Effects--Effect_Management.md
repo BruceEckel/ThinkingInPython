@@ -399,23 +399,21 @@ and its return value,
 so the function is safe to run in parallel with any other code.
 
 The same guarantee makes testing trivial.
-The arguments are the whole input and the return value is the whole output,
-so a test builds the arguments, calls the function, and compares the result,
-and the same call gives the same result on every run.
-A test of an impure function also arranges the state the function reads and inspects the state it writes afterward.
+Calling a pure function with the same arguments produces the same result every time.
+There are no surprises from side causes, side effects, or failures.
 
 ## Two Phases of Effect Analysis
 
-The first phase of Effect analysis separates pure from impure,
-and the pure part is then safe to run in parallel, safe to cache,
-and simple to test.
+The first phase of Effect analysis separates pure from impure.
+The pure part is safe to run in parallel, safe to cache, and simple to test.
 
 The second phase divides the impure part by kind.
 Each kind yields its own benefit:
 
-- **Exceptions** [become data](#converting-effectful-to-pure) in a `Result`.
-  Failures turn into values whose type the checker verifies,
-  and a test checks for an `Err` as easily as an `Ok`.
+- **Failures** [become data](#converting-effectful-to-pure) in a `Result`.
+  The failure appears in the return type,
+  so the type checker sees it at every call site,
+  and a test compares a returned `Err` the way it compares an `Ok`.
 - **Side causes** become replaceable inputs.
   A test substitutes a constant clock for the real one,
   or a seeded generator for true randomness,
