@@ -442,14 +442,14 @@ and a reader who sees only the signature must ask:
 - Can it fail, and does it fail silently or loudly?
 
 The function's signature answers none of these questions.
-You must read the implementation, then trust that you found everything it needs,
+You must read the implementation, trusting that you find everything it needs,
 everything it changes, and everything that might go wrong.
 In a small codebase you can hold that knowledge in your head.
 In a large one you cannot.
-A function written next week calls the function you understand today,
-and code a colleague writes next month calls next week's function.
-Each step adds dependencies the signatures hide,
-until the whole set exceeds what any one person knows.
+Callers stack up: next week a new function calls the one you read today,
+and next month a colleague's function calls that one.
+Each layer adds dependencies the signatures hide,
+until the whole set exceeds what any one person can know.
 
 Tracking supplies that knowledge.
 With it you know what a function does:
