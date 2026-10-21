@@ -445,7 +445,7 @@ every `Lizard` case fails with an `AttributeError`:
 fourteen of the 32 cases, seven per module.
 The chapter modules define `Paper`, `Scissors`, and `Rock`,
 so `getattr()` raises the `AttributeError` when it looks up `"Lizard"`.
-The solution points both imports at exercises 1 and 2 instead.
+The solution points both imports at exercises 1 and 2.
 
 ```python
 # exercise_3.py
@@ -504,7 +504,7 @@ imports name modules that include `Lizard`. One is the sixteen-entry
 `EXPECTED`. The other is in the `compete()` helper. Each of those
 modules defines its own `Outcome`, so the chapter's
 `isinstance(result, Outcome)` assertion fails. The solution's
-`compete()` asserts against `module.Outcome` instead:
+`compete()` asserts against `module.Outcome`:
 the enumeration of the module that produced the result.
 The helper's return annotation loosens from `Outcome` to `str`,
 the base class that both modules' `Outcome` enumerations share,

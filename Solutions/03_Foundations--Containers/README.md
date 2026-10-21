@@ -457,7 +457,7 @@ the same order `a.update(b)` has always used.
 
 **Build a new dictionary.** `|` builds a new dictionary and leaves the left operand alone,
 so `counts` prints unchanged after the merge.
-`|=` instead updates the left dictionary in place.
+`|=` updates the left dictionary in place.
 
 Letting the right operand win makes `|` on dictionaries depend on operand order.
 `a | b` and `b | a` differ when the two dictionaries hold different values for a shared key.
@@ -538,7 +538,7 @@ The same error appears in the other direction, as
 `not enough values to unpack`, when the list is shorter than the
 target list.
 
-`a, *b = row` states a minimum instead: at least one item for `a`, and
+`a, *b = row` states a minimum: at least one item for `a`, and
 the rest, zero or more, for `b`. So the assignment accepts a
 five-item list, a one-item list, and everything between.
 Only an empty list has too few items. The star turns a fixed-shape assertion into a flexible one.

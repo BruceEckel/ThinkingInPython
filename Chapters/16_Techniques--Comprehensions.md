@@ -321,7 +321,7 @@ When you need both a conditional expression and a filter,
 write each in its own position: `[x if a else b for x in xs if c]`.
 
 Nesting one comprehension inside another builds a list of lists.
-Writing two `for` clauses in one comprehension flattens instead,
+Writing two `for` clauses in one comprehension flattens,
 producing a single list.
 Unlike the clauses of a nested comprehension, these clauses read left to right,
 in the order the equivalent nested loops appear:

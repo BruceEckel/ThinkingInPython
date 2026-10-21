@@ -173,7 +173,7 @@ The checker and the frozen field both let code holding a `Memento` read `.stroke
 unpack that tuple, or build a `Memento` by hand.
 The caretaker's side of the contract remains a convention,
 the one on which the classic pattern relies.
-The type checker catches the accidental case instead:
+The type checker catches the accidental case:
 a caretaker that mixes up a `Memento` with some other tuple.
 
 ```python

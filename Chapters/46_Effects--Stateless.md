@@ -203,7 +203,7 @@ Generator[Need[Console] | KeyError, Any, None]
 `A` and `E` share the first type parameter.
 `R` is the third.
 Nothing in the union tells a request from a failure.
-Two bounds on the library's type variables do that instead.
+Two bounds on the library's type variables do that.
 `A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`.
 [Waiting on a Coroutine](#waiting-on-a-coroutine)
 states the `A` bound as the rule for `Depend`.
@@ -240,7 +240,7 @@ the type checker reads `yield Need(Log)` as producing a `Console`.
 So the SendType is `Any`, which accepts every answer unchecked.
 
 A bare `yield` produces that SendType, `Any`.
-`yield from` produces the inner generator's `ReturnType` instead,
+`yield from` produces the inner generator's `ReturnType`,
 so the type checker knows the answer's type.
 `need(Console)` builds a small generator that serves one request,
 so its `ReturnType` can be a specific type.
@@ -408,7 +408,7 @@ A second `supply()` wrapped around the first answers what the inner one re-yield
 
 A dependency injection container often lets you register a fallback for a type nobody else provides.
 Stateless has no such registration, and `need()` takes no default argument.
-Layering handlers produces the fallback instead.
+Layering handlers produces the fallback.
 Here, `Console` carries a tag so the output says which handler answered:
 
 ```python
@@ -853,7 +853,7 @@ def test_holds(
 
 One test function covers four environments.
 `holds()` takes no arguments.
-`supply()` binds `material` and `nailer` instead,
+`supply()` binds `material` and `nailer`,
 so the table reads as a matrix of environments rather than a list of arguments.
 A new `Material` adds one row for each nailer.
 
@@ -1023,7 +1023,7 @@ You can instantiate a concrete `Console` and supply it with no upcast,
 but an interface reaches `supply()` only through an implementation.
 
 `console_protocol.py` is the form to write in production.
-Most listings in these two chapters use a concrete `Console` instead,
+Most listings in these two chapters use a concrete `Console`,
 because an interface adds an `as_type()` call wherever an implementation goes straight to `supply()`.
 [Composing a Program](47_Effects--Stateless_in_Practice.md#composing-a-program)
 declares its Abilities as `Protocol`s and shows the annotation that replaces that call.
@@ -1135,7 +1135,7 @@ The type is the registration key,
 so `register(Console, Recorder())` binds an implementation to the type the caller requests.
 A dictionary matches the key exactly,
 so `get(Console)` never returns a subclass registered under its own name.
-`supply()` takes bare instances and matches a request with `isinstance()` instead,
+`supply()` takes bare instances and matches a request with `isinstance()`,
 so two instances that satisfy one `Need` are [ambiguous](#when-two-implementations-match).
 
 The DI registration key also does the work `as_type(Console)` does for `supply()`.

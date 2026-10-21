@@ -88,7 +88,7 @@ print(xs, 30 in xs)
 
 `append()` adds its argument as a single element,
 so `xs.append([1, 2])` puts a `list` inside the `list`.
-`extend()` adds each item of its argument instead.
+`extend()` adds each item of its argument.
 
 `sorted()` builds a new sorted list from any iterable.
 `list.sort()` reorders a list in place and returns `None`:
@@ -326,7 +326,7 @@ print(type(name).__name__, type(age).__name__,
 
 A tuple used this way is a fixed-length immutable record,
 where each position has a distinct meaning.
-A tuple holding many values of one type is instead an immutable `list`.
+A tuple holding many values of one type is an immutable `list`.
 
 ## Dictionaries
 
@@ -740,8 +740,7 @@ For a lookup that leaves the dictionary as it was, use `in` or `dict.get()`.
 A plain `dict` has a second option, `setdefault()`.
 In `plain.setdefault(kind, []).append(name)`,
 `setdefault()` returns the list already stored under `kind`.
-When `kind` is missing,
-`setdefault()` stores the new `[]` and returns that instead.
+When `kind` is missing, `setdefault()` stores the new `[]` and returns that.
 The `[]` argument builds an empty list on every call.
 A call that finds `kind` discards that list.
 Every line that looks up a key must also repeat the whole expression.

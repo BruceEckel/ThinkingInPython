@@ -409,7 +409,7 @@ the buffer therefore holds the whole stream.
 That buffer uses as much memory as a list,
 and the `buffered.current > listed.current * 0.9` comparison confirms it
 (one machine measured 4,096,992 bytes buffered against 3,999,904 for the list).
-The last block advances `first2` and `second2` together instead,
+The last block advances `first2` and `second2` together,
 one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 That gap stays near zero,
 and the `lockstep.peak < listed.current * 0.1` comparison confirms it.

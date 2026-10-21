@@ -585,7 +585,7 @@ expect(ValueError, list, batched(range(7), 3, strict=True))
 ```
 
 A short final batch is normal for pagination and wrong for fixed-width records.
-For fixed-width records, `strict=True` raises a `ValueError` instead,
+For fixed-width records, `strict=True` raises a `ValueError`,
 as the `[ValueError]` line shows.
 `zip(strict=True)` under [`zip_longest`](#zip_longest) offers the same choice.
 
@@ -1177,7 +1177,7 @@ for i, grouping in enumerate(trios):
 #: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
 ```
 
-Called with `size=3`, the same function schedules trios instead.
+Called with `size=3`, the same function schedules trios.
 Seven students make two threes with one left over, so one group grows to four.
 The leftover student joins a group instead of sitting out the round,
 the alternative to the circle method's phantom player.

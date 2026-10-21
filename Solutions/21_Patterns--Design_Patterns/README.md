@@ -2,7 +2,7 @@
 
 The first three exercises ask about your own experience, so no answer
 here can be the answer. Each of those solutions works a single example
-through instead. The method is the transferable part: name the axis,
+through. The method is the transferable part: name the axis,
 subtract Python's share, then take away one more thing and see whether
 anything breaks. The last exercise has an answer you can check against
 the chapter's figure.

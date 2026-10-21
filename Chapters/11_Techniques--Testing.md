@@ -233,7 +233,7 @@ which a bare `assert` statement discards.
 
 Because `Account` is a `@dataclass`,
 its generated `__repr__()` prints `Account(balance=100.0)`.
-A hand-written class with no `__repr__()` prints `<account.Account object at 0x...>` there instead.
+A hand-written class with no `__repr__()` prints `<account.Account object at 0x...>` there.
 
 ## Testing for Exceptions
 
@@ -603,7 +603,7 @@ def test_report_prints_balance() -> None:
     assert buffer.getvalue() == "balance: 100.00\n"
 ```
 
-`pytest`'s built-in `capsys` fixture captures the output of a whole test instead.
+`pytest`'s built-in `capsys` fixture captures the output of a whole test.
 `capsys.readouterr().out` returns the text the test has printed so far.
 `redirect_stdout()` limits the capture to its block,
 and it works outside `pytest` as well.
@@ -904,7 +904,7 @@ def test_current_temp(
 `weather` imports the function with `from urllib.request import urlopen`.
 That statement binds `urlopen` in `weather`'s own namespace,
 so `weather.urlopen` is the name the call site reads and the name to patch.
-Patching `urllib.request.urlopen` instead leaves `weather`'s copy pointing at the real function.
+Patching `urllib.request.urlopen` leaves `weather`'s copy pointing at the real function.
 One rule covers both `import module` and `from module import name`:
 patch the name the calling code looks up.
 
@@ -965,7 +965,7 @@ because a function that takes its clock or its fetcher as an argument needs no p
 
 The tests in this chapter check specific examples:
 this input produces that output.
-A *property-based* test instead states a law the code must always obey,
+A *property-based* test states a law the code must always obey,
 and lets a tool generate the inputs that try to break it.
 [Confidence](43_Functional--Confidence.md#property-based-testing)
 shows the technique,

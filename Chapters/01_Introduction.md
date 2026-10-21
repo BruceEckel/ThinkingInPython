@@ -195,7 +195,7 @@ one folder per chapter,
 so the listing starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
 is the file `Examples/14_Techniques--Decorators/tracer.py`.
 
-A helper that more than one chapter uses carries a `utils/` path in its filename comment instead,
+A helper that more than one chapter uses carries a `utils/` path in its filename comment,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
 A listing imports such a helper by its bare module name,

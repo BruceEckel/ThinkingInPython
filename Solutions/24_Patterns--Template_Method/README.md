@@ -640,7 +640,7 @@ name, the right parameters, and the right return type, so both satisfy
 **Raise an unexpected exception.** `Exploder` breaks the algorithm on the first step of the first pass.
 Code written against `ApplicationFramework` expects `run()` to return
 normally for every subclass.
-`Exploder`'s `customize1()` raises an exception instead,
+`Exploder`'s `customize1()` raises an exception,
 which propagates out of `run()`
 into a caller written for the base version.
 
@@ -661,7 +661,7 @@ class declares that a subclass may skip this step.
 With that body, no checker can catch the omission,
 because "deliberately empty" and "forgotten" are the same code.
 Only the base class can record that difference.
-The base class can declare instead that a subclass must supply the step,
+The base class can declare that a subclass must supply the step,
 by inheriting from `ABC` and marking `customize2()` with `@abstractmethod`.
 Then constructing `HalfDone` raises a `TypeError`.
 The type checker reports the construction before the program runs.

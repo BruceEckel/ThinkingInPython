@@ -86,7 +86,7 @@ In Python an object attribute exists once a method assigns to it through `self`
 (typically in the constructor, though any method can do it).
 The attributes an object carries therefore depend on which of its methods have run.
 If you assign to a name in the class body, C++/Java style,
-that name becomes a class-level attribute instead
+that name becomes a class-level attribute
 (similar to a static field in C++/Java).
 
 A bare annotation with no value looks most like a C++ or Java field declaration,
@@ -297,7 +297,7 @@ Python runs the constructor the derived class inherits from the base class.
 
 Python accepts any method name in a subclass.
 If you misspell the name of a method you mean to override,
-you define a new method instead.
+you define a new method.
 Python reports nothing.
 Renaming or removing the base method later has the same effect.
 Either bug is easy to miss.
@@ -649,7 +649,7 @@ so the alternative constructor produces the right kind of object.
 `Reading` inherits the method unchanged.
 `Reading.from_fahrenheit(212)` passes `Reading` as `cls`,
 so `type(r).__name__` reports `'Reading'`.
-Writing `return Temperature(...)` instead hard-codes the class.
+Writing `return Temperature(...)` hard-codes the class.
 `Reading.from_fahrenheit()` then returns a `Temperature`.
 
 `is_freezing()` also works as a module-level function,

@@ -320,7 +320,7 @@ A function can read a module-level name,
 but assigning to that name anywhere in the function makes it local for the whole function.
 Python decides which names are local when it compiles the function body,
 so an assignment on the last line of the body has the same effect as one on the first.
-`global` tells Python to rebind the module-level name instead:
+`global` tells Python to rebind the module-level name:
 
 ```python
 # function_scope.py

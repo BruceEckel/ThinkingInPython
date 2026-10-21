@@ -669,11 +669,11 @@ The cancellation that `return_exceptions=True` does return is a responder's own:
 a `CancelledError` raised inside the responder, which is what a cancelled `await` propagates.
 Because `CancelledError` derives from `BaseException` and not from `Exception`,
 an `isinstance(r, Exception)` filter drops that result from `failures` silently.
-This version filters on `BaseException` instead.
+This version filters on `BaseException`.
 
 **Hold a cancellation in the group.** `ExceptionGroup` cannot hold a `BaseException`.
 With the wider filter, `ty` reports an `invalid-argument-type` at an `ExceptionGroup(...)` call.
-The listing raises a `BaseExceptionGroup` instead.
+The listing raises a `BaseExceptionGroup`.
 That constructor returns an `ExceptionGroup` when every member is an `Exception`,
 so the demo's `except* RuntimeError` and the first test still see the group the exercise asks for.
 When a cancellation is among the failures, the group is a `BaseExceptionGroup`.
@@ -1721,7 +1721,7 @@ Pyright rejects `Thermometer.celsius.connect`.
 It reads the constructor's `self.celsius = celsius` as declaring an instance attribute of type `float` beside the descriptor,
 so it types the class access as `Notifying[float] | float` and reports that `float` has no `connect`.
 `ty` types the class access from the `__get__()` overload alone.
-A codebase on Pyright looks the descriptor up in `type(obj).__dict__` instead,
+A codebase on Pyright looks the descriptor up in `type(obj).__dict__`,
 which Pyright accepts.
 
 **Announce on assignment.** `__set__()` stores the value and then calls each responder connected

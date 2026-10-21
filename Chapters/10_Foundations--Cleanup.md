@@ -135,7 +135,7 @@ Python prints a traceback to `sys.stderr`, labeled `Exception ignored`,
 and discards the exception.
 No caller can catch the `RuntimeError`, the exit status is still `0`,
 and a test asserting on stdout passes.
-In a `with` block, an exception from `close()` propagates to the caller instead.
+In a `with` block, an exception from `close()` propagates to the caller.
 
 ## Reference Cycles Delay Destruction
 

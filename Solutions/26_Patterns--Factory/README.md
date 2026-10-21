@@ -139,7 +139,7 @@ s.draw()
 #: Triangle.draw
 ```
 
-`shape_factory_objects.py`'s factory-object version instead needs a `_Triangle`
+`shape_factory_objects.py`'s factory-object version needs a `_Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`.
 In the chapter file the `_Triangle` entry joins the entries for
@@ -428,7 +428,7 @@ If you run the program without fixing it, Python raises a `TypeError` at that co
 before the game runs.
 In `abstract_factory_protocol.py` no class declares that it satisfies
 the protocol, so constructing the factory is legal.
-The type checker reports the call that needs the protocol instead.
+The type checker reports the call that needs the protocol.
 Its diagnostic names the missing method.
 At runtime that version fails later, inside the game.
 `GameEnvironment.__init__()` raises an `AttributeError` when it calls
@@ -719,7 +719,7 @@ again: illegal values are unrepresentable.
 **Check before each change.** Placing the check in `topping()`, as
 `exercise_5.py` does, gives `PizzaBuilder` the same guarantee. The fifth `.topping()`
 call raises a `ValueError` before appending, so `self._toppings` holds
-at most four. Placing the check in `build()` instead lets the builder
+at most four. Placing the check in `build()` lets the builder
 accept a fifth, sixth, or tenth `.topping()` call
 and silently accumulate an overlong list.
 That builder checks the count when `build()` runs,

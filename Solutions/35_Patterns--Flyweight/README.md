@@ -366,7 +366,7 @@ the test passes whether or not the cells share a tile.
 With `@cache` removed from `mutable_tile()`, each cell gets its own `MutableTile`.
 `field[0][0].walkable` still reads `False` after the assignment,
 so the test passes on code that shares nothing.
-The test instead asserts on a different grass cell, `field[1][1]`,
+The test asserts on a different grass cell, `field[1][1]`,
 whose `walkable` turns `False` only when the cells share one `MutableTile`.
 
 ```python
@@ -874,8 +874,8 @@ before the lookup can find a pooled instance or build a new one.
 Every `Color` that `__new__()` pools or returns has in-range components.
 
 [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
-makes the same *parse, don't validate* move with `__post_init__()`. Here the class validates in `__new__()`
-instead, because `__post_init__()` runs after `__new__()` has pooled the instance.
+makes the same *parse, don't validate* move with `__post_init__()`. Here the class validates in `__new__()`,
+because `__post_init__()` runs after `__new__()` has pooled the instance.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

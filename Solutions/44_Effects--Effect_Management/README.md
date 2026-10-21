@@ -450,7 +450,7 @@ If you keep `NonZero`'s `self.value == 0` test under the new name,
 and `slope(10, PositiveInt(-1))` returns `-10.0`.
 The demo's `expect()` loop then raises an `AssertionError` ("no exception raised") on `-1`,
 and the type checker reports nothing, because every argument has the right type.
-The solution's `__post_init__()` tests `value <= 0` instead, which rejects both bad values.
+The solution's `__post_init__()` tests `value <= 0`, which rejects both bad values.
 
 ```python
 # exercise_4.py

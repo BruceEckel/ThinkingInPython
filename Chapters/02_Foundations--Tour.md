@@ -222,7 +222,7 @@ print(True + True, True == 1)  # A bool is an int
 
 `round()` breaks a tie to the nearest even value,
 so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`.
-C's `round()` rounds half away from zero instead.
+C's `round()` rounds half away from zero.
 The format spec of an [f-string](#f-strings), later in this chapter,
 rounds ties the way `round()` does.
 
@@ -258,7 +258,7 @@ print(alias, items)
 Augmented assignment on a mutable object changes it in place,
 so every other name bound to that object refers to the changed object.
 For a list, `+=` does what `extend()` does.
-`items = items + [4]` instead builds a new list and rebinds `items` to it,
+`items = items + [4]` builds a new list and rebinds `items` to it,
 which leaves `alias` bound to the old one.
 For an `int`, both forms rebind the name,
 so `total += 5` behaves the way `+=` does in any other language.
@@ -579,7 +579,7 @@ F-strings replaced them.
 
 An f-string produces a finished `str`,
 converting each value to text before any other code receives the `str`.
-A *t-string* produces a `Template` instead.
+A *t-string* produces a `Template`.
 The `Template` keeps the literal pieces and the interpolated values apart for a consumer to assemble.
 Python 3.14 added t-strings ([PEP 750](https://peps.python.org/pep-0750/)).
 

@@ -447,7 +447,7 @@ Compare these handlers to `student_groups.py` in [Functional Toolkits](41_Functi
 which makes randomness repeatable a different way, by taking a `seed` parameter.
 A `seed` parameter works,
 but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
-Here the return type names the source instead.
+Here the return type names the source.
 No signature between `handle()` and the request mentions it.
 
 `Flip` and `Now` are both side causes,
@@ -1240,7 +1240,7 @@ When `research()` gains a fourth error,
 `report()`'s named `catch()` leaves it in the channel,
 so `report()`'s declared type no longer matches and the type checker reports an error at the `yield from`.
 You decide whether to catch the newcomer or declare it.
-`catch_all()` absorbs it into the result union instead,
+`catch_all()` absorbs it into the result union,
 so the guard must be code that reads the result:
 an annotation that writes the union out, as `outcome()`'s return type does,
 or a `match` that ends with `assert_never()`.
@@ -1374,7 +1374,7 @@ and the graph you can read is the union in the signature.
 
 The bakery graph goes deep,
 with two of its three leaves reached through `bread()`.
-The next example goes wide instead.
+The next example goes wide.
 [Abstract Factories](26_Patterns--Factory.md#abstract-factories)
 builds a gaming environment where a `GameElementFactory` returns a matched `Character` and `Obstacle`,
 and a `GameEnvironment` plays whatever that factory produces.
@@ -1931,7 +1931,7 @@ turning it into one that returns an Effect,
 so it is both an entry point and a transformation.
 On a function that already returns an Effect, as in `fetch_effectful.py`,
 it adds each `E` to that Effect's error channel.
-`throw()` instead builds the failure as a description.
+`throw()` builds the failure as a description.
 And `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
 
@@ -2134,7 +2134,7 @@ The order of the handlers changes what the checker reports.
 `catch_everything.py` supplies first and catches second,
 and its `catch_all(bound)` comes back as `() -> Generator[Unknown, Any, ...]`.
 With every Ability supplied and every error caught,
-the channel that should read `Never` reads `Unknown` instead.
+the channel that should read `Never` reads `Unknown`.
 Catching first and supplying second, `supply(feed, book)(catch_all(research))`,
 reads `Never`.
 That `Unknown` hides no unsupplied `Need`.
@@ -2213,10 +2213,10 @@ and the handlers are the interface.
 A library cannot reproduce a native handler's control over the rest of the Effect.
 `handle()` passes a handler the Ability and takes back an answer,
 and the driver resumes the Effect with that answer, once, always.
-A native handler instead receives the [continuation](44_Effects--Effect_Management.md#native-effect-management)
+A native handler receives the [continuation](44_Effects--Effect_Management.md#native-effect-management)
 and chooses what to do with it.
 Invoking it once gives you what Stateless has.
-Declining to invoke it makes the handled scope produce the handler's value instead,
+Declining to invoke it makes the handled scope produce the handler's value,
 which is how an exception behaves.
 Invoking it repeatedly gives you backtracking and search.
 Stateless offers only the first of the three, one invocation:

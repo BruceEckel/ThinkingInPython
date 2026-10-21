@@ -155,7 +155,7 @@ Python raises an `AttributeError` with the message `can't set attribute`.
 The type checker reports the assignment too,
 as `color_namedtuple.py` shows for `red.r = 9`.
 That attempt tests the `Recipe`'s immutability, which holds.
-The solution calls `append()` instead, which edits the field's list in place.
+The solution calls `append()`, which edits the field's list in place.
 
 ```python
 # exercise_3.py

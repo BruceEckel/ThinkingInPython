@@ -356,7 +356,7 @@ Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
 uses this same self-registration.
-`Shape.__subclasses__()` can build the registry instead,
+`Shape.__subclasses__()` can build the registry,
 but it stops at direct subclasses,
 while `__init_subclass__()` runs for every class anywhere below `Shape`.
 
@@ -964,7 +964,7 @@ Both versions report the omission before the program runs, at different places.
 With the abstract base classes in `abstract_factory_abc.py`,
 the checker reports the line that constructs the incomplete factory.
 With the Protocol, constructing a `BrokenFactory` is legal.
-The checker reports `[1]` instead,
+The checker reports `[1]`,
 the line that passes the factory to `GameEnvironment`.
 
 The two versions differ more at runtime.
@@ -979,7 +979,7 @@ Structural typing preserves the purpose of the interfaces and drops the coupling
 ## Prototype
 
 The factories so far build each object from a class and some arguments.
-*Prototype* instead keeps one fully configured instance and makes new objects by copying it.
+*Prototype* keeps one fully configured instance and makes new objects by copying it.
 Use *Prototype* when a ready-made instance is easier to clone than to construct,
 or when construction is slow and the instances share most of the setup.
 

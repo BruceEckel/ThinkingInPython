@@ -638,7 +638,7 @@ answer it just gave. `stale(made, timedelta(hours=12))` returns
 `False` at 11:00 and `True` at 13:00, so writing down `False` and
 substituting it changes the program the moment the clock passes noon.
 The signature declares no time parameter,
-because `stale()` reads the clock through `datetime.now()` instead.
+because `stale()` reads the clock through `datetime.now()`.
 
 **Take a setting without declaring it.** `timeout()` breaks the same way.
 The break is easier to miss, since the environment

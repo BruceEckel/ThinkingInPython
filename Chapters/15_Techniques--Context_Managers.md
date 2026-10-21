@@ -235,7 +235,7 @@ except RuntimeError as error:
 
 `exit runs` is missing from the output,
 because Python registers the cleanup when `__enter__()` returns,
-and this `__enter__()` raises an exception instead.
+and this `__enter__()` raises an exception.
 A `with` that lists several managers applies the same rule per manager.
 The ones that entered still exit.
 The failing one gets no `__exit__()` call.
@@ -692,7 +692,7 @@ forwards `*args` and `**kwargs` and returns the wrapped function's result.
 [`hijack`](14_Techniques--Decorators.md#what-at-does)
 returns a replacement that runs instead of the original function,
 skipping its call.
-`banner` offers one definition instead,
+`banner` offers one definition,
 usable both as a `with` block and as a `@` decorator.
 Use `ContextDecorator` when setup and cleanup should be identical on every call.
 

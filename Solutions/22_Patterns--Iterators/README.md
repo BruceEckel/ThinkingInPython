@@ -603,7 +603,7 @@ the call runs forever.
 `traverse()` stops only when `is_done()` reports the end.
 `count(1)` counts forever.
 `seen` gains an item on every step for as long as the call runs.
-The solution calls `is_done()`, `current_item()`, and `advance()` in a loop of 50,000 steps instead,
+The solution calls `is_done()`, `current_item()`, and `advance()` in a loop of 50,000 steps,
 so the run ends and the listing prints `len(endless.seen)`.
 
 ```python

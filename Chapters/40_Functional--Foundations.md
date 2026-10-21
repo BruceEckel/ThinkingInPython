@@ -176,7 +176,7 @@ not patching one slot in place.
 Copying a two-field `Point` takes negligible time.
 For a large structure that changes often,
 those copies add up in time and memory.
-Languages built around immutability use *persistent* data structures instead,
+Languages built around immutability use *persistent* data structures,
 which copy the part a change touches and share the rest with the old value.
 Python's standard library has none.
 For such a value, a mutable structure kept private to one function is the right choice.

@@ -152,7 +152,7 @@ print(isinstance(Partial(), Service))
 ```
 
 With inheritance, the abstract base class rejects an incomplete implementation at construction.
-A `Protocol` instead reports the mismatch statically,
+A `Protocol` reports the mismatch statically,
 at a parameter annotated `Service`, and needs no common base.
 
 One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks that the methods exist,
@@ -225,7 +225,7 @@ so a surrogate rarely needs `__getattribute__()`.
 
 The implementation side can keep its static check.
 `proxy_getattr.py` annotates `impl` as `Any`.
-A `__getattr__()` proxy can annotate it `Service` instead,
+A `__getattr__()` proxy can annotate it `Service`,
 as `proxy_interface.py`'s `Proxy` does.
 The type checker then verifies that the implementation you pass has the necessary methods.
 A `Protocol` on that parameter guards the implementation side structurally.
@@ -296,7 +296,7 @@ Under mypy, `__getattr__()` also satisfies the lookup for `__len__()`,
 so `len(p)` passes the check and fails at runtime.
 
 `len(p)` reports the missing method because `object` defines no `__len__()`.
-`str(p)` succeeds instead.
+`str(p)` succeeds.
 `object` defines `__str__()`,
 so the lookup on `type(p)` finds `object`'s version.
 `w` prints as `spam eggs`.
@@ -594,7 +594,7 @@ A protection proxy guards against mistakes,
 not against a caller who reads `_doc`.
 
 `hasattr()` catches `AttributeError` and lets every other exception propagate.
-`guest.__getattr__()` raises `PermissionError` instead,
+`guest.__getattr__()` raises `PermissionError`,
 so `hasattr(guest, "erase")` raises `PermissionError` too,
 where a missing name on an ordinary object returns `False`.
 A surrogate fails `isinstance()` for a [different reason](#a-surrogate-is-not-its-implementation).
@@ -831,7 +831,7 @@ each with a `name()` and none of `Behavior`'s three methods.
 With `Behavior` on those parameters, `ty` rejects that test:
 `type StateA is not assignable to protocol Behavior`.
 
-`state_demo.py` declares the implementations as `first: Behavior` and `second: Behavior` instead.
+`state_demo.py` declares the implementations as `first: Behavior` and `second: Behavior`.
 That declaration checks the implementations and leaves the surrogate generic.
 The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
 and reports a missing method.

@@ -61,7 +61,7 @@ print(describe(301))
 
 A literal pattern compares with `==`, not with `is`,
 so `case 200:` also matches `200.0` and `case 1:` matches `True`.
-`None`, `True`, and `False` compare with `is` instead,
+`None`, `True`, and `False` compare with `is`,
 so `case True:` does not match `1`.
 
 For a value-to-value lookup like this,
@@ -551,7 +551,7 @@ Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
 
 Nesting has a set depth, the depth you write into the pattern.
-A self-referential type such as a tree needs recursion instead:
+A self-referential type such as a tree needs recursion:
 a function whose `match` takes one level apart and calls the function again on the parts.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk)
 walks an expression tree this way.
@@ -635,7 +635,7 @@ Python's `match` is a statement, not an expression,
 so a `match` that must produce a value goes inside a function that returns from each `case`.
 
 Python has no `sealed` keyword.
-`assert_never()` plus a type checker fills that role instead.
+`assert_never()` plus a type checker fills that role.
 An `if`/`isinstance()` chain that ends with `assert_never()` gives the same guarantee.
 A `match` names the subject once and binds fields as it tests the type.
 `case Circle(radius)` in `area()` tests the type and binds `radius` in one pattern,

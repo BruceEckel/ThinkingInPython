@@ -26,7 +26,7 @@ If you want static type checking like you get from a compiler in a typed languag
 you must run a separate type-checking tool.
 Mypy is the original and most widely deployed one.
 Pyright is the one most editors run.
-This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
+This book uses [Astral's `ty`](https://docs.astral.sh/ty/),
 from the same group that makes `uv` and `ruff`.
 
 Pyright checks the same listings as a second opinion.
@@ -56,7 +56,7 @@ Each is compatible with everything.
 `object` is the base of every class,
 so an `object` value carries the methods every class shares.
 The type checker rejects every operation beyond those methods.
-`Any` permits every operation instead,
+`Any` permits every operation,
 so it switches the checker off for that value rather than describing a wide set of values.
 Choose `object` for a value you store or pass along untouched,
 and `Any` for one whose operations you would rather check by hand.
@@ -324,7 +324,7 @@ Dynamic typing finds a missing method when the call runs,
 while structural typing reports it before the program runs.
 
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
-A *Protocol* instead describes a required shape.
+A *Protocol* describes a required shape.
 Any object with that shape qualifies, whatever its base classes:
 
 ```python

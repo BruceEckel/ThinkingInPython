@@ -994,7 +994,7 @@ Handlers().on_open()
 ```
 
 **Discard a repeated name.** `NoDuplicates` raises an exception on a
-repeated key. `KeepFirst.__setitem__()` returns early instead. Python
+repeated key. `KeepFirst.__setitem__()` returns early. Python
 still builds the second `on_open` function and passes it to
 `__setitem__()`, where the early return discards it. The name
 `on_open` still refers to the first function when the body finishes,

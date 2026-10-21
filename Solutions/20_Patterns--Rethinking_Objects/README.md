@@ -161,7 +161,7 @@ returns a `deepcopy()`. The caller mutates a throwaway copy.
 `plugged`'s real `_tags` keeps the items it had.
 
 Every new mutable field needs its own defensive copy. That repetition
-is the tedium that motivates freezing the data instead.
+is the tedium that motivates freezing the data.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

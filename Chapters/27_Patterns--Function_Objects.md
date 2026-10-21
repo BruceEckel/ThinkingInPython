@@ -108,7 +108,7 @@ The class version takes four classes and a wrapper to say what one list of funct
 Because in Python a callback is a function, the replacement is unnecessary.
 
 A `Command` base class is worthwhile when the commands share implementation.
-A second operation calls for a type instead.
+A second operation calls for a type.
 The [undo discussion](#a-callable-object-as-a-command)
 describes that type with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 
@@ -507,8 +507,7 @@ Whichever value marks failure, compare the result against it with `is`.
 `None` is the right failure value here because a root is always a `float`,
 so `float | None` says which result is which.
 When `None` is a possible result, it cannot double as the failure mark.
-A [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
-takes that role instead.
+A [`sentinel()`](05_Foundations--Functions.md#sentinel-values) takes that role.
 
 Each finder decides for itself whether it succeeded,
 and reports that decision as its return value.
@@ -828,7 +827,7 @@ and not the `cls` it received.
 Python sets a class's slots when it creates the class,
 so `slots=True` makes `dataclass()` build a new class and return it.
 Registering `cls` puts the original class in `EVENTS`.
-Every event is an instance of `built` instead.
+Every event is an instance of `built`.
 `publish()` then refuses every event.
 `@handler` refuses every handler class,
 because the annotation it reads names the class that `dataclass()` returned

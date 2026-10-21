@@ -920,7 +920,7 @@ so the task keeps control through them and needs no lock.
 
 A semaphore initialized to one behaves like a lock, with one difference.
 Releasing a `Lock` that no task holds raises `RuntimeError: Lock is not acquired`.
-An over-released `Semaphore` quietly raises its own limit instead,
+An over-released `Semaphore` quietly raises its own limit,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
 `asyncio.BoundedSemaphore` checks for that mistake.
 A `release()` beyond its starting count raises a `ValueError`.
@@ -1558,7 +1558,7 @@ Swapping the loop for a thread pool changes nothing.
 Five threads still take turns holding the one GIL,
 so the threaded run takes as long as the sequential one,
 sometimes a little more because of the added scheduling.
-That is why [Parallelism](#parallelism) uses processes instead.
+That is why [Parallelism](#parallelism) uses processes.
 Each process gets its own interpreter with its own GIL.
 
 ### Why Python Has a GIL
@@ -1994,7 +1994,7 @@ so the class is not thread-safe.
 
 The similar queue interfaces hide a consequential difference.
 `queue.Queue` and `multiprocessing.Queue` block the calling thread while they wait.
-`asyncio.Queue` suspends a task instead.
+`asyncio.Queue` suspends a task.
 As `blocking_the_loop.py` shows,
 a blocked thread freezes every task on an event loop,
 while a suspended task lets the rest keep running.
@@ -2717,7 +2717,7 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
     used STM internally to remove the GIL and exposed a
     `with __pypy__.thread.atomic:` block for ordinary Python code.
     PyPy's own documentation now treats it as discontinued.
-    GIL-removal research moved instead to [fine-grained locking](#free-threading).
+ GIL-removal research moved to [fine-grained locking](#free-threading).
     A couple of academic prototypes exist (PSTM, TraM),
     but neither is a maintained library suited to real code.
     Haskell's `Control.Concurrent.STM` and Clojure's `ref`/`dosync`

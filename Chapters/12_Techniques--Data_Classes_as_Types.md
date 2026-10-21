@@ -675,7 +675,7 @@ The alternative is to refuse the unnormalized value and normalize before constru
 Which to choose depends on the type.
 Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
 which is usually what an email address should mean.
-Refusing instead means the constructor stores what it receives or raises an exception,
+Refusing means the constructor stores what it receives or raises an exception,
 and the caller does the cleanup.
 
 ### Parse, Don't Validate
@@ -1581,7 +1581,7 @@ Calling `type(self)(...)` rather than `Color(...)` gives a subclass a copy of it
 and the `Self` return annotation tells the type checker so.
 
 Define `__replace__()` when your type is immutable and callers need variants of it.
-For a mutable type, the caller assigns to the attribute instead.
+For a mutable type, the caller assigns to the attribute.
 
 ## Serializing to JSON
 

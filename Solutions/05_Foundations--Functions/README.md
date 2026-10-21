@@ -122,7 +122,7 @@ You can also say what `get()` receives as `default` in each of those two calls i
 If you make `None` the sentinel, writing `default=None` and testing `default is None`,
 then `get(prefs, "theme", None)` raises a `KeyError` instead of returning `None`.
 A caller who asks for `None` as the default cannot get it.
-The solution tests against `MISSING` instead,
+The solution tests against `MISSING`,
 so `None` stays available as an ordinary default.
 
 ```python

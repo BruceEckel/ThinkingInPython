@@ -21,7 +21,7 @@ so a programmer from those languages expects per-object storage here too.
 A Python class attribute corresponds to a C++ or Java `static` field.
 Apart from `__slots__`, which comes up below,
 no syntax in a Python class body allocates a per-object field.
-Assigning through `self` inside a method creates that storage instead,
+Assigning through `self` inside a method creates that storage,
 as `self.x = x` in a constructor does.
 
 ```python

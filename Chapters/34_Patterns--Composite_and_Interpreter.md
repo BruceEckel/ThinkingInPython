@@ -440,7 +440,7 @@ Python tests the operand's truth value.
 Then `and` and `or` return one of their two operands,
 and `not` returns a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
-An expression language that needs boolean operators overloads `&` and `|` instead,
+An expression language that needs boolean operators overloads `&` and `|`,
 so a Pandas filter reads `(a > 1) & (b > 2)`.
 The parentheses change the parse.
 `&` binds tighter than `>`, so bare `a > 1 & b > 2` parses `1 & b` first.

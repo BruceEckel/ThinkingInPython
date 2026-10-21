@@ -467,7 +467,7 @@ buying new hardware might solve the problem sooner and for less money.
 The tail-calling interpreter is a build-time choice,
 and nothing at run time turns it on or off.
 A standard build dispatches every bytecode instruction through one large C `switch`.
-Since 3.14, a CPython build can instead make each instruction a small C function that ends by calling the function for the next instruction.
+Since 3.14, a CPython build can make each instruction a small C function that ends by calling the function for the next instruction.
 The C compiler turns each of those calls into a jump,
 so the loop that runs Python bytecode gets faster.
 The tail call is in C, inside the interpreter.
@@ -1378,7 +1378,7 @@ undoing the saving for every instance of that subclass (see exercise 6).
 ### Array Instead of List
 
 A `list` of numbers stores full Python objects, each with its own header.
-The `array` module packs numbers into a single block of C values instead:
+The `array` module packs numbers into a single block of C values:
 
 ```python
 # compact_array.py

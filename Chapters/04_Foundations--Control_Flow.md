@@ -191,7 +191,7 @@ at the outer loop's level.
 When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
 When the inner loop runs to the end,
-the `continue` starts the outer loop's next iteration instead:
+the `continue` starts the outer loop's next iteration:
 
 ```python
 # nested_break.py
@@ -292,7 +292,7 @@ except ValueError as e:
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so it drops the extra score.
 Stopping silently is convenient when the lengths differ on purpose and a bug when you expect them to match.
-`strict=True` raises a `ValueError` instead.
+`strict=True` raises a `ValueError`.
 `zip()` checks the lengths during iteration,
 when one argument runs out while another still has items,
 so the listing consumes the `zip()` with `list()`.

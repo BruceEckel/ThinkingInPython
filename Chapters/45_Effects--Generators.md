@@ -716,7 +716,7 @@ expect(RuntimeError, s.close)
 ```
 
 `close()` requires the generator to finish.
-`stubborn()` instead answers `GeneratorExit` with another `yield`,
+`stubborn()` answers `GeneratorExit` with another `yield`,
 so `close()` raises `RuntimeError: generator ignored GeneratorExit`.
 
 A driver that abandons a live generator shuts it down with `close()`.

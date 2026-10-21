@@ -69,7 +69,7 @@ print(f"set faster on average-case targets too: "
 The conclusion stays the same.
 `target = n - 1` in the original measures the single worst case for a `list` scan:
 the element the scan reaches last, after walking past every other one.
-Random targets cover every position instead,
+Random targets cover every position,
 including targets near the front that a `list` finds quickly.
 The scan for an average target walks about half the `list`,
 far more work than one hash lookup.
@@ -823,7 +823,7 @@ print(f"both under 50 microseconds per call at 100 parts: "
 
 The ratio persists.
 One machine measured `join` about 19 times faster at 10,000 parts and about 7 times faster at 100.
-The absolute time shrinks instead.
+The absolute time shrinks.
 At 100 short strings both versions finish in a couple of microseconds,
 so `build_join()` and `build_concat()` must run thousands of times before the choice shows up in a profile.
 

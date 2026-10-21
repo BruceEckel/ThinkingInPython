@@ -83,7 +83,7 @@ print(Counter.live_count())
 
 **Abandon the old list.** `counters.clear()` empties the existing list
 in place, dropping its reference to the last `Counter` object.
-`counters = []` instead points the name `counters` at a new, empty list
+`counters = []` points the name `counters` at a new, empty list
 and drops the name's reference to the old one.
 Here the name `counters` held the old list's sole reference,
 so CPython frees that list at once.

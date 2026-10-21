@@ -386,7 +386,7 @@ since `json` encodes every tuple as an array of its values,
 and a `NamedTuple` is a tuple.
 Converting first, with `json.dumps(Color(1, 2, 3)._asdict())`,
 writes `{"r": 1, "g": 2, "b": 3}`.
-`json.dumps()` on a data class raises a `TypeError` instead.
+`json.dumps()` on a data class raises a `TypeError`.
 The `TypeError` is the safer failure of the two,
 because the array version drops the names silently.
 

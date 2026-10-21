@@ -389,7 +389,7 @@ that `ContextDecorator` supplies reads that object's generator function
 and arguments. On each call of `quarterly()` the wrapper builds a fresh
 manager from them and enters the fresh one. A hand-written
 class-form manager decorating a function re-enters the same instance
-on every call instead, so every call shares any state the instance
+on every call, so every call shares any state the instance
 holds.
 
 Before you move on, name what separates your attempt from this one:
@@ -588,7 +588,7 @@ around a body whose stack stays empty.
 
 The empty run shows why `ExitStack` exists.
 A written-out `with a, b, c:` line settles its count in the source.
-`ExitStack` instead accepts a count settled at runtime,
+`ExitStack` accepts a count settled at runtime,
 such as the number of names on a command line, zero included.
 
 The `sys.argv` rewrite stays out of the extracted listings.

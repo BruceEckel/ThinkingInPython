@@ -1342,7 +1342,7 @@ The randomness produces the order instead of opposing it.
 ### Testing a Random Process
 
 A test cannot predict where a particular grain ends up after hundreds of random kicks.
-It checks the aggregate instead.
+It checks the aggregate.
 Four hundred steps must divide agitation by ten,
 and the kicks must keep every grain on the plate.
 Seeding `random.Random` makes any failure reproducible.

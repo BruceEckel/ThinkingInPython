@@ -375,7 +375,7 @@ behavior disappears.
 
 **The `read()` wrapper is an *Adapter*.** Its interface differs from
 the wrapped object's interface. The caller asks for `read()`.
-The wrapped object offers `next_chunk()` instead.
+The wrapped object offers `next_chunk()`.
 The wrapper exists to translate the caller's `read()` into a `next_chunk()` call.
 If you remove it, you lose that translation.
 The caller's `read()` then raises an `AttributeError`,
@@ -486,7 +486,7 @@ If you add a `/` to `WhatIUse2.op()` and keep the name `item`,
 the override rejects the keyword that every `WhatIUse` caller may pass.
 `ty` reports `invalid-method-override` because the parameter is positional-only,
 and `run(WhatIUse2())` raises a `TypeError` for the unexpected keyword `what_i_want`.
-The solution gives the parameter the base class's name instead,
+The solution gives the parameter the base class's name,
 so the override accepts every call the base accepts.
 
 ```python

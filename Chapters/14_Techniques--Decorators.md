@@ -49,7 +49,7 @@ written above the function instead of after it.
 `hijack` returns `doesnt_matter`, which Python assigns to the name `cheese`,
 so `cheese` now refers to `doesnt_matter`.
 Calling `cheese()` runs `doesnt_matter`,
-which ignores `func` and prints its own message instead.
+which ignores `func` and prints its own message.
 The original body of `cheese()` never runs.
 
 Since Python binds the returned function to the name `cheese`, the local name
@@ -81,7 +81,7 @@ cheese()
 #: Some more work
 ```
 
-A decorator that forgets its `return wrapper` returns `None` instead,
+A decorator that forgets its `return wrapper` returns `None`,
 so Python binds `cheese` to `None`.
 Python reports the failure at the next call to `cheese()`,
 not at the decoration that caused it.
@@ -767,7 +767,7 @@ if __name__ == "__main__":
 in the constructor rather than in the outer function.
 Its `wrapper()` makes the first call before the loop,
 so `result` holds a value before the loop starts.
-`repeat.py` relies on the `times >= 1` check for that guarantee instead.
+`repeat.py` relies on the `times >= 1` check for that guarantee.
 
 `test_repeat_class.py` differs from `test_repeat.py` in its import alone.
 `test_repeat_call_count` parametrizes over `times`,

@@ -51,7 +51,7 @@ python use_module.py
 ```
 
 However, if another program imports `use_module.py` as a module,
-`__name__` is `"use_module"` instead, so Python skips the `"__main__"` block.
+`__name__` is `"use_module"`, so Python skips the `"__main__"` block.
 Here, `import_module.py` consists of one statement, `import use_module`:
 
 ```python

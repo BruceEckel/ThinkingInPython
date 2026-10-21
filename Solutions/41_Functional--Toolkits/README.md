@@ -225,7 +225,7 @@ each batch, so the body fits on one line with no hand-written loop.
 **Test laziness on an infinite source.** Passing `count(1)` proves the function is lazy. `count()` is infinite, so
 if `batch_totals()` builds a list of batches, or if `batched()` reads
 its source eagerly, the call hangs.
-The call returns immediately instead,
+The call returns immediately,
 and `islice()` then pulls five totals, so
 `count()` yields exactly fifteen integers in all. The first total is
 `1 + 2 + 3`, and each later one is nine larger, since every batch
@@ -415,7 +415,7 @@ type `Hashable`, so both calls draw
 `invalid-argument-type`.
 On the recursive call it reads "Expected `Hashable`, found `list[Nested]`".
 On the list passed through `expect()`, the same diagnostic names the literal's
-inferred type instead. The two
+inferred type. The two
 `# type: ignore` comments silence those diagnostics so the listing
 can run and show the exception.
 

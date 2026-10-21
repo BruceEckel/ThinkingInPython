@@ -541,7 +541,7 @@ Either way, `OnlyOne` is a lot of code for what a module does on its own.
 ### One Instance in a Class Variable
 
 The nested private class is optional.
-`SingletonClassVar` keeps the single instance in a class variable instead.
+`SingletonClassVar` keeps the single instance in a class variable.
 `__new__()` is the method that creates an instance.
 Here it builds the single instance on the first construction and returns that instance from every construction:
 

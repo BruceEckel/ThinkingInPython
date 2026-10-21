@@ -218,7 +218,7 @@ the distinction [Where Enforcement Lives](#where-enforcement-lives) draws.
 The cast states the signature, and nothing confirms it.
 
 `make()` exists so that each `init()` closes over its own `name`.
-A lambda written inline in the comprehension closes over the comprehension's variable instead,
+A lambda written inline in the comprehension closes over the comprehension's variable,
 so every generated class records the last name the comprehension visits as its `action`.
 That is the [late-binding trap](27_Patterns--Function_Objects.md#the-late-binding-trap)
 that `late_binding.py` demonstrates.
@@ -404,7 +404,7 @@ Called inside a function with no namespace argument,
 Since Python 3.13 (PEP 667), each `locals()` call in a function returns a new,
 independent snapshot,
 so a later `locals()` call misses a class that `exec()` defines there.
-A frame's `f_locals` attribute returns a write-through proxy instead,
+A frame's `f_locals` attribute returns a write-through proxy,
 the supported way for a debugger to change a function's variables.
 
 `EventMakers` stores each class it builds.
@@ -600,7 +600,7 @@ and the entry stays as long as the function exists.
 A decorator can use that storage to mark a method.
 A method decorator runs as Python executes the class body,
 before the class object exists, so it cannot register the method with its class.
-It can leave a mark on the function instead,
+It can leave a mark on the function,
 and `__init_subclass__()` collects the marks once Python builds the class:
 
 ```python
@@ -1418,7 +1418,7 @@ Lookup on `Sub` finds `helper()` through its metaclass,
 and lookup on a `Sub` instance does not.
 The `AttributeError` comes from the metamethod rule at the start of [Intercepting Instance Creation](#intercepting-instance-creation).
 Lookup on a `Sub` instance searches `Sub` and its bases.
-`Mixin` sits among the bases of `HelperMeta` instead.
+`Mixin` sits among the bases of `HelperMeta`.
 A `classmethod` works on both.
 
 A metaclass that needs a `dict` holds one in an attribute,
@@ -1486,7 +1486,7 @@ Use a metaclass when you need to change the class object rather than react to it
 - Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
 - Enforcing an invariant across a family of classes that shares no base class.
   `__init_subclass__()` requires a common base to define it.
-  Such a family shares a metaclass instead.
+  Such a family shares a metaclass.
 
 The first case gives the class object an `__iter__()`:
 

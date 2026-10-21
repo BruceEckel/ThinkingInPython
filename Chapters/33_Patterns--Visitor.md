@@ -183,11 +183,11 @@ since a second `def visit()` replaces the first.
 [`@overload`](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
 declares extra signatures for the type checker and leaves the runtime with one implementation,
 which must branch on the argument's type.
-`flower_visitors.py` therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead.
+`flower_visitors.py` therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers.
 The visitors choose between those two methods.
 So `flower_visitors.py`'s primary hierarchy holds the operations the pattern exists to keep out of it.
 
-A Python visitor can keep the operations instead by building the method name from the element's class,
+A Python visitor can keep the operations by building the method name from the element's class,
 as `ast.NodeVisitor` does.
 Its `visit()` calls `getattr(self, "visit_" + node.__class__.__name__, self.generic_visit)`,
 so a node class with no matching method falls back to `generic_visit()`.

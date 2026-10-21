@@ -774,7 +774,7 @@ reports and the one parameter after `self` in the generated signature.
 
 **Count on the class.**
 `frozen=True` installs a `__setattr__()` that rejects assignment to
-an instance. `Stars.built += 1` assigns to the class instead, so it
+an instance. `Stars.built += 1` assigns to the class, so it
 works.
 
 **Show the instance store failing.** `Wrong` tries the same increment

@@ -990,7 +990,7 @@ No name references that class, and no event is an instance of it.
 `@handler`, on `Announce`.
 `handler()` reads the annotation on `event` and gets `Deposit`,
 the class `dataclass()` returned.
-`EVENTS` holds the original class instead,
+`EVENTS` holds the original class,
 so `handler()` raises `TypeError: Announce: not an @event`, although
 `Deposit` went through `@event` a few lines earlier. If something else created
 the handlers, `publish()` would raise a `TypeError` on every event,

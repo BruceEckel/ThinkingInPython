@@ -200,7 +200,7 @@ add(2, 3)
 ```
 
 **Keep the output reproducible.** In real code you would print the
-raw `elapsed`. The listing prints a deterministic check instead,
+raw `elapsed`. The listing prints a deterministic check,
 because the raw number changes every run while the `#:` marker
 stays constant.
 
@@ -726,7 +726,7 @@ If you re-raise the exception from inside the loop with a bare `raise` on the la
 `retry` works at runtime.
 But the type checker infers a path where the loop finishes and `wrapper()` returns `None` implicitly,
 so `ty` reports an `invalid-return-type`.
-The solution makes the final attempt outside the `try` instead.
+The solution makes the final attempt outside the `try`.
 
 ```python
 # exercise_6.py
