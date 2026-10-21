@@ -625,8 +625,9 @@ the same way it tracks whether a value is an integer or a string.
 Thus, a native Effect type system tracks Effects together with ordinary types.
 
 This section and [Library Effect Management](#library-effect-management)
-build small programs in four Effect-managing languages: Koka and Flix,
-which have native Effects, and Scala and TypeScript, which use a library.
+build small programs in four Effect management systems:
+two languages with native Effects, Koka and Flix, and two libraries,
+ZIO for Scala and Effect for TypeScript.
 The first is [Koka](https://koka-lang.github.io/),
 a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
