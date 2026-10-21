@@ -165,7 +165,8 @@ for args in [(10, 2), (10, 0)]:
 #: slope(10, 0): ZeroDivisionError
 ```
 
-Because `@safe` catches whatever `slope()` raises, `slope()` becomes total.
+Because `@safe` catches every exception `slope()` raises,
+`slope()` becomes total.
 Every call returns a `Result`,
 and the caller must unpack it to reach the number.
 
@@ -601,7 +602,7 @@ Setting the wrong `ContextVar`, or forgetting to set one,
 raises a `LookupError` at runtime, in the frame that reads the `ContextVar`.
 A `ContextVar` created with a default returns that default,
 so the read succeeds and the mistake appears later,
-as whatever wrong result the default produces.
+as the incorrect result the default produces.
 You must still do the bookkeeping, but the type checker can no longer verify it.
 
 An EMS moves the bookkeeping into the type system.
@@ -618,14 +619,14 @@ The body looks like ordinary sequential code.
 By examining the function calls made in the body,
 the compiler infers the Effects made by the function,
 the same way it tracks whether a value is an integer or a string.
-Thus, a native Effect type system tracks Effects together with ordinary types.
+Thus, a native Effect type system tracks Effects together with ordinary arguments and return types.
 
 This section and [Library Effect Management](#library-effect-management)
 build small programs in four Effect management systems:
-two languages with native Effects, Koka and Flix, and two libraries,
-ZIO for Scala and Effect for TypeScript.
-The first is [Koka](https://koka-lang.github.io/),
-a research language with native Effects.
+two languages with native Effects, Koka and Flix,
+and two library Effect systems, ZIO for Scala and Effect for TypeScript.
+
+[Koka](https://koka-lang.github.io/) is a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
 
 ```koka
