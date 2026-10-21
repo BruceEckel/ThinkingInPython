@@ -397,8 +397,9 @@ The most obvious gain from purity is parallelism.
 Everything a pure function touches lives in its arguments, its local variables,
 and its return value,
 so the function is safe to run in parallel with any other code.
+
 The same guarantee makes testing trivial.
-A test of a pure function passes arguments and checks the return value.
+You call the function and check what it returns.
 
 ## Two Phases of Effect Analysis
 
