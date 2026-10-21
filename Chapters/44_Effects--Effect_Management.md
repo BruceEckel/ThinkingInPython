@@ -820,7 +820,7 @@ class Tell extends Context.Service<
 
 // Core logic: still just a description
 const greet = Effect.gen(function* () {
-  // Fetch each service object the layer supplied
+  // Fetch each service object the layer supplies
   const ask = yield* Ask
   const tell = yield* Tell
   // Each call builds a description; yield* runs it
@@ -890,16 +890,14 @@ because the imperative part runs when the program builds the description,
 not when the runtime executes it.
 
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
-polysemy and effectful in Haskell, Effect in TypeScript,
+Polysemy and Effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
-Stateless builds on generators, as the TypeScript listing's `function*` does.
+Stateless builds on generators, as TypeScript Effect's `function*` does.
 A Python generator suspends a computation,
-hands control to whoever is driving it, and resumes it with a value.
+hands control to whoever is driving it, and resumes with a value.
 That makes a suspended generator a continuation you can resume once or discard,
 but not resume twice, because nothing can copy a generator's paused frame.
-[Generators](45_Effects--Generators.md) covers that mechanism first.
-[Stateless](46_Effects--Stateless.md)
-then writes these programs again in the language this book teaches.
+[Stateless](46_Effects--Stateless.md) writes these programs in Python.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
