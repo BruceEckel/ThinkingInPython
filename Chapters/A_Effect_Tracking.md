@@ -392,7 +392,7 @@ and each assumption creates its own problem:
   the way `Any` propagates into every type computed from it.
   Nearly every row then reads `Unknown` until someone declares the libraries your code calls.
 - **Declare the libraries separately.**
-  Gradual typing declared them with stub files and typeshed.
+  Gradual typing declares them with stub files and typeshed.
   The C functions under `print()` and `open()` need separate declarations regardless,
   since they have no Python body to analyze.
   [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
