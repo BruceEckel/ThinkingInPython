@@ -699,7 +699,7 @@ An `except` block has two options, catch or propagate,
 and both discard the continuation.
 A handler can resume the continuation once,
 and the operation then behaves like a normal function return.
-A handler can discard the continuation,
+A handler can also discard the continuation,
 and the operation then behaves like an exception.
 A handler can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
