@@ -404,8 +404,8 @@ You call the function and check what it returns.
 ## Two Phases of Effect Analysis
 
 The first phase of Effect analysis separates pure from impure,
-and the pure part is then safe to run in parallel, to cache,
-and to test with a plain call.
+and the pure part is then safe to run in parallel, safe to cache,
+and simple to test.
 
 The second phase divides the impure part by kind.
 Each kind yields its own benefit:
