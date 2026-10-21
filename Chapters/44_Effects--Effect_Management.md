@@ -433,7 +433,8 @@ An Effect Management System scales.
 
 Most functions in most programs perform Effects,
 and their signatures show only the arguments and the return type.
-The hidden Effects make code hard to understand, and leave these questions open:
+The hidden Effects make code hard to understand,
+and a reader who sees only the signature must ask:
 
 - Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
