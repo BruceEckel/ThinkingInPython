@@ -431,7 +431,6 @@ An Effect Management System scales.
 
 ## Effect Management Systems
 
-The currency helper from the chapter's opening is the ordinary case.
 Most functions in most programs perform Effects,
 and their signatures show only the arguments and the return type.
 The hidden Effects make code hard to understand, and leave these questions open:
