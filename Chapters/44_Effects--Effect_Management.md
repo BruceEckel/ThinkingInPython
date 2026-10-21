@@ -724,8 +724,9 @@ though it does not yet track Effects in function types.
 Changing languages is rarely an option.
 A team committed to Scala or TypeScript cannot use native Effects,
 so designers build *library* Effect systems on top of existing type systems.
-In this approach the library does the tracking instead of the compiler.
-The library encodes Effect information into the return type of every function.
+The compiler has no built-in notion of an Effect,
+so the library encodes Effect information into the return type of every function,
+and the compiler's ordinary type checking tracks it from there.
 That encoding changes the mechanism.
 Instead of writing a computation and letting the compiler infer its Effects,
 you build a *description* of a computation, and execute the description later.
