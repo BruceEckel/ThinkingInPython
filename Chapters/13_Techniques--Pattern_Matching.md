@@ -461,7 +461,7 @@ A bare name in a pattern captures, so a `case` tests for it with a guard,
 ## Mapping Patterns
 
 A mapping pattern matches keys in a dictionary and binds their values.
-It checks the keys you name and ignores the rest,
+It checks the keys you specify and ignores the rest,
 so it dispatches cleanly on JSON-shaped data.
 Ignoring the extra keys also makes `case {}` a catch-all for any mapping rather than a test for an empty one.
 `case []` works the opposite way and matches only an empty sequence.

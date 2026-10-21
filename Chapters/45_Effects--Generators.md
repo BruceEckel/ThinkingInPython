@@ -34,7 +34,7 @@ A generator that also receives values needs the full annotation:
 
     Generator[YieldType, SendType, ReturnType]
 
-This annotation names the three things a generator exchanges with its caller:
+This annotation specifies the three things a generator exchanges with its caller:
 
 - `YieldType` is the type `yield` hands out,
   thus the type `next(generator)` returns.

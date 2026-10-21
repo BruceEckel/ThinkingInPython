@@ -200,8 +200,8 @@ expect(ValueError, slope, 10, -1)
 ```
 
 Catching the exception works with the types you have.
-But an `except` clause catches the exceptions it names and lets the rest propagate.
-`slope()`'s `except` names `ZeroDivisionError`.
+But an `except` clause catches the exceptions it specifies and lets the rest propagate.
+`slope()`'s `except` specifies `ZeroDivisionError`.
 `validate()` raises `ValueError` for a negative `run`.
 The `try` around the `validate()` call lets `ValueError` propagate.
 Because `slope()` calls `validate()`,
@@ -470,7 +470,7 @@ A native system adds each Effect for you.
 A library like Stateless has you declare each one,
 and the type checker verifies each declaration.
 With an EMS, the function signature tells you whether the function is pure,
-and for an impure function it names the kinds of impurity.
+and for an impure function it specifies the kinds of impurity.
 
 A full EMS does three things:
 
@@ -484,7 +484,7 @@ A full EMS does three things:
 
 On its own, the first item is *Effect tracking*.
 Tracking alone tells you whether a function is pure,
-and names the kinds of impurity a caller takes on.
+and specifies the kinds of impurity a caller takes on.
 Effect management is tracking plus the second and third items.
 When an Effect is an interface and a caller binds the implementation later,
 you can replace what the Effect does and leave the function that performs it as written.
@@ -499,7 +499,7 @@ The third item names *delayed binding*.
 Delayed binding exists so that the same codebase can serve many contexts
 (test, production, retry-wrapped) without edits.
 When a hundred functions declare "I need something that can read from storage,"
-none of them names a storage implementation.
+none of them specifies a storage implementation.
 Each declaration propagates to its caller, up to a single point,
 usually the edge of the program, where storage binds to an implementation.
 Changing that one binding changes the behavior of all hundred functions at once.
@@ -600,7 +600,7 @@ print(captured.messages)
 ```
 
 `session()`, `menu()`,
-and `main()` each name both parameters and use them for one thing:
+and `main()` each declare both parameters and use them for one thing:
 passing them to the function below.
 You propagate every parameter by hand.
 If a new helper that `greet()` calls needs a `Log` Effect,
@@ -713,7 +713,7 @@ and the row that remains holds the Effects the handler bodies perform:
 Separating the request from its fulfillment is the core of every Effect Management System.
 The code that requests an Effect is separate from the code that performs it,
 and a handler connects the two.
-`greet()` names `ask` and `tell`.
+`greet()` requests `ask` and `tell`.
 The handler decides what each one means.
 A different handler decides differently.
 A test installs one that returns a known name, and the same `greet()` runs.
@@ -1063,7 +1063,7 @@ Try each exercise before opening its [solution](../Solutions/44_Effects--Effect_
     (a protocol with `log(message)`) used by a new helper that `greet()` calls,
     and log from `greet()` too.
     The chapter counts five signatures for that version.
-    Say how many of the five use the `Log` they name,
+    Say how many of the five use the `Log` they declare,
     and then what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Functional Foundations](40_Functional--Foundations.md#pure-functions),

@@ -143,7 +143,7 @@ It holds the adaptee and can wrap any instance passed to it at runtime.
 Approach 2 uses the same object adapter and moves the wrapping into `op()`.
 `WhatIHave2` is a *class adapter*.
 It inherits from the adaptee.
-The base-class list names the adaptee at definition time.
+The base-class list specifies the adaptee at definition time.
 Every caller of `WhatIHave2` can call every method of the adaptee,
 `g()` and `h()` included.
 Composition keeps the two interfaces separate.
@@ -210,7 +210,7 @@ The adapter inherits from `WhatIWant` so that `op()` accepts it.
 Because `f()` is the one method `WhatIUse.op()` calls at runtime,
 any object with an `f()` works, whatever its base classes.
 A type checker still enforces the annotation,
-so name the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
+so specify the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 that lists `f()`, not with a base class to inherit.
 [*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
 makes the same substitution for a proxy's implementation.
@@ -400,7 +400,7 @@ that also creates the subsystem's objects.
 GoF supplies both halves of that combination.
 One *Façade* object is usually enough, which makes it a *Singleton*.
 An [*Abstract Factory*](26_Patterns--Factory.md#abstract-factories)
-can work with a *Façade* to create the subsystem's objects without naming their concrete classes.
+can work with a *Façade* to create the subsystem's objects without specifying their concrete classes.
 When one set of concrete classes is enough,
 a class containing static factory methods covers both halves:
 

@@ -204,7 +204,7 @@ When you do need one, a `breakpoint()` call,
 in the test or in the code it checks, pauses the run at that line in `pdb`.
 `breakpoint()` calls `sys.breakpointhook()`,
 which reads the `PYTHONBREAKPOINT` environment variable,
-so that variable can turn every `breakpoint()` off with `0` or name another debugger in place of `pdb`.
+so that variable can turn every `breakpoint()` off with `0` or specify another debugger in place of `pdb`.
 
 `pytest -k overdraft` runs only the tests whose names contain "overdraft",
 `pytest -x` stops at the first failure,

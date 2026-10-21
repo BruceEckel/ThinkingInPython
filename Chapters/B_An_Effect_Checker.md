@@ -251,7 +251,7 @@ in the style of [*Visitor*](33_Patterns--Visitor.md).
 `ast.NodeVisitor` looks up the method for a node by name,
 `visit_` plus the node's class name,
 so a walker subclasses `ast.NodeVisitor` and defines one such method for each node class it handles.
-A `match` names the node classes in its cases,
+A `match` lists the node classes in its cases,
 so it does the same work with no class to subclass.
 
 `dotted()` is the smallest of these matches.

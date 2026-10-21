@@ -209,7 +209,7 @@ with the asker supplying the coordinates.
 
 ### Typing the Symbol Set
 
-`Symbol` names the closed set of valid map characters,
+`Symbol` lists the closed set of valid map characters,
 so `Tile.symbol` and every key of `SPECS` must be one of those characters.
 If you add a kind to `SPECS` and leave `Symbol` as it is,
 the type checker rejects the mismatch.

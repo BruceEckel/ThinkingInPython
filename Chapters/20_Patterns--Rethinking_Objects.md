@@ -895,7 +895,7 @@ print(audit(invoice))
 `Invoice` inherits from `object` alone and names none of `Priced`,
 `Serializable`, or `Describable`, yet `charge()`, `persist()`,
 and `audit()` each accept it,
-because each function's parameter names the one method it needs.
+because each function's parameter specifies the one method it needs.
 
 #### What the Shape Does Not Say
 

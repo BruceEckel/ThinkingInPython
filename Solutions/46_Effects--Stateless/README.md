@@ -88,7 +88,7 @@ The demo in `test_ch46_ask_and_greet.py` uses `Scripted` rather than
 has no terminal from which to read. `ask_and_greet()` stays
 character-for-character the same function under both bindings.
 
-**Request an interface, not a class.** `ask_and_greet()` names an interface
+**Request an interface, not a class.** `ask_and_greet()` specifies an interface
 in its return type and calls two methods on whatever answers.
 `Terminal`, `Scripted`, and any third implementation are
 interchangeable because none of them appears in the Effect. Adding
@@ -1210,7 +1210,7 @@ the exception as a value instead of letting it propagate up the stack.
 
 `line: str` and `value: int` carry
 annotations by choice, not because the type checker requires them. `yield from` on a `@throws`
-function produces the declared success type, and naming that type
+function produces the declared success type, and specifying that type
 makes the type checker compare its inference with the annotation.
 
 **Let `run()` raise each failure.** Each failure first appears as an exception at `run()`. `Cyd` has a
@@ -1374,7 +1374,7 @@ print(capture.messages)
 **Give each role its own protocol.** The fix renames `Capture.print()` to `record()`, gives each method its
 own `Protocol`, `Screen` and `Recorder`, and splits `greet()` into one
 Effect per `Protocol`. The two `Protocol`s now describe different shapes, so
-each implementation satisfies one of them, and each Effect names the
+each implementation satisfies one of them, and each Effect specifies the
 `Protocol` it needs.
 
 That change turns the silent choice into a diagnostic.

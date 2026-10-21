@@ -325,7 +325,7 @@ and it attaches to a `Thermometer` alone.
 
 Both versions print the same line, and both ignore `arg`. Under
 pull, each observer's own code selects what to read from the subject, so
-each observer must name the type of the subject it watches.
+each observer must specify the type of the subject it watches.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

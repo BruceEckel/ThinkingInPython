@@ -748,8 +748,8 @@ def test_unhandled_event_leaves_no_stray_entry() -> None:
 
 In `event_bus.py`, the events are records, the handlers are functions,
 and the bus is a `dict`.
-Each `subscribe()` call repeats the event type that the handler's annotation names.
-A second version reads the annotation, so a handler names its event once.
+Each `subscribe()` call repeats the event type that the handler's annotation specifies.
+A second version reads the annotation, so a handler specifies its event once.
 
 The second version gives each side a decorator.
 Both decorators produce records:
@@ -881,7 +881,8 @@ The two decorators fill `EVENTS` and `HANDLES` at run time.
 The type checker reads the source and never runs it,
 so it cannot check what those two collections hold.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
-the same annotation the type checker checks, so a handler names its event once.
+the same annotation the type checker checks,
+so a handler specifies its event once.
 
 The demo subscribes each handler with one argument,
 and the bus routes each event by its type:

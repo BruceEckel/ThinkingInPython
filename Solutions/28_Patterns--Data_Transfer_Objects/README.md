@@ -475,7 +475,7 @@ Using an instance of your grid type as a `dict` key succeeds, and passing an ins
 runtime, so you write the code before you know the fields. A `@dataclass`
 or `NamedTuple` needs every field named in the class body before any
 instance exists. Here the names arrive with the instance. A `TypedDict`
-exists to name the keys for the type checker, but here every key
+exists to specify the keys for the type checker, but here every key
 arrives at runtime, after the type checker has run. `SimpleNamespace`
 accepts any name at construction or later, which is the looseness the
 scenario needs. The type checker cannot report a typo in a key name,

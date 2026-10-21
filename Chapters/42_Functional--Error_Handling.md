@@ -169,7 +169,7 @@ so any type can fill them.
 Ignore `bind()` for the moment.
 The two records and the `Result` alias are enough to report errors.
 A function that might fail returns a `Result`.
-The signature names both outcomes:
+The signature specifies both outcomes:
 
 ```python
 # returning_result.py
@@ -244,7 +244,7 @@ A function like `func_a()` is a *Total Function*,
 one whose return type accounts for every outcome it can produce,
 success or failure.
 If the function raises an exception instead,
-the return type does not name that outcome.
+the return type does not specify that outcome.
 Python lets a `Result`-returning function raise an exception as well,
 and the type checker accepts it.
 Totality is therefore a discipline the function's author keeps.
@@ -389,7 +389,7 @@ if __name__ == "__main__":
 
 The two `composed()` functions succeed and fail on the same inputs.
 The exception version is shorter, but its signature says less.
-`-> int` names no failure, where `-> Result[int, str]` names one.
+`-> int` specifies no failure, where `-> Result[int, str]` specifies one.
 In the exception version, Python also deletes `e` when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
@@ -447,7 +447,7 @@ a sibling of `bind()` for steps that always succeed.
 Exercise 2's `map_error()` is the same idea applied to the error side.
 
 A second mistake: mixing error types.
-`Result[A, E]` names one error type for the whole chain.
+`Result[A, E]` specifies one error type for the whole chain.
 If one step's `Err` carries a type different from an earlier step's `Err`,
 the chain returns a union of both types,
 and that union is wider than the annotation you wrote.
@@ -624,7 +624,7 @@ so the caller must unpack the `Result` to reach the number.
 That error type, `Exception`, is the base of the ordinary exception hierarchy.
 The signature therefore says that something can go wrong and not what,
 which is all an `except Exception` clause says.
-`@safe` names `Exception` because it writes one `try`/`except` for every function it wraps,
+`@safe` catches `Exception` because it writes one `try`/`except` for every function it wraps,
 and the base class is the one type that covers whatever those functions raise.
 A wrapper written by hand can be narrower.
 `func_c()` in `steps.py` catches `ZeroDivisionError` alone,
@@ -850,7 +850,7 @@ The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases are `Success` and `Failure`,
 a `@safe` decorator like the one in `safe.py`, and do-notation,
 which combines multiple results in one flat expression instead of nested binds.
-Its `@safe` takes an `exceptions` argument naming the types to catch,
+Its `@safe` takes an `exceptions` argument specifying the types to catch,
 the production form that exercise 4 builds.
 
 ## Which Failures Get a Result

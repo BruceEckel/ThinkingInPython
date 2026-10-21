@@ -145,7 +145,7 @@ and a full profiler times every function to answer a question about one.
 is the interpreter's own instrumentation mechanism,
 the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
-and name the code to which the event applies.
+and specify the code to which the event applies.
 
 The interpreter instruments only the code that has an event attached.
 Everything else keeps its specialized bytecode and runs at full speed.

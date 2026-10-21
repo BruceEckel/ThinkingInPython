@@ -150,7 +150,7 @@ because `Console` is not assignable to `Ability[Any]`.
 so `scripted` and `capture` must annotate their parameters.
 If you leave the annotation off,
 `handle()` raises a `ValueError` at the point of decoration,
-since that annotation names the type a request must match.
+since that annotation specifies the type a request must match.
 
 Each `handle()` subtracts one Ability,
 so `half` still needs an `Ask` and `full` needs nothing.
@@ -829,7 +829,7 @@ Stateless has no equivalent.
 This small application takes three steps: it fetches a headline,
 it finds a topic worth researching within that headline,
 and it looks up that topic.
-Each step needs something or can fail, and no step names an implementation:
+Each step needs something or can fail, and no step specifies an implementation:
 
 ```python
 # research.py
@@ -1050,7 +1050,7 @@ without a cast.
 ## The Success Path
 
 `research()` handles no errors.
-Its body is a straight run of six lines, each naming the next step,
+Its body is a straight run of six lines, each calling the next step,
 and no line tests whether the previous one worked.
 The error channel makes that straight run possible.
 Here is the same pipeline with the failures handled where they arise:
@@ -1179,7 +1179,7 @@ because the yielded type falls outside the declared channel.
 That error is the `invalid-yield` that [Dependencies That Need Dependencies](#dependencies-that-need-dependencies)
 shows in full.
 A `raise` gets no such check.
-`@throws` lifts the types it names.
+`@throws` lifts the types it specifies.
 Anything else propagates untracked.
 No diagnostic connects the decorator's list to what the body raises.
 A failure that enters through `throw()` is in the type system from the moment it exists.
@@ -1216,8 +1216,8 @@ print(type(missing).__name__)
 
 `outcome()` is the boundary function `scenarios.py` uses,
 with the same upcasting annotations.
-Its result type is the union `report()` builds by naming all three errors.
-This listing names none of them at the catch.
+Its result type is the union `report()` builds by listing all three errors.
+This listing specifies none of them at the catch.
 The two calls repeat the `NotInteresting` and `NoArticle` runs of `scenarios.py`.
 Where `report()` turns those failures into messages,
 `catch_all()` returns them as values.
@@ -1319,7 +1319,7 @@ so `toast()` obtains one by writing `yield from bread()` rather than by asking f
 Nothing supplies a loaf, because no loaf exists when `supply()` runs.
 
 The signature carries the graph, flattened into a union.
-`toast()` declares all three leaves although its body names one of them.
+`toast()` declares all three leaves although its body requests one of them.
 `yield from bread()` carries `Need[Dough]` and `Need[Oven]` from the inner Effect into `toast()`'s channel,
 the way `yield from` relays whatever the inner generator yields.
 The type checker enforces that union.
@@ -1656,7 +1656,7 @@ That judgment stays with you.
 
 `retry()` is also all-or-nothing over the error channel.
 Its body catches every declared error and retries on any of them,
-with no way to name the ones worth another attempt.
+with no way to specify the ones worth another attempt.
 Retrying `research()` with the `WEATHER` feed of [Composing a Program](#composing-a-program)
 shows the problem.
 A `WEATHER` headline names no known topic,
@@ -1699,7 +1699,7 @@ the checker reports nothing.
 The result type gains a `Crashed` branch that cannot occur,
 while `RetryError[Crashed]` stays in the error channel.
 At runtime the failure propagates past the useless `catch()` and out of `run()`.
-`catch()` must name what the channel holds at the point of decoration,
+`catch()` must specify what the channel holds at the point of decoration,
 and after `retry()` that is `RetryError[Crashed]`, not `Crashed`.
 
 The library leaves one gap here.
@@ -1850,7 +1850,7 @@ each `wait()` blocks on the task the same iteration just created,
 so the sleeps run one after another and take about five times as long.
 
 The pool is a supplied dependency, not a global,
-so `squares()` declares `Need[Executor]` and names no pool.
+so `squares()` declares `Need[Executor]` and specifies no pool.
 Supplying a `ProcessPoolExecutor` moves the same work into processes.
 `squares()` stays as written.
 `as_type(Executor)` appears for the reason it always does.
@@ -2265,7 +2265,7 @@ The library has `retry()` and `repeat()`.
 `Schedule` offers a regular interval and a repeat count,
 with no exponential backoff and no jitter.
 `retry()` retries every declared error alike,
-with no way to name the one worth retrying.
+with no way to specify the one worth retrying.
 Stateless provides no timeout, `race`, fallback combinator, or finalizer.
 The missing `race` rules out the hedging strategy that races a delayed second request.
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.

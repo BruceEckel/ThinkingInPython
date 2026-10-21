@@ -129,7 +129,7 @@ a different design, a detail, or an equivalent alternative.
 > (a protocol with `log(message)`) used by a new helper that `greet()` calls,
 > and log from `greet()` too.
 > The chapter counts five signatures for that version.
-> Say how many of the five use the `Log` they name,
+> Say how many of the five use the `Log` they declare,
 > and then what an EMS would do instead.
 
 <details>
@@ -631,9 +631,9 @@ list without anyone calling it an Effect system.
 `async` satisfies neither of the other two.
 
 `async` does not **separate the interface from the implementation**.
-`await price_of_async(item)` names no interface. It says "run this
+`await price_of_async(item)` specifies no interface. It says "run this
 particular coroutine." The coroutine's body defines what awaiting
-it does. Compare `Ask` in `ask_tell.py`, where `greet()` names the
+it does. Compare `Ask` in `ask_tell.py`, where `greet()` specifies the
 interface and leaves the implementation to the caller. `async`
 has no equivalent of writing a function against "something awaitable
 that yields a price" and choosing the implementation later.

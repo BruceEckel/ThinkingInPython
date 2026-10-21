@@ -91,7 +91,7 @@ but with the chapter's seed the demo stops with an exception.
 so the demo asks for a `"Triangle"`.
 `Shape.factory()` cannot build one and raises
 `ValueError: Bad shape: Triangle`.
-`shape_factory_objects.py` names its shapes in a literal list,
+`shape_factory_objects.py` lists its shapes in a literal,
 so its demo asks for `"Triangle"` once you add the name to that list.
 Without a `FACTORIES` entry, `create_shape()` then raises `KeyError: 'Triangle'`.
 Each solution therefore adds the class and its entry together.

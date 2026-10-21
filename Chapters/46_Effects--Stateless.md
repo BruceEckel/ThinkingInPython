@@ -243,7 +243,7 @@ A bare `yield` produces that SendType, `Any`.
 `yield from` produces the inner generator's `ReturnType` instead,
 so the type checker knows the answer's type.
 `need(Console)` builds a small generator that serves one request,
-so its `ReturnType` can name a specific type.
+so its `ReturnType` can be a specific type.
 `need()` returns `Depend[Need[T], T]`,
 which expands to `Generator[Need[T], Any, T]`.
 Calling `need(Console)` binds `T` to `Console`,
@@ -943,7 +943,7 @@ No check reports it.
 Stateless's own `Console` is the concrete class [Built-in Dependencies](#builtin-dependencies)
 named.
 Only a subclass can replace it.
-Its accessors name that class,
+Its accessors specify that class,
 so `isinstance()` accepts an instance of the class or a subclass.
 A structurally identical double fails twice.
 `as_type(Console)` rejects it,
@@ -978,7 +978,7 @@ A full EMS does [three things](44_Effects--Effect_Management.md#tracking-and-man
 and the second is to separate each Effect's interface from its implementation.
 `Console` as a `Protocol` holds no implementation.
 `Terminal` is one implementation and `Recorder` is another.
-`greet()` names neither.
+`greet()` specifies neither.
 `Recorder` qualifies as a `Console` without inheriting from `Console`,
 because a `Protocol` matches on structure.
 
@@ -1028,7 +1028,7 @@ because an interface adds an `as_type()` call wherever an implementation goes st
 [Composing a Program](47_Effects--Stateless_in_Practice.md#composing-a-program)
 declares its Abilities as `Protocol`s and shows the annotation that replaces that call.
 
-Write one boundary function whose parameter annotations name the interface types,
+Write one boundary function whose parameter annotations specify the interface types,
 and call `supply()` inside it.
 The parameter annotation upcasts the argument,
 so every call site passes its implementation bare.
@@ -1220,7 +1220,7 @@ Under DI, the same change leaves every signature as it was.
 
 Type checking is the earliest practical time to discover a forgotten dependency,
 so the objection concerns churn and coupling rather than correctness.
-A pass-through function such as `greet_all()` still names `Need[Log]` in its type.
+A pass-through function such as `greet_all()` still declares `Need[Log]` in its type.
 Taking that Ability back out later changes every signature on the path a second time.
 People made the same complaint against [Java's checked exceptions](44_Effects--Effect_Management.md#catch-the-exception-you-expect),
 where an exception added three levels down meant editing every signature above it.
@@ -1256,7 +1256,7 @@ if __name__ == "__main__":
 
 `Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
 Every `Depend` signature so far reads `Depend[Need[...], ...]`,
-while this one names the Ability bare.
+while this one writes the Ability bare.
 One rule covers both cases: the channel holds Abilities.
 `Async` is an Ability, so it sits there bare.
 `Console` is an ordinary class,
@@ -1497,7 +1497,7 @@ For `Result`, you either rewrite the body to return an `Ok` or an `Err`,
 or wrap the function in [`@safe`](42_Functional--Error_Handling.md#turning-exceptions-into-results),
 which turns every exception into an `Err`.
 `@throws` likewise leaves the body alone,
-but it names the exception types it lifts and puts them in the signature rather than in a returned wrapper.
+but it specifies the exception types it lifts and puts them in the signature rather than in a returned wrapper.
 
 ### A Failure Travels as a Value
 
@@ -1568,7 +1568,7 @@ The error channel records which failures can occur.
 `run()` turns any that reach it back into ordinary Python exceptions.
 
 The channel carries the failures `@throws` lifted into it.
-`@throws` lifts the exception types it names.
+`@throws` lifts the exception types it specifies.
 An exception of any other type passes through the decorator as an ordinary raised exception.
 No signature declares it, and the type checker reports nothing.
 An exception raised from a body without `@throws` stays outside the type the same way.

@@ -311,7 +311,7 @@ so `LightOn` gets one `Creating` line though `SCHEDULE` names it twice.
 An unknown name raises a `KeyError`, as a missing key in any `dict` does,
 so a `try: ... except KeyError` around a lookup catches it.
 
-The schedule names three of the seven declared event types.
+The schedule lists three of the seven declared event types.
 `built()` counts the classes in the dict against the names in `NAMES`,
 so its line reports three of the seven built.
 
@@ -543,7 +543,7 @@ so neither `Color` nor `Shape` appears in its own registry.
 The keyword arguments come from the subclass header.
 Writing `class Blue(Color, shade="cool"):` delivers `shade="cool"` to `__init_subclass__()`,
 so a subclass can configure its own registration.
-The base that declares the keyword names it as a parameter,
+The base that declares the keyword takes it as a parameter,
 `def __init_subclass__(cls, shade: str = "", **kwargs: object)`,
 so the keyword binds to `shade` and `kwargs` collects the rest.
 `super().__init_subclass__(**kwargs)` passes `kwargs` up the chain,
@@ -1605,7 +1605,7 @@ so a class that defines it becomes subscriptable without a metaclass.
 which is how `list[int]` works at runtime.
 `typing.Generic` defines it for the classes you write with type parameters.
 
-When a class header names a `GenericAlias` as a base,
+When a class header lists a `GenericAlias` as a base,
 as `dict[str, EventMaker]` does for `EventMakers` in `greenhouse.py`,
 Python records the plain `dict` in `__bases__`.
 `types.get_original_bases(EventMakers)`, new in Python 3.12,
@@ -1937,7 +1937,7 @@ including the interpreter's own machinery.
 `ALL_DUNDERS` is useful for exploring an unfamiliar object,
 but it lists a class's own choices among everything `object` and the interpreter add,
 where they are hard to find.
-`INTERESTING_DUNDERS` names the four a reader typically customizes when defining a class:
+`INTERESTING_DUNDERS` lists the four a reader typically customizes when defining a class:
 `__init__`, `__repr__`, `__eq__`, and `__hash__`.
 Pass it as `dunder` to see those four without the surrounding noise.
 

@@ -435,7 +435,7 @@ As in C++ and Java, an exception propagates up the call stack until it finds a h
 If the exception reaches the top of the stack,
 Python prints the traceback and stops the program.
 In Python, a handler is `except` followed by the exception type it handles.
-You can name the type, or add an `as` to capture the exception object,
+You can specify the type, or add an `as` to capture the exception object,
 as in `except ValueError as e`:
 
 ```python

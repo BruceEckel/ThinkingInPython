@@ -236,7 +236,7 @@ except RuntimeError as error:
 `exit runs` is missing from the output,
 because Python registers the cleanup when `__enter__()` returns,
 and this `__enter__()` raises an exception instead.
-A `with` naming several managers applies the same rule per manager.
+A `with` that lists several managers applies the same rule per manager.
 The ones that entered still exit.
 The failing one gets no `__exit__()` call.
 The statement stops at the failing manager,
@@ -540,7 +540,7 @@ which for `expected()` is `None`.
 
 Many listings in this book call something to show the exception it raises.
 `expect()` is the function form of that demonstration.
-It names the types it expects, calls `fn` with the remaining arguments,
+It takes the types it expects, calls `fn` with the remaining arguments,
 and prints the exception as `[Type] message`,
 wrapped by `textwrap.fill()` when that line is wider than `WIDTH`.
 `WIDTH` is 57 because this book's listings are 60 columns wide and a `#:` output line uses three of them for its prefix.
@@ -637,7 +637,7 @@ The type checker flags the decorator line.
 
 Each call of the decorated function builds a fresh manager,
 so `quarterly()` can run any number of times, each with its own enter and exit.
-The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
+The single-use caution from `trace_gen.py` still holds for the manager object you specify in a `with`.
 
 ```python
 # banner_cm.py

@@ -106,7 +106,7 @@ and counting files or finding an entry by name each needs another.
 ## A Composite of Data Classes
 
 The next version moves the operations out of the classes.
-The nodes keep their fields, a union names the closed set of alternatives,
+The nodes keep their fields, a union lists the closed set of alternatives,
 and each operation becomes a recursive function that matches on that union.
 The nodes stay [records](18_Techniques--Performance.md#record),
 now with no base class above them:

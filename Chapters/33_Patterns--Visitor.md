@@ -446,7 +446,7 @@ but because the operation must be a method on some class.
 The visitor's type names the operation,
 so the language must resolve that type at runtime along with the flower's type.
 When an operation can be a function defined outside the hierarchy,
-the call site names the operation,
+the call site specifies the operation,
 so writing `nectar()` rather than `fragrance()` selects it before the program runs.
 The flower's type is the one thing left for runtime to resolve.
 One dispatch covers it.

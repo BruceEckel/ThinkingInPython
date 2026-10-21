@@ -224,7 +224,7 @@ each `Month` member's value is its month number,
 so `Month(7)` returns the existing member `JULY` rather than building a new object.
 `Month(13)` raises a `ValueError`,
 as `factory()` raises one for a name it does not recognize.
-Where `factory()` has a `match` that names each class,
+Where `factory()` has a `match` that lists each class,
 the `Enum` looks the value up in a table of its members,
 because the class holds every member the call could return.
 A factory over a closed set of products reduces to a lookup.
@@ -287,7 +287,7 @@ keeps a table of instances on purpose and copies one for each caller.
 
 Adding a `Triangle` means one new class, one new line in `SHAPES`,
 and one new member in `Kind`.
-`Kind` names the two keys in `SHAPES`.
+`Kind` lists the two keys in `SHAPES`.
 The checker rejects any other key,
 so a new shape name goes into the `Literal` before it can go into `SHAPES`.
 Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a runtime `KeyError` to a check-time error,
@@ -711,7 +711,7 @@ Every factory so far keeps the choice in one place: a `match` in `factory()`,
 a key in `SHAPES`, a lookup in `FACTORIES`.
 *Factory Method* moves the choice into the type of the object you hold.
 A base class calls an abstract creation method,
-and each subclass overrides that method to name a concrete product:
+and each subclass overrides that method to specify a concrete product:
 
 ```python
 # shape_sketch.py
@@ -891,7 +891,7 @@ At runtime, `make()` in `registry.py` raises the same `TypeError` on a `Shape` s
 and so does `Partial()` in [*Surrogate*](25_Patterns--Surrogate.md#proxy).
 
 A Protocol simplifies the *Abstract Factory*.
-The Protocol names the required methods,
+The Protocol specifies the required methods,
 and a concrete class satisfies it by defining them.
 Here, the concrete classes have no base class:
 

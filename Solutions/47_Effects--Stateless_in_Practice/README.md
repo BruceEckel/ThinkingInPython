@@ -2005,7 +2005,7 @@ error[invalid-yield]: Yield expression type does not match annotation
 
 **Declare every inherited requirement.** The diagnostic points at the `yield from`, not at the signature, and it prints
 the whole union that `toast()` yields. That union is the answer to "what does
-`buttered()` need?" The fix is to write it down. `buttered()` names
+`buttered()` need?" The fix is to write it down. `buttered()` declares
 `Dough` and `Oven` in its type, and its body reaches them through `toast()`.
 That is the propagation the chapter describes: a caller inherits every requirement of
 every Effect to which it delegates.

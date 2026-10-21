@@ -575,7 +575,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-In [Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states), each transition function's `match` names the `Mouse` moves that make sense after its state.
+In [Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states), each transition function's `match` lists the `Mouse` moves that make sense after its state.
 Write those legal successors as a `dict` from the previous action to a list of allowed next actions, with a starting key for "nothing yet."
 Loop `count` times, pick from the list with `random.choice()`, and `yield` the pick, which becomes the previous action.
 

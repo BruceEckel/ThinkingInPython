@@ -192,7 +192,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Errors and Exceptions](../../Chapters/04_Foundations--Control_Flow.md#errors-and-exceptions) shows how `except` selects which exception types it catches, and when `finally` and `else` run.
 Trace which clauses run when the exception type matches none of the `except` clauses.
-To show the exception reaching the caller in a listing, wrap the call in a `try` that names the exception type.
+To show the exception reaching the caller in a listing, wrap the call in a `try` that specifies the exception type.
 
 <details>
 <summary>The shape</summary>

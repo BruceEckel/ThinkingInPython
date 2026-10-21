@@ -293,7 +293,7 @@ The type checker flags `a_package.module1` as a `possibly-missing-submodule`,
 the same fact the marker shows.
 The `# type: ignore` silences that warning.
 
-You can also name the package with `from`:
+You can also specify the package with `from`:
 
 ```python
 # from_packages.py
@@ -312,7 +312,7 @@ print(module2.function2())
 
 Here the module name alone qualifies each function.
 
-You can bring specific functions into the namespace by naming both the package and the module:
+You can bring specific functions into the namespace by specifying both the package and the module:
 
 ```python
 # no_qualification.py

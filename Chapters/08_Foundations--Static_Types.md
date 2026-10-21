@@ -86,7 +86,7 @@ print(total)
 Containers and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`,
 and `str | None` for "a string or nothing."
-A tuple annotation names one type per position,
+A tuple annotation specifies one type per position,
 so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
 The `...` in `tuple[int, ...]` means zero or more `int`s.
 
@@ -363,7 +363,7 @@ so each matches `Drawable`'s shape.
 The signature is part of that shape.
 A `draw()` that returns an `int`, or that requires an argument,
 gives its class a different shape.
-The type checker rejects that class where an annotation names `Drawable`.
+The type checker rejects that class where an annotation specifies `Drawable`.
 
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
@@ -469,7 +469,7 @@ Because an alias is the same type under another name,
 save it for a compound shape and let a built-in keep its own name.
 `type UserId = int` looks like a new type in a signature while behaving like `int`.
 
-`Color` names a union of literal values instead of a union of types.
+`Color` specifies a union of literal values instead of a union of types.
 `Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings.
 Passing `"purple"` to `paint()` is a type error,
 even though `"purple"` is a valid `str`.
@@ -621,7 +621,7 @@ A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 ### Type Parameter Defaults {#type-parameter-defaults}
 
 A type parameter can carry a default,
-and the type checker uses it when an annotation names the class without its brackets:
+and the type checker uses it when an annotation specifies the class without its brackets:
 
 ```python
 # type_defaults.py
@@ -648,7 +648,7 @@ print(counts.top() + 1)
 #: 3
 ```
 
-`words: Stack` names the class without its brackets.
+`words: Stack` specifies the class without its brackets.
 The default makes that annotation mean `Stack[str]`,
 so `words.top()` is a `str` and `upper()` checks.
 At the `reveal_type()` call, the type checker reports that inferred type, `str`.
@@ -708,7 +708,7 @@ so `T` exists only inside that function or class.
 
 A method that returns its own instance allows call chaining.
 What should the type hint be?
-Naming the enclosing class works until someone inherits from it.
+Specifying the enclosing class works until someone inherits from it.
 `Self` means "an instance of the class on which you called this method,"
 so in a subclass it means the subclass:
 

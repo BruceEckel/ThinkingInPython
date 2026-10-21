@@ -1559,9 +1559,11 @@ out. Where a more specific verb fits, use it: a line that quotes Y
 "distinguishes" three states.
 
 **Keep when.** Y is a name: an identifier, a type, a parameter, a
-member, a key, a file, an exception, an Ability ("the `except` clause
-names `ZeroDivisionError`", "a call that names its arguments", "the
-message names `Tally`", "`Need` names what the function requires"). Keep
+member, a key, a file, an exception, an Ability ("a call that names
+its arguments", "the message names `Tally`", "`Need` names what the
+function requires"); where the subject selects or declares Y, an
+`except` clause and its exceptions or an annotation and its type, R42
+turns "names" into "specifies". Keep
 it too when the subject gives Y its name (an alias "names the shape"
 `dict[type[Trash], list[Trash]]`; "Responder" names the action) or
 picks Y out by name from alternatives ("the type checker names each
@@ -1586,9 +1588,67 @@ when the latter is clearer").
   names an item, its delay, and whether it fails" -> "holds". The 476
   keeps are identifiers, aliases, and diagnostics that print a name.
 
-**Home.** the global `CLAUDE.md` style rules, since 2026-10-19; `tip
-watch-words` Tier 1 (`names` before a wh-word or an abstract noun,
+**Home.** the global `CLAUDE.md` style rules (the line landed there on
+2026-10-20, with R42; the 2026-10-19 entry recorded it before it was
+written); `tip watch-words` Tier 1 (`names` before a wh-word or an abstract noun,
 the 30 keeps baselined the same day); this file.
+
+### R42. "names" where the subject selects or declares takes "specifies"
+
+**Test.** "X names Y" where X picks Y out of alternatives or states Y
+as a requirement, and Y is a concrete thing the reader could write in
+code: an `except` clause and the exceptions it catches, a mapping
+pattern and its keys, an import and what it brings in, a `with` and
+its managers, an annotation, a signature, a `Protocol`, or a
+`TypedDict` and the types or methods it states, a factory method and
+its product, a client and the concrete class it leaves open. "names"
+says only that Y is mentioned; "specifies" says X made the choice.
+Where Y is several things in a row, "lists" ("a union lists the closed
+set of alternatives", "`INTERESTING_DUNDERS` lists the four"). Where X
+is a signature stating what it requires, "declares" ("`greet_all()`
+still declares `Need[Log]` in its type"). Where the plain verb is the
+mechanism, use it: a body "requests" or "calls", a `match` "covers",
+`@safe` "catches" `Exception`.
+
+**Keep when.** X gives Y its name (a parameter named `self`, "name the
+result `words`", an alias that names a shape, `checkpoint` names a past
+`Drawing`). X refers to Y in source, the dependency sense Design
+Patterns builds on ("every file that names it", "the caller names
+`Report`", "a generator that does not name its driver", "without naming
+any material in the sorting loop"). X is a message or a report that
+prints Y ("the error names the key", "the type checker names the
+`Effect`"). The reader's own act ("name its drawbacks", "name the
+substitution"). A call that passes keyword arguments literally names
+them ("a call that names its arguments", "a caller must name them").
+
+**Sightings.** 1, Bruce's remark of 2026-10-20: "In many places (not
+all) in the book, the word name or names is used where I think a word
+like specify or specifies would often work better." Promoted on that
+remark. The sweep that day read 296 verb uses of "name" in `Chapters/`
+and 587 in `Solutions/` and changed 70 and 12; the rest are the keeps
+above.
+- `44_Effects--Effect_Management` 2026-10-20, was Claude-written:
+  "an `except` clause catches the exceptions it names" ->
+  "the exceptions it specifies"
+- `08_Foundations--Static_Types` 2026-10-20:
+  "A tuple annotation names one type per position" ->
+  "specifies one type per position"
+- `26_Patterns--Factory` 2026-10-20:
+  "each subclass overrides that method to name a concrete product" ->
+  "to specify a concrete product"
+- `29_Patterns--Changing_the_Interface` 2026-10-20:
+  "create the subsystem's objects without naming their concrete
+  classes" -> "without specifying their concrete classes"
+- `42_Functional--Error_Handling` 2026-10-20:
+  "`-> int` names no failure, where `-> Result[int, str]` names one" ->
+  "specifies no failure ... specifies one"
+- `34_Patterns--Composite_and_Interpreter` 2026-10-20:
+  "a union names the closed set of alternatives" -> "lists"
+
+**Home.** the global `CLAUDE.md` style rules, in one line with R41,
+since 2026-10-20; this file. Not yet in `tip watch-words`: the shape's
+objects (a type, an exception, a key, a class) are also the objects of
+the keeps, so a word rule would list every keep as a hit.
 
 ## Candidates
 

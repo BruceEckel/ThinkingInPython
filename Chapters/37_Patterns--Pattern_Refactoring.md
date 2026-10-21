@@ -280,7 +280,7 @@ Exhaustiveness checking needs a *closed* union against which to compare the case
 but `Trash` is deliberately open.
 The registry exists to accept new subclasses.
 If you add `case _: assert_never(piece)`,
-the type checker reports the call although the `match` names all four materials.
+the type checker reports the call although the `match` covers all four materials.
 A `Trash` instance can still reach the wildcard,
 and so can an instance of a subclass defined later.
 Because the report appears for a complete `match` as well,

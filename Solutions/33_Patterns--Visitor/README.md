@@ -373,7 +373,7 @@ If you annotate the `accept()` parameter as `Visitor` instead of `Visits`,
 because the empty `Visitor` base declares no `visit()`.
 The `Beetle` call then passes the checker, since `Beetle` is a `Visitor`.
 At runtime the call raises the same `AttributeError` as it does under `Any`.
-The solution annotates the parameter with `Visits`, which names the
+The solution annotates the parameter with `Visits`, which specifies the
 method `accept()` calls.
 
 ```python
@@ -419,7 +419,7 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 #: [AttributeError] 'Beetle' object has no attribute 'visit'
 ```
 
-**Declare the visitor's interface.** `Visits` names the one method
+**Declare the visitor's interface.** `Visits` specifies the one method
 `accept()` calls, so the parameter declares what `accept()` needs
 instead of accepting anything.
 A `Protocol` matches on structure,
