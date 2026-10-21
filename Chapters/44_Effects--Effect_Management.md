@@ -471,9 +471,10 @@ An Effect Management System (EMS) does three things:
    and so on out to the edge of the program.
    The signature then tells you whether the function is pure,
    and for an impure function it specifies the kinds of impurity.
-   This item alone is *Effect tracking*.
-   Most of the languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects)
-   go no further, and neither does Python's `async`,
+   This item alone is *Effect tracking*,
+   and tracking alone is as far as most of the languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects)
+   go.
+   Python's `async` stops there too,
    as [Effect Management for Python?](#effect-management-for-python) shows.
 2. **Separates each Effect's interface from its implementation.**
    A function declares which Effects it uses, not how to fulfill them.
