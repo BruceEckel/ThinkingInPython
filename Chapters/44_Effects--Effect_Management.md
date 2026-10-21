@@ -533,9 +533,9 @@ class Capture:
 
 `greet()` performs an `Ask` Effect and a `Tell` Effect.
 Its signature says so, because the parameters are the Effects.
-The bindings come later.
-`greet_demo.py` binds them to test stand-ins, `Scripted` and `Capture`,
-and checks the greeting without reading or writing the console:
+
+Here, the Effects are bound to `Scripted` and `Capture`,
+which check the greeting without using the console:
 
 ```python
 # greet_demo.py
@@ -547,15 +547,12 @@ print(captured.messages)
 #: ['Hello, Alice!']
 ```
 
-A production caller passes objects that read with `input()` and write with `print()`.
-`greet()` stays the same.
-Delayed binding by hand explains why "pass in your dependencies" is such durable advice.
-
+The production version uses objects that read with `input()` and write with `print()`.
+The behavior of `greet()` is modified without changing the function.
 The signature says what `greet()` needs, not everything `greet()` might do.
-A `print()` in the body is still invisible.
 
 The technique works, but you do the bookkeeping.
-Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down.
+Every function that calls `greet()` must accept an `Ask` and a `Tell`.
 Parameters accumulate at every level of the call stack:
 
 ```python
@@ -584,7 +581,7 @@ You propagate every parameter by hand.
 If a new helper that `greet()` calls needs a `Log` Effect,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
 and `main()`.
-With the new helper, that makes five signatures (see exercise 2).
+Tthat makes five signatures (see exercise 2).
 
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you must tell the injector what every function needs,
@@ -601,18 +598,15 @@ but it removes the parameter along with the one benefit the parameter provided.
 A `greet()` that reads two `ContextVar`s hides them.
 
 Setting the wrong `ContextVar`, or forgetting to set one,
-raises a `LookupError` at the read, in whatever frame reads it.
-A `ContextVar` created with a default returns that default instead,
+raises a `LookupError` at runtime, in the frame that reads the `ContextVar`.
+A `ContextVar` created with a default returns that default,
 so the read succeeds and the mistake appears later,
 as whatever wrong result the default produces.
-The bookkeeping stays.
-The type checker can no longer verify it.
+You must still do the bookkeeping, but the type checker can no longer verify it.
 
 An EMS moves the bookkeeping into the type system.
 Either the system infers each Effect from the body,
 or you declare it and the type checker verifies the declaration.
-Moving the bookkeeping into the type system takes a second channel in the signature,
-one that carries Effect information outside the argument list.
 
 ### Native Effect Management
 
@@ -948,7 +942,7 @@ across every library on PyPI, almost all of which carry no Effect annotations.
 `async` succeeded because it arrived as part of the language.
 The interpreter enforces it,
 and its keyword marks each function that carries the Effect.
-An Effect row must instead cover every library in an ecosystem of untracked code.
+An Effect row must cover every library in an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 
 No PEP proposes Effect tracking today.
