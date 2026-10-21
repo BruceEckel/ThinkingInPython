@@ -656,18 +656,18 @@ fun main() : <console,exn> ()
 
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
-The row is the second channel.
-`ask` and `tell` are part of the type.
+The Effect row is a second channel in the signature, outside the parameter list.
+`ask` and `tell` become part of the type.
 The parameter list stays empty.
 
-The compiler infers the row from what the body calls.
+The compiler infers the row from what the body calls
+(this listing writes out the rows of `greet()` and `main()` so you can see them).
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
 The by-hand version makes you add them yourself, one parameter per signature.
 Since the compiler does that work, you rarely write a row by hand.
 You annotate explicitly when you want a constraint,
 such as declaring that a function must remain Effect-free.
-The listing writes out the rows of `greet()` and `main()` so you can read them.
 
 Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.

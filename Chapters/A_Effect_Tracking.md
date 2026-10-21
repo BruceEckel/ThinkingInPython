@@ -54,7 +54,7 @@ A system that tracks Effects needs three things:
 
 1. **A place to write the row.**
    The row must sit in the signature, outside the argument list,
-   as the second channel of [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
+   as the second channel of [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management).
 2. **Something that computes the rule's right side.**
    That means finding every call in a body and the row of every callee.
 3. **Something that compares the computed row with the declared one,** and rejects the program when they differ.
