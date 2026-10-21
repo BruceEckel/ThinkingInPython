@@ -620,7 +620,8 @@ as a *native* Effect system.
 In a native system, a function's signature carries two pieces of information:
 what it returns, and what Effects it performs.
 The body looks like ordinary sequential code.
-The compiler reads what the body calls and infers the Effects,
+By examining the function calls made in the body,
+the compiler infers the Effects made by the function,
 the same way it tracks whether a value is an integer or a string.
 Thus, a native Effect type system tracks Effects together with ordinary types.
 
