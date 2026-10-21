@@ -662,16 +662,14 @@ The `()` after the row is the return type: Koka's unit type,
 the counterpart of Python's `None`.
 
 The compiler infers the row from what the body calls
-(this listing writes out the rows of `greet()` and `main()` so you can see them).
+(this listing explicitly writes the rows for `greet()` and `main()` so you can see them).
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
-The by-hand version makes you add them yourself, one parameter per signature.
 Since the compiler does that work, you rarely write a row by hand.
-You annotate explicitly when you want a constraint,
+You annotate explicitly to specify a constraint,
 such as declaring that a function must remain Effect-free.
 
-Something must eventually fulfill every Effect,
-and the construct that fulfills one is a *handler*.
+A *handler* fulfills an Effect.
 The compiler rejects a program that performs an Effect with no handler in scope,
 so every Effect a running program performs has a handler.
 Think of a handler as a generalized `except` block.
