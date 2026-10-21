@@ -185,13 +185,14 @@ not self-heal; `tip marker-placement ARGS=--write` moves the runs, and
 its docstring has the layout rules (import output goes below the import
 block, for ruff's `I001`).
 
+`prose_lint.py` (gated, in `verify-ch` too) fails a bare "raises"
+(`BARE-RAISE`, since 2026-10-21): the verb takes an object, "raises a
+`TypeError`", never "raises instead" or "raises in `__post_init__()`".
+A fronted object ("the exception it raises") passes.
 Prose-only edits still need `heading_links.py` (cross-references),
 `banned_phrases.py`, and `check_self_reference.py` (claims the book makes
 about its own chapters); all three are in `tip verify`.
-`prose_lint.py` (gated, in `verify-ch` too) also fails a bare "raises"
-(`BARE-RAISE`, since 2026-10-21): the verb takes an object, "raises a
-`TypeError`", never "raises instead" or "raises in `__post_init__()`".
-A fronted object ("the exception it raises") passes. So is
+So is
 `check_quoted_diagnostics.py`: every quoted `ty` diagnostic's gutter
 lines are compared with the extracted listing, and the dozen quotes
 the book deliberately makes against an edited copy of a listing live
