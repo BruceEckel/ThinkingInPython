@@ -284,7 +284,7 @@ Of the three checkers this book names, mypy has a plugin interface.
 `ty` and Pyright have none at this writing.
 A tool that runs outside the checker has two choices.
 It can repeat the checker's inference,
-or it can check the calls it can resolve and treat the others as unknown.
+or it can check the calls it resolves and treat the others as unknown.
 
 ### Propagate Through Callbacks
 

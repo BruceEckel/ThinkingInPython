@@ -116,7 +116,7 @@ A memoizer can return a stored result because the call is interchangeable with i
 Every optimization that skips or reuses work depends on the same interchangeability,
 from a cache to a database query planner.
 The more of your program is referentially transparent,
-the more of it a machine can optimize and a proof can cover.
+the more of it a machine optimizes and a proof covers.
 
 Caching an impure function returns wrong values and raises no exception.
 Because `withdraw()` reads and writes `balance`,

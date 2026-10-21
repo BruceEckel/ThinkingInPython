@@ -1773,7 +1773,7 @@ one duel has two orders and each order has its own cell. If the
 The chapter gives two reasons for preferring the double-dispatch version.
 The first is behavior that reads the object's own state.
 A cell holding a function answers that reason. Whatever
-`Paper.eval_rock()` can read, `paper_vs_rock()` can read too, from the
+`Paper.eval_rock()` reads, `paper_vs_rock()` reads too, from the
 same two objects.
 
 The second reason survives:

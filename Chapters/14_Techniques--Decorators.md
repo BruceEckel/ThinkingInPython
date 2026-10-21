@@ -655,7 +655,7 @@ def test_trace_returns_original_result() -> None:
 
 ### A Class-Form Decorator with State
 
-Because the instance can hold attributes, it can carry state between calls.
+Because the instance holds attributes, it carries state between calls.
 Here, `count_calls` counts calls and keeps the count on the instance:
 
 ```python

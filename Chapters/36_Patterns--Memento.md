@@ -366,7 +366,7 @@ A field keeps the total proportional to `k` when it stays small,
 or when each edit replaces it instead of extending it.
 For a field that grows with every edit, bound the history's depth
 (see exercise 2), coalesce edits before `History` stores them,
-use a persistent structure that shares more than a flat tuple can,
+use a persistent structure that shares more than a flat tuple,
 or switch to *Command*-based undo, which stores an edit instead of a state.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)

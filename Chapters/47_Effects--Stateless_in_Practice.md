@@ -32,7 +32,7 @@ The rest of the chapter adds:
 
 A custom Ability is a request you design.
 A `Need` asks for an instance and gets the instance the handler supplies.
-Your own Ability can ask for anything you can name.
+Your own Ability asks for anything you can name.
 The handler answering it is an ordinary function,
 so the answer can differ at every request.
 

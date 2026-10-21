@@ -408,7 +408,7 @@ and the call passes `p1` as the first argument.
 The dot fills in `self`.
 
 `distance()` reads the same and computes the same, and it has one advantage.
-It can live outside `Point`, so it can serve any type that has an `x` and a `y`.
+It lives outside `Point`, so it serves any type that has an `x` and a `y`.
 The method keeps one advantage of its own.
 `p1.` shows every operation `Point` supports, so the method is discoverable.
 

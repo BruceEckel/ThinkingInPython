@@ -762,7 +762,7 @@ and call it on the demo's `(x * 2 for x in [1, 2, 3])`,
 The following `next(it)` returns `4`.
 The type checker accepts that version, so you find the lost value only by running the program.
 `Peekable` keeps the pulled item in a field,
-where `peek()` can read it any number of times and `__next__()` can still return it.
+where `peek()` reads it any number of times and `__next__()` still returns it.
 
 ```python
 # exercise_8.py

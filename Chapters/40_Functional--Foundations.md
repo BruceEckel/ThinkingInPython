@@ -359,7 +359,7 @@ solves the same `if`/`elif` problem with `match`.
 A `match` is code, so adding an operator means editing the function,
 and the type checker verifies every case.
 The table is data, so adding an operator means adding a row,
-which another module can do at import time and a test can do at runtime.
+which another module does at import time and a test does at runtime.
 Choose `match` when you know the whole set of cases as you write the function,
 and a table when code elsewhere should add cases.
 

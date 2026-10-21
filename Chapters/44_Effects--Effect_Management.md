@@ -671,28 +671,29 @@ such as declaring that a function must remain Effect-free.
 
 A *handler* fulfills an Effect.
 The compiler rejects a program that performs an Effect with no handler in scope,
-so every Effect a running program performs has a handler.
+so every Effect a program performs must have a handler.
 Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what the program does next.
 A handler intercepts any Effect operation and decides what it means.
-In `main()`, the `with fun ask(prompt)` handler decides that `ask` means "prompt the console and read a line."
+In `main()`, the `with fun ask(prompt)` handler says that `ask` means "prompt the console and read a line."
 
 Handling an Effect also discharges it.
 `main()`'s row is not `<ask,tell>` but `<console,exn>`.
 The handlers remove `ask` and `tell`,
 and the row that remains holds the Effects the handler bodies perform:
-`console` from the printing and reading, `exn` because `readline()` can fail.
+`console` for printing and reading, `exn` because `readline()` can fail.
 
 Separating the request from its fulfillment is the core of every Effect Management System.
 The code that requests an Effect is separate from the code that performs it,
 and a handler connects the two.
 `greet()` requests `ask` and `tell`.
 The handler decides what each one means.
-A different handler decides differently.
-A test installs one that returns a known name, and the same `greet()` runs.
+Different handlers make different decisions.
+A test installs a handler that returns a known name,
+so `greet()` produces the same result for each test run.
 
-Handlers can do more than `except` blocks can.
-When an operation runs, the handler receives the *continuation*:
+Handlers do more than `except` blocks.
+When an operation runs, the handler receives a *continuation*:
 the rest of the computation from that point forward.
 An `except` block has two options, catch or propagate,
 and both discard the continuation.
@@ -771,7 +772,7 @@ a companion object to lift that interface into the `ZIO` type,
 a `ZLayer` to package the implementation, and a `provide()` call to bind it.
 All of that, to print one string.
 The machinery exists because the language cannot intercept an Effect at the point where it runs,
-the way a native handler can.
+the way a native handler does.
 A library works with values alone, so every Effect must become a value.
 `hello` is a data structure describing a program.
 Execution begins when the ZIO runtime interprets that structure at `run`,
