@@ -402,7 +402,7 @@ and among equal scores (`Bob` and `Cid`, both `85`) it compares names.
 `key` is a *Strategy*. `sorted()` provides the algorithm (some
 comparison-based sort). The caller supplies the interchangeable
 policy that decides what "in order" means for this call. `sorted()`
-compares whatever `key` returns, and its code mentions no tuples,
+compares the values `key` returns, and its code mentions no tuples,
 scores, or names. Passing a different `key` swaps the ordering
 strategy the same way the chapter's classic *Strategy* form swaps
 the algorithm its Context holds. Here the Context holding the

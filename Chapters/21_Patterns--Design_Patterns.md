@@ -464,7 +464,7 @@ Which edge does this pattern move, and where does it put it?
 Design principles are at least as important as design patterns,
 but they do a different job.
 A pattern is a shape of solution.
-A principle is a test you apply to whatever shape you chose:
+A principle is a test you apply to the shape you chose:
 a claim the design either satisfies or violates.
 
 Most of the principles below hold for any code,

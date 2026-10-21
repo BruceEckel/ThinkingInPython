@@ -209,7 +209,7 @@ Two bounds on the library's type variables do that.
 states the `A` bound as the rule for `Depend`.
 
 At runtime, `run()`'s driver tells a request from a failure with `case Exception() as error`.
-Whatever the generator yields that matches `Exception` is a failure.
+A yielded value that matches `Exception` is a failure.
 Everything else is an Ability request.
 The two bounds overlap.
 A class that subclasses both would satisfy each at once,
@@ -1913,7 +1913,7 @@ Try each exercise before opening its [solution](../Solutions/46_Effects--Statele
     which [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
     covers.
     `default_console.py` defaults by supplying an instance.
-    Write the other kind of default, one that builds whatever the request names.
+    Write the other kind of default, one that builds the type the request names.
     `handle()` reads its handler's parameter annotation to decide what it answers,
     so a function annotated `Need[Console]` and returning `ability.t()` hands back a default-constructed instance of the requested class.
     Run it against `greeter.py`'s `greet()`,

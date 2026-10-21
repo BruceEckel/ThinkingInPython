@@ -177,7 +177,7 @@ print(first, rest)
 #: 10 [20, 30, 40]
 ```
 
-`*rest` collects whatever remains.
+`*rest` collects the remaining items.
 [Containers](03_Foundations--Containers.md#tuples-and-unpacking)
 covers the general form.
 

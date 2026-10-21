@@ -14,7 +14,7 @@ them from the chapter, so a solution keeps working when a chapter listing change
 <details>
 <summary>Where to look</summary>
 
-[Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface) shows a `Protocol` standing in for a base class, and `need(Console)` hands back whatever object the supplier gave.
+[Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface) shows a `Protocol` standing in for a base class, and `need(Console)` hands back the object the supplier gave.
 Add `read()` to the protocol, then write `ask_and_greet()` as a generator that gets the `Console` with `need()` and calls `read()` and `print()` on it.
 In the test, pass `supply()` a scripted object that returns a canned answer, and in the demo, an object wrapping `input()`.
 
@@ -89,7 +89,7 @@ has no terminal from which to read. `ask_and_greet()` stays
 character-for-character the same function under both bindings.
 
 **Request an interface, not a class.** `ask_and_greet()` specifies an interface
-in its return type and calls two methods on whatever answers.
+in its return type and calls two methods on the object that answers.
 `Terminal`, `Scripted`, and any third implementation are
 interchangeable because none of them appears in the Effect. Adding
 `read()` to the protocol changed which classes qualify. `supply()`
@@ -584,7 +584,7 @@ a different design, a detail, or an equivalent alternative.
 > which [Abilities Are Not Special](../../Chapters/47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 > covers.
 > `default_console.py` defaults by supplying an instance.
-> Write the other kind of default, one that builds whatever the request names.
+> Write the other kind of default, one that builds the type the request names.
 > `handle()` reads its handler's parameter annotation to decide what it answers,
 > so a function annotated `Need[Console]` and returning `ability.t()` hands back a default-constructed instance of the requested class.
 > Run it against `greeter.py`'s `greet()`,
@@ -690,7 +690,7 @@ run(defaults(stamped)("Bob"))  # type: ignore
 the class the request carries, and calls that class, so `default()`
 answers a request by constructing the requested class. That is the
 other kind of default. `default_console.py` supplies one prepared
-instance. `default()` builds whatever the request names, on demand.
+instance. `default()` builds the type the request names, on demand.
 
 **Run both Effects through one handler.** At runtime the handler
 answered three requests across the two calls, two for `Console` and one

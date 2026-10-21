@@ -395,7 +395,7 @@ One table holds `Rule[Money]` beside `Rule[Row]`.
 `Rule` is [invariant](08_Foundations--Static_Types.md#variance) in `I`,
 since `I` sits in both `type[I]` and `Callable[[I], ...]`,
 so `Any` is the one type argument that admits every entry.
-The engine calls each condition and action with whatever input arrived.
+The engine calls each condition and action with the input that arrived.
 The checker matches each input class to its methods at the `Rule(...)` call.
 
 Several rules can share one `(state, input_type)` key.

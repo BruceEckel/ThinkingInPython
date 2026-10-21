@@ -623,7 +623,7 @@ your explanation predicts what `ty` reports if you delete the `# type: ignore` i
 
 `send()`'s signature is
 `send(self, value: _SendT_contra, /) -> _YieldT_co`, so its parameter
-type is whatever the generator's `SendType` is. For `interview()` that
+type is the generator's `SendType`. For `interview()` that
 is `Answer`, and `None` is not an `Answer`, so the priming call is a
 type error. `send_none_is_next.py` carries a `# type: ignore` to
 suppress it. Removing that comment draws:

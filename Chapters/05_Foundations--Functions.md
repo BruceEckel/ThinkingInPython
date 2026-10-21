@@ -454,7 +454,7 @@ It receives a function and the arguments for it, and makes the call.
 
 A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
 so you can pass `report` to `trace()` as an argument.
-Inside `trace()`, `func.__name__` reads the name of whatever function the caller passed.
+Inside `trace()`, `func.__name__` reads the name of the function the caller passed.
 
 A forwarded `**kwargs` can name a parameter that the wrapped function also receives another way.
 When a key in the unpacked dictionary names a parameter that a positional argument fills,

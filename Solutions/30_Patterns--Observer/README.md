@@ -1161,7 +1161,7 @@ places in the view involve a selection. Its mouse responder calls
 model, so the view stays correct under any rule.
 `recolored()` holds the rule, `GridModel.select()` calls it, and
 `announce()` delivers the result. `initials()` shows the same separation.
-It is a second view of a `Grid`, and it prints whatever `Grid` the rule produces.
+It is a second view of a `Grid`, and it prints the `Grid` the rule produces.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

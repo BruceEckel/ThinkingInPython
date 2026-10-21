@@ -667,7 +667,7 @@ even when the implementation defines a `calls` of its own.
 
 Python calls `__getattr__()` for a name the proxy and its class lack,
 and finds the proxy's own attributes, such as `calls`, by normal lookup.
-The proxy therefore keeps state of its own and forwards whatever methods the implementation has.
+The proxy therefore keeps state of its own and forwards the methods the implementation has.
 The same few lines serve lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*), over any object.
 

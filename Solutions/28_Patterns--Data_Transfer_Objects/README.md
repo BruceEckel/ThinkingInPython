@@ -114,7 +114,7 @@ print(p == Point(3.5, 2.0, 3.0))
 #: True
 ```
 
-`@dataclass` reads whatever fields the class body declares and
+`@dataclass` reads the fields the class body declares and
 generates `__init__()`, `__repr__()`, and `__eq__()` to match. Adding
 `z: float` extends the constructor to three positional arguments, the
 `repr()` to three fields, and the equality comparison to three values,
@@ -515,9 +515,9 @@ function](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cann
 that a caller can bypass.
 A `TypedDict` describes the `dict` that `json.loads()` returns
 and names the keys for the type checker, but at runtime it is a
-`dict`, which stores whatever values `json.loads()` gives it. A
+`dict`, which stores the values `json.loads()` gives it. A
 `SimpleNamespace` accepts any name with any value, at runtime and under
-the type checker, so the record holds whatever the JSON held.
+the type checker, so the record holds what the JSON held.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

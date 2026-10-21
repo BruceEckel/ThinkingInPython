@@ -481,7 +481,7 @@ and tells you to write `yield from` instead.
 The two forms agree for a generator that yields values and returns `None`,
 as `flatten()` does.
 The `yield from` expression, however, has a value.
-`result = yield from inner()` binds whatever `inner()` returned when it stopped.
+`result = yield from inner()` binds the value `inner()` returned when it stopped.
 The hand-written loop drops that value.
 `yield from` also forwards `send()` and `throw()` into the inner generator.
 The hand-written loop forwards neither.

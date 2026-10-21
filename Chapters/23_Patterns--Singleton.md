@@ -16,7 +16,7 @@ Python [imports each module once](06_Foundations--Modules_and_Packages.md)
 and caches it in `sys.modules`.
 Every `import` after the first produces the same module object.
 A module is a singleton.
-Whatever it defines at module level exists once per interpreter,
+Everything it defines at module level exists once per interpreter,
 and every importer shares it.
 
 One interpreter, not one machine.
@@ -221,7 +221,7 @@ Nesting also breaks the return annotation.
 `def settings() -> Settings` still parses and runs,
 because an annotation evaluates only when something reads it.
 A clean run therefore proves nothing about the name.
-Whatever reads the annotation searches the scope containing the function,
+Any code that reads the annotation searches the scope containing the function,
 while the class lives in the function's own locals.
 A type checker reports an unresolved reference,
 and `inspect.get_annotations()` raises a `NameError`.
@@ -570,7 +570,7 @@ print(x.val, x is y is z, isinstance(x, SingletonClassVar))
 
 `object.__new__(cls)` builds a real `SingletonClassVar`,
 so `isinstance()` reports `True` for the instance every construction hands back.
-Python uses whatever object `__new__()` returns as the result of the construction.
+Python uses the object `__new__()` returns as the result of the construction.
 The type of that object determines whether `__init__()` runs.
 When `__new__()` returns an instance of the class under construction,
 Python runs `__init__()` on it.

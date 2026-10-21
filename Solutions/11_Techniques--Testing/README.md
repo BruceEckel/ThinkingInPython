@@ -461,7 +461,7 @@ now wrong.
 
 **Pass the dependency in.**
 `test_injected()` still passes, because it hands the dependency in instead of naming it,
-and `current_temp_with()` calls whatever it receives.
+and `current_temp_with()` calls the fetcher it receives.
 
 Exercise 4 draws the same lesson from the environment variable.
 Here the dependency is a function.

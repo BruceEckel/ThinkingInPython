@@ -434,7 +434,7 @@ Its `deplete()` is empty, since a turbine burns no fuel.
 <details>
 <summary>Where to look</summary>
 
-[Switching Implementations Mid-Run](../../Chapters/47_Effects--Stateless_in_Practice.md#switching-implementations-mid-run) shows `run_load()` asking for a `Source` and using whatever the handler returns.
+[Switching Implementations Mid-Run](../../Chapters/47_Effects--Stateless_in_Practice.md#switching-implementations-mid-run) shows `run_load()` asking for a `Source` and using the source the handler returns.
 Add a source class with the same two methods and place it in the tuple that `controller()` receives.
 For the blackout, trace which frames the handler's `Blackout` unwinds, and whether any `yield` lies between the handler's `raise` and `run()`.
 
@@ -493,7 +493,7 @@ The battery supplies one hour, 22:00, after the windy range ends.
 
 `run_load()` needs no change.
 It asks for a `Source` at an hour
-and uses whatever source the handler returns.
+and uses the source the handler returns.
 The handler decides which sources exist, the order in which it prefers them,
 and whether one of them is new.
 Choosing the source in the handler is the same substitution `Console` and `Feed` allow, applied to a choice
@@ -1410,7 +1410,7 @@ assertions together say that `spree()` tries every price and writes only the
 affordable ones.
 
 This test cannot check whether the `Get` and `Put` handlers agree. The `Cell`
-version has one piece of state, so the next `Get` returns whatever the last
+version has one piece of state, so the next `Get` returns the value the last
 `Put` wrote. Here the test scripts the balances independently of the writes.
 The script says 40 follows the first purchase because the test's author did that
 subtraction. A `spree()` that writes the wrong amount, say `funds` instead of

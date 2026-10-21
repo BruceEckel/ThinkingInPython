@@ -342,7 +342,7 @@ run(supply(Console())(hello_twice)())
 #: Hello!
 ```
 
-`A` stands for whatever row the argument carries.
+`A` stands for the row the argument carries.
 `reveal_type(twice(hello))` reports `Generator[Need[Console], Any, None]`.
 `ty` solves `A` as `Need[Console]`,
 with the solver it uses for every other generic.

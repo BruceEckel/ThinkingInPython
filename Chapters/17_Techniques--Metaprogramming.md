@@ -1057,7 +1057,7 @@ def test_descriptor_on_class_returns_itself() -> None:
 
 ### A Descriptor That Validates
 
-`Field` shows the protocol and stores whatever you assign.
+`Field` shows the protocol and stores the value you assign.
 Use a descriptor when the write must do more than store.
 `Positive` checks each value before storing it,
 so every attribute declared with one enforces the same rule:
@@ -1560,7 +1560,7 @@ with expected(TypeError):
 ```
 
 `__prepare__()` runs before the class body does,
-and whatever mapping it returns becomes the namespace for that body.
+and the mapping it returns becomes the namespace for that body.
 Every `def` and every assignment in the body becomes a `__setitem__()` call on that mapping,
 so `NoDuplicates.__setitem__()` receives the `on_open` at `[2]` under a key the mapping already holds.
 Python then passes the finished mapping to `type.__new__()`.
@@ -2024,7 +2024,7 @@ passes `exclude=("__hash__",)`.
 and it applies to every member, dunder or ordinary.
 The `exclude` check runs before the `dunder` test,
 so an excluded name stays out of `[Attributes]` and `[Methods]` no matter which mode selects it.
-`display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
+`display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows what `REDEFINED_DUNDERS` finds redefined,
 minus `__hash__`.
 That form helps when an earlier listing has explained the `__hash__` row and repeating the row would add noise.
 

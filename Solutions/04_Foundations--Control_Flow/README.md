@@ -469,7 +469,7 @@ except BadNumber as e:
 ```
 
 **Chain from a constructed cause.** The prediction is the "direct cause" line, the same one `explicit()`
-produces. `from` sets `__cause__` to whatever object follows it.
+produces. `from` sets `__cause__` to the object that follows it.
 When `__cause__` holds an exception,
 Python joins the two tracebacks with the "direct cause" line that `joining_line()` finds.
 An exception constructed in the `raise` statement joins the
@@ -604,7 +604,7 @@ which the loop has passed, so the next iteration looks at position 1
 and finds `1`. The loop leaves the survivor behind in slot 0.
 
 The prediction covers more than "one survives." It says which item
-and where. The survivor is whatever shifts into a slot the loop has
+and where. The survivor is the item that shifts into a slot the loop has
 passed, so its final position depends on the data.
 In the chapter's `[1, 2, 2, 3]` the survivor sits mid-list.
 Here it sits first.

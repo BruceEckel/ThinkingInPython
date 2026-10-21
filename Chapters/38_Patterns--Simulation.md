@@ -790,7 +790,7 @@ One move is one chain.
 `Robot.move()` calls `doors.open(urge)`, which returns the neighboring room,
 `EDGE` when no door leads that way.
 That room's `enter()` passes the robot to its occupant's `interact()`,
-and whatever room `interact()` returns becomes `robot.room`.
+and the room `interact()` returns becomes `robot.room`.
 The `interact()` methods implement every rule of the game.
 
 ### Building the Maze in Stages

@@ -55,7 +55,7 @@ print(total(evens(5)))
 `fibonacci()`.
 Because `evens()` contains `yield`, calling it returns an
 iterator rather than running the body immediately.
-`total()` passes whatever iterable it receives to `sum()`,
+`total()` passes the iterable it receives to `sum()`,
 so it sums `evens(5)` with no change, as it sums `fibonacci(8)` and `Countdown(5)` in the chapter.
 
 Before you move on, name what separates your attempt from this one:

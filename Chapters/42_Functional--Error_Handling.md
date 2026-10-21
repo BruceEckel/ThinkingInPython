@@ -625,7 +625,7 @@ That error type, `Exception`, is the base of the ordinary exception hierarchy.
 The signature therefore says that something can go wrong and not what,
 which is all an `except Exception` clause says.
 `@safe` catches `Exception` because it writes one `try`/`except` for every function it wraps,
-and the base class is the one type that covers whatever those functions raise.
+and the base class is the one type that covers every exception those functions raise.
 A wrapper written by hand can be narrower.
 `func_c()` in `steps.py` catches `ZeroDivisionError` alone,
 and a `parse()` that catches `ValueError` the same way can return `Result[int, ValueError]`.
@@ -793,7 +793,7 @@ The exception inside an `Err` still holds its `__traceback__`,
 but nothing prints a traceback for an `Err` stored in a list.
 The `except` clause that caught the exception returns it as a value,
 so every caller above that clause receives an `Err`, an ordinary return value.
-The exception must carry whatever context it needs:
+The exception must carry the context it needs:
 
 ```python
 # noted_result.py

@@ -1014,7 +1014,7 @@ including `a` and `b`, which had succeeded.
 **Leave the other tasks running.** Unlike a `TaskGroup`, `gather()` leaves the other tasks
 running when the exception propagates, so `e` and
 `f` are still sleeping when `main()` returns. `asyncio.run()` then
-cancels whatever tasks remain as it shuts the loop down, which is why
+cancels the tasks that remain as it shuts the loop down, which is why
 `e` and `f` print nothing further. If `main()` goes on to other work,
 they run to completion in the background with no code awaiting their
 results.

@@ -273,7 +273,7 @@ A class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
 and `announce()`.
 
 A responder returns `None`, as the `Responder` `type` alias declares.
-At runtime, `announce()` discards whatever a responder returns,
+At runtime, `announce()` discards a responder's return value,
 since it calls each responder as a statement.
 The alias turns that silent discard into a type error.
 The type checker rejects a responder that returns a value,
@@ -620,7 +620,7 @@ broadcaster.announce(30.0)
 #: weak: plot gone, disconnecting
 ```
 
-A `Broadcaster` holds a strong reference to whatever you `connect()`,
+A `Broadcaster` holds a strong reference to every object you `connect()`,
 so `weak_responder.py` puts the weak reference inside the responder.
 A different broadcaster could store weak references for every responder.
 With `Broadcaster`, a responder that needs a weak reference creates and holds that reference.
@@ -1122,7 +1122,7 @@ A responder must return an awaitable, produced by calling an `async` function.
 Because `announce()` awaits, it must also be a coroutine,
 and its caller must `await` it in turn.
 A property setter cannot await the asynchronous `announce()`.
-The assignment `t.celsius = value` calls the setter and discards whatever it returns,
+The assignment `t.celsius = value` calls the setter and discards its return value,
 so an `async def` setter would return a coroutine that nothing runs.
 An ordinary `def` setter cannot await,
 since an `await` inside an ordinary `def` is a `SyntaxError`.
@@ -1708,7 +1708,7 @@ No view holds a reference to the controller, and the controller holds no view.
 The controller holds both models because it writes to both,
 while each view holds the one model it displays.
 `CountView` refers to `Counter` alone, and `HistoryView` to `History` alone.
-Each model announces to whatever responders it holds.
+Each model announces to the responders it holds.
 
 That one-way flow is the benefit.
 Because each view receives announcements from its model alone,

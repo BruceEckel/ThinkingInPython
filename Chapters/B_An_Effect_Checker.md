@@ -329,7 +329,7 @@ A `Scope` holds the names the checker has collected at one point in a file.
 `name()` searches from the innermost scope outward, as Python does: variables,
 then the module's imports and definitions, then `builtins`.
 A name found in `types` is a variable,
-and calling a variable calls whatever value it holds at runtime.
+and calling a variable calls the value it holds at runtime.
 The source does not say what that value is, so `name()` answers `UNRESOLVED`.
 
 `callee()` handles the two shapes a resolvable call takes.

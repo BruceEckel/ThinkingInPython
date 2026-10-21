@@ -203,9 +203,8 @@ Calling `interview()` returns a generator object but runs nothing in the functio
 
 A generator is more useful than a coroutine here because you write the driver.
 A coroutine's requests go to the event loop.
-A generator's requests go to whatever code calls `next()` and `send()`.
-The generator yields a *request* out,
-and whatever drives it sends the *answer* back in.
+A generator's requests go to the code that calls `next()` and `send()`.
+The generator yields a *request* out, and the driver sends the *answer* back in.
 That conversation makes an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
 (EMS) possible.
 Typically, a driver function steps the generator.

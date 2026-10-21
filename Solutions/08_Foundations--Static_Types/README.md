@@ -211,7 +211,7 @@ print(last(["a", "b", "c"]))
 ```
 
 `last()` mirrors `first()`: one type parameter `T`, inferred from
-whatever `list[T]` the caller passes.
+the `list[T]` the caller passes.
 A call on a `list[int]` binds `T` to `int` for that call,
 and a call on a `list[str]` binds `T` to `str`.
 The type checker therefore infers that

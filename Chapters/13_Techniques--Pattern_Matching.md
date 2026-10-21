@@ -538,7 +538,7 @@ print(survey([Point(1, 2), Point(3, 4)]))
 
 The case at `[1]` is a sequence pattern holding a class pattern holding two literals,
 with a starred name beside the class pattern.
-`as` binds whatever its sub-pattern matched,
+`as` binds the value its sub-pattern matched,
 so `start` is the whole `Point` while `0, 0` checks its fields.
 With `as`, one pattern both tests the shape and keeps the object.
 

@@ -525,8 +525,8 @@ Because two students cannot fill a group of three, the guard adds an empty group
 With the leftover loop deleted, that group stays empty,
 so the left side of the assertion is `[]`.
 
-The report shows the shrunk case rather than whatever wide
-random roster failed first. When each run starts with an empty
+The report shows the shrunk case rather than the wide
+random roster that failed first. When each run starts with an empty
 `.hypothesis/` directory, its names vary from run to run. Hypothesis
 shrinks a generated string toward a longer run of `a` before it
 tries a second letter, so the report shows `'aa'` as often as `'b'`.

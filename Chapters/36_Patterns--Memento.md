@@ -491,7 +491,7 @@ Each state keeps its value, so every other state stays valid.
 The program runs on with the history one state short.
 
 `apply()` takes the edit instead of its result.
-It reads `present` for the caller and passes whatever the edit returns to `do()`,
+It reads `present` for the caller and passes the edit's return value to `do()`,
 so `apply()` records every state an edit returns.
 `do()` stays public for a state built outside an edit of the present,
 such as the `Sketch` mementos that `history_classic.py` passes to it below.
@@ -628,7 +628,7 @@ and each `Drawing` method reads one state, `self`.
 
 `copy.replace()` is the [general version](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 of `dataclasses.replace()`.
-Choosing `copy.replace()` over `dataclasses.replace()` keeps the technique available to whatever state type a `History` holds.
+Choosing `copy.replace()` over `dataclasses.replace()` keeps the technique available to any state type a `History` holds.
 `NamedTuple`, `datetime`,
 and any class defining `__replace__()` all accept `copy.replace()`.
 
@@ -668,7 +668,7 @@ The bytes encode a class by module and name,
 not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
-The error comes later, from whatever reads a field the bytes lack.
+The error comes later, from the code that reads a field the bytes lack.
 
 `pickle_drift.py` simulates that drift.
 `SketchV1` sits in a module of its own because a real class drifts between two runs of a program:

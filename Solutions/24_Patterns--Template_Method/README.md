@@ -651,7 +651,7 @@ its default breaks the second half. The program still completes
 normally.
 `pending` grows on every pass.
 The flaw stays hidden until the program runs out of
-memory or whatever reads `pending` reports stale data.
+memory or the code that reads `pending` reports stale data.
 
 `Exploder` and `HalfDone` need different things from a type checker.
 Only one of those things exists.

@@ -735,7 +735,7 @@ The `gather()` call returns normally, so the call site needs no `try`/`except*`.
 
 That behavior is `gather()`'s alternative to `TaskGroup`'s all-or-cancel contract.
 For a batch where partial failure is data to examine rather than a reason to stop,
-`return_exceptions=True` collects failures as values instead of cancelling whatever is still in flight.
+`return_exceptions=True` collects failures as values instead of cancelling the tasks still in flight.
 A health check across ten services needs all the answers, including the errors,
 not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
@@ -1130,7 +1130,7 @@ the global holds `req-3`.
 The last line shows the other direction.
 Because `main()` creates the tasks,
 their contexts are copies of `main()`'s context,
-so whatever a task sets stays in its own copy.
+so the value a task sets stays in its own copy.
 `request_id` returns to its default while the global stays clobbered.
 
 A parameter also works here, with no global and no `ContextVar`,
@@ -1168,7 +1168,7 @@ asyncio.run(handle("req-7"))
 ```
 
 Leaving the `with` block calls `reset()` on the token,
-and `reset()` puts back whatever the variable held before, not the default.
+and `reset()` puts back the value the variable held before, not the default.
 So when scopes nest,
 leaving an inner `with` block restores the value the outer one set.
 

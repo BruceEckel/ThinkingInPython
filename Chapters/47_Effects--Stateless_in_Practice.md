@@ -31,7 +31,7 @@ The rest of the chapter adds:
 ## Abilities Are Not Special
 
 A custom Ability is a request you design.
-A `Need` asks for an instance and gets whatever the handler supplies.
+A `Need` asks for an instance and gets the instance the handler supplies.
 Your own Ability can ask for anything you can name.
 The handler answering it is an ordinary function,
 so the answer can differ at every request.
@@ -110,9 +110,9 @@ def __iter__(self: Self) -> Generator[Self, T, T]:
 It yields once, so the handler receives one request.
 By the [return-channel rule](45_Effects--Generators.md#the-return-channel),
 the `yield from` then evaluates to that generator's return value,
-which here is whatever the handler sent back.
+which here is the value the handler sent back.
 `prompt` is payload on the request, there for the handler to read,
-so the answer to an `Ask` is whatever `scripted()` returns.
+so the answer to an `Ask` is the value `scripted()` returns.
 A `Tell` needs no answer,
 which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
 
@@ -334,8 +334,7 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 so `stamp()` produces a known string a test can compare.
 `tomorrow` reports a moment a day later,
 so `batch_due()` returns `True` at once.
-The schedule logic runs against whatever moment the handler names,
-in microseconds.
+The schedule logic runs against the moment the handler names, in microseconds.
 `batch_due()` holds no `datetime.now()` call,
 so a test names the moment outright.
 A production handler that returns `datetime.now()` runs the same function.
@@ -456,7 +455,7 @@ the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 stands in for a side effect, where the function writes something outward.
 The technique is the same for both.
-Name each contact with the outside as an Ability and bind it at the edge to whatever the context needs.
+Name each contact with the outside as an Ability and bind it at the edge to the implementation the context needs.
 An EMS adds one thing: the type checker enforces the declaration.
 
 ## Switching Implementations Mid-Run
@@ -1187,7 +1186,7 @@ A failure that enters through `throw()` is in the type system from the moment it
 ### Catching the Whole Channel
 
 `catch()` names what it takes.
-`catch_all()` takes whatever the channel declares:
+`catch_all()` takes what the channel declares:
 
 ```python
 # catch_everything.py
@@ -1321,7 +1320,7 @@ Nothing supplies a loaf, because no loaf exists when `supply()` runs.
 The signature carries the graph, flattened into a union.
 `toast()` declares all three leaves although its body requests one of them.
 `yield from bread()` carries `Need[Dough]` and `Need[Oven]` from the inner Effect into `toast()`'s channel,
-the way `yield from` relays whatever the inner generator yields.
+the way `yield from` relays each value the inner generator yields.
 The type checker enforces that union.
 If you declare `toast()` with `Need[Toaster]` alone,
 `ty` reports an error at the delegation:
@@ -1377,7 +1376,7 @@ with two of its three leaves reached through `bread()`.
 The next example goes wide.
 [Abstract Factories](26_Patterns--Factory.md#abstract-factories)
 builds a gaming environment where a `GameElementFactory` returns a matched `Character` and `Obstacle`,
-and a `GameEnvironment` plays whatever that factory produces.
+and a `GameEnvironment` plays the elements that factory produces.
 Here each kind of actor is a type the program requests through a `Need`:
 
 ```python

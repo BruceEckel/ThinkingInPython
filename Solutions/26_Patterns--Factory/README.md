@@ -358,7 +358,7 @@ GameEnvironment(GnomesAndFairies()).play()
 
 **Ask the factory for each product.** `GameEnvironment` does not specify
 `Kitty`, `Warrior`, `Puzzle`, or `Weapon`. It calls
-`make_character()` and `make_obstacle()` on whatever
+`make_character()` and `make_obstacle()` on the
 `GameElementFactory` it receives.
 `GameEnvironment` stays as it was while a third concrete factory
 joins `KittiesAndPuzzles` and `WarriorsAndWeapons`.
@@ -1083,7 +1083,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Factory Objects](../../Chapters/26_Patterns--Factory.md#factory-objects) describes the `eval()` dispatcher and the `FACTORIES` table that replaces it.
-`eval()` compiles and runs whatever string it receives, so `kind` can be an expression with a side effect, such as a conditional whose test calls `print()`.
+`eval()` compiles and runs the string it receives, so `kind` can be an expression with a side effect, such as a conditional whose test calls `print()`.
 A dictionary lookup treats the same string as a key, and a missing key raises `KeyError`.
 
 <details>

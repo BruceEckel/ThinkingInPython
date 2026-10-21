@@ -119,7 +119,7 @@ A `key=` function changes the ordering.
 
 ### Mixed Element Types
 
-Each slot of a `list` holds a reference to whatever object you put there,
+Each slot of a `list` holds a reference to the object you put there,
 so the same `list` can mix strings, numbers, `None`, and other containers:
 
 ```python

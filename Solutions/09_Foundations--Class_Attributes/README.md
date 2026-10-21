@@ -12,7 +12,7 @@
 <summary>Where to look</summary>
 
 [Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup) shows a read searching the instance dictionary and then the class.
-A new instance starts with an empty dictionary, so its read falls through to whatever the class holds at that moment.
+A new instance starts with an empty dictionary, so its read falls through to the value the class holds at that moment.
 Compare the order of the three steps: shadow on `a`, change the class, create `c`.
 
 <details>

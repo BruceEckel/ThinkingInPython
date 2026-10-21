@@ -387,7 +387,7 @@ fails `func_c()`.
 **Widen the error type.** One generic `Ok`/`Err` pair carries both shapes. The
 three steps return `Result[int, str]`, an `int` or one error string,
 while `combined()` returns `Result[str, list[str]]`, a finished `str`
-or a list of error strings. `Ok` and `Err` take whatever type
+or a list of error strings. `Ok` and `Err` take the type
 parameters each call needs.
 
 **Narrow for the type checker.** The type checker verifies both
