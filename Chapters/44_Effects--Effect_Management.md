@@ -216,17 +216,17 @@ The rest reach the caller.
 Knowing every one of them means reading the code for every callee.
 An Effect Management System replaces that tedious, error-prone work.
 
-C++ and Java tried to track exceptions with *exception specifications*,
-a list of exceptions written by hand on each function.
+*Exception specifications* in C++ and Java track exceptions with a list written by hand on each function.
 Java's compiler checks the list
-(Java calls the listed exceptions *checked exceptions*),
-while C++ checked it at runtime and ended the program on an exception the list left out.
-Neither language inferred the list from the functions a body called,
-so an exception introduced three levels down meant editing every signature above it by hand.
-Programmers usually avoided that work by widening the specification until it permitted every exception.
-The specifications exposed implementation details.
+(Java calls the listed exceptions *checked exceptions*), while C++,
+before C++17 removed them,
+checked it at runtime and ended the program on an exception the list left out.
+Neither language infers the list from the functions a body calls,
+so an exception introduced three levels down means editing every signature above it by hand.
+Programmers usually avoid that work by widening the specification until it permits every exception.
+The specifications expose implementation details.
 Most people now count them a failure.
-C++ reduced its version to a single bit:
+C++11 reduced its version to a single bit:
 whether a function can throw an exception.
 
 ### Make the Bad Value Impossible
@@ -717,7 +717,7 @@ def greet(): Unit \ {Ask, Tell} =
 ```
 
 Languages in this family include Koka, Flix, Eff, Effekt, and Unison.
-OCaml 5 added the handler mechanism,
+OCaml 5 has the handler mechanism,
 though it does not yet track Effects in function types.
 
 ### Library Effect Management
@@ -940,7 +940,7 @@ Imagine a signature that declares its Effects the way `async def` already declar
 The hard part is propagation, not syntax.
 A type checker must compute the Effect row of every function from the functions it calls,
 across every library on PyPI, almost all of which carry no Effect annotations.
-`async` succeeded because it arrived as part of the language.
+`async` succeeds because it is part of the language.
 The interpreter enforces it,
 and its keyword marks each function that carries the Effect.
 An Effect row must cover every library in an ecosystem of untracked code.
@@ -967,10 +967,10 @@ and a generation later, nobody can imagine doing it by hand.
 
 Namespaces are a clear example.
 Early languages put every name in one global namespace,
-and the programmer prevented collisions by hand.
-Collisions were often silent, producing hidden bugs,
-and third-party libraries made the problem worse.
-The solution divided names among separate namespaces.
+and the programmer prevents collisions by hand.
+Collisions are often silent, producing hidden bugs,
+and third-party libraries make the problem worse.
+The solution divides names among separate namespaces.
 In Python, every module is automatically a namespace.
 The practice is so settled that the Zen of Python ends by celebrating it:
 <!-- vale House.EmDash = NO -->
@@ -980,12 +980,12 @@ Nobody audits their imports for name collisions anymore.
 The language does the bookkeeping.
 
 The same pattern repeats across the field.
-Version control gave every state of the code a name to which you can return,
-so experimenting became safe.
-Automated testing moved "does it still work?" from a manual ritual into the build.
-Garbage collection took the tracking of memory ownership out of the programmer's head.
-Each of these met resistance as unnecessary overhead, then won adoption,
-then faded as a question.
+Version control gives every state of the code a name to which you can return,
+so experimenting is safe.
+Automated testing moves "does it still work?" from a manual ritual into the build.
+Garbage collection takes the tracking of memory ownership out of the programmer's head.
+Each meets resistance as unnecessary overhead, then wins adoption,
+then fades as a question.
 
 A barrier is hardest to see from inside,
 and Effects are the barrier we are inside right now.
@@ -1009,7 +1009,7 @@ comparing each callee's Effects with the caller's declaration at each call.
 
 The languages that track Effects today are young,
 and the libraries that retrofit Effect tracking are demanding.
-Every solution to every previous barrier was young and demanding at this stage.
+Every solution to a barrier is young and demanding at this stage.
 Namespaces once looked like ceremony.
 Effect tracking will look obvious in hindsight.
 Future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
