@@ -617,14 +617,12 @@ In a native system, a function's signature carries two pieces of information:
 what it returns, and what Effects it performs.
 The body looks like ordinary sequential code.
 By examining the function calls made in the body,
-the compiler infers the Effects made by the function,
-the same way it tracks whether a value is an integer or a string.
-Thus, a native Effect type system tracks Effects together with ordinary arguments and return types.
+the compiler infers the Effects made by the function.
+Thus, a native Effect type system function signature tracks Effects together with ordinary arguments and return types.
 
-This section and [Library Effect Management](#library-effect-management)
-build small programs in four Effect management systems:
-two languages with native Effects, Koka and Flix,
-and two library Effect systems, ZIO for Scala and Effect for TypeScript.
+We'll examine different Effect management systems using the same small program in two languages with native Effects,
+Koka and Flix, and two library Effect systems,
+ZIO for Scala and Effect for TypeScript.
 
 [Koka](https://koka-lang.github.io/) is a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
@@ -658,7 +656,10 @@ The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
 The Effect row is a second channel in the signature, outside the parameter list.
 `ask` and `tell` become part of the type.
-The parameter list stays empty.
+In `ask_tell.py`, `greet()` receives them as parameters;
+here the row carries them, so the parameter list is empty.
+The `()` after the row is the return type: Koka's unit type,
+the counterpart of Python's `None`.
 
 The compiler infers the row from what the body calls
 (this listing writes out the rows of `greet()` and `main()` so you can see them).
