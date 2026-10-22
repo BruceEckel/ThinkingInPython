@@ -327,7 +327,7 @@ and for the `count` that `Registry.count = 0` creates in `declared_classvar.py`.
 ### A Base Class Declares, a Subclass Supplies
 
 A `ClassVar` with no value usually appears in a base class,
-naming what its subclasses must supply:
+declaring what its subclasses must supply:
 
 ```python
 # required_classvar.py
@@ -357,7 +357,7 @@ A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 declares its attributes in the same form, a bare annotation,
 since it describes what a class must have and leaves the value to the class.
 
-`ty` 0.0.87 enforces what the declaration states about the value.
+`ty` 0.0.89 enforces what the declaration states about the value.
 A subclass that writes `sides = "four"` draws `invalid-assignment` on that line,
 since the checker compares the value with the declared `ClassVar[int]`.
 A subclass that redeclares the attribute as `sides: ClassVar[str] = "four"` draws `invalid-attribute-override`.
@@ -530,7 +530,7 @@ whenever a `ClassVar` must count across every subclass rather than fork one coun
 A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
 that writes `cls.total += 1` forks the same way,
 because `cls` is the class that received the call.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry keeps one dictionary for every subclass by mutating it in place.
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry avoids the fork by mutating one dictionary in place.
 `Trash.registry[cls.__name__] = cls` assigns into the dictionary,
 not to an attribute of `cls`, so every subclass shares the one registry.
 

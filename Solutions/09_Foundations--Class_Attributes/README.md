@@ -156,7 +156,7 @@ to `self.x` as a fresh instance attribute for that object.
 `b2` comes from a separate `B()` call and keeps its `100`,
 the way each `A()` in `real_defaults.py` holds its own `x`.
 A constructor default creates one value per instance,
-unlike a class-body attribute,
+unlike a plain class attribute,
 which creates one value shared by all instances until something shadows it.
 
 Before you move on, name what separates your attempt from this one:
@@ -260,13 +260,13 @@ a different design, a detail, or an equivalent alternative.
 
 [A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) shows two `Cart` objects sharing one list, so an append through one object changes the list both objects hold.
 The fix builds the list per instance with `field(default_factory=list)` from `dataclasses`.
-For the second half, write the bare `[]` default and see whether the `class` statement finishes, and when.
+For the second half, write the `[]` default and see whether the `class` statement finishes, and when.
 
 <details>
 <summary>Done when</summary>
 
 after the `append()` through `a`, printing both lists shows `['apple'] []`.
-With the bare `[]` default, the `class` statement fails before any `Cart` exists, raising a `ValueError` whose message ends with `use default_factory`.
+With the `[]` default, the `class` statement fails before any `Cart` exists, raising a `ValueError` whose message ends with `use default_factory`.
 
 <details>
 <summary>Solution</summary>
@@ -291,7 +291,7 @@ every `Cart`.
 Because each object holds its own list from construction,
 `a`'s append leaves `b.items` empty.
 
-For the same class written with a bare `items: list[str] = []`,
+For the same class written with `items: list[str] = []`,
 `@dataclass` raises a `ValueError`,
 which turns the shared-list bug into an immediate error:
 
