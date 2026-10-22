@@ -115,7 +115,7 @@ The checker [applies the base's declaration to an override](09_Foundations--Clas
 so it rejects `Aluminum(1.0).value = 2.0` with or without the restatement.
 
 A new material registers itself, and `create()` builds it.
-`sum_value()` also handles the new material as written.
+`sum_value()` also totals the new material as written.
 That ordinary function reads `piece.value` and `piece.weight` polymorphically,
 so each piece answers `value` from its own class.
 
@@ -181,7 +181,7 @@ Cardboard:12
 ```
 
 The parser builds `Trash` objects through the registry and specifies no concrete material,
-so it handles a new kind of trash as written:
+so a new material needs no edit to `parse()`:
 
 ```python
 # parse_trash.py
@@ -404,7 +404,7 @@ so a type checker accepts `bins: Bins = {}` too.
 That version raises a `KeyError` on the first piece of trash.
 
 `plastic_dropped.py` drops the plastic in `plastic.dat`.
-Here, `recycle_dict_plastic.py` passes that file to `sort_by_type()` and defines `Plastic` the same way `plastic_dropped.py` does:
+Here, `recycle_dict_plastic.py` passes that file to `sort_by_type()` and defines the same `Plastic` class as `plastic_dropped.py`:
 
 ```python
 # recycle_dict_plastic.py
@@ -537,9 +537,9 @@ or when operations start to outnumber materials.
 [*Visitor*](33_Patterns--Visitor.md)
 is the classic way to add an operation from outside the classes.
 It is elaborate: a visitor class, an `accept()` method on every element,
-and double dispatch to select the right overload.
+and double dispatch to select the overload for each element's class.
 All of that works around a statically typed language that cannot add a method to a class from outside.
-`functools.singledispatch` selects the same implementation in one call.
+`functools.singledispatch` selects the implementation for the argument's class in one call.
 Any module can register an implementation for a new type.
 
 ```python
@@ -630,8 +630,8 @@ Python still has the expression problem,
 but each side is now an addition in one place instead of an edit spread across classes.
 
 `singledispatch` is for behavior that differs by type.
-The earlier `sum_value()` does the same thing for every type,
-so it stays an ordinary function.
+The earlier `sum_value()` runs the same expression,
+`piece.weight * piece.value`, for every type, so it stays an ordinary function.
 
 For an operation that belongs on an object and still varies by type,
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)

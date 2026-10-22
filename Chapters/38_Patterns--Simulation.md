@@ -8,7 +8,7 @@ A simulation models a set of objects that act on their own and interact through 
 This chapter builds three,
 each giving its agents less to work with than the last.
 A pack of rats coordinates through a shared blackboard,
-a single robot walks a maze where each object it meets handles the robot's arrival,
+a single robot walks a maze where each object it meets decides which room the robot ends up in,
 and a plate of vibrating sand runs on grains that hold only a position.
 The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture.
@@ -801,7 +801,7 @@ Each stage depends on the one before it,
 so each runs as its own labeled pass instead of all three interleaving in one loop.
 [Factory](26_Patterns--Factory.md#builder)
 counts `GameBuilder` among the cases where *Builder* remains useful in Python,
-because construction here is a process rather than a single call.
+because construction here takes three ordered stages rather than a single call.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
@@ -1165,7 +1165,7 @@ the starting point for a robot that steers continuously instead of planning a gr
 The two simulations so far confirm designs.
 The rats cover every reachable cell, and because `claim()` is atomic,
 each cell gets one rat.
-The robot reaches the goal because polymorphism handles every encounter.
+The robot reaches the `!` because each occupant's `interact()` sends it where `landing()` predicted.
 Both times you know the outcome in advance and run the program to confirm it.
 The third example gives you only half the outcome.
 `amplitude()` determines the shape the sand traces.
@@ -1454,7 +1454,7 @@ so in any one run the step count, not the plate, sets their width.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
 Exercise 7 asks you to tell the physics from the rule that models it.
 If you swap `amplitude()`'s formula for a membrane's formula,
-every figure changes while the rest of the program stays the same.
+every figure changes while `chladni.py` and the view stay as they are.
 
 When behavior emerges, reading the code is not enough.
 Run it.

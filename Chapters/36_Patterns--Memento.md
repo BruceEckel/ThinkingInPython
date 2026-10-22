@@ -315,7 +315,7 @@ and the copying.
 ![](_images/memento_story)
 
 Frames 1 to 3 trace `sketch_demo.py`,
-with a copy at each crossing between the sketch and the caretaker.
+with a copy in each call to `save()` and `restore()`.
 Frame 4 traces `frozen_demo.py` and has no copy.
 The caretaker keeps `before`.
 `draw()` returns `after` as a new object beside it.
@@ -798,7 +798,7 @@ instead of leaving a query to fail on the mismatch.
 When drift or the security risk is too much to accept,
 other libraries address both.
 `msgspec` and `pydantic` both validate on load.
-A shape mismatch raises a clear error at the boundary,
+A shape mismatch raises the library's `ValidationError` inside the load call,
 instead of the delayed `AttributeError` from `pickle_drift.py`.
 Protocol Buffers goes further.
 A schema shared across languages gives every field an explicit number.
