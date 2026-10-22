@@ -431,7 +431,7 @@ for tolerance in (0.1, 1e-9):
 ```
 
 Each `partial` object satisfies `RootFinder`,
-so `solve()` runs a `partial` object as it runs a closure.
+so `solve()` calls a `partial` object with the same three arguments it passes a closure.
 
 A caller must pass a [positional-only parameter](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
 by position, so binding one with `partial()` means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
@@ -505,14 +505,15 @@ The hazard is the truthiness test, not the choice of failure value.
 Whichever value marks failure, compare the result against it with `is`.
 
 `None` is the right failure value here because a root is always a `float`,
-so `float | None` says which result is which.
+so a `None` result means the search failed.
 When `None` is a possible result, it cannot double as the failure mark.
 A [`sentinel()`](05_Foundations--Functions.md#sentinel-values) takes that role.
 
 Each finder decides for itself whether it succeeded,
 and reports that decision as its return value.
 `secant()` and `newton()` report success when their latest step shrinks below the tolerance.
-A step below the tolerance is not quite the same as reaching a root,
+A small step shows that the estimate stopped moving,
+and neither finder checks how close `f(x)` is to zero,
 so a chain's answer is as trustworthy as the finder that gave it.
 
 The test file confirms that:
