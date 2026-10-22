@@ -365,7 +365,8 @@ Python's logical operators are the words `and`, `or`, and `not`,
 where C and Java write `&&`, `||`, and `!`.
 The bitwise `&` and `|` from `bitwise.py` also accept `bool` values.
 Unlike `and` and `or`, `&` and `|` bind more tightly than a comparison,
-so `x > 0 & y > 0` means `x > (0 & y) > 0`.
+so `x > 0 & y > 0` means `x > (0 & y) > 0`,
+which is `False` for any integers `x` and `y`.
 
 `not` always produces a `bool`.
 `and` and `or` short-circuit and return one of their operands,

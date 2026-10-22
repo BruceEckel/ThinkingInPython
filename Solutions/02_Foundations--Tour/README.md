@@ -10,7 +10,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Variables and References](../../Chapters/02_Foundations--Tour.md#variables-and-references) shows that assignment copies a reference, not the list.
+[Variables and References](../../Chapters/02_Foundations--Tour.md#variables-and-references) shows that assignment binds a name to the existing list instead of copying it.
 A slice builds a new list object, so `a` and `c` name different lists.
 Check which of `b` and `c` names the same list as `a` before you explain the difference.
 
@@ -42,6 +42,8 @@ print(a, c)
 `b.append(4)` changes `a` too, because `b` and `a` name the same list object.
 `c = a[:]` makes a new list with the same elements,
 so `c.append(99)` changes `c` and leaves `a` alone.
+The identity test shows the difference:
+`references.py` prints `True` for `a is b` and `False` for `a is c`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
