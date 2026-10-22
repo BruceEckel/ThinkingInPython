@@ -784,7 +784,7 @@ The type records which Abilities each layer leaves open.
 
 The repeated union is the shape a `type` alias normally shortens.
 Elsewhere the book writes one.
-Under `ty` 0.0.87 the alias checks the same as the written-out signature.
+Under `ty` 0.0.89 the alias checks the same as the written-out signature.
 An undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
 This book still writes Effect signatures out in full,
 because the union is the information.
@@ -884,7 +884,7 @@ def test_greet_all(console: Console) -> None:
 ```
 
 The test varies the console and checks the log,
-which records the same greeting under either `Console`.
+which holds the same entry under either `Console`.
 The test has two rows and two `Console` implementations.
 `greet_all()` and `greet_logged()` keep their parameter lists.
 The parameter-passed version adds a `console` argument to both,
@@ -905,7 +905,8 @@ a different Ability from the `Need[Console]` that `greet()` requests.
 `as_type(Console)(recorder)` converts the argument's static type into `Console`,
 so `supply()` builds the handler type `greet()` needs.
 
-At runtime `as_type()` is the identity function and returns the object it received.
+At runtime `as_type(Console)` returns an identity function,
+which hands back the object it receives.
 Only the static type changes.
 
 `typing.cast(Console, recorder)` produces the same static type,
@@ -940,7 +941,7 @@ No check reports it.
 ### An Interface Instead of a Base Class
 
 Stateless's own `Console` is the concrete class [Built-in Dependencies](#builtin-dependencies)
-named.
+lists.
 Only a subclass can replace it.
 Its accessors specify that class,
 so `isinstance()` accepts an instance of the class or a subclass.
@@ -1025,7 +1026,7 @@ but an interface reaches `supply()` only through an implementation.
 Most listings in these two chapters use a concrete `Console`,
 because an interface adds an `as_type()` call wherever an implementation goes straight to `supply()`.
 [Composing a Program](47_Effects--Stateless_in_Practice.md#composing-a-program)
-declares its Abilities as `Protocol`s and shows the annotation that replaces that call.
+declares its dependencies as `Protocol`s and shows the annotation that replaces that call.
 
 Write one boundary function whose parameter annotations specify the interface types,
 and call `supply()` inside it.

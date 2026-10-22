@@ -714,7 +714,7 @@ runtime class, so no runtime check tells the two apart. The distinction
 lives in the annotation, where the type checker reads it.
 `handle()` matches on the annotation's origin, which erases the distinction.
 A handler like `default()` handles more than its type says.
-A handler that assumes `ability.t` is a `Console` receives a `Clock` unchecked.
+A handler that assumes `ability.t` is a `Console` receives a `Need[Clock]` request unchecked.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -963,8 +963,8 @@ hands back a function that takes the same arguments.
 
 The Effect the returned function builds has a wider type.
 [`retry()`](../../Chapters/47_Effects--Stateless_in_Practice.md#retry-and-a-flaky-database)
-adds the clock on which it sleeps and replaces the error with a
-`RetryError`.
+adds `Need[Time]` and `Async` for the sleeps between attempts and
+replaces the error with a `RetryError`.
 
 The same reasoning explains
 [`repeat()` and `memoize()`](../../Chapters/47_Effects--Stateless_in_Practice.md#repeat-and-memoize).
@@ -1213,7 +1213,7 @@ annotations by choice, not because the type checker requires them. `yield from` 
 function produces the declared success type, and specifying that type
 makes the type checker compare its inference with the annotation.
 
-**Let `run()` raise each failure.** Each failure first appears as an exception at `run()`. `Cyd` has a
+**Let `run()` raise each failure.** Each failure comes out of `run()` as an exception. `Cyd` has a
 score, so the lookup succeeds and `format_score()` fails. `Dana` has
 none, so the lookup fails and the Effect ends before `format_score()`. In both
 cases each `yield from` relays the error value as is, through
@@ -1242,8 +1242,8 @@ error[invalid-yield]: Yield expression type does not match annotation
 The error appears on line 29, the `yield from` that introduces the
 undeclared failure, not on the signature and not at the call site.
 That statement is the useful place for the diagnostic. The diagnostic
-names both the undeclared failure and the delegation that yields it,
-so the fix is either to declare the failure or to catch
+gives the undeclared failure's type and marks the delegation that
+yields it, so the fix is either to declare the failure or to catch
 it, right there.
 
 Before you move on, name what separates your attempt from this one:
@@ -1418,7 +1418,7 @@ the second half, "supply one implementation per Ability."
 Because `supply()` resolves a request by scanning its arguments at runtime, a
 duplicate is a fact about the call rather than about the types. ZIO's
 compile-time rejection of this case is the difference that section
-names.
+describes.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
