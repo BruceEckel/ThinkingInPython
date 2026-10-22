@@ -236,8 +236,7 @@ The subject can be any expression, and a comma builds a tuple there too.
 Given a `sign()` helper that returns `-1`, `0`, or `1`,
 `match sign(x), sign(y):` matches on a pair computed inline.
 Transforming the subject this way turns a set of comparisons into literal patterns.
-Literal patterns usually read better than the [guards](#guards)
-you would write otherwise.
+A `case 1, -1:` then replaces the [guard](#guards) `if x > 0 and y < 0`.
 
 ## Class Patterns
 
@@ -462,7 +461,7 @@ A bare name in a pattern captures, so a `case` tests for it with a guard,
 
 A mapping pattern matches keys in a dictionary and binds their values.
 It checks the keys you specify and ignores the rest,
-so it dispatches cleanly on JSON-shaped data.
+so it matches a JSON-shaped record that carries extra fields.
 Ignoring the extra keys also makes `case {}` a catch-all for any mapping rather than a test for an empty one.
 `case []` works the opposite way and matches only an empty sequence.
 Test for an empty dictionary with a guard, `case {} if not event:`.
@@ -636,7 +635,7 @@ so a `match` that must produce a value goes inside a function that returns from 
 
 Python has no `sealed` keyword.
 `assert_never()` plus a type checker fills that role.
-An `if`/`isinstance()` chain that ends with `assert_never()` gives the same guarantee.
+An `if`/`isinstance()` chain that ends with `assert_never()` gives the same exhaustiveness check.
 A `match` names the subject once and binds fields as it tests the type.
 `case Circle(radius)` in `area()` tests the type and binds `radius` in one pattern,
 where the chain tests `isinstance(shape, Circle)` and then reads `shape.radius`.
@@ -690,7 +689,7 @@ while a `match` stays as written.
 
 When the set of types is *open* (anyone can add a new one),
 inheritance and dynamic binding work better than `match`.
-Each type defines its own behavior, so adding a type touches only the new class.
+Each type defines its own methods, so adding a type touches only the new class.
 Use `match` for a closed set of cases you want to handle in one place,
 especially when the cases test the value's attributes or elements.
 
@@ -710,7 +709,7 @@ Every channel also has a rough cost to send a message.
 
 The inheritance answer declares both operations as abstract methods on an [abstract base class](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
 Each channel is a subclass that implements them,
-and dynamic binding picks the correct implementation at each call:
+and dynamic binding runs the method of the object's own class at each call:
 
 ```python
 # notifications_oo.py
@@ -843,7 +842,7 @@ print(round(sum(cost(n) for n in notes), 4))
 `render()` and `cost()` each `match` over `Notification` and end with `assert_never()`,
 so the type checker confirms each `match` handles every member of `Notification`.
 
-`test_oo_and_match_agree()` confirms that the two versions render and price each channel alike:
+`test_oo_and_match_agree()` confirms that `render()` and `cost()` return equal values in the two versions for each channel:
 
 ```python
 # test_notifications.py
