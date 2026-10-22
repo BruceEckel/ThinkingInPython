@@ -762,7 +762,7 @@ so the `Ask` handler supplies an empty name in that case.
 `main()` keeps `Console` in its signature,
 the Effect its handler bodies perform,
 the counterpart of Koka's `<console,exn>`.
-Flix supplies the handler for that one when the program starts.
+Flix supplies the `Console` handler itself when the program starts.
 
 Languages in this family include Koka, Flix, Eff, Effekt, and Unison.
 OCaml 5 has the handler mechanism,
