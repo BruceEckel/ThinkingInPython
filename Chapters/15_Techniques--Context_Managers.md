@@ -111,13 +111,14 @@ except ValueError as error:
 which resumes the generator by raising the block's exception at the `yield`.
 Without the `try`/`finally`, that exception leaves the generator at once,
 so the code after the `yield`, `exit A` included, never runs.
-The generator silently skips the cleanup on the one path where it matters most.
+On the exception path the generator skips the cleanup,
+and nothing reports the skip.
 Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator.
 
 ## The Protocol
 
 What does `with` call?
-It treats every manager the same way,
+It calls the same two methods on every manager,
 whether `@contextmanager` built it from a generator or a class defined it.
 A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
@@ -186,7 +187,8 @@ In `trace_gen.py` the second of those statements raises an `AttributeError`,
 because a generator manager is single-use.
 A class manager that stores per-`with` state stays reusable only if `__enter__()` resets that state.
 
-The generator form is usually the clearest choice.
+The generator form is usually the shorter one, with setup, `yield`,
+and cleanup in one function.
 Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
 ## Guaranteed Cleanup
@@ -249,7 +251,7 @@ is the standard tool for that.
 When a later entry fails, `ExitStack` unwinds the managers it entered earlier.
 
 `Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method ignores.
-That shorter form suits a cleanup that runs the same way however the block ended.
+That shorter form suits a cleanup that ignores how the block ended.
 
 The guarantee also assumes that cleanup succeeds.
 Cleanup can fail.
@@ -672,7 +674,7 @@ if __name__ == "__main__":
 
 Like `suppress` and `expected`,
 the class version of `banner` uses a lowercase name because you use it like a function.
-Its `__exit__()` runs the same way however the block ended,
+Its `__exit__()` prints the closing banner however the block ended,
 so it takes the `*exc: object` form and returns `None`,
 which lets an exception from `quarterly()` propagate.
 
@@ -772,7 +774,7 @@ if __name__ == "__main__":
 ```
 
 When the managers are too long for one line, parentheses group them,
-and the behavior stays the same:
+and the managers still enter left to right and exit in reverse:
 
     with (tag("ul") as outer,
           tag("li") as inner):
@@ -863,7 +865,7 @@ The `contextlib` module provides ready-made managers.
 Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 - `suppress(*exceptions)` suppresses the listed exceptions,
-  covering the case the `expected` class handles,
+  as `expected` does for the types it lists,
   without `expected`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers.
