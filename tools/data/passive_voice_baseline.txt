@@ -29,7 +29,6 @@ Chapters/35_Patterns--Flyweight.md	[PASSIVE] is called: A pool of singletons key
 Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: That name is now bound to CODE.
 Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: The dump that builds CODE runs while CODE is bound to the one-field class.
 Chapters/40_Functional--Foundations.md	[PASSIVE] is associated: The runtime message names a local variable instead of the missing declaration: "cannot access local variable 'count' where it is not associated with a value."
-Chapters/44_Effects--Effect_Management.md	[PASSIVE+BY] is consumed: An enormous part of professional programming is consumed by this activity, and it has been normal for so long that it goes unnoticed.
 Chapters/44_Effects--Effect_Management.md	[PASSIVE] is delayed: The connection between the declaration and its supply is *delayed binding*.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
 Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
@@ -46,7 +45,7 @@ Solutions/15_Techniques--Context_Managers/README.md	[PASSIVE] were given: If you
 Solutions/17_Techniques--Metaprogramming/README.md	[PASSIVE] are implemented: CODE and CODE are both implemented in C, each with its own instance layout, so no single object can be both.
 Solutions/19_Techniques--Concurrency/README.md	[PASSIVE] is luck: That reliability is luck rather than a guarantee.
 Solutions/24_Patterns--Template_Method/README.md	[PASSIVE] is anchored: The anchored algorithm is no longer anchored.
-Solutions/26_Patterns--Factory/README.md	[PASSIVE] is decorated: CODE reports a fitting class that is not decorated.
+Solutions/26_Patterns--Factory/README.md	[PASSIVE] is decorated: The checker catches a decorated class that does not fit, while CODE reports a fitting class that is not decorated.
 Solutions/27_Patterns--Function_Objects/README.md	[PASSIVE] is subscribed: **Ignore a handler that is not subscribed.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PASSIVE] are known: It reports passing CODE to a parameter declared CODE, since the element types are still known positionally.
 Solutions/38_Patterns--Simulation/README.md	[PASSIVE] is eaten: on the chapter's CODE, your tour prints CODE, CODE is CODE at the end, and the search for food returns CODE once the last CODE is eaten, so the script reaches the walk to the CODE.

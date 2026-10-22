@@ -249,7 +249,6 @@ Chapters/24_Patterns--Template_Method.md	hook: whether the subclass overrides CO
 Chapters/24_Patterns--Template_Method.md	hooks: The CODE and CODE in the opening example are hooks
 Chapters/24_Patterns--Template_Method.md	hooks: The box beneath them changes from empty hooks to CODE to two lambdas
 Chapters/24_Patterns--Template_Method.md	hooks: starting from the base class with its empty hooks
-Chapters/24_Patterns--Template_Method.md	only: An anchored algorithm is only as secure as its anchor
 Chapters/24_Patterns--Template_Method.md	only: Change the check so it compares a new method only against the names CODE defines
 Chapters/24_Patterns--Template_Method.md	only: Only the type checker enforces CODE
 Chapters/24_Patterns--Template_Method.md	only: That decorator stops an override only when the type checker runs

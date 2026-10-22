@@ -682,7 +682,7 @@ That `__getattr__()` imports and returns a submodule the first time a caller ask
 NumPy and SciPy use that technique to keep import time low.
 `lazy import` replaces the hand-written `__getattr__()` with one keyword and defers every imported name,
 a package's submodules among them.
-Code that must run on a Python older than 3.15 still needs the `__getattr__()` pattern.
+On a Python older than 3.15, code still needs the `__getattr__()` pattern.
 
 ### Limits of `lazy`
 

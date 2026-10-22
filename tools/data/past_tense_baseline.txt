@@ -283,6 +283,7 @@ Solutions/17_Techniques--Metaprogramming/README.md	[PAST] put: Define CODE as an
 Solutions/18_Techniques--Performance/README.md	[PAST] measured: One machine measured CODE about 19 times faster at 10,000 parts and about 7 times faster at 100.
 Solutions/18_Techniques--Performance/README.md	[PAST] read: CODE attaches the same event to every Python code object in the process, so read the CODE for entries beyond your two functions.
 Solutions/19_Techniques--Concurrency/README.md	[PAST] cancelled: CODE still sleeps for CODE, so the group cancels it during that sleep and its task ends cancelled.
+Solutions/19_Techniques--Concurrency/README.md	[PAST] cancelled: The original CODE has both CODE and CODE cancelled because both are still sleeping when CODE and CODE fail.
 Solutions/19_Techniques--Concurrency/README.md	[PAST] read: Two threads can be inside CODE at the same moment, read the same CODE, and return the same ticket, as they do without the lock.
 Solutions/19_Techniques--Concurrency/README.md	[PAST] run: The read-modify-writes run one at a time, as with CODE, and all 400 increments survive.
 Solutions/20_Patterns--Rethinking_Objects/README.md	[PAST-HEADING] plugged: A leaking CODE list, then plugged
