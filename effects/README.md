@@ -59,6 +59,43 @@ missing, so you can install one and run that alone.
   effects-fetch` runs `npm ci` against the committed lockfile into
   `ts/node_modules/`, which git ignores.
 
+### Installing Koka and scala-cli
+
+Java, Node, and npm are common enough that their own installers do.
+The other two are less so, and each has a one-line install.
+
+Koka, release 3.2.9 (the release's own install script pins it):
+
+```
+# Linux or macOS: installs to /usr/local (asks for sudo) and needs clang or gcc
+curl -sSL https://github.com/koka-lang/koka/releases/download/v3.2.9/install.sh | sh
+
+# Windows, in cmd or PowerShell: installs to %LOCALAPPDATA%\koka and adds
+# it to PATH; installs clang if no C compiler is found, and offers the
+# Visual Studio Build Tools (already present if you build the Rust crates)
+curl -sSL -o %TEMP%\install.bat https://github.com/koka-lang/koka/releases/download/v3.2.9/install.bat && %TEMP%\install.bat
+```
+
+Or unpack the `koka-v3.2.9-<os>-<arch>.tar.gz` release tarball anywhere
+and run with `KOKA=<that dir>/bin/koka`, which is how this machine's
+first run was made. Open a new shell after the installer, so PATH is
+current.
+
+scala-cli, any 1.x (checked with 1.18.0):
+
+```
+winget install virtuslab.scalacli                 # Windows
+brew install Virtuslab/scala-cli/scala-cli        # macOS
+curl -sSLf https://scala-cli.virtuslab.org/get | sh   # Linux
+```
+
+Or unpack `scala-cli-x86_64-pc-win32.zip` (or the matching archive for
+another platform) from [its releases](https://github.com/VirtusLab/scala-cli/releases)
+anywhere and run with `SCALA_CLI=<that dir>/scala-cli`.
+
+`tip effects-test` names, in its table, whichever of the four it did
+not find, so run it after each install to see what is left.
+
 ## Running it
 
 From anywhere in the repository:
