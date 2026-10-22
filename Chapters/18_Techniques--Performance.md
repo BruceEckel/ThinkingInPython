@@ -1832,7 +1832,6 @@ The repository's `rust/README.md` explains how to build and run `fastcount` your
 `uv run tip rust-all` compiles both functions, installs the module,
 and runs the comparison in `demo.py`, printing your machine's own numbers.
 The main book build skips this step and requires no Rust toolchain.
-Building `rust/` is a separate, opt-in step.
 
 ## Concurrency
 
