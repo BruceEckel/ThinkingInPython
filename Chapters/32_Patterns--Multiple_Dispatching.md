@@ -423,7 +423,7 @@ The type tests repeat in every class,
 as the `eval_*()` methods do in the method version.
 The programmer resolves by hand what dispatch resolves on its own.
 Every new `Item` requires an edit to every ladder.
-Both patterns in this chapter replace the ladder.
+Both versions in this chapter replace the ladder.
 
 The method version puts `eval_paper()`, `eval_scissors()`,
 and `eval_rock()` on every class.
