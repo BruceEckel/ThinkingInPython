@@ -149,6 +149,27 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   report-only Opus agent, about 90k tokens, 70 seconds). Then
   `tip version-pins ARGS=--write`. winget's pandoc step failed to
   uninstall again (exit 1603), so pandoc stays where it was.
+  The 0.0.90 to 0.0.91 upgrade (2026-10-22 again, that afternoon on the
+  Windows machine, with ruff 0.17.1 to 0.17.2 and hypothesis 6.170.5 to
+  6.170.8) was quiet too. The morning's run happened in another clone,
+  so this machine pulled the lockfile with uv still at 0.13.1 and its
+  managed Python still at 3.15.0: a pull moves `uv.lock`, never uv or
+  the interpreter, so each machine runs `uv self update` and
+  `tip python-upgrade` on its own. The trigger was `tip` itself failing
+  with "did not find executable at 'C:\Python\python.exe'": the tool
+  environment `uv tool install` builds keeps the interpreter it was
+  built on, and a python.org install that the new Python install manager
+  replaced had taken that interpreter away. `uv tool install --reinstall`
+  fails on such an environment, because it queries the old interpreter
+  first; `uv tool uninstall thinking-in-python`, then `uv tool install
+  --managed-python --python 3.15 -e .`, rebuilt it on uv's managed
+  Python. Then `tip python-upgrade` (verify green, no drift) and
+  `tip tools-upgrade` (`tip sweep` green, pandoc 3.12.1 and typst and
+  vale current); `tip check output-check` clean; the pyright delta
+  empty; `tip quoted-diagnostics-probe` 42 of 42 MATCH; and all 13
+  probes and the 7 pinned sentences HOLD, each byte-identical under
+  0.0.90 and 0.0.91 (one report-only Opus agent, about 90k tokens, under
+  two minutes).
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
