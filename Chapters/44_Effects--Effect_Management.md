@@ -1037,7 +1037,6 @@ Code builds objects that describe intents.
 Separate performers execute them, and a test can swap in its own performers.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
 Each of these supplies part of an EMS.
-None supplies all three parts.
 
 One library supplies all three parts.
 [Stateless](46_Effects--Stateless.md)
@@ -1053,8 +1052,9 @@ Stateless verifies that the Effects you declare propagate consistently.
 A function can still call `print()`, next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
 In Python, neither Stateless nor the type checker reports it.
-A library checks the Effects you wrote down,
-but checking the ones you left out takes the language.
+A library checks the Effects you wrote down.
+Only the language can find the ones you left out,
+because only the compiler reads every call in the body.
 
 Could Python itself gain Effect tracking,
 so that a tool infers every declaration instead of you writing it?
