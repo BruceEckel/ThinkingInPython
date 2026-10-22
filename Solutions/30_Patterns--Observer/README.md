@@ -317,7 +317,7 @@ t.celsius = 25
 
 **Name the subject the observer reads.** With `Display.update()` declaring `subject: Thermometer`,
 `t.attach(Display())` now type-checks.
-The requirement the first version's `assert` stated now sits in the observer's type, which names the subject the observer watches.
+The requirement the first version's `assert` stated now sits in the observer's type, which declares the subject the observer watches.
 An observer that declares the wider `Subject[float]` still attaches to any `Subject[float]`,
 because a parameter is contravariant.
 An observer that reads `celsius` must declare `Thermometer`,
@@ -450,7 +450,7 @@ receives the notification, wherever it sits in the connection order.
 
 **Catch any ordinary failure.** Catching bare `Exception` here is deliberate.
 `announce()` calls arbitrary callables, so its code cannot list the exceptions they raise. Catching
-`Exception` lets a `BaseException` propagate, so a
+`Exception` lets every other `BaseException` propagate, so a
 `KeyboardInterrupt` or an `asyncio.CancelledError` raised in a
 responder stops the notification instead of joining `failures`.
 
@@ -470,7 +470,8 @@ and the test's `pytest.raises(ExceptionGroup)` fails with
 can fail on a single notification, and the caller needs every failure,
 not the first. `except*` then lets a caller handle one kind of failure
 and re-raise the rest.
-A plain `except` receives a single exception, with no group to split.
+A plain `except RuntimeError` misses the group,
+because the exception `announce()` raises is the `ExceptionGroup` itself.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1023,9 +1024,9 @@ can also inherit from `Broadcaster[Grid]`, as `GridModel` does, and
 call `self.announce(self.grid)` at the end of a successful `select()`.
 `grid_view.py`'s existing view then repaints after every move. The
 drawing code needs no change, but `show()`'s parameter annotation does.
-That annotation names `GridModel`, which a `FloodGame` is not.
+That annotation specifies `GridModel`, which a `FloodGame` is not.
 Widening the annotation lets the same view draw either model.
-The wider type can be a Protocol that names `connect()`, `size`,
+The wider type can be a Protocol that declares `connect()`, `size`,
 `grid`, and `select()`. It can also be a base class that both models
 inherit, one that extends `Broadcaster[Grid]` with `size`, `grid`, and
 `select()`.
@@ -1713,7 +1714,8 @@ The failure appears only when the program runs.
 **Type each kind of access.** The two `@overload` declarations tell the type checker which result each
 access gets: `Notifying[T]` from the class, `T` from an instance. If you
 remove them, the declared return type is the union. The type checker
-then rejects `t.celsius * 2`. The overloads also check the responder against the
+then rejects `t.celsius * 2`, and `Thermometer.celsius.connect()` as
+well, since `float` has no `connect()`. The overloads also check the responder against the
 attribute: `Thermometer.celsius.connect(t, readings.append)` passes
 because `readings.append` accepts a `float`.
 
@@ -2190,7 +2192,7 @@ class Controller:
 <summary>Done when</summary>
 
 feeding `k`, `k`, `j` to your `Controller` prints six lines, each count beside a bar of that many asterisks, ending at a count of 1.
-You can say which objects `Counter`, each view, and `Controller` each reference, and which existing class a third view would change.
+You can say which objects `Counter`, each view, and `Controller` each reference, and whether a third view would change any existing class.
 
 <details>
 <summary>Solution</summary>

@@ -1753,7 +1753,7 @@ or when interpreting input needs tests that draw nothing.
 
 ## Deciding What Matters
 
-[Cohesion](21_Patterns--Design_Patterns.md#design-principles)
+High [cohesion](21_Patterns--Design_Patterns.md#design-principles)
 means one job per class.
 `Thermometer` has three jobs: it measures, it decides which changes to announce,
 and it notifies the responders.
