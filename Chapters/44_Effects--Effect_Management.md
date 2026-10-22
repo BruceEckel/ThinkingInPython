@@ -836,10 +836,11 @@ so no error reaches the signature.
 The signature does the same job as Koka's Effect row.
 It tells you what `greet` needs, what can go wrong, and what comes back.
 
-Everything else in the listing is machinery, and each Effect pays for it again:
-a trait for each interface,
-a companion object to lift each interface into the `ZIO` type,
-a `ZLayer` to package each implementation, and a `provide()` call to bind them.
+Everything else in the listing is machinery,
+and each Effect pays for it separately: a trait for its interface,
+a companion object to lift that interface into the `ZIO` type,
+and a `ZLayer` to package its implementation,
+plus one `provide()` call to bind them all.
 Koka declared each Effect in two lines and handled it in one `with` clause.
 Even `greet()` grows: it cannot call `ask` and then `tell`,
 because each call produces a description, not a value,
