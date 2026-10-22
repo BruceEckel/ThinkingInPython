@@ -93,8 +93,8 @@ for path in root.walk():
 
 `Directory.disk_usage()` calls `disk_usage()` on each entry,
 whether the entry is a `File` or another `Directory`.
-The demo's first `print()` makes that one call on the whole tree,
-on the `src` subtree, and on a lone file.
+The demo makes that same call on the whole tree, on the `src` subtree,
+and on a lone file.
 
 Adding a node type is one class.
 A plugin writes it and edits nothing above it.
@@ -252,7 +252,7 @@ A `Path` is an immutable value that names a location and holds no entries.
 The tree lives in the operating system's filesystem.
 `iterdir()` asks the OS for the children each time you call it.
 The caller must add up any result over that tree, as `disk_usage()` does.
-On a directory, `stat().st_size` reports the size of the directory entry rather than the size of its contents,
+On a directory, `stat().st_size` reports the size of the directory itself rather than the size of its contents,
 so you add up the sizes yourself:
 
 ```python
@@ -554,7 +554,7 @@ from the same `2 * x + 1`:
 Side by side, the two walks share their shape.
 Each makes one call per node, leaf or group.
 The call for each node returns its result to the call for that node's parent.
-Only the value a node returns differs,
+Only the value each call returns differs,
 an `int` in one walk and a `str` in the other.
 The tree holds the structure.
 Each walker supplies the meaning, so a new operation is one more walker.
@@ -731,10 +731,10 @@ A machine-generated chain of thousands of nested nodes exceeds the limit.
 The alternative is an iterative walk with an explicit stack of pending nodes
 (see exercise 8).
 
-The walkers also assume that each node has one parent.
-`expr.py` lets two parents share a node.
+The walkers also assume that each node appears at one place in the tree.
+`expr.py` lets one node appear at several.
 After `s = x + 1`, the `Mul` that `s * s` builds holds the same `s` twice,
-so `evaluate()` walks `s` once for each parent.
+so `evaluate()` walks `s` twice.
 A dependency graph shares nodes as a rule.
 Several build targets depend on one library,
 so a recursive walk from each target builds that library again.
