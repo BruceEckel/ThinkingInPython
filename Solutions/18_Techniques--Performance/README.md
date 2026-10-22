@@ -572,7 +572,7 @@ That agreement is an artifact of the example's size.
 In a real program `set_events()` reports every Python function the process runs,
 so library code fills the `Counter` beside your own functions,
 and the callback runs on every call to each of those functions.
-Local attachment names the code objects you care about
+Local attachment specifies the code objects you care about
 and leaves the rest running at full speed.
 Global monitoring answers "what ran."
 Local monitoring answers "how often did this run,"
@@ -827,9 +827,9 @@ The absolute time shrinks.
 At 100 short strings both versions finish in a couple of microseconds,
 so `build_join()` and `build_concat()` must run thousands of times before the choice shows up in a profile.
 
-The difference therefore stops mattering once both versions run fast enough
+The difference therefore stops mattering when both versions run fast enough
 that the gap falls below anything you would measure,
-not once the two run equally fast.
+not when the two run equally fast.
 
 Write `join()` at either size.
 It is one line instead of three,
@@ -917,8 +917,8 @@ or an `IndexError` when the target is the largest element in the list.
 **Recover the whole run.** `left` and `right` together answer a third question, one the chapter leaves unasked.
 `xs[left:right]` is the run of equal values,
 and `right - left` counts them.
-Finding the two bounds takes O(log n) with no scan;
-the slice then copies the k values it names.
+Finding the two bounds takes O(log n) with no scan.
+The slice then copies the k values between them.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -963,7 +963,7 @@ print(sys._jit.is_available(), sys._jit.is_enabled())
 The listing carries no `#:` line, because its output depends on the interpreter.
 The book's build prints `False False`.
 
-The two flags name the state.
+The two flags identify the state.
 `False False` means the build has no JIT compiled in, so `PYTHON_JIT` does nothing.
 The python.org Windows and macOS builds report `True False`,
 because python.org compiles them with `--enable-experimental-jit=yes-off`.

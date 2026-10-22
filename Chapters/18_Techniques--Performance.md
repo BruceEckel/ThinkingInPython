@@ -565,7 +565,7 @@ The documentation warns against branching on its result,
 since a tracing compiler can give different answers to the same call.
 
 The speedup is again a percentage,
-and on Windows it is smaller than the tail-calling interpreter's speedup.
+and a smaller one than the tail-calling interpreter's 15-20% on Windows.
 On the `pyperformance` suite,
 3.15 measures 7-8% faster on x86-64 Linux against the standard optimized build,
 and 11-12% faster on AArch64 macOS against the tail-calling interpreter.
@@ -840,7 +840,7 @@ print(values)  # Neither call reorders its argument
 After `heapify()` the smallest element sits at index 0.
 `nsmallest()` and `nlargest()` answer top-N questions on any list and leave its order as it was.
 
-Through Python 3.13, `heapq` built min-heaps.
+Through Python 3.13, `heapq` built only min-heaps.
 Getting a max-heap meant negating every value going in and out.
 Python 3.14 added `_max` variants that keep the largest item at index 0:
 `heapify_max()`, `heappush_max()`, `heappop_max()`, and others.
@@ -1108,7 +1108,7 @@ A smaller instance means fewer bytes for the allocator and garbage collector to 
 more instances fitting in the CPU cache at once, and,
 for `__slots__` specifically,
 attribute access through a known offset instead of a `__dict__` lookup.
-Three tools reduce per-object overhead,
+Slots and `array` reduce per-object overhead, `memoryview` avoids copies,
 and the byte counts below show what each tool saves.
 Multiply by a population in the millions to see why it matters.
 
@@ -1467,7 +1467,8 @@ with expected(TypeError):
 ```
 
 `payload` is a second `memoryview`, not a copy of `data`.
-`payload.obj` names the buffer from which it reads, and that buffer is `data`.
+`payload.obj` refers to the buffer from which it reads,
+and that buffer is `data`.
 
 Sharing the buffer is also the trap.
 `memoryview(data)` keeps an export open on `data` for as long as `view` stays alive.
@@ -1483,7 +1484,7 @@ A `memoryview` over immutable `bytes` supports reading and slicing,
 but writing through it raises a `TypeError` regardless of whether anything else has it open.
 `memory_view.py` above writes through a view of a `bytearray`, which is mutable.
 
-The saving shows up clearly in a million-byte buffer:
+A view's own size stays fixed however much of the buffer it covers:
 
 ```python
 # memory_view_size.py
