@@ -408,7 +408,7 @@ When `first` drains while `second` waits,
 the buffer therefore holds the whole stream.
 That buffer uses as much memory as a list,
 and the `buffered.current > listed.current * 0.9` comparison confirms it
-(one machine measured 4,096,992 bytes buffered against 3,999,904 for the list).
+(one machine measured 4,096,384 bytes buffered against 4,000,672 for the list).
 The last block advances `first2` and `second2` together,
 one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 That gap stays near zero,
@@ -515,7 +515,7 @@ def test_flatten(
 
 The standard library's `itertools` module contains the generic iterator algorithms `chain()`,
 `islice()`, `groupby()`, `takewhile()`, and more.
-Each of these consumes and produces iterators.
+Each of these consumes iterables and produces iterators.
 Combine them with [generator expressions](16_Techniques--Comprehensions.md#generator-expressions)
 such as `(x * x for x in data if x > 0)` to build pipelines that stay lazy end to end.
 Each stage pulls one item at a time,

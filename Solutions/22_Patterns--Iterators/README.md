@@ -684,7 +684,7 @@ print(len(endless.seen))
 #: 50000
 ```
 
-**Match by methods, not by base.** `traverse()` needs no change, because its parameter names the
+**Match by methods, not by base.** `traverse()` needs no change, because its parameter specifies the
 `GoFIterator` protocol rather than a class. `OverSequence` and
 `OverStream` share no base class, and neither names the protocol.
 Defining the protocol's four methods satisfies it.
@@ -700,7 +700,7 @@ After 50,000 steps `seen` holds 50,000 items, and after a million steps it holds
 `first()` works only if every value stays reachable, so supporting it
 on an endless source takes unbounded memory.
 Python's iterator protocol has no `first()`,
-so `itertools.count()` holds one number, the next value it returns.
+so `itertools.count()` holds two numbers, the next value it returns and the step.
 Iterating over `count()` takes constant memory.
 Rewinding it is impossible.
 
@@ -875,7 +875,7 @@ You can say which line of `flatten_loop()` changes.
 If you add `str` to the `isinstance()` test but leave the return type as `Iterator[int]`,
 the program prints the same lists,
 and `ty` reports an `invalid-yield` at `yield item`, whose type is now `int | str`.
-The solution widens the return type with the test, so the annotation names every kind of leaf the function yields.
+The solution widens the return type with the test, so the annotation declares every kind of leaf the function yields.
 
 ```python
 # exercise_9.py
