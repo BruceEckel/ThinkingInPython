@@ -130,7 +130,7 @@ print("still running")
 #: still running
 ```
 
-The release fails.
+`Resource.__del__()` raises a `RuntimeError`, so the release fails.
 Nothing printed to stdout reports the failure.
 Python prints a traceback to `sys.stderr`, labeled `Exception ignored`,
 and discards the exception.
@@ -358,7 +358,7 @@ A variable, a list slot, or an attribute holds a *strong reference*,
 which keeps its object alive.
 
 The callback receives `name`, not the `Connection`,
-so registering the cleanup leaves the `Connection`'s lifetime as it was.
+so the registered cleanup adds no strong reference to the `Connection`.
 `finalize(self, self.close)` looks tidier, but it gives the callback the object.
 The bound method holds a strong reference to the object,
 so the object survives until the program ends.
@@ -419,7 +419,7 @@ Reference counting reclaims it there, before `gc.collect()` runs.
 A bound method is a small object that stores its instance in its `__self__` attribute,
 so whatever holds `self.close` holds `Leaky` through it.
 A lambda that uses `self`, such as `lambda: print(self.name, "closed")`,
-holds the object the same way.
+holds the object through its closure.
 
 `Leaky` prints nothing, since its callback is waiting in the registry.
 No error reports the leak.
@@ -579,9 +579,11 @@ When an open file loses its last reference, Python finalizes the file.
 The file's `__del__()` closes it and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
 On CPython `del f` is that moment.
-The `gc.collect()` call covers an implementation that waits for its collector.
+On an implementation that reclaims the file only when its collector runs,
+the `gc.collect()` call runs that collector before the `print()`.
 
-The diagnostic backstop exists to catch the mistake, not to be the plan.
+The diagnostic backstop exists to report a file left open,
+not to replace `close()`.
 It depends on Python reclaiming the object.
 A reference cycle defers that collection until the cyclic collector runs,
 or until interpreter shutdown if `gc.disable()` has stopped the collector.
