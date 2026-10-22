@@ -625,7 +625,7 @@ line carries a `# type: ignore` because the listing makes the
 assignment on purpose, to show the runtime exception.
 
 **Find the limit of immutability.** A `frozendict` freezes
-the objects to which it maps its keys, not what those objects contain.
+the value under each key, not what those values contain.
 To hash `nested`, `hash()` must hash its `list` value, and hashing a `list` raises a `TypeError`.
 The immutability is shallow, as it is for the `tuple` in `shallow_immutability.py`.
 Because a `frozendict` is hashable when its values are,

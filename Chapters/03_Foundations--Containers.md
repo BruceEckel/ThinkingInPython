@@ -379,7 +379,7 @@ from the newest entry back to the oldest.
 
 `collections.OrderedDict`, added in Python 3.1,
 kept insertion order before `dict` did.
-It keeps two features that `dict` lacks.
+`dict` still lacks two of its features.
 Two `OrderedDict`s compare equal when they hold the same entries in the same order,
 where `dict` equality ignores order.
 `move_to_end()` moves a key to either end,
@@ -891,8 +891,7 @@ binary search in a sorted `list` (`bisect`), and a heap-backed priority queue
 Each of the three built-in mutable containers has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
 Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
-completes the trio: a built-in,
-hashable mapping that rejects changes after creation.
+completes the trio: a built-in mapping that rejects changes after creation.
 
 A `frozenset` is hashable, so it can be a set member or a dictionary key.
 A `list` or a `set` is unhashable, so it can be neither.
