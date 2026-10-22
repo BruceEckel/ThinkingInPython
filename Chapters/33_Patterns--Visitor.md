@@ -9,7 +9,7 @@ People can confuse the two by looking at the implementation rather than the inte
 *Visitor* assumes you have a primary class hierarchy you cannot change,
 perhaps because it comes from another vendor.
 You'd like to add new polymorphic methods to it,
-which normally means adding something to the base class interface.
+which normally means declaring them in the base class interface.
 How do you add them from outside the base class?
 
 ## The Classic Visitor
@@ -171,7 +171,7 @@ that declares `visit()` removes the `Any`:
 to show what the `Any` gives up: every check on the visitor side.
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
 In [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods),
-the `Any` in `paper_scissors_rock.py` lets a class that omits an `eval_*()` method pass the checker the same way.
+the `Any` in `paper_scissors_rock.py` lets a class that omits an `eval_*()` method pass the checker and raise an `AttributeError` at runtime.
 The `Any` in `accept()` is a choice,
 unlike the one in [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger),
 where a bag of attributes named at runtime leaves no precise type to write.
@@ -295,7 +295,7 @@ the one stored under `object`.
 
 A new `Flower` subclass gets the default answer until someone registers it.
 Both the runtime and the checker accept the `nectar()` call on that subclass,
-so a forgotten registration produces a wrong result rather than a failure.
+so a forgotten registration returns the default's `no nectar` string and raises no exception.
 
 The default also accepts arguments outside `Flower`.
 Because the default sits under `object`,
@@ -317,7 +317,7 @@ Under `@singledispatch`, adding a new operation is a new function.
 Adding a new flower is a class,
 plus one registration for each operation whose default answer is wrong for it.
 
-When the operation should read like a method,
+When the operation should be a method of a class,
 use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 instead.
 `singledispatchmethod` dispatches on the first argument after `self`.
@@ -410,8 +410,8 @@ if __name__ == "__main__":
 ```
 
 The recursion works because `Corsage` and `Flower` both define `accept()`.
-The loop in `Corsage.accept()` calls `accept()` on each element the same way,
-whether the element is a flower or another corsage.
+The loop in `Corsage.accept()` makes the same call, `element.accept(visitor)`,
+on each element, whether the element is a flower or another corsage.
 The `Accepts` protocol declares that shared method,
 so the type checker reports an element that lacks `accept()`,
 such as `Corsage("rose")`, before the program runs.

@@ -8,7 +8,8 @@
 Recall [*State*](25_Patterns--Surrogate.md#state):
 a surrogate forwards calls to one of several implementations,
 and the client programmer chooses an implementation.
-*State Machine* adds a structure that makes the switch from one implementation to the next.
+*State Machine* adds transitions,
+which choose the next implementation from the current state and an input.
 The system behaves differently as it moves from state to state.
 
 You call `run()` on a state to perform its behavior.
@@ -54,7 +55,7 @@ and each machine's transition functions declare the input type they accept.
 This is a *Moore machine*, where what a state does depends on the state alone.
 `run()` calls `self.action()` with no arguments.
 `action` defaults to a do-nothing function.
-A state that needs additional behavior supplies an `action` as the third constructor argument.
+A state that does more than print its message supplies an `action` as the third constructor argument.
 
 `self.action()` has the form of a method call.
 In a method call, Python passes `self` automatically as the first argument.
@@ -145,7 +146,7 @@ def holding(input_: Mouse) -> TrapState:
             return TrapState.HOLDING
 ```
 
-Each transition function contains a `case` for every input that matters to its state,
+Each transition function contains a `case` for every input that moves the trap out of its state,
 and produces the state the trap enters next.
 The default `case _` returns the current state, so the state stays the same.
 The four functions use `TrapState` before the file defines it.
@@ -207,7 +208,8 @@ def run_all[I](machine: StateMachine[I],
 then calls `run()` on the new state, the one the machine has just entered.
 `run()` is an entry action:
 each transition arrives in a state and calls that state's `run()`.
-The constructor calls the initial state's `run()` for the same reason.
+The constructor calls the initial state's `run()`,
+because constructing the machine enters that state.
 
 `run_all()` is a convenience function that feeds an iterable of inputs to the machine.
 
@@ -296,7 +298,7 @@ so the test covers a new member of `TrapState` as soon as it exists.
 The first design, [Each State Decides](#each-state-decides),
 keeps each state's transitions with that state, in its `next` function.
 A fully table-driven design represents the entire machine as a single transition table.
-All the behavior is then in one place,
+Every transition, with its condition and its action, is then in one place,
 so you can build and maintain the table from a state-transition diagram.
 The example is a vending machine, built in two steps: a general-purpose engine,
 then the vending machine's table.
@@ -596,14 +598,14 @@ If you pair `Column` with `choose_row()`, written for a `Row`,
 `refund()` accepts `object`, so it pairs with any input type.
 
 The listing binds the list to `rules`, with no annotation, before the call,
-and that binding keeps the check alive.
+and that binding leaves each `Rule(...)` to infer its `I` from its own arguments.
 If you write the list inline as the argument,
 the parameter's `Sequence[Rule[Any]]` becomes its expected type.
 That `Any` reaches into every `Rule(...)` and makes its `I` `Any`,
 so the checker accepts any method on any rule.
 The `Column`/`choose_row()` mismatch above then passes the checker.
 At runtime `choose_row()` stores a `Column` in `self.row`,
-so the machine carries on with a wrong selection.
+and `_slot()` then uses that column's `value` as the row index.
 
 Adding a state or an input is now a local change:
 a rule in the list and a method or two.
@@ -672,8 +674,8 @@ so the engine takes that rule and reports `COLLECTING`,
 as though more money would sell a sold-out item.
 If you swap the rule order, the same input reports `UNAVAILABLE`.
 By the engine's [ordering rule](#the-engine),
-the first rule whose condition passes wins,
-whether or not a later rule matters more.
+the first rule whose condition passes wins, even when a later rule,
+here the `sold_out()` rule, also passes.
 
 ### Testing the Vending Machine
 
@@ -756,7 +758,7 @@ That is the Moore shape: the action belongs to the state.
 The second design, the [Table-Driven *State Machine*](#table-driven-state-machine),
 suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
-Everything is in one table, in the same order as the diagram.
+Every transition is a rule in one table, in the same order as the diagram.
 Adding a state or an input is a rule in the list and a method or two.
 
 In the first design a member is also a `State` record with an `action` field.

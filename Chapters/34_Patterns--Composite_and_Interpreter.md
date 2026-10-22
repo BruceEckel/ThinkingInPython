@@ -153,7 +153,7 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
 `Node` is a *recursive* union.
 `Directory` holds a `tuple[Node, ...]`,
 so the alias names itself through one of its own members.
-That self-reference makes the tree a tree.
+That self-reference lets a `Directory` hold other directories to any depth.
 
 `Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement)
 that defines `Node`.
@@ -186,14 +186,14 @@ including the `assert_never()` in each `case _`.
 `walk()` is a generator, so traversing a composite is lazy.
 The [`yield from`](22_Patterns--Iterators.md#delegating-with-yield-from)
 flattens the recursion into a single stream of paths.
-Any consumer of that stream stays decoupled from the tree structure.
+A consumer of that stream receives path strings and needs no case for `File` or `Directory`.
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
 A `list` there leaves the tree mutable.
 A record freezes the binding of the field.
 As [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates, a list in that field keeps its `append()`.
-With the tuple, sharing a subtree is safe.
+With the tuple, two trees can share a subtree, and neither can change it.
 
 The test file confirms that:
 
@@ -726,7 +726,7 @@ operator methods that build nodes, and `match` functions that walk them.
 
 Every function here recurses once per level of tree.
 Python's default recursion limit of 1000 frames therefore caps how deep a tree these functions can walk.
-Realistic expressions stay far below it.
+A hand-written expression nests a few levels deep.
 A machine-generated chain of thousands of nested nodes exceeds the limit.
 The alternative is an iterative walk with an explicit stack of pending nodes
 (see exercise 8).
@@ -858,7 +858,8 @@ The `else` paired with `isinstance(piece, Interpolation)` is the `str` case.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure that mentions neither of them.
-Adding a third leaves the existing code as it was.
+A third operation is one more function,
+and neither `Template` nor the two existing functions change.
 
 `outer` interpolates `inner`, another `Template`, rather than a plain value.
 `to_query()` checks for that case and recurses,

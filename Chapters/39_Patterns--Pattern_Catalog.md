@@ -268,7 +268,7 @@ built on the operating system's I/O completion ports.
 
 Several entries above are in the catalog because the literature documents them,
 not because you need to write them.
-Python includes the piece their inventors set out to supply.
+For each of them, Python provides a language feature or a standard-library tool in place of the classes the pattern describes.
 
 | Pattern | What Python gives you instead |
 |---------|------------------------------|

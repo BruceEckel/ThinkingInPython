@@ -9,7 +9,7 @@ You want to say `Number + Number`, `Number * Number`, etc.,
 where `Number` is the base class for a family of numerical objects.
 But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,
-how can you get them to interact properly?
+how does the code choose the operation that fits both types?
 
 Python dispatches on one type at a time.
 When two objects of unknown type interact,
@@ -204,7 +204,9 @@ but the declaration repeats every class's method names.
 In `paper_scissors_rock.py`,
 each `Item` type encodes the answers for its own combinations.
 Together the answers form a table spread across the classes.
-That table is hard to maintain if you expect to modify the behavior or to add a new `Item` class.
+That table is hard to maintain.
+Changing who wins one pairing means editing two methods in two classes,
+and a new `Item` class needs a new method in every existing class.
 Making the table explicit puts all nine answers in one place:
 
 ```python
@@ -317,8 +319,8 @@ Adding a new `Item` then means adding rows to the table and leaving the classes 
 `singledispatch` resolves through the MRO,
 so a function registered for a base class serves every subclass.
 The table matches the class exactly.
-Swapping one for the other changes which pairings the code covers,
-as well as how many types it considers.
+Swapping one for the other changes whether a subclass gets its base class's answer,
+as well as how many types the dispatch reads.
 
 ### `match` with Class Patterns
 
@@ -372,7 +374,8 @@ That is the pair of dispatches the `eval_*()` family writes out by hand.
 `singledispatchmethod` matches on the MRO, like `singledispatch`,
 rather than exactly.
 
-One mistake runs cleanly and prints a plausible answer.
+One mistake raises no exception,
+and `Paper().compete(Rock())` prints the answer registered through `Rock.compete`.
 A `@singledispatchmethod` declared on a shared base is one dispatcher that every subclass inherits.
 Because resolving `self` finds that same dispatcher for every subclass,
 each class needs its own `@singledispatchmethod`.
@@ -430,7 +433,8 @@ and `eval_rock()` on every class.
 It comes from languages where a table keyed by a pair of types is awkward to write.
 There, spreading the table across the classes is the easier form.
 A Python `dict` takes a tuple of classes as a key,
-so the table is both shorter and easier to maintain.
+so the table version is shorter,
+and adding a class means adding rows to one dictionary.
 A table cell can hold a function, so even elaborate behavior fits the table
 (see exercise 9).
 
@@ -486,7 +490,8 @@ Editing `Paper`'s rows changes the game for every `Paper`.
 
 ## Testing Both Versions
 
-The win/lose/draw result is pure logic, so tests validate it easily.
+Each win/lose/draw result depends on the two types alone,
+so a test creates two items, calls `compete()`, and compares the `Outcome`.
 The spread-out method version and the table version must return the same `Outcome` for each of the nine combinations.
 If they diverge, one of them has a bug.
 

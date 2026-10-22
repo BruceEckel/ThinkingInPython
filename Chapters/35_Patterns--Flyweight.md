@@ -16,7 +16,7 @@ First, split each object's state in two.
 *Intrinsic state* belongs to the value and is identical across every use,
 so it can live in the shared object.
 *Extrinsic state* varies per use, so it must live outside,
-where the context supplies it.
+where each use supplies it.
 Second, construct every object through a factory that returns the existing instance for a given value.
 
 Sharing one object under many names is safe when the object stays the same for everyone,
@@ -76,13 +76,14 @@ and for interned strings, equal means identical.
 
 The small-integer cache and string interning are CPython implementation details,
 not language guarantees.
-Write code that works on any Python implementation, but notice the technique.
+Write code that works on any Python implementation,
+but notice that both keep one shared object per distinct value.
 
 ## Intrinsic and Extrinsic State
 
 A map can hold millions of cells, but only a handful of tile kinds.
 Here, the handful is grass, water, and rock.
-A first design gives each cell everything it knows about itself,
+A first design stores every attribute of a cell in the cell's own object,
 its position included:
 
 ```python
@@ -212,7 +213,8 @@ with the asker supplying the coordinates.
 `Symbol` lists the closed set of valid map characters,
 so `Tile.symbol` and every key of `SPECS` must be one of those characters.
 If you add a kind to `SPECS` and leave `Symbol` as it is,
-the type checker rejects the mismatch.
+the type checker rejects the `SPECS` assignment,
+because the new key is not a `Symbol`.
 
 `tile()` declares its parameter a `Symbol`,
 but callers call the wrapper that `@cache` returns.
@@ -304,8 +306,8 @@ Step 4 shows a construction that goes around the factory.
 A `Tile` built by a direct call equals the shared tile but is a separate object.
 
 The memory saving and every `is` comparison depend on that sameness.
-A factory that evicts an entry and builds a replacement breaks the pattern,
-whereas a cache that evicts an entry runs slower and stays correct.
+A factory that evicts an entry and builds a replacement leaves two uses of one value holding two objects,
+whereas a cache that evicts an entry runs slower and returns equal results.
 
 ## Interning in the Constructor
 
@@ -392,7 +394,7 @@ Every `Color(...)` call looks in the pool first,
 so two `Color`s with the same components are the same object and `is` returns the same result as `==`.
 The bookkeeping exists for that guarantee, or for the constructor syntax.
 When you need neither,
-the `@cache` factory from `tile_map.py` does the same job.
+a `@cache` factory like `tile_map.py`'s `tile()` shares one object per value with no `__new__()`.
 
 One more hazard from [*Singleton*](23_Patterns--Singleton.md#the-first-call-race)'s cached factory applies here.
 Every lazy check-then-insert pool races under threads.
@@ -465,7 +467,8 @@ CPython's reference counting frees the object,
 and the weak reference's callback removes the pool entry.
 The pool guarantees sharing.
 Each object lives as long as a reference outside the pool holds it.
-`sys.intern()` follows the same design.
+`sys.intern()`'s pool works the same way.
+Its entries keep no interned string alive.
 
 *Flyweight* cuts the number of objects,
 and [`slots=True`](18_Techniques--Performance.md#slots)
