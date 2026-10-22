@@ -215,7 +215,8 @@ The usual alternative constructor is a `@classmethod` like `from_fahrenheit()`,
 which computes the constructor's arguments and ends with `return cls(...)`.
 That form is the most common factory.
 The standard library's `dict.fromkeys()` and `datetime.fromisoformat()` are two examples.
-The `@classmethod` form chooses arguments rather than a class,
+The `@classmethod` form chooses arguments rather than a class.
+`cls` is whichever class receives the call,
 so a subclass that calls the inherited method gets an instance of the subclass.
 
 An `Enum` makes its constructor a factory over a closed set.
@@ -567,6 +568,7 @@ Keeping the table in the factory removes two hazards from [Hazards of Self Regis
 The table belongs to `make` rather than to a class in the hierarchy,
 so no `cls.registry` lookup walks the MRO.
 No shape class carries a `make()` that a call like `Circle.make("Square")` could misuse.
+
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,
 an abstract `Polygon` between `Shape` and `Triangle` registers as well,
@@ -764,7 +766,7 @@ and the reason the pattern takes its name from a method rather than a class.
 *Factory Method* adds a second hierarchy.
 Each product needs a factory that produces it,
 so the two hierarchies grow together.
-The second hierarchy is worth having only when the factory does work of its own,
+The second hierarchy is justified only when the factory does work of its own,
 as `render()` does here.
 When choosing the class is the factory's only job,
 a dictionary of classes says the same thing in one table:
@@ -1235,7 +1237,7 @@ print(family)
 
 Every combination of settings is a single call.
 The call site names each option just as the chain does.
-The fields declare the defaults, where the builder needed a second class.
+The fields declare the defaults, where the builder needs a second class.
 
 A second use for builder chains is to vary an existing configuration.
 For a [record](18_Techniques--Performance.md#record),
