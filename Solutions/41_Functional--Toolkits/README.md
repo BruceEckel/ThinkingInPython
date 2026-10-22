@@ -329,7 +329,7 @@ It also holds a finite source entirely in memory.
 because it yields each group as the group arrives and keeps only the current one.
 `sorted()` makes `groupby()` safe, but `sorted()` holds the whole input in memory too,
 and it adds the sort.
-Whenever the input fits in memory, `grouped()` is the better answer.
+Whenever the input fits in memory, `grouped()` is a better choice.
 
 `grouped()` also loses the input's order. `groupby()` reports groups
 as they occur, while `grouped()` reports them in first-appearance

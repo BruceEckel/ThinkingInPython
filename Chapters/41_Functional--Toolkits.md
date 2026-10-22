@@ -341,7 +341,7 @@ The rule compares two strings at a time,
 so where `"3"` belongs depends on the string beside it.
 A per-element key for this order is hard to find.
 The comparator states the rule.
-When a key function exists, it is the better choice,
+When a key function exists, it is a better choice,
 as in `sorted(words, key=len, reverse=True)`, which orders words by length.
 `cmp_to_key()` is for a comparator that arrives from older code,
 and for an ordering like this one,
@@ -837,8 +837,8 @@ print(list(product("AB", [1, 2])))
 Unlike the tools above,
 `product()` reads its inputs completely before yielding its first tuple,
 so every input must be finite.
-`product(count(1), "AB")` runs forever,
-because the call tries to read all of `count(1)`, an infinite input.
+`product(count(1), "AB")` reads the infinite `count(1)` until memory runs out,
+so it yields no tuple.
 
 ### `permutations` and `combinations` {#permutations-and-combinations}
 
