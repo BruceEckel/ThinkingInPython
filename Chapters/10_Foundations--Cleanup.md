@@ -53,7 +53,8 @@ when it tears down the global `counters` list.
 That list holds the only remaining references,
 so destroying the list drops each `Counter`'s reference count to zero,
 and Python destroys each `Counter` in turn.
-The listing ends at `End of delete loop`, the program's last statement.
+The listing's markers end at `End of delete loop`,
+which the program's last statement prints.
 Each `__del__()` prints afterward.
 If you run `cleanup.py` as a standalone program,
 three more lines follow `End of delete loop`:
@@ -211,7 +212,8 @@ Two approaches are more reliable than `__del__()`.
 
 The first is an explicit cleanup method,
 such as the `close()` that file objects provide,
-which a [`with` block](04_Foundations--Control_Flow.md#context-managers) calls.
+which a [`with` block](04_Foundations--Control_Flow.md#context-managers)
+runs as the block ends.
 Here a class supplies the two methods that `with` calls.
 `close()` runs whether or not an error interrupts the block:
 
@@ -580,7 +582,7 @@ On CPython `del f` is that moment.
 The `gc.collect()` call covers an implementation that waits for its collector.
 
 The diagnostic backstop exists to catch the mistake, not to be the plan.
-It depends on the collector reclaiming the object.
+It depends on Python reclaiming the object.
 A reference cycle defers that collection until the cyclic collector runs,
 or until interpreter shutdown if `gc.disable()` has stopped the collector.
 
