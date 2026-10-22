@@ -56,7 +56,7 @@ This is a *Moore machine*, where what a state does depends on the state alone.
 `action` defaults to a do-nothing function.
 A state that needs additional behavior supplies an `action` as the third constructor argument.
 
-Note that the form of `self.action()` looks like a method call.
+`self.action()` has the form of a method call.
 In a method call, Python passes `self` automatically as the first argument.
 However, Python supplies `self` only when the lookup finds the function on the class.
 Here, `next` and `action` are references to external (non-method) functions.
@@ -180,8 +180,7 @@ with `message` and `next` as attributes.
 which sounds when the trap catches a mouse.
 
 The `StateMachine` holds the current state and advances it on each input.
-This is the *State* pattern combined with automated transitions,
-producing *State Machine*:
+The *State* pattern combined with automated transitions is *State Machine*:
 
 ```python
 # state_machine.py
@@ -221,8 +220,7 @@ Every state prints its message, and `Holding` also calls `chime()`.
 `step()` defines the flow,
 while each `State`'s fields supply the varying behavior.
 `next` chooses the next state,
-and `action` holds the behavior particular to one state,
-such as `Holding`'s chime.
+and `action` holds the behavior particular to one state.
 
 `trap_states_demo.py` runs a trap through every move in `MOVES`,
 then feeds a fresh trap an input that only matches `waiting()`'s `case _`:
@@ -265,8 +263,8 @@ trap.step(Mouse.ESCAPES)
 #: Broadcasting cheese smell
 ```
 
-`StateMachine`'s constructor runs the initial state,
-so constructing the machine starts the engine.
+Each `StateMachine(TrapState.WAITING)` call prints `Broadcasting cheese smell` before any input arrives,
+because the constructor runs the initial state.
 
 `test_trap_states.py` checks two facts:
 the nine moves bring the trap back to `Waiting`, as the trace shows,

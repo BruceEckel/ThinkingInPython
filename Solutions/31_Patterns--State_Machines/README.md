@@ -332,7 +332,6 @@ Exercise 1's `UnpredictablePerson` accepts any object with a `hello()`, so the s
 Exercise 1's classes can carry that state per instance, and a mood whose behavior needs more than a message, a successor, and an action is a class in either design.
 
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood` object through `change_to()`, this machine reaches the same moods by returning the next member from a transition function.
-Both model a thing that changes behavior over time.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1210,10 +1209,10 @@ two-rule groups. A reading still outside the band keeps the system
 running, and one inside the band falls through to the unconditional
 rule back to `IDLE`.
 
-Every
-decision in the machine is a condition on the one input type. Every
-rule here keeps the default `None` action, and the fall-through rules
-keep the default `None` condition too, so both fields are optional per rule.
+Every decision in the machine is a condition on the one input type.
+Every rule here keeps the default `None` action, and the fall-through
+rules keep the default `None` condition too, so both fields are
+optional per rule.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
