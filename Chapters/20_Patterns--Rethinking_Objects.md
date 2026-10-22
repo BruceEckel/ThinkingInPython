@@ -344,7 +344,7 @@ expect(TypeError, hash, fl)
 
 Frozen guards the binding, not the object.
 `fl.numbers` must keep pointing at the same list,
-and attempting to rebind it raises an exception.
+and rebinding it raises a `FrozenInstanceError`.
 But the list stays mutable, so `FrozenLeaky` leaks the same way `Leaky` does.
 
 The same list field makes the instance unhashable.
@@ -359,7 +359,7 @@ A second reason survives freezing: representation hiding,
 which lets the internal type change later while callers keep working.
 A public frozen field gives up that protection.
 If you later swap `numbers` from a `tuple` to some other sequence,
-every caller that named `tuple` breaks.
+every caller that relies on `numbers` being a `tuple` breaks.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#immutability)
 makes the fuller case for frozen data classes.

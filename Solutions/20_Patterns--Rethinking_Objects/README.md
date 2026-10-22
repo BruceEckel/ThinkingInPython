@@ -362,11 +362,10 @@ info:     └── incompatible return types: `Weight` is not assignable to `Pr
 The comment lets the listing pass the book's type check while the call
 still runs and prints `4.5`.
 
-**Give each meaning its own type.** At runtime, `Package` still matches
-the shape of `Priced`. `Package.total()` takes no arguments and returns
-a float, as before. The two `NewType` declarations make the two return
-types distinct, so the type checker now rejects a weight where `Priced`
-declares a price.
+**Give each meaning its own type.** `Package.total()` still takes no
+arguments and returns the same float at runtime. The two `NewType`
+declarations make the two return types distinct, so the type checker
+now rejects a weight where `Priced` declares a price.
 
 If someone deletes the annotations, the program behaves as it does
 now. It prints `4.5` and charges the customer for a number of kilograms.
