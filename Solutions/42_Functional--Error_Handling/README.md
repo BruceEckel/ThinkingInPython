@@ -627,7 +627,6 @@ result that has something to explain.
 **Report without a traceback.** The second and third runs name a different setting and a different text in their notes.
 The `Err` holds the exception, and the exception holds the note as ordinary data,
 so `report()` prints the note from that data after `load_setting()` has returned.
-The run prints no traceback.
 The exception keeps its `__traceback__`,
 but `load_setting()` returns the exception inside an `Err`,
 so it never propagates to the top-level handler that prints a traceback.
