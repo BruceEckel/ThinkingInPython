@@ -136,8 +136,6 @@ If you mistakenly annotate the generator in `interview_generator.py` as `Generat
 - `question1`, `question2`,
   and `question3` receive an `Answer` where their declarations say `Question`.
 
-`Generator[str, str, str]` accepts the reversal.
-
 `next(conversation)` starts the generator and produces a `Question`.
 `conversation.send(Answer("Alice"))` provides an answer and produces the next question.
 The last `send()` resumes the body,
@@ -169,7 +167,8 @@ The frame holds them, and the frame is the generator's state.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
-The first call must therefore be `next()` or `send(None)`.
+The first call, which runs the body to its first `yield`,
+*primes* the generator, and it must be `next()` or `send(None)`.
 `conversation.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 `next(conversation)` is equivalent to `conversation.send(None)`:
@@ -190,9 +189,11 @@ so both lines start from the beginning and produce the first question.
 The `# type: ignore` marks a real mismatch.
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
-The interpreter accepts the priming `send()`, but the type checker rejects it.
-The annotation applies one `SendType` to every call, the first included.
-A driver therefore primes with `next()`.
+The interpreter accepts `send(None)` as the priming call,
+but the type checker rejects it,
+because the annotation applies one `SendType` to every call, the first included.
+A driver therefore primes with `next()`,
+which sends no value and passes the check.
 
 ## A Generator Is a Description
 
