@@ -422,9 +422,9 @@ define the operation. `recycling_note()` is now a method you call as
 The method form matters if `Sorter` holds state of its own alongside the dispatch:
 a log of notes issued, a configuration, statistics.
 When `Sorter` holds only the dispatch, as here, the function in
-`recycling_note.py`
-is simpler and does the same job. Use `singledispatchmethod` when the
-operation needs to read or update an object's state.
+`recycling_note.py` is simpler and does the same job. Use
+`singledispatchmethod` when the operation needs to read or update an
+object's state.
 
 The method form also brings the trap that
 [*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#the-singledispatchmethod-trap)
@@ -738,8 +738,6 @@ If you register `Aluminum` for `strict_hazard()` and skip `Paper`,
 The program stops before it reaches the plastic.
 The strict base function raises an exception for every unregistered type,
 including a harmless one like `Paper`, whose answer is `"none"`.
-The solution registers `Paper` to return `"none"`,
-and that registration settles the exercise's last question.
 
 **Fall back to a default answer.** `hazard()` returns `"none"` for
 the plastic. That answer is wrong and looks like every correct
