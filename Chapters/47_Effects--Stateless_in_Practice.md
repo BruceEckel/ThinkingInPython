@@ -337,7 +337,7 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 so `stamp()` produces a known string a test can compare.
 `tomorrow` reports a moment a day later,
 so `batch_due()` returns `True` at once.
-The schedule logic runs against the moment the handler names, in microseconds.
+`batch_due()` subtracts `last_run` from the moment the handler names and finishes in microseconds.
 `batch_due()` holds no `datetime.now()` call,
 so a test names the moment outright.
 A production handler that returns `datetime.now()` runs the same function.
@@ -548,7 +548,9 @@ The request carries the hour so the handler can check which sources are availabl
 
 `Source` carries no `@runtime_checkable`,
 because nothing calls `isinstance()` against it.
-That decorator matters where `supply()` [matches an instance to a requested class](46_Effects--Stateless.md#supplying-an-interface).
+`supply()` needs that decorator,
+because it [matches an instance to a requested class](46_Effects--Stateless.md#supplying-an-interface)
+with `isinstance()`.
 Here `handle()` matches on the Ability's own type, `Outlet`.
 The `Source` that comes back is only a return value.
 
@@ -700,7 +702,7 @@ and that type appears once.
 The object answering the need changes:
 four objects in turn during the first run.
 A dependency bound before the program starts gives one answer for the whole run.
-Here the right answer changes with the hour.
+Here the source that can supply the load changes with the hour.
 In `microgrid.py` the binding is a call to `choose()`,
 which checks each source's `available()` at each request.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
@@ -774,8 +776,8 @@ def ledger(cell: Cell) -> tuple[
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
 `Put` has `Tell`'s shape: payload out, nothing back.
 `purchase()` uses both.
-It reads, decides, and writes.
-The decision sits between the two requests, in code that mentions no cell.
+It reads the balance, compares it with `price`, and writes the remainder back.
+The comparison sits between the two requests, in code that mentions no cell.
 
 `purchase()`'s signature declares the shared state.
 `Depend[Get | Put, bool]` tells a caller this function reads or writes something that outlives it.
@@ -817,7 +819,7 @@ No parameter carries the cell through the signatures between them.
 
 Treatments of algebraic effects open with this pattern and name it the *State effect*,
 with `get` and `put` as its two operations.
-Stateless's machinery is enough to build that effect.
+`wallet.py` builds that effect from two `Ability` subclasses and the two handlers `ledger()` returns.
 
 No lock protects the cell.
 Forking two Effects that share a `Cell` interleaves their reads and writes,
@@ -915,14 +917,15 @@ def fetch_headline() -> Depend[Need[Feed], str]:
     return feed.latest()
 ```
 
-The decorator adds the error the same way it does for `score()` in [The Error Channel](46_Effects--Stateless.md#the-error-channel).
+The decorator adds `Unavailable` to the yield type,
+as it adds `KeyError` for `score()` in [The Error Channel](46_Effects--Stateless.md#the-error-channel).
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
 
 `research.py` keeps the request and the failure in separate functions for two reasons.
 A function that receives everything it uses as arguments is easier to test on its own,
 and the split keeps the Ability requests in one place.
-Either shape type-checks and either propagates correctly.
+Either shape type-checks, and either puts `Unavailable` in the error channel.
 
 `newswire.py` defines two feeds and an encyclopedia to supply,
 and names four instances for the scenarios that follow:
@@ -1046,8 +1049,8 @@ If you annotate `report()` as `Success[str]`,
 the type checker names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
 `supply()` empties that half, and `run()` accepts what remains.
 
-Declaring `outcome()`'s parameters as `Feed` and `Encyclopedia` does the job of `as_type()` at the boundary,
-without a cast.
+Declaring `outcome()`'s parameters as `Feed` and `Encyclopedia` upcasts the two implementations at the boundary,
+as `as_type()` would, without a cast.
 
 ## The Success Path
 
@@ -1544,7 +1547,8 @@ error[no-matching-overload]: No overload of function `supply`
 matches arguments
 ```
 
-The call still runs correctly, since the implementation is variadic,
+The call still runs and binds all ten actors,
+since the implementation is variadic,
 but the type checker no longer verifies the call.
 Two chained handlers keep the checking.
 [Layering Handlers](46_Effects--Stateless.md#layering-handlers)
@@ -2393,7 +2397,7 @@ They make most of a function's failures visible in its signature,
 with no generator discipline and no description/execution split.
 Use Stateless when a system is large enough that hidden Effects have caused a production incident,
 and when the team will declare every Effect at every boundary.
-Below that scale, the discipline matters and the machinery is optional.
+Below that scale, use those three techniques, and treat Stateless as optional.
 
 Whatever you decide about the library, the habit survives it.
 Name each contact with the outside (the clock, the feed, the pool, the console)
