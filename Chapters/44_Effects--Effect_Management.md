@@ -693,7 +693,7 @@ Separating the request from its fulfillment is the core of every Effect Manageme
 The code that requests an Effect is separate from the code that performs it,
 and a handler connects the two.
 `greet()` requests `ask` and `tell`.
-The handler decides what each one means.
+The handlers decide what each one means.
 Different handlers make different decisions.
 A test installs a handler that returns a known name,
 so `greet()` produces the same result for each test run.
@@ -709,6 +709,7 @@ A handler can also discard the continuation,
 and the Effect then behaves like an exception.
 A handler can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
+
 *Algebraic effects* is the name for this design:
 Effects declared as an interface, plus handlers that receive the continuation.
 
@@ -729,8 +730,7 @@ eff Tell {
     def tell(message: String): Unit
 }
 
-// Core logic: the Effect row after the backslash is part
-// of the type
+// Core logic: the Effect row appears after the backslash
 def greet(): Unit \ {Ask, Tell} =
     let name = Ask.ask("What is your name? ");
     Tell.tell("Hello, ${name}!")
@@ -751,8 +751,9 @@ def main(): Unit \ Console =
     }
 ```
 
-Each handler operation takes one parameter more than its `eff` declared:
-`resume`, the continuation.
+The `eff` declares `ask` with one parameter, `prompt`.
+The handler's `ask` has two, `prompt` and `resume`,
+and `resume` is the continuation.
 Koka's `with fun` handler resumes for you when its body returns.
 Flix hands you the continuation,
 and `resume(value)` returns `value` to the point in `greet()` that performed the Effect.
