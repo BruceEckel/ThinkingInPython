@@ -378,6 +378,13 @@ roughly 25 files from 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's
   approaches carry one Java habit: the adapter inherits from `WhatIWant`
   so that `op()` accepts it."
 
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page), three:
+  "One call up, the side effect is invisible" -> "In the caller, the side
+  effect is invisible"; "a caller sees the same thing from each" -> "a
+  caller receives `None` from each"; "perform Effects their signatures
+  leave out" -> "perform Effects, and their signatures show only the
+  arguments and the return type"
+
 **Home.** this file only. Promoted at Bruce's call (2026-08-29).
 
 ### R10. Replace a judgment or figure about a mechanism with the mechanism
@@ -450,6 +457,16 @@ already stated nearby, as in a summary sentence that closes a section.
   to go" -> "so a value stored on a member is shared by every machine
   too"; Solutions 47 the same day: "the request has nowhere to carry
   the range" -> "the request has no field to carry the range"
+
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page), five:
+  "the check moves out of `slope()` and into the type" -> "the type's
+  `__post_init__()` runs the check instead of `slope()`"; "escaping
+  `slope()` as an exception" -> "reaching `slope()`'s caller as an
+  exception"; "instead of touching every call site" -> "modifying";
+  "checking the ones you left out takes the language" -> "Only a language
+  with native Effects can find the ones you left out, because only its
+  compiler reads every call in the body"; "one read of that function
+  settles the question" -> "tells you what's happening"
 
 **Home.** literal (Accrued patterns), the pass that owns figures.
 Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
@@ -535,6 +552,14 @@ reads the others as "prefer the noun" will overshoot.
   "Because `WhatIUse` calls `f()` and `WhatIHave` has none" -> "and
   `WhatIHave` has no `f()`"
 
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page), five:
+  "every exception it raises" -> "every exception `slope()` raises";
+  "Setting the wrong one ... in whatever frame reads it" -> "the wrong
+  `ContextVar` ... in the frame that reads the `ContextVar`"; "the way
+  `async def` already declares one" -> "declares `async`"; "you find
+  them by inspection" -> "find Effects"; "A system that does so is" ->
+  "That type system is"
+
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
 2026-09-15 on chapter 27's sightings (C6 -> R12).
@@ -616,6 +641,12 @@ different `Console` in a test").
 - `27_Patterns--Function_Objects` 2026-09-16, was Claude-written: "You provide a
   function that decides how to compare." -> "That argument determines
   how comparison works."
+
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page), three, Bruce's hand:
+  "If you call a function that writes to an audit log, your function
+  writes to an audit log" -> "If your function calls a function that
+  writes to an audit log, your function writes to an audit log" (and the
+  clock and `ValueError` sentences beside it)
 
 **Home.** activate (Accrued patterns), beside its "you can" keep.
 Promoted 2026-09-16 on the second chapter's sighting (C15 -> R15).
@@ -1655,10 +1686,108 @@ above.
 - `34_Patterns--Composite_and_Interpreter` 2026-10-20:
   "a union names the closed set of alternatives" -> "lists"
 
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page), four:
+  "names the kinds of impurity" -> "specifies the kinds of impurity"
+  (twice); "each name both parameters" -> "declare"; "the `Log` they
+  name" -> "declare"
+
 **Home.** the global `CLAUDE.md` style rules, in one line with R41,
 since 2026-10-20; this file. Not yet in `tip watch-words`: the shape's
 objects (a type, an exception, a key, a class) are also the objects of
 the keeps, so a word rule would list every keep as a hit.
+
+### R43. Standing behavior under a stated condition takes the present tense, not "would"
+
+**Test.** The main verb carries a modal ("would", "can") and the
+condition is in the sentence: a subject with a restrictive clause ("A
+`list` there"), an "If" clause, a "With" or "Without" phrase. Drop the
+modal and put the condition in the present ("If `host` has a default,
+`name` follows it with none"); the claim about the listing is unchanged.
+`tools/past_tense.py` skips modals, so no check covers this.
+
+**Keep when.** A hedge about the reader's own choice ("the lambda you
+would write"); "would otherwise"; an exercise prompt; a tool or design
+that does not exist (appendix A's checker); "as though more money would
+sell a sold-out item"; advice ("In real code `Weight` would be a
+`@dataclass`").
+
+**Sightings.** 3 shown, and a book-wide sweep. Promoted 2026-10-21 (P1
+on the chapter 44 page) on Bruce's direction that day ("this could be
+'breaks'. Search the book for similar present-tense transformations"):
+106 sentences in 33 chapters and 20 Solutions files, commit ba516387.
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "Generated code that rebinds an implementation would break that
+  guarantee" -> "breaks that guarantee"
+- `44_Effects--Effect_Management` 2026-10-21, Bruce's hand:
+  "A type system that verified purity would do that reading for you" ->
+  "A type system that verifies purity does the work for you"
+- `34_Patterns--Composite_and_Interpreter` 2026-10-21 (ba516387):
+  "A `list` there would leave the tree mutable" -> "leaves the tree
+  mutable"
+
+**Home.** this file; the activate skill's accrued patterns (a register
+rule).
+
+### R44. A generic plural with a restrictive clause drops its article
+
+**Test.** "the <plural> that/who <verb>" in a general claim about every
+member of that kind ("The languages that track Effects today are
+young"). Drop "the". If the sentence then reads as about a specific set
+the text has set up, the article was definite and stays.
+
+**Keep when.** A definite set: "the steps that vary" in a Template
+Method's own sequence, "the imports that ran", "the records that inherit
+from it", "the cells that need code" in a specific grid, "the ones that
+return a pooled instance" ("ones" needs the article). A set phrase:
+"separate the things that change from the things that stay the same".
+
+**Sightings.** 3 shown, and a book-wide read. Promoted 2026-10-21 (P2 on
+the chapter 44 page) on Bruce's direction ("Both 'the' can be removed.
+Look through the book for other opportunities"): of 96 "the Xs that"
+phrases, eight generic ones lost the article in chapters 01, 11, 17, 21,
+39, 42, 44, 46 (commit 93cb0163) and 88 definite ones kept it.
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "The languages that track Effects today are young, and the libraries
+  that retrofit Effect tracking are demanding" -> "Languages that track
+  Effects today are young, and libraries that retrofit Effect tracking
+  are demanding"
+- `44_Effects--Effect_Management` 2026-10-21:
+  "can drop the conveniences that help a person read code" -> "can drop
+  conveniences that help people write and read code"
+- `21_Patterns--Design_Patterns` 2026-10-21 (93cb0163):
+  "The programmers who arrive next learn it as syntax" -> "Programmers
+  who arrive next learn it as syntax"
+
+**Home.** this file.
+
+### R45. An enumeration of clause-length items becomes a list
+
+**Test.** One sentence holds three or more parallel items joined by
+commas and "that" or "and", and each item is a clause with its own
+verb ("confirms that X, that Y, and that Z"; "First, ... Second, ...
+Third, ..." across sentences). Write the lead-in with a colon and one
+item per bullet, numbered when the order matters.
+
+**Keep when.** The items are short phrases rather than clauses: "has
+three jobs: it measures, it decides which changes to announce, and it
+notifies the responders" stayed inline.
+
+**Sightings.** 7, two chapters. Promoted 2026-10-21 (P3 on the chapter 44 page). First 4, one chapter (`30_Patterns--Observer`, the pass
+2e61b3e7..HEAD, approved on the fault-review page 2026-10-11)
+- Bruce's hand, twice: "Testing confirms that X, that Y, that Z." ->
+  "The test file confirms that:" with one bullet per clause
+- Bruce's hand: the paragraph listing the extraction designs -> bullets
+- "less precise ... in three ways. First, ... Second, ... Third, ..."
+  -> a numbered list, the compared things named in the lead-in
+
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page), three, two of them Bruce's own requests ("rewrite using
+  bullet points for clarity", "make these bullets"): the EMS
+  paragraph -> "does three things:" with one bullet each; the
+  four-language survey sentence -> a lead-in and two bullets; the
+  `returns` library's four containers -> "provides four containers:"
+  and one bullet each
+
+**Home.** this file; the deep-review skill (structural).
 
 ## Candidates
 
@@ -1996,28 +2125,6 @@ candidate at the capture's suggestion:
   legitimate method, not only to catch misspellings" -> "should expect to
   catch typos and also to rename an occasional legitimate method"
 
-### C30. An enumeration of clause-length items becomes a list
-
-**Test.** One sentence holds three or more parallel items joined by
-commas and "that" or "and", and each item is a clause with its own
-verb ("confirms that X, that Y, and that Z"; "First, ... Second, ...
-Third, ..." across sentences). Write the lead-in with a colon and one
-item per bullet, numbered when the order matters.
-
-**Keep when.** The items are short phrases rather than clauses: "has
-three jobs: it measures, it decides which changes to announce, and it
-notifies the responders" stayed inline.
-
-**Sightings.** 4, one chapter (`30_Patterns--Observer`, the pass
-2e61b3e7..HEAD, approved on the fault-review page 2026-10-11)
-- Bruce's hand, twice: "Testing confirms that X, that Y, that Z." ->
-  "The test file confirms that:" with one bullet per clause
-- Bruce's hand: the paragraph listing the extraction designs -> bullets
-- "less precise ... in three ways. First, ... Second, ... Third, ..."
-  -> a numbered list, the compared things named in the lead-in
-
-**Home.** this file; the deep-review skill (structural) if promoted.
-
 ### C31. Show the code the prose describes (additive)
 
 **Test.** A sentence describes code in words ("becomes an awaitable
@@ -2174,6 +2281,112 @@ Machine): "The `invalid-argument-type` report above disappears." ->
 "The `Column`/`choose_row()` mismatch above then passes the checker. At
 runtime `choose_row()` stores a `Column` in `self.row`, so the machine
 carries on with a wrong selection."
+
+**Home.** this file.
+
+### C40. Give an elided noun its noun back
+
+**Test.** A stand-in for a noun ("one", "others", "the third", "any of
+them", "every callee") whose noun is in an earlier sentence, in a
+sentence that makes a claim the reader must check against that noun.
+Repeat the noun. Differs from R12, which fires only where a competitor
+exists; here the stand-in is unambiguous but still makes the reader
+reconstruct it.
+
+**Keep when.** The noun is the subject of the sentence just before and
+repeating it would be padding (R12's keep); "one" as a count ("one
+Effect").
+
+**Sightings.** 4, one chapter, Bruce's hand (approved as P4 on the
+chapter 44 page, 2026-10-21)
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "One reading stops being enough as soon as the function calls others"
+  -> "Reading a single function stops working when that function calls
+  other functions"
+- "A test installs one that returns a known name, and the same
+  `greet()` runs" -> "A test installs a handler that returns a known
+  name, so `greet()` produces the same result for each test run"
+- "Knowing every one of them means reading every callee" -> "reading
+  the code for every callee"
+- "The third is an exception" -> "The third kind of Effect is an
+  exception"
+
+**Home.** this file.
+
+### C41. A colon that names an item follows its noun directly
+
+**Test.** "<noun phrase promising an item>, and <clause>: <item>". Move
+the clause out to its own sentence; the colon now follows the noun.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 1 (approved as P5 on the chapter 44 page, 2026-10-21)
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "Python tracks one Effect in function signatures, and enforces that
+  tracking on every caller: `async`." -> "Python tracks one Effect in
+  function signatures: `async`." with the enforcement as its own
+  sentence after
+
+**Home.** this file.
+
+### C42. An "and" joining two clauses with different subjects, where neither explains the other, becomes two sentences
+
+**Test.** A main-clause "and" whose two clauses have different subjects,
+and the second is neither a consequence of the first (then it takes
+"so") nor a parallel action by the same actor. `tools/sentence_shapes.py`
+lists the wider shape under `ARGS=--survey` as `[AND]`, and its
+calibration found the author's own rewrites fire it, so this is the
+narrower case: the two clauses are about different things.
+
+**Keep when.** Two actions by one actor ("reads the file and prints
+it"); a consequence, which takes "so"; a deliberate pairing of two
+parallel facts ("X is young, and Y is demanding").
+
+**Sightings.** 2, one chapter (approved as P6 on the chapter 44 page,
+2026-10-21)
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "Calling `greet()` builds a coroutine object, a description of work,
+  and `ran` stays empty." -> "... a description of work. The body waits,
+  so `ran` is still `[]`."
+- "Effect tracking will look obvious in hindsight, and future
+  programmers will regard ..." -> two sentences
+
+**Home.** this file; the straighten skill if promoted.
+
+### C43. When the prose explains one of a listing's parallel parts, name each of them (additive)
+
+**Test.** The prose says what one member of a parallel pair in the
+listing above does ("the `ask` handler says that `ask` means ...") and
+the listing has a sibling of the same shape the prose never names.
+
+**Keep when.** The siblings are identical in all but name and the
+paragraph says so ("each of the three layers wraps its call the same
+way").
+
+**Sightings.** 1 (additive), Bruce's request "name the other handler as
+well" (approved as P7 on the chapter 44 page, 2026-10-21)
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "In `main()`, the `with fun ask(prompt)` handler decides that `ask`
+  means ..." -> "... says that `ask` means ..., and the `with fun
+  tell(message)` handler says that `tell` means \"print the message.\""
+
+**Home.** this file; the deep-review skill's teaching pass if promoted.
+
+### C44. Before stating a loss, state what persists (additive)
+
+**Test.** A main clause "X can no longer Y" or "X cannot Y" that closes
+a comparison with an earlier design, where the earlier design's cost
+(the bookkeeping, the parameter threading) is still paid under the new
+one and the paragraph does not say so.
+
+**Keep when.** The persisting cost is in the previous sentence; the
+loss is the whole point and nothing persists.
+
+**Sightings.** 1 (additive), Bruce's hand (approved as P8 on the chapter
+44 page, 2026-10-21)
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "The type checker can no longer verify it." -> "You must still do the
+  bookkeeping, but the type checker can no longer verify it."
 
 **Home.** this file.
 
