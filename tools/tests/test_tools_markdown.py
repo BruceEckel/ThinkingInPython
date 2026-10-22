@@ -77,9 +77,14 @@ def test_slug_none_without_path_comment() -> None:
     doc = Document.from_text("```python\nimport os\n```\n")
     assert doc.blocks[0].slug is None
 
-def test_rust_slug_reads_the_slash_comment_form() -> None:
+def test_slash_slug_reads_the_slash_comment_form() -> None:
     doc = Document.from_text("```rust\n// fastcount/src/lib.rs\n```\n")
-    assert doc.blocks[0].rust_slug == "fastcount/src/lib.rs"
+    assert doc.blocks[0].slash_slug == "fastcount/src/lib.rs"
+
+def test_slash_slug_is_independent_of_the_fence_language() -> None:
+    doc = Document.from_text(
+        "```koka\n// koka/greet.kk\nimport std/os/readline\n```\n")
+    assert doc.blocks[0].slash_slug == "koka/greet.kk"
 
 def test_slug_ignores_the_rust_comment_form() -> None:
     # slug is the `#` form whatever the fence language. Making it switch on

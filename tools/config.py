@@ -84,10 +84,12 @@ PATH_LINE_RE = re.compile(
 # A ```rust opener at any indent, for extract_rust.py.
 RUST_FENCE_RE = re.compile(r"^\s*```rust\s*$")
 
-# A ```rust block's first content line naming the file it extracts to,
-# relative to rust/, e.g. "// fastcount/src/lib.rs". The Rust-comment
-# analog of PATH_LINE_RE above.
-RUST_PATH_LINE_RE = re.compile(r"^//\s*([\w./\\-]+\.\w+)\s*$")
+# A block's first content line naming its file with a `//` comment, the
+# form Rust, Koka, Flix, Scala, and TypeScript share: "// fastcount/src/lib.rs"
+# for extract_rust.py (relative to rust/), "// koka/greet.kk" for
+# extract_effects.py (relative to effects/). The slash-comment analog of
+# PATH_LINE_RE above.
+SLASH_PATH_LINE_RE = re.compile(r"^//\s*([\w./\\-]+\.\w+)\s*$")
 
 
 def utils_dir(tree: Path) -> Path:

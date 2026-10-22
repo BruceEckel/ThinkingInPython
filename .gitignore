@@ -10,3 +10,14 @@ build/
 !/styles/House/
 !/styles/config/
 /Examples/.idea
+
+# Chapter 44 Effect programs: fetched toolchain pieces and build output
+# (`tip effects-fetch`, `tip effects-test`); the sources beside them are tracked.
+/effects/ts/node_modules/
+/effects/flix/flix.jar
+/effects/zio/.scala-build/
+/effects/zio/.bsp/
+/effects/koka/.koka/
+/effects/koka/greet
+/effects/koka/greet.exe
+/effects/koka/*.pdb

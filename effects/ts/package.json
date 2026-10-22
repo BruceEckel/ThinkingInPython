@@ -1,0 +1,16 @@
+{
+  "name": "thinking-in-python-effects-ts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "start": "node greet.ts"
+  },
+  "dependencies": {
+    "effect": "4.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.0",
+    "typescript": "7.0.2"
+  }
+}

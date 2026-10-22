@@ -49,6 +49,22 @@ gate does read `rust/`: `tip check` (and the gate's check step) runs
 leaves `rust/fastcount/demo.py` or `src/lib.rs` stale fails the build, and
 `tip rust-sync` regenerates them. Details: `rust/CLAUDE.md`.
 
+## Effect programs: effects/, isolated the same way
+
+Chapter 44's Koka, Flix, Scala (ZIO), and TypeScript (Effect) listings
+are complete programs, extracted by `tools/extract_effects.py` into
+`effects/<lang>/` from a first-line `// koka/greet.kk` path comment
+(`Block.slash_slug`, shared with the Rust extractor; the fence language
+picks the extractor). Only the `effects-*` tasks build or run them, each
+with its own toolchain, and `tools/effects_run.py` skips a toolchain
+that is not installed, so `verify`/`gate`/`ci` need none. The gate does
+read `effects/`: `tip check` runs `extract_effects.py` in check mode, so
+a chapter 44 listing edit that leaves `effects/` stale fails the build,
+and `tip effects-sync` regenerates it. All four programs are held to one
+transcript, `effects/expected.txt`, so the prompt and the greeting
+change in five places together. Details and the facts the runner
+depends on: `effects/CLAUDE.md`; setup and versions: `effects/README.md`.
+
 ## Cloud sessions: tools/cloud-setup.sh
 
 A cloud session needs the environment's Setup script before anything

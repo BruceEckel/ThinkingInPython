@@ -49,11 +49,8 @@ from pathlib import Path
 from tools.config import CHAPTERS_DIR, ROOT
 from tools.extract import (
     ExtractResult,
-    check_against,
+    check_or_write,
     extract as extract_blocks,
-    report_conflicts,
-    report_drift,
-    write_tree,
 )
 from tools.markdown import Block, Document
 from tools.repo import md_files
@@ -65,7 +62,7 @@ def route_rust(doc: Document, block: Block) -> str | None:
     """A ```rust block naming its file with a `// path` first line."""
     if block.lang != "rust":
         return None
-    slug = block.rust_slug
+    slug = block.slash_slug
     return f"rust/{slug}" if slug else None
 
 
@@ -96,22 +93,7 @@ def main(argv: list[str] | None = None) -> int:
 
     result = extract()
     print(f"Scanned {CHAPTERS_DIR.name}: {len(result.files)} rust/ file(s).")
-
-    report_conflicts(result)
-
-    if args.write:
-        written = write_tree(result, ROOT)
-        print(f"\nWrote {written} changed file(s) under {RUST_DIR.name}/.")
-        return 1 if result.conflicts else 0
-
-    missing, changed = check_against(result, ROOT)
-    report_drift(missing, changed, noun="file", where=RUST_DIR.name)
-
-    if not (missing or changed or result.conflicts):
-        print(f"\nIn sync: every {RUST_DIR.name}/ file matches the book.")
-        return 0
-    print(f"\n(Run with --write to update {RUST_DIR.name}/.)")
-    return 1
+    return check_or_write(result, ROOT, RUST_DIR.name, write=args.write)
 
 
 if __name__ == "__main__":

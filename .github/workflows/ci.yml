@@ -15,6 +15,12 @@ name: CI
 #       gh workflow run ci.yml -f run_gates=true
 #   * Include the marker [full-ci] anywhere in a push commit message.
 #
+# Chapter 44's four Effect programs (Koka, Flix, ZIO, TypeScript Effect)
+# have a job of their own, "effects", on a separate switch: the
+# "run_effects" input (default false) or the marker [effects-ci] in a push
+# commit message. It installs four toolchains, so it stays off the default
+# path; locally, `tip effects-all` does the same with whatever is installed.
+#
 # Tooling is managed by uv.
 
 on:
@@ -27,6 +33,10 @@ on:
         description: "Run the full gates plus the spelling/house-style checks"
         type: boolean
         default: true
+      run_effects:
+        description: "Build and run chapter 44's Koka, Flix, ZIO, and TypeScript programs"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -189,6 +199,58 @@ jobs:
       # warnings and do not fail the job. Config in .vale.ini.
       - name: House-style lint with Vale
         run: vale Chapters
+
+  # Chapter 44's greeting program in four other languages, each built and
+  # run with its own toolchain and held to one expected transcript
+  # (effects/README.md). Opt-in on its own switch, since four toolchains
+  # take minutes to install and the programs change only with chapter 44.
+  # The gate's own read of effects/ (drift against the Markdown) needs no
+  # toolchain and is part of `tip check` in the gates job above.
+  effects:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.run_effects) ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[effects-ci]'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.15"
+          enable-cache: true
+
+      - name: Install tooling
+        run: uv sync --locked
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install scala-cli
+        uses: VirtusLab/scala-cli-setup@v1
+
+      # The install script at a release's own URL pins that release.
+      - name: Install Koka
+        run: |
+          curl -sSL https://github.com/koka-lang/koka/releases/download/v3.2.9/install.sh | sh -s -- --quiet
+          koka --version --console=raw
+
+      # flix.jar at the pinned version, and npm ci against the lockfile.
+      - name: Fetch the Flix compiler and the TypeScript packages
+        run: uv run tip effects-fetch
+
+      # REQUIRE=1: with every toolchain installed, a skip is a failure.
+      - name: Build and run the four programs
+        run: uv run tip effects-test REQUIRE=1
 
   # Publishes the site to GitHub Pages (bruceeckel.github.io/ThinkingInPython)
   # on a push to master. It depends only on the site build, not on the opt-in

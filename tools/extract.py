@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """The machinery both extractors share: route blocks to files, write, check.
 
-extract_examples.py and extract_rust.py were structural mirrors. Each had
+extract_examples.py and extract_rust.py were structural mirrors, and
+extract_effects.py (2026-10-21) is a third of the same shape. Each had
 its own file dataclass, its own result dataclass, its own extract loop,
 its own write-if-changed, its own compare-against-a-tree, and its own
 copy of the "conflicting duplicate path" report. The two differed in
@@ -228,3 +229,28 @@ def report_drift(
               f"{where}/:")
         for path in changed:
             print(f"  ~ {path}")
+
+
+def check_or_write(
+    result: ExtractResult, root: Path, tree: str, *, write: bool,
+) -> int:
+    """The tail both committed-tree extractors share: an exit status.
+
+    `tree` is the directory under `root` the report names (rust,
+    effects). With `write`, every extracted file is written under `root`
+    and only a conflict fails. Without it, nothing is written: drift
+    against the committed tree is reported, and a missing or changed
+    file, or a conflict, fails.
+    """
+    report_conflicts(result)
+    if write:
+        written = write_tree(result, root)
+        print(f"\nWrote {written} changed file(s) under {tree}/.")
+        return 1 if result.conflicts else 0
+    missing, changed = check_against(result, root)
+    report_drift(missing, changed, noun="file", where=tree)
+    if not (missing or changed or result.conflicts):
+        print(f"\nIn sync: every {tree}/ file matches the book.")
+        return 0
+    print(f"\n(Run with --write to update {tree}/.)")
+    return 1

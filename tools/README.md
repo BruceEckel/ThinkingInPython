@@ -542,6 +542,43 @@ python -m tools.extract_rust            # check vs rust/
 python -m tools.extract_rust --write     # update rust/
 ```
 
+## extract_effects.py
+
+A third extractor of the same shape, for chapter 44's
+[Effect Management](../Chapters/44_Effects--Effect_Management.md)
+programs in Koka, Flix, Scala (ZIO), and TypeScript (Effect). A block in
+one of those four fence languages whose first line is a `//` comment
+naming the file (relative to `effects/`, e.g. `// koka/greet.kk`, the
+same `slash_slug` the Rust extractor reads) extracts there; a block in
+one of those languages with no path line is a fragment. Default mode is
+**check** against the committed `effects/` tree, run by `tip check` and
+the gate; pass `--write` (`tip effects-sync`) to update it. It never
+touches the project files beside the programs (`package.json`,
+`tsconfig.json`, `project.scala`, `expected.txt`).
+
+```
+python -m tools.extract_effects            # check vs effects/
+python -m tools.extract_effects --write    # update effects/
+```
+
+## effects_run.py
+
+Builds and runs the four programs under `effects/`, each with its own
+toolchain, feeds each the same name on stdin, and compares its stdout
+with `effects/expected.txt`. A toolchain that is not installed is a
+skip in the final table, never a failure, unless `--require` (CI's
+`effects` job). `--fetch` downloads the pinned `flix.jar` and runs
+`npm ci` in `effects/ts`, both into gitignored paths. On Windows it
+finds MSVC through `vswhere` for Koka's C step. `effects/README.md` has
+the per-toolchain setup; the `effects-*` tasks (`tip effects-all`) are
+the only tasks that enter `effects/`.
+
+```
+python -m tools.effects_run                 # what is installed
+python -m tools.effects_run --only flix,ts  # a subset
+python -m tools.effects_run --fetch         # flix.jar and node_modules
+```
+
 ## run_examples.py
 
 Runs every `.py` under `build/examples/`, each in its own directory so the

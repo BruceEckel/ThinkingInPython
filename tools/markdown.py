@@ -31,7 +31,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-from tools.config import PATH_LINE_RE, RUST_PATH_LINE_RE
+from tools.config import PATH_LINE_RE, SLASH_PATH_LINE_RE
 from tools.prose import is_prose_line
 
 # A fence opening or closing at any indent, capturing the language word.
@@ -91,7 +91,7 @@ class Block:
         Deliberately independent of `lang`: the book's convention is the
         `#` comment form whatever the fence says, and extract_examples.py
         has always read it that way, so a ```text block naming a data file
-        extracts like any other. Rust's `//` form is a separate property
+        extracts like any other. The `//` form is a separate property
         rather than an automatic switch on the language, because making
         this one language-aware silently pulled a ```rust block into the
         Python examples tree.
@@ -112,9 +112,14 @@ class Block:
         return m is not None and m.group(2) is not None
 
     @property
-    def rust_slug(self) -> str | None:
-        """The path a `// fastcount/src/lib.rs` first line names, if any."""
-        return self._first_content_path(RUST_PATH_LINE_RE)
+    def slash_slug(self) -> str | None:
+        """The path a `// fastcount/src/lib.rs` first line names, if any.
+
+        The `//` comment form that Rust, Koka, Flix, Scala, and TypeScript
+        share; extract_rust.py and extract_effects.py read it, each for
+        the fence languages it claims.
+        """
+        return self._first_content_path(SLASH_PATH_LINE_RE)
 
     def line_number(self, index: int) -> int:
         """The file's 1-based line number for content line `index`."""
