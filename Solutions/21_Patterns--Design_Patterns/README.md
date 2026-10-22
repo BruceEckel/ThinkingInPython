@@ -371,7 +371,7 @@ nothing, and one that broke the requirement. *Subtraction* is a test
 you run, not a rule to remove as much as you can. Take something away,
 run the program, and read the result. If nothing breaks, the piece is
 supporting code. If something breaks, the piece you removed expresses
-the design, and that piece is worth keeping and worth naming.
+the design. Keep it, and give it a name.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

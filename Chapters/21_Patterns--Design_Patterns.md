@@ -558,7 +558,7 @@ That describes the problem the pattern exists to solve.
 How much of the answer does Python supply on its own?
 That decides how much remains for you to write.
 What remains after you subtract Python's share?
-That remainder is worth learning,
+That remainder is the part to learn,
 and it is usually the intent rather than the structure.
 
 A pattern that subtracts to nothing is not a mistake.
