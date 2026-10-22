@@ -23,7 +23,7 @@ shows a form that keeps the decoupling and connects the observers once,
 when you create the subject.
 
 The classic example is Smalltalk's *Model-View-Controller* (MVC),
-or the nearly-equivalent *Document-View* architecture,
+or the nearly equivalent *Document-View* architecture,
 which combines the controller with the view.
 In both, *Observer* connects the state change to its views.
 One subject keeps a list of views and accepts any view that has the update method it calls.
@@ -1275,7 +1275,7 @@ so a single broken responder cancels the others mid-notification.
 
 ## A Visual Example
 
-This example emphasizes the model-view split.
+This example separates the model from the view.
 The *model*, `grid_observer.py`,
 is a grid of colored boxes and the rule that decides what changes for a selection event.
 The model manipulates `Grid` values.
