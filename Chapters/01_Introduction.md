@@ -274,8 +274,9 @@ an attribute, or a keyword argument.
 
 Solutions live in the `Solutions/` directory of the source repository.
 Each solution opens in steps, so you can take as little help as you need:
-a hint first, then the full answer.
-Most solutions add a step between them,
+a hint first, then a check that tells you when your attempt is finished,
+then the full answer.
+Most solutions add a step after the hint,
 the shape of the code with its function bodies left out.
 `tip hint CH=30 N=3` prints the same steps one per run,
 `CH` naming the chapter and `N` the exercise.
