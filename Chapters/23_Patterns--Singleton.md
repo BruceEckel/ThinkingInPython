@@ -230,8 +230,6 @@ The signature must specify something reachable,
 so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to specify in its place.
 
 Privacy in Python is advice, not enforcement.
-An underscore marks a name as internal.
-Python lets any caller use it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
 makes the same case about hidden data.
 The reachable class is also useful when a test needs a fresh `Settings`,
