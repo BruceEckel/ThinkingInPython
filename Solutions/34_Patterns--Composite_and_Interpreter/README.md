@@ -939,7 +939,7 @@ other factor as written, so the original, undifferentiated
 subtrees stay in the result.
 
 Running the raw result through `simplify()` turns `((1 * x) + (x * 1))`
-into the much more readable `(x + x)`.
+into the more readable `(x + x)`.
 Reaching `2 * x` takes a further rule, "combine like terms,"
 that this `simplify()` does not implement.
 

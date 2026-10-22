@@ -868,10 +868,9 @@ Composing `t`-strings this way builds a nested composite.
 Iterating over any one `Template` stays flat.
 
 `to_query()` uses the walk to keep user values out of the query text.
-`name` holds an injection attempt,
-and it comes out as a value in the parameter list rather than as text in the query.
+`name` holds an injection attempt.
 `to_query()` receives the literal pieces and the values separately,
-so values stay out of the `sql` list.
+so `name` comes out as a value in the parameter list rather than as text in the query.
 Written as an f-string,
 the same line is one finished `str` with the attack inside it.
 Any defense must then inspect that string and guess where the user's text begins.
