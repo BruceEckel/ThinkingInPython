@@ -34,7 +34,7 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 
 The code at the end of `use_module.py` starts with an `if` clause that checks whether the standard variable `__name__` equals the string `"__main__"`.
 Any identifier that begins and ends with double underscores (a dunder)
-is special in some way.
+is one that Python itself sets or calls.
 Python calls a class's dunder methods, for example,
 to apply the language's operators and built-in functions to its objects.
 [Classes](07_Foundations--Classes.md)
@@ -199,7 +199,7 @@ only flags the directory as a package.^[The name `__init__.py` often confuses pe
 An `__init__.py` with content usually re-exports the package's public names.
 If `a_package/__init__.py` re-exports `function1`,
 callers write `from a_package import function1`.
-The submodule that defines `function1` then stays a detail inside the package.
+Callers then never write the name of the submodule that defines `function1`.
 
 You can also import a directory without `__init__.py` as a *namespace package*.
 Namespace packages let one package span several directories,
@@ -213,7 +213,9 @@ the import still succeeds and hides the missing file.
 Any module or `__init__.py` package of the same name then takes precedence over your package,
 wherever it sits on `sys.path`, including a directory later in the search.
 This book uses an explicit `__init__.py` by default,
-because it makes the package's identity and boundary clear.
+because a directory with `__init__.py` is one package,
+found at its own place on `sys.path`,
+and no module or package later in the search can replace it.
 
 To explore packages,
 create a directory called `a_package` whose `__init__.py` prints a message,
@@ -290,7 +292,7 @@ Reading `a_package.module1` raises an `AttributeError`,
 so `a_package.module1.function1()` fails here too.
 The submodule becomes an attribute of the package only when something imports it by name.
 The type checker flags `a_package.module1` as a `possibly-missing-submodule`,
-the same fact the marker shows.
+the missing attribute that the marker's `AttributeError` reports.
 The `# type: ignore` silences that warning.
 
 You can also specify the package with `from`:
@@ -402,8 +404,9 @@ the way `use_module.py` looks for `module`.
 
 Two dots refer to the parent package,
 so `a_package/b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
-The absolute form `from a_package.module1 import function1` works from inside the package too,
-and is a better choice when the import crosses a package boundary.
+The absolute form `from a_package.module1 import function1` works from inside the package too.
+Use it when the import crosses a package boundary,
+since it spells out the full path from the top-level package.
 Keep relative imports for a package's own submodules.
 
 A relative import needs a package context, and a file run as a script has none.
@@ -543,7 +546,9 @@ This book uses `test_*.py`, e.g. `test_result.py`.
 
 Give your modules names that no standard library module uses.
 A file named `random.py`, `string.py`,
-or `weakref.py` can shadow the stdlib one and break imports,
+or `weakref.py` can shadow the stdlib module,
+so `import random` loads your file instead,
+even inside a standard-library module,
 because Python [searches the script's directory before the standard library](#pythonpath).
 
 Give a shared module a distinctive name.
@@ -556,7 +561,8 @@ Python's import system still matches names case-sensitively by default,
 so `import module` raises a `ModuleNotFoundError` for a file saved as `Module.py`,
 even on a filesystem that treats the two names as one.
 `PYTHONCASEOK` turns that case check off, so `import module` finds `Module.py`.
-Turning the check off brings back the confusion it exists to prevent.
+A program that relies on that setting runs on Windows and macOS and raises a `ModuleNotFoundError` on Linux,
+whose filesystems are case-sensitive.
 Write a module's file name and its import in the same case,
 so the import behaves the same on every filesystem.
 

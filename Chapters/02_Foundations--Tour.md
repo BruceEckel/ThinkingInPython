@@ -185,11 +185,11 @@ covers the general form.
 Integers have unlimited precision, so they cannot overflow.
 Underscores group digits for readability,
 so `10_000_000` is the same literal as `10000000`.
-Floating point is the usual IEEE double.
+A `float` is a 64-bit IEEE 754 double, the same as C's and Java's `double`.
 
-The operators are what you expect, with two differences:
-`/` on integers always produces a `float`, and `//` is floor division
-(divide, then round down to a whole number).
+`+`, `-`, and `*` work as in C and Java.
+Division differs in two ways: `/` on integers always produces a `float`,
+and `//` is floor division (divide, then round down to a whole number).
 The result's type follows the operands, so `7.0 // 2` is `3.0`.
 Floor division rounds toward negative infinity, not toward zero,
 so `-7 // 2` is `-4` where C and Java give `-3`.
@@ -318,7 +318,8 @@ That rule is *truthiness*,
 and it lets you write `if items:` instead of `if len(items) != 0:`.
 
 A type defines that test with `__bool__()`, a *dunder*:
-a name with double underscores at each end that Python reserves for the methods and attributes it uses.
+a name with double underscores at each end that Python reserves for the methods and attributes the interpreter itself calls and reads,
+as an `if` calls `__bool__()`.
 Without one, Python falls back to `__len__()`, so an empty container is false.
 
 ```python
@@ -528,7 +529,8 @@ either with `str()` or inside an f-string.
 
 Modern Python uses *f-strings*.
 Prefix the string with `f` and put expressions in curly braces.
-F-strings are readable and fast:
+Each expression sits where its value appears in the result.
+Python compiles an f-string into dedicated instructions that format each value and join the pieces:
 
 ```python
 # fstrings.py
@@ -686,7 +688,8 @@ before any code can inspect the values.
 
 Uppercasing and rejecting are small demonstrations.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
-builds a full query from the parts the same way.
+builds a SQL query from a `Template`'s pieces,
+writing a `?` in place of each value and collecting the values in a separate list.
 
 Keep using f-strings for ordinary output.
 Use a t-string only when a consumer must inspect, escape,
@@ -713,7 +716,8 @@ and `functools.partial` that way.
 Name every other class `CapWords`.
 
 [PEP 8](https://peps.python.org/pep-0008/#naming-conventions)
-covers style issues.
+gives the full naming rules and the conventions for layout, whitespace,
+and imports.
 Tools such as ruff report violations and fix many of them automatically.
 
 ## Exercises

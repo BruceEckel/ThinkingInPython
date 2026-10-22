@@ -75,7 +75,8 @@ After `a.x = 1`, the instance's own entry shadows the class entry,
 so `a.x` reads `1` while `vars(A)["x"]` still holds `100`.
 
 The listing subscripts `vars(A)` instead of printing it whole,
-because a class's dictionary carries the compiler's own bookkeeping alongside `x`.
+because a class's dictionary also holds entries the compiler adds,
+such as `__module__` and `__doc__`.
 That dictionary is a read-only `mappingproxy`,
 so writing to it raises a `TypeError`.
 To change the entry, assign through the class name,
@@ -381,7 +382,7 @@ Python's attribute lookup ignores the hint.
 `@dataclass` does read it at runtime,
 and leaves a `ClassVar` out of the fields it generates.
 
-At runtime an assignment does the same thing with or without `ClassVar`:
+At runtime an assignment through `self` creates an instance attribute with or without `ClassVar`:
 
 ```python
 # self_increment.py
@@ -417,7 +418,8 @@ It is writing one where you meant a per-object default.
 Three kinds of value belong in class attributes:
 a count of every object created, a registry mapping names to classes,
 and a constant that all instances read but none change.
-Each reads better when you declare the sharing.
+Declare the sharing for each,
+so the type checker reports an instance assignment that would shadow it.
 `Tally.total` is the first of these.
 
 For the third kind, a class-level constant,
@@ -614,7 +616,8 @@ The difference is the generated `__init__()`,
 which runs `self.x = x` on every construction.
 Each object therefore shadows the class attribute immediately and always reads its own value.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
-covers the details.
+shows the `__init__()`, `__repr__()`,
+and `__eq__()` that `@dataclass` generates.
 
 ## Which Dictionary?
 
