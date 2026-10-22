@@ -157,7 +157,7 @@ shows that a Python module already is one.].
 [*Iterator*](22_Patterns--Iterators.md#the-pattern-that-disappeared)
 is the clear case.
 It was implicit in the `for` loop from the start,
-and Python 2.2 made it a protocol the language calls on your behalf.
+and Python 2.2 made it a protocol whose methods the `for` loop calls on your behalf.
 More often the language had the piece all along,
 and the pattern came from a language that didn't.
 [*Strategy*](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
@@ -195,7 +195,7 @@ holding the chosen algorithm in `strategy` for one call.
 This listing shows only the shape.
 Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.
 [Function Objects](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
-works through a case with a real motivation.
+works through three root-finding algorithms that a caller chooses between at runtime.
 
 A function with a `Callable` parameter can replace a pattern's interface and classes.
 That replacement is why the chapters ahead keep asking a question from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines):
@@ -320,13 +320,13 @@ A caller written against an abstract base class knows a set of method names and 
 and every class that implements them says so in its own `class` line.
 A caller written against a `Protocol` knows the same set of names,
 but no class declares that it implements them.
-The type checker matches shapes.
+The type checker compares each class's method names and signatures with the protocol's.
 A caller that takes a `Callable` knows one signature.
 A caller that takes a value knows the value's type and nothing about who produced it.
 
 The rung a dependence sits on decides how many parts a change can reach.
 If you rename a method on a class that other code subclasses,
-the subclasses break.
+every subclass that overrides or calls the old name must change.
 If you rename it on a class that other code reaches through a `Protocol`,
 every caller's source stays as it was,
 because each caller names the protocol's method.
@@ -403,7 +403,7 @@ coupling you can see and have placed on purpose.
 
 ### The Reach of a Change
 
-Coupling matters because of what it does when something changes.
+Coupling decides which existing parts you edit when you add a part.
 A `Report` renders itself through a writer, and `main` assembles the pieces.
 On the left, `Report` names each writer class and chooses between them.
 On the right, `Report` specifies a `Writer` protocol.
@@ -453,7 +453,9 @@ The implementer must specify the interface.
 That edge makes every implementer depend on the interface,
 so renaming or moving the interface means editing every file that names it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols)
-makes the same point about types "in libraries you cannot edit."
+states the consequence:
+a protocol works with any type that has matching members,
+"including types in libraries you cannot edit."
 In general, the fewer edges in source, the fewer files a change can reach.
 
 One question serves for every pattern chapter.
@@ -509,7 +511,8 @@ The rest are here for your own designs.
 -   *Managed Coupling*.
     Declaring that a design should have "low coupling" is usually too vague.
     Every design has coupling, so acknowledge it and control it.
-    Say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
+    Find each dependence,
+    and use a design or pattern to put it where a change reaches the fewest parts.
 -   *Design the communication, not the parts*.
     Alan Kay, on the purpose of object orientation:
     "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message's second paragraph begins "The big idea is 'messaging'."]
