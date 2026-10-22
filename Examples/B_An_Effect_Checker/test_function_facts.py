@@ -91,6 +91,17 @@ def test_a_binding_shadows_the_builtin(
     calls = facts(f"def f(xs):\n{body}\n")["m.f"].calls
     assert calls[-1] == UNRESOLVED
 
+def test_a_packed_parameter_shadows_the_builtin() -> None:
+    source = (
+        "def f(*dir, **str):\n"
+        "    dir.pop()\n"
+        "    str.pop()\n"
+    )
+    assert facts(source)["m.f"].calls == (
+        UNRESOLVED,
+        UNRESOLVED,
+    )
+
 def test_a_syntax_error_comes_back_as_a_value() -> None:
     result = read_module("bad", "def f(:\n")
     assert isinstance(result, Err)

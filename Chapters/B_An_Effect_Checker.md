@@ -628,6 +628,9 @@ def parameters(
         else UNRESOLVED
         for arg in every
     }
+    for packed in (args.vararg, args.kwarg):
+        if packed:
+            types[packed.arg] = UNRESOLVED
     if owner and positional:
         types[positional[0].arg] = owner
     return types
@@ -636,6 +639,9 @@ def parameters(
 `parameters()` and `assigned()` fill a scope's `types`: an annotated parameter,
 the first parameter of a method (the class), an annotated assignment,
 and a plain assignment whose right side has an evident type.
+`parameters()` gives every other parameter `UNRESOLVED`,
+including a `*args` or `**kwargs` parameter,
+whose annotation gives the type of each item and not of the tuple or dictionary.
 `assigned()` also records every other name a body binds: a loop variable,
 a `with` or `except` target, a walrus target, a name inside a tuple target,
 a name a pattern captures, and a parameter of a nested function or a `lambda`.
@@ -796,6 +802,17 @@ def test_a_binding_shadows_the_builtin(
     calls = facts(f"def f(xs):\n{body}\n")["m.f"].calls
     assert calls[-1] == UNRESOLVED
 
+def test_a_packed_parameter_shadows_the_builtin() -> None:
+    source = (
+        "def f(*dir, **str):\n"
+        "    dir.pop()\n"
+        "    str.pop()\n"
+    )
+    assert facts(source)["m.f"].calls == (
+        UNRESOLVED,
+        UNRESOLVED,
+    )
+
 def test_a_syntax_error_comes_back_as_a_value() -> None:
     result = read_module("bad", "def f(:\n")
     assert isinstance(result, Err)
@@ -809,6 +826,7 @@ the string by being a constant, `names` through a `type` alias,
 
 `test_a_binding_shadows_the_builtin()` binds the name `str` in nine ways.
 Each time, `str.upper()` comes back `UNRESOLVED` instead of resolving to `builtins.str.upper`.
+`test_a_packed_parameter_shadows_the_builtin()` does the same for a function's own `*args` and `**kwargs` parameters.
 
 ## Rows to a Fixed Point
 
@@ -1285,7 +1303,7 @@ Every limit below produces `Unknown`, so each one appears in a row:
 - A call of a call's result, as in `dataclass(frozen=True)(cls)`.
 - A method on an attribute, such as a record's field,
   or on a name bound in one of these places: a loop, a `with`, an `except`,
-  a walrus, a tuple target, a pattern,
+  a walrus, a tuple target, a pattern, a `*args` or `**kwargs` parameter,
   or the parameters of a nested function or a `lambda`.
 - A method on a local that two assignments give different types.
 - A receiver annotated with an `X | Y` union,

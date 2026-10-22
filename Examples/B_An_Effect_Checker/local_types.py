@@ -44,6 +44,9 @@ def parameters(
         else UNRESOLVED
         for arg in every
     }
+    for packed in (args.vararg, args.kwarg):
+        if packed:
+            types[packed.arg] = UNRESOLVED
     if owner and positional:
         types[positional[0].arg] = owner
     return types
