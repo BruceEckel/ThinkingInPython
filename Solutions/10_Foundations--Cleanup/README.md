@@ -481,9 +481,9 @@ triggers the finalizer.
 but the registry still holds one, so the `Connection` survives.
 
 `B closed` prints only because `finalize()`'s `atexit` backstop runs
-every still-alive finalizer as the interpreter shuts down. That
-backstop is the fallback the chapter describes. Here it runs the
-callback for an object that `del b` should have destroyed.
+every still-alive finalizer as the interpreter shuts down, the
+backstop the chapter describes. Here it runs the callback for an
+object that `del b` should have destroyed.
 
 The chapter's `finalize(self, print, name, "closed")` avoids the trap
 by passing the pieces the callback needs rather than the object that
@@ -589,8 +589,7 @@ any allocation after `self_link()` returns. This small program still
 prints the same transcript every run, because the explicit
 `gc.collect()` stays in the listing and sets the moment of collection.
 While that call is there, the two `finalized` lines print at that
-call or earlier. The loss is in the
-guarantee, not in what this run prints.
+call or earlier.
 
 The chapter's listing calls `gc.disable()` to get a deterministic transcript
 for a demonstration about unpredictable timing.
