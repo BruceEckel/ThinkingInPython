@@ -89,8 +89,7 @@ So `[_, *_]` also fits a singleton.
 `[_]` must come before it, or `[_, *_]` matches the one-element list
 first, leaving the "singleton" case unreachable.
 
-**Test the type alone.** `Point()` matches any `Point`
-instance and checks its type alone.
+**Test the type alone.** `Point()` matches any `Point` instance.
 That suits `classify()`, which returns the same string whatever `x`
 and `y` hold.
 
