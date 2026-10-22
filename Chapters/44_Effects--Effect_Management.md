@@ -447,7 +447,8 @@ You must read the implementation, trusting that you find everything it needs,
 everything it changes, and everything that might go wrong.
 In a small codebase you can hold that knowledge in your head.
 In a large one you cannot.
-Callers stack up: next week a new function calls the one you read today,
+Callers stack up.
+Next week a new function calls the one you read today,
 and next month a colleague's function calls that one.
 Each layer adds dependencies the signatures hide,
 until the whole set exceeds what any one person can know.
@@ -535,8 +536,8 @@ class Capture:
 `greet()` performs an `Ask` Effect and a `Tell` Effect.
 Its signature says so, because the parameters are the Effects.
 
-Here, the Effects are bound to `Scripted` and `Capture`,
-so the test checks the greeting without using the console:
+Here, the test binds the Effects to `Scripted` and `Capture`,
+so it checks the greeting without using the console:
 
 ```python
 # greet_demo.py
@@ -549,7 +550,7 @@ print(captured.messages)
 ```
 
 The production version uses objects that read with `input()` and write with `print()`.
-The behavior of `greet()` is modified without changing the function.
+Passing those objects instead changes what `greet()` does without changing `greet()`.
 The signature says what `greet()` needs, not everything `greet()` might do.
 
 The technique works, but you do the bookkeeping.
@@ -582,7 +583,7 @@ You propagate every parameter by hand.
 If a new helper that `greet()` calls needs a `Log` Effect,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
 and `main()`.
-That makes five signatures (see exercise 2).
+With the helper's own signature, that makes five (see exercise 2).
 
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you must tell the injector what every function needs,
@@ -660,8 +661,8 @@ A Koka function type has three parts: the parameter types, the Effect row,
 and the result type.
 The row sits between the other two.
 `ask` and `tell` become part of the type.
-In `ask_tell.py`, `greet()` receives them as parameters;
-here the Effect row carries them, so the parameter list is empty.
+In `ask_tell.py`, `greet()` receives them as parameters.
+Here the Effect row carries them, so the parameter list is empty.
 The `()` after the row is the return type: Koka's unit type,
 the counterpart of Python's `None`.
 
@@ -906,7 +907,7 @@ Effect.runPromise(greet.pipe(Effect.provide(Console)))
 Here `greet` reads as straight-line code because `Effect.gen` builds the description from a generator,
 and each `yield*` hands a sub-description to the library and receives its result back.
 The first two `yield*`s request the service objects from the environment,
-the records the layers supplied, and the next two call their methods.
+the objects the layers supplied, and the next two call their methods.
 Koka's `main()` reads a line with `readline()`.
 The `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
 close the interface,
@@ -923,7 +924,7 @@ and `readLine` in the ZIO listing are the wrapped versions of Scala's own consol
 The TypeScript listing uses no wrapper from the library and does the wrapping itself:
 `console.log` goes in `Effect.sync` and Node's `readline` in `Effect.promise`.
 Console, file, clock, random, and network calls each get a wrapped version,
-and a third-party library must be wrapped to make it conform.
+and you must wrap a third-party library to make it conform.
 The parallel surface exists because the library tracks Effects without the compiler's help.
 A native system's standard library declares its Effects in its own signatures,
 written once, so no second copy exists.
@@ -934,7 +935,7 @@ Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
 A library has no such help from the language.
-The only way it can delay the binding of `ask` to an implementation is to delay the call itself,
+It can delay the binding of `ask` to an implementation only by delaying the call itself,
 so it builds a description now and runs it later.
 
 Deferring execution adds one question to every value you handle:
@@ -1004,7 +1005,7 @@ print(asyncio.run(description), ran)
 
 Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyncio-mechanics),
 a description of work.
-The body waits, so `ran` is still `[]`.
+The body has not started, so `ran` is still `[]`.
 The body runs only when something drives the description: an `await`, a task,
 or `asyncio.run()`.
 That description/execution split is the library Effect system model.

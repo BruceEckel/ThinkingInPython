@@ -98,7 +98,7 @@ object for both parameters. You can also replace either parameter with
 a double, and the other parameter keeps its binding.
 
 **Declare what the function needs.** `greet()` requires no change, and
-could not have required one. It names the two Effects it performs and
+could not have required one. It declares the two Effects it performs and
 calls methods on them. Its body names none of `Console`, `input()`,
 `print()`, or `Scripted`, so changing the binding leaves that body
 as it is.
@@ -250,7 +250,7 @@ for line in captured.messages:
 #: Hello, Alice!
 ```
 
-Five signatures name the new Effect. Only two of them use it.
+Five signatures declare the new Effect. Only two of them use it.
 
 **Log at the point of use.** One of the five is new rather than edited: `format_greeting()`, the
 helper that uses the `Log`.
@@ -262,7 +262,7 @@ to hand down to `format_greeting()`.
 `session()`, `menu()`, and `main()`, each gain a `log` parameter whose
 one use is passing it to the next function.
 They sit between `greet()`, which uses the `Log`, and the call site that binds it.
-Their signatures now name an Effect they do not perform,
+Their signatures now declare an Effect they do not perform,
 so a reader of `menu()` learns something false about what `menu()`
 does.
 
@@ -280,7 +280,7 @@ and keeps the signature edits. `format_greeting()` declares in its return
 type that it needs a `Log`, and so does every function on the path to
 `format_greeting()`.
 Their parameter lists and their call sites stay as they were.
-The type checker names each declaration you miss.
+The type checker reports each declaration you miss.
 You supply the binding at one place near the top,
 where the program decides what a `Log` means.
 [Stateless](../../Chapters/46_Effects--Stateless.md) shows that shape
@@ -343,7 +343,7 @@ Neither function in `slope_catch.py` has a side effect or a side
 cause. Both read only their arguments and change nothing outside
 themselves. The two Effects are both exceptions.
 
-The chapter demonstrates both conversions the table names for those exceptions.
+The chapter demonstrates both conversions the table lists for those exceptions.
 `slope()` catches the `ZeroDivisionError`,
 and in `slope_nonzero.py` a restrictive type makes a zero `run` unconstructable.
 The third conversion, a `Result`, applies to both exceptions as well.
@@ -523,7 +523,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Effect Management for Python?](../../Chapters/44_Effects--Effect_Management.md#effect-management-for-python) shows that calling an `async` function returns a coroutine, a description of work.
+[Effect Management for Python](../../Chapters/44_Effects--Effect_Management.md#effect-management-for-python) shows that calling an `async` function returns a coroutine, a description of work.
 Make the helper `async`, then change each caller to `async` with `await` until `asyncio.run()` ends the chain.
 Weigh what you get against the list in [Tracking and Management](../../Chapters/44_Effects--Effect_Management.md#tracking-and-management).
 
