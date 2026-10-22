@@ -689,7 +689,7 @@ whether the `try` block raised a group or a single exception.
 ### Failures as Values with `gather()`
 
 When the others should keep running after one task fails,
-`gather(..., return_exceptions=True)` handles the situation differently:
+`gather(..., return_exceptions=True)` returns each failure as a value instead of raising it:
 
 ```python
 # gather_with_exceptions.py
@@ -747,7 +747,7 @@ Every delay in this chapter so far has a set length or, in `network_io.py`,
 waits on a server in the same process, so every wait so far ends on its own.
 A call to a remote server can wait indefinitely.
 `asyncio.timeout()` (3.11) bounds how long a block of code may run,
-and it composes with `TaskGroup` the way a `with` block composes with anything inside it:
+and a `TaskGroup` nested inside its `async with` block falls under the same deadline:
 
 ```python
 # async_timeout.py
@@ -783,7 +783,7 @@ and re-raises the cancellation as it exits.
 `asyncio.timeout()` recognizes the cancellation as coming from its own deadline,
 so it converts that `CancelledError` into a `TimeoutError` as it exits.
 The caller therefore sees an ordinary exception instead of a bare cancellation.
-The last two lines show the deadline's reach.
+The last two lines show which task the deadline stopped.
 `fast` finishes before the deadline and keeps its result,
 and `slow` reports `cancelled() == True`.
 
@@ -1121,13 +1121,14 @@ asyncio.run(main())
 #: after: context -, global req-3
 ```
 
-The listing puts the global and the `ContextVar` side by side because they behave differently for the same code.
+The listing puts the global and the `ContextVar` side by side,
+so each printed line shows both values as one task reads them.
 All three tasks assign both, then suspend at the `await`,
 then resume to read them back.
 Each task reads its own `request_id`.
 Every task reads the same `current`, because by the time any of them resumes,
 the global holds `req-3`.
-The last line shows the other direction.
+The last line shows what `main()` reads after its tasks finish.
 Because `main()` creates the tasks,
 their contexts are copies of `main()`'s context,
 so the value a task sets stays in its own copy.
@@ -1400,7 +1401,7 @@ and the pool starts a worker for each of the `cores` tasks.
 
 Wall time drops sharply as the split grows toward one task per core.
 Past that point the curve flattens,
-and can turn back upward when pickling one more chunk costs more than what you get from load balancing.
+and can turn back upward when pickling one more chunk takes longer than the finer load balancing saves.
 
 Task counts double from 1 up to `CORE_MULTIPLIER` times the core count,
 so the sweep covers well below, at, and beyond the number of cores available.
@@ -2321,8 +2322,9 @@ The interpreter pool keeps all five workers in one process.
 
 ## Are Threads Still Necessary?
 
-`asyncio` handles I/O-bound work.
-Processes and [subinterpreters](#subinterpreters) handle CPU-bound work.
+`asyncio` overlaps the waits of I/O-bound work.
+Processes and [subinterpreters](#subinterpreters)
+run CPU-bound work on separate cores.
 With both halves covered, does new code still need threads?
 
 It does, but not for the reason threads were once the default choice.
