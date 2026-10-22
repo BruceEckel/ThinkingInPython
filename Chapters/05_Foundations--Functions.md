@@ -190,7 +190,6 @@ print(good_append(2))
 #: [2]
 ```
 
-A mutable default persists because the function object holds it and every call reuses it.
 The function object keeps its default values in the tuple `__defaults__`.
 Both calls append to the same list inside that tuple.
 The default looks like an expression each call evaluates,
