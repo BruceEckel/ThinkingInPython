@@ -12,7 +12,7 @@ and the client programmer chooses an implementation.
 The system behaves differently as it moves from state to state.
 
 You call `run()` on a state to perform its behavior.
-Providing an input to `next()` moves the machine into its subsequent state.
+`next()` takes an input and returns the machine's next state.
 
 We look at two designs.
 In the first, each `State` object decides its own next state.
@@ -87,7 +87,7 @@ Because `Mouse` is a [`StrEnum`](12_Techniques--Data_Classes_as_Types.md#enum-mi
 each member is a `str`, and `print()` shows a member as its value,
 e.g. `mouse appears` rather than `Mouse.APPEARS`.
 
-A sequence of nine moves covers every transition in the trap:
+A sequence of nine moves covers every transition that changes the trap's state:
 
 ```python
 # mouse_moves.py
@@ -381,12 +381,13 @@ A state is an `Enum` member, so a misspelled state is a type error.
 `Rule` is generic in `I`, the input class, and `input_type` is `type[I]`,
 so a rule's `action` and `condition` must accept the class its `input_type` names.
 
-`input_type` is a field as well as the argument of `type[I]`,
+The input class appears twice,
+as the `input_type` field and as the type argument `I`,
 because the two do different jobs.
 `I` exists for the type checker and is erased before the program runs,
 so a `Rule[Money]` object carries only what its fields hold.
 The `input_type` field holds the class,
-and the constructor uses it as half of each table key.
+and `StateMachine`'s constructor uses it as half of each table key.
 
 The constructor groups the rules by `(state, input_type)` into a dictionary,
 so `handle()` finds the candidates for the current state and the input's class in one lookup.
@@ -407,7 +408,7 @@ A rule whose condition is `None` matches every time,
 so it belongs last in its group.
 
 When every condition in a group returns `False`,
-`handle()` raises the same `NoTransition` a missing key raises.
+`handle()` raises the same `NoTransition` it raises for a missing key.
 
 ### A Vending Machine
 
@@ -661,9 +662,9 @@ for input_ in inputs:
 #: SELECTING col 0 -> COLLECTING: Cleared: 25c, 0 left
 ```
 
-The two `Cleared` lines end in different states,
+The first two `Cleared` lines end in different states,
 `COLLECTING` for too expensive and `UNAVAILABLE` for sold out.
-The state after the arrow names the condition;
+The state after the arrow shows which condition passed;
 the message alone leaves you to infer it from the `left` count.
 
 The last input picks the sold-out slot again with a dime inserted,
@@ -744,7 +745,7 @@ def test_no_transition_raises() -> None:
 
 The first design, [Each State Decides](#each-state-decides),
 suits a machine whose states have only a few transitions.
-Reading `trap_states.py`'s `LURING` and `luring()` tells you what it does and which states can follow it.
+Reading `trap_states.py`'s `LURING` and `luring()` tells you what that state does and which states can follow it.
 Adding a state is one row and one function.
 The design reads best when the transitions are obvious from the state's own name.
 
