@@ -1119,7 +1119,7 @@ It might fail and take the system down.
 You discover these behaviors by trusting documentation, reading source,
 and observing failures.
 Then you write compensating code.
-An enormous part of professional programming is consumed by this activity,
+This activity consumes an enormous part of professional programming,
 and it has been normal for so long that it goes unnoticed.
 Like every hand-tracked concern before it, this one prevents scaling.
 
