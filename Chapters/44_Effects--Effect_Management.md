@@ -200,7 +200,7 @@ expect(ValueError, slope, 10, -1)
 #: [ValueError] run cannot be negative: -1
 ```
 
-Catching the exception works with the types you have.
+Catching the exception keeps `slope()`'s return type, `float`.
 But an `except` clause catches the exceptions it specifies and lets the rest propagate.
 `slope()`'s `except` specifies `ZeroDivisionError`.
 `validate()` raises `ValueError` for a negative `run`.
@@ -412,7 +412,7 @@ The second phase divides the impure part by kind.
 Each kind yields its own benefit:
 
 - **Failures** [become data](#converting-effectful-to-pure) in a `Result`.
-  The caller handles them as ordinary return values instead of managing an exception-handling mechanism.
+  The caller handles them as ordinary return values instead of catching exceptions.
 - **Side causes** become replaceable inputs.
   A test substitutes a constant clock for the real one,
   or a seeded generator for true randomness.
@@ -489,7 +489,8 @@ while the hundred functions remain untouched.
 
 To add caching, tracing, or retries to every storage access,
 you insert a layer at the binding point instead of modifying every call site.
-Variation concentrates at the edge of the program.
+Each swap of an implementation, and each layer added around one,
+happens at the edge of the program.
 
 ### Effects by Hand
 
@@ -604,7 +605,8 @@ raises a `LookupError` at runtime, in the frame that reads the `ContextVar`.
 A `ContextVar` created with a default returns that default,
 so the read succeeds and the mistake appears later,
 as the incorrect result the default produces.
-You must still do the bookkeeping, but the type checker can no longer verify it.
+You must still set every `ContextVar` by hand,
+and the type checker cannot verify that you did.
 
 An EMS moves the bookkeeping into the type system.
 Either the system infers each Effect from the body,
@@ -670,7 +672,8 @@ The compiler infers the row from what the body calls
 (this listing explicitly writes the rows for `greet()` and `main()` so you can see them).
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
-Since the compiler does that work, you rarely write a row by hand.
+Since the compiler computes each row from the calls in the body,
+you rarely write a row by hand.
 You annotate explicitly to specify a constraint,
 such as declaring that a function must remain Effect-free.
 
@@ -852,7 +855,8 @@ A library works with values alone, so every Effect must become a value.
 Execution begins when the ZIO runtime interprets that structure at `run`,
 the edge between description and action.
 
-The TypeScript [Effect](https://effect.website/) library works the same way:
+The TypeScript [Effect](https://effect.website/)
+library also builds a description and runs it later:
 
 ```typescript
 // ts/greet.ts
@@ -1018,11 +1022,11 @@ so any function that awaits a coroutine must become `async`,
 and so must its callers, all the way up to the edge.
 If you replace "async" with "network access" or "database write" in that sentence,
 you have described Effect tracking.
-Python demonstrates that the machinery can work,
+Python demonstrates that this tracking can work,
 and hard-codes it to a single Effect, asynchrony,
 rather than letting you declare your own.
 
-Third-party libraries supply pieces of the rest.
+Third-party libraries supply other parts of an EMS.
 The [returns](https://github.com/dry-python/returns)
 library provides four containers:
 
@@ -1130,12 +1134,14 @@ The compiler checks every composition,
 comparing each callee's Effects with the caller's declaration at each call.
 
 Languages that track Effects today are young,
-and libraries that retrofit Effect tracking are demanding.
+and libraries that retrofit Effect tracking make you package each Effect's interface and implementation by hand,
+and wrap every effectful call.
 Effect tracking will look obvious in hindsight.
 Future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
 Python offers no native Effect tracking beyond `async`, and will not soon.
-[Generators](45_Effects--Generators.md) supplies the mechanism a library needs,
+[Generators](45_Effects--Generators.md) shows the mechanism a library needs:
+a generator suspends and resumes with a value.
 [Stateless](46_Effects--Stateless.md) builds a library EMS on that mechanism,
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 puts the library to work.
