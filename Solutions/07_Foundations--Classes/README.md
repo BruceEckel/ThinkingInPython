@@ -573,9 +573,8 @@ info: No `show` definitions were found on any superclasses of `Derived`
 
 If you remove the decorator, the type checker reports no error, since
 the code no longer states an intention for it to verify.
-The program prints `Derived.show` at every step of the exercise. The feature has
-three parts: `@override` states an intention, the type checker
-verifies it, and the running program ignores it.
+The feature has three parts: `@override` states an intention, the
+type checker verifies it, and the running program ignores it.
 
 In a real codebase the base class and its overrides often sit in
 different files, so a rename slips past a reader. With `@override` on
