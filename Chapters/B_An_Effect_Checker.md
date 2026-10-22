@@ -252,7 +252,7 @@ in the style of [*Visitor*](33_Patterns--Visitor.md).
 `visit_` plus the node's class name,
 so a walker subclasses `ast.NodeVisitor` and defines one such method for each node class it handles.
 A `match` lists the node classes in its cases,
-so it does the same work with no class to subclass.
+so it chooses the code to run for each node class with no class to subclass.
 
 `dotted()` is the smallest of these matches.
 It is recursive, as the tree is.
@@ -434,8 +434,8 @@ as the type checker trusts a `cast()`.
 `hides()` is the third line of Appendix A's rule, "the Effects f handles,"
 in the weakest form you can write without handlers.
 
-The annotation also puts two pieces of metadata in one `Annotated`,
-the arrangement PEP 593 exists to allow.
+The annotation also puts two pieces of metadata in one `Annotated`.
+PEP 593 lets an `Annotated` carry any number of metadata objects after its type.
 `row()` from Appendix A keeps the `Performs` objects and passes over the `Hides` object.
 
 ```python
@@ -649,7 +649,7 @@ A name bound in any of those ways gets `UNRESOLVED`,
 and so does a name that two assignments give different types.
 An annotation overrides `UNRESOLVED` in both cases.
 
-The or-pattern in `assigned()` handles every one of those binding nodes.
+The or-pattern in `assigned()` matches every one of those binding nodes.
 Each alternative binds `name`, as an or-pattern requires.
 `values` supplies the name's type.
 `ast.walk()` visits an assignment before its target,
@@ -689,7 +689,7 @@ def module_scope(module: str, tree: ast.Module) -> Scope:
     return Scope(module, named.names, defined, types)
 ```
 
-`module_scope()` fills `types` the same way for a module's top level.
+`module_scope()` fills `types` for a module by calling `assigned()` on its top-level statements outside any function or class.
 It reads each `type` statement separately,
 so a parameter annotated `Table` resolves to `builtins.dict`.
 It also keeps those statements out of `assigned()`,
@@ -1152,7 +1152,7 @@ def test_a_broken_module_is_a_finding() -> None:
 ## Effects for Code You Don't Own
 
 The table covers the standard library with patterns.
-A third-party library needs the other form, a *stub*:
+A third-party library gets its declarations from a *stub*:
 source text in this appendix's own notation,
 passed to `check()` under the library's module name.
 
@@ -1256,7 +1256,8 @@ The output names no function from `effect_table.py`, `call_names.py`,
 so the checker confirms that its core is pure.
 `FileSystem` and `Console` appear in three functions at the edge and in the module that calls them.
 [Effect Management](44_Effects--Effect_Management.md#a-program-can-never-be-pure)
-calls that arrangement pushing the Effects to the edges.
+calls isolating the Effects in a few functions,
+with the rest of the program pure, pushing the Effects to the edges.
 Here a tool verifies it.
 
 The one `Unknown` is `Ok.bind()`, which calls the function it receives.
@@ -1390,4 +1391,4 @@ Removing those limits means writing a type checker.
 Much of tracking needs no type inference, though.
 Name resolution, a table of the standard library,
 and a fixed point give every function in a program a row.
-Here they also verify the architecture of the program that computes the rows.
+Here they also verify that the core of the program that computes the rows is pure.
