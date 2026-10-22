@@ -1355,8 +1355,7 @@ A production tool must remove each one:
 - A function passed as an argument.
   In `list(map(print, names))` the checker resolves `list()` and `map()`,
   which the table calls pure.
-  `print` is an argument there,
-  and the checker resolves callees and passes over a function named as an argument.
+  `print` is an argument there, so the checker passes over it.
 - A method that runs without a call expression: an operator, a property,
   a `with` statement, or a `for` loop.
 - A pure pattern in the table, which matches every name beneath it.
