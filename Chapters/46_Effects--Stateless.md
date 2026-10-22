@@ -444,7 +444,7 @@ The type records which handler answered.
 `chosen` is already `(str) -> Success[None]`,
 so `fallback(chosen)` keeps that type.
 
-A default removes the check that makes `Need` worth declaring.
+A default removes the type check, the reason a function declares its `Need`.
 An Effect missing its `Console` now passes the type check and runs.
 A forgotten binding then shows up as a wrong-looking result rather than an error.
 Use a fallback for a genuine default, a null logger or a no-op console,
