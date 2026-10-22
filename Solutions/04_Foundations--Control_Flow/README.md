@@ -330,7 +330,6 @@ print(run("go north"))
 matches on length as well as content, so
 `["go", direction]` matches only a list of two items. The three-item
 split matches neither of the original patterns and reaches `case _`.
-The longer pattern gives a three-item list a `case` of its own.
 
 **Arrange the patterns.** Order matters only between patterns that
 could both match the same value.
