@@ -292,7 +292,7 @@ except ValueError as e:
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so it drops the extra score.
 Stopping silently is convenient when the lengths differ on purpose and a bug when you expect them to match.
-`strict=True` raises a `ValueError`.
+With `strict=True`, `zip()` raises a `ValueError` when the lengths differ.
 `zip()` checks the lengths during iteration,
 when one argument runs out while another still has items,
 so the listing consumes the `zip()` with `list()`.
@@ -435,7 +435,7 @@ As in C++ and Java, an exception propagates up the call stack until it finds a h
 If the exception reaches the top of the stack,
 Python prints the traceback and stops the program.
 In Python, a handler is `except` followed by the exception type it handles.
-You can specify the type, or add an `as` to capture the exception object,
+An optional `as` after the type captures the exception object,
 as in `except ValueError as e`:
 
 ```python
@@ -593,7 +593,7 @@ The `except BadNumber` handler matches on the class.
 
 Each output line starts with a function's name, then shows the `__cause__`,
 `__context__`, and `__suppress_context__` of the `BadNumber` it raised.
-`name()` gives an attribute's exception class,
+`name()` gives the class name of the exception an attribute holds,
 or `None` when the attribute is empty.
 
 In all three functions,

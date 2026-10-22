@@ -241,11 +241,11 @@ except TypeError as e:
 ```
 
 **Let an unmatched exception through.** `divide_and_report(1, "x")`
-raises `TypeError` inside `checked_divide()`, because Python cannot
-divide an `int` by a `str`. The `except` clause names
+raises a `TypeError` inside `checked_divide()`, because Python cannot
+divide an `int` by a `str`. The `except` clause specifies
 `ValueError`, so the `TypeError` propagates past it.
 The `finally` block still runs,
-since `finally` runs whatever exception is propagating.
+since `finally` runs whether or not an exception is propagating.
 The `else` clause runs only when the `try` block finishes without an exception,
 so the two lines of output come from `finally` and from the caller.
 
