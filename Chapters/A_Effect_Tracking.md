@@ -7,8 +7,7 @@ This appendix states the tracking problem apart from any one language,
 says why a language that tracks Effects natively solves the problem best,
 and then builds the carrier Python has today,
 the `Annotated` type from [PEP 593](https://peps.python.org/pep-0593/).
-The last part analyzes the tool that would check those annotations,
-showing how much of a type checker the tool would contain.
+The last part analyzes the tool that would check those annotations and shows how much of a type checker the tool would contain.
 [An Effect Checker](B_An_Effect_Checker.md)
 builds the part of that tool that needs no type inference.
 
