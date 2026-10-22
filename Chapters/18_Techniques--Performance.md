@@ -46,7 +46,7 @@ The standard library includes two profilers,
 the classic `cProfile` and a sampling profiler new in Python 3.15.
 `cProfile` is a deterministic tracing profiler that arrived in 2006 and records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
-sometimes enough to distort the behavior you are measuring.
+sometimes enough to inflate the times of functions that make many small calls.
 You run `cProfile` on a script from the command line:
 
     uv run python -m cProfile -s cumulative my_program.py
@@ -254,7 +254,7 @@ and after the first hit the monitored code runs at full speed again.
 
 A profiler gives you a ranked table with no code to write.
 `sys.monitoring` gives you one number about one function.
-It is the better tool when you know which function matters and the profiler's overhead changes the answer.
+It is the better tool when you already know which function to measure and the profiler's overhead changes the answer.
 
 ## Benchmark Alternatives with `timeit`
 
@@ -700,7 +700,8 @@ The [immutable containers](03_Foundations--Containers.md#immutability)
 are not a speed upgrade.
 A `frozenset` looks up just as fast as a `set`,
 a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.
-In CPython these share the same machinery.
+In CPython each one uses its mutable partner's lookup,
+a hash table for the two frozen containers and an element-by-element scan for `tuple`.
 Choose immutability for correctness and safe sharing.
 Immutable values are hashable,
 so they can serve as dictionary keys and as arguments to the caches below.
@@ -1110,7 +1111,8 @@ for `__slots__` specifically,
 attribute access through a known offset instead of a `__dict__` lookup.
 Slots and `array` reduce per-object overhead, `memoryview` avoids copies,
 and the byte counts below show what each tool saves.
-Multiply by a population in the millions to see why it matters.
+A saving of a few hundred bytes per instance, multiplied by a million instances,
+is a few hundred megabytes.
 
 ### Slots
 
@@ -1559,7 +1561,8 @@ examines: describe the whole-array result and let the engine arrange the steps.
 NumPy is a fast library you call, not a compiled extension you write.
 You keep NumPy's speedup only while the data stays inside NumPy.
 Calling a Python function on each element,
-or converting arrays to lists and back, reintroduces the overhead.
+or converting arrays to lists and back,
+puts a Python-level step back on every element.
 
 One machine measured the vectorized pass at about 11x faster than the loop.
 The 3x threshold sits far below any multiple you should see.
@@ -1613,8 +1616,8 @@ Numba often runs nearly as fast as C.
 The first call stops to compile.
 Numba also rejects code that uses general Python objects,
 such as custom classes.
-When the hot spot is number-crunching,
-`@njit` is a lighter step than rewriting in another language.
+When the hot spot is number-crunching, `@njit` needs one decorator,
+where rewriting in another language needs a second toolchain and a build step.
 
 One machine measured the compiled `count_primes()` at about 12x faster than the loop.
 The 3x threshold sits far below any multiple you should see.
@@ -1684,7 +1687,7 @@ so the 3x threshold leaves a wide margin here too.
 
 ## Converting a Slow Function to Rust
 
-Moving the hot function into a compiled language works well.
+Moving the hot function into a compiled language runs it as machine code instead of as bytecode.
 Rust fits because two tools, described below,
 generate the binding code and build the package for you.
 If you ask your AI to convert the hot Python function,
@@ -1800,7 +1803,8 @@ Adding Rust makes one baseline and three faster alternatives,
 listed by how much work each takes rather than by speed.
 The plain Python loop, timed in the Numba listings and in `demo.py`,
 is the baseline.
-NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
+NumPy alone runs the parts of a problem that reduce to whole-array arithmetic,
+in compiled loops.
 `@njit` compiles a loop that no array expression can replace,
 at its first call and from inside Python.
 Rust compiles that loop ahead of time,
@@ -1862,7 +1866,7 @@ stopping when the program is fast enough:
    It may be fast enough.
 2. Try a faster platform: a newer CPython, a tail-calling build, its JIT, PyPy,
    or better hardware.
-3. Write idiomatic Python and let the interpreter's C loops do the work.
+3. Write idiomatic Python and let built-ins like `sum()` run the loop in C.
 4. Fix the algorithm and the data structures.
    This can produce order-of-magnitude improvements.
 5. Make pipelines lazy with generators.
