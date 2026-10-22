@@ -196,10 +196,10 @@ print(sorted(unique))
 #: ['Alice', 'Bob', 'J', 'John']
 ```
 
-**Collapse the repeats.** The set holds four entries, one more than the filtered version. The
-seven names normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`,
-`Bob`. A set keeps one of each, so the duplicates and the case variants
-collapse to `Bob`, `John`, and `Alice`.
+**Collapse the repeats.** The set holds four entries, one more than the filtered version.
+The seven names normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`, `Bob`.
+A set keeps one of each,
+so the duplicates and the case variants collapse to `Bob`, `John`, and `Alice`.
 `J` makes the fourth.
 
 **Change the case and keep every character.** `"J"` stays apart from `"JOHN"`

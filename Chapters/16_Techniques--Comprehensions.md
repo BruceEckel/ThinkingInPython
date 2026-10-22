@@ -461,8 +461,7 @@ Use it too when the comprehension needs the directory structure rather than a fl
 ## Breaking Up a Complex Comprehension
 
 A comprehension is the right choice when you can read it in one pass.
-A comprehension can nest more `for` and `if` clauses,
-or sit inside another call,
+It can nest more `for` and `if` clauses, or sit inside another call,
 but each addition makes the expression harder to read.
 
 `dense_comprehension.py` and `comprehension_steps.py` share one inventory,
