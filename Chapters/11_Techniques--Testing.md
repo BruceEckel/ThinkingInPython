@@ -949,8 +949,8 @@ def test_negative_balance_sends_message() -> None:
 which is another `Mock` by default.
 `assert_called_once_with()` checks two things at once:
 that `send` ran exactly once, and that it ran with this argument.
-A stub cannot make that check.
-`fake_urlopen()` records nothing about the calls it receives.
+A stub such as `fake_urlopen()` records nothing about its calls,
+so it cannot make that check.
 
 A `Mock` accepts a call the real function rejects,
 so a test keeps passing after the real signature changes.
