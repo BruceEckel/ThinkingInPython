@@ -153,7 +153,7 @@ GoF describes two further variations.
 A *pluggable adapter* is a class with the adaptation built in,
 which takes the adapting operations from its client.
 A *two-way adapter* presents both interfaces at once,
-so it works wherever either type does.
+so code that expects either type accepts it.
 
 ### What an Override May Change
 
@@ -209,7 +209,7 @@ All three approaches follow one Java habit.
 The adapter inherits from `WhatIWant` so that `op()` accepts it.
 Because `f()` is the one method `WhatIUse.op()` calls at runtime,
 any object with an `f()` works, whatever its base classes.
-A type checker still enforces the annotation,
+A type checker still rejects an argument that is not a `WhatIWant`,
 so specify the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 that lists `f()`, not with a base class to inherit.
 [*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
@@ -357,7 +357,7 @@ The test file confirms that:
 - The new `f()` puts its own output in front of the adaptee's `g()` and `h()` results.
 - A forwarded method returns what the adaptee's method returns.
 - A forwarded method carries the adaptee as its `__self__`.
-- A copy and a pickled adapter both still work.
+- A copied adapter still runs `f()`, and an unpickled one still forwards `g()`.
 
 ```python
 # test_adapter.py
@@ -453,7 +453,7 @@ small enough here to read at a glance.
 In real code, the construction order of three or thirty classes belongs inside the subsystem,
 and a façade keeps it there.
 `Facade.start_car()` is the static factory method.
-One call runs the constructors in the right order, starts the car,
+One call runs the three constructors from the inside out, starts the car,
 and returns the assembled `Ignition`, which the last output line shows.
 
 The figure shows each pattern as a before-and-after pair:
@@ -518,7 +518,7 @@ The underscore is a convention,
 and `checkout._PriceEngine` resolves for anyone who types it.
 Mechanically, `from checkout import *` skips a name with a leading underscore.
 An [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
-list of the public names states the same boundary explicitly.
+list of the public names makes `from checkout import *` import exactly those names.
 A façade is an agreement about which names to call,
 not a restriction on the rest.
 
@@ -553,8 +553,8 @@ ask what breaks if you remove it:
 | --- | --- | --- | --- |
 | [*Proxy*](25_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call reaches the implementation |
 | [*Decorator*](14_Techniques--Decorators.md#the-decorator-pattern) | same | behavior | the added behavior |
-| *Adapter* | changed | nothing | the fit between caller and callee |
-| *Façade* | many narrowed to a few | nothing | the simplicity |
+| *Adapter* | changed | nothing | the interface the caller expects |
+| *Façade* | many narrowed to a few | nothing | the short list of names a caller needs |
 
 [*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
 takes the looser view of the first row:
@@ -570,7 +570,7 @@ Name a wrapper for why it is there, not for its shape.
 
 Replacing an interface you own takes two steps.
 The first is writing the new interface.
-Once the better interface exists,
+Once the new interface exists,
 callers keep using the old one until something tells them to switch.
 Deleting the old interface breaks those callers.
 The second step marks the old interface as deprecated,
@@ -639,8 +639,7 @@ where it warns on construction and on subclassing.
 Applied to a single `@overload`,
 the mark deprecates one call signature while the rest stay current.
 When a function now takes a `Path` in place of a string,
-the mark on the string overload makes the type checker flag each call that still passes a string,
-and leaves the rest alone.
+the mark on the string overload makes the type checker flag each call that still passes a string and accept each call that passes a `Path`.
 The mark on an overload is static only.
 At runtime every call runs the implementation,
 so Python issues no `DeprecationWarning`.

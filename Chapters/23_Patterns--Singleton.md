@@ -108,7 +108,7 @@ replace the contents in place with `settings.clear()` and `settings.update()`.
 Mutate through any name.
 Rebind only through the module.
 
-Sharing also depends on the name.
+Sharing also depends on the module's name.
 `sys.modules` uses the module name as its key,
 and the file you launch runs under the name `__main__`.
 If that file is `config.py`, a later `import config` finds no cached entry,
@@ -211,9 +211,9 @@ A caller who annotates the result must write that name.
 A type outsiders must name is public, whatever its first character.
 `_Settings` fits a type that stays inside the module.
 
-Two stronger-looking moves fail the same way.
-Deleting the name after building the instance leaves the class reachable.
-`type(settings())` returns the class.
+Two stronger-looking moves also leave the class reachable.
+Deleting the class name after `settings()` builds the instance changes nothing,
+since `type(settings())` returns the class.
 Defining the class inside `settings()` puts its name in the function's locals,
 and `@cache` runs that body once.
 `type(settings())` still recovers the class.
@@ -231,7 +231,8 @@ so a nested class forces a choice between dropping the annotation and defining a
 
 Privacy in Python is advice, not enforcement.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
-makes the same case about hidden data.
+shows the same limit for data:
+a read-only property over an underscore-named field still hands the caller a mutable reference.
 The reachable class is also useful when a test needs a fresh `Settings`,
 built outside the cache.
 
@@ -446,7 +447,7 @@ Its class blocks direct construction and hands out the sole instance through a c
 The cached factory's `settings()` is that operation written as a function.
 Python [cannot block construction](#nothing-keeps-the-class-private),
 so the class-based forms here keep the constructor public and route every construction to the same shared state.
-Each does more work than a module or a cached factory.
+Each takes more code than a module or a cached factory.
 
 The first form wraps a single instance of a private nested class.
 The second form keeps the instance in a class variable.
@@ -535,7 +536,9 @@ The class then builds the object whether or not anything uses it
 The qualified `OnlyOne.__OnlyOne()` fails,
 since the name `OnlyOne` stays unbound until its own class body finishes running.)
 
-Either way, `OnlyOne` is a lot of code for what a module does on its own.
+Either way, `OnlyOne` takes a nested class, a class variable,
+and a `__getattr__()` to share one object,
+while a module shares its state with no class at all.
 
 ### One Instance in a Class Variable
 
@@ -577,7 +580,8 @@ A `__new__()` that returns some other object skips `__init__()` and fails `isins
 A singleton `__new__()` returns an instance of the class on every construction,
 so Python runs `__init__()` on the shared instance after *every* construction
 (see exercise 7).
-`SingletonClassVar` defines no `__init__()`, so `__new__()` does all the work.
+`SingletonClassVar` defines no `__init__()`,
+so `__new__()` both creates the shared list and appends each argument.
 
 ### Borg: Singleton by Inheritance
 
@@ -590,8 +594,8 @@ A *Borg* points every instance's `__dict__` at the same storage:
 
 ![Three distinct instances share one `__dict__`](_images/borg_shared_state)
 
-The previous singleton designs stand alone,
-but you reuse *Borg* through inheritance:
+Each previous design manages one specific class,
+but *Borg* is a base class that any class reuses through inheritance:
 
 ```python
 # singleton_borg.py
