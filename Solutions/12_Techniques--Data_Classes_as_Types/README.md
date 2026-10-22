@@ -459,7 +459,7 @@ def from_json(text: str) -> Person:
 <summary>Done when</summary>
 
 `from_json()` on your JSON string raises a `TypeFailure` reading `EmailAddress('no-at-sign') needs an @` (with your email text).
-Uncaught, its traceback ends in `EmailAddress.__post_init__()`, outside `from_json()`.
+Uncaught, its traceback runs from `from_json()` through `EmailAddress.__post_init__()` to the `raise` in `check()`.
 
 <details>
 <summary>Solution</summary>

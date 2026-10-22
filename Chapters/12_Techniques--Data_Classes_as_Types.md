@@ -107,7 +107,7 @@ not the running program.
 `f3(11)` returns 1100, beyond anything a legal rating produces,
 and the caller receives it as if it were fine.
 
-A check that is present still stops at the argument.
+A check that is present still tests only the argument.
 `f1(6)` returns 11, outside the range of a rating.
 
 ## A Class Is Not a Type
@@ -630,7 +630,7 @@ A type built at that boundary therefore tests the field's type in the check as w
 
 ### Normalizing a Frozen Field
 
-`__post_init__()` can check a field but cannot change one.
+`__post_init__()` can check a field but cannot assign to one.
 `frozen=True` works by installing a `__setattr__()` that rejects every assignment,
 including assignments in the class's own methods.
 Normalizing a field in `__post_init__()` therefore raises `FrozenInstanceError`:
@@ -992,6 +992,7 @@ A month carries an `int` rather than being one.
 `max_days` reads that number through `.value`.
 A class of your own can be the mix-in too.
 `Enum` passes the assigned value to its `__init__()`,
+unpacking a tuple into separate arguments,
 so `Enum` builds each member the way a constructor call builds an ordinary instance.
 [State Machines](31_Patterns--State_Machines.md#mousetrap-states)
 mixes its `State` data class into `Enum` this way,
@@ -1044,7 +1045,7 @@ A `Flag` is still a closed set.
 so a member is an `int` and compares equal to its number.
 That suits the bit patterns a library or an operating system returns as integers.
 `Mode(6)` turns the integer into `R|W`.
-`IntFlag` also keeps bits that no member names,
+`IntFlag` also keeps unnamed bits,
 so `Mode(9)` holds `X` plus a bare 8 where `Perm(8)` raises an exception.
 
 ## When an `Enum` Beats a Data Class
