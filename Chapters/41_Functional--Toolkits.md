@@ -101,7 +101,8 @@ runs both versions side by side.
 
 An iterative Fibonacci, `a, b = b, a + b` in a loop,
 needs neither recursion nor a cache.
-The recursive one stays the running example here because it keeps the point about caching small.
+The recursive one stays the running example here because its body is one line and its calls repeat the same arguments,
+so the cache's effect shows in the hit count.
 The branching and the repeated subproblem matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
@@ -341,8 +342,9 @@ The rule compares two strings at a time,
 so where `"3"` belongs depends on the string beside it.
 A per-element key for this order is hard to find.
 The comparator states the rule.
-When a key function exists, it is a better choice,
+When a key function exists, use it,
 as in `sorted(words, key=len, reverse=True)`, which orders words by length.
+`sorted()` calls a key function once per element and a comparator once per comparison.
 `cmp_to_key()` is for a comparator that arrives from older code,
 and for an ordering like this one,
 where the rule is a comparison between two elements.
@@ -351,7 +353,8 @@ where the rule is a comparison between two elements.
 
 Fills in the rest of the comparison methods from `__eq__` and one of `__lt__`,
 `__le__`, `__gt__`, or `__ge__`,
-so a class needs two methods instead of five to sort and compare correctly.
+so a class writes two methods instead of five and still supports `<`, `<=`, `>`,
+and `>=`.
 
 ```python
 # functools_total_ordering.py
@@ -645,8 +648,8 @@ The input ends with a `1` to show how `takewhile()` differs from `filter()`.
 `filter()` returns `[1, 2, 1]`,
 because it skips a failing element and tests the next.
 `takewhile()` stops at the first failure, before it reaches the last element.
-On finite data the distinction is a detail.
-On an infinite source it decides whether the program terminates.
+On finite data the two calls differ in which elements they return.
+On an infinite source the difference decides whether the program terminates.
 [Reusable Algorithms](22_Patterns--Iterators.md#reusable-algorithms)
 works through that case.
 
@@ -813,7 +816,7 @@ The second caution concerns memory.
 Each case drains `a` completely before touching `b`,
 so `tee()` stores the whole sequence.
 When one consumer runs far ahead of the other,
-`list()` is simpler and uses the same memory.
+`list()` collects the same values once, and both consumers read that one list.
 `tee()` saves memory when the consumers stay roughly in step.
 
 [Iterators](22_Patterns--Iterators.md#what-tee-buffers)
@@ -1005,8 +1008,9 @@ A tree walk branches too, but each subproblem occurs once,
 so a cache saves nothing.
 The reason to recurse there is shape.
 Code that walks a tree, nested data,
-or a directory reads best when its shape matches the data's shape.
-The function handles one node and calls itself for the rest:
+or a directory can call itself once for each nested level,
+so its calls nest the way the data does.
+`deep_sum()` adds up one list's integers and calls itself for each nested list:
 
 ```python
 # nested_sum.py
@@ -1068,7 +1072,7 @@ so seven students have none.
 
 A given `students` and `size` may have no exact answer.
 Here, the general version therefore replaces the circle method with a greedy search,
-which produces a good schedule rather than a perfect one.
+which keeps repeated pairs few rather than ruling them out.
 The greedy search builds each group one member at a time,
 adding whoever the current members have met the fewest times.
 Those meeting counts come from a running history,
@@ -1159,7 +1163,7 @@ The same seven rounds hold `2` repeat meetings.
 For the same eight students and seven rounds,
 the circle method schedules each of the `28` pairs once, with no repeats.
 The greedy search picks each partner from the meeting counts so far and plans no later round,
-so its schedule is good rather than perfect.
+so its seven rounds repeat two meetings and leave two pairs apart.
 
 Trios come from the first seven of those students:
 
@@ -1224,9 +1228,10 @@ because no formula takes a round number and returns the grouping of arbitrary si
 To reach round `100`,
 `group_rounds()` therefore generates rounds `0` through `99` first.
 The circle method computes round `100` from its arithmetic alone.
-[Recursion](#recursion) makes the same choice.
-When a problem outgrows a loop's counter,
-the recursive version keeps its state on the call stack.
+`deep_sum()` in [Recursion](#recursion) makes the same choice.
+A counter cannot record which sublists are still open,
+so the recursive version keeps that state on the call stack,
+one frame per open sublist.
 
 `group_rounds()` remains deterministic in the sense that matters for testing.
 The same `students`, `size`,
