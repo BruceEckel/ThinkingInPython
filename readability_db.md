@@ -578,3 +578,83 @@ and pointers with two candidates,
 where a "This" or an "it" could name either of two nouns in the sentence before.
 Checking each rewritten claim against its listing turned up a few inaccuracies along the way,
 so a pass that rewrites a sentence reads the listing first.
+
+---
+
+## The 2026-10-22 generation
+
+A fourth pass ran on 2026-10-22, six days after the third and one day
+after the whole-book technical and prose review, as 49 Opus agents, one
+per chapter with its Solutions file, from a brief that set the
+annealing disposition: apply every fix that clears the bar, discard the
+rest, write a review file only for a finding only Bruce can decide.
+No agent wrote one. The pass made about 70 edits across 41 chapter
+commits, one to six per chapter, and found nothing to change in 01, 28,
+29, 35, 36, 39, 40, and 43. `tip verify` was green afterwards with no
+marker drift, and the prose tools reported four re-keyed baseline
+entries and one new subject gap, all settled the same day.
+
+The edits clustered on the same shapes as the third generation:
+a sentence restating the paragraph before it or its own bold step
+label (about 30), a "worth" frame with no cost weighed (21's "worth
+learning", 08's "worth annotating precisely", 46's "worth declaring"),
+a §70 "X matters" or "note that" frame (15, 25, 31, 47), an aphorism or
+closer that would fit any chapter (17's "Choose the lightest tool", 24's
+"only as secure as its anchor", 31 Solutions' "Both model a thing that
+changes behavior over time", 45's "the question stops being what a
+function does"), a bare "real" or "really" or "much more" (14
+Solutions, 32 Solutions, 34 Solutions), a trailing participle (17, 31,
+A), and a passive with a by-phrase (44). Three agents rewrapped a
+Solutions paragraph whose lines broke after one word.
+
+### Keeps this round adds
+
+- **A deliberate repetition in 01's AI-disclosure section.** Lines 60
+  to 69 say three times that Claude made the work faster without
+  replacing it; the last sentence was added on its own on 2026-09-30.
+  Treat the passage as settled. Vale's one standing warning, "excellent"
+  at line 69, is in that sentence and is Bruce's own.
+- **"Real" against the exercise or the demo.** "In a real codebase" (07
+  Solutions), "A real module" (29 Solutions), "has a real adapter" (29),
+  "Real programs chain steps" (42), "a real rock-paper-scissors
+  tournament" (32 Solutions). The contrast is the listing on the page,
+  named by context rather than in the sentence. It joins the §34 keep.
+- **The chapter's own term, again.** 24's "faithful substitute" and the
+  Solutions heading "faithless substitutes" fire §35 and stay: they are
+  tied to the listing name `faithless_step.py`. 24's "starts the engine"
+  matches its heading. The convention entry above for 24's "Structure
+  fixes it ... Discipline fixes the rest" anaphora is stale: that section
+  is now a bullet list.
+- **A test-list lead-in.** "The tests cover:" (31) and "The tests
+  confirm that:" (37, B) are the same book-wide lead-in as "The test
+  file confirms that:", and the bare-noun bullets under them are the
+  file's convention, not §59.
+- **"X matters" with the reason in the next sentence is a claim.** 10's
+  "That ordering matters when `__init__()` fails", 30 Solutions'
+  "Keeping the exceptions matters as much as catching them", 37's "The
+  deeper skill is spotting the *vector of change*". Each is followed by
+  the sentences that make it specific. The frame to cut is the one with
+  nothing after it (15's "The parentheses matter", cut this round).
+- **A known-before-new chain is not synonym cycling.** 35 Solutions'
+  "serializes every miss" followed by "Serializing every miss" opens
+  the next sentence on the fact just stated.
+- **Three short claims in a row stay when each is a separate claim with
+  its example following.** 47's "Each is reasonable alone. None composes
+  with another. Some pairs allow no conversion." and 40's five
+  properties of a composition under "Composing Functions".
+- **"brand-new" in 09 Solutions** (three uses) stresses that the
+  instance is fresh and is not an intensifier.
+- **A restatement that closes an exercise's own question.** 27
+  Solutions' "The exercise's closing question turns on that", 38
+  Solutions' "That interleaving breaks the guarantee", 26's chapter
+  closer restating line 691 with the static `factory()` half added.
+
+### Tool notes
+
+- `reflow_prose.py` does not split after a sentence that starts with a
+  lowercase code name: 29's "(see exercise 5). mypy accepts it," stays
+  on one line. The rendered text is the same.
+- `tip grounding-triage` needs `TYPESAFE_API_KEY`, which the agent
+  environment lacks. The sweep left three untriaged SR002 findings for
+  Bruce: 25:209 (the reshaped mangling sentence, from this pass),
+  25:779 and 44:1006 (untouched by this pass).
