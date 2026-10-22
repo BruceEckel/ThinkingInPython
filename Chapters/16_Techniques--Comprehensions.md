@@ -86,7 +86,7 @@ print(list(map(lambda e: e ** 2,  # type: ignore
 The `map()`/`filter()` form calls a `lambda` on every element and is harder to read.
 The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
-`map()` and `filter()` are the better choice when a named function does the work:
+`map()` and `filter()` are a better choice when a named function does the work:
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
 So the `lambda` makes `map_and_filter.py` worse, not `map()`.
 [Functional Foundations](40_Functional--Foundations.md#higher-order-functions)
@@ -627,7 +627,7 @@ print(initials)
 
 A set or dict must hold every element,
 so `set(...)` or `dict(...)` consumes the whole generator immediately.
-Comprehensions build the same results directly and are the better choice:
+Comprehensions build the same results directly and are a better choice:
 `{len(w) for w in words}` for the set and `{w: w[0] for w in words}` for the dict.
 
 Use a generator expression when the consumer takes values one at a time,
@@ -654,7 +654,7 @@ so it converts its argument to a list first.
 A generator expression therefore saves nothing over a list comprehension there.
 
 A generator expression that is a function's sole argument shares the call's parentheses.
-A second argument requires a pair of its own.
+With a second argument, the generator expression needs a pair of its own.
 `sum(n * n for n in nums, 0)` is a `SyntaxError`,
 and `sum((n * n for n in nums), 0)` is the fix.
 
@@ -717,7 +717,7 @@ A list comprehension has no such gap.
 It evaluates its output expression for every element before the next statement runs.
 
 The gap between creation and consumption is also why `path_walk_comprehension.py` uses brackets.
-With parentheses, Python still calls the outermost iterable, `root.walk()`,
+With parentheses, Python still evaluates the outermost iterable, `root.walk()`,
 at creation.
 The walking and the filtering run later, when a consumer pulls values.
 That consumer is `sorted()`,
