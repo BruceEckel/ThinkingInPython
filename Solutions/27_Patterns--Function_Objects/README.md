@@ -132,8 +132,9 @@ In Python that type is a `Protocol`, here `UndoableCommand`.
 `run()` still calls each command with `()`, as it
 calls a function.
 
-The *GoF Design Patterns* shape is a base class with two
-`raise NotImplementedError` bodies. A base class makes sense when
+Written the way `command_pattern.py` writes it, the *GoF Design
+Patterns* shape is a base class with two `raise NotImplementedError`
+bodies. A base class makes sense when
 the commands share implementation. These commands share none.
 
 **Remember what to reverse.** `Deposit` must also remember what it
@@ -354,7 +355,7 @@ Pyright allows the reads, inferring the attributes of a function object.
 satisfies both.
 
 The listing copies the finders from `algorithms.py` rather than
-importing them, because each solution runs on its own.
+importing them, because each failing `return` now returns a `Failed`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -426,7 +427,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) builds a configured *Strategy* from `bisection_within()` and again with `functools.partial`.
+[*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) builds a configured *Strategy* from `bisection_within()` and again with `functools.partial()`.
 Give `newton()` a `tolerance` parameter with a default so existing calls keep working.
 Then write a factory that returns an inner function calling `newton()` with the tolerance, and build a second finder with `partial()` and a keyword argument.
 Both finders match the `RootFinder` type, so `first_root()` needs no change.

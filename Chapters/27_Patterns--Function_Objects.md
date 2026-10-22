@@ -7,7 +7,7 @@
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
-The call site names the signature it calls.
+The call site specifies the signature it calls.
 The callable can come from anywhere.
 [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 states that principle as "design the communication, not the parts."
@@ -108,7 +108,7 @@ The class version takes four classes and a wrapper to say what one list of funct
 Because in Python a callback is a function, the replacement is unnecessary.
 
 A `Command` base class is worthwhile when the commands share implementation.
-A second operation calls for a type.
+A second operation, such as `undo()`, calls for a type with two members.
 The [undo discussion](#a-callable-object-as-a-command)
 describes that type with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 
