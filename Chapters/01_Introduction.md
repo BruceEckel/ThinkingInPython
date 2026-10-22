@@ -159,7 +159,7 @@ errors returned as values instead of raised exceptions,
 and a spectrum of confidence that runs from local reasoning up to machine-checked proof.
 
 Part V, *Effects*, closes the book by covering everything a program does that a pure function cannot.
-One chapter surveys the languages that track Effects in a function's type,
+One chapter surveys languages that track Effects in a function's type,
 and asks what Python could adopt.
 Another develops the full generator protocol.
 The last two put Effect tracking and generators to work with Stateless,

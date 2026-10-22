@@ -957,7 +957,7 @@ but not resume twice, because nothing can copy a generator's paused frame.
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.
-A language written for an AI can drop the conveniences that help people write and read code.
+A language written for an AI can drop conveniences that help people write and read code.
 An AI can start using that language as soon as it works,
 while people take years to adopt a new language.
 
@@ -1095,7 +1095,7 @@ Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
 The solution divided names among separate namespaces.
 In Python, every module is automatically a namespace.
-The practice is so settled that the Zen of Python ends by celebrating it:
+The practice is so settled that the Zen of Python celebrates it:
 <!-- vale House.EmDash = NO -->
 "Namespaces are one honking great idea -- let's do more of those!"
 <!-- vale House.EmDash = YES -->
@@ -1120,9 +1120,9 @@ It might fail and take the system down.
 You discover these behaviors by trusting documentation, reading source,
 and observing failures.
 Then you write compensating code.
-An enormous share of professional programming is this activity,
+An enormous part of professional programming is consumed by this activity,
 and it has been normal for so long that it goes unnoticed.
-Like every hand-tracked concern before it, this one stops scaling.
+Like every hand-tracked concern before it, this one prevents scaling.
 
 An Effect Management System moves the bookkeeping into the type system.
 The function signature answers the questions from [Effect Management Systems](#effect-management-systems):
@@ -1130,10 +1130,8 @@ what does this function need, what does it change, what can go wrong.
 The compiler checks every composition,
 comparing each callee's Effects with the caller's declaration at each call.
 
-The languages that track Effects today are young,
-and the libraries that retrofit Effect tracking are demanding.
-Every solution to a barrier is young and demanding at this stage.
-Namespaces once looked like ceremony.
+Languages that track Effects today are young,
+and libraries that retrofit Effect tracking are demanding.
 Effect tracking will look obvious in hindsight.
 Future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 

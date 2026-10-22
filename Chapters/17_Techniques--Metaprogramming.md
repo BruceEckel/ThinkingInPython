@@ -1475,7 +1475,7 @@ so the line carries a `# type: ignore`.
 Both failures have the same shape:
 an inheritance graph that looks legal until you check each base's layout or metaclass.
 That shape is one more reason to reserve metaclasses,
-and arguably multiple inheritance, for the cases that need them.
+and arguably multiple inheritance, for cases that need them.
 
 ## When You Still Need a Metaclass
 

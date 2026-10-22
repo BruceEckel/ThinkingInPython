@@ -861,8 +861,8 @@ anything a caller cannot reasonably handle.
 Rust and Go call these errors *panics*,
 and keep them apart from the errors a function returns as values.
 
-Use a `Result` for the failures that are part of a function's normal job:
-bad input, a missing file, a value out of range.
+Use a `Result` for failures that are part of a function's normal job: bad input,
+a missing file, a value out of range.
 Those are not exceptional.
 They are routine, and the type should say so.
 

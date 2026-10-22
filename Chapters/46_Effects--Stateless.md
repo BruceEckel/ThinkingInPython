@@ -1182,7 +1182,7 @@ An EMS requires more than the service locator does.
 The dependency must appear in the signature so the type checker can verify it.
 That is why the EMS `greet()` returns `Depend[Need[Console], None]` while `dependency_injection.py`'s `greet()` returns `None`.
 An EMS tracks every dependency,
-so the type checker reports the errors that a programmer's memory or an exhaustive test suite must otherwise find.
+so the type checker reports errors that a programmer's memory or an exhaustive test suite must otherwise find.
 
 ### No Container, Three Consequences
 

@@ -965,7 +965,7 @@ because a function that takes its clock or its fetcher as an argument needs no p
 The tests in this chapter check specific examples:
 this input produces that output.
 A *property-based* test states a law the code must always obey,
-and lets a tool generate the inputs that try to break it.
+and lets a tool generate inputs that try to break it.
 [Confidence](43_Functional--Confidence.md#property-based-testing)
 shows the technique,
 including the [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)

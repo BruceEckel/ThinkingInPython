@@ -141,7 +141,7 @@ so leave a solution at the stage it has reached rather than forcing it toward a 
 
 The progression also runs in reverse.
 A pattern that a language builds in becomes an idiom again, stage one.
-The programmers who arrive next learn it as syntax rather than as a design.
+Programmers who arrive next learn it as syntax rather than as a design.
 Stepping through a container is stage one in Python and was stage four in the *GoF Design Patterns* examples.
 
 ## When a Pattern Dissolves

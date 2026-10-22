@@ -32,7 +32,7 @@ accepts for *Creational* and questions for *Structural* and *Behavioral*.
 A few idioms below belong to no single source.
 They sit in three groups by what they share: language and implementation idioms
 (most of them tied to C++ or Java's limits), functional idioms,
-and dependency supply (the patterns that supply a collaborator from outside).
+and dependency supply (patterns that supply a collaborator from outside).
 Everything else sits in [Other Patterns and Idioms](#other-patterns-and-idioms),
 whose rows share no trait.
 The source and group tables list their rows alphabetically.
