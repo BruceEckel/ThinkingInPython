@@ -1053,8 +1053,8 @@ A function can still call `print()`, next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
 In Python, neither Stateless nor the type checker reports it.
 A library checks the Effects you wrote down.
-Only the language can find the ones you left out,
-because only the compiler reads every call in the body.
+Only a language with native Effects can find the ones you left out,
+because only its compiler reads every call in the body.
 
 Could Python itself gain Effect tracking,
 so that a tool infers every declaration instead of you writing it?
