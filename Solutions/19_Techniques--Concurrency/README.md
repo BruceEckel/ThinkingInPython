@@ -524,7 +524,7 @@ a different design, a detail, or an equivalent alternative.
 
 [What a Process Pool Requires](../../Chapters/19_Techniques--Concurrency.md#what-a-process-pool-requires) describes how a worker process finds the function it must run.
 The worker imports your module, and importing executes every top-level statement.
-Read the `RuntimeError` traceback for what a worker tries to do during that import, and for the name `__mp_main__` that the guard tests.
+Read the `RuntimeError` traceback for what a worker tries to do during that import, and for the name `__mp_main__`, which `__name__` holds in a worker.
 
 <details>
 <summary>Done when</summary>

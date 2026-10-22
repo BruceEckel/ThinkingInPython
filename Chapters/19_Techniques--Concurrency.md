@@ -920,7 +920,7 @@ so the task keeps control through them and needs no lock.
 
 A semaphore initialized to one behaves like a lock, with one difference.
 Releasing a `Lock` that no task holds raises `RuntimeError: Lock is not acquired`.
-An over-released `Semaphore` quietly raises its own limit,
+An over-released `Semaphore` quietly increases its own limit,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
 `asyncio.BoundedSemaphore` checks for that mistake.
 A `release()` beyond its starting count raises a `ValueError`.
@@ -1168,7 +1168,7 @@ asyncio.run(handle("req-7"))
 ```
 
 Leaving the `with` block calls `reset()` on the token,
-and `reset()` puts back the value the variable held before, not the default.
+and `reset()` restores the variable's previous value, not the default.
 So when scopes nest,
 leaving an inner `with` block restores the value the outer one set.
 
@@ -1717,7 +1717,7 @@ The number is one machine's actual output.)
 CPython's default build, convert this indented block to a real, fenced,
 tested example. -->
 
-Free threading finally met the 1996 requirement by making reference counting fast without a global lock.
+Free threading came close to the 1996 requirement by making reference counting fast without a global lock.
 Usually only one thread touches an object, the one that created it.
 *Biased reference counting* lets that owning thread update the count with ordinary,
 non-atomic arithmetic.
@@ -1734,7 +1734,7 @@ so two threads contend only when they touch the same container.
 Biased counting, immortality,
 and per-container locks slow single-threaded code slightly.
 In 3.14, the [free-threading HOWTO](https://docs.python.org/3.14/howto/free-threading-python.html)
-puts the average overhead on the `pyperformance` benchmark suite at about one percent on macOS aarch64 and about eight on x86-64 Linux.
+puts the average overhead on the `pyperformance` benchmark suite at about one percent on ARM64 macOS and about eight on x86-64 Linux.
 The 3.14 What's New page gives roughly 5-10%,
 depending on the platform and C compiler.
 
@@ -2717,7 +2717,7 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
     used STM internally to remove the GIL and exposed a
     `with __pypy__.thread.atomic:` block for ordinary Python code.
     PyPy's own documentation now treats it as discontinued.
- GIL-removal research moved to [fine-grained locking](#free-threading).
+    CPython's [free-threaded build](#free-threading) removes the GIL with fine-grained locking instead.
     A couple of academic prototypes exist (PSTM, TraM),
     but neither is a maintained library suited to real code.
     Haskell's `Control.Concurrent.STM` and Clojure's `ref`/`dosync`
