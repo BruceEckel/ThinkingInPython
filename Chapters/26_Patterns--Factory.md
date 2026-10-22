@@ -6,7 +6,7 @@
 
 When a system needs new types,
 start with a base type that gives them a common interface.
-The common interface separates the rest of your code from knowledge of the specific types you add.
+Code that calls through that interface never names the specific types you add.
 Adding a type then means writing one subclass,
 with no changes to existing code ... or so it seems.
 But something must still create an object of the new type,
@@ -191,7 +191,9 @@ so the name a caller passes to `factory()` is `"Circle"`, not `_Circle`.
 The underscore discourages direct construction,
 but it is a convention rather than concealment.
 [*Singleton*](23_Patterns--Singleton.md#nothing-keeps-the-class-private)
-makes the same case.
+says the same of `_Settings`.
+Its underscore keeps the class out of `from module import *`,
+and Python enforces nothing more.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.
@@ -238,8 +240,7 @@ A class is a first-class object.
 You can store it in a variable and call it to construct an instance.
 [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
 and [`field(default_factory=list)`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared)
-both take a class where a function serves,
-and call it whenever they need a fresh value.
+both take a class as the zero-argument callable they call whenever they need a fresh value.
 
 Thus, the simplest factory is a dictionary that maps names to classes:
 
@@ -350,7 +351,7 @@ but `make()` contains no such line.
 `Shape.registry[name]()` calls a `type[Shape]`.
 Any `type[Shape]` may be a concrete subclass, so the checker accepts the call.
 [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
-moves that report to the check.
+makes the checker report a class that lacks `draw()` at the line that registers it.
 
 Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
@@ -542,7 +543,8 @@ make("Circle").draw()
 ```
 
 `@make.register` has the same form as `@nectar.register` in [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch),
-where `functools.singledispatch` keeps a function's table beside it.
+where `functools.singledispatch` stores a function's implementations,
+keyed by type, on the function itself.
 `singledispatch` cannot serve as this factory,
 because it picks an implementation by the type of its first argument.
 `make()` receives a name.
@@ -689,7 +691,8 @@ and `create_shape()` looks up that factory and calls its `create()`.
 
 Python does not need a `Factory` class nested in every shape.
 `shape_factory_objects.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
-The registry in `registry.py` does the same job with no nested classes.
+`registry.py` stores each class itself in the dictionary,
+with no nested classes.
 
 A separate factory object is worth writing when it holds state of its own,
 such as a pool, a cache, or loaded configuration,
@@ -769,7 +772,7 @@ so the two hierarchies grow together.
 The second hierarchy is justified only when the factory does work of its own,
 as `render()` does here.
 When choosing the class is the factory's only job,
-a dictionary of classes says the same thing in one table:
+a dictionary of classes maps each name to its class in one table:
 `shape_table.py` when the set of shapes is closed,
 `protocol_registry.py` when it is open.
 
@@ -877,7 +880,7 @@ or a rules object passed alongside the factory.
 
 `interact_with()` dispatches on the character's type,
 and `obstacle.description()` dispatches again on the obstacle's type.
-Thus, the pair of calls chooses behavior from both types.
+Thus, the line `play()` prints depends on both types.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
@@ -975,7 +978,8 @@ If you run the program despite the report,
 it fails with an `AttributeError` when `GameEnvironment.__init__()` calls `make_obstacle()`.
 
 Checking against a Protocol is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
-Structural typing preserves the purpose of the interfaces and drops the coupling a shared base class imposes.
+With structural typing, the checker still reports an incomplete class,
+and no concrete class inherits from an interface.
 
 ## Prototype
 
@@ -1303,7 +1307,7 @@ That shape is everywhere,
 so save the name *Builder* for construction that is a process in its own right,
 with intermediate state and rules that apply across several steps.
 When each builder call sets one optional value,
-a data class with keyword arguments does the job.
+a data class with keyword arguments sets the same values in one call.
 
 ## Which Factory to Use
 

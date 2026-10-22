@@ -13,7 +13,7 @@ A `dict` requires the clumsier `d["name"]` syntax.
 
 Fowler's DTO crosses a process or network boundary,
 batching several values into one object to cut round trips.
-The objects in this chapter have the same shape,
+The objects in this chapter also hold several named values in one object,
 whether or not your program sends them to another process.
 To send one to a worker process,
 a [process pool pickles it](19_Techniques--Concurrency.md#what-a-process-pool-requires).
@@ -148,7 +148,8 @@ This book's listings write the frozen form as [`@record`](18_Techniques--Perform
 
 ### `NamedTuple`
 
-A `NamedTuple` declares its fields the same way but produces immutable instances.
+A `NamedTuple` declares its fields as annotations in the class body,
+as a data class does, but produces immutable instances.
 `typing.NamedTuple` is the class form of [`namedtuple()`](03_Foundations--Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names.
 The class form adds a type for each field,
@@ -180,7 +181,8 @@ print(red._asdict(), Color._fields)
 #: {'r': 255, 'g': 0, 'b': 0} ('r', 'g', 'b')
 ```
 
-Printing a `NamedTuple` gives the same readable output as a data class.
+Printing a `NamedTuple` shows the class name and each field by name,
+`Color(r=255, g=0, b=0)`, as printing a data class does.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 
 An attribute bag accepts every write.
@@ -257,7 +259,7 @@ If `Stats` is a `@dataclass`,
 since a data class is not iterable.
 `dataclasses.astuple()` converts a data class when you need the positional form.
 [More Data Class Tools](12_Techniques--Data_Classes_as_Types.md#more-data-class-tools)
-covers the recursive, copying behavior of `astuple()`.
+shows that `astuple()` also converts nested data classes and builds a new copy of every list and dict it returns.
 
 ## A NamedTuple Is Still a Tuple
 
@@ -434,7 +436,7 @@ the same structural equality that `still_a_tuple.py` shows.
 
 Tuple operations return plain tuples: `p + (3.0,)` and `p[:1]` are `tuple`s,
 not `Point`s.
-A subclass that must survive those operations overrides the operators.
+A subclass whose `+` and slicing must return its own type overrides `__add__()` and `__getitem__()`.
 The empty `__slots__ = ()` keeps a `Point` as small as a tuple.
 A subclass that declares no `__slots__` gives each instance a `__dict__`,
 and with it the ability to grow attributes beyond the ones the class declares.
@@ -444,7 +446,7 @@ and with it the ability to grow attributes beyond the ones the class declares.
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
 a `@dataclass` for typed fields you reassign,
 and a `NamedTuple` for typed fields set once.
-The hand-rolled `Messenger` is worth writing only to show how `SimpleNamespace` works underneath.
+The hand-rolled `Messenger` is worth writing only to show that `SimpleNamespace` stores its keyword arguments in the instance `__dict__`.
 
 The frozen data class, which this book writes as `@record`,
 is the other immutable type with typed fields.
