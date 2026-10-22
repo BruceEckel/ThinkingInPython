@@ -75,7 +75,7 @@ At runtime the read raises an `AttributeError`.
 Instead of annotating every variable that holds a `Messenger`,
 you can move that `Any` into the class.
 Declare a [`__getattr__()`](25_Patterns--Surrogate.md#forwarding-with-getattr)
-that returns `Any` and a `__setattr__()` that accepts one.
+that returns `Any` and a `__setattr__()` that accepts an `Any` value.
 The `__getattr__()` covers reads,
 and the write `m.more = 11` needs the `__setattr__()`.
 The standard library's type declaration for `SimpleNamespace` has such a pair.

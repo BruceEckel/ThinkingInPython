@@ -181,7 +181,7 @@ with expected(TypeError):
 but `append()` leaves `toast.steps` bound to the same list.
 
 **Hash the `Recipe`.** Using the `Recipe` as a `dict` key raises a `TypeError`, whose message
-names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
+states the cause: `cannot use 'Recipe' as a dict key (unhashable type:
 'list')`. Hashing a tuple hashes each element, so a `Recipe` is
 hashable only when every field is. The `list` has no hash, so the
 `Recipe` has none either.
@@ -328,7 +328,7 @@ A bare tuple has no `mean` attribute, so the type checker reports
 the `mean` read.
 At runtime that read raises an `AttributeError` before the `count` read runs.
 The `count` read passes the type checker, because a tuple has a `count()` method.
-`result.count` names that bound method instead of the number.
+`result.count` evaluates to that bound method instead of the number.
 The repair is `result[0]` and `result[1]`.
 
 The call sites lose the names. `print(result)` now writes
@@ -514,7 +514,7 @@ so a `NamedTuple` [runs its check in a factory
 function](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate)
 that a caller can bypass.
 A `TypedDict` describes the `dict` that `json.loads()` returns
-and names the keys for the type checker, but at runtime it is a
+and declares the keys for the type checker, but at runtime it is a
 `dict`, which stores the values `json.loads()` gives it. A
 `SimpleNamespace` accepts any name with any value, at runtime and under
 the type checker, so the record holds what the JSON held.
@@ -616,12 +616,12 @@ The parameter carries `tuple[float, ...]` rather than `tuple[float, float]` beca
 The wider annotation lets `p + (1.0, 1.0)` type-check as well as `Point + Point`.
 At runtime, the unpacking `x, y = other` raises a `ValueError` for a tuple of any other length.
 
-**Reuse the properties in `__repr__()`.** `tuple.__repr__()` prints `(4.0, 6.0)`; the override prints the class name around the two properties, so the `Point` names its type the way a `NamedTuple` does.
+**Reuse the properties in `__repr__()`.** `tuple.__repr__()` prints `(4.0, 6.0)`. The override prints the class name around the two properties, so the `Point` names its type the way a `NamedTuple` does.
 
 **What stays a tuple.** Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone, so `p[:1]` is the plain `(4.0,)`.
 A tuple on the left of `+` is the other gap: `(1.0, 1.0) + p` runs `tuple.__add__()` first and concatenates to a four-element tuple, since `Point` defines no `__radd__()`.
 Each tuple operation a `Point` must survive is one more override.
-So a `NamedTuple` is the better choice when positional tuple behavior is a feature, and a record is the better choice when that behavior is a liability.
+So a `NamedTuple` is a better choice when positional tuple behavior is a feature, and a record is a better choice when that behavior is a liability.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
