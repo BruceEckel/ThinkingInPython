@@ -45,7 +45,8 @@ a method the language calls for you.
 The `__new__()` method is the constructor, which you rarely use
 ([*Singleton*](23_Patterns--Singleton.md) shows a case that needs it).
 Most programmers call `__init__()` the *constructor*,
-since it does the job of constructors in other OOP languages.
+since it sets up the new object's attributes,
+as a constructor does in other OOP languages.
 This book follows that practice.
 
 Python calls the constructor automatically when it creates an object.
@@ -129,8 +130,8 @@ it applies an operation to an object without checking an interface first.
 You therefore inherit an implementation, to reuse the code from the base class.
 To name an interface,
 Python uses a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols),
-which describes the shape a function needs.
-A class matches a protocol by having that shape, whatever it inherits.
+which lists the methods and attributes a function needs.
+A class matches a protocol by defining them, whatever it inherits.
 
 First import the base class the same way you import [any name from a module](06_Foundations--Modules_and_Packages.md#importing-names-with-from-and-as).
 Then inherit by listing the base class in parentheses after the name of the inheriting class.
@@ -299,7 +300,8 @@ Python accepts any method name in a subclass.
 If you misspell the name of a method you mean to override,
 you define a new method.
 Python reports nothing.
-Renaming or removing the base method later has the same effect.
+Renaming or removing the base method later leaves the subclass method overriding nothing,
+and Python again reports nothing.
 Either bug is easy to miss.
 
 To let a type checker report either bug,
@@ -349,7 +351,9 @@ At run time `@override` returns the same function object it received.
 Before returning the function,
 the decorator tries to set an `__override__` attribute on it,
 so that code can find overrides by introspection.
-On some callables that assignment raises an exception,
+On an object that rejects the new attribute,
+such as one with `__slots__` or a built-in class,
+that assignment raises an `AttributeError` or a `TypeError`,
 which the decorator catches and ignores.
 
 Apply `@override` to any method that replaces an inherited method.
@@ -380,7 +384,7 @@ print(c.area)  # Properties don't use parentheses
 ```
 
 Here `radius` is a plain attribute, while `area` is a computation.
-The call site reads both the same way.
+The call site reads both with attribute syntax, `c.radius` and `c.area`.
 Writing `c.area()` reads the property and then calls the `float` it produced,
 which raises a `TypeError`.
 
@@ -478,7 +482,9 @@ expect(RecursionError, Circle, 10)
 
 `property(fset=...)` builds a write-only property,
 the reverse of a getter-only one, but write-only properties are rare.
-A method expresses that intent better.
+Reading one raises an `AttributeError` reporting that the property has no getter.
+A method that takes the value makes the write a call,
+with no attribute to read back.
 
 ### Caching with `cached_property` {#cached-property}
 
@@ -646,7 +652,7 @@ print(type(r).__name__)
 
 `from_fahrenheit()` builds its result with `cls(...)` rather than `Temperature(...)`.
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
-so the alternative constructor produces the right kind of object.
+so the alternative constructor returns an instance of that subclass.
 `Reading` inherits the method unchanged.
 `Reading.from_fahrenheit(212)` passes `Reading` as `cls`,
 so `type(r).__name__` reports `'Reading'`.
@@ -656,7 +662,7 @@ Writing `return Temperature(...)` hard-codes the class.
 `is_freezing()` also works as a module-level function,
 and that is the usual choice.
 Its result depends on its `celsius` argument alone,
-so it works the same outside the class.
+so it reads nothing from the class or an instance.
 Make it a `@staticmethod` when it belongs with the class's interface,
 where a reader looks for it,
 or when a subclass should be able to replace it like any other method.

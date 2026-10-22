@@ -72,7 +72,7 @@ expect(TypeError, add, 42, "spam")
 #: 'str'
 ```
 
-A function argument works as long as the function can apply its operations to it.
+A call succeeds as long as each operation in the function body accepts the arguments it receives.
 The failure comes from `+` inside the function body,
 not from the call that passed the arguments.
 The call binds each argument to its parameter and accepts any type.
@@ -147,8 +147,11 @@ including a required one such as `host`, which the last call names.
 At the call site, write every keyword argument after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
 `positional argument follows keyword argument`.
-The grammar allows a few rarer arrangements that this chapter leaves alone.
-Keeping the keyword arguments last avoids every one of them.
+The grammar makes one exception.
+A `*` unpacking, which [Unpacking Arguments](#unpacking-arguments) introduces,
+can follow a keyword argument, as in `f(x=1, *rest)`.
+Its values still bind first, as positional arguments,
+so writing every keyword argument last keeps the call in the order Python binds it.
 
 Every required parameter must come before the first parameter with a default.
 `def f(a=1, b):` is a `SyntaxError`:
@@ -269,7 +272,7 @@ Test the parameter with `is None` rather than truthiness.
 `None` works there because every real `target` is a list.
 When `None` is a valid argument, you need a distinct sentinel.
 Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
-adds a `sentinel` built-in that creates a unique self-describing value for this purpose:
+adds a `sentinel` built-in that creates a unique value that prints as the name you give it:
 
 ```python
 # sentinel_default.py
@@ -308,7 +311,7 @@ Create a sentinel once and share that name.
 Two `sentinel()` calls with the same name build two different objects,
 so `default is sentinel("MISSING")` compares against a second object and is always false.
 
-Code written before 3.15 builds the same sentinel as `MISSING = object()`.
+Code written before 3.15 builds its sentinel as `MISSING = object()`.
 A bare `object()` is unique, so `is` tells it apart from every other value.
 It prints as `<object object at 0x...>`, though,
 where a `sentinel()` value prints its name.
@@ -489,7 +492,7 @@ Because Python raises the `TypeError` there, `calling report` prints first.
 ## Positional-Only and Keyword-Only Parameters
 
 Two markers in a parameter list control how callers may pass arguments.
-The markers also decide how much of a signature you commit to keeping.
+The markers also decide which parameter names you can later rename without breaking a call.
 A parameter's name is part of the contract when a caller can write it,
 and stays outside the contract when the caller must pass by position.
 
@@ -579,7 +582,7 @@ so the call raises a `TypeError`.
 
 Among the built-ins, `max()` and `min()` take a keyword-only `default`,
 which they return for an empty iterable in place of raising a `ValueError`.
-With `max(scores, default=0)`, the call covers an empty `scores`,
+With `max(scores, default=0)`, the call returns `0` for an empty `scores`,
 so the code needs no `try`/`except` around it.
 
 ## Lambdas
@@ -612,7 +615,7 @@ so a traceback shows `<lambda>` where a `def` shows `square`.
 
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
-For anything more complicated, write a `def`.
+A body that needs a statement, such as a `for` loop or a `try`, needs a `def`.
 
 For a key that reads an index or an attribute,
 `operator.itemgetter()` and `operator.attrgetter()` build that key function without a lambda.
