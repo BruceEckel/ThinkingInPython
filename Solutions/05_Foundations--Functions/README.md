@@ -582,8 +582,9 @@ expect(UnboundLocalError, rebinds)
 #: where it is not associated with a value
 ```
 
-**Drop the `global` declaration.** Both calls raise `UnboundLocalError: cannot access local variable
-'count' where it is not associated with a value`.
+**Drop the `global` declaration.** `writes_global()` raises
+`UnboundLocalError: cannot access local variable 'count' where it is
+not associated with a value`.
 Without `global`, the assignment in `count += 1` makes `count` local to
 `writes_global()`, so the read half of `+=` reads that local
 before any assignment gives it a value.

@@ -440,7 +440,7 @@ A call can use several `*` and `**` operands, mixed with ordinary arguments:
 [Containers](03_Foundations--Containers.md)
 uses the same stars to spread iterables into a list, `[*evens, *odds]`,
 and to merge dictionaries, `{**a, **b}`.
-A call is stricter than a dictionary display about a repeated key.
+A call is stricter than a dictionary literal about a repeated key.
 `{**a, **b}` keeps the later value,
 while a call whose two `**` operands share a key raises a `TypeError`.
 
@@ -616,7 +616,7 @@ a lambda body must be a single expression.
 For anything more complicated, write a `def`.
 
 For a key that reads an index or an attribute,
-`operator.itemgetter()` and `operator.attrgetter()` name the same operation.
+`operator.itemgetter()` and `operator.attrgetter()` build that key function without a lambda.
 `sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` in `lambdas.py`.
 For a key that calls a method on each element,
 `operator.methodcaller("lower")` replaces `lambda w: w.lower()`,
