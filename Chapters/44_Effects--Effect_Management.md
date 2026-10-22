@@ -957,7 +957,7 @@ but not resume twice, because nothing can copy a generator's paused frame.
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.
-A language written for an AI can drop the conveniences that help a person write and read code.
+A language written for an AI can drop the conveniences that help people write and read code.
 An AI can start using that language as soon as it works,
 while people take years to adopt a new language.
 
@@ -980,11 +980,11 @@ Its `bind effect` rebinds a handler separately from its use.
 Both separate an Effect's interface from its implementation and bind the implementation later,
 the second and third properties of a full EMS.
 
-## Effect Management for Python?
+## Effect Management for Python
 
 The Python language has no Effect Management System, but it has a start.
-Python tracks one Effect in function signatures,
-and enforces that tracking on every caller: `async`.
+Python tracks one Effect in function signatures: `async`.
+It enforces that tracking on every caller:
 
 ```python
 # coroutines_are_descriptions.py
@@ -1004,7 +1004,8 @@ print(asyncio.run(description), ran)
 ```
 
 Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyncio-mechanics),
-a description of work, and `ran` stays empty.
+a description of work.
+The body has not run, so `ran` is still `[]`.
 The body runs only when something drives the description: an `await`, a task,
 or `asyncio.run()`.
 That description/execution split is the library Effect system model.
