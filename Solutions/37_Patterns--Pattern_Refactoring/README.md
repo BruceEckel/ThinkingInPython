@@ -423,7 +423,7 @@ The method form matters if `Sorter` holds state of its own alongside the dispatc
 a log of notes issued, a configuration, statistics.
 When `Sorter` holds only the dispatch, as here, the function in
 `recycling_note.py`
-is simpler and does the same job. Use `singledispatchmethod` once the
+is simpler and does the same job. Use `singledispatchmethod` when the
 operation needs to read or update an object's state.
 
 The method form also brings the trap that
@@ -453,7 +453,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) keys each bin on `type(piece)`, an exact-class lookup, while `singledispatch` in [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) walks the MRO.
-To let a subclass share its parent's bin, give `Trash` a class variable that names the bin's key, and have `__init_subclass__()` default that variable for each class.
+To let a subclass share its parent's bin, give `Trash` a class variable that holds the bin's key, and have `__init_subclass__()` default that variable for each class.
 A subclass overrides it, and the loop indexes by that attribute instead of `type(t)`.
 
 <details>
@@ -582,7 +582,7 @@ know the exact class that arrived. The note uses the nearest
 registration along the MRO.
 
 **Give each class a default bin.** To share a parent's bin without
-naming a material in the loop, choose your own key instead of
+specifying a material in the loop, choose your own key instead of
 accepting `type(t)`. A `bin` class variable supplies that key.
 `__init_subclass__()` sets each class's `bin` to that class by
 default, so every material keeps a bin of its own.

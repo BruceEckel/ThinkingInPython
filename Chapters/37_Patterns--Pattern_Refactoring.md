@@ -124,9 +124,11 @@ A dictionary keeps its keys in insertion order,
 so the material that appears first in the data prints first.
 Each recycling script in the chapter prints its bins with `report()`.
 
-The tests confirm that each subclass registers itself,
-`create()` builds an instance by name,
-and `sum_value()` totals weight times the per-pound value:
+The tests confirm that:
+
+- Each subclass registers itself.
+- `create()` builds an instance by name.
+- `sum_value()` totals weight times the per-pound value.
 
 ```python
 # test_trash.py
@@ -178,7 +180,7 @@ Aluminum:81
 Cardboard:12
 ```
 
-The parser builds `Trash` objects through the registry and names no concrete material,
+The parser builds `Trash` objects through the registry and specifies no concrete material,
 so it handles a new kind of trash as written:
 
 ```python
@@ -527,7 +529,7 @@ This hierarchy is small and the book owns every subclass,
 so `note()` on each material is a fair choice here.
 The method is a better choice while you own the hierarchy and the operations stay few.
 Each subclass defines its own answer, so a new class brings its answers with it.
-The method is the worse choice when the hierarchy belongs to someone else,
+The method is a worse choice when the hierarchy belongs to someone else,
 or when operations start to outnumber materials.
 
 ### One `singledispatch` Function per Operation
@@ -651,7 +653,7 @@ draws the same distinction between a table keyed by class and dispatch that foll
 ## Choosing the Lightest Construct
 
 Design patterns separate the things that change from the things that stay the same.
-Polymorphism is one way to do that.
+Overriding a method in each subclass is one way to do that.
 This chapter uses two others:
 a dictionary keyed by type and a `singledispatch` function.
 The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#the-vector-of-change)
@@ -659,10 +661,12 @@ and choosing the lightest construct that isolates it.
 
 This chapter meets two vectors, each through a concrete requirement:
 plastic for new types, and the disposal hazard for new operations.
-Each kind of change now touches one place.
-`bins[type(piece)]` bins a new material with no edit,
-one `@recycling_note.register` adds that material's answer to an existing operation,
-and a new operation is one `singledispatch` function in its own file.
+Each kind of change now touches one place:
+
+- `bins[type(piece)]` bins a new material with no edit.
+- One `@recycling_note.register` adds that material's answer to an existing operation.
+- A new operation is one `singledispatch` function in its own file.
+
 None of the three is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
