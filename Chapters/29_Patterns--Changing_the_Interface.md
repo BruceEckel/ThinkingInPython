@@ -639,7 +639,8 @@ where it warns on construction and on subclassing.
 Applied to a single `@overload`,
 the mark deprecates one call signature while the rest stay current.
 When a function now takes a `Path` in place of a string,
-the mark on the string overload warns the callers still passing a string and leaves the rest alone.
+the mark on the string overload makes the type checker flag each call that still passes a string,
+and leaves the rest alone.
 The mark on an overload is static only.
 At runtime every call runs the implementation,
 so Python issues no `DeprecationWarning`.

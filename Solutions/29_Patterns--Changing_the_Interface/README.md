@@ -190,9 +190,9 @@ they get the `Report`, not where they call `render()`.
 both lines carry `# type: ignore`.
 
 Python issues the subclass warning when the `class` statement runs,
-so for a module-level subclass the warning appears at import, before any call. A library that subclasses a
-deprecated class emits the warning as soon as Python imports that
-library.
+so for a module-level subclass the warning appears at import, before
+any call. A library that subclasses a deprecated class emits the
+warning as soon as Python imports that library.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -301,7 +301,7 @@ print([name for name in vars(shop)
 #: ['record', 'start_car']
 ```
 
-**Hide the classes behind a function.** The caller sees one function.
+**Hide the classes behind a function.** The caller uses one function.
 Inside the module, `start_car()` holds the assembly order:
 `_Ignition(_FuelPump(_Engine()))`.
 `shop._Engine` and `shop._FuelPump` still reach the classes, because
