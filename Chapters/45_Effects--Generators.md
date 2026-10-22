@@ -1,8 +1,8 @@
 # Generators
 
-> Some computations pause partway, ask for something,
+> A generator can pause partway, ask for something,
 > and continue when the answer arrives.
-> Python's generators can do that, and an Effect system is built on it.
+> An Effect system runs on that conversation.
 
 [Iterators](22_Patterns--Iterators.md#generators)
 presents generators as a way to produce values lazily:
@@ -10,7 +10,7 @@ a function containing `yield`,
 driven by a `for` loop that takes one value at a time.
 Producing values is half of what a generator does.
 
-The other half is the return path.
+The other half runs the other way.
 `yield` is an expression,
 so a generator can receive a value as well as hand one out,
 and it can return a final result when it finishes.
@@ -35,7 +35,7 @@ A generator that also receives values needs the full annotation:
 
     Generator[YieldType, SendType, ReturnType]
 
-This annotation specifies the three things a generator exchanges with its caller:
+This annotation specifies the type of each of the three values a generator exchanges with its caller:
 
 - `YieldType` is the type `yield` hands out,
   thus the type `next(generator)` returns.
@@ -65,10 +65,10 @@ print(list(countdown(6)), list(squares(6)))
 ```
 
 `Generator[int]` means `Generator[int, None, None]`.
-`Iterator[int]` describes the same one-way generator and reads better.
+`Iterator[int]` describes the same one-way generator without relying on the defaults.
 It describes the yield channel alone,
 so a type checker rejects `send()` on anything annotated `Iterator`.
-The long form is necessary when the send and return channels carry something,
+The long form is necessary when the send and return channels carry a value other than `None`,
 as they do in this chapter.
 
 Here, the `interview()` generator yields a question, receives an answer,
@@ -93,7 +93,8 @@ def interview() -> Generator[Question, Answer, Result]:
 Although `Generator[str, str, str]` describes `interview()` accurately,
 it gives all three channels the same `str`.
 `NewType` gives each channel a distinct type,
-so the annotation states the arrangement and a type checker enforces it.
+so the annotation says which kind of value each channel carries,
+and a type checker rejects a value on the wrong channel.
 `Question` fills the `YieldType` position, `Answer` the `SendType`,
 and `Result` the `ReturnType`.
 The distinction exists for the type checker.
@@ -161,7 +162,7 @@ so a `next()` call inside the body can trigger that conversion.
 
 A suspended generator holds its frame:
 the position in the body and every local variable.
-Resuming continues the existing computation.
+Resuming runs the body from that position, with every local variable intact.
 `interview()`'s local `name` keeps its value through the next two `send()` calls,
 and `town` keeps its value through the last one.
 The frame holds them, and the frame is the generator's state.
@@ -201,9 +202,9 @@ The call returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
 the same three-part shape as a `Generator`.
 The match is deliberate.
-`async def` and generator functions both build descriptions that something else drives.
+`async def` and generator functions both build descriptions for a driver to run.
 Calling `interview()` returns a generator object but runs nothing in the function body.
-`next()` and `send()` do that work, one `yield` at a time.
+`next()` and `send()` run the body, one `yield` at a time.
 
 A generator is more useful than a coroutine here because you write the driver.
 A coroutine's requests go to the event loop.
@@ -277,8 +278,8 @@ Nothing verifies it.
 
 Inside the `try`, `StopIteration` means the conversation finished,
 so only the `send()` call sits there.
-`next()` on an exhausted answer source also raises `StopIteration`,
-so a call like that belongs outside the `try`.
+A driver that reads its answers from an iterator gets a `StopIteration` from `next()` when that iterator runs out,
+so that call belongs outside the `try`.
 
 `interview()` accepts its answers from any driver that calls `send()`.
 Its body is three questions and a `return`,
@@ -452,7 +453,7 @@ The driver sees `StopIteration` once,
 when `both()` finishes its last delegation.
 
 The natural first attempt is to write the forwarding as a loop by hand.
-That loop silently discards every sent value:
+That loop discards every sent value, and nothing reports the loss:
 
 ```python
 # manual_forwarding.py
@@ -530,13 +531,13 @@ As the `SendType` it is the value the driver sends in,
 which arrives as the value of the `yield` expression and binds to `answer`.
 As the `ReturnType` it is the value `ask()` returns when it finishes.
 That value becomes the value of the whole `yield from` expression,
-so `interview()`'s three assignments read like ordinary ones.
+so each of `interview()`'s three assignments binds an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
 because it returns a sentence built from all three answers,
 a different kind of value from the answer to any one question.
 
 `drive()` receives a request that `ask()` yielded two frames down,
-and treats it the same as one that `interview()` yielded in its own body.
+and looks it up in `answers` as it would one that `interview()` yielded in its own body.
 The answer `drive()` sends back becomes the value of the `yield` inside `ask()`.
 Nothing in `ask()` specifies the driver that sent it.
 A single loop at the edge of the program interprets requests yielded anywhere inside it.
@@ -581,7 +582,8 @@ Now `survey()` delegates to `interview()`.
 
 `survey()` then asks about a color,
 so the argument to `drive()` uses the dictionary union operator to add one more pair to a copy of `ANSWERS`.
-The driver receives one more question and the same shape of trace.
+The driver receives one more question,
+and the trace gains one more `request` line and one more `ask()` line.
 
 `drive()` still runs `interview()`, now through `survey()`.
 Something must still call `next()` and `send()` at the top,
@@ -839,11 +841,11 @@ answering each request before the next turn.
 `index()` discards what it receives.
 A job that yields only to take turns can ignore the answer.
 
-You have run a driver like `drive()` many times.
+Every call to `asyncio.run()` runs a driver like `drive()`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 describes `await` as suspending a task until the event loop resumes it.
-The protocol underneath is the two halves `task_runner_send.py` combines:
-`task_runner()`'s turn-taking and `drive()`'s question-answering, in one loop.
+The event loop does the two things `task_runner_send.py` combines.
+It gives each task a turn, and it answers the request each task yields.
 A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.
 `await` suspends the coroutine and yields a request, a `Future`,
@@ -889,7 +891,7 @@ The `yield` goes to `main()`.
 
 On each pass, `async for` awaits the generator's `__anext__()`,
 so the `async for` loop must appear inside an `async def`.
-The *asynchronous comprehension* `[n * n async for n in countdown(3)]` collects the values the same way,
+The *asynchronous comprehension* `[n * n async for n in countdown(3)]` collects the values through the same `__anext__()` calls,
 and it also requires an enclosing `async def`.
 
 `AsyncGenerator[YieldType, SendType]` takes two parameters,
