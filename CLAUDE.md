@@ -648,19 +648,25 @@ and how it was measured.
   chapter) that vanished once invoked via `uv run`. Always go through
   `uv run` for anything that executes example code; never assume bare
   `python`/`ty`/`pytest` matches it. Bare `python` is also a different
-  *build* of the same version: `C:/Python/python.exe` is the python.org
-  installer's CPython, with the JIT compiled in
+  *build* of the same version. Since 2026-10-22 bare `python`,
+  `python3`, and `py` all start the Python install manager's per-user
+  CPython (`AppData/Local/Python/pythoncore-3.15-64`, 3.15.1 that
+  day), a python.org build with the JIT compiled in
   (`sys._jit.is_available()` is `True`), while `uv run` uses uv's
-  managed build, where it is `False`. `[tool.uv] python-preference =
-  "only-managed"` in `pyproject.toml` (2026-09-17) keeps a fresh clone
-  or worktree's `uv sync` off the PATH interpreter; before that, uv's
-  default preference picked `C:/Python`, and a scratch worktree
+  managed build, where it is `False`. `sys.version` tells the builds
+  apart: "tags/v3.15..." is python.org, "main, ..." is managed.
+  Before that date the python.org build lived at `C:/Python/python.exe`
+  and there was no `python3` on PATH. The install manager replaced
+  that build, and every environment created on it broke. A `uv tool`
+  install (`tip`, `black`) then fails with "did not find executable at
+  'C:\Python\python.exe'", and `uv tool install --reinstall` fails the
+  same way, since it queries the old interpreter first; `uv tool
+  uninstall` followed by `uv tool install --managed-python ...`
+  rebuilds it. `[tool.uv] python-preference = "only-managed"` in
+  `pyproject.toml` (2026-09-17) keeps a fresh clone or worktree's
+  `uv sync` off the PATH interpreter; before that, uv's default
+  preference picked the python.org build, and a scratch worktree
   reported two JIT markers as changed for that reason alone.
-  `sys.version` tells the builds apart: "tags/v3.15..." is python.org,
-  "main, ..." is managed. There is no `python3` on PATH:
-  the Microsoft Store app-execution stub that answered to that name
-  (printing "Python was not found" and exiting 9009) was disabled on
-  2026-09-13, so a `python3` command now fails as "not recognized".
 - **CPython's small-int cache is wider on the pinned 3.15 than the
   textbook `-5..256` range.** Confirmed cached up to at least 1024 on
   the beta and again on 3.15.0 final (2026-10-11). An example meant to
