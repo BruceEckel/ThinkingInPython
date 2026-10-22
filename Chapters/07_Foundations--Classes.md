@@ -227,7 +227,7 @@ A helper object or a module-level function is almost always clearer.
 
 `super()` and ordinary attribute lookup both follow one list,
 the class's *method resolution order* (MRO).
-The MRO names the classes Python searches for a name,
+The MRO lists the classes Python searches for a name,
 starting with the class and ending at `object`.
 `Derived.__mro__` is `(Derived, Simple, object)`.
 `super()` searches the same list,
@@ -523,8 +523,9 @@ so the method runs at the first read rather than when the constructor runs.
 
 `cached_property` stores the value in the instance's [`__dict__`](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup),
 the dictionary that holds the instance's attributes.
-Reading an attribute checks the instance first,
-so a later `n.total` returns the stored value before the lookup reaches the method in the class.
+A `@property` takes precedence over that dictionary for its name,
+but a `cached_property` does not.
+A later `n.total` checks the instance first and returns the stored value before the lookup reaches the method in the class.
 
 When a class and all its base classes declare `__slots__`,
 its instances have no `__dict__` to hold the cached value.
