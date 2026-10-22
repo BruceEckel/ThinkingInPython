@@ -19,7 +19,7 @@ The test runner calls `run()` on the finished object.
 
 ## The Anchored Algorithm
 
-A *Template Method* anchors the shape of the algorithm in the base class.
+A *Template Method* anchors the algorithm's sequence of steps in the base class.
 Subclasses provide the individual steps.
 
 [Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final)
@@ -125,7 +125,7 @@ The `setUp()` and `tearDown()` in the opening example are hooks.
 `TestCase` supplies empty versions,
 so a test class overrides `setUp()` only when it has setup work to do.
 
-A forgotten step silently does nothing.
+A forgotten step runs the base's `...` body, and nothing reports the omission.
 The do-nothing default also hides a misspelling.
 `def customise1()` ('s' instead of 'z')
 adds a new method and leaves the base's do-nothing version in place.
@@ -214,7 +214,8 @@ The `__final__` check exists because a subclass that replaces `run()` moves the 
 and `@final` stops that replacement only when the type checker runs.
 
 The `__final__` check reads a flag rather than a method name.
-A second `@final` instance method in `ApplicationFramework` therefore gets the same protection from the same `__init_subclass__()`.
+A second `@final` instance method in `ApplicationFramework` therefore needs no change to `__init_subclass__()`.
+The `class` statement of a subclass that replaces it raises the same `TypeError`.
 The check misses a `@final` on a `@property`,
 and a `@final` written above `@classmethod` or `@staticmethod`.
 For those, `getattr()` on the class returns the property object, a bound method,
@@ -319,7 +320,7 @@ The *Template Method* depends on the [Liskov Substitution Principle](20_Patterns
 when code expects a base-class instance,
 an instance of a subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`.
-The algorithm works only if each step the subclass supplies does its part on every call.
+The algorithm works only if each method the subclass supplies performs its step every time `run()` calls it.
 A subclass can break that requirement in three ways and still pass the type checker:
 it raises an exception where the base does not,
 leaves a step empty when the anchored algorithm depends on it,
@@ -359,7 +360,7 @@ The base states its algorithm in the loop, not in any type.
 Each pass calls the step, so each pass must perform it.
 
 An unexpected exception, an empty step the flow needs,
-and a skipped pass each change what the anchored algorithm does.
+and a skipped pass each stop `run()` from performing every step on every pass.
 Because the `...` defaults make a step optional,
 a step left empty on purpose looks identical to a forgotten one.
 The *Template Method* works only when every subclass is a faithful substitute for its base.
@@ -437,7 +438,7 @@ Structure anchors the algorithm,
 and that anchor holds at runtime as well as under the type checker.
 
 Passing functions is not the *Strategy* pattern,
-although the two look alike at the call site.
+although at the call site both pass a function as an argument.
 A *Strategy* swaps out a whole algorithm behind a single interface.
 In `template_function.py` the algorithm stays in `run_framework()`,
 and the caller supplies the steps.

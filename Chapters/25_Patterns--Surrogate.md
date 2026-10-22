@@ -15,8 +15,8 @@ The surrogate and every implementing class derive from one base class:
 ![*Surrogate* and each Implementation realize the same Interface](_images/surrogate)
 
 This is the shape *GoF Design Patterns* gives *Proxy*.
-Python does not need the shared base,
-but the base is the clearest way to see what a surrogate is.
+Python does not need the shared base, but the base shows, in one class,
+the interface the surrogate shares with every implementation.
 
 A surrogate object receives an implementation and forwards all method calls to it.
 Code can therefore use a surrogate anywhere it uses an implementation.
@@ -164,7 +164,7 @@ The static type checker verifies signatures.
 `__getattr__()` is Python's built-in delegation mechanism,
 which [*Singleton*](23_Patterns--Singleton.md)
 uses to forward attribute access to its inner object.
-Delegating through it makes `Proxy` simpler to implement:
+Delegating through it replaces `Proxy`'s forwarding method for each call with a single `__getattr__()`:
 
 ```python
 # proxy_getattr.py
@@ -421,7 +421,8 @@ Without the guard, the misspelled `self._imp` produces a `RecursionError` that h
 With the guard, the second call to `__getattr__()` reports the typo by name.
 The guard also makes the proxy work with `copy` and `pickle`,
 which look up `__setstate__()` on an instance whose `__init__()` has not run.
-Both get an `AttributeError`, which those modules handle, instead of recursing.
+Both get an `AttributeError`, treat it as a missing `__setstate__()`,
+and copy the saved state into the new instance's `__dict__` instead of recursing.
 
 The guard raises an `AttributeError` for every name that starts with an underscore,
 though, including an implementation's `_helper()` and an explicit `p.__len__()` like the one in `dunder_bypass.py`.
@@ -473,7 +474,7 @@ The [protection proxy](#protection-proxy) below raises a different exception,
 and its section shows what `hasattr()` does with it.
 
 Two workarounds make `isinstance()` return `True`,
-and neither verifies anything:
+and neither checks which methods the proxy supplies:
 
 -   `Service.register(Proxy)` tells the ABC machinery to answer `True` for every `Proxy`,
     whatever methods it has.
@@ -860,9 +861,11 @@ with *State* adding a method to change the implementation.
 
 *GoF Design Patterns* gives *Proxy* a shared base,
 written in `proxy_interface.py` as the `Service` ABC.
-That base matters when other people write the implementations and you need it to state which methods an implementation must supply.
+When other people write the implementations,
+that base states which methods an implementation must supply,
+and Python refuses to construct one that lacks any of them.
 When you write both sides,
-the single generic surrogate in `state_surrogate.py` is simpler and just as flexible.
+the single generic surrogate in `state_surrogate.py` forwards to any implementation with one `__getattr__()` and no base class.
 
 ## Exercises
 
