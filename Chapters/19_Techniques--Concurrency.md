@@ -1992,7 +1992,7 @@ That guarantee holds within the event loop's own thread alone.
 A call from another thread bypasses that guarantee,
 so the class is not thread-safe.
 
-The similar queue interfaces hide a consequential difference.
+The similar queue interfaces hide a difference in how they wait.
 `queue.Queue` and `multiprocessing.Queue` block the calling thread while they wait.
 `asyncio.Queue` suspends a task.
 As `blocking_the_loop.py` shows,
@@ -2581,7 +2581,7 @@ Even when you understand the problems produced by shared mutable state,
 you might not have a choice.
 Some problems preclude immutability.
 For example, a solution might require packing as much data as possible into RAM.
-In those cases you almost inevitably share mutable state.
+In those cases you nearly always share mutable state.
 These are the kinds of decisions you must make when you move from the examples in this chapter into serious real-world concurrency.
 
 People continue to work toward better ways of concurrent programming.[^libraries]
@@ -2729,7 +2729,7 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
       Behavior-Oriented Concurrency.
     - [Trio](https://trio.readthedocs.io/): Origin of structured concurrency.
     - [AnyIO](https://pypi.org/project/anyio/):
-      a bridge between Trio and asyncio.
+      A bridge between Trio and asyncio.
     - [uvloop](https://github.com/MagicStack/uvloop):
       Fast drop-in replacement for the standard event loop.
       See also [rsloop](https://github.com/RustedBytes/rsloop).

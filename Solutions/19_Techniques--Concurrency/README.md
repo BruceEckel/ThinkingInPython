@@ -911,11 +911,11 @@ returns `"E"`, and has finished by the time the group starts
 cancelling. `f` still sleeps for `0.3`, so the group cancels it
 during that sleep and its task ends cancelled.
 
-**Cancel what is still running.** A
-`TaskGroup` cancels what is still running, which is why the original
-`FETCHES` has both `e` and `f` cancelled. The group cannot cancel a task
-that has returned, and it cannot unprint `e: fetched` or undo
-whatever a real `fetch()` wrote to a database before it returned.
+**Cancel what is still running.** The original `FETCHES` has both
+`e` and `f` cancelled because both are still sleeping when `c` and
+`d` fail. The group cannot cancel a task that has returned, and it
+cannot unprint `e: fetched` or undo whatever a real `fetch()` wrote
+to a database before it returned.
 Structured concurrency guarantees that every task has ended when the block exits.
 Every effect a task had before the failure stays in place.
 
