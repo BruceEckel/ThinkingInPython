@@ -898,9 +898,7 @@ Writing `return` with a value in one is a `SyntaxError`, as is `yield from`.
 The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
 Each of the three returns an awaitable for the caller to `await`.
 
-Once you see a program as requests and drivers that answer them,
-the question stops being what a function does and becomes what it requests.
-The next chapter writes those requests into a function's return type.
+The next chapter describes a function by what it requests and writes those requests into its return type.
 
 ## Exercises
 
