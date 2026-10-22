@@ -368,7 +368,7 @@ If a field has a `default_factory` or `__post_init__()` has a side effect,
 the re-run repeats that factory call or that side effect on a finished object.
 
 Because every caller that asks for the same components receives the same `Color`,
-a caller that sets `crimson.red` changes every crimson in the program.
+an assignment to `crimson.red` would change every crimson in the program.
 The record's frozen fields reject that assignment,
 which makes sharing a `Color` safe for the same reason sharing a `Tile` is safe.
 
@@ -405,8 +405,11 @@ and the store as three separate steps,
 so threads that all miss on the same key each run the function and each keep their own result.
 
 `interned_color.py` adds a second hazard.
-`__new__()` pools the object before `__init__()` fills in its fields,
-so another thread can receive a `Color` before `__init__()` sets its components.
+`__new__()` pools the object before `__init__()` fills in its fields.
+A constructor call runs `__init__()` before it returns,
+so every caller of `Color(...)` receives a complete object.
+Code that reads `Color._pool` from another thread can still find a `Color` whose components are unset,
+and reading a component then raises an `AttributeError`.
 When more than one thread uses a pool,
 populate the pool eagerly or guard the insert with a lock.
 
@@ -555,8 +558,9 @@ so `__new__()` must assign that name rather than a name of its own such as `_sym
 `__new__()`, not `__init__()`, must assign `_value_`.
 Enum reads `_value_` as soon as `__new__()` returns.
 An `__init__()` that assigns `_value_` runs too late.
-The lookup table behind `Tile(".")` then stays keyed by the tuples.
-With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
+The lookup table behind `Tile(".")` then stays keyed by the tuples,
+so `Tile(".")` raises a `ValueError`.
+With `_value_` set in `__new__()`, `Tile(".")` returns `Tile.GRASS`.
 
 `object.__new__(cls)` builds a bare instance by going straight to `object`,
 past `Tile.__new__()`, so the call cannot recurse.
