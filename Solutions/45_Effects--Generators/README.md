@@ -801,7 +801,7 @@ for event in [Coin(25), Digit("1"), Digit("1"), Digit("1"),
 
 **Let position carry the state.** The machine holds no `state`
 attribute and consults no table. Where the generator pauses is the
-state. A pause in the coin loop means COLLECTING, and a pause after
+state. A pause in the coin loop means `COLLECTING`, and a pause after
 `yield "SELECTING"` means a first digit has arrived and the machine
 waits for a second. `amount`, `row`, and
 `stock` are locals that keep their values between sends because the

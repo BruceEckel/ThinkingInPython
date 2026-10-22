@@ -28,7 +28,8 @@ the loop, and `yield from`, but generators are useful on their own.
 Earlier chapters annotate their generators with a short form:
 `Iterator[int]` in [Iterators](22_Patterns--Iterators.md#generators),
 and `Generator[str]` in [Context Managers](15_Techniques--Context_Managers.md#a-basic-context-manager).
-A short form fits a generator that yields values and receives `None`.
+A short form fits a generator that yields values, receives `None`,
+and returns `None`.
 
 A generator that also receives values needs the full annotation:
 
@@ -130,7 +131,8 @@ If you mistakenly annotate the generator in `interview_generator.py` as `Generat
 All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
 In `drive_by_hand.py`,
 all three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
-All three `question` variables also receive an `Answer` where their declarations say `Question`.
+`question1`, `question2`,
+and `question3` also receive an `Answer` where their declarations say `Question`.
 `Generator[str, str, str]` accepts the reversal.
 
 `next(conversation)` starts the generator and produces a `Question`.
@@ -282,13 +284,13 @@ with no dictionary and no `input()` call.
 `interview()` yields each question and suspends until `send()` supplies the answer.
 `drive()` decides how to answer those questions,
 and it receives the answers through its `answers: dict[Question, Answer]` parameter.
-Swapping the dictionary for a database changes a single argument.
+Swapping the dictionary for a database changes `drive()` and leaves `interview()` as it is.
 
 `interview()` and `drive()` form an EMS in miniature.
 The generator declares requests.
 The driver interprets them.
 
-Each generator has one driver.
+Each generator has one driver at a time.
 No annotation states that pairing, but the runtime enforces it.
 A generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
@@ -582,7 +584,6 @@ Now `survey()` delegates to `interview()`.
 so the argument to `drive()` uses the dictionary union operator to add one more pair to a copy of `ANSWERS`.
 The driver receives one more question and the same shape of trace.
 
-`yield from` takes over from `drive()` as the receiver of `interview()`'s `Result`.
 `drive()` still runs `interview()`, now through `survey()`.
 Something must still call `next()` and `send()` at the top,
 so the example ends with a `drive()` call.
@@ -834,7 +835,7 @@ The queue rotates job to job as before.
 Now the runner also does `drive()`'s work,
 answering each request before the next turn.
 
-`download()` reads what it receives, into `reply`.
+`download()` binds what it receives to `reply` and prints it.
 `index()` discards what it receives.
 A job that yields only to take turns can ignore the answer.
 
