@@ -315,7 +315,6 @@ This `squares()` leaves out the chapter's trace line,
 since the exercise is about the second pass.
 Both fixes produce the values again on a second pass, one by storing and one by
 recomputing.
-The list's second pass reads the stored values back.
 The list holds every value for as long as the name lives,
 so a million items is a million items in memory.
 `Squares` holds one integer, `n`.
