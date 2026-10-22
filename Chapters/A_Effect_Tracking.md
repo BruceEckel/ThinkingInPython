@@ -53,8 +53,9 @@ computed and checked for every function.
 A system that tracks Effects needs three things:
 
 1. **A place to write the row.**
-   The row must sit in the signature, outside the argument list,
-   as the second channel of [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management).
+   The row must sit in the signature,
+   beside the argument list and the return type,
+   as the third channel of [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management).
 2. **Something that computes the rule's right side.**
    That means finding every call in a body and the row of every callee.
 3. **Something that compares the computed row with the declared one,** and rejects the program when they differ.

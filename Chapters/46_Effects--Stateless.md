@@ -24,12 +24,11 @@ and `yield from`, which composes generators and produces the inner generator's r
 Every Effect in this chapter is such a generator.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
 
-An Effect declares two channels:
+An Effect's return type declares two things:
 the dependencies it needs and the ways it can fail.
-Both channels live in the signature,
-and both use the yield channel every generator carries.
+Both travel the yield channel every generator carries.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
-builds examples using those channels.
+builds examples with both.
 
 My understanding of Effects came from work with Bill Frasure and James Ward as we created [Effect Oriented Programming](https://effectorientedprogramming.com/).
 Some of the examples in these two chapters derive from that book.

@@ -163,7 +163,10 @@ The by-hand version puts two objects in every signature.
 The Stateless version threads nothing.
 `greet()` takes no arguments.
 The two Abilities appear in the return type, where a type checker verifies them.
-The return type is the second channel in the signature that Effect Management says an EMS needs.
+Python's signatures have no third channel for Effects,
+so the return type carries them,
+the job that [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
+gives Koka's Effect row.
 
 The whole library is visible in `drive.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
 An Effect is a generator, so you can drive one yourself,
