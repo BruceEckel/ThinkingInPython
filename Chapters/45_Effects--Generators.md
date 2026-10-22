@@ -127,12 +127,14 @@ print(f"{result = }")
 
 The `NewType` definitions let the type checker report a transposed annotation.
 If you mistakenly annotate the generator in `interview_generator.py` as `Generator[Answer, Question, Result]`,
-`ty` reports nine errors in three groups of three.
-All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
-In `drive_by_hand.py`,
-all three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
-`question1`, `question2`,
-and `question3` also receive an `Answer` where their declarations say `Question`.
+`ty` reports nine errors in three groups of three:
+
+- All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
+- In `drive_by_hand.py`,
+  all three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
+- `question1`, `question2`,
+  and `question3` receive an `Answer` where their declarations say `Question`.
+
 `Generator[str, str, str]` accepts the reversal.
 
 `next(conversation)` starts the generator and produces a `Question`.
@@ -209,7 +211,8 @@ A generator's requests go to the code that calls `next()` and `send()`.
 The generator yields a *request* out, and the driver sends the *answer* back in.
 That conversation makes an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
 (EMS) possible.
-Typically, a driver function steps the generator.
+
+A driver function steps the generator.
 `drive.py` holds one, along with a table of answers:
 
 ```python
@@ -257,8 +260,7 @@ print(f"{result = }")
 
 `two_way_generator.py` imports `interview()` unchanged.
 The driver is new.
-The first line of output shows the state of the generator `interview()` returned.
-`inspect.getgeneratorstate()` reports `GEN_CREATED`.
+`inspect.getgeneratorstate()` reports `GEN_CREATED` for the generator `interview()` returned.
 The generator exists and waits to start its body.
 
 `drive()` uses all three type parameters:
@@ -443,7 +445,7 @@ so the body of `both()` is its two delegations.
 That finish completes the `yield from` at `[2]`,
 so `both()` starts the `yield from` at `[3]`.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
-The output shows the finish and the new prompt on adjacent lines:
+The output shows the finish and the new prompt on adjacent lines.
 `alpha got 1 and 2` prints during `send(2)`,
 and `send(2)` returns `beta needs a value`.
 The driver sees `StopIteration` once,
@@ -522,7 +524,6 @@ if __name__ == "__main__":
 
 The listing imports `drive()` unchanged from `drive.py`,
 and nothing in `drive()` refers to `ask()`.
-The new code is all on the generator side.
 
 `ask()` uses `Answer` in two of the three positions, for two different reasons.
 As the `SendType` it is the value the driver sends in,
@@ -530,8 +531,6 @@ which arrives as the value of the `yield` expression and binds to `answer`.
 As the `ReturnType` it is the value `ask()` returns when it finishes.
 That value becomes the value of the whole `yield from` expression,
 so `interview()`'s three assignments read like ordinary ones.
-The inner generator receives one answer and returns it,
-so its send and return channels both carry an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
 because it returns a sentence built from all three answers,
 a different kind of value from the answer to any one question.
@@ -728,12 +727,13 @@ A generator written for others to drive must therefore let `GeneratorExit` end i
 
 ## The Driver You Already Use
 
-[Stateless](46_Effects--Stateless.md) builds on three ideas from this chapter.
-A generator function builds a description instead of doing work.
-`yield` makes that description two-way,
-so the description can ask for something.
-`yield from` composes those conversations.
-No generator in the chain specifies its driver.
+[Stateless](46_Effects--Stateless.md) builds on three ideas from this chapter:
+
+- A generator function builds a description instead of doing work.
+- `yield` makes that description two-way,
+  so the description can ask for something.
+- `yield from` composes those conversations.
+  No generator in the chain specifies its driver.
 
 Those ideas are enough to build a task runner.
 A queue keeps the live generators.
@@ -886,6 +886,7 @@ asyncio.run(main())
 `asyncio.sleep(0)` stands in for real I/O.
 In `countdown()`, the `await` goes to the event loop.
 The `yield` goes to `main()`.
+
 On each pass, `async for` awaits the generator's `__anext__()`,
 so the `async for` loop must appear inside an `async def`.
 The *asynchronous comprehension* `[n * n async for n in countdown(3)]` collects the values the same way,
