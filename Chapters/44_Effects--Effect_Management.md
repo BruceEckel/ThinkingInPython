@@ -920,8 +920,9 @@ Scala's `println` prints, and its signature promises only a `Unit`.
 The library therefore ships its own copy of every effectful standard-library call,
 each returning a description that carries the Effect signature.
 `print`, `printLine`,
-and `readLine` in the ZIO listing are the wrapped versions of Scala's own console calls,
-and the TypeScript listing wraps `console.log` in `Effect.sync` and Node's `readline` in `Effect.promise` by hand.
+and `readLine` in the ZIO listing are the wrapped versions of Scala's own console calls.
+The TypeScript listing uses no shipped wrapper and does the wrapping itself:
+`console.log` goes in `Effect.sync` and Node's `readline` in `Effect.promise`.
 Console, file, clock, random, and network calls each get a wrapped version,
 and a third-party library with no wrapper must be wrapped before it fits.
 The parallel surface exists because the library tracks Effects without the compiler's help.
