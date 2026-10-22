@@ -196,7 +196,7 @@ if __name__ == "__main__":
 says it returns an `int` on success or a `str` on failure.
 To get the answer, the caller must unpack the `Result`.
 `unwrap()`, a name borrowed from Rust, returns the answer an `Ok` holds.
-Reading the `answer` field works the same way.
+Reading the `answer` field returns the same value.
 Use whichever name reads better in your own code.
 
 `unwrap()` and the `answer` field exist on `Ok` alone,
@@ -251,7 +251,7 @@ Totality is therefore a discipline the function's author keeps.
 
 The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
-The type checker reports a misread `Result`.
+The type checker reports a read of the answer before narrowing.
 Noticing an ignored one is up to you.
 The listing shows both limits:
 
@@ -444,7 +444,8 @@ and `bind()` expects a `Result`.
 To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
 a sibling of `bind()` for steps that always succeed.
-Exercise 2's `map_error()` is the same idea applied to the error side.
+Exercise 2's `map_error()` applies a plain function to the error inside an `Err`,
+as `map()` does to the answer inside an `Ok`.
 
 A second mistake: mixing error types.
 `Result[A, E]` specifies one error type for the whole chain.
@@ -629,7 +630,8 @@ and the base class is the one type that covers every exception those functions r
 A wrapper written by hand can be narrower.
 `func_c()` in `steps.py` catches `ZeroDivisionError` alone,
 and a `parse()` that catches `ValueError` the same way can return `Result[int, ValueError]`.
-Write the wrapper yourself when the narrower type matters more than the convenience.
+Write the wrapper yourself when the caller needs to know which exception type the `Err` holds,
+and use `@safe` when `Exception` tells the caller enough.
 
 `Exception` covers every ordinary failure the wrapped function can produce,
 including the ones that are defects rather than expected outcomes.
@@ -838,7 +840,7 @@ The `Err` branch reads `error.__notes__`, and that read type-checks.
 The `match` narrows the `Result` to `Err[Exception]`,
 so the type checker infers that `error` is an `Exception`.
 Typeshed declares `__notes__` on `Exception`'s base class, `BaseException`.
-The narrowing works the same way with `isinstance()`.
+`isinstance(result, Err)` narrows `result` to `Err[Exception]` too.
 
 Reading `error.__notes__` is safe here because `parse_field()` adds a note on every failure.
 An exception from someone else's code may carry no notes,
@@ -874,7 +876,7 @@ The type checker makes a caller tell the two apart.
 [Confidence](43_Functional--Confidence.md)
 examines what this discipline lets you claim,
 and [Effect Management](44_Effects--Effect_Management.md#converting-effectful-to-pure)
-reuses this `Result` machinery to convert Effects.
+imports this chapter's `Result` and `@safe` to convert Effects.
 
 ## Exercises
 
