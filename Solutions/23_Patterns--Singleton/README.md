@@ -369,10 +369,6 @@ print(config.settings)  # [2]
 #: {}
 ```
 
-The listing puts `import config` at the top, where ruff expects
-every import. Either order gives the same output. Whichever import comes
-first runs the body. The other finds `config` in `sys.modules`.
-
 The prints at `[1]` and `[2]` disagree.
 
 **Give one dict two names.** `from config import settings` copies a binding.

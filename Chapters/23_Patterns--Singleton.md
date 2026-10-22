@@ -199,7 +199,8 @@ so at module level `__Settings` keeps its name as written,
 as reachable as any other.
 The second underscore has one effect:
 it breaks a reference written inside a class body.
-There the compiler rewrites `m.__Settings` into a lookup for `m._TheClass__Settings`.
+Inside the body of a class `Client`, the compiler rewrites `m.__Settings`,
+a lookup in module `m`, into a lookup for `m._Client__Settings`.
 That lookup fails.
 
 The cached-factory listings name the class `Settings`, with no underscore,
@@ -529,7 +530,7 @@ When the inner object needs nothing from that first call,
 you can create it eagerly in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Eager creation removes the sentinel, the guard,
-and the first-call race that the cached factory has under threads.
+and the first-call race that every lazy singleton has under threads.
 The class then builds the object whether or not anything uses it
 (see exercise 1).
 (The bare `__OnlyOne()` works because the nested class exists at that point in the body.
