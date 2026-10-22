@@ -206,9 +206,8 @@ it keeps working when you add a method to the implementation.
 `Implementation` here has an `h()` that the `Implementation` in `proxy_forwarding.py` lacks,
 and the same `Proxy` forwards `p.h()`.
 
-The double underscore on `self.__implementation` matters.
-The name [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
-to `_Proxy__implementation`,
+The double underscore on `self.__implementation` [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
+the name to `_Proxy__implementation`,
 so it stays distinct from any attribute the implementation defines.
 
 Do not confuse `__getattr__()` with its lookalike, `__getattribute__()`.
