@@ -503,8 +503,8 @@ That `pop()` comes first, so a failed undo leaves the history as it was.
 An editor calls them to gray out the menu item.
 
 `History` stores whole states and moves them between stacks,
-so it works for any state type, from `int` to a full `Drawing`.
-`History` requires one thing of a state: immutability.
+so it accepts any state type, from `int` to a full `Drawing`.
+Correct undo requires one thing of a state: immutability.
 `History` keeps a reference, not a copy,
 so a list mutated in place changes in the past too.
 A `History` of lists is a stack of aliases, the bug in `aliased_snapshot.py`.
@@ -628,7 +628,7 @@ and each `Drawing` method reads one state, `self`.
 
 `copy.replace()` is the [general version](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 of `dataclasses.replace()`.
-Choosing `copy.replace()` over `dataclasses.replace()` keeps the technique available to any state type a `History` holds.
+Choosing `copy.replace()` over `dataclasses.replace()` keeps the technique available to state types that are not dataclasses.
 `NamedTuple`, `datetime`,
 and any class defining `__replace__()` all accept `copy.replace()`.
 
@@ -711,7 +711,7 @@ with expected(AttributeError):
 #: 'title'
 ```
 
-The dump that builds `blob` runs while `sketch_v1.SketchV1` means the one-field class.
+The dump that builds `blob` runs while `sketch_v1.SketchV1` is bound to the one-field class.
 `sketch_v1.SketchV1 = SketchV2` stands in for an edit and reload of that module,
 with a field added between the save and the load.
 
