@@ -220,7 +220,9 @@ so reading that name inside `__getattr__()` returns the attribute.
 including each `self.` access in its own body,
 so a `__getattribute__()` that reads `self.__implementation` calls itself forever.
 To avoid that recursion,
-`__getattribute__()` must call `object.__getattribute__()` for every internal access,
+`__getattribute__()` must call `object.__getattribute__()` for every internal access.
+A surrogate forwards only the names it lacks,
+and `__getattr__()` receives exactly those,
 so a surrogate rarely needs `__getattribute__()`.
 
 The implementation side can keep its static check.
@@ -242,7 +244,7 @@ and the checker verifies the call.
 
 `proxy_interface.py`'s `Proxy` also passes as a `Service`.
 Because it inherits `Service`, code typed against `Service` accepts it.
-`__getattr__()` gives up that check so it can forward every method,
+A `__getattr__()` proxy gives up that check so it can forward every method,
 including ones added later.
 
 The lost static check is the first of five limits on `__getattr__()` delegation.
@@ -509,7 +511,7 @@ Code that checks a surrogate with `isinstance()` should check for the method ins
 
 The standard library's `weakref.proxy()` is a transparent forwarding wrapper too,
 but it solves none of these four.
-It forwards to a weakly referenced object and raises `ReferenceError` once the last strong reference to that object goes away.
+It forwards to a weakly referenced object and raises `ReferenceError` on any use after the last strong reference to that object goes away.
 
 ### Virtual Proxy
 

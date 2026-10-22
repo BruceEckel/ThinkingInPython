@@ -110,7 +110,7 @@ count, and builds the real object. At `[2]`, `__getattr__()` runs
 again, finds `_real` set, and forwards the lookup with no report and
 no build.
 
-The counter records how much work the proxy saved.
+The counter records how many requests the proxy answered without building `Expensive`.
 The proxy serves three requests from a string it holds from the start
 and defers the slow construction until the first `query()`.
 GoF's image proxy is the same design.
