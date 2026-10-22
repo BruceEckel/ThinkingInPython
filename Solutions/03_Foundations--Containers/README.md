@@ -389,7 +389,7 @@ print(person[0], type(person[0]).__name__)
 ```
 
 The unpacking line stays the same, because a `namedtuple` is a tuple
-subclass. The `namedtuple` unpacks by position like any other tuple.
+subclass and unpacks by position like any other tuple.
 
 Line `[1]` reads fields by name.
 `person.height` names the field that `person[2]` reads by position.
@@ -541,8 +541,8 @@ target list.
 `a, *b = row` states a minimum: at least one item for `a`, and
 the rest, zero or more, for `b`. So the assignment accepts a
 five-item list, a one-item list, and everything between.
-Only an empty list has too few items. The star turns a fixed-shape assertion into a flexible one.
-The same flexibility lets `*args` work in a function signature.
+Only an empty list has too few items.
+A `*args` parameter collects a call's extra positional arguments the same way.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
