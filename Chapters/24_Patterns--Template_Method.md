@@ -424,7 +424,8 @@ The function form makes a step optional by giving its parameter a default.
 In `template_function.py`,
 `customize2` defaults to the do-nothing `lambda: None`,
 so the closing `run_framework()` call passes one step and the loop prints `one` twice.
-With a do-nothing default, the loop calls both steps on every pass.
+With a do-nothing default,
+the loop calls both steps on every pass and needs no `None` test.
 `customize1` is a required parameter,
 so the type checker reports a call that omits it.
 
