@@ -1071,7 +1071,6 @@ An Effect row must cover every library in an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 
 No PEP proposes Effect tracking today.
-If one arrives, it will contain the ideas in this chapter.
 [Effect Tracking](A_Effect_Tracking.md) works through one candidate design:
 an Effect row carried in `typing.Annotated` metadata,
 and an analysis of the tool that would propagate and check it.
@@ -1082,7 +1081,7 @@ builds the part of that tool that needs no type inference.
 
 ## Effects Are the Next Barrier
 
-The history of programming is a history of scaling barriers.
+The history of programming is a history of barriers to growth.
 Each time, the pattern is the same.
 Something the programmer tracks by hand works in small programs.
 Systems grow until hand-tracking fails.

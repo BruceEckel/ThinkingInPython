@@ -2334,7 +2334,7 @@ and `wait()` returns `Boom | int` instead of raising the `Boom`.
 ## What Survives the Library
 
 [Effect Management](44_Effects--Effect_Management.md#effects-are-the-next-barrier)
-argues that Effects are the next scaling barrier,
+argues that Effects are the next barrier to growth,
 and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today.
 That preview is the value of studying the library,
