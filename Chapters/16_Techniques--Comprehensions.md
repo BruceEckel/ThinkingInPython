@@ -86,7 +86,7 @@ print(list(map(lambda e: e ** 2,  # type: ignore
 The `map()`/`filter()` form calls a `lambda` on every element and is harder to read.
 The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
-`map()` and `filter()` are a better choice when a named function does the work:
+`map()` and `filter()` are a better choice when the function they apply already has a name:
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
 So the `lambda` makes `map_and_filter.py` worse, not `map()`.
 [Functional Foundations](40_Functional--Foundations.md#higher-order-functions)
@@ -200,8 +200,8 @@ Without the walrus, the filter and the output each need their own call:
 
 ## Set Comprehensions
 
-Set comprehensions use the same principles as list comprehensions,
-with `{}` instead of `[]`.
+A set comprehension has the same four parts as a list comprehension,
+inside `{}` instead of `[]`.
 Braces build a set when the comprehension produces one value per member,
 and a dict when it produces a `key: value` pair.
 The colon decides which.
@@ -561,7 +561,7 @@ print(wasted)
 The comprehension calls `print()` for its side effect.
 `print()` returns `None`, so `wasted` ends up holding three `None`s,
 one for each call.
-Worse, a reader scanning `[...]` expects a meaningful collection.
+Worse, a reader scanning `[...]` expects a list that later code reads.
 This comprehension is a loop written with the wrong punctuation.
 
 ```python
@@ -626,7 +626,8 @@ print(initials)
 
 A set or dict must hold every element,
 so `set(...)` or `dict(...)` consumes the whole generator immediately.
-Comprehensions build the same results directly and are a better choice:
+Comprehensions build the same results without creating a generator,
+and are a better choice:
 `{len(w) for w in words}` for the set and `{w: w[0] for w in words}` for the dict.
 
 Use a generator expression when the consumer takes values one at a time,
@@ -689,7 +690,7 @@ Writing it again works when the source is re-iterable, as a `range` is.
 
 ### The Gap Between Creation and Consumption
 
-Creating a generator expression evaluates its outermost iterable immediately and defers everything else:
+Creating a generator expression evaluates its outermost iterable immediately and runs the rest of the expression only when a consumer pulls values:
 
 ```python
 # genexp_timing.py
@@ -790,10 +791,10 @@ Braces build a set, or a dict when a colon separates a key from a value or `**` 
 Parentheses build a generator, for a consumer that takes values one at a time.
 When you want the side effect rather than the collection, write a `for` loop.
 
-The delimiters also decide when the work runs.
+The delimiters also decide when the loop runs.
 The list, set, and dict forms run to completion before the next statement,
-so a comprehension does all its work where you wrote it.
-A generator expression defers that work to whoever consumes it,
+so a comprehension computes every element where you wrote it.
+A generator expression defers its loop to whoever consumes it,
 and computes only the values the consumer pulls.
 
 ## Exercises
