@@ -276,7 +276,7 @@ pass the copied text through `re.escape()` so the pattern matches it literally.
 `InsufficientFunds` stores `balance` and `amount` as attributes,
 so the test checks `excinfo.value.amount` as a number.
 A reworded message breaks the `match=` pattern when the test runs,
-while a renamed attribute shows up in the type checker before the run.
+while the type checker reports a renamed attribute before the run.
 
 Both assertions belong after the block, not inside it.
 A failed withdrawal must leave the balance alone.
@@ -453,7 +453,7 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
 
 `pytest` builds the session-scoped `bank_name` fixture once and reuses it,
 which suits resources that are slow to build.
-The reuse is the risk as well as the point.
+The reuse saves that build time, and it is also the risk.
 Because every test receives the same object,
 one test that mutates it changes what the next test sees.
 A session fixture that returns a mutable object shows the leak:
@@ -515,7 +515,7 @@ Nothing imports either fixture.
 A parametrized fixture multiplies every test that requests it,
 in `test_fixtures.py` and every other file that can see the `conftest.py`.
 Use the mark when the cases belong to one test,
-and the fixture when the same variation should apply to every test in a suite.
+and the fixture when every test in a suite should run over the same values.
 
 ## White-Box and Black-Box Tests
 
@@ -698,7 +698,7 @@ def roll() -> int:
 
 `monkeypatch` replaces `randint()` with a *stub*,
 a function that returns a known value,
-so `roll()` stays predictable while the test runs:
+so `roll()` returns that value while the test runs:
 
 ```python
 # test_dice.py
@@ -717,7 +717,7 @@ def test_roll_returns_known_value(
 so `dice.random` and `random` are the same object.
 The patch therefore replaces `randint()` process-wide.
 `monkeypatch` restores the original when the test ends.
-That restoration makes a process-wide patch safe.
+Because of that restoration, a later test calls the real `randint()`.
 
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
@@ -769,8 +769,8 @@ def elapsed(start: float) -> float:
 It keeps counting forward when someone resets the system clock,
 while `time.time()` jumps with the reset.
 
-`monkeypatch` replaces `time.monotonic()` with a function that returns a known value,
-the same way it does for `randint()`:
+`monkeypatch.setattr()` replaces `time.monotonic()` with a function that returns a known value,
+as it replaced `randint()`:
 
 ```python
 # test_stopwatch.py
@@ -783,7 +783,7 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
     assert stopwatch.elapsed(40.0) == 60.0
 ```
 
-As with randomness, injecting the clock is cleaner still.
+As with randomness, injecting the clock removes the patch.
 The same computation becomes `elapsed(start: float, now: Callable[[], float]) -> float`,
 which receives the clock as an argument instead of calling `time.monotonic()`:
 
@@ -977,7 +977,7 @@ To make an untested function testable, first name its dependencies: the clock,
 randomness, the filesystem, the environment, the network.
 Replace those at the boundary,
 by injection where you can change the code and with `monkeypatch` where you cannot.
-Then pin the remaining behavior with a handful of parametrized cases.
+Then test what the function computes from its inputs with a handful of parametrized cases.
 The work is mostly in the first step,
 since a function that is hard to test usually fetches a dependency that a caller could pass in.
 

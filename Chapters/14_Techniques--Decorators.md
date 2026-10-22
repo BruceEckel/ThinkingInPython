@@ -140,7 +140,7 @@ With `add_behavior` on a `def add(a, b)`,
 the call `add(2, 3)` raises a `TypeError`.
 The wrapper takes zero positional arguments.
 The call passes two.
-A wrapper that must handle any function uses the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
+A wrapper that must accept any function's arguments uses the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
 The wrapper collects the arguments with `*args, **kwargs` and passes them on to the original function.
 Here, the `trace` decorator traces calls, and its `wrapper()` takes that shape.
 The helper `call_text()` formats a call as text, such as `add(2, b=3)`,
@@ -465,8 +465,9 @@ With `func is None`, the same call raises a `TypeError` at decoration.
 `decorate("TAG")` wraps the string,
 and when Python applies that wrapper to the function,
 the wrapper calls `"TAG"` as if the string were the decorated function.
-A decorator has the same problem with either test when its own argument could be callable,
-such as a `key` function.
+With either test, a decorator whose own argument could be callable,
+such as a `key` function, mistakes that argument, passed positionally,
+for the function it decorates.
 For that reason `label` makes its arguments keyword-only,
 so a caller must name them.
 
@@ -763,7 +764,7 @@ if __name__ == "__main__":
 #: Hello, Bob
 ```
 
-`repeat` here validates `times` the same way `repeat.py` does,
+`repeat` here raises the same `ValueError` for a `times` below one that `repeat.py` raises,
 in the constructor rather than in the outer function.
 Its `wrapper()` makes the first call before the loop,
 so `result` holds a value before the loop starts.
@@ -802,7 +803,8 @@ which appears when the decorator instance replaces the function it decorates.
 A method decorated that way becomes an instance rather than a function,
 and calling it fails.
 `trace_class.py` and `count_calls.py` decorate module-level functions for that reason.
-`logged` has the same shape as those two classes,
+Like those two classes,
+`logged` stores the function in its constructor and calls it from `__call__()`,
 and decorating a method with it fails at the call:
 
 ```python
@@ -1077,10 +1079,10 @@ After decoration the name `greeting` refers to that `str`,
 so `greeting()` raises a `TypeError`, because a `str` is not callable.
 
 `run_once` suits a value that needs one-time setup logic but stays constant afterward.
-For anything simpler,
-a module-level constant computed the ordinary way reads better.
+For a value that a single expression computes,
+an assignment to a module-level constant needs no function and no decorator.
 
-A decorator can replace a class the same way.
+A class decorator can also return an object that is not a class.
 [*Singleton*](23_Patterns--Singleton.md#singleton-by-class-decorator)
 replaces a class with a callable object that stands in for it.
 The name that follows `class` then refers to that callable object,
@@ -1270,8 +1272,10 @@ are class-form decorators like `trace_class.trace`.
 Each is a class, and decorating a function stores that function in a new instance.
 Unlike `logged`, each of these classes also implements `__get__()`,
 so its instances are descriptors.
-Being descriptors lets those instances change how attribute access behaves,
-and makes them work on methods, where `logged` fails.
+Python calls that `__get__()` when code reads the attribute,
+so `@property` runs its getter, `@staticmethod` returns the plain function,
+and `@classmethod` binds the function to the class.
+The same `__get__()` makes them work on methods, where `logged` fails.
 [`@dataclass`](12_Techniques--Data_Classes_as_Types.md#data-classes)
 is a class decorator like `register`, except it mutates the class,
 adding a generated `__init__()`, `__repr__()`,
