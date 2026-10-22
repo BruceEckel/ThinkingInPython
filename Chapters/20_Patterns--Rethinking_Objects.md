@@ -48,7 +48,7 @@ Everything lives inside a class,
 including code that works as a standalone function.
 Java is statically compiled, so substitutability matters.
 Yet Java encouraged reusing code by inheriting implementation.
-That reuse works against substitutability.
+A subclass that inherits code to reuse it need not honor the base's contract.
 
 Newer languages backed away from inheritance.
 Rust, Swift, Go, and Kotlin build programs from data structures rather than deep class hierarchies,
@@ -407,10 +407,13 @@ and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
 
-`distance()` reads the same and computes the same, and it has one advantage.
+`distance()` has the same body as `distance_to()`,
+with `a` and `b` in place of `self` and `other`.
+It returns the same result, and it has one advantage.
 It lives outside `Point`, so it serves any type that has an `x` and a `y`.
 The method keeps one advantage of its own.
-`p1.` shows every operation `Point` supports, so the method is discoverable.
+Dot-completion on `p1.` lists every operation `Point` supports,
+so the method is discoverable.
 
 ## Protocols Generalize, Composition Adapts
 
@@ -608,7 +611,8 @@ Value equality and hashing follow from the fields rather than from a base class.
 
 Changing one city means rebuilding the `Address` and then the `Contact`.
 [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
-makes that rebuild routine.
+shows `copy.replace()`,
+which builds each copy in one call that names only the changed field.
 
 ## Polymorphism Without Inheritance
 
@@ -739,7 +743,8 @@ A bare `@record` there declares slots and still gets the base's `__dict__`.
 
 ### Dynamic Typing
 
-With dynamic typing, any type works as long as it has the necessary methods.
+With dynamic typing,
+any type works as long as it has the methods the function calls.
 The parameter accepts any argument.
 The one validity check comes at runtime, when the call runs:
 
@@ -809,7 +814,9 @@ for item in (Bicycle("Bob"), Glider(65)):
 
 A structural type describes the required shape,
 and the type checker verifies it ahead of time.
-Dynamic typing and protocols are the same idea, checked at different times.
+Dynamic typing and protocols both accept any type with a `display()` method.
+Dynamic typing finds a missing method when the call runs,
+and the type checker finds it before the program runs.
 
 An abstract base class is *nominal* (named),
 so a type joins by inheriting from it.
@@ -930,7 +937,8 @@ print(charge(package))  # Silently treated as a price
 
 The type checker accepts `package` as a `Priced` argument,
 and `charge()` returns `4.5`, silently treating a weight as a price.
-The checker matches the shape correctly.
+The shapes do match: `Package.total()` returns a `float`,
+as `Priced.total()` declares.
 The mismatch is in what the number means.
 No type checker checks meaning.
 
@@ -957,7 +965,8 @@ if __name__ == "__main__":
 Without the `# type: ignore`, the type checker rejects `lookup(42)`.
 `UserId` and `int` are different types to the checker.
 If `total()` in `protocol_collision.py` returns a `Price` or a `Weight` instead of a bare `float`,
-the same distinction separates `Priced` from `Weighted`.
+the two protocols' `total()` methods return different types,
+and the type checker can tell `Priced` from `Weighted`.
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.

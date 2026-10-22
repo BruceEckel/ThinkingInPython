@@ -45,7 +45,7 @@ The instance stays as it was.
 
 What creates these "class" objects?
 Other special objects, called *metaclasses*.
-The default metaclass is `type`, and it almost always does the right thing.
+The default metaclass is `type`, and almost every class needs no other.
 You can customize how Python produces classes by running extra code or injecting members as it builds each class.
 That is metaclass programming.
 
@@ -96,7 +96,7 @@ print(isinstance(C(), C), isinstance(D(), D))
 #: True True
 ```
 
-You can add bases, fields, and methods the same way:
+The tuple of bases and the namespace dictionary add bases, fields, and methods:
 
 ```python
 # my_list.py
@@ -322,8 +322,8 @@ and prefixes `* ` to every event that `isinstance()` reports as a `RingBell`.
 A distinct subclass lets each event carry its kind as its type,
 where `isinstance()` or a `match` class pattern can test it.
 
-Calling the base class, `Event(name, hour, minute)`,
-produces the right field values, but every entry shares one type.
+Calling the base class, `Event(name, hour, minute)`, sets the same `action`,
+`hour`, and `minute` as a generated class does, but every entry shares one type.
 The loop then has no `RingBell` class for `isinstance()` to test.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
@@ -333,7 +333,8 @@ The demo wraps its `RingBell` lookup in `cast(type, ...)`.
 and `isinstance()` requires a class,
 so without the cast the type checker reports an `invalid-argument-type`.
 Every value `__missing__()` stores is a class that `type()` built,
-so the cast states something true that the declared type leaves out.
+so the cast states that each value is a class,
+a fact the declared type leaves out.
 
 ## Generating Classes with `exec()`
 
@@ -455,7 +456,8 @@ Pickle therefore looks for `events.LightOn` and does not find that either.
 `inspect.getsource()` raises an `OSError` instead of a `TypeError`.
 For both generators' classes, then,
 `pickle` and `inspect.getsource()` raise exceptions.
-The rest of `inspect` works, as `display_object(MyList)` shows.
+`inspect.signature()` and `inspect.getmembers_static()` still work,
+as `display_object(MyList)` shows.
 
 Pickle records a class as its module and name,
 and checks that the pair leads back to the class.
@@ -575,7 +577,7 @@ def test_independent_hierarchies_have_separate_registries(
         init_subclass.Color.registry)
 ```
 
-The mechanism is reliable.
+`__init_subclass__()` runs for every subclass definition Python executes.
 The registries built on it fail in two ways that have nothing to do with `__init_subclass__()`.
 [Factory](26_Patterns--Factory.md#hazards-of-self-registration) covers both:
 a class in a module nobody imports stays out of the registry,
@@ -661,7 +663,7 @@ print(Button.press.__dict__)
 ```
 
 `on()` takes the event name and returns `mark()`,
-the decorator that does the work.
+the decorator that stores the event name on the function.
 `on()`'s type parameter `F` has the bound `Callable[..., object]`,
 which any function satisfies.
 `mark()` returns the same `F` it receives,
@@ -866,7 +868,7 @@ This `model()` generates nothing, and `object`'s constructor takes no arguments.
 The declaration is a claim, and this one is false.
 
 Libraries like attrs and Pydantic make the claim true by generating the methods their `@dataclass_transform` declares.
-The declaration then gives their classes first-class checking in every checker that follows the typing specification.
+The declaration then makes every checker that follows the typing specification synthesize their constructors from the field declarations and check each call against them.
 The shortest `model()` that makes its claim true delegates the generation:
 
 ```python
@@ -896,7 +898,7 @@ and `frozen_default=True` tells the checker that classes built by `model()` reje
 
 `@dataclass_transform` generalizes one shape:
 a decorator that builds a class's methods from its field declarations.
-The checker cannot represent anything stranger,
+The checker cannot represent a class built any other way,
 because it neither imports nor executes your code.
 The checker emulates the constructs it recognizes, accepts what you declare,
 and has no other source of information about a class.
@@ -1065,7 +1067,7 @@ def test_descriptor_on_class_returns_itself() -> None:
 `Field` shows the protocol and stores the value you assign.
 Use a descriptor when the write must do more than store.
 `Positive` checks each value before storing it,
-so every attribute declared with one enforces the same rule:
+so every attribute declared with one raises a `ValueError` for a value of zero or less:
 
 ```python
 # validating_descriptor.py
@@ -1254,7 +1256,8 @@ so mutating the original dict leaves the class unchanged.
 
 Override `__new__()` when you must change `name`, `bases`, or the namespace
 (including special members like `__slots__`) before Python builds the class.
-Otherwise, prefer `__init__()`, which is simpler.
+Otherwise, prefer `__init__()`,
+which receives the finished class and returns nothing.
 
 ## Intercepting Instance Creation
 
@@ -1334,7 +1337,7 @@ That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the m
 Annotating the first parameter as `type[T]` drops `Singleton` from the type of `cls`.
 `ty` and mypy accept a zero-argument `super()` only when they can confirm that `cls` is a `Singleton`.
 Pyright accepts it without the check.
-Both forms do the same work at run time.
+At run time both forms call `type.__call__()` on `cls` with the same arguments.
 
 You might expect to parameterize[^parameterize-spelling] the class,
 with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
@@ -1574,7 +1577,7 @@ Python then passes the finished mapping to `type.__new__()`.
 `__prepare__()` must carry `@classmethod`.
 Python calls it on the metaclass before any class object exists,
 so an ordinary method receives the class name as its `self` and leaves `bases` unfilled.
-The resulting `TypeError` says nothing about the real mistake.
+The resulting `TypeError` reports a missing `bases` argument and never mentions `@classmethod`.
 
 No other hook can detect the `on_open` at `[2]`.
 `__init_subclass__()`, `__set_name__()`,
@@ -1634,7 +1637,7 @@ and instances.
 
 - `inspect.signature(callable)` returns a `Signature` object describing the parameters,
   their annotations, and their defaults.
-- `inspect.getdoc(obj)` returns the cleaned-up docstring.
+- `inspect.getdoc(obj)` returns the docstring with its common indentation removed.
 - `inspect.getmembers(obj)` and `inspect.getmembers_static(obj)` return an object's `(name, value)` pairs.
   The `_static` variant reads them without running properties or other descriptors.
 - Predicates such as `inspect.isclass()`, `inspect.isfunction()`,
@@ -1777,7 +1780,7 @@ print(get_annotations(Order)["buyer"] is Customer)
 ```
 
 `Order` specifies `Customer` before `Customer` exists.
-The `VALUE` request fails the same way it does inside a decorator applied to `Order`.
+The `VALUE` request raises the same `NameError` that a decorator applied to `Order` would get.
 `FORWARDREF` resolves `item` to the `str` class and puts a `ForwardRef` in place of `buyer`.
 The reference's `__forward_arg__` holds the missing name.
 `STRING` evaluates nothing, so it cannot fail,
@@ -1852,7 +1855,8 @@ class Derived(Base):
 `Base`'s four lines are the bare sequence.
 They also show that `Base.__init_subclass__()` does not run for `Base`,
 the rule [Making a Class Final](#making-a-class-final) needs.
-`Derived` adds the rest.
+`Derived` adds four lines: `class body`, `__set_name__(Derived, field)`,
+`__init_subclass__ Derived`, and `decorator Derived`.
 `__prepare__()` runs before the body, so its line comes first.
 The body then executes, printing `class body`.
 `__set_name__()` and `__init_subclass__()` both run between `__new__ Derived enter` and `__new__ Derived exit`.
