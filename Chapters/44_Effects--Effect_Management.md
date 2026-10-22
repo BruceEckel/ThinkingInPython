@@ -1081,7 +1081,7 @@ builds the part of that tool that needs no type inference.
 
 ## Effects Are the Next Barrier
 
-The history of programming is a history of barriers to growth.
+The history of programming is a history of barriers that limit how large a program can grow.
 Each time, the pattern is the same.
 Something the programmer tracks by hand works in small programs.
 Systems grow until hand-tracking fails.
