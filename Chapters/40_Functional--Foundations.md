@@ -75,7 +75,7 @@ because each call changes `balance` and the next call reads the new value.
 To understand one `withdraw()` call you must trace every call before it.
 
 A pure function is the most reliable code you can write,
-because its inputs fully describe its behavior.
+because its arguments alone determine what it returns or raises.
 You can call it from many threads at once,
 because it shares no state to corrupt.
 [Automatic Parallelism](43_Functional--Confidence.md#automatic-parallelism)
@@ -179,7 +179,8 @@ those copies add up in time and memory.
 Languages built around immutability use *persistent* data structures,
 which copy the part a change touches and share the rest with the old value.
 Python's standard library has none.
-For such a value, a mutable structure kept private to one function is the right choice.
+For such a value, keep a mutable structure private to one function,
+which then changes it in place with no other code reading it between changes.
 
 ### Immutability in Annotations
 
@@ -350,11 +351,11 @@ Supporting a new operator means adding a row to the table,
 whether the literal holds that row or a later line adds it,
 as the `operations["%"]` line does here.
 The dispatch code stays the same.
-The same structure underlies [the dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
+The same table of functions underlies [the dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let you add features to a program from outside its core.
 
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
-solves the same `if`/`elif` problem with `match`.
+replaces the same kind of `if`/`elif` chain with `match`.
 `match` and the table differ in one way that decides between them.
 A `match` is code, so adding an operator means editing the function,
 and the type checker verifies every case.
@@ -432,7 +433,8 @@ Higher-order functions separate the iteration from the operation.
 `map()`, `filter()`,
 and `sorted()` each contain the loop that iterates over the data,
 so that loop appears once, inside the function.
-You supply only the part that differs from one use to the next.
+You supply only the function each one calls on every element,
+the part that differs from one use to the next.
 You stop rewriting the same loop,
 and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
 
@@ -627,7 +629,7 @@ so `ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` agai
 It also types the resulting callable as one that takes no arguments,
 and refuses to assign that callable to the declared `Callable[[int], int]`.
 Both reports fall on the assignment line, so one comment covers them.
-The runtime behaves correctly.
+At runtime `percent()` clamps each argument, as the `#:` line shows.
 
 The declaration on its own line states the type of the function that `partial()` builds.
 `ty` takes the type of `percent` from that declaration and checks the three calls against it.
@@ -668,7 +670,7 @@ print(compose(label, increment_then_double)(10))  # [1]
 `compose(double, increment)` returns a function that increments first,
 then doubles.
 Each piece stays small and pure.
-Composition combines the pieces as they are.
+`compose()` combines them without changing either one.
 
 The type parameters matter at `[1]`.
 The type checker verifies that `label()` accepts what `increment_then_double` produces,
