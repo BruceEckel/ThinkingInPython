@@ -86,7 +86,6 @@ except NameError as e:
 #: name 'val' is not defined
 ```
 
-Because Python skips the body of the `if`, `val` stays unbound.
 Indentation shows where the assignment sits, not whether it runs.
 
 The type checker infers that `val = 1` cannot run and reports an error on `print(val)`.
