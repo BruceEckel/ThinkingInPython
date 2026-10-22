@@ -129,7 +129,7 @@ tied to a language that provides `with`.
 A dictionary mapping one program's shape names to its shape classes is a specific design,
 stage two.
 The same dictionary becomes a standard design, stage three,
-once each subclass registers itself as its `class` statement runs.
+when each subclass registers itself as its `class` statement runs.
 Adding a type then needs no edit to the dictionary.
 [Factory](26_Patterns--Factory.md) builds both designs.
 [*Template Method*](24_Patterns--Template_Method.md) is a design pattern,
@@ -375,7 +375,7 @@ which is where a heavy edge belongs.
 Something must specify a class to construct it.
 The pattern moves that choice out of the client and into a creator.
 Holding the name is the creator's whole job,
-and no other part depends on the creator.
+and no other part names the concrete creator.
 
 *Adapter* moves the heavy edge inside the adapter.
 The client specifies the target interface.
@@ -521,7 +521,7 @@ The rest are here for your own designs.
     [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
     moves the same declaration into a function's signature,
     where `Need` specifies what the function requires of its surroundings.
-    Designing the communication gives Managed Coupling its target:
+    Designing the communication gives *Managed Coupling* its target:
     not the least coupling, but coupling you can read.
 -   *Subtraction*.
     A design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].

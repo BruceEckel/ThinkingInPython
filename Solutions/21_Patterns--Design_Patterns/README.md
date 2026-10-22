@@ -1,8 +1,8 @@
 # Design Patterns: Solutions
 
 The first three exercises ask about your own experience, so no answer
-here can be the answer. Each of those solutions works a single example
-through. The method is the transferable part: name the axis,
+here can be the answer. Each of those solutions works through a single
+example. The method is the transferable part: name the axis,
 subtract Python's share, then take away one more thing and see whether
 anything breaks. The last exercise has an answer you can check against
 the chapter's figure.
@@ -362,12 +362,12 @@ Taking away one more thing changes the answer. Removing `checkout()`'s
 `shipping` was and dropping the second argument from each call. The
 program still runs and still prints a number. What stops working is the
 requirement. Charging by weight now means editing `checkout()`.
-Subtraction stops at the parameter. The parameter is the
+*Subtraction* stops at the parameter. The parameter is the
 last piece that expresses the design's intent, so removing it removes
 the design rather than its supporting code.
 
 Both outcomes are the exercise working correctly: a removal that broke
-nothing, and one that broke the requirement. Subtraction is a test
+nothing, and one that broke the requirement. *Subtraction* is a test
 you run, not a rule to remove as much as you can. Take something away,
 run the program, and read the result. If nothing breaks, the piece is
 supporting code. If something breaks, the piece you removed expresses
