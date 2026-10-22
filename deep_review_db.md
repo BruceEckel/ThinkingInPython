@@ -109,11 +109,11 @@ repeated false positive in the book. The house-style sweep greps
 Each has a recorded reason: dataclasses are not taught until chapter 12, so
 chapter 10's `Node` and `Resource` cannot use them; `leaky.py` and `plugged.py`
 (ch. 20) exist to show underscore-private fields behind properties;
-`OverStream` (ch. 23) transforms its argument (`iter(source)`) and seeds derived
+`OverStream` (ch. 22) transforms its argument (`iter(source)`) and seeds derived
 state; `History` (ch. 36) and `StateMachine` (ch. 31) rename what they store,
 which a generated `__init__()` cannot express; `Sketch` (ch. 36) is the mutable
 originator deliberately contrasted with the frozen `Drawing`; the `singleton`
-decorator class (ch. 24) matches chapter 14's `repeat`; `PizzaBuilder` (ch. 27)
+decorator class (ch. 23) matches chapter 14's `repeat`; `PizzaBuilder` (ch. 26)
 is framed as a direct translation of a Java workaround (the bare pointer
 sentence "Translated to Python, it looks like this:" went on 2026-10-04 at
 Bruce's ruling, with the framing kept in the sentence before the listing);

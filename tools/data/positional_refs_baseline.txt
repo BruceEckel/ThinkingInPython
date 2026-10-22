@@ -119,8 +119,8 @@ Chapters/47_Effects--Stateless_in_Practice.md	the next line	The stop comes befor
 Chapters/B_An_Effect_Checker.md	the first assignment	If it kept the first assignment's type, `path.read_text()` would resolve to `builtins.str.read_text`.
 Chapters/B_An_Effect_Checker.md	the first call	It matches a return annotation of the form `Annotated[T, ...]`, binds everything after `T` to `extras`, and returns the argument names of the first call to `marker`.
 Chapters/B_An_Effect_Checker.md	the third line	`hides()` is the third line of Appendix A's rule, "the Effects f handles," in the weakest form you can write without handlers.
-Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except` clause names `ValueError`, so the `TypeError` propagates past it.
-Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs, since `finally` runs whatever exception is propagating.
+Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except` clause specifies `ValueError`, so the `TypeError` propagates past it.
+Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs, since `finally` runs whether or not an exception is propagating.
 Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` shifts down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
 Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in automatically.
 Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the two lines of output come from `finally` and from the caller.

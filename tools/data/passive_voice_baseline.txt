@@ -6,6 +6,7 @@
 # the sentence retires it. Rewritten by `tip passive-accept`;
 # read the delta with `tip passive` before accepting.
 # See tools/passive_voice.py.
+Chapters/01_Introduction.md	[PASSIVE] is finished: Each solution opens in steps, so you can take as little help as you need: a hint first, then a check that tells you when your attempt is finished, then the full answer.
 Chapters/03_Foundations--Containers.md	[PASSIVE] is read: CODE, from the CODE module, is read-only without being immutable.
 Chapters/03_Foundations--Containers.md	[PASSIVE] is set: CODE is also set-like, and so is CODE when every value is hashable.
 Chapters/04_Foundations--Control_Flow.md	[PASSIVE+BY] is followed: In Python, a handler is CODE followed by the exception type it handles.
@@ -19,14 +20,17 @@ Chapters/18_Techniques--Performance.md	[PASSIVE] was reached: The question is "w
 Chapters/19_Techniques--Concurrency.md	[PASSIVE] are suspended: The CODE responds by cancelling CODE and CODE, which are still suspended with far more sleep to go, so both stop before their CODE print.
 Chapters/20_Patterns--Rethinking_Objects.md	[PASSIVE] is compiled: Java is statically compiled, so substitutability matters.
 Chapters/21_Patterns--Design_Patterns.md	[PASSIVE] is reached: A design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".
-Chapters/26_Patterns--Factory.md	[PASSIVE] 's bound: A generic factory would need CODE's bound to name the factory's own type parameter.
+Chapters/26_Patterns--Factory.md	[PASSIVE] 's bound: A generic factory needs CODE's bound to name the factory's own type parameter.
+Chapters/26_Patterns--Factory.md	[PASSIVE] is justified: The second hierarchy is justified only when the factory does work of its own, as CODE does here.
 Chapters/30_Patterns--Observer.md	[PASSIVE] are connected: Use a weak responder only when a long-lived broadcaster holds short-lived responders that the program drops while they are still connected.
 Chapters/30_Patterns--Observer.md	[PASSIVE] is connected: A CODE that is still connected keeps CODE in memory.
 Chapters/30_Patterns--Observer.md	[PASSIVE] is decoupled: A broadcaster that receives its responders at construction is decoupled but not dynamic:
 Chapters/35_Patterns--Flyweight.md	[PASSIVE] is called: A pool of singletons keyed this way is sometimes called *Multiton*.
 Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: That name is now bound to CODE.
+Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: The dump that builds CODE runs while CODE is bound to the one-field class.
 Chapters/40_Functional--Foundations.md	[PASSIVE] is associated: The runtime message names a local variable instead of the missing declaration: "cannot access local variable 'count' where it is not associated with a value."
-Chapters/44_Effects--Effect_Management.md	[PASSIVE] gets delayed: In a language not designed for Effects, a library gets delayed binding by deferring execution.
+Chapters/44_Effects--Effect_Management.md	[PASSIVE+BY] is consumed: An enormous part of professional programming is consumed by this activity, and it has been normal for so long that it goes unnoticed.
+Chapters/44_Effects--Effect_Management.md	[PASSIVE] is delayed: The connection between the declaration and its supply is *delayed binding*.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
 Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
 Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] 's named: When CODE gains a fourth error, CODE's named CODE leaves it in the channel, so CODE's declared type no longer matches and the type checker reports an error at the CODE.
@@ -34,7 +38,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] is prepackaged: CODE is 
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the run prints CODE, and you can say which slot the surviving CODE occupies and why the loop skipped it.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the swapped CODE prints CODE, and you can say what a single value of CODE would have to do for the order of the two CODE blocks to change the output.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the traceback shows CODE above CODE, and printing the classes of CODE and CODE names two different exceptions: the one you constructed and CODE.
-Solutions/05_Foundations--Functions/README.md	[PASSIVE] is associated: ** Both calls raise `UnboundLocalError: cannot access local variable 'count' where it is not associated with a value`.
+Solutions/05_Foundations--Functions/README.md	[PASSIVE] is associated: ** CODE raises `UnboundLocalError: cannot access local variable 'count' where it is not associated with a value`.
 Solutions/08_Foundations--Static_Types/README.md	[PASSIVE] is defined: If you name CODE's method CODE, as the chapter's CODE does, CODE rejects CODE with an CODE, reporting that protocol member CODE is not defined on type CODE.
 Solutions/10_Foundations--Cleanup/README.md	[PASSIVE] is gone: You can say what makes the collector run once CODE is gone, and why the explicit CODE still keeps this run's transcript the same.
 Solutions/15_Techniques--Context_Managers/README.md	[PASSIVE] sits nested: CODE's whole lifetime, enter and exit, sits nested inside CODE's lifetime.

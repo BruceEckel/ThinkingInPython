@@ -33,7 +33,7 @@ Solutions/19_Techniques--Concurrency/README.md	[IMP] Compare each task's delay w
 Solutions/22_Patterns--Iterators/README.md	[IMP] For the explanation, consider what a generator keeps between calls to CODE, and what CODE would have to do to learn a count.
 Solutions/23_Patterns--Singleton/README.md	[COLON+AND] Externally the behavior stays the same: CODE accumulates the same way, CODE is still CODE, and CODE is still CODE.
 Solutions/30_Patterns--Observer/README.md	[COLON+AND] your test passes against your CODE: the first responder raises an exception, CODE raises an CODE holding it, and the second responder has recorded the value.
-Solutions/37_Patterns--Pattern_Refactoring/README.md	[IMP] To let a subclass share its parent's bin, give CODE a class variable that names the bin's key, and have CODE default that variable for each class.
+Solutions/37_Patterns--Pattern_Refactoring/README.md	[IMP] To let a subclass share its parent's bin, give CODE a class variable that holds the bin's key, and have CODE default that variable for each class.
 Solutions/38_Patterns--Simulation/README.md	[IMP] Make CODE return values from an iterator you script, and have CODE append to a list.
 Solutions/40_Functional--Foundations/README.md	[COLON+AND] That split is the chapter's point: CODE makes the checker reject a rebinding of the name, and the value's own type makes it reject a change to the contents.
 Solutions/45_Effects--Generators/README.md	[COLON+AND] CODE takes the other route: CODE yields it, the CODE in CODE relays it, and the driver receives it.

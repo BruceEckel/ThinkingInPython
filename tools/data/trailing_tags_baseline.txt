@@ -17,10 +17,11 @@ Chapters/08_Foundations--Static_Types.md	[R32] CODE is a placeholder, filled in 
 Chapters/08_Foundations--Static_Types.md	[R32] Checking is a separate step you run, the same way you run tests
 Chapters/09_Foundations--Class_Attributes.md	[R32] A CODE with no value stays a declaration, the same as CODE in CODE
 Chapters/09_Foundations--Class_Attributes.md	[R32] The first CODE (CODE) reads the same CODE, adds one, and the assignment creates CODE on CODE alone, the same shadowing CODE demonstrates in CODE
-Chapters/09_Foundations--Class_Attributes.md	[R32] Writing the same increment through CODE forks the counter once the base class has subclasses, the same way CODE forks CODE
+Chapters/09_Foundations--Class_Attributes.md	[R32] Writing the same increment through CODE forks the counter when the base class has subclasses, the same way CODE forks CODE
 Chapters/11_Techniques--Testing.md	[R32] CODE replaces CODE with a function that returns a known value, the same way it does for CODE
 Chapters/13_Techniques--Pattern_Matching.md	[R35] Rethinking Objects works through the same tradeoff with shapes, and *Multiple Dispatching* and *Visitor* explore it further
-Chapters/13_Techniques--Pattern_Matching.md	[R35] That is the open-set-versus-closed-set tradeoff from When Not to Match, which the two notification versions show in code
+Chapters/13_Techniques--Pattern_Matching.md	[R35] The tradeoff has a name
+Chapters/13_Techniques--Pattern_Matching.md	[R35] When Not to Match weighs an open set of types against a closed one, and the two notification versions show that tradeoff in code
 Chapters/14_Techniques--Decorators.md	[R32] With CODE, the same call raises a CODE at decoration
 Chapters/14_Techniques--Decorators.md	[R35] Changing the price of a topping means changing one number, in one place
 Chapters/15_Techniques--Context_Managers.md	[R32] CODE builds such a manager from an async generator, the same way CODE builds the synchronous form
@@ -44,7 +45,7 @@ Chapters/30_Patterns--Observer.md	[R32] For CODE, which exists to record every r
 Chapters/30_Patterns--Observer.md	[R32] The window looks the same, but the canvas's list of items grows with every notification, the same quiet accumulation as a lapsed listener
 Chapters/31_Patterns--State_Machines.md	[R32] If you swap the rule order, the same input reports CODE
 Chapters/38_Patterns--Simulation.md	[R32] CODE numbers the frames, the same endless counter that numbered the rats
-Chapters/41_Functional--Toolkits.md	[R32] Called with CODE, the same function schedules trios instead
+Chapters/41_Functional--Toolkits.md	[R32] Called with CODE, the same function schedules trios
 Chapters/41_Functional--Toolkits.md	[R32] The Cartesian product of the input iterables, the same pairs a nested CODE loop builds
 Chapters/42_Functional--Error_Handling.md	[R32] Written with exceptions and one CODE at the top, the same composition is shorter
 Chapters/45_Effects--Generators.md	[R32] A coroutine's annotation is CODE, the same three-part shape as a CODE
@@ -67,6 +68,7 @@ Solutions/29_Patterns--Changing_the_Interface/README.md	[R32] The adapter adds t
 Solutions/30_Patterns--Observer/README.md	[R32] The protocol here is the one from CODE, unchanged
 Solutions/31_Patterns--State_Machines/README.md	[R35] The chapter's Table-Driven *State Machine* section makes the same trade-off over the per-state CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[R32] Sixteen entries cover the four types against each other (4 × 4), the same shape as the original nine (3 × 3)
+Solutions/41_Functional--Toolkits/README.md	[R32] On the list passed through CODE, the same diagnostic names the literal's inferred type
 Solutions/41_Functional--Toolkits/README.md	[R32] Passing the CODE is dependency injection applied to a source of nondeterminism, the same technique Random Numbers recommends for testing
 Solutions/42_Functional--Error_Handling/README.md	[R32] The chapter's CODE returns the CODE as CODE, the same shape a bad-input failure takes
 Solutions/46_Effects--Stateless/README.md	[R32] Now every caller has two options, the same two CODE's callers have

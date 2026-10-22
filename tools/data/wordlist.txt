@@ -372,3 +372,4 @@ wildcard
 workaround
 workarounds
 worklist
+subscriptable

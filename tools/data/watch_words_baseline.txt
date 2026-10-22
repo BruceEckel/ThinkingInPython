@@ -134,9 +134,7 @@ Chapters/17_Techniques--Metaprogramming.md	hooks: None of these hooks is a separ
 Chapters/17_Techniques--Metaprogramming.md	hooks: and you write one when the simpler hooks are not enough
 Chapters/17_Techniques--Metaprogramming.md	hooks: but simpler hooks cover almost every case a metaclass handled before those hooks existed
 Chapters/17_Techniques--Metaprogramming.md	itself: Extend CODE so a class declares itself final with a keyword in its header
-Chapters/17_Techniques--Metaprogramming.md	itself: and returns itself when you read it through the class
 Chapters/17_Techniques--Metaprogramming.md	names the rule: CODE names the rule twice and writes no checking code of its own
-Chapters/17_Techniques--Metaprogramming.md	names what: CODE names what builds a class
 Chapters/17_Techniques--Metaprogramming.md	never: It accepts the declaration and never runs CODE
 Chapters/17_Techniques--Metaprogramming.md	never: The type checker never runs the metaclass
 Chapters/17_Techniques--Metaprogramming.md	never: a name the module never defined prints as a CODE instead of raising a CODE
@@ -227,7 +225,6 @@ Chapters/21_Patterns--Design_Patterns.md	already: but [*Singleton* shows that a 
 Chapters/21_Patterns--Design_Patterns.md	does it: and where does it put it
 Chapters/21_Patterns--Design_Patterns.md	itself: A CODE renders itself through a writer
 Chapters/21_Patterns--Design_Patterns.md	itself: by letting the new class register itself as its CODE statement runs
-Chapters/21_Patterns--Design_Patterns.md	itself: once each subclass registers itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	names the patterns: GoF's first chapter lists eight "common causes of redesign" and names the patterns that address each one
 Chapters/21_Patterns--Design_Patterns.md	only: *Once and once only*
 Chapters/21_Patterns--Design_Patterns.md	only: This listing shows only the shape
@@ -299,7 +296,6 @@ Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that p
 Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs more than the money inserted
 Chapters/31_Patterns--State_Machines.md	expensive: CODE for too expensive and CODE for sold out
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
-Chapters/31_Patterns--State_Machines.md	names the condition: The state after the arrow names the condition
 Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
 Chapters/31_Patterns--State_Machines.md	paid: and a CODE selects from every paid state but CODE
 Chapters/31_Patterns--State_Machines.md	price: A CODE holds one item's price and quantity
@@ -322,7 +318,6 @@ Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE receives CODE w
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
-Chapters/34_Patterns--Composite_and_Interpreter.md	only: Only the value a node returns differs
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
 Chapters/35_Patterns--Flyweight.md	itself: A first design gives each cell everything it knows about itself
@@ -339,7 +334,6 @@ Chapters/36_Patterns--Memento.md	only: CODE exists only for the type checker
 Chapters/36_Patterns--Memento.md	only: Only unpickle data you trust
 Chapters/36_Patterns--Memento.md	only: The record makes the attribute that holds it read-only too
 Chapters/36_Patterns--Memento.md	only: so a history of CODE states stores each stroke once and duplicates only the pointers
-Chapters/37_Patterns--Pattern_Refactoring.md	itself: The tests confirm that each subclass registers itself
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: so each one can register itself in CODE automatically
 Chapters/37_Patterns--Pattern_Refactoring.md	names the shape: CODE names the shape the sorting sections use
 Chapters/37_Patterns--Pattern_Refactoring.md	wants: Now the safety officer wants a disposal hazard printed beside the instruction
@@ -418,8 +412,6 @@ Chapters/44_Effects--Effect_Management.md	itself: The function reads nothing out
 Chapters/44_Effects--Effect_Management.md	never: the exception never propagates to the caller
 Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
-Chapters/45_Effects--Generators.md	only: CODE's single CODE finishes only after every generator beneath it has finished
-Chapters/45_Effects--Generators.md	only: The driver sees CODE only when CODE finishes its last delegation
 Chapters/45_Effects--Generators.md	only: so only the CODE call sits there
 Chapters/46_Effects--Stateless.md	already: A function that already returns an Effect needs no CODE
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
@@ -510,6 +502,7 @@ Solutions/10_Foundations--Cleanup/README.md	only: Reference Cycles Delay Destruc
 Solutions/10_Foundations--Cleanup/README.md	only: The CODE statement calls CODE only after CODE returns
 Solutions/10_Foundations--Cleanup/README.md	only: The CODE statement calls CODE only for a block it has entered
 Solutions/10_Foundations--Cleanup/README.md	only: and it enters the block only after CODE returns
+Solutions/11_Techniques--Testing/README.md	never: although CODE never touches the disk
 Solutions/11_Techniques--Testing/README.md	only: An injected test depends only on the shape of what it passes
 Solutions/11_Techniques--Testing/README.md	only: If you test only a positive balance
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	itself: A CODE Cannot Validate Itself explains why the class body of a CODE refuses a CODE
@@ -553,7 +546,6 @@ Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes 
 Solutions/20_Patterns--Rethinking_Objects/README.md	price: so the type checker now rejects a weight where CODE declares a price
 Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the same shipping calculation
 Solutions/22_Patterns--Iterators/README.md	have to: and what CODE would have to do to learn a count
-Solutions/22_Patterns--Iterators/README.md	names every kind: so the annotation names every kind of leaf the function yields
 Solutions/22_Patterns--Iterators/README.md	only: A log is an append-only record that many processes write
 Solutions/22_Patterns--Iterators/README.md	only: CODE stops only when CODE reports the end
 Solutions/22_Patterns--Iterators/README.md	only: CODE works only if every value stays reachable
@@ -585,7 +577,6 @@ Solutions/26_Patterns--Factory/README.md	only: That test works on a CODE only wh
 Solutions/26_Patterns--Factory/README.md	only: and only when something mutates them in place
 Solutions/26_Patterns--Factory/README.md	only: the table is the only acceptable version of the two
 Solutions/27_Patterns--Function_Objects/README.md	never: A CODE is never a root
-Solutions/28_Patterns--Data_Transfer_Objects/README.md	names the cause: whose message names the cause
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	only: 'list')CODERecipe` is hashable only when every field is
 Solutions/29_Patterns--Changing_the_Interface/README.md	already: A module is already a namespace
 Solutions/29_Patterns--Changing_the_Interface/README.md	even: even through an instance

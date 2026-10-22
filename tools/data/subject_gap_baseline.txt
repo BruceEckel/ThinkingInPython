@@ -22,7 +22,6 @@ Chapters/11_Techniques--Testing.md	[relcl] function .. needs: This book patches 
 Chapters/12_Techniques--Data_Classes_as_Types.md	[acl,cc,conj] CODE .. is: A CODE made of a legal CODE and a legal CODE is legal by construction:
 Chapters/12_Techniques--Data_Classes_as_Types.md	[cc,dep,neg,prep] rebuilds .. produces: CODE rebuilds through CODE, not through your CODE, so CODE on a validated instance quietly produces an unvalidated one.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[prep,relcl] type .. is: A type you define, like a rating from one to ten, is a smaller set: the allowed values.
-Chapters/14_Techniques--Decorators.md	[cc,npadvmod,relcl] decorator .. binds: A decorator that forgets its CODE returns CODE instead, so Python binds CODE to CODE.
 Chapters/14_Techniques--Decorators.md	[prep] CODE .. is: CODE above a bare assignment, or above a CODE alias, is a syntax error rather than a decorator applied to something unusual.
 Chapters/15_Techniques--Context_Managers.md	[prep] defaults .. catch: The constructor's CODE parameter defaults to the CODE sentinel, which makes CODE with no argument catch everything.
 Chapters/16_Techniques--Comprehensions.md	[relcl] CODE .. deletes: That consumer is CODE, which runs after the CODE block exits and the context manager deletes the directory.
@@ -51,7 +50,6 @@ Chapters/30_Patterns--Observer.md	[cc,nummod,prep] exercise .. raised: Redo exer
 Chapters/31_Patterns--State_Machines.md	[cc,dobj,npadvmod,prep] stores .. reuse: The event bus stores its handlers under the event class the same way, and *Multiple Dispatching* and Pattern Refactoring reuse the lookup.
 Chapters/31_Patterns--State_Machines.md	[cc,relcl] rule .. belongs: A rule whose condition is CODE matches every time, so it belongs last in its group.
 Chapters/34_Patterns--Composite_and_Interpreter.md	[relcl] build .. alternates: A build that runs targets in parallel calls CODE once, then alternates CODE and CODE in place of CODE.
-Chapters/35_Patterns--Flyweight.md	[advmod,dep,dobj] names .. be: CODE names the closed set of valid map characters, so CODE and every key of CODE must be one of those characters.
 Chapters/40_Functional--Foundations.md	[appos,prep,relcl] Five .. requires: Five of the chapter's ideas work at once: a record for the value, CODE to state that CODE leaves its input unchanged, two pure functions, CODE to turn a two-argument predicate into the one-argument callable CODE requires, and CODE and CODE for the traversal.
 Chapters/40_Functional--Foundations.md	[conj] key .. is: Contents-based equality together with a stable hash is why a dictionary key, a cache entry, or a value shared across threads is normally a tuple or a record.
 Chapters/41_Functional--Toolkits.md	[relcl] CODE .. calls: The CODE that CODE supplies for CODE calls your CODE, then calls CODE too when CODE returns CODE.
@@ -75,7 +73,6 @@ Solutions/15_Techniques--Context_Managers/README.md	[appos,prep] prints .. match
 Solutions/16_Techniques--Comprehensions/README.md	[appos,prep] prints .. passes: your version prints CODE through CODE, then a list of three usable values in place of CODE, and CODE passes on your file.
 Solutions/23_Patterns--Singleton/README.md	[relcl] subclass .. gets: A subclass that binds its own CODE in its class body gets separate storage.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[appos,prep] Classes .. makes: [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values) makes CODE the place to check each value the JSON decoder produces.
-Solutions/30_Patterns--Observer/README.md	[advmod,appos,cc,conj] appends .. bind: CODE appends and returns CODE, so CODE above a CODE would bind that name to CODE.
 Solutions/30_Patterns--Observer/README.md	[cc,prep,relcl] responder .. reports: A responder in a module that nothing imports does not run, and nothing reports its absence.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[advmod,dep,dobj] Count .. rows: Count the methods you wrote, then compare with the seven dictionary rows the table version needs.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[acl] type .. adds: a node type written below your existing classes, with none of them edited, adds its share to CODE for a directory that holds it, and CODE passes.

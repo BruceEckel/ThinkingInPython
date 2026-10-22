@@ -178,7 +178,7 @@ Chapters/33_Patterns--Visitor.md	[PAST] built: CODE inspects the dispatch table 
 Chapters/35_Patterns--Flyweight.md	[PAST] included: A first design gives each cell everything it knows about itself, its position included:
 Chapters/35_Patterns--Flyweight.md	[PAST] set: Replace CODE on CODE with CODE and set CODE on a parsed map.
 Chapters/35_Patterns--Flyweight.md	[PAST] split: First, split each object's state in two.
-Chapters/36_Patterns--Memento.md	[PAST] bound: For a field that grows with every edit, bound the history's depth (see exercise 2), coalesce edits before CODE stores them, use a persistent structure that shares more than a flat tuple can, or switch to *Command*-based undo, which stores an edit instead of a state.
+Chapters/36_Patterns--Memento.md	[PAST] bound: For a field that grows with every edit, bound the history's depth (see exercise 2), coalesce edits before CODE stores them, use a persistent structure that shares more than a flat tuple, or switch to *Command*-based undo, which stores an edit instead of a state.
 Chapters/36_Patterns--Memento.md	[PAST] had: CODE builds a bare CODE with CODE, skipping CODE, and copies in the fields the old bytes had.
 Chapters/36_Patterns--Memento.md	[PAST] let: The checker and the frozen field both let code holding a CODE read CODE, unpack that tuple, or build a CODE by hand.
 Chapters/36_Patterns--Memento.md	[PAST] read: All three read the bytes as data and run no code from them, which removes pickle's security risk.
@@ -202,30 +202,19 @@ Chapters/42_Functional--Error_Handling.md	[PAST] read: An exception from someone
 Chapters/42_Functional--Error_Handling.md	[PAST] read: The CODE branch reads CODE, and that read type-checks.
 Chapters/43_Functional--Confidence.md	[PAST] bound: Each test checks a single input against a single answer, so the examples you invent bound what you learn.
 Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place appends nothing.
-Chapters/44_Effects--Effect_Management.md	[PAST] added: OCaml 5 added the handler mechanism, though it does not yet track Effects in function types.
-Chapters/44_Effects--Effect_Management.md	[PAST] avoided: Programmers usually avoided that work by widening the specification until it permitted every exception.
-Chapters/44_Effects--Effect_Management.md	[PAST] became: Version control gave every state of the code a name to which you can return, so experimenting became safe.
-Chapters/44_Effects--Effect_Management.md	[PAST] committed: A team committed to Scala or TypeScript cannot use native Effects, so designers built *library* Effect systems on top of existing type systems.
-Chapters/44_Effects--Effect_Management.md	[PAST] declared: *Algebraic effects* is the name for this design: operations declared as an interface, plus handlers that receive the continuation.
+Chapters/44_Effects--Effect_Management.md	[PAST] checked: *checked exceptions*), while C++, before C++17 removed them, checked it at runtime and ended the program on an exception the list left out.
+Chapters/44_Effects--Effect_Management.md	[PAST] committed: A team committed to Scala or TypeScript cannot use native Effects, so designers build *library* Effect systems on top of existing type systems.
+Chapters/44_Effects--Effect_Management.md	[PAST] declared: *Algebraic effects* is the name for this design: Effects declared as an interface, plus handlers that receive the continuation.
 Chapters/44_Effects--Effect_Management.md	[PAST] delayed: Native systems deliver tracking, interface separation, and delayed binding while the code runs eagerly, with no description trees and no interpreter.
 Chapters/44_Effects--Effect_Management.md	[PAST] divided: The solution divided names among separate namespaces.
-Chapters/44_Effects--Effect_Management.md	[PAST] exposed: The specifications exposed implementation details.
+Chapters/44_Effects--Effect_Management.md	[PAST] ended: *checked exceptions*), while C++, before C++17 removed them, checked it at runtime and ended the program on an exception the list left out.
 Chapters/44_Effects--Effect_Management.md	[PAST] faced: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] followed: A perfectly pure computation, followed to its logical end, is a space heater with extra steps.
-Chapters/44_Effects--Effect_Management.md	[PAST] gave: Version control gave every state of the code a name to which you can return, so experimenting became safe.
-Chapters/44_Effects--Effect_Management.md	[PAST] introduced: Neither language inferred the list from the functions a body called, so an exception introduced three levels down meant editing every signature above it by hand.
-Chapters/44_Effects--Effect_Management.md	[PAST] looked: Namespaces once looked like ceremony.
-Chapters/44_Effects--Effect_Management.md	[PAST] met: Each of these met resistance as unnecessary overhead, then won adoption, then faded as a question.
-Chapters/44_Effects--Effect_Management.md	[PAST] moved: Automated testing moved "does it still work?" from a manual ritual into the build.
+Chapters/44_Effects--Effect_Management.md	[PAST] introduced: Neither language infers the list from the functions a body calls, so an exception introduced three levels down means editing every signature above it by hand.
 Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put every name in one global namespace, and the programmer prevented collisions by hand.
-Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++ reduced its version to a single bit: whether a function can throw.
-Chapters/44_Effects--Effect_Management.md	[PAST] succeeded: CODE succeeded because it arrived as part of the language.
-Chapters/44_Effects--Effect_Management.md	[PAST] took: Garbage collection took the tracking of memory ownership out of the programmer's head.
+Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
-Chapters/44_Effects--Effect_Management.md	[PAST] tried: C++ and Java tried to track exceptions with *exception specifications*, a list of exceptions written by hand on each function.
-Chapters/44_Effects--Effect_Management.md	[PAST] was: That was true of every solution to every previous barrier at this stage.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
-Chapters/44_Effects--Effect_Management.md	[PAST] won: Each of these met resistance as unnecessary overhead, then won adoption, then faded as a question.
 Chapters/45_Effects--Generators.md	[PAST] resumed: A generator resumed from two threads at once raises CODE rather than interleaving.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
 Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's parameter annotation to decide what it answers, so a function annotated CODE and returning CODE hands back a default-constructed instance of the requested class.
@@ -243,7 +232,6 @@ Chapters/47_Effects--Stateless_in_Practice.md	[PAST] remained: Two purchases wen
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] spread: The pipeline is in there, spread across three CODE blocks.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] was: Each was a class with a method per product.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] went: Two purchases went through, and 10 remained.
-Chapters/A_Effect_Tracking.md	[PAST] declared: ** Gradual typing declared them with stub files and typeshed.
 Chapters/A_Effect_Tracking.md	[PAST] delayed: Stateless gets tracking, interface separation, and delayed binding with no new tool.
 Chapters/A_Effect_Tracking.md	[PAST] put: Stateless and ZIO put their rows in the return type too.
 Chapters/B_An_Effect_Checker.md	[PAST] called: CODE called CODE inside a comprehension, and now calls CODE.
@@ -266,6 +254,7 @@ Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote
 Solutions/07_Foundations--Classes/README.md	[PAST] removed: With the decorator removed, CODE prints CODE.
 Solutions/08_Foundations--Static_Types/README.md	[PAST] found: before the widening, CODE reports CODE on the CODE call with CODEExpected CODE, found CODE CODE.
 Solutions/08_Foundations--Static_Types/README.md	[PAST] found: with the comment removed, CODE reports CODE on CODE, marking CODE with CODEExpected CODE, found CODE CODE, and you can say what CODE returns at run time.
+Solutions/08_Foundations--Static_Types/README.md	[PAST] inferred: CODE mirrors CODE: one type parameter CODE, inferred from the CODE the caller passes.
 Solutions/09_Foundations--Class_Attributes/README.md	[PAST-HEADING] shared: A mutable CODE shared down the hierarchy
 Solutions/09_Foundations--Class_Attributes/README.md	[PAST] declared: Combined, the mutable value and the inheritance lookup produce one list, declared on the base class, that every subclass mutates under its own name.
 Solutions/09_Foundations--Class_Attributes/README.md	[PAST] gave: The line CODE gave CODE its own instance attribute, and that attribute shadows the class attribute when you read CODE.
@@ -283,14 +272,13 @@ Solutions/13_Techniques--Pattern_Matching/README.md	[PAST] put: For the first fi
 Solutions/15_Techniques--Context_Managers/README.md	[PAST-HEADING] restored: CODE with its CODE/CODE restored
 Solutions/15_Techniques--Context_Managers/README.md	[PAST-HEADING] stacked: 5. Two CODE decorators stacked on one function
 Solutions/15_Techniques--Context_Managers/README.md	[PAST] entered: Combining Context Managers shows several managers on one CODE statement, entered left to right.
-Solutions/15_Techniques--Context_Managers/README.md	[PAST] included: CODE instead accepts a count settled at runtime, such as the number of names on a command line, zero included.
+Solutions/15_Techniques--Context_Managers/README.md	[PAST] included: CODE accepts a count settled at runtime, such as the number of names on a command line, zero included.
 Solutions/15_Techniques--Context_Managers/README.md	[PAST] wrote: you wrote your prediction before running, and your function prints CODE first and CODE last, with the two CODE lines nested inside them around the body line.
 Solutions/15_Techniques--Context_Managers/README.md	[PAST] wrote: you wrote your six-line prediction before running, and your edited CODE prints CODE right after CODE and CODE right before CODE, the last line.
 Solutions/16_Techniques--Comprehensions/README.md	[PAST] predicted: you predicted the count before running, and the edited CODE, with a CODE added, prints that number.
 Solutions/16_Techniques--Comprehensions/README.md	[PAST] wrote: you wrote down all three printed values before running, and the edited CODE prints them in that order.
 Solutions/16_Techniques--Comprehensions/README.md	[PAST] wrote: you wrote down the entries before running, and the edited CODE prints the keys and values you wrote.
 Solutions/16_Techniques--Comprehensions/README.md	[PAST] wrote: you wrote the whole printed dictionary, keys in order, before running, and the edited CODE prints what you wrote.
-Solutions/17_Techniques--Metaprogramming/README.md	[PAST] dropped: That assignment dropped the last reference to the first function, so that function has disappeared before any of the three runs.
 Solutions/17_Techniques--Metaprogramming/README.md	[PAST] put: Define CODE as an ordinary function, then put it in the dictionary beside CODE.
 Solutions/18_Techniques--Performance/README.md	[PAST] measured: One machine measured CODE about 19 times faster at 10,000 parts and about 7 times faster at 100.
 Solutions/18_Techniques--Performance/README.md	[PAST] read: CODE attaches the same event to every Python code object in the process, so read the CODE for entries beyond your two functions.

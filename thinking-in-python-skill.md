@@ -67,7 +67,7 @@ file passes a strict type checker and linter.
 - For a generator function whose yield type carries a guarantee you
   want verified, write the `Generator[...]` annotation out in full:
   the yield type is the information, and it stays visible at the
-  point of use. Under `ty` 0.0.87 a `type` alias checks the same (a
+  point of use. Under `ty` 0.0.89 a `type` alias checks the same (a
   wrong `yield` draws `invalid-yield` through the alias), but confirm
   that with your own checker before aliasing such a signature.
 
