@@ -139,8 +139,9 @@ shape. Passing `(ZeroDivisionError, TypeError)` therefore suppresses
 both. The `TypeError` block prints a `[Type] message` line in the
 same form the `ZeroDivisionError` block printed before the change.
 
-**Check that the original type still matches.** The second block shows that the tuple still covers the original
-exception.
+**Check that the original type still matches.** The second block
+divides by zero and prints `[ZeroDivisionError] division by zero`,
+so the tuple still covers the original exception.
 
 If you write `expected(ZeroDivisionError, TypeError)` without the
 inner parentheses, the script stops before printing `before`, with a
@@ -373,24 +374,25 @@ quarterly()
 #: === outer ends ===
 ```
 
-**Apply the decorators bottom-up.** Stacked context-manager decorators apply in the same order as any other stacked decorators. Python evaluates
-the stack as `quarterly = banner("outer")(banner("inner")(quarterly))`.
-`@banner("inner")` is nearest the `def`, so it wraps `quarterly()` first,
-and `@banner("outer")` then wraps the inner wrapper. Calling `quarterly()`
-therefore enters the outer manager first. Inside the outer manager, the outer wrapper
-calls the inner wrapper, which enters the inner manager and then runs
-the body. Unwinding
-reverses that order, so the four bracketing lines nest rather than
-interleave.
+**Apply the decorators bottom-up.** Stacked context-manager
+decorators apply in the same order as any other stacked decorators.
+Python evaluates the stack as
+`quarterly = banner("outer")(banner("inner")(quarterly))`.
+`@banner("inner")` is nearest the `def`, so it wraps `quarterly()`
+first, and `@banner("outer")` then wraps the inner wrapper. Calling
+`quarterly()` therefore enters the outer manager first. Inside the
+outer manager, the outer wrapper calls the inner wrapper, which enters
+the inner manager and then runs the body. Unwinding reverses that
+order, so the four bracketing lines nest rather than interleave.
 
-**Enter a fresh manager on each call.** When Python defines `quarterly()`,
-each `@banner(...)` line builds one manager object. A generator manager is single-use, so the wrapper
-that `ContextDecorator` supplies reads that object's generator function
-and arguments. On each call of `quarterly()` the wrapper builds a fresh
-manager from them and enters the fresh one. A hand-written
-class-form manager decorating a function re-enters the same instance
-on every call, so every call shares any state the instance
-holds.
+**Enter a fresh manager on each call.** When Python defines
+`quarterly()`, each `@banner(...)` line builds one manager object. A
+generator manager is single-use, so the wrapper that
+`ContextDecorator` supplies reads that object's generator function and
+arguments. On each call of `quarterly()` the wrapper builds a fresh
+manager from them and enters the fresh one. A hand-written class-form
+manager decorating a function re-enters the same instance on every
+call, so every call shares any state the instance holds.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

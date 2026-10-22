@@ -29,7 +29,8 @@ function with a single `yield`.
 The `contextlib.contextmanager` decorator turns that function into a context manager.
 [Generators](45_Effects--Generators.md) covers the two-way form.
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Techniques--Testing.md#fixtures-replace-setup-and-teardown).
-Everything before the `yield` is setup, and everything after it is cleanup.
+Everything before the `yield` is setup.
+Everything after it is cleanup.
 That shape is all a context manager needs.
 
 ```python
@@ -628,8 +629,8 @@ if __name__ == "__main__":
 `ContextDecorator` applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
 so `quarterly()` keeps its name and docstring.
 
-The parentheses in `@banner("quarterly")` matter.
-The call constructs the manager, which then decorates the function.
+In `@banner("quarterly")`, the call constructs the manager,
+which then decorates the function.
 Written bare, `@banner` passes the function `quarterly` as `title`,
 so the name `quarterly` holds a manager object rather than a function.
 Calling `quarterly()` then raises a `TypeError`.
@@ -923,8 +924,7 @@ Exiting a `nullcontext` does nothing,
 so the same `with` block closes the file in the `Path` branch and leaves `sys.stdout` and the caller's stream open,
 as the caller expects.
 
-`chdir()` makes a useful contrast with the hand-written managers earlier in the chapter.
-It is a class manager like `Trace`,
+`chdir()` is a class manager like `Trace`,
 a few lines long in the standard library's source.
 Its `__enter__()` appends `os.getcwd()` to a list and calls `os.chdir()`.
 Its `__exit__()` pops the saved directory off the list and changes back to it.
@@ -1139,7 +1139,7 @@ Across sixteen hundred lease-and-return cycles,
 spread over eight threads competing for two connections, `peak` tops out at two.
 A thread that calls `lease()` while the pool is empty blocks in `get()` until another thread returns a connection.
 With a pool that has no limit, all eight threads hold a lease together,
-and the demo prints a peak of eight.
+so the demo prints a peak of eight.
 
 `available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate when more than one thread is borrowing,
