@@ -10,8 +10,7 @@ eff Tell {
     def tell(message: String): Unit
 }
 
-// Core logic: the Effect row after the backslash is part
-// of the type
+// Core logic: the Effect row appears after the backslash
 def greet(): Unit \ {Ask, Tell} =
     let name = Ask.ask("What is your name? ");
     Tell.tell("Hello, ${name}!")

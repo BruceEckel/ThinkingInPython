@@ -952,26 +952,22 @@ A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes with a value.
 That makes a suspended generator a continuation you can resume once or discard,
 but not resume twice, because nothing can copy a generator's paused frame.
-[Stateless](46_Effects--Stateless.md) writes these programs in Python.
-[Stateless in Practice](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
-rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
 ### Custom AI Languages with Effects
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.
-A language written for an AI can drop the conveniences that help a person read code.
+A language written for an AI can drop the conveniences that help a person write and read code.
 An AI can start using that language as soon as it works,
-while people take years to learn a new language written for them.
+while people take years to adopt a new language.
 
-Most of these languages are tracking systems,
-in the sense [Tracking and Management](#tracking-and-management) gives the term.
-They provide the first part of a full EMS.
+Most of these AI languages are tracking systems;
+they provide the first part of a full EMS.
 For their purpose the other two parts, interface separation and delayed binding,
-are liabilities.
-When the host supplies every implementation,
+are unnecessary.
+When the AI generates the implementation,
 it can guarantee what the generated code does.
-Generated code that rebinds an implementation would break that guarantee.
+Generated code that rebinds an implementation breaks that guarantee.
 
 Two languages go further.
 In [Pact](https://github.com/KikotVit/pact-lang),
