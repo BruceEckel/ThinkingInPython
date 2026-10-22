@@ -294,7 +294,6 @@ The word `Final` suggests immutability,
 but the qualifier blocks rebinding the name,
 not mutation of the object the name holds.
 `HISTORY.append("first")` checks and runs, the same as it does on any list.
-The type checker refuses an assignment to the name `HISTORY` and accepts every call that changes the list.
 For a collection that must stay as it is,
 hold a tuple or a `frozenset` under the `Final` name,
 since neither type has a method that changes its contents (see exercise 10).
@@ -847,7 +846,7 @@ A local variable whose type is obvious from its initializer gains nothing from a
 A hint helps in proportion to the distance between a value's creation and its use.
 A value created and used within three lines needs no annotation.
 A value that arrives from another module, inside a container,
-is worth annotating precisely.
+needs a precise annotation.
 
 ## Type Hint Summary
 
