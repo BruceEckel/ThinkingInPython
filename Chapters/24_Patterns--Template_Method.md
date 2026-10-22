@@ -447,7 +447,6 @@ You make the same choice between a class and a function when you write a [*Strat
 
 ## What Anchors the Algorithm
 
-An anchored algorithm is only as secure as its anchor.
 Each of this chapter's four anchors guards against a different way of breaking the anchored algorithm:
 
 - Structure, in `template_function.py`.

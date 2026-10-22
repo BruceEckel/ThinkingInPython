@@ -394,8 +394,7 @@ The signature of `Framework.__init__()` is silent on the order.
 Every type checker accepts the usual one.
 Python reports the failure as an `AttributeError` raised in the
 subclass's own `step()`, called from a base class someone else wrote.
-The reorder turns safety into a rule the next author must remember.
-That author may not have read this chapter.
+The next author may not have read this chapter.
 
 Separating construction from starting makes the mistake impossible,
 because the engine starts in `run()`,
@@ -676,10 +675,9 @@ annotation expresses "this raises nothing." An exception type in a
 docstring is a note to a human. Only discipline, review, or a test
 catches `Exploder`.
 
-That split is the chapter's point stated from the other side. `@final`
-protects the shape of the algorithm, and `@abstractmethod` protects the
-presence of a step, because both are properties of the class structure
-that a base class can declare. What a step does once called is
+`@final` protects the shape of the algorithm, and `@abstractmethod`
+protects the presence of a step, because both are properties of the
+class structure that a base class can declare. What a step does once called is
 behavior, and
 [Liskov substitution](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution)
 is a rule about behavior.
