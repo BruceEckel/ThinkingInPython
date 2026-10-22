@@ -124,13 +124,10 @@ because an object of type `Command` has no attribute `undo`.
 `Command` describes one call,
 so the solution gives the list a `Protocol` that declares both operations.
 
-**Name both requests in one type.** A list of undoable commands
-needs a type with two members, `__call__()` and `undo()`.
-In Python that type is a `Protocol`, here `UndoableCommand`.
-`Macro` annotates `self.commands` with `UndoableCommand`.
+**Name both requests in one type.** That `Protocol` is
+`UndoableCommand`, and `Macro` annotates `self.commands` with it.
 `Deposit` matches `UndoableCommand` with no base class.
-`run()` still calls each command with `()`, as it
-calls a function.
+`run()` still calls each command with `()`, as it calls a function.
 
 Written the way `command_pattern.py` writes it, the *GoF Design
 Patterns* shape is a base class with two `raise NotImplementedError`
