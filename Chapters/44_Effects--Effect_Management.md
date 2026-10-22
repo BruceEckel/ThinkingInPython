@@ -1024,13 +1024,15 @@ rather than letting you declare your own.
 
 Third-party libraries supply pieces of the rest.
 The [returns](https://github.com/dry-python/returns)
-library provides a `Result` container like the one in [Error Handling](42_Functional--Error_Handling.md),
-a `Maybe` container for a value that might be absent,
-an `IO` container that marks a value as having come from input/output,
-and a `RequiresContext` container for delayed binding of dependencies.
+library provides four containers:
+
+- `Result`, like the one in [Error Handling](42_Functional--Error_Handling.md).
+- `Maybe`, for a value that might be absent.
+- `IO`, which marks a value as having come from input/output.
+- `RequiresContext`, for delayed binding of dependencies.
+
 The [effect](https://pypi.org/project/effect/)
 library ports the description/execution split to Python.
-The name is all it shares with the TypeScript library.
 Code builds objects that describe intents.
 Separate performers execute them, and a test can swap in its own performers.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
