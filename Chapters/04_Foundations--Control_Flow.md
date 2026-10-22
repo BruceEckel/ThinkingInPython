@@ -162,7 +162,8 @@ so the test sits between the `pop()` and the addition.
 
 A loop may have an `else` clause.
 It runs when the loop runs to the end, but a `break` skips it.
-That makes the `else` clause natural for search loops:
+A search loop `break`s when it finds its target,
+so its `else` clause runs only when the search finds nothing:
 
 ```python
 # loop_else.py
@@ -183,7 +184,8 @@ find_factor(13)
 ```
 
 The `else` belongs to the `for`, not the `if`.
-A `while` loop can use `else` the same way.
+A `while` loop's `else` runs when its condition turns false,
+and a `break` skips it there too.
 
 The loop `else` is also how you leave two nested loops at once.
 Put `continue` in the inner loop's `else`, and a `break` after the inner loop,
@@ -337,7 +339,8 @@ so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 
-A [comprehension](#comprehensions) can use `:=` the same way.
+A [comprehension](#comprehensions)
+can use `:=` to name a value in its `if` clause and reuse it in the result.
 This chapter's last section introduces comprehensions,
 and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
@@ -509,7 +512,8 @@ The caller receives `"swallowed"` and no exception.
 Python also flags the `return` in `finally` at compile time.
 Running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
-Catch an exception only when you can do something about it.
+Catch an exception only when the handler can recover from it,
+as `parse_int()` does by returning `None`.
 A broad `except` clause catches the exception from a bug in the `try` block along with the failure you expected.
 The clause runs the same handler for both,
 so the bug looks like the expected failure.
@@ -520,7 +524,7 @@ When you do need a broad handler, write `except Exception:`.
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
 so they propagate past that clause and stop the program.
 
-To handle several types the same way, give a tuple:
+To catch several types with one handler, give a tuple:
 `except (ValueError, TypeError) as e:`.
 Since Python 3.14 you can leave out the parentheses,
 as in `except ValueError, TypeError:`,
@@ -656,7 +660,8 @@ the two answers `look_first()` gets wrong.
 
 The file system can also change between the test and the operation.
 A file that exists at the `if` can disappear before the `open()`.
-The EAFP form handles that case, because its `open()` is the test.
+The EAFP form catches the `FileNotFoundError` that `open()` raises for the missing file,
+so the `open()` is the test.
 
 ## Context Managers
 
