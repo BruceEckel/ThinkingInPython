@@ -446,9 +446,9 @@ show the runtime failure. If you remove the comment, `ty` reports an
 
 The chapter's version needs the `Any` because its `Visitor` base is
 empty. Two fixes restore the checks that `Any` turns off on the
-visitor side:
-declaring `visit()` abstract on that base, as the classic pattern does,
-or annotating the parameter with the `Visits` protocol, as this solution does.
+visitor side: declaring `visit()` abstract on that base, as the
+classic pattern does, or annotating the parameter with the `Visits`
+protocol, as this solution does.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
