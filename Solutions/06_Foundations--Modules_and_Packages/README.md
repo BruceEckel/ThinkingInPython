@@ -73,10 +73,8 @@ many of the three import styles you combine. Python caches every
 module in `sys.modules` on its first import, keyed by the module's
 full dotted name. A later `import` of the same module, in any of
 these forms, takes the module from the cache instead of running its
-top-level code again,
-and then binds the names it requests.
-The package's `__init__.py` runs once for the same
-reason.
+top-level code again, and then binds the names it requests. The
+package's `__init__.py` runs once for the same reason.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -150,24 +148,26 @@ print(function6())
 #: function6 calls function5 in module5 in a_package
 ```
 
-**Import from the parent package.** `module6` is in `b_package` and imports a module from
-`a_package`, its parent, so the absolute form is the right choice here. The
-relative equivalent, `from ..module5 import function5`, works too.
-Keep the relative form for siblings within one package.
+**Import from the parent package.** `module6` is in `b_package` and
+imports a module from `a_package`, its parent, so the absolute form is
+the right choice here. The relative equivalent,
+`from ..module5 import function5`, works too. Keep the relative form
+for siblings within one package.
 
-If you write the import as `from module5 import function5`,
-dropping the `a_package.` prefix, both packages initialize and then
+If you write the import as `from module5 import function5`, dropping
+the `a_package.` prefix, both packages initialize and then
 `use_module6.py` stops with
-`ModuleNotFoundError: No module named 'module5'`.
-Python looks for a top-level `module5` on `sys.path`,
-but `module5.py` sits one level down, inside the `a_package` directory.
-The full dotted path names `module5` through the package that contains
-it, so the solution writes `from a_package.module5 import function5`.
+`ModuleNotFoundError: No module named 'module5'`. Python looks for a
+top-level `module5` on `sys.path`, but `module5.py` sits one level
+down, inside the `a_package` directory. The full dotted path names
+`module5` through the package that contains it, so the solution writes
+`from a_package.module5 import function5`.
 
-**Trace the load order.** Python initializes both packages before it runs `module6`. `module5`
-then loads before `module6` finishes loading, because the import at
-the top of `module6` runs before the rest of its body. All four messages
-therefore print before the script's own `print()` runs.
+**Trace the load order.** Python initializes both packages before it
+runs `module6`. `module5` then loads before `module6` finishes loading,
+because the import at the top of `module6` runs before the rest of its
+body. All four messages therefore print before the script's own
+`print()` runs.
 
 After you rename the directory to `bPackage` and update the import to
 `a_package.bPackage.module6`, the script still runs. Python accepts
@@ -310,24 +310,22 @@ You can also say why the effect of setting `PYTHONCASEOK` shows which program co
 <summary>Solution</summary>
 
 The `import Module` statement resolves, because the name and the file
-agree.
-The call in `use_module.py` becomes `Module.useful_function()` to match. Left as `module.useful_function()`, the call raises a
-`NameError`.
-Changing the import back to `import module` while the file is still
-`Module.py` raises
+agree. The call in `use_module.py` becomes `Module.useful_function()`
+to match. Left as `module.useful_function()`, the call raises a
+`NameError`. Changing the import back to `import module` while the
+file is still `Module.py` raises
 `ModuleNotFoundError: No module named 'module'. Did you mean: 'Module'?`
-on every platform, Windows and macOS included. The
-suggestion shows that `Module.py` sits on the search path under a
-name that differs in case alone.
+on every platform, Windows and macOS included. The suggestion shows
+that `Module.py` sits on the search path under a name that differs in
+case alone.
 
 Windows's NTFS and macOS's default filesystem both open `module.py`
-and `Module.py` as the same file, so an open by either name
-succeeds.
-Python checks the module name before it opens anything.
-Its import machinery reads the directory listing and compares the
-module name against the name on disk case-sensitively.
-To that comparison, `"module" + ".py"` and the stored `Module.py` differ,
-so Python moves on to the next directory on `sys.path`.
+and `Module.py` as the same file, so an open by either name succeeds.
+Python checks the module name before it opens anything. Its import
+machinery reads the directory listing and compares the module name
+against the name on disk case-sensitively. To that comparison,
+`"module" + ".py"` and the stored `Module.py` differ, so Python moves
+on to the next directory on `sys.path`.
 
 The case check is deliberate, and
 [PEP 235](https://peps.python.org/pep-0235/) says why. Without the check, a
@@ -413,9 +411,11 @@ suggestion names `b_package`, the name on the path closest to
 
 `python -m a_package.module4` works with either form and fixes both
 problems at once. `-m` sets `sys.path[0]` to the current directory
-rather than the script's directory, so Python finds `a_package`. `-m` also imports
-the module as a member of its package rather than running the file
-by its path, so `__package__` holds `a_package` and the dot resolves.
+rather than the script's directory, so when you run it from the
+directory that holds `a_package`, Python finds the package. `-m` also
+imports the module as a member of its package rather than running the
+file by its path, so `__package__` holds `a_package` and the dot
+resolves.
 
 A module inside a package works only as a member of that package,
 so run it with `-m`. A file you intend to run with `python file.py`

@@ -136,8 +136,8 @@ app_settings.show()
 ```
 
 `show()` prints the new value because it looks the name up in its own module every time it runs.
-Because the local `debug` is a separate binding that `from` set once, at import,
-it still holds `False`.
+Because the `debug` in `from_snapshot.py` is a separate binding that `from` set once,
+at import, it still holds `False`.
 
 Import the module and write `app_settings.debug` when the value can change.
 Use `from ... import` for names that keep the same value,
@@ -408,7 +408,8 @@ Keep relative imports for a package's own submodules.
 
 A relative import needs a package context, and a file run as a script has none.
 Running `python a_package/module4.py` raises `ImportError: attempted relative import with no known parent package`.
-Run it as `python -m a_package.module4` instead.
+From the directory that holds `a_package`,
+run it as `python -m a_package.module4` instead.
 
 ### Circular Imports
 
@@ -465,8 +466,7 @@ The underscore changes one mechanical thing:
 
 `__all__` states the export list explicitly.
 You assign it at module level as a list of strings naming the public names,
-and `from module import *` then imports the names on that list.
-A star import binds every name listed in `__all__`,
+and `from module import *` then binds every name on that list,
 including one that begins with an underscore.
 An `__all__` also gathers the public names into one readable place.
 Documentation tools read it to report a module's public names.
@@ -555,8 +555,7 @@ so `module.py` and `Module.py` name the same file there.
 Python's import system still matches names case-sensitively by default,
 so `import module` raises a `ModuleNotFoundError` for a file saved as `Module.py`,
 even on a filesystem that treats the two names as one.
-`PYTHONCASEOK` turns that case check off,
-so `import module` finds `Module.py` again.
+`PYTHONCASEOK` turns that case check off, so `import module` finds `Module.py`.
 Turning the check off brings back the confusion it exists to prevent.
 Write a module's file name and its import in the same case,
 so the import behaves the same on every filesystem.
