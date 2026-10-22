@@ -231,9 +231,9 @@ so the `__setattr__()` that `frozen=True` generated for `Immutable` never runs.
 same shallowness. `frozen=True` generates a `__hash__()` that hashes
 the tuple of field values, so hashing an `Immutable` hashes its `Bob`.
 `Bob` is a mutable data class that compares by value. On such a class,
-`@dataclass` sets `__hash__` to `None`. If a field of a `Bob` changed
-after that `Bob` went into a dict, its hash would change while the
-dict kept the old one. A lookup would then search the wrong slot. With
+`@dataclass` sets `__hash__` to `None`. If a field of a `Bob` changes
+after that `Bob` goes into a dict, its hash changes while the
+dict keeps the old one. A lookup then searches the wrong slot. With
 `Bob.__hash__` set to `None`, `hash()` raises a `TypeError` when it
 reaches `Bob`.
 

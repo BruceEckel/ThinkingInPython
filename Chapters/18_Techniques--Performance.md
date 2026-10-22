@@ -1290,7 +1290,7 @@ because the checker rejects every assignment to an instance.
 
 A class whose base declares no `__slots__` writes `@record(slots=False)`.
 The base gives every instance its `__dict__` back,
-so slots on the subclass would remove nothing.
+so slots on the subclass remove nothing.
 The flag states that at the class.
 That form is for a base someone else owns, such as a library class,
 and for the rare class whose code reads the instance dict on purpose.
@@ -1599,7 +1599,7 @@ print(f"Numba at least 3x faster: {t_numba * 3 < t_python}")
 #: Numba at least 3x faster: True
 ```
 
-`njit(count_primes)` is the call that `@njit` above the `def` would make.
+`njit(count_primes)` is the call that `@njit` above the `def` makes.
 The explicit call keeps the original `count_primes()` as the Python baseline.
 `njit()` returns `fast_count_primes`.
 Numba compiles that function at its first call.

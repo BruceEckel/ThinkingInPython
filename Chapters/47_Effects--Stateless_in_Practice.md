@@ -1466,7 +1466,7 @@ Its body is the one place in the program that binds an implementation to an Abil
 
 Each requested type needs a shape of its own.
 You could rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
-`Hero` would stay distinct, since it also declares `approach()`.
+`Hero` stays distinct, since it also declares `approach()`.
 But every hero then satisfies `Obstacle` as well.
 `play()` supplies the hero first,
 so the hero answers the request for an obstacle.

@@ -895,7 +895,7 @@ Decorating `Month` with `@verify(UNIQUE, CONTINUOUS)` catches a repeated or skip
 
 `DAYS` sits outside the class for a related reason.
 Inside the class body,
-`DAYS = (31, 28, ...)` would make the tuple a thirteenth member,
+`DAYS = (31, 28, ...)` makes the tuple a thirteenth member,
 because `Enum` treats a value assigned there as one more member.
 Wrapping the tuple in `nonmember()` keeps it an ordinary class attribute,
 so `DAYS = nonmember((31, 28, ...))` puts the table inside `Month` and leaves twelve members.
@@ -1347,7 +1347,7 @@ print(c.host, c.name)
 ```
 
 A default in the base class is the one snag.
-If `host` had a default, `name` would follow it with none,
+If `host` has a default, `name` follows it with none,
 and `@dataclass` refuses that order under its [field-ordering rule](#more-data-class-tools).
 The rule governs positional fields alone,
 so `kw_only=True` on `NamedConnection` avoids it by making `name` keyword-only.

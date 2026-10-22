@@ -932,8 +932,8 @@ Its `__exit__()` pops the saved directory off the list and changes back to it.
 The list makes one `chdir` instance reentrant.
 A `with` nested inside another `with` on the same instance saves a second directory.
 Each exit restores the directory that its own entry saved.
-A `@contextmanager` version would keep the saved directory in a local variable and restore it in a `finally`.
-Like every generator manager, it would be single-use.
+A `@contextmanager` version keeps the saved directory in a local variable and restores it in a `finally`.
+Like every generator manager, it is single-use.
 
 The working directory belongs to the whole process,
 so a `chdir()` block in one thread moves the relative paths of every thread.
@@ -1138,7 +1138,7 @@ so both connections are out at once.
 Across sixteen hundred lease-and-return cycles,
 spread over eight threads competing for two connections, `peak` tops out at two.
 A thread that calls `lease()` while the pool is empty blocks in `get()` until another thread returns a connection.
-A pool with no limit would let all eight threads hold a lease together and print a peak of eight.
+A pool with no limit lets all eight threads hold a lease together and prints a peak of eight.
 
 `available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate when more than one thread is borrowing,
@@ -1208,7 +1208,7 @@ with pool.lease() as second:
 
 The assignment to `stale` stands for any place a borrower stores the reference,
 such as an attribute or a list.
-With no assignment, `first` would serve as the stale reference too.
+With no assignment, `first` serves as the stale reference too.
 `with` creates no scope,
 so `first` still names the connection after its block ends.
 `test_lease_hands_out_same_object()` relies on that binding when it compares `second` with `first`.

@@ -433,7 +433,7 @@ the `Plastic` definition and the data file's name.
 Both plastic listings import their sorter,
 so `sort_by_type()` and `sort_by_match()` run on `plastic.dat` as written.
 The sorting line, `bins[type(piece)].append(piece)`, bins the new material,
-while the `match` in `sort_by_match()` would need a new `case`.
+while the `match` in `sort_by_match()` needs a new `case`.
 
 Each line of `plastic.dat` takes this path through `recycle_dict_plastic.py`:
 
@@ -579,7 +579,7 @@ Three materials get a registered note.
 A forgotten material gets the default answer,
 with no exception at runtime and no report from the type checker.
 `Paper` needs no special handling, so here the fallback answer is correct.
-When the default answer would be wrong for an unregistered material,
+When the default answer is wrong for an unregistered material,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call (see exercise 5).
 

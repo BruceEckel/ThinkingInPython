@@ -304,7 +304,7 @@ because the dispatcher that `@singledispatch` builds declares its parameters as 
 Only mypy rejects it,
 since mypy's built-in `singledispatch` plugin checks the call against the base function's signature.
 
-When the default answer would be wrong for an unregistered type,
+When the default answer is wrong for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` in place of the fallback string.
 A forgotten registration then fails at its first call.
 A `match` over a union of types goes further when `assert_never()` sits in its `case _`.

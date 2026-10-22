@@ -1392,8 +1392,8 @@ so no timed result includes process startup.
 Each later call reuses that same pool.
 
 By default, a `ProcessPoolExecutor` starts a new worker when a task arrives and every running worker is busy.
-A warm-up of one quick task would start one worker,
-and the timed runs would include the startup of the rest.
+A warm-up of one quick task starts one worker,
+and the timed runs include the startup of the rest.
 Each warm-up task sleeps for a second,
 so every worker is still busy when the next task arrives,
 and the pool starts a worker for each of the `cores` tasks.

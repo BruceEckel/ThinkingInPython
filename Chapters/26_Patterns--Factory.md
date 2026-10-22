@@ -163,7 +163,7 @@ Both classes exist before anything calls `factory()`.
 *GoF Design Patterns* defines *Factory Method* as a creation method that [subclasses override](#subclasses-choose-the-type)
 to choose the concrete type.
 This `factory()` is the smallest version of that idea: one class, one method,
-and a `match` where the overrides would be.
+and a `match` where the overrides go.
 
 `shape_name()` is a [*generator*](22_Patterns--Iterators.md#generators).
 A factory takes information that tells it what to build.
@@ -237,7 +237,7 @@ A class is a first-class object.
 You can store it in a variable and call it to construct an instance.
 [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
 and [`field(default_factory=list)`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared)
-both take a class where a function would do,
+both take a class where a function serves,
 and call it whenever they need a fresh value.
 
 Thus, the simplest factory is a dictionary that maps names to classes:
@@ -279,9 +279,8 @@ make("Square").draw()
 
 The `dict` values have the type `type[Shape]` because they are classes,
 and calling one constructs an instance.
-If the table held instances instead, as in `{"Circle": Circle()}`,
-`make()` would return the stored object,
-so every caller would share one `Circle`.
+If the table holds instances instead, as in `{"Circle": Circle()}`,
+`make()` returns the stored object, so every caller shares one `Circle`.
 [*Prototype*](#prototype)
 keeps a table of instances on purpose and copies one for each caller.
 
@@ -342,7 +341,7 @@ A subclass registers as its `class` statement executes,
 so a subclass that lacks `draw()` still registers.
 The guard acts when `make()` constructs that class.
 The call fails with a `TypeError`.
-A base class whose `draw()` raises a `NotImplementedError` would report the omission later,
+A base class whose `draw()` raises a `NotImplementedError` reports the omission later,
 at the first `draw()` call.
 
 The type checker reports a line that constructs such a class by name,
@@ -557,7 +556,7 @@ where a subclass that lacks `draw()` registers, fails at construction,
 and gets no report from the checker.
 
 The bound is also why the factory names `Shape` instead of taking a type parameter.
-A generic factory would need `register()`'s bound to name the factory's own type parameter.
+A generic factory needs `register()`'s bound to name the factory's own type parameter.
 The type checker rejects a bound that contains another type parameter.
 
 `register()` returns `type[S]`, the decorated class's own type,
@@ -1098,7 +1097,7 @@ print(spawn("troll"))
 
 `a.powers` keeps its one entry because `spawn()` calls `copy.deepcopy()`,
 so each goblin owns its list.
-With `copy.copy()`, both goblins would share the prototype's list,
+With `copy.copy()`, both goblins share the prototype's list,
 as `shallow` shares `goblin`'s list in `prototype.py`.
 Because `spawn()` returns an independent object every time,
 callers can modify their copy while the prototype stays as it was.

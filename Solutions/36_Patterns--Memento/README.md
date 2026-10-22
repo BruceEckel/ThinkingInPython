@@ -299,7 +299,7 @@ You can say why that answer is right although the program made more `do()` calls
 If `can_undo()` reads a counter that `do()` increments and `undo()` decrements,
 it reports `True` once the bound has discarded a state the count still includes.
 In the demo it reports `True` after the two undos, with `_past` empty.
-A third `undo()` would then raise an `IndexError` from `pop()`.
+A third `undo()` then raises an `IndexError` from `pop()`.
 The solution keeps the chapter's `bool(self._past)`, which asks what the past holds now.
 
 ```python
@@ -343,7 +343,7 @@ print(h.can_undo())
 discards its leftmost entry, the oldest state, when `append()`
 overflows it. `do()` therefore keeps the chapter's three lines, and
 the bound is one constructor argument. `undo()` still calls `pop()`,
-which takes the newest state from the right end. A list would need
+which takes the newest state from the right end. A list needs
 a length check after every append and a `pop(0)`, which shifts every
 remaining element.
 

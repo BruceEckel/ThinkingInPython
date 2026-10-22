@@ -118,7 +118,7 @@ Halfway between the function form and the class form,
 a *bound method* is a ready-made command.
 `account.deposit` names a function with its instance attached,
 so a macro can hold it alongside plain functions.
-The bound instance carries the state that a `Command` subclass would hold:
+The bound instance carries the state that a `Command` subclass holds:
 
 ```python
 # bound_method.py
@@ -692,7 +692,7 @@ bus.publish(Closed("inactivity"))
 letting the `defaultdict` build each event type's list on first use.
 `publish()` reads with `.get(type(event), [])` instead of indexing,
 because indexing a `defaultdict` inserts an empty list as a side effect.
-Indexing would leave a stray entry behind for every published event type with no handler,
+Indexing leaves a stray entry behind for every published event type with no handler,
 such as `Closed`.
 
 The lookup uses `type(event)`, which matches the event's exact class.
@@ -1002,7 +1002,7 @@ Stop at the first form that supports what you need:
 5.  A class, when the behavior needs a second operation such as `undo()`,
     or the several related methods and mutable state the *Strategy* section describes.
 
-A function that carries data in its `__dict__` would sit between entries 1 and 3.
+A function that carries data in its `__dict__` sits between entries 1 and 3.
 The list leaves it out.
 The type checker reports each [dotted access to such an attribute](17_Techniques--Metaprogramming.md#attributes-on-a-function),
 so configuration goes in a closure or a callable object instead.

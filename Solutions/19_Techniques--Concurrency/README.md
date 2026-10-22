@@ -562,7 +562,7 @@ bottom:
 imports this module, the program's main module, before it runs any work.
 Importing the module runs every top-level statement,
 including the `with ProcessPoolExecutor()` line that creates workers. Each worker therefore tries to build a pool of
-its own, whose workers would import the module again.
+its own, whose workers import the module again.
 
 The recursion is the failure. The `RuntimeError` comes from a safety
 check against it.

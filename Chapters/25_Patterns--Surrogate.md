@@ -788,8 +788,7 @@ See [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
 for the races an unsynchronized swap allows.
 
 `run()` takes `surrogate: Any` because a `Behavior` annotation fails at the call.
-If `run()` declared `surrogate: Behavior`,
-the checker would reject `run(surrogate)`,
+If `run()` declares `surrogate: Behavior`, the checker rejects `run(surrogate)`,
 because `Surrogate` defines no `f()` of its own.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
 
@@ -821,8 +820,8 @@ which the book's typing guidance treats as a last resort.
 `__getattr__()` returns `Any` because it returns the attribute for any name the caller reads,
 whatever that attribute's type.
 The `Any` on the parameters of `__init__()` and `change_to()` is a choice.
-`state_demo.py` would still type-check if both parameters carried `Behavior`.
-The checker would then verify every implementation that reaches either method.
+`state_demo.py` still type-checks if both parameters carry `Behavior`.
+The checker then verifies every implementation that reaches either method.
 That annotation also limits the surrogate to implementations of one Protocol,
 but the generic surrogate exists to accept any implementation.
 `test_state.py` passes the same `Surrogate` two implementations,

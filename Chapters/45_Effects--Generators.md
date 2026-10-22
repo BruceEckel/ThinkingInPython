@@ -341,7 +341,7 @@ In between, the inner generator yields its values one at a time,
 as the driver requests each one.
 
 Without `from`, a bare `yield one()` yields the generator object as a single value,
-so `list(outer())` would show `<generator object one at ...>` in place of `'only'`.
+so `list(outer())` shows `<generator object one at ...>` in place of `'only'`.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`.

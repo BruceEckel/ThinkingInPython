@@ -514,7 +514,7 @@ print(Counter.live_count())
 #: 0
 ```
 
-A `WeakSet` would do for counting alone.
+A `WeakSet` is enough for counting alone.
 You need the dictionary as soon as you look instances up rather than count them,
 as [*Flyweight*](35_Patterns--Flyweight.md) does.
 

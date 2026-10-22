@@ -334,8 +334,8 @@ A dictionary (`dict`) maps keys to values, with fast lookup.
 Lookup computes a *hash* from each key:
 an integer derived from the key's contents.
 Python reduces that integer to the slot where the entry lives.
-If a key's hash changed after insertion,
-the next lookup would compute a different slot and miss the entry.
+If a key's hash changes after insertion,
+the next lookup computes a different slot and misses the entry.
 So keys must be *hashable*: able to produce a hash that stays the same,
 and comparable with `==`.
 Lookup needs `==` because it checks that the key stored in the slot equals the key you looked up.

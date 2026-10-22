@@ -211,8 +211,8 @@ At runtime, `run()`'s driver tells a request from a failure with `case Exception
 A yielded value that matches `Exception` is a failure.
 Everything else is an Ability request.
 The two bounds overlap.
-A class that subclasses both would satisfy each at once,
-and at runtime it would count as a failure.
+A class that subclasses both satisfies each at once,
+and at runtime it counts as a failure.
 No listing here builds one.
 
 The second type parameter is `Any`,
@@ -478,7 +478,7 @@ The `run()` at `[1]` exhausts the generator.
 The `run()` at `[2]` drives that same exhausted object and gets an immediate `StopIteration` whose value is `None`.
 The generator stays finished, so it greets nobody and produces `None`.
 Calling `bound("Bob")` builds a fresh description, and that one runs.
-A second `bound("Alice")` would build a fresh one too.
+A second `bound("Alice")` builds a fresh one too.
 
 An Effect from `success()` can run more than once,
 because `success()` builds no generator.

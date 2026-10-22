@@ -258,8 +258,8 @@ Adding the target's size again double-counts those bytes.
 
 **Stop at the link.** `walk()` reports the link as its own entry,
 `name -> target`, and stops there.
-If `walk()` followed a link back to one of its own ancestors,
-it would re-enter that ancestor until Python raised a `RecursionError`.
+If `walk()` follows a link back to one of its own ancestors,
+it re-enters that ancestor until Python raises a `RecursionError`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -724,7 +724,7 @@ an `Add` child, while an `Add` leaves another `Add` on its left bare.
 rather than `prec`, is simple and always safe.
 The rule can print one redundant pair of parentheses
 around a right-hand child at the same precedence as its parent,
-as in `x + (x + 1)` where `x + x + 1` would do.
+as in `x + (x + 1)` where `x + x + 1` is enough.
 It still keeps every pair that the expression's meaning requires.
 
 Before you move on, name what separates your attempt from this one:
@@ -1619,7 +1619,7 @@ type checker does warn the plugin author.
 When a plugin passes a `Symlink` to `disk_usage()`
 or places one in a `Directory`'s entries,
 `ty` reports `invalid-argument-type`. The fix the warning calls for belongs in your file,
-because the union it would need to extend is yours.
+because the union it needs to extend is yours.
 At runtime, a `Symlink` falls through every case to
 `assert_never()`, which raises an `AssertionError`. The plugin's alternatives
 are to vendor a patched copy of your module or to persuade you to add
@@ -1643,7 +1643,7 @@ are the normal case.
 
 For `expr.py`, use the closed one. The four node types are the
 grammar, so a plugin adding a fifth does not extend the language but
-defines a different one. Every walker would then be silently wrong
+defines a different one. Every walker is then silently wrong
 rather than helpfully extended. The `assert_never()` that reads as an
 obstacle in the file system reads as the point here. When the grammar
 does grow a `Neg`, the type checker reports each walker that

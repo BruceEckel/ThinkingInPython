@@ -151,7 +151,7 @@ and then points at the declaration that set the expectation.
 
 Listings in this book use a shorthand for a diagnostic.
 A neighboring `# ty:` comment summarizes what the type checker reports for a line.
-For a line that would fail the check,
+For a line that fails the check,
 commented out or suppressed with `# type: ignore`,
 the comment gives the diagnostic.
 For a `reveal_type()` call, the comment gives the type the call produces.
@@ -188,7 +188,7 @@ print(shout(None))
 Inside the `if`, the type checker *narrows* `text` from `str | None` to `str`,
 so `.upper()` needs no cast.
 After the `if`, `text` is `None`, since the branch returned for every `str`.
-Had the branch fallen through, `text` would be the full `str | None` again.
+If the branch falls through, `text` is the full `str | None` again.
 
 The same narrowing follows an `isinstance()` check, an equality test,
 or an identity test against a specific value such as `is not SOME_SENTINEL`.
@@ -575,7 +575,7 @@ A *bound* limits the parameter to one hierarchy.
 A *constraint* lists unrelated choices.
 With `[T: (int, str)]`, `T` is `int` or `str`.
 An argument whose class subclasses `int` binds `T` to `int`,
-where a bound would keep the subclass.
+where a bound keeps the subclass.
 
 ### Variance {#variance}
 
@@ -814,7 +814,7 @@ so every signature that unpacks it accepts the same keywords.
 
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
-A wrongly typed value that gets past the type checker runs as it would in a program with no hints.
+A wrongly typed value that gets past the type checker runs as it does in a program with no hints.
 Checking is a separate step you run, the same way you run tests.
 The hints are for the tools and for the reader.
 

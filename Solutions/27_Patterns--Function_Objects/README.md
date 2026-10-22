@@ -129,8 +129,8 @@ needs a type with two members, `__call__()` and `undo()`.
 In Python that type is a `Protocol`, here `UndoableCommand`.
 `Macro` annotates `self.commands` with `UndoableCommand`.
 `Deposit` matches `UndoableCommand` with no base class.
-`run()` still calls each command with `()`, as it would
-call a function.
+`run()` still calls each command with `()`, as it
+calls a function.
 
 The *GoF Design Patterns* shape is a base class with two
 `raise NotImplementedError` bodies. A base class makes sense when

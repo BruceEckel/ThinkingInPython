@@ -213,7 +213,7 @@ Under Pyright `make()` needs `cast(EventMaker, new_cls)`.
 Under mypy the result is an unknown class,
 so mypy checks nothing and accepts either form.
 
-Under `ty` a cast would replace a check with a claim,
+Under `ty` a cast replaces a check with a claim,
 the distinction [Where Enforcement Lives](#where-enforcement-lives) draws.
 The cast states the signature, and nothing confirms it.
 
@@ -261,7 +261,7 @@ so `__missing__()` builds the class, stores it under its name, and returns it.
 The next lookup of that name finds the stored class,
 so `__missing__()` builds each class once.
 Without `__missing__()`,
-every caller would check for the name and build the missing class.
+every caller checks for the name and builds the missing class.
 
 A new `EventMakers` starts out empty.
 `NAMES`, imported from `events.py`, holds the seven legitimate event names.
@@ -423,7 +423,7 @@ The `klass` string is the danger in this approach.
 `exec()` runs its argument with the full power of the language,
 and `klass` splices `class_name` into source text as-is.
 A name could hold a newline followed by a second statement.
-Without validation, that statement would break out of the `class` block and run anything,
+Without validation, that statement breaks out of the `class` block and runs anything,
 the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check prevents that injection.
 Only three known names reach the template.
@@ -1771,7 +1771,7 @@ print(get_annotations(Order)["buyer"] is Customer)
 ```
 
 `Order` specifies `Customer` before `Customer` exists.
-The `VALUE` request fails the same way it would inside a decorator applied to `Order`.
+The `VALUE` request fails the same way it does inside a decorator applied to `Order`.
 `FORWARDREF` resolves `item` to the `str` class and puts a `ForwardRef` in place of `buyer`.
 The reference's `__forward_arg__` holds the missing name.
 `STRING` evaluates nothing, so it cannot fail,

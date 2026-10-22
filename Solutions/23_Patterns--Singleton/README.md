@@ -238,9 +238,9 @@ to call it once.
 
 **Refuse a second release.** `release()` removes the connection from `_leased`
 with `remove()`, which raises a `KeyError` for a connection that is
-not on lease. With `discard()` there, a second `release()` would
-put the same connection into `_available` twice, so the pool would
-hand one connection to two callers.
+not on lease. With `discard()` there, a second `release()`
+puts the same connection into `_available` twice, so the pool
+hands one connection to two callers.
 
 **Share one pool.** The zero-argument `pool()` constructor function still
 returns one `ConnectionPool` object (`p1 is p2`), because `@cache` stores its first result.
@@ -551,7 +551,7 @@ running waits for the body to finish.
 
 The module body builds the object whether or not
 anything uses it. For `Settings`, an object that sits idle is fine.
-A database connection, though, would open at import, before any caller asks for it.
+A database connection, though, opens at import, before any caller asks for it.
 For a connection, the hand-written lock is the answer.
 
 Before you move on, name what separates your attempt from this one:

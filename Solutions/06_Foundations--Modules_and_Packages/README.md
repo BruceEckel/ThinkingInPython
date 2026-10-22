@@ -321,8 +321,8 @@ suggestion shows that `Module.py` sits on the search path under a
 name that differs in case alone.
 
 Windows's NTFS and macOS's default filesystem both open `module.py`
-and `Module.py` as the same file, so an open by either name would
-succeed.
+and `Module.py` as the same file, so an open by either name
+succeeds.
 Python checks the module name before it opens anything.
 Its import machinery reads the directory listing and compares the
 module name against the name on disk case-sensitively.

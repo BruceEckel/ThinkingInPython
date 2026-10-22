@@ -913,7 +913,7 @@ The `noqa` comment is the one mark in the file that says the import is deliberat
 The import must stay an ordinary import.
 A `lazy import` defers the module body, and with it the two `class` statements,
 until the first use of `extra_shapes`.
-The demo makes no such use, so the classes would stay unregistered.
+The demo makes no such use, so the classes stay unregistered.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

@@ -456,7 +456,7 @@ The implementation must satisfy both overloads,
 so it declares the widest return type, `Any`,
 and the overloads narrow that back down at every call site.
 
-A `callable(func)` test would also tell the two calls apart,
+A `callable(func)` test also tells the two calls apart,
 but it asks what kind of value arrived rather than whether one arrived.
 The `callable()` test then fails silently when a caller passes a prefix positionally.
 With `callable(func)`,
@@ -846,7 +846,7 @@ The `TypeError` reports a missing `x`,
 and its message says nothing about the real cause, a missing `__get__()`.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 shows the full descriptor protocol,
-including the `__get__()` that `logged` would need to work on methods.
+including the `__get__()` that `logged` needs to work on methods.
 
 Because a function is a descriptor,
 `wrapper()` in the function form binds to an instance like any other method:

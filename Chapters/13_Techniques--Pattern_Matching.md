@@ -368,7 +368,7 @@ print(describe(3.5))
 Because a subclass matches, the order of the cases decides which body runs.
 `bool` is a subclass of `int`,
 so moving `case bool(b)` below `case int(n)` makes the `bool` case unreachable.
-`describe(True)` would then return `int True`.
+`describe(True)` then returns `int True`.
 
 In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
 Python special-cases a handful of built-ins this way,
@@ -677,7 +677,7 @@ print(describe(301))
 
 `STATUS.get(status)` returns `None` for a missing key,
 and `or` builds the default string for that miss.
-A falsy value in the table would count as a miss too,
+A falsy value in the table counts as a miss too,
 but every value in `STATUS` is a nonempty string.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,

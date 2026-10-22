@@ -278,7 +278,7 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 
 The freezing must cover what each field holds, too.
 A record blocks assignment to a field, not mutation inside one.
-A `Tile` holding a `list` would hand the same mutable list to every cell that shares the tile.
+A `Tile` holding a `list` hands the same mutable list to every cell that shares the tile.
 That is the [shallow-freezing trap](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
 Every field here is immutable, so the sharing is safe.
 
@@ -368,7 +368,7 @@ If a field has a `default_factory` or `__post_init__()` has a side effect,
 the re-run repeats that factory call or that side effect on a finished object.
 
 Because every caller that asks for the same components receives the same `Color`,
-a caller that set `crimson.red` would change every crimson in the program.
+a caller that sets `crimson.red` changes every crimson in the program.
 The record's frozen fields reject that assignment,
 which makes sharing a `Color` safe for the same reason sharing a `Tile` is safe.
 
@@ -540,7 +540,7 @@ class Tile(Enum):
 `walkable` is a bare annotation, not a `ClassVar`.
 It declares a per-member attribute, the role a dataclass field plays.
 Here `__new__()` assigns the attribute by hand,
-where a dataclass would assign it in a generated `__init__()`.
+where a dataclass assigns it in a generated `__init__()`.
 `__new__()` runs during class creation,
 before the `class` statement binds the name `Tile`,
 so every member has its `walkable` by the time any code can read it.

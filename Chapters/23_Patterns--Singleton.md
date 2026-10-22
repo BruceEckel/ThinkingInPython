@@ -810,7 +810,7 @@ In a class that overrides `__new__()` instead,
 as `singleton_class_variable.py` does, `__new__()` still runs on every call.
 That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call,
 so each later argument joins the shared list,
-where the metaclass form would discard it.
+where the metaclass form discards it.
 
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,

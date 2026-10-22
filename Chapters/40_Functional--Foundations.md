@@ -573,7 +573,7 @@ print(square.func.__name__, square.keywords)
 each with one argument already supplied.
 Without the keyword, `partial(power, 2)` presets `base`,
 because positional arguments fill from the left.
-`square(5)` would then compute `2 ** 5`.
+`square(5)` then computes `2 ** 5`.
 
 Partial application turns a general function into the specific one a caller needs.
 [`multiplier()`](#closures) does the same by hand.
@@ -618,7 +618,7 @@ Before 3.14, a hand-written wrapper supplied that specialization.
 Calling `percent()` with no argument raises a `TypeError`.
 The library also rejects a trailing placeholder as redundant.
 `partial()` already appends the call's arguments after the preset ones,
-so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
+so `partial(clamp, 0, Placeholder)` means the same as `partial(clamp, 0)`.
 
 The `# type: ignore` comment marks a type checker limitation rather than a code problem.
 The stub for `partial()` does not yet describe what `Placeholder` does at runtime,

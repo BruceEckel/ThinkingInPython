@@ -249,8 +249,8 @@ but `claim()` runs from its test to its `add()` as one synchronous stretch
 The `async with` block of a `TaskGroup` waits until every task in the group has finished,
 including tasks created after the block began.
 That wait matches this problem, in which each rat can create more rats.
-If `spawn()` kept each task in a list,
-a single `asyncio.gather(*tasks)` would await only the tasks in the list at the moment of the call,
+If `spawn()` keeps each task in a list,
+a single `asyncio.gather(*tasks)` awaits only the tasks in the list at the moment of the call,
 because `*tasks` unpacks the list at that moment.
 Most of the rats spawn later.
 

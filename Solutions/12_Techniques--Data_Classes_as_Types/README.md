@@ -1031,8 +1031,8 @@ and an `isinstance()` test accepts `True` as the rating 1.
 and rejects a `bool` along with a `float` and a `str`.
 
 **Test the type before the range.** Comparing `"five"` with `1`
-raises a `TypeError`, so if the range check ran first, a `str` would
-end in that `TypeError` instead of a `TypeFailure`.
+raises a `TypeError`, so if the range check runs first, a `str`
+ends in that `TypeError` instead of a `TypeFailure`.
 
 **Feed values the checker refuses.** The type checker rejects `5.5`
 and `"five"` as arguments before the program runs.

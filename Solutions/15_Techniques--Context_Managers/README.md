@@ -152,7 +152,7 @@ straight out of the script. `ty` flags the call as
 
 `contextlib.suppress` takes its exception classes as `*exceptions`,
 so it accepts them as separate arguments.
-A version of `expected` taking `*types` would accept
+A version of `expected` taking `*types` accepts
 `expected(ZeroDivisionError, TypeError)` the same way.
 
 Before you move on, name what separates your attempt from this one:
@@ -295,8 +295,8 @@ def test_both_leased_at_once() -> None:
 **Hold both connections at once.** The `lease()` at `[1]` takes one connection out of the queue, and the
 nested `lease()` at `[2]` takes the other, so `pool.available()` is `0`
 inside the inner `with`. The `0` confirms that the pool hands out one
-concurrent lease for each item you gave its constructor. A third nested `lease()` would block forever in
-`get()`, since the one thread that could return a connection is the
+concurrent lease for each item you gave its constructor. A third nested `lease()` blocks forever in
+`get()`, since the one thread that can return a connection is the
 thread waiting for it.
 
 **Check that both connections come back.** Exiting the inner `with` (`[2]`) puts `second`

@@ -135,8 +135,8 @@ for the pieces they cover.
 exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and `Plastic` is
 now a fifth entry. That failure is correct. The test exists to prove
 that defining a subclass registers it, so a new material changes the
-set the assertion compares. A passing test would mean that
-`__init_subclass__()` had stopped registering subclasses. Once you
+set the assertion compares. A passing test means that
+`__init_subclass__()` has stopped registering subclasses. Once you
 update the expected set, the test checks registration again.
 
 Before you move on, name what separates your attempt from this one:

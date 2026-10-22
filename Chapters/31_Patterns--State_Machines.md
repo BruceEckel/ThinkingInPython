@@ -664,7 +664,7 @@ for input_ in inputs:
 The two `Cleared` lines end in different states,
 `COLLECTING` for too expensive and `UNAVAILABLE` for sold out.
 The state after the arrow names the condition;
-the message alone would leave you to infer it from the `left` count.
+the message alone leaves you to infer it from the `left` count.
 
 The last input picks the sold-out slot again with a dime inserted,
 so both conditions are true.

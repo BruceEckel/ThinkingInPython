@@ -289,9 +289,9 @@ Notification runs one way, from broadcaster to responders.
 *GoF Design Patterns* states the premise of broadcast communication:
 a notification goes to every connected responder.
 Each one decides whether to handle it.
-If responders could return values,
-one announcement would collect an unknown number of them.
-The broadcaster would then need a rule for combining those values.
+If responders return values,
+one announcement collects an unknown number of them.
+The broadcaster then needs a rule for combining those values.
 Returning `None` makes that rule unnecessary.
 
 A design that needs an answer uses a different pattern.
@@ -336,7 +336,7 @@ A responder that needs the current reading when it connects reads `celsius`.
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
 A class that inherits from another can be a `dataclass`,
 but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
-A `@dataclass` `Thermometer` would have no list of responders.
+A `@dataclass` `Thermometer` has no list of responders.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
 [Decorated Responders](#decorated-responders)
@@ -346,7 +346,7 @@ gets a generated `__init__()` and the list another way.
 not because the pattern requires a base class.
 A `Thermometer` could use composition, holding a `Broadcaster` as an attribute
 (`self.temperature_changed = Broadcaster[float]()`).
-Code that connects a responder would specify that attribute
+Code that connects a responder specifies that attribute
 (`t.temperature_changed.connect(display)`).
 An object can hold several `Broadcaster` attributes,
 so it can publish more than one kind of change.
@@ -845,8 +845,8 @@ print(changes)
 Python routes every attribute assignment through `__setattr__()`,
 including assignments within the constructor.
 `__setattr__()` begins by reading `self._responders`.
-An ordinary `self._responders = []` in the constructor would therefore run that read before the list exists,
-and the read would raise an `AttributeError`.
+An ordinary `self._responders = []` in the constructor therefore runs that read before the list exists,
+and the read raises an `AttributeError`.
 To prevent this, the `_responders` property creates the list upon first read,
 using `setdefault()` on the instance `__dict__`.
 A property takes precedence over an instance attribute of the same name,
@@ -918,7 +918,7 @@ thermometer.celsius = 200
 The `respond()` decorator method appends its function to `thermometer`'s list of responders and returns the function unchanged,
 so `display` stays callable by name.
 `Broadcaster.connect()` returns `None`,
-so as a decorator it would bind the function's name to `None` (see exercise 11).
+so as a decorator it binds the function's name to `None` (see exercise 11).
 
 The two listings that follow hold the shared machinery,
 so a subclass such as `Thermometer` declares its fields and inherits the rest.
@@ -1059,7 +1059,7 @@ The checker accepts `Thermometer(100)` because `100` fits that parameter.
 `eq_default=False` makes the checker's claim match the runtime `eq=False`.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
-A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
+A class that declares `celsius` and `humidity` sends both readings to the same responders with no name attached.
 A class with several published attributes uses `WeatherStation`'s name-and-value pair
 (exercise 12), or gives each attribute its own responders with the descriptor in exercise 10.
 
@@ -1123,7 +1123,7 @@ Because `announce()` awaits, it must also be a coroutine,
 and its caller must `await` it in turn.
 A property setter cannot await the asynchronous `announce()`.
 The assignment `t.celsius = value` calls the setter and discards its return value,
-so an `async def` setter would return a coroutine that nothing runs.
+so an `async def` setter returns a coroutine that nothing runs.
 An ordinary `def` setter cannot await,
 since an `await` inside an ordinary `def` is a `SyntaxError`.
 The asynchronous `Thermometer` therefore replaces the setter with a coroutine method,
@@ -1350,7 +1350,7 @@ because iterating over an enum produces its members in definition order.
 `Color.at(n)` counts `n` places around that cycle,
 and `n % len(members)` wraps a count past the last member back to the start.
 `at()` is a classmethod because it works on the whole set rather than a single member.
-(A class attribute holding the list would become another member, because an ordinary assignment in an `Enum` body creates one.)
+(A class attribute holding the list becomes another member, because an ordinary assignment in an `Enum` body creates one.)
 Calling `next()` on a member finds that member's position with `index()`,
 then calls `at()` with the position after it,
 so `Color.KHAKI.next()` is `Color.SKYBLUE`.

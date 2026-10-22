@@ -45,7 +45,7 @@ C++ brought object-oriented programming and exceptions into the mainstream.
 
 *Java* drew from Smalltalk.
 Everything lives inside a class,
-including code that would work as a standalone function.
+including code that works as a standalone function.
 Java is statically compiled, so substitutability matters.
 Yet Java encouraged reusing code by inheriting implementation.
 That reuse works against substitutability.
@@ -735,7 +735,7 @@ and [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 carry the same empty `__slots__` for the same reason.
 When a base comes from a library and declares no `__slots__`,
 its records use `@record(slots=False)`, which drops slots visibly.
-A bare `@record` there would declare slots and still get the base's `__dict__`.
+A bare `@record` there declares slots and still gets the base's `__dict__`.
 
 ### Dynamic Typing
 
@@ -935,7 +935,7 @@ The checker matches the shape correctly.
 The mismatch is in what the number means.
 No type checker checks meaning.
 
-A distinct type per concept would make the type checker report this mismatch.
+A distinct type per concept makes the type checker report this mismatch.
 `typing.NewType` looks like the natural fix:
 
 ```python

@@ -61,8 +61,8 @@ since a named parameter must follow a bare `*`.
 
 The listing needs the `m: Any` annotation to pass the type checker.
 The `Messenger` class declares no attributes.
-If `m` kept its inferred type, `Messenger`,
-the type checker would reject the write `m.more = 11` and every read,
+If `m` keeps its inferred type, `Messenger`,
+the type checker rejects the write `m.more = 11` and every read,
 such as `m.info`.
 With `Any`, the type checker accepts every operation on `m`.
 
@@ -252,8 +252,8 @@ as `mean=2 count=3.0` in the output shows.
 Reading `result.mean` picks the field by name, whatever its position.
 
 Unpacking sets a `NamedTuple` apart from a data class.
-If `Stats` were a `@dataclass`,
-`mean, count = summarize(data)` would raise a `TypeError`,
+If `Stats` is a `@dataclass`,
+`mean, count = summarize(data)` raises a `TypeError`,
 since a data class is not iterable.
 `dataclasses.astuple()` converts a data class when you need the positional form.
 [More Data Class Tools](12_Techniques--Data_Classes_as_Types.md#more-data-class-tools)

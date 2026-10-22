@@ -265,8 +265,7 @@ so the pattern can match any part of the message.
 The full message here is `balance 100 is less than 250`.
 `re.prefixmatch()`, new in Python 3.15,
 anchors a pattern at the start of the string,
-so it would reject `less than 250` for this message,
-which starts with `balance`.
+so it rejects `less than 250` for this message, which starts with `balance`.
 Its old name, `re.match()`, is now soft-deprecated,
 since that name hides the anchoring and reads like the `match` statement.
 If the message holds `.`, `(`, or another regular-expression metacharacter,
@@ -953,7 +952,7 @@ that `send` ran exactly once, and that it ran with this argument.
 A stub cannot make that check.
 `fake_urlopen()` records nothing about the calls it receives.
 
-A `Mock` accepts a call the real function would reject,
+A `Mock` accepts a call the real function rejects,
 so a test keeps passing after the real signature changes.
 `create_autospec()`, also in `unittest.mock`,
 builds a mock from the real function and checks each call against the real function's signature.

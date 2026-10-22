@@ -1393,11 +1393,11 @@ print(run(scripted((60, 50, 30, 20))), written)
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 
 **Prove the loop tries every price.** The test proves from both sides
-that `spree()` attempts all four prices. A fifth `Get` request would
-exhaust the script. `handle()` reads the `StopIteration` from `read()`
+that `spree()` attempts all four prices. A fifth `Get` request
+exhausts the script. `handle()` reads the `StopIteration` from `read()`
 as the end of the Effect, the silent failure the chapter describes, so
-`run()` would return `None` and the first assertion would fail on
-`None == 2`. Stopping early would leave a balance unread, which the
+`run()` returns `None` and the first assertion fails on
+`None == 2`. Stopping early leaves a balance unread, which the
 final assertion catches by checking that the iterator has run out.
 
 If you script three balances, `[100, 40, 10]`, and forget that the

@@ -325,7 +325,7 @@ as well as how many types it considers.
 A `match` statement with class patterns is a third option for a two-type decision.
 Like `singledispatch`, it matches subclasses.
 A class pattern tests with `isinstance()`,
-so a subclass matches the pattern its base would:
+so a subclass matches the pattern its base does:
 
 ```python
 # match_dispatch.py
@@ -421,7 +421,7 @@ testing the opponent's type case by case.
 It works.
 The type tests repeat in every class,
 as the `eval_*()` methods do in the method version.
-The programmer resolves by hand what dispatch would resolve on its own.
+The programmer resolves by hand what dispatch resolves on its own.
 Every new `Item` requires an edit to every ladder.
 Both patterns in this chapter replace the ladder.
 
@@ -538,7 +538,7 @@ The test then reads each expected answer from `EXPECTED`.
 
 `compete()` also checks the result's type.
 A `StrEnum` member equals its string,
-so a version that returned the bare string `"win"` would pass the `==` alone.
+so a version that returns the bare string `"win"` passes the `==` alone.
 
 ## Operators Dispatch Twice
 

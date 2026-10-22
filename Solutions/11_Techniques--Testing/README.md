@@ -555,8 +555,8 @@ so a mistaken `<=` that sends at zero fails the zero case.
 **Record the calls by hand.**
 A stub like exercise 5's `fake_fetch()` answers each call and forgets it.
 A `send` stub built that way gives the test nothing to inspect.
-The test would then pass whether or not `send` ran,
-including against a `notify_negative_balance()` that always sent.
+The test then passes whether or not `send` runs,
+including against a `notify_negative_balance()` that always sends.
 To make the check, the stub must gain a record of its calls.
 Here that record is the list `sent`.
 The stub appends each message to it,

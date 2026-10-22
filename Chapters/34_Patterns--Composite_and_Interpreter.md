@@ -189,7 +189,7 @@ flattens the recursion into a single stream of paths.
 Any consumer of that stream stays decoupled from the tree structure.
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
-A `list` there would leave the tree mutable.
+A `list` there leaves the tree mutable.
 A record freezes the binding of the field.
 As [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates, a list in that field keeps its `append()`.
@@ -632,7 +632,7 @@ print(to_infix(simplify(messy)))
 `messy` writes `Num(2) + 3` rather than the plainer `2 + 3` on purpose.
 With `2 + 3`, both operands are plain `int`,
 so Python adds them to `5` before any node exists.
-`simplify()` would receive `5 * x` with the fold already done.
+`simplify()` receives `5 * x` with the fold already done.
 `2 + 3` shows the limit of using the host parser.
 An operator builds a node when either operand is a node,
 and does plain arithmetic otherwise.

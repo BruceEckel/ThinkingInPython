@@ -940,7 +940,7 @@ so the third `computing square` line is the last.
 The output alternates.
 Each `computing square N` line appears the moment the loop over `islice()` pulls that value,
 and the loop body prints `got` before the generator computes the next square.
-An eager function would print every `computing square` line before the first `got`.
+An eager function prints every `computing square` line before the first `got`.
 
 `list(squares())[:3]` looks equivalent and is a different program.
 It builds the whole list before slicing, so it asks `squares()` for every value.
@@ -1002,7 +1002,7 @@ gets a decorator rather than a rewrite as a loop.
 The recursion states the definition, and the cache removes the repetition.
 
 A tree walk branches too, but each subproblem occurs once,
-so a cache would save nothing.
+so a cache saves nothing.
 The reason to recurse there is shape.
 Code that walks a tree, nested data,
 or a directory reads best when its shape matches the data's shape.

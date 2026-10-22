@@ -1562,7 +1562,7 @@ a `compete()` and six `eval_*()` methods in each class.
 More than a hundred lines hold 36 answers,
 four times the chapter's nine,
 because the answers grow with the square of the number of weapons.
-A seventh weapon would add an `eval_*()` method to each of the six classes,
+A seventh weapon adds an `eval_*()` method to each of the six classes,
 plus a new class of eight methods.
 [Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
 weighs the length of the method version against a table.
@@ -1767,8 +1767,8 @@ a table of answers. Only the cells that need code look like code.
 **Read the state in both orders.** The `(Paper, Rock)` cell receives both items, so it can consult
 `player.wet`. The `(Rock, Paper)` cell consults `opponent.wet`, because
 one duel has two orders and each order has its own cell. If the
-`(Rock, Paper)` cell ignored `opponent.wet`, a rock that calls
-`compete()` would still lose to wet paper.
+`(Rock, Paper)` cell ignores `opponent.wet`, a rock that calls
+`compete()` still loses to wet paper.
 
 The chapter gives two reasons for preferring the double-dispatch version.
 The first is behavior that reads the object's own state.
@@ -2074,7 +2074,7 @@ answers, the table is shorter and easier to maintain.
 Exercise 8's version keeps one advantage.
 Its `eval_*()` methods receive the competing objects,
 so a weapon whose result depends on its own state fits there,
-while this grid would need exercise 9's callable cells.
+while this grid needs exercise 9's callable cells.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

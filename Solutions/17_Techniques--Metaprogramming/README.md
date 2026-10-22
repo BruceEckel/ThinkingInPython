@@ -414,8 +414,8 @@ any ancestor declared itself final.
 
 `A.__init_subclass__()` refuses the first subclass of a final class as
 Python creates that subclass, so the hierarchy below a final class
-stays empty. A check of the direct bases in `cls.__bases__` would
-therefore also refuse every descendant. The `__mro__` walk
+stays empty. A check of the direct bases in `cls.__bases__`
+therefore also refuses every descendant. The `__mro__` walk
 stays because it states the rule as written, "no final class anywhere
 above," in one line.
 

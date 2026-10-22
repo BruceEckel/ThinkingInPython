@@ -533,7 +533,7 @@ rest, however many that is.
 
 **Reject a count mismatch.** `a, b = row` fails because an unstarred target list states an exact
 count, two, and `row` holds five. Python raises a `ValueError` rather
-than dropping the extras, since a silent drop would hide the mismatch.
+than dropping the extras, since a silent drop hides the mismatch.
 The same error appears in the other direction, as
 `not enough values to unpack`, when the list is shorter than the
 target list.

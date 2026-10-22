@@ -118,7 +118,7 @@ and spawns a rat at every open cell after that, here `(1, 0)` alone.
 
 **Stop the rat when the script ends.** Once the script runs out,
 `claim()` returns `False` for every cell, so the rat dead-ends on its
-second turn, the way it would against walls, and `run()` returns.
+second turn, the way it does against walls, and `run()` returns.
 The `False` default in `next(self.claim_results, False)` supplies those returns.
 If you call `next(self.claim_results)` without the `False` default,
 the fake works for the rat's first turn and fails on its second.

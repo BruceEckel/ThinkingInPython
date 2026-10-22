@@ -85,7 +85,7 @@ this generator yields a `Prompt`, receives an `Amount`, and finally
 returns a `Total`. Three `NewType` definitions over `str`, `int`, and
 `int` keep the two integer channels apart, so transposing the
 `SendType` and the `ReturnType` is a type checker error.
-With bare `int` on both channels, the checker would accept the swap.
+With bare `int` on both channels, the checker accepts the swap.
 
 **Drive the conversation by hand.** `tally()` needs four calls: one
 `next()` and three sends. `next(t)` runs the body up to the first
@@ -466,7 +466,7 @@ That assignment is the defect. The runtime output shows a consequence two lines 
 in the `return` statement, where the f-string formats the object. A reader
 must work backward from a `<generator object ...>` in a report to the
 missing `yield from`. Worse, the failure is quiet: no exception, an
-exit code of zero, and output that a log scraper would accept. A
+exit code of zero, and output that a log scraper accepts. A
 coroutine that nothing awaits draws a `RuntimeWarning` when
 Python reclaims it, as
 [Concurrency](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics)
