@@ -682,7 +682,7 @@ That `__getattr__()` imports and returns a submodule the first time a caller ask
 NumPy and SciPy use that technique to keep import time low.
 `lazy import` replaces the hand-written `__getattr__()` with one keyword and defers every imported name,
 a package's submodules among them.
-The `__getattr__()` pattern serves code that must run on a Python older than 3.15.
+Code that must run on a Python older than 3.15 still needs the `__getattr__()` pattern.
 
 ### Limits of `lazy`
 
@@ -705,7 +705,8 @@ A module that registers a [plugin class](26_Patterns--Factory.md#hazards-of-self
 installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
 the module stays unloaded for the rest of the run, so that work never happens.
-The failure is silent: no error, just a table with a row missing.
+The failure is silent.
+Python raises no exception, and the table ends up one row short.
 `all` defers ordinary `import` statements too,
 including the ones that exist to run a module's body.
 The same silent failure therefore makes `all` an experiment to run rather than a setting to leave on.
