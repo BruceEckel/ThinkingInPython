@@ -1885,7 +1885,7 @@ A native Effect system provides that flat resource management.
 Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Techniques--Context_Managers.md#combining-context-managers),
 which holds a set of managers decided at runtime and unwinds them together.
 `ExitStack` flattens nested `with` blocks in ordinary Python,
-so the missing scope mechanism matters less than it first appears.
+which covers part of what the missing scope mechanism would do.
 
 ## The Toolkit
 
