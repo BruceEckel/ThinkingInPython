@@ -221,8 +221,9 @@ print(describe(42))
 
 Inside the `if`, `value` is a `str`, so `upper()` checks.
 `repr()` accepts every object, so the `return` at `[1]` needs no test.
-With `Any` in place of `object`, the commented-out line checks too.
-`describe(42)` then fails at runtime with an `AttributeError`.
+If you annotate `value` as `Any` and uncomment that line,
+the type checker accepts it,
+and `describe(42)` fails at runtime with an `AttributeError`.
 
 Narrowing an attribute is riskier than narrowing a local variable.
 A call between the check and the use can reset that attribute.
@@ -261,8 +262,8 @@ A narrowing on a local variable holds.
 A narrowing on an attribute holds until a call rebinds the attribute,
 so recheck the attribute after any call that might change the object.
 Copying the attribute into a local variable before the test keeps the narrowing valid,
-because a function defined elsewhere cannot rebind its caller's local variable
-(see exercise 9).
+because a function defined elsewhere cannot rebind its caller's local variable,
+short of frame introspection (see exercise 9).
 
 ## Constants with Final
 
@@ -794,7 +795,7 @@ A call that leaves out `width` draws `missing-argument`.
 
 The checkers disagree about a misspelled keyword.
 Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
-but `ty` 0.0.87 accepts that call silently.
+but `ty` 0.0.89 accepts that call silently.
 At runtime `fil` becomes an extra key in `style`.
 `label()` ignores that key, so the fill stays a space.
 
