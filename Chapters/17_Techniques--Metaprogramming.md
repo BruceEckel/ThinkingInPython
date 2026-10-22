@@ -1351,7 +1351,6 @@ The metaclass version works,
 but it is heavier than the problem usually requires.
 [*Singleton*](23_Patterns--Singleton.md) covers the lighter alternatives,
 from a class decorator down to a module.
-Choose the lightest tool that solves your problem.
 
 ## Multiple Inheritance and Metaclasses
 
@@ -1955,8 +1954,7 @@ and the report lists an inherited dunder the same way as one the class wrote.
 Among those same four,
 it keeps only the ones whose value differs from `object`'s version,
 so a class that overrides none of them shows no dunders.
-`_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
-deliberately narrowing the comparison to those four.
+`_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing.
 
 Every class, even an empty one, has its own `__module__`, `__dict__`,
 and a handful of other bookkeeping dunders that always differ from the ones on `object`,
