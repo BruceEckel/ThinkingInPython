@@ -15,7 +15,8 @@ but left the meaning of those annotations to third-party libraries.
 Python 3.5 (2015) introduced *type hints* (PEP 484),
 which look like the type declarations of statically typed languages.
 The Python runtime never acts on a type hint.
-It stores the hint and evaluates it only when something reads the annotations.
+It stores the hint and evaluates it only when code reads the annotations,
+through `__annotations__` or `annotationlib.get_annotations()`.
 
 Older code often begins with a `__future__` import of `annotations` (PEP 563),
 an earlier form of postponed evaluation that stores each annotation as a string.
@@ -126,7 +127,8 @@ At runtime `area("3", 4)` succeeds.
 It returns `"3333"`, because `"3" * 4` repeats the string four times.
 The wrong value causes a failure later,
 often far from the line that produced it.
-The type checker reports the problem before the program runs.
+The type checker reports the `str` argument at the call,
+before the program runs.
 
 The `# type: ignore` comment tells the type checker to skip this line,
 so this book's build passes.
@@ -254,7 +256,7 @@ expect(AttributeError, show, Box("hi"))
 `ty check` passes this file.
 The `if` narrows `b.val` to `str`,
 and the checker keeps that narrowing through the `return`,
-because its model has no link between `reset()` and `b.val`.
+because the checker does not track which attributes `reset()` assigns.
 The `AttributeError` shows that `b.val` was `None` by the time `upper()` ran,
 while the checker still treated it as a `str`.
 
@@ -467,7 +469,8 @@ so the type checker accepts any pair of ints as a `Coord`.
 
 Because an alias is the same type under another name,
 save it for a compound shape and let a built-in keep its own name.
-`type UserId = int` looks like a new type in a signature while behaving like `int`.
+`type UserId = int` looks like a new type in a signature,
+yet the type checker accepts any `int` as a `UserId`.
 
 `Color` specifies a union of literal values instead of a union of types.
 `Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings.
@@ -476,7 +479,7 @@ even though `"purple"` is a valid `str`.
 The alias also documents the allowed values in one place,
 instead of scattering the literal list across every function that accepts a `Color`.
 
-A `Literal` union is the lightest way to close a set of values.
+A `Literal` union closes a set of values without defining a class.
 If those values need behavior or an identity of their own,
 an `Enum` is the better fit.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
@@ -549,7 +552,7 @@ Both `n + 1` and `s.upper()` pass the type checker,
 while the commented-out `n.upper()` fails.
 In `first_any.py` the same call type-checks and then fails at runtime.
 
-A class declares type parameters the same way:
+A class declares type parameters in square brackets after the class name:
 
 ```python
 # generic_box.py
@@ -659,7 +662,7 @@ Callers who use that type omit the brackets and still get a precise annotation.
 Without the default, the annotation `words: Stack` leaves `T` unsolved
 (see exercise 5).
 
-A `type` alias takes a default the same way, as `Pair` shows:
+A `type` alias declares a default with `=` inside its brackets, as `Pair` shows:
 
 ```python
 # alias_default.py
@@ -1011,7 +1014,7 @@ Try each exercise before opening its [solution](../Solutions/08_Foundations--Sta
     and call it on both a `list[int]` and a `list[str]` the way the listing calls `first()`.
 4.  In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
     calling `super().report()` first.
-    Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
+    Confirm that `ty check` accepts `.bump().bump().report()` on a `LoudTally` and that the call prints the message in capitals.
 5.  Run `ty check` on `type_defaults.py` and read what it reports for `reveal_type(words.top())`.
     Remove the `= str` default and run it again.
     The type checker reports no error either way.

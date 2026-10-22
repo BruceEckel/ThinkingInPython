@@ -230,7 +230,7 @@ a different design, a detail, or an equivalent alternative.
 
 > In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
 > calling `super().report()` first.
-> Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
+> Confirm that `ty check` accepts `.bump().bump().report()` on a `LoudTally` and that the call prints the message in capitals.
 
 <details>
 <summary>Where to look</summary>
