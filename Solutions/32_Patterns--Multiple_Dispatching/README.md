@@ -1015,7 +1015,7 @@ That subclass is the new type most likely to
 receive an old type's answers by mistake.
 
 Which behavior you want depends on whether a subclass is a new
-competitor or a variation on an existing one. `Origami` really is
+competitor or a variation on an existing one. `Origami` is
 paper for the purposes of this game. A `WetPaper` that loses to
 everything is a new competitor.
 
