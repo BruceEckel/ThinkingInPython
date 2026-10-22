@@ -344,10 +344,11 @@ print(f"{decaf.description}: ${decaf.cost:.2f}")
 #: Cappuccino + Decaf: $3.25
 ```
 
-**Share one interface.** The listing has `pizza_decorator.py`'s shape with the menu changed: a
-`Drink` `Protocol` naming the two readable properties, plain drinks
-that satisfy it with class attributes, and an `Extra` base that wraps
-one `Drink` and forwards through the same interface.
+**Share one interface.** The listing has `pizza_decorator.py`'s
+shape with the menu changed: a `Drink` `Protocol` declaring the two
+readable properties, plain drinks that satisfy it with class
+attributes, and an `Extra` base that wraps one `Drink` and forwards
+through the same interface.
 `Espresso`, `Cappuccino`, and `Extra` satisfy `Drink` by providing `cost` and `description`.
 The type checker matches a `Protocol` structurally,
 so none of the three needs to inherit from `Drink`.
@@ -510,7 +511,7 @@ a different design, a detail, or an equivalent alternative.
 > Write a `memo` decorator that works both with and without parentheses,
 > so `@memo` and `@memo(maxsize=10)` both decorate a function.
 > Cache each result in a dictionary keyed by the arguments,
-> and drop the oldest entry once the cache holds more than `maxsize` of them.
+> and drop the oldest entry when the cache holds more than `maxsize` of them.
 > Distinguish the two forms by checking whether a first argument arrived.
 
 <details>

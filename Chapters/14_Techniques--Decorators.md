@@ -144,7 +144,7 @@ A wrapper that must handle any function uses the [argument-unpacking pattern](05
 The wrapper collects the arguments with `*args, **kwargs` and passes them on to the original function.
 Here, the `trace` decorator traces calls, and its `wrapper()` takes that shape.
 The helper `call_text()` formats a call as text, such as `add(2, b=3)`,
-so `wrapper()` holds the trace lines, the forwarded call, and the return:
+so `wrapper()` holds only the trace lines, the forwarded call, and the return:
 
 ```python
 # tracer.py
@@ -191,8 +191,8 @@ and documentation tools show the wrapper's metadata instead of the function's me
 Nearly every wrapper should use it.
 
 `tracer.py` relies on that copy.
-Inside `wrapper()`, the name `wrapper` refers to the decorated function object,
-and `wraps` has set its `__name__` to `add`.
+Inside `wrapper()`, the name `wrapper` refers to the wrapper function itself,
+the same object now bound to `add`, and `wraps` has set its `__name__` to `add`.
 The trace lines read `wrapper.__name__` and print `add`.
 
 `wraps` also sets `__wrapped__` on the wrapper, pointing at the original.
@@ -878,8 +878,9 @@ For the same reason, `repeat_class.repeat` works on methods.
 Its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
 
-With a fully typed class-form decorator, like `trace_class.trace`,
-the type checker catches the failure in `method_decoration.py` before the program runs.
+If `method_decoration.py` decorates `Ex.method` with a fully typed class-form decorator,
+such as `trace_class.trace`, instead of `logged`,
+the type checker catches the failure before the program runs.
 It reports a missing argument and a type mismatch on a call like `ex.method(5)`.
 
 ### Function Form or Class Form?
@@ -1220,7 +1221,7 @@ where a price change means editing every class that includes that topping.
 
 A `Pizza` with a `toppings: list[Topping]` field solves the same combinatorial problem,
 with no wrapping and no `Protocol`.
-It sums each topping's `add_cost` and joins its name.
+It sums the toppings' `add_cost` values and joins their names.
 That list is the simpler design here, where a topping contributes data
 (a number and a name).
 The *Decorator* pattern becomes the simpler design when a topping needs behavior as well as data:
@@ -1306,7 +1307,7 @@ Try each exercise before opening its [solution](../Solutions/14_Techniques--Deco
 5.  Write a `memo` decorator that works both with and without parentheses,
     so `@memo` and `@memo(maxsize=10)` both decorate a function.
     Cache each result in a dictionary keyed by the arguments,
-    and drop the oldest entry once the cache holds more than `maxsize` of them.
+    and drop the oldest entry when the cache holds more than `maxsize` of them.
     Distinguish the two forms by checking whether a first argument arrived.
 6.  Write a `retry(times)` decorator in the function form that calls the wrapped function again when it raises an exception,
     up to `times` attempts, and re-raises the last exception when they all fail.
