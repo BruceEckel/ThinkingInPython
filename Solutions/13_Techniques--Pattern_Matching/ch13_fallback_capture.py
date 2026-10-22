@@ -18,7 +18,6 @@ def act(s: Signal) -> str:
             return "accelerate"
         case FALLBACK:
             return f"fallback, FALLBACK is now {FALLBACK}"
-    return "unreachable"
 
 def dotted(s: Signal) -> str:
     match s:

@@ -626,7 +626,7 @@ and it silently skips any value outside its cases.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala.
-The check applies only when the declaration of the matched type lists every member:
+The compiler can prove the cases complete without a default branch only when the declaration of the matched type lists every member:
 a sealed hierarchy or an enum.
 
 The Scala, Kotlin, and Java versions are also expressions,
@@ -841,7 +841,7 @@ print(round(sum(cost(n) for n in notes), 4))
 ```
 
 `render()` and `cost()` each `match` over `Notification` and end with `assert_never()`,
-so the type checker confirms each `match` handles every case.
+so the type checker confirms each `match` handles every member of `Notification`.
 
 `test_oo_and_match_agree()` confirms that the two versions render and price each channel alike:
 
@@ -884,9 +884,10 @@ The existing classes and functions stay untouched.
 Inheritance confines a new type to one new subclass.
 Pattern matching confines a new operation to one new function.
 The other kind of change touches every existing subclass or every existing `match`.
-That is the open-set-versus-closed-set tradeoff from [When Not to Match](#when-not-to-match),
-which the two notification versions show in code.
-It also has a name: the *expression problem*.
+[When Not to Match](#when-not-to-match)
+weighs an open set of types against a closed one,
+and the two notification versions show that tradeoff in code.
+The tradeoff has a name: the *expression problem*.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works through the same tradeoff with shapes,
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
