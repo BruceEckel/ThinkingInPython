@@ -763,9 +763,12 @@ Use the runtime version in the rare case where the interpreter must refuse the s
 
 A decorator like `@final` is a *marker*.
 It sets an attribute and leaves enforcement to the type checker.
-Testing confirms that the `@final` marker is present,
-the runtime-final class refuses subclassing,
-and its non-final base still allows it:
+
+The test file confirms that:
+
+- The `@final` marker is present.
+- The runtime-final class refuses subclassing.
+- Its non-final base still allows it.
 
 ```python
 # test_final.py
@@ -798,7 +801,7 @@ The language devices you have met divide into four families.
 `@final` and `@override` are markers.
 At runtime each sets a single attribute, `__final__` or `__override__`,
 that the interpreter ignores and your own code can read, as `near_miss.py` does.
-The type checker enforces the rule each marker names,
+The type checker enforces each marker's rule,
 and [Making a Class Final](#making-a-class-final)
 builds the runtime half by hand with `__init_subclass__()`.
 
@@ -1030,9 +1033,11 @@ The instance's `__dict__` comes first.
 That is why assigning to `greet` on a `Person` instance shadows the method on that one instance,
 while `p.x = 3` cannot shadow `Field`, because `Field` defines `__set__()`.
 
-Testing confirms that `__set_name__()` gives the descriptor its name,
-stores each value under the storage key built from that name,
-and returns itself when you read it through the class:
+The test file confirms that:
+
+- `__set_name__()` gives the descriptor its name.
+- The descriptor stores each value under the storage key built from that name.
+- The descriptor returns itself when you read it through the class.
 
 ```python
 # test_set_name.py
@@ -1168,7 +1173,7 @@ writing `class Simple(SimpleMeta):` means something else.
 That syntax makes `SimpleMeta` an ordinary base class,
 so `Simple` inherits `type` and becomes a second metaclass,
 not a class built by `SimpleMeta`.
-`metaclass=` names what builds a class, independent of its base classes.
+`metaclass=` specifies what builds a class, independent of its base classes.
 Python computes a new class's metaclass from all of its bases,
 so `class Child(Simple):` also gets `SimpleMeta` as its metaclass.
 
@@ -1186,11 +1191,13 @@ The type checker never runs the metaclass,
 so it reports the lines that use those changes as errors.
 
 Three ways suppress the type checker's reports, from narrowest to broadest:
-`setattr(cls, "name", value)` adds an attribute through a string the type checker does not track;
-a localized `# type: ignore` silences one line,
-as on `Simple().uses_metaclass()` in `simple_meta.py`;
-and copying the class into an `Any`-typed name, `klass: Any = cls`,
-stops attribute checking for everything reached through that name.
+
+1.  `setattr(cls, "name", value)` adds an attribute through a string the type checker does not track.
+2.  A localized `# type: ignore` silences one line,
+    as on `Simple().uses_metaclass()` in `simple_meta.py`.
+3.  Copying the class into an `Any`-typed name, `klass: Any = cls`,
+    stops attribute checking for everything reached through that name.
+
 Prefer the narrowest escape that fits,
 because a broad `Any` also suppresses reports of genuine mistakes.
 
@@ -1419,7 +1426,7 @@ and lookup on a `Sub` instance does not.
 The `AttributeError` comes from the metamethod rule at the start of [Intercepting Instance Creation](#intercepting-instance-creation).
 Lookup on a `Sub` instance searches `Sub` and its bases.
 `Mixin` sits among the bases of `HelperMeta`.
-A `classmethod` works on both.
+A `classmethod` defined in `Sub` works through both `Sub` and its instances.
 
 A metaclass that needs a `dict` holds one in an attribute,
 as `Singleton._instances` does,
@@ -2313,6 +2320,6 @@ Try each exercise before opening its [solution](../Solutions/17_Techniques--Meta
     before it binds the name `ASingleton`,
     and offers no equivalent incomplete-type stage to exploit.
 
-[^parameterize-spelling]: pytest's own spelling for `@pytest.mark.parametrize`,
-    and "parameterize" everywhere else.
+[^parameterize-spelling]: The book uses pytest's own spelling, `parametrize`,
+    for `@pytest.mark.parametrize`, and "parameterize" everywhere else.
     [Testing](11_Techniques--Testing.md) explains the four possible spellings.

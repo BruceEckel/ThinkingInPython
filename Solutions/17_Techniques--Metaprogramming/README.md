@@ -657,7 +657,7 @@ print(c + 0.5, isinstance(c, float))
 
 **Define the method as a function.** `describe()` is a module-level
 function, defined before `type()` creates the class that carries
-`unit`. The annotation on `self` therefore names `Any`, so the type
+`unit`. The annotation on `self` therefore specifies `Any`, so the type
 checker accepts `self.unit`.
 
 **Assemble the class from data.** The three arguments are the name,
@@ -1004,8 +1004,8 @@ No class decorator can keep the first definition, and neither can
 `__init_subclass__()` or `__set_name__()`. All three receive the class
 after its body has finished executing. By then the body has run
 `on_open = <second function>` as an ordinary assignment into the
-namespace mapping. That assignment dropped the last reference to the
-first function, so that function has disappeared before any of the three runs. Among
+namespace mapping. That assignment drops the last reference to the
+first function, so nothing refers to it when any of the three runs. Among
 the class-creation steps, `__prepare__()` alone supplies the mapping
 that receives the assignments one at a time, as the body makes them.
 That is why the chapter says `__prepare__()` has no simpler substitute.
