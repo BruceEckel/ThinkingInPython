@@ -368,7 +368,7 @@ so a subclass must keep the type it inherits.
 
 One mistake passes the checker.
 Nothing requires `Blob` to supply a `sides`,
-because the checker accepts the declaration's statement that the attribute exists.
+because the checker accepts the declaration that the attribute exists.
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
 
