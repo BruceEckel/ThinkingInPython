@@ -1058,12 +1058,11 @@ print("finished:", game.robot.finished)
 #: finished: True
 ```
 
-**Let the caller define arrival.** `solve()`'s search changes in one place. The `isinstance(room.occupant,
-EndGame)` test becomes `arrived(room)`, a call to a predicate the caller
-supplies.
-That predicate alone decides what counts as
-arriving. The `EndGame` version is now a one-line function on the
-caller's side, `end()`, and `food()` is another.
+**Let the caller define arrival.** `solve()`'s search changes in one
+place. The `isinstance(room.occupant, EndGame)` test becomes
+`arrived(room)`, a call to a predicate the caller supplies.
+The `EndGame` version is now a one-line function on the caller's side,
+`end()`, and `food()` is another.
 
 **Report an empty search as `None`.** The other change is the return type.
 The chapter's version raises a `ValueError` when the search runs out
