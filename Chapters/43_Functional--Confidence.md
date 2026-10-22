@@ -44,8 +44,8 @@ print(x, y, x == y)
 so the call and the value are interchangeable everywhere in the program.
 An implementation may therefore cache the call,
 run the two calls in either order, or skip the second.
-The language has no way to mark `add()` as pure,
-so CPython leaves all three to you.
+The language has no way to mark `add()` as pure, so CPython runs both calls,
+left to right, and any cache is yours to add.
 
 The same substitution serves your reasoning as well as the machine's optimization.
 You can reason about the code by replacing a call with its value,
@@ -148,7 +148,7 @@ The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 `cache_info()` reports that one miss and one hit.
 Nothing warns you about the skipped subtraction.
 `lru_cache` returns the stored result for any repeated arguments,
-and takes the wrapped function's referential transparency on trust.
+and never checks whether the wrapped function is referentially transparent.
 
 ## Automatic Parallelism
 
@@ -160,7 +160,7 @@ and still return the same answers.
 Shared state makes the answers depend on the schedule.
 Two parallel `withdraw()` calls could both read `balance` before either writes it back.
 The second write then overwrites the first, so `balance` records one withdrawal.
-A lock makes the two calls safe,
+A lock makes each call finish its read and write before the other call reads `balance`,
 but the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it.
 With nothing shared, a lock has nothing to guard.
@@ -206,7 +206,7 @@ because a pure call returns the same answer whichever process runs it and whenev
 Like `map()`, `pool.map()` returns the answers in the order of `limits`,
 whichever call finishes first, so the two lists match position by position.
 
-The limits in `parallel_pure.py` are large enough for the difference to show.
+The limits in `parallel_pure.py` are large enough for the parallel run to finish sooner.
 [`report()`](18_Techniques--Performance.md#numbers-on-your-machine)
 prints the two times only when you run the listing with `--numbers`.
 On the machine that built this book,
@@ -214,7 +214,7 @@ the serial run took a few seconds and the parallel run about half that,
 well over the 1.3x margin `faster` checks.
 At small enough limits the serial run finishes before a pool has started its workers.
 At those sizes the parallel run takes longer than the serial one.
-Purity makes parallel safe.
+Purity guarantees that the parallel run returns the serial run's answers.
 Whether parallel runs faster at a given size is a separate question,
 and the timing answers it.
 
@@ -253,7 +253,8 @@ A [comprehension](16_Techniques--Comprehensions.md) describes the result,
 the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
 takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,
-because less of it can be wrong.
+because it has no intermediate state, such as an accumulator or a loop counter,
+to get wrong.
 
 A description of the result also leaves the steps to the runtime.
 A SQL query, a NumPy expression, or a dataframe operation describes its result.
@@ -276,7 +277,8 @@ You decide how far up the spectrum to go.
    The type checker takes some types on trust: an `Any`, a `cast()`,
    or the type written for data arriving from outside the program.
    The theorem holds only for the code where the checker verifies every type.
-   Running `ty` over the examples in this book catches a useful class of mistakes,
+   Running `ty` over the examples in this book reports mistakes such as an argument of the wrong type,
+   a misspelled attribute, or a possibly-`None` value used without a check,
    and that is most of what this rung offers.
 4. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
@@ -420,14 +422,16 @@ the smallest code point on which the two decodings disagree.
 Decoding those two bytes as Latin-1 returns two characters where one went in
 (`[1]`), so the round trip returns `'Â\x80'` instead of `'\x80'`.
 That code point is the unusual Unicode the hand-written loop's alphabet excludes.
-Hypothesis finds it while treating `decode()` as opaque throughout.
+Hypothesis finds it by calling `decode()` and comparing results,
+without reading its body.
 
 `derandomize=True` seeds the search from a hash of the test function,
 so this book gets the same answer on every run.
-`random.seed(42)` does the same job in the hand-written loop.
+`random.seed(42)` makes the hand-written loop draw the same strings on every run.
 `database=None` turns off the example database,
 so every run searches from scratch.
-A real test keeps the defaults.
+A real test keeps both defaults,
+a randomized search and a database that replays past failures.
 
 `roundtrip()` exists to fail, so the listing calls it inside a `try`.
 Its name drops the `test_` prefix,
@@ -517,4 +521,4 @@ Try each exercise before opening its [solution](../Solutions/43_Functional--Conf
     then rewrite the function so the value arrives as an argument.
 7.  Take the `describe()` function from [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
     and rewrite its `match` as `isinstance()` tests.
-    Count the lines, then run `ty` on both versions and compare what it knows about the value inside the `Ok` in each.
+    Count the lines, then run `ty` on both versions and compare the type it infers for the value inside the `Ok` in each.

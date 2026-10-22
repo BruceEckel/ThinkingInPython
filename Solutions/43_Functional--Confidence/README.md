@@ -674,7 +674,7 @@ a different design, a detail, or an equivalent alternative.
 
 > Take the `describe()` function from [Error Handling](../../Chapters/42_Functional--Error_Handling.md#matching-on-the-error)
 > and rewrite its `match` as `isinstance()` tests.
-> Count the lines, then run `ty` on both versions and compare what it knows about the value inside the `Ok` in each.
+> Count the lines, then run `ty` on both versions and compare the type it infers for the value inside the `Ok` in each.
 
 <details>
 <summary>Where to look</summary>
