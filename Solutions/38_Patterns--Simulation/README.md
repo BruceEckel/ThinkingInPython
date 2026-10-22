@@ -1434,8 +1434,8 @@ more than anyone wants to watch.
 
 `kick=0.5` fails differently. Its agitation falls to `0.00` as
 convincingly as it does at the default kick, but no figure appears.
-One kick moves a grain up to half the plate,
-or the full width where the amplitude peaks at 2,
+One kick moves a grain up to half the plate where the amplitude is 1,
+and up to the full width where the amplitude peaks at 2,
 so a single step can carry a grain across the plate.
 Instead of walking toward the nearest nodal line, the grain jumps to a random spot
 and stays only if that spot is quiet. The spots that hold a grain
@@ -1460,8 +1460,8 @@ fast. As it nears a nodal line the amplitude shrinks and so does its
 step, so the grain slows down and settles on the line. Too small a kick
 keeps the step small in a loud region too, so the grain barely travels.
 Too large a kick keeps the step large near a nodal line,
-since a heavily scaled step can still carry the grain out of the neighborhood
-in which it was settling.
+since a small amplitude still leaves the step large enough
+to carry the grain out of the neighborhood in which it was settling.
 With the default `0.05`, both halves work.
 A step is at most a tenth of the plate where the amplitude peaks,
 and vanishingly small once a grain arrives.
