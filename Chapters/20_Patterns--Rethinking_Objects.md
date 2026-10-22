@@ -819,7 +819,6 @@ A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-Protocols connect pieces and leave each piece as its author wrote it.
 
 The same independence hides membership.
 Nothing in a class's own source names the protocols it satisfies,
