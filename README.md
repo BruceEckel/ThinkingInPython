@@ -414,8 +414,8 @@ just that it hasn't gotten an edit *in this pass* (there are multiple edit passe
 - ⬜ 41_Functional--Toolkits.md
 - ⬜ 42_Functional--Error_Handling.md
 - ⬜ 43_Functional--Confidence.md
-- 🚧 44_Effects--Effect_Management.md
-- ⬜ 45_Effects--Generators.md
+- ✅ 44_Effects--Effect_Management.md
+- 🚧 45_Effects--Generators.md
 - ⬜ 46_Effects--Stateless.md
 - ⬜ 47_Effects--Stateless_in_Practice.md
 - ⬜ A_Effect_Tracking.md
