@@ -1512,8 +1512,8 @@ The runtime test is weaker than the type checker's test. `issubclass()` checks
 for an attribute named `draw` and ignores its signature, so a
 class whose `draw()` takes an extra parameter passes here.
 The type checker rejects that class at `@make.register`.
-The checker rejects a decorated class that does not fit.
-`unregistered()` reports a fitting class that is not decorated.
+The checker catches a decorated class that does not fit,
+while `unregistered()` reports a fitting class that is not decorated.
 
 `unregistered()` has two further limits.
 `issubclass()` against a Protocol works only when every member is a method.
