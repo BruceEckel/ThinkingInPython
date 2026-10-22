@@ -490,7 +490,8 @@ propagates to the chapter's `expected`, which prints it.
 **Handle a clean exit.** The `exc_type is not None` test keeps the normal path working. When a
 block finishes cleanly, Python still calls `__exit__()`
 and passes `None` for all three arguments.
-Without the test, `issubclass(None, KeyError)` would raise a `TypeError`. Checking for `None`
+Without the test, a clean exit calls `issubclass(None, KeyError)`,
+which raises a `TypeError`. Checking for `None`
 first also lets the type checker narrow `exc_type` to
 `type[BaseException]`, as `issubclass()` requires.
 
