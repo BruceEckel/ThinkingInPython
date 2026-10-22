@@ -57,7 +57,7 @@ Chapters/17_Techniques--Metaprogramming.md	the first lookup	On the first lookup 
 Chapters/17_Techniques--Metaprogramming.md	the lines that	The type checker never runs the metaclass, so it reports the lines that use those changes as errors.
 Chapters/18_Techniques--Performance.md	The first call	The first call stops to compile.
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
-Chapters/19_Techniques--Concurrency.md	The last line	The last line shows the other direction.
+Chapters/19_Techniques--Concurrency.md	The last line	The last line shows what `main()` reads after its tasks finish.
 Chapters/19_Techniques--Concurrency.md	the `try` block	A bare `ValueError` raised into an `except* ValueError` clause arrives as a group of one, so an `except*` handler always reads its exceptions from `.exceptions`, whether the `try` block raised a group or a single exception.
 Chapters/19_Techniques--Concurrency.md	the outer `except ExceptionGroup`	The members no clause matches propagate as a new group that keeps the original message, so the outer `except ExceptionGroup` catches the `KeyError` alone.
 Chapters/20_Patterns--Rethinking_Objects.md	The final `def`	The final `def` is the function that runs.
@@ -73,6 +73,7 @@ Chapters/25_Patterns--Surrogate.md	the second call	With the guard, the second ca
 Chapters/26_Patterns--Factory.md	the first `build()`	Every `.topping()` call after the first `build()` adds to that same list, so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
 Chapters/26_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` raises a `NotImplementedError` reports the omission later, at the first `draw()` call.
 Chapters/26_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
+Chapters/26_Patterns--Factory.md	the line that	[Explicit Registration with a Protocol](#explicit-registration-with-a-protocol) makes the checker report a class that lacks `draw()` at the line that registers it.
 Chapters/29_Patterns--Changing_the_Interface.md	The first line	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/30_Patterns--Observer.md	The second `announce()`	The second `announce()` copies the shortened list, so `always` receives both changes and `once` receives one.
 Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, and Python evaluates an annotation lazily, so by the first call the whole module has loaded and `TrapState` exists.
@@ -83,7 +84,7 @@ Chapters/35_Patterns--Flyweight.md	the first call	`@cache` stores each result un
 Chapters/36_Patterns--Memento.md	The final `Drawing`	The final `Drawing` alone costs two thousand.
 Chapters/36_Patterns--Memento.md	The later `todo[0].append("jam")`	The later `todo[0].append("jam")` grows `todo[0]` to four elements.
 Chapters/36_Patterns--Memento.md	the line that	`restored.title` raises `AttributeError` when anything reads it, often far from the line that called `pickle.loads()`.
-Chapters/37_Patterns--Pattern_Refactoring.md	The earlier `sum_value()`	The earlier `sum_value()` does the same thing for every type, so it stays an ordinary function.
+Chapters/37_Patterns--Pattern_Refactoring.md	The earlier `sum_value()`	The earlier `sum_value()` runs the same expression, `piece.weight * piece.value`, for every type, so it stays an ordinary function.
 Chapters/37_Patterns--Pattern_Refactoring.md	several lines before	A `type` statement's right side evaluates lazily, so the alias can name `Trash` several lines before the `class` statement that defines it.
 Chapters/37_Patterns--Pattern_Refactoring.md	the first `Plastic:`	Without that `class` statement, `create()` raises a `KeyError` at the first `Plastic:` line, loudly, at parse time.
 Chapters/37_Patterns--Pattern_Refactoring.md	the first call	When the default answer is wrong for an unregistered material, the *Visitor* chapter advises making the base function raise `NotImplementedError`, so a forgotten registration fails at the first call (see exercise 5).
@@ -103,8 +104,7 @@ Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdr
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 Chapters/45_Effects--Generators.md	The `for` loop	The `for` loop then resumes `collect()` with `next()`, so both of `collect()`'s `yield` expressions produce `None`.
-Chapters/45_Effects--Generators.md	The first call	The first call must therefore be `next()` or `send(None)`.
-Chapters/45_Effects--Generators.md	The first line	The first line of output shows the state of the generator `interview()` returned.
+Chapters/45_Effects--Generators.md	The first call	The first call, which runs the body to its first `yield`, *primes* the generator, and it must be `next()` or `send(None)`.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes the body, which reaches `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	the `yield` expression	As the `SendType` it is the value the driver sends in, which arrives as the value of the `yield` expression and binds to `answer`.
 Chapters/45_Effects--Generators.md	the first `Question`	`drive()` uses all three type parameters: `next()` produces the first `Question`, `send()`'s argument supplies the `Answer`, and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.

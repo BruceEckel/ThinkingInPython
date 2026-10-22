@@ -8,17 +8,16 @@
 # `tip trailing-accept`; read the delta with `tip trailing`
 # before accepting.
 # See tools/trailing_tags.py.
+Chapters/02_Foundations--Tour.md	[R32] A CODE is a 64-bit IEEE 754 double, the same as C's and Java's CODE
 Chapters/02_Foundations--Tour.md	[R32] In front of a CODE or a CODE, the same character marks a decorator
 Chapters/04_Foundations--Control_Flow.md	[R32] On its own as a statement it does nothing, the same as CODE
 Chapters/06_Foundations--Modules_and_Packages.md	[R32] Python names the offending file by its full path, abbreviated here as CODE
-Chapters/06_Foundations--Modules_and_Packages.md	[R32] The type checker flags CODE as a CODE, the same fact the marker shows
 Chapters/08_Foundations--Static_Types.md	[R32] CODE checks and runs, the same as it does on any list
 Chapters/08_Foundations--Static_Types.md	[R32] CODE is a placeholder, filled in separately at each call
 Chapters/08_Foundations--Static_Types.md	[R32] Checking is a separate step you run, the same way you run tests
 Chapters/09_Foundations--Class_Attributes.md	[R32] A CODE with no value stays a declaration, the same as CODE in CODE
 Chapters/09_Foundations--Class_Attributes.md	[R32] The first CODE (CODE) reads the same CODE, adds one, and the assignment creates CODE on CODE alone, the same shadowing CODE demonstrates in CODE
 Chapters/09_Foundations--Class_Attributes.md	[R32] Writing the same increment through CODE forks the counter when the base class has subclasses, the same way CODE forks CODE
-Chapters/11_Techniques--Testing.md	[R32] CODE replaces CODE with a function that returns a known value, the same way it does for CODE
 Chapters/13_Techniques--Pattern_Matching.md	[R35] Rethinking Objects works through the same tradeoff with shapes, and *Multiple Dispatching* and *Visitor* explore it further
 Chapters/13_Techniques--Pattern_Matching.md	[R35] The tradeoff has a name
 Chapters/13_Techniques--Pattern_Matching.md	[R35] When Not to Match weighs an open set of types against a closed one, and the two notification versions show that tradeoff in code
@@ -35,7 +34,6 @@ Chapters/19_Techniques--Concurrency.md	[R32] CODE sends each order to a worker p
 Chapters/19_Techniques--Concurrency.md	[R32] Guard it with CODE, the same fix CODE gives threads
 Chapters/19_Techniques--Concurrency.md	[R32] The change from CODE is the CODE block wrapped around the read-modify-write, plus the CODE import, the module-level CODE, and a final line that prints the count, the same line CODE prints
 Chapters/20_Patterns--Rethinking_Objects.md	[R32] At runtime, CODE prints CODE, the same as CODE
-Chapters/20_Patterns--Rethinking_Objects.md	[R32] If CODE in CODE returns a CODE or a CODE instead of a bare CODE, the same distinction separates CODE from CODE
 Chapters/20_Patterns--Rethinking_Objects.md	[R35] This trade-off is the expression problem
 Chapters/21_Patterns--Design_Patterns.md	[R35] *Command*, *Observer*, *Mediator*, and *Chain of Responsibility* each decouple a sender from a receiver, "but with different trade-offs
 Chapters/22_Patterns--Iterators.md	[R32] It offers to rewrite CODE as CODE, the same problem with fewer characters

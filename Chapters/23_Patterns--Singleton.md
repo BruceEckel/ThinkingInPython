@@ -538,7 +538,7 @@ since the name `OnlyOne` stays unbound until its own class body finishes running
 
 Either way, `OnlyOne` takes a nested class, a class variable,
 and a `__getattr__()` to share one object,
-while a module shares its state with no class at all.
+while a module shares its state with no class.
 
 ### One Instance in a Class Variable
 

@@ -13,7 +13,7 @@ Chapters/02_Foundations--Tour.md	[cc,conj] CODE .. explain: Print CODE and CODE 
 Chapters/05_Foundations--Functions.md	[cc,relcl] function .. does: A function that finishes without a CODE returns CODE, and so does a bare CODE.
 Chapters/06_Foundations--Modules_and_Packages.md	[appos,cc,conj,prep] Windows .. name: Windows and macOS default to case-insensitive filesystems, so CODE and CODE name the same file there.
 Chapters/06_Foundations--Modules_and_Packages.md	[prep] CODE .. finds: Every later CODE of that name, from any file in the program, finds the module there and binds the same object.
-Chapters/06_Foundations--Modules_and_Packages.md	[relcl] identifier .. is: Any identifier that begins and ends with double underscores (a dunder) is special in some way.
+Chapters/06_Foundations--Modules_and_Packages.md	[relcl] identifier .. is: Any identifier that begins and ends with double underscores (a dunder) is one that Python itself sets or calls.
 Chapters/07_Foundations--Classes.md	[appos,cc,conj] Print .. shows: Print a single CODE and a list of two of them, and confirm the list shows the same form for each element.
 Chapters/07_Foundations--Classes.md	[cc,conj,relcl] method .. be: A method that needs the class rather than an instance can be a CODE.
 Chapters/08_Foundations--Static_Types.md	[cc,conj,relcl] CODE .. gives: A CODE that returns an CODE, or that requires an argument, gives its class a different shape.
@@ -30,6 +30,7 @@ Chapters/17_Techniques--Metaprogramming.md	[cc,conj] registry .. needs: A regist
 Chapters/17_Techniques--Metaprogramming.md	[relcl] body .. dict: Here, CODE holds that class body, which is easier to read and modify than a namespace dict:
 Chapters/18_Techniques--Performance.md	[prep] CODE .. repeat: Time CODE against CODE in a loop for 10,000 short strings, then repeat at 100 strings.
 Chapters/19_Techniques--Concurrency.md	[cc,conj,dobj,prep] catches .. reaches: The CODE form catches members of a group by type, and iterating through CODE reaches every member.
+Chapters/19_Techniques--Concurrency.md	[cc,conj,pobj] Past .. takes: Past that point the curve flattens, and can turn back upward when pickling one more chunk takes longer than the finer load balancing saves.
 Chapters/19_Techniques--Concurrency.md	[relcl] job .. speeds: A job that spends 10 percent of its time in serial overhead speeds up at most tenfold, on 16 cores or 1,600.
 Chapters/20_Patterns--Rethinking_Objects.md	[prep] Many .. arose: Many of the design patterns in this part of the book arose to work around limitations of older object-oriented languages.
 Chapters/21_Patterns--Design_Patterns.md	[appos] Kay .. was: "^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot".

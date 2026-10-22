@@ -320,7 +320,7 @@ A caller written against an abstract base class knows a set of method names and 
 and every class that implements them says so in its own `class` line.
 A caller written against a `Protocol` knows the same set of names,
 but no class declares that it implements them.
-The type checker compares each class's method names and signatures with the protocol's.
+The type checker compares each class's method names and signatures with those of the protocol.
 A caller that takes a `Callable` knows one signature.
 A caller that takes a value knows the value's type and nothing about who produced it.
 

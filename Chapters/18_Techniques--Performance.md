@@ -1111,8 +1111,8 @@ for `__slots__` specifically,
 attribute access through a known offset instead of a `__dict__` lookup.
 Slots and `array` reduce per-object overhead, `memoryview` avoids copies,
 and the byte counts below show what each tool saves.
-A saving of a few hundred bytes per instance, multiplied by a million instances,
-is a few hundred megabytes.
+Over a million instances,
+a saving of a few hundred bytes each is a few hundred megabytes.
 
 ### Slots
 

@@ -615,7 +615,7 @@ so a traceback shows `<lambda>` where a `def` shows `square`.
 
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
-A body that needs a statement, such as a `for` loop or a `try`, needs a `def`.
+If the body needs a statement, such as a `for` loop or a `try`, write a `def`.
 
 For a key that reads an index or an attribute,
 `operator.itemgetter()` and `operator.attrgetter()` build that key function without a lambda.

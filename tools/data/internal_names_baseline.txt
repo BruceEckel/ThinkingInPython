@@ -26,7 +26,6 @@ Examples/31_Patterns--State_Machines/vending_machine.py::Column.C1
 Examples/31_Patterns--State_Machines/vending_machine.py::Column.C2
 Examples/31_Patterns--State_Machines/vending_machine.py::Column.C3
 Examples/31_Patterns--State_Machines/vending_machine.py::Row.B
-Examples/31_Patterns--State_Machines/vending_machine.py::VendingMachine.sold_out
 Examples/33_Patterns--Visitor/recursive_accept.py::Corsage.elements
 Solutions/14_Techniques--Decorators/decorated_methods.py::Counter.total
 Solutions/14_Techniques--Decorators/exercise_1.py::Point.y

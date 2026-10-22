@@ -24,7 +24,6 @@ Chapters/02_Foundations--Tour.md	only: Use a t-string only when a consumer must 
 Chapters/03_Foundations--Containers.md	already: CODE returns the list already stored under CODE
 Chapters/03_Foundations--Containers.md	only: Go past those four only when a measurement or a specific job calls for it
 Chapters/04_Foundations--Control_Flow.md	never: so CODE through CODE never print
-Chapters/04_Foundations--Control_Flow.md	only: Catch an exception only when you can do something about it
 Chapters/04_Foundations--Control_Flow.md	only: they are keywords only in this statement
 Chapters/05_Foundations--Functions.md	itself: A call that names its arguments documents itself
 Chapters/05_Foundations--Functions.md	never: CODE never reads the signature of the function it calls
@@ -38,8 +37,10 @@ Chapters/05_Foundations--Functions.md	only: because CODE is keyword-only
 Chapters/05_Foundations--Functions.md	only: keyword-only
 Chapters/05_Foundations--Functions.md	only: many built-in functions and methods take positional-only parameters
 Chapters/05_Foundations--Functions.md	only: positional-only
+Chapters/06_Foundations--Modules_and_Packages.md	even: even inside a standard-library module
 Chapters/06_Foundations--Modules_and_Packages.md	even: even on a filesystem that treats the two names as one
 Chapters/06_Foundations--Modules_and_Packages.md	ever: not names your program ever deferred
+Chapters/06_Foundations--Modules_and_Packages.md	never: Callers then never write the name of the submodule that defines CODE
 Chapters/06_Foundations--Modules_and_Packages.md	never: so that work never happens
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
 Chapters/06_Foundations--Modules_and_Packages.md	only: When the cycle exists only in annotations
@@ -54,7 +55,6 @@ Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
 Chapters/08_Foundations--Static_Types.md	names the rule: A diagnostic names the rule in brackets
 Chapters/08_Foundations--Static_Types.md	never: The Python runtime never acts on a type hint
 Chapters/08_Foundations--Static_Types.md	only: It is a keyword only at the start of this statement
-Chapters/08_Foundations--Static_Types.md	only: It stores the hint and evaluates it only when something reads the annotations
 Chapters/08_Foundations--Static_Types.md	only: The Python runtime checks types only when an operation runs
 Chapters/08_Foundations--Static_Types.md	only: but that is only a hint to human readers
 Chapters/08_Foundations--Static_Types.md	only: that rejection is the only enforcement
@@ -92,7 +92,6 @@ Chapters/13_Techniques--Pattern_Matching.md	only: The case matches only when the
 Chapters/13_Techniques--Pattern_Matching.md	only: Use a captured name only in the CODE that captured it
 Chapters/13_Techniques--Pattern_Matching.md	only: Use it as a type-only check or a final catch-all
 Chapters/13_Techniques--Pattern_Matching.md	only: they act as keywords only inside this statement
-Chapters/13_Techniques--Pattern_Matching.md	price: CODE confirms that the two versions render and price each channel alike
 Chapters/13_Techniques--Pattern_Matching.md	want: Use CODE for a closed set of cases you want to handle in one place
 Chapters/13_Techniques--Pattern_Matching.md	want: You rarely want a pattern to take a string apart character by character
 Chapters/14_Techniques--Decorators.md	cost: A plain pizza stores its own cost and description
@@ -117,6 +116,7 @@ Chapters/15_Techniques--Context_Managers.md	only: it wrapped only the call that 
 Chapters/15_Techniques--Context_Managers.md	want: Write a manager when you want the CODE syntax at the call site
 Chapters/15_Techniques--Context_Managers.md	want: once you decide you want one
 Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect unless you want the block to suppress every exception
+Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE are a better choice when the function they apply already has a name
 Chapters/16_Techniques--Comprehensions.md	only: especially if you consume the result only once
 Chapters/16_Techniques--Comprehensions.md	only: write a list comprehension that finds the string elements made only of digits (CODE)
 Chapters/16_Techniques--Comprehensions.md	paying: paying attention to which value wins for the key CODE
@@ -136,6 +136,7 @@ Chapters/17_Techniques--Metaprogramming.md	hooks: but simpler hooks cover almost
 Chapters/17_Techniques--Metaprogramming.md	itself: Extend CODE so a class declares itself final with a keyword in its header
 Chapters/17_Techniques--Metaprogramming.md	names the rule: CODE names the rule twice and writes no checking code of its own
 Chapters/17_Techniques--Metaprogramming.md	never: It accepts the declaration and never runs CODE
+Chapters/17_Techniques--Metaprogramming.md	never: The resulting CODE reports a missing CODE argument and never mentions CODE
 Chapters/17_Techniques--Metaprogramming.md	never: The type checker never runs the metaclass
 Chapters/17_Techniques--Metaprogramming.md	never: a name the module never defined prints as a CODE instead of raising a CODE
 Chapters/17_Techniques--Metaprogramming.md	only: CODE and CODE normally run only because the default CODE calls them
@@ -148,6 +149,7 @@ Chapters/17_Techniques--Metaprogramming.md	only: so only the current leaves rema
 Chapters/17_Techniques--Metaprogramming.md	only: while a metamethod works only through the class
 Chapters/17_Techniques--Metaprogramming.md	spelling: You might expect to parameterize[^parameterize-spelling] the class
 Chapters/17_Techniques--Metaprogramming.md	want: and you configure them to produce the objects you want
+Chapters/18_Techniques--Performance.md	already: It is the better tool when you already know which function to measure and the profiler's overhead changes the answer
 Chapters/18_Techniques--Performance.md	cost: Each timing includes the cost of calling the lambda
 Chapters/18_Techniques--Performance.md	cost: How much does a hardware upgrade cost compared to paying programmers to solve the performance problem
 Chapters/18_Techniques--Performance.md	cost: The size comparison shows the cost of boxing
@@ -166,7 +168,6 @@ Chapters/18_Techniques--Performance.md	paying: How much does a hardware upgrade 
 Chapters/19_Techniques--Concurrency.md	already: Threads already distributed computing resources
 Chapters/19_Techniques--Concurrency.md	already: Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort
 Chapters/19_Techniques--Concurrency.md	cost: A million tiny results can cost more to pickle than the parallelism saves
-Chapters/19_Techniques--Concurrency.md	costs: and can turn back upward when pickling one more chunk costs more than what you get from load balancing
 Chapters/19_Techniques--Concurrency.md	even: Even when you understand the problems produced by shared mutable state
 Chapters/19_Techniques--Concurrency.md	even: even a program written as CODE from top to bottom keeps a thread pool underneath
 Chapters/19_Techniques--Concurrency.md	even: since finer chunks even out the load across workers
@@ -271,6 +272,7 @@ Chapters/26_Patterns--Factory.md	itself: CODE lets each subclass register itself
 Chapters/26_Patterns--Factory.md	itself: Testing confirms that every subclass registers itself
 Chapters/26_Patterns--Factory.md	itself: a new CODE subclass can register itself with no edit to existing code
 Chapters/26_Patterns--Factory.md	never: An import written only to trigger registration never uses that name
+Chapters/26_Patterns--Factory.md	never: Code that calls through that interface never names the specific types you add
 Chapters/26_Patterns--Factory.md	never: Run the program and confirm that CODE never yields CODE
 Chapters/26_Patterns--Factory.md	never: The classic failure is a plugin that "never registered
 Chapters/26_Patterns--Factory.md	only: An import written only to trigger registration never uses that name
@@ -283,7 +285,6 @@ Chapters/27_Patterns--Function_Objects.md	exactly: When each type needs exactly 
 Chapters/27_Patterns--Function_Objects.md	never: The type checker reads the source and never runs it
 Chapters/27_Patterns--Function_Objects.md	only: and the type checker rejects CODE as an assignment to a read-only property
 Chapters/27_Patterns--Function_Objects.md	want: or do you now want an object
-Chapters/28_Patterns--Data_Transfer_Objects.md	only: The hand-rolled CODE is worth writing only to show how CODE works underneath
 Chapters/28_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
 Chapters/29_Patterns--Changing_the_Interface.md	itself: so CODE calls itself until Python raises a CODE
 Chapters/29_Patterns--Changing_the_Interface.md	names that place: The first line of each trace names that place
@@ -293,6 +294,7 @@ Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from
 Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
 Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs more than the money inserted
+Chapters/31_Patterns--State_Machines.md	even: even when a later rule
 Chapters/31_Patterns--State_Machines.md	expensive: CODE for too expensive and CODE for sold out
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
 Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
@@ -319,7 +321,6 @@ Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checkin
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
-Chapters/35_Patterns--Flyweight.md	itself: A first design gives each cell everything it knows about itself
 Chapters/35_Patterns--Flyweight.md	only: Only identity proves sharing
 Chapters/35_Patterns--Flyweight.md	only: but only a handful of tile kinds
 Chapters/35_Patterns--Flyweight.md	want: If you want callers to construct objects with an ordinary class call such as CODE
@@ -372,7 +373,6 @@ Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to s
 Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pair into rounds in which each player appears exactly once
 Chapters/41_Functional--Toolkits.md	itself: *Recursion* expresses a repeated computation as a function that calls itself
 Chapters/41_Functional--Toolkits.md	itself: CODE states what to do with one element and delegates the nesting to itself
-Chapters/41_Functional--Toolkits.md	itself: The function handles one node and calls itself for the rest
 Chapters/41_Functional--Toolkits.md	names the role: so the call names the role of the CODE
 Chapters/41_Functional--Toolkits.md	never: The slice never runs
 Chapters/41_Functional--Toolkits.md	never: because CODE never returns
@@ -396,6 +396,7 @@ Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type
 Chapters/42_Functional--Error_Handling.md	wants: A caller who wants the original must read it from the new exception's CODE
 Chapters/43_Functional--Confidence.md	even: and perhaps some should even be mathematically provable
 Chapters/43_Functional--Confidence.md	exactly: every student appears in exactly one group per round
+Chapters/43_Functional--Confidence.md	never: and never checks whether the wrapped function is referentially transparent
 Chapters/43_Functional--Confidence.md	only: CODE prints the two times only when you run the listing with CODE
 Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the counts
 Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result you want
@@ -468,6 +469,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	only: and whose body is only the s
 Chapters/47_Effects--Stateless_in_Practice.md	only: so the only evidence is a bug report saying the log file is occasionally short by a few lines
 Chapters/47_Effects--Stateless_in_Practice.md	price: Assert that CODE attempts every price and writes once per purchase
 Chapters/A_Effect_Tracking.md	names an effect: The row names an Effect
+Chapters/A_Effect_Tracking.md	never: or never
 Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
 Chapters/B_An_Effect_Checker.md	is what: is what the checker resolves
 Chapters/B_An_Effect_Checker.md	itself: CODE declares itself pure and calls CODE

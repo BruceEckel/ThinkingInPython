@@ -43,13 +43,11 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST] passed: A parameter anno
 Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST] read: Give CODE a second field, a CODE index written with a CODE default, and read the error CODE reports.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[PAST] spread: Defensive checks then spread through your code.
 Chapters/13_Techniques--Pattern_Matching.md	[PAST] read: Run CODE before adding its CODE to CODE and CODE, and read the errors.
-Chapters/14_Techniques--Decorators.md	[PAST] computed: For anything simpler, a module-level constant computed the ordinary way reads better.
 Chapters/14_Techniques--Decorators.md	[PAST] let: The annotations let the type checker report the mistake either way, at the decoration rather than at the call.
 Chapters/14_Techniques--Decorators.md	[PAST] looked: A decorator looked up by subscript, as in CODE, was a syntax error.
 Chapters/14_Techniques--Decorators.md	[PAST] re: Write a CODE decorator in the function form that calls the wrapped function again when it raises an exception, up to CODE attempts, and re-raises the last exception when they all fail.
 Chapters/14_Techniques--Decorators.md	[PAST] read: The trace lines read CODE and print CODE.
 Chapters/14_Techniques--Decorators.md	[PAST] was: A decorator looked up by subscript, as in CODE, was a syntax error.
-Chapters/15_Techniques--Context_Managers.md	[PAST] defined: It treats every manager the same way, whether CODE built it from a generator or a class defined it.
 Chapters/15_Techniques--Context_Managers.md	[PAST] finished: Call the manager's CODE, however the block finished.
 Chapters/15_Techniques--Context_Managers.md	[PAST] included: Without the CODE/CODE, that exception leaves the generator at once, so the code after the CODE, CODE included, never runs.
 Chapters/15_Techniques--Context_Managers.md	[PAST] nested: A CODE nested inside another CODE on the same instance saves a second directory.
@@ -58,7 +56,7 @@ Chapters/16_Techniques--Comprehensions.md	[PAST] borrowed: Haskell had list comp
 Chapters/16_Techniques--Comprehensions.md	[PAST] entered: CODE, entered later, overwrites CODE at key CODE, because a dictionary keeps the last value it receives for a duplicate key.
 Chapters/16_Techniques--Comprehensions.md	[PAST] had: Haskell had list comprehensions, and Python borrowed them.
 Chapters/16_Techniques--Comprehensions.md	[PAST] originated: The idea originated in mathematical set-builder notation, and functional programming languages adopted it.
-Chapters/17_Techniques--Metaprogramming.md	[PAST] declared: CODE checks each value before storing it, so every attribute declared with one enforces the same rule:
+Chapters/17_Techniques--Metaprogramming.md	[PAST] declared: CODE checks each value before storing it, so every attribute declared with one raises a CODE for a value of zero or less:
 Chapters/17_Techniques--Metaprogramming.md	[PAST] wrote: For the standard library, the checker's authors wrote those rules into the checker.
 Chapters/18_Techniques--Performance.md	[PAST] compiled: Rust offers something else: no warm-up call, no Numba dependency at runtime, and compiled code for functions
 Chapters/18_Techniques--Performance.md	[PAST] had capped: LLVM 19 had capped its tail-duplication pass, which collapsed the old interpreter's 332 dispatch jumps into 3, so the comparison was against a compiler regression rather than a fast interpreter.
@@ -175,7 +173,7 @@ Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] cut: Scissors cut paper, so
 Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] declared: A CODE declared on a shared base is one dispatcher that every subclass inherits.
 Chapters/33_Patterns--Visitor.md	[PAST] added: The two operations, CODE and CODE, are new, each added independently of the other:
 Chapters/33_Patterns--Visitor.md	[PAST] built: CODE inspects the dispatch table the decorator built:
-Chapters/35_Patterns--Flyweight.md	[PAST] included: A first design gives each cell everything it knows about itself, its position included:
+Chapters/35_Patterns--Flyweight.md	[PAST] included: A first design stores every attribute of a cell in the cell's own object, its position included:
 Chapters/35_Patterns--Flyweight.md	[PAST] set: Replace CODE on CODE with CODE and set CODE on a parsed map.
 Chapters/35_Patterns--Flyweight.md	[PAST] split: First, split each object's state in two.
 Chapters/36_Patterns--Memento.md	[PAST] bound: For a field that grows with every edit, bound the history's depth (see exercise 2), coalesce edits before CODE stores them, use a persistent structure that shares more than a flat tuple, or switch to *Command*-based undo, which stores an edit instead of a state.
@@ -192,7 +190,6 @@ Chapters/38_Patterns--Simulation.md	[PAST] rejected: CODE tallies every CODE rej
 Chapters/38_Patterns--Simulation.md	[PAST] sprinkled: In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
 Chapters/38_Patterns--Simulation.md	[PAST] steered: Nothing steered them there.
 Chapters/38_Patterns--Simulation.md	[PAST] wrote: Jeremy Meyer wrote the original Java version of this example.
-Chapters/40_Functional--Foundations.md	[PAST] kept: For such a value, a mutable structure kept private to one function is the right choice.
 Chapters/41_Functional--Toolkits.md	[PAST] consumed: CODE consumed the CODE on its way to the stop index, although it yielded nothing for it.
 Chapters/41_Functional--Toolkits.md	[PAST] found: CODE's first parameter is CODE, so CODE draws CODE: expected CODE, found CODE.
 Chapters/41_Functional--Toolkits.md	[PAST] kept: CODE is CODE with the intermediate results kept.
@@ -202,6 +199,7 @@ Chapters/42_Functional--Error_Handling.md	[PAST] read: An exception from someone
 Chapters/42_Functional--Error_Handling.md	[PAST] read: The CODE branch reads CODE, and that read type-checks.
 Chapters/43_Functional--Confidence.md	[PAST] bound: Each test checks a single input against a single answer, so the examples you invent bound what you learn.
 Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place appends nothing.
+Chapters/44_Effects--Effect_Management.md	[PAST] added: Each swap of an implementation, and each layer added around one, happens at the edge of the program.
 Chapters/44_Effects--Effect_Management.md	[PAST] checked: *checked exceptions*), while C++, before C++17 removed them, checked it at runtime and ended the program on an exception the list left out.
 Chapters/44_Effects--Effect_Management.md	[PAST] committed: A team committed to Scala or TypeScript cannot use native Effects, so designers build *library* Effect systems on top of existing type systems.
 Chapters/44_Effects--Effect_Management.md	[PAST] declared: *Algebraic effects* is the name for this design: Effects declared as an interface, plus handlers that receive the continuation.
