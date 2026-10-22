@@ -137,10 +137,11 @@ for item in mixed:
 ```
 
 Mixing types is convenient but easy to overuse.
-A `list` of mixed types usually means each element needs different handling.
+A `list` of mixed types usually means each element plays a different role,
+so the code that reads the list must test each element's type.
 A `tuple` or a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes)
-expresses those differing roles better,
-and so do separate lists that each hold a single type.
+gives each role its own position or field,
+and separate lists can each hold a single type.
 
 ### Two List Traps
 
@@ -543,7 +544,7 @@ To delete entries as you go, iterate over a copy of the keys,
 A set is an unordered collection of unique items.
 Like the `dict`, it finds an item by its hash,
 so membership tests are fast and every item must be hashable.
-Sets also provide the expected set algebra:
+Sets also provide the operators of mathematical set algebra:
 
 ```python
 # sets.py
@@ -870,8 +871,8 @@ print(height)
 ```
 
 A `namedtuple` is a fixed-length record like the tuple in `heterogeneous.py`,
-but its fields are self-documenting.
-`typing.NamedTuple` is the class form of the same idea.
+but each field has a name, so `alice.age` says which value it reads.
+`typing.NamedTuple` builds the same kind of tuple subclass from a `class` statement.
 You write `class Person(NamedTuple):` and annotate each field in the body,
 as in `name: str`, instead of listing bare names.
 A type checker then checks each field against its annotation.

@@ -171,8 +171,9 @@ Two appendices follow.
 [Effect Tracking](A_Effect_Tracking.md)
 asks how much Effect tracking Python's `Annotated` type could express without a library,
 and [An Effect Checker](B_An_Effect_Checker.md)
-builds a checker for those annotations,
-limited to the part that needs no type inference.
+builds a checker for those annotations.
+The checker works without type inference,
+resolving a call by its name and by the written type of its receiver.
 
 ## The Examples
 
@@ -206,7 +207,7 @@ A file run straight from the repository root lacks `Examples/utils/` on its impo
 The repository comes with a task runner, `tip`,
 that has a command for running one example.
 `tip run-one <name>` (`tools/run_one_example.py`)
-supplies the working directory and import path the book assumes,
+runs the file from its chapter folder with `Examples/utils/` on the import path,
 and prints the equivalent by-hand commands first.
 
 The short form, `tip <name>`, takes the listing's name alone.
@@ -287,7 +288,7 @@ not in the code you produce.
 
 If you keep an AI assistant open while you work,
 the repository's `AGENTS.md` asks it to coach you toward your own answer until you open the solution,
-then to review your answer against the book's criteria.
+then to review your answer against the criteria its chapter states.
 
 ## Resources
 
