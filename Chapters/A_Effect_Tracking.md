@@ -69,8 +69,8 @@ Every approach in the Effects chapters fills those three roles:
 | Stateless | The generator's yield type | You | The type checker, at every `yield from` |
 | Koka | The Effect row | The compiler | The compiler |
 
-Down the table, the work moves from you to the compiler.
-The open question is how far `Annotated` can move that work toward the compiler.
+Down the table, computing the row moves from you to the compiler.
+The open question is whether a tool can compute and check a row written in `Annotated`.
 
 ## Why a Native System Tracks Best
 
@@ -109,7 +109,8 @@ Programmers wrap the exception in an unchecked one, which the compiler accepts.
 In the Koka greeting program of [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management),
 `main()` handles `ask` and `tell`, so neither appears in its row,
 `<console,exn>`.
-The handler syntax and the subtraction are one construct, so they always agree.
+The handler syntax and the subtraction are one construct,
+so the row drops exactly the Effects a handler handles.
 
 **Every function has a row.**
 Koka's `println()` carries `console` in its type,
@@ -169,7 +170,7 @@ imports it too.
 `Performs` wraps the row because every tool shares the metadata.
 A validation library may put its own objects in the same `Annotated`.
 The PEP directs every consumer to act on the objects it recognizes and ignore the rest.
-The `isinstance()` test in `row()` does that.
+The `isinstance()` test in `row()` skips every piece that is not a `Performs`.
 
 `get_type_hints()` strips the metadata unless you pass `include_extras=True`.
 `Annotated` stores the metadata in its `__metadata__` tuple.
@@ -234,7 +235,8 @@ including the `Tell` in the return annotation of `tell()`.
 Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it),
 where the type checker reports the same mistake as an `invalid-yield` error.
 A row inside `Annotated` is a structured comment until a tool reads it.
-`greet()`'s row is right because I typed it correctly.
+`greet()`'s row lists `Ask` and `Tell` because I typed them,
+and no tool compares them with the calls in its body.
 
 `shout()`'s empty row has a second reading.
 `quiet()` declares `performs()` with no arguments, which states that it is pure.
@@ -369,7 +371,7 @@ Interception requires `ask()` to consult the installed handler instead of callin
 Consulting an installed handler takes a runtime mechanism,
 such as the `ContextVar` in [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
 Now the design has two halves, a static tool and a runtime library.
-The tool cannot check that the library does what the metadata says.
+The tool cannot check that the library intercepts the Effect that the `handling` block removes from the row.
 In Koka one construct installs the handler and subtracts from the row.
 In Stateless the `Handler` that `supply()` returns does the subtracting.
 Its type removes the `Need` from the row of the function it wraps,
@@ -462,7 +464,8 @@ divides algebraic effects into a row half and a handler half.
 `Annotated` can carry the row, so PEP 593 could give Python the row half,
 algebraic effect tracking.
 No metadata can supply the handler half.
-A native handler receives the continuation and decides what to do with it.
+A native handler receives the continuation and can resume it once,
+several times, or never.
 In Python the handler half would come from a library.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
 shows the limit Python puts on that half.
