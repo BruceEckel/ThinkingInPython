@@ -52,7 +52,7 @@ What `deposit(30)` returns depends on how many times `deposit()` (or
 `130` and then `160`, where a pure function returns the same value
 both times. To predict either result, you must track the history of
 every prior call.
-The chapter names that tracking as the problem with `withdraw()`.
+The chapter makes the same point about `withdraw()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -201,7 +201,9 @@ print(double(10), triple(10), quadruple(10))
 Each call to `multiplier()` creates a new `multiply` closure with its
 own private `factor`. `quadruple` holds `4` independently of
 `double`'s `2` and `triple`'s `3`, the same way `double` and `triple`
-are independent of each other.
+are independent of each other. Each function keeps its `factor` in its
+own closure cell, `__closure__[0]`, so
+`inspect.getclosurevars(quadruple).nonlocals` reports `{'factor': 4}`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -412,7 +414,8 @@ a different design, a detail, or an equivalent alternative.
 [Immutability in Annotations](../../Chapters/40_Functional--Foundations.md#immutability-in-annotations) contrasts `Final` with a read-only type such as `Sequence`.
 `Final` constrains a name's binding, and the object's type decides which methods you can call.
 To make the append an error, annotate with an immutable type such as `tuple[int, ...]` and assign a tuple.
-A `Sequence` annotation is not enough: the checker keeps the assigned list's own type for a `Final` name, so the append still passes.
+A `Sequence` annotation is not enough.
+For a `Final` name, the checker keeps the assigned list's own type, so the append still passes.
 
 <details>
 <summary>Done when</summary>
