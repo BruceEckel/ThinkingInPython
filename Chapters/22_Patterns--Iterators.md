@@ -247,7 +247,7 @@ Each later `next()` resumes the body just after the `yield` instead of restartin
 
 Any validation at the top of a generator also waits for the first `next()`.
 A check meant to reject a bad argument raises its exception at the first `next()`,
-far from the call that caused the problem.
+far from the call that passed the bad argument.
 
 In `eager_validation.py`, `lazy_squares()` shows the delay.
 `squares()` removes the delay by being a plain function.
@@ -421,7 +421,8 @@ They share one buffer with no lock,
 so two threads advancing them at the same time can raise a `RuntimeError`.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 covers `threading.concurrent_tee()`, the thread-safe version,
-along with what goes wrong when two threads call `next()` on the same iterator.
+along with what two threads get when they call `next()` on the same unguarded iterator:
+duplicate items from a class iterator, and a `ValueError` from a generator.
 
 ## Delegating with `yield from`
 
@@ -519,7 +520,7 @@ Each of these consumes iterables and produces iterators.
 Combine them with [generator expressions](16_Techniques--Comprehensions.md#generator-expressions)
 such as `(x * x for x in data if x > 0)` to build pipelines that stay lazy end to end.
 Each stage pulls one item at a time,
-so an infinite source is fine as long as something downstream stops it:
+so a pipeline over an infinite source ends when a later stage stops pulling:
 
 ```python
 # reusable_algorithms.py
@@ -564,7 +565,7 @@ A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
 In `test_endless.py`, `counter()` stands in for `count(1)`.
 It counts up the same way,
-then raises an exception after something has pulled `LIMIT` values:
+then raises a `Tripwire` when its consumer asks for value number `LIMIT + 1`:
 
 ```python
 # test_endless.py
@@ -608,8 +609,9 @@ In `test_the_if_clause_skips_but_never_stops()`,
 nothing after `2` satisfies `n < 3`,
 yet the generator expression keeps pulling from `counter()` to find another match,
 until `counter()` raises the same `Tripwire`.
-The `takewhile()` and `islice()` tests stop on their own,
-before `counter()` reaches its limit.
+The `takewhile()` test stops when it pulls `3`,
+and the `islice()` test stops after three values,
+both before `counter()` reaches its limit.
 
 Failing at 1,000 values stands in for how a real program fails.
 A real program hangs, or it dies when it exhausts memory.
@@ -669,7 +671,7 @@ Two wrappers over separate iterators of the same list compare unequal.
 With `eq=False`, the wrapper keeps `object`'s identity-based `__eq__()` and `__hash__()`,
 as other iterators do.
 
-A generator wraps an iterator just as well, and in fewer lines:
+A generator can wrap an iterator and check each item, in fewer lines:
 
 ```python
 # typed_generator.py
@@ -711,7 +713,8 @@ such as `accepted` in `typed_iterator.py`, and use the generator otherwise.
 `typed_demo.py` reads `accepted` mid-stream,
 while a generator's local variables stay hidden from its caller.
 Either way, the wrapper works with every function that takes an iterator,
-because every such function calls the same protocol methods.
+because every such function calls `iter()` and `next()`,
+and both wrappers support those calls.
 
 The two wrappers' inputs differ, though.
 `typed()` takes an `Iterable[object]`, so a list is fine.

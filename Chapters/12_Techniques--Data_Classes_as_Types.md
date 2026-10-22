@@ -113,7 +113,8 @@ A check that is present still tests only the argument.
 ## A Class Is Not a Type
 
 The object-oriented answer is to wrap the value in a class and validate it in the constructor.
-That is better, but the value is still mutable.
+The constructor then rejects an illegal starting value,
+but the value is still mutable.
 Every method that changes it must re-validate,
 and a method can leave the object in an illegal state between steps:
 
@@ -165,7 +166,7 @@ Catching the exception leaves `_number` at 13.
 The order is a choice, not something mutation forces.
 `f1()` could check the sum before assigning it,
 and then `damaged` stays `Stars(8)` instead of holding a corrupted `13`.
-Mutation forces every method to choose that order correctly,
+With mutation, every method must check before it assigns,
 every time it changes the value.
 `f1()` here gets that order wrong.
 
@@ -320,8 +321,8 @@ def show(obj: object) -> None:
 ```
 
 `show()` calls `display_object()` with `REDEFINED_DUNDERS`,
-so each report lists the dunders a class customizes,
-not the standard machinery every object inherits from `object`.
+so each report lists which of `__init__()`, `__repr__()`, `__eq__()`,
+and `__hash__` differ from `object`'s versions.
 For clarity, `show()` also excludes [`__hash__`](#data-classes)
 from these reports.
 
@@ -537,7 +538,8 @@ You can still mutate a field's `list` in place.
 demonstrates that leak.
 A frozen instance is hashable only when every field it holds is.
 The types this chapter validates hold `int`s and `str`s,
-so for them the guarantee is total.
+so every field of theirs keeps its constructed value,
+and every instance is hashable.
 `Months` and `Line`, both later in this chapter, each hold a `list`.
 Both are unhashable, and code can change either one through that list.
 
@@ -984,7 +986,7 @@ Its `__str__()` is `str.__str__()`,
 so an f-string shows `info` rather than `Level.INFO`.
 A class written as `(str, Enum)` by hand keeps `Enum`'s `__str__()` and prints `Level.INFO`;
 ruff's `UP042` rewrites that form to `StrEnum`.
-`IntEnum` is the same arrangement for `int`.
+`IntEnum` mixes `int` into `Enum`, so each member is an `int`.
 
 Mix in a type when the member is one of that type.
 `Month` stays a bare `Enum`.
@@ -1238,7 +1240,8 @@ Every factory in [Factory](26_Patterns--Factory.md#hiding-the-concrete-classes)
 shares that limit.
 
 `test_the_check_cannot_move_inside()` shows why the check cannot move inside the type.
-`NamedTuple` refuses `__new__()` and refuses `__init__()` the same way.
+`NamedTuple` refuses `__new__()`,
+and it refuses `__init__()` with the same `AttributeError`.
 Python raises the `AttributeError` while it is still executing the `class` statement,
 before the class exists.
 
@@ -1669,7 +1672,7 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 
 `json.dumps()` calls `default()` for any object it cannot serialize on its own.
 The encoder converts each data class to a dictionary,
-and the base encoder handles the dictionary from there,
+and the base encoder serializes that dictionary,
 recursing through lists and nested objects.
 
 `is_dataclass()` answers `True` for the class object as well as for an instance,
@@ -1697,7 +1700,7 @@ the parsed JSON, the database row, the form field, the command-line argument.
 It reads untrusted text and hands the pieces to `FullName` and `EmailAddress`.
 That boundary is the last point where you can reject a bad value before the rest of the program receives it.
 After those constructor calls your code holds types rather than raw data.
-A function receiving a `FullName` or an `EmailAddress` does its work and trusts the value.
+A function receiving a `FullName` or an `EmailAddress` uses the value without checking it again.
 
 Away from the boundaries, the types also use more memory and time.
 Every value is now an object.
