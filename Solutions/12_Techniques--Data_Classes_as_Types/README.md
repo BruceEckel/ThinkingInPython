@@ -380,7 +380,7 @@ a `__new__()` in the subclass runs on every call to `Stars`.
 **Test the replacement path.** `_replace()` builds the new tuple through
 `tuple.__new__()`, which skips `Stars.__new__()` and its check.
 `copy.replace()` calls `_replace()`, so it skips them too.
-A validated `Stars` therefore produces an unvalidated one.
+`copy.replace()` on a validated `Stars` therefore produces an unvalidated one.
 That gap is worse than no check,
 because the type now looks like it guarantees its values.
 
