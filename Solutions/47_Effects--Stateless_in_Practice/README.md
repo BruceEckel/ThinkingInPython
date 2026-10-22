@@ -488,7 +488,7 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 #: [Blackout] 20
 ```
 
-**Slot a new source into the order.** The turbine takes the evening hours the battery covers in the chapter's `sun_first` run.
+**Slot a new source into the order.** The turbine takes 19:00 through 21:00, the hours the battery and the grid cover in the chapter's `sun_first` run.
 The battery supplies one hour, 22:00, after the windy range ends.
 
 `run_load()` needs no change.
@@ -1545,9 +1545,9 @@ undecorated shape, `Effect[Need[Ticker], Unavailable, str]`, and
 adds `Unavailable`.
 
 **Send the failure into the channel.** The versions differ in where you write the failure. `throw()` puts an exception into
-the channel at the point of the `yield from`. `@throws` lifts what the body
-raises, so the `raise` is an ordinary statement and the decorator moves the
-exception into the channel.
+the channel at the point of the `yield from`. With `@throws`, the body fails
+with an ordinary `raise` statement, and the decorator moves that exception
+into the channel.
 
 Making each version fail with an undeclared type shows the same asymmetry
 exercise 2 finds. If you change `throw(Empty())` to `throw(ValueError())`, the type checker
