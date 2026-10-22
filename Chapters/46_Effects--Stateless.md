@@ -61,7 +61,7 @@ Effect[Need[Console], KeyError, None]
 
 This Effect needs a `Console`, can fail with a `KeyError`, and produces nothing.
 The first parameter is `Need[Console]` rather than `Console`.
-The Effect asks for a console, and something else supplies one later.
+The Effect asks for a console, and a later `supply()` call provides one.
 [Nothing Runs Yet](#nothing-runs-yet)
 explains why that request must be a value of its own.
 
@@ -126,14 +126,15 @@ In a generator function, `return value` sets the Effect's `R`.
 so the type checker rejects it.
 
 `double()` takes everything it uses as its argument,
-so it gains nothing from being an Effect.
-The gain appears when a function depends on something created elsewhere,
+so its Effect type has no dependency to declare.
+An Effect type declares one when a function uses an object created elsewhere,
 such as a console, a file, or a network connection.
 
 ## Declaring a Dependency
 
 `Need` is how Stateless does dependency injection.
-A `Need` is a request for an instance, and something else answers it.
+A `Need` is a request for an instance,
+and code outside the requesting function answers it.
 `need(SomeClass)` is an Effect that produces an instance of `SomeClass` and leaves open what supplies that instance:
 
 ```python
@@ -178,7 +179,7 @@ Two details in `greeter.py` matter:
 1. `greet()` is a generator function, because it contains `yield from`,
    so calling it builds the Effect its signature declares.
 2. `console` is of type `Console`,
-   so the type checker treats `console.print()` the same as any other method call.
+   so the type checker checks each `console.print()` call against `Console.print()`'s signature.
    `console` has that type before anything supplies an instance.
 
 ### The Effect Definition
@@ -267,7 +268,7 @@ Stateless also provides three dependencies of its own:
   supplies to `retry()`.
 
 All three are concrete classes rather than interfaces.
-Being concrete constrains [what a test double for one of them can be](#supplying-an-interface).
+Being concrete means [a test double for one of them must inherit from it](#supplying-an-interface).
 
 The `read_file()` accessor in `stateless.files` is also the library's own example of both channels at once.
 It carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
@@ -446,7 +447,7 @@ so `fallback(chosen)` keeps that type.
 
 A default removes the type check, the reason a function declares its `Need`.
 An Effect missing its `Console` now passes the type check and runs.
-A forgotten binding then shows up as a wrong-looking result rather than an error.
+A forgotten binding then shows up as the default `Console`'s output rather than as an error.
 Use a fallback for a genuine default, a null logger or a no-op console,
 not to silence a type error that reports a missing binding.
 
@@ -604,8 +605,8 @@ so the test reads the messages back out of `recorder` afterward.
 It says "treat this recorder as a `Console`,"
 and at runtime it returns the object it received.
 `supply()` requires `as_type()` because it reads the Ability from the static type of its argument.
-Inheritance answers the same question at runtime,
-since `Recorder` derives from `Console`.
+At runtime, `supply()` matches the request with `isinstance()`,
+which accepts `recorder` because `Recorder` derives from `Console`.
 [Supplying an Interface](#supplying-an-interface) explains both halves,
 along with what changes when the Ability is an interface rather than a class.
 
@@ -1013,7 +1014,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
   |     `Generator[Need[Console], Any, None]`
 ```
 
-Structural matching decides the runtime issue, not the static one.
+Structural matching decides what `isinstance()` accepts,
+not what the type checker accepts.
 `supply(Terminal())` still builds a handler for `Need[Terminal]`,
 which leaves `greet()`'s `Need[Console]` in place.
 The unhandled request stays in the type that reaches `run()`.
@@ -1032,7 +1034,7 @@ Write one boundary function whose parameter annotations specify the interface ty
 and call `supply()` inside it.
 The parameter annotation upcasts the argument,
 so every call site passes its implementation bare.
-Every function between that boundary and the Effect reads the same under either form.
+The functions between that boundary and the Effect keep the same signatures whether the Ability is a `Protocol` or a concrete class.
 An annotated local variable is different.
 `screen: Console = Terminal()` narrows back to `Terminal` at the assignment,
 so `supply(screen)` builds a `Need[Terminal]` handler again.
@@ -1082,7 +1084,7 @@ Here Stateless lacks a check ZIO performs.
 ZIO reports two implementations of one requirement as a compile-time error naming both candidates,
 because its `provide` resolves the dependency graph during compilation.
 `supply()` resolves at runtime by scanning its arguments,
-so the same mistake produces a program that runs and does the wrong thing.
+so the same mistake produces a program that runs and hands each request to whichever instance comes first in the argument list.
 Give Abilities distinct method names when that ambiguity is possible,
 and supply one implementation per Ability.
 
@@ -1138,7 +1140,8 @@ so `get(Console)` never returns a subclass registered under its own name.
 `supply()` takes bare instances and matches a request with `isinstance()`,
 so two instances that satisfy one `Need` are [ambiguous](#when-two-implementations-match).
 
-The DI registration key also does the work `as_type(Console)` does for `supply()`.
+The DI registration key also sets the type an instance answers for,
+as `as_type(Console)` does for `supply()`.
 `supply()` [reads each Ability from its argument's static type](#supplying-an-interface),
 so `supply(recorder)` is a `Handler[Need[Recorder]]`,
 and no `Need[Console]` matches it.
@@ -1523,7 +1526,8 @@ Requests and failures are both values a description yields to its driver.
 
 ### Errors Propagate
 
-The `Effect` type carries a failure the same way it carries an Ability:
+A failure propagates through `yield from` the way an Ability request does,
+so the caller's `Effect` type declares it too:
 
 ```python
 # announce.py
@@ -1591,7 +1595,7 @@ Catching is different from handling.
 The `KeyError` stays in the channel,
 so the signature keeps declaring a failure that can no longer escape.
 `catch()` alone moves an error in the type.
-A `catch()` further out changes the outcome again.
+A `catch()` further out takes the `KeyError` before an inner `except` can catch it.
 One listing shows an `except`, a `catch()`,
 and a `catch()` wrapped around an `except`:
 
@@ -1626,7 +1630,8 @@ if __name__ == "__main__":
 #: KeyError('Carol')
 ```
 
-`guarded()` and `moved()` behave identically at the edge and differ in their types.
+`run()` returns `Carol: unknown` from both `guarded()` and `moved()`,
+and the two differ in their types.
 `guarded()` must keep declaring a `KeyError` it can no longer emit,
 while `moved()` is a `Success`.
 Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
