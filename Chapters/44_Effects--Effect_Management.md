@@ -657,11 +657,12 @@ fun main() : <console,exn> ()
 
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
-The Effect row is a third channel in the signature,
-beside the parameter list and the return type.
+A Koka function type has three parts: the parameter types, the Effect row,
+and the result type.
+The row sits between the other two.
 `ask` and `tell` become part of the type.
 In `ask_tell.py`, `greet()` receives them as parameters;
-here the row carries them, so the parameter list is empty.
+here the Effect row carries them, so the parameter list is empty.
 The `()` after the row is the return type: Koka's unit type,
 the counterpart of Python's `None`.
 
@@ -679,7 +680,8 @@ so every Effect a program performs must have a handler.
 Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what the program does next.
 A handler intercepts an Effect and decides what it means.
-In `main()`, the `with fun ask(prompt)` handler says that `ask` means "prompt the console and read a line."
+In `main()`, the `with fun ask(prompt)` handler says that `ask` means "prompt the console and read a line,"
+and the `with fun tell(message)` handler says that `tell` means "print the message."
 
 Handling an Effect also discharges it.
 `main()`'s row is not `<ask,tell>` but `<console,exn>`.
