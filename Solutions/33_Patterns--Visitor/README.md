@@ -208,8 +208,8 @@ You can also state, for each change, how many lines and how many `register` call
 <details>
 <summary>Solution</summary>
 
-If you add the `Rose` class alone,
-`nectar()` and `fragrance()` both fall back to their defaults,
+If you add the `Rose` class without registering it with `nectar()`
+and `fragrance()`, both fall back to their defaults,
 so the demo prints `Rose: no nectar / faint / sharp`.
 The interpreter and the type checker both accept that version, so the
 wrong answer arrives as ordinary output.
@@ -285,8 +285,8 @@ function and three for the one flower that differs.
 
 Both changes add lines and leave every existing line as it was.
 Here the operation takes fewer lines to add than the type. `thorns()`
-needs one registration, because three of the four flowers accept its
-default. `Rose` differs from the default in both existing operations,
+needs one registration, because three of the four flowers get its
+default answer. `Rose` differs from the default in both existing operations,
 so it needs a registration in each.
 
 The new operation also sits in one place, while the new type's two

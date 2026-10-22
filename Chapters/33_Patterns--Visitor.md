@@ -255,7 +255,8 @@ Nothing edits `Flower`.
 Each operation is a separate function.
 
 `@nectar.register` reads the annotation on the implementation's first parameter.
-`flower: Gladiolus` stores that implementation in the dispatch table under the key `Gladiolus`.
+For `flower: Gladiolus`,
+it stores that implementation in the dispatch table under the key `Gladiolus`.
 A union annotation, `flower: Gladiolus | Ranunculus`,
 registers one implementation for several types at once.
 
@@ -314,7 +315,7 @@ The set of types is then closed, since adding a type means editing the union.
 
 Under `@singledispatch`, adding a new operation is a new function.
 Adding a new flower is a class,
-plus one registration for each operation that needs more than the default.
+plus one registration for each operation whose default answer is wrong for it.
 
 When the operation should read like a method,
 use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
@@ -411,7 +412,7 @@ if __name__ == "__main__":
 The recursion works because `Corsage` and `Flower` both define `accept()`.
 The loop in `Corsage.accept()` calls `accept()` on each element the same way,
 whether the element is a flower or another corsage.
-The `Accepts` protocol names that shared method,
+The `Accepts` protocol declares that shared method,
 so the type checker reports an element that lacks `accept()`,
 such as `Corsage("rose")`, before the program runs.
 
@@ -443,7 +444,7 @@ That one dispatch resolves everything *Visitor*'s two dispatches do.
 
 The dispatch on the visitor's type exists not because two types are unknown,
 but because the operation must be a method on some class.
-The visitor's type names the operation,
+The visitor's type specifies the operation,
 so the language must resolve that type at runtime along with the flower's type.
 When an operation can be a function defined outside the hierarchy,
 the call site specifies the operation,
