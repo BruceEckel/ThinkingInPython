@@ -1088,12 +1088,12 @@ Systems grow until hand-tracking fails.
 The solution moves that tracking into the language or the toolchain,
 and a generation later, nobody can imagine doing it by hand.
 
-Namespaces are a clear example.
+Namespaces are an example.
 Early languages put every name in one global namespace,
-and the programmer prevents collisions by hand.
-Collisions are often silent, producing hidden bugs,
-and third-party libraries make the problem worse.
-The solution divides names among separate namespaces.
+and the programmer prevented collisions by hand.
+Collisions were often silent, producing hidden bugs,
+and third-party libraries made the problem worse.
+The solution divided names among separate namespaces.
 In Python, every module is automatically a namespace.
 The practice is so settled that the Zen of Python ends by celebrating it:
 <!-- vale House.EmDash = NO -->
