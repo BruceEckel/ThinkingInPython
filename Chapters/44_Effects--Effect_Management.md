@@ -582,7 +582,7 @@ You propagate every parameter by hand.
 If a new helper that `greet()` calls needs a `Log` Effect,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
 and `main()`.
-Tthat makes five signatures (see exercise 2).
+That makes five signatures (see exercise 2).
 
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you must tell the injector what every function needs,
@@ -613,8 +613,8 @@ or you declare it and the type checker verifies the declaration.
 
 Ideally, Effect tracking comes built into the language,
 as a *native* Effect system.
-In a native system, a function's signature carries two pieces of information:
-what it returns, and what Effects it performs.
+In a native system, a function's signature carries three pieces of information:
+what it takes, what it returns, and what Effects it performs.
 The body looks like ordinary sequential code.
 By examining the function calls made in the body,
 the compiler infers the Effects made by the function.
@@ -657,7 +657,8 @@ fun main() : <console,exn> ()
 
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
-The Effect row is a second channel in the signature, outside the parameter list.
+The Effect row is a third channel in the signature,
+beside the parameter list and the return type.
 `ask` and `tell` become part of the type.
 In `ask_tell.py`, `greet()` receives them as parameters;
 here the row carries them, so the parameter list is empty.
