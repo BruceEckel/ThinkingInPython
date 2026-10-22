@@ -278,7 +278,7 @@ so the test checks `excinfo.value.amount` as a number.
 A reworded message breaks the `match=` pattern when the test runs,
 while a renamed attribute shows up in the type checker before the run.
 
-The assertions after the block belong outside it.
+Both assertions belong after the block, not inside it.
 A failed withdrawal must leave the balance alone.
 That check is separate from the exception.
 Inside the block neither assertion runs.
@@ -513,7 +513,7 @@ Nothing imports either fixture.
 
 `parametrize` multiplies the one test it marks.
 A parametrized fixture multiplies every test that requests it,
-in this file and every other file that can see the `conftest.py`.
+in `test_fixtures.py` and every other file that can see the `conftest.py`.
 Use the mark when the cases belong to one test,
 and the fixture when the same variation should apply to every test in a suite.
 
@@ -830,7 +830,7 @@ That rejection justifies the effort of injection for code that calls `datetime.n
 
 If you cannot change the code,
 the library [`time-machine`](https://github.com/adamchainz/time-machine)
-freezes every source of wall-clock time at once, including `datetime.now()`,
+sets every source of wall-clock time at once, including `datetime.now()`,
 with no monkeypatching on your part:
 
 ```python

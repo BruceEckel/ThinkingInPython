@@ -343,7 +343,7 @@ The second test depends on one fact about behavior: given a
 directory, the function returns the settings file inside it. That test survives
 the rename, and it survives a program that drops the environment variable.
 
-The second test takes `tmp_path` as well, although the fixture alone touches the disk.
+The second test takes `tmp_path` as well, although `settings_path_in()` never touches the disk.
 `tmp_path` supplies a real, valid path,
 where a hard-coded one differs across operating systems.
 
