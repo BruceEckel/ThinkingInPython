@@ -631,8 +631,7 @@ A wrapper written by hand can be narrower.
 and a `parse()` that catches `ValueError` the same way can return `Result[int, ValueError]`.
 Write the wrapper yourself when the narrower type matters more than the convenience.
 
-`@safe` catches `Exception`,
-which covers every ordinary failure the wrapped function can produce,
+`Exception` covers every ordinary failure the wrapped function can produce,
 including the ones that are defects rather than expected outcomes.
 If you misspell a name inside the wrapped function,
 `@safe` returns the resulting `NameError` as an ordinary `Err`,
@@ -735,7 +734,7 @@ A caller who wants the original must read it from the new exception's `__cause__
 which `raise New(...) from e` sets, or from `__context__`,
 which Python sets when a handler raises an exception without `from`.
 `BaseException.add_note()`, added in Python 3.11,
-improves the message and keeps the exception.
+adds context to the original exception instead of replacing it.
 It attaches a line that the traceback prints after the original message:
 
 ```python
@@ -793,7 +792,9 @@ The exception inside an `Err` still holds its `__traceback__`,
 but nothing prints a traceback for an `Err` stored in a list.
 The `except` clause that caught the exception returns it as a value,
 so every caller above that clause receives an `Err`, an ordinary return value.
-The exception must carry the context it needs:
+No handler above that clause catches the exception,
+so none can add a note from its own frame.
+The exception must carry the context it needs before it becomes an `Err`:
 
 ```python
 # noted_result.py
