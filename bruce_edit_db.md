@@ -468,7 +468,21 @@ already stated nearby, as in a summary sentence that closes a section.
   compiler reads every call in the body"; "one read of that function
   settles the question" -> "tells you what's happening"
 
-**Home.** literal (Accrued patterns), the pass that owns figures.
+- `45_Effects--Generators` 2026-10-22, Bruce's note "vague" on "states
+  the arrangement", then "check and fix the rest of the chapter" and
+  "the rest of the book": "so the annotation states the arrangement
+  and a type checker enforces it" -> "so the annotation says which
+  kind of value each channel carries, and a type checker rejects a
+  value on the wrong channel"; "`next()` and `send()` do that work"
+  -> "run the body"; "the same shape of trace" -> "the trace gains
+  one more `request` line and one more `ask()` line". Fifteen more in
+  that chapter, and a book-wide sweep the same day (one Opus agent per
+  chapter, about 150 edits). The shape is now the `literal` skill's
+  "Vague descriptions" section and the deep-review prose pass's
+  "Vague" lens.
+
+**Home.** literal (Accrued patterns and the "Vague descriptions"
+section), the pass that owns figures; deep-review (prose pass, "Vague").
 Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
 
 ### R11. Cut a scope phrase the book already supplies

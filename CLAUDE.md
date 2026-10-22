@@ -87,7 +87,11 @@ cuts metadiscourse, empty frames, and expletive constructions; new
 passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
 section.
 `/literal`, `/positive`, `/straighten`, `/cohesion`, and `/antecedents`
-are the other prose passes.
+are the other prose passes. Since 2026-10-22 `/literal` and the
+deep-review prose pass also look for and fix vague descriptions: an
+abstract noun, a pointer phrase, or a verdict standing where the
+sentence could say what the machinery does ("states the
+arrangement", "do that work", "the same shape of trace").
 `tip rewrite CH=NN` runs these five plus `elements-of-style` and `bruce-edit-apply` by
 default; `tip rewrite ARGS=--list` shows the set and the model each
 pass runs on. Each pass can name its own model in `tools/rewrite.py`'s

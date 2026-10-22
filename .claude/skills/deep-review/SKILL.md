@@ -128,6 +128,17 @@ flourishes, nothing that obscures the point.
   or the consequence. Cutting words is right only when the meaning
   survives the cut, so restore the missing half instead of trimming
   further.
+- **Vague:** an abstract noun, a pointer phrase, or a verdict standing
+  where the sentence could say what the machinery does: "the annotation
+  states the arrangement", "`next()` and `send()` do that work", "the
+  same shape of trace", "reads better". The reader asks which
+  arrangement, what work, better how, and the sentence does not answer.
+  Write what the reader would observe (the value, the call, the frame,
+  the output line, the diagnostic, the field) and check it against the
+  listing before writing it. A term the chapter defines and a judgment
+  that sits beside its mechanism stay. The `literal` skill's "Vague
+  descriptions" section has the test and the calibration pairs (Bruce,
+  2026-10-22, from chapter 45 and the book-wide sweep that followed).
 
 The style rules and watch list in the global `~/.claude/CLAUDE.md` are
 the standard for this pass. `banned_phrases.py` gates a handful of them;

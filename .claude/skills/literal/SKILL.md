@@ -137,6 +137,54 @@ The exception is *expect* in its typing sense
   becomes "an exception raised where no `@throws` wraps the body
   is not in the type"
 
+## Vague descriptions
+
+The same test applies to a phrase that is not a figure but an
+abstraction: an abstract noun, a pointer phrase, or a verdict standing
+where the sentence could say what the machinery does. The reader asks
+"which arrangement?", "what work?", "the same as what?", "better
+how?" and the sentence does not answer. Replace the phrase with what
+the reader would observe: the value, the call, the frame, the line of
+output, the diagnostic, the field. Bruce named the shape on chapter
+45's "states the arrangement" (2026-10-22) and had the book swept for
+it the same day, about 150 edits in 47 chapters.
+
+Calibration pairs from that chapter:
+
+- "so the annotation states the arrangement and a type checker
+  enforces it" becomes "so the annotation says which kind of value
+  each channel carries, and a type checker rejects a value on the
+  wrong channel".
+- "`next()` and `send()` do that work" becomes "`next()` and
+  `send()` run the body".
+- "Resuming continues the existing computation" becomes "Resuming
+  runs the body from that position, with every local variable intact".
+- "The driver receives one more question and the same shape of
+  trace" becomes "..., and the trace gains one more `request` line
+  and one more `ask()` line" (checked against the two listings'
+  markers).
+- "`Iterator[int]` describes the same one-way generator and reads
+  better" becomes "... without relying on the defaults".
+- "That loop silently discards every sent value" becomes "discards
+  every sent value, and nothing reports the loss".
+
+Usual carriers: "the arrangement", "the same thing", "the same
+way", "that work", "the job", "the right thing", "the details",
+"the rest", "something", "many times", "the machinery", "the
+logic", "the behavior", "properly", "correctly", "handles", "deals
+with", "takes care of", "reads better", "is cleaner", "is
+simpler", "the point", "matters", "as expected", "the problem".
+None is a hit on its own. The test is whether the sentence leaves the
+reader to supply what the code does. A phrase whose referent is in the
+sentence before or after it, or in the listing beside it with no
+competing candidate, is fine; so is a judgment that sits beside its
+mechanism ("easy to confuse", followed by what the two share), and a
+term the chapter defines ("a conversation", "a description of
+work"). Every rewrite that states a fact about a listing is checked
+against the listing first; the sweep found sentences whose referent
+was not in the listing at all (chapter 45's "exhausted answer
+source", in a listing whose answers are a `dict`).
+
 ## Boundaries
 
 - **Terms stay.** The first test above is decisive.
