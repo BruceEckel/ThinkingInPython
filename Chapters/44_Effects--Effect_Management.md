@@ -401,7 +401,7 @@ so the function is safe to run in parallel with any other code.
 
 The same guarantee makes testing trivial.
 Calling a pure function with the same arguments produces the same result every time.
-There are no surprises from side causes, side effects, or failures.
+No side cause, side effect, or failure can surprise you.
 
 ## Two Phases of Effect Analysis
 
@@ -412,7 +412,7 @@ The second phase divides the impure part by kind.
 Each kind yields its own benefit:
 
 - **Failures** [become data](#converting-effectful-to-pure) in a `Result`.
-  They are treated as ordinary return values rather than managing an exception-handling mechanism.
+  The caller handles them as ordinary return values instead of managing an exception-handling mechanism.
 - **Side causes** become replaceable inputs.
   A test substitutes a constant clock for the real one,
   or a seeded generator for true randomness.
@@ -463,7 +463,7 @@ and composition is how programs scale.
 
 An Effect Management System (EMS) does three things:
 
-1. **Effect tracking.**
+1. **Tracks Effects.**
    The type system records the Effects a function performs.
    If your function calls an effectful function,
    that Effect belongs in your function's type.
@@ -536,7 +536,7 @@ class Capture:
 Its signature says so, because the parameters are the Effects.
 
 Here, the Effects are bound to `Scripted` and `Capture`,
-which check the greeting without using the console:
+so the test checks the greeting without using the console:
 
 ```python
 # greet_demo.py
@@ -618,7 +618,6 @@ what it takes, what it returns, and what Effects it performs.
 The body looks like ordinary sequential code.
 By examining the function calls made in the body,
 the compiler infers the Effects made by the function.
-Thus, a native Effect type system function signature tracks Effects together with ordinary arguments and return types.
 
 The same small program, written four times,
 shows how different Effect Management Systems work:
@@ -837,11 +836,11 @@ The signature does the same job as Koka's Effect row.
 It tells you what `greet` needs, what can go wrong, and what comes back.
 
 Everything else in the listing is machinery,
-and each Effect pays for it separately: a trait for its interface,
+and each Effect carries its own copy: a trait for its interface,
 a companion object to lift that interface into the `ZIO` type,
 and a `ZLayer` to package its implementation,
 plus one `provide()` call to bind them all.
-Koka declared each Effect in two lines and handled it in one `with` clause.
+Koka declares each Effect in two lines and handles it in one `with` clause.
 Even `greet()` grows: it cannot call `ask` and then `tell`,
 because each call produces a description, not a value,
 so a `for` comprehension chains the two descriptions into one.
@@ -908,7 +907,7 @@ Here `greet` reads as straight-line code because `Effect.gen` builds the descrip
 and each `yield*` hands a sub-description to the library and receives its result back.
 The first two `yield*`s request the service objects from the environment,
 the records the layers supplied, and the next two call their methods.
-Koka's `main()` read a line with `readline()`.
+Koka's `main()` reads a line with `readline()`.
 The `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
 close the interface,
 and wrap all of that in `Effect.promise` so the result is a description the library can track.
@@ -916,12 +915,12 @@ and wrap all of that in `Effect.promise` so the result is a description the libr
 The machinery does not stop at your own code.
 A library Effect system tracks Effects only in values of its own type,
 so it cannot see an ordinary function that performs an Effect.
-Scala's `println` prints, and its signature promises only a `Unit`.
-The library therefore ships its own copy of every effectful standard-library call,
+Scala's `println` prints, and its signature declares only a `Unit` result.
+The library therefore supplies its own copy of every effectful standard-library call,
 each returning a description that carries the Effect signature.
 `print`, `printLine`,
 and `readLine` in the ZIO listing are the wrapped versions of Scala's own console calls.
-The TypeScript listing uses no shipped wrapper and does the wrapping itself:
+The TypeScript listing uses no wrapper from the library and does the wrapping itself:
 `console.log` goes in `Effect.sync` and Node's `readline` in `Effect.promise`.
 Console, file, clock, random, and network calls each get a wrapped version,
 and a third-party library must be wrapped to make it conform.
@@ -961,8 +960,8 @@ A language written for an AI can drop conveniences that help people write and re
 An AI can start using that language as soon as it works,
 while people take years to adopt a new language.
 
-Most of these AI languages are tracking systems;
-they provide the first part of a full EMS.
+Most of these AI languages are tracking systems.
+They provide the first part of a full EMS.
 For their purpose the other two parts, interface separation and delayed binding,
 are unnecessary.
 When the AI generates the implementation,
@@ -984,7 +983,7 @@ the second and third properties of a full EMS.
 
 The Python language has no Effect Management System, but it has a start.
 Python tracks one Effect in function signatures: `async`.
-It enforces that tracking on every caller:
+An `async def` builds a description instead of running its body:
 
 ```python
 # coroutines_are_descriptions.py
@@ -1059,8 +1058,7 @@ because only its compiler reads every call in the body.
 Could Python itself gain Effect tracking,
 so that a tool infers every declaration instead of you writing it?
 The annotation syntax could carry the Effect row.
-Imagine a signature that declares every Effect,
-as `async def` already declares `async`.
+Imagine a signature that declares every Effect, as `async def` declares `async`.
 The hard part is propagation, not syntax.
 A type checker must compute the Effect row of every function from the functions it calls,
 across every library on PyPI, almost all of which carry no Effect annotations.

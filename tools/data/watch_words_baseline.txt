@@ -229,7 +229,6 @@ Chapters/21_Patterns--Design_Patterns.md	itself: A CODE renders itself through a
 Chapters/21_Patterns--Design_Patterns.md	itself: by letting the new class register itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	itself: once each subclass registers itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	names the patterns: GoF's first chapter lists eight "common causes of redesign" and names the patterns that address each one
-Chapters/21_Patterns--Design_Patterns.md	names what: where CODE names what the function requires of its surroundings
 Chapters/21_Patterns--Design_Patterns.md	only: *Once and once only*
 Chapters/21_Patterns--Design_Patterns.md	only: This listing shows only the shape
 Chapters/21_Patterns--Design_Patterns.md	only: This usually appears only after you apply a standard design several times
@@ -265,7 +264,7 @@ Chapters/25_Patterns--Surrogate.md	expensive: Provides "lazy initialization" to 
 Chapters/25_Patterns--Surrogate.md	itself: CODE calls itself when the name it reads is also missing
 Chapters/25_Patterns--Surrogate.md	itself: so a CODE that reads CODE calls itself forever
 Chapters/25_Patterns--Surrogate.md	names the cause: not the CODE that names the cause
-Chapters/25_Patterns--Surrogate.md	never: so the client never names one
+Chapters/25_Patterns--Surrogate.md	never: so the client never specifies one
 Chapters/25_Patterns--Surrogate.md	only: A guest reaches only the names in CODE
 Chapters/25_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a set number of connections at a time
 Chapters/25_Patterns--Surrogate.md	only: Only the surrogate's current implementation changes
@@ -319,7 +318,7 @@ Chapters/32_Patterns--Multiple_Dispatching.md	want: You want to say CODE
 Chapters/33_Patterns--Visitor.md	itself: *Multiple Dispatching* is the end in itself
 Chapters/33_Patterns--Visitor.md	only: CODE is the conventional placeholder for a name that exists only to satisfy CODE
 Chapters/33_Patterns--Visitor.md	only: Only mypy rejects it
-Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE would receive CODE with the fold already done
+Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE receives CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
@@ -397,8 +396,6 @@ Chapters/41_Functional--Toolkits.md	want: CODE is the right choice when equal le
 Chapters/41_Functional--Toolkits.md	want: CODE to take as many of them as you want
 Chapters/41_Functional--Toolkits.md	want: Keeping one is right when you want each pair of distinct elements once
 Chapters/42_Functional--Error_Handling.md	names a structure: but the word names a structure that many types share
-Chapters/42_Functional--Error_Handling.md	names both outcomes: The signature names both outcomes
-Chapters/42_Functional--Error_Handling.md	names no failure: CODE names no failure
 Chapters/42_Functional--Error_Handling.md	never: and it never sees a field name
 Chapters/42_Functional--Error_Handling.md	never: which CODE never receives
 Chapters/42_Functional--Error_Handling.md	only: The only way to the answer is narrowing to one of the two classes
@@ -409,23 +406,18 @@ Chapters/43_Functional--Confidence.md	exactly: every student appears in exactly 
 Chapters/43_Functional--Confidence.md	only: CODE prints the two times only when you run the listing with CODE
 Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the counts
 Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result you want
-Chapters/44_Effects--Effect_Management.md	already: Imagine a signature that declares its Effects the way CODE already declares one
-Chapters/44_Effects--Effect_Management.md	does it: Automated testing moved "does it still work
 Chapters/44_Effects--Effect_Management.md	does it: Does it behave differently in a different environment
 Chapters/44_Effects--Effect_Management.md	does it: and does it fail silently or loudly
 Chapters/44_Effects--Effect_Management.md	does it: what does it change
 Chapters/44_Effects--Effect_Management.md	even: A handler can even invoke the continuation several times
-Chapters/44_Effects--Effect_Management.md	even: not even the exit code the operating system checks
+Chapters/44_Effects--Effect_Management.md	even: Even CODE grows
 Chapters/44_Effects--Effect_Management.md	is what: CODE is what it produces on success
 Chapters/44_Effects--Effect_Management.md	is what: Serving a new context without edits is what delayed binding provides
 Chapters/44_Effects--Effect_Management.md	itself: Could Python itself gain Effect tracking
 Chapters/44_Effects--Effect_Management.md	itself: The function reads nothing outside itself and changes nothing outside itself
-Chapters/44_Effects--Effect_Management.md	names the failure: the return type names the failure the caller handles
-Chapters/44_Effects--Effect_Management.md	names the kinds: and for an impure function it names the kinds of impurity
-Chapters/44_Effects--Effect_Management.md	names the kinds: and names the kinds of impurity a caller takes on
-Chapters/44_Effects--Effect_Management.md	only: CODE is the only place that can fail
+Chapters/44_Effects--Effect_Management.md	never: the exception never propagates to the caller
 Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
-Chapters/44_Effects--Effect_Management.md	want: You annotate explicitly when you want a constraint
+Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/45_Effects--Generators.md	only: CODE's single CODE finishes only after every generator beneath it has finished
 Chapters/45_Effects--Generators.md	only: The driver sees CODE only when CODE finishes its last delegation
 Chapters/45_Effects--Generators.md	only: so only the CODE call sits there
@@ -586,7 +578,6 @@ Solutions/25_Patterns--Surrogate/README.md	only: Let only a CODE class create th
 Solutions/25_Patterns--Surrogate/README.md	only: The Recursion Trap and Forwarding with CODE describe a method that Python calls only after normal lookup fails
 Solutions/25_Patterns--Surrogate/README.md	only: which runs only when normal lookup fails
 Solutions/26_Patterns--Factory/README.md	itself: Each class registers itself
-Solutions/26_Patterns--Factory/README.md	names its shapes: CODE names its shapes in a literal list
 Solutions/26_Patterns--Factory/README.md	never: The demo never uses the name CODE
 Solutions/26_Patterns--Factory/README.md	never: but the demo never makes that call
 Solutions/26_Patterns--Factory/README.md	never: so its body never runs
