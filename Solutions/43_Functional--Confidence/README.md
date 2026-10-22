@@ -71,7 +71,7 @@ answers wherever it runs, which is the point of `parallel_pure.py`.
 
 The number is greater than one,
 so some of the work ran outside the main process.
-`assert parallel == serial` alone could not show where the work ran.
+`assert parallel == serial` alone cannot show where the work ran.
 
 The number is also far below thirty-two. `ProcessPoolExecutor`
 allows one worker per core but starts workers on demand. The pool
@@ -284,7 +284,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Shrinking a Failure](../../Chapters/43_Functional--Confidence.md#shrinking-a-failure) shows Hypothesis reducing a failing input to a minimal one.
 Put `s.upper().lower() == s.lower()` under `@given(strategies.text())` and read the shrunk string.
-Print its code points with `unicodedata.name()`, since the two sides of the failed assertion look alike.
+Print each character's Unicode name with `unicodedata.name()`, since the two sides of the failed assertion look alike.
 
 <details>
 <summary>Done when</summary>
@@ -634,9 +634,10 @@ can find. `stale()` and `timeout()` break it silently,
 by reading state hidden from the caller.
 
 **Take the time without declaring it.** The substitution that breaks `stale()` is replacing a call with the
-answer it just gave. `stale(made, timedelta(hours=12))` returns
-`False` at 11:00 and `True` at 13:00, so writing down `False` and
-substituting it changes the program the moment the clock passes noon.
+answer it just gave. `made` is midnight on 1 January 2020, and on that
+day `stale(made, timedelta(hours=12))` returns `False` at 11:00 and
+`True` at 13:00, so writing down `False` and substituting it changes
+the program the moment the clock passes noon.
 The signature declares no time parameter,
 because `stale()` reads the clock through `datetime.now()`.
 
@@ -652,7 +653,7 @@ No argument list records the dependency.
 **Make the hidden input a parameter.** The repair is the same for
 `stale()` and `timeout()`, and it is the one
 [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
-names: pass the implementation in as a parameter.
+describes: pass the implementation in as a parameter.
 `stale_pure()` takes the current time, and `timeout_pure()` takes the
 mapping to read. Both are now referentially transparent, and both are
 testable without a clock or a monkeypatched environment.
@@ -781,7 +782,7 @@ Inside the `Ok`, `ty` knows `float` either way.
 **Rule out a shared subclass.** The precision behind that agreement
 depends on one decorator: both `Ok` and `Err` carry `@final`, in
 `describe_isinstance.py` and in `utils/result.py`. Without that
-decorator `ty` 0.0.87 allows for a class inheriting from both, so it
+decorator `ty` 0.0.89 allows for a class inheriting from both, so it
 keeps the intersection of the two as a possible type. The value in
 the `Ok` then comes back as `float | Unknown` rather than plain
 `float`. Pyright and mypy do not build that intersection and report

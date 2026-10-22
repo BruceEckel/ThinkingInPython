@@ -145,7 +145,7 @@ print(withdraw.cache_info())
 Two withdrawals of `30` should leave `balance` at `40`.
 The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
-`cache_info()` counts that one miss and one hit when you ask for them.
+`cache_info()` reports that one miss and one hit.
 Nothing warns you about the skipped subtraction.
 `lru_cache` returns the stored result for any repeated arguments,
 and takes the wrapped function's referential transparency on trust.
