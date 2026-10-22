@@ -131,6 +131,24 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   one). Trap: `tip pyright-review` re-extracts both build trees, so
   running it while a probe agent works deletes the agent's scratch
   files mid-run; run it before launching the agents.
+  The 0.0.89 to 0.0.90 upgrade (2026-10-22, with Python 3.15.0rc2 to
+  3.15.1, uv 0.12.18 to 0.13.5, and hypothesis 6.170.1 to 6.170.5;
+  ruff, pyright, and the other libraries unchanged) was a quiet one.
+  `ty` had already moved 0.0.87 to 0.0.89 on 2026-10-17 through a bare
+  "Update uv.lock" commit with no pin sweep, so the whole-book review
+  of 2026-10-21 re-probed every pinned claim on 0.0.89 first. Then, in
+  order: `uv self update` alone, because the old uv could not see the
+  3.15.1 download; `tip python-upgrade`, whole-book verify green with
+  no marker or reflow drift; `tip tools-upgrade`, `tip sweep` green on
+  both trees; `tip pyright-review` with one NEW, chapter 03's
+  `chain_map.py`, where pyright infers `dict[str, int]` for
+  `user = {"zoom": 125}` and rejects `user["theme"] = "dark"` while
+  `ty` accepts it (accepted; the chapter makes no checker claim
+  there); `tip quoted-diagnostics-probe` 42 of 42 MATCH; and all ten
+  pinned probes HOLD, including `record(cls)` still mistyped (one
+  report-only Opus agent, about 90k tokens, 70 seconds). Then
+  `tip version-pins ARGS=--write`. winget's pandoc step failed to
+  uninstall again (exit 1603), so pandoc stays where it was.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,

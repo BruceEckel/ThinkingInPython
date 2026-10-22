@@ -838,7 +838,7 @@ and how it was measured.
 - **Effect signatures stay written out in full; don't fold them into
   `type` aliases.** Chapters 46 and 47 spell every Effect signature out
   (47 carries the wrapped five-way union): the union is the information,
-  and it stays visible at the point of use. On `ty` 0.0.89 a
+  and it stays visible at the point of use. On `ty` 0.0.90 a
   `type X = ...` alias as a generator's return annotation checks the
   same as the spelled-out form (an undeclared Ability draws
   `invalid-yield` through the alias), but an inference gained in one
