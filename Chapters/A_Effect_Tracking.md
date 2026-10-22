@@ -41,9 +41,9 @@ calls the hard part.
 Koka and the other native systems compute this rule as part of algebraic effects,
 the design [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 names.
-In algebraic effects, each Effect is declared as an interface.
-A handler gives it its meaning.
-Handling removes the effect from the row.
+In algebraic effects, you declare each Effect as an interface.
+A handler gives the Effect its meaning.
+Handling removes the Effect from the row.
 The design has two halves, the row and the handlers.
 A language can have one without the other.
 OCaml 5 has handlers and records no row in a function's type.
@@ -175,7 +175,7 @@ The `isinstance()` test in `row()` does that.
 `get_type_hints()` strips the metadata unless you pass `include_extras=True`.
 `Annotated` stores the metadata in its `__metadata__` tuple.
 
-Python annotates two places in a function, its parameters and its return value.
+A function has two places for annotations, its parameters and its return value.
 A row describes a call.
 A function with no parameters, such as `greet()`,
 has no parameter annotation to hold the row, but every function returns a value,
@@ -402,7 +402,7 @@ and each assumption creates its own problem:
 Dynamic code adds to the unknowns: `getattr(obj, name)()`,
 a decorator that returns a wrapper with a different row,
 a module-level `__getattr__()`, a function replaced at runtime by a test.
-A type checker infers `Any` or `Unknown` for the same constructs.
+A type checker infers `Any` or `Unknown` for most of the same constructs.
 The Effect tool would answer `Unknown` for them too.
 Every row that includes `Unknown` would be incomplete.
 
