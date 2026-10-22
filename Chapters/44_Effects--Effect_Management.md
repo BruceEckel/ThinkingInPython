@@ -924,7 +924,7 @@ and `readLine` in the ZIO listing are the wrapped versions of Scala's own consol
 The TypeScript listing uses no shipped wrapper and does the wrapping itself:
 `console.log` goes in `Effect.sync` and Node's `readline` in `Effect.promise`.
 Console, file, clock, random, and network calls each get a wrapped version,
-and a third-party library with no wrapper must be wrapped before it fits.
+and a third-party library must be wrapped to make it conform.
 The parallel surface exists because the library tracks Effects without the compiler's help.
 A native system's standard library declares its Effects in its own signatures,
 written once, so no second copy exists.
@@ -934,8 +934,9 @@ rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
-A library must build descriptions,
-because in a language not designed for Effects it gets delayed binding by deferring execution.
+A library has no such help from the language.
+The only way it can delay the binding of `ask` to an implementation is to delay the call itself,
+so it builds a description now and runs it later.
 
 Deferring execution adds one question to every value you handle:
 is it a description or an action?
