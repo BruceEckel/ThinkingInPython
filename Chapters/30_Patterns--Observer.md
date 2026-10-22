@@ -333,7 +333,8 @@ A responder connects after the constructor returns,
 so the list of responders is empty while the constructor runs.
 A responder that needs the current reading when it connects reads `celsius`.
 
-`Thermometer`'s constructor is simple and suggests using a `dataclass`.
+`Thermometer`'s constructor stores its one argument in a field,
+which is what a `dataclass`-generated `__init__()` does.
 A class that inherits from another can be a `dataclass`,
 but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
 A `@dataclass` `Thermometer` has no list of responders.
@@ -394,7 +395,8 @@ Two kinds of arrow cross the boundary, in opposite directions:
 and `announce()` calls each stored responder in turn.
 Each call returns `None`,
 so `Thermometer` goes on to the next responder as soon as the call returns.
-A new responder such as `plot` connects the same way the other two do.
+A new responder such as `plot` connects with `t.connect(plot)`,
+as `display` and `alarm` do.
 
 ### Testing the Broadcaster
 
@@ -503,7 +505,7 @@ and `remove()` takes out the first equal entry and raises a `ValueError` when no
 
 ### Disconnecting During a Notification
 
-The copy in `announce()` matters when a responder disconnects itself mid-notification:
+The copy in `announce()` keeps the loop from skipping a responder when another responder disconnects itself mid-notification:
 
 ```python
 # self_removing_responder.py
@@ -582,7 +584,8 @@ Every announcement still calls `redraw()`.
 A responder the program stops using but leaves connected is a *lapsed listener*.
 Lapsed listeners that accumulate over a long run are a memory leak.
 
-Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
+Long-lived broadcasters need either a `disconnect()` call for every responder the program stops using,
+or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 which let Python collect the object a responder calls.
 A weak responder holds its object through a weak reference.
 On each announcement the responder passes the announcement to the object while the object is alive,
@@ -866,9 +869,9 @@ A single `__setattr__()` gives up three things that `Thermometer`'s per-attribut
     and filters by name to act on one attribute.
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
     so each responder takes the `float` reading as its one argument.
-    When a responder sorts its own notifications,
-    the broadcaster has left the decision to its responders.
-    [Deciding What Matters](#deciding-what-matters) returns to this issue.
+    When a responder sorts its own notifications, the responder,
+    not the broadcaster, decides which changes it acts on.
+    [Deciding What Matters](#deciding-what-matters) returns to that choice.
 2.  Every assignment reaches the responders, including the internal ones.
     Assigning a cached result or a hit counter notifies the responders,
     as assigning a published attribute does.
@@ -885,7 +888,7 @@ A single `__setattr__()` gives up three things that `Thermometer`'s per-attribut
 
 ### Decorated Responders
 
-Using decorators, we can simplify and automate connecting responders to broadcasters:
+Using decorators, we can connect each responder to its broadcaster on the line above the responder's `def`:
 
 ```python
 # broadcasting_thermometer.py
@@ -920,8 +923,9 @@ so `display` stays callable by name.
 `Broadcaster.connect()` returns `None`,
 so as a decorator it binds the function's name to `None` (see exercise 11).
 
-The two listings that follow hold the shared machinery,
-so a subclass such as `Thermometer` declares its fields and inherits the rest.
+The two listings that follow build the `__init__()`, the announcing properties,
+and the list of responders that every subclass shares,
+so a subclass such as `Thermometer` declares its fields and writes no method.
 The first piece builds the property that publishes a field:
 
 ```python
@@ -1509,7 +1513,7 @@ The responder calls the model, and `draw()` does the painting.
 Because the view handles the mouse as well as the screen,
 the view also does the controller's job.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
-or a test call drives the model the way a click does.
+or a test call drives the model through the same `select()` call a click makes.
 
 The model calls a view through the view's responder alone,
 so you can connect a second view to the same model and keep both views in step
@@ -1730,9 +1734,8 @@ The controller alone defines what the keys mean.
 A new key scheme is two constructor arguments.
 A new kind of key, say one that resets the count, is an edit to `Controller`.
 
-The same flexibility works in the other direction.
-A second view connects to a model, both views display,
-and both controllers stay as they are (see exercise 13).
+Adding a view leaves the controllers unchanged.
+A second view connects to a model and both views display (see exercise 13).
 A third model is a new view class and one more field in the controller,
 with `CountView` and `HistoryView` untouched.
 
