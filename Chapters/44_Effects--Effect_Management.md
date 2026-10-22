@@ -628,6 +628,7 @@ ZIO for Scala and Effect for TypeScript.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
 
 ```koka
+// koka/greet.kk
 import std/os/readline
 
 // Effect declarations: the interface, not the implementation
@@ -707,13 +708,55 @@ which is how native systems express retries and backtracking as ordinary handler
 Effects declared as an interface, plus handlers that receive the continuation.
 
 [Flix](https://flix.dev/) expresses the same model with different notation.
-The Effect row follows a backslash:
+The Effect row follows a backslash,
+and a handler receives the continuation as a named parameter:
 
 ```flix
+// flix/Greet.flix
+use Sys.Console
+
+// Effect declarations: the interface, not the implementation
+eff Ask {
+    def ask(prompt: String): String
+}
+
+eff Tell {
+    def tell(message: String): Unit
+}
+
+// Core logic: the Effect row after the backslash is part
+// of the type
 def greet(): Unit \ {Ask, Tell} =
     let name = Ask.ask("What is your name? ");
     Tell.tell("Hello, ${name}!")
+
+// Main binds each Effect to an implementation
+def main(): Unit \ Console =
+    run {
+        greet()
+    } with handler Ask {
+        def ask(prompt, resume) = {
+            Console.print(prompt);
+            let line = Console.readln();
+            resume(Option.getWithDefault("", line))
+        }
+    } with handler Tell {
+        def tell(message, resume) =
+            resume(Console.println(message))
+    }
 ```
+
+Each handler operation takes one parameter more than its `eff` declared:
+`resume`, the continuation.
+Koka's `with fun` handler resumes for you when its body returns.
+Flix hands you the continuation,
+and `resume(value)` returns `value` to the point in `greet()` that performed the Effect.
+`Console.readln()` returns an `Option`, `None` at end of input,
+so the `Ask` handler supplies an empty name in that case.
+`main()` keeps `Console` in its signature,
+the Effect its handler bodies perform,
+the counterpart of Koka's `<console,exn>`.
+Flix supplies the handler for that one when the program starts.
 
 Languages in this family include Koka, Flix, Eff, Effekt, and Unison.
 OCaml 5 has the handler mechanism,
@@ -735,6 +778,7 @@ Here is the greeting program again.
 In ZIO it is a description first and a run second:
 
 ```scala
+// zio/Greet.scala
 import zio.*
 import zio.Console.{print, printLine, readLine}
 
@@ -803,6 +847,7 @@ the edge between description and action.
 The TypeScript [Effect](https://effect.website/) library works the same way:
 
 ```typescript
+// ts/greet.ts
 import { Context, Effect, Layer } from "effect"
 import * as readline from "node:readline/promises"
 import { stdin, stdout } from "node:process"
