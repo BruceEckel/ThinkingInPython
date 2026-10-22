@@ -326,7 +326,7 @@ Only now does the body of `decorate` run, including its `@wraps(func)` line.
 Python calls `wraps(func)` to get a decorator,
 then applies that decorator to `wrapper`.
 The inner decoration runs inside the outer one,
-so `@repeat(times=3)` and `@wraps(func)` are two separate applications of the same two-step pattern,
+so `@repeat(times=3)` and `@wraps(func)` are two separate decorations,
 not one recursive call.
 The nesting stops at two levels, matching the two nested `def`s in the source.
 

@@ -79,7 +79,7 @@ The printed line is the decorator's one effect.
 `register` returns its argument the same way,
 so the two decorators can do the same kinds of work.
 A class decorator that returns the class it received can observe and
-record. Observing and recording covers most real uses: a registry, a
+record. Observing and recording covers most uses: a registry, a
 plugin table, a validation pass at import time.
 
 Two other kinds of class decorator change the class or replace it.
