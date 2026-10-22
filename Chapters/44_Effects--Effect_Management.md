@@ -1005,7 +1005,7 @@ print(asyncio.run(description), ran)
 
 Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyncio-mechanics),
 a description of work.
-The body has not run, so `ran` is still `[]`.
+The body waits, so `ran` is still `[]`.
 The body runs only when something drives the description: an `await`, a task,
 or `asyncio.run()`.
 That description/execution split is the library Effect system model.
