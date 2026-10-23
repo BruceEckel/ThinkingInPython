@@ -189,10 +189,10 @@ flattens the recursion into a single stream of paths.
 A consumer of that stream receives path strings and needs no case for `File` or `Directory`.
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
-A `list` there leaves the tree mutable.
-A record freezes the binding of the field.
+A record freezes the binding of the field, not the object bound to it.
 As [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
-demonstrates, a list in that field keeps its `append()`.
+demonstrates, a list in that field keeps its `append()`,
+so a `list` there leaves the tree mutable.
 With the tuple, two trees can share a subtree, and neither can change it.
 
 The test file confirms that:
@@ -282,7 +282,7 @@ Python's parser builds them only for sentences written as Python source in which
 A GoF *Interpreter* more often parses a rules file, a configuration value,
 or a query a user types at runtime.
 Those arrive as text, and text needs a real parser.
-`expr.py` holds the complete grammar for a small arithmetic language:
+The complete grammar for a small arithmetic language fits in one module:
 
 ```python
 # expr.py
@@ -613,7 +613,7 @@ def simplify(e: Expr) -> Expr:
             assert_never(e)
 ```
 
-`simplify_demo.py` prints a messy tree before and after `simplify()`:
+Printing a messy tree before and after `simplify()` shows the rules at work:
 
 ```python
 # simplify_demo.py
@@ -655,8 +655,8 @@ reported when the module compiles rather than as an unbound name at runtime.
 Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
 A `case Add(Num(0), other)` at the top of the function tests the tree as the caller wrote it.
-In `(0 * y) + x`, the left child is a `Mul` until something simplifies it into a `Num`,
-so the expression keeps its zero.
+In `(0 * y) + x`, the left child is still a `Mul` when that case tests it.
+The pattern does not match, so the expression keeps its zero.
 Simplifying both children first, then matching the results,
 applies the rule to the `Num(0)` the recursion just produced.
 That order lets the demo's `((1 * x) + (0 * y))` simplify to `x`.
@@ -786,7 +786,7 @@ Iterating over a `Template` is flat.
 so the walk is a loop rather than a recursion.
 An interpolation's value can be a `Template`,
 built by nesting one `t`-string inside another.
-`+` concatenates `t`-strings into one flat `Template`,
+`+` instead concatenates `t`-strings into one flat `Template`,
 as `query` in `template_query.py` shows.
 Nesting is the one way to produce a `Template`-valued interpolation.
 A walker that needs the pieces at every level must therefore also recurse into any value that is a `Template`.
