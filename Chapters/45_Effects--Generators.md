@@ -335,13 +335,10 @@ print(inspect.getgeneratorstate(watched))
 #: GEN_SUSPENDED
 ```
 
-`watched` appears in `watch()` only as a read,
-so the name refers to the module-level `watched`
-([Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function) covers how Python decides).
-Python looks up a module-level name each time the body reads it,
-not when `def` runs.
-`next()` runs the body after `watched = watch()` has bound the name,
-so the lookup finds the generator.
+`watch()` names `watched` before the module binds it.
+As [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
+shows, a function looks up a module-level name when its body runs.
+`next()` runs the body after `watched = watch()` has bound the name.
 
 Every answer `interview()` receives comes from its driver.
 Swapping `drive()`'s dictionary for a database, or for `input()`,

@@ -440,18 +440,6 @@
   "p_terms": 0.0,
   "asked": "2026-10-23"
  },
- "6a5c95f955206294": {
-  "file": "45_Effects--Generators.md",
-  "line": 338,
-  "target": "05_Foundations--Functions.md",
-  "terms": [
-   "watched",
-   "watch"
-  ],
-  "sentence": "`watched` appears in `watch()` only as a read, so the name refers to the module-level `watched` ([Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function) covers how Python decides).",
-  "p_terms": 0.01,
-  "asked": "2026-10-23"
- },
  "66259d22eeb4fc05": {
   "file": "47_Effects--Stateless_in_Practice.md",
   "line": 455,

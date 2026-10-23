@@ -331,6 +331,9 @@ count = 0
 def read_only():
     print(count)
 
+def reads_later():
+    print(limit)
+
 def rebinds():
     # A local, unrelated to the module-level count
     count = 99
@@ -340,8 +343,11 @@ def writes_global():
     global count
     count += 1
 
+limit = 10
 read_only()
 #: 0
+reads_later()
+#: 10
 rebinds()
 #: 99
 print(count)
@@ -360,6 +366,12 @@ the compiler marks `count` local for the whole function.
 The read half of `count += 1` then looks up a local that has no value yet.
 A call to `writes_global()` raises an `UnboundLocalError`.
 `global` governs rebinding, not reading, so `read_only()` needs no declaration.
+
+`reads_later()` names `limit`, which the module binds after the `def`.
+Python looks up a module-level name each time the body reads it,
+not when `def` runs.
+The module binds `limit` before it calls `reads_later()`,
+so the lookup succeeds.
 
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
