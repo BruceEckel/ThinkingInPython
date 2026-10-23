@@ -128,7 +128,7 @@ PEP 593 added `Annotated[T, x, y, ...]` to `typing` in Python 3.9.
 The arguments after it are *metadata*, and `Annotated` requires at least one.
 Each piece of metadata is an ordinary expression,
 and `Annotated` keeps its value.
-The type checker treats a class in that position as a value, not as a type.
+The type checker treats a class in the metadata as a value, not as a type.
 `Annotated[int, "meters", range(0, 100)]` carries two pieces of metadata,
 a string and a `range` object.
 
@@ -167,7 +167,8 @@ def row(f: Callable[..., object]) -> list[str]:
 
 The listing lives in `utils/` because [An Effect Checker](B_An_Effect_Checker.md)
 imports it too.
-`Performs` wraps the row because every tool shares the metadata.
+`Performs` wraps the row in a type that `row()` can recognize,
+because every tool shares the metadata.
 A validation library may put its own objects in the same `Annotated`.
 The PEP directs every consumer to act on the objects it recognizes and ignore the rest.
 The `isinstance()` test in `row()` skips every piece that is not a `Performs`.
@@ -386,9 +387,9 @@ and each assumption creates its own problem:
 - **Undeclared means pure.**
   The row becomes a lower bound.
   It lists the Effects someone wrote down.
-  A direct call to `print()` leaves the row as it was,
-  the limit [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
-  finds in Stateless.
+  A direct call to `print()` leaves the row as it was.
+  [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
+  finds the same limit in Stateless.
 - **Undeclared means `Unknown`.**
   `Unknown` propagates into the row of every caller,
   the way `Any` propagates into every type computed from it.
@@ -398,7 +399,7 @@ and each assumption creates its own problem:
   The C functions under `print()` and `open()` need separate declarations regardless,
   since they have no Python body to analyze.
   [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
-  says how long that took: a decade.
+  says how long gradual typing took to cover the ecosystem: a decade.
 
 Dynamic code adds to the unknowns: `getattr(obj, name)()`,
 a decorator that returns a wrapper with a different row,
@@ -427,7 +428,7 @@ the running function's row, plus the Effect of each enclosing `handling` block.
 On each decorated call,
 the decorator raises an exception when the callee's row holds an Effect outside that set,
 and otherwise sets the `ContextVar` to the callee's row until the call returns.
-That step bounds each function the callee calls by the callee's row,
+Setting the `ContextVar` that way bounds each function the callee calls by the callee's row,
 not by the caller's wider set.
 A function that handles `Ask` leaves `Ask` out of its own row.
 That function's `handling(Ask, Scripted())` block puts `Ask` back in the set,
