@@ -70,9 +70,9 @@ print(intern(joined) is intern(joined2))
 
 The two `join()` calls build equal but distinct strings.
 `intern()` maps both to one shared copy.
-Equal interned strings compare in one step.
-CPython's `==` on two strings checks identity before it compares characters,
-and for interned strings, equal means identical.
+CPython's `==` on two strings checks identity before it compares characters.
+For interned strings, equal means identical,
+so equal interned strings compare in one step.
 
 The small-integer cache and string interning are CPython implementation details,
 not language guarantees.
@@ -165,7 +165,7 @@ def parse_map(text: str) -> list[list[Tile]]:
             for line in text.split()]
 ```
 
-`tile_map_demo.py` parses a small map and counts the objects behind it:
+The demo below parses a small map and counts the objects behind it:
 
 ```python
 # tile_map_demo.py
@@ -316,7 +316,7 @@ so a caller can see that construction goes through the factory rather than the c
 If you want callers to construct objects with an ordinary class call such as `Color(...)`,
 hide the pool inside `__new__()` instead.
 [*Singleton*](23_Patterns--Singleton.md#the-classic-implementations)
-keeps its pool in `__new__()` the same way.
+builds and returns its one instance in `__new__()` the same way.
 Here the pool stores each instance under its constructor arguments instead of a single constant key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
 A *Multiton*'s objects can be mutable.
@@ -483,7 +483,7 @@ With `slots=True` alone, `_pool[text] = found` therefore raises a `TypeError`.
 so `Name` writes the `dataclass` call in full.
 
 `functools.lru_cache(maxsize=n)` bounds a pool a different way.
-Once it holds `n` entries, it evicts the least recently used one.
+Once it holds `n` entries, each new entry evicts the least recently used one.
 That eviction turns the factory back into a cache.
 Requesting an evicted value builds a fresh object,
 equal to any surviving original and distinct from it.
@@ -521,7 +521,7 @@ the class definition can build the pool.
 An [Enum](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 is a flyweight pool the language maintains.
 Python constructs each member once, at class creation.
-Any reference produces that one object.
+Every later lookup of a member returns that one object.
 Here is `tile_map.py`'s `Tile` recast as an enum,
 with the pool moved into the language and the member name replacing the `name` field:
 
@@ -568,7 +568,7 @@ With `_value_` set in `__new__()`, `Tile(".")` returns `Tile.GRASS`.
 `object.__new__(cls)` builds a bare instance by going straight to `object`,
 past `Tile.__new__()`, so the call cannot recurse.
 
-`tile_enum_demo.py` reaches one member by attribute, by name, and by symbol,
+The demo below reaches one member by attribute, by name, and by symbol,
 reads a member's value and walkability, and iterates over the members:
 
 ```python
