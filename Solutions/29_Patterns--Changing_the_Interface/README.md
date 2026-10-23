@@ -181,8 +181,8 @@ use the class as a type: constructing an instance and subclassing.
 yet `caught` holds two entries: one for the construction and one for the subclass.
 Code that holds a `Report` therefore calls its methods silently.
 
-Warning on the type alone matches the replacement.
-`TextReport` replaces the type, not the method.
+`TextReport` replaces the type, not the method, so warning on the
+type alone matches the replacement.
 A caller who wants to act on the warning must change where
 they get the `Report`, not where they call `render()`.
 
@@ -422,7 +422,8 @@ a different design, a detail, or an equivalent alternative.
 
 [What an Override May Change](../../Chapters/29_Patterns--Changing_the_Interface.md#what-an-override-may-change) explains which parts of a signature a subclass may alter.
 The `/` keeps a parameter's name out of the interface, so removing it lets callers pass the argument by name.
-Call through a `WhatIUse` variable, so the checker verifies the call against the base class's signature, and give the override the base parameter's name.
+Call through a `WhatIUse` variable, so the checker verifies the call against the base class's signature.
+Then give the override the base parameter's name.
 
 <details>
 <summary>The shape</summary>
