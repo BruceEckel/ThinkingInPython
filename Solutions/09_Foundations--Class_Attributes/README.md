@@ -373,9 +373,10 @@ instance dictionary, which is where assignment writes. `vars(a)` is
 empty again, and `a.x` reads `100`, because the lookup falls back to
 the class the way it did before any assignment.
 
-**Show that deletes stop at the instance.** The second `del a.x` (`[2]`) raises an `AttributeError` because the instance dictionary is empty.
-`del` acts on the instance dictionary alone, the way assignment does, so
-`vars(A)["x"]` keeps its `100`.
+**Show that deletes stop at the instance.** `del` acts on the
+instance dictionary alone, the way assignment does, so `vars(A)["x"]`
+keeps its `100`. The second `del a.x` (`[2]`) finds the instance
+dictionary empty and raises an `AttributeError`.
 Deleting the class attribute takes `del A.x`, naming the class.
 
 Before you move on, name what separates your attempt from this one:
@@ -486,8 +487,9 @@ writes the same class dictionary, so both instances report `2`.
 Reading `c.total` falls back to that shared value.
 
 Writing the fix as `type(self).total += 1` also prints `2 2 2`
-here, because `Counting` has no subclass. Once a subclass exists,
-the counter forks the way `classvar_fork.py` forks it for `Sub`.
+here, because `Counting` has no subclass. With a subclass, the
+subclass's first construction forks the counter the way
+`classvar_fork.py` forks it for `Sub`.
 Constructing an empty subclass twice after `c` and `d` leaves
 `Counting.total` at `2` and gives the subclass its own `total` of
 `4`. Naming the class sends every write to one dictionary.
@@ -574,6 +576,7 @@ one object, not three equal lists.
 
 This listing combines the shared mutable value of `shared_mutable.py`
 with the inheritance lookup of `class_var_inheritance.py`.
+Each one alone keeps a change where you can see it.
 In a single class, a mutable `ClassVar` declares its sharing in the
 body of the class that uses it, so the sharing stays visible.
 A subclass changes an inherited immutable `ClassVar` by assignment,
