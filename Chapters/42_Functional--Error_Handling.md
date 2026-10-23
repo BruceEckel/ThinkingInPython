@@ -251,8 +251,8 @@ Totality is therefore a discipline the function's author keeps.
 
 The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
-The type checker reports a read of the answer before narrowing.
-Noticing an ignored one is up to you.
+The type checker reports a read of the answer before narrowing,
+but noticing an ignored `Result` is up to you.
 The listing shows both limits:
 
 ```python
@@ -478,7 +478,7 @@ def test_bind_short_circuits_a_failure() -> None:
 The assertion in `test_bind_short_circuits_a_failure()` uses `is`,
 proving `bind()` returns the original `Err` object rather than an equal copy.
 
-`test_composing.py` confirms that the hand-written and `bind()` versions agree on the five inputs the demos use:
+A parametrized test confirms that the hand-written and `bind()` versions agree on the five inputs the demos use:
 
 ```python
 # test_composing.py
@@ -495,7 +495,7 @@ def test_manual_and_bind_agree(i: int) -> None:
 
 `bind()` passes one answer from each step to the next.
 When you have several independent inputs,
-nest the binds so each answer stays in scope for the next step:
+nest the binds so each answer stays in scope for every later step:
 
 ```python
 # combining.py
@@ -546,7 +546,7 @@ and each step you add nests one level deeper.
 [The returns Library](#the-returns-library)
 later in this chapter offers do-notation, a flatter alternative to this nesting.
 
-`test_combining.py` confirms that `combined()` returns the answer,
+A second parametrized test confirms that `combined()` returns the answer,
 or the first failure in the chain:
 
 ```python
@@ -717,9 +717,9 @@ A raised exception ends the comprehension at the first failure.
 
 The parentheses in `Err(ValueError())` do the type test.
 Written bare, `case Err(ValueError):` is a [capture](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares).
-It matches every `Err` and binds the error to a new local named `ValueError`.
-Python compiles that `case` and the type checker accepts it,
+It matches every `Err` and binds the error to a new local named `ValueError`,
 so `describe()` answers "Not a number" for a `ZeroDivisionError`.
+Python compiles that `case`, and the type checker accepts it.
 
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
 
