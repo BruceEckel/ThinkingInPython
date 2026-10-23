@@ -353,8 +353,9 @@ The runtime enforces that pairing, though no annotation states it.
 If a second thread resumes a generator while another thread is running its body,
 the second thread gets `ValueError: generator already executing`.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
-shows that error and `threading.synchronized_iterator()`,
-which lets several threads share one generator by serializing their calls.
+reproduces the `ValueError` with several threads.
+It also shows `threading.synchronized_iterator()`,
+which lets those threads share one generator by serializing their calls.
 
 ## `yield from` Composes Descriptions
 
