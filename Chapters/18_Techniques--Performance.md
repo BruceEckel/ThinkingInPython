@@ -151,7 +151,8 @@ The interpreter instruments only the code that has an event attached.
 Everything else keeps its specialized bytecode and runs at full speed.
 `sys.settrace()`, by contrast, slows every Python function its thread runs,
 since its trace function runs on each call,
-and the local trace function it returns runs on each line:
+and the local trace function it returns runs on each line.
+The listing below attaches a call counter to `fib()` alone:
 
 ```python
 # monitoring_counts.py
@@ -551,7 +552,8 @@ so testing `is_available()` first and `is_enabled()` second distinguishes a buil
 The `assert` checks that implication, which holds on every build.
 
 Most listings in this book print the same line on every machine.
-The `print()` changes with your interpreter, so it carries no `#:` line.
+This listing's output changes with your interpreter,
+so its `print()` carries no `#:` line.
 The book's build has no JIT compiled in,
 so `tip jit_status` reports the first state:
 
@@ -1252,7 +1254,8 @@ where a *record* is an immutable class defined by its fields.
 Written bare, `@record` is `model()` from `kept_transform.py` with `slots=True` added.
 The called form, `@record(slots=False)`,
 is for the class that must keep a `__dict__`.
-Dropping the slots then takes a visible flag rather than a missing option.
+Dropping the slots then takes a visible flag.
+Under `@dataclass`, leaving out `slots=True` drops them.
 
 The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decorators.md#decorators-with-optional-parentheses).
 `cls` is `None` when you call the decorator with arguments.
@@ -1799,8 +1802,8 @@ speedup("collatz_lengths", collatz_lengths,
 # Sample run: collatz_lengths Rust speedup: 36.0x
 ```
 
-Adding Rust makes one baseline and three faster alternatives,
-listed by how much work each takes rather than by speed.
+With Rust added, the options are one baseline and three faster alternatives,
+listed here by how much work each takes rather than by speed.
 The plain Python loop, timed in the Numba listings and in `demo.py`,
 is the baseline.
 NumPy alone runs the parts of a problem that reduce to whole-array arithmetic,
