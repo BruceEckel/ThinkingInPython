@@ -226,8 +226,8 @@ Any code that reads the annotation searches the scope containing the function,
 while the class lives in the function's own locals.
 A type checker reports an unresolved reference,
 and `inspect.get_annotations()` raises a `NameError`.
-The signature must specify something reachable,
-so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to specify in its place.
+The annotation must name a type that code outside the function can reach,
+so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to name in its place.
 
 Privacy in Python is advice, not enforcement.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
@@ -427,7 +427,8 @@ print(distinct_objects(settings))
 Apart from the line it prints,
 the listing is `singleton_cached_race.py` plus the priming call.
 The eight threads now get back one object.
-The priming call is safe for the same reason the module form is.
+The priming call runs in the module body,
+so the call is safe for the same reason the module form is.
 The import system runs a module body once,
 so the object exists before any thread can ask for it.
 The race needs laziness, and this listing gives it up on purpose.
@@ -613,7 +614,8 @@ class Singleton(Borg):
         self.val = arg
 ```
 
-`singleton_borg_demo.py` constructs three `Singleton` objects:
+Three `Singleton` objects, each built with its own argument,
+share one `__dict__`:
 
 ```python
 # singleton_borg_demo.py
@@ -685,7 +687,7 @@ and `test_fixture_clears_shared_state` confirms that the next test finds it gone
 ### Singleton by Class Decorator
 
 A [class decorator](14_Techniques--Decorators.md#decorating-classes)
-can wrap a class so that calling it returns a cached instance:
+can wrap a class so that every call to the class returns one cached instance:
 
 ```python
 # singleton_class.py
@@ -786,10 +788,11 @@ Under mypy, which ignores a class decorator's return type,
 `Registry` is still a class, so `Sub` passes.
 
 At runtime the `class` statement raises a `TypeError`.
-`singleton.__init__()` takes two positional arguments and receives four.
 A class statement hands the name, bases,
 and namespace to its [metaclass](17_Techniques--Metaprogramming.md#writing-a-metaclass),
 and Python takes that metaclass from the type of the base, which is `singleton`.
+Calling `singleton` with those three passes four positional arguments to `singleton.__init__()`,
+which takes two.
 Nothing in `class Sub(Registry)` mentions `singleton`,
 so the error names a class that does not appear in the failing line.
 The class decorator causes that confusion.
