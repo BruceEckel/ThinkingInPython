@@ -113,7 +113,7 @@ def function6():
 <details>
 <summary>Done when</summary>
 
-your script outside `a_package` prints `function6 calls function5 in module5 in a_package` after four loading messages, the same script runs again with the directory renamed to `bPackage` and the import updated, and you can cite the rule in File Names that the capital letter breaks.
+your script outside `a_package` prints `function6 calls function5 in module5 in a_package` after four loading messages, the same script runs again with the directory renamed to `bPackage` and the import updated, and you can cite the convention in File Names that the capital letter breaks.
 
 <details>
 <summary>Solution</summary>
@@ -149,10 +149,10 @@ print(function6())
 ```
 
 **Import from the parent package.** `module6` is in `b_package` and
-imports a module from `a_package`, its parent, so the absolute form is
-the right choice here. The relative equivalent,
-`from ..module5 import function5`, works too. Keep the relative form
-for siblings within one package.
+imports a module from `a_package`, its parent. The import crosses a
+package boundary, so the absolute form is the right choice here. The
+relative equivalent, `from ..module5 import function5`, works too.
+Keep the relative form for siblings within one package.
 
 If you write the import as `from module5 import function5`, dropping
 the `a_package.` prefix, both packages initialize and then
@@ -574,8 +574,8 @@ references the first list, which stays as it was.
 
 `exercise_7.py` is `from_snapshot.py` with a mutable value. The
 `from` import shares the module's object.
-After the module rebinds its own name, the script's name still
-references the original object. When a module may rebind a name to a new
+After `plugin_list.plugins = []` rebinds the module's name, the
+script's name still references the original object. When a module may rebind a name to a new
 list or dict, import the module and read the name through it each
 time, as in `plugin_list.plugins`.
 
