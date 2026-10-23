@@ -59,7 +59,7 @@ Python programmers traditionally name the reference `self`,
 but you can use any identifier (though anything else probably confuses people).
 To refer to the object's attributes or its other methods,
 you must go through `self`.
-`forgot_self.py` leaves the parameter out:
+Here `show()` leaves the parameter out:
 
 ```python
 # forgot_self.py
@@ -138,7 +138,7 @@ Then inherit by listing the base class in parentheses after the name of the inhe
 Python supports multiple inheritance, so you can list several classes.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#one-class-many-protocols)
 argues against multiple inheritance in favor of protocols.
-`simple_subclass.py` imports and subclasses `Simple` from the `simple_class` module.
+Here `Derived` subclasses `Simple`, imported from the `simple_class` module.
 Ignore the [`@override` decorator](#marking-overrides-with-override) for now.
 
 ```python
@@ -275,7 +275,7 @@ The base-class constructor runs because `Derived`'s constructor calls it.
 C++ and Java call the base-class constructor automatically,
 but when a Python class defines its own constructor,
 Python runs that constructor alone.
-`missing_super.py` leaves out the `super().__init__(text)` line,
+`Broken`'s constructor leaves out the `super().__init__(text)` line,
 so nothing creates `self.text`:
 
 ```python
@@ -530,7 +530,7 @@ so the method runs at the first read rather than when the constructor runs.
 `cached_property` stores the value in the instance's [`__dict__`](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup),
 the dictionary that holds the instance's attributes.
 A `@property` takes precedence over that dictionary for its name,
-but a `cached_property` does not.
+but the dictionary takes precedence over a `cached_property`.
 A later `n.total` checks the instance first and returns the stored value before the lookup reaches the method in the class.
 
 When a class and all its base classes declare `__slots__`,
@@ -661,8 +661,8 @@ Writing `return Temperature(...)` hard-codes the class.
 
 `is_freezing()` also works as a module-level function,
 and that is the usual choice.
-Its result depends on its `celsius` argument alone,
-so it reads nothing from the class or an instance.
+It reads nothing from the class or an instance,
+so its result depends on its `celsius` argument alone.
 Make it a `@staticmethod` when it belongs with the class's interface,
 where a reader looks for it,
 or when a subclass should be able to replace it like any other method.
