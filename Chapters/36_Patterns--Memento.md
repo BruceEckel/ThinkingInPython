@@ -112,8 +112,7 @@ class Sketch:
         return " ".join(self.strokes) or "(blank)"
 ```
 
-`sketch_demo.py` draws two strokes, saves, draws a third,
-and restores the checkpoint:
+A `Sketch` draws two strokes, saves, draws a third, and restores the checkpoint:
 
 ```python
 # sketch_demo.py
@@ -291,7 +290,7 @@ Its extra `title` field lets [a partial restore](#restoring-part-of-a-state)
 later in this chapter rewind one field and keep the other.
 `draw()` returns a new `Drawing`,
 using `dataclasses.replace()` to change one field and copy the rest.
-Since each call returns a `Drawing`, the calls chain, as in `frozen_demo.py`:
+Since each call returns a `Drawing`, the calls chain:
 
 ```python
 # frozen_demo.py
@@ -345,7 +344,8 @@ as the `History` class in `history.py` does.
 When a field grows by one element per edit, the way `strokes` does,
 the `n`-th edit builds a tuple of `n` pointers,
 so `k` edits held in the history cost `O(k^2)` pointers in total, not `O(k)`.
-`growth_cost.py` keeps every state in a list, as a `History` does:
+The next listing keeps every state in a list, as a `History` does,
+and counts the pointers:
 
 ```python
 # growth_cost.py
@@ -370,8 +370,9 @@ use a persistent structure that shares more than a flat tuple,
 or switch to *Command*-based undo, which stores an edit instead of a state.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
-argues that freezing removes what encapsulation protected.
-That section also explains why `strokes` is a tuple rather than a list.
+argues that encapsulation exists mainly because of mutation,
+so freezing removes most of the reason for it.
+That section's reasoning also makes `strokes` a tuple rather than a list.
 Freezing blocks assignment to the field,
 not changes to the object the field holds.
 A record holding a list therefore lets that list change,
