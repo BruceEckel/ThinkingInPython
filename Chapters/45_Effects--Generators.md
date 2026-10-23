@@ -226,7 +226,7 @@ That conversation makes an [Effect Management System](44_Effects--Effect_Managem
 A driver function runs the generator from start to finish.
 It starts the body with `next()`, sends each answer back with `send()`,
 and returns the generator's result when the body ends.
-`drive.py` defines `drive()` and a table of answers:
+`drive()` looks up each answer in a table:
 
 ```python
 # drive.py
