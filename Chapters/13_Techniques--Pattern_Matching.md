@@ -383,10 +383,10 @@ Python rejects it the same way,
 refusing to compile the `match` when another `case` follows:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
-Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
+Matching on `isinstance()` differs from the exact-type dispatch of a `dict` keyed on `type(value)`,
+where a subclass finds no entry.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
-relies on that dispatch.
-There, a subclass finds no entry.
+relies on that exact-type dispatch.
 
 ## Guards
 
@@ -468,7 +468,7 @@ Test for an empty dictionary with a guard, `case {} if not event:`.
 
 A `**rest` at the end binds the remaining key-value pairs as a `dict`,
 the mapping counterpart of a starred name in a sequence pattern.
-The `{"type": kind, **rest}` case in `handle()` prints those leftover pairs:
+The `{"type": kind, **rest}` case in `handle()` reports those leftover pairs:
 
 ```python
 # mapping_patterns.py
@@ -616,7 +616,7 @@ If one `Signal` member lacked a `case`,
 which breaks its `-> str` annotation.
 In a function that returns `None`, reaching the end matches the declared type,
 so the type checker accepts a missing `case` there.
-`assert_never()` covers both kinds of `match`.
+`assert_never()` catches a missing `case` whatever the function returns.
 It also reports the error inside the `match`, at the `assert_never()` call,
 instead of at the function's return type.
 
@@ -635,8 +635,9 @@ so a `match` that must produce a value goes inside a function that returns from 
 
 Python has no `sealed` keyword.
 `assert_never()` plus a type checker fills that role.
-An `if`/`isinstance()` chain that ends with `assert_never()` gives the same exhaustiveness check.
-A `match` names the subject once and binds fields as it tests the type.
+
+An `if`/`isinstance()` chain that ends with `assert_never()` gives the same exhaustiveness check,
+but a `match` names the subject once and binds fields as it tests the type.
 `case Circle(radius)` in `area()` tests the type and binds `radius` in one pattern,
 where the chain tests `isinstance(shape, Circle)` and then reads `shape.radius`.
 
@@ -882,7 +883,8 @@ The existing classes and functions stay untouched.
 
 Inheritance confines a new type to one new subclass.
 Pattern matching confines a new operation to one new function.
-The other kind of change touches every existing subclass or every existing `match`.
+A new operation touches every existing subclass,
+and a new type touches every existing `match`.
 [When Not to Match](#when-not-to-match)
 weighs an open set of types against a closed one,
 and the two notification versions show that tradeoff in code.
