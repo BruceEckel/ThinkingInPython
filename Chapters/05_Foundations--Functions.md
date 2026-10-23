@@ -73,9 +73,8 @@ expect(TypeError, add, 42, "spam")
 ```
 
 A call succeeds as long as each operation in the function body accepts the arguments it receives.
-The failure comes from `+` inside the function body,
-not from the call that passed the arguments.
-The call binds each argument to its parameter and accepts any type.
+The call binds each argument to its parameter and accepts any type,
+so the failure comes from `+` inside the function body.
 
 [`expect()`](15_Techniques--Context_Managers.md#the-expect-function)
 is a helper that many of this book's listings import.
@@ -194,7 +193,7 @@ print(good_append(2))
 ```
 
 The function object keeps its default values in the tuple `__defaults__`.
-Both calls append to the same list inside that tuple.
+Both `bad_append()` calls append to the same list inside that tuple.
 The default looks like an expression each call evaluates,
 but Python evaluates it once, at the `def`.
 
@@ -202,8 +201,8 @@ The trap follows from how Python passes arguments.
 A parameter is another name bound to the caller's object,
 the binding that [Variables and References](02_Foundations--Tour.md#variables-and-references)
 describes.
-Because `bad_append()` combines that binding with a default Python builds once,
-each call mutates the object the next call uses.
+Every `bad_append()` call that uses the default binds `target` to the one list Python builds at the `def`,
+so each call mutates the list the next call uses.
 A caller that passes a mutable object sees the changes the function makes:
 
 ```python
