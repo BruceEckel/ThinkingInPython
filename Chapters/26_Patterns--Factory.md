@@ -158,7 +158,8 @@ Apart from the new subclass,
 
 `factory()` names `_Circle` and `_Square` above the point where the file defines either class.
 Python looks up a name in a function body when the function runs.
-Both classes exist before anything calls `factory()`.
+Both classes exist before anything calls `factory()`,
+so each lookup finds its class.
 
 *GoF Design Patterns* defines *Factory Method* as a creation method that [subclasses override](#subclasses-choose-the-type)
 to choose the concrete type.
@@ -637,7 +638,7 @@ The pattern remains, but no longer needs a class hierarchy to express it.
 ## Factory Objects
 
 Because the static `factory()` method in `shape_factory_method.py` collects all the creation operations in one place,
-that method is the only code you change.
+that method is the only existing code you change when you add a shape.
 A *factory object* defines a single `create()` method,
 so choosing what to build becomes choosing which factory object to call,
 rather than passing a string to a `match` statement.
@@ -1086,7 +1087,7 @@ def spawn(kind: Kind) -> Monster:
     return copy.deepcopy(PROTOTYPES[kind])
 ```
 
-`spawn_demo.py` spawns two goblins and appends a power to one of them:
+Spawning two goblins and appending a power to one of them shows whether the copies share a list:
 
 ```python
 # spawn_demo.py
@@ -1224,7 +1225,8 @@ class Pizza:
     toppings: tuple[str, ...] = ()
 ```
 
-`pizza_order.py` orders a pizza in one call and varies it with `replace()`:
+One constructor call orders a pizza,
+and `replace()` builds a larger variant from it:
 
 ```python
 # pizza_order.py
