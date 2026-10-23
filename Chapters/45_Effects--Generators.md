@@ -304,11 +304,36 @@ print(inspect.getgeneratorstate(conversation))
 `drive()` then runs the body through all three questions.
 Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
 because whenever `drive()`'s code runs, the generator waits at a `yield`.
+After the `return`, the generator is `GEN_CLOSED`,
+so a further `send()` raises `StopIteration` at once.
+
 The generator and `drive()` take turns.
 While the body runs, `drive()` waits inside `send()`,
 so only code inside the body can see `GEN_RUNNING`.
-After the `return`, the generator is `GEN_CLOSED`,
-so a further `send()` raises `StopIteration` at once.
+That code needs a reference to its own generator,
+which a module-level name supplies:
+
+```python
+# running_state.py
+import inspect
+from collections.abc import Generator
+
+def watch() -> Generator[str]:
+    yield inspect.getgeneratorstate(watched)
+
+watched = watch()
+print(inspect.getgeneratorstate(watched))
+#: GEN_CREATED
+print(next(watched))
+#: GEN_RUNNING
+print(inspect.getgeneratorstate(watched))
+#: GEN_SUSPENDED
+```
+
+The body looks up `watched` when `next()` runs it,
+after the assignment has bound the name.
+The body reads `GEN_RUNNING` and yields it.
+After the `yield`, the caller reads `GEN_SUSPENDED`.
 
 `interview()` accepts its answers from any driver that calls `send()`.
 Its body holds three questions and a `return`,
