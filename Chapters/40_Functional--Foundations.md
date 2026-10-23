@@ -235,8 +235,8 @@ so the value can be a dictionary key or a set member.
 The second is sharing without a defensive copy.
 You can hand the value to any code.
 It stays as you built it.
-`hashable.py` sets a frozen `Point` beside `MutablePoint`,
-its unfrozen `@dataclass` twin:
+A frozen `Point` and `MutablePoint`, its unfrozen `@dataclass` twin,
+show the difference a stable hash makes:
 
 ```python
 # hashable.py
@@ -268,7 +268,7 @@ Contents-based equality, not mutability alone, makes a type unhashable.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 `MutablePoint` and a `list` both compare by contents,
-so a dictionary that stores one as a key loses the entry if the key's contents change.
+so a dictionary that stored one as a key would lose the entry if the key's contents changed.
 Python therefore sets their `__hash__` to `None`.
 `hash([3, 4])` raises the same `TypeError` as `hash(MutablePoint(3, 4))`.
 
@@ -687,7 +687,7 @@ of these small, composable pieces.
 
 ## Putting the Pieces Together
 
-`pipeline.py` combines several of the chapter's constructs in one program:
+A report on temperature readings combines several of the chapter's constructs in one program:
 
 ```python
 # pipeline.py
@@ -731,8 +731,8 @@ Because the input list stays as built, you can recompute the whole report,
 cache it, or run it on another core with no coordination.
 
 `to_fahrenheit()` returns a `Reading` whose `celsius` field holds a Fahrenheit number.
-Up to that stage the `celsius` field holds Celsius, so `report()` converts last,
-after `warmer_than()` reads the field as Celsius.
+`warmer_than()` reads the field as Celsius, so `report()` converts last,
+after the filter.
 
 `pipeline.py` is ordinary Python,
 written so that each piece depends on its arguments alone.
