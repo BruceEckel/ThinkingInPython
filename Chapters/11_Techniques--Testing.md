@@ -243,6 +243,7 @@ The test passes only if the block raises the expected exception.
 Keep the `with` block down to the single call that should fail.
 Any statement inside it that raises the expected type passes the test,
 including one that fails for an unrelated reason.
+
 `match=` takes a regular expression that `pytest` checks against the exception's message,
 so the test can confirm which failure occurred as well as its type:
 
@@ -279,11 +280,11 @@ A reworded message breaks the `match=` pattern when the test runs,
 while the type checker reports a renamed attribute before the run.
 
 Both assertions belong after the block, not inside it.
-A failed withdrawal must leave the balance alone.
-That check is separate from the exception.
-Inside the block neither assertion runs.
 The exception from `withdraw()` skips the rest of the block,
-and `pytest.raises()` then catches and suppresses it.
+and `pytest.raises()` then catches and suppresses it,
+so neither assertion would run inside the block.
+The balance assertion checks a separate claim:
+a failed withdrawal must leave the balance alone.
 
 ## Comparing Floating-Point Values
 
@@ -403,7 +404,8 @@ Everything before the `yield` is setup.
 Everything after it runs once the test finishes,
 whether the test passes or fails.
 Close files, release locks, or check a final invariant after the `yield`.
-Do the cleanup first, so it has run by the time a check fails.
+Do the cleanup first,
+because a failing check raises an `AssertionError` that skips the rest of the teardown.
 The listing withdraws the balance before it asserts.
 
 `pytest` reports a failing check after the `yield` as an error,
@@ -435,7 +437,7 @@ can use a fixture defined there, with no import.
 
 A directory has at most one `conftest.py`,
 so all of that directory's shared fixtures go in the one file.
-Here, `conftest.py` holds a session-scoped fixture and a parametrized one:
+Here that file holds a session-scoped fixture and a parametrized one:
 
 ```python
 # conftest.py
@@ -609,7 +611,7 @@ and it works outside `pytest` as well.
 
 ### Filesystem and Environment
 
-`storage.py` saves and loads files in the directory that the `APP_DATA` environment variable names:
+`save()` and `load()` write and read files in the directory that the `APP_DATA` environment variable names:
 
 ```python
 # storage.py
@@ -808,8 +810,8 @@ def test_elapsed() -> None:
 ```
 
 Both tests check the same arithmetic.
-`test_stopwatch_clock.py` runs with no `monkeypatch`.
-The `elapsed()` it tests names the source of the time in its signature.
+`test_stopwatch_clock.py` needs no `monkeypatch`,
+because the `elapsed()` it tests takes its source of time as a parameter.
 
 The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
 When that code sits several calls deep in a real codebase,
@@ -903,7 +905,7 @@ def test_current_temp(
 `weather` imports the function with `from urllib.request import urlopen`.
 That statement binds `urlopen` in `weather`'s own namespace,
 so `weather.urlopen` is the name the call site reads and the name to patch.
-Patching `urllib.request.urlopen` leaves `weather`'s copy pointing at the real function.
+Patching `urllib.request.urlopen` leaves `weather.urlopen` bound to the real function.
 One rule covers both `import module` and `from module import name`:
 patch the name the calling code looks up.
 
