@@ -90,7 +90,7 @@ so CPython frees that list at once.
 Freeing the list drops its reference to the one remaining `Counter`.
 Both forms reach `live_count() == 0`.
 
-The two forms give different results once a second name refers to the list:
+The two forms give different results when a second name refers to the list:
 
 ```python
 # exercise_1_alias.py
