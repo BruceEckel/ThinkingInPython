@@ -1803,6 +1803,32 @@ notifies the responders" stayed inline.
 
 **Home.** this file; the deep-review skill (structural).
 
+### R46. "raises `X`", not "raises the `X`"
+
+**Test.** A form of "raise" or "re-raise" followed by "the" and an
+exception class in a code span ("Python raises the `StopIteration`").
+Drop the "the": "Python raises `StopIteration`".
+
+**Keep when.** "the" belongs to a different noun: a generic noun ("re-raises
+the exception with a bare `raise`") or a possessive ("the `Enum`'s
+`ValueError`", which the sweep rewrote as "makes `Month()` raise
+`ValueError`"). "raises a `TypeError`" (R1's form) is untouched; the ruling
+is about "the".
+
+**Sightings.** Bruce's ruling 2026-10-23, on
+`45_Effects--Generators` ("don't say 'the' when you're talking about
+raising an exception. just say 'raises StopIteration'"):
+- "Python raises the `StopIteration` on the generator's behalf." ->
+  "Python raises `StopIteration` on the generator's behalf."
+- The sweep that followed fixed 23 sites in chapters 05, 12, 30, 32, 47
+  and Solutions 05, 09, 12, 19, 26, 32, 33, 34, 38, 41, 43, e.g. `30`
+  "`announce()` raises the `ValueError` from `gather()`" -> "raises
+  `ValueError` from `gather()`"; Solutions `33` "raises the
+  `AttributeError` above" -> "raises `AttributeError`, as the `#:` line
+  shows"
+
+**Home.** CLAUDE.md watch list (global, the "Raise" bullet), beside R1.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -2403,6 +2429,71 @@ loss is the whole point and nothing persists.
   bookkeeping, but the type checker can no longer verify it."
 
 **Home.** this file.
+
+---
+
+### C45. A suspended generator or coroutine has no "frame"; say what it preserves
+
+**Test.** "Frame" (or "frames") stands for the saved state of a
+suspended generator, coroutine, or task, or counts the generators in a
+`yield from` chain. Readers take "frame" as a stack frame, which pops
+when its function returns, and a suspended generator's state lives on
+the generator object, off the call stack. Write what persists, "its
+position in the body and its local variables", or name the generator
+("the generator to which `both()` delegates", "every generator in the
+chain", "three generators rather than two").
+
+**Keep when.** "Frame" means a call's stack frame (a traceback, a
+recursion depth, an `except` clause reading its own frame's locals), the
+frame object an API returns (`f_locals`, `sys._getframe()`), or a panel
+of a figure. This rule is a keep-when for C27: CPython's attribute is
+`gi_frame`, and the API's word misleads here.
+
+**Sightings.** 1, Bruce's ruling 2026-10-23 ("we need to consider a
+different word than 'frame' because that suggests stack frame"), applied
+in `ce27e8ec` and `4cd0d107` to sixteen sites in chapters 19, 44, 45 and
+Solutions 45:
+- `45_Effects--Generators`: "A suspended generator holds its frame: the
+  position in the body and every local variable. ... The frame holds
+  them, and the frame is the generator's state." -> "A suspended
+  generator preserves two things: its position in the body and every
+  local variable. The generator object stores both, so they outlive each
+  `next()` or `send()` call that resumes the generator. ... The position
+  and the locals together are the generator's state."
+- `45_Effects--Generators`: "`drive()` receives a request that `ask()`
+  yielded two frames down" -> "that `ask()` yielded inside
+  `interview()`"; "`close()` unwinds every frame in the chain." ->
+  "`close()` ends every generator in the chain."
+- `44_Effects--Effect_Management`: "nothing can copy a generator's paused
+  frame" -> "nothing can copy a paused generator's position and local
+  variables"
+- `19_Techniques--Concurrency`: "A suspended task is a paused frame that
+  runs no bytecode" -> "A suspended task runs no bytecode" (the sentence
+  before already says the task saves its position)
+
+**Home.** this file only; the term is specific to generators and
+coroutines.
+
+---
+
+### C46. State that survives a suspension or a call boundary is "preserved", not "held"
+
+**Test.** "holds" (or "keeps") has state as its object, and the
+sentence's point is that the state lasts across a gap: a suspension, a
+return, a later call ("A suspended generator holds its frame"). Write
+"preserves". "Holds" reads as containment at one moment and leaves the
+lasting to inference.
+
+**Keep when.** The sentence is about containment, not duration ("the
+table holds classes", "a record holds its fields").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-10-23 (`ce27e8ec`),
+Bruce chose the word ("or 'preserves'", over "retains") and confirmed it
+("preserves says it better"):
+- "A suspended generator holds its frame:" -> "A suspended generator
+  preserves its frame:" (later "preserves two things:", see C45)
+
+**Home.** this file only.
 
 ## Retired
 
