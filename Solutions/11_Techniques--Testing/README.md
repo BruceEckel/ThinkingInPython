@@ -89,7 +89,8 @@ touching `self.balance`, so an overdrafting transfer stops before the
 
 **Pin the order with a test.**
 Writing the overdraft test first makes this ordering a
-deliberate decision rather than an accident.
+deliberate decision rather than an accident. A later edit that
+swaps the two calls fails the same test.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -334,7 +335,7 @@ def test_settings_path_in_takes_the_directory(
 The first test depends on two facts about the implementation: that the
 function reads an environment variable, and that the variable's name is
 `APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
-test while the function behaves as before.
+test although the function still works.
 The failure is a `KeyError: 'APP_SETTINGS_DIR'` raised inside the function.
 Its message names the variable the function now reads, not the `APP_CONFIG` the test set.
 
