@@ -513,12 +513,12 @@ The same file runs, and the interpreter runs its busiest paths as machine code.
 
 Your program runs that machine code only when three conditions hold:
 
-1. The interpreter must *include* the JIT,
+1. The interpreter must include the JIT,
    compiled in through the `--enable-experimental-jit` configuration option.
    Building it needs LLVM.
    Running the result does not.
-2. The process must *enable* it, through the `PYTHON_JIT` environment variable.
-3. The code must get *hot*.
+2. The process must enable it, through the `PYTHON_JIT` environment variable.
+3. The code must get hot.
    A script that runs briefly exits before it reaches the threshold,
    so the JIT compiles none of its code.
 

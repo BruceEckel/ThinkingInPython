@@ -2287,7 +2287,7 @@ Try each exercise before opening its [solution](../Solutions/17_Techniques--Meta
     The payload's last line must close or swallow that second splice.
     Restore the check.
 10. Change `prepare_namespace.py`'s `NoDuplicates` so that instead of raising an exception,
-    it keeps the *first* definition of a duplicated name and discards the later one.
+    it keeps the first definition of a duplicated name and discards the later one.
     Give the two `on_open` bodies different `print()` calls so you can tell them apart,
     then confirm that `Handlers().on_open()` runs the first one.
     Explain why no class decorator could achieve the same thing.

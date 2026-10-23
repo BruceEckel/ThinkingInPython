@@ -515,7 +515,7 @@ It forwards to a weakly referenced object and raises `ReferenceError` on any use
 
 ### Virtual Proxy
 
-A *virtual proxy* delays building a slow-to-build object until the first attribute access on the proxy:
+A virtual proxy delays building a slow-to-build object until the first attribute access on the proxy:
 
 ```python
 # virtual_proxy.py
@@ -552,7 +552,7 @@ so the `query()` at `[1]` prints `result` alone.
 
 ### Protection Proxy
 
-A *protection proxy* decides whether a call reaches the implementation.
+A protection proxy decides whether a call reaches the implementation.
 Because `__getattr__()` receives the requested name, the check is one condition:
 
 ```python
@@ -603,7 +603,7 @@ A surrogate fails `isinstance()` for a [different reason](#a-surrogate-is-not-it
 
 ### Smart Reference
 
-A *smart reference* proxy adds behavior around each access.
+A smart reference proxy adds behavior around each access.
 `__getattr__()` can wrap every method call, for example to count the calls:
 
 ```python
@@ -670,8 +670,8 @@ even when the implementation defines a `calls` of its own.
 Python calls `__getattr__()` for a name the proxy and its class lack,
 and finds the proxy's own attributes, such as `calls`, by normal lookup.
 The proxy therefore keeps state of its own and forwards the methods the implementation has.
-The same few lines serve lazy initialization (a *virtual proxy*), access checks
-(a *protection proxy*), or call tracking (a *smart reference*), over any object.
+The same few lines serve lazy initialization (a virtual proxy), access checks
+(a protection proxy), or call tracking (a smart reference), over any object.
 
 The tests confirm that a call reaches the implementation and returns its result,
 and that the proxy counts calls and leaves attribute reads out of the tally:

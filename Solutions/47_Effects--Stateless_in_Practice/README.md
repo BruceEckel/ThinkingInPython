@@ -1718,7 +1718,7 @@ a different design, a detail, or an equivalent alternative.
 > once with a handler that calls `random.randint()`,
 > and once with a handler that walks a scripted sequence.
 > Then delete the `low: int` annotation from the accessor's parameter and say what changes,
-> and delete the annotation on the *handler's* parameter and say what changes.
+> and delete the annotation on the handler's parameter and say what changes.
 
 <details>
 <summary>Where to look</summary>

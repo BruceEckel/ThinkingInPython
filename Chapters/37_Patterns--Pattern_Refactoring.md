@@ -278,7 +278,7 @@ Each one you miss silently leaves the new material out of every bin.
 
 Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 may expect `assert_never()` to make the type checker report the missed case.
-Exhaustiveness checking needs a *closed* union against which to compare the cases,
+Exhaustiveness checking needs a closed union against which to compare the cases,
 but `Trash` is deliberately open.
 The registry exists to accept new subclasses.
 If you add `case _: assert_never(piece)`,
@@ -388,7 +388,7 @@ The loop has no list of materials to maintain and no case to forget.
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).
 That dispatch first appears in an [event bus keyed by type](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
 
-The key is the *exact* class.
+The key is the exact class.
 If you derive `CrushedAluminum` from `Aluminum`,
 a `CrushedAluminum` sorts into its own bin rather than its parent's bin.
 A bin per exact class is usually what a sorter needs,
@@ -446,8 +446,8 @@ The registry, `create()`, and the sorting line all predate plastic.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-So far adding a new *type* means writing one class definition and editing nothing else.
-The other vector of change is adding new *operations*.
+So far adding a new type means writing one class definition and editing nothing else.
+The other vector of change is adding new operations.
 In a design where adding a type means writing one new class,
 adding an operation ordinarily means editing every class.
 That asymmetry is the [expression problem](13_Techniques--Pattern_Matching.md#the-expression-problem).
@@ -656,7 +656,7 @@ Design patterns separate the things that change from the things that stay the sa
 Overriding a method in each subclass is one way to do that.
 This chapter uses two others:
 a dictionary keyed by type and a `singledispatch` function.
-The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#the-vector-of-change)
+The deeper skill is spotting the [vector of change](21_Patterns--Design_Patterns.md#the-vector-of-change)
 and choosing the lightest construct that isolates it.
 
 This chapter meets two vectors, each through a concrete requirement:

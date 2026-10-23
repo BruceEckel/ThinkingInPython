@@ -306,7 +306,7 @@ The return value of `__exit__()` determines whether that exception propagates.
 A falsy value lets it propagate.
 Falsy includes the implicit `None` of a method with no `return`,
 so the exception propagates by default.
-A truthy value *suppresses* it.
+A truthy value suppresses it.
 The `with` statement swallows the exception,
 and execution continues after the block.
 

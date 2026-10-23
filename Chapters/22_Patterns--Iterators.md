@@ -207,7 +207,7 @@ A [generator expression](16_Techniques--Comprehensions.md#generator-expressions)
 such as `(i * i for i in range(n))` is the one-line form of a generator,
 and it is lazy in the same way.
 
-A generator can be *infinite*.
+A generator can be infinite.
 A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
 You take as many as you need with [`itertools.islice()`](#reusable-algorithms),

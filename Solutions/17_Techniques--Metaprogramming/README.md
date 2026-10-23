@@ -915,7 +915,7 @@ a different design, a detail, or an equivalent alternative.
 ## 10. Keeping the first definition instead of raising an exception
 
 > Change `prepare_namespace.py`'s `NoDuplicates` so that instead of raising an exception,
-> it keeps the *first* definition of a duplicated name and discards the later one.
+> it keeps the first definition of a duplicated name and discards the later one.
 > Give the two `on_open` bodies different `print()` calls so you can tell them apart,
 > then confirm that `Handlers().on_open()` runs the first one.
 > Explain why no class decorator could achieve the same thing.

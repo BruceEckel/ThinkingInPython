@@ -150,7 +150,7 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
             assert_never(entry)
 ```
 
-`Node` is a *recursive* union.
+`Node` is a recursive union.
 `Directory` holds a `tuple[Node, ...]`,
 so the alias names itself through one of its own members.
 That self-reference lets a `Directory` hold other directories to any depth.

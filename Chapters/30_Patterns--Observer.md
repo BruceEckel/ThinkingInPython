@@ -27,7 +27,7 @@ or the nearly equivalent *Document-View* architecture,
 which combines the controller with the view.
 In both, *Observer* connects the state change to its views.
 One subject keeps a list of views and accepts any view that has the update method it calls.
-This way, a *document* can have more than one way to view it,
+This way, a document can have more than one way to view it,
 such as a plot and a table.
 With *Observer*, a change in the subject's data notifies each interested view,
 so that every view refreshes.
@@ -36,8 +36,8 @@ so that every view refreshes.
 
 The classic design comes from *GoF Design Patterns*:
 
-- The object that changes is the *subject*.
-- Each *observer* implements an interface with one method.
+- The object that changes is the subject.
+- Each observer implements an interface with one method.
 
 The GoF design has three parts:
 an `Observer` interface every observer implements,
@@ -1280,7 +1280,7 @@ so a single broken responder cancels the others mid-notification.
 ## A Visual Example
 
 This example separates the model from the view.
-The *model*, `grid_observer.py`,
+The model, `grid_observer.py`,
 is a grid of colored boxes and the rule that decides what changes for a selection event.
 The model manipulates `Grid` values.
 `grid_view.py` displays them separately,

@@ -311,9 +311,9 @@ so setting one diagonal element sets it in every row.
 
 `1 if col == row else 0` is a conditional expression, not a filter.
 It sits in the output position, before the `for`,
-and decides what each element *is*.
+and decides what each element is.
 Every `col` still produces one.
-An `if` after the `for` decides *whether* the comprehension produces an element,
+An `if` after the `for` decides whether the comprehension produces an element,
 as in `[e ** 2 for e in a_list if isinstance(e, int)]`.
 Each position accepts one of the two forms,
 so `[x for x in xs if a else b]` is a `SyntaxError`.

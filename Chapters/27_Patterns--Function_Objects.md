@@ -14,11 +14,11 @@ states that principle as "design the communication, not the parts."
 
 Each pattern defers something:
 
-- *Command* defers *what* to do, so you can store the action and run it later.
-- *Strategy* defers *how*.
+- *Command* defers what to do, so you can store the action and run it later.
+- *Strategy* defers how to do the job.
   The job stays the same.
   The caller picks the algorithm that performs it.
-- *Chain of Responsibility* defers *which* handler takes the job,
+- *Chain of Responsibility* defers which handler takes the job,
   trying candidates until one accepts.
 
 In Python a function is an object.

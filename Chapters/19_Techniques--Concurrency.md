@@ -151,7 +151,7 @@ which picks the next task that is ready to run.
    a description of pending work.
 2. `await` starts that work and pauses the awaiting coroutine until the result is ready.
    While that coroutine waits,
-   the *event loop* finds other coroutines ready to run.
+   the event loop finds other coroutines ready to run.
 3. `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
    and shuts the loop down.
@@ -212,7 +212,7 @@ which returns control to the event loop.
 
 Each task runs until it reaches its own `await`,
 so the started lines print as a, b, c.
-At the `await` each task *suspends*.
+At the `await` each task suspends.
 It stops executing, saves its position in the function,
 and hands control back to the event loop.
 
@@ -1177,7 +1177,7 @@ Before 3.14 you wrote `token = var.set(x)` and a matching `var.reset(token)` in 
 The context manager now makes that same pair of calls for you.
 
 The `offloaded` line shows why the modern answer is `ContextVar` rather than `threading.local`.
-`threading.local` gives each *thread* its own value,
+`threading.local` gives each thread its own value,
 and a thread is the wrong unit twice over.
 Thousands of tasks share one event-loop thread,
 so `threading.local` gives them all one value.
@@ -1240,7 +1240,7 @@ and all three appear in `parallel_cpu.py`:
 
 1. The `if __name__ == "__main__"` guard keeps each worker from building a pool of its own.
    To create a worker, the operating system starts a fresh Python interpreter,
-   and that interpreter *imports* this module, the program's main module,
+   and that interpreter imports this module, the program's main module,
    before it runs any work.
    During the import the module's name is not `"__main__"`,
    so the worker skips the guarded block.
@@ -2116,7 +2116,7 @@ but only in the way a crash is better than corruption.
 the way `task.exception()` does in `task_group.py`,
 so `outcome()` counts the failed workers and sums the lists the others returned.
 
-`threading.synchronized_iterator()` takes the generator *function*,
+`threading.synchronized_iterator()` takes the generator function,
 not a generator, and returns a function that serializes every generator it creates.
 `synchronized_iterator()` also works as a decorator on the `def`,
 the right form when the serializing belongs to the function rather than to each caller.

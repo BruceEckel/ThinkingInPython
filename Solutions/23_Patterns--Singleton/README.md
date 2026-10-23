@@ -413,7 +413,7 @@ a different design, a detail, or an equivalent alternative.
 
 ## 5. A lock in the wrong place
 
-> Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
+> Add a `threading.Lock` inside `settings()` in `singleton_cached_race.py`,
 > wrapping only the body of the constructor function, and run it.
 > Explain why the object count does not drop to one,
 > then fix it without a lock.

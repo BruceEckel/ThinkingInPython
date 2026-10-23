@@ -578,7 +578,7 @@ When `__new__()` returns an instance of the class under construction,
 Python runs `__init__()` on it.
 A `__new__()` that returns some other object skips `__init__()` and fails `isinstance()` as well.
 A singleton `__new__()` returns an instance of the class on every construction,
-so Python runs `__init__()` on the shared instance after *every* construction
+so Python runs `__init__()` on the shared instance after every construction
 (see exercise 7).
 `SingletonClassVar` defines no `__init__()`,
 so `__new__()` both creates the shared list and appends each argument.
@@ -722,7 +722,7 @@ not to the class.
 
 Why does `__call__()` intercept the constructor for a `Registry`?
 To evaluate `obj(...)`,
-Python [looks up `__call__()` on the *type* of `obj`](25_Patterns--Surrogate.md#special-methods-bypass-getattr).
+Python [looks up `__call__()` on the type of `obj`](25_Patterns--Surrogate.md#special-methods-bypass-getattr).
 For an ordinary class `C`, `type(C)` is `type`,
 so the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
@@ -865,7 +865,7 @@ Try each exercise before opening its [solution](../Solutions/23_Patterns--Single
     `settings = {"theme": "dark"}`.
     Predict both printed values before running it,
     and explain the difference using the [mutate-versus-rebind distinction](#a-module-is-already-a-singleton).
-5.  Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
+5.  Add a `threading.Lock` inside `settings()` in `singleton_cached_race.py`,
     wrapping only the body of the constructor function, and run it.
     Explain why the object count does not drop to one,
     then fix it without a lock.

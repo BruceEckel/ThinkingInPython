@@ -822,7 +822,7 @@ An abstract base class is *nominal* (named),
 so a type joins by inheriting from it.
 The subclass's own source declares membership.
 The base can carry shared implementation for its children.
-A protocol is *structural*, so it works with any type that has matching members,
+A protocol is structural, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.

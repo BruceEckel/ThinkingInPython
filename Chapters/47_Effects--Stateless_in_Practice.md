@@ -2483,7 +2483,7 @@ Try each exercise before opening its [solution](../Solutions/47_Effects--Statele
     once with a handler that calls `random.randint()`,
     and once with a handler that walks a scripted sequence.
     Then delete the `low: int` annotation from the accessor's parameter and say what changes,
-    and delete the annotation on the *handler's* parameter and say what changes.
+    and delete the annotation on the handler's parameter and say what changes.
 13. Add a `Butter` leaf to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
     Write `buttered()`'s signature with `Need[Butter]` alone first, run `ty`,
     and read the diagnostic before fixing it.

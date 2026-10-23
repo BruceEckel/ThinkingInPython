@@ -211,7 +211,7 @@ each named for what its patterns do:
     When you isolate the details of object creation,
     your code stops depending on which object types exist.
     Adding a type then leaves that code unchanged.
-    [*Singleton*](23_Patterns--Singleton.md) counts as a *Creational* pattern.
+    [*Singleton*](23_Patterns--Singleton.md) counts as a Creational pattern.
     [Factory](26_Patterns--Factory.md) covers the other four: *Factory Method*,
     *Abstract Factory*, *Prototype*, and *Builder*.
 2.  **Structural**: how objects connect to other objects,
@@ -251,7 +251,7 @@ Certainly, the *Creational* patterns are straightforward.
 How will you create objects?
 This is a normal question,
 and the name tells you which group of patterns answers it.
-But I find *Structural* and *Behavioral* far less useful distinctions.
+But I find Structural and Behavioral far less useful distinctions.
 I have not been able to look at a problem and say "clearly,
 you need a structural pattern here,"
 so that classification doesn't lead me to a solution
