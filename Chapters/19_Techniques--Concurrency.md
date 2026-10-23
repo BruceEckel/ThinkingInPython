@@ -205,8 +205,8 @@ and Python emits a `RuntimeWarning: coroutine 'fetch' was never awaited` when th
 
 `gather()` wraps each coroutine in a *task*,
 the event loop's unit of scheduling, and schedules the tasks in the order given.
-Scheduling and running are separate steps.
 `gather()` returns an *awaitable*, an object that `await` accepts.
+Scheduling and running are separate steps.
 The task bodies execute later, after `main()` suspends at its `await`,
 which returns control to the event loop.
 
@@ -275,7 +275,7 @@ class Meter:
         self.active -= 1
 ```
 
-`peak_concurrency.py` gives each run of a price function its own `Meter`:
+Each price function runs on the same five orders, with a `Meter` of its own:
 
 ```python
 # peak_concurrency.py
@@ -605,12 +605,12 @@ The shared deadline puts both failures in one *exception group*,
 a container for simultaneous failures.
 The loop runs every timer due at one instant in the same turn,
 so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
-If each calls `asyncio.sleep(0.03)`,
-the two calls set their timers a few microseconds apart,
+If `fetch()` called `asyncio.sleep(0.03)` instead of `sleep_until()`,
+the two calls would set their timers a few microseconds apart,
 since each call reads the clock when it runs.
-A loop that wakes between the two timers runs `c`'s failure,
-cancels `d` while `d`'s timer is still pending,
-and delivers an exception group holding one exception.
+A loop that woke between the two timers would run `c`'s failure,
+cancel `d` while `d`'s timer was still pending,
+and deliver an exception group holding one exception.
 
 The block exits once every task has either finished or ended in cancellation.
 As it exits, it re-raises both failures wrapped in an exception group,
@@ -631,8 +631,7 @@ so `task.cancelled()` is `True` for both.
 
 Cancelling a task raises `asyncio.CancelledError` inside it,
 at whichever `await` currently suspends it.
-That exception derives from `BaseException` rather than `Exception`,
-and the choice is deliberate.
+That exception derives from `BaseException` rather than `Exception` so that a handler for ordinary errors lets it pass.
 Inside a task, a `try`/`except Exception` that logs and continues lets cancellation propagate,
 so the task still stops the way the group intended.
 The real mistake is catching too much.
@@ -1132,7 +1131,8 @@ The last line shows what `main()` reads after its tasks finish.
 Because `main()` creates the tasks,
 their contexts are copies of `main()`'s context,
 so the value a task sets stays in its own copy.
-`request_id` returns to its default while the global stays clobbered.
+`main()` still reads the default for `request_id`,
+while the global stays clobbered.
 
 A parameter also works here, with no global and no `ContextVar`,
 until a logging helper four calls down needs the value.
@@ -1213,7 +1213,7 @@ def cpu_price(order: int) -> int:
     return order * 10
 ```
 
-`parallel_cpu.py` hands `cpu_price()` to a pool of worker processes:
+A `ProcessPoolExecutor` runs `cpu_price()` in a pool of worker processes:
 
 ```python
 # parallel_cpu.py
@@ -1303,7 +1303,7 @@ if __name__ == "__main__":
     print([price for _, price in pairs])
 ```
 
-`worker()` adapts `cpu_price()` from `utils/pricing.py` to that shape.
+`worker()` adapts `cpu_price()` from `utils/pricing.py` to run in a process.
 It puts the order and its price on the queue instead of returning the price.
 Everything `pool.map()` does is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
@@ -1393,8 +1393,7 @@ so no timed result includes process startup.
 Each later call reuses that same pool.
 
 By default, a `ProcessPoolExecutor` starts a new worker when a task arrives and every running worker is busy.
-A warm-up of one quick task starts one worker,
-and the timed runs include the startup of the rest.
+A warm-up of one quick task would start one worker and leave the startup of the rest inside the timed runs.
 Each warm-up task sleeps for a second,
 so every worker is still busy when the next task arrives,
 and the pool starts a worker for each of the `cores` tasks.
@@ -2360,7 +2359,7 @@ Race conditions become easier to hit.
 
 `asyncio` switches only at an `await`,
 and that makes it easier to [reason about interleaving](#a-single-thread-still-races).
-A thread needs an OS stack and an OS scheduling entity that free threading keeps,
+Under free threading a thread still needs an OS stack and an OS scheduling entity,
 while an `asyncio` task is small enough to run in the thousands.
 [`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
 cancellable batches have no thread equivalent.
@@ -2377,7 +2376,7 @@ The platform sets its size.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint,
 since a task consists of ordinary Python objects.
-`task_vs_thread_memory.py` calculates the ratio between a thread's stack and a task's footprint:
+Dividing the stack size by a task's footprint gives the number of tasks one thread's stack could hold:
 
 ```python
 # task_vs_thread_memory.py
