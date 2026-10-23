@@ -264,7 +264,7 @@ and `stop.value` in the `except` clause becomes the `Result` that `drive()` retu
 
 The type checker verifies each `Question` the generator yields and each `Answer` that `drive()` sends.
 `StopIteration.value` has type `Any`,
-so the type checker cannot check that `drive()` returns a `Result`.
+so the type checker cannot ensure that `drive()` returns a `Result`.
 
 The `try` holds only the `send()` call,
 because a `StopIteration` inside it means the conversation finished.
