@@ -403,7 +403,7 @@ def editor_pin(v: Vars) -> None:
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
     the report-only stranded-preposition, stranded-possessive,
-    watch-word, positional-reference, trailing-tag, subject-gap,
+    watch-word, positional-reference, italics, trailing-tag, subject-gap,
     sentence-shape, passive-voice, past-tense, expletive, and internal-name
     scans (the last reads the whole book; the parse-based ones, listed in
     `parse_check.PROSE_CHECKS`, share one spaCy parse, run in a throwaway
@@ -421,6 +421,7 @@ def prose(v: Vars) -> None:
     py("tools.stranded_possessives", *prose_files(v))
     py("tools.watch_words", *prose_files(v))
     py("tools.positional_refs", *prose_files(v))
+    py("tools.italics", *prose_files(v))
     py("tools.trailing_tags", *prose_files(v))
     for module in PROSE_CHECKS:
         py(module, *prose_files(v))
@@ -714,6 +715,29 @@ def positional(v: Vars) -> None:
       "stale entries", secondary=True)
 def positional_accept(v: Vars) -> None:
     py("tools.positional_refs", "--accept", *prose_files(v))
+
+
+@task("Report new italics that emphasize instead of introducing a term "
+      "(report-only; accept with `tip italics-accept`)")
+def italics(v: Vars) -> None:
+    """Report italic spans that break the rule that italics introduce
+    a term once: [EMPHASIS] a span of function words ("*is*",
+    "defers *how*"), [REPEAT] a term italicized again in the same
+    file, and [EARLIER] a term italicized after the file's prose
+    already used it. Pattern names, which are italic on every mention,
+    and capitalized titles are skipped. It reports and never gates;
+    `tip prose` runs it after the positional-reference scan. CH= picks
+    one chapter and its Solutions file. Hits judged keeps live in
+    tools/data/italics_baseline.txt, so the run prints only new ones;
+    ARGS=--all lists every hit.
+    """
+    py("tools.italics", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new italics hits to the baseline and drop stale entries",
+      secondary=True)
+def italics_accept(v: Vars) -> None:
+    py("tools.italics", "--accept", *prose_files(v))
 
 
 also("checks", "pattern-names")

@@ -1,0 +1,67 @@
+# Italic spans a human read and judged keeps: a term the earlier
+# prose used loosely and this sentence defines, a word set off as
+# a word. An entry is not an exemption from the rule.
+# path<TAB>[RULE] *term* :: clause, with whitespace normalized and
+# no line number, so a reflow leaves an entry alone and an edit to
+# the clause retires it. Rewritten by `tip italics-accept`; read
+# the delta with `tip italics` before accepting.
+# See tools/italics.py.
+Chapters/01_Introduction.md	[EARLIER] *Patterns* :: Part III, *Patterns*, opens by stepping back to question object orientation, because several of the patterns that follow exist to manage problems that objects create
+Chapters/02_Foundations--Tour.md	[EARLIER] *f-strings* :: Modern Python uses *f-strings*
+Chapters/03_Foundations--Containers.md	[EARLIER] *tuple* :: A *tuple* is an immutable sequence
+Chapters/03_Foundations--Containers.md	[EARLIER] *view* :: CODE, CODE, and CODE each return a *view*
+Chapters/04_Foundations--Control_Flow.md	[EARLIER] *raising* :: Python signals an error by *raising* an exception
+Chapters/05_Foundations--Functions.md	[EARLIER] *keyword-only* :: A CODE begins the *keyword-only* parameters
+Chapters/05_Foundations--Functions.md	[EARLIER] *parameter* :: CODE is a *parameter*, the name the function gives to what it receives
+Chapters/07_Foundations--Classes.md	[EARLIER] *constructor* :: Most programmers call CODE the *constructor*, since it sets up the new object's attributes, as a constructor does in other OOP languages
+Chapters/08_Foundations--Static_Types.md	[EARLIER] *closed* :: Python 3.15 (PEP 728) adds *closed* CODEs, which permit only their declared keys
+Chapters/11_Techniques--Testing.md	[EARLIER] *fixtures* :: CODE replaces both with *fixtures*
+Chapters/11_Techniques--Testing.md	[EARLIER] *mark* :: CODE is a *mark*, and three others appear in most existing suites
+Chapters/12_Techniques--Data_Classes_as_Types.md	[EARLIER] *bare annotations* :: CODE and CODE in CODE are *bare annotations*
+Chapters/12_Techniques--Data_Classes_as_Types.md	[EARLIER] *data class* :: A *data class* removes the boilerplate from a class that holds data
+Chapters/15_Techniques--Context_Managers.md	[EARLIER] *context manager* :: A *context manager* is any object that implements two methods
+Chapters/17_Techniques--Metaprogramming.md	[EARLIER] *marker* :: A decorator like CODE is a *marker*
+Chapters/18_Techniques--Performance.md	[EARLIER] *heap* :: When you repeatedly need the smallest or largest item, a *heap* keeps that item at the front, where reading it is O(1) and removing it is O(log n)
+Chapters/18_Techniques--Performance.md	[EARLIER] *record* :: The name follows Java and C#, where a *record* is an immutable class defined by its fields
+Chapters/19_Techniques--Concurrency.md	[EARLIER] *context* :: It holds a value per *context*
+Chapters/19_Techniques--Concurrency.md	[EARLIER] *deadlock* :: In a *deadlock*, two or more tasks each hold a resource the other needs, so neither can proceed
+Chapters/19_Techniques--Concurrency.md	[EARLIER] *livelock* :: A *livelock* keeps every task running
+Chapters/19_Techniques--Concurrency.md	[EARLIER] *lock* :: A *lock* grants exclusive access to a shared resource so one task at a time holds it
+Chapters/19_Techniques--Concurrency.md	[EARLIER] *semaphore* :: A *semaphore* generalizes a lock from a single lock-holder to a set number of them
+Chapters/19_Techniques--Concurrency.md	[EARLIER] *task* :: CODE wraps each coroutine in a *task*, the event loop's unit of scheduling, and schedules the tasks in the order given
+Chapters/20_Patterns--Rethinking_Objects.md	[EARLIER] *Java* :: *Java* drew from Smalltalk
+Chapters/21_Patterns--Design_Patterns.md	[EARLIER] *Cohesion* :: *Cohesion* is the degree to which the contents of one part serve a single subject, so high cohesion means one subject per part
+Chapters/21_Patterns--Design_Patterns.md	[EARLIER] *Creational* :: Certainly, the *Creational* patterns are straightforward
+Chapters/21_Patterns--Design_Patterns.md	[EARLIER] *design patterns* :: I refer to that book as *GoF Design Patterns*, and use *design patterns* for the concept
+Chapters/21_Patterns--Design_Patterns.md	[EARLIER] *type* :: A class that holds a reference to an abstract class "refers to a *type* of object, not a concrete object
+Chapters/21_Patterns--Design_Patterns.md	[EMPHASIS] *Once and once only* :: *Once and once only*
+Chapters/21_Patterns--Design_Patterns.md	[REPEAT] *Law of Demeter* :: *Law of Demeter*
+Chapters/21_Patterns--Design_Patterns.md	[REPEAT] *Reflexivity* :: *Reflexivity*
+Chapters/21_Patterns--Design_Patterns.md	[REPEAT] *Subtraction* :: Apply *Subtraction* to a design of your own
+Chapters/22_Patterns--Iterators.md	[EARLIER] *iterable* :: An *iterable* has CODE, which returns an *iterator*
+Chapters/25_Patterns--Surrogate.md	[EARLIER] *Protection proxy* :: *Protection proxy*
+Chapters/26_Patterns--Factory.md	[REPEAT] *Factory* :: Thus, *Factory* might be the most common design pattern
+Chapters/38_Patterns--Simulation.md	[EARLIER] *maze* :: A *maze* holds its own layout
+Chapters/38_Patterns--Simulation.md	[EARLIER] *rat* :: A *rat* explores
+Chapters/39_Patterns--Pattern_Catalog.md	[EARLIER] *Dispatcher* :: The original description of *Reactor* lists *Dispatcher* as another name for the pattern
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Behavioral* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Creational* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Proactor* :: A *Proactor* starts the read or write and calls the handler once the operation has finished
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Proactor* :: On Windows, asyncio's default event loop is a *Proactor*, CODE, built on the operating system's I/O completion ports
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: *Proactor* is the counterpart of *Reactor* for completed operations
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: A *Reactor* calls a handler when a source is ready, and the handler then performs the read or write
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: Both asyncio's CODE and Twisted's CODE implement *Reactor*
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: The original description of *Reactor* lists *Dispatcher* as another name for the pattern
+Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Structural* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
+Chapters/40_Functional--Foundations.md	[EARLIER] *immutable* :: An *immutable* value cannot change after creation
+Chapters/40_Functional--Foundations.md	[EARLIER] *pure function* :: A *pure function* computes its result from its arguments alone
+Chapters/41_Functional--Toolkits.md	[EARLIER] *Lazy evaluation* :: *Lazy evaluation* computes a value only when something needs it
+Chapters/41_Functional--Toolkits.md	[EARLIER] *Recursion* :: *Recursion* expresses a repeated computation as a function that calls itself
+Chapters/44_Effects--Effect_Management.md	[EARLIER] *Effect* :: An *Effect* is anything a caller takes on by making a call, beyond receiving the return value
+Chapters/44_Effects--Effect_Management.md	[EARLIER] *handler* :: A *handler* fulfills an Effect
+Chapters/44_Effects--Effect_Management.md	[EARLIER] *library* :: A team committed to Scala or TypeScript cannot use native Effects, so designers build *library* Effect systems on top of existing type systems
+Chapters/47_Effects--Stateless_in_Practice.md	[EARLIER] *scenario* :: Effect Oriented Programming calls each such set of bindings a *scenario*
+Solutions/21_Patterns--Design_Patterns/README.md	[EARLIER] *Subtraction* :: Design Principles states *Subtraction*
+Solutions/21_Patterns--Design_Patterns/README.md	[REPEAT] *Subtraction* :: *Subtraction* is a test you run, not a rule to remove as much as you can
+Solutions/21_Patterns--Design_Patterns/README.md	[REPEAT] *Subtraction* :: *Subtraction* stops at the parameter
+Solutions/21_Patterns--Design_Patterns/README.md	[REPEAT] *Subtraction* :: Use *Subtraction* as a test

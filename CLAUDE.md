@@ -242,7 +242,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Eleven report-only
+Twelve report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -372,11 +372,22 @@ and the line `N paragraphs at >= 3 in F files` follow;
 `--top N` keeps the N densest paragraphs.
 The `positive` skill reads it per chapter (`tip negatives CH=NN`), and a
 listed paragraph is a candidate for that skill's test, not a fault.
+`tip italics` (`tools/italics.py`, 2026-10-23) lists italics that break
+the introduce-once rule: `[EMPHASIS]` a span of function words ("*is*",
+"defers *how*"), `[REPEAT]` a term italicized again in the same file,
+and `[EARLIER]` a term italicized after the file's prose already used
+it. Pattern names and capitalized titles are skipped. Run over the 15
+chapters as they stood before that day's hand sweep (cd9c4045), it
+flagged 32 of the 38 lines the sweep changed; a verb or adjective
+stressed at its first use ("*suppresses*") is beyond it. The baseline
+holds the judged keeps: a defining sentence for a term the earlier
+prose used loosely, and a principle or pattern name (*Subtraction*,
+*Reactor*) italic on every mention.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
 `tip trailing-accept`, `tip subject-gap-accept`,
 `tip sentence-shapes-accept`, `tip passive-accept`,
-`tip past-tense-accept`, and `tip expletives-accept` add the current
+`tip past-tense-accept`, `tip expletives-accept`, and `tip italics-accept` add the current
 new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 `CH=NN` scopes an accept the way it scopes the report (since

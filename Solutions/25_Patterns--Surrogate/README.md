@@ -631,7 +631,7 @@ The check in `__getattr__()` then raises a `RuntimeError` on any later use of th
 so each connection serves one client at a time.
 The call to `c1.query()` after both blocks shows that error.
 
-`ConnectionProxy` is a *protection proxy* and a *smart reference* at
+`ConnectionProxy` is a protection proxy and a smart reference at
 once. It controls access, and it adds an action (the check-in) around
 each loan of the connection.
 

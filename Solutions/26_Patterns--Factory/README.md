@@ -582,7 +582,7 @@ for shape in build_shapes(ThinShapeFactory()):
 **Build each family in one factory.** `ShapeFactory` applies `abstract_factory_protocol.py`'s form to
 shapes instead of game elements: a `Protocol` with one method per
 product, `make_circle()` and `make_square()`.
-Each concrete factory produces a consistent *family* of products, here "all
+Each concrete factory produces a consistent family of products, here "all
 thick" or "all thin," and matches the `Protocol` by its structure.
 
 **Accept any factory.** `build_shapes()`
