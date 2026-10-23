@@ -336,7 +336,7 @@ and not the length.
 The walrus helps most in a `while` loop.
 The header checks that the stack has an item, pops it, names it, and tests it,
 so `item` holds the popped value when the body starts.
-The walrus also moves the fetch and the test in `while_true.py` into its loop header:
+The walrus also moves the fetch and the test in `while_true.py` into that loop's header:
 `while (value := values.pop(0)) != 0:`.
 
 A [comprehension](#comprehensions)
@@ -479,7 +479,7 @@ divide_and_report(1, 1)
 ```
 
 `checked_divide()` raises a `ValueError` before the division can raise Python's own `ZeroDivisionError`.
-Choose the exception that way when the report should name the bad argument rather than the failed arithmetic.
+Check the argument and raise your own exception first when the report should name the bad argument rather than the failed arithmetic.
 
 The optional `else` runs when the `try` block raises no exception.
 The loop `else` has the same shape.
@@ -519,7 +519,7 @@ The clause runs the same handler for both,
 so the bug looks like the expected failure.
 A bare `except:` with no type is the broadest of all.
 It catches everything,
-including the `KeyboardInterrupt` you press to stop a runaway program.
+including the `KeyboardInterrupt` Python raises when you press Ctrl+C to stop a runaway program.
 When you do need a broad handler, write `except Exception:`.
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
 so they propagate past that clause and stop the program.
