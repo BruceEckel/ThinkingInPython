@@ -90,8 +90,8 @@ That annotation is the short form of a three-part type that also describes what 
 [Generators](45_Effects--Generators.md#annotating-a-generator)
 covers the full form, which an Effect system needs.
 
-`iterators.py` holds a generator function, `fibonacci()`, and a class,
-`Countdown`, that becomes iterable because its `__iter__()` is a generator:
+`fibonacci()` is a generator function.
+`Countdown` is a class that becomes iterable because its `__iter__()` is a generator:
 
 ```python
 # iterators.py
@@ -118,7 +118,7 @@ def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
 ```
 
-`iterators_demo.py` builds each source and passes it to `total()`:
+The demo builds each source and passes it to `total()`:
 
 ```python
 # iterators_demo.py
@@ -339,8 +339,8 @@ The two calls differ in the argument alone,
 so the `(3, 0)` comes from the spent generator.
 
 When a function iterates over its argument more than once,
-say so in the signature.
-`Collection[T]` and `Sequence[T]` also require `__len__()` and `__contains__()`,
+say so in the signature with `Collection[T]` or `Sequence[T]`.
+Beyond `__iter__()`, both types require `__len__()` and `__contains__()`,
 which no generator has.
 The type checker therefore flags the generator at the call,
 before the function runs and returns a wrong answer.
@@ -454,8 +454,7 @@ def flatten(nested: Sequence[Nested]) -> Iterator[int]:
             yield from flatten(item)
 ```
 
-`yield_from_demo.py` flattens one nested list,
-then checks that both functions agree on it:
+Both functions flatten the same nested list, with the same result:
 
 ```python
 # yield_from_demo.py
@@ -688,8 +687,8 @@ def typed[T](
         yield item
 ```
 
-`typed_demo.py` runs both wrappers,
-then hands `typed()` a `str` where it expects an `int`:
+Both wrappers deliver `int` items unchanged.
+Handed a `str`, `typed()` raises a `TypeError`:
 
 ```python
 # typed_demo.py
@@ -900,8 +899,8 @@ an exhausted source and a source that yields `None` produce the same return valu
 The built-in `iter()` uses a sentinel the same way in its two-argument form.
 `iter(callable, DONE)` calls `callable` until `callable` returns `DONE`.
 
-`escaped_stop.py` doubles the items of a stream in two ways,
-once calling a bare `next()` and once letting a `for` loop call it:
+Two generators double the items of a stream,
+one calling a bare `next()` and one letting a `for` loop call it:
 
 ```python
 # escaped_stop.py
