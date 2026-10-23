@@ -145,8 +145,8 @@ Printing the class of the class produces the metaclass.
 
 Generating classes with `type()` suits a family of classes that differ only by name.
 A greenhouse controller runs scheduled events, one class per kind of event.
-The library `events.py` holds the base class `Event`, the seven event names,
-and `make()`, which builds the class for one name:
+One module holds the base class `Event`, the seven event names, and `make()`,
+which builds the class for one name:
 
 ```python
 # events.py
@@ -196,8 +196,8 @@ Each generated class is a real type, not a label.
 `light` and `water` are both `Event` instances,
 so `isinstance(light, Event)` is `True`,
 but `type(light) is type(water)` is `False`.
-They belong to distinct subclasses.
-`isinstance()` tells them apart.
+They belong to distinct subclasses,
+so `isinstance()` with one of those subclasses tells them apart.
 
 Type checkers read different amounts of a `type()` call.
 `ty` reads the bases and a namespace written as a dict literal.
@@ -868,7 +868,7 @@ This `model()` generates nothing, and `object`'s constructor takes no arguments.
 The declaration is a claim, and this one is false.
 
 Libraries like attrs and Pydantic make the claim true by generating the methods their `@dataclass_transform` declares.
-The declaration then makes every checker that follows the typing specification synthesize their constructors from the field declarations and check each call against them.
+The declaration then makes every checker that follows the typing specification synthesize each decorated class's constructor from its field declarations and check each call against that constructor.
 The shortest `model()` that makes its claim true delegates the generation:
 
 ```python
@@ -1111,7 +1111,7 @@ print(r.width)
 #: 3.0
 ```
 
-`Rectangle` names the rule twice and writes no checking code of its own.
+`Rectangle` writes `Positive()` twice and no checking code of its own.
 `self.width = width` inside `__init__()` routes through `Positive.__set__()` like any other write,
 so the constructor's two assignments validate its arguments.
 The rejected assignment leaves `_width` as it was,
@@ -1427,7 +1427,7 @@ Lookup on `Sub` finds `helper()` through its metaclass,
 and lookup on a `Sub` instance does not.
 The `AttributeError` comes from the metamethod rule at the start of [Intercepting Instance Creation](#intercepting-instance-creation).
 Lookup on a `Sub` instance searches `Sub` and its bases.
-`Mixin` sits among the bases of `HelperMeta`.
+`Mixin` sits among the bases of `HelperMeta`, outside that search.
 A `classmethod` defined in `Sub` works through both `Sub` and its instances.
 
 A metaclass that needs a `dict` holds one in an attribute,
@@ -1972,7 +1972,8 @@ naming each sentinel value rather than the generic `sentinel` class,
 so a type checker narrows `dunder` to `Sequence[str]` once it rules out both sentinels.
 `name in dunder` then needs no further guard.
 
-`dunder_modes.py` applies `INTERESTING_DUNDERS` and `REDEFINED_DUNDERS` to a class that redefines nothing and to one that redefines almost everything:
+`display_object()` reports differently under `INTERESTING_DUNDERS` and `REDEFINED_DUNDERS`,
+on a class that redefines nothing and on one that redefines almost everything:
 
 ```python
 # dunder_modes.py
