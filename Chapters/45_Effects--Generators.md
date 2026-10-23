@@ -154,8 +154,7 @@ so a `next()` call inside the body can trigger that conversion.
 
 A suspended generator preserves two things:
 its position in the body and every local variable.
-The generator object stores both,
-so they outlive each `next()` or `send()` call that resumes the generator.
+These outlive each `next()` or `send()` call that resumes the generator.
 Resuming runs the body from that position, with every local variable intact.
 `interview()`'s local `name` keeps its value through the next two `send()` calls,
 and `town` keeps its value through the last one.
@@ -165,6 +164,19 @@ so that state lasts as long as something holds a reference to the generator.
 [Measuring the Memory](19_Techniques--Concurrency.md#measuring-the-memory)
 uses `tracemalloc` to measure that state for suspended `asyncio` tasks,
 whose coroutines keep their position and locals the same way.
+
+The suspended generator is what [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
+calls a continuation: the rest of the computation from the `yield` forward.
+That section gives a native handler three choices,
+and a generator's driver has two of them.
+The driver resumes the continuation once with `send()`,
+or discards it by dropping its last reference to the generator.
+The third choice is to resume one continuation several times,
+for a retry or a backtracking search.
+Each resumption then needs its own copy of the suspended state.
+Python cannot copy a generator.
+`copy.copy()` on a suspended generator raises `TypeError`.
+A generator is therefore a *one-shot continuation*.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
