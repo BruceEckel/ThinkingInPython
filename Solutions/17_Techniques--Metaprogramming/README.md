@@ -284,9 +284,9 @@ the class `cls` names, so `CSingleton()` type-checks as a `CSingleton`.
 The type checker then catches a misspelled attribute on the result.
 
 The `cls: type[T]` annotation also decides how the body reaches the cache.
-`ty` sees `cls` as some class `T` and reports `unresolved-attribute`
-for `cls._instances`, so the body reads the cache through the class name,
-`Singleton._instances`.
+`ty` sees `cls` as some class `T`, so it would report `unresolved-attribute`
+for `cls._instances`. The body reads the cache through the class name,
+`Singleton._instances`, instead.
 
 **Keep one instance per class.** `Singleton._instances` is a dictionary keyed by the class, so
 each class using the `Singleton` metaclass gets its own entry.
@@ -415,7 +415,7 @@ any ancestor declared itself final.
 `A.__init_subclass__()` refuses the first subclass of a final class as
 Python creates that subclass, so the hierarchy below a final class
 stays empty. A check of the direct bases in `cls.__bases__`
-therefore also refuses every descendant. The `__mro__` walk
+would therefore refuse every descendant too. The `__mro__` walk
 stays because it states the rule as written, "no final class anywhere
 above," in one line.
 
@@ -657,8 +657,8 @@ print(c + 0.5, isinstance(c, float))
 
 **Define the method as a function.** `describe()` is a module-level
 function, defined before `type()` creates the class that carries
-`unit`. The annotation on `self` therefore specifies `Any`, so the type
-checker accepts `self.unit`.
+`unit`. With no class to name as the type of `self`, the annotation
+uses `Any`, which lets the type checker accept `self.unit`.
 
 **Assemble the class from data.** The three arguments are the name,
 the bases, and the namespace, the same three a `class` statement
@@ -754,8 +754,9 @@ print(Tag in Demo.__bases__)
 By the time `__init__()` runs, the class object is complete.
 `type.__new__()` builds it first, from the bases in the class header,
 and computes its `__mro__` from those bases. The `bases` parameter of
-`__init__()` holds the same tuple `__new__()` received, so
-`bases += (Tag,)` rebinds a local name.
+`__init__()` holds the same tuple `__new__()` received. A tuple is
+immutable, so `bases += (Tag,)` builds a new tuple and rebinds the
+local name `bases` to it.
 `Demo.__bases__` stays the same. Passing the longer tuple on to `type.__init__()` leaves the
 class as it was too, since `type.__init__()` checks its arguments and then
 ignores them.
