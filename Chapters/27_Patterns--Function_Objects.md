@@ -380,8 +380,9 @@ Those settings stay available to the strategy after the outer function returns.
 In `algorithms.py`, `bisection()` calls `bisection_tol()`,
 a bisection that stops once the bracket is narrower than `tolerance`,
 and always passes it `TOLERANCE`.
-`RootFinder` describes three parameters and `bisection_tol()` has four,
-so a closure supplies a tolerance of your choosing:
+`RootFinder` describes three parameters, while `bisection_tol()` has four.
+A closure binds the fourth, a tolerance of your choosing,
+and returns a three-parameter finder:
 
 ```python
 # configured_strategy.py
@@ -433,9 +434,10 @@ for tolerance in (0.1, 1e-9):
 Each `partial` object satisfies `RootFinder`,
 so `solve()` calls a `partial` object with the same three arguments it passes a closure.
 
-A caller must pass a [positional-only parameter](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
-by position, so binding one with `partial()` means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
-in each position the caller fills.
+Binding by keyword fails for a [positional-only parameter](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
+which a caller must pass by position.
+To bind one, `partial()` takes a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
+in each earlier position the caller fills.
 
 Save the strategy class for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.
@@ -468,7 +470,7 @@ The caller decides what an empty result means.
 
 Bisection needs the interval to bracket a root.
 The open methods need only a place to start.
-`chain_demo.py` runs bisection alone and then the chain on two intervals:
+Running bisection alone and then the chain on two intervals shows the difference:
 
 ```python
 # chain_demo.py
@@ -512,8 +514,8 @@ A [`sentinel()`](05_Foundations--Functions.md#sentinel-values) takes that role.
 Each finder decides for itself whether it succeeded,
 and reports that decision as its return value.
 `secant()` and `newton()` report success when their latest step shrinks below the tolerance.
-A small step shows that the estimate stopped moving,
-and neither finder checks how close `f(x)` is to zero,
+A small step shows that the estimate stopped moving.
+Neither finder checks how close `f(x)` is to zero,
 so a chain's answer is as trustworthy as the finder that gave it.
 
 The test file confirms that:
