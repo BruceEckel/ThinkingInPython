@@ -639,7 +639,7 @@ the type checker which of the two shapes a given call has. The first
 says "given a function, return a function of the same signature." The
 second says "given `maxsize` alone, return a decorator." The
 implementation returns `Any` because `Any` satisfies both overloads.
-The type checker checks each call against the overloads, not the implementation.
+The type checker verifies each call against the overloads, not the implementation.
 `square(4)` type-checks as an `int`,
 and `memo(maxsize=2)` type-checks as a decorator you can apply to a function.
 

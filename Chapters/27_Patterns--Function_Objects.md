@@ -883,7 +883,7 @@ The two decorators fill `EVENTS` and `HANDLES` at run time.
 The type checker reads the source and never runs it,
 so it cannot check what those two collections hold.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
-the same annotation the type checker checks,
+the same annotation the type checker reads,
 so a handler specifies its event once.
 
 The demo subscribes each handler with one argument,

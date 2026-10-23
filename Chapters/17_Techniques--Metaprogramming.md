@@ -393,7 +393,7 @@ not the module's namespace,
 and seeds it with `{"Command": Command}` so the generated class can find its base.
 `exec()` also adds a `__builtins__` entry, the dictionary of built-in names,
 to any globals mapping that lacks one, so `namespace` holds more than classes.
-The type checker checks none of the code inside the string,
+The type checker skips the code inside the string,
 so `namespace` carries the annotation `dict[str, object]`,
 and `namespace[class_name]` is an `object`.
 Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
@@ -707,7 +707,7 @@ A mark suits data that describes the function and that other code reads later,
 as `handlers` does here.
 A call count, or any state that changes with each call,
 belongs in a closure variable or on a [callable object](14_Techniques--Decorators.md#a-class-form-decorator-with-state),
-where the type checker checks its type.
+where the type checker verifies its type.
 
 ## Making a Class Final
 

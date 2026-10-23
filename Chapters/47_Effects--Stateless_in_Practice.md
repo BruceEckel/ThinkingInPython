@@ -1346,7 +1346,7 @@ error[invalid-yield]: Yield expression type does not match annotation
    |                         expected `Need[Toaster]`
 ```
 
-The type checker checks the other end too.
+The type checker verifies the other end too.
 If you leave `Oven(220)` out of `supply()`,
 the checker rejects the `run()` call,
 finding a `Generator[Need[Oven], Any, str]` where it expected a yield channel holding only `Async` and errors.

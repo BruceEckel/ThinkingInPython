@@ -1835,7 +1835,7 @@ At runtime, `random.randint()` raises a `TypeError`
 when the handler calls it from the driver.
 The traceback names `real()` and the library, and neither `roll()` nor
 `game()`. The accessor
-is the only place where the type checker checks a caller's arguments,
+is the only place where the type checker verifies a caller's arguments,
 since once the accessor builds the request,
 the arguments are fields that the handler alone reads.
 

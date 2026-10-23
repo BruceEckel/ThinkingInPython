@@ -790,7 +790,7 @@ If `Style` declares `width: ReadOnly[int]`,
 with the message that the key "is marked read-only."
 At runtime the assignment succeeds, since every `TypedDict` value is a `dict`.
 
-The type checker checks the keywords at each call.
+The type checker verifies the keywords at each call.
 A call that passes `width="6"` draws `invalid-argument-type` from `ty`,
 the same diagnostic a wrongly typed ordinary parameter draws.
 The diagnostic's message reads "Expected `int`, found `Literal["6"]`".

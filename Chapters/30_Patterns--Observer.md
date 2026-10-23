@@ -884,7 +884,7 @@ A single `__setattr__()` gives up three things that `Thermometer`'s per-attribut
     and the assignment quietly creates a new attribute.
     The same misspelling on a `Thermometer` produces an `unresolved-attribute` error.
     `Thermometer` inherits `object`'s `__setattr__()`,
-    so the type checker checks each assignment against the attributes the class declares.
+    so the type checker verifies each assignment against the attributes the class declares.
 
 ### Decorated Responders
 

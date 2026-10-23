@@ -555,7 +555,7 @@ The `/` makes `types` and `fn` [positional-only](05_Foundations--Functions.md#po
 so every keyword argument goes to `fn`.
 [`**P`](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface)
 gives `*args` and `**kwargs` the parameter types of `fn`'s signature,
-so the type checker checks the forwarded arguments as if you had called `fn`:
+so the type checker verifies the forwarded arguments as if you had called `fn`:
 
 ```python
 # demo_expect.py

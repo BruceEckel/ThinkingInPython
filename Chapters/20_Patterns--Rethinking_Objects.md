@@ -941,7 +941,7 @@ and `charge()` returns `4.5`, silently treating a weight as a price.
 The shapes do match: `Package.total()` returns a `float`,
 as `Priced.total()` declares.
 The mismatch is in what the number means.
-No type checker checks meaning.
+No type checker verifies meaning.
 
 A distinct type per concept makes the type checker report this mismatch.
 `typing.NewType` looks like the natural fix:

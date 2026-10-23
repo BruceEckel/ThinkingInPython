@@ -671,7 +671,7 @@ creates nothing. `vars(t)` holds `holder` alone, and reading `t.seat`
 raises an `AttributeError`.
 
 **Create the attribute from outside.** `t.seat = "14C"` creates the
-attribute on the instance. The type checker checks that assignment
+attribute on the instance. The type checker verifies that assignment
 against the declared `str`.
 
 A bare annotation is safe when the code that assigns the attribute

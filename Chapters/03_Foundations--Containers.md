@@ -875,7 +875,7 @@ but each field has a name, so `alice.age` says which value it reads.
 `typing.NamedTuple` builds the same kind of tuple subclass from a `class` statement.
 You write `class Person(NamedTuple):` and annotate each field in the body,
 as in `name: str`, instead of listing bare names.
-A type checker then checks each field against its annotation.
+A type checker then verifies each field against its annotation.
 For a record that must be mutable,
 use a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes).
 [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#the-standard-library-versions)

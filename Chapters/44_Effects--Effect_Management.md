@@ -3,7 +3,7 @@
 > A function does more than its signature says: it might read a clock, write to a log,
 > open a connection, modify global state, and more.
 > Effect Management puts those actions in the signature, where a reader sees them,
-> a type checker checks them, and a test swaps them for stand-ins.
+> a type checker verifies them, and a test swaps them for stand-ins.
 
 A test you wrote last week starts failing about one run in five.
 The function it calls computes a total price, and the math is right.

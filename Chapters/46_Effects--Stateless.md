@@ -2,7 +2,7 @@
 
 > The easiest things to forget about a function are what it needs from outside and how it can fail.
 > Stateless writes both into the function's type,
-> and the type checker checks every caller against them.
+> and the type checker verifies every caller against them.
 
 [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 introduces library Effect systems.
@@ -179,7 +179,7 @@ Two details in `greeter.py` matter:
 1. `greet()` is a generator function, because it contains `yield from`,
    so calling it builds the Effect its signature declares.
 2. `console` is of type `Console`,
-   so the type checker checks each `console.print()` call against `Console.print()`'s signature.
+   so the type checker verifies each `console.print()` call against `Console.print()`'s signature.
    `console` has that type before anything supplies an instance.
 
 ### The Effect Definition
