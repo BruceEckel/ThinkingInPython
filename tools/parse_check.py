@@ -34,9 +34,9 @@ NEW (or, under `--all`, every) hit and the stale entries, and
 Command line. `build_arg_parser()` makes the parser every check shares
 (paths, `--fail`, `--all`, `--accept`, `--survey`, `--calibrate`, each
 optional where a check has no use for it, plus a `leading` hook for a
-check's own flags such as `--gap`), `parse_args()` parses it and
-refuses `--accept` with paths, and `run_calibrate()` wraps a
-calibration in the parser-unavailable handler.
+check's own flags such as `--gap`), `parse_args()` parses it, and
+`run_calibrate()` wraps a calibration in the parser-unavailable
+handler.
 
 Run driver. `run()` is a baselined check's whole default run: read the
 files, call the check's finder, catch `ParserUnavailable` (it prints
@@ -268,11 +268,10 @@ def build_arg_parser(
 
 def parse_args(ap: argparse.ArgumentParser,
                argv: list[str] | None) -> argparse.Namespace:
-    """Parse, refusing `--accept` together with paths."""
-    args = ap.parse_args(argv)
-    if args.paths and getattr(args, "accept", False):
-        ap.error("--accept rewrites the whole baseline; give no paths")
-    return args
+    """Parse. `--accept` with paths touches only those files'
+    baseline entries, since `run()` drops stale entries for the
+    files it read and keeps the rest."""
+    return ap.parse_args(argv)
 
 
 def report_unavailable(name: str, exc: ParserUnavailable) -> None:

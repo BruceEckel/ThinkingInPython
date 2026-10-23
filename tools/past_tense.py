@@ -88,8 +88,9 @@ it. The default run prints each NEW hit, lists a `stale` entry that
 matches no hit any more, and ends with a summary (`N new, M accepted`).
 `--all` prints every hit, marked NEW or accepted. `--accept` appends
 every NEW hit to the baseline and drops the stale entries. A run given
-paths compares against those files' entries alone, and refuses
-`--accept`.
+paths compares against those files' entries alone, and `--accept`
+with paths adds and drops entries for those files and keeps
+every other file's entries.
 
 `--calibrate` compares the check with `tools/data/edit_pairs.json` (the
 sentences the author rewrote): per label, the pairs where it fires on

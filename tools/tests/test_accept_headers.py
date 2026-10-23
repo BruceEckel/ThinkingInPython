@@ -4,7 +4,7 @@ Each of the five baselined parse checks passes its `BASELINE` and
 `HEADER` to `parse_check.run()`. A check that wires in the wrong
 header, or none, writes a baseline that fails to say what it holds.
 
-`--accept` refuses paths, so the run reads the whole book by default.
+The run is given no paths, so it reads the whole book by default.
 The test patches `parse_check.prose_paths`, which `run()` calls, to
 return one tmp fixture file, and patches the module's `find` to yield
 the findings under test, so the real rules and spaCy stay out of it.

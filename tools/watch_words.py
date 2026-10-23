@@ -68,8 +68,9 @@ Tier 1 shown, `N new (a T3, b T2, c T1), M accepted`).
 `--all` prints every hit, marked NEW or accepted. `--accept` appends
 every NEW Tier 2 and Tier 3 hit to the baseline and drops the stale
 entries. A run
-given paths compares against those files' entries alone, and refuses
-`--accept`.
+given paths compares against those files' entries alone, and `--accept`
+with paths adds and drops entries for those files and keeps
+every other file's entries.
 
     uv run python -m tools.watch_words          # new hits
     uv run python -m tools.watch_words --all    # every hit
@@ -272,8 +273,6 @@ def main(argv: list[str] | None = None) -> int:
                          "1, the Tier 1 hits) to the baseline and "
                          "drop stale entries")
     args = ap.parse_args(argv)
-    if args.paths and args.accept:
-        ap.error("--accept rewrites the whole baseline; give no paths")
     if args.accept and args.tier in (2, 3):
         ap.error("--accept covers Tiers 2 and 3; give no --tier, "
                  "or --tier 1")

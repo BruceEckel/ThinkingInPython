@@ -51,8 +51,9 @@ it. The default run prints each NEW hit, lists a `stale` entry that
 matches no hit any more, and ends with a summary (`N new, M accepted`).
 `--all` prints every hit, marked NEW or accepted. `--accept` appends
 every NEW hit to the baseline and drops the stale entries. A run given
-paths compares against those files' entries alone, and refuses
-`--accept`. The baseline file, the report, the command line, and the
+paths compares against those files' entries alone, and `--accept`
+with paths adds and drops entries for those files and keeps
+every other file's entries. The baseline file, the report, the command line, and the
 edit-pairs and Vale comparisons are `tools/parse_check.py`'s, shared
 with the other parse-based checks.
 

@@ -54,8 +54,9 @@ NEW hit and a summary (`N new, M accepted`), and lists a `stale` entry
 that matches no hit any more. `--all` prints every hit, marked NEW or
 accepted. `--accept` appends every NEW hit to the baseline and drops
 the stale entries, keeping the file sorted and free of duplicates. A
-run given paths compares against those files' entries alone, and
-refuses `--accept`. `--gap N` changes the threshold for one run.
+run given paths compares against those files' entries alone, and `--accept`
+with paths adds and drops entries for those files and keeps
+every other file's entries. `--gap N` changes the threshold for one run.
 
 Known false-positive shapes, all left in the report for a human: two
 coordinated subjects ("A module or a package with the same name"), a

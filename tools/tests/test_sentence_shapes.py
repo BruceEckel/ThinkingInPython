@@ -140,8 +140,8 @@ def test_main_reports_without_failing_and_accepts(
             shown, "[IMP] Remove CODE and the pattern fails.")})
     assert main([str(path), "--fail"], recorded_parser) == 0
     assert "0 new, 1 accepted" in capsys.readouterr().out
-    with pytest.raises(SystemExit):
-        main([str(path), "--accept"], recorded_parser)
+    assert main([str(path), "--accept"], recorded_parser) == 0
+    assert "added 0, dropped 0" in capsys.readouterr().out
 
 
 def test_a_missing_baseline_is_empty(tmp_path: Path) -> None:

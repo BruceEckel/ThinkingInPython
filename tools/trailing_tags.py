@@ -50,8 +50,9 @@ rule. The default run prints each NEW hit and a summary (`N new, M
 accepted`), and lists a `stale` entry that matches no hit any more.
 `--all` prints every hit, marked NEW or accepted. `--accept` appends
 every NEW hit to the baseline and drops the stale entries, keeping the
-file sorted and free of duplicates. A run given paths compares against
-those files' entries alone, and refuses `--accept`.
+file sorted and free of duplicates. A run given paths compares against those files' entries alone, and `--accept`
+with paths adds and drops entries for those files and keeps
+every other file's entries.
 
 Known false-positive shapes, all left in the report for a human: a
 participle that describes the noun it follows ("a `logged` instance,
@@ -227,8 +228,6 @@ def main(argv: list[str] | None = None) -> int:
                     help="add the NEW hits to the baseline and drop "
                          "stale entries")
     args = ap.parse_args(argv)
-    if args.paths and args.accept:
-        ap.error("--accept rewrites the whole baseline; give no paths")
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
     found = sorted(

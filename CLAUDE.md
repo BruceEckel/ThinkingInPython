@@ -379,6 +379,11 @@ listed paragraph is a candidate for that skill's test, not a fault.
 `tip past-tense-accept`, and `tip expletives-accept` add the current
 new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
+`CH=NN` scopes an accept the way it scopes the report (since
+2026-10-23): it adds and drops entries for that chapter and its
+Solutions file and leaves every other file's entries alone, so one
+chapter's accept never takes in another chapter's unread hits.
+`tip internal-names-accept` reads code, not prose, and takes no `CH=`.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
 accepted, 610 watch words fixed and 220 accepted (a `want` with a
 human subject, an arithmetic `even`, a `never` that is the claim, a

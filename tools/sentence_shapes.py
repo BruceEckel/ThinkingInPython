@@ -90,8 +90,9 @@ entry is a judged keep, not an exemption. The default run prints each
 NEW hit and a summary (`N new, M accepted`), and lists a `stale` entry
 that matches no hit any more. `--all` prints every hit, marked NEW or
 accepted. `--accept` appends every NEW hit to the baseline and drops
-the stale entries. A run given paths compares against those files'
-entries alone, and refuses `--accept`.
+the stale entries. A run given paths compares against those files' entries alone, and `--accept`
+with paths adds and drops entries for those files and keeps
+every other file's entries.
 
 `--calibrate` checks all four rules against `tools/data/edit_pairs.json`
 (the sentences the author rewrote, 72 records of `before`, `after`, and

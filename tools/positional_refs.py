@@ -66,8 +66,9 @@ then each `stale` entry (a baseline entry for a scanned file that
 matches no current hit), then a summary (`N new, M accepted[, K
 stale]`). `--all` prints every hit, marked NEW or accepted. `--accept`
 adds every NEW hit to the baseline and drops the stale entries. A run
-given paths compares against those files' entries alone, and refuses
-`--accept`.
+given paths compares against those files' entries alone, and `--accept`
+with paths adds and drops entries for those files and keeps
+every other file's entries.
 
     uv run python -m tools.positional_refs          # new hits
     uv run python -m tools.positional_refs --all    # every hit
@@ -323,8 +324,6 @@ def main(argv: list[str] | None = None) -> int:
                     help="add the NEW hits to the baseline and drop "
                          "stale entries")
     args = ap.parse_args(argv)
-    if args.paths and args.accept:
-        ap.error("--accept rewrites the whole baseline; give no paths")
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
     found = sorted(

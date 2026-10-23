@@ -132,6 +132,14 @@ def test_edit_retires_entry(
     assert "1 new, 0 accepted, 1 stale" in capsys.readouterr().out
 
 
-def test_accept_refuses_paths(book: Path) -> None:
-    with pytest.raises(SystemExit):
-        main([str(book), "--accept"])
+def test_accept_with_paths_touches_only_their_entries(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    other = book.parent / "b.md"
+    other.write_text(book.read_text(encoding="utf-8"), encoding="utf-8")
+    assert main([str(book), "--accept"]) == 0
+    entries = load_baseline(book.parent.parent / "baseline.txt")
+    assert [e.split("\t", 1)[0] for e in entries] == [display(book)]
+    capsys.readouterr()
+    assert main(["--fail"]) == 1
+    assert "1 new, 1 accepted" in capsys.readouterr().out

@@ -71,7 +71,10 @@ def prose_files(v: Vars) -> list[str]:
     `tip prose CH=33` or `tip prose CH=33_Patterns--Visitor`. CH= covers
     the chapter and its Solutions file together, and a CH matching
     nothing is passed through as a pattern so the tool still errors
-    loudly instead of silently linting everything."""
+    loudly instead of silently linting everything. The `-accept`
+    tasks pass the same files, so `tip stranded-accept CH=33` adds and
+    drops baseline entries for those two files and keeps every other
+    file's entries."""
     ch = v.get("CH")
     if not ch:
         return v.words("DOCS") or ["Chapters", "Solutions"]
@@ -439,7 +442,7 @@ def stranded(v: Vars) -> None:
 @task("Add new stranded-preposition hits to the baseline and drop "
       "stale entries", secondary=True)
 def stranded_accept(v: Vars) -> None:
-    py("tools.stranded_prepositions", "--accept")
+    py("tools.stranded_prepositions", "--accept", *prose_files(v))
 
 
 @task("Report new possessives whose head noun is elided "
@@ -459,7 +462,7 @@ def possessives(v: Vars) -> None:
 @task("Add new stranded-possessive hits to the baseline and drop "
       "stale entries", secondary=True)
 def possessives_accept(v: Vars) -> None:
-    py("tools.stranded_possessives", "--accept")
+    py("tools.stranded_possessives", "--accept", *prose_files(v))
 
 
 @task("Report new trailing participle tags and transactional connectives "
@@ -479,7 +482,7 @@ def trailing(v: Vars) -> None:
 @task("Add new trailing-tag hits to the baseline and drop stale "
       "entries", secondary=True)
 def trailing_accept(v: Vars) -> None:
-    py("tools.trailing_tags", "--accept")
+    py("tools.trailing_tags", "--accept", *prose_files(v))
 
 
 @task("Report new sentences whose subject is held open from its verb "
@@ -504,7 +507,7 @@ def subject_gap(v: Vars) -> None:
 @task("Add new subject-gap hits to the baseline and drop stale "
       "entries", secondary=True)
 def subject_gap_accept(v: Vars) -> None:
-    py("tools.subject_gap", "--accept")
+    py("tools.subject_gap", "--accept", *prose_files(v))
 
 
 @task("Report new imperative-plus-consequence sentences, split-worthy "
@@ -533,7 +536,7 @@ def sentence_shapes(v: Vars) -> None:
 @task("Add new sentence-shape hits to the baseline and drop stale "
       "entries", secondary=True)
 def sentence_shapes_accept(v: Vars) -> None:
-    py("tools.sentence_shapes", "--accept")
+    py("tools.sentence_shapes", "--accept", *prose_files(v))
 
 
 @task("Report new passive clauses (report-only; accept with "
@@ -557,7 +560,7 @@ def passive(v: Vars) -> None:
 @task("Add new passive-voice hits to the baseline and drop stale "
       "entries", secondary=True)
 def passive_accept(v: Vars) -> None:
-    py("tools.passive_voice", "--accept")
+    py("tools.passive_voice", "--accept", *prose_files(v))
 
 
 @task("Report new past-tense verbs in prose and headings (report-only; "
@@ -587,7 +590,7 @@ def past_tense(v: Vars) -> None:
 @task("Add new past-tense hits to the baseline and drop stale entries",
       secondary=True)
 def past_tense_accept(v: Vars) -> None:
-    py("tools.past_tense", "--accept")
+    py("tools.past_tense", "--accept", *prose_files(v))
 
 
 @task("Report new expletive frames: there is, it is easy to "
@@ -612,7 +615,7 @@ def expletives(v: Vars) -> None:
 @task("Add new expletive hits to the baseline and drop stale entries",
       secondary=True)
 def expletives_accept(v: Vars) -> None:
-    py("tools.expletives", "--accept")
+    py("tools.expletives", "--accept", *prose_files(v))
 
 
 @task("Survey sentences that open with a pointer pronoun, for the "
@@ -689,7 +692,7 @@ def watch_words(v: Vars) -> None:
 @task("Add new watch-word hits to the baseline and drop stale "
       "entries", secondary=True)
 def watch_words_accept(v: Vars) -> None:
-    py("tools.watch_words", "--accept")
+    py("tools.watch_words", "--accept", *prose_files(v))
 
 
 @task("Report new prose that points at a listing line by position or "
@@ -710,7 +713,7 @@ def positional(v: Vars) -> None:
 @task("Add new positional-reference hits to the baseline and drop "
       "stale entries", secondary=True)
 def positional_accept(v: Vars) -> None:
-    py("tools.positional_refs", "--accept")
+    py("tools.positional_refs", "--accept", *prose_files(v))
 
 
 also("checks", "pattern-names")

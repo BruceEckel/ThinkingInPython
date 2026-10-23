@@ -114,13 +114,10 @@ def test_skipped_labels() -> None:
     assert not skipped(para("A hint: look here"))
 
 
-def test_parse_args_refuses_accept_with_paths(
-        capsys: pytest.CaptureFixture[str]) -> None:
+def test_parse_args_takes_accept_with_paths() -> None:
     ap = build_arg_parser("doc", fail_help="fail")
-    with pytest.raises(SystemExit) as caught:
-        parse_args(ap, ["--accept", "a.md"])
-    assert caught.value.code == 2
-    assert "give no paths" in capsys.readouterr().err
+    args = parse_args(ap, ["--accept", "a.md"])
+    assert args.accept and args.paths == ["a.md"]
     assert parse_args(ap, ["--accept"]).accept
 
 
@@ -184,6 +181,22 @@ def test_run_accept_rewrites_the_baseline(
         f"Baseline: added 1, dropped 1 stale, in {display(base)}\n")
     assert base.read_text(encoding="utf-8") == (
         HEADER + f"{key(shown, '[X] fresh')}\n")
+
+
+def test_run_accept_keeps_unread_files_entries(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    prose = tmp_path / "a.md"
+    prose.write_text("Some prose.\n", encoding="utf-8")
+    base = tmp_path / "base.txt"
+    other = key("Chapters/b.md", "[X] other")
+    write_baseline({other}, base, HEADER)
+    ap = build_arg_parser("doc", fail_help="fail")
+    args = parse_args(ap, [str(prose), "--accept"])
+    finder = fake_finder([(1, "[X] fresh")])
+    assert run("t", args, finder, baseline=base, header=HEADER) == 0
+    capsys.readouterr()
+    assert load_baseline(base) == {other, key(display(prose), "[X] fresh")}
 
 
 @pytest.mark.parametrize("survey_last", [False, True])

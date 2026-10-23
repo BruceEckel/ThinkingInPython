@@ -149,9 +149,15 @@ def test_accept_adds_new_and_drops_stale(book: Path) -> None:
     assert main([]) == 0
 
 
-def test_accept_refuses_paths(book: Path) -> None:
-    with pytest.raises(SystemExit):
-        main([str(book), "--accept"])
+def test_accept_with_paths_touches_only_their_entries(
+    book: Path,
+) -> None:
+    other = book.parent / "b.md"
+    other.write_text(f"{CLAUSE}.\n", encoding="utf-8")
+    kept = entry(other, "The tool ships")
+    write_baseline({kept}, baseline_of(book))
+    assert main([str(book), "--accept"]) == 0
+    assert load_baseline(baseline_of(book)) == {kept, entry(book)}
 
 
 def test_fail_only_on_tier_3(tmp_path: Path) -> None:
