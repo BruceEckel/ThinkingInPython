@@ -395,7 +395,7 @@ leaving the `Never` from the alias table.
 Handling an Ability *subtracts* it from the type.
 Here the subtraction empties the Ability channel.
 `greet()` declares one Ability and cannot fail, so `bound` produces a `Success`.
-That `Success` is a consequence rather than a requirement.
+That `Success` follows from `greet()`'s signature rather than from anything `run()` requires.
 `run()`'s parameter type rejects every unanswered Ability except `Async`.
 `run()` accepts an Effect that can still fail,
 and [raises the failure as an ordinary exception](#the-error-channel).
@@ -445,7 +445,8 @@ The type records which handler answered.
 `chosen` is already `(str) -> Success[None]`,
 so `fallback(chosen)` keeps that type.
 
-A default removes the type check, the reason a function declares its `Need`.
+A function declares its `Need` so the type checker reports a missing binding.
+A default removes that check.
 An Effect missing its `Console` now passes the type check and runs.
 A forgotten binding then shows up as the default `Console`'s output rather than as an error.
 Use a fallback for a genuine default, a null logger or a no-op console,
@@ -944,7 +945,7 @@ No check reports it.
 Stateless's own `Console` is the concrete class [Built-in Dependencies](#builtin-dependencies)
 lists.
 Only a subclass can replace it.
-Its accessors specify that class,
+Its accessors request that class with `need(Console)`,
 so `isinstance()` accepts an instance of the class or a subclass.
 A structurally identical double fails twice.
 `as_type(Console)` rejects it,
@@ -979,7 +980,7 @@ A full EMS does [three things](44_Effects--Effect_Management.md#tracking-and-man
 and the second is to separate each Effect's interface from its implementation.
 `Console` as a `Protocol` holds no implementation.
 `Terminal` is one implementation and `Recorder` is another.
-`greet()` specifies neither.
+`greet()` refers to neither.
 `Recorder` qualifies as a `Console` without inheriting from `Console`,
 because a `Protocol` matches on structure.
 
@@ -1594,7 +1595,7 @@ and the `except` clause around the `yield from` catches it.
 Catching is different from handling.
 The `KeyError` stays in the channel,
 so the signature keeps declaring a failure that can no longer escape.
-`catch()` alone moves an error in the type.
+`catch()` alone moves an error out of the error channel and into the result.
 A `catch()` further out takes the `KeyError` before an inner `except` can catch it.
 One listing shows an `except`, a `catch()`,
 and a `catch()` wrapped around an `except`:
@@ -1667,8 +1668,7 @@ but the two do different things with what they remove.
 `supply()` provides the Ability inside the Effect,
 so [the Ability parameter becomes `Never`](#supplying-the-dependency)
 and the result type stays as it was.
-`@throws` puts a raised exception into the channel,
-and `catch()` takes it back out as a value in the result:
+`catch()` takes out the exception that `@throws` put into the channel and returns it as a value in the result:
 
 ```python
 # catch_score.py
