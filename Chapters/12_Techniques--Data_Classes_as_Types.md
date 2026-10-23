@@ -107,7 +107,7 @@ not the running program.
 `f3(11)` returns 1100, beyond anything a legal rating produces,
 and the caller receives it as if it were fine.
 
-A check that is present still tests only the argument.
+A check that is present still tests only the argument and leaves the result unchecked.
 `f1(6)` returns 11, outside the range of a rating.
 
 ## A Class Is Not a Type
@@ -160,8 +160,8 @@ so `f1()` must re-check the result before returning it.
 That check runs after the mutation,
 so it reports the illegal value instead of preventing it.
 `Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`.
-The object goes on holding that illegal value.
-Catching the exception leaves `_number` at 13.
+After the caller catches the exception,
+the object still holds that illegal value.
 
 The order is a choice, not something mutation forces.
 `f1()` could check the sum before assigning it,
@@ -235,7 +235,9 @@ The trailing `...` is `display_object()` trimming that line to its report width.
 
 `__hash__` is `None`.
 A mutable `@dataclass` compares by value with `__eq__()`,
-so it makes its instances unhashable.
+so a hash that agreed with that comparison would change whenever a field changed.
+`@dataclass` sets `__hash__` to `None` instead,
+which makes the instances unhashable.
 An unhashable instance cannot go in a `set` or serve as a `dict` key.
 
 As [Class Attributes](09_Foundations--Class_Attributes.md) explains,
@@ -696,8 +698,7 @@ you transform one legal value into a new legal value.
 A parameter [annotated](08_Foundations--Static_Types.md#how-much-to-annotate)
 `Stars` states more than a type: the value passed the check.
 
-`test_stars.py` shows that illegal values cannot exist.
-Its tests confirm that:
+Four tests show that illegal values cannot exist:
 
 - `Stars(1)` and `Stars(10)`, the ends of the range, are legal.
 - The constructor rejects values outside the set.
@@ -989,11 +990,11 @@ ruff's `UP042` rewrites that form to `StrEnum`.
 `IntEnum` mixes `int` into `Enum`, so each member is an `int`.
 
 Mix in a type when the member is one of that type.
-`Month` stays a bare `Enum`.
-A month carries an `int` rather than being one.
+`Month` stays a bare `Enum`,
+because a month carries an `int` rather than being one.
 `max_days` reads that number through `.value`.
 A class of your own can be the mix-in too.
-`Enum` passes the assigned value to its `__init__()`,
+`Enum` passes the assigned value to the mix-in's `__init__()`,
 unpacking a tuple into separate arguments,
 so `Enum` builds each member the way a constructor call builds an ordinary instance.
 [State Machines](31_Patterns--State_Machines.md#mousetrap-states)
@@ -1251,7 +1252,8 @@ Pyright accepts the `__new__()` without comment.
 
 A subclass of the `NamedTuple` may define `__new__()`.
 That avoids the prohibition, but one path still bypasses the check.
-`_replace()` rebuilds through `tuple.__new__()`, not through your `__new__()`,
+`copy.replace()` calls the named tuple's `_replace()`,
+which rebuilds through `tuple.__new__()`, not through your `__new__()`,
 so `copy.replace()` on a validated instance quietly produces an unvalidated one.
 
 A frozen data class runs `__post_init__()` on every construction,
