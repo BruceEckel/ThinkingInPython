@@ -137,7 +137,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Pythonic *Visitor*: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) builds each operation as one `@singledispatch` function with a default and a `register` per exception.
+[The Pythonic *Visitor*: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) builds each operation as one `@singledispatch` function with a default and a `register` for each flower whose answer differs from the default.
 A new class requires the class plus one registration in every operation where its answer differs from the default.
 A new operation requires one function plus a registration for each flower that differs.
 Count both in lines, then compare with [The Expression Problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem).
@@ -363,7 +363,8 @@ class Beetle(Bug):  # Inherits no visit()
 <summary>Done when</summary>
 
 your `Bee` call prints `Gladiolus pollinated by Bee`, and `uv run ty check` reports `invalid-argument-type` on your `Beetle` call to `accept()`.
-Under the chapter's `Any` version, the checker accepts the same call and running it raises an `AttributeError`: `'Beetle' object has no attribute 'visit'`.
+Under the chapter's `Any` version, the checker accepts the same call.
+Running it raises an `AttributeError`: `'Beetle' object has no attribute 'visit'`.
 
 <details>
 <summary>Solution</summary>
@@ -434,7 +435,7 @@ The listing keeps the chapter's `Visitor`, `Bug`, `Pollinator`, and
 The `Any` and `Visits` versions report the `Beetle` mistake at
 different times. Under `Any`, the type checker accepts every argument,
 so the call type-checks. At runtime `accept()` raises
-`AttributeError`, as the `#:` line shows.
+`AttributeError` under either annotation, as the `#:` line shows.
 Under `Visits`, the type checker rejects the argument before the
 program runs, because `Visits` requires a `visit()` method and
 `Beetle` inherits none.
