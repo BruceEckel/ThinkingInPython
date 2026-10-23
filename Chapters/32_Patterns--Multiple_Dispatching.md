@@ -144,7 +144,7 @@ class Rock(Item):
         return Outcome.DRAW
 ```
 
-`methods_demo.py` plays each of the nine pairs through `duel()`:
+A loop over `all_pairs(Item)` plays each of the nine pairs through `duel()`:
 
 ```python
 # methods_demo.py
@@ -189,11 +189,11 @@ A game whose outcome depends on the caller's state reads that state through `cal
 This game ignores the argument,
 since the outcome depends on the two types alone.
 
+`Item` declares `__str__()` alone,
+so each `opponent` and `caller` parameter takes `Any`.
 Those `Any` annotations turn off static checking.
 Classes that supply eight of the nine answers then pass the type checker.
 Python raises an `AttributeError` at the first duel that calls the ninth.
-`Item` declares `__str__()` alone,
-so each `opponent` and `caller` parameter takes `Any`.
 A precise type needs a declaration of all four methods,
 either on `Item` as abstract methods or in a `Protocol`.
 Declaring the four methods restores the checking,
@@ -374,11 +374,12 @@ That is the pair of dispatches the `eval_*()` family writes out by hand.
 `singledispatchmethod` matches on the MRO, like `singledispatch`,
 rather than exactly.
 
-One mistake raises no exception,
-and `Paper().compete(Rock())` prints the answer registered through `Rock.compete`.
-A `@singledispatchmethod` declared on a shared base is one dispatcher that every subclass inherits.
+Declaring the `@singledispatchmethod` on a shared base is a mistake that raises no exception.
+The base then holds one dispatcher that every subclass inherits.
 Because resolving `self` finds that same dispatcher for every subclass,
 each class needs its own `@singledispatchmethod`.
+The listing below makes the mistake,
+so `Paper().compete(Rock())` prints the answer registered through `Rock.compete`:
 
 ```python
 # singledispatch_trap.py
@@ -567,7 +568,8 @@ Python 3.5 added the operator for array libraries such as NumPy.
 No built-in type implements either method, so `2 @ 3` raises a `TypeError`.
 The in-place forms, `__iadd__()` and its siblings, are a separate family.
 They serve `+=`, not `a + b`.
-`radd_dispatch.py` traces each dispatch:
+`Meters.__add__()` and `Meters.__radd__()` each print a line when they run,
+so the output traces each dispatch:
 
 ```python
 # radd_dispatch.py
