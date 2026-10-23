@@ -258,8 +258,7 @@ If you predicted `20`, you can say which of the two functions passed to `compose
 If you read `compose(square, increment_then_double)` left to right and
 predict that `square` runs first, you expect `(3 * 3 + 1) * 2 = 20`, but
 the program prints `64`.
-`compose(f, g)` runs `g` first, so the solution traces the call
-from right to left.
+`compose(f, g)` runs `g` first, so the stages run from right to left.
 Passing the stages square-first,
 `compose(increment_then_double, square)`, prints `20`.
 The type checker accepts that call too, since every stage takes and
@@ -773,7 +772,8 @@ Fahrenheit number against a Celsius limit. The Fahrenheit values
 
 Nothing raises an exception, because `to_fahrenheit()` and each
 predicate are correct on their own. The field name `celsius` alone
-records the unit. `to_fahrenheit()` keeps that name. A stage that
+records the unit. `to_fahrenheit()` stores a Fahrenheit number under
+that name, so the field's name and its value disagree. A stage that
 changes what a value means must run after every stage that reads the
 old meaning.
 
