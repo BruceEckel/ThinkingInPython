@@ -378,7 +378,8 @@ not as a guarantee that the attribute exists.
 
 `ClassVar` is a hint for the type checker.
 It records that `total` belongs to the class,
-and makes the type checker report the accidental shadowing from `class_attribute_confusion.py` as an error.
+so the type checker reports an assignment to `total` through an instance as an error.
+That assignment is the shadowing `class_attribute_confusion.py` performs unchecked on `Stars.rating`.
 Python's attribute lookup ignores the hint.
 `@dataclass` does read it at runtime,
 and leaves a `ClassVar` out of the fields it generates.

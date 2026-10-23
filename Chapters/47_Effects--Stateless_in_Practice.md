@@ -1798,7 +1798,6 @@ print(db1.attempts, db2.attempts)
 The second call's answer comes from `db1`'s cache entry,
 because `memoize()` keys on `"Morty"` alone.
 Memoize a function only where one scenario serves the memoized call for its whole lifetime,
-the way [State as an Ability](#state-as-an-ability)'s `Cell` does once bound,
 or key the cache on the scenario too.
 
 ## Running Effects in Parallel

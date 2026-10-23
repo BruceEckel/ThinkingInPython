@@ -483,8 +483,8 @@ expect(RecursionError, Circle, 10)
 `property(fset=...)` builds a write-only property,
 the reverse of a getter-only one, but write-only properties are rare.
 Reading one raises an `AttributeError` reporting that the property has no getter.
-A method that takes the value makes the write a call,
-with no attribute to read back.
+A class that needs a write-only value usually takes it through a method instead.
+The write is then a call, and no attribute exists to read back.
 
 ### Caching with `cached_property` {#cached-property}
 

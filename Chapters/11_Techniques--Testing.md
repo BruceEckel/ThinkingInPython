@@ -980,7 +980,7 @@ randomness, the filesystem, the environment, the network.
 Replace those at the boundary,
 by injection where you can change the code and with `monkeypatch` where you cannot.
 Then test what the function computes from its inputs with a handful of parametrized cases.
-The work is mostly in the first step,
+The work is mostly in the first two steps,
 since a function that is hard to test usually fetches a dependency that a caller could pass in.
 
 To find out what you have not tested, run the suite under `coverage.py`,
