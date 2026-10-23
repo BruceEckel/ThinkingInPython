@@ -58,7 +58,8 @@ So every instance holds its own dictionary.
 `m1` has no `name`, and `m2` has no `info`.
 A [class attribute](../../Chapters/09_Foundations--Class_Attributes.md)
 works the other way.
-Every instance shares that one object until something shadows it.
+Every instance shares the one object the class holds,
+until an instance attribute of the same name shadows it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -619,7 +620,8 @@ At runtime, the unpacking `x, y = other` raises a `ValueError` for a tuple of an
 **Reuse the properties in `__repr__()`.** `tuple.__repr__()` prints `(4.0, 6.0)`. The override prints the class name around the two properties, so the `Point` names its type the way a `NamedTuple` does.
 
 **What stays a tuple.** Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone, so `p[:1]` is the plain `(4.0,)`.
-A tuple on the left of `+` is the other gap: `(1.0, 1.0) + p` runs `tuple.__add__()` first and concatenates to a four-element tuple, since `Point` defines no `__radd__()`.
+A tuple on the left of `+` is the other gap: `(1.0, 1.0) + p` runs `tuple.__add__()`, which concatenates to a four-element tuple.
+Python calls `__radd__()` on the right operand first when that operand's class is a subclass of the left operand's class, but `Point` defines no `__radd__()`.
 Each tuple operation a `Point` must survive is one more override.
 So a `NamedTuple` is a better choice when positional tuple behavior is a feature, and a record is a better choice when that behavior is a liability.
 
