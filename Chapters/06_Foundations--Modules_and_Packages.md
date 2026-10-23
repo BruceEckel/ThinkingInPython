@@ -500,10 +500,9 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 #: ['_helper', 'public']
 ```
 
-Without `__all__`, the star import binds every name that starts with a letter:
-`public` and `undeclared`.
-With `__all__`, it binds the two listed names, including `_helper`.
-`undeclared` stays in `exporting` with `_internal`.
+With `__all__`, the star import binds the two listed names, including `_helper`.
+`undeclared` stays in `exporting` with `_internal`,
+although its name has no underscore.
 
 The `# noqa: F403` silences the linter's warning about the star import.
 A star import hides the source of each name from a reader and from the tools.
