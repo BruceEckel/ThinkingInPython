@@ -218,14 +218,14 @@ The type checker infers `I` from the initial state,
 so `StateMachine(TrapState.WAITING)` is a `StateMachine[Mouse]` whose `step()` accepts only a `Mouse`.
 
 `run()`'s behavior depends on the current state.
-Every state prints its message, and `Holding` also calls `chime()`.
+Every state prints its message, and `HOLDING` also calls `chime()`.
 `step()` defines the flow,
 while each `State`'s fields supply the varying behavior.
 `next` chooses the next state,
 and `action` holds the behavior particular to one state.
 
-`trap_states_demo.py` runs a trap through every move in `MOVES`,
-then feeds a fresh trap an input that only matches `waiting()`'s `case _`:
+The demo runs one trap through every move in `MOVES`,
+then feeds a fresh trap an input that matches only `waiting()`'s `case _`:
 
 ```python
 # trap_states_demo.py
@@ -268,9 +268,8 @@ trap.step(Mouse.ESCAPES)
 Each `StateMachine(TrapState.WAITING)` call prints `Broadcasting cheese smell` before any input arrives,
 because the constructor runs the initial state.
 
-`test_trap_states.py` checks two facts:
-the nine moves bring the trap back to `Waiting`, as the trace shows,
-and every state answers every move with a state:
+The tests check two facts: the nine moves bring the trap back to `Waiting`,
+as the trace shows, and every state answers every move with a state:
 
 ```python
 # test_trap_states.py
@@ -391,8 +390,9 @@ and `StateMachine`'s constructor uses it as half of each table key.
 
 The constructor groups the rules by `(state, input_type)` into a dictionary,
 so `handle()` finds the candidates for the current state and the input's class in one lookup.
-The engine holds the rules as `Rule[Any]`.
-One table holds `Rule[Money]` beside `Rule[Row]`.
+
+One table holds `Rule[Money]` beside `Rule[Row]`,
+so the engine holds the rules as `Rule[Any]`.
 `Rule` is [invariant](08_Foundations--Static_Types.md#variance) in `I`,
 since `I` sits in both `type[I]` and `Callable[[I], ...]`,
 so `Any` is the one type argument that admits every entry.
@@ -401,9 +401,10 @@ The checker matches each input class to its methods at the `Rule(...)` call.
 
 Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
-The engine tries them in order and the first whose condition passes handles the input,
-the [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
-shape, so a single input can lead to different states depending on a condition.
+The engine tries them in order and runs the first rule whose condition passes.
+In this [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+shape, a single input can lead to different states,
+depending on which condition passes.
 A rule whose condition is `None` matches every time,
 so it belongs last in its group.
 
@@ -427,7 +428,7 @@ A `Column` moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
 The vending machine's states carry no data,
-and the demo prints a state by its `name`:
+so the demo prints a state by its `name`:
 
 ```python
 # vending_machine.py
@@ -614,7 +615,7 @@ or a `Condition`/`Transition` class hierarchy.
 The `dict` does the dispatch,
 and a bound method stored in a rule is the condition or the action.
 
-`vending_demo.py` feeds a `VendingMachine` a list of inputs.
+The demo feeds a `VendingMachine` a list of inputs.
 For each input it prints the transition in the mousetrap's form,
 the state before, the input, and the state after,
 then the `message` that the rule's action wrote:
@@ -769,8 +770,8 @@ it is the `action` of every rule whose `next_state` is that state.
 `refund()` runs on every transition into `QUIESCENT`,
 so one comprehension writes it into all four `Quit` rules.
 That is the Mealy shape: the action belongs to the transition.
-A rule's action reads the input that caused the transition,
-where a state's `action` takes no arguments:
+A state's `action` takes no arguments,
+while a rule's action reads the input that caused the transition:
 `add_money()` reads the coin's `value`.
 
 In both designs the states are `Enum` members because a state machine works with a closed set of states.
