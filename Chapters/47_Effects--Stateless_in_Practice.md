@@ -2488,7 +2488,7 @@ Try each exercise before opening its [solution](../Solutions/47_Effects--Statele
 13. Add a `Butter` leaf to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
     Write `buttered()`'s signature with `Need[Butter]` alone first, run `ty`,
     and read the diagnostic before fixing it.
-    Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
+    Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels below `run()`.
 14. `play()` in `casts.py` accepts any three actors, matched or not.
     `kitties_and_puzzles()` and `warriors_and_weapons()` already share a signature.
     Give that shape a name so a caller can pass either one where a cast belongs,

@@ -1916,7 +1916,7 @@ def toast() -> Depend[
 > Add a `Butter` leaf to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
 > Write `buttered()`'s signature with `Need[Butter]` alone first, run `ty`,
 > and read the diagnostic before fixing it.
-> Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
+> Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels below `run()`.
 
 <details>
 <summary>Where to look</summary>
@@ -2023,7 +2023,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
    |                               found `Generator[Need[Toaster], Any, str]`
 ```
 
-**Answer every requirement at the edge.** The second diagnostic tells you about the dependency two levels down. `supply()` leaves
+**Answer every requirement at the edge.** The second diagnostic tells you about the dependency two levels below `run()`. `supply()` leaves
 `Need[Toaster]` in the channel, so the requirement reaches `run()`. Nothing in
 `buttered()`'s body mentions a toaster. The requirement comes from `toast()`, which `buttered()` calls.
 The type checker reports it at `run()`, the program's edge,
