@@ -500,7 +500,8 @@ first also lets the type checker narrow `exc_type` to
 If you return `issubclass(exc_type, KeyError)` without the `None` test,
 the demo prints the same two lines,
 because both of its blocks raise an exception.
-In that version a block that finishes cleanly fails.
+In that version a block that finishes cleanly raises a `TypeError`
+from the `issubclass()` call.
 `ty` reports an `invalid-argument-type` at the `issubclass()` call,
 so the type checker catches the mistake that the demo's output hides.
 
