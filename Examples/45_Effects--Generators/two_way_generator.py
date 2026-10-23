@@ -1,7 +1,8 @@
 # two_way_generator.py
 import inspect
 from drive import ANSWERS, drive
-from interview_generator import interview
+from exceptions import expect
+from interview_generator import Answer, interview
 
 conversation = interview()
 print(inspect.getgeneratorstate(conversation))
@@ -14,3 +15,5 @@ print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 print(inspect.getgeneratorstate(conversation))
 #: GEN_CLOSED
+expect(StopIteration, conversation.send, Answer("Bob"))
+#: [StopIteration]

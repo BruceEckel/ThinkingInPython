@@ -285,7 +285,8 @@ The driver would then return `None` as the result.
 # two_way_generator.py
 import inspect
 from drive import ANSWERS, drive
-from interview_generator import interview
+from exceptions import expect
+from interview_generator import Answer, interview
 
 conversation = interview()
 print(inspect.getgeneratorstate(conversation))
@@ -298,6 +299,8 @@ print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 print(inspect.getgeneratorstate(conversation))
 #: GEN_CLOSED
+expect(StopIteration, conversation.send, Answer("Bob"))
+#: [StopIteration]
 ```
 
 `GEN_CREATED` shows that calling `interview()` created the generator and ran none of its body.
@@ -305,7 +308,8 @@ print(inspect.getgeneratorstate(conversation))
 Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
 because whenever `drive()`'s code runs, the generator waits at a `yield`.
 After the `return`, the generator is `GEN_CLOSED`,
-so a further `send()` raises `StopIteration` at once.
+so sending it another answer raises `StopIteration` at once.
+That `StopIteration` carries no value, so `expect()` prints its name alone.
 
 The generator and `drive()` take turns.
 While the body runs, `drive()` waits inside `send()`,
