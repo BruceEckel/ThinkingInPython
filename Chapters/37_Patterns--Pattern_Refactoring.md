@@ -180,7 +180,7 @@ Aluminum:81
 Cardboard:12
 ```
 
-The parser builds `Trash` objects through the registry and specifies no concrete material,
+The parser looks up each material by name in the registry,
 so a new material needs no edit to `parse()`:
 
 ```python
@@ -252,7 +252,8 @@ def sort_by_match(pieces: list[Trash]) -> Bins:
     return bins
 ```
 
-`recycle_rtti.py` sorts the pieces in `trash.dat` with `sort_by_match()`:
+`sort_by_match()` sorts the pieces in `trash.dat`,
+and `report()` prints each bin's total:
 
 ```python
 # recycle_rtti.py
@@ -267,7 +268,7 @@ report(sort_by_match(parse("trash.dat")))
 #: Cardboard: 120.08
 ```
 
-`recycle_rtti.py` sorts every piece and reports each material's total,
+Every piece in `trash.dat` reaches a bin,
 but `sort_by_match()` has a classic flaw.
 It tests for every type.
 Testing for one type, or a small subset that needs special handling, is fine.
@@ -309,7 +310,7 @@ Aluminum:30
 Plastic:40
 ```
 
-`plastic_dropped.py` defines `Plastic` and passes the new data to the imported `sort_by_match()`,
+With `Plastic` defined, the new data goes to the imported `sort_by_match()`,
 which stays as written:
 
 ```python
@@ -365,7 +366,8 @@ def sort_by_type(pieces: list[Trash]) -> Bins:
     return bins
 ```
 
-`recycle_dict.py` sorts `trash.dat` with `sort_by_type()` and prints the same report as `recycle_rtti.py`:
+`sort_by_type()` sorts `trash.dat` into the same bins,
+and `report()` prints the same totals as `recycle_rtti.py`:
 
 ```python
 # recycle_dict.py
@@ -404,7 +406,8 @@ so a type checker accepts `bins: Bins = {}` too.
 That version raises a `KeyError` on the first piece of trash.
 
 `plastic_dropped.py` drops the plastic in `plastic.dat`.
-Here, `recycle_dict_plastic.py` passes that file to `sort_by_type()` and defines the same `Plastic` class as `plastic_dropped.py`:
+This time `plastic.dat` goes to `sort_by_type()`,
+with the same `Plastic` class as `plastic_dropped.py`:
 
 ```python
 # recycle_dict_plastic.py
@@ -693,7 +696,7 @@ Try each exercise before opening its [solution](../Solutions/37_Patterns--Patter
     then run `recycle_dict.py` and `recycling_note.py`.
     Explain why `CrushedAluminum` gets its own bin but not its own note.
     Then change `sort_by_type()` so a subclass shares its parent's bin,
-    without specifying any material in the sorting loop.
+    without naming any material class in the sorting loop.
 5.  Define `Plastic`, whose disposal hazard is toxic fumes,
     and leave it out of `disposal_hazard.py`'s registrations.
     What does `hazard()` answer for a piece of plastic?
