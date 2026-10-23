@@ -89,7 +89,7 @@ With bare `int` on both channels, the checker accepts the swap.
 
 **Drive the conversation by hand.** `tally()` needs four calls: one
 `next()` and three sends. `next(t)` runs the body up to the first
-`yield` and produces the first prompt. Each `send()` resumes at that suspended `yield`, whose
+`yield` and produces the first prompt. Each `send()` resumes the suspended `yield`, whose
 value becomes `amount`, then runs to the next one. The third `send()`
 resumes the last `yield`, so the loop ends and `tally()` returns. The
 return value arrives as `StopIteration`'s `value` rather than as the
@@ -384,9 +384,10 @@ send that supplies a collector's second value produces two: the
 completed collector's `print()`, then the first prompt of the next
 collector. The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
 so the output alternates between one-line and two-line responses.
-`send(6)`'s second line differs. `gamma` is the last
-collector, so when it finishes, `both()` finishes too.
-`send(6)` then raises `StopIteration`, and the `except` prints `both() is exhausted`.
+`gamma` is the last collector, so when it finishes, `both()`
+finishes too. Instead of returning a next prompt, `send(6)` raises
+`StopIteration`, so its second line comes from the `except`:
+`both() is exhausted`.
 
 `both()` holds three `yield from` statements and leaves all the
 forwarding to them. `yield from`
@@ -478,7 +479,8 @@ Once you remove the annotation, the type checker accepts `survey()`. For
 that inference. The f-string then accepts any object, since formatting
 one calls `str()` on it.
 A generator object's `str()` is its repr, so the output shows the repr.
-The annotation alone gives the checker a declared type to compare.
+The annotation alone gives the checker a declared type to compare
+with the call's type.
 So annotate a local whenever you want the checker to verify
 the type of the call that produces its value.
 
@@ -646,10 +648,10 @@ generator's `SendType` describes what a suspended `yield` expression
 can receive.
 A just-started generator has no suspended `yield`, so
 nothing receives the value handed to the first `send()`. The runtime
-enforces the same rule from the other side. Sending a non-`None`
+enforces the same rule. Sending a non-`None`
 value to a fresh generator raises `TypeError: can't send non-None value
-to a just-started generator`. So the first call is special in both
-directions, and `None` is the only value it accepts.
+to a just-started generator`. So at runtime the first `send()` accepts
+`None` alone, a value the `SendType` excludes.
 
 An annotation cannot express "`None` for the first call, `Answer`
 afterward," because a single `SendType` covers every call. Widening the
