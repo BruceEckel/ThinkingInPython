@@ -165,7 +165,8 @@ but the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it.
 With nothing shared, a lock has nothing to guard.
 
-`count_primes()` is pure, and each call does enough work to spread across cores:
+`count_primes()` is pure,
+and each call does enough work to be worth sending to a separate core:
 
 ```python
 # parallel_pure.py
@@ -211,7 +212,7 @@ The limits in `parallel_pure.py` are large enough for the parallel run to finish
 prints the two times only when you run the listing with `--numbers`.
 On the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
-well over the 1.3x margin `faster` checks.
+a speedup well over the 1.3x margin `faster` checks.
 At small enough limits the serial run finishes before a pool has started its workers.
 At those sizes the parallel run takes longer than the serial one.
 Purity guarantees that the parallel run returns the serial run's answers.
@@ -244,7 +245,7 @@ These chapters build three properties: purity, immutability,
 and referential transparency.
 Together they provide confidence at every level.
 
-Style contributes before the first rung.
+Style contributes before the first rung of that spectrum.
 *Declarative* code states the result you want.
 *Imperative* code spells out each step to produce it.
 A [comprehension](16_Techniques--Comprehensions.md) describes the result,
@@ -287,7 +288,7 @@ You decide how far up the spectrum to go.
    That search is the falsifiability the opening requires of a science.
    What this rung adds to rung 3 is expressiveness, not certainty.
    A type states what shape a value has.
-   A property can state a fact about the value's behavior,
+   A property can state a fact about a function's behavior,
    but it checks a sample of the inputs.
 5. At the top is formal proof.
    In a dependently typed language such as Lean, Idris, or Rocq (formerly Coq),
@@ -443,7 +444,7 @@ The roundtrip law belongs to a small family of reusable property shapes.
 Knowing the family is most of the skill.
 An *invariant* states a fact about every output.
 Sorting produces an ordered list.
-*Idempotence* states that repeating changes nothing.
+*Idempotence* states that repeating an operation changes nothing.
 Sorting a sorted list returns the same order.
 An *oracle* states that two implementations agree.
 The simple version you can check by reading matches the fast one.
