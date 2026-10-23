@@ -76,8 +76,8 @@ Instead of annotating every variable that holds a `Messenger`,
 you can move that `Any` into the class.
 Declare a [`__getattr__()`](25_Patterns--Surrogate.md#forwarding-with-getattr)
 that returns `Any` and a `__setattr__()` that accepts an `Any` value.
-The `__getattr__()` covers reads,
-and the write `m.more = 11` needs the `__setattr__()`.
+The `__getattr__()` covers reads.
+The `__setattr__()` covers writes such as `m.more = 11`.
 The standard library's type declaration for `SimpleNamespace` has such a pair.
 In place of `__getattr__()`, its read half is `__getattribute__()`,
 which intercepts every attribute access.
@@ -247,7 +247,7 @@ so a call site reads `result.mean` instead of `result[0]`.
 
 Because a `NamedTuple` is a tuple, you can also unpack it.
 Unpacking assigns by position,
-so a caller can again swap the mean and the count.
+so a caller can still swap the mean and the count.
 `count, mean = summarize([1.0, 5.0])` runs, passes the type checker,
 and binds each name to the other's value,
 as `mean=2 count=3.0` in the output shows.
@@ -315,7 +315,7 @@ The frozen data classes compare unequal,
 because a data class's generated `__eq__()` tests `other.__class__ is self.__class__` before it compares the fields.
 
 A `NamedTuple` inherits ordering from `tuple` the same way.
-`tuple_ordering.py` repeats `Color`, `Dimensions`,
+The listing below repeats `Color`, `Dimensions`,
 and `FrozenColor` beside two data classes that pass `order=True`:
 
 ```python
@@ -375,8 +375,9 @@ The sequence of the field declarations sets that order implicitly.
 A frozen data class generates ordering methods only when the decorator receives `order=True`.
 `FrozenColor` leaves `order` at its default, `False`,
 so `<` between two `FrozenColor`s raises a `TypeError`.
-`OrderedColor` compares with its own class.
-Comparing an `OrderedColor` with an `OrderedDimensions` raises a `TypeError`.
+`OrderedColor` orders instances of its own class.
+Its generated `__lt__()` runs the same class test as `__eq__()`,
+so comparing an `OrderedColor` with an `OrderedDimensions` raises a `TypeError`.
 
 Both listings write `@dataclass(frozen=True)` in full instead of `@record`,
 so that `FrozenColor` reads the same in each,
