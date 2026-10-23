@@ -223,8 +223,10 @@ The generator yields a request out, and the driver sends the answer back in.
 That conversation makes an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
 (EMS) possible.
 
-A driver function steps the generator.
-`drive.py` holds one, along with a table of answers:
+A driver function runs the generator from start to finish.
+It starts the body with `next()`, sends each answer back with `send()`,
+and returns the generator's result when the body ends.
+`drive.py` defines `drive()` and a table of answers:
 
 ```python
 # drive.py
@@ -554,7 +556,7 @@ A single loop at the edge of the program interprets requests yielded anywhere in
 
 ### Composing Is Not Interpreting
 
-`drive()` and `yield from` both step a generator and both finish at `StopIteration`,
+`drive()` and `yield from` both run a generator's body one `yield` at a time and both finish at `StopIteration`,
 so they are easy to confuse.
 In `yield_from_delegates.py`, `drive()` receives `interview()`'s `Result`.
 `yield from` can take over that job:
