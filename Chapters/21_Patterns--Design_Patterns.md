@@ -17,8 +17,8 @@ along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 Many of those examples inspired the ones in this part of the book.
 This chapter introduces the concepts.
-Its one listing shows a pattern shrinking to a function,
-and the chapters that follow supply the rest of the code.
+Its one listing shows a pattern shrinking to a function.
+The chapters that follow supply the rest of the code.
 
 ## What Is a Pattern?
 
@@ -152,7 +152,7 @@ The pattern exists because the language leaves that code for them to write.
 
 A language can supply that missing piece in two ways.
 Sometimes a language adds the feature,
-and the feature replaces the pattern^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and a count for Python comes out differently. *Singleton* is one of the seven he leaves unchanged, but [*Singleton*](23_Patterns--Singleton.md)
+and the feature replaces the pattern^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan. A count for Python comes out differently. *Singleton* is one of the seven he leaves unchanged, but [*Singleton*](23_Patterns--Singleton.md)
 shows that a Python module already is one.].
 [*Iterator*](22_Patterns--Iterators.md#the-pattern-that-disappeared)
 is the clear case.
@@ -337,7 +337,7 @@ In Python, the `Protocol` and `Callable` rungs require nothing from an implement
 An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and no implementer inherits.
 A `Callable` annotation is not a class.
-Those two rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
+The `Protocol` and `Callable` rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
 In a language where every implementer must specify its interface,
 a pattern exists to build a declared interface.
 In a language that supplies the `Protocol` and `Callable` rungs,
@@ -374,8 +374,8 @@ which is where a heavy edge belongs.
 *Factory Method* keeps a heavy edge too.
 Something must specify a class to construct it.
 The pattern moves that choice out of the client and into a creator.
-Holding the name is the creator's whole job,
-and no other part names the concrete creator.
+Naming the concrete product is the creator's whole job.
+No other part names the concrete creator.
 
 *Adapter* moves the heavy edge inside the adapter.
 The client specifies the target interface.
@@ -574,8 +574,8 @@ drawn from that chapter's own listings.
 [*Data Transfer Objects*](28_Patterns--Data_Transfer_Objects.md)
 is the one chapter in that range without a figure.
 The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
-shows which way each edge points.
-Each chapter's figure shows what happens, in what order,
+shows which way each edge points,
+while each chapter's figure shows what happens, in what order,
 and which part knows about which.
 
 Part III closes with a [Pattern Catalog](39_Patterns--Pattern_Catalog.md),
