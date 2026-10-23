@@ -60,7 +60,7 @@ p.g()
 ### What the Implementation Supplies
 
 `Implementation` can have an interface different from `Proxy`'s interface.
-`Proxy` qualifies as long as code calls it in place of the implementation.
+`Proxy` still counts as a *Proxy* as long as code calls it in place of the implementation.
 That definition is looser than the one in *GoF Design Patterns*,
 because it depends only on how code uses `Proxy`.
 Under GoF's stricter definition,
@@ -164,7 +164,7 @@ The static type checker verifies signatures.
 `__getattr__()` is Python's built-in delegation mechanism,
 which [*Singleton*](23_Patterns--Singleton.md)
 uses to forward attribute access to its inner object.
-Delegating through it replaces `Proxy`'s forwarding method for each call with a single `__getattr__()`:
+Delegating through it replaces `Proxy`'s hand-written `f()` and `g()` with a single `__getattr__()`:
 
 ```python
 # proxy_getattr.py
