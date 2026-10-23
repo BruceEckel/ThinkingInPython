@@ -548,7 +548,7 @@ The listing imports `drive()` unchanged from `drive.py`,
 and nothing in `drive()` refers to `ask()`.
 
 `ask()` uses `Answer` in two of the three positions, in two different roles.
-As the `SendType`, `Answer` types the value the driver sends in,
+As the `SendType`, `Answer` types each value the driver sends,
 which arrives as the value of the `yield` expression and binds to `answer`.
 As the `ReturnType`, `Answer` types the value `ask()` returns when it finishes.
 That value becomes the value of the whole `yield from` expression,
@@ -743,7 +743,8 @@ expect(RuntimeError, s.close)
 `stubborn()` answers `GeneratorExit` with another `yield`,
 so `close()` raises `RuntimeError: generator ignored GeneratorExit`.
 
-A driver that stops using a live generator before it finishes shuts it down with `close()`.
+When a driver stops using a live generator before the generator finishes,
+the driver shuts it down with `close()`.
 Python also calls `close()` on a live generator when it reclaims the generator's memory.
 When Python reclaims a generator like `stubborn()`,
 the `RuntimeError` has no caller to reach,
