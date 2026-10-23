@@ -211,17 +211,19 @@ shows that calling an `async def` function runs nothing.
 The call returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
 the same three-part shape as a `Generator`.
-The match is deliberate.
-`async def` and generator functions both build descriptions for a driver to run.
-Calling `interview()` returns a generator object but runs nothing in the function body.
+The shapes match because `async def` and generator functions both build descriptions for a driver to run.
+Calling `interview()` returns a generator object and runs none of the function body.
 `next()` and `send()` run the body, one `yield` at a time.
 
-A generator is more useful than a coroutine here because you write the driver.
-A coroutine's requests go to the event loop.
-A generator's requests go to the code that calls `next()` and `send()`.
+For managing Effects,
+a generator is more useful than a coroutine because you write the driver.
+Under `asyncio`, a coroutine's requests go to the event loop.
+A generator's requests go to whatever code calls `next()` and `send()`.
 The generator yields a request out, and the driver sends the answer back in.
-That conversation makes an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
-(EMS) possible.
+The driver chooses each answer,
+so the same generator runs unchanged under different drivers.
+That separation of a request from its fulfillment is the core of an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
+(EMS).
 
 A driver function runs the generator from start to finish.
 It starts the body with `next()`, sends each answer back with `send()`,
@@ -252,7 +254,26 @@ def drive(conversation: Generator[Question, Answer, Result],
             return stop.value
 ```
 
-`two_way_generator.py` runs `interview()` under that driver:
+`drive()` uses all three type parameters:
+`next()` produces the first `Question`,
+`send()`'s argument supplies the `Answer`,
+and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
+
+The type checker verifies each `Question` the generator yields and each `Answer` that `drive()` sends.
+`StopIteration.value`'s type is `Any`,
+so the type checker accepts `return stop.value` under any return type `drive()` declares.
+The `Result` in `drive()`'s signature states the intent.
+Nothing verifies it.
+
+The `try` holds only the `send()` call,
+because a `StopIteration` inside it means the conversation finished.
+Another call that can raise `StopIteration` belongs outside the `try`.
+A driver that reads its answers from an iterator, for example,
+gets `StopIteration` from `next()` when the answers run out.
+Inside the `try`, that exception would look like the end of the conversation.
+The driver would then return `None` as the result.
+
+Running the conversation takes two calls, `interview()` and `drive()`:
 
 ```python
 # two_way_generator.py
@@ -271,30 +292,11 @@ print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
-`two_way_generator.py` imports `interview()` unchanged.
-The driver is new.
-`inspect.getgeneratorstate()` reports `GEN_CREATED` for the generator `interview()` returned.
-The generator exists and waits to start its body.
-
-`drive()` uses all three type parameters:
-`next()` produces the first `Question`,
-`send()`'s argument supplies the `Answer`,
-and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
-The `answers` map stores each `Answer` under its `Question`.
-
-The type checker verifies the `Question` and the `Answer`.
-`StopIteration.value`'s type is `Any`,
-so a type checker accepts `return stop.value` under any return type `drive()` declares.
-The `Result` in `drive()`'s signature states the intent.
-Nothing verifies it.
-
-Inside the `try`, `StopIteration` means the conversation finished,
-so only the `send()` call sits there.
-A driver that reads its answers from an iterator gets a `StopIteration` from `next()` when that iterator runs out,
-so that call belongs outside the `try`.
+`GEN_CREATED` shows that calling `interview()` created the generator and ran none of its body.
+`drive()` then runs the body through all three questions.
 
 `interview()` accepts its answers from any driver that calls `send()`.
-Its body is three questions and a `return`,
+Its body holds three questions and a `return`,
 with no dictionary and no `input()` call.
 `interview()` yields each question and suspends until `send()` supplies the answer.
 `drive()` decides how to answer those questions,
@@ -306,11 +308,11 @@ The generator declares requests.
 The driver interprets them.
 
 Each generator has one driver at a time.
-No annotation states that pairing, but the runtime enforces it.
+The runtime enforces that pairing, though no annotation states it.
 A generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 shows that error and `threading.synchronized_iterator()`,
-which serializes the conversation.
+which lets several threads share one generator by serializing their calls.
 
 ## `yield from` Composes Descriptions
 
