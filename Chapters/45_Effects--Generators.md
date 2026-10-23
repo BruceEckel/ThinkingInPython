@@ -316,7 +316,8 @@ which lets several threads share one generator by serializing their calls.
 
 ## `yield from` Composes Descriptions
 
-Generators can support an EMS because they nest.
+An EMS needs a request made deep inside a program to reach the one driver at its edge.
+Generators provide that path because they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
 
@@ -355,8 +356,8 @@ print(list(top()))
 
 Each `yield from` runs its target until that generator finishes,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
-"Exhausted" describes where the delegation ends.
-In between, the inner generator yields its values one at a time,
+"To exhaustion" says when the delegation ends.
+Until then, the inner generator yields its values one at a time,
 as the driver requests each one.
 
 Exhaustion is transitive.
@@ -370,7 +371,7 @@ so `list(outer())` shows `<generator object one at ...>` in place of `'only'`.
 ### The Return Channel
 
 A `yield from` expression passes the inner generator's yielded values through to the driver and evaluates to the inner generator's return value.
-Here, `report()` captures the return value from `yield from emit(items)` into `size`.
+`report()` stores the value of `yield from emit(items)` in `size`.
 `report()` is a one-way generator,
 annotated with the short `Iterator[str]` form:
 
@@ -395,11 +396,11 @@ print(list(report(["red", "green", "blue"])))
 
 `emit()` is a `Generator[str, None, int]`.
 It yields strings, receives `None`,
-and returns the `int` total it accumulates while iterating over `items`.
+and returns the number of characters in `items` as an `int`.
 
 The return channel delivers a value from a generator to the generator that delegated to it.
 `report()` receives the total `emit()` computed.
-Neither function specifies the driver.
+Neither function refers to the driver.
 
 Any iterable can follow `yield from`.
 The expression takes its value from the `StopIteration` that ends the iteration.
@@ -410,8 +411,10 @@ so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 
 ### The Send Channel
 
-The `SendType` is the type of the value a driver sends back into the generator.
-A generator that receives values and returns `None` can leave the `ReturnType` at its default:
+`yield from` also forwards each value the driver sends,
+delivering it to the `yield` that waits inside the inner generator.
+Here `collect()` receives two values and returns `None`,
+so its annotation leaves the `ReturnType` at its default:
 
 ```python
 # yield_from_send.py
@@ -466,8 +469,8 @@ and `send(2)` returns `beta needs a value`.
 The driver sees `StopIteration` once,
 when `both()` finishes its last delegation.
 
-The natural first attempt is to write the forwarding as a loop by hand.
-That loop discards every sent value, and nothing reports the loss:
+A hand-written loop is the natural first attempt at that forwarding.
+The loop silently discards every sent value:
 
 ```python
 # manual_forwarding.py
@@ -505,7 +508,8 @@ The send channel appears in the declaration and goes unused.
 
 ### All Three Channels
 
-`yield from` restructures the `interview()` example:
+This version of `interview()` makes each request through a helper, `ask()`,
+and delegates to it with `yield from`:
 
 ```python
 # yield_from_delegates.py
@@ -540,10 +544,10 @@ if __name__ == "__main__":
 The listing imports `drive()` unchanged from `drive.py`,
 and nothing in `drive()` refers to `ask()`.
 
-`ask()` uses `Answer` in two of the three positions, for two different reasons.
-As the `SendType` it is the value the driver sends in,
+`ask()` uses `Answer` in two of the three positions, in two different roles.
+As the `SendType`, `Answer` types the value the driver sends in,
 which arrives as the value of the `yield` expression and binds to `answer`.
-As the `ReturnType` it is the value `ask()` returns when it finishes.
+As the `ReturnType`, `Answer` types the value `ask()` returns when it finishes.
 That value becomes the value of the whole `yield from` expression,
 so each of `interview()`'s three assignments binds an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
@@ -553,8 +557,8 @@ a different kind of value from the answer to any one question.
 `drive()` receives a request that `ask()` yielded inside `interview()`,
 and looks it up in `answers` as it would one that `interview()` yielded in its own body.
 The answer `drive()` sends back becomes the value of the `yield` inside `ask()`.
-Nothing in `ask()` specifies the driver that sent it.
-A single loop at the edge of the program interprets requests yielded anywhere inside it.
+Nothing in `ask()` refers to the driver that sent the answer.
+A single loop at the edge of the program interprets requests yielded at any depth.
 
 ### Composing Is Not Interpreting
 
@@ -589,7 +593,7 @@ print(drive(survey(),
 ```
 
 The listing imports `interview()` unchanged from `yield_from_delegates.py`,
-where `drive()` drives it.
+where `drive()` runs it directly.
 Now `survey()` delegates to `interview()`.
 `interview()`'s `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
 `interview()`'s questions reach `drive()` through three generators rather than two.
@@ -597,12 +601,12 @@ Now `survey()` delegates to `interview()`.
 `survey()` then asks about a color,
 so the argument to `drive()` uses the dictionary union operator to add one more pair to a copy of `ANSWERS`.
 The driver receives one more question,
-and the trace gains one more `request` line and one more `ask()` line.
+so the trace gains one more `request` line and one more `ask()` line.
 
 `drive()` still runs `interview()`, now through `survey()`.
-Something must still call `next()` and `send()` at the top,
-so the example ends with a `drive()` call.
-However deep you stack delegations, the number of drivers stays at one.
+The outermost generator still needs code that calls `next()` and `send()`,
+so the listing ends with a `drive()` call.
+However deeply the delegations nest, the program has one driver.
 
 `drive()` and `yield from` differ in how they respond to a request.
 `drive()` answers it.
@@ -655,9 +659,10 @@ g.close()
 #: cleanup
 ```
 
-`g.throw(ValueError("bad input"))` raises that exception at the suspended `yield`,
+`g.throw(ValueError("bad input"))` raises that exception at the suspended `yield "ready"`,
 inside `worker()`'s body, the same way the `with` block's exception does.
-`worker()` catches it, prints, and yields again, so the generator keeps running.
+`worker()` catches the exception, prints the message, and yields again,
+so the generator keeps running.
 Like `send()`, `throw()` returns the next value the generator yields,
 here `"recovered"`.
 An exception that escapes the generator's body ends the generator and propagates out of `throw()` into the driver.
@@ -701,7 +706,8 @@ g.close()
 #: outer cleanup
 ```
 
-The driver calls `throw()` on `outer()`, but `inner()` prints the `caught` line.
+The driver calls `throw()` on the generator `outer()` returned,
+but `inner()` prints the `caught` line.
 `yield from` passes the exception down to the `yield` where `inner()` waits.
 `inner()`'s `except` clause handles it,
 so the `ValueError` stays inside `inner()`.
@@ -734,7 +740,7 @@ expect(RuntimeError, s.close)
 `stubborn()` answers `GeneratorExit` with another `yield`,
 so `close()` raises `RuntimeError: generator ignored GeneratorExit`.
 
-A driver that abandons a live generator shuts it down with `close()`.
+A driver that stops using a live generator before it finishes shuts it down with `close()`.
 Python also calls `close()` on a live generator when it reclaims the generator's memory.
 When Python reclaims a generator like `stubborn()`,
 the `RuntimeError` has no caller to reach,
