@@ -154,26 +154,22 @@ so a `next()` call inside the body can trigger that conversion.
 
 A suspended generator preserves two things:
 its position in the body and every local variable.
-These outlive each `next()` or `send()` call that resumes the generator.
+These outlive each `next()` or `send()` that resumes the generator.
 Resuming runs the body from that position, with every local variable intact.
 `interview()`'s local `name` keeps its value through the next two `send()` calls,
 and `town` keeps its value through the last one.
 The position and the locals together are the generator's state.
 The generator is an ordinary object,
 so that state lasts as long as something holds a reference to the generator.
-[Measuring the Memory](19_Techniques--Concurrency.md#measuring-the-memory)
-uses `tracemalloc` to measure that state for suspended `asyncio` tasks,
-whose coroutines keep their position and locals the same way.
 
 The suspended generator is what [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 calls a continuation: the rest of the computation from the `yield` forward.
-That section gives a native handler three choices,
-and a generator's driver has two of them.
-The driver resumes the continuation once with `send()`,
-or discards it by dropping its last reference to the generator.
-The third choice is to resume one continuation several times,
-for a retry or a backtracking search.
-Each resumption then needs its own copy of the suspended state.
+A native handler can do three things with a continuation: resume it once,
+discard it, or resume it several times for a retry or a backtracking search.
+A generator's driver can do the first two.
+It resumes the continuation once with `send()`,
+and discards it by dropping the last reference to the generator.
+Resuming several times needs a separate copy of the suspended state for each resumption.
 Python cannot copy a generator.
 `copy.copy()` on a suspended generator raises `TypeError`.
 A generator is therefore a *one-shot continuation*.
