@@ -352,7 +352,8 @@ The identity `a == (a // b) * b + a % b` then forces the remainder to `3`.
 
 The result of `%` takes the sign of the divisor.
 With a positive divisor the remainder is zero or positive, which is why
-`index % len(items)` wraps to a valid index in either direction.
+`index % len(items)` wraps an index below zero or past the end to a
+valid index.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
