@@ -40,7 +40,7 @@ because a verdict on a hard case is a fact about one checker, not about Python.
 
 You can add type hints one function at a time.
 Code without hints still works.
-The type checker treats it as the type `Any`,
+The type checker treats each missing annotation as the type `Any`,
 which is compatible with everything.
 Thus, typed and untyped code can coexist,
 and that coexistence is *gradual typing*.
@@ -223,7 +223,7 @@ print(describe(42))
 
 Inside the `if`, `value` is a `str`, so `upper()` checks.
 `repr()` accepts every object, so the `return` at `[1]` needs no test.
-If you annotate `value` as `Any` and uncomment that line,
+If you annotate `value` as `Any` and uncomment the `return` above the `if`,
 the type checker accepts it,
 and `describe(42)` fails at runtime with an `AttributeError`.
 
@@ -367,7 +367,8 @@ A `draw()` that returns an `int`, or that requires an argument,
 gives its class a different shape.
 The type checker rejects that class where an annotation specifies `Drawable`.
 
-`Drawable` appears in one place, the annotation on `render()`'s parameter.
+Outside its definition, `Drawable` appears in one place,
+the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
 the type checker rejects the call.
 `Blob` draws, in the everyday sense, but its method's name is `paint()`.
@@ -523,9 +524,9 @@ including one that runs and fails.
 `expected()` is the `with` form of the `expect()` helper that [Functions](05_Foundations--Functions.md)
 introduces.
 The block under `with expected(AttributeError):` runs,
-and the manager catches the named exception and prints it.
+and `expected()` catches the named exception and prints it.
 [Context Managers](15_Techniques--Context_Managers.md#the-expected-manager)
-builds it.
+builds `expected()`.
 
 A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
@@ -840,7 +841,7 @@ so the question is when a hint is worth the words.
 Annotate what crosses a boundary: function signatures, public attributes,
 anything another file imports.
 Those are the places where the code's reader and writer are different people,
-and where the most code separates a wrong assumption from the failure it causes.
+and where a wrong assumption and the failure it causes sit farthest apart.
 
 Let the type checker infer the rest.
 A local variable whose type is obvious from its initializer gains nothing from a hint.
