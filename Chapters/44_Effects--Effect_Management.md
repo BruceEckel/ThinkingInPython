@@ -213,7 +213,7 @@ so the uncaught `ValueError` is easy to spot.
 In a real call stack the `raise` is usually in another file, several calls down.
 Catching by hand covers the exceptions you know a callee can raise.
 The rest reach the caller.
-Knowing every one of them means reading the code for every callee.
+Knowing every exception that can reach the caller means reading the code for every callee.
 An Effect Management System replaces that tedious, error-prone work.
 
 *Exception specifications* in C++ and Java track exceptions with a list written by hand on each function.
@@ -253,7 +253,8 @@ def slope(rise: int, run: NonZero) -> float:
     return rise / run.value
 ```
 
-`slope_nonzero.py` builds a valid `NonZero` and then tries to build one that holds 0:
+A `NonZero` that holds 2 passes to `slope()`,
+while building one that holds 0 raises a `ValueError`:
 
 ```python
 # slope_nonzero.py
@@ -338,7 +339,9 @@ for text in ["2", "0", "two"]:
 ```
 
 `parse_run()` receives the bad input.
-`int()` rejects `"two"` and `NonZero` rejects `"0"`, each with a `ValueError`.
+`int()` rejects `"two"`,
+and `NonZero` rejects the `0` that `int()` returns for `"0"`,
+each with a `ValueError`.
 The `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
 The error type in `parse_run()`'s `Result` is `ValueError`,
 the one failure its caller can handle,
@@ -434,8 +437,8 @@ An Effect Management System scales.
 
 Most functions in most programs perform Effects,
 and their signatures show only the arguments and the return type.
-The hidden Effects make code hard to understand,
-and a reader who sees only the signature must ask:
+The hidden Effects make code hard to understand.
+A reader who sees only the signature must ask:
 
 - Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
@@ -832,8 +835,8 @@ object Main extends ZIOAppDefault:
 The three type parameters of `ZIO[Ask & Tell, Nothing, Unit]` carry the Effect information.
 `Ask & Tell` is the environment the computation requires,
 an intersection type that lists both Effects.
-`Nothing` is the error type, meaning `greet` cannot fail:
-each console layer turns the `IOException` a read or write can raise into a defect with `orDie`,
+`Nothing` is the error type, meaning `greet` cannot fail.
+Each console layer turns the `IOException` a read or write can raise into a defect with `orDie`,
 so no error reaches the signature.
 `Unit` is what it produces on success.
 The signature does the same job as Koka's Effect row.
@@ -929,7 +932,7 @@ The TypeScript listing uses no wrapper from the library and does the wrapping it
 `console.log` goes in `Effect.sync` and Node's `readline` in `Effect.promise`.
 Console, file, clock, random, and network calls each get a wrapped version,
 and you must wrap a third-party library to make it conform.
-The parallel surface exists because the library tracks Effects without the compiler's help.
+The library needs these copies because it tracks Effects without the compiler's help.
 A native system's standard library declares its Effects in its own signatures,
 written once, so no second copy exists.
 
@@ -1134,8 +1137,8 @@ what does this function need, what does it change, what can go wrong.
 The compiler checks every composition,
 comparing each callee's Effects with the caller's declaration at each call.
 
-Languages that track Effects today are young,
-and libraries that retrofit Effect tracking make you package each Effect's interface and implementation by hand,
+Languages that track Effects today are young.
+Libraries that retrofit Effect tracking make you package each Effect's interface and implementation by hand,
 and wrap every effectful call.
 Effect tracking will look obvious in hindsight.
 Future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
