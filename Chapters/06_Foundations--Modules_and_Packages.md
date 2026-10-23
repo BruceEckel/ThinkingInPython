@@ -52,7 +52,7 @@ python use_module.py
 
 However, if another program imports `use_module.py` as a module,
 `__name__` is `"use_module"`, so Python skips the `"__main__"` block.
-Here, `import_module.py` consists of one statement, `import use_module`:
+The next script consists of one statement, `import use_module`:
 
 ```python
 # import_module.py
@@ -291,8 +291,8 @@ expect(AttributeError, lambda: a_package.module1)  # type: ignore
 Reading `a_package.module1` raises an `AttributeError`,
 so `a_package.module1.function1()` fails here too.
 The submodule becomes an attribute of the package only when something imports it by name.
-The type checker flags `a_package.module1` as a `possibly-missing-submodule`,
-the missing attribute that the marker's `AttributeError` reports.
+The type checker reports the same missing attribute before the program runs,
+flagging `a_package.module1` as a `possibly-missing-submodule`.
 The `# type: ignore` silences that warning.
 
 You can also specify the package with `from`:
@@ -418,13 +418,13 @@ run it as `python -m a_package.module4` instead.
 
 Two modules in a package can end up importing each other.
 Python places the first one to load in `sys.modules` before its body finishes.
+The first module's body has stopped at its `import` of the second,
+so the names it defines below that line are still missing.
 A `from` import in the second module then finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
 A plain `import` of that same module succeeds at this point,
 since it needs the module to exist in `sys.modules`,
 not to have finished running.
-The first module's body has stopped at its `import` of the second,
-so the names it defines below that line are still missing.
-If the second module's top-level code uses one of them,
+If the second module's top-level code uses one of the missing names,
 Python raises an `AttributeError` there.
 
 The "circular import" wording appears when the module's file lives outside the directory of the script you ran,
@@ -468,8 +468,8 @@ The underscore changes one mechanical thing:
 `from accounting import *` skips every name that begins with one.
 
 `__all__` states the export list explicitly.
-You assign it at module level as a list of strings naming the public names,
-and `from module import *` then binds every name on that list,
+You assign it at module level as a list of strings naming the public names.
+`from module import *` then binds every name on that list,
 including one that begins with an underscore.
 An `__all__` also gathers the public names into one readable place.
 Documentation tools read it to report a module's public names.
@@ -512,7 +512,9 @@ and keep the star for experiments at the interactive prompt.
 
 The underscore and `__all__` both say which names a caller should use.
 That stated boundary lets a module act as a [*Façade*](29_Patterns--Changing_the_Interface.md#façade)
-over its internals or as a shared single instance
+over its internals.
+Because every `import` of a module binds the one object cached in `sys.modules`,
+a module is also a shared single instance
 ([*Singleton*](23_Patterns--Singleton.md#a-module-is-already-a-singleton)).
 
 ## File Names
@@ -610,8 +612,7 @@ Once the module loads, its names behave like eagerly imported ones.
 
 ### Watching the Deferral
 
-`noisy.py` prints a message when its body runs,
-so the output shows when `lazy` loads it:
+To see when `lazy` loads a module, give the module a body that prints a message:
 
 ```python
 # noisy.py
