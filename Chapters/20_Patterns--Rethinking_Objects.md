@@ -75,8 +75,8 @@ That obedience makes polymorphism safe,
 and with it patterns like the [*Template Method*](24_Patterns--Template_Method.md).
 
 Code written against the base class calls a method and depends on every subclass standing in for the base.
-A statically typed compiler can check that an override's signature stays compatible.
-It cannot check whether the override behaves the way the base class declares.
+A statically typed compiler can ensure that an override's signature stays compatible.
+It cannot ensure that the override behaves the way the base class declares.
 
 Python has no such compiler,
 but its type checker stops at the same place that compiler does.
@@ -138,7 +138,7 @@ Two later tests use the same pattern to check other runtime guarantees:
 `test_plugged.py` confirms that a getter's copy holds,
 and `test_immutable.py` confirms that a frozen field refuses assignment.
 
-Substitutability is the part of polymorphism that no tool can check.
+Substitutability is the part of polymorphism that no tool can ensure.
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.

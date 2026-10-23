@@ -462,7 +462,7 @@ Each of this chapter's four anchors guards against a different way of breaking t
   whereas the type checker alone enforces `@final`.
 - Discipline, via the Liskov Substitution Principle.
   The principle governs whether each step is a faithful substitute.
-  `@abstractmethod` checks that a required step exists.
+  `@abstractmethod` ensures that a required step exists.
   No tool checks what the step does.
 
 Ask how the algorithm might break, and choose the mechanism that protects it.

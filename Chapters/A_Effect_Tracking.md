@@ -372,7 +372,7 @@ Interception requires `ask()` to consult the installed handler instead of callin
 Consulting an installed handler takes a runtime mechanism,
 such as the `ContextVar` in [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
 Now the design has two halves, a static tool and a runtime library.
-The tool cannot check that the library intercepts the Effect that the `handling` block removes from the row.
+The tool cannot ensure that the library intercepts the Effect that the `handling` block removes from the row.
 In Koka one construct installs the handler and subtracts from the row.
 In Stateless the `Handler` that `supply()` returns does the subtracting.
 Its type removes the `Need` from the row of the function it wraps,
