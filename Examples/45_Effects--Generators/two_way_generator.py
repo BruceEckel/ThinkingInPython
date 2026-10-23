@@ -12,3 +12,5 @@ result = drive(conversation, ANSWERS)
 #: request = 'friend', answer = 'Rabbit'
 print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
+print(inspect.getgeneratorstate(conversation))
+#: GEN_CLOSED

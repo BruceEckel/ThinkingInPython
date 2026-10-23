@@ -1,4 +1,5 @@
 # drive_by_hand.py
+import inspect
 from interview_generator import (Answer, Question,
                                  Result, interview)
 
@@ -13,6 +14,8 @@ question3: Question = conversation.send(
     Answer("Wonderland"))
 print(f"{question3 = }")
 #: question3 = 'friend'
+print(inspect.getgeneratorlocals(conversation))
+#: {'name': 'Alice', 'town': 'Wonderland'}
 try:
     conversation.send(Answer("Rabbit"))
 except StopIteration as stop:

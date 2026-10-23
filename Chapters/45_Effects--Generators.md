@@ -104,6 +104,7 @@ Driving the generator by hand sends one `Answer` at a time:
 
 ```python
 # drive_by_hand.py
+import inspect
 from interview_generator import (Answer, Question,
                                  Result, interview)
 
@@ -118,6 +119,8 @@ question3: Question = conversation.send(
     Answer("Wonderland"))
 print(f"{question3 = }")
 #: question3 = 'friend'
+print(inspect.getgeneratorlocals(conversation))
+#: {'name': 'Alice', 'town': 'Wonderland'}
 try:
     conversation.send(Answer("Rabbit"))
 except StopIteration as stop:
@@ -158,8 +161,8 @@ A suspended generator preserves two things:
 its position in the body and every local variable.
 These outlive each `next()` or `send()` that resumes the generator.
 Resuming runs the body from that position, with every local variable intact.
-`interview()`'s local `name` keeps its value through the next two `send()` calls,
-and `town` keeps its value through the last one.
+In `drive_by_hand.py`,
+`inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
 The position and the locals together are the generator's state.
 The generator is an ordinary object,
 so that state lasts as long as something holds a reference to the generator.
@@ -291,10 +294,14 @@ result = drive(conversation, ANSWERS)
 #: request = 'friend', answer = 'Rabbit'
 print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
+print(inspect.getgeneratorstate(conversation))
+#: GEN_CLOSED
 ```
 
 `GEN_CREATED` shows that calling `interview()` created the generator and ran none of its body.
 `drive()` then runs the body through all three questions.
+After the `return`, the generator is `GEN_CLOSED`,
+so a further `send()` raises `StopIteration` at once.
 
 `interview()` accepts its answers from any driver that calls `send()`.
 Its body holds three questions and a `return`,
