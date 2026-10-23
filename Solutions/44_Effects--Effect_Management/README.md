@@ -384,9 +384,9 @@ print, record, or fail. Reading `celsius` is a side cause for the same
 reason `withdraw()` reading `balance` is one. The value of `celsius` can change
 between calls, so the answer depends on earlier assignments to `celsius` rather than on arguments.
 
-The functional conversion returns each reading as a value from the
-temperature source. The caller folds new readings into the state
-it keeps. The chapter quotes the common name for that conversion,
+The functional conversion makes the temperature source return each
+reading as a value. The caller folds new readings into the state it
+keeps. The chapter quotes the common name for that conversion,
 [pushing the Effects to the edges](../../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).
 
 Across `withdraw()` and `Thermometer`, the classification depends on
@@ -620,8 +620,9 @@ the boundary that discharges the Effect.
 
 That propagation is Effect tracking.
 The Effect appears in the type. `ty` reports the return type of
-`price_of_async()` as `CoroutineType[Any, Any, float]`, not `float`. A caller that
-forgets `await` then gets a type error rather than a coroutine where it expected a `float`.
+`price_of_async()` as `CoroutineType[Any, Any, float]`, not `float`. If a caller
+forgets `await`, the type checker reports the coroutine where the caller
+expected a `float`.
 Each caller in turn must become `async`, as the chapter says
 an Effect propagates.
 The chain ends at the edge of the program, where one `asyncio.run()` call runs the coroutine.
