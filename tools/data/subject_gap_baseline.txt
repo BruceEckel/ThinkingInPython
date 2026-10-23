@@ -16,11 +16,11 @@ Chapters/06_Foundations--Modules_and_Packages.md	[prep] CODE .. finds: Every lat
 Chapters/06_Foundations--Modules_and_Packages.md	[relcl] identifier .. is: Any identifier that begins and ends with double underscores (a dunder) is one that Python itself sets or calls.
 Chapters/07_Foundations--Classes.md	[appos,cc,conj] Print .. shows: Print a single CODE and a list of two of them, and confirm the list shows the same form for each element.
 Chapters/07_Foundations--Classes.md	[cc,conj,relcl] method .. be: A method that needs the class rather than an instance can be a CODE.
+Chapters/08_Foundations--Static_Types.md	[cc,ccomp,conj,punct] rejects .. accepts: Pyright rejects CODE misspelled as CODE with CODE, but CODE 0.0.91 accepts that call silently.
 Chapters/08_Foundations--Static_Types.md	[cc,conj,relcl] CODE .. gives: A CODE that returns an CODE, or that requires an argument, gives its class a different shape.
 Chapters/08_Foundations--Static_Types.md	[relcl] function .. takes: A function that validates or converts data against an arbitrary annotation takes a type expression as its argument.
 Chapters/11_Techniques--Testing.md	[relcl] function .. needs: This book patches with CODE and prefers injection where you can change the code, because a function that takes its clock or its fetcher as an argument needs no patching library.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[acl,cc,conj] CODE .. is: A CODE made of a legal CODE and a legal CODE is legal by construction:
-Chapters/12_Techniques--Data_Classes_as_Types.md	[cc,dep,neg,prep] rebuilds .. produces: CODE rebuilds through CODE, not through your CODE, so CODE on a validated instance quietly produces an unvalidated one.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[prep,relcl] type .. is: A type you define, like a rating from one to ten, is a smaller set: the allowed values.
 Chapters/14_Techniques--Decorators.md	[prep] CODE .. is: CODE above a bare assignment, or above a CODE alias, is a syntax error rather than a decorator applied to something unusual.
 Chapters/15_Techniques--Context_Managers.md	[prep] defaults .. catch: The constructor's CODE parameter defaults to the CODE sentinel, which makes CODE with no argument catch everything.
@@ -49,7 +49,6 @@ Chapters/29_Patterns--Changing_the_Interface.md	[appos] parameter .. raises: If 
 Chapters/29_Patterns--Changing_the_Interface.md	[cc,conj] CODE .. look: CODE and CODE build the new instance without running CODE, then look up CODE on it.
 Chapters/30_Patterns--Observer.md	[cc,nummod,prep] exercise .. raised: Redo exercise 3 with each failure returned as a value instead of raised as an exception.
 Chapters/31_Patterns--State_Machines.md	[cc,dobj,npadvmod,prep] stores .. reuse: The event bus stores its handlers under the event class the same way, and *Multiple Dispatching* and Pattern Refactoring reuse the lookup.
-Chapters/31_Patterns--State_Machines.md	[cc,relcl] rule .. belongs: A rule whose condition is CODE matches every time, so it belongs last in its group.
 Chapters/34_Patterns--Composite_and_Interpreter.md	[relcl] build .. alternates: A build that runs targets in parallel calls CODE once, then alternates CODE and CODE in place of CODE.
 Chapters/40_Functional--Foundations.md	[appos,prep,relcl] Five .. requires: Five of the chapter's ideas work at once: a record for the value, CODE to state that CODE leaves its input unchanged, two pure functions, CODE to turn a two-argument predicate into the one-argument callable CODE requires, and CODE and CODE for the traversal.
 Chapters/40_Functional--Foundations.md	[conj] key .. is: Contents-based equality together with a stable hash is why a dictionary key, a cache entry, or a value shared across threads is normally a tuple or a record.

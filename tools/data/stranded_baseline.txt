@@ -37,7 +37,6 @@ Chapters/31_Patterns--State_Machines.md	the state before
 Chapters/38_Patterns--Simulation.md	The teleports are not shortcuts but the only way through
 Chapters/38_Patterns--Simulation.md	a single robot walks a maze where each object it meets decides which room the robot ends up in
 Chapters/41_Functional--Toolkits.md	CODE saves each element the first time through
-Chapters/45_Effects--Generators.md	As the CODE it is the value the driver sends in
 Chapters/46_Effects--Stateless.md	CODE puts an instance in
 Chapters/46_Effects--Stateless.md	The DI registration key also sets the type an instance answers for
 Chapters/47_Effects--Stateless_in_Practice.md	Two purchases went through

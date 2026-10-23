@@ -23,7 +23,7 @@ Chapters/04_Foundations--Control_Flow.md	the outer loop	When the inner loop runs
 Chapters/05_Foundations--Functions.md	The third call	The third call matches neither test, so execution reaches the end of the body and the function returns `None`.
 Chapters/05_Foundations--Functions.md	the first statement	A string literal that is the first statement under `def` becomes the function's *docstring*, stored on `__doc__`:
 Chapters/05_Foundations--Functions.md	the last call	A caller can pass any parameter by name, including a required one such as `host`, which the last call names.
-Chapters/05_Foundations--Functions.md	the next call	Because `bad_append()` combines that binding with a default Python builds once, each call mutates the object the next call uses.
+Chapters/05_Foundations--Functions.md	the next call	Every `bad_append()` call that uses the default binds `target` to the one list Python builds at the `def`, so each call mutates the list the next call uses.
 Chapters/06_Foundations--Modules_and_Packages.md	The first `import`	The first `import` creates the module object, stores it in `sys.modules`, and then runs the file's body to fill it.
 Chapters/07_Foundations--Classes.md	The first read	The first read of a `cached_property` then raises a `TypeError` ([Performance](18_Techniques--Performance.md#when-slots-does-not-fit) shows the failure).
 Chapters/07_Foundations--Classes.md	the first read	`total` is *lazily initialized*, created on first use, so the method runs at the first read rather than when the constructor runs.
@@ -31,7 +31,7 @@ Chapters/08_Foundations--Static_Types.md	the line that	The wrong value causes a 
 Chapters/09_Foundations--Class_Attributes.md	the first read	No attribute exists until something assigns one, so the first read raises an `AttributeError`.
 Chapters/10_Foundations--Cleanup.md	the `with` block	The explicit `sock.close()` after the `with` block prints nothing, because `close()` returns at once when `self.closed` is `True`.
 Chapters/10_Foundations--Cleanup.md	the `with` block	`__exit__()` calls `close()`, so `close()` runs at the end of the `with` block, at a line you can identify.
-Chapters/13_Techniques--Pattern_Matching.md	the last `case`	When the capture is the last `case`, as here, Python compiles the `match` silently, and `ty` accepts it.
+Chapters/13_Techniques--Pattern_Matching.md	the last `case`	When the capture is the last `case`, as here, Python compiles the `match` silently, and the type checker accepts it.
 Chapters/13_Techniques--Pattern_Matching.md	the next `case`	For a list of two points, `match` moves on to the next `case`.
 Chapters/13_Techniques--Pattern_Matching.md	the next `case`	When a guard is false, `match` tries the next `case`, but the names stay bound.
 Chapters/13_Techniques--Pattern_Matching.md	the next `case`	`case [a, b]` matches a two-element `range`, but for a generator or a `set`, `match` moves on to the next `case`.
@@ -104,9 +104,9 @@ Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdr
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 Chapters/45_Effects--Generators.md	The `for` loop	The `for` loop then resumes `collect()` with `next()`, so both of `collect()`'s `yield` expressions produce `None`.
-Chapters/45_Effects--Generators.md	The first call	The first call, which runs the body to its first `yield`, *primes* the generator, and it must be `next()` or `send(None)`.
+Chapters/45_Effects--Generators.md	The first call	The first call, which runs the body to its first `yield`, *primes* the generator.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes the body, which reaches `return` instead of another `yield`, so the generator returns its `Result`.
-Chapters/45_Effects--Generators.md	the `yield` expression	As the `SendType` it is the value the driver sends in, which arrives as the value of the `yield` expression and binds to `answer`.
+Chapters/45_Effects--Generators.md	the `yield` expression	As the `SendType`, `Answer` types each value the driver sends, which arrives as the value of the `yield` expression and binds to `answer`.
 Chapters/45_Effects--Generators.md	the first `Question`	`drive()` uses all three type parameters: `next()` produces the first `Question`, `send()`'s argument supplies the `Answer`, and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
 Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop obtains a source, the inner one draws from it hour after hour, and `connected()` wraps the inner loop.
@@ -123,7 +123,7 @@ Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except
 Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs, since `finally` runs whether or not an exception is propagating.
 Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` shifts down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
 Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in automatically.
-Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the two lines of output come from `finally` and from the caller.
+Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so it prints nothing here.
 Solutions/05_Foundations--Functions/README.md	the first call	A tuple has no `append()`, so the first call that omits `target` raises an `AttributeError`.
 Solutions/05_Foundations--Functions/README.md	the line that	You can name the line that makes `count` local in each function.
 Solutions/05_Foundations--Functions/README.md	the third `bad_append(3)`	the third `bad_append(3)` prints `[1, 2, 3]`, matching the prediction you wrote down first.
@@ -158,8 +158,8 @@ Solutions/17_Techniques--Metaprogramming/README.md	the second `on_open`	Python s
 Solutions/17_Techniques--Metaprogramming/README.md	the second call	your edited `singleton.py` prints `True` for `c1 is c2` and `False` for `c1 is a`, and its trace shows `building CSingleton` once, followed by `reusing CSingleton` on the second call.
 Solutions/18_Techniques--Performance/README.md	The last line	**Expose the inherited `__slots__`.** The last line shows why the subclass's `__dict__` is easy to miss.
 Solutions/18_Techniques--Performance/README.md	The last line	**Measure the remaining gap.** The last line shows that the lazy peak is under one percent of the one-list peak.
-Solutions/18_Techniques--Performance/README.md	the first call	It prints, writes a file, or increments a counter on the first call with a given argument.
 Solutions/18_Techniques--Performance/README.md	the first call	The `"computing noisy(3)"` message prints once, on the first call.
+Solutions/18_Techniques--Performance/README.md	the first call	The cache lets that side effect run on the first call with a given argument and silently skips it on every repeat.
 Solutions/19_Techniques--Concurrency/README.md	the `for` statement	**Take each item unguarded.** `for item in source:` is the `for` statement calling `source.__next__()`, and that call runs before control reaches the indented block.
 Solutions/19_Techniques--Concurrency/README.md	the first `resumed`	your edited `async_mechanics.py` prints `d: started` as the fourth `started` line and `d: resumed` as the first `resumed` line, and the final list reads `['A', 'B', 'C', 'D']`, in argument order.
 Solutions/19_Techniques--Concurrency/README.md	the fourth `started`	your edited `async_mechanics.py` prints `d: started` as the fourth `started` line and `d: resumed` as the first `resumed` line, and the final list reads `['A', 'B', 'C', 'D']`, in argument order.
@@ -201,9 +201,9 @@ Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third 
 Solutions/45_Effects--Generators/README.md	The third `send()`	The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	the final `send()`	you wrote the full sequence of lines before running the modified `yield_from_send.py`, and it matches the run line for line, including which sends print two lines and what the final `send()` after the loop prints.
 Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
+Solutions/45_Effects--Generators/README.md	the first `send()`	So at runtime the first `send()` accepts `None` alone, a value the `SendType` excludes.
 Solutions/45_Effects--Generators/README.md	the first `yield`	`next(t)` runs the body up to the first `yield` and produces the first prompt.
 Solutions/45_Effects--Generators/README.md	the first call	An annotation cannot express "`None` for the first call, `Answer` afterward," because a single `SendType` covers every call.
-Solutions/45_Effects--Generators/README.md	the first call	So the first call is special in both directions, and `None` is the only value it accepts.
 Solutions/45_Effects--Generators/README.md	the first line	The call `interview()` returns a generator object, suspended before the first line of its body.
 Solutions/45_Effects--Generators/README.md	the last `send()`	If you read the total as the result of the last `send()`, writing `total: Total = t.send(Amount(12))` with no `try`, the script prints the three prompts and then stops with `StopIteration: 42`.
 Solutions/45_Effects--Generators/README.md	the last `yield`	The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.

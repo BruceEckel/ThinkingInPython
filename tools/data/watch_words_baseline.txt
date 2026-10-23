@@ -134,7 +134,6 @@ Chapters/17_Techniques--Metaprogramming.md	hooks: None of these hooks is a separ
 Chapters/17_Techniques--Metaprogramming.md	hooks: and you write one when the simpler hooks are not enough
 Chapters/17_Techniques--Metaprogramming.md	hooks: but simpler hooks cover almost every case a metaclass handled before those hooks existed
 Chapters/17_Techniques--Metaprogramming.md	itself: Extend CODE so a class declares itself final with a keyword in its header
-Chapters/17_Techniques--Metaprogramming.md	names the rule: CODE names the rule twice and writes no checking code of its own
 Chapters/17_Techniques--Metaprogramming.md	never: It accepts the declaration and never runs CODE
 Chapters/17_Techniques--Metaprogramming.md	never: The resulting CODE reports a missing CODE argument and never mentions CODE
 Chapters/17_Techniques--Metaprogramming.md	never: The type checker never runs the metaclass
@@ -202,8 +201,8 @@ Chapters/19_Techniques--Concurrency.md	only: but only in the way a crash is bett
 Chapters/19_Techniques--Concurrency.md	only: only the type of object the call built
 Chapters/19_Techniques--Concurrency.md	only: so two threads contend only when they touch the same container
 Chapters/19_Techniques--Concurrency.md	only: while a coroutine yields only at an CODE you chose to write
-Chapters/19_Techniques--Concurrency.md	price: CODE gives each run of a price function its own CODE
 Chapters/19_Techniques--Concurrency.md	price: CODE runs a price function sequentially and threaded and confirms the two agree
+Chapters/19_Techniques--Concurrency.md	price: Each price function runs on the same five orders
 Chapters/19_Techniques--Concurrency.md	price: It puts the order and its price on the queue instead of returning the price
 Chapters/19_Techniques--Concurrency.md	price: writing the same price lookup twice
 Chapters/19_Techniques--Concurrency.md	prices: the same prices CODE prints
@@ -252,7 +251,6 @@ Chapters/24_Patterns--Template_Method.md	hooks: The box beneath them changes fro
 Chapters/24_Patterns--Template_Method.md	hooks: starting from the base class with its empty hooks
 Chapters/24_Patterns--Template_Method.md	only: Change the check so it compares a new method only against the names CODE defines
 Chapters/24_Patterns--Template_Method.md	only: Only the type checker enforces CODE
-Chapters/24_Patterns--Template_Method.md	only: That decorator stops an override only when the type checker runs
 Chapters/24_Patterns--Template_Method.md	only: The *Template Method* works only when every subclass is a faithful substitute for its base
 Chapters/24_Patterns--Template_Method.md	only: so a subclass overrides only the steps that matter to it
 Chapters/24_Patterns--Template_Method.md	want: If you want an override to fail at runtime
@@ -280,7 +278,6 @@ Chapters/26_Patterns--Factory.md	only: CODE is the only code that changes when y
 Chapters/26_Patterns--Factory.md	only: When the variant differs only in field values
 Chapters/26_Patterns--Factory.md	only: and a factory class only when that work has state of its own
 Chapters/26_Patterns--Factory.md	only: and the only method CODE and CODE override
-Chapters/26_Patterns--Factory.md	only: that method is the only code you change
 Chapters/27_Patterns--Function_Objects.md	exactly: When each type needs exactly one
 Chapters/27_Patterns--Function_Objects.md	never: The type checker reads the source and never runs it
 Chapters/27_Patterns--Function_Objects.md	only: and the type checker rejects CODE as an assignment to a read-only property
@@ -412,7 +409,6 @@ Chapters/44_Effects--Effect_Management.md	itself: The function reads nothing out
 Chapters/44_Effects--Effect_Management.md	never: the exception never propagates to the caller
 Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
-Chapters/45_Effects--Generators.md	only: so only the CODE call sits there
 Chapters/46_Effects--Stateless.md	already: A function that already returns an Effect needs no CODE
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
 Chapters/46_Effects--Stateless.md	already: It carries CODE on a function that already returns an Effect
@@ -451,8 +447,6 @@ Chapters/47_Effects--Stateless_in_Practice.md	even: then say why it differs from
 Chapters/47_Effects--Stateless_in_Practice.md	is what: Here is what ZIO does that Stateless cannot
 Chapters/47_Effects--Stateless_in_Practice.md	is what: The difference between the two ways in is what the type checker verifies
 Chapters/47_Effects--Stateless_in_Practice.md	itself: It prints nothing itself
-Chapters/47_Effects--Stateless_in_Practice.md	names the moment: and every test names the moment it needs
-Chapters/47_Effects--Stateless_in_Practice.md	names the moment: so a test names the moment outright
 Chapters/47_Effects--Stateless_in_Practice.md	names what: CODE names what it takes
 Chapters/47_Effects--Stateless_in_Practice.md	never: CODE never runs
 Chapters/47_Effects--Stateless_in_Practice.md	never: This one never propagates
@@ -640,7 +634,6 @@ Solutions/44_Effects--Effect_Management/README.md	price: the list comprehension 
 Solutions/44_Effects--Effect_Management/README.md	prices: CODE receives a list of coroutines rather than prices
 Solutions/44_Effects--Effect_Management/README.md	prices: so a test that needs fake prices must inject CODE by the same hand-threading this chapter's exercise 2 measures
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
-Solutions/45_Effects--Generators/README.md	only: and CODE is the only value it accepts
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
 Solutions/45_Effects--Generators/README.md	want: So annotate a local whenever you want the checker to verify the type of the call that produces its value
 Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
@@ -657,7 +650,6 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	never: The driver never th
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: CODE is the only addition
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: The accessor is the only place where the type checker checks a caller's arguments
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the assertions together say that CODE tries every price and writes only the affordable ones
-Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the run prints only the message
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: **Prove the loop tries every price
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: Dropping the last price from the call makes that last check fail
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: so the assertions together say that CODE tries every price and writes only the affordable ones

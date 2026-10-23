@@ -138,7 +138,7 @@ Chapters/20_Patterns--Rethinking_Objects.md	[PAST] were: Objects were optional.
 Chapters/21_Patterns--Design_Patterns.md	[PAST] arrived: Many people have worked out all the angles of a problem and arrived at the most general, flexible solution.
 Chapters/21_Patterns--Design_Patterns.md	[PAST] became known: The four became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.
 Chapters/21_Patterns--Design_Patterns.md	[PAST] came: More often the language had the piece all along, and the pattern came from a language that didn't.
-Chapters/21_Patterns--Design_Patterns.md	[PAST] counted: He counted for Lisp and Dylan, and a count for Python comes out differently.
+Chapters/21_Patterns--Design_Patterns.md	[PAST] counted: He counted for Lisp and Dylan.
 Chapters/21_Patterns--Design_Patterns.md	[PAST] had: More often the language had the piece all along, and the pattern came from a language that didn't.
 Chapters/21_Patterns--Design_Patterns.md	[PAST] inspired: Many of those examples inspired the ones in this part of the book.
 Chapters/21_Patterns--Design_Patterns.md	[PAST] was: Stepping through a container is stage one in Python and was stage four in the *GoF Design Patterns* examples.
@@ -170,9 +170,7 @@ Chapters/31_Patterns--State_Machines.md	[PAST] decided: A single CODE input must
 Chapters/31_Patterns--State_Machines.md	[PAST] pressed: The vending machine's inputs carry values: what a coin is worth, which row or column the user pressed.
 Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] closed: A CODE keeps every case together in one block, closed the way the table is, so adding an CODE means adding cases to that block.
 Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] cut: Scissors cut paper, so that is the outcome for the scissors that started the duel, not for the CODE whose code is running.
-Chapters/32_Patterns--Multiple_Dispatching.md	[PAST] declared: A CODE declared on a shared base is one dispatcher that every subclass inherits.
 Chapters/33_Patterns--Visitor.md	[PAST] added: The two operations, CODE and CODE, are new, each added independently of the other:
-Chapters/33_Patterns--Visitor.md	[PAST] built: CODE inspects the dispatch table the decorator built:
 Chapters/35_Patterns--Flyweight.md	[PAST] included: A first design stores every attribute of a cell in the cell's own object, its position included:
 Chapters/35_Patterns--Flyweight.md	[PAST] set: Replace CODE on CODE with CODE and set CODE on a parsed map.
 Chapters/35_Patterns--Flyweight.md	[PAST] split: First, split each object's state in two.
@@ -214,6 +212,7 @@ Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its vers
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
 Chapters/45_Effects--Generators.md	[PAST] resumed: A generator resumed from two threads at once raises CODE rather than interleaving.
+Chapters/45_Effects--Generators.md	[PAST] returned: The driver calls CODE on the generator CODE returned, but CODE prints the CODE line.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
 Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's parameter annotation to decide what it answers, so a function annotated CODE and returning CODE hands back a default-constructed instance of the requested class.
 Chapters/46_Effects--Stateless.md	[PAST] came: My understanding of Effects came from work with Bill Frasure and James Ward as we created Effect Oriented Programming.
@@ -246,7 +245,7 @@ Solutions/05_Foundations--Functions/README.md	[PAST] thought: The message, CODE,
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST-HEADING] imported: A fourth module, imported three ways
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] included: Changing the import back to CODE while the file is still CODE raises CODE on every platform, Windows and macOS included.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] read: When a module may rebind a name to a new list or dict, import the module and read the name through it each time, as in CODE.
-Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] updated: your script outside CODE prints CODE after four loading messages, the same script runs again with the directory renamed to CODE and the import updated, and you can cite the rule in File Names that the capital letter breaks.
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] updated: your script outside CODE prints CODE after four loading messages, the same script runs again with the directory renamed to CODE and the import updated, and you can cite the convention in File Names that the capital letter breaks.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote a prediction before each run, the CODE version prints CODE, and you have the result of the CODE run against CODE on your own machine.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote your prediction before running, CODE without the line prints a list that matches it and differs from CODE by two names, and after you restore the line it prints CODE again.
 Solutions/07_Foundations--Classes/README.md	[PAST] removed: With the decorator removed, CODE prints CODE.
@@ -301,7 +300,7 @@ Solutions/27_Patterns--Function_Objects/README.md	[PAST-HEADING] applied: A conf
 Solutions/27_Patterns--Function_Objects/README.md	[PAST-HEADING] closed: A configurable CODE, closed over and partially applied
 Solutions/27_Patterns--Function_Objects/README.md	[PAST] read: The two lambda forms run their body at the call, so CODE and the factory's lambda both read CODE when the command runs.
 Solutions/27_Patterns--Function_Objects/README.md	[PAST] read: They read the variable they name, at the moment of the call.
-Solutions/27_Patterns--Function_Objects/README.md	[PAST] returned: CODE reads the annotation on CODE and gets CODE, the class CODE returned.
+Solutions/27_Patterns--Function_Objects/README.md	[PAST] returned: CODE reads the annotation on the CODE parameter of CODE and gets CODE, the class CODE returned.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] accepted: The CODE changed, and both Python and the type checker accepted the change.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] changed: The CODE changed, and both Python and the type checker accepted the change.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] checked: Freezing the data class makes that check final, since every field keeps the value CODE checked.

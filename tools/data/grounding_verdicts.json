@@ -1,7 +1,7 @@
 {
  "6476eb4778e6007d": {
   "file": "02_Foundations--Tour.md",
-  "line": 359,
+  "line": 361,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "Bucket"
@@ -45,7 +45,7 @@
  },
  "58b756be3c8da8fa": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 241,
+  "line": 243,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "depth"
@@ -56,7 +56,7 @@
  },
  "92d572806e136770": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 696,
+  "line": 698,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Stars"
@@ -67,7 +67,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1124,
+  "line": 1125,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -78,7 +78,7 @@
  },
  "7c9a753f95d1c66a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1268,
+  "line": 1270,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace_class"
@@ -122,7 +122,7 @@
  },
  "6203333350c5fed9": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1504,
+  "line": 1503,
   "target": "28_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -133,7 +133,7 @@
  },
  "04acbadd1165eaba": {
   "file": "22_Patterns--Iterators.md",
-  "line": 763,
+  "line": 762,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
    "__iter__",
@@ -145,7 +145,7 @@
  },
  "1121029ae76447a0": {
   "file": "22_Patterns--Iterators.md",
-  "line": 833,
+  "line": 832,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "GoFIterator"
@@ -156,7 +156,7 @@
  },
  "674efb071da3872a": {
   "file": "22_Patterns--Iterators.md",
-  "line": 896,
+  "line": 895,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -178,7 +178,7 @@
  },
  "7af500ad34e92834": {
   "file": "23_Patterns--Singleton.md",
-  "line": 724,
+  "line": 726,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -222,7 +222,7 @@
  },
  "17a44941abf94c5d": {
   "file": "26_Patterns--Factory.md",
-  "line": 168,
+  "line": 169,
   "target": "22_Patterns--Iterators.md",
   "terms": [
    "shape_name"
@@ -242,21 +242,9 @@
   "p_terms": 0.01,
   "asked": "2026-10-13"
  },
- "0f1b2d7a09ebf4e9": {
-  "file": "27_Patterns--Function_Objects.md",
-  "line": 436,
-  "target": "05_Foundations--Functions.md",
-  "terms": [
-   "partial",
-   "Placeholder"
-  ],
-  "sentence": "A caller must pass a [positional-only parameter](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) by position, so binding one with `partial()` means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder) in each position the caller fills.",
-  "p_terms": 0.01,
-  "asked": "2026-10-13"
- },
  "19283748bd6927e4": {
   "file": "28_Patterns--Data_Transfer_Objects.md",
-  "line": 478,
+  "line": 479,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "messenger_idiom.py",
@@ -279,7 +267,7 @@
  },
  "c8b45c3e67ecadbb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 330,
+  "line": 331,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "PairCoord",
@@ -327,7 +315,7 @@
  },
  "174f9c2a8b0e1a24": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 801,
+  "line": 802,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -340,7 +328,7 @@
  },
  "919cfd41be150204": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 816,
+  "line": 817,
   "target": "22_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -364,7 +352,7 @@
  },
  "78d9ea293b963dca": {
   "file": "36_Patterns--Memento.md",
-  "line": 411,
+  "line": 412,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "History"
@@ -386,7 +374,7 @@
  },
  "a286d6447dd0fc95": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 387,
+  "line": 389,
   "target": "32_Patterns--Multiple_Dispatching.md",
   "terms": [
    "bins"
@@ -397,7 +385,7 @@
  },
  "d10d959abb81c3c4": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 387,
+  "line": 389,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "bins"
@@ -408,7 +396,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 647,
+  "line": 650,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -443,7 +431,7 @@
  },
  "cfbc0527ad9d260c": {
   "file": "44_Effects--Effect_Management.md",
-  "line": 1011,
+  "line": 1014,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "greet"
@@ -465,7 +453,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1357,
+  "line": 1356,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
