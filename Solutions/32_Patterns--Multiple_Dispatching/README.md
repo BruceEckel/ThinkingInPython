@@ -1765,8 +1765,9 @@ combinations with a constant answer stay one line each and still read as
 a table of answers. Only the cells that need code look like code.
 
 **Read the state in both orders.** The `(Paper, Rock)` cell receives both items, so it can consult
-`player.wet`. The `(Rock, Paper)` cell consults `opponent.wet`, because
-one duel has two orders and each order has its own cell. If the
+`player.wet`. One duel has two orders, and each order has its own
+cell, so the `(Rock, Paper)` cell needs the same test. In that cell
+the paper is the opponent, so the cell reads `opponent.wet`. If the
 `(Rock, Paper)` cell ignores `opponent.wet`, a rock that calls
 `compete()` still loses to wet paper.
 
@@ -2057,7 +2058,7 @@ so the seeded meeting draws the same weapons and `Troll` wins again.
 `by_methods()` plays each pair through exercise 8's classes,
 finding them by name as exercise 3 does.
 
-If you drop `strict=True` and a row of `GRID` comes up one cell short,
+If you drop `strict=True` and `Jargon`'s row of `GRID` comes up one cell short,
 the comprehension builds 35 entries and raises no exception.
 The check then prints `35 pairs agree with exercise 8: True`,
 since it plays only the pairs the table holds,
