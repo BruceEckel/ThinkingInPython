@@ -575,8 +575,9 @@ print(count(circles))
 **Widen what the parameter accepts.** The type checker accepts the call because `Sequence` is covariant in its element
 type. A `Sequence[Shape]` declares that you can read `Shape`s out
 of it, not that you can put them in.
-Every `Circle` is a `Shape`, so a `list[Circle]` meets that requirement. `list[Shape]` refuses the same
-argument because `list` is invariant.
+Every `Circle` is a `Shape`, so a `list[Circle]` meets that
+requirement. A `list[Shape]` parameter refuses the same argument
+because `list` is invariant.
 
 **Give up the write operations.** `shapes.append(...)` draws a
 diagnostic for the reason the widening works.
@@ -749,7 +750,8 @@ second line of output shows. The call leaves `val` as it was, though.
 `b.val`, not the local. The narrowing of `val` to `str` therefore
 holds through the call, and the type checker's verdict matches what
 the program does. In the chapter's version the verdict concerns
-`b.val`, which the call changes after the test.
+`b.val`, which the call sets to `None` after the test, so the verdict
+is wrong by the time `upper()` runs.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
