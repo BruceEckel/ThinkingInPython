@@ -140,7 +140,7 @@ record.
 
 The uppercase policy needs no data. The subclass overrides
 `process()`. The function form passes `str.upper`, which has the
-signature the framework calls:
+signature the framework expects:
 
 ```python
 # exercise_1_upper.py
@@ -655,8 +655,9 @@ memory or the code that reads `pending` reports stale data.
 `Exploder` and `HalfDone` need different things from a type checker.
 Only one of those things exists.
 
-`HalfDone`'s omission is repairable. Through the `...` body, the base
-class declares that a subclass may skip this step.
+A declaration in the base class can expose `HalfDone`'s omission.
+Through the `...` body, the base class declares that a subclass may
+skip this step.
 With that body, no checker can catch the omission,
 because "deliberately empty" and "forgotten" are the same code.
 Only the base class can record that difference.
@@ -665,10 +666,10 @@ by inheriting from `ABC` and marking `customize2()` with `@abstractmethod`.
 Then constructing `HalfDone` raises a `TypeError`.
 The type checker reports the construction before the program runs.
 
-`Exploder`'s exception is not repairable this way. For a type
-checker to catch `Exploder`, the base class must state which
-exceptions a step may raise, and the checker must compare every
-override with that list.
+Exposing `Exploder`'s exception would take a declaration that Python
+lacks. For a type checker to catch `Exploder`, the base class must
+state which exceptions a step may raise, and the checker must compare
+every override with that list.
 Java's `throws` clause provides that mechanism for checked exceptions.
 Python has no such declaration, and no
 annotation expresses "this raises nothing." An exception type in a
@@ -911,8 +912,8 @@ statement runs, so `__init_subclass__()` can name it.
 **Pass the helper, catch the step.** The `class Audited` statement now
 completes.
 A misspelled step still fails at any depth of the
-hierarchy, because the check compares every subclass against the
-framework's three names.
+hierarchy, because the check compares the methods of every subclass
+with the framework's three names.
 
 A misspelling of a name that a subclass introduced now passes the narrower check.
 If `Audited` meant to override `report()`, its
