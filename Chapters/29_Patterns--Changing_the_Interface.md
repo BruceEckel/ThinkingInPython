@@ -77,6 +77,7 @@ explains.
 
 The name `ProxyAdapter` uses the term "[*Proxy*](25_Patterns--Surrogate.md#proxy)" loosely.
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object to which it forwards.
+`ProxyAdapter` presents `f()` and forwards to an adaptee whose methods are `g()` and `h()`.
 
 ### Three Places for the Adaptation
 
@@ -283,8 +284,8 @@ yet `isinstance()` reports it as an `os.PathLike`.
 At runtime, `os.PathLike` is an abstract base class whose `__subclasshook__()` accepts any class that defines `__fspath__()`.
 The type checker treats `os.PathLike` as a `Protocol`,
 so `Path(logo)` passes the check.
-Each path-taking function calls `os.fspath()` on its argument,
-which returns a `str` or `bytes` argument as it is and calls `__fspath__()` on anything else.
+Each path-taking function passes its argument to `os.fspath()`,
+which returns a `str` or `bytes` as it is and calls `__fspath__()` on anything else.
 
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
@@ -397,7 +398,7 @@ create an interface that presents only what the client programmer needs.
 
 A *Façade* is often a [*Singleton*](23_Patterns--Singleton.md)
 that also creates the subsystem's objects.
-GoF supplies both halves of that combination.
+GoF describes both halves of that combination.
 One *Façade* object is usually enough, which makes it a *Singleton*.
 An [*Abstract Factory*](26_Patterns--Factory.md#abstract-factories)
 can work with a *Façade* to create the subsystem's objects without specifying their concrete classes.
@@ -606,7 +607,7 @@ print(caught[0].message)
 ```
 
 `to_string()` keeps working,
-so existing callers get a warning in place of an `AttributeError`.
+so existing callers get a warning in place of the `AttributeError` that deleting the method would raise.
 The mark works in two halves.
 The static half is a `ty` diagnostic on the deprecated call,
 which the caller sees before running anything.
