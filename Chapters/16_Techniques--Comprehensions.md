@@ -482,7 +482,7 @@ warehouses = {
 }
 ```
 
-`dense_comprehension.py` builds a report from it in one comprehension:
+One comprehension builds a report from that inventory:
 
 ```python
 # dense_comprehension.py
