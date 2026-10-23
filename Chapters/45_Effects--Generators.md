@@ -310,7 +310,7 @@ because whenever `drive()`'s code runs, the generator waits at a `yield`.
 After the `return`, the generator is `GEN_CLOSED`,
 so sending it another answer raises `StopIteration` at once.
 That `StopIteration` carries no value,
-so `expect()` prints the exception's class name with no message after it.
+so `expect()` prints the exception's class name with no message.
 
 The generator and `drive()` take turns.
 While the body runs, `drive()` waits inside `send()`,
@@ -335,18 +335,17 @@ print(inspect.getgeneratorstate(watched))
 #: GEN_SUSPENDED
 ```
 
-The body looks up `watched` when `next()` runs it,
-after the assignment has bound the name.
-The body reads `GEN_RUNNING` and yields it.
-After the `yield`, the caller reads `GEN_SUSPENDED`.
+`watched` appears in `watch()` only as a read,
+so the name refers to the module-level `watched`
+([Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function) covers how Python decides).
+Python looks up a module-level name each time the body reads it,
+not when `def` runs.
+`next()` runs the body after `watched = watch()` has bound the name,
+so the lookup finds the generator.
 
-`interview()` accepts its answers from any driver that calls `send()`.
-Its body holds three questions and a `return`,
-with no dictionary and no `input()` call.
-`interview()` yields each question and suspends until `send()` supplies the answer.
-`drive()` decides how to answer those questions,
-and it receives the answers through its `answers: dict[Question, Answer]` parameter.
-Swapping the dictionary for a database changes `drive()` and leaves `interview()` as it is.
+Every answer `interview()` receives comes from its driver.
+Swapping `drive()`'s dictionary for a database, or for `input()`,
+changes `drive()` and leaves `interview()` as it is.
 
 `interview()` and `drive()` form an EMS in miniature.
 The generator declares requests.
