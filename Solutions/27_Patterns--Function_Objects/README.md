@@ -552,7 +552,8 @@ The fine finder runs the same code with a tolerance of
 `1e-12` and matches the true root to six places.
 
 `partial` is the shorter of the two ways to configure the finder, and
-it works here because the caller can supply `tolerance` by keyword.
+it works here because `newton()` has a `tolerance` parameter that
+`partial()` can bind by keyword.
 You need a closure when the function has no parameter for the setting.
 `partial()` binds arguments. A closure's body can use the setting
 in any expression.
@@ -851,8 +852,8 @@ as a parameter a caller can override.
 in the `partial` object's public `args` attribute, where
 `by_partial[0].args` is `(0,)`.
 
-A value computed from the frozen `n` separates the fixes. The two
-lambda forms run their body at the call, so
+The fixes differ when the command computes a value from the frozen
+`n`. The two lambda forms run their body at the call, so
 `lambda n=n: print(n * rate())` and the factory's lambda both read
 `rate()` when the command runs. `partial(print, n * rate())`
 evaluates the product while the loop builds the command.
@@ -986,13 +987,15 @@ No name references that class, and no event is an instance of it.
 
 **Refuse the first handler.** The import stops at the first
 `@handler`, on `Announce`.
-`handler()` reads the annotation on `event` and gets `Deposit`,
-the class `dataclass()` returned.
+`handler()` reads the annotation on the `event` parameter of
+`Announce.__call__()` and gets `Deposit`, the class `dataclass()`
+returned.
 `EVENTS` holds the original class,
 so `handler()` raises `TypeError: Announce: not an @event`, although
-`Deposit` went through `@event` a few lines earlier. If something else created
-the handlers, `publish()` would raise a `TypeError` on every event,
-since `type(event)` is the returned class too.
+`Deposit` went through `@event` a few lines earlier. If the handler
+classes got past `handler()` some other way, `publish()` would still
+raise a `TypeError` on every event, since it checks `type(event)`,
+the returned class, against `EVENTS`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
