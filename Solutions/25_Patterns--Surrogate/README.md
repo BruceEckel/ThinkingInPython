@@ -851,11 +851,11 @@ replacement drops a name the current implementation answers. The
 surrogate keeps its current implementation, so `s.g()` still works
 after the rejected swap.
 
-The type checker cannot make this decision. The decision compares
-the type of the implementation the surrogate holds right now with the type of
-`new`.
-The checker sees `Any` for both. `Any` is the
-choice `state_surrogate.py` makes so that one surrogate accepts any
+The type checker cannot make this decision. To make it, the checker
+would compare the type of the implementation the surrogate holds
+with the type of `new`. The checker sees `Any` for both, so to the
+checker each one has every method. `Any` is the choice
+`state_surrogate.py` makes so that one surrogate accepts any
 implementation.
 
 Annotating the stored implementation and `new` against a `Protocol` gives a different guarantee:
