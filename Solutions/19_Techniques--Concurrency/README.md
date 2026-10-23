@@ -355,11 +355,10 @@ asyncio.run(main())
 
 **Hold the thread while waiting.** The peak falls from `5` to `1`, the
 same figure the CPU-bound version produces.
-As in `blocking_the_loop.py`, `time.sleep()` stops the thread
-instead of suspending the task, and the event loop runs on that
-thread. A coroutine with no `await` returns control to the loop
-when it finishes, so each task runs start to finish before the next
-begins.
+As in `blocking_the_loop.py`, `time.sleep()` stops the event loop's
+thread instead of suspending the task. A coroutine with no `await`
+returns control to the loop when it finishes, so each task runs
+start to finish before the next begins.
 
 Waiting does not create overlap. Suspending does. These five tasks
 spend almost all their time waiting and still run one at a time.
@@ -494,7 +493,7 @@ The semaphore reports no error,
 because `release()` adds one to the count whether or not an `acquire()` came first.
 That missing error is the difference between a semaphore and a lock.
 `asyncio.Lock` checks for a matching acquire,
-and a release without one raises
+so a release without one raises
 `RuntimeError: Lock is not acquired.` A semaphore's count has no
 upper limit, so the same mistake lifts the count to two and silently
 admits a second holder.
@@ -558,8 +557,9 @@ bottom:
     child processes and you have forgotten to use the proper idiom
     in the main module
 
-**Build the pool at import time.** Each worker does what the chapter describes. A fresh interpreter
-imports this module, the program's main module, before it runs any work.
+**Build the pool at import time.** As the chapter describes, each
+worker starts as a fresh interpreter that imports this module, the
+program's main module, before it runs any work.
 Importing the module runs every top-level statement,
 including the `with ProcessPoolExecutor()` line that creates workers. Each worker therefore tries to build a pool of
 its own, whose workers import the module again.
