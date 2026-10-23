@@ -88,19 +88,19 @@ The demo in `test_ch46_ask_and_greet.py` uses `Scripted` rather than
 has no terminal from which to read. `ask_and_greet()` stays
 character-for-character the same function under both bindings.
 
-**Request an interface, not a class.** `ask_and_greet()` specifies an interface
+**Request an interface, not a class.** `ask_and_greet()` declares an interface
 in its return type and calls two methods on the object that answers.
 `Terminal`, `Scripted`, and any third implementation are
 interchangeable because none of them appears in the Effect. Adding
 `read()` to the protocol changed which classes qualify. `supply()`
 still picks among them the same way.
 
-**Supply under the protocol's type.** `as_type(Console)` acts on the static type in both
-calls. `supply()` reads the Ability from the declared type of its
-argument, so `supply(scripted)` alone builds a handler for
-`Need[Scripted]` rather than the `Need[Console]` that
-`ask_and_greet()` requests.
-The wrapper changes the argument's static type from `Scripted` to `Console`.
+**Supply under the protocol's type.** `supply()` reads the Ability
+from the declared type of its argument, so `supply(scripted)` alone
+builds a handler for `Need[Scripted]` rather than the `Need[Console]`
+that `ask_and_greet()` requests.
+In both calls, `as_type(Console)` changes the argument's static type
+from `Scripted` to `Console`.
 At runtime the wrapper returns the same `scripted` object.
 `supply()` still finds it, because `Console` is `@runtime_checkable`
 and `isinstance()` matches `Scripted` on shape.
@@ -466,7 +466,7 @@ type, so `supply(recorder, recorder)` builds a handler for
 `Need[Recorder]`, an Ability neither Effect requests. Each wrapper
 names the role this instance fills.
 
-**Check the greeting and the log together.** One test holds both assertions because it holds the
+**Check the greeting and the log together.** One test holds both assertions because it supplies the
 whole environment. It checks, in one function, that `print()` received
 the greeting and `write()` received the log entry, with no capture of
 stdout and no temporary file. Each `need()` yields a request that the
@@ -643,7 +643,7 @@ prints its greeting, but `stamped()` fails with
 `AttributeError: 'Console' object has no attribute 'now'`.
 The handler answers the `Clock` request too, as it answers every
 `Need`, and hands that request a `Console`.
-The type checker reports nothing, since `default()`
+The type checker accepts `return Console()`, since `default()`
 declares that it returns a `Console`. The solution calls `ability.t()`,
 which builds the class the request names, so the `Clock` request
 receives a `Clock`.
@@ -686,7 +686,7 @@ run(defaults(stamped)("Bob"))  # type: ignore
 #: [noon] Hello, Bob!
 ```
 
-**Build the class the request names.** `default()` specifies no `Console` in its body. It reads `ability.t`,
+**Build the class the request names.** `default()` names `Console` only in its annotations. It reads `ability.t`,
 the class the request carries, and calls that class, so `default()`
 answers a request by constructing the requested class. That is the
 other kind of default. `default_console.py` supplies one prepared
@@ -1374,7 +1374,7 @@ print(capture.messages)
 **Give each role its own protocol.** The fix renames `Capture.print()` to `record()`, gives each method its
 own `Protocol`, `Screen` and `Recorder`, and splits `greet()` into one
 Effect per `Protocol`. The two `Protocol`s now describe different shapes, so
-each implementation satisfies one of them, and each Effect specifies the
+each implementation satisfies one of them, and each Effect requests the
 `Protocol` it needs.
 
 That change turns the silent choice into a diagnostic.
