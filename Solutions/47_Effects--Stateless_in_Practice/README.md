@@ -499,7 +499,7 @@ and whether one of them is new.
 Choosing the source in the handler is the same substitution `Console` and `Feed` allow, applied to a choice
 made fresh at every request rather than once at the start.
 
-**Leave an hour with no supplier.** With every other source shortened, hour 20 has no supplier.
+**Leave an hour with no supplier.** With the turbine, the battery, the grid, and the backup shortened, hour 20 has no supplier.
 The `Blackout` propagates out of `run()` instead of arriving on the
 Effect's error channel.
 `catch(Blackout)` around `run_load()` does not intercept it,
@@ -910,7 +910,7 @@ now with `TooLong` in the yielded type. Once edits 5 and 6 widen `catch()` and t
 `found:` annotation to match, `assert_never()` reports `TooLong` as an
 unhandled branch until edit 7 adds its case.
 Each missing edit fails the type check before the program runs, instead of failing in production.
-The type checker reports each line the change requires, one edit at a time.
+Starting with edit 4, the type checker reports each line the change requires, one edit at a time.
 
 The by-hand version needs a comparable edit, and no tool reports any of it:
 
@@ -1039,7 +1039,7 @@ The difference is where inside `latest()` the failure arises.
 `StaleWire.latest()` prints its trace line
 before it raises the exception, so `feed: fetching` appears.
 `DeadWire.latest()` raises the exception on its first line,
-so the run prints only the message.
+so `no headline today` is all the run prints.
 The trace shows how far each supplied implementation got before it failed.
 The value `report()` returns is the same for both.
 
@@ -1151,7 +1151,7 @@ failure as transient, because its schedule decides when to try again and
 nothing decides whether to try. ZIO provides that retry as `retryWhile`, which
 takes a predicate on the error.
 
-In Stateless, selective behavior means
+In Stateless, a selective retry means
 narrowing the channel first.
 `catch()` the failures that retrying cannot help,
 so they leave the error channel as values.
@@ -1310,7 +1310,7 @@ a different design, a detail, or an equivalent alternative.
 
 [State as an Ability](../../Chapters/47_Effects--Stateless_in_Practice.md#state-as-an-ability) reads and writes the balance through `Get` and `Put` requests.
 Write one handler factory that reads from an iterator of balances and another that appends each `Put` to a list, then `handle()` both around `spree()`.
-Check the list, check that the balance iterator has run out, and compare what the scripted answers share with each other.
+Check the list, check that the balance iterator has run out, and ask what ties the scripted balances to the writes.
 
 <details>
 <summary>Done when</summary>
@@ -1393,12 +1393,13 @@ print(run(scripted((60, 50, 30, 20))), written)
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 
 **Prove the loop tries every price.** The test proves from both sides
-that `spree()` attempts all four prices. A fifth `Get` request
-exhausts the script. `handle()` reads the `StopIteration` from `read()`
-as the end of the Effect, the silent failure the chapter describes, so
-`run()` returns `None` and the first assertion fails on
-`None == 2`. Stopping early leaves a balance unread, which the
-final assertion catches by checking that the iterator has run out.
+that `spree()` attempts all four prices. A `spree()` that makes a fifth
+`Get` request exhausts the script. `handle()` reads the `StopIteration`
+from `read()` as the end of the Effect, the silent failure the chapter
+describes, so `run()` returns `None` and the first assertion fails on
+`None == 2`. A `spree()` that stops early leaves a balance unread,
+which the final assertion catches by checking that the iterator has
+run out.
 
 If you script three balances, `[100, 40, 10]`, and forget that the
 refused `50` still reads one, the script runs out at the fourth price.
@@ -1551,7 +1552,7 @@ into the channel.
 
 Making each version fail with an undeclared type shows the same asymmetry
 exercise 2 finds. If you change `throw(Empty())` to `throw(ValueError())`, the type checker
-reports it at that line. The yielded type is `ValueError`, and the
+reports an `invalid-yield` at that line. The yielded type is `ValueError`, and the
 annotation allows `Need[Ticker] | Unavailable | Empty`. If you change
 `lifted()`'s `raise Empty()` to `raise ValueError()` while its
 decorator still says `@throws(Empty)`, the checker reports nothing.
