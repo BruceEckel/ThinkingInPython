@@ -46,12 +46,6 @@ Chapters/38_Patterns--Simulation.md	[EARLIER] *rat* :: A *rat* explores
 Chapters/39_Patterns--Pattern_Catalog.md	[EARLIER] *Dispatcher* :: The original description of *Reactor* lists *Dispatcher* as another name for the pattern
 Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Behavioral* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
 Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Creational* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
-Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Proactor* :: A *Proactor* starts the read or write and calls the handler once the operation has finished
-Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Proactor* :: On Windows, asyncio's default event loop is a *Proactor*, CODE, built on the operating system's I/O completion ports
-Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: *Proactor* is the counterpart of *Reactor* for completed operations
-Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: A *Reactor* calls a handler when a source is ready, and the handler then performs the read or write
-Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: Both asyncio's CODE and Twisted's CODE implement *Reactor*
-Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Reactor* :: The original description of *Reactor* lists *Dispatcher* as another name for the pattern
 Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Structural* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
 Chapters/40_Functional--Foundations.md	[EARLIER] *immutable* :: An *immutable* value cannot change after creation
 Chapters/40_Functional--Foundations.md	[EARLIER] *pure function* :: A *pure function* computes its result from its arguments alone
