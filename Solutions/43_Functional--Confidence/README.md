@@ -257,7 +257,8 @@ elements, their multiplicities, and their order at once.
 
 The oracle repeats no part of `sorted()`'s implementation. It computes the
 same answer by a different algorithm. That independence makes an oracle
-useful, and makes `assert sorted(xs) == sorted(xs)` worthless.
+useful, and its absence makes `assert sorted(xs) == sorted(xs)`
+worthless.
 
 Capping the list length keeps the quadratic oracle fast, since the
 bugs it catches appear in short inputs.
@@ -358,8 +359,9 @@ Unicode case mapping is not a pair of inverse functions. It is a
 many-to-one mapping in each direction.
 Some characters, like `µ`, are lowercase without being the lowercase of anything.
 
-`ß` breaks the same law from the other side. `"ß".upper()` is `"SS"`,
-two characters, so uppercasing can change a string's length.
+`ß` breaks the same law by changing a string's length. `"ß".upper()`
+is `"SS"`, two characters. Lowering `"SS"` gives `"ss"`, which differs
+from `"ß"`.
 For case-insensitive comparison Python provides `str.casefold()` rather than `str.lower()`.
 `casefold()` has no inverse either.
 
@@ -495,7 +497,8 @@ for every roster. Hypothesis finds the roster that breaks it.
 The property passes on a roster with a repeated name,
 because every student still appears in one group.
 But `group_rounds()` keys its history by `frozenset` of names,
-so it records both students' meetings under the same keys.
+so it records the meetings of two students who share a name under
+the same keys.
 When it avoids repeat meetings, it treats the two students as one.
 Generating distinct names writes `group_rounds()`'s precondition into
 the test.
@@ -527,9 +530,9 @@ so the left side of the assertion is `[]`.
 
 The report shows the shrunk case rather than the wide
 random roster that failed first. When each run starts with an empty
-`.hypothesis/` directory, its names vary from run to run. Hypothesis
-shrinks a generated string toward a longer run of `a` before it
-tries a second letter, so the report shows `'aa'` as often as `'b'`.
+`.hypothesis/` directory, the reported names vary from run to run.
+Hypothesis shrinks a generated string toward a longer run of `a` before
+it tries a second letter, so the report shows `'aa'` as often as `'b'`.
 Now and then a run stops at a different shape: three students in
 groups of two, such as `names=['a', 'b', 'c'], size=2`, which leaves
 one student over.
