@@ -286,7 +286,8 @@ which is always `None`.
 The resulting list holds three `None`s.
 The brackets tell the reader that the list matters,
 but the printing is the purpose.
-Giving the output expression a value to return replaces the `None`s and makes the list the point.
+When the output expression calls a function that returns a useful value,
+the list holds those values instead of `None`s and becomes the point.
 `show()` prints the line and returns it,
 so `lines` holds the three strings a caller can check, write to a file, or join.
 
@@ -300,7 +301,7 @@ use a comprehension when you want the collection it produces,
 and a loop when you want the side effect alone.
 
 A comprehension whose output expression has a side effect
-still deserves a second look when it returns something useful.
+still deserves a second look when its list is useful.
 `show()` does two jobs.
 A reader must open it to learn that one of them is printing.
 
@@ -483,7 +484,8 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Scope and the Walrus Operator](../../Chapters/16_Techniques--Comprehensions.md#scope-and-the-walrus-operator) shows the filter and the output expression sharing one call through `y`.
-Without the walrus, the filter runs for every element and the output expression runs again for each element that passes.
+Without the walrus, the filter calls `cube_if_even()` for every element.
+The output expression calls it again for each element that passes.
 Count the elements that pass the filter, and add that number to the length of `data`.
 
 <details>
