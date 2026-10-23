@@ -955,7 +955,8 @@ Stateless builds on generators, as TypeScript Effect's `function*` does.
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes with a value.
 That makes a suspended generator a continuation you can resume once or discard,
-but not resume twice, because nothing can copy a generator's paused frame.
+but not resume twice,
+because nothing can copy a paused generator's position and local variables.
 
 ### Custom AI Languages with Effects
 

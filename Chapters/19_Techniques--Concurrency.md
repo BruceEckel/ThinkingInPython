@@ -216,7 +216,7 @@ At the `await` each task *suspends*.
 It stops executing, saves its position in the function,
 and hands control back to the event loop.
 
-A suspended task is a paused frame that runs no bytecode and uses no processor time.
+A suspended task runs no bytecode and uses no processor time.
 Local variables keep their values until the task resumes.
 The event loop starts the next task,
 so all three are in flight during the first wait.

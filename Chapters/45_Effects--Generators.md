@@ -158,14 +158,14 @@ As [Asking Consumes an Item](22_Patterns--Iterators.md#asking-consumes-an-item)
 shows, calling `next()` on an exhausted iterator raises `StopIteration`,
 so a `next()` call inside the body can trigger that conversion.
 
-A suspended generator preserves its frame:
-the position in the body and every local variable.
-The generator object stores that frame off the call stack,
-so the frame outlives each `next()` or `send()` call that resumes it.
+A suspended generator preserves two things:
+its position in the body and every local variable.
+The generator object stores both,
+so they outlive each `next()` or `send()` call that resumes the generator.
 Resuming runs the body from that position, with every local variable intact.
 `interview()`'s local `name` keeps its value through the next two `send()` calls,
 and `town` keeps its value through the last one.
-The frame holds them, and the frame is the generator's state.
+The position and the locals together are the generator's state.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
@@ -441,7 +441,7 @@ because `yield from` passes the inner generator's yield and send channels throug
 
 `yield from` delivers each number to the `yield` that produced the prompt.
 The value from `g.send(1)` becomes the result of the `yield` at `[1]` inside `collect("alpha")`,
-two frames below the driver.
+the generator to which `both()` delegates.
 `yield from` does the forwarding,
 so the body of `both()` is its two delegations.
 
@@ -539,7 +539,7 @@ so each of `interview()`'s three assignments binds an `Answer`.
 because it returns a sentence built from all three answers,
 a different kind of value from the answer to any one question.
 
-`drive()` receives a request that `ask()` yielded two frames down,
+`drive()` receives a request that `ask()` yielded inside `interview()`,
 and looks it up in `answers` as it would one that `interview()` yielded in its own body.
 The answer `drive()` sends back becomes the value of the `yield` inside `ask()`.
 Nothing in `ask()` specifies the driver that sent it.
@@ -581,7 +581,7 @@ The listing imports `interview()` unchanged from `yield_from_delegates.py`,
 where `drive()` drives it.
 Now `survey()` delegates to `interview()`.
 `interview()`'s `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
-`interview()`'s questions reach `drive()` through three frames rather than two.
+`interview()`'s questions reach `drive()` through three generators rather than two.
 
 `survey()` then asks about a color,
 so the argument to `drive()` uses the dictionary union operator to add one more pair to a copy of `ANSWERS`.
@@ -613,7 +613,7 @@ after which that generator keeps running.
 A driver can `throw()` an exception into a generator or `close()` it.
 `yield from` relays both calls.
 `throw()` raises its exception inside the innermost generator rather than in the delegating one.
-`close()` unwinds every frame in the chain.
+`close()` ends every generator in the chain.
 
 In [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager),
 `@contextmanager`'s `__exit__()` calls the generator's `throw()` method,
@@ -645,7 +645,7 @@ g.close()
 ```
 
 `g.throw(ValueError("bad input"))` raises that exception at the suspended `yield`,
-inside `worker()`'s frame, the same way the `with` block's exception does.
+inside `worker()`'s body, the same way the `with` block's exception does.
 `worker()` catches it, prints, and yields again, so the generator keeps running.
 Like `send()`, `throw()` returns the next value the generator yields,
 here `"recovered"`.
@@ -696,9 +696,9 @@ The driver calls `throw()` on `outer()`, but `inner()` prints the `caught` line.
 so the `ValueError` stays inside `inner()`.
 `g.close()` raises `GeneratorExit` in `inner()` first,
 so the cleanup lines print from the inside out.
-A driver that holds the outermost generator can stop and clean up every frame beneath it.
+A driver that holds the outermost generator can stop and clean up every generator beneath it.
 
-A generator can catch `GeneratorExit` and yield again instead of letting it end the frame.
+A generator can catch `GeneratorExit` and yield again instead of ending.
 Doing so makes `close()` raise a `RuntimeError`:
 
 ```python

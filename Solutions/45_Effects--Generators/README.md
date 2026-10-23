@@ -96,7 +96,7 @@ return value arrives as `StopIteration`'s `value` rather than as the
 result of `send()`.
 
 `total` is a local of the generator, and it keeps its value across three
-suspensions because the generator's frame holds it. The frame is the state.
+suspensions because the suspended generator preserves its locals. Those locals are the state.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -391,7 +391,7 @@ collector, so when it finishes, `both()` finishes too.
 `both()` holds three `yield from` statements and leaves all the
 forwarding to them. `yield from`
 relays in both directions on its own: prompts up to the driver, numbers
-down to whichever `yield` is currently suspended, two frames below.
+down to whichever `yield` is suspended inside the current `collect()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -734,7 +734,7 @@ After three `"12"` sales, by any mix of machines,
 a fresh `machine()` answers the next `"12"` order with `UNAVAILABLE`.
 The `Final` annotation forbids rebinding the name and permits changing the dictionary,
 so the type checker passes the shared version.
-The solution copies `STOCK` into a local, so each generator's frame holds its own stock.
+The solution copies `STOCK` into a local, so each generator holds its own stock.
 
 ```python
 # exercise_7.py
@@ -805,7 +805,7 @@ state. A pause in the coin loop means `COLLECTING`, and a pause after
 `yield "SELECTING"` means a first digit has arrived and the machine
 waits for a second. `amount`, `row`, and
 `stock` are locals that keep their values between sends because the
-suspended frame holds them.
+suspended generator preserves them.
 
 **Report the state reached.** The `yield` in `machine()` runs the
 opposite direction from the one in `interview()`. Neither signature
