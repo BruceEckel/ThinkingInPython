@@ -413,7 +413,8 @@ and `ask()` in [Effect Tracking](A_Effect_Tracking.md#a-row-inside-annotated)
 shows why.
 `ask()` declares `Ask` and calls `input()`, which performs `Console`.
 Both descriptions are accurate.
-[The Check](#the-check) shows the checker reporting each.
+The declared row holds `Ask` alone, so [The Check](#the-check)
+shows the checker reporting `Console` as undeclared.
 A second piece of metadata names the Effects the function performs and leaves out of its declared row:
 
 ```python
@@ -1203,9 +1204,9 @@ with stub files that declare the types of code they cannot read.
 ## The Checker Checks Itself
 
 Every function in the checker so far is pure.
-Here, `check_files.py` is the edge,
+The edge is the program that runs the checker,
 the one place the checker reads a file or writes to the console.
-Each of its functions declares the row it performs:
+Each function there declares the row it performs:
 
 ```python
 # check_files.py
@@ -1256,9 +1257,9 @@ The output names no function from `effect_table.py`, `call_names.py`,
 so the checker confirms that its core is pure.
 `FileSystem` and `Console` appear in three functions at the edge and in the module that calls them.
 [Effect Management](44_Effects--Effect_Management.md#a-program-can-never-be-pure)
-calls isolating the Effects in a few functions,
-with the rest of the program pure, pushing the Effects to the edges.
-Here a tool verifies it.
+describes pushing the Effects to the edges:
+isolating them in a few functions so the rest of the program stays pure.
+Here a tool verifies that the checker keeps its Effects at its edge.
 
 The one `Unknown` is `Ok.bind()`, which calls the function it receives.
 That call is the callback problem of [Effect Tracking](A_Effect_Tracking.md#propagate-through-callbacks),
