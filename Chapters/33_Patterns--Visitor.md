@@ -84,7 +84,7 @@ a new operation whose behavior varies by flower type also needs a new method on 
 [Two Departures from the Classic Shape](#two-departures-from-the-classic-shape)
 explains why.
 
-`bug_visits.py` sends each bug to each flower:
+Each flower accepts each bug in turn:
 
 ```python
 # bug_visits.py
@@ -126,7 +126,7 @@ If you delete the override, every flower resolves to the same `Flower.eat()`,
 so the visitor's type alone decides which method runs.
 
 `bug_visits.py`'s output shows results, not mechanism.
-`dispatch_trace.py` makes both dispatches visible by printing the qualified name of the method to which each dispatch resolves:
+Printing the qualified name of the method to which each dispatch resolves makes both dispatches visible:
 
 ```python
 # dispatch_trace.py
@@ -187,7 +187,7 @@ which must branch on the argument's type.
 The visitors choose between those two methods.
 So `flower_visitors.py`'s primary hierarchy holds the operations the pattern exists to keep out of it.
 
-A Python visitor can keep the operations by building the method name from the element's class,
+A Python visitor can keep the operations in its own methods by building the method name from the element's class,
 as `ast.NodeVisitor` does.
 Its `visit()` calls `getattr(self, "visit_" + node.__class__.__name__, self.generic_visit)`,
 so a node class with no matching method falls back to `generic_visit()`.
@@ -274,7 +274,7 @@ A subclass resolves to its nearest registered ancestor.
 from which every class descends.
 A type whose only registered ancestor is `object` therefore gets the default.
 
-`dispatch_table.py` inspects the dispatch table the decorator built:
+`nectar()` exposes the dispatch table the decorator built:
 
 ```python
 # dispatch_table.py
@@ -444,10 +444,10 @@ That one dispatch resolves everything *Visitor*'s two dispatches do.
 
 The dispatch on the visitor's type exists not because two types are unknown,
 but because the operation must be a method on some class.
-The visitor's type specifies the operation,
+The visitor's type chooses the operation,
 so the language must resolve that type at runtime along with the flower's type.
 When an operation can be a function defined outside the hierarchy,
-the call site specifies the operation,
+the call site names the operation,
 so writing `nectar()` rather than `fragrance()` selects it before the program runs.
 The flower's type is the one thing left for runtime to resolve.
 One dispatch covers it.
