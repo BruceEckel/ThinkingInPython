@@ -318,9 +318,11 @@ That rule is *truthiness*,
 and it lets you write `if items:` instead of `if len(items) != 0:`.
 
 A type defines that test with `__bool__()`, a *dunder*:
-a name with double underscores at each end that Python reserves for the methods and attributes the interpreter itself calls and reads,
+a name with double underscores at each end.
+Python reserves dunder names for the methods and attributes the interpreter itself calls and reads,
 as an `if` calls `__bool__()`.
-Without one, Python falls back to `__len__()`, so an empty container is false.
+Without `__bool__()`, Python falls back to `__len__()`,
+so an empty container is false.
 
 ```python
 # truthiness.py
@@ -452,9 +454,9 @@ In an ordinary string, a backslash starts an escape sequence, as in C and Java.
 `\n` is a newline and `\t` is a tab.
 The `r` right before a string means "raw."
 Python takes each backslash in a raw string literally, as a single character.
-Without the `r`, the last literal in `strings.py` is a syntax error.
-`\u` starts a Unicode escape, which requires four hex digits.
-The `tils` after it supplies none.
+Without the `r`, the `\u` in the last literal of `strings.py` starts a Unicode escape,
+which requires four hex digits.
+The `tils` after it supplies none, so the literal is a syntax error.
 A raw string has one limit: it cannot end with a single backslash,
 because a backslash in a raw string still makes the quote after it part of the string's text.
 
@@ -609,8 +611,8 @@ for piece in message.interpolations:
 A `Template` stores its two kinds of piece separately.
 `message.strings` holds the literal text around and between the values,
 so it has one entry more than `message.interpolations`.
-A template that opens with a value therefore opens with an empty string,
-which prints as `''`.
+Because `message` opens with a value,
+`message.strings` opens with an empty string, which prints as `''`.
 `message.interpolations` holds one `Interpolation` per value.
 Each `Interpolation` keeps the value,
 the source text of the expression that produced it, and its format spec.
@@ -626,8 +628,8 @@ a consumer cannot assume that literals and interpolations alternate.
 Iterating over `t"{first}{last}"`, with two interpolations side by side,
 produces two `Interpolation`s in a row.
 
-`template_consumers.py` rebuilds `message` from the same t-string and passes it to two consumers,
-`shout()` and `safe()`:
+Two consumers, `shout()` and `safe()`, each walk a `Template` piece by piece.
+The listing rebuilds `message` from the same t-string for `shout()` and passes `safe()` two new templates:
 
 ```python
 # template_consumers.py
