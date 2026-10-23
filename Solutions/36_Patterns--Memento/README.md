@@ -344,8 +344,9 @@ discards its leftmost entry, the oldest state, when `append()`
 overflows it. `do()` therefore keeps the chapter's three lines, and
 the bound is one constructor argument. `undo()` still calls `pop()`,
 which takes the newest state from the right end. A list needs
-a length check after every append and a `pop(0)`, which shifts every
-remaining element.
+a length check after every append, and a `pop(0)` when the check
+finds one state too many. That `pop(0)` shifts every remaining
+element.
 
 **Report what the past still holds.** `can_undo()` asks whether
 `_past` still holds a state. A bounded history empties
@@ -373,7 +374,8 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Mementos That Outlive the Process](../../Chapters/36_Patterns--Memento.md#mementos-that-outlive-the-process) uses `pickle`, which keeps Python types intact.
-JSON has a smaller set of types, so print the type of `strokes` after `json.loads()`.
+JSON has a smaller set of types than Python, so a field can come back as a different type.
+Print the type of `strokes` after `json.loads()`.
 Rebuild the `Drawing` from the loaded dictionary, converting that one field back to the type the record declares.
 Compare the result with the original using `==`.
 
@@ -807,11 +809,10 @@ to `copy.replace()` as the single change, and pushes the result
 through `do()`. The rename to `"Goose"` survives the restore because
 `copy.replace()` copies every other field from `history.present`.
 
-**Narrow the history's state type.** `restore_field()` takes a `History[Drawing]`,
-whose `Drawing` states carry the `__replace__()` method that
-`dataclass()` generates.
-`copy.replace()` requires a `__replace__()` method, and a bare
-type variable `S` declares none.
+**Narrow the history's state type.** `copy.replace()` requires a
+`__replace__()` method. A bare type variable `S` declares none, so
+`restore_field()` takes a `History[Drawing]`, whose `Drawing` states
+carry the `__replace__()` method that `dataclass()` generates.
 A generic version would need
 a `Protocol` declaring `__replace__()` as the type variable's bound.
 A library would justify that `Protocol`.
