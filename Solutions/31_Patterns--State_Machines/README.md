@@ -142,9 +142,9 @@ print(person.hello())
 ```
 
 `Prozac` needs nothing beyond `Happy` and `Grumpy`'s own shape: one
-`hello()` method. `UnpredictablePerson` names no specific mood, so a
-third mood changes the `Mood` object that `change_to()` installs, and
-no code in `UnpredictablePerson`.
+`hello()` method. `UnpredictablePerson` names no specific mood, so
+adding a third mood changes which `Mood` object `change_to()`
+installs and leaves every line of `UnpredictablePerson` as it was.
 `UnpredictablePerson` is the
 [*State* surrogate](../../Chapters/25_Patterns--Surrogate.md#state),
 applied to a new domain.
@@ -328,8 +328,9 @@ The moods alone hold the transition rules, which distinguishes this design from 
 `list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`, and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 constructs.
 Exercise 1's `UnpredictablePerson` accepts any object with a `hello()`, so the set of moods there is open and nothing lists it.
 
-**What a mood loses.** A member is one object shared by every machine in the program, so a count of the `ANNOY` inputs a mood has received, stored on the member, counts every machine's inputs together.
-Exercise 1's classes can carry that state per instance, and a mood whose behavior needs more than a message, a successor, and an action is a class in either design.
+**What a mood loses.** A member is one object shared by every machine in the program, so a count of `ANNOY` inputs stored on the member adds up every machine's inputs together.
+Exercise 1's classes can carry that state per instance.
+A mood whose behavior needs more than a message, a successor, and an action is a class in either design.
 
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood` object through `change_to()`, this machine reaches the same moods by returning the next member from a transition function.
 
@@ -394,8 +395,8 @@ A word missing from the current state's `dict` gets the behavior you chose, not 
 
 If `next_state()` indexes the table with `transitions[word]`,
 the first word, `push` while locked, raises `KeyError: 'push'`.
-A turnstile ignores a word that changes nothing,
-so each table carries a `"*"` entry, and the lookup falls back on it through `.get()`.
+A turnstile stays in its state on a word missing from that state's table,
+so each table carries a `"*"` entry that names its own state, and the lookup falls back on it through `.get()`.
 
 ```python
 # exercise_3.py
@@ -440,7 +441,7 @@ so each member's line holds that state's whole table.
 and `Turnstile[name]` turns a name into the member,
 so the enum replaces the `dict` of name to state object a controller would otherwise keep.
 
-**Wrap the function in a tuple.** A function has a `__get__()`,
+**Wrap the function in a tuple.** A function has a `__get__()`, which makes it a descriptor,
 and `Enum` leaves a name whose value is a descriptor as a method rather than a member,
 so each value is a one-element tuple holding the function.
 `Enum` unpacks the tuple into the row's constructor,
@@ -713,7 +714,7 @@ a different design, a detail, or an equivalent alternative.
 
 [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rules under a `(state, input type)` key in order and takes the first whose condition passes.
 Put a guarded rule for the heavy load ahead of an unconditional rule, and let the condition read the load from the machine.
-For the stray `Start`, note that `trap_states.py`'s `case _` keeps the machine in its state while [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) raises a `NoTransition`, then weigh a control panel's stray presses against a cycle that stops.
+For the stray `Start`, note that `trap_states.py`'s `case _` keeps the machine in its state while `table_machine.py`'s `handle()` raises a `NoTransition`, then weigh a control panel's stray presses against a cycle that stops.
 
 <details>
 <summary>The shape</summary>
@@ -877,8 +878,8 @@ own, so the condition reads `load_kg` off the machine, where
 
 **Reject an input with no rule.** A second `Start` during `FILLING` finds no rule, so `handle()` raises
 `NoTransition`. The press changes nothing. The state is still
-`FILLING` and `load_kg` is still 3, because the engine finds a rule
-before it runs any action.
+`FILLING` and `load_kg` is still 3, because the engine runs an
+action only after it finds a matching rule.
 
 For a washing machine the caller should
 ignore the press, catching `NoTransition` and continuing.
