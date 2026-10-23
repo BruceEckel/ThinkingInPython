@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Benchmark Alternatives with `timeit`](../../Chapters/18_Techniques--Performance.md#benchmark-alternatives-with-timeit) times one lookup of the last element, which is the worst case for a `list` scan.
+[Benchmark Alternatives with `timeit`](../../Chapters/18_Techniques--Performance.md#benchmark-alternatives-with-timeit) times lookups of one target, the last element, which is the worst case for a `list` scan.
 Build a list of targets with `random.randrange()`, seeded so the run repeats.
 Time a loop over all of them against the `list`, then against the `set`, and compare the two totals.
 
@@ -307,8 +307,9 @@ A cache assumes its stored answer can stand in for a repeat call,
 because the same argument gives the same answer
 and computing that answer is all the call does.
 An impure function breaks that assumption.
-It prints, writes a file, or increments a counter on the first call with a given argument.
-The cache silently skips that side effect on every repeat.
+Each of its calls also prints, writes a file, or increments a counter.
+The cache lets that side effect run on the first call with a given argument
+and silently skips it on every repeat.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -946,7 +947,7 @@ For the last question, consider where the measured work runs, how long the progr
 <summary>Done when</summary>
 
 you can name the state `jit_status.py` prints on your interpreter (the book's build prints `no JIT in this build`), and on a `JIT built in, switched off` build you have compared the two `ratio` lines.
-You can give three reasons the two runs differ by about run-to-run noise.
+You can give three reasons the two runs differ by about as much as run-to-run noise.
 
 <details>
 <summary>Solution</summary>
@@ -988,7 +989,7 @@ The measured work runs in C, not in bytecode.
 `target in as_list` and `target in as_set` both do their work in the interpreter's C code.
 The JIT compiles only the bytecode the interpreter runs,
 so it could speed up almost none of the time the listing reports.
-The advice in [Write Idiomatic Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python) speeds a program up for the same reason.
+Moving work into C is also why the advice in [Write Idiomatic Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python) speeds a program up.
 
 The program is too short to get hot.
 The JIT compiles a code path after the path has run enough times to cross a threshold,
