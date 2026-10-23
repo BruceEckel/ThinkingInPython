@@ -650,8 +650,8 @@ If you leave out `return_exceptions=True`,
 `gather()` re-raises the first failure as a bare `RuntimeError`.
 `pytest.raises(ExceptionGroup)` lets that `RuntimeError` propagate,
 which fails the test.
-The demo still prints `1 [7]`.
-`except*` wraps a bare exception in a group,
+The demo still prints `1 [7]`,
+because `except*` wraps a bare exception in a group
 and `record()` finishes before `main()` resumes.
 A slower responder, though, keeps running with nothing awaiting it,
 as [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows.
@@ -1538,7 +1538,7 @@ no count of selections reaches that color.
 **Report the reachable colors.** The six sizes split three ways. At 3x3, 6x6, and 7x7 the matrix has
 full rank, so every color is reachable from any starting grid. At 4x4
 the rank is 14 of 16, and at 8x8 it is 60 of 64.
-Each missing dimension is a combination of cells that no selection can change,
+Each missing dimension is a combination of cells that every selection leaves unchanged,
 so the starting grid must agree with the target on each such combination.
 The 4x4 banded grid agrees for all three colors, and the 8x8 grid for
 `palegreen` alone, which is the puzzle the window poses. At 5x5 three
