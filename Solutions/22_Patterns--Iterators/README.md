@@ -110,7 +110,8 @@ If `__len__()` returns `self.start` alone,
 `len(Countdown(-1))` raises a `ValueError`, since `len()` rejects a negative length.
 So does `list(Countdown(-1))`, because `list()` calls `__len__()` to size its result.
 A `for` loop over the same object runs zero times and raises no exception.
-The solution returns `max(self.start, 0)`, so the length matches the zero values that iteration produces.
+The solution returns `max(self.start, 0)`, so a negative `start`
+gives a length of 0, matching the empty iteration.
 
 ```python
 # exercise_2.py
@@ -683,7 +684,7 @@ print(len(endless.seen))
 #: 50000
 ```
 
-**Match by methods, not by base.** `traverse()` needs no change, because its parameter specifies the
+**Match by methods, not by base.** `traverse()` needs no change, because its parameter's type is the
 `GoFIterator` protocol rather than a class. `OverSequence` and
 `OverStream` share no base class, and neither names the protocol.
 Defining the protocol's four methods satisfies it.
@@ -914,7 +915,8 @@ so it goes to `flatten("ab")`, which iterates over it
 and gets `"a"`. That `"a"` is a `str` too, so `flatten("ab")`
 recurses into `flatten("a")`, which iterates over `"a"` and gets
 `"a"` again. From here on the string stays one character long.
-A nested list ends because each level holds one less level of nesting, until the items are `int`s.
+The recursion into a nested list ends because each level holds one
+less level of nesting, until the items are `int`s.
 A `str` keeps descending.
 Iterating over a string yields strings,
 and a one-character string is a `Sequence` of one-character strings.
