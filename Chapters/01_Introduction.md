@@ -191,7 +191,8 @@ and the parts join in order into one file.
 Most of these files run on their own.
 Some are modules that another listing imports.
 The `test_*.py` files hold tests that `pytest` runs.
-These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
+All of these files, tests included,
+live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
 so the listing starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
 is the file `Examples/14_Techniques--Decorators/tracer.py`.
@@ -288,7 +289,7 @@ not in the code you produce.
 
 If you keep an AI assistant open while you work,
 the repository's `AGENTS.md` asks it to coach you toward your own answer until you open the solution,
-then to review your answer against the criteria its chapter states.
+then to review your answer against the criteria the exercise's chapter states.
 
 ## Resources
 
