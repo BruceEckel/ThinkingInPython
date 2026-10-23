@@ -168,7 +168,7 @@ so the return type carries them,
 the job that [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 gives Koka's Effect row.
 
-The whole library is visible in `drive.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
+Each tool in the library is a version of `drive()` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
 An Effect is a generator, so you can drive one yourself,
 as `hand_driven.py` in [Nothing Runs Yet](46_Effects--Stateless.md#nothing-runs-yet)
 does with that chapter's `greet("Alice")`.
@@ -337,13 +337,13 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 so `stamp()` produces a known string a test can compare.
 `tomorrow` reports a moment a day later,
 so `batch_due()` returns `True` at once.
-`batch_due()` subtracts `last_run` from the moment the handler names and finishes in microseconds.
+`batch_due()` subtracts `last_run` from the handler's answer and finishes in microseconds.
 `batch_due()` holds no `datetime.now()` call,
-so a test names the moment outright.
+so a test supplies the moment outright.
 A production handler that returns `datetime.now()` runs the same function.
 
 Those three runs are claims about testability, so each one becomes a test.
-The handler moves inside each test, and every test names the moment it needs:
+The handler moves inside each test, and every test sets the moment it needs:
 
 ```python
 # test_timekeeping.py
@@ -807,9 +807,8 @@ def test_spree_spends_from_the_tests_cell() -> None:
 
 After the run, the cell holds what the program left.
 Two purchases went through, and 10 remained.
-The test asserts on the cell it built,
-so each test starts from a cell of its own,
-and two tests can run in either order.
+Each test builds its own cell and asserts on that cell,
+so two tests can run in either order.
 
 When one function owns a number, a local variable is the right tool,
 and `count_heads()` keeps its count in one.
@@ -927,8 +926,8 @@ A function that receives everything it uses as arguments is easier to test on it
 and the split keeps the Ability requests in one place.
 Either shape type-checks, and either puts `Unavailable` in the error channel.
 
-`newswire.py` defines two feeds and an encyclopedia to supply,
-and names four instances for the scenarios that follow:
+Two feeds and an encyclopedia implement the two Protocols,
+and four named instances serve the scenarios that follow:
 
 ```python
 # newswire.py
@@ -1514,7 +1513,7 @@ print(script.lines)
 #: ['Kitty arrives', 'and bats at the puzzle']
 ```
 
-The fourth run swaps one actor and captures the output.
+The fourth run swaps the narrator for a `Script` and captures the output.
 `Script` records what arrives,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching.
 The engine holds no printing to intercept.
@@ -1937,7 +1936,8 @@ turning it into one that returns an Effect,
 so it is both an entry point and a transformation.
 On a function that already returns an Effect, as in `fetch_effectful.py`,
 it adds each `E` to that Effect's error channel.
-`throw()` builds the failure as a description.
+`throw()`, despite the similar name, belongs in the first table,
+since it builds the failure as a description.
 And `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
 
@@ -2194,7 +2194,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 The `# type: ignore` silences that diagnostic,
 since the listing provokes the matching runtime failure on purpose.
 The `MissingAbilityError` the listing prints names the `Log` nobody supplied.
-Nesting the `supply()` inside the `run()` call keeps the diagnostic.
+Nesting the `supply()` inside the `run()` call draws the same diagnostic,
+so the checker needs no named intermediate to catch the missing `Log`.
 
 `catch()` handles part of a channel the way `supply()` does.
 If you catch one of two declared errors, the other stays in the error channel.
@@ -2235,7 +2236,8 @@ Two pieces of the library show that limit.
 `Effect[A, E, R]` carries a separate `E` that `@throws` fills and `catch()` empties.
 Koka needs no such type parameter,
 because an exception there is an ordinary Ability whose handler declines to resume.
-The extra type parameter exists because a Stateless Ability cannot fail.
+The extra type parameter exists because a Stateless handler always resumes the Effect,
+so a failure cannot be an Ability.
 The `ZIO[R, E, A]` of [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 carries one for the same reason.
 `Async` is the other piece.
