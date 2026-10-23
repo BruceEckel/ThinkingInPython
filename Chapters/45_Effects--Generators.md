@@ -19,7 +19,7 @@ It yields a request, suspends, and continues when a caller sends the answer.
 
 This chapter covers the full three-channel annotation, the *driver*
 (the loop that runs such a conversation), and `yield from`,
-which composes generators that do not specify their driver.
+which composes generators that do not refer to their driver.
 [Stateless](46_Effects--Stateless.md) builds an Effect system on the annotation,
 the loop, and `yield from`, but generators are useful on their own.
 
@@ -128,7 +128,9 @@ print(f"{result = }")
 
 The `NewType` definitions let the type checker report a transposed annotation.
 If you mistakenly annotate the generator in `interview_generator.py` as `Generator[Answer, Question, Result]`,
-the type checker gives a detailed error report.
+the type checker flags each `yield` in the body,
+because each one yields a `Question` where the annotation declares an `Answer`.
+It also flags each `next()` and `send()` in `drive_by_hand.py`.
 
 `next(conversation)` starts the generator and produces a `Question`.
 `conversation.send(Answer("Alice"))` provides an answer and produces the next question.
@@ -177,7 +179,8 @@ A generator is therefore a *one-shot continuation*.
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
 The first call, which runs the body to its first `yield`,
-*primes* the generator, and it must be `next()` or `send(None)`.
+*primes* the generator.
+That call must be `next()` or `send(None)`.
 `conversation.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 `next(conversation)` is equivalent to `conversation.send(None)`:
