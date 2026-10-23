@@ -140,6 +140,7 @@ With `add_behavior` on a `def add(a, b)`,
 the call `add(2, 3)` raises a `TypeError`.
 The wrapper takes zero positional arguments.
 The call passes two.
+
 A wrapper that must accept any function's arguments uses the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
 The wrapper collects the arguments with `*args, **kwargs` and passes them on to the original function.
 Here, the `trace` decorator traces calls, and its `wrapper()` takes that shape.
@@ -354,7 +355,7 @@ so Python raises the exception at the `@` line rather than at some later call.
 Because that check guarantees `times >= 1`,
 `wrapper()`'s loop always runs at least once.
 The loop therefore always leaves a value of type `R` in `result` to return.
-`test_repeat.py` parametrizes over `times` and covers the rejection:
+The tests parametrize over `times` and cover the rejection:
 
 ```python
 # test_repeat.py
@@ -770,7 +771,7 @@ Its `wrapper()` makes the first call before the loop,
 so `result` holds a value before the loop starts.
 `repeat.py` relies on the `times >= 1` check for that guarantee.
 
-`test_repeat_class.py` differs from `test_repeat.py` in its import alone.
+The class form's tests differ from `test_repeat.py` in their import alone.
 `test_repeat_call_count` parametrizes over `times`,
 and `test_repeat_rejects_times_below_one` covers the rejection in the constructor:
 
@@ -799,7 +800,7 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 ### A Limitation: Methods Need a Descriptor
 
 The class form has one limitation,
-which appears when the decorator instance replaces the function it decorates.
+which arises because the decorator instance replaces the function it decorates.
 A method decorated that way becomes an instance rather than a function,
 and calling it fails.
 `trace_class.py` and `count_calls.py` decorate module-level functions for that reason.
@@ -959,7 +960,8 @@ so the name `Espresso` refers to the original class.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
-The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
+The type parameter `T` keeps the decorated class's type for the type checker,
+as `**P` and `R` keep a decorated function's signature.
 If `register`'s annotation is `(cls: type) -> type`,
 `register()` returns a bare `type`.
 `ty` and Pyright then infer `Espresso()` as an `Any`.
