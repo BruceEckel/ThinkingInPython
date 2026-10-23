@@ -578,9 +578,9 @@ type checker verifies it, and the running program ignores it.
 
 In a real codebase the base class and its overrides often sit in
 different files, so a rename slips past a reader. With `@override` on
-every overriding method, the type checker reports each one the rename
-left matching nothing. A decorator that
-changes no behavior at run time is worth writing when a tool reads it.
+every overriding method, the type checker reports each method whose
+name the rename removed from the base class. A decorator that changes
+no behavior at run time is worth writing when a tool reads it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
