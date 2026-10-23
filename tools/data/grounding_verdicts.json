@@ -176,16 +176,16 @@
   "p_terms": 0.0,
   "asked": "2026-10-13"
  },
- "a0536caddc59da86": {
+ "7af500ad34e92834": {
   "file": "23_Patterns--Singleton.md",
   "line": 724,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "__call__"
   ],
-  "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the *type* of `obj`](25_Patterns--Surrogate.md#special-methods-bypass-getattr).",
-  "p_terms": 0.09,
-  "asked": "2026-10-16"
+  "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the type of `obj`](25_Patterns--Surrogate.md#special-methods-bypass-getattr).",
+  "p_terms": 0.21,
+  "asked": "2026-10-23"
  },
  "c358c8813c054976": {
   "file": "24_Patterns--Template_Method.md",

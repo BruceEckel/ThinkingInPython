@@ -749,16 +749,16 @@ A generator written for others to drive must therefore let `GeneratorExit` end i
 
 ## The Driver You Already Use
 
-[Stateless](46_Effects--Stateless.md) builds on three ideas from this chapter:
+This chapter rests on three ideas:
 
 - A generator function builds a description instead of doing work.
-- `yield` makes that description two-way,
-  so the description can ask for something.
+- `yield` and `send()` make that description two-way,
+  so the description can ask for something and receive the answer.
 - `yield from` composes those conversations.
-  No generator in the chain specifies its driver.
+  No generator in the chain refers to its driver.
 
-Those ideas are enough to build a task runner.
-A queue keeps the live generators.
+The first two ideas are enough to build a task runner.
+A queue holds the live generators.
 The runner gives each one a turn:
 
 ```python
@@ -800,10 +800,9 @@ which then runs the next job.
 The output interleaves the two jobs in a single thread,
 although neither names the other.
 
-`task_runner()` calls `next()` and takes turns.
-`drive()` calls `send()` and answers questions.
-When each job can make a request,
-one loop does both the turn-taking and the answering:
+`task_runner()` calls `next()` to give each job a turn.
+`drive()` calls `send()` to answer a generator's questions.
+When each job can make a request, one loop can do both:
 
 ```python
 # task_runner_send.py
@@ -861,11 +860,11 @@ answering each request before the next turn.
 `index()` discards what it receives.
 A job that yields only to take turns can ignore the answer.
 
-Every call to `asyncio.run()` runs a driver like `drive()`.
+`asyncio.run()` starts an event loop,
+a driver like the one in `task_runner_send.py`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 describes `await` as suspending a task until the event loop resumes it.
-The event loop does the two things `task_runner_send.py` combines.
-It gives each task a turn, and it answers the request each task yields.
+The event loop gives each task a turn and answers the request each task yields.
 A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.
 `await` suspends the coroutine and yields a request, a `Future`,
@@ -873,11 +872,11 @@ to the task that drives it.
 When the `Future` has a result, the loop resumes the coroutine,
 and the `await` expression evaluates to that result.
 
-`asyncio.run()` is the single driver at the edge of the program.
+That event loop is the single driver at the edge of the program.
 Each request passes through every awaiting caller on its way to that loop,
 so an `await` in a function makes every caller `async` in turn.
 
-A function can contain both `async def` and `yield`.
+An `async def` function can also contain `yield`.
 The result is an *asynchronous generator*, which has two drivers at once.
 Each `await` sends a request up to the event loop,
 while each `yield` hands a value to the `async for` loop that consumes it:
@@ -914,14 +913,15 @@ so the `async for` loop must appear inside an `async def`.
 The *asynchronous comprehension* `[n * n async for n in countdown(3)]` collects the values through the same `__anext__()` calls,
 and it also requires an enclosing `async def`.
 
-`AsyncGenerator[YieldType, SendType]` takes two parameters,
-where `Generator` takes three.
-An asynchronous generator has no return channel.
+An asynchronous generator has no return channel,
+so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
 Writing `return` with a value in one is a `SyntaxError`, as is `yield from`.
 The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
 Each of the three returns an awaitable for the caller to `await`.
 
-The next chapter describes a function by what it requests and writes those requests into its return type.
+[Stateless](46_Effects--Stateless.md)
+builds on all three of this chapter's ideas.
+It describes a function by what it requests and writes those requests into its return type.
 
 ## Exercises
 
