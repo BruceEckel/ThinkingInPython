@@ -1134,7 +1134,7 @@ Project(seed=1).meet(4)
 **Resolve the receiver's type.** Exercise 7 uses single dispatch, not
 double. `a.interact(b)` resolves on `a`'s type alone.
 Each `interact()` interpolates `other` into its message the same way, whatever `other`'s type.
-The design becomes double dispatch once `interact()`'s behavior must vary by `other`'s
+The design becomes double dispatch when `interact()`'s behavior must vary by `other`'s
 type too.
 Exercise 8 adds that dependence.
 

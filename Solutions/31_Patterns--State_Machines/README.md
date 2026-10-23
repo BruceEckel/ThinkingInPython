@@ -686,9 +686,9 @@ generator, the generator picks a legal successor and remembers it
 for the following call. `NEXT_ACTIONS` constrains every choice, so every
 sequence this generator produces is legal by construction.
 
-`trap_states.py` accepts any move in any state and lets each
-`case _` absorb the moves that make no sense there, so the generator's
-table is the stricter of the two.
+`trap_states.py` accepts any move in any state, and each `case _`
+returns the current state on the moves that make no sense there, so
+the generator's table is the stricter of the two.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1211,9 +1211,9 @@ running, and one inside the band falls through to the unconditional
 rule back to `IDLE`.
 
 Every decision in the machine is a condition on the one input type.
-Every rule here keeps the default `None` action, and the fall-through
-rules keep the default `None` condition too, so both fields are
-optional per rule.
+Both fields are optional, so every rule here leaves its action at
+the `None` default, and the fall-through rules leave their condition
+at `None` too.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
