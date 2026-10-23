@@ -27,8 +27,8 @@ The machine chooses each next state.
 
 The tables follow each source's own grouping.
 One of those groupings is GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
-which [Design Patterns](21_Patterns--Design_Patterns.md)
-accepts for *Creational* and questions for *Structural* and *Behavioral*.
+which the [Design Patterns](21_Patterns--Design_Patterns.md)
+chapter accepts for *Creational* and questions for *Structural* and *Behavioral*.
 A few idioms below belong to no single source.
 They sit in three groups by what they share: language and implementation idioms
 (most of them tied to C++ or Java's limits), functional idioms,
