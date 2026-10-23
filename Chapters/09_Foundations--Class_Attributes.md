@@ -90,7 +90,7 @@ and a data class gets them from `slots=True`.
 Each instance then holds one slot per declared name in place of a `__dict__`,
 provided every base class declares slots too.
 An instance of such a class cannot shadow a class attribute.
-Assigning to that name on the instance raises an `AttributeError`,
+Assigning to the class attribute's name on the instance raises an `AttributeError`,
 because the instance has no dictionary to hold the new attribute.
 
 A method is a class attribute like any other.
@@ -263,7 +263,8 @@ In `class_var.py`, `label: str` states that every `Tally` carries a `label` attr
 If no method assigns `self.label`, no attribute exists,
 on the instance or the class.
 The type checker takes the annotation as the attribute's declaration.
-It never checks whether some method sets the attribute, so the check passes.
+It never checks whether some method sets the attribute,
+so it accepts every read of `label`.
 The first code that reads `label` raises an `AttributeError`.
 
 The annotation on `label` is optional here.
