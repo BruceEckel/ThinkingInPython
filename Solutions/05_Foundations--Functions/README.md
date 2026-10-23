@@ -347,8 +347,8 @@ print(apply_twice(lambda n: n * n, 3))
 
 The lambda runs twice, on the original value and then on its own
 result, so `"hi"` gains two exclamation points rather than one. The
-`apply_twice()` call on `3` shows the same shape with numbers. `3` squares to `9`,
-which squares to `81`.
+`apply_twice()` call on `3` runs a squaring lambda twice in the same
+way: `3` squares to `9`, which squares to `81`.
 
 A function that takes another function as an argument declares that
 parameter like any other. `func` has one requirement: it must be
@@ -589,10 +589,10 @@ Without `global`, the assignment in `count += 1` makes `count` local to
 `writes_global()`, so the read half of `+=` reads that local
 before any assignment gives it a value.
 
-**Assign after the read.** `rebinds()` fails for the same reason
-although its `print()` runs before the assignment. Python decides which names
-are local when it compiles the function body, so the `count = 99`
-below the `print()` at `[1]` makes `count` local throughout.
+**Assign after the read.** `rebinds()` fails for the same reason,
+although the `print()` at `[1]` runs before the assignment. Python
+decides which names are local when it compiles the function body, so
+the `count = 99` below that `print()` makes `count` local throughout.
 The `print()` at `[1]` therefore reads the unassigned local, not the module-level name.
 The exception ends the call before the `print()` at `[2]`.
 
@@ -726,8 +726,9 @@ You can name the two parameters that collect `func="f"` on its way to that outpu
 <summary>Solution</summary>
 
 If you predicted a `calling report` line before the error, compare
-`forwarding_collision.py`. There `trace()` runs, and the clash is in
-the arguments `trace()` passes to `report()`. Here the clash is in `trace()`'s own
+`forwarding_collision.py`. There the clash is in the arguments
+`trace()` passes to `report()`, so `trace()`'s body runs and prints
+`calling report` first. Here the clash is in `trace()`'s own
 arguments, so Python raises `TypeError` before `trace()`'s body runs.
 
 ```python
