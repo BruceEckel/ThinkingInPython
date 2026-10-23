@@ -350,7 +350,8 @@ The driver interprets them.
 
 Each generator has one driver at a time.
 The runtime enforces that pairing, though no annotation states it.
-A generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
+Rather than interleaving two threads' calls,
+a generator that both threads resume at once raises `ValueError: generator already executing`.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 shows that error and `threading.synchronized_iterator()`,
 which lets several threads share one generator by serializing their calls.
@@ -395,9 +396,7 @@ print(list(top()))
 #: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
 ```
 
-Each `yield from` runs its target until that generator finishes,
-so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
-"To exhaustion" says when the delegation ends.
+"To exhaustion" means each `yield from` runs its target until that generator finishes.
 Until then, the inner generator yields its values one at a time,
 as the driver requests each one.
 
@@ -411,10 +410,7 @@ so `list(outer())` shows `<generator object one at ...>` in place of `'only'`.
 
 ### The Return Channel
 
-A `yield from` expression passes the inner generator's yielded values through to the driver and evaluates to the inner generator's return value.
-`report()` stores the value of `yield from emit(items)` in `size`.
-`report()` is a one-way generator,
-annotated with the short `Iterator[str]` form:
+A `yield from` expression passes the inner generator's yielded values through to the driver and evaluates to the inner generator's return value:
 
 ```python
 # yield_from_return.py
@@ -435,13 +431,8 @@ print(list(report(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)']
 ```
 
-`emit()` is a `Generator[str, None, int]`.
-It yields strings, receives `None`,
-and returns the number of characters in `items` as an `int`.
-
 The return channel delivers a value from a generator to the generator that delegated to it.
-`report()` receives the total `emit()` computed.
-Neither function refers to the driver.
+Neither `emit()` nor `report()` refers to the driver.
 
 Any iterable can follow `yield from`.
 The expression takes its value from the `StopIteration` that ends the iteration.
@@ -453,9 +444,7 @@ so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 ### The Send Channel
 
 `yield from` also forwards each value the driver sends,
-delivering it to the `yield` that waits inside the inner generator.
-Here `collect()` receives two values and returns `None`,
-so its annotation leaves the `ReturnType` at its default:
+delivering it to the `yield` that waits inside the inner generator:
 
 ```python
 # yield_from_send.py
@@ -487,14 +476,9 @@ except StopIteration:
 #: both() is exhausted
 ```
 
-`collect()` yields prompts, receives numbers, and returns `None`,
-so its type is `Generator[str, int, None]`.
-Because the `ReturnType` defaults to `None`,
-the annotation shortens to `Generator[str, int]`.
-`both()` declares that same type,
+`both()` declares the same type as `collect()`,
 because `yield from` passes the inner generator's yield and send channels through to the driver.
 
-`yield from` delivers each number to the `yield` that produced the prompt.
 The value from `g.send(1)` becomes the result of the `yield` at `[1]` inside `collect("alpha")`,
 the generator to which `both()` delegates.
 `yield from` does the forwarding,
@@ -582,9 +566,6 @@ if __name__ == "__main__":
 #: Alice of Wonderland, friend Rabbit
 ```
 
-The listing imports `drive()` unchanged from `drive.py`,
-and nothing in `drive()` refers to `ask()`.
-
 `ask()` uses `Answer` in two of the three positions, in two different roles.
 As the `SendType`, `Answer` types each value the driver sends,
 which arrives as the value of the `yield` expression and binds to `answer`.
@@ -595,7 +576,8 @@ so each of `interview()`'s three assignments binds an `Answer`.
 because it returns a sentence built from all three answers,
 a different kind of value from the answer to any one question.
 
-`drive()` receives a request that `ask()` yielded inside `interview()`,
+`drive()`, imported unchanged from `drive.py`,
+receives a request that `ask()` yielded inside `interview()`,
 and looks it up in `answers` as it would one that `interview()` yielded in its own body.
 The answer `drive()` sends back becomes the value of the `yield` inside `ask()`.
 Nothing in `ask()` refers to the driver that sent the answer.
@@ -635,16 +617,12 @@ print(drive(survey(),
 
 The listing imports `interview()` unchanged from `yield_from_delegates.py`,
 where `drive()` runs it directly.
-Now `survey()` delegates to `interview()`.
-`interview()`'s `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
+Here `interview()`'s `Result` arrives as the value of `yield from interview()` instead of as `stop.value` in the driver.
 `interview()`'s questions reach `drive()` through three generators rather than two.
 
 `survey()` then asks about a color,
 so the argument to `drive()` uses the dictionary union operator to add one more pair to a copy of `ANSWERS`.
-The driver receives one more question,
-so the trace gains one more `request` line and one more `ask()` line.
 
-`drive()` still runs `interview()`, now through `survey()`.
 The outermost generator still needs code that calls `next()` and `send()`,
 so the listing ends with a `drive()` call.
 However deeply the delegations nest, the program has one driver.
