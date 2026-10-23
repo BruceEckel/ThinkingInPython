@@ -393,7 +393,7 @@ a different design, a detail, or an equivalent alternative.
 [Contention on a Loop](../../Chapters/38_Patterns--Simulation.md#contention-on-a-loop) shows two rats reaching one unclaimed cell, and [The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows the `claim()` you are changing.
 Making `claim()` an `async def` means each caller must `await` it, so the `Protocol`, the comprehension, and `explore()` all change.
 Count the `True` results in a field on the `Blackboard` and compare the count with `len(visited)`.
-A coroutine gives up control only at an `await`, which decides whether `claim()` needs a lock.
+A coroutine gives up control only at an `await`, so whether `claim()` needs a lock depends on whether an `await` sits inside it.
 
 <details>
 <summary>The shape</summary>
@@ -1066,7 +1066,8 @@ The `EndGame` version is now a one-line function on the caller's side,
 
 **Report an empty search as `None`.** The other change is the return type.
 The chapter's version raises a `ValueError` when the search runs out
-of rooms, because a working maze always has a reachable `!`.
+of rooms. A working maze always has a reachable `!`, so an exhausted
+search signals a broken maze.
 Here, running out of rooms is the ordinary way the food loop ends,
 so `solve()` returns `None`.
 The `while` loop's `is not None` test then ends the loop once the robot has eaten the last food.
@@ -1117,7 +1118,7 @@ into one file that all three import.
 The file makes two changes: `Plate`
 takes the field function as a constructor argument instead of calling
 the module-level `amplitude()`, and the module adds `membrane()`
-beside `amplitude()`. That argument makes exercise
+beside `amplitude()`. The `field` argument makes exercise
 7's different physics a second function rather than an edit.
 The `Plate` there takes `field=membrane`,
 while the other two exercises keep the default `amplitude()`.
@@ -1461,7 +1462,7 @@ keeps the step small in a loud region too, so the grain barely travels.
 Too large a kick keeps the step large near a nodal line,
 since a small amplitude still leaves the step large enough
 to carry the grain out of the neighborhood in which it was settling.
-With the default `0.05`, both halves work.
+With the default `0.05`, a grain both travels and settles.
 A step is at most a tenth of the plate where the amplitude peaks,
 and vanishingly small once a grain arrives.
 
