@@ -313,7 +313,8 @@ For real code, prefer the module,
 as [A Module Is Already a *Singleton*](../../Chapters/23_Patterns--Singleton.md#a-module-is-already-a-singleton)
 argues at the top of the chapter.
 The module is less code, lets the caller
-read the list as a module attribute, and gets the same guarantee.
+read the list as a module attribute, and still holds one list that
+every importer shares.
 The class-based versions are a better choice when the singleton must be a class:
 when it must satisfy an interface other code expects,
 or when it needs `__new__()`-level control over construction.
@@ -699,7 +700,7 @@ a different design, a detail, or an equivalent alternative.
 
 [One Instance in a Class Variable](../../Chapters/23_Patterns--Singleton.md#one-instance-in-a-class-variable) returns the stored instance from `__new__()`.
 When `__new__()` returns an instance of the class under construction, Python then calls `__init__()` on it.
-Count how many times Python calls `__init__()` across the three constructions, and what each call does to `val`.
+Count how many times Python calls `__init__()` across the three constructions, and note what each call does to `val`.
 
 <details>
 <summary>The shape</summary>
@@ -768,17 +769,20 @@ runs. Each run rebinds `val` to a new one-item list, discarding the
 list before it. The object is single. Every caller who constructs
 it resets its state.
 
-The chapter's listing inherits `object.__init__()` and does all its work in `__new__()`.
-There the `None` test separates
-the first construction, which creates `val`, from the later ones,
-which append to it. A singleton that keeps an `__init__()` must
+The chapter's listing inherits `object.__init__()` and does all its
+work in `__new__()`. There the first construction passes the `None`
+test and creates `val`. Every construction, the first included,
+appends its argument to `val`. A singleton that keeps an `__init__()` must
 make it safe to run repeatedly, for example by returning at once
 when `hasattr(self, "val")` is true.
 
 The metaclass form in
 [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation)
-runs `__init__()` once. Its `__call__()` runs before `__new__()` and `__init__()`.
-After the first construction, `__call__()` returns the stored instance from `_instances`.
+runs `__init__()` once. Its `__call__()` runs before `__new__()` and
+`__init__()` and decides whether they run. On the first construction
+it builds the instance through `type.__call__()`, which runs both.
+After that it returns the stored instance from `_instances`, and
+neither method runs.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
