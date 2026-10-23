@@ -555,7 +555,7 @@ The solution keeps an unreachable `case _` so every path returns a
 
 The second version reads better. A guard hides the shape of the
 dispatch. You must read four nearly identical `if` clauses one at a
-time to see that they enumerate sign combinations. Once the subject is
+time to see that they enumerate sign combinations. When the subject is
 `sign(p.x), sign(p.y)`, the cases are literals in a two-column table.
 A missing combination is visible at a glance. The `|` alternation
 then handles both axis cases in one line,
