@@ -378,7 +378,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Class-Form Decorator with State](../../Chapters/14_Techniques--Decorators.md#a-class-form-decorator-with-state) keeps `count` on each instance, which is one instance per decorated function.
+[A Class-Form Decorator with State](../../Chapters/14_Techniques--Decorators.md#a-class-form-decorator-with-state) keeps `count` on each instance, one instance per decorated function.
 A `ClassVar` on the decorator class is one value that every instance reads and writes through the class name.
 Increment both counters in `__call__()`, and use `update_wrapper()` so the instance keeps the function's name.
 
@@ -477,9 +477,9 @@ print(f.count, g.count, trace_counting.total_calls)
 #: 2 1 3
 ```
 
-**Count each function's calls.** Each decorated function gets its own instance of `trace_counting`
-(the same as `count_calls`), so `f.count` and `g.count` track
-their own function's calls: `2` and `1`.
+**Count each function's calls.** As with `count_calls`, each
+decorated function gets its own instance of `trace_counting`, so
+`f.count` and `g.count` track their own function's calls: `2` and `1`.
 
 **Share one total across functions.** `total_calls` is a class
 attribute, annotated `ClassVar[int]`, so it belongs to the
@@ -787,7 +787,7 @@ frame appears with or without `@wraps`.
 **Retry all but the last attempt.** The loop runs `times - 1`
 attempts inside a `try`. The final attempt sits outside it.
 
-**Make the last attempt unguarded.** That attempt satisfies both
+**Make the last attempt unguarded.** The final attempt meets two
 requirements at once. It returns `R` on success, so `wrapper()` has a
 return value on every path the type checker can see. It also lets the
 last exception propagate to the caller, since that attempt sits
