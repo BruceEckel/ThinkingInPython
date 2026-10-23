@@ -483,7 +483,7 @@ With `slots=True` alone, `_pool[text] = found` therefore raises a `TypeError`.
 so `Name` writes the `dataclass` call in full.
 
 `functools.lru_cache(maxsize=n)` bounds a pool a different way.
-Once it holds `n` entries, each new entry evicts the least recently used one.
+When it holds `n` entries, each new entry evicts the least recently used one.
 That eviction turns the factory back into a cache.
 Requesting an evicted value builds a fresh object,
 equal to any surviving original and distinct from it.
@@ -588,7 +588,7 @@ The enum version also brings iteration, exhaustive `match`,
 and a closed set of members.
 `Tile("?")` raises a `ValueError`, and `Tile.DOOR` raises an `AttributeError`.
 
-A `match` over `Tile` needs no `case _:` catch-all once every member has a case.
+A `match` over `Tile` needs no `case _:` catch-all when every member has a case.
 If you leave a member out of a function that declares a return type,
 the type checker reports the missing case before the code runs:
 
