@@ -384,16 +384,17 @@ reports a single-item list, `["func_a(1)"]`, because `func_b(5)` and
 at once: `i=1` fails `func_a()`, `j=2` fails `func_b()`, and `i+j=3`
 fails `func_c()`.
 
-**Widen the error type.** One generic `Ok`/`Err` pair carries both shapes. The
-three steps return `Result[int, str]`, an `int` or one error string,
-while `combined()` returns `Result[str, list[str]]`, a finished `str`
-or a list of error strings. `Ok` and `Err` take the type
-parameters each call needs.
+**Widen the error type.** The three steps return `Result[int, str]`,
+an `int` or one error string, while `combined()` returns
+`Result[str, list[str]]`, a finished `str` or a list of error strings.
+One generic `Ok`/`Err` pair carries both shapes, because `Ok` and
+`Err` take the type parameters each call needs.
 
 **Narrow for the type checker.** The type checker verifies both
 instantiations. The `Ok(a), Ok(b), Ok(c)` pattern narrows each result to
-`Ok[int]`, so `a`, `b`, and `c` are `int`s, and `isinstance(r, Err)`
-narrows the comprehension to `list[str]`.
+`Ok[int]`, so `a`, `b`, and `c` are `int`s. `isinstance(r, Err)`
+narrows each `r` to `Err[str]`, so the comprehension builds a
+`list[str]`.
 
 If you build the error list first and return early when it holds
 anything, the type checker rejects a later `a.answer`.
@@ -632,10 +633,10 @@ but `load_setting()` returns the exception inside an `Err`,
 so it never propagates to the top-level handler that prints a traceback.
 
 **Sequence the two loads.** The lambdas ignore their parameter, since
-the second load works from its own name and text. `bind()`
-reads worst in that case. It exists to pass one step's answer to
-the next step. Here it sequences the two calls while the lambda
-discards the answer. The `returns` library's
+the second load works from its own name and text. `bind()` exists to
+pass one step's answer to the next step, so it reads worst when the
+next step ignores that answer. Here it sequences the two calls while
+the lambda discards the answer. The `returns` library's
 [do-notation](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
 reads better.
 
