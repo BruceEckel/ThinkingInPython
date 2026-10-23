@@ -975,7 +975,7 @@ your `exercise_8.py` raises a `TypeFailure` from the type test for `Stars(5.5)`,
 <details>
 <summary>Solution</summary>
 
-[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) tests `isinstance(self.number, int)` for a type built at a JSON boundary.
+[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) writes the type test as `isinstance(self.number, int)` for a type built at a JSON boundary.
 If you write the type test that way,
 `Stars(5.5)` and `Stars("five")` raise a `TypeFailure`,
 but `Stars(True)` builds `Stars(number=True)`.
