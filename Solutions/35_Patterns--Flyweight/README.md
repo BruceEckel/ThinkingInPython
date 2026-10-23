@@ -605,8 +605,8 @@ the intrinsic color-and-kind that `@cache` shares.
 `move()` pops the moving piece's reference from `src` and writes it
 over the captured piece's reference at `dst`,
 so a capture leaves the board one entry shorter.
-The captured piece's flyweight stays in the cache,
-because it represents "a black knight" in the abstract rather than any particular knight on a square.
+`@cache` keeps the captured piece's flyweight,
+which represents "a black knight" in the abstract rather than any particular knight on a square.
 The twelve `Piece` objects therefore remain however many captures follow.
 
 **Promote by switching flyweights.** A frozen `Piece` keeps its color and kind for life,
@@ -631,7 +631,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak) holds its flyweights in a `WeakValueDictionary` behind a factory function.
+[A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak) builds a pool that holds its flyweights in a `WeakValueDictionary` behind a factory function.
 Apply that shape to `Color`.
 A weak reference needs a `__weakref__` slot, which `weakref_slot=True` adds.
 `record()` forwards `slots=False` alone, so this `Color` needs the `dataclass` call written out.
@@ -982,11 +982,10 @@ The enum makes that mismatch impossible,
 because it declares the set once instead of twice.
 
 The enum adds one check. A misspelled or missing member, such as
-`Tile.DOOR`, is an `unresolved-attribute` error. The `Literal` version
-accepts the matching mistake, because the wrapper that `@cache` returns
-takes any hashable argument in place of `tile()`'s `Symbol`.
-`tile("+")` passes the type checker and
-fails at runtime with a `KeyError`.
+`Tile.DOOR`, is an `unresolved-attribute` error. In the `Literal`
+version, the wrapper that `@cache` returns takes any hashable argument
+in place of `tile()`'s `Symbol`, so the matching mistake, `tile("+")`,
+passes the type checker and fails at runtime with a `KeyError`.
 
 An unknown symbol that arrives as data is a runtime failure in both
 versions. The type checker passes `Tile("?")`, and the call raises a
