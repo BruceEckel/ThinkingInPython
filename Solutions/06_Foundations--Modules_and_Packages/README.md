@@ -89,7 +89,7 @@ a different design, a detail, or an equivalent alternative.
 > Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
 > Import and call `function6()` from a script outside `a_package`,
 > then rename `b_package` to `bPackage` (and rename it back afterward)
-> and explain, from the rules in [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names),
+> and explain, from the conventions in [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names),
 > why that name is a poor choice although the import still works.
 
 <details>

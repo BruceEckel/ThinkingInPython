@@ -731,7 +731,7 @@ Try each exercise before opening its [solution](../Solutions/06_Foundations--Mod
 2.  Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
     Import and call `function6()` from a script outside `a_package`,
     then rename `b_package` to `bPackage` (and rename it back afterward)
-    and explain, from the rules in [File Names](#file-names),
+    and explain, from the conventions in [File Names](#file-names),
     why that name is a poor choice although the import still works.
 3.  Write a small module `noisy2.py` whose top-level body prints a message,
     like `noisy.py`.
