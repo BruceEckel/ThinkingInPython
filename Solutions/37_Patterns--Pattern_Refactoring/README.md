@@ -112,7 +112,7 @@ the class with no further code.
 
 **Bin each piece by its class.** `sort_by_type()` needs no change because
 its loop, `bins[type(piece)].append(piece)`, keys on the class of each
-piece. `Plastic` is a new key for the dictionary, and
+piece. `Plastic` is a new key for the dictionary, so
 `defaultdict` creates its bin the way it creates every other.
 
 The one edit to `recycle_dict.py` is the filename, since the script hardcodes
@@ -135,9 +135,9 @@ for the pieces they cover.
 exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and `Plastic` is
 now a fifth entry. That failure is correct. The test exists to prove
 that defining a subclass registers it, so a new material changes the
-set the assertion compares. A passing test means that
-`__init_subclass__()` has stopped registering subclasses. Once you
-update the expected set, the test checks registration again.
+set the assertion compares. With `Plastic` defined, the test passes
+only if `__init_subclass__()` has stopped registering subclasses.
+Once you update the expected set, the test checks registration again.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -454,7 +454,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) keys each bin on `type(piece)`, an exact-class lookup, while `singledispatch` in [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) walks the MRO.
 To let a subclass share its parent's bin, give `Trash` a class variable that holds the bin's key, and have `__init_subclass__()` default that variable for each class.
-A subclass overrides it, and the loop indexes by that attribute instead of `type(t)`.
+A subclass that shares its parent's bin overrides the variable, and the loop indexes by that attribute instead of `type(t)`.
 
 <details>
 <summary>The shape</summary>
@@ -740,9 +740,9 @@ The strict base function raises an exception for every unregistered type,
 including a harmless one like `Paper`, whose answer is `"none"`.
 
 **Fall back to a default answer.** `hazard()` returns `"none"` for
-the plastic. That answer is wrong and looks like every correct
-`"none"` beside it. The forgotten registration produces no exception
-and no report from the type checker.
+the plastic, whose hazard is toxic fumes. That wrong answer looks
+like every correct `"none"` beside it. The forgotten registration
+produces no exception and no report from the type checker.
 
 **Refuse an unregistered type.** `strict_hazard()` raises a
 `NotImplementedError` that names the material at the first call.
