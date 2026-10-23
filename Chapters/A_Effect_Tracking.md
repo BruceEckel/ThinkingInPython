@@ -220,7 +220,7 @@ for f in ask, tell, greet, shout, quiet:
 ```
 
 The bodies are ordinary eager code, with no generators and no `yield from`.
-`ty` follows the PEP's rule.
+The type checker follows the PEP's rule.
 `reveal_type(ask)` reports `def ask(prompt: str) -> str`,
 and `name: str = ask(...)` checks against that `str`.
 Existing callers stay as they are,
@@ -346,7 +346,7 @@ run(supply(Console())(hello_twice)())
 
 `A` stands for the row the argument carries.
 `reveal_type(twice(hello))` reports `Generator[Need[Console], Any, None]`.
-`ty` solves `A` as `Need[Console]`,
+The type checker solves `A` as `Need[Console]`,
 with the solver it uses for every other generic.
 `hello_twice()` must then declare that row,
 or the checker rejects its `yield from`.

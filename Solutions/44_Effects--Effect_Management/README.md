@@ -553,7 +553,7 @@ async def total_price_async(items: list[str]) -> float:
 <summary>Done when</summary>
 
 `total_price()` and `asyncio.run()` on its `async` version print the same total, and `uv run ty check` passes.
-Deleting the `await` in front of the helper call makes `ty` report an error.
+Deleting the `await` in front of the helper call makes the type checker report an error.
 You can name the two items of the three-item list in Tracking and Management that `async` lacks.
 
 <details>

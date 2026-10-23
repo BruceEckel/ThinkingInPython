@@ -125,7 +125,7 @@ The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 
 You can skip the accessor and write `yield from Ask(...)` inside `greet()`,
 and both the program and the type checker still work,
-because `ty` reads the answer type from `Ask`'s base, `Ability[str]`.
+because the checker reads the answer type from `Ask`'s base, `Ability[str]`.
 A bare `yield Ask(...)` also runs, since the handler receives the same request,
 but the answer then has the type `Any`.
 A generator's send type is all the checker knows about a bare `yield`,
@@ -1179,7 +1179,7 @@ The `Never` in `throw()`'s type records that.
 
 The difference between the two ways in is what the type checker verifies.
 If you change `Empty()` to some undeclared exception,
-`ty` reports an error at that `yield from`,
+the checker reports an error at that `yield from`,
 because the yielded type falls outside the declared channel.
 That error is the `invalid-yield` that [Dependencies That Need Dependencies](#dependencies-that-need-dependencies)
 shows in full.

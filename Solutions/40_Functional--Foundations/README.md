@@ -385,7 +385,7 @@ which is the opposite of leaving them to the caller.
 and leaves `low` and `value` to the caller.
 
 **Suppress the type checker's report.** The `# type: ignore` silences
-`ty`, which finds the mistake earlier than the runtime does. `ty`
+the type checker, which finds the mistake earlier than the runtime does. `ty`
 reports `positional-only-parameter-as-kwarg` on
 `partial(clamp, high=100)`, which builds the partial, and
 `missing-argument` on the `expect()` call that passes it `0, 5` with
@@ -422,7 +422,7 @@ For a `Final` name, the checker keeps the assigned list's own type, so the appen
 
 `ty` reports `invalid-assignment` on `MAX_SIZE = 200` and nothing on `CONFIG.append(3)`, and you can say why.
 After your annotation change, `ty` reports `unresolved-attribute` on the append.
-If `ty` still passes the append, your annotation leaves the value's type mutable.
+If the type checker still passes the append, your annotation leaves the value's type mutable.
 
 <details>
 <summary>Solution</summary>

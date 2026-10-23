@@ -662,8 +662,8 @@ A function with a second `yield` stays a generator function after the deletion.
 `greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
 makes two requests, one for the greeting and one for the log.
 If you write its first line as a bare `greet(name)`, every check passes.
-`ty` and `ruff` report nothing, the program runs, the log gains both entries,
-and no greeting prints.
+The type checker and `ruff` report nothing, the program runs,
+the log gains both entries, and no greeting prints.
 The call still builds a description, and the body discards it unrun.
 
 ZIO allows the same mistake for the same reason.
@@ -1934,9 +1934,9 @@ Try each exercise before opening its [solution](../Solutions/46_Effects--Statele
     Explain where the greetings went and why no tool reports an error.
     Then restore that `yield from`,
     and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
-    This time `ty` produces two diagnostics.
+    This time the type checker produces two diagnostics.
     Explain what each one catches,
-    and why the type checker catches assigning a dropped request but not discarding one.
+    and why the checker catches assigning a dropped request but not discarding one.
 8.  Build a registry of Effects:
     a `dict[str, Success[None]]` that maps each of two names to `supply(Console())(greet)(name)`.
     Run every entry, then run every entry a second time,

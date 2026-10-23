@@ -785,7 +785,7 @@ def report() -> Depend[
 <summary>Where to look</summary>
 
 [Composing a Program](../../Chapters/47_Effects--Stateless_in_Practice.md#composing-a-program) builds `research()` from `yield from` steps, and [The Success Path](../../Chapters/47_Effects--Stateless_in_Practice.md#the-success-path) writes the same pipeline with ordinary calls.
-In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until `ty` reports nothing.
+In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until the type checker reports nothing.
 In the by-hand version, ask which tool, if any, reports the changes.
 
 <details>
@@ -840,7 +840,7 @@ def research_and_report(
 
 `uv run ty check` passes on your Effect version and on `report()`, which has a branch for `TooLong`.
 Taking `TooLong` back out of `research()`'s error parameter makes `ty` report `invalid-yield` at your new `yield from`.
-`ty` passes on your by-hand version whether or not it handles `TooLong`, and your edit list says which tool named each line.
+The type checker accepts your by-hand version whether or not it handles `TooLong`, and your edit list says which tool named each line.
 
 <details>
 <summary>Solution</summary>
@@ -1440,7 +1440,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Failing from Inside an Effect](../../Chapters/47_Effects--Stateless_in_Practice.md#failing-from-inside-an-effect) contrasts `throw()` with `@throws` for putting `Empty` into the channel.
 Move the `raise` into an ordinary body and decorate it with `@throws(Empty)`.
-Then change each version to fail with a different exception and note which one `ty` flags, and at which line.
+Then change each version to fail with a different exception and note which one the type checker flags, and at which line.
 
 <details>
 <summary>The shape</summary>
@@ -1689,7 +1689,7 @@ changes its type every time `research()`'s error set changes.
 
 `ty` stops checking the correspondence between the annotation and the
 Effect. The annotation is where a human writes down which failures this program
-expects, and `ty`'s job is to confirm that the Effect agrees.
+expects, and the checker's job is to confirm that the Effect agrees.
 Once you delete the annotation, the type checker has one description instead of
 two, so it can no longer report a disagreement.
 Callers lose their check too.
@@ -1922,7 +1922,7 @@ def toast() -> Depend[
 
 [Dependencies That Need Dependencies](../../Chapters/47_Effects--Stateless_in_Practice.md#dependencies-that-need-dependencies) shows `Need[...]` unions growing as one Effect delegates to another with `yield from`.
 Write the first signature with the new appliance alone
-and read which line `ty` reports.
+and read which line the type checker reports.
 Then compare that diagnostic with the one `run()` reports when `supply()` leaves a requirement unanswered.
 
 <details>
@@ -2025,7 +2025,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 **Answer every requirement at the edge.** The second diagnostic tells you about the dependency two levels down. `supply()` leaves
 `Need[Toaster]` in the channel, so the requirement reaches `run()`. Nothing in
 `buttered()`'s body mentions a toaster. The requirement comes from `toast()`, which `buttered()` calls.
-`ty` reports it at `run()`, the program's edge,
+The type checker reports it at `run()`, the program's edge,
 where no handler remains to answer it.
 
 The two diagnostics divide the work. `invalid-yield` catches an

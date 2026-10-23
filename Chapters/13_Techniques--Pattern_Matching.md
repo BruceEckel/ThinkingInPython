@@ -152,8 +152,8 @@ and leaves the module-level constant untouched.
 When a later `case` follows a capture pattern,
 Python refuses to compile the `match` and reports `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here,
-Python compiles the `match` silently, and `ty` accepts it.
-`ty` treats the capture as matching every value,
+Python compiles the `match` silently, and the type checker accepts it.
+The checker treats the capture as matching every value,
 so `broken()` needs no `return` after its `match`.
 `ruff` flags the line only when you enable its pep8-naming rules.
 Then N806 reports `DEFAULT` as an uppercase variable inside a function.

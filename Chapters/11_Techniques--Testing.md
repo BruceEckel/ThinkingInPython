@@ -535,7 +535,7 @@ though it is still not access control.
 Inside a class body,
 Python's compiler rewrites `self.__pin` into `self._ClassName__pin`,
 a transformation called *name mangling*.
-`ty` does not model this rewriting,
+The type checker does not model this rewriting,
 so its report on the code below disagrees with what runs:
 
 ```python

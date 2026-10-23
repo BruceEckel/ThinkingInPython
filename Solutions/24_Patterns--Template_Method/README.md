@@ -427,7 +427,7 @@ a different design, a detail, or an equivalent alternative.
 
 [The Anchored Algorithm](../../Chapters/24_Patterns--Template_Method.md#the-anchored-algorithm) explains how `@final` marks `run()` as the part of the *Template Method* that stays the same.
 Override `run()` in a subclass, run the file, then run `ty` over it.
-Compare what Python and `ty` each report, and ask which of them reads the `@final` marker.
+Compare what Python and the type checker each report, and ask which of them reads the `@final` marker.
 A `# type: ignore` on the override keeps the listing in the build.
 
 <details>
@@ -508,7 +508,7 @@ Python objects to nothing. The program runs and prints the steps in
 the reversed order the subclass chose. The anchored algorithm is
 no longer anchored.
 
-`ty` objects. The override carries a `# type: ignore` to keep this
+The type checker objects. The override carries a `# type: ignore` to keep this
 listing in the book's build. With that comment removed, `ty` reports:
 
 ```

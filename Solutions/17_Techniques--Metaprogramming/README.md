@@ -535,7 +535,7 @@ Read both the summary line and the `info` block of the diagnostic, and compare t
 <summary>Solution</summary>
 
 Removing the `# type: ignore` from `metaclass_layout_conflict.py` exposes
-the class header to `ty`, inside the listing's
+the class header to the type checker, inside the listing's
 `with expected(TypeError):` block:
 
 ```python

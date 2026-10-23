@@ -777,7 +777,7 @@ In the error branches,
 the `isinstance()` version narrows `result.error` to
 `ValueError` or `ZeroDivisionError`. The `match` patterns bind no
 name there, so `result.error` stays `Exception`.
-Inside the `Ok`, `ty` knows `float` either way.
+Inside the `Ok`, the type checker knows `float` either way.
 
 **Rule out a shared subclass.** The precision behind that agreement
 depends on one decorator: both `Ok` and `Err` carry `@final`, in

@@ -228,7 +228,7 @@ The check then catches the override.
 Reading the attribute through `getattr()` also passes the type checker,
 because `getattr()` with a default accepts any name.
 A function's type declares no `__final__`,
-so `ty` reports a direct read such as `ApplicationFramework.run.__final__` as an unresolved attribute.
+so the checker reports a direct read such as `ApplicationFramework.run.__final__` as an unresolved attribute.
 
 A name that matches a step, such as `customize1`, is an ordinary override.
 A name far from every inherited name, such as `report()`,

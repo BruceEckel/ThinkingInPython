@@ -35,7 +35,7 @@ def tally() -> Generator[Prompt, Amount, Total]:
 <summary>Done when</summary>
 
 your script prints the three prompts and then the sum of your three sent amounts, read from the `StopIteration`'s `value`, and `uv run ty check` passes.
-If you swap the second and third type parameters of your annotation, `ty` reports errors on your `send()` calls.
+If you swap the second and third type parameters of your annotation, the type checker reports errors on your `send()` calls.
 
 <details>
 <summary>Solution</summary>

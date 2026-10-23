@@ -407,8 +407,9 @@ The write through `self` is why `class_var.py` increments through the class name
 `Tally.total += 1`.
 
 With `ClassVar`, the type checker reports this mistake before the program runs.
-`ty` rejects the augmented form as it rejects a direct `self.total = 5`.
-For a write like `a.total = 99` it reports "Cannot assign to ClassVar `total` from an instance of type `Tally`".
+The checker rejects the augmented form as it rejects a direct `self.total = 5`.
+For a write like `a.total = 99`,
+`ty` reports "Cannot assign to ClassVar `total` from an instance of type `Tally`".
 Inside `__init__()` the message names the type of `self` in place of `Tally`.
 The `# type: ignore` suppresses that report so the listing can show what the line does when it runs.
 

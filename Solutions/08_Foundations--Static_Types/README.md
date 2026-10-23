@@ -359,7 +359,7 @@ class Stack[T = str]:
 <details>
 <summary>Done when</summary>
 
-you can name the type `ty` reveals for `words.top()` with and without `= str`, and you predict, before running it, whether `ty check` flags `words.top().no_such_method()` in each version.
+you can name the type that the type checker (`ty`) reveals for `words.top()` with and without `= str`, and you predict, before running it, whether `ty check` flags `words.top().no_such_method()` in each version.
 Run both versions to confirm your prediction; your statement about a bare `Stack` follows from the result.
 
 <details>

@@ -732,9 +732,9 @@ a different design, a detail, or an equivalent alternative.
 > Explain where the greetings went and why no tool reports an error.
 > Then restore that `yield from`,
 > and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
-> This time `ty` produces two diagnostics.
+> This time the type checker produces two diagnostics.
 > Explain what each one catches,
-> and why the type checker catches assigning a dropped request but not discarding one.
+> and why the checker catches assigning a dropped request but not discarding one.
 
 <details>
 <summary>Where to look</summary>
