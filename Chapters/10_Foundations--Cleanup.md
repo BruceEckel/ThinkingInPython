@@ -202,7 +202,8 @@ so a cycle now delays finalization until the collector runs.
 
 Cycles are one more reason to keep cleanup out of `__del__()`.
 One back-reference between two objects is enough to postpone `__del__()`.
-The code that creates the cycle often belongs to a different class or module than the code that owns the resource.
+The code that creates the cycle often belongs to a different class or module than the code that owns the resource,
+so a change in unrelated code can delay the resource's cleanup.
 
 ## Reliable Alternatives
 
@@ -351,11 +352,10 @@ print("End of program")
 ```
 
 `finalize()` registers `print(name, "closed")` to run when Python destroys the `Connection`.
-`finalize()` refers to the `Connection` through a *weak reference*,
-which lets Python destroy the object.
-After the destruction, `finalize()` calls the callback.
 A variable, a list slot, or an attribute holds a *strong reference*,
 which keeps its object alive.
+`finalize()` refers to the `Connection` through a *weak reference*,
+which lets Python destroy the object.
 
 The callback receives `name`, not the `Connection`,
 so the registered cleanup adds no strong reference to the `Connection`.
@@ -524,7 +524,8 @@ as [*Flyweight*](35_Patterns--Flyweight.md) does.
 not per name.
 Keyed by name, two `Counter` objects that share a name collide,
 and the second replaces the first.
-Reused `id()` values are harmless,
+Python can give a new object the `id()` of a destroyed one.
+That reuse is harmless here,
 since the dictionary holds only live objects and each live object has a distinct id.
 
 `live_count()` returns the size of that registry,
