@@ -247,7 +247,8 @@ divide an `int` by a `str`. The `except` clause specifies
 The `finally` block still runs,
 since `finally` runs whether or not an exception is propagating.
 The `else` clause runs only when the `try` block finishes without an exception,
-so the two lines of output come from `finally` and from the caller.
+so it prints nothing here.
+The two lines of output come from `finally` and from the caller.
 
 **Catch the exception at the caller.** Because the `TypeError`
 propagates up past `divide_and_report()`, this listing wraps the
@@ -329,7 +330,7 @@ print(run("go north"))
 `run("go north 3")` returns `unknown command`. A list pattern
 matches on length as well as content, so
 `["go", direction]` matches only a list of two items. The three-item
-split matches neither of the original patterns and reaches `case _`.
+split matches neither list pattern and reaches `case _`.
 
 **Arrange the patterns.** Order matters only between patterns that
 could both match the same value.
