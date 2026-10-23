@@ -12,8 +12,8 @@ a single robot walks a maze where each object it meets decides which room the ro
 and a plate of vibrating sand runs on grains that hold only a position.
 The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture.
-The formula determines its shape.
-The grains gather on it.
+A formula determines the pattern's shape.
+The grains gather on that shape.
 
 The first example, the pack of rats,
 combines [`asyncio` tasks](19_Techniques--Concurrency.md#asyncio-mechanics),
@@ -262,7 +262,7 @@ The declaration gives the type checker the attribute's type,
 so `spawn()` skips the `None` check and calls `self.group.create_task()`.
 In a data class, a bare annotation adds a parameter to the generated `__init__()`,
 so `group` needs `field(init=False)`.
-The robot example later in this chapter declares `Robot.room` for the same reason.
+The robot example later in this chapter also declares `Robot.room` to give the type checker its type.
 `Robot` is an ordinary class, so its declaration is a bare annotation.
 
 The other three `init=False` fields, `visited`, `messages`, and `_numbers`,
@@ -891,8 +891,7 @@ The robot is the one item that moves,
 so its room gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
 `show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
 
-`robot_maze.py` holds the maze as text in `MAZE`, which the demo, the tests,
-and the view import:
+The demo, the tests, and the view all import the maze as one string, `MAZE`:
 
 ```python
 # robot_explorer/robot_maze.py
@@ -939,7 +938,7 @@ so `game.run(solve(game))` walks the route the search found.
 It expands the room reached in the fewest moves first,
 so the first route it finds to the `!` is a shortest one.
 It makes the same `doors.open(urge)` calls `Robot.move()` makes,
-so it works entirely in rooms and the moves between them.
+so it works in rooms and the moves between them rather than in grid coordinates.
 
 `landing()` decides whether a door is passable by testing the occupant's type with `isinstance()`.
 That test reproduces what `Room.enter()` gets from `interact()`.
@@ -1343,7 +1342,7 @@ The randomness produces the order instead of opposing it.
 
 A test cannot predict where a particular grain ends up after hundreds of random kicks.
 It checks the aggregate.
-Four hundred steps must divide agitation by ten,
+Four hundred steps must cut agitation below a tenth of its starting value,
 and the kicks must keep every grain on the plate.
 Seeding `random.Random` makes any failure reproducible.
 
