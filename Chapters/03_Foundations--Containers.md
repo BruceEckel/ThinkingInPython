@@ -380,7 +380,7 @@ from the newest entry back to the oldest.
 
 `collections.OrderedDict`, added in Python 3.1,
 kept insertion order before `dict` did.
-`dict` still lacks two of its features.
+`dict` still lacks two `OrderedDict` features.
 Two `OrderedDict`s compare equal when they hold the same entries in the same order,
 where `dict` equality ignores order.
 `move_to_end()` moves a key to either end,
@@ -744,7 +744,7 @@ In `plain.setdefault(kind, []).append(name)`,
 When `kind` is missing, `setdefault()` stores the new `[]` and returns that.
 The `[]` argument builds an empty list on every call.
 A call that finds `kind` discards that list.
-Every line that looks up a key must also repeat the whole expression.
+Every line that looks up a key must repeat `setdefault()` and its `[]` default.
 A `defaultdict` states the default once, where you create the dictionary.
 
 ### `deque`
@@ -915,8 +915,10 @@ except AttributeError as e:
 #: 'frozenset' object has no attribute 'add'
 ```
 
-The type checker reports an attempt to modify an immutable container before the program runs,
-so each line that attempts it carries a `# type: ignore` comment.
+The type checker reports an attempt to modify an immutable container before the program runs.
+The listings in this section make that attempt on purpose,
+to show the exception Python raises when the program runs,
+so each such line carries a `# type: ignore` comment.
 That comment silences the type checker for its line.
 
 Use the immutable form whenever a container should stay the same after you build it.
@@ -984,7 +986,8 @@ it is hashable when its values are.
 Like a `tuple` or a `frozenset`,
 it can then be a dictionary key or a set member.
 A dictionary key must be hashable, though it need not be immutable.
-Immutability keeps a container's hash stable.
+A container's hash comes from its contents,
+so immutability keeps that hash stable.
 
 ### Shallow Immutability
 
