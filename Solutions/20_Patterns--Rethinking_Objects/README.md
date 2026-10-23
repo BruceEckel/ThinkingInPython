@@ -506,7 +506,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Pattern Matching on a Union](../../Chapters/20_Patterns--Rethinking_Objects.md#pattern-matching-on-a-union) shows `area()` matching on each member of a closed union.
 Add `Square` to the `type Shape` alias and give `area()` a matching `case` with a class pattern.
-The final `case _` calls `assert_never()`, which requires the type `Never`.
+The final `case _` calls `assert_never()`, whose parameter has the type `Never`.
 Remove your new `case` and read the type the checker reports for the argument of `assert_never()`.
 
 <details>
@@ -896,7 +896,7 @@ a different design, a detail, or an equivalent alternative.
 [The Liskov Substitution Principle](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution) shows `fill()` relying on a base `push()` that always succeeds.
 Keep that guarantee.
 Have `push()` accept every item and enforce the limit another way, and add a `full()` method that callers can ask.
-Then decide whether the weaker guarantee is acceptable, and whether a subclass is the right relationship.
+Then decide whether you can accept what `BoundedStack` gives up to keep that guarantee, and whether a subclass is the right relationship.
 
 <details>
 <summary>The shape</summary>
