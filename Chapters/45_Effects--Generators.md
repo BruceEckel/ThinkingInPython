@@ -274,7 +274,7 @@ gets `StopIteration` from `next()` when the answers run out.
 Inside the `try`, that exception would look like the end of the conversation.
 The driver would then return `None` as the result.
 
-Running the conversation takes two calls, `interview()` and `drive()`:
+`drive()` runs the conversation:
 
 ```python
 # two_way_generator.py
