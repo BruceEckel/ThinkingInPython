@@ -309,7 +309,8 @@ Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
 because whenever `drive()`'s code runs, the generator waits at a `yield`.
 After the `return`, the generator is `GEN_CLOSED`,
 so sending it another answer raises `StopIteration` at once.
-That `StopIteration` carries no value, so `expect()` prints its name alone.
+That `StopIteration` carries no value,
+so `expect()` prints the exception's class name with no message after it.
 
 The generator and `drive()` take turns.
 While the body runs, `drive()` waits inside `send()`,
