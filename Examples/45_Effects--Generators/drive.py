@@ -1,4 +1,5 @@
 # drive.py
+import inspect
 from collections.abc import Generator
 from typing import Final
 from interview_generator import Answer, Question, Result
@@ -14,7 +15,8 @@ def drive(conversation: Generator[Question, Answer, Result],
     request = next(conversation)
     while True:
         answer = answers[request]
-        print(f"{request = }, {answer = }")
+        state = inspect.getgeneratorstate(conversation)
+        print(f"{request = }, {answer = }, {state}")
         try:
             request = conversation.send(answer)
         except StopIteration as stop:

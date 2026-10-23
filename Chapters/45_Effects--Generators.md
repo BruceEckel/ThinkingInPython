@@ -238,6 +238,7 @@ and returns the generator's result when the body ends.
 
 ```python
 # drive.py
+import inspect
 from collections.abc import Generator
 from typing import Final
 from interview_generator import Answer, Question, Result
@@ -253,7 +254,8 @@ def drive(conversation: Generator[Question, Answer, Result],
     request = next(conversation)
     while True:
         answer = answers[request]
-        print(f"{request = }, {answer = }")
+        state = inspect.getgeneratorstate(conversation)
+        print(f"{request = }, {answer = }, {state}")
         try:
             request = conversation.send(answer)
         except StopIteration as stop:
@@ -289,9 +291,9 @@ conversation = interview()
 print(inspect.getgeneratorstate(conversation))
 #: GEN_CREATED
 result = drive(conversation, ANSWERS)
-#: request = 'name', answer = 'Alice'
-#: request = 'town', answer = 'Wonderland'
-#: request = 'friend', answer = 'Rabbit'
+#: request = 'name', answer = 'Alice', GEN_SUSPENDED
+#: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
+#: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
 print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 print(inspect.getgeneratorstate(conversation))
@@ -300,6 +302,11 @@ print(inspect.getgeneratorstate(conversation))
 
 `GEN_CREATED` shows that calling `interview()` created the generator and ran none of its body.
 `drive()` then runs the body through all three questions.
+Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
+because whenever `drive()`'s code runs, the generator waits at a `yield`.
+The generator and `drive()` take turns.
+While the body runs, `drive()` waits inside `send()`,
+so only code inside the body can see `GEN_RUNNING`.
 After the `return`, the generator is `GEN_CLOSED`,
 so a further `send()` raises `StopIteration` at once.
 
@@ -540,11 +547,11 @@ def interview() -> Generator[Question, Answer, Result]:
 
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
-#: request = 'name', answer = 'Alice'
+#: request = 'name', answer = 'Alice', GEN_SUSPENDED
 #:   ask() received Alice
-#: request = 'town', answer = 'Wonderland'
+#: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
 #:   ask() received Wonderland
-#: request = 'friend', answer = 'Rabbit'
+#: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
 #:   ask() received Rabbit
 #: Alice of Wonderland, friend Rabbit
 ```
@@ -589,13 +596,13 @@ def survey() -> Generator[Question, Answer, Result]:
 
 print(drive(survey(),
             ANSWERS | {Question("color"): Answer("blue")}))
-#: request = 'name', answer = 'Alice'
+#: request = 'name', answer = 'Alice', GEN_SUSPENDED
 #:   ask() received Alice
-#: request = 'town', answer = 'Wonderland'
+#: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
 #:   ask() received Wonderland
-#: request = 'friend', answer = 'Rabbit'
+#: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
 #:   ask() received Rabbit
-#: request = 'color', answer = 'blue'
+#: request = 'color', answer = 'blue', GEN_SUSPENDED
 #:   ask() received blue
 #: Alice of Wonderland, friend Rabbit, color blue
 ```

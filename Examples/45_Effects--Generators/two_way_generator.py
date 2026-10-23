@@ -7,9 +7,9 @@ conversation = interview()
 print(inspect.getgeneratorstate(conversation))
 #: GEN_CREATED
 result = drive(conversation, ANSWERS)
-#: request = 'name', answer = 'Alice'
-#: request = 'town', answer = 'Wonderland'
-#: request = 'friend', answer = 'Rabbit'
+#: request = 'name', answer = 'Alice', GEN_SUSPENDED
+#: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
+#: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
 print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 print(inspect.getgeneratorstate(conversation))
