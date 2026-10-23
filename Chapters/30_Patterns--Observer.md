@@ -347,7 +347,7 @@ gets a generated `__init__()` and the list another way.
 not because the pattern requires a base class.
 A `Thermometer` could use composition, holding a `Broadcaster` as an attribute
 (`self.temperature_changed = Broadcaster[float]()`).
-Code that connects a responder specifies that attribute
+Code then connects a responder through that attribute
 (`t.temperature_changed.connect(display)`).
 An object can hold several `Broadcaster` attributes,
 so it can publish more than one kind of change.
@@ -967,9 +967,9 @@ Python finds `announce()` on the instance.
 
 `published()` reaches `announce()` through `self`, whose annotation is `Any`,
 so the type checker accepts the call.
-`value` is `Any` for the same reason.
-`published()` receives the field's name alone,
-and the type checker types each field from the subclass's annotation,
+`value` is `Any` too,
+since `published()` receives the field's name and not its type.
+The type checker types each field from the subclass's annotation,
 not from this property.
 
 `Broadcasting` installs that property on each subclass and holds the responders:
@@ -1293,8 +1293,8 @@ try to turn every box `palegreen`.
 Only `palegreen` works.
 On the 8x8 grid that `grid_view.py` opens,
 no sequence of clicks turns every box `skyblue` or `khaki`.
-The grid's size determines that, and a 3x3 grid reaches all three colors
-(see exercise 9).
+The colors a grid can reach depend on its size.
+A 3x3 grid reaches all three colors (see exercise 9).
 
 ### The Model
 
@@ -1796,7 +1796,7 @@ With pull, a broadcast sends the thermometer.
 Each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
 Pull leaves the decision of which changes to announce with the thermometer.
 A responder's choice covers what it reads and which announcements prompt it to act.
-`weather_station.py` pushes a pair and leaves that choice to its responders.
+`weather_station.py` pushes a pair and lets each responder choose the changes it handles.
 `celsius` and `humidity` share one channel,
 so every responder receives both kinds of change, along with the attribute name.
 
