@@ -129,7 +129,8 @@ print(dict(counts))
 The `0` that `defaultdict(int)` supplies for a missing key comes from
 `int()`, which returns `0` when called with no arguments.
 That default lets `counts[kind] += 1` work with no "does this key exist yet" check.
-`defaultdict(list)` removes the same check before appending to a fresh list.
+In `defaultdict.py`, `defaultdict(list)` removes the same check from the
+grouping loop, with a fresh empty list as the default.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -274,7 +275,7 @@ A negative `start` counts from the end, so `xs[-2:]` needs no length.
 forms: slice, then reverse the copy, or count the indices down with a
 negative `step`. The one-slice form is harder to read because the
 bounds swap roles. `3` is now the first index visited and `0` is the
-stop, so the slice ends at index `1`.
+stop, which the slice excludes, so the slice ends at index `1`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -566,7 +567,7 @@ a different design, a detail, or an equivalent alternative.
 
 [`frozendict`](../../Chapters/03_Foundations--Containers.md#frozendict) shows construction, equality, and the error on assignment, and [Shallow Immutability](../../Chapters/03_Foundations--Containers.md#shallow-immutability) shows how far immutability reaches.
 A dictionary finds a key by hash and equality, so a separately built, equal `frozendict` locates the same entry.
-For the last part, ask what `hash()` must do with each value, and what a `list` value does to that.
+For the last part, ask what `hash()` must do with each value, and what happens when one of those values is a `list`.
 
 <details>
 <summary>Done when</summary>
@@ -625,7 +626,7 @@ line carries a `# type: ignore` because the listing makes the
 assignment on purpose, to show the runtime exception.
 
 **Find the limit of immutability.** A `frozendict` freezes
-the value under each key, not what those values contain.
+which object sits under each key, not what those objects contain.
 To hash `nested`, `hash()` must hash its `list` value, and hashing a `list` raises a `TypeError`.
 The immutability is shallow, as it is for the `tuple` in `shallow_immutability.py`.
 Because a `frozendict` is hashable when its values are,
