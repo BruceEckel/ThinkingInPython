@@ -1218,7 +1218,7 @@ The seven rounds `pair_rounds.py` schedules then cover 22 of the 28 pairs instea
 `met()` reads `history`, which changes at the end of every round.
 An answer cached in round 0 therefore comes back unchanged in a later round,
 after the counts it summed have grown.
-The reason is the `cache` entry's rule: pure functions only.
+Caching `met()` breaks the `cache` entry's rule: pure functions only.
 A function that reads mutable state is impure, however simple its body looks.
 
 The general version needs memory, where the circle method needs a round number.
@@ -1228,7 +1228,7 @@ because no formula takes a round number and returns the grouping of arbitrary si
 To reach round `100`,
 `group_rounds()` therefore generates rounds `0` through `99` first.
 The circle method computes round `100` from its arithmetic alone.
-`deep_sum()` in [Recursion](#recursion) makes the same choice.
+`deep_sum()` in [Recursion](#recursion) needs memory too.
 A counter cannot record which sublists are still open,
 so the recursive version keeps that state on the call stack,
 one frame per open sublist.
