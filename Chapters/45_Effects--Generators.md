@@ -158,8 +158,10 @@ As [Asking Consumes an Item](22_Patterns--Iterators.md#asking-consumes-an-item)
 shows, calling `next()` on an exhausted iterator raises `StopIteration`,
 so a `next()` call inside the body can trigger that conversion.
 
-A suspended generator holds its frame:
+A suspended generator preserves its frame:
 the position in the body and every local variable.
+The generator object stores that frame off the call stack,
+so the frame outlives each `next()` or `send()` call that resumes it.
 Resuming runs the body from that position, with every local variable intact.
 `interview()`'s local `name` keeps its value through the next two `send()` calls,
 and `town` keeps its value through the last one.
