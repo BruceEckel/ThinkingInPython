@@ -128,7 +128,7 @@ print(f"{result = }")
 
 The `NewType` definitions let the type checker report a transposed annotation.
 If you mistakenly annotate the generator in `interview_generator.py` as `Generator[Answer, Question, Result]`,
-`ty` reports nine errors in three groups of three:
+the type checker reports nine errors in three groups of three:
 
 - All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
 - In `drive_by_hand.py`,
