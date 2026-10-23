@@ -144,7 +144,7 @@ that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`.
 In the chapter file the `_Triangle` entry joins the entries for
 `_Circle` and `_Square`, and `"Triangle"` joins the demo's list.
-`exercise_2.py` shows the new shape alone:
+The listing below shows the new shape alone:
 
 ```python
 # exercise_2.py
@@ -356,7 +356,7 @@ GameEnvironment(GnomesAndFairies()).play()
 #: Gnome discovers a Fairy
 ```
 
-**Ask the factory for each product.** `GameEnvironment` does not specify
+**Ask the factory for each product.** `GameEnvironment` does not name
 `Kitty`, `Warrior`, `Puzzle`, or `Weapon`. It calls
 `make_character()` and `make_obstacle()` on the
 `GameElementFactory` it receives.
@@ -883,8 +883,8 @@ They import the plugin package explicitly at startup, walk a
 directory with `importlib`, or declare entry points that the
 packaging system imports for them.
 
-`registry_demo.py` has the same dependency. It imports
-`Shape` and `make` from `registry`, but every subclass now lives in `extra_shapes`.
+`registry_demo.py` imports `Shape` and `make` from `registry`,
+but every subclass now lives in `extra_shapes`.
 The unchanged demo therefore prints `[]`, and its first `make()`
 call raises a `KeyError`. One added import restores the output:
 
