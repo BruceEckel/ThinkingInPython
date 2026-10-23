@@ -249,11 +249,11 @@ where the flat `{"type": "click", "x": x, "y": y}` case finds them.
 A nested event keeps them under `"at"`,
 where the nested case finds them.
 
-**Try the specific cases first.** Any event with a `"type"` key satisfies `{"type": kind}`,
-so the order of the cases matters.
+**Try the specific cases first.** Any event with a `"type"` key satisfies
+`{"type": kind, **rest}`, so the order of the cases matters.
 `match` tries cases top to bottom and stops
-at the first one that fits, so `{"type": kind}` sits after the specific
-click and key cases.
+at the first one that fits, so `{"type": kind, **rest}` sits after the
+specific click and key cases.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -586,7 +586,7 @@ a different design, a detail, or an equivalent alternative.
 
 [A Bare Name Captures, a Dotted Name Compares](../../Chapters/13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares) explains why a module-level constant in a `case` binds instead of comparing.
 For the first fix, put the constant in a namespace so the pattern is a dotted name.
-For the second, bind any value and compare it to the constant in a guard, where the name is an ordinary expression.
+For the second, bind any value and compare it to the constant in a guard, where `FALLBACK` is an ordinary expression.
 
 <details>
 <summary>The shape</summary>
@@ -697,8 +697,8 @@ because `act()` and `guarded()` need the bare name.
 
 **Compare in a guard.** The second fix keeps the bare constant and moves the comparison into a
 guard, where `FALLBACK` is an ordinary expression rather than a
-pattern. `case other if other is FALLBACK:` is longer than the
-dotted name, and more flexible. A value pattern always compares with `==`, while a
+pattern. `case other if other is FALLBACK:` is longer than
+`case Defaults.FALLBACK:`, and more flexible. A value pattern always compares with `==`, while a
 guard holds any expression:
 an `is` test like this one, a membership test, or a call. Choose the guard when the test needs one of those.
 
