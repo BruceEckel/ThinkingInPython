@@ -145,7 +145,7 @@ the module that defines `STYLES` and `render()` as it was.
 
 Everything outside the axis still needs hand edits. Printing a new
 field of `Row` means editing every entry in `STYLES`. `STYLES` absorbs
-the format. A field is a different vector of change.
+new formats. A field is a different vector of change.
 
 Two things generalize from the example. First, the axis is visible in
 the history rather than in the code. When the same function appears in
@@ -219,7 +219,7 @@ Now cross out what Python supplies:
 
 - The interface goes. A function is a value with a call
   signature, and `Callable[[float], float]` states that signature
-  without declaring a type.
+  without declaring an interface.
 - The concrete classes go. Each holds one method and no state, so each
   becomes one function.
 - The context class goes, along with its field and its setter. The
