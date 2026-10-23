@@ -2228,7 +2228,8 @@ Invoking it repeatedly gives you backtracking and search.
 Stateless offers only the first of the three, one invocation:
 a *tail-resumptive* handler.
 The limit comes from Python rather than from the library's design.
-A Python generator is one-shot, so each `yield` resumes once.
+A Python generator is a [one-shot continuation](45_Effects--Generators.md#annotating-a-generator).
+Python cannot copy a suspended generator, so each `yield` resumes once.
 
 Two pieces of the library show that limit.
 `Effect[A, E, R]` carries a separate `E` that `@throws` fills and `catch()` empties.
