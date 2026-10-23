@@ -367,9 +367,9 @@ print(Counter.live_count())
 
 **Register each instance strongly.** The count stays at three. A `dict` holds a strong reference to each
 value, so `_instances` alone keeps every `Counter` alive, whatever
-`counters` does. `pop()` removes the list's reference, and the
-registry keeps its own. The `Counter`'s reference count stays above
-zero, so the `Counter` survives.
+`counters` does. `pop()` removes the list's reference. The registry
+keeps its own, so the `Counter`'s reference count stays above zero
+and the `Counter` survives.
 
 The registry now leaks every `Counter` it tracks. `live_count()`
 reports how many `Counter` objects the program has created,
@@ -587,7 +587,8 @@ runs on its own schedule, triggered by allocation counts,
 so an automatic pass could in principle reclaim the cycle at
 any allocation after `self_link()` returns. This small program still
 prints the same transcript every run, because the explicit
-`gc.collect()` stays in the listing and sets the moment of collection.
+`gc.collect()` runs before the program has allocated enough objects
+to start an automatic pass, so that call sets the moment of collection.
 While that call is there, the two `finalized` lines print at that
 call or earlier.
 
