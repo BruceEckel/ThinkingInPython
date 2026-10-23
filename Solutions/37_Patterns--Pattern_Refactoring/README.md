@@ -447,7 +447,7 @@ a different design, a detail, or an equivalent alternative.
 > then run `recycle_dict.py` and `recycling_note.py`.
 > Explain why `CrushedAluminum` gets its own bin but not its own note.
 > Then change `sort_by_type()` so a subclass shares its parent's bin,
-> without specifying any material in the sorting loop.
+> without naming any material class in the sorting loop.
 
 <details>
 <summary>Where to look</summary>
