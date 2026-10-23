@@ -109,7 +109,7 @@ where `walk()` yields only file paths. Matching also continues
 into a matched directory, so a directory named `"src"` and a
 file beneath it named `"src"` can both appear in the results.
 
-The call at `[1]` shows a simpler duplication. `root` holds two
+The call at `[1]` returns the same path twice. `root` holds two
 separate directories named `"src"`, and both come back as
 `root/src`, so a path alone does not say which one matched.
 
@@ -1623,7 +1623,8 @@ because the union it needs to extend is yours.
 At runtime, a `Symlink` falls through every case to
 `assert_never()`, which raises an `AssertionError`. The plugin's alternatives
 are to vendor a patched copy of your module or to persuade you to add
-the case. The open design removes that coupling.
+the case. The open design lets a plugin define its node types in
+its own package.
 
 **Move the operation onto the classes.** The open design undoes
 [A *Composite* of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes),
