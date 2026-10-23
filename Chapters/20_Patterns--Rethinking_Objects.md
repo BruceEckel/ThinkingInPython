@@ -132,7 +132,8 @@ A `BoundedStack` handed to `fill()` raises an `OverflowError` on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
 No tool catches the broken contract, but a test can.
-A test written against `Stack`'s contract catches `fill()` failing on the third item when the test runs against `BoundedStack` too.
+If a test written against `Stack`'s contract also runs against `BoundedStack`,
+the test catches `fill()` failing on the third item.
 Two later tests use the same pattern to check other runtime guarantees:
 `test_plugged.py` confirms that a getter's copy holds,
 and `test_immutable.py` confirms that a frozen field refuses assignment.
@@ -410,7 +411,7 @@ The dot fills in `self`.
 `distance()` has the same body as `distance_to()`,
 with `a` and `b` in place of `self` and `other`.
 It returns the same result, and it has one advantage.
-It lives outside `Point`, so it serves any type that has an `x` and a `y`.
+It lives outside `Point`, so it can serve any type that has an `x` and a `y`.
 The method keeps one advantage of its own.
 Dot-completion on `p1.` lists every operation `Point` supports,
 so the method is discoverable.
@@ -562,7 +563,7 @@ not the `list` internals hidden behind `CountingList`.
 
 Composition does more than repair a broken subclass.
 A composed type holds other types as fields.
-Records compare by value and work as keys:
+A record built from records compares by value and works as a dict key:
 
 ```python
 # composition.py
@@ -815,8 +816,8 @@ for item in (Bicycle("Bob"), Glider(65)):
 A structural type describes the required shape,
 and the type checker verifies it ahead of time.
 Dynamic typing and protocols both accept any type with a `display()` method.
-Dynamic typing finds a missing method when the call runs,
-and the type checker finds it before the program runs.
+Dynamic typing finds a missing method when the call runs.
+The type checker finds it before the program runs.
 
 An abstract base class is *nominal* (named),
 so a type joins by inheriting from it.
@@ -901,11 +902,11 @@ print(audit(invoice))
 `Invoice` inherits from `object` alone and lists none of `Priced`,
 `Serializable`, or `Describable`, yet `charge()`, `persist()`,
 and `audit()` each accept it,
-because each function's parameter specifies the one method it needs.
+because each function annotates its parameter with a protocol that names the one method the function calls.
 
 #### What the Shape Does Not Say
 
-That same structural check compares method names and signatures alone.
+A protocol's structural check compares method names and signatures alone.
 Two unrelated protocols can share a method name and signature by coincidence.
 The checker treats them as interchangeable:
 
@@ -964,9 +965,9 @@ if __name__ == "__main__":
 
 Without the `# type: ignore`, the type checker rejects `lookup(42)`.
 `UserId` and `int` are different types to the checker.
-If `total()` in `protocol_collision.py` returns a `Price` or a `Weight` instead of a bare `float`,
-the two protocols' `total()` methods return different types,
-and the type checker can tell `Priced` from `Weighted`.
+If `Priced.total()` in `protocol_collision.py` returns a `Price` and `Weighted.total()` returns a `Weight`,
+the two protocols declare different return types,
+so the type checker can tell `Priced` from `Weighted`.
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.
@@ -1012,7 +1013,7 @@ Another approach uses a union and an [exhaustive `match`](13_Techniques--Pattern
 The shapes become immutable data, and one free function handles all the cases,
 with no base class and no overridden methods.
 The type checker ensures that the match covers every shape.
-`shapes_match.py` rewrites `shapes_oo.py` with pattern matching:
+A `Shape` union and one `area()` function replace the class hierarchy in `shapes_oo.py`:
 
 ```python
 # shapes_match.py
