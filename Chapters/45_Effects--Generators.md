@@ -350,8 +350,8 @@ The driver interprets them.
 
 Each generator has one driver at a time.
 The runtime enforces that pairing, though no annotation states it.
-Rather than interleaving two threads' calls,
-a generator that both threads resume at once raises `ValueError: generator already executing`.
+If a second thread resumes a generator while another thread is running its body,
+the second thread gets `ValueError: generator already executing`.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 shows that error and `threading.synchronized_iterator()`,
 which lets several threads share one generator by serializing their calls.
