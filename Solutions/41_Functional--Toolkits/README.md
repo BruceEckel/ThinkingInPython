@@ -324,13 +324,13 @@ instead of replacing it.
 
 `grouped()` loses the streaming that `groupby()` provides. It reads
 the whole input before returning anything, so an infinite source makes
-it loop forever.
-It also holds a finite source entirely in memory.
-`groupby()` can stream a file larger than memory,
-because it yields each group as the group arrives and keeps only the current one.
-`sorted()` makes `groupby()` safe, but `sorted()` holds the whole input in memory too,
-and it adds the sort.
-Whenever the input fits in memory, `grouped()` is a better choice.
+it loop forever. It also holds a finite source entirely in memory.
+If equal keys sit next to each other, `groupby()` can stream a file
+larger than memory, because `groupby()` yields each group as the
+group arrives and keeps only the current one. `sorted()` makes
+`groupby()` safe, but `sorted()` holds the whole input in memory too,
+and it adds the sort. Whenever the input fits in memory, `grouped()`
+is a better choice.
 
 `grouped()` also loses the input's order. `groupby()` reports groups
 as they occur, while `grouped()` reports them in first-appearance
@@ -554,11 +554,13 @@ object's state.
 The `rng` parameter lets the caller choose the random source,
 which makes reproducibility the caller's responsibility. The
 `seed: int = 0` version accepts only an integer. A caller who needs
-two different schedules must pass two different integers.
-A caller cannot
-pass in a program-wide random stream for this function to share. The `rng` version serves both callers. It also lets a caller
-pass `random.Random()`, which seeds itself from the operating system,
-and get schedules that differ on every run.
+two different schedules must pass two different integers. A caller
+cannot pass in a program-wide random stream for this function to
+share. The `rng` version serves both callers: the first can share one
+`Random` between its two calls, and the second can pass in the
+program-wide stream. The `rng` version also lets a caller pass
+`random.Random()`, which seeds itself from the operating system, and
+get schedules that differ on every run.
 
 Passing the `rng` is dependency injection applied to a source of
 nondeterminism, the same technique
