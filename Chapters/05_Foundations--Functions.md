@@ -303,7 +303,7 @@ so a `None` from `get()` cannot also mean "no such key."
 With the `MISSING` sentinel, `get()` tells the two cases apart.
 A stored `None` comes back as `None`,
 and a missing key with no default comes back as `MISSING`
-(a real `get()` re-raises the `KeyError` there, as the comment says).
+(a real `get()` re-raises `KeyError` there, as the comment says).
 Because `get()` tests `default` against `MISSING`,
 a caller can also pass `None` as a real default.
 
@@ -487,7 +487,7 @@ so `report()`'s first parameter, `label`, also receives `1`.
 Each parameter takes one value.
 `trace()` never reads the signature of the function it calls,
 so the clash first appears when `trace()` calls `report()`.
-Because Python raises the `TypeError` there, `calling report` prints first.
+Because Python raises `TypeError` there, `calling report` prints first.
 
 ## Positional-Only and Keyword-Only Parameters
 
@@ -634,7 +634,7 @@ Try each exercise before opening its [solution](../Solutions/05_Foundations--Fun
     Then change `bad_append()`'s default from `[]` to `()` and explain why that change alone does not fix `bad_append()`
     (hint: `target.append(item)` on a tuple).
 2.  In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
-    so a missing key with no default re-raises the `KeyError`.
+    so a missing key with no default re-raises `KeyError`.
     Confirm that `get(prefs, "theme")` raises a `KeyError` and that `get(prefs, "theme", None)` returns `None`.
     Explain why `default=None` could not serve as the sentinel in this function.
 3.  In `param_markers.py`, add a parameter `label="result"` to `divide()`,

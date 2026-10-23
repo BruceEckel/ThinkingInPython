@@ -657,7 +657,7 @@ You can say, for a check in `topping()` and for one in `build()`, what the build
 
 If you put the check in `build()` and let `topping()` append freely, the call `topping("e")` succeeds,
 so the demo's `expect()` raises an `AssertionError` ("no exception raised").
-The builder holds five toppings until `build()` raises the `ValueError`.
+The builder holds five toppings until `build()` raises `ValueError`.
 The solution checks in `topping()`, so the builder's list stops at four toppings.
 
 ```python

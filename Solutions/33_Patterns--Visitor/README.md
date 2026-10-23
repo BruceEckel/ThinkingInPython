@@ -433,8 +433,8 @@ The listing keeps the chapter's `Visitor`, `Bug`, `Pollinator`, and
 
 The `Any` and `Visits` versions report the `Beetle` mistake at
 different times. Under `Any`, the type checker accepts every argument,
-so the call type-checks. At runtime `accept()` raises the
-`AttributeError` above.
+so the call type-checks. At runtime `accept()` raises
+`AttributeError`, as the `#:` line shows.
 Under `Visits`, the type checker rejects the argument before the
 program runs, because `Visits` requires a `visit()` method and
 `Beetle` inherits none.

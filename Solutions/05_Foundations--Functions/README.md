@@ -86,7 +86,7 @@ a different design, a detail, or an equivalent alternative.
 ## 2. A `get()` that re-raises, and why `None` cannot be its sentinel
 
 > In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
-> so a missing key with no default re-raises the `KeyError`.
+> so a missing key with no default re-raises `KeyError`.
 > Confirm that `get(prefs, "theme")` raises a `KeyError` and that `get(prefs, "theme", None)` returns `None`.
 > Explain why `default=None` could not serve as the sentinel in this function.
 
@@ -728,7 +728,7 @@ You can name the two parameters that collect `func="f"` on its way to that outpu
 If you predicted a `calling report` line before the error, compare
 `forwarding_collision.py`. There `trace()` runs, and the clash is in
 the arguments `trace()` passes to `report()`. Here the clash is in `trace()`'s own
-arguments, so Python raises the `TypeError` before `trace()`'s body runs.
+arguments, so Python raises `TypeError` before `trace()`'s body runs.
 
 ```python
 # exercise_10.py

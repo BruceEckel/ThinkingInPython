@@ -474,7 +474,7 @@ roster with `size=3`, such as `names=['a', 'b']`, and a
 `ValueError: min() iterable argument is empty`. With fewer students
 than the group size, the `while len(pool) >= size` loop runs zero
 times, so `groups` stays empty. The leftover loop then calls `min()`
-on the empty `groups`, and that call raises the `ValueError`.
+on the empty `groups`, and that call raises `ValueError`.
 
 The crash is a real defect rather than an unstated precondition.
 `group_rounds()` keeps everyone in a group when a roster divides

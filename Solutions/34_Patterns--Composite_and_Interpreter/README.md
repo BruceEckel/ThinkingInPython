@@ -555,7 +555,7 @@ division the program throws away. Leaving `Div(lhs, Num(0))` in the
 tree lets `evaluate()` raise `ZeroDivisionError` at the moment the division
 runs.
 Python treats `1 / 0` in source the same way. The compiler accepts
-it. Python raises the `ZeroDivisionError` when the line executes.
+it. Python raises `ZeroDivisionError` when the line executes.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1111,7 +1111,7 @@ that `Num`.
 **Hand the decision back to Python.** Returning `NotImplemented`
 tells Python to try the next method. `__radd__()` now answers for
 an `int` alone, so it declines the string. Python then falls back
-to `str` concatenation, which raises the `TypeError`.
+to `str` concatenation, which raises `TypeError`.
 
 The message comes from `str`, which is the right source. The left
 operand is what the caller wrote first, and no method in this expression

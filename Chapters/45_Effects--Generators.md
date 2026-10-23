@@ -150,7 +150,7 @@ To read the `ReturnType`, catch the exception yourself,
 as `drive_by_hand.py` does.
 
 When the body finishes with `return`,
-Python raises the `StopIteration` on the generator's behalf.
+Python raises `StopIteration` on the generator's behalf.
 If a `StopIteration` propagates out of the body instead,
 Python converts it into a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)).
@@ -166,6 +166,11 @@ Resuming runs the body from that position, with every local variable intact.
 `interview()`'s local `name` keeps its value through the next two `send()` calls,
 and `town` keeps its value through the last one.
 The position and the locals together are the generator's state.
+The generator is an ordinary object,
+so that state lasts as long as something holds a reference to the generator.
+[Measuring the Memory](19_Techniques--Concurrency.md#measuring-the-memory)
+uses `tracemalloc` to measure that state for suspended `asyncio` tasks,
+whose coroutines keep their position and locals the same way.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.

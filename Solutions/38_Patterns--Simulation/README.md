@@ -974,7 +974,7 @@ on the chapter's `MAZE`, your tour prints `16 meals, 282 moves`, `game.robot.fin
 
 If you keep the chapter's final `raise ValueError`,
 the food loop ends in a traceback.
-After the last meal, the search for more food raises the `ValueError`,
+After the last meal, the search for more food raises `ValueError`,
 and the script stops before the walk to the `!` and before either `print()`.
 Returning `None` makes an empty search the loop's ordinary exit.
 

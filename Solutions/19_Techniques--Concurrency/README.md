@@ -993,7 +993,7 @@ asyncio.run(main())
 Two `fetched` lines print, `a` and `b`, the two whose timers fire
 before `c` fails at `0.03`. `e` and `f` print nothing.
 Control passes from the `await` to the `except` block,
-because the `await` raises the `ValueError` instead of returning a value.
+because the `await` raises `ValueError` instead of returning a value.
 
 The `return` in the `except` block ends `main()` there.
 If you leave it out,
@@ -1520,7 +1520,7 @@ executor's own handle on a result a worker is still computing. The
 `Future`'s interface blocks. You wait by calling `result()`, which stops the
 calling thread until the worker finishes. That future holds no
 reference to an event loop and defines no `__await__`.
-`ty` therefore reports the `await`, and Python raises the `TypeError` at runtime.
+`ty` therefore reports the `await`, and Python raises `TypeError` at runtime.
 
 `loop.run_in_executor()` is the bridge the original listing uses. It
 submits the call to the executor the same way `submit()` does, but

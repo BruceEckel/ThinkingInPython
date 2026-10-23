@@ -308,7 +308,7 @@ with expected(ValueError):
 #: items is not allowed: use default_factory
 ```
 
-**Fail at class definition.** `@dataclass` raises the `ValueError` at class-definition time, not at first use,
+**Fail at class definition.** `@dataclass` raises `ValueError` at class-definition time, not at first use,
 because it inspects every default before generating the constructor.
 `shared_mutable.py`'s `Cart` has no decorator to inspect its defaults,
 so `Cart` gets its shared list silently.

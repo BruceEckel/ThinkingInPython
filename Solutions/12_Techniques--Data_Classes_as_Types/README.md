@@ -408,7 +408,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Serializing to JSON](../../Chapters/12_Techniques--Data_Classes_as_Types.md#serializing-to-json) rebuilds a `Person` from parsed JSON by calling the field classes.
 Build a JSON string whose email lacks an `@` with `json.dumps()`, and pass it to `from_json()`.
-Watch which code raises the `TypeFailure`: the constructor of `EmailAddress`, not `from_json()`.
+Watch which code raises `TypeFailure`: the constructor of `EmailAddress`, not `from_json()`.
 
 <details>
 <summary>The shape</summary>

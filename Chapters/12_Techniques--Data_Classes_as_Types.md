@@ -904,7 +904,7 @@ so `DAYS = nonmember((31, 28, ...))` puts the table inside `Month` and leaves tw
 
 The tests confirm that `Month(7)` finds `JULY` in a legal date,
 that a day past the end of its month raises `TypeFailure`,
-and that a month number outside the twelve raises the `Enum`'s `ValueError`:
+and that a month number outside the twelve makes `Month()` raise `ValueError`:
 
 ```python
 # test_birth_date.py
@@ -1242,7 +1242,7 @@ shares that limit.
 `test_the_check_cannot_move_inside()` shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`,
 and it refuses `__init__()` with the same `AttributeError`.
-Python raises the `AttributeError` while it is still executing the `class` statement,
+Python raises `AttributeError` while it is still executing the `class` statement,
 before the class exists.
 
 `ty` reports the `__new__()` override as `invalid-named-tuple`,

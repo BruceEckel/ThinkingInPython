@@ -620,7 +620,7 @@ The last case shows why the sentinel exists.
 `Meters.__add__()` runs and declines the string,
 and `str` defines no `__radd__()`.
 With the left operand declining and no reflected method to try,
-Python raises the `TypeError`.
+Python raises `TypeError`.
 
 Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately.

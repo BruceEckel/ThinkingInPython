@@ -408,7 +408,7 @@ dictionary keyed on the arguments, every argument must be hashable. A
 `list` is not hashable, because its contents can change after the
 cache stores it.
 A mutated key hashes to a different slot from
-the one holding its entry. The call raises the `TypeError` before `deep_sum()`'s body runs.
+the one holding its entry. The call raises `TypeError` before `deep_sum()`'s body runs.
 
 **Silence the checker so the listing runs.** `ty` reports the same problem before the program runs. The standard
 library's type declarations give a cached function's parameters the

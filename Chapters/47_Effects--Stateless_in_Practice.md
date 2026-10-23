@@ -2333,7 +2333,7 @@ move the failure into the result before you fork.
 Apply `catch_all()` before `@fork`.
 With `bad` left undecorated,
 `fork(catch_all(bad))` matches the overload for an Effect with no declared error,
-and `wait()` returns `Boom | int` instead of raising the `Boom`.
+and `wait()` returns `Boom | int` instead of raising `Boom`.
 
 ## What Survives the Library
 

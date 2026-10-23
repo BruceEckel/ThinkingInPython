@@ -444,7 +444,7 @@ and leave the test importing the chapter's `paper_scissors_rock` and `paper_scis
 every `Lizard` case fails with an `AttributeError`:
 fourteen of the 32 cases, seven per module.
 The chapter modules define `Paper`, `Scissors`, and `Rock`,
-so `getattr()` raises the `AttributeError` when it looks up `"Lizard"`.
+so `getattr()` raises `AttributeError` when it looks up `"Lizard"`.
 The solution points both imports at exercises 1 and 2.
 
 ```python
@@ -817,7 +817,7 @@ right answer every time.
 
 **Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__()`, so Python calls
 `Meters.__rsub__()` next, which returns `NotImplemented` for a
-`str`. With both sides declining, Python raises the `TypeError`,
+`str`. With both sides declining, Python raises `TypeError`,
 whose message names both types.
 
 Returning `NotImplemented`, rather than raising an exception,

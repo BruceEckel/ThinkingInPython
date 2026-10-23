@@ -1258,7 +1258,7 @@ asyncio.run(main())
 #: slow finished: 1
 ```
 
-`announce()` raises the `ValueError` from `gather()` the moment `failing()` raises it.
+`announce()` raises `ValueError` from `gather()` the moment `failing()` raises it.
 `slow` is still sleeping at that point,
 so this `announce()` ends while a responder still runs,
 unlike the one in `async_thermometer_demo.py`.
