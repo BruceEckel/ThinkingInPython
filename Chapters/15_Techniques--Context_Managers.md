@@ -27,7 +27,7 @@ The borrower writes nothing to arrange it.
 The simplest way to write a context manager is a [generator](22_Patterns--Iterators.md#generators)
 function with a single `yield`.
 The `contextlib.contextmanager` decorator turns that function into a context manager.
-[Generators](45_Effects--Generators.md) covers the two-way form.
+[Generators](45_Effects--Generators.md) covers the two-way form of `yield`.
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Techniques--Testing.md#fixtures-replace-setup-and-teardown).
 Everything before the `yield` is setup.
 Everything after it is cleanup.
@@ -82,7 +82,7 @@ the manager raises `RuntimeError: generator didn't stop`.
 Construct a fresh manager for each `with` statement.
 
 The `finally` makes the cleanup dependable.
-`@contextmanager` raises an exception from the block at the `yield`,
+`@contextmanager` raises the block's exception at the `yield`,
 and `finally` runs the cleanup before the exception propagates.
 
 Leaving the `try`/`finally` out is the common mistake:
@@ -302,7 +302,7 @@ as `expected_one.py` does.
 A manager that reads `tb` types it as `TracebackType | None`,
 importing `TracebackType` from `types`.
 
-The return value of `__exit__()` determines whether that exception propagates.
+The return value of `__exit__()` determines whether the block's exception propagates.
 A falsy value lets it propagate.
 Falsy includes the implicit `None` of a method with no `return`,
 so the exception propagates by default.
@@ -596,7 +596,7 @@ brackets a function call the same way.
 A subclass works both as a context manager and as a decorator.
 Every manager `@contextmanager` produces inherits from `ContextDecorator`,
 so `banner` works as a decorator,
-although `ContextDecorator` is absent from `context_decorator.py`:
+although `ContextDecorator` is absent from the listing below:
 
 ```python
 # context_decorator.py
@@ -695,6 +695,7 @@ forwards `*args` and `**kwargs` and returns the wrapped function's result.
 [`hijack`](14_Techniques--Decorators.md#what-at-does)
 returns a replacement that runs instead of the original function,
 skipping its call.
+
 `banner` offers one definition,
 usable both as a `with` block and as a `@` decorator.
 Use `ContextDecorator` when setup and cleanup should be identical on every call.
@@ -704,7 +705,7 @@ Before Python 3.15, it wrapped only the call that creates the generator object,
 so the context entered and exited before the generator's body ran.
 The manager closed any resource it opened before the body could use it.
 On 3.15 the wrapper enters the context at the first `next()` and exits it when the generator finishes or its `close()` method runs.
-`decorated_generator.py` imports `banner` from `context_decorator.py` and decorates a generator with it:
+Decorating a generator with `banner` from `context_decorator.py` shows when the context opens and closes:
 
 ```python
 # decorated_generator.py
@@ -824,7 +825,7 @@ A comma-separated `with` sets its count when you write it.
 `wrap()` shows the case where every entry succeeds.
 `ExitStack` makes a second guarantee, for a later entry that fails:
 the stack unwinds the managers that entered earlier.
-`exit_stack_fails.py` enters two `tag()` managers from `multiple.py`,
+The stack below enters two `tag()` managers from `multiple.py`,
 then a third manager, `broken()`, that fails to enter:
 
 ```python
@@ -856,7 +857,8 @@ with expected(RuntimeError):
 `broken()` raises a `RuntimeError` before its `yield` and so fails to enter.
 `ExitStack` registers a manager's exit after its `__enter__()` returns,
 so it registers nothing for `broken("c")`.
-Because `a` and `b` enter first, both unwind in reverse.
+The managers for `a` and `b` enter first,
+so the stack holds both exits and unwinds them in reverse.
 A comma-separated `with` follows the same rule.
 
 ## The `contextlib` Toolkit
@@ -1043,8 +1045,8 @@ The `finally` puts it back.
 and it neither creates nor destroys anything.
 Its one job is holding the items between leases.
 
-`pool_demo.py` leases a connection,
-then raises a `RuntimeError` inside a second lease:
+The first lease runs a query,
+and then a second lease raises a `RuntimeError` inside its block:
 
 ```python
 # pool_demo.py
@@ -1092,8 +1094,9 @@ In an `asyncio` program a blocking `get()` blocks the whole event loop,
 so an async pool holds an `asyncio.Queue`, awaits its `get()`,
 and builds `lease()` with `asynccontextmanager`.
 
-`pool_contention.py` puts the pool under contention.
-Eight threads share a pool of two connections and lease and return a connection two hundred times each.
+Eight threads contend for the pool.
+They share its two connections,
+and each thread leases and returns a connection two hundred times.
 
 ```python
 # pool_contention.py
