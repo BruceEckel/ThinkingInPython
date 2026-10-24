@@ -2644,6 +2644,22 @@ the gate run it. To clear a finding, add or remove the bullet.
 tip check    # the drift checks, this one included
 ```
 
+## readme_coverage.py
+
+Every module in `tools/` needs a name in this file: its filename
+(`check_all.py`) or its dotted name (`tools.check_all`). A package,
+such as `story_figures/`, needs its name with a trailing slash. The
+check fails on each module or package this file never names, so a new
+tool arrives with its entry. `tip check` and the gate run it. It reads
+names alone, so a module mentioned in passing in another entry passes;
+the entry is still worth writing. To clear a finding, add an entry
+that says what the tool does, which task runs it, and whether a gate
+does.
+
+```
+tip check    # the drift checks, this one included
+```
+
 ## Advisory checks: check_links.py and list_todos.py
 
 Neither is part of `verify`/`gate`/`ci`. Run them now and then.

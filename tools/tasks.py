@@ -258,6 +258,7 @@ def gate(v: Vars) -> None:
     py("tools.extract_rust")
     py("tools.extract_effects")
     py("tools.archive_contents")
+    py("tools.readme_coverage")
     py("tools.check_skip_lists")
     py("tools.extract_examples", "--write")
     if not markers_fresh(v):
@@ -1029,12 +1030,15 @@ def check(v: Vars) -> None:
     effects-sync` is its fix. archive_contents (since 2026-10-24)
     compares archive/README.md's Contents bullets with the files in
     archive/, so an archived file with no entry fails here.
+    readme_coverage (same date) fails on a module or package in
+    tools/ that tools/README.md never names.
     """
     py("tools.extract_examples")
     py("tools.extract_solutions")
     py("tools.extract_rust")
     py("tools.extract_effects")
     py("tools.archive_contents")
+    py("tools.readme_coverage")
 
 
 @task("Delete orphaned stray files under Examples/ and Solutions/ "
