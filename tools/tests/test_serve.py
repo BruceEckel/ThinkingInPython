@@ -11,6 +11,11 @@ made every save a ten-second wait). A save that lands while a rebuild
 runs gets a rebuild of its own on the next poll (since 2026-10-24, when
 the watcher re-snapshotted after each rebuild and so took that save as
 already built).
+
+The --watch supervisor restarts the server when the build code changes.
+A restart that dies, because the save caught a `tools/` module mid-edit,
+waits for the next change to the build code instead of ending the
+session, which it did before 2026-10-24.
 """
 from itertools import chain, repeat
 from pathlib import Path
@@ -128,3 +133,54 @@ def test_a_chapter_rebuild_leaves_the_index_page_for_its_next_request(
     assert not watcher.index_stale
     watcher.refresh_index()
     assert index_rebuilds == [tmp_path]
+
+
+class FakeChild:
+    """A server process whose `poll()` answers from a script."""
+
+    def __init__(self, polls: list[int | None]) -> None:
+        self.polls = chain(polls, repeat(polls[-1]))
+        self.pid = 0
+
+    def poll(self) -> int | None:
+        return next(self.polls)
+
+
+def run_supervisor(monkeypatch: pytest.MonkeyPatch,
+                   children: list[FakeChild],
+                   snapshots: list[dict[Path, float]]) -> tuple[int, int]:
+    """Run `supervise()` over scripted children and code snapshots;
+    return its exit code and the number of servers it started."""
+    started = iter(children)
+    count = 0
+
+    def popen(*args: object, **kwargs: object) -> FakeChild:
+        nonlocal count
+        count += 1
+        return next(started)
+
+    polls = chain(snapshots, repeat(snapshots[-1]))
+    monkeypatch.setattr(serve, "code_files", lambda: [])
+    monkeypatch.setattr(serve, "code_snapshot", lambda files: next(polls))
+    monkeypatch.setattr(serve.subprocess, "Popen", popen)
+    monkeypatch.setattr(serve.time, "sleep", lambda seconds: None)
+    monkeypatch.setattr(serve, "stop", lambda child: None)
+    return serve.supervise([]), count
+
+
+def test_a_restart_that_dies_waits_for_the_next_code_change(
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    code = Path("build_site.py")
+    broken, fixed = {code: 2.0}, {code: 3.0}
+    children = [FakeChild([None]), FakeChild([1]), FakeChild([None, 0])]
+    snapshots = [{code: 1.0}, broken, broken, broken, broken, fixed]
+    assert run_supervisor(monkeypatch, children, snapshots) == (0, 3)
+    assert capsys.readouterr().out.count("waiting for the next") == 1
+
+
+def test_a_first_server_that_dies_ends_the_session(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    code = Path("build_site.py")
+    assert run_supervisor(monkeypatch, [FakeChild([1])],
+                          [{code: 1.0}]) == (1, 1)

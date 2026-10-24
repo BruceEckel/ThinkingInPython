@@ -36,6 +36,8 @@ source of every `tools/` module it has itself imported (the same set
 the child uses, `serve.py` included). On a change it stops the child
 and starts a fresh one, which rebuilds the whole site with the new code
 before serving; the open page reloads when the new server answers.
+A fresh child that dies, because the save caught a module mid-edit,
+leaves the supervisor waiting for the next change to the build code.
 
 With `--copy-on-select`, each served page also carries a script that
 copies a mouse selection to the clipboard as soon as the button is
@@ -404,18 +406,30 @@ def supervise(argv: list[str]) -> int:
     # A restart must not open a second browser window, and its pages
     # were built by the old code.
     restart = [a for a in command if a != "--open"] + ["--rebuild"]
+    restarted = waiting = False
     try:
         while True:
             time.sleep(POLL_SECONDS)
             now = code_snapshot(files)
             if now == seen:
-                if child.poll() is not None:
-                    return child.returncode
+                code = child.poll()
+                if code is None:
+                    continue
+                # A save caught mid-edit (a syntax error, a half-renamed
+                # name) kills the restarted child. The next save fixes
+                # it, so wait for that instead of ending the session.
+                if not restarted or code == 0:
+                    return code
+                if not waiting:
+                    print(f"The server exited ({code}); waiting for "
+                          "the next change to the build code...")
+                    waiting = True
                 continue
             seen = now
             print("Build code changed; restarting the server...")
             stop(child)
             child = subprocess.Popen(restart, env=env)
+            restarted, waiting = True, False
     except KeyboardInterrupt:
         return 0
     finally:
