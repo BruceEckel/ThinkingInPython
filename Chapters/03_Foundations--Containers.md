@@ -689,6 +689,11 @@ print(counts.most_common(2))
 #: [('a', 3), ('cat', 2)]
 print(Counter("aab") - Counter("ab"))  # Multiset diff
 #: Counter({'a': 1})
+print(Counter("aab") + Counter("abc"))  # Sum
+#: Counter({'a': 3, 'b': 2, 'c': 1})
+counts += Counter(["cat", "dog"])  # Add in place
+print(counts["cat"], counts["dog"])
+#: 3 1
 print(Counter("aaab") ^ Counter("abbc"))  # Symmetric diff
 #: Counter({'a': 2, 'b': 1, 'c': 1})
 ```
@@ -699,6 +704,7 @@ A missing key counts as zero rather than raising a `KeyError`.
 They are the operators from [Sets](#sets), here meaning multiset difference,
 minimum, and maximum.
 A fourth operator, `+`, sums the counts of both counters.
+Its augmented form, `+=`, adds another counter's counts into `counts` in place.
 Python 3.15 adds `^`, the multiset symmetric difference,
 which gives each item the larger of its two counts minus the smaller.
 
