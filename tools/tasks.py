@@ -855,7 +855,7 @@ section("Code examples (build/examples/, build/solutions/)")
 
 @task("Run the code checks for one chapter only (CH=12), ~1s")
 def check_ch(v: Vars) -> None:
-    """The edit loop for one chapter's listings. `gate` checks all 44 chapters
+    """The edit loop for one chapter's listings. `gate` checks every chapter
     and spends most of its time executing listings you did not touch; this runs
     the same code-example checks (markers, listing style, ty, ruff, pytest)
     against one chapter, in about a second. It is not a substitute for `gate`,

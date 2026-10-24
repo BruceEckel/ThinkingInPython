@@ -2,7 +2,7 @@
 """Run the code-example gates for one chapter, and nothing else.
 
 `tip gate` checks the whole book and takes tens of seconds, most of it
-spent executing every listing in all 44 chapters. When you are editing the
+spent executing every listing in the book. When you are editing the
 listings in a single chapter, almost none of that work is about your edit.
 This runs the same checks a code example must pass, scoped to one chapter:
 

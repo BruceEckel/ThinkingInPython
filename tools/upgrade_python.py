@@ -2,8 +2,8 @@
 """Upgrade the project's Python and resync the environment.
 
 With no argument, fetch the latest patch of the minor pinned in
-``.python-version`` (e.g. the newest 3.14.x). With a minor argument
-such as ``3.15``, first repin: rewrite ``.python-version`` and the
+``.python-version`` (e.g. the newest 3.15.x). With a minor argument
+such as ``3.16``, first repin: rewrite ``.python-version`` and the
 ``requires-python`` floor in ``pyproject.toml``, then sync.
 
 Run via ``tip python-upgrade``, which executes it outside the project
@@ -13,7 +13,7 @@ is no separate version to bump.
 
 Usage:
     python -m tools.upgrade_python        # latest patch of the minor
-    python -m tools.upgrade_python 3.15   # move to the 3.15 minor
+    python -m tools.upgrade_python 3.16   # move to the 3.16 minor
 """
 
 import re
