@@ -383,6 +383,35 @@ a chapter's listings import their siblings), then narrows the expensive
 step, `validate_output.py --update`, to that chapter, and finishes with the
 listing gates plus `ty`, `ruff`, and `pytest` over that chapter's directory.
 
+## verify_chapter.py
+
+`tip verify` spends nearly all its time on chapters you did not touch.
+`tip verify-ch` runs the same loop scoped to one chapter and its Solutions
+file, in a few seconds:
+
+```
+tip verify-ch CH=28              # or CH=27_Patterns--Function_Objects
+tip verify-ch CH=28 ISOLATED=1   # private build trees, for parallel runs
+```
+
+The steps mirror `verify`. It fixes line endings, reflows the chapter (the
+Solutions file keeps its column wrapping, since the gate reflows
+`Chapters/` alone), regenerates the exercise statements and solution
+steps, and rebuilds both build trees whole-book. Then it refreshes both
+files' `#:` markers and checks their placement, syncs and drift-checks,
+and runs the Markdown gates and `ty`, `ruff`, `run`, and `pytest` over the
+chapter's directory. `tools/tasks.py` passes `GATE_CHECKS` through, so the
+Markdown checks are the gate's by construction. Every step after the
+rebuild runs whether or not an earlier one fails, so one pass reports
+every problem.
+
+It writes no gate stamp. A change that can reach other chapters (a renamed
+listing, a `utils/` helper, a heading that other chapters cite) still
+needs `tip verify`. Two runs at once wipe each other's `build/examples`,
+so parallel runs add `ISOLATED=1`, which extracts into
+`build/verify-ch-<NN>/`; deleting `build/verify-ch-*` is safe at any time.
+The module docstring lists every step.
+
 ## Status stamps: gate_stamp.py and tool_stamp.py
 
 Both write to `build/`, which is gitignored, so neither can enter a commit
@@ -411,6 +440,30 @@ one that is behind; the gate's one line never reaches the network.
 When something is behind, it asks whether to run `tip tools-upgrade`,
 but only a person at a terminal: a captured, piped, or CI run is never
 asked, so nothing starts the upgrade unattended.
+
+## skip_stamps.py
+
+The gate repeats work that rarely finds anything new, so this library
+keeps a stamp in `build/` for each kind of work, recording when it last
+passed, and the gate skips the work while the stamp still matches. Three
+steps use it. The gate skips the tools' own tests while nothing under
+`tools/`, `pyproject.toml`, or `uv.lock` has changed since they last
+passed (tests marked `book` read a chapter and always run).
+`run_examples --quick` runs the listings without `#:` markers, since the
+marker refresh executed the rest, and does a full run once a day.
+`validate_output --changed-only` (`tip output`) skips a chapter whose
+Markdown, `utils/` helpers, and checker modules match the digest recorded
+when its markers last passed, and `marker_placement --changed-only` keeps
+the same digest in a stamp of its own.
+
+Setting `TIP_FULL=1` turns every shortcut off. `tip ci`, `tip release`,
+and `tip everything` set it, and `RUN=full` sets it for one gate:
+
+```
+tip gate RUN=full   # one gate with every shortcut off
+```
+
+The module docstring has the policy and what each digest covers.
 
 ## check_tools.py
 
@@ -716,6 +769,52 @@ honors.
 
 When pointed at `Solutions/`, `--tree` must be **absolute**; see
 [extract_solutions.py](#extract_solutions.py) below.
+
+## marker_placement.py
+
+A `#:` run belongs directly after the statement that printed it.
+`validate_output.py` cannot see a misplaced run. It compares each run with
+everything printed since the previous one, so markers gathered at the end
+of a listing pass as long as their text is right. `marker_placement.py`
+runs each marked block the way `validate_output.py` does, one top-level
+statement at a time, and reports every run that sits below a statement
+other than the one that printed it.
+
+```
+tip marker-placement                # report, both trees
+tip marker-placement ARGS=--write   # move the runs
+```
+
+Both gates run it with `--changed-only` right after the marker refresh,
+and `verify-ch` runs it on its two files; a finding fails the build. In
+the gates it reports and leaves the Markdown as it is, because a move can
+need a human's eye. `ARGS=--write` rewrites each block with the same
+marker text in the new layout. Output from an import goes below the blank line that
+closes the import block, since a marker hugging an import fails ruff's
+`I001`. A block whose total output differs from its markers is reported
+and left alone, so run `tip output` first. The module docstring has the
+layout rules.
+
+## check_skip_lists.py
+
+`tools/data/norun.txt` names the listings `tip run` skips.
+`tools/data/timing.txt` names the listings whose `#:` markers are
+wall-clock claims, which `validate_output.py` must leave as written. Both
+hold `fnmatch` patterns over a listing's path, and both go stale when a
+listing is renamed or deleted, or a chapter is renumbered. A stale timing
+entry is the dangerous one. The listing's timing boolean stops being a
+claim, so the gate rewrites its next flip into the chapter with
+everything green.
+
+```
+tip skip-lists   # fail on a pattern that matches no listing
+```
+
+The check matches each pattern against `Examples/` and `Solutions/`; one
+file serves both trees, so a match in either passes. The gate runs it
+right after the drift check, so the committed trees it reads equal what
+the Markdown generates. To clear a finding, correct the pattern to the
+listing's new path, or delete it.
 
 ## extract_solutions.py
 
@@ -1149,6 +1248,68 @@ Do not run `ruff format` on the examples: it would re-expand to two blank lines
 between top-level defs and undo the density. The gate runs `ruff check` (the
 linter) only, which is happy with one blank line.
 
+## listing_width.py
+
+Fails if any line of a ```python block in `Chapters/` or `Solutions/` is
+wider than 60 characters, so listings fit phones and e-readers. It
+measures the Markdown, so it covers fragment blocks, which ruff never
+sees, and every `#:` marker. A trailing `# type: ignore` pragma is the one
+sanctioned overflow. A marker wider than the limit means the program's
+own output needs shortening. It is `widths` in `GATE_CHECKS`, and the gate
+runs it over `Solutions/` as well. The fix is a judgment call: wrap the
+statement, move a comment to its own line or into the prose, or change
+what the program prints.
+
+```
+tip widths    # check (part of the gate through GATE_CHECKS)
+```
+
+## listing_tags.py
+
+Prose that walks a listing line by line points at a line with a numbered
+tag: a trailing comment `# [1]`, `# [2]`, and so on, on the code line (or
+alone on the line above it, when the line is too long to carry it). The
+prose cites the tag as a code span, `` `[1]` ``. `tip listing-tags` fails
+on four things: tags that break the 1, 2, ..., n sequence, a tag that the
+prose below the listing (up to the next block or heading) leaves uncited, a
+`[n]` code span that names no tag in the listing above it, and a bracketed
+tag number in prose outside a code span. The last rule exists because the
+EPUB and PDF concatenate every chapter, where one stray `[n]:` reference
+definition would turn every bare citation in the book into a link.
+
+```
+tip listing-tags    # check (part of the gate through GATE_CHECKS)
+```
+
+It is `listing-tags` in `GATE_CHECKS`, and the gate runs it over
+`Solutions/` as well. An untagged listing whose prose cites nothing draws
+no finding. Each finding is a hand edit: renumber the tags, cite the
+missing one, or put the citation in a code span.
+
+## record_check.py
+
+From chapter 18's `utils/record.py` on, the book writes a frozen data
+class as `@record`, which is `dataclass(frozen=True, slots=True)`.
+`tip records` fails on three shapes: a `@dataclass(frozen=True)` whose
+bases are all known to be slotted (it could be a record), a
+`@record(slots=False)` under bases that are all slotted (the flag drops
+slots for nothing), and a bare `@record` under a base with no `__slots__`,
+which gives every instance its `__dict__` back. A `record(...)` call with
+an argument other than `slots=False` fails too. A base the check cannot
+see, such as one imported from another listing, draws no finding, so the
+check under-reports by design.
+
+```
+tip records    # check (part of the gate through GATE_CHECKS)
+```
+
+It is `records` in `GATE_CHECKS`, and the gate runs it over `Solutions/`
+as well. To clear a finding, convert the class, give the book's own base
+`__slots__ = ()`, or list a deliberate exception with its reason in
+`tools/data/record_exceptions.txt`. That file is keyed by chapter name, so
+a renumbering leaves it alone. When run standalone, `tip records` also
+fails on an entry that matches no class, so the file stays current.
+
 ## fix_imports.py
 
 Sorts the import block of each ```python listing and drops unused imports,
@@ -1280,6 +1441,79 @@ with no definition is a pandoc warning on every build, site included.
 The fix is to rename one label at both its reference and its
 definition.
 
+## opening_epigraph.py
+
+Chapters 02 onward open with an epigraph, a blockquote of two to four
+lines directly under the `#` heading. `build_site.split_epigraph()` finds
+it for the site, EPUB, and PDF by matching a blockquote at the start of
+the body, so a chapter whose opener loses its `>` markers, or gains a
+paragraph above them, builds with no epigraph and no complaint.
+`tip epigraph` turns that into a failure. It requires the heading on line
+1, a blank line 2, and the blockquote from line 3, followed by a blank
+line. Chapter 01 and the appendices open with an ordinary paragraph and
+are skipped. It is `epigraph` in `GATE_CHECKS`; restore the blockquote to
+clear a finding.
+
+```
+tip epigraph    # check (part of the gate through GATE_CHECKS)
+```
+
+## check_self_reference.py
+
+`heading_links.py` proves that a cross-chapter link resolves, while the
+sentence around the link can still make a false claim about the chapter
+it names. Chapter 07 said "[Rethinking Objects] uses it" of `slots=True`,
+and chapter 20 contains the string "slot" zero times. `tip self-reference`
+checks three literal shapes, each taken from a real error:
+
+* `absence` (gates): a claim that something appears nowhere else, where
+  a code span or listing elsewhere in the book holds it.
+* `direction` (gates): an ordering phrase ("an earlier chapter") near a
+  link that points the other way.
+* `grounding`: a sentence that links a chapter containing none of the
+  code terms the sentence names. Search cannot tell a misattribution from
+  terms that belong to the linking chapter, so `tip grounding-triage`
+  asks a model and commits each verdict to
+  `tools/data/grounding_verdicts.json`. A misattribution verdict (SR004)
+  fails the gate. `tip self-reference-report` lists a finding with no
+  verdict yet (SR002), which the gate lets pass.
+
+```
+tip self-reference          # the gating rules (part of GATE_CHECKS)
+tip self-reference-report   # plus grounding findings with no verdict
+tip grounding-triage        # ask about new findings (TYPESAFE_API_KEY)
+```
+
+A new misattribution passes the gate until it has a verdict, so run the
+triage after editing a sentence that links another chapter. Waivers go in
+`tools/data/self_reference_ok.txt`. The rules under-report by design: a
+claim with no code term in it is invisible to them. The module docstring
+and `tools/CLAUDE.md` have the details.
+
+## pattern_names.py
+
+Every naming of a design pattern is capitalized and italic, on every
+mention, in prose and in link text (*State*, *Chain of Responsibility*),
+since names like State, Command, and Proxy are ordinary words otherwise.
+Headings stay plain, code spans are class names, and the lowercase word
+keeps its ordinary sense. `tip pattern-names` reports a capitalized name
+outside italics, a bold name, and a lowercase name directly before
+"pattern", and `tip fix-pattern-names` wraps each of those in italics. A
+name that is also a common verb or noun (State, Command, Bridge) at the
+start of a line is ambiguous ("State the rule"), so the tool leaves it
+unrewritten and lists it under `--sentence-start` for a human to judge.
+
+```
+tip pattern-names        # check (part of the gate through GATE_CHECKS)
+tip fix-pattern-names    # italicize the unambiguous ones
+uv run python -m tools.pattern_names --sentence-start   # line-start cases
+```
+
+The names live in `tools/data/pattern_names.txt`, along with `!` phrases
+that contain a name without naming the pattern (`!State Machines`). It is
+`pattern-names` in `GATE_CHECKS`, and the gate runs it over `Solutions/`
+as well.
+
 ## check_quoted_diagnostics.py
 
 Advisory. The book quotes `ty` output in fenced blocks that begin
@@ -1387,6 +1621,33 @@ chapter", which a chapter split retargets silently. Entries are keyed by chapter
 renumbering leaves the baseline alone and a chapter rename does not.
 "The last three exercises" and an exercise described without a
 number are invisible to it.
+
+## skill_copies.py
+
+The book's coding-style skill exists twice: `thinking-in-python-skill.md`
+at the repo root and `.claude/skills/thinking-in-python/SKILL.md`, where
+Claude Code loads it. The repo sets `core.symlinks = false`, so the two
+are copies. An edit to one leaves the other stale until someone copies it
+over. `tip skill-copies` compares them byte for byte and fails, naming
+the first line where they diverge. `gate` runs it too. To clear a finding,
+copy the edited file over the other. The pairs live in `PAIRS` in the
+module, so a second pair of copies is one more line.
+
+```
+tip skill-copies    # check (part of the gate)
+```
+
+## archive_contents.py
+
+`archive/README.md` describes each finished document in `archive/`, one
+bullet per file, opening with the filename in a code span. The check
+compares those bullets with the files in the directory and fails on a
+file with no bullet and on a bullet whose file is gone. `tip check` and
+the gate run it. To clear a finding, add or remove the bullet.
+
+```
+tip check    # the drift checks, this one included
+```
 
 ## Advisory checks: check_links.py and list_todos.py
 
