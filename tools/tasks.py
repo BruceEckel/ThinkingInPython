@@ -257,6 +257,7 @@ def gate(v: Vars) -> None:
     py("tools.extract_examples")
     py("tools.extract_rust")
     py("tools.extract_effects")
+    py("tools.archive_contents")
     py("tools.check_skip_lists")
     py("tools.extract_examples", "--write")
     if not markers_fresh(v):
@@ -1025,12 +1026,15 @@ def check(v: Vars) -> None:
     `tip rust-sync` is the fix when this reports drift. extract_effects
     does the same for chapter 44's four Effect programs under effects/
     (since 2026-10-21), needing none of their toolchains; `tip
-    effects-sync` is its fix.
+    effects-sync` is its fix. archive_contents (since 2026-10-24)
+    compares archive/README.md's Contents bullets with the files in
+    archive/, so an archived file with no entry fails here.
     """
     py("tools.extract_examples")
     py("tools.extract_solutions")
     py("tools.extract_rust")
     py("tools.extract_effects")
+    py("tools.archive_contents")
 
 
 @task("Delete orphaned stray files under Examples/ and Solutions/ "
