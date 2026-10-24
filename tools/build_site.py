@@ -367,24 +367,80 @@ def asset_tag(content: str) -> str:
     return f"?v={digest}"
 
 
-def social_meta(title: str, page: str = "") -> str:
+# Markdown that a preview card would show as literal characters.
+MD_INLINE_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+MD_FOOTNOTE = re.compile(r"\^\[[^\]]*\]|\[\^[^\]]*\]")
+# The book italicizes with `*`, so `_` stays (`__init__()`).
+MD_MARKUP = re.compile(r"[`*]")
+QUOTE_MARK = re.compile(r"^>[ ]?", re.MULTILINE)
+LIST_ITEM = re.compile(r"[-*+]\s|\d+\.\s")
+SENTENCE_END = re.compile(r"[.!?](?=\s|$)")
+# Slack shows about two lines of a description; Google cuts near 160.
+DESCRIPTION_LIMIT = 200
+
+
+def plain_text(markdown: str) -> str:
+    """Markdown prose as one line of text: links keep their words,
+    footnotes go, and code spans and italics lose their marks."""
+    text = MD_FOOTNOTE.sub("", markdown)
+    text = MD_INLINE_LINK.sub(r"\1", text)
+    text = MD_MARKUP.sub("", text).replace("---", "\u2014")
+    return " ".join(text.split())
+
+
+def page_description(body: str) -> str:
+    """A chapter's preview-card text: its epigraph, or, for a chapter
+    without one, its first prose paragraph, cut at the last sentence
+    that fits in `DESCRIPTION_LIMIT` characters.
+
+    `body` is the chapter as `load_chapter()` returns it, before any
+    rewriting. A chapter with no prose before its first section gets
+    the book's description.
+    """
+    epigraph, rest = split_epigraph(body)
+    if epigraph:
+        text = plain_text(QUOTE_MARK.sub("", epigraph))
+    else:
+        text = ""
+        for para in rest.split("\n\n"):
+            para = para.strip()
+            if para.startswith("#"):
+                break
+            if (para and para[0] not in "!<>|`:"
+                    and not LIST_ITEM.match(para)):
+                text = plain_text(para)
+                break
+    if not text:
+        return BOOK_DESCRIPTION
+    if len(text) <= DESCRIPTION_LIMIT:
+        return text
+    ends = [m.end() for m in SENTENCE_END.finditer(text, 0,
+                                                    DESCRIPTION_LIMIT)]
+    if ends:
+        return text[:ends[-1]]
+    return text[:DESCRIPTION_LIMIT].rsplit(" ", 1)[0] + "\u2026"
+
+
+def social_meta(title: str, page: str = "",
+                description: str = BOOK_DESCRIPTION) -> str:
     """The Open Graph and Twitter card tags for one page.
 
     A link pasted into Slack or a social post shows a preview card
-    built from these: the title, the book's description, and
-    `SOCIAL_IMAGE`. `page` is the file name, empty for the contents
-    page.
+    built from these: the title, the description, and `SOCIAL_IMAGE`.
+    `page` is the file name, empty for the contents page. A chapter
+    passes its own `description` (`page_description()`); every other
+    page uses the book's.
     """
     tags = [("property", "og:type", "website"),
             ("property", "og:site_name", BOOK_TITLE),
             ("property", "og:title", title),
-            ("property", "og:description", BOOK_DESCRIPTION),
+            ("property", "og:description", description),
             ("property", "og:url", SITE_URL + page),
             ("property", "og:image", SITE_URL + SOCIAL_IMAGE),
             ("property", "og:image:alt",
              "A python as an ouroboros, coiled into an infinity sign"),
             ("name", "twitter:card", "summary_large_image"),
-            ("name", "description", BOOK_DESCRIPTION)]
+            ("name", "description", description)]
     return "\n".join(
         f'<meta {kind}="{key}" content="{html.escape(value)}">'
         for kind, key, value in tags)
@@ -455,7 +511,8 @@ def render_toc_menu(chapters: list[Chapter], current: Chapter | None) -> str:
 def render_chapter(body: str, ch: Chapter,
                    prev: Chapter | None, nxt: Chapter | None,
                    chapter_toc: bool = False, toc_menu: str = "",
-                   steps: bool = False) -> str:
+                   steps: bool = False,
+                   description: str = BOOK_DESCRIPTION) -> str:
     """Render one page through template.html.
 
     `steps` adds solutions.css and solutions.js, the styling and the
@@ -467,7 +524,8 @@ def render_chapter(body: str, ch: Chapter,
         f"--variable=chapter-label:{ch.label}",
         f"--variable=book-title:{BOOK_TITLE}",
         "--variable=social-meta:"
-        + social_meta(f"{ch.title} · {BOOK_TITLE}", ch.out_name),
+        + social_meta(f"{ch.title} · {BOOK_TITLE}", ch.out_name,
+                      description),
         f"--variable=heading-font:{HEADING_FONT}",
         f"--variable=heading-font-google:{HEADING_FONT_GOOGLE}",
         f"--variable=search-css:search.css{static_tag('search.css')}",
@@ -699,6 +757,7 @@ def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
     if nxt is None and located is not None:
         nxt = index_chapter()
     _, body = load_chapter(ch.md, site=solutions_file(ch.md).exists())
+    description = page_description(body)
     if located is not None:
         body = located.inject_anchors(body, ch.md.stem)
     used = {m.group(2) for m in IMG_REF.finditer(body)}
@@ -710,7 +769,8 @@ def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
     if epigraph:
         body = epigraph_metadata(epigraph) + body
     page = render_chapter(body, ch, prev, nxt, chapter_toc,
-                          render_toc_menu(chapters, ch))
+                          render_toc_menu(chapters, ch),
+                          description=description)
     (out_dir / ch.out_name).write_text(page, encoding="utf-8")
     return used
 

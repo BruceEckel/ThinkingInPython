@@ -12,11 +12,14 @@ import pytest
 
 from tools.build_epub import Ids, relink
 from tools.build_site import (
+    BOOK_DESCRIPTION,
+    DESCRIPTION_LIMIT,
     SOLUTIONS_BLOB_URL,
     SOLUTIONS_TREE_URL,
     link_solutions,
     load_chapter,
     load_solutions,
+    page_description,
     rewrite_md_links,
     search_sources,
     solutions_page_name,
@@ -163,3 +166,25 @@ def test_solutions_pages_join_the_search_index(
 def test_clean_drops_only_the_step_labels() -> None:
     assert clean(["<summary>Solution</summary>", "A Solution here."]) == (
         "A Solution here.")
+
+
+def test_description_is_the_epigraph_as_plain_text() -> None:
+    body = ("> A *Factory* puts `make()`\n> in [one place](x.md).\n\n"
+            "Prose.\n")
+    assert page_description(body) == "A Factory puts make() in one place."
+
+
+def test_description_without_an_epigraph_is_the_first_paragraph() -> None:
+    body = ("![fig](_images/a.svg)\n\n- a list\n\n"
+            "*Observer* calls `__init__()`.\n\nMore.\n")
+    assert page_description(body) == "Observer calls __init__()."
+
+
+def test_description_stops_at_the_first_section() -> None:
+    assert page_description("## Start\n\nProse.\n") == BOOK_DESCRIPTION
+
+
+def test_long_description_is_cut_at_a_sentence() -> None:
+    first = "Short sentence here."
+    assert page_description(f"{first} {'word ' * 60}end.\n") == first
+    assert len(page_description("word " * 60)) <= DESCRIPTION_LIMIT + 1
