@@ -503,13 +503,16 @@ for line in census(garden):
 ```
 
 Each value in a `Tree` is a `Color` or another `Tree`,
-so a dictionary can hold plants and further dictionaries to any depth.
-For each nested dictionary, `visit()` calls itself through `yield from`.
+so a dictionary can hold plants and further `Tree`s to any depth.
+For each nested `Tree`, `visit()` calls itself through `yield from`.
 
-The two channels run in opposite directions through that recursion.
-Each path travels out through every enclosing `visit()` and through `census()` to the `for` loop that drives them.
-Each subtree's [`Counter`](03_Foundations--Containers.md#counter)
-travels back one level, and its parent adds it to its own counts with `+=`.
+The yield channel and the return channel carry values different distances through that recursion.
+A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`,
+and reaches the `for` loop at the bottom of the listing.
+A returned [`Counter`](03_Foundations--Containers.md#counter) climbs one level,
+to the `visit()` that called the one returning it.
+In that parent, the `yield from` expression evaluates to the subtree's `Counter`,
+and the parent adds it to its own counts with `+=`.
 `census()` receives the count for the whole garden through its own `yield from` and yields one line per color.
 
 Any iterable can follow `yield from`, including a list:
