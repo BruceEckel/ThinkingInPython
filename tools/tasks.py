@@ -1162,8 +1162,8 @@ def epub(v: Vars) -> None:
     grayscale screens). The site keeps one HTML page per chapter, so a
     cross-reference stays a link between files; an EPUB is a single document,
     so build_epub.py namespaces every heading id by chapter (ch12-immutability)
-    before merging. Without that, the 44 chapters ending in `## Exercises` and
-    the nine other repeated headings would collide and pandoc would quietly
+    before merging. Without that, the 45 chapters ending in `## Exercises` and
+    the other repeated headings would collide and pandoc would quietly
     retarget those links. Needs pandoc, like `site`.
     """
     py("tools.build_epub")

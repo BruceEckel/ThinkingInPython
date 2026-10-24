@@ -9,7 +9,7 @@ docstring for why the namespacing exists. The one difference is
 `hang_code=False`: the EPUB rewrites listings into raw-HTML `<pre>`
 blocks for its hanging indent, and pandoc's typst writer drops raw
 HTML, so here the listings stay fenced code blocks. Nothing is lost by
-that: ruff caps listing lines at 70 characters, which fits the text
+that: ruff caps listing lines at 60 characters, which fits the text
 column, and typst highlights fenced Python natively.
 
 Typst is the PDF engine rather than a LaTeX: it is a single ~40 MB

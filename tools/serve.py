@@ -8,10 +8,10 @@ With `--watch`, a background thread polls `Chapters/*.md` and
 `Solutions/*/README.md` (and the few files the whole site is rendered
 from: `template.html`, the static assets, and the figures in
 `resources/images/`). A changed chapter takes
-`build_site.rebuild_chapter()`'s incremental path, one pandoc run
-rather than the ~46 of a full build, and a changed solutions file takes
-the same path through its chapter, since that one run also rewrites
-the chapter's solutions page (before 2026-10-10 the watcher listed
+`build_site.rebuild_chapter()`'s incremental path, two pandoc runs
+(the chapter page and its solutions page) rather than the ~95 of a full
+build, and a changed solutions file takes the same path through its
+chapter, since that path also rewrites the chapter's solutions page (before 2026-10-10 the watcher listed
 `Chapters/` alone, so a solutions edit never reached the browser). A
 changed template or asset rebuilds everything. A rebuild that raises
 an exception prints its traceback in the server's terminal and leaves

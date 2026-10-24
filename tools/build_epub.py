@@ -23,7 +23,7 @@ link to match:
     [x](#immutability)
         ->  [x](#ch12-immutability)
     [x](23_Patterns--Singleton.md)
-        ->  [x](#ch24)
+        ->  [x](#ch23)
 
 The `ch` prefix is not decoration: an EPUB is XHTML, where an id may not
 start with a digit.

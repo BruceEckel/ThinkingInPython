@@ -889,10 +889,12 @@ def rebuild_chapter(md: Path, out_dir: Path,
                     chapter_toc: bool = CHAPTER_TOC,
                     listing_links_on: bool = True,
                     index_on: bool = True) -> bool:
-    """Re-render one chapter page, plus the contents and search index.
+    """Re-render one chapter page and its Solutions page, plus the contents
+    and search index.
 
-    This is the incremental path `serve.py --watch` takes: one pandoc run
-    instead of the ~46 a full build spends. The contents page and the
+    This is the incremental path `serve.py --watch` takes: two pandoc runs
+    (the chapter and its Solutions page) instead of the ~95 a full
+    build spends. The contents page and the
     search index are rewritten too, since editing a heading changes
     both, and neither costs a pandoc run. Returns False when `md` is not
     a book chapter or the site has not been built yet, leaving the
