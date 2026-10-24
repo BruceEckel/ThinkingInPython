@@ -62,7 +62,7 @@ break a Solutions file.
 * **Shared libraries** (`config.py`, `repo.py`, `markdown.py`, ...) define
   no command and are only imported, as `tools.config` and so on. The
   package is what keeps them apart from the book: `validate_output.py`
-  execs every book listing in its own process, and chapter 24 has a
+  execs every book listing in its own process, and chapter 23 has a
   listing called `config.py`, so a bare `config` module on `sys.path`
   would be found by that chapter's `import config` through the
   `sys.modules` cache. `tools.config` is a key no listing can collide
@@ -71,7 +71,9 @@ break a Solutions file.
   read (`wordlist.txt`, `norun.txt`, `banned_phrases.txt`, ...), so this
   directory lists code and nothing else.
 * **`tests/`** holds the harness's own unit tests, run by `tip tools-test`
-  and as the first step of `tip gate`. They are separate from the book's
+  every time and by `tip gate` after its `solutions-gate` prerequisite.
+  The gate skips them while `tools/` is unchanged since they last passed
+  (`tools/skip_stamps.py` has the policy). They are separate from the book's
   example tests, which live in the chapters and run from `build/examples/`.
 
 The libraries are worth knowing before reading any entry point, because
@@ -92,7 +94,7 @@ A check is a function from a `Document` to `Finding`s, which is what lets
 document in memory with no filesystem at all.
 
 This README covers the tools you invoke by hand and the conventions behind
-them. It is deliberately not an inventory of all forty files: `tip help`
+them. It is deliberately not an inventory of every file: `tip help`
 lists every target, and each script's `--help` prints its own docstring.
 
 ## Commands
@@ -171,7 +173,7 @@ gets the static text.
 but folded out of the listing because a sibling's doc text names it
 (each `fix-*` under the check it repairs). An `also("name", ...)` call
 repeats targets defined in other sections into the section it sits in,
-at that point, so a target that belongs to two jobs (`sync` is an
+at that point, so a target that belongs to two jobs (`check-ch` is an
 everyday step and a code-examples step) is listed under both; the flat
 `entries()` view reports it once, so the smoke test runs it once. The
 sections run from the everyday loop down to setup and cleanup, most
@@ -200,9 +202,10 @@ uv run python -m tools.tip_help --pick never # static text in a terminal
 
 ## help_picker.py
 
-The interactive side of `tip help`, built on `prompt_toolkit` (a dev
-dependency; without it `tip help` falls back to the static listing and
-says so). A full-screen list of the same sections and doc text:
+The interactive side of `tip help`, built on `prompt_toolkit` (a project
+dependency in `pyproject.toml`, which is how `uv tool install` puts it in
+`tip`'s environment; without it `tip help` falls back to the static listing
+and says so). A full-screen list of the same sections and doc text:
 Up/Down, PageUp/PageDown, Home/End move the highlight, Enter runs the
 highlighted target, and Esc leaves without running anything. Typing
 searches: the list narrows to the targets whose name or description
@@ -338,9 +341,10 @@ Smoke-tests every target in `tip help`, so a target that broke stays
 broken for one run rather than until someone happens to use it. Read-only
 and idempotent targets run directly; a target that bakes `--fix`/`--write`
 into its recipe runs in a disposable git worktree, so this working tree is
-never touched. `tools-upgrade`, `python-upgrade`, `serve`, and `local`
-never run at all, being network or environment mutations or a server that
-blocks forever. Logs land in `build/target_test_logs/`. Each passing
+never touched. A list of targets never runs (`EXCLUDED` in the script,
+each with its reason): the upgrades, the servers, the publishing and GUI
+targets, the ones that need a `CH=` selector, and the token-spending AI
+passes. Logs land in `build/target_test_logs/`. Each passing
 target's time is recorded for the help listing, and the run ends by
 rewriting `tools/data/target_tiers.txt`, the committed tier per target
 that the listing falls back on for a target this machine has not run.
@@ -366,8 +370,8 @@ uv run python -m tools.target_times   # what the listing knows, per target
 
 ## check_chapter.py
 
-The full gate spends most of its time executing every listing in all 44
-chapters, almost none of which is about the chapter you just edited. This
+The full gate spends most of its time executing every listing in the
+book, almost none of which is about the chapter you just edited. This
 runs the same code-example checks scoped to one:
 
 ```
@@ -385,13 +389,13 @@ Both write to `build/`, which is gitignored, so neither can enter a commit
 or dirty a diff.
 
 **`gate_stamp.py` (`tip gate-status`)** records a pass of the gate along
-with a hash of every `Chapters/` and `Solutions/` file, so it answers the
-question that matters after an editing session, which is not "when did the
-gate run" but "has anything changed since it did":
+with a hash of every Markdown file in `Chapters/` and `Solutions/`, so it
+answers the question that matters after an editing session, which is not
+"when did the gate run" but "has anything changed since it did":
 
 ```
 gate passed 12 minutes ago (2026-07-25 14:03), at commit d6b9ad6
-3 files changed since: 22_Patterns--Iterators.md, 23_Patterns--Singleton.md, ...
+3 file(s) changed since: Chapters/22_Patterns--Iterators.md, Chapters/23_Patterns--Singleton.md, ...
 ```
 
 **`tool_stamp.py` (`tip tools-status`)** records when `tip tools-upgrade`
@@ -463,25 +467,32 @@ tip doctor
 
 Updates the project's tools to their latest versions. `uv self update`
 updates uv itself (a no-op with its own message if uv was installed via
-pipx, Homebrew, or winget rather than its standalone installer). `uv lock
+pipx, Homebrew, or winget rather than its standalone installer). `uv tool
+upgrade ty` upgrades the globally installed `ty`, the copy bare `ty` on PATH
+resolves to; it is best-effort, since not every machine installed `ty` that
+way. `uv lock
 --upgrade` then `uv sync` upgrade every uv-managed dev tool (`ty`, `ruff`,
 `pytest`, `codespell`, ...) to the latest version `pyproject.toml` allows,
-rewriting `uv.lock`; review `git diff uv.lock` before committing. `pandoc`
-and `vale` are standalone binaries uv does not manage, so this is
+rewriting `uv.lock`; review `git diff uv.lock` before committing. `pandoc`,
+`typst`, and `vale` are standalone binaries uv does not manage, so this is
 best-effort: it tries winget (Windows) or Homebrew, whichever is on PATH,
 and falls back to printing the install link if neither works. `git` is
 left alone, the one tool `check_tools.py` treats as assumed. For the pinned Python
 version itself, use `upgrade_python.py` below instead.
 
+The `tip tools-upgrade` task then runs `tools-check-full`, writes the
+upgrade stamp (see `tool_stamp.py` above), lists the prose pins that name
+an older `ty` version, and ends with `tip sweep`.
+
 ```
-tip tools-upgrade   # update uv, ty/ruff/pytest/..., and (best-effort) pandoc/vale
+tip tools-upgrade   # update uv, global ty, ty/ruff/pytest/..., (best-effort) pandoc/typst/vale, then sweep
 ```
 
 ## upgrade_python.py
 
 Upgrades the pinned development Python and resyncs the environment. With no
 argument, `tip python-upgrade` fetches the latest patch of the minor pinned
-in `.python-version` (e.g. the newest 3.14.x). With `TO=3.15`, it first
+in `.python-version` (e.g. the newest 3.15.x). With `TO=3.16`, it first
 repins: rewrites `.python-version` and the `requires-python` floor in
 `pyproject.toml`, then syncs. Either way it finishes by running `tip
 verify`. It runs through `uv run --no-project` so the orchestrating
@@ -489,7 +500,7 @@ interpreter is never the venv that `uv sync` is about to rebuild.
 
 ```
 tip python-upgrade           # latest patch of the pinned minor, then verify
-tip python-upgrade TO=3.15   # repin to a new minor, then verify
+tip python-upgrade TO=3.16   # repin to a new minor, then verify
 ```
 
 ## extract_examples.py
@@ -505,13 +516,15 @@ It exits non-zero on any of these, so CI catches prose/code drift. Pass
 
 Check mode also looks the other way, at *strays*: a file under `Examples/`
 that no current block generates, typically left by a rename or deletion.
-A stray whose bare filename appears nowhere in `Chapters/*.md` is
+A stray whose bare filename appears nowhere in the chapter that generates
+its directory (the whole of `Chapters/` for a directory with no chapter
+behind it, such as `utils/`) is
 *orphaned* and fails the check; one still mentioned there (a hand-written
 helper) is *referenced* and only reported, since deleting it needs a human.
 
 ```
 tip sync    # write Examples/ and the .py files in Solutions/ from the Markdown
-tip check   # verify the Markdown matches both committed trees
+tip check   # verify the Markdown matches Examples/, Solutions/, rust/, and effects/
 tip prune   # delete the orphaned strays check flags, in both trees (never Markdown)
 ```
 
@@ -535,11 +548,11 @@ This tool only ever touches the specific files a book block names
 does not build or run anything, that needs a Rust toolchain and is never
 done by the main build; see `rust/README.md` and the `rust-*` tasks
 (`tip rust-all`, crate list in `CRATES` in `tools/tasks.py`), the only
-tasks that enter `rust/` or need a Rust toolchain.
+tasks that build or run anything in `rust/` or need a Rust toolchain.
 
 ```
-python -m tools.extract_rust            # check vs rust/
-python -m tools.extract_rust --write     # update rust/
+uv run python -m tools.extract_rust            # check vs rust/
+uv run python -m tools.extract_rust --write     # update rust/
 ```
 
 ## extract_effects.py
@@ -557,8 +570,8 @@ touches the project files beside the programs (`package.json`,
 `tsconfig.json`, `project.scala`, `expected.txt`).
 
 ```
-python -m tools.extract_effects            # check vs effects/
-python -m tools.extract_effects --write    # update effects/
+uv run python -m tools.extract_effects            # check vs effects/
+uv run python -m tools.extract_effects --write    # update effects/
 ```
 
 ## effects_run.py
@@ -571,12 +584,12 @@ skip in the final table, never a failure, unless `--require` (CI's
 `npm ci` in `effects/ts`, both into gitignored paths. On Windows it
 finds MSVC through `vswhere` for Koka's C step. `effects/README.md` has
 the per-toolchain setup; the `effects-*` tasks (`tip effects-all`) are
-the only tasks that enter `effects/`.
+the only tasks that build or run anything in `effects/`.
 
 ```
-python -m tools.effects_run                 # what is installed
-python -m tools.effects_run --only flix,ts  # a subset
-python -m tools.effects_run --fetch         # flix.jar and node_modules
+uv run python -m tools.effects_run                 # what is installed
+uv run python -m tools.effects_run --only flix,ts  # a subset
+uv run python -m tools.effects_run --fetch         # flix.jar and node_modules
 ```
 
 ## run_examples.py
@@ -586,10 +599,10 @@ examples' relative data paths resolve. Reports passed / skipped / timed-out /
 failed and exits non-zero if anything fails or times out.
 
 `test_*.py` and `conftest.py` are skipped here: they are pytest files, run by
-`tip test` (`uv run pytest build/examples`), not as standalone scripts. See
-the Testing chapter.
+`tip test` (`uv run pytest` over `build/examples` and `build/solutions`), not
+as standalone scripts. See the Testing chapter.
 
-* Narrow the run: `python -m tools.run_examples 31_Patterns--State_Machines`
+* Narrow the run: `uv run python -m tools.run_examples 31_Patterns--State_Machines`
 * Adjust the kill timeout: `--timeout 20` (default 60s)
 * Parallelism: runs on all cores by default (`-j auto`); each example is its
   own subprocess, so this is safe. Use `-j 1` for serial, or `-j N` for a fixed
@@ -605,7 +618,7 @@ and streams its output:
 ```
 tip deque_timing
 tip run-one deque_timing
-python -m tools.run_one_example Examples/03_Foundations--Containers/deque_timing.py
+uv run python -m tools.run_one_example Examples/03_Foundations--Containers/deque_timing.py
 ```
 
 The argument is a path, a file name (`.py` optional), or pieces of the
@@ -622,9 +635,9 @@ always, and a bare word or path when it names a listing exactly, so a
 mistyped task still gets tip's "no task named" message. Every word after the
 name goes to the program.
 
-It supplies the same two things `run_one()` above does, the example's own
-directory as the working directory and the tree's `utils/` on `PYTHONPATH`,
-and prints the equivalent `cd` and `PYTHONPATH` commands before running. That
+It supplies the same two things `run_examples.py` does for every example,
+the example's own directory as the working directory and the tree's `utils/`
+on `PYTHONPATH`, and prints the equivalent `cd` and `PYTHONPATH` commands before running. That
 banner is the point: `ModuleNotFoundError: No module named 'benchmark'` is
 what a reader gets running an example from the repo root, and the fix should
 be visible rather than buried in a wrapper.
@@ -649,12 +662,14 @@ red on every one of them would have gated nothing.
 modes use it:
 
 ```
-python -m tools.run_examples --baseline        # fail only on NEW breakage
-python -m tools.run_examples --write-baseline   # regenerate the baseline
+uv run python -m tools.run_examples --baseline        # fail only on NEW breakage
+uv run python -m tools.run_examples --write-baseline   # regenerate the baseline
 ```
 
-The book is now fully modernized, so the baseline is **empty** and CI runs a
-strict pass: every example must run. The `--baseline` mechanism remains for
+The book is now fully modernized, so the baseline is **empty** and every run
+is a strict pass: every example must run. CI by default only builds and
+publishes the site; it runs the examples only when you request the gates
+(see "Continuous integration" below). The `--baseline` mechanism remains for
 future bulk work (e.g. importing a batch of new, not-yet-fixed examples): record
 them with `--write-baseline`, gate only regressions with `--baseline`, then trim
 entries as you repair them.
@@ -679,7 +694,7 @@ not-yet-filled-in placeholder and is always filled, even without `--update`.
 
 ```
 tip output-check   # verify markers, no rewrite
-tip output         # rewrite stale markers in Chapters/
+tip output         # rewrite stale markers in Chapters/ and Solutions/, changed chapters only
 ```
 
 The gate runs `--update`, so a stale marker self-heals rather than failing
@@ -705,9 +720,9 @@ When pointed at `Solutions/`, `--tree` must be **absolute**; see
 ## extract_solutions.py
 
 The exact counterpart of `extract_examples.py`, pointed at `Solutions/`
-instead of `Chapters/`; it imports and reuses that module's `extract()`,
-`check_against()`, `write_tree()`, and `is_derived()` rather than duplicating
-them. `Solutions/` is the committed tree (like `Examples/`): each
+instead of `Chapters/`; it imports and reuses that module's `extract()` and
+`is_derived()`, and `tools/extract.py`'s `check_against()` and `write_tree()`,
+rather than duplicating them. `Solutions/` is the committed tree (like `Examples/`): each
 `Solutions/<chapter>/` holds the authored `README.md` beside the `.py`
 files extracted from it. `build/solutions/` is the throwaway tree used for running (like
 `build/examples/`). Same two modes: check (default, compares against
@@ -728,13 +743,16 @@ and the chapter's own copy lives under `Examples/`.
 The `tip` targets that cover `Examples/` cover this tree in the same
 run: `sync`, `check`, `prune`, `extract`, `output`, `output-check`,
 `ty`, `lint`, `run`, and `test` each take both trees (until 2026-09-24
-each had a `solutions-*` twin). Two targets are Solutions-only:
+each had a `solutions-*` twin). These targets are Solutions-only:
 
 ```
 tip solutions-numbering      # every exercise has a solution (below)
 tip fix-solutions-links      # insert or correct the chapter's Solutions link
 tip statements               # copy each exercise under its solution heading
 tip statements-check         # report a statement that differs from its chapter
+tip steps                    # fold each hinted solution into steps (below)
+tip steps-check              # report steps that differ from what `tip steps` writes
+tip hint CH=30 N=3           # reveal the next step of one solution
 tip solutions-gate           # numbering, drift, output, ty, ruff, run, pytest
 ```
 
@@ -775,8 +793,7 @@ tip solutions-numbering ARGS=19    # only chapter 19
 ```
 
 Two conventions it knows about. A chapter whose Exercises section holds only
-prose (chapter 1 describes the convention rather than setting any) has no
-exercises and needs no `Solutions/` file. And one heading may answer several
+prose has no exercises and needs no `Solutions/` file. And one heading may answer several
 exercises at once, written `## 1 & 2. ...`, `## 1, 2. ...`, or `## 1-3. ...`,
 which is the right form when two exercises share one worked answer; a heading
 with no leading number at all (`## Shared code: the microgrid`) is a preamble
@@ -806,9 +823,10 @@ a link that names another folder, which a chapter rename leaves behind. It holds
 the link target only, so the author may reword the sentence. `tip
 fix-solutions-links` inserts the default sentence where the link is missing and
 corrects a stale target, keeping the wording; it is not part of `verify`, since
-no tool rewrites `Chapters/` prose on its own. The builders rewrite the link to
-the GitHub URL in `build_site.load_chapter()`, because the site, EPUB, and PDF
-carry no Solutions pages.
+no tool rewrites `Chapters/` prose on its own. The builders rewrite the link in
+`build_site.link_solutions()`, which `load_chapter()` calls: on the site it
+points at the chapter's `<stem>.solutions.html`, and in the EPUB and PDF,
+which carry no Solutions pages, at the GitHub URL.
 
 `heading_links.py` covers the other half. The gate now runs its `anchors`
 check over `Solutions/` as well (see `GATE_DOCS` in `tools/tasks.py`), which
@@ -938,7 +956,8 @@ matched against `Chapters/`: a number or stem prefix (`02`,
 
 ## rewrite.py
 
-Runs the AI editing passes over one chapter's prose, in place. Each pass is
+Runs the AI editing passes over one chapter's prose, in place, or over
+several chapters in parallel (`CH="25 28"`, `CH=30-40`). Each pass is
 one headless `claude -p "/<skill> <chapter>"` run of a skill (from
 `.claude/skills/` or an installed plugin) with `--permission-mode
 acceptEdits`, scoped by an appended system note to the chapter's prose
@@ -949,7 +968,7 @@ touched a listing or broke a link fails right there. The chain stops at the
 first failure.
 
 ```
-tip rewrite CH=25                        # default passes (elements-of-style, bruce-edit-apply)
+tip rewrite CH=25                        # the seven default passes (ARGS=--list shows them)
 tip rewrite CH=25 ARGS=--list            # show the passes, run nothing
 tip rewrite CH=25 ARGS=--dry-run         # print the commands only
 tip rewrite CH=25 ARGS="--passes activate"
@@ -970,7 +989,8 @@ excludes it. Review `git diff` before committing what it did.
 
 ## Spelling and prose style
 
-Several layers, all optional and not part of the default CI gate.
+Several layers, all optional and not part of the default CI gate. The local
+gate runs one of them, prose_lint.
 
 **Spelling: codespell (`tip spell`).** A uv-managed dev tool, so it runs through
 `uv run`. It prints one line per suspected misspelling and exits non-zero if it
@@ -1011,20 +1031,23 @@ cannot tell a real term from a typo, so always review
 **Mechanical prose: prose_lint (`tip spell`).** `tools/prose_lint.py` runs
 alongside codespell and catches small mechanical slips a spell checker ignores:
 more than one space between words, a space before `.`/`,`/`;`/`!`/`?`, more than
-one blank line in a row, a period or comma left outside a closing quote, and
-trailing whitespace (a two-space hard break is allowed). It shares the
+one blank line in a row, a period or comma left outside a closing quote,
+trailing whitespace (a two-space hard break is allowed), "fix" meaning "set"
+(`SET-FIX`), and a "raises" with no object (`BARE-RAISE`). It shares the
 `tools/prose.py` classifier with `reflow_prose.py`, so fenced and indented code,
 tables, blockquotes, and HTML are skipped, and inline code spans and footnotes
 are ignored inside a prose line; headings and list-item text are checked but
-their markers are not. It is report-only and exits non-zero on any finding. Run
-it directly with `uv run python -m tools.prose_lint Markdown` (or a single file).
+their markers are not. It exits non-zero on any finding, and it runs in the
+gate (`prose-lint` in `GATE_CHECKS`). Run
+it directly with `uv run python -m tools.prose_lint Chapters` (or a single file).
 
 The quote check reads a quoted *literal* differently from quoted prose. The book
 puts the mark inside a quoted phrase (`"easier to ask forgiveness than
 permission,"`) but outside a literal, where moving it in would put a comma into
 a `pytest -k` substring or a period into an error message the reader matches
-against. A quote holding an inline code span, and a single-token quote such as
-`"overdraft"`, are therefore skipped. A multi-word literal fits neither shape,
+against. A quote holding an inline code span, and a single-token quote whose
+token also appears in a code span on the same line (`"overdraft"` beside
+`pytest -k overdraft`), are therefore skipped. A multi-word literal fits neither shape,
 so write that one as an inline code span rather than as a quotation.
 
 **House style: Vale (`tip prose`).** Vale is a standalone binary, not a Python
@@ -1032,22 +1055,37 @@ package, so install it once (`winget install errata-ai.Vale`,
 `brew install vale`, or see <https://vale.sh/docs/install>). Vale parses Markdown
 and checks only text, never code spans or fenced code, so the rules never fire on
 identifiers or examples. Spelling is left to codespell; Vale enforces house style
-only. The rules live in `styles/House/` and are wired up by `.vale.ini`:
+only. The nine rules live in `styles/House/` and are wired up by `.vale.ini`:
 
 * `EmDash` (error): no `—`, `–`, or `--` used as a dash.
 * `Filler` (warning): throat-clearing phrases ("this is the whole idea", and so on).
+* `InOrderTo` (warning): "in order to" where a bare "to" says the same.
+* `NoChain` (warning): a "no X, no Y, no Z" chain of three or more.
+* `Nominalization` (suggestion): an action hiding in a noun ("performs a lookup").
+* `UsedTo` (warning): a past-habitual "used to" in place of a dated earlier state.
+* `WeakVerb` (warning): a weak-verb frame ("is used to preserve").
+* `Weasel` (warning): the words that are vague in this book.
+* `WholePoint` (warning): an "is the whole/entire X" closer.
 
-The community packages for passive-voice and usage checks are listed in
+The community packages for usage checks are listed in
 `.vale.ini` (`Packages = write-good, proselint`); `tip prose` runs `vale
 sync` to download them into the gitignored `styles/` the first time, when
-that directory has no `write-good`.
+that directory has no `write-good`. write-good's `Passive` rule is off in
+`.vale.ini`; `tip passive` replaces it.
+
+After Vale, `tip prose` runs twelve report-only scans, each with a
+baseline of judged keeps: stranded prepositions, stranded possessives,
+watch words, positional references, italics, trailing tags, subject gaps,
+sentence shapes, passive voice, past tense, expletives, and internal names.
+The root `CLAUDE.md` describes each one.
 
 ## check_all.py
 
 The checks below each have their own script and their own `tip` target,
 which is what you want when one thing is broken and you are iterating on
 it. Running them one at a time means an interpreter startup and a fresh
-parse of all 45 chapters per tool, and N summaries instead of one answer to
+parse of all 49 chapter files (47 chapters and two appendices) per tool,
+and N summaries instead of one answer to
 the question "is the book clean?"
 
 This runs them together: every file is parsed once into a `Document` and
@@ -1069,9 +1107,9 @@ the default run, and as a selectable name.
 
 `gate` runs the selection named by `GATE_CHECKS` in `tools/tasks.py`, which is
 now the whole registry: `prose-lint` was the last holdout and joined once
-its findings were cleared. `tip checks` runs the same registry plus the
-Vale prose lint, which the gate leaves out because Vale is a standalone
-binary rather than a uv-managed one.
+its findings were cleared. `tip checks` runs the same registry. The
+Vale prose lint is `tip prose`, which the gate leaves out because
+Vale is a standalone binary rather than a uv-managed one.
 
 ## check_line_endings.py
 
@@ -1081,8 +1119,9 @@ guards the **working tree**: on Windows an editor can write CRLF into a source
 file, which is harmless to git but produces noisy warnings and inconsistent
 local files. `tip eol` reads `git ls-files --eol` (so it honors the binary
 markers in `.gitattributes`) and fails if any tracked text file has CRLF or
-mixed endings. It is part of the `tip ci` gate. There is no auto-convert in the
-build; run the fixer explicitly when the check flags something:
+mixed endings. It is part of the `tip ci` gate. The gate converts nothing,
+but `tip verify` runs `fix-eol` before it; elsewhere, run the fixer
+explicitly when the check flags something:
 
 ```
 tip eol       # check, exit 1 on CRLF (part of `tip ci`)
@@ -1098,7 +1137,8 @@ line between import groups. Ruff's isort config (`no-lines-before`,
 blank-line counts between defs at all. This tool closes both gaps by checking
 the Markdown directly. It is string-aware, so blank lines inside triple-quoted
 strings are never touched, and it only looks at ```python blocks. It is part of
-the `tip ci` gate; like line endings, there is no auto-fix in the build:
+the `tip ci` gate. Like line endings, the gate fixes nothing, but `tip verify`
+runs `fix-listings` before it:
 
 ```
 tip listings       # check, exit 1 on extra blank lines (part of `tip ci`)
@@ -1211,7 +1251,8 @@ tip anchors    # check (part of `tip ci`)
 To make an anchor stable against rewording, give the target heading an explicit
 id: `## Heading {#stable-id}`, then link `(chapter.md#stable-id)`.
 
-The gate checks `Chapters/` and this README (`GATE_DOCS` in `tools/tasks.py`).
+The gate checks `Chapters/`, `Solutions/`, and this README (`GATE_DOCS` in
+`tools/tasks.py`).
 Two links in here were dead for a while precisely because nothing looked
 outside `Chapters/`. Only the anchors check runs over this file: `banned`
 would fire on the worked example in
@@ -1341,8 +1382,8 @@ own chapter unless the reference is tied to a chapter link: "exercise
 4 of [Generators](...)", "[Generators](...)'s exercise 4", or "its
 exercise 9" after a link earlier in the paragraph. Two findings are
 errors that no baseline accepts: a number the target's Solutions file
-lacks, and an exercise of "the previous chapter", which a chapter
-split retargets silently. Entries are keyed by chapter name, so a
+lacks, and an exercise of "the previous chapter" or "the next
+chapter", which a chapter split retargets silently. Entries are keyed by chapter name, so a
 renumbering leaves the baseline alone and a chapter rename does not.
 "The last three exercises" and an exercise described without a
 number are invisible to it.
@@ -1364,12 +1405,13 @@ the Markdown. A marker is an HTML comment, so pandoc strips it from the
 rendered site while it stays greppable in the source:
 
 ```
-<!-- TODO(py315-deps): NumPy has no Python 3.15 wheel yet. Once it
-does, convert this indented block to a real, fenced, tested example. -->
+<!-- TODO(free-threaded-default): if free threading ever becomes
+CPython's default build, convert this indented block to a real, fenced,
+tested example. -->
 ```
 
 The tag groups related markers that share one underlying blocker, and
-doubles as a plain `grep -rn "TODO(py315-deps)" Chapters/` when you care
+doubles as a plain `grep -rn "TODO(free-threaded-default)" Chapters/` when you care
 about only one of them. It always exits 0, being informational.
 
 ## build_site.py
@@ -1380,14 +1422,16 @@ contents list, a sidebar, previous/next links, and syntax-highlighting CSS.
 
 The book's **Part dividers are generated here, not written in the Markdown.**
 The `PARTS` map names Part I (Foundations, before chapter `02`), Part II
-(Techniques, before `09`), and Part III (Patterns, before `17`); the builder
+(Techniques, before `11`), Part III (Patterns, before `20`), Part IV
+(Functional, before `40`), Part V (Effects, before `44`), and the
+Appendices (before `A`); the builder
 emits each heading in the table of contents before its starting chapter, with
 the Introduction standing alone above Part I. So a chapter file with no "Part"
 heading is correct: to move or rename a Part, edit `PARTS`, not the chapters.
 
 Book images are referenced in the Markdown as `_images/<name>` with no
 extension. The builder resolves each to the real file in `resources/images`
-(`decorator` to `decorator.gif`), copies the referenced ones into
+(`decorator_pattern` to `decorator_pattern.svg`), copies the referenced ones into
 `build/site/images/`, and warns about any reference with no matching file.
 
 Cross-references between chapters use standard relative Markdown links to the
@@ -1397,7 +1441,7 @@ These render correctly on GitHub; the builder rewrites intra-book `.md` links to
 `.html` so they also resolve in the site. External links (which carry a scheme)
 are left alone.
 
-Requires `pandoc` on PATH. Run `python -m tools.build_site` (or `tip site`);
+Requires `pandoc` on PATH. Run `uv run python -m tools.build_site` (or `tip site`);
 use `-o DIR` to build elsewhere. `tip serve` serves the
 existing `build/site/` at <http://localhost:8000>, watching for edits and
 copying selections; `tip local` builds the site first and also opens a
@@ -1412,8 +1456,9 @@ point at it; the EPUB and PDF keep the GitHub URL, since they carry no
 Solutions pages.
 
 `rebuild_chapter()` is the incremental entry point `serve.py --watch` uses:
-it re-renders one chapter (a single pandoc run, against the ~46 of a full
-build) plus the index page and the search index, both of which a changed
+it re-renders one chapter and its Solutions page (two pandoc runs, against
+the ~95 of a full build: 49 chapter pages, about 45 Solutions pages, and the
+book index) plus the index page and the search index, both of which a changed
 heading affects and neither of which needs pandoc. It returns `False` for a
 path that is not a book chapter, or when `build/site/` does not exist yet,
 leaving the caller to do a full build.
@@ -1438,8 +1483,8 @@ Chapter discovery, titles, the Part dividers, and the image map all come from
 from it. What differs is linking. The site keeps one HTML page per chapter, so
 a cross-reference stays a link between files and the builder only rewrites
 `.md` to `.html`. An EPUB is a single document, and merging the chapters makes
-the book's anchors ambiguous: 44 chapters end in `## Exercises`, and
-`#immutability`, `#generators`, `#lambdas` and six other anchors each appear in
+the book's anchors ambiguous: 45 chapters end in `## Exercises`, and
+`#immutability` and six other anchors each appear in
 two to four chapters. Pandoc's own de-duplication numbers repeats in document
 order, so `[Immutability](12_Techniques--Data_Classes_as_Types.md#immutability)` would
 quietly open chapter 3.
@@ -1452,7 +1497,7 @@ link is rewritten to match:
 | `## Immutability` | `## Immutability {#ch12-immutability}` |
 | `[x](12_Techniques--Data_Classes_as_Types.md#immutability)` | `[x](#ch12-immutability)` |
 | `[x](#immutability)` (same chapter) | `[x](#ch12-immutability)` |
-| `[x](23_Patterns--Singleton.md)` | `[x](#ch24)` |
+| `[x](23_Patterns--Singleton.md)` | `[x](#ch23)` |
 
 The `ch` prefix is not decoration: an EPUB is XHTML, where an id may not start
 with a digit. The old ids come from `heading_links.pandoc_anchor()`, the
@@ -1461,9 +1506,7 @@ link this build resolves; its per-file de-duplication is mirrored too, so a
 chapter with two identical headings keeps pandoc's `-1` suffix inside its own
 namespace. A link naming a chapter's *own* title heading is aliased to the
 chapter's root id, since `load_chapter()` lifts that heading out into the
-title. Anything that still resolves to nothing is reported and left unlinked,
-which is a stricter check than the gate's: `heading_links.py` skips an anchor
-containing a period, and chapter 13 has one.
+title. Anything that still resolves to nothing is reported and left unlinked.
 
 `--release VERSION` (what `tip release` passes) stamps the title page
 with the release number and today's date via `release_line()`
@@ -1540,7 +1583,8 @@ mouse and taps from its screen. The caption is sticky, which keeps
 
 `tip preview-check` (`tools/site_preview_check.js`) builds the site
 and then uses the previews under jsdom: it hovers every link on every
-page, taps the first link of each kind on each page, and fails on a
+page (of a page's listing line-number anchors, the first
+`CODE_LINES_PER_PAGE`), taps the first link of each kind on each page, and fails on a
 link into the book with no panel, a navigation link with one, or a
 panel with an id, a back-link, or a stray `#place` link in it. It
 needs node, which no gate does, and its first run installs jsdom
@@ -1579,9 +1623,10 @@ green, in the cover art's palette, linked from every site page
 (picked from candidate galleries for staying legible at 16 px on
 both light and dark browser chrome). And `chapter-ornament.{svg,png}`:
 a band of diamond scales that sits under every chapter title, the SVG
-on the site (template.html) and the PNG in the PDF and EPUBs
+on the site (template.html) and the PNG in the EPUBs
 (injected by build_epub.py's shared assembly, which also places the
-cover art on each Part divider page). And `chapter-snake.png`: the
+cover art on each Part divider page). The PDF draws its own band in
+typst (`build_pdf.py` passes the assembly `ornament=False`). And `chapter-snake.png`: the
 line-drawn serpent from `resources/chapter-snake-source.png`, 320 px
 wide, which template.html sets to the left of each chapter title on
 the site (and above it on a narrow screen). `snake_from_drawing()`
@@ -1591,8 +1636,8 @@ out and the drawing's anti-aliased edges survive, and the image is
 cropped to what remains; `--snake` writes it alone. It replaced a
 cutout of the cover art's serpent on 2026-09-30, which read too dark
 beside a title. The EPUBs set it on its own line under each
-chapter title, above the ornament, and the PDF under the ornament
-band that underlines the title. The index page does
+chapter title, above the ornament, and the PDF under the typst
+ornament band that underlines the title. The index page does
 not use it. `--preview` writes a small `cover-preview.png` for quick
 iteration.
 
@@ -1610,7 +1655,7 @@ namespaced anchors and rewritten links applies here unchanged. The one
 difference is `hang_code=False`: the EPUB rewrites listings into raw-HTML
 `<pre>` blocks for its hanging indent, and pandoc's typst writer drops raw
 HTML, so the PDF keeps listings as fenced blocks. Nothing needs the hang
-there anyway: ruff caps listing lines at 70 characters, which fits the
+there anyway: ruff caps listing lines at 60 characters, which fits the
 page, and typst highlights fenced Python itself. Typst also renders the
 SVG diagrams directly, so the EPUB's PNG rasterization step has no PDF
 counterpart. Page breaks before each Part and chapter and the table of
@@ -1655,8 +1700,9 @@ Tests live in `tools/tests/test_book_index.py`.
 
 ## release.py
 
-Publishes a GitHub release whose uploaded assets are exactly the fresh
-PDF and the two EPUB variants (`-color` and `-eink`). Run
+Publishes a GitHub release whose uploaded assets are the fresh
+PDF, the two EPUB variants (`-color` and `-eink`), and the reader guides
+in `GUIDES`, shipped as-is from `resources/`. Run
 `tip release VERSION=1.0`; the tag is the version
 with a `v` prefix (`v1.0`), created on origin at the branch tip. Needs
 `git` and an authenticated `gh` (`gh auth login`).
@@ -1675,7 +1721,9 @@ create`. All are built with the `--release` stamp, so their title
 pages tell the reader which release they hold and when it was made
 ("Release 1.0 · August 23, 2026"); an ad-hoc `tip pdf`/`tip epub`
 carries no stamp, so a casual build never masquerades as a numbered
-release. Deleting a bad release stays a manual act:
+release. A final prune step deletes every release older than the newest
+two (the git tags stay), and `tip release-prune` runs that step alone.
+Deleting a bad release stays a manual act:
 `gh release delete v1.0 --cleanup-tag`.
 
 Deliberately excluded from `verify_targets.py`'s smoke test, alongside
@@ -1691,7 +1739,8 @@ the reader, fetched lazily the first time someone opens the search box.
 A record is one *section*: the text under a single `##` or `###` heading,
 plus the chapter's opening text, which sits under no heading and links to
 the page itself. Each carries the page, anchor, chapter title, and section
-heading needed to deep-link to it. Anchors come from
+heading needed to deep-link to it. Solutions pages are sources too, with
+one record per exercise. Anchors come from
 `heading_links.pandoc_anchor()`, the same function the gate checks links
 with, so a link the gate accepts and a link a search result produces
 resolve to the same heading.
@@ -1705,7 +1754,8 @@ Serves `build/site/` over HTTP for local preview. `tip serve` runs it with
 first if `build/site/` is missing.
 
 `--watch` turns it into an edit loop. A daemon thread compares modification
-times every second across `Chapters/*.md` and the few files the whole site
+times every second across `Chapters/*.md`, `Solutions/*/README.md`, the
+figures in `resources/images/`, and the few files the whole site
 renders from (`template.html`, the static assets). A changed chapter goes
 through `build_site.rebuild_chapter()`, roughly 0.3s here; a changed template
 or asset rebuilds every page, roughly 5s. A change to the build code itself
@@ -1716,7 +1766,7 @@ polls `/__reload` for a token the watcher bumps after each rebuild, so the
 open page refreshes on its own. A rebuild holds a lock the request handler
 also takes, so no request can read `build/site/` while a full build is
 deleting and rewriting it. Polling beats a filesystem-watch library here
-because it needs no new dependency, and 50-odd `stat()` calls a second cost
+because it needs no new dependency, and about 130 `stat()` calls a second cost
 nothing.
 
 ### Publishing to GitHub Pages
@@ -1738,10 +1788,12 @@ machine before you push (and Actions can be slow), so **the default CI path only
 builds and publishes the site**. The workflow has these jobs:
 
 * **`site` (always runs):** installs uv (`astral-sh/setup-uv`, Python 3.15,
-  cached) and pandoc, runs `uv sync --locked`, and builds the static site. On a
+  cached) and pandoc, runs `uv sync --locked`, builds the static site, and
+  tests its link previews (`site_preview_check.js`, as `tip preview-check`
+  does locally). On a
   push to `master` it hands the site to the `deploy` job, which publishes it to
   GitHub Pages. Pull requests build the site but do not deploy.
-* **`gates` (opt-in only):** the full suite, the same one `tip ci` runs
+* **`gates` (opt-in only):** a subset of what `tip ci` runs
   locally: the drift check (`extract_examples.py`), the example run
   (`run_examples.py`, all must pass), the pytest examples
   (`pytest build/examples`), the type check (`ty check build/examples`,
@@ -1749,14 +1801,21 @@ builds and publishes the site**. The workflow has these jobs:
   findings), followed by the same five checks for `Solutions/`
   (`extract_solutions.py`, `validate_output.py --tree build/solutions`,
   `ty check build/solutions`, `ruff check build/solutions`, and
-  `pytest build/solutions`). Deliberate lint exceptions live in
+  `pytest build/solutions`). It does not validate the `#:` markers in
+  `Chapters/`. Deliberate lint exceptions live in
   `[tool.ruff.lint.per-file-ignores]` in `pyproject.toml`.
-* **`prose` (opt-in only):** the same checks as `tip spell` and `tip prose`.
+* **`prose` (opt-in only):** codespell and Vale over `Chapters` only, the
+  CI-safe part of `tip spell` and `tip prose`.
   codespell spell-checks `Chapters/` (config in `[tool.codespell]`, ignore list
   in `tools/data/codespell-ignore.txt`) and fails on a spelling error. It then
   installs the Vale binary and runs the house-style rules in `styles/House/`;
   Vale fails the job on an em-dash (error level) and prints the filler
   findings as warnings. Shares the gates trigger.
+* **`effects` (opt-in only, on its own switch):** builds and runs chapter
+  44's Koka, Flix, Scala (ZIO), and TypeScript (Effect) programs with
+  `tip effects-test REQUIRE=1`, after installing the four toolchains. It runs
+  when the `run_effects` input is `true` on a manual run, or when a push's
+  commit message holds `[effects-ci]`.
 
 `deploy` depends only on `site`, not on `gates` or `prose`, so publishing is
 never blocked by the opt-in checks. The trade-off is that a push can publish even if an example
