@@ -911,7 +911,7 @@ def run_all(v: Vars) -> None:
 def by_hand(v: Vars) -> None:
     """Start every example listed under `# [by-hand]` in tools/data/norun.txt,
     all at once, each from its own chapter directory with utils/ on PYTHONPATH.
-    Today that is the five Tkinter views, which no gate executes. Try each
+    Today that is the four Tkinter views, which no gate executes. Try each
     window and close it; the tool prints a line as each one ends, then the
     traceback of any that exited nonzero, and exits 1 if one did. ARGS=--list
     prints what would start and opens nothing. Excluded from verify-targets'
@@ -1682,12 +1682,12 @@ def coupling_panels_png(v: Vars) -> None:
     py("tools.coupling_panels", "--png")
 
 
-@task("Fail if a pattern chapter's opening figure differs from its module "
+@task("Fail if a story figure differs from its module "
       "in tools/story_figures/ or fails a figure check; "
       "`tip fix-story-figures` regenerates")
 def story_figures(v: Vars) -> None:
-    """Each pattern chapter's opening figure tells the pattern's story and
-    is drawn by a module in tools/story_figures/ (chNN_<pattern>.py); this
+    """Each pattern chapter's story figure, and several body figures, is
+    drawn by a module in tools/story_figures/ (chNN_<name>.py); this
     fails when a committed SVG differs from what its module draws, or when
     a figure fails one of `tip figures`' per-figure checks. ARGS=--only NN
     limits it to one chapter, and ARGS="--png DIR" rasterizes to look.
@@ -1696,7 +1696,7 @@ def story_figures(v: Vars) -> None:
     py("tools.story_figures", "--check", *v.words("ARGS"))
 
 
-@task("Regenerate the pattern chapters' opening figures from "
+@task("Regenerate the story figures from "
       "tools/story_figures/", secondary=True)
 def fix_story_figures(v: Vars) -> None:
     py("tools.story_figures", *v.words("ARGS"))
@@ -1827,7 +1827,8 @@ def self_reference_report(v: Vars) -> None:
 
 
 # The TypeSafe SDK builds pydantic-core from source on the pinned Python,
-# so it stays out of pyproject.toml and joins only these two runs.
+# so it stays out of pyproject.toml and joins only the runs that ask
+# TypeSafe: grounding-triage, link-support, and edit-patterns.
 TYPESAFE = ("uv", "run", "--with", "typesafe-sdk", "python", "-m")
 
 

@@ -44,7 +44,7 @@ VARIANTS = ("eink", "color")
 # the built file stale.
 INPUTS = (CHAPTERS_DIR, ROOT / "resources",
           TOOLS_DIR / "build_epub.py", TOOLS_DIR / "build_site.py",
-          TOOLS_DIR / "tools/config.py")
+          TOOLS_DIR / "config.py")
 
 WINDOWS_APP = Path(
     os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")

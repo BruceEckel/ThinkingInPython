@@ -10,7 +10,8 @@ Moved from `CLAUDE.md`.
 
 ## Diagrams: the figure labels, the caption names, the prose explains
 
-A figure is a hand-authored SVG in `resources/images/`, referenced from
+A figure is an SVG in `resources/images/`, most of them hand-authored
+and some generated (see below), referenced from
 the prose as `![caption](_images/<name>)` with no extension.
 `build_site.py` and `build_epub.py` resolve it (the EPUB rasterizes the
 SVG to PNG, so a rasterizer must be on PATH: `resvg`, `rsvg-convert`,

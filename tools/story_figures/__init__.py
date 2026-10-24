@@ -2,11 +2,11 @@
 
 Each pattern chapter's story figure came first; since 2026-09-29 the
 package also draws figures inside chapters that replaced UML or
-hand-drawn diagrams (chapter 14's decorator, 16's comprehension, 27's
+hand-drawn diagrams (chapter 14's decorator, 16's comprehension, 26's
 abstract factory, 32's double dispatch, 34's filesystem, 36's history,
 37's trash sorter, 38's maze). A chapter may have several modules.
 
-Each pattern chapter opens with a figure that tells the pattern's story:
+Each pattern chapter has a figure that tells the pattern's story:
 what happens, in what order, and who knows what. Chapter 30's Observer
 storyboard came first (2026-09-29). Bruce found it told "a much more
 accessible story" than the coupling-notation panels, and asked for the

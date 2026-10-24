@@ -19,8 +19,8 @@ coordinating conjunction (dep `advmod` or `cc`, or "then", "so", "but",
 "and", "here", "now", "also", "still"), is one of "this", "that",
 "these", "those", "it", or "they", used as a pronoun: its dep is
 `nsubj` or `nsubjpass`. "This technique" has "This" as a determiner and
-is not a hit, and the cleft "It is X that" has an `expl` and is left
-for a later rule.
+is not a hit, and the cleft "It is X that" has an `expl` and is no hit
+(`expletives.py` has no cleft rule either; see its docstring).
 
 Two labels. `[THIS]`: the opening pronoun is a demonstrative. It is
 always a hit, since a sentence-opening demonstrative pronoun gets its

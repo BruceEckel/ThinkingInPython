@@ -10,7 +10,7 @@ which listings each one owns, then reads the `## Exercises` section and maps
 every exercise back to the sections it touches. A section that no exercise
 reaches is reported.
 
-An exercise reaches a section three ways, all of them literal:
+An exercise reaches a section four ways, all of them literal:
 
 - It names a listing the section owns (`In "sketch.py", add ...`). Listings
   are the `# path/slug.py` first lines of fenced blocks, so a section owns

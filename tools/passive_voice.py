@@ -3,7 +3,7 @@
 
 The author's style guide asks for the active register: a real actor in
 the subject, the action in the verb. Vale's write-good `Passive` rule
-(run by `tip prose`) matches by word pattern, so it flags an adjective
+(off in `.vale.ini` since 2026-10-19) matches by word pattern, so it flags an adjective
 after "be" ("is unchanged"). This check reads the dependency parse that
 `tools/parsed_prose.py` caches under `build/parses/` (spaCy, run in a
 throwaway Python 3.12 environment; see that module) and is meant to

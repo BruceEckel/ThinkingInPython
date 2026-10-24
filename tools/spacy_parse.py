@@ -16,7 +16,8 @@ the paragraph), `punct` (is it punctuation), and `morph` (its
 morphology as a string, such as `Tense=Pres|VerbForm=Fin`).
 
 The rules that read the table live in the checks (`subject_gap.py`,
-`sentence_shapes.py`), so a new rule never needs a new parse.
+`sentence_shapes.py`, and the others `parsed_prose.py` serves), so a
+new rule never needs a new parse.
 """
 
 import json

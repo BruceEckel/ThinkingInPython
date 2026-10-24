@@ -2,7 +2,7 @@
 """A cached dependency parse of the book's prose, shared by the checks.
 
 Several report-only checks need a parser (`tools/subject_gap.py`,
-`tools/sentence_shapes.py`), and a whole-book parse takes about 24
+`tools/sentence_shapes.py`, and five more), and a whole-book parse takes about 24
 seconds, so they share one. `parsed()` reads each document's
 paragraphs through the same reader as `tools/stranded_prepositions.py`
 (fenced listings, headings, block quotes, tables, HTML, link and

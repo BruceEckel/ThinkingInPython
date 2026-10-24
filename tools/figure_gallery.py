@@ -33,7 +33,7 @@ the build. Text lying across a line or a shape still needs the eye.
 Under each figure is a style line: the distinct colors, stroke widths,
 dash patterns, font families and sizes, and arrowhead markers the SVG
 uses, with anything outside the cover palette or the book's monospace
-font marked. The figures are hand-authored and nothing else compares
+font marked. Most figures are hand-authored and nothing else compares
 them with each other, so this is where an odd arrowhead or a stray
 color shows.
 

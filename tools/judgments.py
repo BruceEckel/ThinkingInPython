@@ -7,7 +7,8 @@ section covers what the sentence credits it with. Both answer the kind
 of question `check_self_reference.py` and `check_claims.py` can only
 narrow, because the answer depends on reading.
 
-This module holds what the two share: a verdict store in
+This module holds what the two share, and `prose_calibration.py`
+and `edit_patterns.py` ask through it too: a verdict store in
 `tools/data/`, a key that survives reflowing, and one function that
 sends a batch of questions to TypeSafe concurrently.
 
