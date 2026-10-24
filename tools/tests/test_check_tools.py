@@ -82,3 +82,24 @@ def test_too_old_reads_the_first_numeric_word():
     assert not PANDOC.too_old("pandoc 3.11")
     assert not PANDOC.too_old("pandoc")           # nothing to judge
     assert not TYPST.too_old("typst 0.1.0")       # no minimum set
+
+
+def test_ci_pandoc_reads_the_workflow_pin(tmp_path):
+    workflow = tmp_path / "ci.yml"
+    workflow.write_text('env:\n  PANDOC_VERSION: "3.12.1"\n', encoding="utf-8")
+    assert check_tools.ci_pandoc(workflow) == "3.12.1"
+    workflow.write_text("env: {}\n", encoding="utf-8")
+    assert check_tools.ci_pandoc(workflow) is None
+    assert check_tools.ci_pandoc(tmp_path / "missing.yml") is None
+
+
+def test_the_repo_workflow_pins_a_pandoc():
+    assert check_tools.ci_pandoc() is not None
+
+
+def test_pandoc_pin_note_only_on_a_mismatch():
+    assert check_tools.pandoc_pin_note("pandoc 3.12.1", "3.12.1") is None
+    assert check_tools.pandoc_pin_note("pandoc 3.12.1", None) is None
+    note = check_tools.pandoc_pin_note("pandoc 3.13", "3.12.1")
+    assert note is not None
+    assert "pandoc 3.12.1" in note and "Set PANDOC_VERSION to 3.13" in note

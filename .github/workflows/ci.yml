@@ -45,7 +45,8 @@ permissions:
   contents: read
 
 # The pandoc every job installs. Keep it equal to the local pandoc
-# (`pandoc --version`), so the deployed site is the one tested locally.
+# (`pandoc --version`), so the deployed site is the one tested locally;
+# `tip tools-check-full` prints a note when they differ.
 env:
   PANDOC_VERSION: "3.12.1"
 

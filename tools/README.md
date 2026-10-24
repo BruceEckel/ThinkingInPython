@@ -606,6 +606,14 @@ Each tool's packages per manager are in the script's `TOOLS` list, and
 `install_hint(name)` gives a build script the same per-machine command for
 its own error message.
 
+The full tier also compares the local pandoc with `PANDOC_VERSION` in
+`.github/workflows/ci.yml`, the pandoc CI builds the deployed site
+with. CI stopped testing the link previews on 2026-10-24, so
+`tip preview-check` tests them locally, and that test covers the live
+site only while the two pandocs match. A mismatch prints a note naming
+both versions. It leaves the exit status alone, since the fix is to
+update the pin after a local pandoc upgrade, not to undo the upgrade.
+
 ```
 tip tools-check        # uv, ty, ruff, pytest (git checked, assumed)
 tip tools-check-full   # the above, plus pandoc, typst, vale, gh, pyright, a rasterizer

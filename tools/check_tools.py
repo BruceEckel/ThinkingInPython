@@ -25,17 +25,29 @@ Linux, and a download command for a tool the package manager lacks
 (typst and vale on Ubuntu, which packages neither). Exit status is 0
 only if every non-assumed tool for the requested tier is present.
 
+The full tier also compares the local pandoc with `PANDOC_VERSION` in
+`.github/workflows/ci.yml`, the pandoc CI builds the deployed site
+with. The two must match, because `tip preview-check` tests the site
+locally and CI no longer does (since 2026-10-24). A mismatch prints a
+note asking for the pin to be updated. It is a reminder, so it leaves
+the exit status alone: a pandoc upgrade on this machine is fine, as
+long as the pin follows it.
+
 Usage:
     python -m tools.check_tools         # basic tier
     python -m tools.check_tools --full  # basic + site/prose tools
 """
 import argparse
 import platform
+import re
 import shutil
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from pathlib import Path
+
+from tools.config import ROOT
 from tools.repo import run_capture
 
 # The package managers a machine can have. `winget` is Windows, `brew`
@@ -81,6 +93,12 @@ _PANDOC_DEB = (
     "curl -sL https://api.github.com/repos/jgm/pandoc/releases/latest"
     f" | grep -o 'https://[^\"]*-{_DEB_ARCH}.deb' | head -1"
     " | xargs -I{} curl -L -o /tmp/pandoc.deb {} && sudo dpkg -i /tmp/pandoc.deb")
+
+
+# The pandoc the CI workflow installs, read from its `env:` block.
+CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
+PANDOC_PIN = re.compile(r'^\s*PANDOC_VERSION:\s*"?([0-9][0-9.]*)"?',
+                        re.MULTILINE)
 
 
 def _by_os(*, linux: str, windows: str | None = None, other: str) -> str:
@@ -134,8 +152,7 @@ class Tool:
         """
         if not self.minimum:
             return False
-        number = next((w for w in version_line.split()
-                       if w[:1].isdigit()), None)
+        number = version_number(version_line)
         if number is None:
             return False
         found = tuple(int(n) for n in number.split(".") if n.isdigit())
@@ -193,6 +210,31 @@ TOOLS: list[Tool] = [
                        ["magick", "--version"],
                        ["inkscape", "--version"])),
 ]
+
+
+def version_number(version_line: str) -> str | None:
+    """The first word of `version_line` that starts with a digit."""
+    return next((w for w in version_line.split() if w[:1].isdigit()), None)
+
+
+def ci_pandoc(workflow: Path = CI_WORKFLOW) -> str | None:
+    """The `PANDOC_VERSION` the CI workflow pins, or None."""
+    try:
+        match = PANDOC_PIN.search(workflow.read_text(encoding="utf-8"))
+    except OSError:
+        return None
+    return match.group(1) if match else None
+
+
+def pandoc_pin_note(version_line: str, pinned: str | None) -> str | None:
+    """A note when the local pandoc differs from the CI pin, else None."""
+    local = version_number(version_line)
+    if pinned is None or local is None or local == pinned:
+        return None
+    return (f"note: CI builds the site with pandoc {pinned} "
+            f"(PANDOC_VERSION in .github/workflows/ci.yml), and this "
+            f"machine has {local}. Set PANDOC_VERSION to {local} so the "
+            f"deployed site is the one tip preview-check tests.")
 
 
 def install_hint(name: str) -> str:
@@ -260,8 +302,13 @@ def main(argv: list[str] | None = None) -> int:
     manager = package_manager()
 
     missing: list[Tool] = []
+    notes: list[str] = []
     for tool in tools:
         version = tool.version()
+        if version is not None and tool.name == "pandoc":
+            note = pandoc_pin_note(version, ci_pandoc())
+            if note:
+                notes.append(note)
         if version is not None and tool.too_old(version):
             want = ".".join(map(str, tool.minimum))
             print(f"  {tool.name:<{width}}  OLD      {version} "
@@ -276,6 +323,9 @@ def main(argv: list[str] | None = None) -> int:
                 missing.append(tool)
 
     print()
+    for note in notes:
+        print(note)
+        print()
     if missing:
         print(f"{len(missing)} required tool(s) missing: "
               f"{', '.join(t.name for t in missing)}")
