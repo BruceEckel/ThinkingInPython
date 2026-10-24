@@ -433,18 +433,20 @@ print(list(report(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)']
 ```
 
-The values `emit()` sends out travel on two channels that end in different places.
-Each `item` it yields passes through `report()` to `list()`.
-Its `return total` goes to `report()` alone,
+Each `item` `emit()` yields passes through `report()` to `list()`.
+`emit()`'s `return total` goes to `report()` alone,
 as the value of the `yield from` expression, which `report()` binds to `size`.
-`list()` sees the 12 inside the string that `report()` builds from it.
 A `yield from` therefore works like a function call:
 `report()` calls `emit()` and gets its result back,
 while the values `emit()` yields still go to the driver.
 
+`drive_by_hand.py` and `drive()` read a generator's result by catching `StopIteration` and taking its `value`.
+`report()` has no `try`, because `yield from` does that catch:
+when `emit()` finishes,
+`yield from` catches the `StopIteration` and evaluates to the exception's `value`,
+the 12 that `emit()` returned.
+
 Any iterable can follow `yield from`.
-The expression takes its value from the `StopIteration` that ends the iteration.
-A generator's `return` sets that value.
 A list's iterator ends with a bare `StopIteration`,
 whose `value` defaults to `None`,
 so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
