@@ -26,28 +26,28 @@ The latest release, rebuilt from the current book source:
   with color syntax highlighting, for phone and tablet reading apps.
 - [EPUB for e-ink readers](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/ThinkingInPython-eink.epub),
   which marks code with bolding instead of color.
-- Step-by-step guides, simplest way first, to reading it on a
-  [Kindle](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/kindle-uploading.txt),
+- Step-by-step guides, simplest way first,
+  to reading it on a [Kindle](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/kindle-uploading.txt),
   an [iPad](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/ipad-uploading.txt),
   an [Android phone or tablet](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/android-uploading.txt),
   a [computer](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/computer-reading.txt),
   or a [Kobo or other EPUB e-reader](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/ereader-uploading.txt).
 
-All versions are on the
-[releases page](https://github.com/BruceEckel/ThinkingInPython/releases).
+All versions are on the [releases page](https://github.com/BruceEckel/ThinkingInPython/releases).
 
 ## Support the Book
 
-Thinking in Python is free. If it has helped you and you'd like to
-support the work, you can do that on
-[GitHub Sponsors](https://github.com/sponsors/BruceEckel) or
-[Ko-fi](https://ko-fi.com/bruceeckel). No obligation, and no
-difference in what you get.
+Thinking in Python is free.
+If it has helped you and you'd like to support the work,
+you can do that on [GitHub Sponsors](https://github.com/sponsors/BruceEckel)
+or [Ko-fi](https://ko-fi.com/bruceeckel).
+No obligation, and no difference in what you get.
 
 ## Examples and Solutions
 
-Every listing in the book is a real file that runs. You will find it in
-`Examples/`, in its chapter's directory, under the name the book gives it.
+Every listing in the book is a real file that runs.
+You will find it in `Examples/`, in its chapter's directory,
+under the name the book gives it.
 The answers to the exercises are in `Solutions/`.
 
 | Directory | Contents |
@@ -58,8 +58,8 @@ The answers to the exercises are in `Solutions/`.
 | `Chapters/` | The book itself, one Markdown file per chapter. |
 
 The build generates the `.py` files in `Examples/` and `Solutions/` from `Chapters/` and `Solutions/`,
-where each listing is a fenced `python` block whose first line is a
-`# name.py` comment. The code you read is therefore the code that runs.
+where each listing is a fenced `python` block whose first line is a `# name.py` comment.
+The code you read is therefore the code that runs.
 
 ### Reading a listing
 
@@ -83,14 +83,17 @@ Each chapter ends with exercises that name the listing to start from
 Copy the example file, change it, run it.
 
 The chapter's Exercises section links to its solutions.
-On [thinkinginpython.com](https://thinkinginpython.com/) the link opens a Solutions page beside the chapter;
+On [thinkinginpython.com](https://thinkinginpython.com/)
+the link opens a Solutions page beside the chapter;
 in the repository the solutions are the `README.md` in that chapter's `Solutions/` folder,
 numbered to match the exercises.
 Each answer quotes its exercise from the chapter,
-then reveals itself in collapsed steps, so you can take as little help as you need:
+then reveals itself in collapsed steps,
+so you can take as little help as you need:
 
 - **Where to look**: a hint that points to the part of the chapter the exercise draws on.
-- **The shape**: the solution's skeleton, with the function bodies left out. Most answers have this step.
+- **The shape**: the solution's skeleton, with the function bodies left out.
+  Most answers have this step.
 - **Done when**: the check that tells you your attempt is finished.
 - **Solution**: the full listing and an explanation of its design.
   It closes by asking you to name what separates your attempt from it:
@@ -101,27 +104,30 @@ The site remembers which steps you opened.
 In a clone, `tip hint CH=30 N=3` prints the same steps in the terminal,
 one more on each run, with `CH` naming the chapter and `N` the exercise.
 
-Each solution is self-contained: it
-repeats whatever it needs from the chapter rather than importing it, so you
-can read or run one on its own. A solution often rewrites the
-listing instead of editing it, so a line-by-line diff of your file against
-the solution's `.py` file is mostly noise. Compare what the two programs
-print and how they are organized.
+Each solution is self-contained:
+it repeats whatever it needs from the chapter rather than importing it,
+so you can read or run one on its own.
+A solution often rewrites the listing instead of editing it,
+so a line-by-line diff of your file against the solution's `.py` file is mostly noise.
+Compare what the two programs print and how they are organized.
 
-`tip sync` regenerates `Examples/` and the `.py` files in `Solutions/` from
-the Markdown, discarding any edits you made to them. Each `README.md` is the
-source and is not overwritten. Experiment in the generated files freely, but
-keep anything you want to save outside them.
+`tip sync` regenerates `Examples/` and the `.py` files in `Solutions/` from the Markdown,
+discarding any edits you made to them.
+Each `README.md` is the source and is not overwritten.
+Experiment in the generated files freely,
+but keep anything you want to save outside them.
 
-If you work with an AI coding agent in the clone, `AGENTS.md` at the repo
-root is written for it (Codex, Cursor, and others read the file on their own;
-`CLAUDE.md` sends Claude Code to it). While a solution's Solution step is
-closed, the file has the agent coach: it asks what you have tried, gives the
-smallest hint, and withholds the answer. Once you open the step, the agent
-reviews: it runs your file and the exercise's checks first, then compares
-your design with the chapter's criteria, treating the book's solution as one
-correct design rather than the only one. The rules are there for your
-learning, not the book's; delete the file if you want an unguarded assistant.
+If you work with an AI coding agent in the clone,
+`AGENTS.md` at the repo root is written for it
+(Codex, Cursor, and others read the file on their own; `CLAUDE.md` sends Claude Code to it).
+While a solution's Solution step is closed, the file has the agent coach:
+it asks what you have tried, gives the smallest hint, and withholds the answer.
+Once you open the step, the agent reviews:
+it runs your file and the exercise's checks first,
+then compares your design with the chapter's criteria,
+treating the book's solution as one correct design rather than the only one.
+The rules are there for your learning, not the book's;
+delete the file if you want an unguarded assistant.
 
 ## Setup
 
@@ -160,19 +166,19 @@ You'll need to do this to experiment with the examples and exercises.
      winget install --id=astral-sh.uv -e
      ```
 
-3. The book's commands go through `tip`, a task runner written in Python
-   that comes with the repository.
+3. The book's commands go through `tip`,
+   a task runner written in Python that comes with the repository.
    From the repository's root directory, put a `tip` command on your PATH:
 
    ```sh
    uv tool install --editable .
    ```
 
-   If your shell cannot find `tip` afterward, `uv tool update-shell` adds
-   uv's tool directory to your PATH.
+   If your shell cannot find `tip` afterward,
+   `uv tool update-shell` adds uv's tool directory to your PATH.
    This works the same on Windows, macOS, and Linux.
-   Because the install is editable, a change under `tools/` takes effect
-   immediately.
+   Because the install is editable,
+   a change under `tools/` takes effect immediately.
 
 4. Verify the essential tools:
 
@@ -182,38 +188,36 @@ You'll need to do this to experiment with the examples and exercises.
 
    The book's environment needs no separate install step.
    Every `tip` target goes through `uv run`,
-   and the first one you run creates `.venv` and installs the pinned
-   Python (3.15+) and the dev tools before it does anything else.
+   and the first one you run creates `.venv` and installs the pinned Python
+   (3.15+) and the dev tools before it does anything else.
    `uv sync` builds the same environment explicitly,
    for when you need `.venv` before running a target,
    such as pointing an editor at its interpreter.
-   On WSL, clone into the Linux filesystem (under `~`), not into a
-   Windows checkout under `/mnt/c`. A `.venv` cannot be shared between
-   Windows and Linux: each side's `uv` tries to rebuild it for
-   itself and fails when the other side has it open. A clone under
-   `/mnt/c` also runs every command through the Windows filesystem
-   bridge, which turns a three-second install into a minute and slows
-   `tip verify` the same way.
+   On WSL, clone into the Linux filesystem (under `~`),
+   not into a Windows checkout under `/mnt/c`.
+   A `.venv` cannot be shared between Windows and Linux:
+   each side's `uv` tries to rebuild it for itself and fails when the other side has it open.
+   A clone under `/mnt/c` also runs every command through the Windows filesystem bridge,
+   which turns a three-second install into a minute and slows `tip verify` the same way.
 
 That is everything you need to run and test the examples and the solutions.
 `tip doctor` diagnoses the two common environment problems:
-a stale `uv` stuck on an old Python prerelease, and (on Windows) a process
-holding `.venv` open.
+a stale `uv` stuck on an old Python prerelease, and (on Windows)
+a process holding `.venv` open.
 
-Type `tip` to see every target; it opens a picker where
-arrow keys choose, Enter runs, and `?` shows a target's full documentation.
+Type `tip` to see every target; it opens a picker where arrow keys choose,
+Enter runs, and `?` shows a target's full documentation.
 Piped into another command, `tip` prints the same list by category instead,
 and `tip help style` shows one section of it.
 Targets that take a setting use `NAME=value`, as in `tip check-ch CH=07`.
-`tip` echoes each command before it runs it, and ends with a timing line
-such as `tip verify: 1m 32s`.
+`tip` echoes each command before it runs it,
+and ends with a timing line such as `tip verify: 1m 32s`.
 `tools/tasks.py` defines every target.
 
 ### Run and test everything
 
-The commands below rebuild `build/examples/` and `build/solutions/` from
-the Markdown chapters, so they always test the current book, never a stale
-copy.
+The commands below rebuild `build/examples/` and `build/solutions/` from the Markdown chapters,
+so they always test the current book, never a stale copy.
 
 - Execute every example file and report failures:
 
@@ -239,10 +243,11 @@ copy.
   tip lint
   ```
 
-- Each of those four covers `build/solutions/`, the extracted exercise
-  answers, in the same run.
+- Each of those four covers `build/solutions/`, the extracted exercise answers,
+  in the same run.
 
-- Run every solutions check at once (exercise numbering, drift, output markers, types, lint, runs, tests):
+- Run every solutions check at once
+  (exercise numbering, drift, output markers, types, lint, runs, tests):
 
   ```sh
   tip solutions-gate
@@ -256,27 +261,30 @@ copy.
 
 A first run also downloads the pinned Python and the dev tools.
 
-To run one example instead of all of them, see
-[Run one example by hand](#run-one-example-by-hand) below.
+To run one example instead of all of them,
+see [Run one example by hand](#run-one-example-by-hand) below.
 
-A few examples cannot run unattended because they open a window, wait for
-input, or loop forever. `tip run` reports those as "Can't run unattended"
-rather than as failures. `tools/data/norun.txt` lists them. Run one by hand
-to watch it work, or open all the windowed ones at once:
+A few examples cannot run unattended because they open a window, wait for input,
+or loop forever.
+`tip run` reports those as "Can't run unattended" rather than as failures.
+`tools/data/norun.txt` lists them.
+Run one by hand to watch it work, or open all the windowed ones at once:
 
 ```sh
 tip by-hand
 ```
 
-Try each window and close it. The command prints a line as each one
-closes, and the traceback of any that failed.
+Try each window and close it.
+The command prints a line as each one closes,
+and the traceback of any that failed.
 
-`tip gate` runs the solutions checks first, as a prerequisite, so a
-failure there hides every `Chapters/` failure behind it. `tip sweep` runs
-everything and reports them all instead of stopping at the first. `gate`
-also refreshes generated content in place: it rewraps prose to one sentence
-per line, and it rewrites any `#:` marker whose listing now prints
-something else. Expect `git diff Chapters/` to show both.
+`tip gate` runs the solutions checks first, as a prerequisite,
+so a failure there hides every `Chapters/` failure behind it.
+`tip sweep` runs everything and reports them all instead of stopping at the first.
+`gate` also refreshes generated content in place:
+it rewraps prose to one sentence per line,
+and it rewrites any `#:` marker whose listing now prints something else.
+Expect `git diff Chapters/` to show both.
 
 ### Work on one chapter
 
@@ -288,7 +296,8 @@ tip check-ch CH=07
 
 The gate extracts the chapter, then checks output markers, listing format,
 types, lint, and tests.
-`CH` takes a number or a filename stem. Make this your edit loop.
+`CH` takes a number or a filename stem.
+Make this your edit loop.
 Only `tip gate` catches breakage across chapters.
 
 ### Run one example by hand
@@ -300,12 +309,12 @@ Give it the file's name, with or without `.py`:
 tip deque_timing
 ```
 
-Words after the name go to the program, so `tip membership --numbers`
-prints the measurements.
+Words after the name go to the program,
+so `tip membership --numbers` prints the measurements.
 Solutions answers are found the same way.
 When a name fits several files, `tip` lists them,
-and a piece of the path picks one out:
-the chapter number, or `Solutions` for an answer.
+and a piece of the path picks one out: the chapter number,
+or `Solutions` for an answer.
 
 ```sh
 tip 18/exercise_1
@@ -317,19 +326,21 @@ tip Solutions/47/research_by_hand
 
 `tip run-one deque_timing` is the long form of the same command.
 
-It sets up what the example expects, and prints the commands it stood in
-for, because those are what you type when `tip` is not at hand:
+It sets up what the example expects, and prints the commands it stood in for,
+because those are what you type when `tip` is not at hand:
 
 ```sh
 cd Examples/03_Foundations--Containers
 PYTHONPATH=../utils uv run python deque_timing.py
 ```
 
-Both lines matter. An example reads its sibling modules and data files by
-relative path, so it must run from its own chapter directory. About 70 of
-them also import a shared helper that lives in `Examples/utils`
-(`from benchmark import report`), so that directory has to be on the
-import path. Miss the second line and Python says:
+Both lines matter.
+An example reads its sibling modules and data files by relative path,
+so it must run from its own chapter directory.
+About 70 of them also import a shared helper that lives in `Examples/utils`
+(`from benchmark import report`),
+so that directory has to be on the import path.
+Miss the second line and Python says:
 
 ```
 ModuleNotFoundError: No module named 'benchmark'
@@ -345,40 +356,43 @@ uv run python deque_timing.py
 
 `tip run-one` prints whichever form fits your shell.
 
-Use `uv run python`, not a bare `python`. A `python` already on your PATH is
-usually an older release, and these examples use Python 3.15 syntax.
+Use `uv run python`, not a bare `python`.
+A `python` already on your PATH is usually an older release,
+and these examples use Python 3.15 syntax.
 
 ### Optional: Building the Book
 
-Building the book itself needs more. `tip site`, `tip local`, and
-`tip serve` need `pandoc` on your PATH, `tip pdf` also needs `typst`, and
-`tip prose` needs the standalone `vale` binary.
+Building the book itself needs more.
+`tip site`, `tip local`, and `tip serve` need `pandoc` on your PATH,
+`tip pdf` also needs `typst`,
+and `tip prose` needs the standalone `vale` binary.
 Check for all of them:
 
 ```sh
 tip tools-check-full
 ```
 
-See
-[tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
+See [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
 for details and install links.
 
 ---
 
 ## History
 
-I started this book in 2008 and by 2011 it had drifted to a stop. I think part of the
-problem was that I wanted to move the design patterns work I had done in Java into Python and
-even then I was beginning to become uncertain about OOP (The material is still there, translated,
-but it is preceded by a chapter explaining my OOP misgivings).
+I started this book in 2008 and by 2011 it had drifted to a stop.
+I think part of the problem was that I wanted to move the design patterns work I had done in Java into Python and even then I was beginning to become uncertain about OOP
+(The material is still there, translated, but it is preceded by a chapter explaining my OOP misgivings).
 
-I had forgotten about this book but (especially at Pycons) people would occasionally come up to me
-and mention that they had gotten some value out of it. Because of the condition of the book,
-which still had a number of examples that were still in Java (!), I found this embarrassing.
+I had forgotten about this book but (especially at Pycons)
+people would occasionally come up to me and mention that they had gotten some value out of it.
+Because of the condition of the book,
+which still had a number of examples that were still in Java (!),
+I found this embarrassing.
 
-In June 2026 I decided to see what the Claude AI could do with it, and in short order it had brought
-everything up to Python 3.15, with type annotations, passing standards checkers, cleaning up prose, etc.
-I began going back through my Pycon presentations and blog posts and adding those.
+In June 2026 I decided to see what the Claude AI could do with it,
+and in short order it had brought everything up to Python 3.15,
+with type annotations, passing standards checkers, cleaning up prose,
+etc. I began going back through my Pycon presentations and blog posts and adding those.
 
 ---
 
@@ -386,7 +400,8 @@ I began going back through my Pycon presentations and blog posts and adding thos
 
 For my own bookkeeping.
 The unchecked boxes do not mean a chapter hasn't been edited,
-just that it hasn't gotten an edit *in this pass* (there are multiple edit passes).
+just that it hasn't gotten an edit *in this pass*
+(there are multiple edit passes).
 
 - ⬜ 01_Introduction.md
 - ⬜ 02_Foundations--Tour.md
