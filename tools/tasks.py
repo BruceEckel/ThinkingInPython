@@ -143,12 +143,13 @@ def verify(v: Vars) -> None:
 
 
 @task("Do everything with no shortcuts: verify with TIP_FULL=1, spell, "
-      "prose, site, EPUB, PDF (ARGS=--help lists them)")
+      "prose, site and preview check, EPUB, PDF (ARGS=--help lists them)")
 def everything(v: Vars) -> None:
     """The heavyweight run. `verify` skips work that cannot find anything
     new (tools/skip_stamps.py); this turns every shortcut off with
     TIP_FULL=1, runs verify, then the spelling and house-style checks no
-    gate runs, then the site, EPUB, and PDF builds. It keeps going after
+    gate runs, then the site build with its link-preview test, and the
+    EPUB and PDF builds. It keeps going after
     a failure and lists every target's result at the end. Run it before
     a release, after a tool upgrade, or when a shortcut is in doubt. The
     list lives in tools/everything.py (EVERYTHING).
@@ -1156,6 +1157,8 @@ def preview_check(v: Vars) -> None:
     a link into the book that shows no panel, a navigation link that shows
     one, or a panel with something wrong in it. In no gate: it needs node,
     and its first run installs jsdom under build/node/ from the network.
+    `tip release` and `tip everything` run it; CI stopped on 2026-10-24,
+    once ci.yml pinned pandoc to the local version.
     After an edit to resources/static/link-preview.js alone, `node
     tools/site_preview_check.js` reruns it against the site already built.
     """
@@ -1260,7 +1263,8 @@ def release(v: Vars) -> None:
     freshly rebuilt PDF and the two EPUBs. release.py orchestrates:
     preflight (clean tree, HEAD pushed, tag free, gh authenticated),
     then `tip verify` so a book that fails the gate can never ship,
-    then fresh `tip pdf` + `tip epub`, then
+    then `tip preview-check` (the site's link previews, which CI no
+    longer tests), then fresh `tip pdf` + `tip epub`, then
     `gh release create vVERSION`. Deliberately excluded from
     verify-targets' smoke test: it tags the repo and publishes to GitHub.
     """

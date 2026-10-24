@@ -1,10 +1,13 @@
 name: CI
 
 # Default behavior, on every push to master and every pull request: build the
-# static site, test its link previews, and (on master) publish it to GitHub
-# Pages. That is all that runs by default, because the full
-# example/test/type/lint suite is already run on the local machine before
-# pushing, and GitHub Actions can be slow.
+# static site and (on master) publish it to GitHub Pages. That is all that
+# runs by default, because the full example/test/type/lint suite is already
+# run on the local machine before pushing, and GitHub Actions can be slow.
+# The link-preview test (`tip preview-check`) left this path on 2026-10-24,
+# when it took 4m40s of a 5m44s run: pandoc is pinned to the local
+# version below, so the local run in `tip release` and `tip everything`
+# tests the same HTML.
 #
 # The full gates (examples match the Markdown, every example runs clean, pytest
 # passes, ty-clean, ruff-clean) are opt-in, as are the prose checks (codespell
@@ -41,10 +44,15 @@ on:
 permissions:
   contents: read
 
+# The pandoc every job installs. Keep it equal to the local pandoc
+# (`pandoc --version`), so the deployed site is the one tested locally.
+env:
+  PANDOC_VERSION: "3.12.1"
+
 jobs:
-  # Default work: build the static site and test its link previews. Fast,
-  # because it skips running the examples, type-checking, and linting. On a
-  # push to master it hands the built site to the deploy job below.
+  # Default work: build the static site. Fast, because it skips running the
+  # examples, type-checking, and linting. On a push to master it hands the
+  # built site to the deploy job below.
   site:
     runs-on: ubuntu-latest
     steps:
@@ -56,24 +64,21 @@ jobs:
           python-version: "3.15"
           enable-cache: true
 
+      # The release .deb at PANDOC_VERSION (top of this file), not
+      # Ubuntu's apt pandoc (3.1.3 on 2026-10-24), so the site the
+      # runner builds is the HTML the local pandoc writes.
       - name: Install pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/pandoc.deb" \
+            "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb"
+          sudo dpkg -i "$RUNNER_TEMP/pandoc.deb"
+          pandoc --version | head -1
 
       - name: Install tooling
         run: uv sync --locked
 
       - name: Build the static site
         run: uv run python -m tools.build_site
-
-      # Hovers and taps the built pages' links under jsdom (`tip
-      # preview-check` locally). The previews depend on the HTML this
-      # runner's pandoc writes, which is not the pandoc that built the site
-      # locally, so this is the one check that has to run here: a link into
-      # the book with no panel fails the job, and the deploy with it. Node
-      # is on the runner image; the script installs its pinned jsdom under
-      # build/node/, outside the build/site that gets uploaded.
-      - name: Test the link previews
-        run: node tools/site_preview_check.js
 
       # On master only, hand the built site to the deploy job below.
       - name: Upload Pages artifact
@@ -100,8 +105,15 @@ jobs:
           python-version: "3.15"
           enable-cache: true
 
+      # The release .deb at PANDOC_VERSION (top of this file), not
+      # Ubuntu's apt pandoc (3.1.3 on 2026-10-24), so the site the
+      # runner builds is the HTML the local pandoc writes.
       - name: Install pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/pandoc.deb" \
+            "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb"
+          sudo dpkg -i "$RUNNER_TEMP/pandoc.deb"
+          pandoc --version | head -1
 
       - name: Install tooling
         run: uv sync --locked

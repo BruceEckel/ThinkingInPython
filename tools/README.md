@@ -357,14 +357,15 @@ Commit that file when the run changes it.
 house-style checks or the book builds. `tip everything` covers all of
 it. It sets `TIP_FULL=1`, which turns every skip off in each step it
 starts, then runs six targets in order: `verify`, `spell`, `prose`,
-`site`, `epub`, and `pdf` (`EVERYTHING` in the script). Unlike `verify`,
+`preview-check` (the site build and its link-preview test), `epub`,
+and `pdf` (`EVERYTHING` in the script). Unlike `verify`,
 it keeps going after a failure. At the end it prints every target's
 time, names the ones that failed, and exits 1 if any did. Run it before
 a release, after a tool upgrade, or when a shortcut's assumptions are in
 doubt.
 
 It needs every tool those targets need: pandoc and typst for the builds,
-vale for `prose` (`tip tools-check-full` lists them). Left out on
+node for `preview-check`, vale for `prose` (`tip tools-check-full` lists them). Left out on
 purpose are `links` (network, and link rot is not the book's fault),
 `pyright-review` (advisory), the `rust-*` tasks (cargo), `verify-targets`
 (it tests the harness, not the book), and anything that publishes.
@@ -3231,10 +3232,12 @@ link into the book with no panel, a navigation link with one, or a
 panel with an id, a back-link, or a stray `#place` link in it. It
 needs node, which no gate does, and its first run installs jsdom
 (major version pinned in the script) under `build/node/` from the
-network, so it is in no local gate and `verify-targets` skips it. The
-`site` job in `.github/workflows/ci.yml` does run it, between the
-build and the Pages upload: the runner's pandoc is not the local one,
-and the previews depend on the HTML it writes. It reads the script from `resources/static`
+network, so it is in no gate and `verify-targets` skips it.
+`tip release` runs it after `verify`, and `tip everything` runs it in
+place of a bare site build. CI ran it before the Pages upload until
+2026-10-24, when it took 4m40s of a 5m44s run; the workflow now pins
+pandoc to the local version (`PANDOC_VERSION` in `ci.yml`), so a
+local run tests the HTML the deploy publishes. It reads the script from `resources/static`
 and the pages from `build/site`, so after an edit to the script alone,
 `node tools/site_preview_check.js 29 index` reruns it on a few pages
 in a couple of seconds. jsdom lays nothing out: check where the panel
@@ -3349,14 +3352,17 @@ in `GUIDES`, shipped as-is from `resources/`. Run
 with a `v` prefix (`v1.0`), created on origin at the branch tip. Needs
 `git` and an authenticated `gh` (`gh auth login`).
 
-The order is preflight, verify, build, publish, cheapest first. The
+The order is preflight, verify, preview check, build, publish,
+cheapest first. The
 preflight refuses a dirty tree, a detached HEAD, a branch whose tip
 does not match origin, and a tag that already exists (locally or on
 origin): the tag must point at the pushed commit the assets were built
 from. Then `tip verify` runs the full gate, so a book that fails it
 can never ship. If verify's self-healing fixers rewrite tracked files,
 the run stops and asks for a review-commit-push before trying again,
-since the tree no longer matches the pushed commit. Only then are the
+since the tree no longer matches the pushed commit. `tip
+preview-check` then builds the site and tests its link previews,
+which CI no longer does. Only then are the
 PDF and EPUBs rebuilt (both builders wipe their output directory first,
 which is what makes the assets fresh) and handed to `gh release
 create`. All are built with the `--release` stamp, so their title
@@ -3430,9 +3436,10 @@ machine before you push (and Actions can be slow), so **the default CI path only
 builds and publishes the site**. The workflow has these jobs:
 
 * **`site` (always runs):** installs uv (`astral-sh/setup-uv`, Python 3.15,
-  cached) and pandoc, runs `uv sync --locked`, builds the static site, and
-  tests its link previews (`site_preview_check.js`, as `tip preview-check`
-  does locally). On a
+  cached) and pandoc, runs `uv sync --locked`, and builds the static site.
+  The pandoc is the release `.deb` at `PANDOC_VERSION`, set at the top of
+  the workflow; keep it equal to the local `pandoc --version`, so the
+  deployed HTML is the HTML `tip preview-check` tests locally. On a
   push to `master` it hands the site to the `deploy` job, which publishes it to
   GitHub Pages. Pull requests build the site but do not deploy.
 * **`gates` (opt-in only):** a subset of what `tip ci` runs

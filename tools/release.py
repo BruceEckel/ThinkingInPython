@@ -12,8 +12,8 @@ other e-readers), each step by step, simplest way first. (GitHub
 itself always adds "Source code" archive links to a release page;
 those are GitHub's, not uploads.)
 
-The order is preflight, verify, build, publish, with the cheap checks
-first so a doomed run dies before the expensive gate:
+The order is preflight, verify, preview check, build, publish, with
+the cheap checks first so a doomed run dies before the expensive gate:
 
 1. Preflight: a VERSION was given and makes a sane tag; `gh` is
    installed and authenticated; the working tree is clean; HEAD is a
@@ -25,17 +25,20 @@ first so a doomed run dies before the expensive gate:
    rewrite tracked files; if that happens the tree is no longer the
    pushed commit, so the run stops and asks for a review-commit-push
    before trying again.
-3. Build the PDF and EPUBs (in-process, the equivalent of `tip pdf`
+3. `tip preview-check`: build the site and test its link previews
+   under jsdom. CI deploys the site on every push and no longer runs
+   this test (since 2026-10-24), so a release is where it runs.
+4. Build the PDF and EPUBs (in-process, the equivalent of `tip pdf`
    and `tip epub` plus a `--release` stamp): both builders wipe
    their output directory and rebuild from the Markdown, which is
    what makes the assets fresh, and both stamp their title page with
    the release number and today's date ("Release 1.0 · August 23,
    2026") so the reader can tell which release they hold.
-4. `gh release create v<VERSION> <pdf> <epubs> <guides>`: creates the
+5. `gh release create v<VERSION> <pdf> <epubs> <guides>`: creates the
    tag on origin at the branch tip and uploads the assets. gh
    prints the release URL on success. The new tag is then fetched, so
    the local clone has it too (gh tags only on GitHub).
-5. Prune: every release older than the newest KEEP_RELEASES (two: the
+6. Prune: every release older than the newest KEEP_RELEASES (two: the
    new one and the one before it, a fallback should the new one turn
    out broken) is deleted with `gh release delete`, assets and all.
    The git tags stay, so history is intact and the menu's next-version
@@ -55,7 +58,8 @@ Usage:
     python -m tools.release --prune # only delete the old releases
 
 Requires `git` and an authenticated `gh` on PATH, plus everything
-`tip verify`, `tip pdf`, and `tip epub` need.
+`tip verify`, `tip preview-check` (node), `tip pdf`, and `tip epub`
+need.
 """
 
 import argparse
@@ -320,6 +324,7 @@ def release(version: str) -> int:
                  "trees), so the tree no longer matches the pushed "
                  "commit. Review the diff, commit, push, and run "
                  f"`tip release VERSION={version}` again:\n{dirty}")
+    run_task("preview-check")
 
     assets = build_assets(version.removeprefix("v"))
     publish(tag, version, branch, assets)

@@ -6,7 +6,9 @@
 own tests while tools/ is unchanged, and all but the unmarked listings
 between daily full runs. `tip everything` sets `TIP_FULL=1`, which turns
 every one of those off, and then goes past the gate: the spelling and
-house-style checks, which no gate runs, and the three book builds.
+house-style checks, which no gate runs, the site build with its
+link-preview test (`preview-check`, which needs node), and the EPUB
+and PDF builds.
 
 Unlike `verify`, it keeps going after a failure and reports every target
 at the end, so one run shows everything that is wrong. It exits nonzero
@@ -37,7 +39,7 @@ EVERYTHING: list[str] = [
     "verify",
     "spell",
     "prose",
-    "site",
+    "preview-check",
     "epub",
     "pdf",
 ]

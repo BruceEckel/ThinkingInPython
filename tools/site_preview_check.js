@@ -6,9 +6,11 @@
 //   node tools/site_preview_check.js            # every page in build/site
 //   node tools/site_preview_check.js 29 index   # pages whose names start so
 //
-// `tip preview-check` builds the site first and then runs this, and so
-// does the site job in .github/workflows/ci.yml, ahead of the deploy. No
-// local gate runs it: it needs node, which nothing else in the repo does,
+// `tip preview-check` builds the site first and then runs this, and
+// `tip release` and `tip everything` run that task. CI does not, since
+// 2026-10-24: .github/workflows/ci.yml pins pandoc to the local version,
+// so a local run tests the HTML the deploy publishes. No gate runs it:
+// it needs node, which nothing else in the repo does,
 // and on its first run it needs the network, to install jsdom under
 // build/node/ (build/ is derived and gitignored, so the repo gains no
 // package.json). JSDOM_VERSION pins the major, so a jsdom release cannot
