@@ -25,6 +25,7 @@ floating "Contents" link to the index is unaffected.
 
 import argparse
 import hashlib
+import html
 import re
 import shutil
 import subprocess
@@ -65,6 +66,15 @@ BOOK_TITLE = "Thinking in Python"
 BOOK_SUBTITLE = "Fluency, Types, and Design"
 BOOK_AUTHOR = "Bruce Eckel"
 REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
+# The deployed site, for the absolute URLs a link-preview card needs.
+SITE_URL = "https://thinkinginpython.com/"
+# The image Slack, Discord, and the social sites show when someone
+# posts a link to the site. make_cover.py builds it at 1280x640, the
+# 2:1 shape of a large preview card, and build() copies it beside the
+# pages. The card reads it through `og:image`, which must be absolute.
+SOCIAL_IMAGE = "social-preview.jpg"
+BOOK_DESCRIPTION = ("A free book on modern, statically typed Python: "
+                    "fluency, types, and design.")
 # The newest release's page, listing every published asset (PDF, both
 # EPUBs). `releases/latest` always resolves to the newest published
 # release, so the link never goes stale when a new version ships
@@ -357,6 +367,29 @@ def asset_tag(content: str) -> str:
     return f"?v={digest}"
 
 
+def social_meta(title: str, page: str = "") -> str:
+    """The Open Graph and Twitter card tags for one page.
+
+    A link pasted into Slack or a social post shows a preview card
+    built from these: the title, the book's description, and
+    `SOCIAL_IMAGE`. `page` is the file name, empty for the contents
+    page.
+    """
+    tags = [("property", "og:type", "website"),
+            ("property", "og:site_name", BOOK_TITLE),
+            ("property", "og:title", title),
+            ("property", "og:description", BOOK_DESCRIPTION),
+            ("property", "og:url", SITE_URL + page),
+            ("property", "og:image", SITE_URL + SOCIAL_IMAGE),
+            ("property", "og:image:alt",
+             "A python as an ouroboros, coiled into an infinity sign"),
+            ("name", "twitter:card", "summary_large_image"),
+            ("name", "description", BOOK_DESCRIPTION)]
+    return "\n".join(
+        f'<meta {kind}="{key}" content="{html.escape(value)}">'
+        for kind, key, value in tags)
+
+
 def static_tag(name: str) -> str:
     return asset_tag((STATIC_SRC / name).read_text(encoding="utf-8"))
 
@@ -433,6 +466,8 @@ def render_chapter(body: str, ch: Chapter,
         f"--variable=title:{ch.title}",
         f"--variable=chapter-label:{ch.label}",
         f"--variable=book-title:{BOOK_TITLE}",
+        "--variable=social-meta:"
+        + social_meta(f"{ch.title} · {BOOK_TITLE}", ch.out_name),
         f"--variable=heading-font:{HEADING_FONT}",
         f"--variable=heading-font-google:{HEADING_FONT_GOOGLE}",
         f"--variable=search-css:search.css{static_tag('search.css')}",
@@ -534,6 +569,7 @@ def render_index(chapters: list[Chapter], book_index_page: bool = False
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{BOOK_TITLE}</title>
+  {social_meta(f"{BOOK_TITLE}: {BOOK_SUBTITLE}").replace("\n", "\n  ")}
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family={HEADING_FONT_GOOGLE}&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cormorant+SC:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
@@ -873,7 +909,8 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
             copied += 1
     for asset in ("favicon.svg", "chapter-ornament.svg",
                   "chapter-snake.png",
-                  "cover-art.svg", "cover-art.jpg"):
+                  "cover-art.svg", "cover-art.jpg",
+                  SOCIAL_IMAGE):
         if (STATIC_SRC / asset).exists():
             shutil.copy2(STATIC_SRC / asset, out_dir / asset)
 
