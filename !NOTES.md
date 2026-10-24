@@ -77,10 +77,13 @@ Appendix perhaps containing learning resources, ask Claude to find the best ones
   - [Learning Python](http://www.makeuseof.com/tag/5-websites-learn-python-programming/)
 
 ---
-Potential Pycon talks:
-Testing unpredictable functions
-Python's built-in design patterns
-Concurrency for beginners
+
+## Potential Pycon talks
+
+- Testing unpredictable functions
+- Python's built-in design patterns
+- Concurrency for beginners
+- Understanding Generators
 
 ---
 Short monty python phrases
