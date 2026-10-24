@@ -432,10 +432,11 @@ def social_meta(title: str, page: str = "",
     built from these: the title, the description, and `SOCIAL_IMAGE`.
     `page` is the file name, empty for the contents page. A chapter
     passes its own `description` (`page_description()`); every other
-    page uses the book's.
+    page uses the book's. Every title already holds `BOOK_TITLE`, so
+    the tags carry no `og:site_name`, which Slack prints as a footer
+    line under the description.
     """
     tags = [("property", "og:type", "website"),
-            ("property", "og:site_name", BOOK_TITLE),
             ("property", "og:title", title),
             ("property", "og:description", description),
             ("property", "og:url", SITE_URL + page),
