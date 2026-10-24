@@ -248,7 +248,6 @@ class Watcher:
         print("Rebuilding the index page...")
         build_site.rebuild_index_page(self.out_dir)
         self.index_stale = False
-        self._seen = snapshot()
 
     def _check(self) -> None:
         now = snapshot()
@@ -277,8 +276,10 @@ class Watcher:
                     self.index_stale = True
             self._counter += 1
             self.token = f"{os.getpid()}-{self._counter}"
-        # A rebuild's own writes must not look like a new edit.
-        self._seen = snapshot()
+        # `_seen` stays the snapshot taken before the rebuild. A rebuild
+        # writes only under `out_dir`, which nothing watches, so a later
+        # snapshot would hide only a save made while pandoc ran (two
+        # edits a second apart left the page showing the first).
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):

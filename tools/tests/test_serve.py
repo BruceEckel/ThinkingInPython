@@ -7,7 +7,10 @@ rebuild that raises an exception is reported in the terminal instead of
 disappearing, which is what it did before 2026-10-10. A chapter rebuild
 leaves the book's index page stale, and the first request for that page
 rebuilds it (since 2026-10-18, when the ten-second whole-book match had
-made every save a ten-second wait).
+made every save a ten-second wait). A save that lands while a rebuild
+runs gets a rebuild of its own on the next poll (since 2026-10-24, when
+the watcher re-snapshotted after each rebuild and so took that save as
+already built).
 """
 from itertools import chain, repeat
 from pathlib import Path
@@ -74,6 +77,19 @@ def test_a_chapter_and_its_solutions_rebuild_once(
                                     {CHAPTER: 2.0, SOLUTIONS: 2.0})
     watcher.tick()
     assert rebuilt == [CHAPTER]
+
+
+def test_a_save_during_a_rebuild_rebuilds_again(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    watcher, rebuilt = make_watcher(monkeypatch, tmp_path, {CHAPTER: 1.0},
+                                    {CHAPTER: 2.0})
+    # The second save lands while the first rebuild runs: any snapshot
+    # after the first poll sees it.
+    polls = chain([{CHAPTER: 2.0}], repeat({CHAPTER: 3.0}))
+    monkeypatch.setattr(serve, "snapshot", lambda: next(polls))
+    watcher.tick()
+    watcher.tick()
+    assert rebuilt == [CHAPTER, CHAPTER]
 
 
 def test_a_failed_rebuild_is_reported_and_polling_goes_on(
