@@ -74,7 +74,7 @@ SITE_URL = "https://thinkinginpython.com/"
 # pages. The card reads it through `og:image`, which must be absolute.
 SOCIAL_IMAGE = "social-preview.jpg"
 BOOK_DESCRIPTION = ("A free book by Bruce Eckel on modern Python with "
-                    "static types throughout, from the foundations "
+                    "static types throughout, from foundations "
                     "through design patterns, functional programming, "
                     "and Effects.")
 # The newest release's page, listing every published asset (PDF, both
