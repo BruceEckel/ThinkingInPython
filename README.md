@@ -267,8 +267,8 @@ A first run also downloads the pinned Python and the dev tools.
 To run one example instead of all of them,
 see [Run one example by hand](#run-one-example-by-hand) below.
 
-A few examples cannot run unattended:
-four open a window, and two are package modules that run only when imported.
+A few examples cannot run unattended: four open a window,
+and two are package modules that run only when imported.
 `tip run` reports those as "Can't run unattended" rather than as failures.
 `tools/data/norun.txt` lists them.
 Run one by hand to watch it work, or open all the windowed ones at once:
@@ -283,8 +283,7 @@ and the traceback of any that failed.
 
 `tip gate` runs the solutions checks first, as a prerequisite,
 so a failure there hides every `Chapters/` failure behind it.
-`tip sweep` runs every static check over both trees
-and reports all the failures instead of stopping at the first.
+`tip sweep` runs every static check over both trees and reports all the failures instead of stopping at the first.
 It leaves out the `#:` markers and the `Examples/` drift check,
 so run `tip check output-check` before you trust a green sweep.
 `gate` also refreshes generated content in place:
