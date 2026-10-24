@@ -366,9 +366,9 @@ passing every yielded request out to the outer driver and every sent answer back
 
 In the simplest case,
 each generator yields values and leaves its send and return channels at `None`,
-so `Iterator[str]` describes it.
+so the listing annotates each generator as `Iterator[str]`.
 The driver is `list()`,
-which calls `next()` until the outermost generator finishes and collects each value it yields:
+which calls `next()` until the outermost generator finishes:
 
 ```python
 # yield_to_exhaustion.py
