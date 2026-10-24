@@ -468,9 +468,9 @@ def visit(tree: Tree, at: str = ""
           ) -> Generator[str, None, Counter[Color]]:
     counts = Counter[Color]()
     for name, node in tree.items():
-        if isinstance(node, dict):
+        if isinstance(node, dict):  # node is a Tree
             counts += yield from visit(node, f"{at}{name}/")
-        else:
+        else:  # node is a Color
             yield f"{at}{name}: {node}"
             counts[node] += 1
     return counts
@@ -508,8 +508,8 @@ For each nested dictionary, `visit()` calls itself through `yield from`.
 
 The two channels run in opposite directions through that recursion.
 Each path travels out through every enclosing `visit()` and through `census()` to the `for` loop that drives them.
-Each subtree's `Counter` travels back one level,
-and its parent adds it to its own counts with `+=`.
+Each subtree's [`Counter`](03_Foundations--Containers.md#counter)
+travels back one level, and its parent adds it to its own counts with `+=`.
 `census()` receives the count for the whole garden through its own `yield from` and yields one line per color.
 
 Any iterable can follow `yield from`, including a list:

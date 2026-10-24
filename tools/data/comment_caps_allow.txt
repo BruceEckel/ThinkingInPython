@@ -15,3 +15,6 @@ name -> subclass
 ty accepts this: a function that always
 ty can't see this clears val
 bytes is immutable, so a view over it stays read-only:
+# Refer to the loop variable node in color_count.py:
+node is a Tree
+node is a Color

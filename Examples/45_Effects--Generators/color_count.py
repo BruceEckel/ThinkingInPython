@@ -14,9 +14,9 @@ def visit(tree: Tree, at: str = ""
           ) -> Generator[str, None, Counter[Color]]:
     counts = Counter[Color]()
     for name, node in tree.items():
-        if isinstance(node, dict):
+        if isinstance(node, dict):  # node is a Tree
             counts += yield from visit(node, f"{at}{name}/")
-        else:
+        else:  # node is a Color
             yield f"{at}{name}: {node}"
             counts[node] += 1
     return counts
