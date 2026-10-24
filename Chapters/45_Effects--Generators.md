@@ -477,7 +477,7 @@ def visit(tree: Tree, at: str = ""
 
 def census(tree: Tree) -> Iterator[str]:
     counts = yield from visit(tree)
-    for color, n in counts.most_common():
+    for color, n in counts.items():
         yield f"{n} {color}"
 
 garden: Tree = {
@@ -497,8 +497,8 @@ for line in census(garden):
 #: beds/pond/iris: blue
 #: beds/pond/reed: green
 #: ivy: green
-#: 3 green
 #: 2 red
+#: 3 green
 #: 1 blue
 ```
 
