@@ -9,19 +9,16 @@ def collect(name: str) -> Generator[str, int]:
 def both() -> Generator[str, int]:
     yield from collect("alpha")  # [2]
     yield from collect("beta")  # [3]
+    yield "both() is done"  # [4]
 
 g = both()
 print(next(g))
 #: alpha needs a value
-for value in [1, 2, 3]:
+for value in [1, 2, 3, 4]:
     print(f"send({value}) -> {g.send(value)}")
 #: send(1) -> alpha needs another
 #: alpha got 1 and 2
 #: send(2) -> beta needs a value
 #: send(3) -> beta needs another
-try:
-    g.send(4)
-except StopIteration:
-    print("both() is exhausted")
 #: beta got 3 and 4
-#: both() is exhausted
+#: send(4) -> both() is done

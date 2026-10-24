@@ -509,7 +509,8 @@ For each nested `Tree`, `visit()` calls itself through `yield from`.
 A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`,
 and reaches the `for` loop at the bottom of the listing.
 
-A [`Counter`](03_Foundations--Containers.md#counter) is returned to its calling `visit()`.
+A [`Counter`](03_Foundations--Containers.md#counter)
+is returned to its calling `visit()`.
 The `yield from` expression evaluates to the subtree's `Counter`.
 The parent adds it to its own counts with `+=`.
 `census()` receives the count for the whole garden through its own `yield from` and yields one line per color.
@@ -549,22 +550,19 @@ def collect(name: str) -> Generator[str, int]:
 def both() -> Generator[str, int]:
     yield from collect("alpha")  # [2]
     yield from collect("beta")  # [3]
+    yield "both() is done"  # [4]
 
 g = both()
 print(next(g))
 #: alpha needs a value
-for value in [1, 2, 3]:
+for value in [1, 2, 3, 4]:
     print(f"send({value}) -> {g.send(value)}")
 #: send(1) -> alpha needs another
 #: alpha got 1 and 2
 #: send(2) -> beta needs a value
 #: send(3) -> beta needs another
-try:
-    g.send(4)
-except StopIteration:
-    print("both() is exhausted")
 #: beta got 3 and 4
-#: both() is exhausted
+#: send(4) -> both() is done
 ```
 
 `both()` declares the same type as `collect()`,
@@ -573,7 +571,7 @@ because `yield from` passes the inner generator's yield and send channels throug
 The value from `g.send(1)` becomes the result of the `yield` at `[1]` inside `collect("alpha")`,
 the generator to which `both()` delegates.
 `yield from` does the forwarding,
-so the body of `both()` is its two delegations.
+so the body of `both()` needs no code to pass values along.
 
 `g.send(2)` supplies alpha's second value, so `collect("alpha")` finishes.
 That finish completes the `yield from` at `[2]`,
@@ -582,8 +580,12 @@ A single `send()` therefore ends one inner generator and produces the first prom
 The output shows the finish and the new prompt on adjacent lines.
 `alpha got 1 and 2` prints during `send(2)`,
 and `send(2)` returns `beta needs a value`.
-The driver sees `StopIteration` once,
-when `both()` finishes its last delegation.
+
+After its two delegations, `both()` yields a value of its own at `[4]`.
+`send(4)` finishes `collect("beta")` and returns that value,
+so one loop sends all four values.
+If `[4]` were missing, `send(4)` would finish `both()` as well,
+and the driver would have to catch `StopIteration`.
 
 A hand-written loop is the natural first attempt at that forwarding.
 The loop silently discards every sent value:
