@@ -6,9 +6,13 @@ section shows moving a hot Python function into a compiled
 directory holds real, buildable copies of those examples.
 
 It is deliberately separate from the rest of the book's tooling.
-Only the `rust-*` tasks enter this directory or require a Rust
+Only the `rust-*` tasks build anything here or need a Rust
 toolchain: `tip verify`, `tip gate`, and `tip ci`
-all work with no Rust installed. Building and running the code
+all work with no Rust installed. The one thing the gate does here is
+compare `fastcount/src/lib.rs` and `fastcount/demo.py` with the chapter
+(`tools/extract_rust.py` in check mode, inside `tip check`), which needs
+no compiler, so a chapter 18 edit without `tip rust-sync` fails the
+build. Building and running the code
 here is an extra, opt-in step for a reader (or maintainer) who has Rust
 and wants to reproduce the speedup numbers themselves.
 

@@ -15,7 +15,7 @@ Opens with a condensed introduction for programmers coming from other languages.
 
 ## Read the Book Online
 
-[ThinkingInPython.com](https://bruceeckel.github.io/ThinkingInPython)
+[ThinkingInPython.com](https://thinkinginpython.com/)
 
 ## Download the Book
 
@@ -78,7 +78,7 @@ so a marker in the book always shows what the code prints.
 
 ### Working the exercises
 
-Each chapter ends with exercises that name the listing to start from
+Most chapters end with exercises that name the listing to start from
 (e.g.: "Add a method `shrink(self, factor)` to `Circle` in `property_setter.py`").
 Copy the example file, change it, run it.
 
@@ -107,6 +107,9 @@ one more on each run, with `CH` naming the chapter and `N` the exercise.
 Each solution is self-contained:
 it repeats whatever it needs from the chapter rather than importing it,
 so you can read or run one on its own.
+The one exception is the shared helpers in `Examples/utils`,
+which a solution imports the way a chapter listing does
+(see [Run one example by hand](#run-one-example-by-hand)).
 A solution often rewrites the listing instead of editing it,
 so a line-by-line diff of your file against the solution's `.py` file is mostly noise.
 Compare what the two programs print and how they are organized.
@@ -205,7 +208,7 @@ That is everything you need to run and test the examples and the solutions.
 a stale `uv` stuck on an old Python prerelease, and (on Windows)
 a process holding `.venv` open.
 
-Type `tip` to see every target; it opens a picker where arrow keys choose,
+Type `tip` to see the targets; it opens a picker where arrow keys choose,
 Enter runs, and `?` shows a target's full documentation.
 Piped into another command, `tip` prints the same list by category instead,
 and `tip help style` shows one section of it.
@@ -264,8 +267,8 @@ A first run also downloads the pinned Python and the dev tools.
 To run one example instead of all of them,
 see [Run one example by hand](#run-one-example-by-hand) below.
 
-A few examples cannot run unattended because they open a window, wait for input,
-or loop forever.
+A few examples cannot run unattended:
+four open a window, and two are package modules that run only when imported.
 `tip run` reports those as "Can't run unattended" rather than as failures.
 `tools/data/norun.txt` lists them.
 Run one by hand to watch it work, or open all the windowed ones at once:
@@ -280,7 +283,10 @@ and the traceback of any that failed.
 
 `tip gate` runs the solutions checks first, as a prerequisite,
 so a failure there hides every `Chapters/` failure behind it.
-`tip sweep` runs everything and reports them all instead of stopping at the first.
+`tip sweep` runs every static check over both trees
+and reports all the failures instead of stopping at the first.
+It leaves out the `#:` markers and the `Examples/` drift check,
+so run `tip check output-check` before you trust a green sweep.
 `gate` also refreshes generated content in place:
 it rewraps prose to one sentence per line,
 and it rewrites any `#:` marker whose listing now prints something else.
@@ -337,7 +343,7 @@ PYTHONPATH=../utils uv run python deque_timing.py
 Both lines matter.
 An example reads its sibling modules and data files by relative path,
 so it must run from its own chapter directory.
-About 70 of them also import a shared helper that lives in `Examples/utils`
+About 200 of them also import a shared helper that lives in `Examples/utils`
 (`from benchmark import report`),
 so that directory has to be on the import path.
 Miss the second line and Python says:
@@ -354,16 +360,18 @@ $env:PYTHONPATH = "../utils"
 uv run python deque_timing.py
 ```
 
-`tip run-one` prints whichever form fits your shell.
+`tip run-one` prints the PowerShell form on Windows and the POSIX form elsewhere.
 
 Use `uv run python`, not a bare `python`.
-A `python` already on your PATH is usually an older release,
+A `python` already on your PATH may be an older release,
 and these examples use Python 3.15 syntax.
+Even a 3.15 `python` lacks the packages the examples import,
+which live in the project's `.venv`.
 
 ### Optional: Building the Book
 
 Building the book itself needs more.
-`tip site`, `tip local`, and `tip serve` need `pandoc` on your PATH,
+`tip site`, `tip local`, `tip serve`, and `tip epub` need `pandoc` on your PATH,
 `tip pdf` also needs `typst`,
 and `tip prose` needs the standalone `vale` binary.
 Check for all of them:

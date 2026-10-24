@@ -28,7 +28,8 @@ effects/
   zio/Greet.scala     extracted from the chapter
   zio/project.scala   scala-cli directives: the Scala and ZIO versions
   ts/greet.ts         extracted from the chapter
-  ts/package.json     the effect and typescript versions, plus the lockfile
+  ts/package.json     the effect and typescript versions
+  ts/package-lock.json  the lockfile `npm ci` installs from
   ts/tsconfig.json    strict type checking of the listing
 ```
 
@@ -55,7 +56,7 @@ missing, so you can install one and run that alone.
   (checked with 1.18.0) and a Java runtime. The first run downloads
   Scala 3.3 and ZIO, as `zio/project.scala` pins them.
   `SCALA_CLI=path` names a launcher that is not on PATH.
-- **TypeScript / Effect**: Node 22 or later and npm on PATH. `tip
+- **TypeScript / Effect**: Node 22.18 or later (the first release that runs `.ts` files without a flag) and npm on PATH. `tip
   effects-fetch` runs `npm ci` against the committed lockfile into
   `ts/node_modules/`, which git ignores.
 
@@ -70,10 +71,13 @@ Koka, release 3.2.9 (the release's own install script pins it):
 # Linux or macOS: installs to /usr/local (asks for sudo) and needs clang or gcc
 curl -sSL https://github.com/koka-lang/koka/releases/download/v3.2.9/install.sh | sh
 
-# Windows, in cmd or PowerShell: installs to %LOCALAPPDATA%\koka and adds
-# it to PATH; installs clang if no C compiler is found, and offers the
-# Visual Studio Build Tools (already present if you build the Rust crates)
+# Windows, in cmd: installs to %LOCALAPPDATA%\koka and adds it to PATH;
+# installs clang if no C compiler is found, and offers the Visual Studio
+# Build Tools (already present if you build the Rust crates)
 curl -sSL -o %TEMP%\install.bat https://github.com/koka-lang/koka/releases/download/v3.2.9/install.bat && %TEMP%\install.bat
+
+# Windows, in PowerShell: the same installer
+curl.exe -sSL -o $env:TEMP\install.bat https://github.com/koka-lang/koka/releases/download/v3.2.9/install.bat; & $env:TEMP\install.bat
 ```
 
 Or unpack the `koka-v3.2.9-<os>-<arch>.tar.gz` release tarball anywhere
@@ -125,13 +129,15 @@ four programs are held to one transcript. The compile step is the test
 that matters: the chapter's claims about these listings are claims about
 their signatures (Koka's Effect row, ZIO's three type parameters, the
 service types in the TypeScript version), and a compiler checks the
-signatures as written. The run ends with one line per program:
+signatures as written. The run ends with one line per program and a count:
 
 ```
-  koka  ok      4.2s
-  flix  ok      6.8s
+  koka  ok       4.2s
+  flix  ok       6.8s
   zio   skip           scala-cli not on PATH (install it, or set SCALA_CLI=path)
-  ts    ok      2.1s
+  ts    ok       2.1s
+
+3 program(s) ran, 0 failed, 1 skipped.
 ```
 
 ## In CI

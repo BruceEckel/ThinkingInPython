@@ -4,7 +4,7 @@ the book assumes.
 
 An example expects to run from inside its own chapter directory, so the
 sibling modules and data files it opens (``../mouse/Moves.txt``) resolve.
-Seventy-one of them also import a shared helper from the tree's ``utils/``
+About two hundred of them also import a shared helper from the tree's ``utils/``
 directory (``from benchmark import report``). The gate supplies both by
 itself: pytest reads ``utils`` from ``pythonpath``, ty from
 ``extra-paths``, and run_examples.py sets PYTHONPATH on every subprocess

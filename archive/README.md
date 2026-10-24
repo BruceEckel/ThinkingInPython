@@ -2,7 +2,7 @@
 
 Finished working documents, kept for the record and out of the way.
 
-Nothing here is read by the build. `make verify`, `gate`, and every tool
+Nothing here is read by the build. `tip verify`, `tip gate`, and every tool
 under `tools/` scan `Chapters/`, `Solutions/`, and their generated trees,
 so a file moved here stops being a distraction in the root listing
 without any risk of breaking a target.
@@ -26,6 +26,15 @@ distillates that later rounds must still read (`deep_review_db.md`,
   sweep fixed, grouped by error shape, and a later review should read it
   before re-proposing anything in that list. The sweep's own commits are
   `7583395d` through `e2e5ba75`.
+- `~exercise_review.md`: the decision queue from the 2026-09-02
+  whole-book exercise pass (about 320 exercises). 73 of 75 findings
+  applied in `57a0a193`, `4b067f7e`, `abc1e7aa`, `8f0fffac`, `2980cec5`,
+  and `40832bb4`; the two declined are recorded in the message of
+  `2980cec5`, the Part 4 commit.
+- `~adversarial_review.md`: the 2026-09-02/03 hostile-reviewer pass
+  over every chapter. 213 of 252 findings applied (the file's
+  header lists the commits), one declined, and 38 moved to
+  `~adversarial_undecided.md`.
 - `~adversarial_undecided.md` — the author-level queue from the
   2026-09-03 adversarial review. 37 of 38 calls were performed that day;
   the last (a chapter 01 AI anecdote) was declined on 2026-09-29 and is a
