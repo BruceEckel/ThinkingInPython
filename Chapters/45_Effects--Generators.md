@@ -542,15 +542,16 @@ delivering it to the `yield` that waits inside the inner generator:
 # yield_from_send.py
 from collections.abc import Generator
 
-def collect(name: str) -> Generator[str, int]:
+def collect(name: str) -> Generator[str, int, int]:
     first = yield f"{name} needs a value"  # [1]
     second = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
+    return first + second
 
 def both() -> Generator[str, int]:
-    yield from collect("alpha")  # [2]
-    yield from collect("beta")  # [3]
-    yield "both() is done"  # [4]
+    alpha = yield from collect("alpha")  # [2]
+    beta = yield from collect("beta")  # [3]
+    yield f"total {alpha + beta}"  # [4]
 
 g = both()
 print(next(g))
@@ -562,11 +563,15 @@ for value in [1, 2, 3, 4]:
 #: send(2) -> beta needs a value
 #: send(3) -> beta needs another
 #: beta got 3 and 4
-#: send(4) -> both() is done
+#: send(4) -> total 10
 ```
 
-`both()` declares the same type as `collect()`,
+`both()` declares the same yield and send types as `collect()`,
 because `yield from` passes the inner generator's yield and send channels through to the driver.
+The return value goes to `both()` instead of the driver.
+Each `yield from` evaluates to the sum that `collect()` returns,
+as `yield from emit()` evaluates to `12` in `report()`.
+`both()` returns `None`, the default for a `Generator`'s third type parameter.
 
 The value from `g.send(1)` becomes the result of the `yield` at `[1]` inside `collect("alpha")`,
 the generator to which `both()` delegates.
@@ -581,8 +586,9 @@ The output shows the finish and the new prompt on adjacent lines.
 `alpha got 1 and 2` prints during `send(2)`,
 and `send(2)` returns `beta needs a value`.
 
-After its two delegations, `both()` yields a value of its own at `[4]`.
-`send(4)` finishes `collect("beta")` and returns that value,
+After its two delegations,
+`both()` adds the two sums and yields the total at `[4]`.
+`send(4)` finishes `collect("beta")` and returns that total,
 so one loop sends all four values.
 If `[4]` were missing, `send(4)` would finish `both()` as well,
 and the driver would have to catch `StopIteration`.
