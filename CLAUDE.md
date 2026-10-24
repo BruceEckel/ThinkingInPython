@@ -424,8 +424,9 @@ so a reader on GitHub can click through. `check_solutions.py` fails a
 chapter whose link is missing or names another folder, which a chapter
 rename leaves behind; `tip fix-solutions-links` inserts or corrects it.
 The wording is the author's to change; the gate holds the target.
-`build_site.load_chapter()` rewrites the link to the GitHub URL, since
-the site, EPUB, and PDF carry no Solutions pages.
+`build_site.link_solutions()` rewrites the link: on the site to the
+chapter's `<stem>.solutions.html` page, and in the EPUB and PDF, which
+carry no Solutions pages, to the GitHub URL.
 
 **Solutions layout (2026-10-02).** A chapter's solutions are
 `Solutions/<chapter>/README.md`, the authored Markdown, and the `.py`
@@ -455,8 +456,9 @@ prints the same steps one per run. The `<details>` lines, the four
 `# The shape of` are tool-owned and rewritten on every run; edit the
 hint, the `Done when:` criterion, the prose, and the listings inside
 the ladder, never the tags. A solution without a `Hint:`
-paragraph is left flat. Chapter 30 is the prototype; the other 44
-files have no hints yet. The site renders each Solutions file as
+paragraph is left flat. Every Solutions file has had ladders since
+c6271a94 (2026-10-02); the two flat answers left are chapter 38's
+combined ones ("4 and 5", "6, 7, and 8"). The site renders each Solutions file as
 `<stem>.solutions.html` beside its chapter (`tools/build_site.py`,
 `write_solutions_page()`), with `solutions.js` remembering which
 steps a reader opened; the EPUB and PDF still link GitHub. A shape

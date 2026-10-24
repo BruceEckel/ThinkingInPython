@@ -54,7 +54,7 @@ The answers to the exercises are in `Solutions/`.
 |---|---|
 | `Examples/` | The book's listings, one directory per chapter (`Examples/07_Foundations--Classes/`), each file named the way the book names it (`property_setter.py`). |
 | `Examples/utils/` | Helpers that several chapters import, such as `display.py` and `benchmark.py`. Not a chapter. |
-| `Solutions/` | One folder per chapter (`Solutions/07_Foundations--Classes/`). Its `README.md` holds the worked answers, numbered to match that chapter's exercise list, each opening with the exercise it answers, quoted from the chapter. The solution listings sit beside it as `.py` files generated from that `README.md`. |
+| `Solutions/` | One folder per chapter (`Solutions/07_Foundations--Classes/`). Its `README.md` holds the worked answers, numbered to match that chapter's exercise list, each opening with the exercise it answers, quoted from the chapter, followed by the answer in collapsed steps (see [Working the exercises](#working-the-exercises)). The solution listings sit beside it as `.py` files generated from that `README.md`. |
 | `Chapters/` | The book itself, one Markdown file per chapter. |
 
 The build generates the `.py` files in `Examples/` and `Solutions/` from `Chapters/` and `Solutions/`,
@@ -80,13 +80,30 @@ so a marker in the book always shows what the code prints.
 
 Each chapter ends with exercises that name the listing to start from
 (e.g.: "Add a method `shrink(self, factor)` to `Circle` in `property_setter.py`").
-Copy the example file, change it, run it. Then compare with the numbered answer in
-that chapter's `Solutions/` folder. Each solution is self-contained: it
-repeats whatever it needs from the chapter rather than importing it, so you
-can read or run one on its own.
+Copy the example file, change it, run it.
 
-Each answer opens with its exercise, quoted from the chapter, so you can
-read the question and the answer together. A solution often rewrites the
+The chapter's Exercises section links to its solutions.
+On [thinkinginpython.com](https://thinkinginpython.com/) the link opens a Solutions page beside the chapter;
+in the repository the solutions are the `README.md` in that chapter's `Solutions/` folder,
+numbered to match the exercises.
+Each answer quotes its exercise from the chapter,
+then reveals itself in collapsed steps, so you can take as little help as you need:
+
+- **Where to look**: a hint that points to the part of the chapter the exercise draws on.
+- **The shape**: the solution's skeleton, with the function bodies left out. Most answers have this step.
+- **Done when**: the check that tells you your attempt is finished.
+- **Solution**: the full listing and an explanation of its design.
+  It closes by asking you to name what separates your attempt from it:
+  a different design, a detail, or an equivalent alternative.
+
+Open one step at a time, and go back to your own code after each one.
+The site remembers which steps you opened.
+In a clone, `tip hint CH=30 N=3` prints the same steps in the terminal,
+one more on each run, with `CH` naming the chapter and `N` the exercise.
+
+Each solution is self-contained: it
+repeats whatever it needs from the chapter rather than importing it, so you
+can read or run one on its own. A solution often rewrites the
 listing instead of editing it, so a line-by-line diff of your file against
 the solution's `.py` file is mostly noise. Compare what the two programs
 print and how they are organized.

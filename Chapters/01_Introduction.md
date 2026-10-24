@@ -274,12 +274,15 @@ down to the one operation in a long expression,
 and ends with a suggestion such as `Did you mean: 'count'?` when you misspell a name,
 an attribute, or a keyword argument.
 
-Solutions live in the `Solutions/` directory of the source repository.
+Each chapter's Exercises section links to that chapter's solutions.
+On the website they are a page beside the chapter.
+The EPUB and PDF link to the `Solutions/` directory of the source repository.
 Each solution opens in steps, so you can take as little help as you need:
 a hint first, then a check that tells you when your attempt is finished,
 then the full answer.
 Most solutions add a step after the hint,
 the shape of the code with its function bodies left out.
+The full answer closes by asking you to name what separates your attempt from it.
 `tip hint CH=30 N=3` prints the same steps one per run,
 `CH` naming the chapter and `N` the exercise.
 
