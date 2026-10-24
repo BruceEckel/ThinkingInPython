@@ -364,9 +364,11 @@ Generators provide that path because they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
 
-### Running to Exhaustion
-
-The simplest `yield from` targets generators that use the yield channel alone:
+In the simplest case,
+each generator yields values and leaves its send and return channels at `None`,
+so `Iterator[str]` describes it.
+The driver is `list()`,
+which calls `next()` until the outermost generator finishes and collects each value it yields:
 
 ```python
 # yield_to_exhaustion.py
@@ -399,11 +401,11 @@ print(list(top()))
 
 "To exhaustion" means each `yield from` runs its target until that generator finishes.
 Until then, the inner generator yields its values one at a time,
-as the driver requests each one.
+as `list()` requests each one.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`.
-The driver still receives one flat sequence.
+`list(top())` still receives one flat sequence.
 `top()`'s single `yield from` finishes when the last generator beneath it finishes.
 
 Without `from`, a bare `yield one()` yields the generator object as a single value,
