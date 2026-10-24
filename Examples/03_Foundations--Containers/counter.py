@@ -15,3 +15,5 @@ print(counts.most_common(2))
 #: [('a', 3), ('cat', 2)]
 print(Counter("aab") - Counter("ab"))  # Multiset diff
 #: Counter({'a': 1})
+print(Counter("aaab") ^ Counter("abbc"))  # Symmetric diff
+#: Counter({'a': 2, 'b': 1, 'c': 1})
