@@ -446,10 +446,73 @@ When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`,
 the `12` that `emit()` returns.
 
-Any iterable can follow `yield from`.
-A list's iterator ends with a bare `StopIteration`,
-whose `value` defaults to `None`,
-so a `yield from` over a list evaluates to `None`:
+Because each `yield from` hands a result back to its caller,
+a recursive generator can combine results on the way back up a tree.
+`color_count.py` walks a nested dictionary of plants,
+yields the path to each plant, and returns a count of each color:
+
+```python
+# color_count.py
+from collections import Counter
+from collections.abc import Generator
+from enum import StrEnum
+
+class Color(StrEnum):
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+
+type Tree = dict[str, Tree | Color]
+
+def visit(tree: Tree, at: str = ""
+          ) -> Generator[str, None, Counter[Color]]:
+    counts = Counter[Color]()
+    for name, node in tree.items():
+        if isinstance(node, dict):
+            counts += yield from visit(node, f"{at}{name}/")
+        else:
+            yield f"{at}{name}: {node}"
+            counts[node] += 1
+    return counts
+
+def census(tree: Tree) -> Generator[str]:
+    counts = yield from visit(tree)
+    for color, n in counts.most_common():
+        yield f"{n} {color}"
+
+garden: Tree = {
+    "rose": Color.RED,
+    "beds": {
+        "fern": Color.GREEN,
+        "tulip": Color.RED,
+        "pond": {"iris": Color.BLUE, "reed": Color.GREEN},
+    },
+    "ivy": Color.GREEN,
+}
+for line in census(garden):
+    print(line)
+#: rose: red
+#: beds/fern: green
+#: beds/tulip: red
+#: beds/pond/iris: blue
+#: beds/pond/reed: green
+#: ivy: green
+#: 3 green
+#: 2 red
+#: 1 blue
+```
+
+The `Tree` alias refers to itself on its right side,
+so a dictionary can hold plants and further dictionaries to any depth.
+For each nested dictionary, `visit()` calls itself through `yield from`.
+
+The two channels run in opposite directions through that recursion.
+Each path travels out through every enclosing `visit()` and through `census()` to the `for` loop that drives them.
+Each subtree's `Counter` travels back one level,
+and its parent adds it to its own counts with `+=`.
+`census()` receives the count for the whole garden through its own `yield from` and yields one line per color.
+
+Any iterable can follow `yield from`, including a list:
 
 ```python
 # yield_from_list.py
@@ -462,6 +525,10 @@ def relay() -> Iterator[int | None]:
 print(list(relay()))
 #: [1, 2, 3, None]
 ```
+
+A list's iterator ends with a bare `StopIteration`,
+whose `value` defaults to `None`,
+so a `yield from` over a list evaluates to `None`.
 
 ### The Send Channel
 
