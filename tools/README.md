@@ -350,6 +350,120 @@ rewriting `tools/data/target_tiers.txt`, the committed tier per target
 that the listing falls back on for a target this machine has not run.
 Commit that file when the run changes it.
 
+## everything.py
+
+`tip verify` skips work that cannot find anything new (see
+[skip_stamps.py](#skip_stamps.py)), and no gate runs the spelling and
+house-style checks or the book builds. `tip everything` covers all of
+it. It sets `TIP_FULL=1`, which turns every skip off in each step it
+starts, then runs six targets in order: `verify`, `spell`, `prose`,
+`site`, `epub`, and `pdf` (`EVERYTHING` in the script). Unlike `verify`,
+it keeps going after a failure. At the end it prints every target's
+time, names the ones that failed, and exits 1 if any did. Run it before
+a release, after a tool upgrade, or when a shortcut's assumptions are in
+doubt.
+
+It needs every tool those targets need: pandoc and typst for the builds,
+vale for `prose` (`tip tools-check-full` lists them). Left out on
+purpose are `links` (network, and link rot is not the book's fault),
+`pyright-review` (advisory), the `rust-*` tasks (cargo), `verify-targets`
+(it tests the harness, not the book), and anything that publishes.
+`verify-targets` runs `everything` in a disposable worktree, since
+`verify` rewrites tracked files.
+
+```
+tip everything              # every fixer, gate, and build, no shortcuts
+tip everything ARGS=--help  # list the targets without running them
+```
+
+## by_hand.py
+
+`tip run` skips every listing in `tools/data/norun.txt`. Among them are
+the Tkinter views, which open a window that nothing unattended can
+close. No gate executes those files, so a view that raises an exception
+at startup or on the first click goes unseen. `tip by-hand` is the check
+a person runs instead. It starts every example listed under the
+`# [by-hand]` header in `norun.txt` (today the four Tkinter views in
+chapters 30 and 38), all at once, each as its own process from its own
+chapter directory under `Examples/`, with `utils/` on `PYTHONPATH`. Try
+each window and close it. The tool prints a line as each process ends,
+then the traceback of each one that exited nonzero, and exits 1 if one
+did. Ctrl+C stops whatever is still open.
+
+The header is a comment, so `run_examples.py` and `run_one_example.py`
+still skip every pattern in the file. The section runs to the next
+`# [name]` header or the end of the file, and entries above it (chapter
+6's package submodules) stay out. A pattern under the header that
+matches no file is reported as stale. `ARGS=--list` prints what would
+start, opens nothing, and exits 1 on a stale pattern, so it can serve as
+a check. `verify-targets` leaves `by-hand` out, since it waits for a
+person.
+
+```
+tip by-hand              # open every by-hand example and wait
+tip by-hand ARGS=--list  # list them; exit 1 on a stale pattern
+```
+
+## tools_tests.py
+
+The gate's first step: the tools' own unit tests under `tools/tests/`.
+Every later step trusts these tools, so a broken one makes the rest of
+the gate's verdict meaningless. The suite tests the tools, so while
+nothing under `tools/`, `pyproject.toml`, or `uv.lock` has changed since
+it last passed, a rerun can only repeat the verdict. In that case the
+module runs only the tests marked `book`, the few that read a chapter,
+which an edit can break with the tools untouched. A run where every test
+is deselected counts as a pass. A full pass records the digest of those
+files; [skip_stamps.py](#skip_stamps.py) holds the digest, the stamp,
+and the policy. The digest is taken before the suite starts, so an edit
+made during the run stays unstamped.
+
+`tip tools-test` passes `--always`, which runs the full suite every time
+and refreshes the stamp. `TIP_FULL=1` does the same, so `tip gate
+RUN=full`, `tip ci`, `tip release`, and `tip everything` run it in full.
+`PYTEST_N=` passes extra arguments to pytest. A new test that reads a
+chapter rather than a fixture needs `@pytest.mark.book`, or the skip
+hides its failures while `tools/` is unchanged.
+
+```
+tip tools-test   # the full suite; refreshes the skip stamp
+tip gate         # runs it first, with the skip
+```
+
+## verify_targets_wsl.py
+
+`tip verify-targets` starts every task as a new process, and on Windows
+that run takes most of an hour. The same run in the WSL clone,
+`~/ThinkingInPython`, a clone in the Linux filesystem (the root
+`README.md`'s Install section says why it belongs under `~` and not
+under `/mnt/c`), took seven minutes on 2026-10-10, because Linux starts a
+process about ten times faster. The clone normally pulls from GitHub,
+which would mean a push before every smoke test. `tip
+verify-targets-wsl` skips the push. It fetches this checkout's `master`
+into the clone over `/mnt/<drive>/...`, fast-forwards the clone to it,
+and runs `verify_targets.py` there. The output streams here, with the
+summary and each failed target's excerpt at the end. What runs is the
+last commit on `master`; uncommitted edits in this tree stay out of it.
+
+The clone is for running, never for editing. The script resets the
+clone's tracked files first (`git checkout -- .`), because a
+verify-targets run leaves `tools/data/target_tiers.txt` and a
+self-healed marker or two behind, and a fast-forward refuses to run over
+them. A commit made in the clone fails the `--ff-only` merge loudly
+instead of being discarded. The task refuses to start where `wsl` is not
+on PATH (exit 2), and kills the run after `LIMIT=` minutes (default 40,
+about six times the measured run; exit 1). `ARGS=--dry-run` prints the
+bash script the clone would run and starts nothing; other `ARGS=` words
+go to verify-targets. `verify-targets` leaves this target out of its own
+run.
+
+```
+tip verify-targets-wsl                     # every task, in the WSL clone
+tip verify-targets-wsl ARGS="--only gate"  # the named targets
+tip verify-targets-wsl LIMIT=60            # a longer cap, in minutes
+tip verify-targets-wsl ARGS=--dry-run      # print the clone's script
+```
+
 ## target_times.py
 
 Where the help listing's time column comes from. Two sources, the first
@@ -555,6 +669,63 @@ interpreter is never the venv that `uv sync` is about to rebuild.
 tip python-upgrade           # latest patch of the pinned minor, then verify
 tip python-upgrade TO=3.16   # repin to a new minor, then verify
 ```
+
+## version_pins.py
+
+Some sentences in the book and in the project's instructions name the
+`ty` version on which a claim was last checked, as a code span followed
+by a three-part version ("`ty` 0.0.87"). `tip tools-upgrade` moves `ty`,
+but nothing rewrites those numbers, so after an upgrade each pin keeps
+asserting a version nobody has run. `tip version-pins` finds every pin
+in every chapter, every Solutions `README.md`, `CLAUDE.md`,
+`tools/CLAUDE.md`, `AGENTS.md`, and both copies of the coding-style
+skill. It compares each pin with the version `uv run ty --version`
+reports and lists the stale ones. Review files, `archive/`, and the
+tool-upgrade skill record history, so it leaves them unscanned. The
+`TOOLS` table holds one row per tool; today `ty` is the one row.
+
+The report is a to-do list, never a gate: it exits 0 whether or not pins
+are stale, and 2 on an error (the installed version is unreadable, or a
+keep entry matches no line). By default it reads and reports.
+`ARGS=--write` rewrites each stale pin to the installed version, and
+writes a file only when a pin in it changed; while an error stands it
+writes nothing. Run `--write` after the probes in the tool-upgrade skill
+pass, since a bumped pin asserts that someone re-checked the claim on
+that version. A historical sentence keeps its version through an entry
+in `tools/data/version_pins_keep.txt`, one `path:substring` per line. A
+matching line is reported as KEEP and never rewritten. An entry that
+matches no line is the error above, so the list cannot rot. `tip
+tools-upgrade` runs the report, without `--write`, after it stamps the
+upgrade.
+
+```
+tip version-pins               # list the stale pins
+tip version-pins ARGS=--all    # current and kept pins too
+tip version-pins ARGS=--write  # bump the stale pins
+```
+
+## libs_check.py
+
+A library module with no task of its own. The dev group in
+`pyproject.toml` holds two kinds of package: the tools that check the
+listings (`ty`, `ruff`, `pytest`) and the libraries the listings import
+(`LIBRARIES`: Stateless, numpy, hypothesis, time-machine). A library
+release can change a listing's behavior, a revealed type, or an overload
+list the prose quotes, the same way a `ty` upgrade can. Stateless is the
+heavy case, since chapters 46 and 47 describe its API in prose.
+
+`current()` reads each package's locked version from `uv.lock`, and
+`rows()` asks PyPI for each one's latest release, all lookups at once
+with a 10-second timeout. `tool_stamp.py` is the caller. `tip
+tools-status` prints each package against PyPI's latest, and `tip
+tools-upgrade` records the libraries' locked versions in its stamp under
+`build/`. `libs_check.py` writes no file, and an offline machine is no
+failure: an unreachable PyPI gives `None`, and the report line reads
+"latest unknown". No gate imports it, because a gate that reaches the
+network fails for reasons the book did not cause. A library that is
+behind is upgraded alone, with `uv lock --upgrade-package NAME`, `uv
+sync`, and `tip sweep`, so a failure afterward has one cause. The
+tool-upgrade skill's Stateless entry lists what to re-check.
 
 ## extract_examples.py
 
@@ -1176,7 +1347,459 @@ After Vale, `tip prose` runs twelve report-only scans, each with a
 baseline of judged keeps: stranded prepositions, stranded possessives,
 watch words, positional references, italics, trailing tags, subject gaps,
 sentence shapes, passive voice, past tense, expletives, and internal names.
-The root `CLAUDE.md` describes each one.
+Each has an entry below, under "Report-only prose scans" and "The spaCy
+parse".
+
+## Report-only prose scans
+
+`tip prose` runs Vale and then a family of literal scans, each aimed at
+one shape the style guide rules out. No gate runs them. A word-pattern
+heuristic finds false alarms beside real faults, which a human tells
+apart. Vale runs first. A Vale error stops `tip prose` before the scans,
+so each scan also has a task of its own. `tip everything` includes
+`tip prose`. The parse-based scans that `tip prose` runs after
+these (subject gaps, sentence shapes, passive voice, past tense,
+expletives) share one spaCy parse and have an entry of their own.
+
+Each scan keeps a baseline in `tools/data/` of the hits a human read and
+judged keeps, so a run prints the new hits, then any `stale` entry (a
+baseline entry for a scanned file that matches no current hit), then a
+summary line, `N new, M accepted`, with a stale count when there is one.
+An entry holds the path and the clause or sentence with its whitespace
+normalized and no line number, so a reflow leaves it in place. An edit to
+the clause retires the entry, and the rewritten clause reports as NEW.
+To act on a hit, fix the prose, or judge it a keep and run
+`tip <name>-accept`, which appends every NEW hit to the baseline and
+drops the stale entries.
+
+`CH=` picks a chapter by number or stem prefix and passes that chapter
+and its Solutions file (`Chapters/<CH>*.md`, `Solutions/<CH>*/README.md`)
+to the scan; with no `CH=` a scan reads all of `Chapters/` and
+`Solutions/`. The `-accept` tasks pass the same files. A run given
+paths compares against those files' baseline entries alone, so
+`tip stranded-accept CH=33` adds and drops entries for chapter 33
+and its Solutions file and leaves every other file's entries alone.
+`ARGS=--all` on a report task lists every hit, marked NEW or accepted,
+and `ARGS=--fail` exits 1 on a NEW hit. `tip prose` passes no `ARGS` to
+the scans.
+
+```
+tip prose CH=30             # Vale, then every scan, on one chapter
+tip stranded CH=30          # one scan alone
+tip stranded CH=30 ARGS=--all
+tip stranded-accept CH=30   # baseline the new hits after reading them
+```
+
+## stranded_prepositions.py
+
+Lists a clause that ends on a preposition whose object moved or went
+missing ("the field they sit on", "what it is for"). The scan joins each
+paragraph's lines, splits the text into clauses at `.`, `,`, `;`, `:`,
+`?`, and `!`, and reports a clause whose last word is in `PREPOSITIONS`.
+It skips a phrasal verb whose pronoun object sits before the particle
+("turn it on", "passes `x` through") and the idioms in `IDIOMS` ("and so
+on", "as before"). Inline code spans become the placeholder `CODE`, so
+"refers to `x`" is no hit. Fenced listings, headings, block quotes,
+tables, HTML, link definitions, and `#:` lines are skipped. The
+possessive, watch-word, italics, and trailing-tag scans reuse this
+module's paragraph reader, so they skip the same input. The
+module docstring lists the false-positive shapes left for a human (an
+infinitive marker closing a clause, a phrasal verb with no pronoun).
+Front the preposition, restructure the sentence, or use a transitive
+verb. The baseline is `tools/data/stranded_baseline.txt`.
+
+```
+tip stranded CH=30          # new hits
+tip stranded-accept CH=30   # baseline the judged false positives
+```
+
+## stranded_possessives.py
+
+Lists a possessive whose head noun is elided ("the subclass's type, not
+the base's"), the possessive cousin of the stranded preposition (a style
+rule since 2026-10-14). A word ending in `'s` or `s'` is a hit when clause
+punctuation, the end of the paragraph, or a function word from
+`FUNCTION_WORDS` follows it; the contractions in `CONTRACTIONS` ("it's",
+"let's") are skipped. A code span after the possessive counts as its noun
+("the wrapper's `__dict__`"). Restore the noun or restate the sentence.
+The baseline is `tools/data/stranded_possessives_baseline.txt`.
+
+```
+tip possessives CH=30          # new hits
+tip possessives-accept CH=30   # baseline the judged false positives
+```
+
+## watch_words.py
+
+Lists the words in the style guide's three watch tiers, matched as whole
+words and phrases, case-insensitively, with the tier label on each
+hit. `[T3]` ("Don't use": `ships`, `lands`, `wants`, and the other
+metaphors) is a defect unless a human reads it as literal. `[T2]`
+("Avoid if possible": `already`, `even`, `never`, the commerce family)
+stays where the word changes the meaning. Tier 1 ("Consider
+rewriting": `only`, `itself`, `once`, `names`, and the rest) is
+advisory. A default run
+leaves it out of the report, the `new` count, and `--fail`. Two literal
+senses are skipped: the arithmetic `even` and a `hook` near `git`,
+`pre-commit`, `SessionStart`, or `Claude`. `ARGS="--tier 3"` prints one
+tier, `ARGS="--tier 1"` or `ARGS=--all` shows Tier 1, and `ARGS=--fail`
+exits 1 on a new Tier 3 hit alone. `tip watch-words-accept` baselines
+the new Tier 2 and Tier 3 hits. That task passes no `ARGS`, so
+baselining Tier 1 hits takes the module's `--accept --tier 1` directly.
+The baseline is `tools/data/watch_words_baseline.txt`.
+
+```
+tip watch-words CH=30                    # new Tier 2 and 3 hits
+tip watch-words CH=30 ARGS="--tier 1"    # the advisory tier
+tip watch-words-accept CH=30             # baseline the judged keeps
+uv run python -m tools.watch_words --accept --tier 1 Chapters/30_*.md
+```
+
+## positional_refs.py
+
+Lists prose after a listing that points at a line by position ("the
+second `print()`", "the last line", "line 3") or by a construct the
+listing holds more than once ("the `for` loop" beside two `for`s), the
+shapes the `# [n]` tag convention replaces (see `listing_tags.py`). A
+listing's region runs from its closing fence to the next fence or
+heading, as in `listing_tags.py`. A sentence that cites a `` `[n]` ``
+tag is skipped. Six patterns match; the construct pattern counts the
+keyword in the listing's code and reports the count (`construct x3`).
+The noun list leaves out "argument", "version", and "element", so an
+ordinal naming a parameter, a variant, or data draws no hit. A runtime
+order ("the second `run()`") still matches and goes in the baseline as
+a keep. Tag the line, or name the construct when the listing holds
+one. The baseline is `tools/data/positional_refs_baseline.txt`.
+
+```
+tip positional CH=30          # new hits
+tip positional-accept CH=30   # baseline the judged keeps
+```
+
+## italics.py
+
+Lists italics that break the rule that italics introduce a term once.
+`[EMPHASIS]` is a span made of function words ("*is*", "defers *how*"),
+`[REPEAT]` a term italicized again in the same file, and `[EARLIER]` a
+term italicized after the file's prose used it without italics, with a
+trailing "s" or "es" tried both ways. All three rules skip pattern
+names, which are italic on every mention. `[REPEAT]` and `[EARLIER]`
+also skip capitalized titles and spans under three letters. Run over
+the 15 chapters as they stood before the 2026-10-23 hand sweep (commit
+cd9c4045), the scan flagged 32 of the 38 lines that sweep changed; a
+verb or adjective stressed at first use is beyond it. Remove the
+italics, or baseline a defining sentence for a term the earlier prose
+used loosely. The baseline is `tools/data/italics_baseline.txt`.
+
+```
+tip italics CH=45          # new hits
+tip italics-accept CH=45   # baseline the judged keeps
+```
+
+## trailing_tags.py
+
+Lists two shapes from rules R32 and R35 in `bruce_edit_db.md`, marked in
+chapter 31 on 2026-10-18, with the rule label at the front of each hit.
+`[R32]` is a clause whose last comma-separated segment is a past
+participle plus a measure or place from `MEASURES` ("belongs in that
+state's row, written once"), the word "unchanged", or "the same" plus a
+few words. `[R35]` is a transactional connective from `CONNECTIVES`
+anywhere in a clause ("in return", "the trade-off", "the cost of").
+Every "the cost of" and "the price of" is reported, and the baseline
+holds the measured ones. Clauses split at `.`, `;`, `:`, `?`, and `!`,
+since R32 reads the segment after the last comma. A participle that
+describes the noun before it is a typical keep. The baseline is
+`tools/data/trailing_tags_baseline.txt`.
+
+```
+tip trailing CH=31          # new hits
+tip trailing-accept CH=31   # baseline the judged keeps
+```
+
+## internal_names.py
+
+Lists public class names that nothing outside their class uses, each a
+candidate for a leading underscore. Unlike the rest of the family it
+reads code: every class under `Examples/<chapter>/` and
+`Solutions/<chapter>/`, collecting each method, property, class
+attribute, class-body annotation, and `self.x` store. A name counts as
+used when `.name` or `name=` appears in the chapter's code outside the
+class's own lines, or when the name sits in a code span of the
+chapter's Markdown or its Solutions README. Record fields (class-body
+annotations of a `@dataclass`, `@record`, or `NamedTuple` class) are
+skipped by design. A hit prints as
+`path:line: Class.name (kind, N references inside the class)`. The baseline,
+`tools/data/internal_names_baseline.txt`, keys an entry as
+`path::Class.name` and holds the judged keeps: stored constructor data,
+table-driven names, double-dispatch legs, introspection demos. Add the
+underscore in the listing's Markdown block (`Examples/` and `Solutions/`
+are generated from it), or accept the hit.
+The scan always reads the whole book, so neither task takes `CH=`.
+
+```
+tip internal-names          # new hits, whole book
+tip internal-names-accept   # baseline the judged keeps
+```
+
+## bare_raise.py
+
+Lists a "raise" word with no object in the prose of `Chapters/` and
+`Solutions/` (or the files given in `ARGS`): "raise", "raises",
+"raised", "raising", and "re-raise", followed by clause punctuation or
+a word from `NOT_AN_OBJECT`. It joins each sentence across line breaks
+first, so a verb at a line end whose object opens the next line is no
+hit. A verb after an article and one whose object comes first ("the
+exception it raises", "what they raise") are skipped. `tip bare-raise`
+runs it. The task sits under "Style gates" in `tip help`, but neither
+a gate nor `tip prose` runs it. It keeps no baseline. The gated form of
+the same rule is `prose_lint.py`'s `BARE-RAISE` (since 2026-10-21),
+which the gate runs over `Chapters/` through `check_all.py` and
+`tip spell` runs over both trees. The two matchers differ. `BARE-RAISE`
+skips "raised" as passive and excuses a verb at a line end, while
+`bare_raise.py` reads "raised" and joined sentences, so it finds
+"raised inside" and similar shapes the gate passes, beside false alarms
+of the non-exception sense ("the limit raised to"). Read each hit and
+give the verb an object where it means raising an exception.
+
+```
+tip bare-raise                               # both trees
+tip bare-raise ARGS=Chapters/42_Functional--Error_Handling.md
+```
+
+## The spaCy parse: spacy_parse.py, parsed_prose.py, parse_check.py
+
+Seven report-only prose checks read a dependency parse instead of matching
+word patterns. Five run in `tip prose` against a baseline, and two are
+surveys that run alone. A whole-book parse takes about 24 seconds, so the
+seven share one, and these three modules hold what they have in common.
+
+**`spacy_parse.py`** is the parser half. The book pins a Python for which
+spaCy publishes no wheel, so this file runs in a separate environment:
+`parsed_prose.py` starts it with `uv run --no-project --python 3.12 --with
+spacy ...` (`PARSER_CMD`, which pins spaCy 3.8 and the `en_core_web_sm`
+3.8.0 model wheel). It reads paragraph texts as JSON on stdin and writes
+each sentence's token table (text, lemma, part of speech, tag, dependency
+label, head, character offset, morphology) as JSON on stdout. Since it
+runs outside the project, it imports nothing from `tools/`. uv caches the
+environment. The first run downloads an interpreter, spaCy, and the
+model, which takes a minute or so, and later runs start in a few seconds.
+
+**`parsed_prose.py`** is the half the checks call. `parsed()` reads each
+document's paragraphs through `stranded_prepositions.py`'s reader
+(listings, headings, block quotes, tables, HTML, and `#:` lines are
+skipped, an inline code span becomes the placeholder `CODE`, and a
+paragraph's lines are joined), parses them, and returns typed `Paragraph`,
+`Sentence`, and `Token` records. Each document's parse is kept in
+`build/parses/`, one JSON file per document named for its path
+(`Chapters__31_Patterns--State_Machines.md.json`), with a hash of the
+document's paragraph texts. A document whose hash matches is read from
+its file. Every paragraph of the other documents goes to one parser call,
+so a run with stale documents starts one subprocess, and a run with none
+starts no subprocess. The hash covers the text alone, so a spaCy or model
+upgrade leaves the cache looking current: delete `build/parses/` after
+one. The directory is derived, so deleting it is always safe. The module
+also holds the token-table helpers the rules share (`finite()`,
+`children()`, `subtree()`, `subject_of()`, `conj_verbs()`,
+`coordinator()`).
+
+When the environment cannot start (no `uv` on `PATH`, or no network on a
+first run), `parse()` raises `ParserUnavailable`. Each check catches it,
+prints `<name>: parser unavailable (...); nothing checked` to stderr, and
+exits 0, so `tip prose` goes on to the next scan.
+
+**`parse_check.py`** holds the rest. `run()` is a baselined check's whole
+default run: read the files, call the check's rule, apply the baseline,
+then print the report or, under `--accept`, rewrite the baseline. The
+baseline mechanics are the ones the section above describes.
+`build_arg_parser()` gives every check the same command line: paths,
+`--fail` (exit 1 on a NEW hit, or on any hit for a survey), `--all` and
+`--accept` for a baselined check, and `--survey` and `--calibrate` where a
+check has them. `PROSE_CHECKS` lists the five checks `tip prose` runs, in
+order. The module docstring ends with the steps for adding a check.
+
+Two conventions run through the checks. A survey rule finds a shape that
+the author's own rewrites carry about as often as the originals, so each
+hit is a question for an editing pass rather than a fault. A baselined
+check prints its survey rules under `ARGS=--survey` alone, each line
+marked `survey`, never written to the baseline and never counted in
+`N new`. `pointer_words.py` and `negation_density.py` are surveys
+through and through, with no baseline. `ARGS=--calibrate` shows whether a
+rule separates bad prose from good. It parses the `before` and `after`
+text of each record in `tools/data/edit_pairs.json` (sentences the author
+rewrote) and prints, per label, the pairs where the rule fires on the
+before text alone, on both, and on the after text alone. A default rule
+should fire on the originals and stay quiet on the rewrites. Most checks
+then print their built-in examples with the result each should give, and
+`passive_voice.py` and `expletives.py` also compare their hits with a
+Vale rule. The edit pairs and examples are parsed without the cache.
+
+The tests start no spaCy. Each `tools/tests/make_<check>_parses.py`
+records the real parse of its fixture paragraphs into
+`tools/tests/data/<check>_parses.json`, and the tests read it through that
+module's `recorded_parser()`. Rerun a recorder after a spaCy or model
+upgrade, or after changing its `SOURCES`, then run `tip tools-test`.
+
+```
+uv run python -m tools.tests.make_passive_voice_parses  # rerecord
+```
+
+## subject_gap.py
+
+Lists a sentence whose subject is held open from its verb: the subject
+head carries a relative clause, a participle, a "such as" phrase, a
+prepositional chain, or an appositive, and the finite verb arrives nine
+or more words later ("an action that must run on every entry into that
+state appears once", the chapter 31 sentence that started it on
+2026-10-18). The `straighten` skill calls the shape "the subject held
+open". A hit prints as `path:line: [kinds] subject .. verb: sentence`,
+where `kinds` are the dependency labels of the subject's postmodifiers
+(`relcl`, `acl`, `prep`, `appos`, `conj`). The repair moves the modifier
+after the verb, turns it into a when-clause, or gives it a sentence of its
+own; commit 0fc6e04d has 37 examples. Keeps go in
+`tools/data/subject_gap_baseline.txt`: coordinated subjects, a short
+appositive, a relative clause that is the claim and reads once, and a
+parser misreading. `tip prose` runs it, and no gate does.
+
+```
+tip subject-gap CH=31            # new hits, chapter and Solutions
+tip subject-gap ARGS="--gap 12"  # a different threshold for one run
+tip subject-gap-accept CH=31     # baseline the judged keeps
+```
+
+## sentence_shapes.py
+
+Finds four sentence shapes from the style rules. Two are default rules,
+held to `tools/data/sentence_shapes_baseline.txt`: `[IMP]`, a command
+plus its consequence ("Remove `frozen=True` and the pattern fails"), and
+`[COLON+AND]`, a colon followed by a clause whose verb joins a second
+clause with its own subject through "and". Two are survey rules: `[AND]`,
+an "and" that joins two clauses with different subjects, and `[COLON]`,
+a colon followed by an independent clause. A colon after a count or a
+demonstrative ("three parts:", "this shape:") is skipped. Two imperatives
+in a row ("Try the operation and handle the exception") are no hit, since
+the second verb has no subject. In calibration `[AND]` fired on 7 pairs'
+before text alone, 1 on both, and 6 on the after text alone, so its hits
+are judgments made per sentence. `tip prose` runs the default rules.
+
+```
+tip sentence-shapes CH=31                # new default hits
+tip sentence-shapes CH=31 ARGS=--survey  # plus [AND] and [COLON]
+tip sentence-shapes ARGS=--calibrate     # all four, edit pairs
+tip sentence-shapes-accept CH=31         # baseline the judged keeps
+```
+
+## passive_voice.py
+
+Lists each passive clause: a verb with a passive auxiliary and a passive
+subject, a relative clause ("a value that is written once") and a
+get-passive included. `[PASSIVE]` names no actor. `[PASSIVE+BY]` writes
+the actor out in a by-phrase, so the sentence could make that actor its
+subject; it is the form most often worth turning around. A bare
+participle ("a value stored in the class") and an adjective after "be"
+("is unchanged") are no hit. Vale's write-good `Passive` rule matches by
+word pattern and flags that adjective, so `.vale.ini` turns it off (since
+2026-10-19), and this check replaces it. Keeps go in
+`tools/data/passive_voice_baseline.txt`: an unknown actor ("Java is
+statically compiled"), a quoted diagnostic, a naming convention ("is
+called *Multiton*"), and a parser misreading. `ARGS=--calibrate` compares
+the check with the edit pairs and with Vale's `Passive` alerts (it runs
+`vale` over the book and skips that half when `vale` is missing).
+
+```
+tip passive CH=31              # new hits
+tip passive ARGS=--calibrate   # edit pairs, then Vale comparison
+tip passive-accept CH=31       # baseline the judged keeps
+```
+
+## past_tense.py
+
+Holds standing behavior to the present tense. It finds a simple-past
+verb, or a participle with a past auxiliary ("was built", "had loaded");
+a present perfect ("has loaded") is no hit. `[PAST]` is the past verb of
+a main clause ("One design served three jobs in this chapter").
+`[PAST-HEADING]` is a past verb in a heading ("What Stayed Constant"),
+which the check reads from the heading lines, since the paragraph reader
+skips them. Both are held to `tools/data/past_tense_baseline.txt`.
+`[PAST-SUB]`, every other past verb, is a survey rule: the first run on
+2026-10-19 found 1283 hits, nearly all subordinate ("the function the
+caller passed"), which refer back inside present narration. A sentence
+with a year, a version number, a PEP number, or the modal "would",
+"could", "might", or "should" is skipped, and so are a verb inside
+double quotes, a main-clause past whose subject is "I" or "we", and the
+subjunctive "were" in a sentence that opens with "If" or "When". Keeps
+are a narrated run, a measurement, and history without a year.
+
+```
+tip past-tense CH=31                # new [PAST] and [PAST-HEADING] hits
+tip past-tense CH=31 ARGS=--survey  # plus [PAST-SUB], for an activate pass
+tip past-tense ARGS=--calibrate     # edit pairs and built-in examples
+tip past-tense-accept CH=31         # baseline the judged keeps
+```
+
+## expletives.py
+
+Lists the empty frames the style rules exclude. `[THERE]` is the
+existential "there" in any position ("there is", "if there were",
+"there is no X"): a "there" with dependency `expl` whose verb has no
+subject of its own. That second test separates it from a place adverb
+the parser also labels `expl` ("Caching there is one way"). `[IT-IS]` is
+the extraposed frame, "it is easy to add" or "it is true that": "it"
+with a form of "be" whose adjective carries an infinitive or a
+that-clause. The check has no cleft rule, because the parse cannot tell
+"it is X that" from "it is a NOUN that" with a real antecedent.
+Vale's write-good `ThereIs` stays on, and it matches a sentence-initial
+"There is/are" alone, so this check adds the mid-sentence cases. Keeps go
+in `tools/data/expletives_baseline.txt`: an `[IT-IS]` "it" with a real
+antecedent, a quotation the quote count missed, and a mislabeled place
+adverb with no subject beside it.
+
+```
+tip expletives CH=31              # new hits
+tip expletives ARGS=--calibrate   # edit pairs, examples, and Vale's ThereIs
+tip expletives-accept CH=31       # baseline the judged keeps
+```
+
+## pointer_words.py
+
+A survey for the `antecedents` skill, outside `tip prose`, with no
+baseline. It lists each sentence that opens with a pronoun used as a
+subject, after any opening adverb or conjunction. `[THIS]` is a
+demonstrative ("This is the fast path") and always prints. `[IT]` is "it"
+or "they", and it prints when the previous sentence of the paragraph
+holds two or more nouns of matching number, which the line names as
+candidates (`it -> proxy, level`), or when the pronoun opens the
+paragraph. The calibration fired about as often on the author's rewrites
+as on the originals (`[THIS]` 1 before alone, 0 both, 2 after alone;
+`[IT]` 1, 0, 1), so each line is a candidate for that pass to judge. A
+pronoun whose target the sentence and the paragraph's topic make clear
+stays.
+
+```
+tip pointers CH=31             # every hit, to start an antecedents pass
+tip pointers ARGS=--calibrate  # edit pairs and built-in examples
+```
+
+## negation_density.py
+
+A survey for the `positive` skill, outside `tip prose`, with no baseline.
+It counts the style rule's family of negatives per paragraph: the
+parse's `neg` dependency; no, none, nothing, never, without, unless, and
+cannot; verbs such as omit, lack, fail, and skip; and un-, non-, and -less
+words, minus stop lists for words such as "under", "unique", and
+"regardless". The restrictive "only" is counted apart. A paragraph at
+three or more, "only" aside, prints as `[NEG n +k only] word, word x2:
+text`, and a table follows with each file's negatives per 1000 words and
+a line `N paragraphs at >= 3 in F files`. A listed paragraph is a
+candidate: the `positive` pass keeps a negation that is the claim or half
+of a real contrast. `ARGS=--calibrate` sorts the edit pairs into FEWER,
+SAME, and MORE negatives after the author's rewrite.
+
+```
+tip negatives CH=31                    # paragraphs at 3 or more
+tip negatives ARGS="--threshold 4"     # a different threshold
+tip negatives ARGS="--top 20"          # the 20 densest paragraphs
+tip negatives ARGS=--calibrate         # edit pairs and the rule's examples
+```
 
 ## check_all.py
 
@@ -1262,6 +1885,50 @@ what the program prints.
 
 ```
 tip widths    # check (part of the gate through GATE_CHECKS)
+```
+
+## code_width.py
+
+`listing_width.py` (`tip widths`, and `widths` in `GATE_CHECKS`)
+enforces the 60-character limit. `tip code-width` answers a different
+question: what would break at another width, when weighing a narrower
+limit, an e-reader column, or a code font size. It is a survey, never a
+gate, and exits 0 whatever it finds. It measures every line of every
+Python block in `Chapters/` and `Solutions/` by its raw rstripped
+length, with no pragma exemption, since the question is what a reader's
+screen has to fit. `WIDTH=` (default 60) sets the threshold for the
+printed count and for `--tsv`, and where the page's slider starts.
+
+By default it writes `build/reports/code_width.html`, a self-contained
+page grouped by chapter. Each row gives the extracted file and line
+(under `Examples/` or `Solutions/`, or `(fragment)` for a block the
+extractor never writes), the Markdown line, the width, and the line with
+the overflow highlighted. The page carries every line wider than 40
+columns, so its slider (40 to 80) re-filters live without another run.
+Lines past the gate's 60 are marked apart from those merely over the
+slider's value. One checkbox, on by default, hides the lines the gate
+forgives (those that fit once a trailing `# type: ignore` is excluded),
+using `listing_width.py`'s own measure so the two agree. A second, off
+by default, keeps only the lines that a comment carries over the width.
+A `#:` marker counts as program output, never as a comment.
+
+When stdout is a terminal, the script also opens the page in the browser
+and stays up as a small HTTP server on 127.0.0.1 until Ctrl+C. A click
+on a row asks that server to run the Zed CLI, `zed path:line`, which
+opens the chapter at that line; the row's file cell opens the extracted
+file instead. The server opens files under the repo and refuses any
+other path. It finds Zed through `$ZED`, then `zed` on PATH, then Zed's
+per-user install location. Piped or captured, the script writes the
+page, prints the count and the path, and exits, which is how
+`verify-targets` runs it. `ARGS=--no-open` and `ARGS=--open` override
+the terminal test. `ARGS=--tsv` prints one tab-separated row per line
+(code location, Markdown location, width, line) and writes no page.
+
+```
+tip code-width                  # page of lines over 60; serve and open it
+tip code-width WIDTH=50         # what would break at 50
+tip code-width ARGS=--no-open   # write the page only
+tip code-width ARGS=--tsv       # tab-separated rows, for cut or a sheet
 ```
 
 ## listing_tags.py
@@ -1490,6 +2157,334 @@ triage after editing a sentence that links another chapter. Waivers go in
 claim with no code term in it is invisible to them. The module docstring
 and `tools/CLAUDE.md` have the details.
 
+## Model-backed reviews
+
+Some questions about the prose depend on reading, so no search can
+settle them. Does a sentence attribute a name to the chapter it links?
+Does the linked section cover what the sentence credits it with? Would
+the author rewrite this sentence? The tools in this family put such
+questions to a model. Two services answer. TypeSafe takes structured
+questions through `judgments.py`: a Choice among named options, a Score
+on a scale, or a Noul, the probability of yes. Gemini, reached through
+Google's Antigravity CLI (`agy`), reads a whole chapter or a numbered
+list of statements. Two members call no model: `check_claims.py`
+narrows by search the question `link_support.py` asks a model, and
+`sentence_diff.py` is the library that finds the sentences an edit
+rewrote.
+
+None of these tools is part of `verify`, `gate`, `sweep`, or `ci`. Each
+run uses tokens and can answer differently from the last. A model's
+answer reaches a gate in one place: `check_self_reference.py` reads the
+grounding verdicts that `grounding_triage.py` stored in `tools/data/`,
+offline, so the gate stays deterministic and makes no network call.
+`tip verify-targets` smoke-tests `grounding-triage` and `link-support`
+on a machine where the TypeSafe key is set and skips them elsewhere. It
+excludes `edit-patterns`, `outside-review`, and `prompt-facts`
+everywhere. Treat every finding as an observation to test against the
+chapter before editing.
+
+## judgments.py
+
+The shared TypeSafe layer, a library with no command. `ask()` sends a
+batch of (state, questions) pairs to TypeSafe's `system_one()` call,
+eight at a time. It retries a gateway error, a dropped connection, or a
+timeout up to four times with backoff; the SDK retries rate limits on
+its own. Four tools call `ask()`: `grounding_triage.py`,
+`link_support.py`, `prose_calibration.py`, and `edit_patterns.py`.
+`check_self_reference.py` imports the module to read
+`grounding_verdicts.json`. `fault_review.py` and `fix_triage.py` use its
+`load()` and `save()` on `edit_pairs.json`. Those three ask nothing.
+
+Asking needs the `typesafe-sdk` package and a `TYPESAFE_API_KEY`. The
+SDK stays out of `pyproject.toml`, because it builds `pydantic-core` from
+source on the pinned Python, which a fresh cloud session cannot do. The
+`tip` tasks add it for one run with `uv run --with typesafe-sdk`.
+`api_key()` looks in the process environment and then, on Windows, in
+the user's registry environment (`HKCU\Environment`). The registry
+fallback dates from 2026-09-29, when a Claude Code session started from
+an older shell inherited no copy of the key. An exit message naming
+both places means the key is unset. Reading a store needs neither the
+SDK nor the key, which keeps the gate offline.
+
+`key()` hashes everything a question saw, with whitespace collapsed. A
+reflow therefore keeps a verdict. An edit to the sentence (or to the
+linked section) retires it, leaving that sentence unjudged until the
+next run. `save()` sorts a store by file and line, so its diff reads in
+book order. `SECTION_LIMIT` (12,000 characters) caps how much of a
+linked section a question sees.
+
+## grounding_triage.py
+
+`check_self_reference.py`'s `grounding` rule finds a sentence that links
+a chapter containing none of the code names the sentence holds. Search
+cannot tell a misattribution (chapter 07's old "[Rethinking Objects]
+does with `slots=True`") from a sentence that credits the linked chapter
+with an idea while the names belong to the current chapter's example.
+All 41 findings on 2026-09-27 were the second kind. `tip
+grounding-triage` asks TypeSafe a Choice about each finding that has no
+stored verdict, `terms_to_target` against `idea_to_target`. It writes
+the probability of `terms_to_target`, with the date asked, to
+`tools/data/grounding_verdicts.json`. It also prunes a verdict whose
+sentence no longer produces a finding and refreshes the stored line
+numbers without asking again.
+
+The gate reads that file offline (see `check_self_reference.py` above).
+A verdict at or above `MISATTRIBUTED` (0.4) becomes SR004 and fails the
+gate. A finding judged to credit an idea drops out. One with no
+verdict stays SR002, which `tip self-reference-report` lists and the
+gate lets pass. A new misattribution therefore passes the gate until
+the triage runs, so run it after editing a sentence that links another
+chapter, and commit the verdict file. An SR004 asks you to correct the
+sentence: link the chapter that holds the name, or credit the linked
+chapter with its idea alone. The 2026-09-27 calibration scored the 41
+real findings 0.00 to 0.11 for attribution and the five planted
+misattributions in `CALIBRATION` 0.66 to 0.93. `ARGS=--calibrate`
+re-asks the planted cases and every stored one, stores nothing, and
+exits 1 when a case falls on the wrong side of 0.4. Run it after a
+model or wording change.
+
+```
+tip grounding-triage                    # ask about new findings, store the verdicts
+tip grounding-triage ARGS=--dry-run     # list what would be asked
+tip grounding-triage ARGS=--calibrate   # re-ask the planted and stored cases
+tip self-reference-report               # findings still without a verdict
+```
+
+## check_claims.py
+
+`heading_links.py` proves that a cross-chapter link resolves.
+`check_claims.py` narrows, by search and with no model, the links whose
+text might claim something the target does not say. A link whose text
+shares at least half its words with the target chapter's title or with
+the target heading (`--threshold 0.5`, short function words removed)
+asserts nothing the target can contradict. A link text under three words
+(`--min-words 3`) is a term link, one word of the running sentence
+linked to where the term is taught. What remains is a phrase the author
+wrote to describe the target, and the tool lists each one with its
+target heading, then a count. It always exits 0. To act on a line, read
+the target section; if it says something else, reword the link text or
+point the link at the section that does say it. `tip link-support` asks
+a model the same question of every anchored link.
+
+```
+tip claims               # every chapter
+tip claims ARGS=33       # one chapter
+tip claims ARGS=--all    # every link, classified as chapter, heading, or term
+```
+
+## link_support.py
+
+For every anchored link from one chapter into another, `tip
+link-support` gives TypeSafe the sentence, the sentence before it, and
+the linked section, and asks a Choice: `supports`, `contradicts`, or
+`says_nothing`. A section longer than `SECTION_LIMIT` goes as its
+opening plus the subsections that share the most words with the
+sentence, in book order, with `[...]` at each gap. `excerpt()`'s
+docstring records the false alarms that shaped that rule. Verdicts go to
+`tools/data/link_support_verdicts.json`, keyed by the sentence, the
+target, the anchor, and the section text the question saw, so an edit at
+either end re-asks that one link. A run asks about new links, prunes
+stale verdicts, and then reports. Commit the updated file.
+
+The report lists each link whose answer is not `supports`, at a
+confidence of 0.5 or more (`CONFIDENT`); `--all` adds the
+low-confidence answers. A `says_nothing` is often a link doing its job
+loosely, such as an exercise that links "descriptor" to the nearest
+descriptor example. The first run's real finding was chapter 42 linking
+"put the meaning in the type" to chapter 08's annotation-syntax section,
+when chapter 12 makes that argument. Each line asks for a judgment:
+retarget the link, reword the sentence, or leave a loose link as it is.
+`ARGS=--report` reads the store and needs no key.
+
+```
+tip link-support                        # ask about new links, then report
+tip link-support ARGS=--report          # report from the store; no key needed
+tip link-support ARGS="--report --all"  # include low-confidence answers
+```
+
+## sentence_diff.py
+
+A library for `prose_calibration.py` and `edit_patterns.py`. Given the
+before and after text of a chapter, `diff()` returns the rewritten
+sentences, each paired with the most similar new sentence and its
+`difflib` ratio, and the sentences left alone. It collapses whitespace
+first, so a reflow is not a rewrite. A sentence whose words still read
+straight through the new text also counts as left alone, since a line
+break after a colon splits a sentence nobody edited. `prose()` drops
+the text no sentence-level judgment covers: table rows,
+list items, figure captions, anything under 40 characters, and any
+sentence holding a `[[...]]` draft note. Each `Sentence` carries its
+neighbors, the nearest heading, and its paragraph (up to 2,000
+characters), which is the context the model questions see.
+
+## prose_calibration.py
+
+A study rather than a check: does a model score pick out the sentences
+Bruce rewrites? A score should agree with the author before it steers a
+prose pass (`/straighten`, `/antecedents`, the clarity agent). Git
+holds the evidence. The tool collects the author's editor commits under
+`Chapters/` (no Co-Authored-By trailer, a subject such as "Update
+30_Patterns--Observer.md" or "more ch 30"). From each it takes the
+sentences the commit rewrote, through `sentence_diff.py`, and as
+controls an equal number from the same commit and chapter that no
+collected commit rewrote. TypeSafe answers eight questions about each
+sentence. Four are Scores for one fault each: subject-verb distance,
+ambiguous pointers, skipped steps, and overloaded claims. The Noul
+`would_rewrite` shows six before/after pairs from `bruce_edit_db.md` and
+asks whether the author would rewrite the sentence. Three more Nouls,
+`preamble`, `fractal_summary`, and `comma_tail`, ask about the faults
+the riff prose linter flags.
+
+The report gives each question's AUC, the chance that a rewritten
+sentence outscores a left-alone one (0.5 is no signal), with a standard
+error. Longer sentences get rewritten more and score higher on every
+question, so it also gives the AUC within length bands, then the
+top-scoring rewrites per question. The samples split by commit. The
+report reads the half of the commits that supplied none of the six
+examples, which keeps `would_rewrite` from scoring its own examples.
+Answers cache in `build/prose_calibration.json`, stamped with each
+question's wording, so a rerun asks a new or reworded question and
+reuses the rest. No `tip` task runs the study. It needs the TypeSafe
+setup described under `judgments.py`.
+
+The results, from `tools/CLAUDE.md`, count a rewrite as restructured
+below 0.75 similarity. On 2026-09-27 (115 restructured rewrites, 299
+controls) `would_rewrite` led at AUC 0.66 ± 0.03, unchanged by length
+banding; ambiguous pointers and skipped steps were near 0.58, and
+subject-verb distance near chance. On 2026-10-03 (110 restructured
+rewrites, 294 controls) the added `overloaded` Score reached 0.59 ±
+0.03, 0.58 within bands, behind `would_rewrite` (0.63), pointers (0.62),
+and skipped steps (0.61). The three riff Nouls scored 0.54, 0.50, and
+0.56. Those numbers are good enough to rank sentences for a human
+reader and too weak to justify an edit. Rerun the study before letting
+a model score steer a prose pass.
+
+```
+uv run --with typesafe-sdk python -m tools.prose_calibration            # ask, then report
+uv run --with typesafe-sdk python -m tools.prose_calibration --dry-run  # count samples and questions
+```
+
+## edit_patterns.py
+
+`/bruce-edit-capture` turns an editing pass into written rules, applied
+after a second sighting. `edit_patterns.py` works from the examples
+instead. Each sentence a pass rewrote becomes a before/after pair in
+`tools/data/edit_pairs.json`. A pair that carries a one-line `fault`
+is searched for across `Chapters/`. A bare `tip edit-patterns` diffs the
+open `edit-start-NN` tag against the working tree, whoever made each
+edit; with no open tag, or several, it exits and asks for
+`ARGS="--since REF"` or `ARGS="--range A..B"`. `/edit-done` step 3b runs
+it with `--dry-run`, which records the pairs and asks nothing. The
+fault lines come from the review page that `fault_review.py` seeds. Two
+filters keep noise out of the store. A pair below 0.6 similarity
+(`MIN_SIMILARITY`) is dropped unless it is a deletion. In chapter 31's
+pass on 2026-10-19 the pairs at 0.3 to 0.5 were all spurious. A pair
+whose every change is a rename, a word swap seen in three or more pairs,
+is dropped too.
+
+Then come three TypeSafe steps. A Noul checks each pair: its own before
+must score at or above 0.7 (`REPORT`) and its after below 0.7, or the
+pair is `unclear` and stays out of the search. A Choice screens every
+sentence in the book against up to 20 searchable pairs at once, plus
+`none`. A sentence that gives a pair at least 0.15 gets that pair's
+Noul, and a hit at or above the pair's `floor` (0.7 by default) goes to
+`build/edit_patterns.md`, strongest first. Since 2026-09-27 every
+question sees the sentence's paragraph and heading. Answers cache in
+`build/edit_patterns.json`, so a rerun asks about new pairs and changed
+sentences. A full search takes about five minutes, most of it one
+screening question per sentence of the book.
+
+What the runs found, from `tools/CLAUDE.md`: with no fault line the
+search matches surface features (chapter 30's metadiscourse cut matched
+158 sentences for ending in a colon). With a fault line, the top hits
+were real metadiscourse. The fault line's wording sets the precision, so a
+loose hit list calls for rewording the fault, not for raising the floor.
+On 2026-09-27 Bruce labeled ten sampled hits for each of six faults on a
+blind page. Each labeled pair now carries its own `floor` and
+`floor_basis`, from 0.62 for R21 to 0.84 for R2. For three of the six
+the score did not rank the right hits first, so a floor is a rough
+filter and a long hit list is a review batch. `ARGS=--from-rules`
+searches for `bruce_edit_db.md`'s promoted rules, with each rule's
+title, Test, and Keep-when lines as the fault and, as the example, the
+sighting the pair check separates best; 14 of 19 rules were searchable.
+The tool reports and edits nothing. A hit asks for a human decision,
+made on the page that `fix_triage.py` seeds or in a prose pass.
+
+```
+tip edit-patterns                                # the open edit-start pass
+tip edit-patterns ARGS="--since edit-start-30"   # REF to the working tree
+tip edit-patterns ARGS=--dry-run                 # record the pairs, ask nothing
+tip edit-patterns ARGS=--report                  # every stored pair, from the cache
+tip edit-patterns ARGS=--from-rules              # search for bruce_edit_db.md's rules
+tip edit-patterns ARGS="--pair FILE:LINE"        # one stored pair
+```
+
+## outside_review.py
+
+`tip outside-review CH=17` sends one chapter to Gemini through Google's
+Antigravity CLI (`agy`) in one headless call: the instructions in
+`tools/data/outside_review_prompt.md`, then the chapter's Markdown. The
+reply goes to `outside_review/<stem>.md`, tracked like `deep_review/`,
+under a first line that records the chapter, the model, and the date.
+The default model is `gemini-3.1-pro-high`; `MODEL=` picks another.
+`CH="17 18"` or a range such as `CH=30-32` reviews several chapters in
+order. `ARGS="--suffix .r2"` keeps a second round beside the first.
+It needs an `agy` that is installed and signed in: install it from
+https://antigravity.google/docs/getting-started?tab=cli and run `agy`
+once. The tool finds it on PATH or under `%LOCALAPPDATA%\agy\bin`. It
+refuses to run under `CI`.
+
+A transient failure is rerun up to two more times (`--retries`): an
+`ERROR` result for exceeding the output token limit, an empty reply
+after `agy` denied a tool call, an interrupted stream with no reply, and
+a server error (code 500). An interrupted stream that carries a reply
+is saved, with a second header line telling you to check its tail. Any
+other failure (a nonzero exit, no reply within 900 seconds, no result
+event) is final for that chapter. The run goes on to the next chapter
+and exits 1 at the end.
+
+The reply is a set of observations, never instructions. Applying it is
+a separate step in a Claude session: test each item against the chapter
+and a run under `uv run`, apply what passes, and append a `## Verdicts`
+section to the review file, one line per item, applied or rejected, with
+the evidence and the commit. The test matters. In the tool's first runs
+(2026-10-08) all five items of the first reply were wrong for Python
+3.15, and the prompt now lists the 3.12-3.15 features the book uses.
+The corrected run's third item claimed a `TypeError` that
+`type.__new__()` never raises.
+
+```
+tip outside-review CH=17                        # one chapter, default model
+tip outside-review CH="17 18" MODEL=gemini-3.8-flash-high
+tip outside-review CH=17 ARGS="--suffix .r2"    # a second round beside the first
+tip outside-review CH=17 ARGS=--dry-run         # print the command and sizes, call nothing
+```
+
+## prompt_facts_probe.py
+
+The outside-review prompt carries a list under "Treat these as valid and
+do not flag them:", each bullet a Python 3.12-3.15 fact the reviewer
+model tends to get wrong. Every bullet adds tokens to every review, so
+each one should earn its place. `tip prompt-facts` sends the bullets to
+Gemini through `agy` in one call, without the prompt or its framing,
+and asks for TRUE, FALSE, or UNSURE on each, with a one-sentence reason.
+It prints a row per bullet. A `no` row (FALSE, UNSURE, or no answer) is
+a bullet the model still disputes, so the bullet stays. A `yes` row is a
+candidate to drop. Answers vary from run to run, so the task passes
+`--save`, which appends the model, the date, and the table to
+`tools/data/prompt_facts_runs.md`. Drop a bullet after two runs mark it
+`yes`, and commit the log. The default model is `gemini-3.8-flash-high`,
+the one whose reviews prompted the bullets. The probe reuses
+`outside_review.py`'s `agy` helpers and needs the same sign-in. It makes
+one attempt with no retry and refuses to run under `CI`.
+
+```
+tip prompt-facts                             # ask, print the table, append it to the log
+tip prompt-facts ARGS=--raw                  # the model's reply before the table
+tip prompt-facts ARGS=--dry-run              # print the command and the message
+tip prompt-facts MODEL=gemini-3.1-pro-high   # another model
+```
+
 ## pattern_names.py
 
 Every naming of a design pattern is capitalized and italic, on every
@@ -1675,6 +2670,345 @@ The tag groups related markers that share one underlying blocker, and
 doubles as a plain `grep -rn "TODO(free-threaded-default)" Chapters/` when you care
 about only one of them. It always exits 0, being informational.
 
+## Review pages and author reports
+
+Five tools put work in front of the author and gate nothing. Two print a
+worklist in the terminal. The other three prepare a review page: a
+claude.ai artifact that the session publishes with a database
+(`capabilities: {"db": {}}`), where Bruce reads cards or a whole chapter
+and records decisions with the mouse. The page tools share one
+shape. A `seed` or `load` step writes one JSON file per database
+document under `build/<tool>/`, plus `batch*.json` files of 50 writes
+each, which the session sends to the page with one `ArtifactData`
+`batch` call per file. When Bruce is done, the session reads the
+documents back with `ArtifactData` into a `read/` folder, and an `apply`
+step turns the decisions into edits. A skill drives each page's round.
+The commands in each page entry are steps of that round. None of the
+five calls a model.
+
+## chapter_editor.py
+
+The chapter editor shows a whole chapter, one block per paragraph,
+heading, list, table, figure, or listing. Bruce selects text and marks
+it Rewrite (with an optional note) or Delete, or opens a block's
+Markdown and edits it in place. Each mark saves when it is made. After
+reading through the chapter, Bruce types `apply` in the terminal. The
+`chapter-editor` skill (`.claude/skills/chapter-editor/SKILL.md`) runs
+the round. The page template is `chapter_editor.html` beside it. The
+Markdown in `Chapters/` stays the source of truth; the page's database
+mirrors it.
+
+`tip editor-load CH=NN` parses the chapter into blocks and writes the
+documents, the batch files, and a copy of the page titled for the
+chapter, all under `build/chapter_editor/NN/`. The first load writes
+every block. A later load compares the chapter with the snapshot the
+previous load left in `state.json` and writes only what changed. A
+changed block keeps its id and records its old text as `previous`, so
+the page outlines the change. A block gone from the chapter is
+deleted. `load` refuses to start a round over one that was never
+applied, since that would drop its marks; `ARGS=--force` overrides it.
+`ARGS=--refresh` stays in the open round instead, for a change made to
+the chapter while the page shows no marks.
+
+`tip editor-apply CH=NN` reads the saved documents from
+`build/chapter_editor/NN/read/`. It writes the in-place edits and the
+Delete cuts into the chapter, prints each cut with its surroundings, and
+saves the Rewrite marks to `round-R.json` beside the state, since a
+rewrite is the session's work. A marked block whose chapter text changed
+during the round (an edit made in Zed) is a conflict. `apply` lists it
+and leaves that block for the session. The store refuses a write to an
+existing document unless the write names its current version, so `load`
+pins each write from a ledger, `versions.json`, of the versions its own
+batches leave behind. `tip editor-pin` sets a pin by hand for a write the
+store refused. `tools/data/chapter_editor.json` maps each chapter number
+to its page's artifact URL, so a chapter keeps one page across rounds.
+Every other piece of state lives in `build/`. A wiped `build/` makes the
+next load a first load.
+
+```
+tip editor-load CH=30                    # start the next round
+tip editor-load CH=30 ARGS=--refresh     # update the open round
+tip editor-apply CH=30                   # edits and cuts; list rewrites
+tip editor-pin CH=30 ARGS="blocks/b0011=4"  # pin a refused write
+uv run python -m tools.chapter_editor page 30  # page copy only
+```
+
+## fault_review.py
+
+`/edit-done` step 3b (`.claude/skills/edit-done/SKILL.md`) asks Bruce to
+approve a one-line `fault` for each sentence the editing pass rewrote,
+because `edit_patterns.py` searches the book only for a pair that
+carries one. The fault-review page shows one card per rewrite, the
+session's proposed line editable in place, with Approve or Local edit on
+each. The same page carries the rule proposals from
+`/bruce-edit-capture`, each decided with Approve, Narrow, or Reject
+and a note. The template is `.claude/skills/edit-done/fault_review.html`.
+Each pass publishes its own copy as a new artifact.
+
+`seed --since REF` records the pass's rewrites in
+`tools/data/edit_pairs.json` and writes the cards from the session's
+`--proposals` file, a JSON object from pair key to fault line, and the
+rule proposals from `--rules`. Three filters keep the page small.
+A pair below the similarity floor (0.6, `--min-similarity` overrides it)
+is dropped. So is a pair whose changes are all renames, a word replaced
+the same way in three or more pairs. A proposal the session marks
+`"local": true` makes no card. `seed` marks that pair local. The
+page lists the local pairs in one collapsed row, each with a Disagree
+button. `seed` also clears `build/fault_review/read/`, since a read-back
+adds files there and deletes none. A stale card left there could
+overwrite a newer decision.
+
+`apply` reads the cards back and writes each decision into
+`edit_pairs.json`. An approved line, edited or not, becomes the pair's
+`fault`. A Local edit clears the `fault` and marks the pair local.
+Undecided cards are listed and left alone. With `--rules-dir` it prints
+one line per rule proposal with Bruce's decision and note. It never
+writes `bruce_edit_db.md`; the session writes that file from the printed
+lines, in Bruce's words. No `tip` task runs the module.
+
+```
+uv run python -m tools.fault_review seed --since edit-start-30 \
+    --proposals build/fault_review/proposals.json \
+    --rules build/fault_review/rules.json   # write the page's documents
+uv run python -m tools.fault_review apply \
+    build/fault_review/read/cards \
+    --rules-dir build/fault_review/read/proposals  # record decisions
+```
+
+## fix_triage.py
+
+`edit_patterns.py` searches the book for sentences that share a fault
+Bruce fixed once. A list of a hundred hits in a terminal goes unread. The
+fix-triage page (`.claude/skills/edit-done/fix_triage.html`, offered in
+`/edit-done` step 3b) shows one card per hit: the sentence in its
+paragraph, a proposed rewrite editable in place, and four choices. Apply
+rewrite and Delete sentence change the chapter. Skip keeps a sentence
+that has the fault. Not this fault marks a false hit. `apply` counts
+those last two per fault, so a pair's floor can be revisited.
+
+`export PAIR ...` writes `build/fix_triage/hits.json`, every hit at or
+above each pair's floor. It reads the verdicts `tip edit-patterns` cached
+in `build/edit_patterns.json` and asks no model, so that run comes
+first. The session then writes `build/fix_triage/proposals.json`, a
+rewrite or a deletion for each hit id. `seed` joins the two into cards
+and batch files. `apply DIR` edits the chapters, finding each sentence
+by its words with any whitespace between them, and exits 1 when a
+sentence is no longer there. It refuses a directory that holds a card
+outside the current `hits.json`. Reflow is left to `tip verify-ch`.
+
+A pair marked `"direct": true` in `tools/data/edit_pairs.json` skips the
+page; the flag is set after a page where Bruce applied a fault's
+proposals wholesale. `direct` applies the proposed rewrites and lists
+the deletions for the session, which reads the next sentence for a lost
+antecedent. With `--commit` it runs `tip verify-ch CH=NN ISOLATED=1` on
+every edited chapter and commits one chapter per commit. One failed
+gate holds every commit, so a batch is never half committed. The
+top-level `--dir` option moves the working directory away from
+`build/fix_triage`. No `tip` task runs the module.
+
+```
+uv run python -m tools.fix_triage export KEY      # hits for a pair
+uv run python -m tools.fix_triage seed            # cards and batches
+uv run python -m tools.fix_triage apply build/fix_triage/read/cards
+uv run python -m tools.fix_triage direct --commit --trailer "..."
+```
+
+## comment_report.py
+
+A comment in a listing belongs there when it says something the code
+does not. No rule can tell a comment that restates its own line from one
+that teaches. `tip comment-report` narrows the reading instead.
+It lists the listing comments in `Chapters/` and `Solutions/` that are
+new since a git ref, one per line as `path:line: [listing] source`, so
+you read the comments you wrote and delete the ones that repeat their
+line. It tokenizes each block, so a `#` inside a string stays out, and
+it skips the `# slug.py` line, `#:` markers, and tool directives. A
+comment counts as new when its listing holds more copies of that text
+than it did at the ref, so a reworded comment is new and a moved one is
+not. Moving a listing to another chapter reports all its comments as new
+in the receiving file. Inserting an unmarked fragment renumbers the
+fragments after it, so their comments read as new too. It is report-only
+and exits 2 on a usage error (an unknown ref, a missing file).
+
+```
+tip comment-report                 # new since HEAD (uncommitted edits)
+tip comment-report SINCE=v0.5.9    # new since a tag or commit
+tip comment-report ARGS=--all      # every comment in the book
+```
+
+## exercise_coverage.py
+
+A chapter's exercises tend to cluster on one section and leave others
+with nothing for the reader to do. `tip exercise-coverage` lists, per
+chapter, the `##` sections that no exercise reaches. An exercise reaches
+a section when it names a listing the section owns, names a function or
+class those listings define, links the section's anchor, or quotes its
+heading (one longer than 12 characters). The matching is literal, so it
+under-reports coverage. Confirm a reported section by eye before writing
+an exercise for it, since a table, an aside, or a conclusion needs none.
+The tool reads `Chapters/` and exits 0 unless `--strict` is given, which
+exits 1 on any gap. No gate runs it.
+
+```
+tip exercise-coverage                    # every chapter
+tip exercise-coverage ARGS="19 31"       # chapters by number
+tip exercise-coverage ARGS=--deep        # count ### sections too
+tip exercise-coverage ARGS=--covered     # list practiced sections too
+```
+
+## Figures
+
+Every figure is an SVG in `resources/images/`, referenced from the prose
+as `![caption](_images/<name>)`. Most are drawn by hand. Two sources are
+generated, and their SVGs are never edited by hand: the 22 figures that
+`tools/story_figures/` draws (each pattern chapter's story figure, plus
+body figures in chapters 14, 16, 26, 32, 34, 36, 37, and 38), and chapter
+21's `coupling_gallery.svg`, which `coupling_panels.py` draws. To change
+one, edit its module or spec and run its `tip fix-*` task. The `figures`
+skill (`.claude/skills/figures/SKILL.md`) holds the rules for drawing a
+figure: captions, palette, arrowheads, placement, and what `tip figures`
+checks. Read it before creating or changing any SVG.
+
+The gate runs the two drift checks, `tip story-figures` and `tip
+coupling-panels`, and so do `verify-ch` and `sweep`. `tip figures` runs
+in `verify` alone. `arrowheads.py` and `svg_text.py` are libraries that
+the other three call.
+
+## story_figures/
+
+A package with one module per generated figure, named `chNN_<name>.py`.
+Each module defines `STEM`, the SVG's name in `resources/images/` without
+`.svg`, and `render()`, which returns the SVG source as a string. Its
+docstring says which listings its names come from, so read it before
+changing the figure. `__init__.py` holds the vocabulary the figures
+share: the cover palette, `SHADE` (`#eeeeee`, the one fill for a shaded
+region, since the EPUB's PNG8 conversion turned every pale warm tint
+yellow), the book font, `text()`, `rect()`, `line()`, `arrow()`,
+`cross()`, and `svg()`. An `arrow()` takes its head from `arrowheads.py`
+and stops `TIP_GAP` (4 units) short of the target's border. An outer
+shape that encloses an arrow's target is a `region()` path rather than a
+`rect()`, because `arrowheads.tight_tips()` would read a tip on the inner
+box as buried in the outer rect.
+
+`__main__.py` discovers every `chNN_*` module and writes each SVG whose
+committed copy differs. With `--check` it writes nothing and fails on a
+committed SVG that differs from its module, or on any flag `tip figures`
+would report for that figure (`lint()`, which calls
+`figure_gallery.read_style()`). That makes the check stricter than the
+gallery: a color outside the palette, a missing `<title>`, or another
+font fails a generated figure, where the gallery marks it and passes a
+hand-drawn one. `--only NN` limits a run to one chapter's modules, and
+`--png DIR` also rasterizes each figure with the EPUB's rasterizer, since
+text that fits in a browser can collide once rasterized. `--png` exits
+with a message when no rasterizer is on PATH. `tip story-figures` runs
+the check in `gate`, `verify-ch`, and `sweep`. To clear a drift finding,
+run `tip fix-story-figures` and commit the SVG; to clear a lint finding,
+change the module.
+
+```
+tip story-figures                         # drift and lint check (gated)
+tip story-figures ARGS="--only 30"        # one chapter's figures
+tip fix-story-figures                     # regenerate every SVG
+tip fix-story-figures ARGS="--only 30 --png build/story"   # and look
+```
+
+## coupling_panels.py
+
+Generates chapter 21's `coupling_gallery.svg`: six patterns, three to a
+row, drawn in the coupling notation that chapter's Coupling section
+defines. A heavy edge names a concrete class, a thin edge names an
+interface, a dashed hollow-headed edge satisfies one, and the red box is
+the part the pattern protects from change. The spec is `GALLERY`, one
+`Cell` per pattern with its title, position, nodes, and edges. The
+section's other three figures (`coupling_edges.svg`,
+`coupling_ladder.svg`, `coupling_reach.svg`) are hand-drawn. From
+2026-09-23 to 2026-09-29 the module also drew a panel at the top of each
+pattern chapter; the story figures replaced them.
+
+`--check` regenerates in memory and fails when the committed SVG
+differs. Every run, writing or checking, also checks each cell's edges
+(`edge_problems()`): a head's tip must sit `TIP_PAD` (4 units) from its
+target's rounded outline, within `TIP_SLACK` (1), and no edge may cross a
+box other than its own two. `edge_points()` slides every tip onto that
+line, so a new edge finding usually means two boxes need moving. `--png
+[DIR]` rasterizes every `resources/images/coupling_*.svg` into
+`build/coupling/` by default, with the EPUB's rasterizer, and writes
+nothing else. `tip coupling-panels` runs the check in `gate`,
+`verify-ch`, and `sweep`.
+
+```
+tip coupling-panels        # drift and edge check (gated)
+tip fix-coupling-panels    # regenerate coupling_gallery.svg
+tip coupling-panels-png    # rasterize into build/coupling/ to look
+```
+
+## arrowheads.py
+
+The book's four arrowheads as SVG markers, with the geometry an edge
+needs to carry one. `filled`, a swept head, marks anything that points;
+`hollow`, an open triangle, marks inherits or satisfies; `open`, a V,
+marks a return; `diamond` marks aggregation at the owning end. Each head
+has a fixed size in user units, so heavy and thin edges carry the same
+head. The open shapes have no fill, since a paper-colored fill shows as a
+patch on the EPUB's white page. Instead the edge stops short by the
+head's `trim`, and the head, anchored at its back, reaches the target.
+`marker_def()` writes a `<marker>` in a given color. `shorten_line()`,
+`shorten_path_end()`, and `shorten_path_start()` shorten a hand-drawn
+edge by the trim, cutting a curve at its arc length.
+
+The module also holds the checks the other figure tools run on any SVG:
+`marker_kinds()` (a marker outside the four), `mismatched_heads()` (a
+head whose color differs from its line's), `short_edges()` (a marked line
+shorter than `MIN_LINE`, 8), `tight_tips()` (a tip closer than `MIN_GAP`,
+3, to its box or circle), `stray_tips()` (a tip farther than `MAX_GAP`,
+6, from every shape, legend samples excepted), and `crossed_boxes()` (an
+edge through a box that holds neither end). `figure_gallery.py` runs
+them all; `coupling_panels.py` and `story_figures/` write their markers
+with `marker_def()`. No task runs it directly.
+
+## svg_text.py
+
+Finds text that runs off a figure's canvas or into other text, without
+rendering anything. Every figure sets its text in JetBrains Mono, whose
+characters all advance 0.6 em, so a `<text>` element's box follows from
+its position, `font-size`, `text-anchor`, and character count, with the
+box running from 0.75 em above the baseline to 0.2 em below it.
+`clipped()` names text that crosses the `viewBox` edge, which every
+renderer cuts off, and `collisions()` names pairs of text boxes that
+overlap by more than one unit. `figure_gallery.py` fails on either, so
+`tip figures` and the story-figure check report them. The estimate
+handles no `transform` or `<g>`, which no figure uses today, and knows
+nothing of lines and shapes: text lying across a line still needs the
+gallery's PNG view and an eye. No task runs it directly.
+
+## figure_gallery.py
+
+Builds `build/figures/index.html`, every figure the prose in `Chapters/`
+and `Solutions/` references, in book order and numbered, each under its
+file name, chapter, line, and caption, so a figure can be named by its
+number or its stem. The page shows the live SVG from `resources/images/`
+and can switch to the PNG the EPUB draws, rasterized into
+`build/figures/png/` with the first rasterizer on PATH and redrawn only
+when its SVG is newer. With no rasterizer the page shows SVGs alone. A
+style line under each figure lists its colors, stroke widths, dashes,
+fonts, and markers, and marks anything outside the cover palette or the
+book font.
+
+The run fails on a reference to a figure with no file, on any arrowhead
+or edge finding from `arrowheads.py`, and on any text finding from
+`svg_text.py`. A color or font outside the palette is marked on the page,
+and a file no chapter references is listed and reported; neither fails.
+`TIP_GAP_EXEMPT` and `STRAY_TIP_EXEMPT` would name a figure excused from
+the tip checks, with the reason; both are empty. `tip figures` runs it
+and `tip verify` runs that, so the gallery tracks the working tree; the
+gate does not run it. `tip figures-open` also opens the page in a
+browser.
+
+```
+tip figures          # build build/figures/index.html (part of verify)
+tip figures-open     # build it and open it in a browser
+```
+
 ## build_site.py
 
 Renders `Chapters/*.md` into a browsable site under `build/site/` (git-ignored).
@@ -1781,6 +3115,37 @@ PDF's title page too, with no OPF concern there.
 Tests live in `tools/tests/test_build_epub.py`. They are worth keeping green:
 a namespacing bug produces a valid EPUB whose links open the wrong chapter,
 with nothing in the build to show for it.
+
+## send_to_kindle.py
+
+`tip kindle` hands a built EPUB to Amazon's Send to Kindle desktop app.
+The app takes a file path on its command line, the same call its
+Explorer context-menu entry makes, and opens its dialog with the file
+queued. The device choice and the Send click belong to the app, so the
+script starts it and returns without waiting for the upload. It also
+opens a file-manager window (Explorer, or Finder on macOS) with the EPUB
+selected, for drag and drop if the app starts empty. On Windows it
+expects the app under `Program Files (x86)\Amazon\SendToKindle\` and
+names the download page when the app is missing. Linux has no app, so
+there the script exits with a message pointing to email delivery or the
+web uploader.
+
+The e-ink EPUB is the default (a Paperwhite is the target), and
+`VARIANT=color` sends the other. Before sending, the script compares the
+EPUB's modification time with its inputs: everything under `Chapters/`
+and `resources/`, plus `build_epub.py`, `build_site.py`, and
+`config.py`. A missing or
+older file is rebuilt with the same `build_epub.build()` call `tip epub`
+makes, so the file sent is current with the Markdown. A current file
+goes as it is, and its age is printed either way. `tip epub` always
+rebuilds, so this is the one place the inputs are compared. A rebuild
+needs pandoc. `verify-targets` leaves `kindle` out because it opens a
+GUI.
+
+```
+tip kindle                # send the e-ink EPUB, rebuilt first if stale
+tip kindle VARIANT=color  # send the color EPUB
+```
 
 ## listing_links.py
 
