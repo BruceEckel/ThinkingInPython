@@ -366,7 +366,7 @@ passing every yielded request out to the outer driver and every sent answer back
 
 In the simplest case,
 each generator yields values and leaves its send and return channels at `None`,
-so the listing annotates each generator as `Iterator[str]`.
+so `Iterator[str]` can be used instead of `Generator[str]`.
 The driver is `list()`,
 which calls `next()` until the outermost generator finishes:
 
@@ -400,8 +400,7 @@ print(list(top()))
 ```
 
 "To exhaustion" means each `yield from` runs its target until that generator finishes.
-Until then, the inner generator yields its values one at a time,
-as `list()` requests each one.
+Until then, the inner generator yields its values one at a time.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`.
@@ -413,7 +412,7 @@ so `list(outer())` shows `<generator object one at ...>` in place of `'only'`.
 
 ### The Return Channel
 
-A `yield from` expression passes the inner generator's yielded values through to the driver and evaluates to the inner generator's return value:
+A `yield from` expression evaluates to the inner generator's return value:
 
 ```python
 # yield_from_return.py
@@ -434,8 +433,14 @@ print(list(report(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)']
 ```
 
-The return channel delivers a value from a generator to the generator that delegated to it.
-Neither `emit()` nor `report()` refers to the driver.
+The values `emit()` sends out travel on two channels that end in different places.
+Each `item` it yields passes through `report()` to `list()`.
+Its `return total` goes to `report()` alone,
+as the value of the `yield from` expression, which `report()` binds to `size`.
+`list()` sees the 12 inside the string that `report()` builds from it.
+A `yield from` therefore works like a function call:
+`report()` calls `emit()` and gets its result back,
+while the values `emit()` yields still go to the driver.
 
 Any iterable can follow `yield from`.
 The expression takes its value from the `StopIteration` that ends the iteration.
