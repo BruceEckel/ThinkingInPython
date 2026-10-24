@@ -441,15 +441,27 @@ A `yield from` therefore works like a function call:
 while the values `emit()` yields still go to the driver.
 
 `drive_by_hand.py` and `drive()` read a generator's result by catching `StopIteration` and taking its `value`.
-`report()` has no `try`, because `yield from` does that catch:
-when `emit()` finishes,
+`report()` has no `try`, because `yield from` manages the result for you.
+When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`,
-the 12 that `emit()` returned.
+the `12` that `emit()` returns.
 
 Any iterable can follow `yield from`.
 A list's iterator ends with a bare `StopIteration`,
 whose `value` defaults to `None`,
-so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
+so a `yield from` over a list evaluates to `None`:
+
+```python
+# yield_from_list.py
+from collections.abc import Iterator
+
+def relay() -> Iterator[int | None]:
+    v = yield from [1, 2, 3]
+    yield v
+
+print(list(relay()))
+#: [1, 2, 3, None]
+```
 
 ### The Send Channel
 
