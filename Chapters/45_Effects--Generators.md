@@ -502,7 +502,7 @@ for line in census(garden):
 #: 1 blue
 ```
 
-The `Tree` alias refers to itself on its right side,
+Each value in a `Tree` is a `Color` or another `Tree`,
 so a dictionary can hold plants and further dictionaries to any depth.
 For each nested dictionary, `visit()` calls itself through `yield from`.
 
