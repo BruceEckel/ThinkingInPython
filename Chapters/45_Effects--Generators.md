@@ -454,7 +454,7 @@ yields the path to each plant, and returns a count of each color:
 ```python
 # color_count.py
 from collections import Counter
-from collections.abc import Generator
+from collections.abc import Generator, Iterator
 from enum import StrEnum
 
 class Color(StrEnum):
@@ -475,7 +475,7 @@ def visit(tree: Tree, at: str = ""
             counts[node] += 1
     return counts
 
-def census(tree: Tree) -> Generator[str]:
+def census(tree: Tree) -> Iterator[str]:
     counts = yield from visit(tree)
     for color, n in counts.most_common():
         yield f"{n} {color}"
