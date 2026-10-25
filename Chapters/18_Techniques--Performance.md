@@ -200,9 +200,7 @@ which turns the event on for every Python function in the process.
 When one function is the question,
 `set_events()` collects data you discard and slows the run you are measuring.
 
-`set_local_events()` with `NO_EVENTS` detaches,
-and `free_tool_id()` releases the identifier.
-The identifiers are a shared resource.
+Tool identifiers are a shared resource.
 `PROFILER_ID`, `DEBUGGER_ID`,
 and `COVERAGE_ID` carry the names of their intended users.
 Claiming one that another tool holds raises a `ValueError`,
@@ -425,7 +423,6 @@ then `get_traced_memory()` and `stop()` after it.
 The `Traced` object it yields fills in when the block ends.
 `current` holds the bytes still allocated at that point,
 and `peak` holds the most the block allocated at once.
-The `finally` clause stops tracing whether the block ends normally or raises an exception.
 `tee.py` in [Iterators](22_Patterns--Iterators.md#what-tee-buffers)
 measures each of its three cases with `traced()`.
 
@@ -840,9 +837,6 @@ print(values)  # Neither call reorders its argument
 #: [5, 1, 8, 3, 2]
 ```
 
-After `heapify()` the smallest element sits at index 0.
-`nsmallest()` and `nlargest()` answer top-N questions on any list and leave its order as it was.
-
 Through Python 3.13, `heapq` built only min-heaps.
 Getting a max-heap meant negating every value going in and out.
 Python 3.14 added `_max` variants that keep the largest item at index 0:
@@ -868,8 +862,6 @@ print(max_nums)  # Heap ordering is maintained
 #: [8, 3, 5, 1, 2]
 ```
 
-Every operation mirrors its min-heap partner,
-with `heapify_max()` putting the largest element at index 0.
 The output shows the list in the order the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
 keeps it, which is not sorted order.
 
@@ -1015,8 +1007,7 @@ and the listing keeps the peak.
 Each function runs inside its own `start()`/`stop()` pair,
 so the lazy peak measures the lazy pipeline alone.
 
-Both versions produce the same five numbers.
-The eager one builds a million-element list and a half-million-element list to get them.
+The eager version builds a million-element list and a half-million-element list to get them.
 The lazy one computes nine squares,
 enough for `islice()` to collect the first five evens.
 `islice()` replaces the eager version's `evens[:5]`.
@@ -1082,7 +1073,6 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 
 `cache_info().misses` counts the calls that ran the body to compute a new result,
 one for each `n` from 0 through 25.
-`fib_plain()` ran 242,785 times for the same answer.
 Each step up in `n` multiplies `fib_plain()`'s count by about 1.6 and adds one to the cached count,
 so the gap widens as `n` grows.
 
@@ -1440,7 +1430,6 @@ print(data)
 #: bytearray(b'zBCDEF')
 ```
 
-The view shares storage with `data`, so writing through it changes the original.
 `bytes(chunk)` copies, but only to print the slice.
 The view copies nothing.
 
@@ -1555,9 +1544,7 @@ Both build the same sequence of `n` numbers (it's `arange`, not `arrange`).
 the same layout `array` uses in `compact_array.py`.
 `dtype=np.float64` chooses the element type, as `array`'s `"d"` type code does.
 
-`vectorized()` computes the same `3x + 1` as `pure_python()`,
-and the `assert` confirms the two results match before the timing starts.
-NumPy runs that expression as one compiled pass over contiguous memory instead of a million individual Python-level steps.
+NumPy runs `vectorized()`'s expression as one compiled pass over contiguous memory instead of a million individual Python-level steps.
 That whole-array expression is the declarative style [Confidence](43_Functional--Confidence.md#a-confidence-spectrum)
 examines: describe the whole-array result and let the engine arrange the steps.
 
@@ -1608,8 +1595,7 @@ print(f"Numba at least 3x faster: {t_numba * 3 < t_python}")
 
 `njit(count_primes)` is the call that `@njit` above the `def` makes.
 The explicit call keeps the original `count_primes()` as the Python baseline.
-`njit()` returns `fast_count_primes`.
-Numba compiles that function at its first call.
+Numba compiles `fast_count_primes()` at its first call.
 The `assert` makes that first call on a small input, before the timing starts.
 That call compiles `fast_count_primes()` and checks its answer against the Python version's answer,
 so the timed calls measure steady-state speed.
