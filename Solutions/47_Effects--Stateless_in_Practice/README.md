@@ -1179,7 +1179,8 @@ Distinguishing `Unavailable` from `NotInteresting` needs something the library d
 a retry that selects on the error type.
 `retry()` here applies to the whole error channel,
 treating every declared failure as transient,
-because its schedule decides when to try again and nothing decides whether to try.
+because its schedule decides when to try again,
+while every declared failure gets another try.
 ZIO provides that retry as `retryWhile`, which takes a predicate on the error.
 
 In Stateless, a selective retry means narrowing the channel first.
@@ -1315,7 +1316,7 @@ info:            -> ((**P) -> Generator[Need[Executor], Any, Task[R]])
 
 **Keep requests out of forked work.**
 Every overload accepts an Effect whose yield channel holds errors, `Async`,
-or nothing, and none accepts one that still holds a `Need`.
+or `Never`, and none accepts one that still holds a `Need`.
 The forked work runs in a worker,
 outside the driver and the handler stack that answers requests.
 So you must remove the requirement before the fork.
@@ -1746,7 +1747,7 @@ Removing `outcome()`'s return annotation makes the error disappear.
 `ty` infers no return type from the body.
 `reveal_type(outcome)` reports `-> Unknown`,
 and `Unknown` is compatible with every type,
-so the returned value contradicts nothing.
+so the type checker accepts whatever the function returns.
 Pyright does infer the union from the body,
 so under Pyright the function changes its type every time `research()`'s error set changes.
 
@@ -2105,7 +2106,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 The second diagnostic tells you about the dependency two levels below `run()`.
 `supply()` leaves `Need[Toaster]` in the channel,
 so the requirement reaches `run()`.
-Nothing in `buttered()`'s body mentions a toaster.
+`buttered()`'s body names `toast()` and `Butter` alone.
 The requirement comes from `toast()`, which `buttered()` calls.
 The type checker reports it at `run()`, the program's edge,
 where no handler remains to answer it.
