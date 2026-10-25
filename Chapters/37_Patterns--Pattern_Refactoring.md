@@ -321,7 +321,7 @@ print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 2
 ```
 
-Nothing fails.
+Every step succeeds.
 The parser builds two `Plastic` objects, the `match` lets both fall through,
 and the report totals the trash the `match` recognized.
 The totals the plant uses leave out sixty pounds of plastic.
@@ -435,7 +435,7 @@ The registry, `create()`, and the sorting line all predate plastic.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-So far adding a new type means writing one class definition and editing nothing else.
+So far adding a new type means writing one class definition and leaving the existing code as it is.
 The other vector of change is adding new operations.
 In a design where adding a type means writing one new class,
 adding an operation ordinarily means editing every class.
