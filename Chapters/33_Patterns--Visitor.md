@@ -249,7 +249,7 @@ if __name__ == "__main__":
 #: Chrysanthemum: a little nectar | fragrance: faint
 ```
 
-Nothing edits `Flower`.
+Both operations live outside `Flower`, which stays as it is.
 
 `@nectar.register` reads the annotation on the implementation's first parameter.
 For `flower: Gladiolus`,
