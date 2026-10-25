@@ -137,14 +137,6 @@ class Account:
 ```
 
 By convention, tests live in a file whose name starts with `test_`.
-The test file confirms that:
-
-- A new account starts empty.
-- A deposit increases the balance.
-- A deposit of zero or less raises a `ValueError`.
-- A withdrawal reduces the balance.
-- An overdraft raises `InsufficientFunds`.
-- Interest adds to the balance.
 
 ```python
 # test_account.py
@@ -406,7 +398,6 @@ whether the test passes or fails.
 Close files, release locks, or check a final invariant after the `yield`.
 Do the cleanup first,
 because a failing check raises an `AssertionError` that skips the rest of the teardown.
-The listing withdraws the balance before it asserts.
 
 `pytest` reports a failing check after the `yield` as an error,
 not as a test failure.
@@ -554,11 +545,6 @@ print(v._Vault__pin)  # type: ignore
 #: 1234
 ```
 
-`vars(v)` shows what Python stored: `_balance` under its own name,
-and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
-The rewritten name is a real attribute like any other,
-so `v._Vault__pin` reads it.
-
 Mangling exists to keep a base class's private-looking names apart from a subclass's names,
 not to hide the attribute.
 In Python the distinction between white-box and black-box remains one of discipline,
@@ -668,13 +654,10 @@ def test_missing_file_raises() -> None:
 
 A fixture requests other fixtures the way a test does,
 by naming them as parameters.
-`app_data()` names the built-in `tmp_path` and `monkeypatch`.
 
 The value of `app_data()` is a side effect,
 so `@pytest.fixture(autouse=True)` applies the fixture to both tests in `test_storage.py`,
 whose parameter lists stay empty.
-`test_round_trip()` loads back what it saved,
-and `test_missing_file_raises()` confirms that loading an absent file raises a `FileNotFoundError`.
 
 `data_dir()` reads `APP_DATA` on every call,
 so the fixture's `monkeypatch.setenv()` can change the directory `data_dir()` returns.
@@ -785,8 +768,6 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
 ```
 
 As with randomness, injecting the clock removes the patch.
-The same computation becomes `elapsed(start: float, now: Callable[[], float]) -> float`,
-which receives the clock as an argument instead of calling `time.monotonic()`:
 
 ```python
 # stopwatch_clock.py
@@ -796,8 +777,6 @@ def elapsed(start: float,
             now: Callable[[], float]) -> float:
     return now() - start
 ```
-
-The test hands it a function that returns the same time on every call:
 
 ```python
 # test_stopwatch_clock.py
