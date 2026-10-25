@@ -71,8 +71,6 @@ print(function5())
 #: function5 in module5 in a_package
 ```
 
-The `"importing module5..."` message prints once,
-however many of the three import styles you combine.
 Python caches every module in `sys.modules` on its first import,
 keyed by the module's full dotted name.
 A later `import` of the same module, in any of these forms,
@@ -177,7 +175,6 @@ so the solution writes `from a_package.module5 import function5`.
 Python initializes both packages before it runs `module6`.
 `module5` then loads before `module6` finishes loading,
 because the import at the top of `module6` runs before the rest of its body.
-All four messages therefore print before the script's own `print()` runs.
 
 After you rename the directory to `bPackage` and update the import to `a_package.bPackage.module6`,
 the script still runs.
@@ -280,9 +277,6 @@ print("after both")
 #: after both
 ```
 
-Although the `lazy import noisy` line comes first,
-`noisy`'s body runs at `noisy.announce()`,
-and that call comes after `noisy2.announce()`.
 Each `lazy import` binds the name and defers the load.
 The module's top-level code runs at the first use of that name, so use order,
 not declaration order, decides which module loads first.
@@ -515,8 +509,6 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 
 Without `__all__`, the star import falls back to the underscore convention.
 The star import binds every top-level name that does not start with an underscore.
-`undeclared` therefore joins `public`.
-`_helper` and `_internal` stay out.
 Restoring the `__all__` line limits the star import to `public` and `_helper` again.
 
 When a module defines `__all__`, that list replaces the underscore convention.
@@ -598,8 +590,6 @@ The script's name still references the first list, which stays as it was.
 
 `exercise_7.py` is `from_snapshot.py` with a mutable value.
 The `from` import shares the module's object.
-After `plugin_list.plugins = []` rebinds the module's name,
-the script's name still references the original object.
 When a module may rebind a name to a new list or dict,
 import the module and read the name through it each time,
 as in `plugin_list.plugins`.
