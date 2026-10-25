@@ -6,7 +6,7 @@
 > a `description` string given at construction, without building `Expensive`.
 > Count the accesses it answers that way,
 > and report the count when `Lazy` builds `Expensive`.
-> Confirm that reading `description` several times builds nothing,
+> Confirm that `Lazy` answers several reads of `description` before it builds `Expensive`,
 > and that the first `query()` reports the count.
 
 <details>
@@ -57,7 +57,7 @@ A second `query()` prints its result with no count and no build.
 <summary>Solution</summary>
 
 If you store `description` as an ordinary instance attribute,
-normal lookup finds it, so the three reads build nothing.
+normal lookup finds it, so the build still waits for `query()`.
 Each read returns the stored string, though, so the counter stays at zero.
 The first `query()` then reports `0 answered before build`.
 A property also stops the lookup at the class, before `__getattr__()`,
