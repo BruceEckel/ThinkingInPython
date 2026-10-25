@@ -916,7 +916,7 @@ def test_a_declared_row_is_trusted_by_callers() -> None:
 ```
 
 `infer_rows.py` starts from `Facts`,
-so each test builds its `Facts` by hand instead of writing and parsing a program.
+so each test builds its `Facts` as a literal instead of writing and parsing a program.
 
 ## The Check
 
