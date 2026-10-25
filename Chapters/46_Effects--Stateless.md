@@ -201,8 +201,8 @@ Generator[Need[Console] | KeyError, Any, None]
 
 `A` and `E` share the first type parameter.
 `R` is the third.
-Nothing in the union tells a request from a failure.
-Two bounds on the library's type variables do that.
+The union lists requests and failures alike.
+Two bounds on the library's type variables tell them apart.
 `A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`.
 [Waiting on a Coroutine](#waiting-on-a-coroutine)
 states the `A` bound as the rule for `Depend`.
@@ -321,7 +321,7 @@ except StopIteration:
 `need(Console)` builds a small generator that yields a `Need[Console]`,
 a frozen data class whose `t` field holds the requested class.
 `yield from` passes that `Need` out of `greet()`'s body.
-Nothing has printed at that point,
+The greeting has yet to print at that point,
 because `greet()` has suspended inside `need()`,
 at the `yield` its `yield from` reaches.
 
@@ -344,7 +344,7 @@ Those two lines do three things:
 1. `supply(Console())` builds a [handler](44_Effects--Effect_Management.md#native-effect-management),
    an object that answers `Need[Console]` with that instance.
 2. Calling the handler on `greet` returns a new function `bound` that answers the requests `greet()` makes.
-3. Calling that function with `"Alice"` builds an Effect with nothing left to supply,
+3. Calling that function with `"Alice"` builds a fully supplied Effect,
    which `run()` then executes.
 
 Supplying the `Console` changes the type:
@@ -1144,9 +1144,9 @@ apart from `console: Console = get(Console)` in place of `console = yield from n
 Its signature matches the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and neither names the `Console` it uses.
 
-The `greet("Alice")` call at `[1]` fails at runtime because nothing has registered a `Console` yet.
+The `greet("Alice")` call at `[1]` fails at runtime because it runs before `register()` binds a `Console`.
 The second, at `[2]`, succeeds because the binding now exists.
-The two calls are identical, and the types say nothing about registration,
+The two calls are identical, and registration sits outside the types,
 so the type checker accepts both.
 
 DI meets its goal.
@@ -1253,8 +1253,7 @@ writes an Ability from scratch and explains what that type bound rejects.
 
 An `Async` request carries an awaitable and asks the driver to await it.
 `run()` does that with the event loop it starts.
-So nothing supplies `Async`.
-The driver answers it.
+So the driver, rather than a `supply()`, answers `Async`.
 `supply()` answers `Need` requests and passes every other Ability outward.
 
 `report()` is not an `async def` and contains no `await`,
@@ -1483,8 +1482,7 @@ but it specifies the exception types it lifts and puts them in the signature rat
 
 ### A Failure Travels as a Value
 
-Calling `score()` runs nothing.
-It returns an `Effect`.
+Calling `score()` defers the lookup and returns an `Effect`.
 If you advance the `Effect` one step with `next()`,
 `next()` returns the `KeyError` as a value instead of raising it:
 
@@ -1551,7 +1549,8 @@ The error channel records which failures can occur.
 The channel carries the failures `@throws` lifted into it.
 `@throws` lifts the exception types it specifies.
 An exception of any other type passes through the decorator as an ordinary raised exception.
-No signature declares it, and the type checker reports nothing.
+The exception stays out of every signature,
+so the type checker accepts the code that raises it.
 An exception raised from a body without `@throws` stays outside the type the same way.
 [Nothing stops an undeclared Effect](47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect)
 examines that limit.
@@ -1634,7 +1633,8 @@ expect(KeyError, run, supply(Console())(guarded)("Carol"))
 ```
 
 This `guarded()` is the one that returned `Carol: unknown` in `except_vs_catch.py`.
-It requests no `Console`, so the `supply(Console())` around it answers nothing.
+It requests no `Console`, so the `supply(Console())` around it does one thing:
+pass the `KeyError` outward.
 Wrapping `guarded()` in that `supply()` is enough to keep the `KeyError` out of its `except` clause.
 
 ## Turning an Error Into a Value
@@ -1683,7 +1683,7 @@ That makes `value` something to `match` on rather than an exception to catch.
 
 `Success` describes the Effect rather than the lookup.
 Both channels are empty,
-with nothing left to supply and no failure for `run()` to raise.
+with every request answered and the `KeyError` moved into the result.
 The Effect "succeeds" at producing either a score or a `KeyError` that reports the missing score.
 A raised `KeyError` is a failure.
 A returned `KeyError` is data.
