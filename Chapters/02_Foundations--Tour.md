@@ -494,7 +494,7 @@ but that argument is a set of characters, not a prefix or suffix.
 leaving `"up"`.
 To remove one exact piece from an end, use `removeprefix()` or `removesuffix()`.
 
-`+` joins two strings, and it converts nothing:
+`+` joins two strings and leaves any conversion to you:
 
 ```python
 # concatenate.py
