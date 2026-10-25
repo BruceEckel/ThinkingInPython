@@ -773,7 +773,7 @@ and then raises an `AttributeError` at runtime.
 Context matters more under a `Result` than in ordinary exception code,
 because the `Result` keeps the exception as a value rather than propagating it.
 The exception inside an `Err` still holds its `__traceback__`,
-but nothing prints a traceback for an `Err` stored in a list.
+but the traceback of an `Err` stored in a list stays out of sight until your code prints it.
 The `except` clause that caught the exception returns it as a value,
 so every caller above that clause receives an `Err`, an ordinary return value.
 No handler above that clause catches the exception,
