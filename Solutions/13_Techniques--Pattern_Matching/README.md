@@ -87,12 +87,8 @@ print(classify((1,)))
 ```
 
 **Tell lists apart by length.**
-`[]` matches only an empty sequence.
-`[_]` matches a sequence with one element
-(the `_` matches the element and discards it).
 `[_, *_]` matches one or more elements.
-The first `_` matches the first element, and `*_` collects the rest,
-including an empty rest.
+Its `*_` collects the rest, including an empty rest.
 So `[_, *_]` also fits a singleton.
 `[_]` must come before it, or `[_, *_]` matches the one-element list first,
 leaving the "singleton" case unreachable.
@@ -179,7 +175,6 @@ the type checker finds that a `Rectangle` value falls through both `case`s and r
 so `shape` can be a `Rectangle` at the `assert_never()` call.
 `assert_never()` requires an argument of type `Never`,
 meaning "this code is unreachable."
-`Rectangle` differs from `Never`, so the checker reports an error.
 
 The `type-assertion-failure` is the check the chapter describes.
 The missing case becomes a type error at check time,
@@ -260,15 +255,6 @@ print(handle({"type": "key", "key": "Enter"}))
 
 **Match the inner dictionary.**
 The new `case` nests a mapping pattern inside a mapping pattern.
-`{"at": {"x": x, "y": y}}` matches when `"at"` maps to a dictionary that has `"x"` and `"y"` keys,
-binding both in one step.
-
-**Accept both click shapes.**
-The two click cases return the same string,
-but each one matches a different shape of click event.
-A flat event keeps `"x"` and `"y"` at the top level,
-where the flat `{"type": "click", "x": x, "y": y}` case finds them.
-A nested event keeps them under `"at"`, where the nested case finds them.
 
 **Try the specific cases first.**
 Any event with a `"type"` key satisfies `{"type": kind, **rest}`,
@@ -426,7 +412,6 @@ With both cases added, as in `exercise_4.py`,
 so the call type-checks only when the cases above it have eliminated every member of the union.
 The inferred type is what remains after those cases narrow `note`:
 a `Webhook` that is none of the three handled types.
-A `Webhook` can reach the `assert_never()` call, so the checker flags that call.
 
 One new channel produces two diagnostics because adding a type to the match version requires a new `case` in every function that matches on the union,
 as the chapter describes.
@@ -720,8 +705,7 @@ and rejects any case after it with a `SyntaxError`.
 
 **Compare through a dotted name.**
 The first fix gives the constant a dotted name by putting it in a namespace.
-`Defaults.FALLBACK` is a value pattern,
-so `dotted()` compares against it and returns "brake" for `Signal.STOP`.
+`Defaults.FALLBACK` is a value pattern, so `dotted()` compares against it.
 Any dotted name works, including `Signal.CAUTION`.
 
 In a program the constant would live in `Defaults` alone,
