@@ -596,41 +596,11 @@ which gives `send(4)` a value to return.
 Without `[3]`, `send(4)` would finish `both()`,
 and the loop would need a `try` for `StopIteration`.
 
-A hand-written loop is the natural first attempt at that forwarding.
-The loop silently discards every sent value:
-
-```python
-# manual_forwarding.py
-from collections.abc import Generator
-
-def collect(name: str) -> Generator[str, int]:
-    first = yield f"{name} needs a value"
-    second = yield f"{name} needs another"
-    print(f"{name} got {first} and {second}")
-
-def manual() -> Generator[str, int]:
-    for prompt in collect("alpha"):  # noqa: UP028
-        yield prompt
-
-g = manual()
-print(next(g))
-#: alpha needs a value
-try:
-    for value in [1, 2, 3]:
-        print(f"send({value}) -> {g.send(value)}")
-except StopIteration:
-    print("manual() is exhausted")
-#: send(1) -> alpha needs another
-#: alpha got None and None
-#: manual() is exhausted
-```
-
-Each `send()` delivers its value to `manual()`'s own `yield`, which discards it.
-The `for` loop then resumes `collect()` with `next()`,
-so both of `collect()`'s `yield` expressions produce `None`.
-The type checker accepts `manual()` as a valid `Generator[str, int]`.
-The send channel appears in the declaration and goes unused.
-`yield from` forwards the values this loop drops.
+A hand-written `for prompt in collect("alpha"): yield prompt` loop produces the same prompts but drops every sent value.
+Each value arrives at the loop's own `yield`, which discards it,
+so `next()` resumes `collect()` and both of its `yield` expressions produce `None`.
+The type checker accepts that loop as a valid `Generator[str, int]`,
+since the send channel appears in the declaration whether or not the body uses it.
 
 ### All Three Channels
 
