@@ -145,8 +145,8 @@ A hit returns the stored result and skips the `print()`,
 the skipped side effect the `cache` section describes.
 The single hit is the second `square(2)` (`[1]`),
 which returns the stored `4` because `2` is still in the cache.
-The second `square(1)` (`[2]`) prints `computing 1` again, the fourth miss.
-`1` was the first value computed, so that miss proves the cache evicted it.
+`1` was the first value computed, so the fourth miss, at `[2]`,
+proves the cache evicted it.
 The cache discards the least recently used entry before it stores a new one,
 so `currsize` stays at or below `maxsize`.
 
@@ -243,10 +243,8 @@ print(x.squared)
 ```
 
 The stored result stays when an input changes.
-`x.n = 10` leaves `squared` at `25`.
 `del x.squared` at `[1]` discards the stored value.
-The next access recomputes it from the current state,
-so the last access prints `computing` again and then `100`.
+The next access recomputes it from the current state.
 
 A first access from two threads at once is a race.
 `cached_property` takes no lock,
@@ -304,10 +302,7 @@ print(greet_bare.__name__, "-", greet_bare.__doc__)
 `bare()` is `passthrough()` without the `@wraps(func)` line.
 Both decorators return the function they define as `wrapper`,
 so `greet` and `greet_bare` each name a wrapper.
-In `passthrough()`, `wraps()` copies the original's name and docstring onto `wrapper`,
-so `greet` reports the original's name and docstring.
-`greet_bare` reports `wrapper - None`.
-`help()` shows the wrapper too,
+For `greet_bare`, `help()` shows the wrapper too,
 as does every tool that reads a function's name or docstring.
 
 `wraps()` also sets `greet.__wrapped__` to the original function,
@@ -587,8 +582,7 @@ expect(ValueError, list, batched(range(7), 3, strict=True))
 ```
 
 A short final batch is normal for pagination and wrong for fixed-width records.
-For fixed-width records, `strict=True` raises a `ValueError`,
-as the `[ValueError]` line shows.
+For fixed-width records, `strict=True` raises a `ValueError`.
 `zip(strict=True)` under [`zip_longest`](#zip_longest) offers the same choice.
 
 ### `accumulate`
@@ -741,8 +735,7 @@ Python offers three ways to zip inputs of different lengths,
 and the one you choose records what a mismatch means.
 Plain `zip()` (`[1]`) stops at the shortest, drops the `3`,
 and raises no exception, the right choice when the extra elements are surplus.
-`zip(a, b, strict=True)` (`[2]`) raises a `ValueError`,
-which for the same two lists reads `zip() argument 2 is shorter than argument 1`.
+`zip(a, b, strict=True)` (`[2]`) raises a `ValueError`.
 `strict=True` is the right choice when equal lengths are an invariant you want checked.
 `zip_longest()` pads,
 the right choice when the missing elements are data in their own right.
@@ -769,10 +762,9 @@ print([(k, list(g))
 #: [('a', ['a']), ('b', ['b', 'b'])]
 ```
 
-The `print()` at `[1]` shows what unsorted input does.
+For the unsorted input at `[1]`,
 `groupby()` silently returns `"b"` as two separate groups.
-Sorting first is the fix.
-At `[2]` the two `"b"` elements come back as one group.
+Sorting first, at `[2]`, is the fix.
 With a key function, pass the same one to both calls,
 as in `groupby(sorted(data, key=keyfunc), key=keyfunc)`.
 `sorted()` returns a new list and leaves `data` as it was,
@@ -898,7 +890,6 @@ print(list(islice(squares, 3)))  # [1]
 #: [256, 289, 324]
 ```
 
-The pipeline stacks four stages on an infinite source.
 Every stage waits for `list()` to pull.
 To stop, `takewhile()` pulls one more total,
 the 590 from the batch `(169, 196, 225)`, and discards it as over the limit.
@@ -1153,12 +1144,9 @@ print(len(meetings) - len(distinct), "repeat meetings")
 #: 2 repeat meetings
 ```
 
-Called with `size=2`,
-`group_rounds()` covers `26` of the `28` possible pairs across the seven rounds.
 Each round is a shuffle, then a greedy choice repeated until the pool is empty,
 in place of the circle method's rotation around a stationary player.
 
-The same seven rounds hold `2` repeat meetings.
 For the same eight students and seven rounds,
 the circle method schedules each of the `28` pairs once, with no repeats.
 The greedy search picks each partner from the meeting counts so far and plans no later round,
@@ -1180,7 +1168,6 @@ for i, grouping in enumerate(trios):
 #: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
 ```
 
-Called with `size=3`, the same function schedules trios.
 Seven students make two threes with one left over, so one group grows to four.
 The leftover student joins a group instead of sitting out the round,
 the alternative to the circle method's phantom player.
@@ -1201,9 +1188,7 @@ because the alternative is a round in which everyone sits out.
 
 In `group_rounds()`,
 the `while len(pool) >= size` loop exits at once and leaves `groups` empty.
-The `if pool and not groups` line then creates one empty group,
-and the `for extra in pool` loop adds each leftover student to it.
-If you delete that `if` line,
+If you delete the `if pool and not groups` line,
 `min()` receives an empty sequence and raises a `ValueError`.
 
 ### `history` Is Mutable State
