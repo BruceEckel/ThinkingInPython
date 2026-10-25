@@ -317,10 +317,6 @@ asyncio.run(main())
 #: cpu: peak=1, prices=[10, 20, 30, 40, 50]
 ```
 
-`run()` creates the `Meter` object, then passes it to each task.
-A task uses that object as a context manager,
-writing `with meter:` around its own active span.
-
 Both runs use the same `asyncio.gather()`, yet the peaks differ.
 Each I/O task reaches its `await` and suspends there.
 All five are in flight at once: peak 5.
@@ -373,9 +369,8 @@ asyncio.run(main())
 #: blocking sleeps serialize: True
 ```
 
-Five awaited sleeps finish together in about the time of one.
-Five blocking sleeps run one after another.
-Each stalls the loop for its full duration, so the total is at least their sum.
+Each blocking sleep stalls the loop for its full duration,
+so the total is at least their sum.
 
 `await time.sleep()` raises a `TypeError`,
 since the call returns `None` and `None` is not awaitable.
@@ -430,12 +425,8 @@ asyncio.run(main())
 `start_server()` opens a listening socket on an OS-assigned port
 (port `0` asks the OS to choose one)
 and hands each new connection to `handle_client()`.
-`open_connection()` opens a client socket connected to that server.
 Each `await` on a reader suspends its task the way `asyncio.sleep()` does,
 except the wake-up condition is now "the socket has bytes to read," not a timer.
-Two clients connect at once.
-`gather()` returns their replies in argument order, `a` then `b`,
-as it does for the three fetches in `async_mechanics.py`.
 `async with server:` closes the listening socket once both requests finish.
 
 ## Escaping to a Thread
@@ -475,8 +466,6 @@ which hands the call to a worker thread and awaits its completion.
 `time.sleep()` still blocks, but it blocks a worker thread,
 not the one running the event loop,
 so the loop stays free to run the other four tasks while each sleep finishes.
-Five offloaded sleeps overlap and finish together,
-as five `asyncio.sleep()` calls do with no worker thread.
 
 [Simulation](38_Patterns--Simulation.md)
 builds a full program on these mechanics:
@@ -533,12 +522,8 @@ async def fetch(job: Fetch, t0: float) -> str:
     return job.item.upper()
 ```
 
-Each `Fetch` record in `FETCHES` holds an item, its delay, and whether it fails.
 Each delay is an offset from `t0`,
 one reading of the event loop's clock that the caller takes before it starts any task.
-`fetch()` adds the two,
-and `sleep_until()` hands that absolute time to `loop.call_at()`.
-`a` and `b` have the shortest delays and succeed.
 `c` and `d` share one deadline and carry `fails=True`, so they fail together.
 `e` and `f` are still sleeping when `c` and `d` fail,
 with a wide gap to their own deadlines.
@@ -623,11 +608,8 @@ so the `ExceptionGroup` propagates straight past a plain `except ValueError:` ar
 
 Keeping the task objects lets you inspect each outcome after a partial failure.
 `a` and `b` succeeded before the failures, and their results stay intact.
-`task.result()` returns `'A'` and `'B'`, the same as in a clean run.
 `c` and `d` each completed with their own exception,
 so `task.exception()` returns the `ValueError` instead of raising it.
-The group cancels `e` and `f` before they reach their `fetched` print,
-so `task.cancelled()` is `True` for both.
 
 Cancelling a task raises `asyncio.CancelledError` inside it,
 at whichever `await` currently suspends it.
@@ -724,12 +706,8 @@ asyncio.run(main())
 #: f: F
 ```
 
-Again, `c` and `d` fail at the 0.03-second mark,
-but this time the rest continue.
 `gather()` leaves its siblings unsupervised, where `TaskGroup` cancels them,
 so `e` and `f` keep sleeping and eventually print their `fetched` line.
-`return_exceptions=True` catches both `ValueError`s and places them in the result list,
-in argument order, alongside the successful results.
 The `gather()` call returns normally, so the call site needs no `try`/`except*`.
 
 That behavior is `gather()`'s alternative to `TaskGroup`'s all-or-cancel contract.
@@ -773,7 +751,6 @@ asyncio.run(main())
 #: slow cancelled: True
 ```
 
-The group holds a fast task and a slow one.
 `asyncio.timeout()`'s deadline passes well before the slow task's sleep ends,
 so the timeout cancels the task running `main()`.
 The resulting `asyncio.CancelledError` reaches the `TaskGroup`,
@@ -783,8 +760,6 @@ and re-raises the cancellation as it exits.
 so it converts that `CancelledError` into a `TimeoutError` as it exits.
 The caller therefore sees an ordinary exception instead of a bare cancellation.
 The last two lines show which task the deadline stopped.
-`fast` finishes before the deadline and keeps its result,
-and `slow` reports `cancelled() == True`.
 
 `asyncio.wait_for()` bounds one awaitable the same way.
 [`async_deadlock.py`](#deadlock)
@@ -825,8 +800,6 @@ asyncio.run(main())
 #: counter: 50 of 400
 ```
 
-Eight tasks each add 50, so `counter` should reach 400.
-Instead it stops at 50.
 Every `await asyncio.sleep(0)` releases control to the event loop before the write.
 (The `sleep(0)` is a stand-in for a database query or an HTTP call.)
 In each round all eight tasks read the same value before any of them writes,
@@ -870,13 +843,10 @@ asyncio.run(main())
 #: counter: 400 of 400
 ```
 
-The change from `async_race.py` is the module-level `lock` and the `async with lock:` block.
-The block protects the read, the yielding `await`, and the write.
 If another task holds the lock,
 a task that reaches `async with lock` suspends until the lock becomes available.
 One task at a time runs its read-modify-write,
 however often the event loop switches to another task in between.
-The counter now reaches 400.
 A `threading.Lock` repairs the threaded version of this race the same way.
 
 An `asyncio.Lock` orders tasks on one event loop and gives no protection across threads.
@@ -909,7 +879,6 @@ asyncio.run(main())
 #: peak concurrent workers: 2
 ```
 
-Five tasks start together, but `semaphore` admits two at a time.
 `meter` is the `Meter` from [Overlapping the Waits](#overlapping-the-waits),
 which reports a peak of 5 for the unbounded I/O tasks there and 2 here.
 A threaded equivalent of this worker needs a lock around the two updates in `Meter.__enter__()`,
@@ -987,8 +956,6 @@ asyncio.run(main())
 #: deadlock detected
 ```
 
-The first task takes `lock_a` then tries to acquire `lock_b`.
-The second takes `lock_b` then tries to acquire `lock_a`.
 The `sleep(0.01)` gives each task time to acquire its first lock before either asks for its second.
 The deadlock depends on that `await`.
 Tasks run one at a time and switch only at an `await`,
@@ -996,8 +963,6 @@ and a task that acquires a free lock keeps running.
 Without the sleep, the first task takes both locks and releases them before the second task starts,
 and each task prints `holds both` in turn.
 
-The trace shows both tasks holding their first lock before `deadlock detected`,
-and no `holds both` line.
 Once both hold their first lock,
 each task's `async with second:` suspends on a lock the other task keeps holding.
 A real deadlock has no `timeout`.
@@ -1051,9 +1016,6 @@ asyncio.run(main())
 #: resolved: False
 ```
 
-Each round, `a` checks `wants["b"]` and `b` checks `wants["a"]`,
-and both still see the other wanting the resource, so both give.
-Thus both entries in `wants` stay `True` for the next round.
 Two equally polite tasks make no progress,
 although the event loop keeps both tasks busy the whole time.
 A real livelock repeats these rounds forever.
@@ -1122,8 +1084,6 @@ asyncio.run(main())
 
 The listing puts the global and the `ContextVar` side by side,
 so each printed line shows both values as one task reads them.
-All three tasks assign both, then suspend at the `await`,
-then resume to read them back.
 Each task reads its own `request_id`.
 Every task reads the same `current`, because by the time any of them resumes,
 the global holds `req-3`.
@@ -1131,8 +1091,6 @@ The last line shows what `main()` reads after its tasks finish.
 Because `main()` creates the tasks,
 their contexts are copies of `main()`'s context,
 so the value a task sets stays in its own copy.
-`main()` still reads the default for `request_id`,
-while the global stays clobbered.
 
 A parameter also works here, with no global and no `ContextVar`,
 until a logging helper four calls down needs the value.
@@ -1303,8 +1261,6 @@ if __name__ == "__main__":
     print([price for _, price in pairs])
 ```
 
-`worker()` adapts `cpu_price()` from `utils/pricing.py` to run in a process.
-It puts the order and its price on the queue instead of returning the price.
 Everything `pool.map()` does is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result carries its `order`).
@@ -1390,7 +1346,6 @@ The only difference between one run and another is how finely the listing splits
 
 The listing creates the pool once and starts its workers before any measurement starts,
 so no timed result includes process startup.
-Each later call reuses that same pool.
 
 By default, a `ProcessPoolExecutor` starts a new worker when a task arrives and every running worker is busy.
 A warm-up of one quick task would start one worker and leave the startup of the rest inside the timed runs.
@@ -1525,7 +1480,6 @@ print("threads at least 3x faster on I/O: "
 #: threads at least 3x faster on I/O: True
 ```
 
-Five 50-millisecond waits finish in about the time of one.
 Each sleeping thread releases the GIL,
 so the operating system runs another thread while the sleeping one waits.
 `asyncio` gets the same overlap from suspended tasks.
@@ -1554,7 +1508,6 @@ print(f"threads no faster: {thr > seq * 0.9}")
 #: threads no faster: True
 ```
 
-Swapping the loop for a thread pool leaves the time where it was.
 Five threads still take turns holding the one GIL,
 so the threaded run takes as long as the sequential one,
 sometimes a little more because of the added scheduling.
@@ -1685,9 +1638,6 @@ print(f"counter: {counter} of {8 * 50}")
 #: counter: 400 of 400
 ```
 
-The change from `gil_race.py` is the `with lock:` block wrapped around the read-modify-write,
-plus the `threading` import, the module-level `lock`,
-and a final line that prints the count, the same line `async_locks.py` prints.
 Eight threads still take turns,
 but now each one reads `counter` after the previous lock holder has written it.
 `counter` reaches 400 every time,
@@ -1938,8 +1888,6 @@ A consumer blocked in `get()` still needs a way to stop.
 `tasks.shutdown()` (3.13) answers that.
 Once the queue runs empty,
 every blocked or future `get()` raises `queue.ShutDown` instead of waiting forever.
-`consume()` catches it and returns,
-so `consumer.result()` completes instead of hanging.
 Calling `shutdown()` while items remain in the queue is safe too.
 Those items still come out through `get()` normally.
 Only a `get()` against an empty, shut-down queue raises `ShutDown`.
@@ -1983,8 +1931,7 @@ asyncio.run(main())
 
 `consumer()` starts first and finds the queue empty,
 so `get()` suspends it rather than blocking the thread underneath it.
-`producer()` then runs, sleeps to stand in for slow work, and puts an item.
-That `put()` wakes the waiting consumer.
+The producer's `put()` wakes the waiting consumer.
 
 `asyncio.Queue` needs no locks,
 since the event loop lets one task at a time touch it.
@@ -2053,8 +2000,6 @@ distribute("serialized",
 
 With one thread, `Tickets` hands out each number once: read, pause, write back.
 `Tickets.__next__()` follows the same sequence as `gil_race.py`.
-It reads the counter, does something that releases the GIL,
-and writes the counter back.
 Eight threads read the same number and all eight receive it,
 so a ticket meant to go to one worker goes to several.
 The count of distinct values is still 200,
@@ -2275,8 +2220,6 @@ if __name__ == "__main__":
 ```
 
 Three different backends run inside one `TaskGroup`.
-`io_price()` suspends and resumes on the event loop the way `fetch()` does in `async_mechanics.py`.
-`to_thread()` hands `blocking_price()` to a worker thread the way it does in `to_thread.py`.
 `process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` does.
 Wrapping that hand-off in an `async def` lets `TaskGroup` hold it alongside the others.
 All three start together, and the block exits once all three finish,
@@ -2422,10 +2365,6 @@ print(f"bytes per task under 4 KiB: {task_cost < 4096}")
 print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 #: holds over 200 tasks: True
 ```
-
-`bytes_per_task()` creates 5,000 tasks that immediately suspend on `asyncio.sleep(999)`,
-so they stay alive and idle.
-The two `tracemalloc` snapshots capture the heap they add.
 
 `STACK_SIZE` stipulates the stack figure as a common one-mebibyte default instead of measuring a thread that ran.
 
