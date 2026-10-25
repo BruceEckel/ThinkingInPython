@@ -92,16 +92,13 @@ print(x.val, x is y, x.instance is y.instance)
 **Build the instance with the class.**
 The sentinel and the guard exist to defer creation,
 so removing the deferral removes both.
-`instance` now carries the type `ClassVar[__OnlyOne]` rather than `ClassVar[__OnlyOne | None]`,
-and the class body binds it to the inner instance.
-The bare `__OnlyOne()` works there.
+In the class body, the bare `__OnlyOne()` works.
 The qualified `OnlyOne.__OnlyOne()` fails,
 since Python binds the name `OnlyOne` after the class body finishes.
 
 **Record each caller's argument.**
 `__init__()` shrinks to the one `append`.
-Externally the behavior stays the same: `x.val` accumulates the same way,
-`x is y` is still `False`, and `x.instance is y.instance` is still `True`.
+Externally the behavior stays the same.
 
 The change gives up the deferral.
 Python now builds the inner object at class definition, during module import,
@@ -249,9 +246,7 @@ but puts the member back automatically when the `with` block ends.
 Here a caller must remember to call `release()`, and to call it once.
 
 **Refuse a second release.**
-`release()` removes the connection from `_leased` with `remove()`,
-which raises a `KeyError` for a connection that is not on lease.
-With `discard()` there,
+With `discard()` in place of `remove()` in `release()`,
 a second `release()` puts the same connection into `_available` twice,
 so the pool hands one connection to two callers.
 
@@ -574,7 +569,6 @@ so build the object first.
 The module body calls `primed()` once,
 before the second pool starts any worker thread,
 so every call a worker makes to `primed()` is a cache hit.
-The count is `1`.
 
 The chapter's `singleton_eager_factory.py` uses the same technique.
 It primes the cache at import, before any thread can ask.
@@ -689,7 +683,6 @@ print(a.val, b.val, a.__dict__ is b.__dict__)
 #: spam beans False
 ```
 
-`x.val` is `"eggs"`, the value `Other` set.
 Constructing an unrelated subclass overwrites a value belonging to `Singleton`.
 Nothing reports the overwrite.
 
@@ -697,7 +690,6 @@ Nothing reports the overwrite.
 `_shared_state` is one dict, and it lives on `Borg`.
 `Singleton` and `Other` inherit it,
 so `self._shared_state` resolves to `Borg`'s dict from both.
-`Borg.__init__()` then points both instances' `__dict__` at that one dict.
 The sharing is per-`Borg`, not per-subclass.
 The class hierarchy hides that sharing.
 Read separately, `Singleton` and `Other` look like independent siblings.
@@ -803,7 +795,6 @@ print(x.val, x is y is z)
 #: ['spam'] True
 ```
 
-`x.val` is `['spam']`.
 The three names refer to one object,
 and that object holds the value from the last construction.
 
@@ -813,8 +804,8 @@ That instance is a `SingletonClassVar`, the class under construction,
 so Python runs `__init__()` on it after every call to `__new__()`.
 
 **Reset the state on every construction.**
-The trace shows three runs.
-Each run rebinds `val` to a new one-item list, discarding the list before it.
+Each run of `__init__()` rebinds `val` to a new one-item list,
+discarding the list before it.
 The object is single.
 Every caller who constructs it resets its state.
 
