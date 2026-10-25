@@ -107,18 +107,12 @@ print(list(find(root, "src")))  # [1]
 #: ['root/src', 'root/src']
 ```
 
-**Dispatch on the node type.**
-`find()` follows `walk()`'s shape: a `match` with one case per `Node` type,
-recursing with `yield from` into each `Directory`'s entries.
-
 **Match a directory, then descend.**
 A `Directory` can match `name`, where `walk()` yields only file paths.
 Matching also continues into a matched directory,
 so a directory named `"src"` and a file beneath it named `"src"` can both appear in the results.
 
-The call at `[1]` returns the same path twice.
-`root` holds two separate directories named `"src"`,
-and both come back as `root/src`,
+The two paths at `[1]` come from two separate directories named `"src"`,
 so a path alone does not say which one matched.
 
 Before you move on, name what separates your attempt from this one:
@@ -270,7 +264,6 @@ since the target file's own entry counts its bytes.
 Adding the target's size again double-counts those bytes.
 
 **Stop at the link.**
-`walk()` reports the link as its own entry, `name -> target`, and stops there.
 If `walk()` follows a link back to one of its own ancestors,
 it re-enters that ancestor until Python raises a `RecursionError`.
 
@@ -549,19 +542,13 @@ print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 ```
 
 **Add one case per new node.**
-`evaluate()` and `to_infix()` gain one case per new node,
-and `evaluate()` now returns a `float`, since `/` produces one.
+`evaluate()` now returns a `float`, since `/` produces one.
 
 **Fold negations where possible.**
-`simplify()` gains two rewrites for `Neg`.
-It folds a constant operand (`Neg(Num(a))` → `Num(-a)`)
-and cancels a double negation (`Neg(Neg(inner))` → `inner`).
 The `Neg` case keeps the chapter's `is` test,
 so an unchanged subtree stays shared.
 
 **Leave division for evaluation.**
-For `Div`, `simplify()` simplifies both operands and keeps the division,
-with the same `is` test.
 A `Num` holds an `int`, and a quotient of two `int`s is usually a fraction,
 which no `Num` can hold.
 Division by `Num(0)` produces no value to fold.
@@ -737,7 +724,6 @@ print(to_infix((x + 1) * (x + 2)))
 ```
 
 **Parenthesize by context.**
-Each recursive call passes down the precedence its parent requires.
 A child gets parentheses only when its own operator binds more loosely than what the parent needs.
 A `Mul` therefore parenthesizes an `Add` child,
 while an `Add` leaves another `Add` on its left bare.
@@ -959,15 +945,11 @@ print(to_infix(simplify(d)))
 one case per node type,
 but produces another `Expr` instead of a number or a string.
 A `Num` is constant, so its derivative is always `0`.
-The derivative of `Var(n)` is `1` with respect to itself and `0` with respect to every other variable.
 
 **Combine the children's derivatives.**
-`Add`'s case is the sum rule.
-`Mul`'s case is the product rule.
-Each of its two terms multiplies one factor's derivative by the other factor as written,
+Each of the product rule's two terms multiplies one factor's derivative by the other factor as written,
 so the original, undifferentiated subtrees stay in the result.
 
-Running the raw result through `simplify()` turns `((1 * x) + (x * 1))` into the more readable `(x + x)`.
 Reaching `2 * x` takes a further rule, "combine like terms,"
 that this `simplify()` does not implement.
 
@@ -1140,7 +1122,6 @@ Every walker mishandles that `Num`.
 
 **Hand the decision back to Python.**
 Returning `NotImplemented` tells Python to try the next method.
-`__radd__()` now answers for an `int` alone, so it declines the string.
 Python then falls back to `str` concatenation, which raises `TypeError`.
 
 The message comes from `str`, which is the right source.
@@ -1151,7 +1132,6 @@ and no method in this expression language accepts a `str`.
 The forward methods need the same guard for the same reason.
 The old `__add__()` passes the raw string through `wrap()`,
 so `x + "a"` builds the ill-typed tree `Add(Var('x'), 'a')` from the other direction.
-Guarding all four methods makes each one decline an operand it cannot use.
 
 The two messages differ because each comes from a different source.
 `str` reports `"a" + x`, and Python's own fallback reports `x + "a"`,
