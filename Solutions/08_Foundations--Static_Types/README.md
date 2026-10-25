@@ -481,7 +481,7 @@ print(grid)
 ```
 
 Before you add `"purple"` to `Color`, the call runs and stores the string,
-because a `Literal` constrains nothing at run time.
+because the interpreter lets any value through a `Literal` annotation at run time.
 `ty check` reports:
 
 ```
