@@ -57,7 +57,6 @@ print(hasattr(m1, "name"), hasattr(m2, "info"))
 
 Each `Messenger()` call builds a fresh `dict` in `**kwargs` from that call's arguments and assigns it to that instance's `__dict__`.
 So every instance holds its own dictionary.
-`m1` has no `name`, and `m2` has no `info`.
 A [class attribute](../../Chapters/09_Foundations--Class_Attributes.md)
 works the other way.
 Every instance shares the one object the class holds,
@@ -190,9 +189,6 @@ The `Recipe` changed, and both Python and the type checker accepted the change.
 but `append()` leaves `toast.steps` bound to the same list.
 
 **Hash the `Recipe`.**
-Using the `Recipe` as a `dict` key raises a `TypeError`,
-whose message states the cause:
-`cannot use 'Recipe' as a dict key (unhashable type: 'list')`.
 Hashing a tuple hashes each element,
 so a `Recipe` is hashable only when every field is.
 The `list` has no hash, so the `Recipe` has none either.
@@ -268,13 +264,8 @@ print(vars(built) == vars(assigned), built == assigned)
 A keyword argument and a later assignment both add one entry to the instance's `__dict__`.
 `vars()` reads that dict, which keeps insertion order.
 The two namespaces insert `note` at different moments.
-The constructor adds it to `built` before `built.more = 11` runs,
-so `note` comes third there.
-In `assigned` the assignment to `note` follows `assigned.more = 11`,
-so `note` comes last.
 
 **Compare the contents.**
-The order differs, but `built` and `assigned` end with the same four attributes.
 Dict equality ignores order, so the two dicts compare equal,
 and so do the namespaces.
 
@@ -352,7 +343,6 @@ At runtime that read raises an `AttributeError` before the `count` read runs.
 The `count` read passes the type checker,
 because a tuple has a `count()` method.
 `result.count` evaluates to that bound method instead of the number.
-The repair is `result[0]` and `result[1]`.
 
 The call sites lose the names.
 `print(result)` now writes `(4.0, 3)` where it wrote `Stats(mean=4.0, count=3)`,
@@ -373,7 +363,6 @@ It also reports indexing past the end and calling a `str` method on `count`.
 
 The checker cannot catch the mistake this exercise examines:
 swapping `mean` and `count`.
-`mean, count = summarize(data)` and `count, mean = summarize(data)` destructure the same `tuple[float, int]` into two names.
 The swapped unpacking type-checks cleanly and misnames both values,
 as the listing's `mean=2 count=3.0` output shows.
 With `Stats` you write `result.count`, which reads the field by name,
@@ -457,7 +446,6 @@ The field names serve the reader.
 The `==` operator ignores them.
 
 **Check the class before the fields.**
-`FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`.
 A frozen data class's generated `__eq__()` checks `other.__class__ is self.__class__` before comparing fields,
 and returns `NotImplemented` for a tuple.
 Python then tries the tuple's own comparison,
@@ -659,8 +647,7 @@ At runtime, the unpacking `x, y = other` raises a `ValueError` for a tuple of an
 
 **Reuse the properties in `__repr__()`.**
 `tuple.__repr__()` prints `(4.0, 6.0)`.
-The override prints the class name around the two properties,
-so the `Point` names its type the way a `NamedTuple` does.
+The override makes a `Point` name its type the way a `NamedTuple` does.
 
 **What stays a tuple.**
 Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone,
