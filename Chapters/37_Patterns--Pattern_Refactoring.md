@@ -35,7 +35,6 @@ In the `Trash` hierarchy, each material class declares a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically.
 The base class's `create()` method is the [dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary).
-It builds an instance from a material name.
 
 ```python
 # trash.py
@@ -119,16 +118,9 @@ A new material registers itself, and `create()` builds it.
 That ordinary function reads `piece.value` and `piece.weight` polymorphically,
 so each piece answers `value` from its own class.
 
-`report()` prints one line per bin, the material's name beside its total.
+Each recycling script in the chapter prints its bins with `report()`.
 A dictionary keeps its keys in insertion order,
 so the material that appears first in the data prints first.
-Each recycling script in the chapter prints its bins with `report()`.
-
-The tests confirm that:
-
-- Each subclass registers itself.
-- `create()` builds an instance by name.
-- `sum_value()` totals weight times the per-pound value.
 
 ```python
 # test_trash.py
@@ -200,8 +192,7 @@ def parse(filename: str | Path) -> list[Trash]:
     return items
 ```
 
-The test writes its own small data file to a temporary directory and parses that.
-It confirms that `parse()` skips comment and blank lines and builds each remaining piece by name with its weight:
+The test writes its own small data file to a temporary directory and parses that:
 
 ```python
 # test_parse_trash.py
@@ -251,9 +242,6 @@ def sort_by_match(pieces: list[Trash]) -> Bins:
                 bins[Cardboard].append(piece)
     return bins
 ```
-
-`sort_by_match()` sorts the pieces in `trash.dat`,
-and `report()` prints each bin's total:
 
 ```python
 # recycle_rtti.py
@@ -336,8 +324,7 @@ print(f"parsed {len(pieces)}, binned {binned}")
 Nothing fails.
 The parser builds two `Plastic` objects, the `match` lets both fall through,
 and the report totals the trash the `match` recognized.
-The loop appends two of the four pieces to a bin,
-so the totals the plant uses leave out sixty pounds of plastic.
+The totals the plant uses leave out sixty pounds of plastic.
 Each total in the report is right for the pieces it covers.
 A missed `case` produces a report that looks complete and leaves out a material,
 not an exception to debug.
@@ -430,7 +417,6 @@ print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 4
 ```
 
-The loop bins every piece, plastic included: `parsed 4, binned 4`.
 The last two lines count the pieces for the comparison with `plastic_dropped.py`.
 Apart from those lines,
 `recycle_dict_plastic.py` differs from `recycle_dict.py` in two places:
@@ -578,8 +564,7 @@ for material in Trash.registry.values():
 Each implementation above takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
 
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
-Three materials get a registered note.
-`Paper`, the fourth, falls through to the base function.
+`Paper` falls through to the base function.
 
 A forgotten material gets the default answer,
 with no exception at runtime and no report from the type checker.
@@ -621,8 +606,6 @@ print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 0
 ```
 
-The loop reads every material from the registry,
-and `hazard()` answers for each.
 `trash.py` stays as written.
 A third operation and a fourth are one more file each.
 In `note_methods.py`,
