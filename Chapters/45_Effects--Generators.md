@@ -1,6 +1,6 @@
 # Generators
 
-> A generator can pause partway, ask for something,
+> A generator is a *resumable function*: it can pause partway, ask for something,
 > and continue when the answer arrives.
 > An Effect system runs on that conversation.
 
@@ -10,7 +10,6 @@ a function containing `yield`,
 driven by a `for` loop that takes one value at a time.
 Producing values is half of what a generator does.
 
-The other half runs the other way.
 `yield` is an expression,
 so a generator can receive a value as well as hand one out,
 and it can return a final result when it finishes.
@@ -596,12 +595,6 @@ which gives `send(4)` a value to return.
 Without `[3]`, `send(4)` would finish `both()`,
 and the loop would need a `try` for `StopIteration`.
 
-A hand-written `for prompt in collect("alpha"): yield prompt` loop produces the same prompts but drops every sent value.
-Each value arrives at the loop's own `yield`, which discards it,
-so `next()` resumes `collect()` and both of its `yield` expressions produce `None`.
-The type checker accepts that loop as a valid `Generator[str, int]`,
-since the send channel appears in the declaration whether or not the body uses it.
-
 ### All Three Channels
 
 This version of `interview()` makes each request through a helper, `ask()`,
@@ -1013,6 +1006,47 @@ Each of the three returns an awaitable for the caller to `await`.
 [Stateless](46_Effects--Stateless.md)
 builds on all three of this chapter's ideas.
 It describes a function by what it requests and writes those requests into its return type.
+
+## Half a Coroutine by Design
+
+The three channels, the driver, and `yield from` arrived over fourteen years,
+each one answering a request the one before had opened.
+PEP 255 added generators to Python 2.2 in 2001 to solve one problem:
+a producer that keeps state between the values it produces.
+Before that, such a producer took a callback,
+built its whole result list up front,
+or was rewritten as an iterator class with its control flow turned inside out.
+The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
+and the useful part is the frame:
+a suspended generator keeps its frame alive and resumes it on the next call.
+Tim Peters called the result a semi-coroutine, after Knuth,
+and credited Ralph Griswold's Icon for most of the inspiration.
+Icon's `suspend` statement produces a value and leaves the procedure ready to produce another.
+The keyword came from CLU and Sather,
+where an iterator yields one element at a time to a `for` loop.
+
+The restriction is the design.
+A generator always returns to the code that resumed it,
+because a frame that could transfer anywhere would have to carry the C stack with it,
+the obstacle that kept Stackless Python's coroutines out of the core.
+That restriction is why a driver exists.
+Something must call `next()` and `send()`,
+and since a generator cannot name that something, you write it.
+In 1999 Tim Peters called generators "half a coroutine."
+The other half came in 2005, when PEP 342 added the send channel for Python 2.5.
+Simulations, games, and asynchronous I/O need to pass a value or an exception into a generator at its suspension point,
+so `send()`, `throw()`, and `close()` arrived together,
+and the PEP describes a scheduler that runs many generators as a "trampoline,"
+the shape of `task_runner_send.py`.
+`yield from` (PEP 380, Python 3.3) completed the set.
+A delegating generator passes all three channels through to the innermost generator,
+so you can compose a conversation from parts that never refer to their driver.
+
+An event loop is one such driver, and `async`/`await` (Python 3.5)
+is the same machinery under a syntax that tells the reader which driver runs it.
+An Effect system builds on a generator rather than a coroutine for the reason the 2001 design chose the half it did:
+a generator hands each request to whoever resumes it,
+and that caller is yours to write.
 
 ## Exercises
 

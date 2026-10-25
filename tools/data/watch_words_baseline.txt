@@ -420,6 +420,7 @@ Chapters/44_Effects--Effect_Management.md	never: the exception never propagates 
 Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
+Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
 Chapters/46_Effects--Stateless.md	already: A function that already returns an Effect needs no CODE
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
 Chapters/46_Effects--Stateless.md	already: It carries CODE on a function that already returns an Effect
