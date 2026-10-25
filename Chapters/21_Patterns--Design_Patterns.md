@@ -333,7 +333,7 @@ because each caller names the protocol's method.
 The renamed class stops matching the protocol,
 and the type checker reports each place that passes it to a caller.
 
-In Python, the `Protocol` and `Callable` rungs require nothing from an implementer.
+In Python, an implementer meets the `Protocol` and `Callable` rungs through its signatures alone.
 An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and no implementer inherits.
 A `Callable` annotation is not a class.
@@ -341,7 +341,7 @@ The `Protocol` and `Callable` rungs are the mechanism behind [When a Pattern Dis
 In a language where every implementer must specify its interface,
 a pattern exists to build a declared interface.
 In a language that supplies the `Protocol` and `Callable` rungs,
-that pattern has nothing left to build.
+those rungs supply the interface, so the pattern dissolves.
 
 ### A Pattern Moves an Edge
 
@@ -484,7 +484,7 @@ The rest are here for your own designs.
 -   *Make common things easy, and rare things possible*.
 -   *Consistency*.
     Every inconsistency in a design is one more arbitrary rule to remember.
-    The more rules you impose that have nothing to do with solving the problem at hand,
+    The more rules you impose beyond what the problem at hand needs,
     the slower the programmer works.
     The slowdown grows faster than the rule count, because the rules interact.
 -   [*Liskov Substitution Principle*](20_Patterns--Rethinking_Objects.md#liskov-substitution)
@@ -597,7 +597,7 @@ Try each exercise before opening its [solution](../Solutions/21_Patterns--Design
 3.  Apply *Subtraction* to a design of your own.
     Remove one class, one interface, or one level of inheritance,
     and say what stopped working.
-    If nothing did, leave it out.
+    If everything still works, leave it out.
 4.  Write the `Report` design from [The Reach of a Change](#the-reach-of-a-change)
     twice, with a PDF writer and an HTML writer:
     once where `Report` specifies each writer class,
