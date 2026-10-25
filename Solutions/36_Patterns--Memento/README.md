@@ -165,10 +165,6 @@ def test_erase_leaves_history_states_untouched() -> None:
     assert history.past[0].strokes == ("a",)
 ```
 
-**Remove the last stroke.**
-`erase()` mutates `self.strokes` in place, as `draw()` does.
-It pops the last stroke whenever the list holds one.
-
 **Copy the state when saving.**
 `save()` copies the strokes into an immutable `Memento`,
 so each memento keeps the strokes it held when `save()` returned it,
@@ -245,16 +241,8 @@ def test_erase_leaves_history_states_untouched() -> None:
 ```
 
 **Derive the shorter state.**
-The frozen version's `erase()` follows `draw()`'s shape too.
-It returns a new `Drawing` via `replace()`,
-this time with the last stroke sliced off.
 `before` keeps its own strokes,
 so any `History` holding `before` as a past state still holds both strokes.
-
-**Prove the history keeps its states.**
-The history test checks that claim.
-After `do(before.erase())`, the stored past state `is` the original object,
-still carrying both strokes.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -367,7 +355,6 @@ and a `pop(0)` when the check finds one state too many.
 That `pop(0)` shifts every remaining element.
 
 **Report what the past still holds.**
-`can_undo()` asks whether `_past` still holds a state.
 A bounded history empties `_past` sooner: after at most `max_depth` undos,
 however many `do()` calls the program made.
 So `can_undo()` can report `False` while the program has made more `do()` calls than it has undone.
@@ -474,10 +461,6 @@ where the record declares it `tuple[str, ...]`.
 `pickle` preserves the Python type, tuple in, tuple out,
 because it serializes Python's own object representations rather than translating into a shared,
 language-neutral format.
-
-**Restore the declared type.**
-The reconstruction compensates for what JSON loses.
-It wraps `data["strokes"]` back in `tuple(...)` before passing it to `Drawing`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -698,7 +681,6 @@ print(h.present)
 ```
 
 **Step back through `undo()`.**
-`goto()` calls the existing `undo()` repeatedly.
 Each `undo()` pushes the state it leaves onto `_future`,
 so redo works as if you had called `undo()` `steps_back` times.
 After `goto(2)`, `h.redo()` returns `2`, then `3`, the states `goto()` undid,
@@ -841,14 +823,9 @@ the restore leaves `history.present` as it was,
 and the print after it shows `strokes=('body', 'beak', 'tail')` again.
 The restored state appears when `undo()` pops it off `_past`, so the undo step,
 rather than the restore, produces `strokes=('body',)`.
-The solution calls `do()`, which pushes the present onto `_past`,
-makes the new state the present, and clears `_future`.
 
 **Take one field from the past.**
 `restore_field()` is `partial_restore.py` with the field name passed as a parameter.
-It reads one attribute off the past state,
-passes it to `copy.replace()` as the single change,
-and pushes the result through `do()`.
 The rename to `"Goose"` survives the restore because `copy.replace()` copies every other field from `history.present`.
 
 **Narrow the history's state type.**
