@@ -94,9 +94,8 @@ the assignment calls the `@radius.setter` method.
 The existing validation then applies to every method that changes the radius this way.
 
 **Confirm the setter rejects a negative result.**
-`shrink(-2)` runs after `shrink(2)` has set the radius to `5.0`,
-so it computes `5.0 / -2 == -2.5`.
-The setter rejects `-2.5`, just as it rejects `c.radius = -2.5` written by hand.
+The setter rejects the computed `-2.5`,
+just as it rejects `c.radius = -2.5` written by hand.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -179,11 +178,6 @@ t2 = Temperature.from_kelvin(373.15)
 print(round(t1.celsius, 2), round(t2.celsius, 2))
 #: 100.0 100.0
 ```
-
-**Convert, then construct.**
-Both class methods end with `return cls(...)`,
-so `from_kelvin()` builds a `Temperature` the way `from_fahrenheit()` does,
-with a different formula for `celsius`.
 
 **Compare the results within rounding.**
 212°F, 373.15 K, and 100°C are the same temperature (water's boiling point),
@@ -314,17 +308,11 @@ If you add `MoreDerived` to `simple_subclass.py`, as the exercise says,
 the two constructor lines print first.
 
 **Dispatch on the object's class.**
-`MoreDerived` inherits `show_twice()` from `Simple`,
-and `show_twice()` calls `self.show()` twice.
-The lookup starts at the class of the object, and `self` is a `MoreDerived`,
+The lookup for `self.show()` starts at the class of the object,
+and `self` is a `MoreDerived`,
 so each call resolves to `MoreDerived.show()` first.
 
 **Pass each call up the chain.**
-`MoreDerived.show()` prints its own message, then calls `super().show(msg)`,
-which runs `Derived.show()`.
-`Derived.show()` prints its message and calls `super().show(msg)` again,
-which runs `Simple.show()`.
-`Simple.show()` finally prints `x`.
 Each `super()` call runs the `show()` of the class one step closer to `Simple`,
 so the messages appear in derived-to-base order, twice.
 
@@ -407,12 +395,7 @@ print(n.average)
 #: 10.0
 ```
 
-**Compute on first access.**
-The first access to `n.total` runs its body, prints the `"summing"` message,
-and stores `30` on the instance.
-
 **Reuse the cached value.**
-`average`'s body then reads `self.total` and gets that stored value.
 The `"summing"` message appears once,
 because the `n.total` access computes and caches `total` before `average` reads it.
 If you access `average` first,
@@ -506,7 +489,6 @@ and that method calls `__repr__()`.
 
 **Add a readable form for users.**
 Adding `__str__()` makes `print(t)` and the printed list differ.
-`print(t)` and `f"{t}"` show the readable form.
 The list keeps showing `Temperature(21.0)` for each element,
 because a container formats its elements with `repr()`, not `str()`.
 `{t!r}` calls `repr()`,
@@ -587,7 +569,6 @@ Derived().show()
 ```
 
 **Rename the base-class method.**
-The program prints `Derived.show`.
 `Derived` defines `show()` itself,
 so `Derived().show()` finds it there and the lookup stops before reaching `Base`.
 The rename turns the override into an unrelated new method.
