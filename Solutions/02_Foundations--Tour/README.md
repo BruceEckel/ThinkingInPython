@@ -94,8 +94,6 @@ for value in [0, 1, "", "hi", [], [1], None, {}, {"k": 1}]:
 #: {'k': 1} -> True
 ```
 
-An empty dictionary is falsy, the same as an empty list or an empty string.
-A dictionary with one or more entries is truthy.
 The rule is the same for every container: falsy when empty, truthy otherwise.
 
 Before you move on, name what separates your attempt from this one:
@@ -139,8 +137,7 @@ print(f"{score = }")
 ```
 
 `.2f` always shows two digits after the decimal point, a trailing zero included.
-`{score = }` prints both the expression's source text and its value,
-so one field replaces a debugging `print("score", score)`.
+One `{score = }` field replaces a debugging `print("score", score)`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
