@@ -231,9 +231,8 @@ print(4_000 < heads < 6_000)
 #: True
 ```
 
-`count_heads()` declares `-> Depend[Flip, int]`,
-so it needs a `Flip` and produces an `int`.
-Its body does not call `random`, and no parameter carries a seed or a source.
+The body of `count_heads()` does not call `random`,
+and no parameter carries a seed or a source.
 `Ask` and `Tell` each carry a payload the request delivers,
 whereas `Flip`'s whole content is its type and the `bool` it produces.
 
@@ -244,9 +243,6 @@ An `if` condition is none of those,
 so `if yield from flip():` is a syntax error.
 
 Two handlers feed the same function.
-`scripted` walks an iterator over a preset sequence,
-so the sequence decides the five tosses before the program runs and the count is `3`.
-`coin` calls `random.random()`, so ten thousand tosses come out near half heads.
 `count_heads()` runs the same code under both,
 because either answer arrives through the same `send()` channel.
 
@@ -306,8 +302,6 @@ def batch_due(last_run: datetime) -> Depend[Now, bool]:
 
 Like `Flip`, `Now` carries no data.
 Its answer type is its whole content.
-A handler for `Now` returns a `datetime`,
-and `now()` is the accessor that declares that type.
 The handlers decide which moment `stamp()` and `batch_due()` receive:
 
 ```python
@@ -337,7 +331,6 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 so `stamp()` produces a known string a test can compare.
 `tomorrow` reports a moment a day later,
 so `batch_due()` returns `True` at once.
-`batch_due()` subtracts `last_run` from the handler's answer and finishes in microseconds.
 `batch_due()` holds no `datetime.now()` call,
 so a test supplies the moment outright.
 A production handler that returns `datetime.now()` runs the same function.
@@ -376,9 +369,7 @@ def test_batch_due_at_a_full_day(elapsed: timedelta,
     assert is_due is due
 ```
 
-`at()` builds a handler from a moment,
-so each test freezes its own clock in one line.
-That frozen clock can report the parametrized reading one minute short of a day,
+A clock from `at()` can report the parametrized reading one minute short of a day,
 which a real clock cannot produce on demand.
 Against a real clock you must start the test at the right minute,
 but here the margin is a `timedelta`.
@@ -422,10 +413,7 @@ print(run(handle(crossing)(archive)("backup ok")))
 ```
 
 Under `steady` the two dates agree and the function looks correct.
-`crossing` answers the first request one second before midnight and the second request one second after midnight.
-The file then carries January 1's name,
-and the entry inside it carries January 2's date.
-An entry archived as midnight passes ends up in the previous day's file.
+Under `crossing`, an entry archived as midnight passes ends up in the previous day's file.
 The window for the mistake is only as wide as the gap between the two reads.
 
 Using a real clock, you wait for that window and probably miss it.
@@ -542,8 +530,7 @@ def draw(source: Source, hour: int) -> None:
     source.deplete()
 ```
 
-`Outlet` is an Ability whose handler returns a `Source`.
-The request carries the hour so the handler can check which sources are available at that hour.
+An `Outlet` request carries the hour so the handler can check which sources are available at that hour.
 `Ask` carries a prompt for the same reason.
 
 `Source` carries no `@runtime_checkable`,
@@ -555,9 +542,7 @@ Here `handle()` matches on the Ability's own type, `Outlet`.
 The `Source` that comes back is only a return value.
 
 `draw()` is the lifting wrapper.
-It raises `Drained` when `available()` reports that the source cannot supply the hour,
-and otherwise depletes the source.
-`@throws` lifts that `Drained` into the error channel.
+`@throws` lifts the `Drained` it raises into the error channel.
 
 Here are the consumer and the handler that feeds it:
 
@@ -607,9 +592,6 @@ def run_load(start: int,
                 remaining -= 1
 ```
 
-Read `run_load()` from the outside in.
-The outer loop obtains a source, the inner one draws from it hour after hour,
-and `connected()` wraps the inner loop.
 `draw()` returns `None` on success,
 so anything else in `failure` is the `Drained` that ends the inner loop.
 The outer loop then calls `plug()` again for a replacement.
@@ -680,16 +662,8 @@ run(handle(battery_first)(run_load)(17, 4))
 #: Grid offline
 ```
 
-The first trace is an evening.
-Solar covers two hours and stops at sunset.
-The battery covers two more and stops when its charge falls below the threshold.
-The grid covers one and stops when the outage begins at 22:00.
-The backup covers the last.
-
 `run_load()` draws from whichever source `plug()` hands it,
 so the second run prints a different trace from the same code.
-`battery_first` puts the battery ahead of the sun,
-so the charge drains first and the grid supplies the load from 19:00.
 Apart from their lengths,
 the two runs differ only in the order of the tuple passed to `controller()`.
 `controller()` sets the priority,
@@ -775,13 +749,11 @@ def ledger(cell: Cell) -> tuple[
 
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
 `Put` has `Tell`'s shape: payload out, nothing back.
-`purchase()` uses both.
-It reads the balance, compares it with `price`, and writes the remainder back.
-The comparison sits between the two requests, in code that mentions no cell.
+`purchase()`'s comparison sits between the two requests,
+in code that mentions no cell.
 
 `purchase()`'s signature declares the shared state.
 `Depend[Get | Put, bool]` tells a caller this function reads or writes something that outlives it.
-`spree()` composes purchases, and its signature carries the same union.
 
 The handlers own the cell.
 `ledger()` builds `read()` and `write()` from one `Cell`,
@@ -805,8 +777,6 @@ def test_spree_spends_from_the_tests_cell() -> None:
     assert cell.amount == 10
 ```
 
-After the run, the cell holds what the program left.
-Two purchases went through, and 10 remained.
 Each test builds its own cell and asserts on that cell,
 so two tests can run in either order.
 
@@ -887,8 +857,7 @@ def research() -> Effect[
 ```
 
 The `research()` signature declares what the program needs and how it can fail.
-`research()` reads a `Feed` and an `Encyclopedia` from outside and can fail three ways.
-The signature is also the only place those failures appear.
+The signature is also the only place the three failures appear.
 The body requests each dependency by its type,
 and nothing in it mentions a network, a file, or a print.
 Calling `research()` performs no work.
@@ -1038,7 +1007,6 @@ and no step tests for it.
 Where the run stops depends on where the failure arises.
 The run at `[4]` prints its outcome alone,
 since `DeadWire.latest()` raises `Unavailable` where `Wire.latest()` prints `feed: fetching`.
-The run at `[3]` reaches the library and fails there.
 
 `report()` handles the two channels differently.
 `catch()` empties the error channel, so `report()` cannot fail.
@@ -1415,7 +1383,6 @@ def encounter() -> Depend[
 `encounter()` holds all the engine's logic.
 It constructs no `GameEnvironment`, holds no factory,
 and mentions only the three Protocols.
-It sends every line of output through `narrator.say()`.
 Output is a requested type like `Hero` and `Obstacle`.
 `Narrator` is one of the three requests,
 so the code that supplies it chooses whether a line prints, goes into a list,
@@ -1460,7 +1427,6 @@ def warriors_and_weapons(narrator: Narrator) -> None:
 ```
 
 `play()` is the boundary function of [Composing a Program](#composing-a-program).
-Where that section's `outcome()` takes two parameters, `play()` takes three.
 Its annotations do the upcasting,
 so each actor reaches `supply()` as its Protocol type,
 the job `as_type()` does elsewhere.
@@ -1513,7 +1479,6 @@ print(script.lines)
 #: ['Kitty arrives', 'and bats at the puzzle']
 ```
 
-The fourth run swaps the narrator for a `Script` and captures the output.
 `Script` records what arrives,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching.
 The engine holds no printing to intercept.
@@ -1523,7 +1488,6 @@ makes the same swap with one Ability rather than three.
 ### The Unmatched Cast
 
 The third run mixes the casts, and nothing reports it.
-A `Kitty` bats at a `Weapon`.
 The unmatched cast type-checks, and it runs.
 That is a loss compared with the *Abstract Factory*,
 whose purpose is families of matched products.
@@ -1637,8 +1601,6 @@ The first run is the baseline: one attempt, no retry, and it fails.
 `three` comes from the only two schedule combinators the library has.
 `spaced()` yields the same interval forever,
 and `recurs()` stops it after `n` yields.
-Three attempts against a database that fails twice succeed on the third,
-and three attempts against one that fails nine times produce a `RetryError` holding all three failures.
 `save_user()` stays as written through all of it.
 
 `retry()` decorates the function `save_user`,
@@ -1794,7 +1756,6 @@ print(db1.attempts, db2.attempts)
 #: 1 0
 ```
 
-`db2` never runs.
 The second call's answer comes from `db1`'s cache entry,
 because `memoize()` keys on `"Morty"` alone.
 Memoize a function only where one scenario serves the memoized call for its whole lifetime,
