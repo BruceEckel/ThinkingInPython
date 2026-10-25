@@ -13,7 +13,11 @@ place: `already`, `even`, `honest`, `buy`, `hooks`, `never`, `anyway`,
 `cheap`, `expensive`, `pay`, `earn`, `bargain`, every form), a figure
 standing for a consequence that the sentence should name (edit
 database rule R2; a measured cost, time, memory, or a line count,
-stays). Tier 1 ("Consider rewriting") is a word with
+stays), and a verb whose object is `nothing` (since 2026-10-24:
+"reports nothing", "changes nothing", "prints nothing", the verbs in
+`NOTHING_VERBS`; the positive form usually exists, "accepts", "leaves
+the list as it was", "prints an empty line", and a negation that is
+the claim stays). Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -136,6 +140,19 @@ NAMES_NOT_NOUN: Final = (
     r"(?<!\bsome )(?<!\bmany )(?<!\bother )(?<!\bour )(?<!\byour )"
     r"(?<!\bhis )(?<!\bher )(?<!\bboth )(?<!\bsame )(?<!ing )(?<!-)"
 )
+NOTHING_VERBS: Final = (
+    r"(?:reports?|reported|reporting|says?|said|saying|prints?|printed"
+    r"|printing|changes?|changed|changing|does|do|did|doing|returns?"
+    r"|returned|returning|finds?|found|finding|checks?|checked|checking"
+    r"|sees?|saw|seen|seeing|knows?|knew|known|knowing|flags?|flagged"
+    r"|flagging|catch(?:es)?|caught|catching|yields?|yielded|yielding"
+    r"|produces?|produced|producing|shows?|showed|shown|showing"
+    r"|needs?|needed|needing|holds?|held|holding|learns?|learned"
+    r"|learning|receives?|received|receiving|emits?|emitted|emitting"
+    r"|writes?|wrote|written|writing|reads?|reading|adds?|added|adding"
+    r"|requires?|required|requiring)"
+)
+"""A verb whose object is "nothing" (Tier 2, since 2026-10-24)."""
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
@@ -187,6 +204,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"pays?|paid|paying"),
         (2, r"earns?|earned|earning"),
         (2, r"bargains?"),
+        (2, NOTHING_VERBS + r" nothing"),
     ]
 )
 EVEN_AFTER: Final = re.compile(
