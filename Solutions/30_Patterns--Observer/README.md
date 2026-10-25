@@ -469,7 +469,7 @@ the silent failure leaves the caller believing every responder succeeded.
 If you catch each exception and discard it, every responder runs,
 but `announce()` returns normally.
 The demo's `print()` sits inside its `except*` block,
-so the script prints nothing,
+so the script finishes silently,
 and the test's `pytest.raises(ExceptionGroup)` fails with `DID NOT RAISE`.
 
 **Report every failure together.**
@@ -499,7 +499,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest)
-shows `gather()` raising the first failure while the other coroutines keep running with nothing awaiting them.
+shows `gather()` raising the first failure while the other coroutines keep running as orphans.
 With `return_exceptions=True`, `gather()` returns every result,
 exceptions among them.
 Keep the results that are exceptions and raise them as one group.
@@ -664,7 +664,7 @@ If you leave out `return_exceptions=True`,
 which fails the test.
 The demo still prints `1 [7]`,
 because `except*` wraps a bare exception in a group and `record()` finishes before `main()` resumes.
-A slower responder, though, keeps running with nothing awaiting it,
+A slower responder, though, keeps running as an orphan,
 as [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest)
 shows.
 
@@ -1923,7 +1923,7 @@ The load-time form removes three of the runtime problems:
 - A lapsed listener is an object kept alive by its connection.
   The registry holds module-level functions,
   and their module keeps them alive for the whole program.
-  The registry's strong references therefore keep nothing alive that Python would otherwise collect.
+  The registry's strong references therefore match the lifetimes the module gives its functions.
 
 Two problems remain.
 A responder that raises an exception stops the loop,
@@ -1939,8 +1939,8 @@ The load-time form also brings three problems that `Broadcaster` avoids:
   Sending the thermometer along with the reading tells the responders the source,
   but every responder still receives every thermometer's changes.
 - A responder registers only if Python imports its module.
-  A responder in a module that nothing imports does not run,
-  and nothing reports its absence.
+  A responder in a module the program forgets to import stays out of the registry.
+  The program runs on silently without it.
   Django's documentation handles this by importing an app's signal handlers from its `AppConfig.ready()` method,
   which Django calls at startup.
 - Tests share the registry.
@@ -1958,7 +1958,7 @@ A test creates its own thermometer and registers against it,
 so each test has a registry of its own too.
 The import problem stays.
 A responder registers when Python runs its `def`,
-so a responder in a module nothing imports still registers nothing.
+so a responder in a module the program forgets to import still stays off every thermometer's list.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
