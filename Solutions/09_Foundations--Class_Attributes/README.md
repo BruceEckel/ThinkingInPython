@@ -67,7 +67,7 @@ a different design, a detail, or an equivalent alternative.
 
 [ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance)
 walks one class attribute down a hierarchy.
-A subclass that declares nothing reads through to its base.
+A subclass that inherits `shared` unchanged reads through to its base.
 Add `Middle` as a second subclass like `Left`,
 print `Middle.shared` beside the others at each step,
 and check which classes move together.
@@ -694,7 +694,7 @@ print(vars(t), t.seat)
 **Declare the attribute without creating it.**
 The type checker passes this file.
 The checker accepts the declaration `seat: str` and never checks that a method assigns `seat`.
-At runtime the declaration creates nothing.
+At runtime the declaration becomes an entry in the class's annotations alone.
 
 **Create the attribute from outside.**
 The type checker verifies `t.seat = "14C"` against the declared `str`.
