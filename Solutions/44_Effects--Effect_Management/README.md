@@ -109,7 +109,7 @@ where a test can choose differently from production.
 
 **Satisfy the protocols structurally.**
 After the choice moves, the type checker still enforces the protocols.
-`Console` inherits from nothing and declares no relationship to `Ask` or `Tell`,
+`Console` inherits from `object` alone and declares no relationship to `Ask` or `Tell`,
 but it has the two methods with the right signatures,
 so it satisfies both protocols structurally.
 If you give `Console` a `tell()` that returns a `str`,
