@@ -101,10 +101,8 @@ both forms write `'spam eggs\neggs ham\n'`, one line per input file.
 <details>
 <summary>Solution</summary>
 
-The framework anchors the shape: read every file but the last,
-run the varying `process()` step over each input's text,
-and write the combined result to the last file.
-It appears twice, as a base class whose `run()` is the template method and as a function that takes the step as an argument.
+The framework appears twice,
+as a base class whose `run()` is the template method and as a function that takes the step as an argument.
 Every customization must supply `process()`,
 so the base class declares it with `@abstractmethod`:
 
@@ -145,7 +143,6 @@ explains.
 `Search`, which stores its word list in a field, is such a record.
 
 The uppercase policy needs no data.
-The subclass overrides `process()`.
 The function form passes `str.upper`,
 which has the signature the framework expects:
 
@@ -182,8 +179,6 @@ demo()
 #: 'HELLO\nWORLD\n'
 #: 'HELLO\nWORLD\n'
 ```
-
-The two mechanisms supply the same step, so both produce `'HELLO\nWORLD\n'`.
 
 The search policy needs the word list while it processes each file.
 The framework treats every input alike,
@@ -517,7 +512,6 @@ Reversed().run()
 ```
 
 Python objects to nothing.
-The program runs and prints the steps in the reversed order the subclass chose.
 The anchored algorithm is no longer anchored.
 
 The type checker objects.
@@ -802,8 +796,7 @@ You can say which misspelling now passes unreported.
 
 The chapter's `__init_subclass__()` builds its set of names from every base class,
 so the set grows as the hierarchy does.
-`MyApp` adds `report()`.
-A subclass of `MyApp` inherits that name along with the framework's own names:
+A subclass of `MyApp` inherits `report()` along with the framework's own names:
 
 ```python
 # exercise_5.py
@@ -861,7 +854,6 @@ with expected(TypeError):
 ```
 
 **Compare against every base.**
-The `class Audited` statement raises a `TypeError`.
 The check compares a new method against every non-dunder name in every base,
 and `report` is one of those names.
 Yet `report()` is a helper that `MyApp` added, not a step of the framework,
