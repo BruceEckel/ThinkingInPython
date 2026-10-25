@@ -720,7 +720,7 @@ while `getattr()` still finds it in `__dict__`.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
 
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
-The deleted-field drift raises nothing,
+The deleted-field drift stays silent,
 and reading the deleted `title` returns stale data.
 Running the same reassignment backwards shows the deleted field:
 
