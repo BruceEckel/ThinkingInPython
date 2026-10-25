@@ -128,7 +128,6 @@ so the signatures match.
 `@override` finds a `push()` in `Stack` to override.
 The type checker accepts `BoundedStack` as a `Stack`.
 `fill()` takes a `Stack` and relies on its `push()` always succeeding.
-A `BoundedStack` handed to `fill()` raises an `OverflowError` on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
 No tool catches the broken contract, but a test can.
@@ -253,8 +252,7 @@ A shallow copy of a list of `Bob`s protects the list and leaves the `Bob`s share
 The caller's copy holds the same `Bob` objects as your list,
 so the caller can change each one.
 
-A test confirms that the defensive copy holds.
-Mutating the returned list leaves the original as it was:
+A test confirms that the defensive copy holds:
 
 ```python
 # test_plugged.py
@@ -297,7 +295,6 @@ if __name__ == "__main__":
 #: [FrozenInstanceError] cannot assign to field 'name'
 ```
 
-Assigning to a field of the frozen `Bob` raises a `FrozenInstanceError`.
 The demo goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
 `frozen=True` enforces the rule at runtime,
 including in code that skips the type checker.
@@ -348,7 +345,6 @@ Frozen guards the binding, not the object.
 and rebinding it raises a `FrozenInstanceError`.
 But the list stays mutable, so `FrozenLeaky` leaks the same way `Leaky` does.
 
-The same list field makes the instance unhashable.
 A frozen data class is hashable only when every field it compares is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
@@ -408,9 +404,7 @@ and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
 
-`distance()` has the same body as `distance_to()`,
-with `a` and `b` in place of `self` and `other`.
-It returns the same result, and it has one advantage.
+`distance()` has one advantage.
 It lives outside `Point`, so it can serve any type that has an `x` and a `y`.
 The method keeps one advantage of its own.
 Dot-completion on `p1.` lists every operation `Point` supports,
@@ -606,8 +600,6 @@ print({c: "found"}[twin])
 
 `Contact` inherits nothing and gains only the methods `@record` generates for it.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
-Two contacts built from equal parts are equal and hash alike,
-so `twin` finds the entry stored under `c`.
 Value equality and hashing follow from the fields rather than from a base class.
 
 Changing one city means rebuilding the `Address` and then the `Contact`.
@@ -781,15 +773,11 @@ if __name__ == "__main__":
 #: [AttributeError] 'int' object has no attribute 'display'
 ```
 
-`show()` accepts anything because `t`'s type is `Any`.
 `Any` switches the type checker off for `t`, so any type passes.
 Each `Any` parameter is dynamically typed.
 `Any` is a different thing from `object`.
 If you use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
-
-The `expect()` call passes `show()` an `int`, which has no `display()` method,
-so the call raises an `AttributeError` when the line runs.
 
 ### Protocols
 
@@ -963,7 +951,6 @@ if __name__ == "__main__":
 #: user-42
 ```
 
-Without the `# type: ignore`, the type checker rejects `lookup(42)`.
 `UserId` and `int` are different types to the checker.
 If `Priced.total()` in `protocol_collision.py` returns a `Price` and `Weighted.total()` returns a `Weight`,
 the two protocols declare different return types,
@@ -983,10 +970,7 @@ def test_newtype_has_no_runtime_effect() -> None:
     assert type(UserId(42)) is int
 ```
 
-Both assertions in that test always pass.
 Passing a raw `int` where a signature says `UserId` raises no exception either.
-In `newtype_boundary.py`,
-the `# type: ignore` silences the type checker's diagnostic.
 At runtime, `lookup(42)` prints `user-42`, the same as `lookup(UserId(42))`.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
