@@ -203,7 +203,7 @@ a sort that drops the last element fails idempotence and the oracle and passes t
 If you write the oracle as `assert sorted(xs) == sorted(xs)`, the test passes,
 and it keeps passing for a sort that drops the last element,
 because both sides of `==` share the bug.
-A property that restates the implementation tests nothing.
+A property that restates the implementation agrees with every bug in it.
 The solution therefore checks `sorted()` against `insertion_sort()`,
 a separate implementation that cannot share the bugs of `sorted()`.
 The insertion-sort oracle fails the broken sort on `xs=[0]`.
