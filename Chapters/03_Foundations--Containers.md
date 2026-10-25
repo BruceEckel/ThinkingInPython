@@ -29,11 +29,7 @@ for x in odds:
 #: 7
 ```
 
-The literal `[1, 3, 5]` creates a `list`.
-`append()` adds a new element to `odds`.
 The `list` grows automatically.
-The `for` statement iterates through `odds`,
-so `x` takes on each value in the `list`.
 
 ### Indexing and Slicing
 
@@ -195,8 +191,6 @@ print(xs)
 Each `remove()` shifts the following elements one place to the left,
 and the loop then advances its index,
 so it steps over the element that moved into the vacated slot.
-The loop prints `1` and `3`, the values it visits, and skips `2` and `4`.
-Skipping every other element leaves half of `xs`.
 No exception reports the skip.
 Build a new list instead, with a comprehension that keeps the items you need,
 or iterate over a copy with `for x in xs[:]`.
@@ -265,12 +259,8 @@ except ValueError as e:
 ```
 
 At most one target at each level can carry the star.
-The starred target always receives a `list`, whether the source is a list,
-a tuple, or a string.
 By convention, a value you discard gets the name `_`,
 so `*_` discards a run of elements.
-Without a star the number of names must equal the number of elements,
-or the assignment raises a `ValueError`.
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 matches `case` patterns against the same shapes.
 
@@ -296,9 +286,6 @@ print([*rest, first])  # Collect, then spread
 #: [2, 4, 0]
 ```
 
-A starred operand can be any expression that produces an iterable: a list,
-a tuple, a string, a `range`, or the value a call returns,
-as with `*sorted("cab")`.
 Unlike a starred target, any number of operands can carry a star,
 and they mix freely with ordinary elements.
 
@@ -391,8 +378,6 @@ an object that reads the `dict`'s current contents each time you use it,
 rather than a copy.
 A view therefore also shows the entries added after you made it.
 
-Iterating over the `dict` iterates over `keys()`,
-so `for name in ages` walks the names.
 `items()` alone yields `(key, value)` pairs.
 
 Leaving off `items()` is a common slip.
@@ -418,7 +403,6 @@ At `[1]`, unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
 At `[2]`, every key has two characters,
 so each key unpacks into its two letters.
-The loop runs to the end with a letter in `name` and a letter in `age`.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable.
 Each supports the [set operators](#sets) `&`, `|`, `-`,
@@ -436,9 +420,6 @@ other = {"Bob": 0, "Eve": 0}
 print(names & other.keys())  # Set algebra on a view
 #: {'Bob'}
 ```
-
-`names` comes from `ages.keys()` before `"Dan"` joins `ages`.
-Printing `names` shows `Dan` too.
 
 `|` merges two dictionaries, `pop()` and `del` remove entries,
 and `dict()` builds a dictionary from pairs:
@@ -461,14 +442,12 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 #: {'a': 1, 'b': 2, 'c': 3}
 ```
 
-`|` builds a merged `dict`.
 `|=` updates the left `dict` in place, as `update()` does.
 For sets, `|` means union, so the operands can come in either order.
 For dictionaries the order matters.
 When both dictionaries hold the same key,
 the merged `dict` keeps the right operand's value, so `"y"` comes out as `20`.
 
-`{**a, **b}` builds the same merged `dict`.
 `**` spreads each dictionary's entries the way `*` spreads a list's elements.
 A later entry replaces an earlier one with the same key.
 Like a list display,
@@ -699,12 +678,9 @@ print(Counter("aaab") ^ Counter("abbc"))  # Symmetric diff
 ```
 
 A missing key counts as zero rather than raising a `KeyError`.
-`most_common()` returns the highest counts first.
 `-`, `&`, and `|` also work between two counters.
 They are the operators from [Sets](#sets), here meaning multiset difference,
 minimum, and maximum.
-A fourth operator, `+`, sums the counts of both counters.
-Its augmented form, `+=`, adds another counter's counts into `counts` in place.
 Python 3.15 adds `^`, the multiset symmetric difference,
 which gives each item the larger of its two counts minus the smaller.
 
@@ -853,7 +829,6 @@ print(window)
 #: deque([2, 3, 4], maxlen=3)
 ```
 
-Appending five values to a window of three keeps the last three.
 A `deque` with a `maxlen` is a sliding window.
 A `list` has no equivalent.
 
@@ -960,10 +935,6 @@ except TypeError as e:
 #: 'mappingproxy' object does not support item assignment
 ```
 
-Because the view is live rather than a copy,
-writing to `settings` changes what `config` reports.
-Writing through `config` raises a `TypeError`.
-
 ### `frozendict`
 
 Where a `MappingProxyType` reads a `dict` that can still change,
@@ -1022,8 +993,6 @@ except TypeError as e:
 #: 'tuple' object does not support item assignment
 ```
 
-The `tuple` holds the same `list` for its whole life.
-That `list` stays free to change.
 An immutable container holding an unhashable object is unhashable too.
 
 Immutability is beneficial when every nested object is also immutable,
