@@ -433,7 +433,7 @@ so the append still passes.
 <details>
 <summary>Done when</summary>
 
-`ty` reports `invalid-assignment` on `MAX_SIZE = 200` and nothing on `CONFIG.append(3)`,
+`ty` reports `invalid-assignment` on `MAX_SIZE = 200` and accepts `CONFIG.append(3)`,
 and you can say why.
 After your annotation change, `ty` reports `unresolved-attribute` on the append.
 If the type checker still passes the append,
@@ -796,7 +796,7 @@ so they now compare a Fahrenheit number against a Celsius limit.
 The Fahrenheit values 64.4, 77.0,
 and 86.9 all pass `warmer_than(20.0)` and all fail `colder_than(30.0)`.
 
-Nothing raises an exception,
+Every stage runs cleanly,
 because `to_fahrenheit()` and each predicate are correct on their own.
 The field name `celsius` alone records the unit.
 `to_fahrenheit()` stores a Fahrenheit number under that name,
