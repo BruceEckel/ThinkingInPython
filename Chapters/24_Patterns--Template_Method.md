@@ -68,13 +68,8 @@ MyApp().run()
 #: Say no more, say no more!
 ```
 
-`MyApp` inherits `run()` from the base class.
-That inherited `run()` holds the loop and calls the steps `MyApp` supplies,
+The inherited `run()` holds the loop and calls the steps `MyApp` supplies,
 so `MyApp().run()` starts the engine that drives the application.
-
-A test supplies steps that record their calls,
-confirms that the record stays empty after construction,
-then checks the order in which `run()` makes them:
 
 ```python
 # test_template_method.py
@@ -205,10 +200,6 @@ and `ApplicationFramework`, which supplies `run` and the two steps.
 For each name the subclass defines,
 `getattr(super(cls, cls), name, None)` finds the attribute that the name replaces,
 searching the classes that follow `cls` in its [method resolution order](07_Foundations--Classes.md#method-resolution-order).
-If that attribute carries `__final__`,
-`__init_subclass__()` raises a `TypeError`.
-`class Hijack` fails that check,
-because the `run()` it replaces carries `__final__`.
 
 The `__final__` check exists because a subclass that replaces `run()` moves the algorithm out of the base class,
 and `@final` stops that replacement only when the type checker runs.
@@ -234,11 +225,7 @@ A name that matches a step, such as `customize1`, is an ordinary override.
 A name far from every inherited name, such as `report()`,
 is an ordinary new method.
 Both pass the check.
-A name that nearly matches an inherited name produces a `TypeError`,
-and the message names the method the author probably meant.
-`customise1` comes close to `customize1`,
-so the `class Typo` statement raises a `TypeError`.
-The misspelling fails at import time,
+The misspelled `customise1` fails at import time,
 before the framework runs and calls the empty default in place of the step.
 
 Rejecting every new method also catches the typo, but it forbids `report()` too.
@@ -300,7 +287,6 @@ expect(AttributeError, Greeter, "Robin")
 #: [AttributeError] 'Greeter' object has no attribute 'name'
 ```
 
-`Greeter("Robin")` fails with an `AttributeError`.
 `super().__init__()` calls `run()`, `run()` calls `step()`,
 and `step()` reads `self.name` before the constructor assigns it.
 
@@ -352,9 +338,7 @@ OnlyOnce().run()
 #: Say no more, say no more!
 ```
 
-`run()` calls `customize1()` twice.
-`OnlyOnce` performs the step once.
-The name, the parameters, and the return type all match the base,
+Each step's name, parameters, and return type match the base,
 so the type checker accepts `@override` on both methods.
 The base states its algorithm in the loop, not in any type.
 Each pass calls the step, so each pass must perform it.
@@ -422,9 +406,6 @@ passing functions takes fewer lines and needs no class hierarchy.
 The subclass form also makes each step optional,
 since the base supplies the `...` default.
 The function form makes a step optional by giving its parameter a default.
-In `template_function.py`,
-`customize2` defaults to the do-nothing `lambda: None`,
-so the closing `run_framework()` call passes one step and the loop prints `one` twice.
 With a do-nothing default,
 the loop calls both steps on every pass and needs no `None` test.
 `customize1` is a required parameter,
