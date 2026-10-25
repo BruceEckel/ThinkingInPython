@@ -91,7 +91,7 @@ because the instance has no dictionary to hold the new attribute.
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
 and `a.show()` finds it by the same fallback that finds `a.x`:
-nothing on the instance, so look at the class.
+the instance first, then the class.
 Because the class dictionary holds the method,
 assigning `a.show = something` shadows the method for `a` alone.
 The inspection helper `display_object()` that [Classes](07_Foundations--Classes.md)
@@ -221,8 +221,8 @@ print(Tally.total)
 # a.total = 99  # ty: Cannot assign to ClassVar `total`
 ```
 
-`display_object(Tally)` shows what the class holds: `total`,
-and nothing called `label`.
+`display_object(Tally)` shows that the class holds `total` alone.
+`label` first appears in `display_object(a)`, on the instance.
 An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` shows.
 `total: ClassVar[int] = 0` has the `= 0`,
@@ -353,8 +353,8 @@ A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#varian
 so a subclass must keep the type it inherits.
 
 One mistake passes the checker.
-Nothing requires `Blob` to supply a `sides`,
-because the checker accepts the declaration that the attribute exists.
+The checker accepts `Blob` as written,
+because it trusts the declaration that `sides` exists.
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
 
@@ -502,7 +502,7 @@ The second `Sub()` (`[3]`) increments that separate copy to `3`.
 
 The type checker accepts every line.
 The augmented assignment is a valid `ClassVar[int]` update either way,
-and nothing in the annotation says which class name should receive it.
+and the annotation leaves open which class name should receive it.
 
 Write the increment through the literal class name, as `class_var.py` does,
 whenever a `ClassVar` must count across every subclass rather than fork one counter per subclass.
