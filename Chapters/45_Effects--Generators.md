@@ -1027,7 +1027,7 @@ where an iterator yields one element at a time to a `for` loop.
 
 The restriction is the design.
 Each `yield` hands control back to whoever called `next()` or `send()`.
-Handing control anywhere else would mean carrying the C stack along,
+Handing control anywhere else would mean carrying the C stack as well,
 the obstacle that kept Stackless Python's coroutines out of the core.
 That restriction is why a driver exists.
 Something must call `next()` and `send()`,
