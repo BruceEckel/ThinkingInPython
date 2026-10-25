@@ -306,8 +306,7 @@ a different design, a detail, or an equivalent alternative.
 ## 3. A third delegation in `yield_from_send.py`
 
 > Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()`,
-> extending the loop to `[1, 2, 3, 4, 5]`,
-> and changing the final `g.send(4)` after the loop to `g.send(6)`.
+> adding its sum to the total, and extending the loop to `[1, 2, 3, 4, 5, 6]`.
 > Write down the sequence of printed lines before running it.
 
 <details>
@@ -324,7 +323,7 @@ Write the printed lines before you run the script, and note which sends produce 
 # The shape of exercise_3.py
 from collections.abc import Generator
 
-def collect(name: str) -> Generator[str, int]:
+def collect(name: str) -> Generator[str, int, int]:
     ...
 
 def both() -> Generator[str, int]:
@@ -334,7 +333,7 @@ def both() -> Generator[str, int]:
 <details>
 <summary>Done when</summary>
 
-you wrote the full sequence of lines before running the modified `yield_from_send.py`, and it matches the run line for line, including which sends print two lines and what the final `send()` after the loop prints.
+you wrote the full sequence of lines before running the modified `yield_from_send.py`, and it matches the run line for line, including which sends print two lines and what `send(6)` prints.
 
 <details>
 <summary>Solution</summary>
@@ -343,20 +342,22 @@ you wrote the full sequence of lines before running the modified `yield_from_sen
 # exercise_3.py
 from collections.abc import Generator
 
-def collect(name: str) -> Generator[str, int]:
+def collect(name: str) -> Generator[str, int, int]:
     first = yield f"{name} needs a value"
     second = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
+    return first + second
 
 def both() -> Generator[str, int]:
-    yield from collect("alpha")
-    yield from collect("beta")
-    yield from collect("gamma")
+    alpha = yield from collect("alpha")
+    beta = yield from collect("beta")
+    gamma = yield from collect("gamma")
+    yield f"total {alpha + beta + gamma}"
 
 g = both()
 print(next(g))
 #: alpha needs a value
-for value in [1, 2, 3, 4, 5]:
+for value in [1, 2, 3, 4, 5, 6]:
     print(f"send({value}) -> {g.send(value)}")
 #: send(1) -> alpha needs another
 #: alpha got 1 and 2
@@ -365,29 +366,23 @@ for value in [1, 2, 3, 4, 5]:
 #: beta got 3 and 4
 #: send(4) -> gamma needs a value
 #: send(5) -> gamma needs another
-try:
-    g.send(6)
-except StopIteration:
-    print("both() is exhausted")
 #: gamma got 5 and 6
-#: both() is exhausted
+#: send(6) -> total 21
 ```
 
 **Count the values the collectors need.** Each `collect()` consumes two
-values, so the three collectors need six. The loop supplies five.
-`gamma` stays suspended at its second `yield` after the loop ends,
-until `send(6)` completes it.
+values, so the three collectors need six, and the loop supplies six.
+The final `yield` in `both()` gives `send(6)` a value to return,
+so the loop ends with `both()` suspended and no `StopIteration`.
 
 **Read the output in pairs.** The two-line responses mark where one collector ends and the next begins. A send that supplies a collector's
 first value produces one line: that collector's second prompt. A
 send that supplies a collector's second value produces two: the
-completed collector's `print()`, then the first prompt of the next
-collector. The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
+completed collector's `print()`, then the next prompt.
+The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
 so the output alternates between one-line and two-line responses.
-`gamma` is the last collector, so when it finishes, `both()`
-finishes too. Instead of returning a next prompt, `send(6)` raises
-`StopIteration`, so its second line comes from the `except`:
-`both() is exhausted`.
+After `gamma` the next prompt comes from `both()` rather than a collector:
+the total, `21`.
 
 `both()` holds three `yield from` statements and leaves all the
 forwarding to them. `yield from`

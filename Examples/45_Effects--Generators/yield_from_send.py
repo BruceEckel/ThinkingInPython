@@ -1,16 +1,11 @@
 # yield_from_send.py
 from collections.abc import Generator
-
-def collect(name: str) -> Generator[str, int, int]:
-    first = yield f"{name} needs a value"  # [1]
-    second = yield f"{name} needs another"
-    print(f"{name} got {first} and {second}")
-    return first + second
+from collect import collect
 
 def both() -> Generator[str, int]:
-    alpha = yield from collect("alpha")  # [2]
-    beta = yield from collect("beta")  # [3]
-    yield f"total {alpha + beta}"  # [4]
+    alpha = yield from collect("alpha")  # [1]
+    beta = yield from collect("beta")  # [2]
+    yield f"total {alpha + beta}"  # [3]
 
 g = both()
 print(next(g))

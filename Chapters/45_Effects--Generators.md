@@ -536,22 +536,34 @@ so a `yield from` over a list evaluates to `None`.
 ### The Send Channel
 
 `yield from` also forwards each value the driver sends,
-delivering it to the `yield` that waits inside the inner generator:
+delivering it to the `yield` that waits inside the inner generator.
+`collect()` asks the driver for two values and returns their sum:
+
+```python
+# collect.py
+from collections.abc import Generator
+
+def collect(name: str) -> Generator[str, int, int]:
+    first = yield f"{name} needs a value"
+    second = yield f"{name} needs another"
+    print(f"{name} got {first} and {second}")
+    return first + second
+```
+
+Each `yield` produces a prompt for the driver,
+and the value the driver sends in reply becomes the result of that `yield`,
+so two `send()` calls bind `first` and `second`.
+`both()` delegates to `collect()` twice:
 
 ```python
 # yield_from_send.py
 from collections.abc import Generator
-
-def collect(name: str) -> Generator[str, int, int]:
-    first = yield f"{name} needs a value"  # [1]
-    second = yield f"{name} needs another"
-    print(f"{name} got {first} and {second}")
-    return first + second
+from collect import collect
 
 def both() -> Generator[str, int]:
-    alpha = yield from collect("alpha")  # [2]
-    beta = yield from collect("beta")  # [3]
-    yield f"total {alpha + beta}"  # [4]
+    alpha = yield from collect("alpha")  # [1]
+    beta = yield from collect("beta")  # [2]
+    yield f"total {alpha + beta}"  # [3]
 
 g = both()
 print(next(g))
@@ -568,30 +580,21 @@ for value in [1, 2, 3, 4]:
 
 `both()` declares the same yield and send types as `collect()`,
 because `yield from` passes the inner generator's yield and send channels through to the driver.
-The value `collect()` returns goes to `both()` instead of the driver.
-Each `yield from` evaluates to that sum,
-as `yield from emit()` evaluates to `12` in `report()`.
-`both()` returns `None`, the default for a `Generator`'s third type parameter.
+The sum each `collect()` returns goes to `both()`,
+which returns `None` and leaves the third type parameter at its default.
 
-The value from `g.send(1)` becomes the result of the `yield` at `[1]` inside `collect("alpha")`,
-the generator to which `both()` delegates.
-`yield from` does the forwarding,
-so the body of `both()` needs no code to pass values along.
-
-`g.send(2)` supplies alpha's second value, so `collect("alpha")` finishes.
-That finish completes the `yield from` at `[2]`,
-so `both()` starts the `yield from` at `[3]`.
-A single `send()` therefore ends one inner generator and produces the first prompt of the next.
-The output shows the finish and the new prompt on adjacent lines.
-`alpha got 1 and 2` prints during `send(2)`,
-and `send(2)` returns `beta needs a value`.
+`g.send(1)` becomes `first` inside `collect("alpha")` with no forwarding code in `both()`.
+`g.send(2)` supplies `second`, so `collect("alpha")` finishes,
+the `yield from` at `[1]` completes,
+and `both()` starts the `yield from` at `[2]` in the same call.
+One `send()` therefore ends one inner generator and produces the first prompt of the next,
+which is why `alpha got 1 and 2` and `beta needs a value` sit on adjacent output lines.
 
 After its two delegations,
-`both()` adds the two sums and yields the total at `[4]`.
-`send(4)` finishes `collect("beta")` and returns that total,
-so one loop sends all four values.
-If `[4]` were missing, `send(4)` would finish `both()` as well,
-and the driver would have to catch `StopIteration`.
+`both()` adds the two sums and yields the total at `[3]`,
+which gives `send(4)` a value to return.
+Without `[3]`, `send(4)` would finish `both()`,
+and the loop would need a `try` for `StopIteration`.
 
 A hand-written loop is the natural first attempt at that forwarding.
 The loop silently discards every sent value:
@@ -1058,8 +1061,7 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     `StopIteration` now means two different things in the same loop.
     Keep them apart.
 3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()`,
-    extending the loop to `[1, 2, 3, 4, 5]`,
-    and changing the final `g.send(4)` after the loop to `g.send(6)`.
+    adding its sum to the total, and extending the loop to `[1, 2, 3, 4, 5, 6]`.
     Write down the sequence of printed lines before running it.
 4.  Remove `yield from` in `yield_from_nested.py`,
     leaving `profile: Result = interview()`.
