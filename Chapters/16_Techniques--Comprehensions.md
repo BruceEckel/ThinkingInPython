@@ -432,7 +432,7 @@ while the directory still exists.
 The `for` loop runs after the context manager deletes the directory,
 and it reads the strings in `py_paths`, which outlive the directory.
 If you turn the comprehension's brackets into parentheses,
-the program prints nothing and raises no exception.
+the program exits normally with empty output.
 [The Gap Between Creation and Consumption](#the-gap-between-creation-and-consumption)
 explains why.
 
@@ -632,7 +632,7 @@ memory holds one value at a time.
 `str.join()` is the exception.
 It needs two passes, one to size the result and one to fill it,
 so it converts its argument to a list first.
-A generator expression therefore saves nothing over a list comprehension there.
+With `str.join()`, a generator expression and a list comprehension therefore both end up as a full list.
 
 A generator expression that is a function's sole argument shares the call's parentheses.
 With a second argument, the generator expression needs a pair of its own.
