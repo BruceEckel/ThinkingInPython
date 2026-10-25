@@ -143,7 +143,7 @@ a different design, a detail, or an equivalent alternative.
 [`NamedTuple`](../../Chapters/28_Patterns--Data_Transfer_Objects.md#namedtuple)
 says how far a `NamedTuple`'s immutability reaches, and why it hashes.
 Call a mutating method on the `list` field.
-That call assigns nothing to the `Recipe`.
+That call changes the list and leaves the `Recipe`'s fields as they were.
 For the `dict` key, ask what hashing a tuple does with each of its elements.
 
 <details>
@@ -369,7 +369,7 @@ With `Stats` you write `result.count`, which reads the field by name,
 whatever its position.
 A parameter annotated `Stats` also rejects a hand-built tuple in either order,
 because a `tuple[float, int]` is not a `Stats`.
-A position tells the type checker an element's type and tells a reader nothing.
+A position tells the type checker an element's type and tells a reader an index.
 A name tells both of them what the element is.
 
 Before you move on, name what separates your attempt from this one:
