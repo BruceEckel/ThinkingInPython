@@ -93,8 +93,6 @@ for path in root.walk():
 
 `Directory.disk_usage()` calls `disk_usage()` on each entry,
 whether the entry is a `File` or another `Directory`.
-The demo makes that same call on the whole tree, on the `src` subtree,
-and on a lone file.
 
 Adding a node type is one class.
 A plugin writes it and edits nothing above it.
@@ -194,12 +192,6 @@ As [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solu
 demonstrates, a list in that field keeps its `append()`,
 so a `list` there leaves the tree mutable.
 With the tuple, two trees can share a subtree, and neither can change it.
-
-The test file confirms that:
-
-- `disk_usage()` returns the size of the whole tree, a subtree, or a lone file.
-- `walk()` yields each file's full path.
-- An empty directory has size 0 and yields no paths.
 
 ```python
 # test_filesystem.py
@@ -376,11 +368,8 @@ print(expr == by_hand, type(expr).__name__, expr.left)
 #: True Add Mul(left=Num(value=2), right=Var(name='x'))
 ```
 
-The operators build the same tree you assemble by hand.
 Records generate `__eq__()`,
 so `expr == by_hand` compares the two trees by value.
-Printing the root's type and then `expr.left` shows the nesting.
-The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 
 `build_tree.py` puts the integer on the left of `*` and on the right of `+`.
 The test checks the integer on either side of `+`,
@@ -481,18 +470,10 @@ if __name__ == "__main__":
 #: 7 21
 ```
 
-The demo evaluates one `expr` twice,
-once with `x` bound to 3 and once with `x` bound to 10.
 Building `2 * x + 1` produces a tree, not a number,
 so `expr` is a value you can pass to `evaluate()` under different variable bindings,
 as many times as you like.
 An unbound variable raises a `KeyError`, naming the variable.
-
-The test file confirms that:
-
-- A `Num` evaluates to its value and a `Var` to its binding.
-- One tree evaluates under different bindings.
-- An unbound variable raises a `KeyError` that names the variable.
 
 ```python
 # test_evaluate.py
@@ -641,7 +622,6 @@ and does plain arithmetic otherwise.
 The patterns read like the algebra they implement.
 `(Num(0), other) | (other, Num(0))` says "zero on either side,
 keep the other side."
-`(Num(a), Num(b))` captures two constants for folding.
 The same syntax does two opposite jobs:
 `Num(0)` after `case` is a pattern that tests for a `Num` whose `value` equals 0,
 and `Num(0)` after `return` is a constructor call.
@@ -663,20 +643,10 @@ That order lets the demo's `((1 * x) + (0 * y))` simplify to `x`.
 
 A record freezes every field, so `simplify()` builds its result as a new tree.
 That tree shares unchanged subtrees with the original.
-The `if` inside each `case _` returns the node it received when both children simplified to themselves.
-That `if` tests identity with `is` rather than equality with `==`.
+The `if` inside each `case _` tests identity with `is` rather than equality with `==`.
 Sharing means the same object.
 `is` answers with one comparison,
 where a record's `==` compares fields and descends into any subtree that changed.
-
-The test file confirms that:
-
-- Adding zero or multiplying by one returns the other operand.
-- Multiplying by zero returns `Num(0)`.
-- Constant subtrees fold into one `Num`.
-- The rules apply at every level of the tree.
-- An expression in simplest form comes back as the same object.
-- The result shares an unchanged subtree with the input.
 
 ```python
 # test_simplify.py
@@ -763,16 +733,12 @@ with expected(CycleError):
 #: 'ui', 'app'])
 ```
 
-`static_order()` lists `core` first and `app` last.
 `core` appears once, although both `ui` and `db` depend on it.
 
 A build that runs targets in parallel calls `prepare()` once,
 then alternates `get_ready()` and `done()` in place of `static_order()`.
 `get_ready()` returns every node whose dependencies have all finished,
 so `ui` and `db` come back together after `core` finishes.
-
-Making `core` depend on `app` closes a loop.
-`static_order()` then raises a `CycleError` whose message lists the nodes around the cycle.
 
 ## A Template Is a Tree {#a-template-is-a-tree}
 
@@ -861,8 +827,7 @@ two operations over one structure that mentions neither of them.
 A third operation is one more function,
 and neither `Template` nor the two existing functions change.
 
-`outer` interpolates `inner`, another `Template`, rather than a plain value.
-`to_query()` checks for that case and recurses,
+`to_query()` recurses into the nested `inner`,
 so `inner`'s pieces flatten into the same `sql` string and `values` list.
 Every entry in `values2` is then a value a database driver accepts.
 Composing `t`-strings this way builds a nested composite.
