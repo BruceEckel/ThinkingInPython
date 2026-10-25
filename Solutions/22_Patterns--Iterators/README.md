@@ -160,7 +160,7 @@ so to learn how many values remain, you must consume them.
 
 `Countdown` can count because it is a container that produces a generator on demand.
 The container keeps the value `len()` reads,
-and reading that value consumes nothing.
+so `len()` answers from the container alone.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -229,7 +229,7 @@ print(list(islice(fibonacci(1_000_000), 10)))
 ```
 
 `fibonacci(1_000_000)` builds a generator ready to yield a million values,
-but building it computes nothing.
+but building it leaves the body paused before its first line.
 Each time something asks a generator for a value,
 its body runs to the next `yield` and pauses there.
 `islice(..., 10)` asks for ten,
@@ -1112,7 +1112,7 @@ With the version that raises a `TypeError`, the exception ends the generator,
 so the caller resumes by parsing the file again and somehow starting past the line that failed.
 
 Skipping hides what it drops.
-A filter that quietly drops every line looks the same as a file with nothing to report.
+A filter that quietly drops every line looks the same as an empty file.
 If you take the skipping version, count what it drops and report the count.
 
 **Keep pulling until a match.**
