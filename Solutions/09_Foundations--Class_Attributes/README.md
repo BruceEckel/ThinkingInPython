@@ -11,14 +11,18 @@
 <details>
 <summary>Where to look</summary>
 
-[Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup) shows a read searching the instance dictionary and then the class.
-A new instance starts with an empty dictionary, so its read falls through to the value the class holds at that moment.
-Compare the order of the three steps: shadow on `a`, change the class, create `c`.
+[Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup)
+shows a read searching the instance dictionary and then the class.
+A new instance starts with an empty dictionary,
+so its read falls through to the value the class holds at that moment.
+Compare the order of the three steps: shadow on `a`, change the class,
+create `c`.
 
 <details>
 <summary>Done when</summary>
 
-printing `c.rating` gives `9` while `a.rating` still gives `1`, and you can name the dictionary in which each of the two reads finds `rating`.
+printing `c.rating` gives `9` while `a.rating` still gives `1`,
+and you can name the dictionary in which each of the two reads finds `rating`.
 
 <details>
 <summary>Solution</summary>
@@ -37,9 +41,9 @@ print(c.rating)
 #: 9
 ```
 
-`c` is a brand-new instance with an empty instance dictionary, so
-reading `c.rating` falls back to the class attribute, which is now
-`9`. `c.rating` differs from `a.rating`, which is still `1`.
+`c` is a brand-new instance with an empty instance dictionary,
+so reading `c.rating` falls back to the class attribute, which is now `9`.
+`c.rating` differs from `a.rating`, which is still `1`.
 The line `a.rating = 1` gave `a` its own instance attribute,
 and that attribute shadows the class attribute when you read `a.rating`.
 
@@ -61,14 +65,18 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance) walks one class attribute down a hierarchy.
+[ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance)
+walks one class attribute down a hierarchy.
 A subclass that declares nothing reads through to its base.
-Add `Middle` as a second subclass like `Left`, print `Middle.shared` beside the others at each step, and check which classes move together.
+Add `Middle` as a second subclass like `Left`,
+print `Middle.shared` beside the others at each step,
+and check which classes move together.
 
 <details>
 <summary>Done when</summary>
 
-at each step `Middle.shared` prints the same value as `Left.shared` until `Left.shared = 5`, and your last line reads `9 5 9 100` for `Base`, `Left`, `Middle`, and `Right`.
+at each step `Middle.shared` prints the same value as `Left.shared` until `Left.shared = 5`,
+and your last line reads `9 5 9 100` for `Base`, `Left`, `Middle`, and `Right`.
 
 <details>
 <summary>Solution</summary>
@@ -99,13 +107,13 @@ print(Base.shared, Left.shared, Middle.shared, Right.shared)
 #: 9 5 9 100
 ```
 
-`Middle` behaves like `Left`. Both inherit `shared` from `Base`, so
-both track `Base.shared` through attribute lookup until something
-assigns to `Left.shared` or `Middle.shared`. In the last step,
-`Left.shared = 5` gives `Left` its own entry, and `Middle` still reads
-`Base`'s `9`.
-`Right` holds `100` throughout, because its class body creates its
-own class attribute with `shared = 100`.
+`Middle` behaves like `Left`.
+Both inherit `shared` from `Base`,
+so both track `Base.shared` through attribute lookup until something assigns to `Left.shared` or `Middle.shared`.
+In the last step, `Left.shared = 5` gives `Left` its own entry,
+and `Middle` still reads `Base`'s `9`.
+`Right` holds `100` throughout,
+because its class body creates its own class attribute with `shared = 100`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -123,14 +131,17 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Real Per-Object Defaults](../../Chapters/09_Foundations--Class_Attributes.md#real-per-object-defaults) shows a constructor default giving each instance its own value.
-For a `@dataclass` field with a default, the generated `__init__()` assigns `self.x` on every call.
+[Real Per-Object Defaults](../../Chapters/09_Foundations--Class_Attributes.md#real-per-object-defaults)
+shows a constructor default giving each instance its own value.
+For a `@dataclass` field with a default,
+the generated `__init__()` assigns `self.x` on every call.
 Assign to `b.x`, build `b2`, and print both.
 
 <details>
 <summary>Done when</summary>
 
-printing `b.x` and `b2.x` together shows `-1 100`, so the assignment to `b.x` leaves the second instance's `x` at the constructor default.
+printing `b.x` and `b2.x` together shows `-1 100`,
+so the assignment to `b.x` leaves the second instance's `x` at the constructor default.
 
 <details>
 <summary>Solution</summary>
@@ -150,8 +161,8 @@ print(b.x, b2.x)
 #: -1 100
 ```
 
-Each call to `B()` runs the generated `__init__()`, which assigns `100`
-to `self.x` as a fresh instance attribute for that object.
+Each call to `B()` runs the generated `__init__()`,
+which assigns `100` to `self.x` as a fresh instance attribute for that object.
 `b.x = -1` replaces the value of `b`'s own attribute.
 `b2` comes from a separate `B()` call and keeps its `100`,
 the way each `A()` in `real_defaults.py` holds its own `x`.
@@ -176,8 +187,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Declaring Shared State with ClassVar](../../Chapters/09_Foundations--Class_Attributes.md#declaring-shared-state-with-classvar) pairs the shared counter with the error the type checker reports for an instance write.
-Use a plain class attribute for `total`, then call `vars()` on the instance as in [Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup).
+[Declaring Shared State with ClassVar](../../Chapters/09_Foundations--Class_Attributes.md#declaring-shared-state-with-classvar)
+pairs the shared counter with the error the type checker reports for an instance write.
+Use a plain class attribute for `total`,
+then call `vars()` on the instance as in [Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup).
 The instance and class dictionaries show which one receives an assignment made through the instance.
 
 <details>
@@ -196,7 +209,8 @@ class Tally:
 <details>
 <summary>Done when</summary>
 
-after `a.total = 99`, `vars(a)` shows a `total` entry of `99` beside `label`, while `Tally.total` still prints `2`.
+after `a.total = 99`, `vars(a)` shows a `total` entry of `99` beside `label`,
+while `Tally.total` still prints `2`.
 Restoring `ClassVar[int]` on `total` makes `uv run ty check` report `invalid-attribute-access` on the `a.total = 99` line.
 
 <details>
@@ -223,19 +237,20 @@ print(Tally.total)
 #: 2
 ```
 
-**Shadow the class attribute.** `a.total = 99` looks like it should update the shared count, but
-assignment through an instance writes to the instance, not the
-class. That assignment creates a brand-new instance attribute
-named `total` on `a`, which then shadows `Tally.total` for `a`.
+**Shadow the class attribute.**
+`a.total = 99` looks like it should update the shared count,
+but assignment through an instance writes to the instance, not the class.
+That assignment creates a brand-new instance attribute named `total` on `a`,
+which then shadows `Tally.total` for `a`.
 
-**Check where the write went.** `vars(a)` shows the shadow: a
-`total` entry in `a`'s own dictionary. `Tally.total`, read through
-the class, still reports `2`.
+**Check where the write went.**
+`vars(a)` shows the shadow: a `total` entry in `a`'s own dictionary.
+`Tally.total`, read through the class, still reports `2`.
 
-This shadow is the bug `ClassVar` exists to catch. With
-`total: ClassVar[int] = 0` declared instead, the type checker reports
-`a.total = 99` as an error before the line runs, because the
-assignment writes to a `ClassVar` through an instance.
+This shadow is the bug `ClassVar` exists to catch.
+With `total: ClassVar[int] = 0` declared instead,
+the type checker reports `a.total = 99` as an error before the line runs,
+because the assignment writes to a `ClassVar` through an instance.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -258,15 +273,19 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) shows two `Cart` objects sharing one list, so an append through one object changes the list both objects hold.
+[A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value)
+shows two `Cart` objects sharing one list,
+so an append through one object changes the list both objects hold.
 The fix builds the list per instance with `field(default_factory=list)` from `dataclasses`.
-For the second half, write the `[]` default and see whether the `class` statement finishes, and when.
+For the second half,
+write the `[]` default and see whether the `class` statement finishes, and when.
 
 <details>
 <summary>Done when</summary>
 
 after the `append()` through `a`, printing both lists shows `['apple'] []`.
-With the `[]` default, the `class` statement fails before any `Cart` exists, raising a `ValueError` whose message ends with `use default_factory`.
+With the `[]` default, the `class` statement fails before any `Cart` exists,
+raising a `ValueError` whose message ends with `use default_factory`.
 
 <details>
 <summary>Solution</summary>
@@ -285,9 +304,9 @@ print(a.items, b.items)
 #: ['apple'] []
 ```
 
-**Build a list per instance.** `default_factory=list` calls `list()` once per construction, so the
-generated `__init__()` assigns a brand-new list to `self.items` on
-every `Cart`.
+**Build a list per instance.**
+`default_factory=list` calls `list()` once per construction,
+so the generated `__init__()` assigns a brand-new list to `self.items` on every `Cart`.
 Because each object holds its own list from construction,
 `a`'s append leaves `b.items` empty.
 
@@ -308,7 +327,8 @@ with expected(ValueError):
 #: items is not allowed: use default_factory
 ```
 
-**Fail at class definition.** `@dataclass` raises `ValueError` at class-definition time, not at first use,
+**Fail at class definition.**
+`@dataclass` raises `ValueError` at class-definition time, not at first use,
 because it inspects every default before generating the constructor.
 `shared_mutable.py`'s `Cart` has no decorator to inspect its defaults,
 so `Cart` gets its shared list silently.
@@ -332,7 +352,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup) shows that assignment writes to the instance dictionary and a read falls back to the class.
+[Two Dictionaries, One Lookup](../../Chapters/09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup)
+shows that assignment writes to the instance dictionary and a read falls back to the class.
 Use `del a.x` on that same dictionary and print `vars(a)` and `a.x` afterward.
 For the second `del`, compare what `vars(a)` and `vars(A)` each hold.
 
@@ -340,7 +361,9 @@ For the second `del`, compare what `vars(a)` and `vars(A)` each hold.
 <summary>Done when</summary>
 
 after the first `del a.x`, `vars(a)` prints `{}` and `a.x` prints `100`.
-The second `del a.x` raises an `AttributeError` (`'A' object has no attribute 'x'`), and `vars(A)["x"]` still prints `100` afterward.
+The second `del a.x` raises an `AttributeError`
+(`'A' object has no attribute 'x'`),
+and `vars(A)["x"]` still prints `100` afterward.
 
 <details>
 <summary>Solution</summary>
@@ -368,15 +391,17 @@ print(vars(A)["x"])
 #: 100
 ```
 
-**Remove the shadow.** `del a.x` (`[1]`) removes the entry from the
-instance dictionary, which is where assignment writes. `vars(a)` is
-empty again, and `a.x` reads `100`, because the lookup falls back to
-the class the way it did before any assignment.
+**Remove the shadow.**
+`del a.x` (`[1]`) removes the entry from the instance dictionary,
+which is where assignment writes.
+`vars(a)` is empty again, and `a.x` reads `100`,
+because the lookup falls back to the class the way it did before any assignment.
 
-**Show that deletes stop at the instance.** `del` acts on the
-instance dictionary alone, the way assignment does, so `vars(A)["x"]`
-keeps its `100`. The second `del a.x` (`[2]`) finds the instance
-dictionary empty and raises an `AttributeError`.
+**Show that deletes stop at the instance.**
+`del` acts on the instance dictionary alone, the way assignment does,
+so `vars(A)["x"]` keeps its `100`.
+The second `del a.x` (`[2]`)
+finds the instance dictionary empty and raises an `AttributeError`.
 Deleting the class attribute takes `del A.x`, naming the class.
 
 Before you move on, name what separates your attempt from this one:
@@ -398,9 +423,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[What ClassVar Catches](../../Chapters/09_Foundations--Class_Attributes.md#what-classvar-catches) shows `self.total += 1` leaving the class counter at zero.
-The augmented assignment reads through the class but writes to the instance, and `vars()` makes that write visible.
-The fix names the class on the left of `+=`, and removing the `# type: ignore` shows what the checker reports about the write.
+[What ClassVar Catches](../../Chapters/09_Foundations--Class_Attributes.md#what-classvar-catches)
+shows `self.total += 1` leaving the class counter at zero.
+The augmented assignment reads through the class but writes to the instance,
+and `vars()` makes that write visible.
+The fix names the class on the left of `+=`,
+and removing the `# type: ignore` shows what the checker reports about the write.
 
 <details>
 <summary>The shape</summary>
@@ -425,7 +453,8 @@ class Counting:
 <details>
 <summary>Done when</summary>
 
-`vars(a)` shows `{'total': 1}` while `vars(Tally)["total"]` shows `0`, and your fixed class prints `2 2 2` for two instances and the class.
+`vars(a)` shows `{'total': 1}` while `vars(Tally)["total"]` shows `0`,
+and your fixed class prints `2 2 2` for two instances and the class.
 Removing the `# type: ignore` makes `uv run ty check` report `invalid-attribute-access` on `self.total += 1`.
 
 <details>
@@ -460,39 +489,41 @@ print(vars(c), vars(Counting)["total"])
 #: {} 2
 ```
 
-**Show where each write went.** `vars(a)` holds `{'total': 1}` while the class still holds `0`.
-Those two facts explain the output. `self.total += 1` expands to
-`self.total = self.total + 1`. The read finds the instance dictionary empty,
-falls back to the class, and gets `0`. The write then stores `1`
-in the instance dictionary, where every write through an instance goes. Each object ends up
-with its own `total` of `1`, shadowing a class attribute that still
-holds `0`.
+**Show where each write went.**
+`vars(a)` holds `{'total': 1}` while the class still holds `0`.
+Those two facts explain the output.
+`self.total += 1` expands to `self.total = self.total + 1`.
+The read finds the instance dictionary empty, falls back to the class,
+and gets `0`.
+The write then stores `1` in the instance dictionary,
+where every write through an instance goes.
+Each object ends up with its own `total` of `1`,
+shadowing a class attribute that still holds `0`.
 
-**Read the checker's report.** With the `# type: ignore` removed, the type checker (`ty`) reports
-`invalid-attribute-access`, naming the type of `self`. The augmented
-form expands to an assignment through `self`.
+**Read the checker's report.**
+With the `# type: ignore` removed, the type checker (`ty`)
+reports `invalid-attribute-access`, naming the type of `self`.
+The augmented form expands to an assignment through `self`.
 The type checker treats that assignment as a write to a `ClassVar` through an instance,
 the same as `a.total = 99`, the commented-out line in `class_var.py`.
-For the line in `__init__()` it reports
-"Cannot assign to ClassVar `total` from an instance of type `Self@__init__`",
+For the line in `__init__()` it reports "Cannot assign to ClassVar `total` from an instance of type `Self@__init__`",
 where `Self@__init__` is its name for the type of `self` inside that method.
 For `a.total = 99` the message names `Tally`, the type of `a`.
 The `ClassVar` declaration catches the mistake at check time.
-The listing suppresses the report so it can demonstrate
-what the write does at runtime.
+The listing suppresses the report so it can demonstrate what the write does at runtime.
 
-**Send the write to the class.** The fix names the class on the left. `Counting.total += 1` reads and
-writes the same class dictionary, so both instances report `2`.
+**Send the write to the class.**
+The fix names the class on the left.
+`Counting.total += 1` reads and writes the same class dictionary,
+so both instances report `2`.
 `vars(c)` is empty because the constructor writes to the class.
 Reading `c.total` falls back to that shared value.
 
-Writing the fix as `type(self).total += 1` also prints `2 2 2`
-here, because `Counting` has no subclass. With a subclass, the
-subclass's first construction forks the counter the way
-`classvar_fork.py` forks it for `Sub`.
-Constructing an empty subclass twice after `c` and `d` leaves
-`Counting.total` at `2` and gives the subclass its own `total` of
-`4`. Naming the class sends every write to one dictionary.
+Writing the fix as `type(self).total += 1` also prints `2 2 2` here,
+because `Counting` has no subclass.
+With a subclass, the subclass's first construction forks the counter the way `classvar_fork.py` forks it for `Sub`.
+Constructing an empty subclass twice after `c` and `d` leaves `Counting.total` at `2` and gives the subclass its own `total` of `4`.
+Naming the class sends every write to one dictionary.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -513,17 +544,22 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) and [ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance) each cover half of this exercise.
-A mutable `ClassVar` on the base is a single object that every subclass reaches by lookup, so `.append()` changes that object for every subclass.
-An assignment in a subclass body makes a new entry
-in that subclass's dictionary.
+[A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value)
+and [ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance)
+each cover half of this exercise.
+A mutable `ClassVar` on the base is a single object that every subclass reaches by lookup,
+so `.append()` changes that object for every subclass.
+An assignment in a subclass body makes a new entry in that subclass's dictionary.
 Compare the two runs with `is`.
 
 <details>
 <summary>Done when</summary>
 
-the first run prints `[1, 2]` for `Base.shared` and both subclasses, and `Right.shared is Base.shared` prints `True`.
-After you give `Right` its own `shared = []`, the same appends print `[1] [1] [2]` for `Base`, `Left`, and `Right`, and the `is` test prints `False`.
+the first run prints `[1, 2]` for `Base.shared` and both subclasses,
+and `Right.shared is Base.shared` prints `True`.
+After you give `Right` its own `shared = []`,
+the same appends print `[1] [1] [2]` for `Base`, `Left`, and `Right`,
+and the `is` test prints `False`.
 
 <details>
 <summary>Solution</summary>
@@ -567,37 +603,39 @@ print(Right2.shared is Base2.shared)
 #: False
 ```
 
-**Share one list across the hierarchy.** `Base.shared` holds
-`[1, 2]`, and so do both subclasses. `Left` and `Right` both inherit
-`shared`, so both names read through to `Base`, and `.append()`
-mutates the list stored there. `Left.shared is Base.shared` and
-`Right.shared is Base.shared` together prove that the three names share
-one object, not three equal lists.
+**Share one list across the hierarchy.**
+`Base.shared` holds `[1, 2]`, and so do both subclasses.
+`Left` and `Right` both inherit `shared`, so both names read through to `Base`,
+and `.append()` mutates the list stored there.
+`Left.shared is Base.shared` and `Right.shared is Base.shared` together prove that the three names share one object,
+not three equal lists.
 
-This listing combines the shared mutable value of `shared_mutable.py`
-with the inheritance lookup of `class_var_inheritance.py`.
+This listing combines the shared mutable value of `shared_mutable.py` with the inheritance lookup of `class_var_inheritance.py`.
 Each one alone keeps a change where you can see it.
-In a single class, a mutable `ClassVar` declares its sharing in the
-body of the class that uses it, so the sharing stays visible.
+In a single class, a mutable `ClassVar` declares its sharing in the body of the class that uses it,
+so the sharing stays visible.
 A subclass changes an inherited immutable `ClassVar` by assignment,
 which creates the subclass's own entry.
-Combined, the mutable value and the inheritance lookup produce one list, declared on the base class,
-that every subclass mutates under its own name.
+Combined, the mutable value and the inheritance lookup produce one list,
+declared on the base class, that every subclass mutates under its own name.
 
-**Give one subclass its own list.** Giving `Right2` its own `shared = []` changes `Right2` alone. The
-assignment in the class body creates a new entry in `Right2`'s own
-dictionary, so `Right2.shared` reads that entry.
-`Left2` still shares `Base2`'s list. The result, `[1] [1] [2]`,
-follows the same rule the integer `shared` in exercise 2 shows: one
-value per class that declares it.
+**Give one subclass its own list.**
+Giving `Right2` its own `shared = []` changes `Right2` alone.
+The assignment in the class body creates a new entry in `Right2`'s own dictionary,
+so `Right2.shared` reads that entry.
+`Left2` still shares `Base2`'s list.
+The result, `[1] [1] [2]`,
+follows the same rule the integer `shared` in exercise 2 shows:
+one value per class that declares it.
 
-The listing models a bug in which every subclass treats the single
-list on the base class as its own. When one shared table is the intent, as
-in a registry of subclasses, the same code is correct.
-When each owner needs its own list, build the mutable value per owner
-rather than once in the class body. A `default_factory` field gives
-each instance its own list, and `__init_subclass__()`, which
-[Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
+The listing models a bug in which every subclass treats the single list on the base class as its own.
+When one shared table is the intent, as in a registry of subclasses,
+the same code is correct.
+When each owner needs its own list,
+build the mutable value per owner rather than once in the class body.
+A `default_factory` field gives each instance its own list,
+and `__init_subclass__()`,
+which [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 introduces, gives each subclass its own.
 
 Before you move on, name what separates your attempt from this one:
@@ -616,9 +654,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Bare Annotation Declares, It Does Not Create](../../Chapters/09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create) explains the difference between declaring `seat` and creating it.
-The annotation informs the type checker and creates no attribute, so `vars()` on the instance shows what exists.
-Read the attribute inside `expected(AttributeError)`, assign it from outside, and print `vars()` again.
+[A Bare Annotation Declares, It Does Not Create](../../Chapters/09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
+explains the difference between declaring `seat` and creating it.
+The annotation informs the type checker and creates no attribute,
+so `vars()` on the instance shows what exists.
+Read the attribute inside `expected(AttributeError)`, assign it from outside,
+and print `vars()` again.
 
 <details>
 <summary>The shape</summary>
@@ -637,7 +678,8 @@ class Ticket:
 <details>
 <summary>Done when</summary>
 
-`uv run ty check` passes on your file, the first `vars()` shows `holder` alone, and the read inside `expected(AttributeError)` reports `'Ticket' object has no attribute 'seat'`.
+`uv run ty check` passes on your file, the first `vars()` shows `holder` alone,
+and the read inside `expected(AttributeError)` reports `'Ticket' object has no attribute 'seat'`.
 After the outside assignment, `vars()` shows both `holder` and `seat`.
 
 <details>
@@ -664,19 +706,20 @@ print(vars(t), t.seat)
 #: {'holder': 'Ada', 'seat': '14C'} 14C
 ```
 
-**Declare the attribute without creating it.** The type checker passes this file. The annotation `seat: str` states
-that a `Ticket` carries a `seat`.
-The checker accepts that declaration and never checks that a method assigns `seat`. At runtime the declaration
-creates nothing. `vars(t)` holds `holder` alone, and reading `t.seat`
-raises an `AttributeError`.
+**Declare the attribute without creating it.**
+The type checker passes this file.
+The annotation `seat: str` states that a `Ticket` carries a `seat`.
+The checker accepts that declaration and never checks that a method assigns `seat`.
+At runtime the declaration creates nothing.
+`vars(t)` holds `holder` alone, and reading `t.seat` raises an `AttributeError`.
 
-**Create the attribute from outside.** `t.seat = "14C"` creates the
-attribute on the instance. The type checker verifies that assignment
-against the declared `str`.
+**Create the attribute from outside.**
+`t.seat = "14C"` creates the attribute on the instance.
+The type checker verifies that assignment against the declared `str`.
 
-A bare annotation is safe when the code that assigns the attribute
-runs before any code that reads it. The type checker cannot confirm
-that order, so the class depends on its callers to keep it.
+A bare annotation is safe when the code that assigns the attribute runs before any code that reads it.
+The type checker cannot confirm that order,
+so the class depends on its callers to keep it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -696,9 +739,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[`type(self)` Forks the Counter](../../Chapters/09_Foundations--Class_Attributes.md#typeself-forks-the-counter) shows the first `Sub()` writing a new `total` into `Sub`'s own dictionary.
+[`type(self)` Forks the Counter](../../Chapters/09_Foundations--Class_Attributes.md#typeself-forks-the-counter)
+shows the first `Sub()` writing a new `total` into `Sub`'s own dictionary.
 Print `vars(Sub).get("total")` at each step and watch when the entry appears.
-For the second half, naming `Base` in the increment sends every write to `Base`'s dictionary, so predict whether `Sub` gets an entry.
+For the second half,
+naming `Base` in the increment sends every write to `Base`'s dictionary,
+so predict whether `Sub` gets an entry.
 
 <details>
 <summary>The shape</summary>
@@ -729,8 +775,10 @@ class SubCounted(Counted):
 <details>
 <summary>Done when</summary>
 
-`vars(Sub).get("total")` prints `None` before the first `Sub()`, then `2` and `3` after each call, while `Base.total` stays at `1`.
-With `Base.total += 1` as the increment, every `vars(Sub).get("total")` prints `None` and the two counts move together.
+`vars(Sub).get("total")` prints `None` before the first `Sub()`,
+then `2` and `3` after each call, while `Base.total` stays at `1`.
+With `Base.total += 1` as the increment,
+every `vars(Sub).get("total")` prints `None` and the two counts move together.
 
 <details>
 <summary>Solution</summary>
@@ -790,18 +838,21 @@ print(vars(SubCounted).get("total"))
 #: None
 ```
 
-**Watch the subclass fork the counter.** Before the first `Sub()`
-(`[1]`), `vars(Sub)` has no `total`, so `Sub` reads `Base`'s `total`. The
-`Sub()` at `[1]` runs `type(self).total += 1` with `type(self)` as
-`Sub`. The read falls back to `Base.total`, which is `1`, and the
-write stores `2` in `Sub`'s own dictionary. From then on `Sub` has its
-own counter, and the second `Sub()` (`[2]`) moves it to `3` while
-`Base.total` stays at `1`.
+**Watch the subclass fork the counter.**
+Before the first `Sub()` (`[1]`), `vars(Sub)` has no `total`,
+so `Sub` reads `Base`'s `total`.
+The `Sub()` at `[1]` runs `type(self).total += 1` with `type(self)` as `Sub`.
+The read falls back to `Base.total`, which is `1`,
+and the write stores `2` in `Sub`'s own dictionary.
+From then on `Sub` has its own counter, and the second `Sub()` (`[2]`)
+moves it to `3` while `Base.total` stays at `1`.
 
-**Keep one counter for the hierarchy.** `Counted` names the class on the left, so every construction reads
-and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`
-at any point. Both names report the one shared count, so the three
-lines read `1 1`, `2 2`, and `3 3`.
+**Keep one counter for the hierarchy.**
+`Counted` names the class on the left,
+so every construction reads and writes `Counted`'s dictionary.
+`vars(SubCounted)` holds no `total` at any point.
+Both names report the one shared count, so the three lines read `1 1`, `2 2`,
+and `3 3`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

@@ -16,10 +16,13 @@
 <details>
 <summary>Where to look</summary>
 
-[Passing the Steps as Functions](../../Chapters/24_Patterns--Template_Method.md#passing-the-steps-as-functions) shows the same algorithm anchored in a function that takes the varying step as an argument.
+[Passing the Steps as Functions](../../Chapters/24_Patterns--Template_Method.md#passing-the-steps-as-functions)
+shows the same algorithm anchored in a function that takes the varying step as an argument.
 The subclass form is in [The Anchored Algorithm](../../Chapters/24_Patterns--Template_Method.md#the-anchored-algorithm).
-Put the shared loop (read each input, apply the step, write the output) in one `run()` and one function, and leave `process()` as the one open step.
-The search policy needs the word list, so store it on the subclass and close over it in the function form.
+Put the shared loop (read each input, apply the step, write the output)
+in one `run()` and one function, and leave `process()` as the one open step.
+The search policy needs the word list,
+so store it on the subclass and close over it in the function form.
 
 <details>
 <summary>The shape</summary>
@@ -89,18 +92,21 @@ def demo() -> None:
 <details>
 <summary>Done when</summary>
 
-given input files holding `hello` and `world`, both your subclass and your function form write `'HELLO\nWORLD\n'` to the last file.
-Given search words `spam`, `eggs`, and `ham`, and inputs `spam and eggs` and `green eggs and ham`, both forms write `'spam eggs\neggs ham\n'`, one line per input file.
+given input files holding `hello` and `world`,
+both your subclass and your function form write `'HELLO\nWORLD\n'` to the last file.
+Given search words `spam`, `eggs`, and `ham`,
+and inputs `spam and eggs` and `green eggs and ham`,
+both forms write `'spam eggs\neggs ham\n'`, one line per input file.
 
 <details>
 <summary>Solution</summary>
 
-The framework anchors the shape: read every file but the last, run the
-varying `process()` step over each input's text, and write the combined
-result to the last file. It appears twice, as a base class whose
-`run()` is the template method and as a function that takes the step
-as an argument. Every customization must supply `process()`, so the
-base class declares it with `@abstractmethod`:
+The framework anchors the shape: read every file but the last,
+run the varying `process()` step over each input's text,
+and write the combined result to the last file.
+It appears twice, as a base class whose `run()` is the template method and as a function that takes the step as an argument.
+Every customization must supply `process()`,
+so the base class declares it with `@abstractmethod`:
 
 ```python
 # exercise_1.py
@@ -132,15 +138,16 @@ def run_file_framework(
     Path(output).write_text("".join(pieces))
 ```
 
-**Let a subclass be a record.** The empty `__slots__` lets a subclass
-that carries data be a record, as
-[Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#abstract-base-classes)
-explains. `Search`, which stores its word list in a field, is such a
-record.
+**Let a subclass be a record.**
+The empty `__slots__` lets a subclass that carries data be a record,
+as [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#abstract-base-classes)
+explains.
+`Search`, which stores its word list in a field, is such a record.
 
-The uppercase policy needs no data. The subclass overrides
-`process()`. The function form passes `str.upper`, which has the
-signature the framework expects:
+The uppercase policy needs no data.
+The subclass overrides `process()`.
+The function form passes `str.upper`,
+which has the signature the framework expects:
 
 ```python
 # exercise_1_upper.py
@@ -176,12 +183,11 @@ demo()
 #: 'HELLO\nWORLD\n'
 ```
 
-The two mechanisms supply the same step, so both produce
-`'HELLO\nWORLD\n'`.
+The two mechanisms supply the same step, so both produce `'HELLO\nWORLD\n'`.
 
 The search policy needs the word list while it processes each file.
-The framework treats every input alike, so the client reads the word
-list from the first file and passes the framework the rest:
+The framework treats every input alike,
+so the client reads the word list from the first file and passes the framework the rest:
 
 ```python
 # exercise_1_search.py
@@ -230,14 +236,16 @@ demo()
 #: 'spam eggs\neggs ham\n'
 ```
 
-The report has one line for each input file, naming the search words
-that file contains.
+The report has one line for each input file,
+naming the search words that file contains.
 
-**Give the step its data.** The two forms differ in where they store
-the word list. `Search` stores it in a field. The lambda closes over
-the local variable `words`. In both, `run()` and `run_file_framework()`
-stay the same. A new policy is a new step. The algorithm that calls
-the step belongs to the framework.
+**Give the step its data.**
+The two forms differ in where they store the word list.
+`Search` stores it in a field.
+The lambda closes over the local variable `words`.
+In both, `run()` and `run_file_framework()` stay the same.
+A new policy is a new step.
+The algorithm that calls the step belongs to the framework.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -258,7 +266,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Don't Start the Engine in the Constructor](../../Chapters/24_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor) shows `Framework.__init__()` calling a step before the subclass has set its attributes.
+[Don't Start the Engine in the Constructor](../../Chapters/24_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor)
+shows `Framework.__init__()` calling a step before the subclass has set its attributes.
 One repair changes the order of two lines in `Greeter.__init__()`.
 The other removes the call from `Framework.__init__()` so that the client calls `run()`.
 To choose between them, consider who must remember what.
@@ -312,7 +321,9 @@ class Greeter(Framework):
 <details>
 <summary>Done when</summary>
 
-both your files print `Hello, Brian!` (with your name) where `premature_engine.py` raises an `AttributeError`, and in the redesign, the greeting waits for the client to call `run()`.
+both your files print `Hello, Brian!` (with your name)
+where `premature_engine.py` raises an `AttributeError`, and in the redesign,
+the greeting waits for the client to call `run()`.
 You can answer the closing question by stating what a later subclass author must remember under each repair.
 
 <details>
@@ -320,14 +331,13 @@ You can answer the closing question by stating what a later subclass author must
 
 If you drop the `super().__init__()` call from `Greeter.__init__()` to avoid the trap,
 `Greeter("Brian")` completes and prints nothing,
-because the engine starts in `Framework.__init__()`, which `Greeter` now bypasses.
+because the engine starts in `Framework.__init__()`,
+which `Greeter` now bypasses.
 The type checker accepts the class too.
 The reorder keeps the call and moves it after the setup.
-The redesign takes the start out of construction
-and gives it to the client.
+The redesign takes the start out of construction and gives it to the client.
 
-The quick repair reorders the two lines so the subclass finishes its
-own setup before it calls `Framework.__init__()`:
+The quick repair reorders the two lines so the subclass finishes its own setup before it calls `Framework.__init__()`:
 
 ```python
 # exercise_2_reorder.py
@@ -387,25 +397,22 @@ greeter.run()  # The client starts the engine
 The redesign protects the next author.
 The reorder protects the one subclass that performs it.
 Each later subclass is safe only if its author remembers to do the same.
-The reorder asks every future
-subclass author to invert the convention they have used everywhere
-else, which is to call `super().__init__()` first.
+The reorder asks every future subclass author to invert the convention they have used everywhere else,
+which is to call `super().__init__()` first.
 The signature of `Framework.__init__()` is silent on the order.
 Every type checker accepts the usual one.
-Python reports the failure as an `AttributeError` raised in the
-subclass's own `step()`, called from a base class someone else wrote.
+Python reports the failure as an `AttributeError` raised in the subclass's own `step()`,
+called from a base class someone else wrote.
 The next author may not have read this chapter.
 
 Separating construction from starting makes the mistake impossible,
 because the engine starts in `run()`,
 and the client calls `run()` on a finished object.
 Each call site gains a line, `greeter.run()`.
-That line moves the decision about when the algorithm starts
-from the base class to the client.
-The same reasoning favors eager creation in
-[*Singleton*](../../Chapters/23_Patterns--Singleton.md#double-checked-locking-and-eager-creation).
-Eager creation builds the object at import time, before any thread can read a
-half-built one.
+That line moves the decision about when the algorithm starts from the base class to the client.
+The same reasoning favors eager creation in [*Singleton*](../../Chapters/23_Patterns--Singleton.md#double-checked-locking-and-eager-creation).
+Eager creation builds the object at import time,
+before any thread can read a half-built one.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -425,9 +432,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Anchored Algorithm](../../Chapters/24_Patterns--Template_Method.md#the-anchored-algorithm) explains how `@final` marks `run()` as the part of the *Template Method* that stays the same.
+[The Anchored Algorithm](../../Chapters/24_Patterns--Template_Method.md#the-anchored-algorithm)
+explains how `@final` marks `run()` as the part of the *Template Method* that stays the same.
 Override `run()` in a subclass, run the file, then run `ty` over it.
-Compare what Python and the type checker each report, and ask which of them reads the `@final` marker.
+Compare what Python and the type checker each report,
+and ask which of them reads the `@final` marker.
 A `# type: ignore` on the override keeps the listing in the build.
 
 <details>
@@ -462,8 +471,11 @@ class Reversed(ApplicationFramework):
 <details>
 <summary>Done when</summary>
 
-your file runs and prints `two`, `one`, `two`, `one` with no error, and `uv run ty check` on it, with no `# type: ignore` on the override, reports `override-of-final-method` at your `run()`.
-You can then say which of the two reads `@final`, and what that means for a build that skips the type checker.
+your file runs and prints `two`, `one`, `two`, `one` with no error,
+and `uv run ty check` on it, with no `# type: ignore` on the override,
+reports `override-of-final-method` at your `run()`.
+You can then say which of the two reads `@final`,
+and what that means for a build that skips the type checker.
 
 <details>
 <summary>Solution</summary>
@@ -504,32 +516,32 @@ Reversed().run()
 #: one
 ```
 
-Python objects to nothing. The program runs and prints the steps in
-the reversed order the subclass chose. The anchored algorithm is
-no longer anchored.
+Python objects to nothing.
+The program runs and prints the steps in the reversed order the subclass chose.
+The anchored algorithm is no longer anchored.
 
-The type checker objects. The override carries a `# type: ignore` to keep this
-listing in the book's build. With that comment removed, `ty` reports:
+The type checker objects.
+The override carries a `# type: ignore` to keep this listing in the book's build.
+With that comment removed, `ty` reports:
 
 ```
 error[override-of-final-method]: Cannot override `ApplicationFramework.run`
 info: `ApplicationFramework.run` is decorated with `@final`, forbidding overrides
 ```
 
-The guarantee comes from the type checker, not the language. `@final`
-sets `__final__ = True` on the function. Nothing in the interpreter
-consults that attribute. The *Template Method*'s central
-guarantee is therefore in the same category as every other annotation
-in this book. A tool enforces it before the program executes, and
-only when you run that tool.
+The guarantee comes from the type checker, not the language.
+`@final` sets `__final__ = True` on the function.
+Nothing in the interpreter consults that attribute.
+The *Template Method*'s central guarantee is therefore in the same category as every other annotation in this book.
+A tool enforces it before the program executes, and only when you run that tool.
 
-`@final` protects a codebase whose build runs a type checker, and
-protects nothing in a codebase that does not. When the interpreter
-must refuse the override, use the `__init_subclass__()` check from
-the chapter's `near_miss.py`, which reads `__final__` from each
-method a subclass replaces. The check raises a `TypeError` at the
-subclass's `class` statement, as soon as the class body has run, long
-before anyone constructs an instance.
+`@final` protects a codebase whose build runs a type checker,
+and protects nothing in a codebase that does not.
+When the interpreter must refuse the override,
+use the `__init_subclass__()` check from the chapter's `near_miss.py`,
+which reads `__final__` from each method a subclass replaces.
+The check raises a `TypeError` at the subclass's `class` statement,
+as soon as the class body has run, long before anyone constructs an instance.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -550,8 +562,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Substitutability](../../Chapters/24_Patterns--Template_Method.md#substitutability) shows a subclass that type-checks yet breaks the algorithm the base class anchors.
-Write one subclass whose `customize1()` raises an exception, and one that keeps the `...` default for a step on which the flow depends.
+[Substitutability](../../Chapters/24_Patterns--Template_Method.md#substitutability)
+shows a subclass that type-checks yet breaks the algorithm the base class anchors.
+Write one subclass whose `customize1()` raises an exception,
+and one that keeps the `...` default for a step on which the flow depends.
 The base class can declare a step mandatory with `ABC` and `@abstractmethod`.
 Consider which of the two failures any declaration available in Python could expose.
 
@@ -588,8 +602,11 @@ class HalfDone(ApplicationFramework):
 <details>
 <summary>Done when</summary>
 
-`uv run ty check` passes on your file; `run()` on the first subclass lets your exception propagate out of `run()`, and `run()` on the second returns normally while printing evidence that `customize2()` never did its share.
-You can name a base-class change that makes the type checker report one subclass, and say why nothing reports the other.
+`uv run ty check` passes on your file;
+`run()` on the first subclass lets your exception propagate out of `run()`,
+and `run()` on the second returns normally while printing evidence that `customize2()` never did its share.
+You can name a base-class change that makes the type checker report one subclass,
+and say why nothing reports the other.
 
 <details>
 <summary>Solution</summary>
@@ -632,32 +649,33 @@ print(app.pending)
 #: ['work', 'work']
 ```
 
-The type checker accepts both classes. Both override with the right
-name, the right parameters, and the right return type, so both satisfy
-`@override` and every signature rule the base class states.
+The type checker accepts both classes.
+Both override with the right name, the right parameters,
+and the right return type,
+so both satisfy `@override` and every signature rule the base class states.
 
-**Raise an unexpected exception.** `Exploder` breaks the algorithm on the first step of the first pass.
-Code written against `ApplicationFramework` expects `run()` to return
-normally for every subclass.
+**Raise an unexpected exception.**
+`Exploder` breaks the algorithm on the first step of the first pass.
+Code written against `ApplicationFramework` expects `run()` to return normally for every subclass.
 `Exploder`'s `customize1()` raises an exception,
-which propagates out of `run()`
-into a caller written for the base version.
+which propagates out of `run()` into a caller written for the base version.
 
-**Skip a step the flow needs.** `HalfDone` breaks the algorithm more quietly, which makes it the
-worse of the two. `customize1()` accumulates work for `customize2()`
-to consume, so the pair is a two-step flow. Leaving `customize2()` at
-its default breaks the second half. The program still completes
-normally.
+**Skip a step the flow needs.**
+`HalfDone` breaks the algorithm more quietly,
+which makes it the worse of the two.
+`customize1()` accumulates work for `customize2()` to consume,
+so the pair is a two-step flow.
+Leaving `customize2()` at its default breaks the second half.
+The program still completes normally.
 `pending` grows on every pass.
-The flaw stays hidden until the program runs out of
-memory or the code that reads `pending` reports stale data.
+The flaw stays hidden until the program runs out of memory or the code that reads `pending` reports stale data.
 
 `Exploder` and `HalfDone` need different things from a type checker.
 Only one of those things exists.
 
 A declaration in the base class can expose `HalfDone`'s omission.
-Through the `...` body, the base class declares that a subclass may
-skip this step.
+Through the `...` body,
+the base class declares that a subclass may skip this step.
 With that body, no checker can catch the omission,
 because "deliberately empty" and "forgotten" are the same code.
 Only the base class can record that difference.
@@ -666,23 +684,24 @@ by inheriting from `ABC` and marking `customize2()` with `@abstractmethod`.
 Then constructing `HalfDone` raises a `TypeError`.
 The type checker reports the construction before the program runs.
 
-Exposing `Exploder`'s exception would take a declaration that Python
-lacks. For a type checker to catch `Exploder`, the base class must
-state which exceptions a step may raise, and the checker must compare
-every override with that list.
+Exposing `Exploder`'s exception would take a declaration that Python lacks.
+For a type checker to catch `Exploder`,
+the base class must state which exceptions a step may raise,
+and the checker must compare every override with that list.
 Java's `throws` clause provides that mechanism for checked exceptions.
-Python has no such declaration, and no
-annotation expresses "this raises nothing." An exception type in a
-docstring is a note to a human. Only discipline, review, or a test
-catches `Exploder`.
+Python has no such declaration,
+and no annotation expresses "this raises nothing."
+An exception type in a docstring is a note to a human.
+Only discipline, review, or a test catches `Exploder`.
 
-`@final` protects the shape of the algorithm, and `@abstractmethod`
-protects the presence of a step, because both are properties of the
-class structure that a base class can declare. What a step does once called is
-behavior, and
-[Liskov substitution](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution)
+`@final` protects the shape of the algorithm,
+and `@abstractmethod` protects the presence of a step,
+because both are properties of the class structure that a base class can declare.
+What a step does once called is behavior,
+and [Liskov substitution](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution)
 is a rule about behavior.
-No tool checks substitution, so the chapter leaves that check to your discipline.
+No tool checks substitution,
+so the chapter leaves that check to your discipline.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -703,10 +722,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Hooks and the Misspelled Override](../../Chapters/24_Patterns--Template_Method.md#hooks-and-the-misspelled-override) builds the set of known names inside `__init_subclass__()` from the classes in `cls.__mro__`.
+[Hooks and the Misspelled Override](../../Chapters/24_Patterns--Template_Method.md#hooks-and-the-misspelled-override)
+builds the set of known names inside `__init_subclass__()` from the classes in `cls.__mro__`.
 `MyApp` defines `report()`.
-Subclass it, add a method whose name is one letter off a known name, and watch which names the check sees.
-For the narrower version, take the names from `vars(ApplicationFramework)` alone.
+Subclass it, add a method whose name is one letter off a known name,
+and watch which names the check sees.
+For the narrower version,
+take the names from `vars(ApplicationFramework)` alone.
 Then test a misspelling of a name that a subclass added.
 
 <details>
@@ -771,16 +793,17 @@ class Audited(MyApp):
 <summary>Done when</summary>
 
 your subclass of `MyApp` with `reports()` fails at its `class` statement with a `TypeError` ending `did you mean report?`.
-Under your narrowed check the same class completes, while a subclass defining `customise2()` still fails with `did you mean customize2?`.
+Under your narrowed check the same class completes,
+while a subclass defining `customise2()` still fails with `did you mean customize2?`.
 You can say which misspelling now passes unreported.
 
 <details>
 <summary>Solution</summary>
 
-The chapter's `__init_subclass__()` builds its set of names from every
-base class, so the set grows as the hierarchy does. `MyApp` adds
-`report()`. A subclass of `MyApp` inherits that name along with the
-framework's own names:
+The chapter's `__init_subclass__()` builds its set of names from every base class,
+so the set grows as the hierarchy does.
+`MyApp` adds `report()`.
+A subclass of `MyApp` inherits that name along with the framework's own names:
 
 ```python
 # exercise_5.py
@@ -837,12 +860,12 @@ with expected(TypeError):
 #: [TypeError] Audited.reports: did you mean report?
 ```
 
-**Compare against every base.** The `class Audited` statement raises a `TypeError`. The check
-compares a new method against every non-dunder name in every base,
+**Compare against every base.**
+The `class Audited` statement raises a `TypeError`.
+The check compares a new method against every non-dunder name in every base,
 and `report` is one of those names.
-Yet `report()` is a helper that `MyApp` added, not a step of the
-framework, so the framework enforces a rule about a name that belongs
-to `MyApp`.
+Yet `report()` is a helper that `MyApp` added, not a step of the framework,
+so the framework enforces a rule about a name that belongs to `MyApp`.
 
 The narrower check reads its names from `ApplicationFramework` alone:
 
@@ -906,19 +929,20 @@ with expected(TypeError):
 #: [TypeError] Typo.customise2: did you mean customize2?
 ```
 
-**Draw names from the framework alone.** `ApplicationFramework` exists by the time any subclass's `class`
-statement runs, so `__init_subclass__()` can name it.
+**Draw names from the framework alone.**
+`ApplicationFramework` exists by the time any subclass's `class` statement runs,
+so `__init_subclass__()` can name it.
 
-**Pass the helper, catch the step.** The `class Audited` statement now
-completes.
-A misspelled step still fails at any depth of the
-hierarchy, because the check compares the methods of every subclass
-with the framework's three names.
+**Pass the helper, catch the step.**
+The `class Audited` statement now completes.
+A misspelled step still fails at any depth of the hierarchy,
+because the check compares the methods of every subclass with the framework's three names.
 
 A misspelling of a name that a subclass introduced now passes the narrower check.
-If `Audited` meant to override `report()`, its
-`reports()` is a new method that nothing calls. The framework accepts
-it. `Audited`'s author must catch that misspelling,
+If `Audited` meant to override `report()`,
+its `reports()` is a new method that nothing calls.
+The framework accepts it.
+`Audited`'s author must catch that misspelling,
 using the protection the chapter recommends for steps:
 `@override` on the method, and a type checker in the build.
 

@@ -12,7 +12,8 @@
 <details>
 <summary>Where to look</summary>
 
-[Adding a Setter](../../Chapters/07_Foundations--Classes.md#adding-a-setter) shows the `@radius.setter` that validates every assignment to `radius`.
+[Adding a Setter](../../Chapters/07_Foundations--Classes.md#adding-a-setter)
+shows the `@radius.setter` that validates every assignment to `radius`.
 Write `shrink()` so it assigns to the public `radius` property instead of the underscore attribute.
 The setter then runs on the computed value.
 `expect()` catches the setter's `ValueError`.
@@ -43,7 +44,9 @@ class Circle:
 <details>
 <summary>Done when</summary>
 
-your `Circle(10)` prints `5.0` after `shrink(2)`, and `shrink(-2)` on that same circle raises the setter's `ValueError`, `radius cannot be negative`.
+your `Circle(10)` prints `5.0` after `shrink(2)`,
+and `shrink(-2)` on that same circle raises the setter's `ValueError`,
+`radius cannot be negative`.
 Reading `radius` after the failed call still gives `5.0`.
 
 <details>
@@ -85,14 +88,14 @@ expect(ValueError, c.shrink, -2)
 #: [ValueError] radius cannot be negative
 ```
 
-**Route the change through the setter.** Because `shrink()` assigns to
-`self.radius` rather than `self._radius`,
+**Route the change through the setter.**
+Because `shrink()` assigns to `self.radius` rather than `self._radius`,
 the assignment calls the `@radius.setter` method.
-The existing validation then applies to
-every method that changes the radius this way.
+The existing validation then applies to every method that changes the radius this way.
 
-**Confirm the setter rejects a negative result.** `shrink(-2)` runs after `shrink(2)` has set the radius
-to `5.0`, so it computes `5.0 / -2 == -2.5`.
+**Confirm the setter rejects a negative result.**
+`shrink(-2)` runs after `shrink(2)` has set the radius to `5.0`,
+so it computes `5.0 / -2 == -2.5`.
 The setter rejects `-2.5`, just as it rejects `c.radius = -2.5` written by hand.
 
 Before you move on, name what separates your attempt from this one:
@@ -113,9 +116,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Static and Class Methods](../../Chapters/07_Foundations--Classes.md#static-and-class-methods) shows `from_fahrenheit()` as a `@classmethod` that converts its argument and returns `cls(...)`.
+[Static and Class Methods](../../Chapters/07_Foundations--Classes.md#static-and-class-methods)
+shows `from_fahrenheit()` as a `@classmethod` that converts its argument and returns `cls(...)`.
 Write `from_kelvin()` the same way with the formula from the exercise.
-Compare the two results with `round()`, since floating-point arithmetic can be off in the last digit.
+Compare the two results with `round()`,
+since floating-point arithmetic can be off in the last digit.
 `310.0 - 273.15` gives `36.85000000000002`.
 
 <details>
@@ -144,7 +149,8 @@ class Temperature:
 <summary>Done when</summary>
 
 `Temperature.from_fahrenheit(212)` and `Temperature.from_kelvin(373.15)` both print `100.0` when you round each `celsius` to two places.
-A second pair, `from_fahrenheit(80.6)` and `from_kelvin(300.15)`, prints `27.0` both ways after rounding, though the unrounded values differ.
+A second pair, `from_fahrenheit(80.6)` and `from_kelvin(300.15)`,
+prints `27.0` both ways after rounding, though the unrounded values differ.
 
 <details>
 <summary>Solution</summary>
@@ -174,17 +180,20 @@ print(round(t1.celsius, 2), round(t2.celsius, 2))
 #: 100.0 100.0
 ```
 
-**Convert, then construct.** Both class methods end with `return cls(...)`, so
-`from_kelvin()` builds a `Temperature` the way `from_fahrenheit()`
-does, with a different formula for `celsius`.
+**Convert, then construct.**
+Both class methods end with `return cls(...)`,
+so `from_kelvin()` builds a `Temperature` the way `from_fahrenheit()` does,
+with a different formula for `celsius`.
 
-**Compare the results within rounding.** 212°F, 373.15 K, and 100°C are the same temperature (water's boiling
-point), so both alternative constructors produce `100.0`. The exercise
-asks for agreement within rounding, so the `print()` call passes each
-`celsius` through `round()`.
+**Compare the results within rounding.**
+212°F, 373.15 K, and 100°C are the same temperature (water's boiling point),
+so both alternative constructors produce `100.0`.
+The exercise asks for agreement within rounding,
+so the `print()` call passes each `celsius` through `round()`.
 For these inputs the unrounded values compare equal,
-but other inputs produce a floating-point rounding error. `from_kelvin(300.15)` stores `27.0`, while
-`from_fahrenheit(80.6)`, the same temperature, stores `26.999999999999996`.
+but other inputs produce a floating-point rounding error.
+`from_kelvin(300.15)` stores `27.0`, while `from_fahrenheit(80.6)`,
+the same temperature, stores `26.999999999999996`.
 Rounded to two places, both print `27.0`.
 
 Before you move on, name what separates your attempt from this one:
@@ -206,9 +215,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Inheritance](../../Chapters/07_Foundations--Classes.md#inheritance) shows `Derived.show()` printing a message and then calling `super().show(msg)`.
+[Inheritance](../../Chapters/07_Foundations--Classes.md#inheritance)
+shows `Derived.show()` printing a message and then calling `super().show(msg)`.
 Give `MoreDerived` a `show()` with the same shape and its own message.
-`MoreDerived` inherits `show_twice()`, which calls `self.show()`, so the lookup starts at the class of `self`.
+`MoreDerived` inherits `show_twice()`, which calls `self.show()`,
+so the lookup starts at the class of `self`.
 Each `super()` call then runs the base class's `show()`.
 
 <details>
@@ -242,7 +253,9 @@ class MoreDerived(Derived):
 <details>
 <summary>Done when</summary>
 
-`MoreDerived("x").show_twice()` prints `MoreDerived show() method`, `Overridden show() method`, and `x`, then the same three lines again, and the run matches the prediction you wrote first.
+`MoreDerived("x").show_twice()` prints `MoreDerived show() method`,
+`Overridden show() method`, and `x`, then the same three lines again,
+and the run matches the prediction you wrote first.
 In `simple_subclass.py` the two constructor lines print ahead of those six.
 
 <details>
@@ -252,7 +265,8 @@ If you leave `super().show(msg)` out of `MoreDerived.show()`,
 the chain stops at `MoreDerived`.
 `show_twice()` then prints two lines, both `MoreDerived show() method`.
 Python runs a base-class method only when an override calls it,
-the same rule [Calling the Base Constructor](../../Chapters/07_Foundations--Classes.md#calling-the-base-constructor) shows for `__init__()`.
+the same rule [Calling the Base Constructor](../../Chapters/07_Foundations--Classes.md#calling-the-base-constructor)
+shows for `__init__()`.
 Each override in the solution therefore calls its base-class method with `super()`.
 
 ```python
@@ -294,23 +308,25 @@ MoreDerived("x").show_twice()
 #: x
 ```
 
-This solution copies `Simple` and `Derived` without their constructor
-`print()` calls and without `display()`, so the trace shows only the
-`show()` chain. If you add
-`MoreDerived` to `simple_subclass.py`, as the exercise says, the two
-constructor lines print first.
+This solution copies `Simple` and `Derived` without their constructor `print()` calls and without `display()`,
+so the trace shows only the `show()` chain.
+If you add `MoreDerived` to `simple_subclass.py`, as the exercise says,
+the two constructor lines print first.
 
-**Dispatch on the object's class.** `MoreDerived` inherits `show_twice()` from `Simple`, and
-`show_twice()` calls `self.show()` twice.
+**Dispatch on the object's class.**
+`MoreDerived` inherits `show_twice()` from `Simple`,
+and `show_twice()` calls `self.show()` twice.
 The lookup starts at the class of the object, and `self` is a `MoreDerived`,
 so each call resolves to `MoreDerived.show()` first.
 
-**Pass each call up the chain.** `MoreDerived.show()` prints its own
-message, then calls `super().show(msg)`, which runs `Derived.show()`.
-`Derived.show()` prints its message and calls `super().show(msg)`
-again, which runs `Simple.show()`.
-`Simple.show()` finally prints `x`. Each `super()` call runs the `show()` of the class one step
-closer to `Simple`, so the messages appear in derived-to-base order, twice.
+**Pass each call up the chain.**
+`MoreDerived.show()` prints its own message, then calls `super().show(msg)`,
+which runs `Derived.show()`.
+`Derived.show()` prints its message and calls `super().show(msg)` again,
+which runs `Simple.show()`.
+`Simple.show()` finally prints `x`.
+Each `super()` call runs the `show()` of the class one step closer to `Simple`,
+so the messages appear in derived-to-base order, twice.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -329,9 +345,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Caching with `cached_property`](../../Chapters/07_Foundations--Classes.md#cached-property) shows `total` computed once and then stored on the instance.
+[Caching with `cached_property`](../../Chapters/07_Foundations--Classes.md#cached-property)
+shows `total` computed once and then stored on the instance.
 Decorate `average` with `@cached_property` and read `self.total` in its body.
-Inside `average`, `self.total` is an ordinary attribute access that returns the stored value, so the `summing` message should print once.
+Inside `average`, `self.total` is an ordinary attribute access that returns the stored value,
+so the `summing` message should print once.
 
 <details>
 <summary>The shape</summary>
@@ -356,7 +374,8 @@ class Numbers:
 <details>
 <summary>Done when</summary>
 
-accessing `n.total` and then `n.average` on `Numbers([5, 10, 15])` prints `30` and then `10.0`, and the `summing 3 values` line appears once in the whole run, before the `30`.
+accessing `n.total` and then `n.average` on `Numbers([5, 10, 15])` prints `30` and then `10.0`,
+and the `summing 3 values` line appears once in the whole run, before the `30`.
 
 <details>
 <summary>Solution</summary>
@@ -388,15 +407,17 @@ print(n.average)
 #: 10.0
 ```
 
-**Compute on first access.** The first access to `n.total` runs its body, prints the `"summing"`
-message, and stores `30` on the instance.
+**Compute on first access.**
+The first access to `n.total` runs its body, prints the `"summing"` message,
+and stores `30` on the instance.
 
-**Reuse the cached value.** `average`'s body then
-reads `self.total` and gets that stored value. The `"summing"`
-message appears once, because the `n.total` access computes and
-caches `total` before `average` reads it. If you access `average`
-first, its read of `self.total` computes and caches `total` at that
-moment. `"summing"` still appears once.
+**Reuse the cached value.**
+`average`'s body then reads `self.total` and gets that stored value.
+The `"summing"` message appears once,
+because the `n.total` access computes and caches `total` before `average` reads it.
+If you access `average` first,
+its read of `self.total` computes and caches `total` at that moment.
+`"summing"` still appears once.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -416,8 +437,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[String Representation](../../Chapters/07_Foundations--Classes.md#string-representation) shows which method `print()` calls, `__repr__()` or `__str__()`, and which one a list calls for its elements.
-Define `__repr__()` first and print one object and a list, then add `__str__()` and print both again.
+[String Representation](../../Chapters/07_Foundations--Classes.md#string-representation)
+shows which method `print()` calls, `__repr__()` or `__str__()`,
+and which one a list calls for its elements.
+Define `__repr__()` first and print one object and a list,
+then add `__str__()` and print both again.
 
 <details>
 <summary>The shape</summary>
@@ -438,15 +462,18 @@ class Temperature:
 <details>
 <summary>Done when</summary>
 
-with `__repr__()` alone, `print(t)` and the printed list both show `Temperature(21.0)`.
-After you add `__str__()`, `print(t)` shows `21.0C` while the list keeps the `Temperature(21.0)` form for each element.
+with `__repr__()` alone,
+`print(t)` and the printed list both show `Temperature(21.0)`.
+After you add `__str__()`,
+`print(t)` shows `21.0C` while the list keeps the `Temperature(21.0)` form for each element.
 
 <details>
 <summary>Solution</summary>
 
 If you define `__str__()` alone, `print(t)` shows `21.0C`,
 but the list shows the default `<__main__.Temperature object at 0x...>` for each element.
-A container formats its elements with `repr()`, which calls `__repr__()` and leaves `__str__()` unused.
+A container formats its elements with `repr()`,
+which calls `__repr__()` and leaves `__str__()` unused.
 The solution defines `__repr__()` for the form a container shows and adds `__str__()` for the readable one.
 
 ```python
@@ -471,22 +498,24 @@ print(f"{t} is {t!r}")
 #: 21.0C is Temperature(21.0)
 ```
 
-**Supply the fallback form.** With `__repr__()` defined and no
-`__str__()`, `print(t)` and the printed list both show
-`Temperature(21.0)`. `print()` calls the `__str__()` that
-`Temperature` inherits from `object`, and that method calls
-`__repr__()`.
+**Supply the fallback form.**
+With `__repr__()` defined and no `__str__()`,
+`print(t)` and the printed list both show `Temperature(21.0)`.
+`print()` calls the `__str__()` that `Temperature` inherits from `object`,
+and that method calls `__repr__()`.
 
-**Add a readable form for users.** Adding `__str__()` makes `print(t)` and the printed list differ.
+**Add a readable form for users.**
+Adding `__str__()` makes `print(t)` and the printed list differ.
 `print(t)` and `f"{t}"` show the readable form.
-The list keeps showing `Temperature(21.0)` for each element, because a container
-formats its elements with `repr()`, not `str()`. `{t!r}`
-calls `repr()`, producing the same `Temperature(21.0)` form inside an f-string.
+The list keeps showing `Temperature(21.0)` for each element,
+because a container formats its elements with `repr()`, not `str()`.
+`{t!r}` calls `repr()`,
+producing the same `Temperature(21.0)` form inside an f-string.
 
-The two forms serve different readers. `Temperature(21.0)` is the
-expression that rebuilds this object, the form you want in a traceback or a
-debugger. `21.0C` is the value with its unit, the form you want
-in output a user reads.
+The two forms serve different readers.
+`Temperature(21.0)` is the expression that rebuilds this object,
+the form you want in a traceback or a debugger.
+`21.0C` is the value with its unit, the form you want in output a user reads.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -509,10 +538,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Marking Overrides with `@override`](../../Chapters/07_Foundations--Classes.md#marking-overrides-with-override) shows the decorator from `typing` on a method that replaces a base-class method.
+[Marking Overrides with `@override`](../../Chapters/07_Foundations--Classes.md#marking-overrides-with-override)
+shows the decorator from `typing` on a method that replaces a base-class method.
 The renamed base leaves `Derived.show()` overriding nothing.
 The program never calls `display()`, so its output stays the same.
-The decorator is for the type checker, so run the checker with and without `@override` and compare.
+The decorator is for the type checker,
+so run the checker with and without `@override` and compare.
 
 <details>
 <summary>The shape</summary>
@@ -532,7 +563,8 @@ class Derived(Base):
 <details>
 <summary>Done when</summary>
 
-your renamed program prints `Derived.show` at every step, and `uv run ty check` on your file reports `invalid-explicit-override` on `Derived.show()` while `@override` is present.
+your renamed program prints `Derived.show` at every step,
+and `uv run ty check` on your file reports `invalid-explicit-override` on `Derived.show()` while `@override` is present.
 With the decorator removed, `uv run ty check` prints `All checks passed!`.
 
 <details>
@@ -554,16 +586,18 @@ Derived().show()
 #: Derived.show
 ```
 
-**Rename the base-class method.** The program prints `Derived.show`.
-`Derived` defines `show()` itself, so `Derived().show()` finds it there
-and the lookup stops before reaching `Base`. The rename turns the
-override into an unrelated new method. Python accepts any method name
-in a subclass and keeps no record of which ones you meant as overrides.
+**Rename the base-class method.**
+The program prints `Derived.show`.
+`Derived` defines `show()` itself,
+so `Derived().show()` finds it there and the lookup stops before reaching `Base`.
+The rename turns the override into an unrelated new method.
+Python accepts any method name in a subclass and keeps no record of which ones you meant as overrides.
 
-**Declare the intended override.** With `from typing import override` added and the decorator
-uncommented, the program still prints `Derived.show`,
-because at run time the decorator returns the method it receives. The
-type checker reports the mismatch:
+**Declare the intended override.**
+With `from typing import override` added and the decorator uncommented,
+the program still prints `Derived.show`,
+because at run time the decorator returns the method it receives.
+The type checker reports the mismatch:
 
 ```text
 error[invalid-explicit-override]: Method `show` is decorated with
@@ -571,16 +605,16 @@ error[invalid-explicit-override]: Method `show` is decorated with
 info: No `show` definitions were found on any superclasses of `Derived`
 ```
 
-If you remove the decorator, the type checker reports no error, since
-the code no longer states an intention for it to verify.
-The feature has three parts: `@override` states an intention, the
-type checker verifies it, and the running program ignores it.
+If you remove the decorator, the type checker reports no error,
+since the code no longer states an intention for it to verify.
+The feature has three parts: `@override` states an intention,
+the type checker verifies it, and the running program ignores it.
 
-In a real codebase the base class and its overrides often sit in
-different files, so a rename slips past a reader. With `@override` on
-every overriding method, the type checker reports each method whose
-name the rename removed from the base class. A decorator that changes
-no behavior at run time is worth writing when a tool reads it.
+In a real codebase the base class and its overrides often sit in different files,
+so a rename slips past a reader.
+With `@override` on every overriding method,
+the type checker reports each method whose name the rename removed from the base class.
+A decorator that changes no behavior at run time is worth writing when a tool reads it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

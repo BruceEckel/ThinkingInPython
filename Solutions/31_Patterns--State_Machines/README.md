@@ -55,8 +55,10 @@ class StateMachine:
 <details>
 <summary>Where to look</summary>
 
-[*State*](../../Chapters/25_Patterns--Surrogate.md#state) shows a surrogate that forwards a call to whichever state object it currently holds.
-Define a `Mood` protocol with one `hello()` method, and give `UnpredictablePerson` a `change_to()` that swaps the held object.
+[*State*](../../Chapters/25_Patterns--Surrogate.md#state)
+shows a surrogate that forwards a call to whichever state object it currently holds.
+Define a `Mood` protocol with one `hello()` method,
+and give `UnpredictablePerson` a `change_to()` that swaps the held object.
 A new mood is another class with the same method, so the person needs no change.
 
 <details>
@@ -95,7 +97,8 @@ class UnpredictablePerson:
 <details>
 <summary>Done when</summary>
 
-one `UnpredictablePerson` in your `exercise_1.py` gives three different `hello()` replies in a row, the last from `Prozac`.
+one `UnpredictablePerson` in your `exercise_1.py` gives three different `hello()` replies in a row,
+the last from `Prozac`.
 Adding `Prozac` changes no line of `UnpredictablePerson`.
 
 <details>
@@ -142,11 +145,9 @@ print(person.hello())
 ```
 
 `Prozac` has the same shape as `Happy` and `Grumpy`: one `hello()` method.
-`UnpredictablePerson` names no specific mood, so
-adding a third mood changes which `Mood` object `change_to()`
-installs and leaves every line of `UnpredictablePerson` as it was.
-`UnpredictablePerson` is the
-[*State* surrogate](../../Chapters/25_Patterns--Surrogate.md#state),
+`UnpredictablePerson` names no specific mood,
+so adding a third mood changes which `Mood` object `change_to()` installs and leaves every line of `UnpredictablePerson` as it was.
+`UnpredictablePerson` is the [*State* surrogate](../../Chapters/25_Patterns--Surrogate.md#state),
 applied to a new domain.
 
 Before you move on, name what separates your attempt from this one:
@@ -168,9 +169,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states) shows the shape: a `State` record with a message and a stored `next`, mixed into an `Enum` and driven by the chapter's engine.
-Make the inputs a `StrEnum`, so each transition function can `match` on them and the trace prints them as words.
-Inline `state.py` and `state_machine.py`, since a solution imports nothing from the chapter.
+[Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states)
+shows the shape: a `State` record with a message and a stored `next`,
+mixed into an `Enum` and driven by the chapter's engine.
+Make the inputs a `StrEnum`,
+so each transition function can `match` on them and the trace prints them as words.
+Inline `state.py` and `state_machine.py`,
+since a solution imports nothing from the chapter.
 
 <details>
 <summary>The shape</summary>
@@ -223,7 +228,8 @@ class Mood(State[Input], Enum):
 <details>
 <summary>Done when</summary>
 
-your trace interleaves greetings with transition lines in the form of `trap_states_demo.py`'s `Waiting mouse appears -> Luring`, the input printed as a word, and `uv run ty check` passes.
+your trace interleaves greetings with transition lines in the form of `trap_states_demo.py`'s `Waiting mouse appears -> Luring`,
+the input printed as a word, and `uv run ty check` passes.
 A transition function that can finish without returning a `Mood` draws `invalid-return-type`.
 You can name one gain and one loss of a member over a class.
 
@@ -233,7 +239,8 @@ You can name one gain and one loss of a member over a class.
 If you leave out the `case _` arm of `happy()`,
 `ty` reports an `invalid-return-type`,
 because the function can fall off its end and return `None`.
-The demo still prints the same lines, since every input that reaches `HAPPY` has a `case` there,
+The demo still prints the same lines,
+since every input that reaches `HAPPY` has a `case` there,
 but if a second `CALM` in a row reaches `HAPPY`, `happy()` returns `None`,
 and `step()`'s call to `run()` raises an `AttributeError`.
 Each function in the solution ends with a `case _` that returns its own member,
@@ -317,22 +324,38 @@ print([mood.name for mood in Mood])
 #: ['HAPPY', 'GRUMPY', 'PROZAC']
 ```
 
-**Each mood is one row.** `Mood.HAPPY` holds its greeting and `happy()`, the function that names its successors, so reading the member tells you what the mood says and where it can go.
-`PROZAC` needs no function of its own: its transition is a lambda that answers every input with `Mood.PROZAC`.
-The engine is the chapter's `StateMachine`, and the trace prints the inputs as the `StrEnum`'s words.
+**Each mood is one row.**
+`Mood.HAPPY` holds its greeting and `happy()`,
+the function that names its successors,
+so reading the member tells you what the mood says and where it can go.
+`PROZAC` needs no function of its own:
+its transition is a lambda that answers every input with `Mood.PROZAC`.
+The engine is the chapter's `StateMachine`,
+and the trace prints the inputs as the `StrEnum`'s words.
 
-**Let each mood pick its successor.** `happy()` answers `ANNOY` with `GRUMPY`, `grumpy()` answers `CALM` with `HAPPY`, and both answer `TAKE_PILL` with `PROZAC`, which stays put for everything after.
-The moods alone hold the transition rules, which distinguishes this design from the chapter's table-driven one, where the rules live in a dictionary a reader can audit in one place.
+**Let each mood pick its successor.**
+`happy()` answers `ANNOY` with `GRUMPY`, `grumpy()` answers `CALM` with `HAPPY`,
+and both answer `TAKE_PILL` with `PROZAC`, which stays put for everything after.
+The moods alone hold the transition rules,
+which distinguishes this design from the chapter's table-driven one,
+where the rules live in a dictionary a reader can audit in one place.
 
-**What a mood gains as a member.** The moods are a closed set the program and the type checker both know.
-`list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`, and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 constructs.
-Exercise 1's `UnpredictablePerson` accepts any object with a `hello()`, so the set of moods there is open and nothing lists it.
+**What a mood gains as a member.**
+The moods are a closed set the program and the type checker both know.
+`list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`,
+and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 constructs.
+Exercise 1's `UnpredictablePerson` accepts any object with a `hello()`,
+so the set of moods there is open and nothing lists it.
 
-**What a mood loses.** A member is one object shared by every machine in the program, so a count of `ANNOY` inputs stored on the member adds up every machine's inputs together.
+**What a mood loses.**
+A member is one object shared by every machine in the program,
+so a count of `ANNOY` inputs stored on the member adds up every machine's inputs together.
 Exercise 1's classes can carry that state per instance.
-A mood whose behavior needs more than a message, a successor, and an action is a class in either design.
+A mood whose behavior needs more than a message, a successor,
+and an action is a class in either design.
 
-Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood` object through `change_to()`, this machine reaches the same moods by returning the next member from a transition function.
+Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood` object through `change_to()`,
+this machine reaches the same moods by returning the next member from a transition function.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -354,9 +377,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states) stores each state's transition function in its row.
-Here a factory builds that function around the state's own table, a `dict` from word to the name of the next state, with a wildcard entry for words the state ignores.
-The enum turns the name into the member, so no controller holds a `dict` of name to state object.
+[Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states)
+stores each state's transition function in its row.
+Here a factory builds that function around the state's own table,
+a `dict` from word to the name of the next state,
+with a wildcard entry for words the state ignores.
+The enum turns the name into the member,
+so no controller holds a `dict` of name to state object.
 
 <details>
 <summary>The shape</summary>
@@ -387,16 +414,19 @@ class Turnstile(WordRow, Enum):
 <details>
 <summary>Done when</summary>
 
-your file runs a list of words through the machine and prints the state after each one, and each member's row holds that state's whole `dict`.
-A word missing from the current state's `dict` gets the behavior you chose, not a `KeyError`.
+your file runs a list of words through the machine and prints the state after each one,
+and each member's row holds that state's whole `dict`.
+A word missing from the current state's `dict` gets the behavior you chose,
+not a `KeyError`.
 
 <details>
 <summary>Solution</summary>
 
-If `next_state()` indexes the table with `transitions[word]`,
-the first word, `push` while locked, raises `KeyError: 'push'`.
+If `next_state()` indexes the table with `transitions[word]`, the first word,
+`push` while locked, raises `KeyError: 'push'`.
 A turnstile stays in its state on a word missing from that state's table,
-so each table carries a `"*"` entry that names its own state, and the lookup falls back on it through `.get()`.
+so each table carries a `"*"` entry that names its own state,
+and the lookup falls back on it through `.get()`.
 
 ```python
 # exercise_3.py
@@ -433,26 +463,28 @@ print(" ".join(str(s) for s in history))
 #: locked locked unlocked locked unlocked unlocked locked
 ```
 
-**Build the function around the table.** `table()` closes over one state's dictionary and returns the function the row stores,
+**Build the function around the table.**
+`table()` closes over one state's dictionary and returns the function the row stores,
 so each member's line holds that state's whole table.
 `next_state()` names `Turnstile` in its body, which runs after the enum exists.
 
-**Look up the next state by name.** The table's values are member names,
+**Look up the next state by name.**
+The table's values are member names,
 and `Turnstile[name]` turns a name into the member,
 so the enum replaces the `dict` of name to state object a controller would otherwise keep.
 
-**Wrap the function in a tuple.** A function has a `__get__()`, which makes it a descriptor,
+**Wrap the function in a tuple.**
+A function has a `__get__()`, which makes it a descriptor,
 and `Enum` leaves a name whose value is a descriptor as a method rather than a member,
 so each value is a one-element tuple holding the function.
 `Enum` unpacks the tuple into the row's constructor,
 as it unpacks the tuples in `trap_states.py`.
 
-The machine is the classic turnstile: `push` while locked keeps it locked (the
-`"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
-again.
+The machine is the classic turnstile: `push` while locked keeps it locked
+(the `"*"` fallback), `coin` unlocks it,
+and `push` while unlocked locks it again.
 
-Reading the words
-from a file, one per line, takes one line of code:
+Reading the words from a file, one per line, takes one line of code:
 `words = Path("moves.txt").read_text().split()`.
 
 Before you move on, name what separates your attempt from this one:
@@ -470,7 +502,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine) moves every rule out of the states' transition functions and into data.
+[Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
+moves every rule out of the states' transition functions and into data.
 Key one `dict` on a `(state, word)` tuple and let its value be the next state.
 The controller then holds the table and does one lookup per word.
 
@@ -500,7 +533,8 @@ class TableController:
 <details>
 <summary>Done when</summary>
 
-one `dict` holds every transition, and editing one entry changes the printed run with no edit anywhere else.
+one `dict` holds every transition,
+and editing one entry changes the printed run with no edit anywhere else.
 Fed the same words, your file prints the same sequence of states as your exercise 3 solution.
 
 <details>
@@ -512,10 +546,9 @@ and the first word, `push` while locked, raises `KeyError: ('locked', 'push')`.
 A dictionary keyed on `(state, word)` has no wildcard,
 so the solution writes out the two rows that leave the state unchanged.
 
-The per-state design in exercise 3 spreads the turnstile's rules
-across two rows, one dictionary each. A single table keyed by
-`(state, word)` collects both dictionaries and makes the whole
-machine's behavior editable in one place:
+The per-state design in exercise 3 spreads the turnstile's rules across two rows,
+one dictionary each.
+A single table keyed by `(state, word)` collects both dictionaries and makes the whole machine's behavior editable in one place:
 
 ```python
 # exercise_4.py
@@ -547,12 +580,11 @@ print(" ".join(history))
 #: locked locked unlocked locked unlocked unlocked locked
 ```
 
-The per-state design (exercise 3) puts each state's rules with that
-state, and reads well when a
-state does more than look a word up. The single-table design puts
-every rule for the whole machine in one dictionary, and is easier to
-audit and edit as a unit. The chapter's
-[Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
+The per-state design (exercise 3) puts each state's rules with that state,
+and reads well when a state does more than look a word up.
+The single-table design puts every rule for the whole machine in one dictionary,
+and is easier to audit and edit as a unit.
+The chapter's [Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
 section makes the same trade-off over the per-state `trap_states.py`.
 
 Before you move on, name what separates your attempt from this one:
@@ -575,9 +607,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-In [Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states), each transition function's `match` lists the `Mouse` moves that make sense after its state.
-Write those legal successors as a `dict` from the previous action to a list of allowed next actions, with a starting key for "nothing yet."
-Loop `count` times, pick from the list with `random.choice()`, and `yield` the pick, which becomes the previous action.
+In [Mousetrap States](../../Chapters/31_Patterns--State_Machines.md#mousetrap-states),
+each transition function's `match` lists the `Mouse` moves that make sense after its state.
+Write those legal successors as a `dict` from the previous action to a list of allowed next actions,
+with a starting key for "nothing yet."
+Loop `count` times, pick from the list with `random.choice()`,
+and `yield` the pick, which becomes the previous action.
 
 <details>
 <summary>The shape</summary>
@@ -618,19 +653,22 @@ def mouse_move_generator(
 <details>
 <summary>Done when</summary>
 
-`list(mouse_move_generator(8))` holds eight `Mouse` members, starting with `Mouse.APPEARS`, and every adjacent pair is a move that makes sense after the one before it in `trap_states.py`.
-Across repeated runs you never see `RUNS_AWAY` before an `APPEARS`, or two `ESCAPES` in a row.
+`list(mouse_move_generator(8))` holds eight `Mouse` members,
+starting with `Mouse.APPEARS`,
+and every adjacent pair is a move that makes sense after the one before it in `trap_states.py`.
+Across repeated runs you never see `RUNS_AWAY` before an `APPEARS`,
+or two `ESCAPES` in a row.
 
 <details>
 <summary>Solution</summary>
 
-If you pick from every `Mouse` member and ignore `previous`, the seeded
-run prints `RUNS_AWAY TRAPPED APPEARS ENTERS` and
-`APPEARS ESCAPES ESCAPES ESCAPES`. The mouse runs away before it
-appears and escapes three times in a row, and the type checker passes
-the variant, since each move is a valid `Mouse` member. The solution
-looks up the legal successors of `previous` in `NEXT_ACTIONS`, so each
-pick depends on the move before it.
+If you pick from every `Mouse` member and ignore `previous`,
+the seeded run prints `RUNS_AWAY TRAPPED APPEARS ENTERS` and `APPEARS ESCAPES ESCAPES ESCAPES`.
+The mouse runs away before it appears and escapes three times in a row,
+and the type checker passes the variant,
+since each move is a valid `Mouse` member.
+The solution looks up the legal successors of `previous` in `NEXT_ACTIONS`,
+so each pick depends on the move before it.
 
 ```python
 # exercise_5.py
@@ -675,20 +713,22 @@ print(" ".join(m.name for m in moves[4:]))
 #: APPEARS ENTERS TRAPPED REMOVED
 ```
 
-**Encode the legal successors.** `NEXT_ACTIONS` is a small state machine of its own: a dictionary from
-"the action just produced" to "the legal actions that can follow it,"
-including the special `None` key for "no action yet," whose
-one successor is `APPEARS`.
+**Encode the legal successors.**
+`NEXT_ACTIONS` is a small state machine of its own:
+a dictionary from "the action just produced" to "the legal actions that can follow it,"
+including the special `None` key for "no action yet,"
+whose one successor is `APPEARS`.
 
-**Remember the last move.** The generator's own state is just `previous`,
-the last action it yielded. Each time `list()` calls `next()` on the
-generator, the generator picks a legal successor and remembers it
-for the following call. `NEXT_ACTIONS` constrains every choice, so every
-sequence this generator produces is legal by construction.
+**Remember the last move.**
+The generator's own state is just `previous`, the last action it yielded.
+Each time `list()` calls `next()` on the generator,
+the generator picks a legal successor and remembers it for the following call.
+`NEXT_ACTIONS` constrains every choice,
+so every sequence this generator produces is legal by construction.
 
-`trap_states.py` accepts any move in any state, and each `case _`
-returns the current state on the moves that make no sense there, so
-the generator's table is the stricter of the two.
+`trap_states.py` accepts any move in any state,
+and each `case _` returns the current state on the moves that make no sense there,
+so the generator's table is the stricter of the two.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -712,9 +752,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rules under a `(state, input type)` key in order and takes the first whose condition passes.
-Put a guarded rule for the heavy load ahead of an unconditional rule, and let the condition read the load from the machine.
-For the stray `Start`, note that `trap_states.py`'s `case _` keeps the machine in its state while `table_machine.py`'s `handle()` raises a `NoTransition`, then weigh a control panel's stray presses against a cycle that stops.
+[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine)
+tries the rules under a `(state, input type)` key in order and takes the first whose condition passes.
+Put a guarded rule for the heavy load ahead of an unconditional rule,
+and let the condition read the load from the machine.
+For the stray `Start`,
+note that `trap_states.py`'s `case _` keeps the machine in its state while `table_machine.py`'s `handle()` raises a `NoTransition`,
+then weigh a control panel's stray presses against a cycle that stops.
 
 <details>
 <summary>The shape</summary>
@@ -766,17 +810,19 @@ class WashingMachine(StateMachine):
 <details>
 <summary>Done when</summary>
 
-a heavy and a light load take different spins through two rules under one `(state, input)` key, and swapping those two rules gives both loads the same spin.
-A mid-cycle `Start` raises `NoTransition` and leaves the state and the load as they were, and you can defend ignoring or stopping.
+a heavy and a light load take different spins through two rules under one `(state, input)` key,
+and swapping those two rules gives both loads the same spin.
+A mid-cycle `Start` raises `NoTransition` and leaves the state and the load as they were,
+and you can defend ignoring or stopping.
 
 <details>
 <summary>Solution</summary>
 
-If you put the unconditional fast-spin rule first,
-it matches every `RinseDone`, and the eight-kilogram load logs `'fast spin'` like the light one.
+If you put the unconditional fast-spin rule first, it matches every `RinseDone`,
+and the eight-kilogram load logs `'fast spin'` like the light one.
 A rule with no condition matches every time,
-as [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) points out,
-so the solution lists the guarded rule first and leaves the unconditional rule to catch the rest.
+as [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine)
+points out, so the solution lists the guarded rule first and leaves the unconditional rule to catch the rest.
 
 ```python
 # exercise_6.py
@@ -864,33 +910,33 @@ print(busy.state.name, busy.load_kg)
 #: FILLING 3
 ```
 
-**Split one input on a condition.** The `(RINSING, RinseDone)` key
-holds the two rules the exercise requires, and
-`too_heavy()` tells them apart. A load over six kilograms takes the slow spin, and
-anything lighter falls through to the unconditional fast-spin rule
-below it. The rest of the cycle is a straight line, one input type
-per state, and the machine is still the chapter's
-`table_machine.py` engine unchanged.
+**Split one input on a condition.**
+The `(RINSING, RinseDone)` key holds the two rules the exercise requires,
+and `too_heavy()` tells them apart.
+A load over six kilograms takes the slow spin,
+and anything lighter falls through to the unconditional fast-spin rule below it.
+The rest of the cycle is a straight line, one input type per state,
+and the machine is still the chapter's `table_machine.py` engine unchanged.
 
-**Record what later conditions need.** A `RinseDone` input carries no data of its
-own, so the condition reads `load_kg` off the machine, where
-`begin()` recorded it when the cycle started.
+**Record what later conditions need.**
+A `RinseDone` input carries no data of its own,
+so the condition reads `load_kg` off the machine,
+where `begin()` recorded it when the cycle started.
 
-**Reject an input with no rule.** A second `Start` during `FILLING` finds no rule, so `handle()` raises
-`NoTransition`.
+**Reject an input with no rule.**
+A second `Start` during `FILLING` finds no rule,
+so `handle()` raises `NoTransition`.
 The press leaves the machine as it was.
-The state is still
-`FILLING` and `load_kg` is still 3, because the engine runs an
-action only after it finds a matching rule.
+The state is still `FILLING` and `load_kg` is still 3,
+because the engine runs an action only after it finds a matching rule.
 
-For a washing machine the caller should
-ignore the press, catching `NoTransition` and continuing.
-A control panel is a source of
-stray presses, and a cycle that stops because
-someone leans on a button is the worse failure. Raising the
-exception is still the right default for the engine. A caller can
-turn an exception into a no-op, and cannot turn a silent no-op into
-a report.
+For a washing machine the caller should ignore the press,
+catching `NoTransition` and continuing.
+A control panel is a source of stray presses,
+and a cycle that stops because someone leans on a button is the worse failure.
+Raising the exception is still the right default for the engine.
+A caller can turn an exception into a no-op,
+and cannot turn a silent no-op into a report.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -909,8 +955,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) lets several rules share one `(state, input type)` key and tries them in order.
-Under the doors-closing state and a sensor input, put the obstruction condition on the first rule and leave the second rule unconditional.
+[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine)
+lets several rules share one `(state, input type)` key and tries them in order.
+Under the doors-closing state and a sensor input,
+put the obstruction condition on the first rule and leave the second rule unconditional.
 The condition is a method that reads the input, so the table stays data.
 
 <details>
@@ -965,7 +1013,9 @@ class Elevator(StateMachine):
 <details>
 <summary>Done when</summary>
 
-closing the doors with the sensor blocked reopens them, and closing them again unblocked leaves the car idle, through two rules under one `(state, input)` key.
+closing the doors with the sensor blocked reopens them,
+and closing them again unblocked leaves the car idle,
+through two rules under one `(state, input)` key.
 A call for the floor the car is on opens the doors instead of raising `NoTransition`.
 
 <details>
@@ -973,7 +1023,8 @@ A call for the floor the car is on opens the doors instead of raising `NoTransit
 
 If you leave out the unconditional rule to `ElevatorState.DOORS_OPEN` under `(IDLE, CallButton)`,
 a call for the floor the car is on fails both `above()` and `below()`,
-and `handle()` raises `NoTransition`: `no rule from ElevatorState.IDLE on CallButton`.
+and `handle()` raises `NoTransition`:
+`no rule from ElevatorState.IDLE on CallButton`.
 The demo makes no such call, so its output does not change.
 The solution keeps that rule last, as the group's `else`.
 
@@ -1062,18 +1113,19 @@ print(elevator.state)
 #: ElevatorState.IDLE
 ```
 
-**Choose a direction from the call.** The `(IDLE, CallButton)` key holds three candidate rules, in the vending machine's
-`(State.SELECTING, Column)` shape: candidate transitions share
-one key, `handle()` tries them in order, and the first whose condition
-passes wins. `above()` and `below()` pick `MOVING_UP` or
-`MOVING_DOWN`, and a call for the current floor falls through both
-conditions to open the doors with no travel.
+**Choose a direction from the call.**
+The `(IDLE, CallButton)` key holds three candidate rules,
+in the vending machine's `(State.SELECTING, Column)` shape:
+candidate transitions share one key, `handle()` tries them in order,
+and the first whose condition passes wins.
+`above()` and `below()` pick `MOVING_UP` or `MOVING_DOWN`,
+and a call for the current floor falls through both conditions to open the doors with no travel.
 
-**Reopen the doors on an obstruction.** The "doors closing" state
-carries the two rules the exercise requires.
-Under `(DOORS_CLOSING, DoorSensor)`, the first rule reopens the doors
-when `obstructed()` passes, and the unconditional rule below it
-finishes the close in `IDLE`.
+**Reopen the doors on an obstruction.**
+The "doors closing" state carries the two rules the exercise requires.
+Under `(DOORS_CLOSING, DoorSensor)`,
+the first rule reopens the doors when `obstructed()` passes,
+and the unconditional rule below it finishes the close in `IDLE`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1092,9 +1144,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) shows one input type leading to different next states through conditions on a shared key.
+[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
+shows one input type leading to different next states through conditions on a shared key.
 Give `TemperatureReading` a `degrees` field and write two condition methods that compare it with a target and a band.
-Order the rules so the conditional ones come first and an unconditional rule, as the last resort, returns to idle.
+Order the rules so the conditional ones come first and an unconditional rule,
+as the last resort, returns to idle.
 
 <details>
 <summary>The shape</summary>
@@ -1129,19 +1183,20 @@ class HVAC(StateMachine):
 <details>
 <summary>Done when</summary>
 
-from idle, readings below, inside, and above the target band lead to heating, idle, and cooling, all under one `(state, TemperatureReading)` key.
+from idle, readings below, inside, and above the target band lead to heating,
+idle, and cooling, all under one `(state, TemperatureReading)` key.
 Moving that group's unconditional rule to the top sends every reading to that rule's state.
 
 <details>
 <summary>Solution</summary>
 
-If you put the unconditional rule to `HVACState.IDLE` first
-under `(IDLE, TemperatureReading)`, every reading prints `IDLE`, from
-`15 IDLE` to `20 IDLE`. `handle()` takes the first rule whose
-condition passes, and a rule with no condition always passes, so the
-machine stops there and does not reach the `too_cold()` and `too_hot()`
-rules below it. The solution lists the conditional rules first and keeps
-the unconditional rule last, as the fallback.
+If you put the unconditional rule to `HVACState.IDLE` first under `(IDLE, TemperatureReading)`,
+every reading prints `IDLE`, from `15 IDLE` to `20 IDLE`.
+`handle()` takes the first rule whose condition passes,
+and a rule with no condition always passes,
+so the machine stops there and does not reach the `too_cold()` and `too_hot()` rules below it.
+The solution lists the conditional rules first and keeps the unconditional rule last,
+as the fallback.
 
 ```python
 # exercise_8.py
@@ -1202,20 +1257,21 @@ for degrees in [15, 17, 21, 30, 20]:
 #: 20 IDLE
 ```
 
-**Decide among three outcomes.** The machine has one input type. The `(IDLE, TemperatureReading)` key
-holds three rules, so a single reading leads to heating, cooling, or
-staying idle, and the two conditions decide which, as the exercise
-requires.
+**Decide among three outcomes.**
+The machine has one input type.
+The `(IDLE, TemperatureReading)` key holds three rules,
+so a single reading leads to heating, cooling, or staying idle,
+and the two conditions decide which, as the exercise requires.
 
-**Run until back inside the band.** The running states carry their own
-two-rule groups. A reading still outside the band keeps the system
-running, and one inside the band falls through to the unconditional
-rule back to `IDLE`.
+**Run until back inside the band.**
+The running states carry their own two-rule groups.
+A reading still outside the band keeps the system running,
+and one inside the band falls through to the unconditional rule back to `IDLE`.
 
 Every decision in the machine is a condition on the one input type.
-Both fields are optional, so every rule here leaves its action at
-the `None` default, and the fall-through rules leave their condition
-at `None` too.
+Both fields are optional,
+so every rule here leaves its action at the `None` default,
+and the fall-through rules leave their condition at `None` too.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1237,8 +1293,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) explains that the engine looks up `type(input_)` as the key, so a subclass of an input type has no rule of its own.
-Read the `NoTransition` message to see which class it reports, then fix it once by adding keys and once by choosing what the input is.
+[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
+explains that the engine looks up `type(input_)` as the key,
+so a subclass of an input type has no rule of its own.
+Read the `NoTransition` message to see which class it reports,
+then fix it once by adding keys and once by choosing what the input is.
 Compare how many rules each fix needs as denominations and states multiply.
 
 <details>
@@ -1278,8 +1337,10 @@ NICKEL = Money("nickel", 5)
 <details>
 <summary>Done when</summary>
 
-your unmodified machine raises `NoTransition` on a `Nickel`, with `Nickel` named in the message, and each fix then adds 5 to the amount.
-You can explain why a `Nickel` key misses a `Money` rule, and how many rules each fix needs as coins and states multiply.
+your unmodified machine raises `NoTransition` on a `Nickel`,
+with `Nickel` named in the message, and each fix then adds 5 to the amount.
+You can explain why a `Nickel` key misses a `Money` rule,
+and how many rules each fix needs as coins and states multiply.
 
 <details>
 <summary>Solution</summary>
@@ -1343,39 +1404,40 @@ print(m2.amount)
 #: 5
 ```
 
-**Reproduce the failure.** The exception is `NoTransition`, not a `TypeError` or a silent no-op,
+**Reproduce the failure.**
+The exception is `NoTransition`, not a `TypeError` or a silent no-op,
 and its message names the input class that found no rule: `Nickel`.
-`handle()` looks up `(self.state, type(input_))`, and
-`type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares
-keys by equality, so the `Nickel` key misses the `Money` rule although
-`Nickel` subclasses `Money`. Nothing walks the
-[MRO](../../Chapters/07_Foundations--Classes.md#method-resolution-order).
-That lookup is the exact-type dispatch the chapter describes, and a
-subclass of an input type is how most readers first meet it.
+`handle()` looks up `(self.state, type(input_))`,
+and `type(Nickel("nickel", 5))` is `Nickel`.
+A dictionary probe compares keys by equality,
+so the `Nickel` key misses the `Money` rule although `Nickel` subclasses `Money`.
+Nothing walks the [MRO](../../Chapters/07_Foundations--Classes.md#method-resolution-order).
+That lookup is the exact-type dispatch the chapter describes,
+and a subclass of an input type is how most readers first meet it.
 
-**Give the subclass its own rules.** Fix 1 adds `(state, Nickel)`
-rules. Those rules work, and they scale badly. Every new denomination
-needs a rule for every state that accepts
-money, so a machine with five states and six coins carries thirty rules
-that all do the same thing.
+**Give the subclass its own rules.**
+Fix 1 adds `(state, Nickel)` rules.
+Those rules work, and they scale badly.
+Every new denomination needs a rule for every state that accepts money,
+so a machine with five states and six coins carries thirty rules that all do the same thing.
 
-Fix 1 is the right fix when the new input behaves
-differently, as `Row` and `Column` do in
-`vending_machine.py`. They exist as separate classes so they arrive
-under different keys.
+Fix 1 is the right fix when the new input behaves differently,
+as `Row` and `Column` do in `vending_machine.py`.
+They exist as separate classes so they arrive under different keys.
 
-**Make the nickel a value.** Fix 2 stops making a class for something
-that is a value. A nickel is not a new kind of money. It is a
-`Money` whose `value` is 5.
-`Money("nickel", 5)` arrives under a key the table has, so the table
-and the classes stay as they are.
+**Make the nickel a value.**
+Fix 2 stops making a class for something that is a value.
+A nickel is not a new kind of money.
+It is a `Money` whose `value` is 5.
+`Money("nickel", 5)` arrives under a key the table has,
+so the table and the classes stay as they are.
 
-Keep fix 2. A subclass is worth creating when the machine must treat
-the input differently. A nickel differs from a quarter only in a
-number the existing action reads. The two fixes illustrate a
-general rule: under exact-type dispatch, a class is a dispatch key,
-so create one when you want a separate rule and not when you want a
-separate value.
+Keep fix 2.
+A subclass is worth creating when the machine must treat the input differently.
+A nickel differs from a quarter only in a number the existing action reads.
+The two fixes illustrate a general rule: under exact-type dispatch,
+a class is a dispatch key,
+so create one when you want a separate rule and not when you want a separate value.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

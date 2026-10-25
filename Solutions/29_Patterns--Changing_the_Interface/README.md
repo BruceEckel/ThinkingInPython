@@ -12,8 +12,10 @@
 <details>
 <summary>Where to look</summary>
 
-[*Adapter* in Python](../../Chapters/29_Patterns--Changing_the_Interface.md#adapter-in-python) shows `__getattr__()` forwarding every attribute the adapter does not define.
-Add `__getitem__()` to the class for the lookup, then try `len()` on the adapter.
+[*Adapter* in Python](../../Chapters/29_Patterns--Changing_the_Interface.md#adapter-in-python)
+shows `__getattr__()` forwarding every attribute the adapter does not define.
+Add `__getitem__()` to the class for the lookup,
+then try `len()` on the adapter.
 Python finds special methods on the class, not through `__getattr__()`.
 That rule explains what `len()` does.
 
@@ -40,8 +42,11 @@ class PairsAdapter:
 <details>
 <summary>Done when</summary>
 
-`adapter["name"]` returns the value, `adapter.append(...)` makes the original list one entry longer, and `adapter["missing"]` raises a `KeyError`.
-`len(adapter)` raises `TypeError: object of type 'PairsAdapter' has no len()`, and you can say why `__getattr__()` never sees that call.
+`adapter["name"]` returns the value,
+`adapter.append(...)` makes the original list one entry longer,
+and `adapter["missing"]` raises a `KeyError`.
+`len(adapter)` raises `TypeError: object of type 'PairsAdapter' has no len()`,
+and you can say why `__getattr__()` never sees that call.
 
 <details>
 <summary>Solution</summary>
@@ -83,31 +88,29 @@ with expected(TypeError):
 #: [TypeError] object of type 'PairsAdapter' has no len()
 ```
 
-**Forward the rest to the list.** The adapter adds the one method the caller needs, `__getitem__()`,
-and forwards everything else to the wrapped list through
-`__getattr__()`, the same shape as `getattr_adapter.py`.
-The adapter defines no `append()`, so the lookup falls through to
-the list.
+**Forward the rest to the list.**
+The adapter adds the one method the caller needs, `__getitem__()`,
+and forwards everything else to the wrapped list through `__getattr__()`,
+the same shape as `getattr_adapter.py`.
+The adapter defines no `append()`, so the lookup falls through to the list.
 
-**Grow the shared list.** Both the adapter and the original `pairs`
-name see the new entry.
+**Grow the shared list.**
+Both the adapter and the original `pairs` name see the new entry.
 The record is frozen, but the list it holds stays mutable.
 `append()` changes the list.
 The adapter's `pairs` field refers to the same list as before.
 
-**Show what `__getattr__()` cannot forward.** `len(adapter)` raises a `TypeError` although the list has a `__len__()`.
+**Show what `__getattr__()` cannot forward.**
+`len(adapter)` raises a `TypeError` although the list has a `__len__()`.
 Python looks up a special method on the class, not on the instance,
-so the lookup skips `__getattr__()` and finds no `__len__()` on
-`PairsAdapter`.
+so the lookup skips `__getattr__()` and finds no `__len__()` on `PairsAdapter`.
 [Special Methods Bypass `__getattr__()`](../../Chapters/25_Patterns--Surrogate.md#special-methods-bypass-getattr)
 in *Surrogate* covers that lookup rule.
 `adapter[key]` works because the class defines `__getitem__()`.
-An adapter that must support `len()` defines a `__len__()` that
-returns `len(self.pairs)`.
+An adapter that must support `len()` defines a `__len__()` that returns `len(self.pairs)`.
 
 The key lookup in `__getitem__()` is a linear scan.
-For a long list and frequent lookups, convert the list once with
-`dict(pairs)`.
+For a long list and frequent lookups, convert the list once with `dict(pairs)`.
 Keep the adapter when some other caller needs the list to stay a list.
 
 Before you move on, name what separates your attempt from this one:
@@ -127,9 +130,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Deprecating the Old Interface](../../Chapters/29_Patterns--Changing_the_Interface.md#deprecating-the-old-interface) marks a method with `warnings.deprecated()`.
+[Deprecating the Old Interface](../../Chapters/29_Patterns--Changing_the_Interface.md#deprecating-the-old-interface)
+marks a method with `warnings.deprecated()`.
 The same decorator accepts a class.
-Record warnings with `warnings.catch_warnings(record=True)`, and compare what constructing the class and calling its method add to the recorded warnings.
+Record warnings with `warnings.catch_warnings(record=True)`,
+and compare what constructing the class and calling its method add to the recorded warnings.
 
 <details>
 <summary>The shape</summary>
@@ -147,7 +152,9 @@ class Report:
 <details>
 <summary>Done when</summary>
 
-inside `warnings.catch_warnings(record=True)`, constructing a `Report` adds one `DeprecationWarning` carrying your message, and calling `render()` on that instance prints `report` and leaves the recorded count unchanged.
+inside `warnings.catch_warnings(record=True)`,
+constructing a `Report` adds one `DeprecationWarning` carrying your message,
+and calling `render()` on that instance prints `report` and leaves the recorded count unchanged.
 `uv run ty check` reports `deprecated` on the construction until you mark it `# type: ignore`.
 
 <details>
@@ -175,24 +182,25 @@ for entry in caught:
 #: DeprecationWarning Report is replaced by TextReport
 ```
 
-**Move the warning to the type.** Decorating the class moves the warning to the two operations that
-use the class as a type: constructing an instance and subclassing.
-`render()` runs inside the recording block,
-yet `caught` holds two entries: one for the construction and one for the subclass.
+**Move the warning to the type.**
+Decorating the class moves the warning to the two operations that use the class as a type:
+constructing an instance and subclassing.
+`render()` runs inside the recording block, yet `caught` holds two entries:
+one for the construction and one for the subclass.
 Code that holds a `Report` therefore calls its methods silently.
 
-`TextReport` replaces the type, not the method, so warning on the
-type alone matches the replacement.
-A caller who wants to act on the warning must change where
-they get the `Report`, not where they call `render()`.
+`TextReport` replaces the type, not the method,
+so warning on the type alone matches the replacement.
+A caller who wants to act on the warning must change where they get the `Report`,
+not where they call `render()`.
 
-**Use the deprecated class on purpose.** The type checker reports both the construction and the subclass, so
-both lines carry `# type: ignore`.
+**Use the deprecated class on purpose.**
+The type checker reports both the construction and the subclass,
+so both lines carry `# type: ignore`.
 
 Python issues the subclass warning when the `class` statement runs,
-so for a module-level subclass the warning appears at import, before
-any call. A library that subclasses a deprecated class emits the
-warning as soon as Python imports that library.
+so for a module-level subclass the warning appears at import, before any call.
+A library that subclasses a deprecated class emits the warning as soon as Python imports that library.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -212,9 +220,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[*Façade*](../../Chapters/29_Patterns--Changing_the_Interface.md#façade) builds the *Façade* as a class of static methods.
-A module is already a namespace, so the classes can stay in it behind leading-underscore names.
-Expose a function that assembles them, import only that function elsewhere, and list the module's public names with `vars()`.
+[*Façade*](../../Chapters/29_Patterns--Changing_the_Interface.md#façade)
+builds the *Façade* as a class of static methods.
+A module is already a namespace,
+so the classes can stay in it behind leading-underscore names.
+Expose a function that assembles them, import only that function elsewhere,
+and list the module's public names with `vars()`.
 
 <details>
 <summary>The shape</summary>
@@ -249,8 +260,10 @@ def start_car() -> _Ignition:
 <details>
 <summary>Done when</summary>
 
-running your second file prints the three calls in `facade.py`'s order, ignition, pump, engine, under underscore names, and then the assembled object.
-Listing the module's names without a leading underscore through `vars()` shows your builder function, and you can explain each other name that appears.
+running your second file prints the three calls in `facade.py`'s order,
+ignition, pump, engine, under underscore names, and then the assembled object.
+Listing the module's names without a leading underscore through `vars()` shows your builder function,
+and you can explain each other name that appears.
 
 <details>
 <summary>Solution</summary>
@@ -301,34 +314,34 @@ print([name for name in vars(shop)
 #: ['record', 'start_car']
 ```
 
-**Hide the classes behind a function.** The caller uses one function.
+**Hide the classes behind a function.**
+The caller uses one function.
 Inside the module, `start_car()` holds the assembly order:
 `_Ignition(_FuelPump(_Engine()))`.
-`shop._Engine` and `shop._FuelPump` still reach the classes, because
-Python enforces no privacy. The underscore marks them as private, so
-`from shop import *` skips them.
+`shop._Engine` and `shop._FuelPump` still reach the classes,
+because Python enforces no privacy.
+The underscore marks them as private, so `from shop import *` skips them.
 
-**List what a caller can see.** The listing prints the module's
-public names, the ones `from shop import *` binds. `record` appears because an
-import binds a name in the module too. A real module therefore
-either sets
-[`__all__`](../../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports)
+**List what a caller can see.**
+The listing prints the module's public names,
+the ones `from shop import *` binds.
+`record` appears because an import binds a name in the module too.
+A real module therefore either sets [`__all__`](../../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports)
 or imports the decorator under a private name,
 `from record import record as _record`, and writes `@_record`.
 
 `Facade` is a class used as a namespace,
 and the module around it is a namespace too.
-`Facade.start_car()` and `shop.start_car()` read identically at the
-call site, but the class version adds a `class` statement and a
-`@staticmethod` on each function.
-None of these functions uses `self`. `@staticmethod` makes Python
-call each one with the caller's arguments alone, even through an
-instance.
+`Facade.start_car()` and `shop.start_car()` read identically at the call site,
+but the class version adds a `class` statement and a `@staticmethod` on each function.
+None of these functions uses `self`.
+`@staticmethod` makes Python call each one with the caller's arguments alone,
+even through an instance.
 A module is a namespace as soon as Python creates it.
 It supports the underscore convention and `__all__`.
 
-A caller of `facade.py` sees `Engine`, `FuelPump`, `Ignition`, and
-`Facade` as public names.
+A caller of `facade.py` sees `Engine`, `FuelPump`, `Ignition`,
+and `Facade` as public names.
 A caller of `shop` sees `start_car`.
 Both also see `record`.
 Neither version enforces privacy.
@@ -353,28 +366,34 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Distinguishing the Wrappers](../../Chapters/29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers) gives the table that separates *Proxy*, *Decorator*, *Adapter*, and *Façade*.
+[Distinguishing the Wrappers](../../Chapters/29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers)
+gives the table that separates *Proxy*, *Decorator*, *Adapter*, and *Façade*.
 For each wrapper, imagine deleting it and ask what breaks.
-Check whether the wrapper changes the interface, adds behavior to each call, or controls whether the call proceeds.
+Check whether the wrapper changes the interface, adds behavior to each call,
+or controls whether the call proceeds.
 
 <details>
 <summary>Done when</summary>
 
 you have one pattern per wrapper, no two the same, and none is *Façade*.
-For each, you can finish "deleting it loses..." with one thing: the log, the translation from `read()` to `next_chunk()`, or the decision whether a call proceeds.
+For each, you can finish "deleting it loses..." with one thing: the log,
+the translation from `read()` to `next_chunk()`,
+or the decision whether a call proceeds.
 
 <details>
 <summary>Solution</summary>
 
-**The logging wrapper is a *Decorator*.** Its interface is the wrapped
-object's interface, unchanged, and it adds behavior around each call it forwards. If you
-remove it, every call still reaches the same method with the same
-arguments and returns the same result. What you lose is the log. That
-is the *Decorator* row: same interface, added behavior, and the
-behavior disappears.
+**The logging wrapper is a *Decorator*.**
+Its interface is the wrapped object's interface, unchanged,
+and it adds behavior around each call it forwards.
+If you remove it, every call still reaches the same method with the same arguments and returns the same result.
+What you lose is the log.
+That is the *Decorator* row: same interface, added behavior,
+and the behavior disappears.
 
-**The `read()` wrapper is an *Adapter*.** Its interface differs from
-the wrapped object's interface. The caller asks for `read()`.
+**The `read()` wrapper is an *Adapter*.**
+Its interface differs from the wrapped object's interface.
+The caller asks for `read()`.
 The wrapped object offers `next_chunk()`.
 The wrapper exists to translate the caller's `read()` into a `next_chunk()` call.
 If you remove it, you lose that translation.
@@ -386,20 +405,22 @@ which separates the *Adapter* from the *Decorator*.
 Both wrappers forward.
 Only the *Adapter* changes the name the caller uses.
 
-**The flag-checking wrapper is a *Proxy*.** Its interface is the
-wrapped object's interface, and it adds no behavior to a call that goes through.
-What it adds is a decision about whether the call proceeds. If you
-remove it, every call reaches the implementation, including the ones
-the proxy refuses.
-What you lose is control over when and whether a call proceeds. This wrapper is the
-[protection proxy](../../Chapters/25_Patterns--Surrogate.md#protection-proxy).
+**The flag-checking wrapper is a *Proxy*.**
+Its interface is the wrapped object's interface,
+and it adds no behavior to a call that goes through.
+What it adds is a decision about whether the call proceeds.
+If you remove it, every call reaches the implementation,
+including the ones the proxy refuses.
+What you lose is control over when and whether a call proceeds.
+This wrapper is the [protection proxy](../../Chapters/25_Patterns--Surrogate.md#protection-proxy).
 
-None of the three is a *Façade*, because a *Façade* narrows many
-objects to a few names, while each of these wraps one object.
+None of the three is a *Façade*,
+because a *Façade* narrows many objects to a few names,
+while each of these wraps one object.
 
-Purpose, not code, decides the classification. All three could be the
-same `__getattr__()` forwarder. What separates them is the answer to
-"what breaks if I delete this."
+Purpose, not code, decides the classification.
+All three could be the same `__getattr__()` forwarder.
+What separates them is the answer to "what breaks if I delete this."
 A name chosen from that answer tells the next reader why the wrapper is there.
 
 Before you move on, name what separates your attempt from this one:
@@ -420,9 +441,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[What an Override May Change](../../Chapters/29_Patterns--Changing_the_Interface.md#what-an-override-may-change) explains which parts of a signature a subclass may alter.
-The `/` keeps a parameter's name out of the interface, so removing it lets callers pass the argument by name.
-Call through a `WhatIUse` variable, so the checker verifies the call against the base class's signature.
+[What an Override May Change](../../Chapters/29_Patterns--Changing_the_Interface.md#what-an-override-may-change)
+explains which parts of a signature a subclass may alter.
+The `/` keeps a parameter's name out of the interface,
+so removing it lets callers pass the argument by name.
+Call through a `WhatIUse` variable,
+so the checker verifies the call against the base class's signature.
 Then give the override the base parameter's name.
 
 <details>
@@ -477,8 +501,11 @@ def run(user: WhatIUse) -> None:
 <details>
 <summary>Done when</summary>
 
-before your fix, `uv run ty check` reports `invalid-method-override` on `WhatIUse2.op()` (the parameter `item` does not match `what_i_want`), and the keyword call raises a `TypeError` for `what_i_want`.
-After it, `ty` passes, and `WhatIUse2().op(what_i_want=WhatIHave())` prints `WhatIUse2.op() wraps it` then the adapter's three lines.
+before your fix, `uv run ty check` reports `invalid-method-override` on `WhatIUse2.op()`
+(the parameter `item` does not match `what_i_want`),
+and the keyword call raises a `TypeError` for `what_i_want`.
+After it, `ty` passes,
+and `WhatIUse2().op(what_i_want=WhatIHave())` prints `WhatIUse2.op() wraps it` then the adapter's three lines.
 
 <details>
 <summary>Solution</summary>
@@ -565,7 +592,8 @@ WhatIUse2().op(what_i_want=WhatIHave())
 #: WhatIHave.h()
 ```
 
-**Reproduce the broken override.** `Renamed` is `WhatIUse2` from `adapter_variations.py`, unchanged.
+**Reproduce the broken override.**
+`Renamed` is `WhatIUse2` from `adapter_variations.py`, unchanged.
 With the `/` removed, `what_i_want` becomes a name callers can pass by keyword,
 and `run()` passes it that way.
 `ty` rejects the override:
@@ -578,22 +606,24 @@ info: the parameter named `item` does not match
 info: This violates the Liskov Substitution Principle
 ```
 
-**Call through the base type.** The `# type: ignore` suppresses that report so the listing can show
-what the checker prevents. `run()` accepts any `WhatIUse`.
-A `Renamed` is a `WhatIUse`, so the type checker accepts the call inside `run()`.
-At runtime `Renamed.op()` has no parameter named
-`what_i_want`, so the call raises a `TypeError`. The override breaks
-`run()`, a caller written against `WhatIUse` alone.
+**Call through the base type.**
+The `# type: ignore` suppresses that report so the listing can show what the checker prevents.
+`run()` accepts any `WhatIUse`.
+A `Renamed` is a `WhatIUse`,
+so the type checker accepts the call inside `run()`.
+At runtime `Renamed.op()` has no parameter named `what_i_want`,
+so the call raises a `TypeError`.
+The override breaks `run()`, a caller written against `WhatIUse` alone.
 
-**Keep the base parameter's name.** `WhatIUse2.op()` names its
-parameter `what_i_want`, as the base class does, so it accepts the
-keyword every `WhatIUse` caller may pass.
+**Keep the base parameter's name.**
+`WhatIUse2.op()` names its parameter `what_i_want`, as the base class does,
+so it accepts the keyword every `WhatIUse` caller may pass.
 It still widens the type to the union, which an override may do.
-`WhatIUse2().op(what_i_want=WhatIHave())` passes a `WhatIHave` by
-that keyword and reaches the adapter.
+`WhatIUse2().op(what_i_want=WhatIHave())` passes a `WhatIHave` by that keyword and reaches the adapter.
 
-With the `/` in place, as in `adapter.py`, every caller must pass
-the parameter by position, so the override is free to call it `item`.
+With the `/` in place, as in `adapter.py`,
+every caller must pass the parameter by position,
+so the override is free to call it `item`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

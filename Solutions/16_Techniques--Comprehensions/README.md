@@ -12,15 +12,20 @@
 <details>
 <summary>Where to look</summary>
 
-[List Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#list-comprehensions) shows the trailing `if` clause that filters elements before the output expression runs.
+[List Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#list-comprehensions)
+shows the trailing `if` clause that filters elements before the output expression runs.
 Combine two tests in that clause with `and`.
-The `and` operator stops at the first false operand, so the second test runs only on the elements the first one accepted.
+The `and` operator stops at the first false operand,
+so the second test runs only on the elements the first one accepted.
 
 <details>
 <summary>Done when</summary>
 
-your comprehension prints a one-element list holding `16`, and `uv run ty check` passes on your file.
-If you swap the two tests in the filter, `ty` reports `unresolved-attribute` on `isdigit`, which confirms that the order of the tests matters.
+your comprehension prints a one-element list holding `16`,
+and `uv run ty check` passes on your file.
+If you swap the two tests in the filter,
+`ty` reports `unresolved-attribute` on `isdigit`,
+which confirms that the order of the tests matters.
 
 <details>
 <summary>Solution</summary>
@@ -30,7 +35,8 @@ the comprehension raises an `AttributeError` at the first element,
 since the integer `1` has no `isdigit()` method.
 The type checker flags the call before the program runs.
 `ty` reports `unresolved-attribute`, because `e` is `int | str` at that point.
-The solution tests `isinstance(e, str)` first, so `and` calls `isdigit()` only on strings.
+The solution tests `isinstance(e, str)` first,
+so `and` calls `isdigit()` only on strings.
 
 ```python
 # exercise_1.py
@@ -64,14 +70,19 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Nested Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#nested-comprehensions) builds the matrix with an inner comprehension inside an outer one.
-The diagonal comes from a conditional expression in the output position, which chooses between two values.
+[Nested Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#nested-comprehensions)
+builds the matrix with an inner comprehension inside an outer one.
+The diagonal comes from a conditional expression in the output position,
+which chooses between two values.
 Change what that expression yields, and leave the loops alone.
 
 <details>
 <summary>Done when</summary>
 
-your `identity_matrix.py` prints six rows with `2` on the diagonal, from `[2, 0, 0, 0, 0, 0]` to `[0, 0, 0, 0, 0, 2]`, and `matrix` comes straight from the comprehension, with no statement that changes it afterward.
+your `identity_matrix.py` prints six rows with `2` on the diagonal,
+from `[2, 0, 0, 0, 0, 0]` to `[0, 0, 0, 0, 0, 2]`,
+and `matrix` comes straight from the comprehension,
+with no statement that changes it afterward.
 
 <details>
 <summary>Solution</summary>
@@ -114,7 +125,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Dictionary Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#dictionary-comprehensions) shows a key expression and a value expression with an `if` filter at the end.
+[Dictionary Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#dictionary-comprehensions)
+shows a key expression and a value expression with an `if` filter at the end.
 The filter runs on the loop variable, before either expression runs.
 The comprehension builds a `dict`, which holds one value per key.
 A later name whose key matches an earlier one replaces that entry.
@@ -122,8 +134,10 @@ A later name whose key matches an earlier one replaces that entry.
 <details>
 <summary>Done when</summary>
 
-you wrote down the entries before running, and the edited `dict_comprehension.py` prints the keys and values you wrote.
-You can also say why `"Ni"` drops out, and what happens to the entry count when two names upper-case to the same key.
+you wrote down the entries before running,
+and the edited `dict_comprehension.py` prints the keys and values you wrote.
+You can also say why `"Ni"` drops out,
+and what happens to the entry count when two names upper-case to the same key.
 
 <details>
 <summary>Solution</summary>
@@ -141,15 +155,17 @@ print(lengths["GALAHAD"], "NI" in lengths)
 #: 7 False
 ```
 
-**Filter before building each entry.** `"Galahad"` has seven characters,
+**Filter before building each entry.**
+`"Galahad"` has seven characters,
 so it passes the `len(name) > 3` filter and adds one entry.
 The filter drops `"Ni"`, as before, and keeps the other five names.
-The filter runs before the output expression,
-so it tests the original name, not the upper-cased key.
+The filter runs before the output expression, so it tests the original name,
+not the upper-cased key.
 That ordering matters when the output expression changes the length,
 as `name * 2` does.
 
-**Keep one value per key.** Two names that upper-case to the same string collide.
+**Keep one value per key.**
+Two names that upper-case to the same string collide.
 The comprehension builds a `dict`,
 so the later value replaces the earlier one under the shared key.
 Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry, not two.
@@ -171,15 +187,19 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Set Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#set-comprehensions) normalizes each name and lets the set discard repeats.
-Work out the normalized form of every name, including the one-character name, and count the distinct results.
+[Set Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#set-comprehensions)
+normalizes each name and lets the set discard repeats.
+Work out the normalized form of every name, including the one-character name,
+and count the distinct results.
 Two entries collide only if their normalized strings are equal.
 
 <details>
 <summary>Done when</summary>
 
-you predicted the count before running, and the edited `set_comprehension.py`, with a `print(len(unique))` added, prints that number.
-You can also say what `"J"` becomes after `capitalize()`, and why that string differs from what `"JOHN"` becomes.
+you predicted the count before running, and the edited `set_comprehension.py`,
+with a `print(len(unique))` added, prints that number.
+You can also say what `"J"` becomes after `capitalize()`,
+and why that string differs from what `"JOHN"` becomes.
 
 <details>
 <summary>Solution</summary>
@@ -196,17 +216,17 @@ print(sorted(unique))
 #: ['Alice', 'Bob', 'J', 'John']
 ```
 
-**Collapse the repeats.** The set holds four entries, one more than the filtered version.
+**Collapse the repeats.**
+The set holds four entries, one more than the filtered version.
 The seven names normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`, `Bob`.
 A set keeps one of each,
 so the duplicates and the case variants collapse to `Bob`, `John`, and `Alice`.
 `J` makes the fourth.
 
-**Change the case and keep every character.** `"J"` stays apart from `"JOHN"`
-because the normalization changes case and keeps every character.
+**Change the case and keep every character.**
+`"J"` stays apart from `"JOHN"` because the normalization changes case and keeps every character.
 `"JOHN"` becomes `"John"`.
-`"J"` stays `"J"`,
-because `capitalize()` lower-cases every character after the first,
+`"J"` stays `"J"`, because `capitalize()` lower-cases every character after the first,
 and `"J"` has one character.
 `"J"` and `"John"` are distinct strings, so the set keeps both.
 
@@ -231,8 +251,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Comprehensions Build, Loops Execute](../../Chapters/16_Techniques--Comprehensions.md#comprehensions-build-loops-execute) explains why a comprehension is for the collection it builds and a loop is for its side effects.
-Write a small function that does the printing and returns a value, then call it in the output expression.
+[Comprehensions Build, Loops Execute](../../Chapters/16_Techniques--Comprehensions.md#comprehensions-build-loops-execute)
+explains why a comprehension is for the collection it builds and a loop is for its side effects.
+Write a small function that does the printing and returns a value,
+then call it in the output expression.
 Decide the shape by asking whether anyone uses the resulting list.
 
 <details>
@@ -247,8 +269,11 @@ def show(n: int) -> str:
 <details>
 <summary>Done when</summary>
 
-your version prints `item 1` through `item 3`, then a list of three usable values in place of `[None, None, None]`, and `uv run ty check` passes on your file.
-You can also name the shape, comprehension or `for` loop, that suits each version, and the question that decides it.
+your version prints `item 1` through `item 3`,
+then a list of three usable values in place of `[None, None, None]`,
+and `uv run ty check` passes on your file.
+You can also name the shape, comprehension or `for` loop,
+that suits each version, and the question that decides it.
 
 <details>
 <summary>Solution</summary>
@@ -278,10 +303,13 @@ for n in [1, 2, 3]:  # Printing alone stays a loop
 
 If you leave `return line` out of `show()`,
 the function returns `None` implicitly.
-`lines` then prints as `[None, None, None]`, the list `comprehension_side_effects.py` builds.
-`ty` reports the omission as `invalid-return-type`, because `show()` declares a `str` return type.
+`lines` then prints as `[None, None, None]`,
+the list `comprehension_side_effects.py` builds.
+`ty` reports the omission as `invalid-return-type`,
+because `show()` declares a `str` return type.
 
-**Give the output expression a value.** The original comprehension collects `print()`'s return value,
+**Give the output expression a value.**
+The original comprehension collects `print()`'s return value,
 which is always `None`.
 The resulting list holds three `None`s.
 The brackets tell the reader that the list matters,
@@ -291,7 +319,8 @@ the list holds those values instead of `None`s and becomes the point.
 `show()` prints the line and returns it,
 so `lines` holds the three strings a caller can check, write to a file, or join.
 
-**Choose the shape by the result.** The right shape depends on whether you want the list.
+**Choose the shape by the result.**
+The right shape depends on whether you want the list.
 Here the comprehension is correct,
 because `lines` is the point and the printing is incidental.
 The `for` loop at the end suits `comprehension_side_effects.py`,
@@ -300,8 +329,7 @@ The chapter's rule decides both cases:
 use a comprehension when you want the collection it produces,
 and a loop when you want the side effect alone.
 
-A comprehension whose output expression has a side effect
-still deserves a second look when its list is useful.
+A comprehension whose output expression has a side effect still deserves a second look when its list is useful.
 `show()` does two jobs.
 A reader must open it to learn that one of them is printing.
 
@@ -322,14 +350,17 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions) shows `**d` inside a dictionary display, merging each `d` in the order the loop produces it.
+[Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
+shows `**d` inside a dictionary display,
+merging each `d` in the order the loop produces it.
 A repeated key keeps the value written last.
 A key keeps the position of its first insertion, which decides the print order.
 
 <details>
 <summary>Done when</summary>
 
-you wrote the whole printed dictionary, keys in order, before running, and the edited `unpacking_comprehensions.py` prints what you wrote.
+you wrote the whole printed dictionary, keys in order, before running,
+and the edited `unpacking_comprehensions.py` prints what you wrote.
 You can also say where the key `"a"` gets its value and where it gets its position.
 
 <details>
@@ -342,16 +373,15 @@ print({**d for d in dicts})
 #: {'a': 5, 'b': 2, 'c': 9}
 ```
 
-`**` merges the dictionaries in iteration order. When the same key
-appears more than once, the value from the later dictionary
-overwrites the earlier value. The key `"a"` appears in the first, third,
-and fourth dictionaries (`1`, then `3`, then `5`), so the final value
-is `5`, the last one written.
+`**` merges the dictionaries in iteration order.
+When the same key appears more than once,
+the value from the later dictionary overwrites the earlier value.
+The key `"a"` appears in the first, third, and fourth dictionaries
+(`1`, then `3`, then `5`), so the final value is `5`, the last one written.
 
-The key `"a"` takes its value from the last dictionary
-but its position from the first.
-The result orders keys by first insertion,
-so `"a"` prints first, ahead of `"b"` and `"c"`.
+The key `"a"` takes its value from the last dictionary but its position from the first.
+The result orders keys by first insertion, so `"a"` prints first,
+ahead of `"b"` and `"c"`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -369,14 +399,17 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Generator Expression Runs Once](../../Chapters/16_Techniques--Comprehensions.md#a-generator-expression-runs-once) shows consumers sharing one generator, each taking what remains.
-`any()` stops at its first true value, so the generator keeps its position when `any()` returns.
+[A Generator Expression Runs Once](../../Chapters/16_Techniques--Comprehensions.md#a-generator-expression-runs-once)
+shows consumers sharing one generator, each taking what remains.
+`any()` stops at its first true value,
+so the generator keeps its position when `any()` returns.
 Trace which values each later consumer receives.
 
 <details>
 <summary>Done when</summary>
 
-you wrote down all three printed values before running, and the edited `spent_generator.py` prints them in that order.
+you wrote down all three printed values before running,
+and the edited `spent_generator.py` prints them in that order.
 You can also name the first value `sum()` receives and say why it differs from the chapter's run.
 
 <details>
@@ -394,8 +427,9 @@ print(list(nums))
 ```
 
 `any()` pulls values until one matches, so it consumes `0` through `5`,
-reports `True`, and stops. Stopping there leaves the generator part-way
-through, not empty. `sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
+reports `True`, and stops.
+Stopping there leaves the generator part-way through, not empty.
+`sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
 giving `230` of the full range's `285`.
 By then `sum()` has consumed every value, so `list()` returns an empty list.
 
@@ -416,9 +450,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Gap Between Creation and Consumption](../../Chapters/16_Techniques--Comprehensions.md#the-gap-between-creation-and-consumption) shows a generator expression delaying its work until a consumer pulls values.
+[The Gap Between Creation and Consumption](../../Chapters/16_Techniques--Comprehensions.md#the-gap-between-creation-and-consumption)
+shows a generator expression delaying its work until a consumer pulls values.
 Square brackets make the comprehension run to completion at the line where it appears.
-Ask when the comprehension calls `source()` and when it reads `factor`, then compare with the print order.
+Ask when the comprehension calls `source()` and when it reads `factor`,
+then compare with the print order.
 
 <details>
 <summary>The shape</summary>
@@ -433,7 +469,8 @@ def source() -> list[int]:
 <summary>Done when</summary>
 
 your edited `genexp_timing.py` builds `built` with a list comprehension and prints its three lines in the order you predicted.
-You can also say which value of `factor`, `2` or `10`, the products use, and at which line the comprehension reads it.
+You can also say which value of `factor`, `2` or `10`, the products use,
+and at which line the comprehension reads it.
 
 <details>
 <summary>Solution</summary>
@@ -454,7 +491,8 @@ print(built)
 #: [2, 4, 6]
 ```
 
-**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`,
+**Compute the products eagerly.**
+The lines print in the same order as in `genexp_timing.py`,
 because the generator expression there also calls `source()` on the line where it appears.
 `exercise_8.py` renames the second message to `list created`.
 The last line changes from `[10, 20, 30]` to `[2, 4, 6]`,
@@ -483,10 +521,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Scope and the Walrus Operator](../../Chapters/16_Techniques--Comprehensions.md#scope-and-the-walrus-operator) shows the filter and the output expression sharing one call through `y`.
+[Scope and the Walrus Operator](../../Chapters/16_Techniques--Comprehensions.md#scope-and-the-walrus-operator)
+shows the filter and the output expression sharing one call through `y`.
 Without the walrus, the filter calls `cube_if_even()` for every element.
 The output expression calls it again for each element that passes.
-Count the elements that pass the filter, and add that number to the length of `data`.
+Count the elements that pass the filter,
+and add that number to the length of `data`.
 
 <details>
 <summary>The shape</summary>
@@ -500,7 +540,8 @@ def cube_if_even(n: int) -> int | None:
 <details>
 <summary>Done when</summary>
 
-both comprehensions print `[0, 8, 64]`, and the recorded arguments match the call count you predicted for each one.
+both comprehensions print `[0, 8, 64]`,
+and the recorded arguments match the call count you predicted for each one.
 You can also name the arguments that appear twice in the second run and say why the rest appear once.
 
 <details>
@@ -531,14 +572,14 @@ print(calls)
 #: [0, 0, 1, 2, 2, 3, 4, 4, 5]
 ```
 
-**One call per element with the walrus.** `cubes` calls
-`cube_if_even()` once for each of the six values in `data`,
+**One call per element with the walrus.**
+`cubes` calls `cube_if_even()` once for each of the six values in `data`,
 so `calls` holds six arguments.
 The output expression reads each result back from `y` instead of calling again.
 
-**A second call for each element that passes.** `again` calls
-`cube_if_even()` in the filter for all six values, then calls it again
-in the output expression for the three that pass.
+**A second call for each element that passes.**
+`again` calls `cube_if_even()` in the filter for all six values,
+then calls it again in the output expression for the three that pass.
 `calls` shows the order.
 `0`, `2`, and `4` each appear twice in a row,
 once for the filter and then once for the output expression.
@@ -546,9 +587,9 @@ once for the filter and then once for the output expression.
 because the filter rejects them before the output expression runs.
 Six plus three makes nine calls for the same three cubes.
 
-`cube_if_even()` returns in a moment, but for a function that reads a
-file or queries a server, the walrus halves the calls for every
-element that passes.
+`cube_if_even()` returns in a moment,
+but for a function that reads a file or queries a server,
+the walrus halves the calls for every element that passes.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

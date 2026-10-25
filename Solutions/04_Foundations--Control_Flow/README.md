@@ -9,7 +9,8 @@
 <details>
 <summary>Where to look</summary>
 
-[The Loop `else` Clause](../../Chapters/04_Foundations--Control_Flow.md#the-loop-else-clause) says when a `for` loop runs its `else`.
+[The Loop `else` Clause](../../Chapters/04_Foundations--Control_Flow.md#the-loop-else-clause)
+says when a `for` loop runs its `else`.
 Ask whether any value of `d` reaches the `break` for 97.
 The `else` depends on how the loop ends, not on what the body does.
 
@@ -25,7 +26,8 @@ def find_factor(n):
 <details>
 <summary>Done when</summary>
 
-you have written your prediction down, `find_factor(97)` prints `97 is prime`, and you can say how the loop ended so that its `else` clause ran.
+you have written your prediction down, `find_factor(97)` prints `97 is prime`,
+and you can say how the loop ended so that its `else` clause ran.
 
 <details>
 <summary>Solution</summary>
@@ -65,8 +67,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Loops](../../Chapters/04_Foundations--Control_Flow.md#loops) walks through `collatz_sequence()` in a `while` loop.
-Add a second counter next to `steps`, and increment it only in the branch that handles an odd `n`.
+[Loops](../../Chapters/04_Foundations--Control_Flow.md#loops)
+walks through `collatz_sequence()` in a `while` loop.
+Add a second counter next to `steps`,
+and increment it only in the branch that handles an odd `n`.
 Return both counts together so the caller can print them side by side.
 
 <details>
@@ -81,7 +85,8 @@ def collatz_sequence(n):
 <details>
 <summary>Done when</summary>
 
-your `exercise_2.py` prints the chapter's six values for `collatz_sequence(10)` and then `(6, 1)`, with the step count first.
+your `exercise_2.py` prints the chapter's six values for `collatz_sequence(10)` and then `(6, 1)`,
+with the step count first.
 If you see `(6, 2)`, your count includes the `1` that ends the sequence.
 
 <details>
@@ -89,7 +94,8 @@ If you see `(6, 2)`, your count includes the `1` that ends the sequence.
 
 If you keep the chapter's one-line conditional expression and add `if n % 2 == 1: odd_count += 1` after it,
 the test sees the new `n`, not the value `n` held when the step began.
-The count then includes the `1` that ends the sequence, so `collatz_sequence(10)` returns `(6, 2)`.
+The count then includes the `1` that ends the sequence,
+so `collatz_sequence(10)` returns `(6, 2)`.
 The solution splits the conditional expression into an `if`/`else` statement.
 The odd case then has a branch of its own,
 where the increment runs under the same test that chooses `3 * n + 1`.
@@ -119,8 +125,8 @@ print(collatz_sequence(10))
 #: (6, 1)
 ```
 
-The sequence takes six steps,
-and one of them (`5 -> 16`) starts from an odd `n`.
+The sequence takes six steps, and one of them (`5 -> 16`)
+starts from an odd `n`.
 `odd_count` increments in the `else` branch,
 which computes `3 * n + 1` and runs only when `n` is odd.
 
@@ -142,14 +148,18 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Loops](../../Chapters/04_Foundations--Control_Flow.md#loops) shows `break` leaving the loop and `continue` skipping to the next iteration.
+[Loops](../../Chapters/04_Foundations--Control_Flow.md#loops)
+shows `break` leaving the loop and `continue` skipping to the next iteration.
 Compare the values of `n` that each `if` tests.
-Ask whether any single `n` can satisfy both tests, since that decides whether their order matters.
+Ask whether any single `n` can satisfy both tests,
+since that decides whether their order matters.
 
 <details>
 <summary>Done when</summary>
 
-your prediction is written down, the swapped `break_continue.py` prints `0 1 2 4 5`, and you can say what a single value of `n` would have to do for the order of the two `if` blocks to change the output.
+your prediction is written down,
+the swapped `break_continue.py` prints `0 1 2 4 5`,
+and you can say what a single value of `n` would have to do for the order of the two `if` blocks to change the output.
 
 <details>
 <summary>Solution</summary>
@@ -170,8 +180,7 @@ The output is the same as with the original order.
 The two `if` blocks test for different values of `n` (`6` and `3`),
 so at most one of them is true on any iteration.
 Each block's outcome therefore stays the same whichever runs first.
-Order matters only when one value satisfies both conditions
-and the two blocks do different things with it,
+Order matters only when one value satisfies both conditions and the two blocks do different things with it,
 as when one ends the loop and the other skips to the next iteration.
 
 Before you move on, name what separates your attempt from this one:
@@ -190,9 +199,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Errors and Exceptions](../../Chapters/04_Foundations--Control_Flow.md#errors-and-exceptions) shows how `except` selects which exception types it catches, and when `finally` and `else` run.
+[Errors and Exceptions](../../Chapters/04_Foundations--Control_Flow.md#errors-and-exceptions)
+shows how `except` selects which exception types it catches,
+and when `finally` and `else` run.
 Trace which clauses run when the exception type matches none of the `except` clauses.
-To show the exception reaching the caller in a listing, wrap the call in a `try` that specifies the exception type.
+To show the exception reaching the caller in a listing,
+wrap the call in a `try` that specifies the exception type.
 
 <details>
 <summary>The shape</summary>
@@ -209,7 +221,9 @@ def divide_and_report(a, b):
 <details>
 <summary>Done when</summary>
 
-your run prints `finally always runs`, then a traceback ending in `TypeError: unsupported operand type(s) for /: 'int' and 'str'`, with neither `caught:` nor `no exception` in the output.
+your run prints `finally always runs`,
+then a traceback ending in `TypeError: unsupported operand type(s) for /: 'int' and 'str'`,
+with neither `caught:` nor `no exception` in the output.
 You can follow the traceback from your call down to the `/` in `checked_divide()`.
 
 <details>
@@ -240,27 +254,26 @@ except TypeError as e:
 #: escaped: TypeError
 ```
 
-**Let an unmatched exception through.** `divide_and_report(1, "x")`
-raises a `TypeError` inside `checked_divide()`, because Python cannot
-divide an `int` by a `str`. The `except` clause specifies
-`ValueError`, so the `TypeError` propagates past it.
+**Let an unmatched exception through.**
+`divide_and_report(1, "x")` raises a `TypeError` inside `checked_divide()`,
+because Python cannot divide an `int` by a `str`.
+The `except` clause specifies `ValueError`,
+so the `TypeError` propagates past it.
 The `finally` block still runs,
 since `finally` runs whether or not an exception is propagating.
 The `else` clause runs only when the `try` block finishes without an exception,
 so the `TypeError` bypasses the `else` clause too.
 The two lines of output come from `finally` and from the caller.
 
-**Catch the exception at the caller.** Because the `TypeError`
-propagates up past `divide_and_report()`, this listing wraps the
-call in its own `try`/`except TypeError` to show the exception
-reaching the caller.
+**Catch the exception at the caller.**
+Because the `TypeError` propagates up past `divide_and_report()`,
+this listing wraps the call in its own `try`/`except TypeError` to show the exception reaching the caller.
 If you call `divide_and_report(1, "x")` at the top level instead,
-`finally always runs` prints first,
-and then the traceback appears, ending in
-`TypeError: unsupported operand type(s) for /: 'int' and 'str'`.
-Above that last line, the traceback lists the calls the
-exception passed on its way out, from your call at the top down to the `/` in
-`checked_divide()`.
+`finally always runs` prints first, and then the traceback appears,
+ending in `TypeError: unsupported operand type(s) for /: 'int' and 'str'`.
+Above that last line,
+the traceback lists the calls the exception passed on its way out,
+from your call at the top down to the `/` in `checked_divide()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -279,9 +292,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Pattern Matching](../../Chapters/04_Foundations--Control_Flow.md#pattern-matching) shows sequence patterns matching a split command.
-A list pattern matches only a sequence of its own length, so count the items in `"go north 3"` against each existing `case`.
-Put the three-item pattern where Python tries it before any `case` that also matches a three-item list, and bind `direction` and `distance` by name.
+[Pattern Matching](../../Chapters/04_Foundations--Control_Flow.md#pattern-matching)
+shows sequence patterns matching a split command.
+A list pattern matches only a sequence of its own length,
+so count the items in `"go north 3"` against each existing `case`.
+Put the three-item pattern where Python tries it before any `case` that also matches a three-item list,
+and bind `direction` and `distance` by name.
 
 <details>
 <summary>The shape</summary>
@@ -295,7 +311,9 @@ def run(command):
 <details>
 <summary>Done when</summary>
 
-the file runs without a `SyntaxError`, `run("go north 3")` returns `unknown command` before your change and a string holding both `north` and `3` after it, and `run("go north")` still returns `moving north`.
+the file runs without a `SyntaxError`,
+`run("go north 3")` returns `unknown command` before your change and a string holding both `north` and `3` after it,
+and `run("go north")` still returns `moving north`.
 
 <details>
 <summary>Solution</summary>
@@ -303,7 +321,8 @@ the file runs without a `SyntaxError`, `run("go north 3")` returns `unknown comm
 If you add the new `case` at the bottom of the `match`, below `case _`,
 Python rejects the file before running any of it:
 `SyntaxError: wildcard makes remaining patterns unreachable`.
-A wildcard matches every value, so it takes every input before a later `case` sees it.
+A wildcard matches every value,
+so it takes every input before a later `case` sees it.
 Python treats that unreachable `case` as an error rather than as dead code.
 The solution puts the three-item pattern first, above the wildcard.
 
@@ -326,14 +345,14 @@ print(run("go north"))
 #: moving north
 ```
 
-**Give the longer command a case.** Before the new `case` exists,
-`run("go north 3")` returns `unknown command`. A list pattern
-matches on length as well as content, so
-`["go", direction]` matches only a list of two items. The three-item
-split matches neither list pattern and reaches `case _`.
+**Give the longer command a case.**
+Before the new `case` exists, `run("go north 3")` returns `unknown command`.
+A list pattern matches on length as well as content,
+so `["go", direction]` matches only a list of two items.
+The three-item split matches neither list pattern and reaches `case _`.
 
-**Arrange the patterns.** Order matters only between patterns that
-could both match the same value.
+**Arrange the patterns.**
+Order matters only between patterns that could both match the same value.
 The two `go` patterns match lists of different lengths,
 so either arrangement works here.
 
@@ -353,14 +372,18 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Comprehensions](../../Chapters/04_Foundations--Control_Flow.md#comprehensions) introduces the list comprehension with a filter.
-Start from an empty list, loop over `range()`, test the condition with an `if`, and call `append()`.
+[Comprehensions](../../Chapters/04_Foundations--Control_Flow.md#comprehensions)
+introduces the list comprehension with a filter.
+Start from an empty list, loop over `range()`, test the condition with an `if`,
+and call `append()`.
 Then compare what each version tells the reader about the finished list.
 
 <details>
 <summary>Done when</summary>
 
-your loop version prints `[0, 2, 4, 6, 8]`, the same list the comprehension prints, and your preference comes with a reason you can point to in the two versions of the code.
+your loop version prints `[0, 2, 4, 6, 8]`,
+the same list the comprehension prints,
+and your preference comes with a reason you can point to in the two versions of the code.
 
 <details>
 <summary>Solution</summary>
@@ -375,16 +398,15 @@ print(evens)
 #: [0, 2, 4, 6, 8]
 ```
 
-The loop takes four lines instead of one. Until it finishes, the
-name `evens` holds a partial result. The comprehension states the
-contents of the list. The loop says how to build it, so the reader
-traces the loop to learn the contents.
+The loop takes four lines instead of one.
+Until it finishes, the name `evens` holds a partial result.
+The comprehension states the contents of the list.
+The loop says how to build it,
+so the reader traces the loop to learn the contents.
 For `evens`, the comprehension is the easier read six months from now.
 
-The loop version is a better choice when the body grows past one
-condition and one expression, since a comprehension with two filters
-and a nested loop is harder to read than the nested `for` loops it
-replaces.
+The loop version is a better choice when the body grows past one condition and one expression,
+since a comprehension with two filters and a nested loop is harder to read than the nested `for` loops it replaces.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -403,9 +425,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Exception Chaining](../../Chapters/04_Foundations--Control_Flow.md#exception-chaining) covers `raise ... from` and the `__cause__` and `__context__` attributes.
-The expression after `from` can be any exception object, including one the `raise` statement constructs.
-Predict the joining line from `__cause__`, then print both attributes to see which exception each one holds.
+[Exception Chaining](../../Chapters/04_Foundations--Control_Flow.md#exception-chaining)
+covers `raise ... from` and the `__cause__` and `__context__` attributes.
+The expression after `from` can be any exception object,
+including one the `raise` statement constructs.
+Predict the joining line from `__cause__`,
+then print both attributes to see which exception each one holds.
 
 <details>
 <summary>The shape</summary>
@@ -428,7 +453,10 @@ def joining_line(e):
 <details>
 <summary>Done when</summary>
 
-your prediction is written down, the traceback shows `The above exception was the direct cause of the following exception:` above `BadNumber`, and printing the classes of `e.__cause__` and `e.__context__` names two different exceptions: the one you constructed and `ValueError`.
+your prediction is written down,
+the traceback shows `The above exception was the direct cause of the following exception:` above `BadNumber`,
+and printing the classes of `e.__cause__` and `e.__context__` names two different exceptions:
+the one you constructed and `ValueError`.
 
 <details>
 <summary>Solution</summary>
@@ -468,27 +496,27 @@ except BadNumber as e:
 #: ArithmeticError ValueError
 ```
 
-**Chain from a constructed cause.** The prediction is the "direct cause" line, the same one `explicit()`
-produces. `from` sets `__cause__` to the object that follows it.
+**Chain from a constructed cause.**
+The prediction is the "direct cause" line, the same one `explicit()` produces.
+`from` sets `__cause__` to the object that follows it.
 When `__cause__` holds an exception,
 Python joins the two tracebacks with the "direct cause" line that `joining_line()` finds.
-An exception constructed in the `raise` statement joins the
-report the same way a caught one does.
+An exception constructed in the `raise` statement joins the report the same way a caught one does.
 `from` accepts any expression that produces an exception.
 A name bound by `except` is one such expression.
 
-**Compare the cause with the context.** The `print()` at `[1]`
-shows that both attributes hold an exception, and different ones.
-`__cause__` is the `ArithmeticError` you supplied, and `__context__`
-is still the `ValueError` Python recorded on its own when `raise` ran
-inside a handler.
+**Compare the cause with the context.**
+The `print()` at `[1]` shows that both attributes hold an exception,
+and different ones.
+`__cause__` is the `ArithmeticError` you supplied,
+and `__context__` is still the `ValueError` Python recorded on its own when `raise` ran inside a handler.
 The traceback reports the cause when one exists,
 so the context stays in its attribute and out of the report.
 
-`__context__` answers "what was the `except` block handling when
-`raise` ran," and Python fills that attribute in automatically.
-`__cause__` answers "what do you, the author, say explains
-this," and `from` alone fills that one in.
+`__context__` answers "what was the `except` block handling when `raise` ran,"
+and Python fills that attribute in automatically.
+`__cause__` answers "what do you, the author, say explains this,"
+and `from` alone fills that one in.
 `from None` leaves `__cause__` as `None` and sets `__suppress_context__`,
 so the traceback omits the `__context__` exception.
 
@@ -509,14 +537,20 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Context Managers](../../Chapters/04_Foundations--Control_Flow.md#context-managers) explains what the `with` block does on entry and exit, and names `read_text()` and `write_text()` for reading or writing a whole file in one call.
+[Context Managers](../../Chapters/04_Foundations--Control_Flow.md#context-managers)
+explains what the `with` block does on entry and exit,
+and names `read_text()` and `write_text()` for reading or writing a whole file in one call.
 Call `read_text()` on the `Path` and split the result into lines.
-To compare the two forms, consider what the file object lets you do between the open and the close.
+To compare the two forms,
+consider what the file object lets you do between the open and the close.
 
 <details>
 <summary>Done when</summary>
 
-your rewritten reading half prints `one` and `two`, as the chapter's version does, and you can name one thing the open file object lets you do between the open and the close, plus a kind of file where that matters.
+your rewritten reading half prints `one` and `two`,
+as the chapter's version does,
+and you can name one thing the open file object lets you do between the open and the close,
+plus a kind of file where that matters.
 
 <details>
 <summary>Solution</summary>
@@ -543,16 +577,16 @@ so one call does the work of the whole `with` block.
 For a small file read in one go, the one-liner is the better choice.
 The chapter names `read_text()` and `write_text()` for that case.
 
-The `with` form gives you control over the code between the open and
-the close. Two things follow from that control. The `with` form binds
-the file object to `f`, so you can iterate over it lazily,
-holding one line in memory at a time. `read_text()` builds one string of
-the entire contents before you see any of it. The `with` form also
-lets several operations share one open file, while each `read_text()`
-call opens and closes the file again.
+The `with` form gives you control over the code between the open and the close.
+Two things follow from that control.
+The `with` form binds the file object to `f`, so you can iterate over it lazily,
+holding one line in memory at a time.
+`read_text()` builds one string of the entire contents before you see any of it.
+The `with` form also lets several operations share one open file,
+while each `read_text()` call opens and closes the file again.
 
-That control matters when the file is too large to hold in memory
-as one string, or when you read a stream that has no end.
+That control matters when the file is too large to hold in memory as one string,
+or when you read a stream that has no end.
 
 Both forms guarantee the close.
 `read_text()` opens the file in a `with` block of its own,
@@ -575,14 +609,17 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Mutating a Container While Looping](../../Chapters/04_Foundations--Control_Flow.md#mutating-a-container-while-looping) explains how `remove()` shifts later items into slots the loop has passed.
-Walk the loop by index over `[2, 2, 1, 3]`, noting which item `remove()` deletes and which item moves into the current position.
+[Mutating a Container While Looping](../../Chapters/04_Foundations--Control_Flow.md#mutating-a-container-while-looping)
+explains how `remove()` shifts later items into slots the loop has passed.
+Walk the loop by index over `[2, 2, 1, 3]`,
+noting which item `remove()` deletes and which item moves into the current position.
 Then predict the final list before you run it.
 
 <details>
 <summary>Done when</summary>
 
-your prediction is written down, the run prints `[2, 1, 3]`, and you can say which slot the surviving `2` occupies and why the loop skipped it.
+your prediction is written down, the run prints `[2, 1, 3]`,
+and you can say which slot the surviving `2` occupies and why the loop skipped it.
 
 <details>
 <summary>Solution</summary>
@@ -597,22 +634,23 @@ print(scores)
 #: [2, 1, 3]
 ```
 
-One `2` survives again, but this time at the front. At position 0 the
-loop sees `2` and `remove()` deletes the first equal item, which is
-that same position-0 element. The second `2` shifts down into slot 0,
-which the loop has passed, so the next iteration looks at position 1
-and finds `1`. The loop leaves the survivor behind in slot 0.
+One `2` survives again, but this time at the front.
+At position 0 the loop sees `2` and `remove()` deletes the first equal item,
+which is that same position-0 element.
+The second `2` shifts down into slot 0, which the loop has passed,
+so the next iteration looks at position 1 and finds `1`.
+The loop leaves the survivor behind in slot 0.
 
-The prediction covers more than "one survives." It says which item
-and where. The survivor is the item that shifts into a slot the loop has
-passed, so its final position depends on the data.
+The prediction covers more than "one survives."
+It says which item and where.
+The survivor is the item that shifts into a slot the loop has passed,
+so its final position depends on the data.
 In the chapter's `[1, 2, 2, 3]` the survivor sits mid-list.
 Here it sits first.
 A prediction of each shifted item's new position therefore holds for one list at a time.
 
 The chapter's three fixes hold for every list.
-Each one keeps the list the loop walks as it was,
-so the loop sees every item.
+Each one keeps the list the loop walks as it was, so the loop sees every item.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -630,8 +668,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Ask Forgiveness, Not Permission](../../Chapters/04_Foundations--Control_Flow.md#ask-forgiveness-not-permission) shows `isdigit()` and `int()` disagreeing on `"-5"` and `"²"`.
-`isdigit()` tests each character on its own, while `int()` reads the whole string as a number, so ask which characters besides digits a number can carry.
+[Ask Forgiveness, Not Permission](../../Chapters/04_Foundations--Control_Flow.md#ask-forgiveness-not-permission)
+shows `isdigit()` and `int()` disagreeing on `"-5"` and `"²"`.
+`isdigit()` tests each character on its own,
+while `int()` reads the whole string as a number,
+so ask which characters besides digits a number can carry.
 For each string, ask whether `look_first()` would need a new test to agree with `int()`.
 
 <details>
@@ -646,7 +687,9 @@ def look_first(text):
 <details>
 <summary>Done when</summary>
 
-your four predictions match the run, where `look_first()` returns `None` for both strings and `int()` returns `42` for both, and you can name the test `look_first()` would need for each string and say why `parse_int()` needs none.
+your four predictions match the run,
+where `look_first()` returns `None` for both strings and `int()` returns `42` for both,
+and you can name the test `look_first()` would need for each string and say why `parse_int()` needs none.
 
 <details>
 <summary>Solution</summary>
@@ -664,19 +707,21 @@ for text in (" 42 ", "4_2"):
 #: '4_2' None 42
 ```
 
-`int()` accepts both strings. `look_first()` rejects both. `int()`
-strips surrounding whitespace, and it allows an underscore between
-digits, the same rule that makes `10_000_000` a valid literal.
-`isdigit()` asks whether every character is a digit, so the spaces
-and the underscore each fail it.
+`int()` accepts both strings.
+`look_first()` rejects both.
+`int()` strips surrounding whitespace,
+and it allows an underscore between digits,
+the same rule that makes `10_000_000` a valid literal.
+`isdigit()` asks whether every character is a digit,
+so the spaces and the underscore each fail it.
 
-Each new disagreement calls for another test in `look_first()`: one
-for a sign, one for whitespace, one for underscores, and one to reject `"²"`.
-Those tests together are a second parser, written to predict what `int()` will do.
+Each new disagreement calls for another test in `look_first()`: one for a sign,
+one for whitespace, one for underscores, and one to reject `"²"`.
+Those tests together are a second parser,
+written to predict what `int()` will do.
 That parser is right only where it repeats `int()`'s rules.
-`parse_int()` calls `int()` and catches the `ValueError`, so
-it agrees with `int()` on every string, including strings you have
-not tried.
+`parse_int()` calls `int()` and catches the `ValueError`,
+so it agrees with `int()` on every string, including strings you have not tried.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

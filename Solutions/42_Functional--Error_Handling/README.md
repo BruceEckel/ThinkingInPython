@@ -11,8 +11,10 @@
 <details>
 <summary>Where to look</summary>
 
-[Composing With bind](../../Chapters/42_Functional--Error_Handling.md#composing-with-bind) chains steps so that an `Err` skips every step after it.
-Write `func_d()` with the same `Result[int, str]` signature, and add one more `.bind()` before the last step.
+[Composing With bind](../../Chapters/42_Functional--Error_Handling.md#composing-with-bind)
+chains steps so that an `Err` skips every step after it.
+Write `func_d()` with the same `Result[int, str]` signature,
+and add one more `.bind()` before the last step.
 To see whether the later step runs, give it a side effect such as a `print()`.
 
 <details>
@@ -41,7 +43,9 @@ def composed(i: int) -> Result[int, str]:
 <details>
 <summary>Done when</summary>
 
-for the input that `func_d()` rejects, your run prints the `Err` from `func_d()` and the later step's trace line is missing, while every input that passes `func_d()` still prints that line.
+for the input that `func_d()` rejects,
+your run prints the `Err` from `func_d()` and the later step's trace line is missing,
+while every input that passes `func_d()` still prints that line.
 The other inputs give the same results as `composing_with_bind.py`.
 
 <details>
@@ -95,26 +99,26 @@ for i in range(5):
 #: 4 Err(error='func_d(4)')
 ```
 
-**Insert the new step.** Adding a third `.bind()`, for `func_d()`, leaves
-`Result`, `Ok`, and `Err` as they are,
+**Insert the new step.**
+Adding a third `.bind()`, for `func_d()`, leaves `Result`, `Ok`,
+and `Err` as they are,
 so the listing imports them from the chapter's `utils/result.py`.
-Because `func_d()` sits before
-`func_c()` in the chain, an `Err` from `func_d()` has a later step to
-skip.
+Because `func_d()` sits before `func_c()` in the chain,
+an `Err` from `func_d()` has a later step to skip.
 
-**Make the skipped step visible.** `func_c()` prints a line when it
-runs. The line appears for `0` and `3` and is missing for `4`, which
-confirms the skip. `4` reaches `func_d()` because `func_a()` and
-`func_b()` both return an `Ok` for it.
+**Make the skipped step visible.**
+`func_c()` prints a line when it runs.
+The line appears for `0` and `3` and is missing for `4`,
+which confirms the skip.
+`4` reaches `func_d()` because `func_a()` and `func_b()` both return an `Ok` for it.
 `func_d(4)` returns an `Err`,
 and `Err.bind()` returns `self` without calling `func_c()`,
 so that `Err` is the chain's result.
 
-`1` and `2` fail earlier and stop the chain
-before it calls `func_d()`.
-`func_d(3)` returns `Ok(3)`,
-so `3` fails in `func_c()`. Inputs `1` through `4` each fail
-at a different step. A chain short-circuits at the first step that fails,
+`1` and `2` fail earlier and stop the chain before it calls `func_d()`.
+`func_d(3)` returns `Ok(3)`, so `3` fails in `func_c()`.
+Inputs `1` through `4` each fail at a different step.
+A chain short-circuits at the first step that fails,
 so the order of the steps decides where the chain stops.
 
 Before you move on, name what separates your attempt from this one:
@@ -135,7 +139,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Result Type](../../Chapters/42_Functional--Error_Handling.md#a-result-type) defines `Ok` and `Err` with a `bind()` on each.
+[A Result Type](../../Chapters/42_Functional--Error_Handling.md#a-result-type)
+defines `Ok` and `Err` with a `bind()` on each.
 `map_error()` is the mirror image of those two `bind()` methods.
 `Err` applies the function to its error and wraps the return value in a new `Err`.
 `Ok` returns `self`, so a chain can call `map_error()` whichever side it holds.
@@ -191,15 +196,19 @@ def prefix(msg: str) -> str:
 <details>
 <summary>Done when</summary>
 
-`Err("boom").map_error(prefix)` prints an `Err` holding the prefixed message, `Ok(5).map_error(prefix)` prints `Ok(answer=5)` unchanged, and `uv run ty check` passes on a `map_error()` call on a parameter annotated `Result[int, str]`.
+`Err("boom").map_error(prefix)` prints an `Err` holding the prefixed message,
+`Ok(5).map_error(prefix)` prints `Ok(answer=5)` unchanged,
+and `uv run ty check` passes on a `map_error()` call on a parameter annotated `Result[int, str]`.
 If `Ok` lacks the method, that call draws `unresolved-attribute`.
 
 <details>
 <summary>Solution</summary>
 
 If you give `map_error()` to `Err` alone,
-`Ok(5).map_error(prefix)` raises an `AttributeError`: `'Ok' object has no attribute 'map_error'`.
-On a value typed `Result[int, str]`, `ty` reports `unresolved-attribute` for every `map_error()` call,
+`Ok(5).map_error(prefix)` raises an `AttributeError`:
+`'Ok' object has no attribute 'map_error'`.
+On a value typed `Result[int, str]`,
+`ty` reports `unresolved-attribute` for every `map_error()` call,
 including one on a value that holds an `Err`,
 because the `Ok` member of the union has no such method.
 The solution gives `Ok` a `map_error()` that returns `self`,
@@ -258,9 +267,9 @@ print(Err("boom").map_error(prefix))
 This exercise changes `Ok` and `Err`,
 so the listing defines its own pair instead of importing the chapter's pair.
 
-`map_error()` works on the side `bind()` skips. `bind()` passes a success to the next step and
-leaves a failure alone, while `map_error()` transforms the failure and
-leaves a success alone.
+`map_error()` works on the side `bind()` skips.
+`bind()` passes a success to the next step and leaves a failure alone,
+while `map_error()` transforms the failure and leaves a success alone.
 
 `map_error()` differs from `bind()` in what it asks of `func`.
 `bind()`'s function returns a `Result`.
@@ -272,14 +281,15 @@ Its [`map()`](../../Chapters/42_Functional--Error_Handling.md#composing-with-bin
 wraps a new answer the way `map_error()` wraps a new error,
 and its counterpart to `map_error()` is `alt()`.
 
-**Leave a success alone.** `Ok`'s version returns `self`,
+**Leave a success alone.**
+`Ok`'s version returns `self`,
 because an `Ok` holds an answer and `func` transforms errors.
 
-**Transform the failure.** `Err`'s version applies `func` to `self.error` and
-wraps `func`'s return value in a new `Err`.
+**Transform the failure.**
+`Err`'s version applies `func` to `self.error` and wraps `func`'s return value in a new `Err`.
 
-**Prefix errors at the boundary.** To prefix every error in a chain,
-you call `result.map_error(prefix)` once,
+**Prefix errors at the boundary.**
+To prefix every error in a chain, you call `result.map_error(prefix)` once,
 at the boundary where you report the error,
 instead of adding the prefix inside every function that might produce an error.
 
@@ -300,16 +310,21 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Combining Multiple Results](../../Chapters/42_Functional--Error_Handling.md#combining-multiple-results) stops at the first `Err` because each nested `bind()` short-circuits.
+[Combining Multiple Results](../../Chapters/42_Functional--Error_Handling.md#combining-multiple-results)
+stops at the first `Err` because each nested `bind()` short-circuits.
 The three calls take independent inputs, so `combined()` can make all three.
 Call all three first, then `match` on the three results together.
-One `case` takes three `Ok`s, and any other combination gathers the `.error` of each `Err` into a list.
+One `case` takes three `Ok`s,
+and any other combination gathers the `.error` of each `Err` into a list.
 Write the three tests before the function.
 
 <details>
 <summary>Done when</summary>
 
-your tests pass and check three calls: `combined(1, 2)` returns an `Err` listing all three failures in step order, `combined(1, 5)` an `Err` holding `["func_a(1)"]` alone, and `combined(7, 5)` the same `Ok(answer='add(7 + 5 + 12): 24')` that `combining.py` prints.
+your tests pass and check three calls:
+`combined(1, 2)` returns an `Err` listing all three failures in step order,
+`combined(1, 5)` an `Err` holding `["func_a(1)"]` alone,
+and `combined(7, 5)` the same `Ok(answer='add(7 + 5 + 12): 24')` that `combining.py` prints.
 `uv run ty check` passes with no `assert` in `combined()`.
 
 <details>
@@ -366,41 +381,43 @@ def test_combined_success_unchanged() -> None:
     assert combined(7, 5) == Ok("add(7 + 5 + 12): 24")
 ```
 
-**Call every step.** The `bind()`-chained version stops at the first failure,
+**Call every step.**
+The `bind()`-chained version stops at the first failure,
 while this version calls all three functions every time.
-Calling every step after a failure makes sense only when each step's input
-comes from the caller.
+Calling every step after a failure makes sense only when each step's input comes from the caller.
 So `func_c()` here takes `i + j`, built from the caller's arguments,
 rather than a value that `func_a()` or `func_b()` produces.
 
-**Gather the failures.** `combined()` matches the three results as
-one tuple. When all three are `Ok`s, `case Ok(a), Ok(b), Ok(c)` binds
-their answers. Every other combination matches `case results`, which gathers every
-`Err`'s `.error` into one list.
+**Gather the failures.**
+`combined()` matches the three results as one tuple.
+When all three are `Ok`s, `case Ok(a), Ok(b), Ok(c)` binds their answers.
+Every other combination matches `case results`,
+which gathers every `Err`'s `.error` into one list.
 
-`combined(1, 5)` now
-reports a single-item list, `["func_a(1)"]`, because `func_b(5)` and
-`func_c(6)` both succeed. `combined(1, 2)` reports all three failures
-at once: `i=1` fails `func_a()`, `j=2` fails `func_b()`, and `i+j=3`
-fails `func_c()`.
+`combined(1, 5)` now reports a single-item list, `["func_a(1)"]`,
+because `func_b(5)` and `func_c(6)` both succeed.
+`combined(1, 2)` reports all three failures at once: `i=1` fails `func_a()`,
+`j=2` fails `func_b()`, and `i+j=3` fails `func_c()`.
 
-**Widen the error type.** The three steps return `Result[int, str]`,
-an `int` or one error string, while `combined()` returns
-`Result[str, list[str]]`, a finished `str` or a list of error strings.
-One generic `Ok`/`Err` pair carries both shapes, because `Ok` and
-`Err` take the type parameters each call needs.
+**Widen the error type.**
+The three steps return `Result[int, str]`, an `int` or one error string,
+while `combined()` returns `Result[str, list[str]]`,
+a finished `str` or a list of error strings.
+One generic `Ok`/`Err` pair carries both shapes,
+because `Ok` and `Err` take the type parameters each call needs.
 
-**Narrow for the type checker.** The type checker verifies both
-instantiations. The `Ok(a), Ok(b), Ok(c)` pattern narrows each result to
-`Ok[int]`, so `a`, `b`, and `c` are `int`s. `isinstance(r, Err)`
-narrows each `r` to `Err[str]`, so the comprehension builds a
-`list[str]`.
+**Narrow for the type checker.**
+The type checker verifies both instantiations.
+The `Ok(a), Ok(b), Ok(c)` pattern narrows each result to `Ok[int]`, so `a`, `b`,
+and `c` are `int`s.
+`isinstance(r, Err)` narrows each `r` to `Err[str]`,
+so the comprehension builds a `list[str]`.
 
-If you build the error list first and return early when it holds
-anything, the type checker rejects a later `a.answer`.
-It cannot infer that an empty error list means all three succeeded. The tuple pattern
-states that condition in the `case`, so the listing needs no `assert`
-to restate it.
+If you build the error list first and return early when it holds anything,
+the type checker rejects a later `a.answer`.
+It cannot infer that an empty error list means all three succeeded.
+The tuple pattern states that condition in the `case`,
+so the listing needs no `assert` to restate it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -419,9 +436,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Turning Exceptions into Results](../../Chapters/42_Functional--Error_Handling.md#turning-exceptions-into-results) shows `@safe` as a decorator that catches every `Exception`.
+[Turning Exceptions into Results](../../Chapters/42_Functional--Error_Handling.md#turning-exceptions-into-results)
+shows `@safe` as a decorator that catches every `Exception`.
 To take arguments, `safe()` becomes a function that receives the exception types and returns the decorator.
-An `except` clause accepts a tuple of exception types, so the wrapper changes in one place.
+An `except` clause accepts a tuple of exception types,
+so the wrapper changes in one place.
 A `Protocol` with a generic `__call__` keeps the decorated function's signature precise.
 
 <details>
@@ -451,7 +470,9 @@ def parse(text: str) -> int:
 <details>
 <summary>Done when</summary>
 
-a `parse()` decorated with `@safe(ValueError)` returns `Ok(answer=42)` for `"42"`, a `TypeError` raised inside it propagates out of the call instead of coming back as an `Err`, and `reveal_type(parse)` under `uv run ty check` shows `(text: str) -> Result[int, Exception]`.
+a `parse()` decorated with `@safe(ValueError)` returns `Ok(answer=42)` for `"42"`,
+a `TypeError` raised inside it propagates out of the call instead of coming back as an `Err`,
+and `reveal_type(parse)` under `uv run ty check` shows `(text: str) -> Result[int, Exception]`.
 
 <details>
 <summary>Solution</summary>
@@ -505,37 +526,38 @@ expect(TypeError, parse, "oops")
 #: [TypeError] 'oops' is not digits
 ```
 
-**Type the returned decorator.** `safe()`
-returns a decorator generic over the function it
-decorates. The `SafeDecorator` protocol gives that decorator a generic `__call__`,
+**Type the returned decorator.**
+`safe()` returns a decorator generic over the function it decorates.
+The `SafeDecorator` protocol gives that decorator a generic `__call__`,
 so `parse` keeps the signature `(text: str) -> Result[int, Exception]`.
 
 A nested `Callable` annotation types `parse` as precisely as the protocol does.
-If `safe()` declares `[**P, A]` and returns
-`Callable[[Callable[P, A]], Callable[P, Result[A, Exception]]]`,
+If `safe()` declares `[**P, A]` and returns `Callable[[Callable[P, A]], Callable[P, Result[A, Exception]]]`,
 `ty` reveals `parse` as `(text: str) -> Ok[int] | Err[Exception]`.
-Under that annotation, one `safe(ValueError)` decorator also stays generic across two different functions.
+Under that annotation,
+one `safe(ValueError)` decorator also stays generic across two different functions.
 The protocol is a readability choice.
 It gives the decorator's shape a name,
-so `safe()`'s return annotation reads `SafeDecorator`
-and the revealed signature keeps the `Result` alias.
+so `safe()`'s return annotation reads `SafeDecorator` and the revealed signature keeps the `Result` alias.
 
-**Accept the types to catch.** `safe()` gains a layer. It now takes
-the exception types and returns the decorator, instead of being the
-decorator.
+**Accept the types to catch.**
+`safe()` gains a layer.
+It now takes the exception types and returns the decorator,
+instead of being the decorator.
 
-**Catch only the named types.** Because the `except catch` clause
-accepts a tuple of exception types, `wrapper()` changes by one word.
+**Catch only the named types.**
+Because the `except catch` clause accepts a tuple of exception types,
+`wrapper()` changes by one word.
 
-**Let everything else propagate.** `parse("42")` comes back as
-an `Ok`. `parse("oops")` raises a `TypeError`, which
-`@safe(ValueError)` lets propagate out of `wrapper()`.
+**Let everything else propagate.**
+`parse("42")` comes back as an `Ok`.
+`parse("oops")` raises a `TypeError`,
+which `@safe(ValueError)` lets propagate out of `wrapper()`.
 `expect()` catches it outside `parse()` and prints it.
 
-A caller of `parse("oops")` receives the `TypeError` like any
-other exception. The chapter's `@safe` returns the `TypeError`
-as `Err(TypeError(...))`, the same shape a bad-input failure
-takes.
+A caller of `parse("oops")` receives the `TypeError` like any other exception.
+The chapter's `@safe` returns the `TypeError` as `Err(TypeError(...))`,
+the same shape a bad-input failure takes.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -555,7 +577,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Attaching Context to an Exception](../../Chapters/42_Functional--Error_Handling.md#attaching-context-to-an-exception) shows `add_note()` and the `__notes__` list it fills.
+[Attaching Context to an Exception](../../Chapters/42_Functional--Error_Handling.md#attaching-context-to-an-exception)
+shows `add_note()` and the `__notes__` list it fills.
 Call `add_note()` in the `except` clause before wrapping the exception in an `Err`.
 A `match` on the `Result` reads the notes back from the error.
 To answer the question, look at which code path reaches `add_note()`.
@@ -578,7 +601,9 @@ def report(result: Result[int, Exception]) -> None:
 <details>
 <summary>Done when</summary>
 
-a chain whose first load fails prints a note naming the first setting and its text, a chain whose second load fails prints the second setting's note, and no run prints a traceback.
+a chain whose first load fails prints a note naming the first setting and its text,
+a chain whose second load fails prints the second setting's note,
+and no run prints a traceback.
 You can answer the question by pointing to the path a successful call takes through `load_setting()`.
 
 <details>
@@ -618,26 +643,30 @@ report(load_setting("timeout", "30").bind(
 #:   setting 'retries' received 'many'
 ```
 
-**Note only the failing path.** The successful call carries no
-note. A successful `load_setting()` returns its `Ok` from inside
-the `try` block and never reaches `add_note()`, which sits in the
-`except` clause. An `Ok` holds an answer, while notes attach to
-exceptions. A note therefore travels with a failure, the one
-result that has something to explain.
+**Note only the failing path.**
+The successful call carries no note.
+A successful `load_setting()` returns its `Ok` from inside the `try` block and never reaches `add_note()`,
+which sits in the `except` clause.
+An `Ok` holds an answer, while notes attach to exceptions.
+A note therefore travels with a failure,
+the one result that has something to explain.
 
-**Report without a traceback.** The second and third runs name a different setting and a different text in their notes.
-The `Err` holds the exception, and the exception holds the note as ordinary data,
+**Report without a traceback.**
+The second and third runs name a different setting and a different text in their notes.
+The `Err` holds the exception,
+and the exception holds the note as ordinary data,
 so `report()` prints the note from that data after `load_setting()` has returned.
 The exception keeps its `__traceback__`,
 but `load_setting()` returns the exception inside an `Err`,
 so it never propagates to the top-level handler that prints a traceback.
 
-**Sequence the two loads.** The lambdas ignore their parameter, since
-the second load works from its own name and text. `bind()` exists to
-pass one step's answer to the next step, so it reads worst when the
-next step ignores that answer. Here it sequences the two calls while
-the lambda discards the answer. The `returns` library's
-[do-notation](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
+**Sequence the two loads.**
+The lambdas ignore their parameter,
+since the second load works from its own name and text.
+`bind()` exists to pass one step's answer to the next step,
+so it reads worst when the next step ignores that answer.
+Here it sequences the two calls while the lambda discards the answer.
+The `returns` library's [do-notation](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
 reads better.
 
 Before you move on, name what separates your attempt from this one:
@@ -658,8 +687,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Reaching the Answer](../../Chapters/42_Functional--Error_Handling.md#reaching-the-answer) compares `None` with `Result`, and [Composing by Hand](../../Chapters/42_Functional--Error_Handling.md#composing-by-hand) has the chain to adapt.
-Return `None` where each function returned an `Err`, and replace each `isinstance` test with `is None`.
+[Reaching the Answer](../../Chapters/42_Functional--Error_Handling.md#reaching-the-answer)
+compares `None` with `Result`,
+and [Composing by Hand](../../Chapters/42_Functional--Error_Handling.md#composing-by-hand)
+has the chain to adapt.
+Return `None` where each function returned an `Err`,
+and replace each `isinstance` test with `is None`.
 Then compare the outputs for inputs `1`, `2`, and `3` with the `Result` version.
 
 <details>
@@ -683,7 +716,9 @@ def composed(i: int) -> int | None:
 <details>
 <summary>Done when</summary>
 
-for inputs `0` through `4` your run prints `0 0` and `4 4`, with the same `None` for `1`, `2`, and `3`, and you can name what those three lines lose compared with `composing.py`'s output for the same inputs.
+for inputs `0` through `4` your run prints `0 0` and `4 4`,
+with the same `None` for `1`, `2`, and `3`,
+and you can name what those three lines lose compared with `composing.py`'s output for the same inputs.
 
 <details>
 <summary>Solution</summary>
@@ -693,7 +728,8 @@ input `0` prints `0 None`.
 `func_a(0)` succeeds with `0`, which is falsy,
 so `composed()` treats a success as a failure.
 The type checker accepts that version.
-The solution compares with `is None`, which separates a missing value from a zero.
+The solution compares with `is None`,
+which separates a missing value from a zero.
 
 ```python
 # exercise_6.py
@@ -732,23 +768,23 @@ for i in range(5):
 #: 4 4
 ```
 
-The three failures become one result. Inputs `1`, `2`, and `3` fail
-in three different functions for three different reasons.
-`composed()` returns the same `None` for all three. Compare the
-`Result` version, where the same three inputs report `func_a(1)`,
+The three failures become one result.
+Inputs `1`, `2`, and `3` fail in three different functions for three different reasons.
+`composed()` returns the same `None` for all three.
+Compare the `Result` version, where the same three inputs report `func_a(1)`,
 `func_b(2)`, and `func_c(3): division by zero`.
 
-**Stop at the first failure.** The structure of `composed()` barely
-changes. `if a is None` replaces `if isinstance(a, Err)`, and the
-early returns stay. What changes is the value each early return gives
-the caller. `None` is one value and holds no reason,
+**Stop at the first failure.**
+The structure of `composed()` barely changes.
+`if a is None` replaces `if isinstance(a, Err)`, and the early returns stay.
+What changes is the value each early return gives the caller.
+`None` is one value and holds no reason,
 so the caller receives the same `None` from every failing step.
 
 The chapter [weighs `None` against `Result`](../../Chapters/42_Functional--Error_Handling.md#reaching-the-answer).
-Use `| None` when the caller needs
-to know whether a step succeeded. Use a `Result` when the caller may need to act on
-which failure occurred, or when a person reading a bug report needs
-to know which of three steps went wrong.
+Use `| None` when the caller needs to know whether a step succeeded.
+Use a `Result` when the caller may need to act on which failure occurred,
+or when a person reading a bug report needs to know which of three steps went wrong.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

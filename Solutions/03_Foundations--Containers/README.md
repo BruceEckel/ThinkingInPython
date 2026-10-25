@@ -14,9 +14,12 @@
 <details>
 <summary>Where to look</summary>
 
-[`deque`](../../Chapters/03_Foundations--Containers.md#deque) compares the cost of operations at the left end of a `list` and of a `deque`.
-Time a loop of `insert(0, x)` and `pop(0)` calls against `appendleft()` and `popleft()`, once at each size.
-Count how many elements each left-end operation on a `list` must move, and compare that with the `deque` version as `n` grows.
+[`deque`](../../Chapters/03_Foundations--Containers.md#deque)
+compares the cost of operations at the left end of a `list` and of a `deque`.
+Time a loop of `insert(0, x)` and `pop(0)` calls against `appendleft()` and `popleft()`,
+once at each size.
+Count how many elements each left-end operation on a `list` must move,
+and compare that with the `deque` version as `n` grows.
 
 <details>
 <summary>The shape</summary>
@@ -37,7 +40,9 @@ def deque_left_ops():
 <details>
 <summary>Done when</summary>
 
-your modified `deque_timing.py` prints `True` at `n = 2_000` and again at `n = 200_000`, and your explanation says how many elements one left-end operation moves in each container as `n` grows, and what that does to the gap between the two times.
+your modified `deque_timing.py` prints `True` at `n = 2_000` and again at `n = 200_000`,
+and your explanation says how many elements one left-end operation moves in each container as `n` grows,
+and what that does to the gap between the two times.
 
 <details>
 <summary>Solution</summary>
@@ -72,9 +77,10 @@ print(deque_time < list_time)
 ```
 
 `deque_time < list_time` holds at `n = 2_000`, `20_000`, and `200_000`.
-But the margin grows with `n`. Each `list.insert(0, x)` or
-`list.pop(0)` shifts every remaining element, so the whole loop costs
-O(n²). Each `deque` operation is O(1), so the `deque` loop costs O(n).
+But the margin grows with `n`.
+Each `list.insert(0, x)` or `list.pop(0)` shifts every remaining element,
+so the whole loop costs O(n²).
+Each `deque` operation is O(1), so the `deque` loop costs O(n).
 At a handful of items the constant-factor overhead of a `deque` makes the two times nearly equal,
 though by `n = 2_000` the `deque` finishes several times faster.
 At large `n` the list's quadratic term dominates,
@@ -97,14 +103,18 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[`defaultdict`](../../Chapters/03_Foundations--Containers.md#defaultdict) shows a factory called to create a missing value.
-The factory here is `int`, so ask what `int()` returns when called with no arguments.
+[`defaultdict`](../../Chapters/03_Foundations--Containers.md#defaultdict)
+shows a factory called to create a missing value.
+The factory here is `int`,
+so ask what `int()` returns when called with no arguments.
 That default lets the loop add to a key before it exists.
 
 <details>
 <summary>Done when</summary>
 
-your file prints `{'dog': 2, 'cat': 1}` (or `defaultdict(<class 'int'>, {'dog': 2, 'cat': 1})` if you print the `defaultdict` directly), and your loop increments each count with no check for whether the key exists yet.
+your file prints `{'dog': 2, 'cat': 1}`
+(or `defaultdict(<class 'int'>, {'dog': 2, 'cat': 1})` if you print the `defaultdict` directly),
+and your loop increments each count with no check for whether the key exists yet.
 
 <details>
 <summary>Solution</summary>
@@ -112,7 +122,8 @@ your file prints `{'dog': 2, 'cat': 1}` (or `defaultdict(<class 'int'>, {'dog': 
 If you start the tally from an empty `dict`,
 the first `counts[kind] += 1` raises a `KeyError` for `'dog'`,
 because `+=` reads the key before it writes it.
-The solution uses `defaultdict(int)`, which supplies the `0` that the first read needs.
+The solution uses `defaultdict(int)`,
+which supplies the `0` that the first read needs.
 
 ```python
 # exercise_2.py
@@ -126,11 +137,12 @@ print(dict(counts))
 #: {'dog': 2, 'cat': 1}
 ```
 
-The `0` that `defaultdict(int)` supplies for a missing key comes from
-`int()`, which returns `0` when called with no arguments.
+The `0` that `defaultdict(int)` supplies for a missing key comes from `int()`,
+which returns `0` when called with no arguments.
 That default lets `counts[kind] += 1` work with no "does this key exist yet" check.
-In `defaultdict.py`, `defaultdict(list)` removes the same check from the
-grouping loop, with a fresh empty list as the default.
+In `defaultdict.py`,
+`defaultdict(list)` removes the same check from the grouping loop,
+with a fresh empty list as the default.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -147,14 +159,18 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Sets](../../Chapters/03_Foundations--Containers.md#sets) lists the set operators, and `set_methods.py` shows the method forms of the same operations.
+[Sets](../../Chapters/03_Foundations--Containers.md#sets)
+lists the set operators,
+and `set_methods.py` shows the method forms of the same operations.
 The methods `union()` and `intersection()` take several arguments at once.
 Pass `b` and `d` in a single call to each.
 
 <details>
 <summary>Done when</summary>
 
-your file prints `{1, 2, 3, 4, 5, 9}` and then `set()`, each from a single method call that receives both `b` and `d`, and you can say why the intersection is empty.
+your file prints `{1, 2, 3, 4, 5, 9}` and then `set()`,
+each from a single method call that receives both `b` and `d`,
+and you can say why the intersection is empty.
 
 <details>
 <summary>Solution</summary>
@@ -170,10 +186,9 @@ print(a.intersection(b, d))
 #: set()
 ```
 
-`union()` and `intersection()` accept any number of arguments, unlike
-the `|` and `&` operators, which take two operands at a time.
-The three-way intersection is empty because no single value is a
-member of all three sets.
+`union()` and `intersection()` accept any number of arguments,
+unlike the `|` and `&` operators, which take two operands at a time.
+The three-way intersection is empty because no single value is a member of all three sets.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -192,14 +207,18 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Immutability](../../Chapters/03_Foundations--Containers.md#immutability) explains that a `frozenset` is hashable, so it works as a set member or a dictionary key.
+[Immutability](../../Chapters/03_Foundations--Containers.md#immutability)
+explains that a `frozenset` is hashable,
+so it works as a set member or a dictionary key.
 A `set` must hash each element when it adds it.
-Wrap the `groups.add()` call in a `try`, catch `TypeError`, and relate the message to what a `list` allows you to do after creation.
+Wrap the `groups.add()` call in a `try`, catch `TypeError`,
+and relate the message to what a `list` allows you to do after creation.
 
 <details>
 <summary>Done when</summary>
 
-your `except` clause catches a `TypeError` whose message is `cannot use 'list' as a set element (unhashable type: 'list')`, and your explanation ties the hash a set computes at insertion to what a `list` lets you do after creation and a `frozenset` does not.
+your `except` clause catches a `TypeError` whose message is `cannot use 'list' as a set element (unhashable type: 'list')`,
+and your explanation ties the hash a set computes at insertion to what a `list` lets you do after creation and a `frozenset` does not.
 
 <details>
 <summary>Solution</summary>
@@ -216,8 +235,9 @@ except TypeError as e:
 #: cannot use 'list' as a set element
 ```
 
-A `set` hashes each element once, at insertion, so every element must
-be hashable. `frozenset` is hashable because it is immutable.
+A `set` hashes each element once, at insertion,
+so every element must be hashable.
+`frozenset` is hashable because it is immutable.
 Its contents stay the same after creation, so its hash stays valid.
 A `list` is mutable, so the `list` class sets `__hash__` to `None`.
 A set member or a dictionary key needs a hash, so a `list` can be neither.
@@ -238,20 +258,27 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Indexing and Slicing](../../Chapters/03_Foundations--Containers.md#indexing-and-slicing) covers `start`, `stop`, and `step`, and the way negative values count from the end.
+[Indexing and Slicing](../../Chapters/03_Foundations--Containers.md#indexing-and-slicing)
+covers `start`, `stop`, and `step`,
+and the way negative values count from the end.
 You can slice a slice to reverse a copy.
-A negative `step` also reverses in a single slice, but then `start` and `stop` swap roles.
+A negative `step` also reverses in a single slice,
+but then `start` and `stop` swap roles.
 
 <details>
 <summary>Done when</summary>
 
-three single expressions on `xs` print `[40, 50]`, `[20, 30, 40]`, and `[40, 30, 20]`, none of them uses `len()`, and `xs` prints `[10, 20, 30, 40, 50]` afterward.
-For a further check, produce `[40, 30, 20]` with one slice that has a negative `step`.
+three single expressions on `xs` print `[40, 50]`, `[20, 30, 40]`,
+and `[40, 30, 20]`, none of them uses `len()`,
+and `xs` prints `[10, 20, 30, 40, 50]` afterward.
+For a further check,
+produce `[40, 30, 20]` with one slice that has a negative `step`.
 
 <details>
 <summary>Solution</summary>
 
-If you fold `xs[1:4][::-1]` into one slice as `xs[1:4:-1]`, you get an empty list.
+If you fold `xs[1:4][::-1]` into one slice as `xs[1:4:-1]`,
+you get an empty list.
 A negative `step` counts down from `start`,
 and index `1` is less than the stop at `4`,
 so the slice ends before it takes an item.
@@ -271,11 +298,12 @@ print(xs[3:0:-1])  # The same three, in one slice
 ```
 
 A negative `start` counts from the end, so `xs[-2:]` needs no length.
-`xs[1:-1]` trims one item from each end. The reversed middle has two
-forms: slice, then reverse the copy, or count the indices down with a
-negative `step`. The one-slice form is harder to read because the
-bounds swap roles. `3` is now the first index visited and `0` is the
-stop, which the slice excludes, so the slice ends at index `1`.
+`xs[1:-1]` trims one item from each end.
+The reversed middle has two forms: slice, then reverse the copy,
+or count the indices down with a negative `step`.
+The one-slice form is harder to read because the bounds swap roles.
+`3` is now the first index visited and `0` is the stop,
+which the slice excludes, so the slice ends at index `1`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -292,20 +320,26 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[`Counter`](../../Chapters/03_Foundations--Containers.md#counter) lists what `Counter` provides beyond a tally, and [`defaultdict`](../../Chapters/03_Foundations--Containers.md#defaultdict) shows the factory that creates missing entries.
+[`Counter`](../../Chapters/03_Foundations--Containers.md#counter)
+lists what `Counter` provides beyond a tally,
+and [`defaultdict`](../../Chapters/03_Foundations--Containers.md#defaultdict)
+shows the factory that creates missing entries.
 Write the counting loop with `defaultdict(int)`.
-Then reproduce `most_common()` with `sorted()` and a `key` function, and notice what reading a missing key does to each container.
+Then reproduce `most_common()` with `sorted()` and a `key` function,
+and notice what reading a missing key does to each container.
 
 <details>
 <summary>Done when</summary>
 
-your file, with no `Counter` import, prints `{'a': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}` and `[('a', 3), ('cat', 2)]`, matching `counter.py`'s `most_common(2)`; `counts["dog"]` prints `0`; and you can say how your container differs from a `Counter` after that read.
+your file, with no `Counter` import,
+prints `{'a': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}` and `[('a', 3), ('cat', 2)]`,
+matching `counter.py`'s `most_common(2)`; `counts["dog"]` prints `0`;
+and you can say how your container differs from a `Counter` after that read.
 
 <details>
 <summary>Solution</summary>
 
-The solution counts with `defaultdict(int)`
-and rebuilds `most_common()` with `sorted()`:
+The solution counts with `defaultdict(int)` and rebuilds `most_common()` with `sorted()`:
 
 ```python
 # exercise_6.py
@@ -323,20 +357,21 @@ print(sorted(counts.items(), key=lambda kv: -kv[1])[:2])
 #: [('a', 3), ('cat', 2)]
 ```
 
-**Count each word.** First, you write the loop yourself. `Counter(words)`
-counts an iterable inside its constructor, while `defaultdict(int)`
-removes the "does this key exist yet" check and leaves the counting to
-you.
+**Count each word.**
+First, you write the loop yourself.
+`Counter(words)` counts an iterable inside its constructor,
+while `defaultdict(int)` removes the "does this key exist yet" check and leaves the counting to you.
 
-**Default a missing key to zero.** Both containers read a missing key as `0`.
+**Default a missing key to zero.**
+Both containers read a missing key as `0`.
 A `Counter` leaves its contents as they were,
 while `defaultdict(int)` stores a `0` for `"dog"`,
 so their contents differ after the `counts["dog"]` line.
 
-**Rebuild the reporting.** The rest is what `Counter` supplies after
-the tally. `most_common()` becomes a `sorted()` call with a key
-function and a slice, and the `Counter({...})` repr becomes a `dict()`
-conversion.
+**Rebuild the reporting.**
+The rest is what `Counter` supplies after the tally.
+`most_common()` becomes a `sorted()` call with a key function and a slice,
+and the `Counter({...})` repr becomes a `dict()` conversion.
 
 If you leave the minus sign out of the `key` function,
 `sorted()` ranks the lowest counts first,
@@ -360,14 +395,20 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[`namedtuple`](../../Chapters/03_Foundations--Containers.md#namedtuple) builds a tuple subclass with named fields.
-Because each instance is still a tuple, the unpacking from [Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking) works by position.
-Create the class with `namedtuple()`, keep the unpacking line as it was, and add a line that reads a field by name.
+[`namedtuple`](../../Chapters/03_Foundations--Containers.md#namedtuple)
+builds a tuple subclass with named fields.
+Because each instance is still a tuple,
+the unpacking from [Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking)
+works by position.
+Create the class with `namedtuple()`, keep the unpacking line as it was,
+and add a line that reads a field by name.
 
 <details>
 <summary>Done when</summary>
 
-the line `name, age, height = person` appears in your file unchanged from `heterogeneous.py` and still prints `Alice 30 1.65`, and another line reads a field by name rather than by position and prints its value, such as `Alice`.
+the line `name, age, height = person` appears in your file unchanged from `heterogeneous.py` and still prints `Alice 30 1.65`,
+and another line reads a field by name rather than by position and prints its value,
+such as `Alice`.
 
 <details>
 <summary>Solution</summary>
@@ -389,15 +430,14 @@ print(person[0], type(person[0]).__name__)
 #: Alice str
 ```
 
-The unpacking line stays the same, because a `namedtuple` is a tuple
-subclass and unpacks by position like any other tuple.
+The unpacking line stays the same,
+because a `namedtuple` is a tuple subclass and unpacks by position like any other tuple.
 
 Line `[1]` reads fields by name.
 `person.height` names the field that `person[2]` reads by position.
 Unpacking and `person[0]` still work beside the names,
 so code written for the tuple runs unchanged.
-A heterogeneous tuple that passes between functions
-is usually better as a `namedtuple` or a data class,
+A heterogeneous tuple that passes between functions is usually better as a `namedtuple` or a data class,
 because each function then reads a field by name instead of by position.
 
 Before you move on, name what separates your attempt from this one:
@@ -417,15 +457,20 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Dictionaries](../../Chapters/03_Foundations--Containers.md#dictionaries) shows the `dict` constructor and the merge operators in `dict_ops.py`.
+[Dictionaries](../../Chapters/03_Foundations--Containers.md#dictionaries)
+shows the `dict` constructor and the merge operators in `dict_ops.py`.
 The `dict()` constructor accepts an iterable of pairs.
 The `|` operator builds a new `dict`.
-To decide which operand supplies the value when both hold the same key, compare `|` with `update()`, which writes its argument's entries over the dictionary's own.
+To decide which operand supplies the value when both hold the same key,
+compare `|` with `update()`,
+which writes its argument's entries over the dictionary's own.
 
 <details>
 <summary>Done when</summary>
 
-your merge prints `{'a': 1, 'b': 2, 'c': 30, 'd': 4}`, your keys and values hold `['a', 'b', 'c']` and `[1, 2, 3]`, and your answer says which operand supplies `30` and what the merge gives if you swap the two operands.
+your merge prints `{'a': 1, 'b': 2, 'c': 30, 'd': 4}`,
+your keys and values hold `['a', 'b', 'c']` and `[1, 2, 3]`,
+and your answer says which operand supplies `30` and what the merge gives if you swap the two operands.
 
 <details>
 <summary>Solution</summary>
@@ -445,18 +490,23 @@ print(counts)  # The merge built a new dict
 #: {'a': 1, 'b': 2, 'c': 3}
 ```
 
-**Build the dictionary.** `dict()` accepts any iterable of two-item pairs, so a list of tuples
-becomes a dictionary in one call. `dict_ops.py` feeds the same
-constructor from two parallel sequences, as `dict(zip("abc", [1, 2, 3]))`.
+**Build the dictionary.**
+`dict()` accepts any iterable of two-item pairs,
+so a list of tuples becomes a dictionary in one call.
+`dict_ops.py` feeds the same constructor from two parallel sequences,
+as `dict(zip("abc", [1, 2, 3]))`.
 
-**Resolve the collision.** `30` ends up under `"c"`, because `|` resolves a collision in favor of
-the right operand.
-A merge holds one value per key, and the two dictionaries hold different values for `"c"`,
+**Resolve the collision.**
+`30` ends up under `"c"`,
+because `|` resolves a collision in favor of the right operand.
+A merge holds one value per key,
+and the two dictionaries hold different values for `"c"`,
 so the merge must drop one of them.
-The right operand wins because `a | b` reads as "start from `a`, then apply `b`,"
-the same order `a.update(b)` has always used.
+The right operand wins because `a | b` reads as "start from `a`,
+then apply `b`," the same order `a.update(b)` has always used.
 
-**Build a new dictionary.** `|` builds a new dictionary and leaves the left operand alone,
+**Build a new dictionary.**
+`|` builds a new dictionary and leaves the left operand alone,
 so `counts` prints unchanged after the merge.
 `|=` updates the left dictionary in place.
 
@@ -483,28 +533,34 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking) shows a starred target collecting the leftover items into a `list`.
+[Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking)
+shows a starred target collecting the leftover items into a `list`.
 Put the star on the target that should collect the middle, or at either end.
-For the explanation, compare how many items an unstarred target list requires with how many a starred one allows.
+For the explanation,
+compare how many items an unstarred target list requires with how many a starred one allows.
 
 <details>
 <summary>Done when</summary>
 
-your file subscripts `row` nowhere, its assignments print `1 [2, 3, 4, 5]`, `[1, 2, 3, 4] 5`, and `1 [2, 3, 4] 5`, catching the exception from `a, b = row` prints `too many values to unpack (expected 2, got 5)`, and your explanation says how many items each of the two target lists accepts.
+your file subscripts `row` nowhere, its assignments print `1 [2, 3, 4, 5]`,
+`[1, 2, 3, 4] 5`, and `1 [2, 3, 4] 5`,
+catching the exception from `a, b = row` prints `too many values to unpack (expected 2, got 5)`,
+and your explanation says how many items each of the two target lists accepts.
 
 <details>
 <summary>Solution</summary>
 
-If you index instead, writing
-`first, middle, last = row[0], row[1:-1], row[-1]`, the program
-prints the same `1 [2, 3, 4] 5`.
+If you index instead,
+writing `first, middle, last = row[0], row[1:-1], row[-1]`,
+the program prints the same `1 [2, 3, 4] 5`.
 That line uses the indexing the exercise rules out.
 The indexed line and the starred unpacking differ on a one-item list.
-The indexed version prints `1 [] 1`, counting the one item as both first
-and last, while `first, *middle, last = [1]` raises a `ValueError`
-(`not enough values to unpack`). The solution uses starred targets,
-because one target list states the shape it expects and Python
-checks that shape for you.
+The indexed version prints `1 [] 1`,
+counting the one item as both first and last,
+while `first, *middle, last = [1]` raises a `ValueError`
+(`not enough values to unpack`).
+The solution uses starred targets,
+because one target list states the shape it expects and Python checks that shape for you.
 
 ```python
 # exercise_9.py
@@ -526,22 +582,26 @@ except ValueError as e:
 #: too many values to unpack (expected 2, got 5)
 ```
 
-**Collect the remaining items.** A starred target collects however many items remain, so one assignment
-reaches any of the three positions without an index. The star may
-appear anywhere in the target list, so `first, *middle, last = row`
-works. `first` and `last` each take one item and `middle` takes the
-rest, however many that is.
+**Collect the remaining items.**
+A starred target collects however many items remain,
+so one assignment reaches any of the three positions without an index.
+The star may appear anywhere in the target list,
+so `first, *middle, last = row` works.
+`first` and `last` each take one item and `middle` takes the rest,
+however many that is.
 
-**Reject a count mismatch.** `a, b = row` fails because an unstarred target list states an exact
-count, two, and `row` holds five. Python raises a `ValueError` rather
-than dropping the extras, since a silent drop hides the mismatch.
-The same error appears in the other direction, as
-`not enough values to unpack`, when the list is shorter than the
-target list.
+**Reject a count mismatch.**
+`a, b = row` fails because an unstarred target list states an exact count, two,
+and `row` holds five.
+Python raises a `ValueError` rather than dropping the extras,
+since a silent drop hides the mismatch.
+The same error appears in the other direction, as `not enough values to unpack`,
+when the list is shorter than the target list.
 
-`a, *b = row` states a minimum: at least one item for `a`, and
-the rest, zero or more, for `b`. So the assignment accepts a
-five-item list, a one-item list, and everything between.
+`a, *b = row` states a minimum: at least one item for `a`, and the rest,
+zero or more, for `b`.
+So the assignment accepts a five-item list, a one-item list,
+and everything between.
 Only an empty list has too few items.
 A `*args` parameter collects a call's extra positional arguments the same way.
 
@@ -565,24 +625,32 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[`frozendict`](../../Chapters/03_Foundations--Containers.md#frozendict) shows construction, equality, and the error on assignment, and [Shallow Immutability](../../Chapters/03_Foundations--Containers.md#shallow-immutability) shows how far immutability reaches.
-A dictionary finds a key by hash and equality, so a separately built, equal `frozendict` locates the same entry.
-For the last part, ask what `hash()` must do with each value, and what happens when one of those values is a `list`.
+[`frozendict`](../../Chapters/03_Foundations--Containers.md#frozendict)
+shows construction, equality, and the error on assignment,
+and [Shallow Immutability](../../Chapters/03_Foundations--Containers.md#shallow-immutability)
+shows how far immutability reaches.
+A dictionary finds a key by hash and equality, so a separately built,
+equal `frozendict` locates the same entry.
+For the last part, ask what `hash()` must do with each value,
+and what happens when one of those values is a `list`.
 
 <details>
 <summary>Done when</summary>
 
-the lookup with your separately built `frozendict` prints the connection name, the caught assignment prints `'frozendict' object does not support item assignment`, and hashing the list-valued `frozendict` raises a `TypeError` that prints `unhashable type: 'list'`, which your explanation connects to shallow immutability.
+the lookup with your separately built `frozendict` prints the connection name,
+the caught assignment prints `'frozendict' object does not support item assignment`,
+and hashing the list-valued `frozendict` raises a `TypeError` that prints `unhashable type: 'list'`,
+which your explanation connects to shallow immutability.
 
 <details>
 <summary>Solution</summary>
 
-If you build the configuration with `dict(pairs)` instead, the
-program prints `{'host': 'localhost', 'port': 8080}`.
+If you build the configuration with `dict(pairs)` instead,
+the program prints `{'host': 'localhost', 'port': 8080}`.
 Then `connections = {config: "primary"}` raises a `TypeError`:
-`cannot use 'dict' as a dict key (unhashable type: 'dict')`. A
-`dict` can change, so the `dict` class sets `__hash__` to `None`. The solution
-builds a `frozendict`, whose entries stay the same after creation,
+`cannot use 'dict' as a dict key (unhashable type: 'dict')`.
+A `dict` can change, so the `dict` class sets `__hash__` to `None`.
+The solution builds a `frozendict`, whose entries stay the same after creation,
 so the `frozendict` is hashable when its values are.
 
 ```python
@@ -610,25 +678,31 @@ except TypeError as e:
 #: unhashable type: 'list'
 ```
 
-**Build the configuration.** `frozendict` takes the same arguments `dict` does: an iterable of
-two-item pairs, keyword arguments, or another mapping.
+**Build the configuration.**
+`frozendict` takes the same arguments `dict` does:
+an iterable of two-item pairs, keyword arguments, or another mapping.
 So `frozendict(pairs)` equals `frozendict(host="localhost", port=8080)`.
 
-**Look up by an equal key.** The lookup with `same` succeeds because a dictionary finds a key by
-hash and equality, not by identity.
+**Look up by an equal key.**
+The lookup with `same` succeeds because a dictionary finds a key by hash and equality,
+not by identity.
 `config` and `same` are separate objects built in different entry orders.
 They hold the same pairs, so they compare equal and hash the same.
 With a `frozendict` key, any equal configuration reaches the same entry.
 
-**Catch the rejected assignment.** Assigning to an entry raises a `TypeError` at runtime,
-and the type checker rejects the assignment too. The
-line carries a `# type: ignore` because the listing makes the
-assignment on purpose, to show the runtime exception.
+**Catch the rejected assignment.**
+Assigning to an entry raises a `TypeError` at runtime,
+and the type checker rejects the assignment too.
+The line carries a `# type: ignore` because the listing makes the assignment on purpose,
+to show the runtime exception.
 
-**Find the limit of immutability.** A `frozendict` freezes
-which object sits under each key, not what those objects contain.
-To hash `nested`, `hash()` must hash its `list` value, and hashing a `list` raises a `TypeError`.
-The immutability is shallow, as it is for the `tuple` in `shallow_immutability.py`.
+**Find the limit of immutability.**
+A `frozendict` freezes which object sits under each key,
+not what those objects contain.
+To hash `nested`, `hash()` must hash its `list` value,
+and hashing a `list` raises a `TypeError`.
+The immutability is shallow,
+as it is for the `tuple` in `shallow_immutability.py`.
 Because a `frozendict` is hashable when its values are,
 keep its values immutable whenever you use the mapping as a key:
 a `tuple` here instead of a `list`.

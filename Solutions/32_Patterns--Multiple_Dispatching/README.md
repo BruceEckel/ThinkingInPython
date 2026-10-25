@@ -1,7 +1,8 @@
 # Multiple Dispatching: Solutions
 
-Every exercise that adds `Lizard` uses the same rule: `Lizard` beats
-Paper and Scissors, and loses to Rock. Lizard versus Lizard is a draw.
+Every exercise that adds `Lizard` uses the same rule:
+`Lizard` beats Paper and Scissors, and loses to Rock.
+Lizard versus Lizard is a draw.
 
 ## 1. Adding `Lizard` to the table version
 
@@ -14,9 +15,12 @@ Paper and Scissors, and loses to Rock. Lizard versus Lizard is a draw.
 <details>
 <summary>Where to look</summary>
 
-[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) shows that `OUTCOME` is a dictionary keyed on a pair of classes.
-Adding a class changes the dictionary and leaves every method alone, so `compete()` stays as it is.
-Write one entry for each ordered pair of `Lizard` with another item, and one for `Lizard` against `Lizard`.
+[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
+shows that `OUTCOME` is a dictionary keyed on a pair of classes.
+Adding a class changes the dictionary and leaves every method alone,
+so `compete()` stays as it is.
+Write one entry for each ordered pair of `Lizard` with another item,
+and one for `Lizard` against `Lizard`.
 
 <details>
 <summary>The shape</summary>
@@ -72,14 +76,16 @@ OUTCOME: Final[Table] = {
 <details>
 <summary>Done when</summary>
 
-`Lizard().compete(Paper())` and `Rock().compete(Lizard())` both return `win`, and `compete()` returns an `Outcome` for all sixteen ordered pairs of the four items, with no `KeyError`.
+`Lizard().compete(Paper())` and `Rock().compete(Lizard())` both return `win`,
+and `compete()` returns an `Outcome` for all sixteen ordered pairs of the four items,
+with no `KeyError`.
 
 <details>
 <summary>Solution</summary>
 
-If you write one order of a mixed pair,
-say `(Lizard, Paper)`, and leave out `(Paper, Lizard)`,
-the demo prints `win win`, since both of its duels find their rows.
+If you write one order of a mixed pair, say `(Lizard, Paper)`,
+and leave out `(Paper, Lizard)`, the demo prints `win win`,
+since both of its duels find their rows.
 `Paper().compete(Lizard())` then raises a `KeyError`,
 at the first duel that asks for that order.
 The table holds one answer per ordered pair,
@@ -138,17 +144,18 @@ if __name__ == "__main__":
 #: win win
 ```
 
-**Answer every ordered pair.** Sixteen entries cover the four types against each other (4 × 4), the
-same shape as the original nine (3 × 3). Adding a fourth `Item` requires
-one class declaration and seven new dictionary rows:
-the six ordered pairs `Lizard` forms with the other three, plus
-`(Lizard, Lizard)`. `compete()` stays as it is.
+**Answer every ordered pair.**
+Sixteen entries cover the four types against each other (4 × 4),
+the same shape as the original nine (3 × 3).
+Adding a fourth `Item` requires one class declaration and seven new dictionary rows:
+the six ordered pairs `Lizard` forms with the other three,
+plus `(Lizard, Lizard)`.
+`compete()` stays as it is.
 
-**Guard the demonstration.** The `__main__` guard lets exercise 3 import this module and skip
-its demonstration.
-The chapter keeps the method version's demonstration in a separate
-file, `methods_demo.py`, so importing `paper_scissors_rock.py` runs
-nothing.
+**Guard the demonstration.**
+The `__main__` guard lets exercise 3 import this module and skip its demonstration.
+The chapter keeps the method version's demonstration in a separate file,
+`methods_demo.py`, so importing `paper_scissors_rock.py` runs nothing.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -168,9 +175,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods) shows `compete()` calling an `eval_*()` method on the opponent, so each class answers for one type.
-A new class needs its own `compete()` and four `eval_*()` methods, and every existing class needs an `eval_lizard()`.
-Count the methods you wrote, then compare with the seven dictionary rows the table version needs.
+[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods)
+shows `compete()` calling an `eval_*()` method on the opponent,
+so each class answers for one type.
+A new class needs its own `compete()` and four `eval_*()` methods,
+and every existing class needs an `eval_lizard()`.
+Count the methods you wrote,
+then compare with the seven dictionary rows the table version needs.
 
 <details>
 <summary>The shape</summary>
@@ -257,13 +268,17 @@ class Lizard(Item):
 <details>
 <summary>Done when</summary>
 
-`Lizard().compete()` returns `win`, `win`, `lose`, `draw` against `Paper`, `Scissors`, `Rock`, and `Lizard`, each reversed duel returns the opposite result (a draw stays a draw), and you can state how many methods you added against exercise 1's seven rows.
+`Lizard().compete()` returns `win`, `win`, `lose`, `draw` against `Paper`,
+`Scissors`, `Rock`, and `Lizard`, each reversed duel returns the opposite result
+(a draw stays a draw),
+and you can state how many methods you added against exercise 1's seven rows.
 
 <details>
 <summary>Solution</summary>
 
 If you forget `eval_lizard()` on one existing class, say `Rock`,
-the type checker accepts the call to the missing method, because every `opponent` and `caller` parameter takes `Any`.
+the type checker accepts the call to the missing method,
+because every `opponent` and `caller` parameter takes `Any`.
 The demo then raises an `AttributeError` at `Lizard().compete(Rock())`,
 the first duel that calls the missing method.
 That `AttributeError` is the first sign of the mistake,
@@ -355,24 +370,28 @@ if __name__ == "__main__":
 #: win win lose draw
 ```
 
-**Retrofit every existing class.** Every existing class
-(`Paper`, `Scissors`, `Rock`) needs a new `eval_lizard()` method.
+**Retrofit every existing class.**
+Every existing class (`Paper`, `Scissors`, `Rock`)
+needs a new `eval_lizard()` method.
 
-**Give the new class both dispatches.** The new `Lizard` class needs a `compete()` plus four
-`eval_*()` methods, one per opponent type including its own.
-Across the four classes, the `eval_*()` methods encode the sixteen answers
-that the table version's `OUTCOME` dictionary collects in one place.
+**Give the new class both dispatches.**
+The new `Lizard` class needs a `compete()` plus four `eval_*()` methods,
+one per opponent type including its own.
+Across the four classes,
+the `eval_*()` methods encode the sixteen answers that the table version's `OUTCOME` dictionary collects in one place.
 The two implementations agree on all sixteen combinations.
 
-**Guard the demonstration.** The `__main__` guard serves exercise 3, as in exercise 1.
+**Guard the demonstration.**
+The `__main__` guard serves exercise 3, as in exercise 1.
 
 Extending the table takes one class and seven dictionary rows.
 Extending the method version takes one class and five new methods,
 plus a method retrofitted onto every existing class.
-Each item type you add lengthens that list of retrofits. The chapter therefore recommends the table by
-default, and reserves the method version for behavior that belongs to
-the class: a combination that reads the object's own state, or one a
-subclass should override while inheriting the rest.
+Each item type you add lengthens that list of retrofits.
+The chapter therefore recommends the table by default,
+and reserves the method version for behavior that belongs to the class:
+a combination that reads the object's own state,
+or one a subclass should override while inheriting the rest.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -391,9 +410,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Testing Both Versions](../../Chapters/32_Patterns--Multiple_Dispatching.md#testing-both-versions) keeps one `EXPECTED` mapping and checks both implementations against it.
-Add the seven `Lizard` rows to that mapping, keyed on the player's and opponent's class names.
-A helper looks each class up by name with `getattr()` on whichever module it receives, so one mapping checks both versions.
+[Testing Both Versions](../../Chapters/32_Patterns--Multiple_Dispatching.md#testing-both-versions)
+keeps one `EXPECTED` mapping and checks both implementations against it.
+Add the seven `Lizard` rows to that mapping,
+keyed on the player's and opponent's class names.
+A helper looks each class up by name with `getattr()` on whichever module it receives,
+so one mapping checks both versions.
 The test reports any disagreement as a failure.
 
 <details>
@@ -434,15 +456,16 @@ def compete(module: ModuleType, player: str,
 <details>
 <summary>Done when</summary>
 
-`uv run pytest` on your `test_paper_scissors.py`, run against your exercise 1 and exercise 2 versions, reports 32 passed: sixteen `EXPECTED` cases for each version.
+`uv run pytest` on your `test_paper_scissors.py`,
+run against your exercise 1 and exercise 2 versions, reports 32 passed:
+sixteen `EXPECTED` cases for each version.
 
 <details>
 <summary>Solution</summary>
 
-If you add the seven rows to `EXPECTED`
-and leave the test importing the chapter's `paper_scissors_rock` and `paper_scissors_rock_table`,
-every `Lizard` case fails with an `AttributeError`:
-fourteen of the 32 cases, seven per module.
+If you add the seven rows to `EXPECTED` and leave the test importing the chapter's `paper_scissors_rock` and `paper_scissors_rock_table`,
+every `Lizard` case fails with an `AttributeError`: fourteen of the 32 cases,
+seven per module.
 The chapter modules define `Paper`, `Scissors`, and `Rock`,
 so `getattr()` raises `AttributeError` when it looks up `"Lizard"`.
 The solution points both imports at exercises 1 and 2.
@@ -490,29 +513,31 @@ for module in (table, methods):
 #: exercise_2 16 agree: True
 ```
 
-**Check both versions against one mapping.** The test imports exercise 1's table and exercise 2's methods,
+**Check both versions against one mapping.**
+The test imports exercise 1's table and exercise 2's methods,
 the two versions that define `Lizard`.
-Its helper, `compete()`, looks each class up by name on whichever module it receives,
+Its helper, `compete()`,
+looks each class up by name on whichever module it receives,
 so one `EXPECTED` checks both sets of classes.
 
-**Compare across separate enumerations.** Each module defines its own
-`Outcome`. The comparison still works, since a `StrEnum` member
-equals its string value.
+**Compare across separate enumerations.**
+Each module defines its own `Outcome`.
+The comparison still works, since a `StrEnum` member equals its string value.
 
-The test in `test_paper_scissors.py` needs two changes once its two
-imports name modules that include `Lizard`. One is the sixteen-entry
-`EXPECTED`. The other is in the `compete()` helper. Each of those
-modules defines its own `Outcome`, so the chapter's
-`isinstance(result, Outcome)` assertion fails. The solution's
-`compete()` asserts against `module.Outcome`:
+The test in `test_paper_scissors.py` needs two changes once its two imports name modules that include `Lizard`.
+One is the sixteen-entry `EXPECTED`.
+The other is in the `compete()` helper.
+Each of those modules defines its own `Outcome`,
+so the chapter's `isinstance(result, Outcome)` assertion fails.
+The solution's `compete()` asserts against `module.Outcome`:
 the enumeration of the module that produced the result.
 The helper's return annotation loosens from `Outcome` to `str`,
 the base class that both modules' `Outcome` enumerations share,
 but the assertion still rejects a version that returns the bare string `"win"`.
 
 `test_versions_match_expected()` takes its cases from `EXPECTED`.
-`pytest` parametrizes it with the keys of that mapping, so the test
-reports sixteen cases per module where it reported nine.
+`pytest` parametrizes it with the keys of that mapping,
+so the test reports sixteen cases per module where it reported nine.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -538,9 +563,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-Write `random_pairs()` as a generator, like the chapter's `all_pairs()` in `arena.py`, so its body runs only as you iterate over it.
-When the caller passes no `Counter`, create a fresh one so the body has a single path.
-Increment the count for each item inside the loop, before the `yield`, so the caller's own `Counter` fills as the loop consumes the pairs.
+Write `random_pairs()` as a generator,
+like the chapter's `all_pairs()` in `arena.py`,
+so its body runs only as you iterate over it.
+When the caller passes no `Counter`,
+create a fresh one so the body has a single path.
+Increment the count for each item inside the loop, before the `yield`,
+so the caller's own `Counter` fills as the loop consumes the pairs.
 
 <details>
 <summary>The shape</summary>
@@ -607,7 +636,8 @@ def random_pairs[T](base: type[T], n: int,
 <details>
 <summary>Done when</summary>
 
-after your loop over `random_pairs(Item, 100, counts)`, the four counts sum to 200, two per pair, and `counts["Lizard"]` is near 50.
+after your loop over `random_pairs(Item, 100, counts)`,
+the four counts sum to 200, two per pair, and `counts["Lizard"]` is near 50.
 Printing `counts["Lizard"]` before the loop shows `0`.
 
 <details>
@@ -695,15 +725,17 @@ print(counts["Lizard"])
 #: 53
 ```
 
-**Make the tally optional.** `counts` is an optional parameter with a default of `None`,
+**Make the tally optional.**
+`counts` is an optional parameter with a default of `None`,
 so a caller that needs only the pairs writes `random_pairs(Item, 10)`.
 The generator yields a `(player, opponent)` pair each time.
 
-**Tally into the caller's counter.** A caller that needs the tally
-passes its own `Counter`. The generator updates that counter in place
-for every pair it produces, one increment per item, so the caller can
-read `counts["Lizard"]` during or after the loop. With the same seed,
-`random_pairs()` yields the same pairs whether or not it counts them.
+**Tally into the caller's counter.**
+A caller that needs the tally passes its own `Counter`.
+The generator updates that counter in place for every pair it produces,
+one increment per item,
+so the caller can read `counts["Lizard"]` during or after the loop.
+With the same seed, `random_pairs()` yields the same pairs whether or not it counts them.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -727,9 +759,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows `__add__()` returning `NotImplemented` so Python retries with `__radd__()` on the other operand.
-Use the same protocol for subtraction, with an `isinstance()` check per accepted type and `NotImplemented` for the rest.
-In `__rsub__()`, `self` is the right-hand operand, so compute the other value minus `self.n` to undo the swap.
+[Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice)
+shows `__add__()` returning `NotImplemented` so Python retries with `__radd__()` on the other operand.
+Use the same protocol for subtraction,
+with an `isinstance()` check per accepted type and `NotImplemented` for the rest.
+In `__rsub__()`, `self` is the right-hand operand,
+so compute the other value minus `self.n` to undo the swap.
 
 <details>
 <summary>The shape</summary>
@@ -753,16 +788,19 @@ class Meters:
 <details>
 <summary>Done when</summary>
 
-`10 - Meters(3)` prints `Meters(n=7)`, as do `Meters(10) - Meters(3)` and `Meters(10) - 3`, and `"ten" - Meters(3)` raises a `TypeError` whose message reads `unsupported operand type(s) for -: 'str' and 'Meters'`.
+`10 - Meters(3)` prints `Meters(n=7)`,
+as do `Meters(10) - Meters(3)` and `Meters(10) - 3`,
+and `"ten" - Meters(3)` raises a `TypeError` whose message reads `unsupported operand type(s) for -: 'str' and 'Meters'`.
 
 <details>
 <summary>Solution</summary>
 
-If you give `__rsub__()` the body of `__sub__()`, `10 - Meters(3)`
-prints `Meters(n=-7)`, while the other lines print what they should.
-The type checker accepts the variant, since both orders produce a
-`Meters`. The solution computes `other - self.n`, because Python
-passes the left operand to the reflected method as `other`.
+If you give `__rsub__()` the body of `__sub__()`,
+`10 - Meters(3)` prints `Meters(n=-7)`,
+while the other lines print what they should.
+The type checker accepts the variant, since both orders produce a `Meters`.
+The solution computes `other - self.n`,
+because Python passes the left operand to the reflected method as `other`.
 
 ```python
 # exercise_5.py
@@ -796,34 +834,38 @@ with expected(TypeError):
 #: 'Meters'
 ```
 
-**Handle each accepted type.** `__sub__()` is `__add__()` with the sign changed.
-Its three cases match those of `__add__()`: a `Meters`, a number, or
-`NotImplemented` for anything else. `__rsub__()` needs only the
-numeric case, because Python calls the left operand's method first,
-and `Meters.__sub__()` handles `Meters(10) - Meters(3)`. Python skips
-the reflected form when both operands have the same type, so no call
-to `__rsub__()` receives two `Meters`.
+**Handle each accepted type.**
+`__sub__()` is `__add__()` with the sign changed.
+Its three cases match those of `__add__()`: a `Meters`, a number,
+or `NotImplemented` for anything else.
+`__rsub__()` needs only the numeric case,
+because Python calls the left operand's method first,
+and `Meters.__sub__()` handles `Meters(10) - Meters(3)`.
+Python skips the reflected form when both operands have the same type,
+so no call to `__rsub__()` receives two `Meters`.
 
-**Undo the swap.** The swap is where subtraction differs from addition. Python calls
-`Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
-so `self` is the right operand and `other` is the left one. The method
-must put them back in the order the source wrote them.
+**Undo the swap.**
+The swap is where subtraction differs from addition.
+Python calls `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
+so `self` is the right operand and `other` is the left one.
+The method must put them back in the order the source wrote them.
 `Meters(other - self.n)` gives `Meters(7)`.
 Copying the body of `__sub__()`, `Meters(self.n - other)`, gives `Meters(-7)`.
 The copied `__rsub__()` looks correct and raises no exception,
 yet it returns the negative of every reflected subtraction.
-Addition commutes, so the same copied body in `__radd__()` gives the
-right answer every time.
+Addition commutes, so the same copied body in `__radd__()` gives the right answer every time.
 
-**Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__()`, so Python calls
-`Meters.__rsub__()` next, which returns `NotImplemented` for a
-`str`. With both sides declining, Python raises `TypeError`,
+**Decline an unsupported operand.**
+`"ten" - Meters(3)` finds no `str.__sub__()`,
+so Python calls `Meters.__rsub__()` next,
+which returns `NotImplemented` for a `str`.
+With both sides declining, Python raises `TypeError`,
 whose message names both types.
 
 Returning `NotImplemented`, rather than raising an exception,
-lets Python report both operand types. An exception raised
-inside `__rsub__()` carries the message `Meters` wrote, in place of
-Python's message naming the pair of types that has no defined subtraction.
+lets Python report both operand types.
+An exception raised inside `__rsub__()` carries the message `Meters` wrote,
+in place of Python's message naming the pair of types that has no defined subtraction.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -845,11 +887,14 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) shows `exact_match.py`, where the key uses `type()`.
+[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
+shows `exact_match.py`, where the key uses `type()`.
 A dictionary probe compares keys by equality, so a subclass finds no row.
 Every class has an `__mro__` tuple that lists it and then its bases in lookup order.
-Loop over one operand's `__mro__`, and inside that loop over the other operand's `__mro__`.
-Skip classes that are not an `Item` (such as `object`), and return the first pair that has a row in `OUTCOME`.
+Loop over one operand's `__mro__`,
+and inside that loop over the other operand's `__mro__`.
+Skip classes that are not an `Item` (such as `object`),
+and return the first pair that has a row in `OUTCOME`.
 
 <details>
 <summary>The shape</summary>
@@ -901,7 +946,8 @@ class TolerantOrigami(TolerantPaper):
 <summary>Done when</summary>
 
 `Origami().compete(Rock())` first reproduces the `KeyError ['Origami', 'Rock']` line from `exact_match.py`.
-After your change it returns `win`, `Rock().compete(Origami())` returns `lose`, and a new direct subclass of `Item` with no rows still raises a `KeyError` at its first duel.
+After your change it returns `win`, `Rock().compete(Origami())` returns `lose`,
+and a new direct subclass of `Item` with no rows still raises a `KeyError` at its first duel.
 
 <details>
 <summary>Solution</summary>
@@ -909,8 +955,7 @@ After your change it returns `win`, `Rock().compete(Origami())` returns `lose`, 
 If you walk the left operand's MRO and key the right on `type(opponent)` as it is,
 `TolerantOrigami().compete(TolerantRock())` still prints `win`,
 but `TolerantRock().compete(TolerantOrigami())` raises a `KeyError` for `(TolerantRock, TolerantOrigami)`.
-A subclass can sit on either side of a duel,
-so the solution walks both MROs.
+A subclass can sit on either side of a duel, so the solution walks both MROs.
 
 ```python
 # exercise_6.py
@@ -974,7 +1019,8 @@ print(TolerantOrigami().compete(TolerantRock()))
 #: win
 ```
 
-**Reproduce the exact-match failure.** The `KeyError` comes from a dictionary probe,
+**Reproduce the exact-match failure.**
+The `KeyError` comes from a dictionary probe,
 which hashes the key and compares it by equality.
 Neither step consults an MRO, so the lookup ignores inheritance.
 `Origami` inherits from `Paper` but is a different class,
@@ -983,41 +1029,38 @@ That is what the chapter's "matches classes exactly" means.
 Exact matching sets the table apart from `singledispatch`,
 which resolves through the MRO.
 
-**Fall back to an ancestor's row.** The tolerant version walks both MROs and takes the first pair that has
-a row, so `TolerantOrigami` finds `(TolerantPaper, TolerantRock)` one
-step up on the left. That version gives up the property the chapter
-names first, exact matching.
-The match now follows inheritance. That change has three consequences.
+**Fall back to an ancestor's row.**
+The tolerant version walks both MROs and takes the first pair that has a row,
+so `TolerantOrigami` finds `(TolerantPaper, TolerantRock)` one step up on the left.
+That version gives up the property the chapter names first, exact matching.
+The match now follows inheritance.
+That change has three consequences.
 
 The lookup becomes a nested loop over two MROs instead of one probe,
 so a miss now takes as many probes as the product of the two depths.
 For a table consulted once per duel, that time is negligible.
 In an inner loop, it matters.
 
-Order now decides the answer. `(TolerantPaper, TolerantRock)` and
-`(TolerantOrigami, TolerantItem)` could both match.
+Order now decides the answer.
+`(TolerantPaper, TolerantRock)` and `(TolerantOrigami, TolerantItem)` could both match.
 The order in which the loops walk picks the one that wins.
 That rule lives in `compete()` instead of in the table.
 The exact version settles the question with one probe.
 Either the pair is in the table or it is not.
 
-The tolerant version also gives up the `KeyError` that makes the exact
-version safe, for one kind of new type: a subclass of a concrete item.
-An `Origami(Paper)` whose rows you forgot to write silently inherits
-`Paper`'s answers and plays as paper.
-A `Lizard(TolerantItem)` still fails fast, since every row's key
-names two concrete items, and `Lizard`'s ancestors are
-`TolerantItem`, `Item`, and `object`.
+The tolerant version also gives up the `KeyError` that makes the exact version safe,
+for one kind of new type: a subclass of a concrete item.
+An `Origami(Paper)` whose rows you forgot to write silently inherits `Paper`'s answers and plays as paper.
+A `Lizard(TolerantItem)` still fails fast,
+since every row's key names two concrete items,
+and `Lizard`'s ancestors are `TolerantItem`, `Item`, and `object`.
 Tolerance lets you write fewer rows,
-but for a subclass of an existing item it drops the fail-fast policy
-the chapter recommends for a table under construction.
-That subclass is the new type most likely to
-receive an old type's answers by mistake.
+but for a subclass of an existing item it drops the fail-fast policy the chapter recommends for a table under construction.
+That subclass is the new type most likely to receive an old type's answers by mistake.
 
-Which behavior you want depends on whether a subclass is a new
-competitor or a variation on an existing one. `Origami` is
-paper for the purposes of this game. A `WetPaper` that loses to
-everything is a new competitor.
+Which behavior you want depends on whether a subclass is a new competitor or a variation on an existing one.
+`Origami` is paper for the purposes of this game.
+A `WetPaper` that loses to everything is a new competitor.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1038,8 +1081,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods) starts with one dispatch, a method call that resolves its receiver's type.
-Give `Inhabitant` an `interact()` method and override it in `Dwarf`, `Elf`, and `Troll`.
+[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods)
+starts with one dispatch, a method call that resolves its receiver's type.
+Give `Inhabitant` an `interact()` method and override it in `Dwarf`, `Elf`,
+and `Troll`.
 `Project` creates the inhabitants with a seeded `random.Random` and calls `interact()` on neighboring pairs.
 
 <details>
@@ -1083,7 +1128,10 @@ class Project:
 <details>
 <summary>Done when</summary>
 
-your `Project` prints one line per `interact()` call, and each line's wording comes from the calling inhabitant's type: a `Troll` addresses a `Dwarf` the same way it addresses an `Elf`, and swapping the two inhabitants of a pair changes the line.
+your `Project` prints one line per `interact()` call,
+and each line's wording comes from the calling inhabitant's type:
+a `Troll` addresses a `Dwarf` the same way it addresses an `Elf`,
+and swapping the two inhabitants of a pair changes the line.
 
 <details>
 <summary>Solution</summary>
@@ -1131,15 +1179,16 @@ Project(seed=1).meet(4)
 #: Dwarf (engineer) negotiates with Elf
 ```
 
-**Resolve the receiver's type.** Exercise 7 uses single dispatch, not
-double. `a.interact(b)` resolves on `a`'s type alone.
-Each `interact()` interpolates `other` into its message the same way, whatever `other`'s type.
-The design becomes double dispatch when `interact()`'s behavior must vary by `other`'s
-type too.
+**Resolve the receiver's type.**
+Exercise 7 uses single dispatch, not double.
+`a.interact(b)` resolves on `a`'s type alone.
+Each `interact()` interpolates `other` into its message the same way,
+whatever `other`'s type.
+The design becomes double dispatch when `interact()`'s behavior must vary by `other`'s type too.
 Exercise 8 adds that dependence.
 
-**Stage the meetings.** `Project` creates the inhabitants in `gather()` and makes neighbors
-interact in `meet()`.
+**Stage the meetings.**
+`Project` creates the inhabitants in `gather()` and makes neighbors interact in `meet()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1166,8 +1215,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods) shows the `compete()` and `eval_*()` pair that resolves both types.
-Give `Weapon` the same pair for six weapon classes, and let each `Inhabitant` kind hold a `WEAPONS` tuple from which `get_weapon()` picks one at random.
+[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods)
+shows the `compete()` and `eval_*()` pair that resolves both types.
+Give `Weapon` the same pair for six weapon classes,
+and let each `Inhabitant` kind hold a `WEAPONS` tuple from which `get_weapon()` picks one at random.
 Rank the weapons around a cycle.
 An even count leaves each weapon an opposite that draws.
 Then have `battle()` compare two weapons and `meeting()` repeat battles until one group remains.
@@ -1332,16 +1383,19 @@ class Project2:
 <details>
 <summary>Done when</summary>
 
-for each of the 36 ordered pairs of your six weapons, the two orders give opposite results (a draw stays a draw), `meeting()` returns one group's name, more than one group wins across many seeds, and `uv run ty check` passes on your file.
+for each of the 36 ordered pairs of your six weapons,
+the two orders give opposite results (a draw stays a draw),
+`meeting()` returns one group's name,
+more than one group wins across many seeds,
+and `uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
 
-Each `Inhabitant` kind holds two of six weapon types,
-ranked around a cycle. Each weapon beats the previous two in the
-ranking and loses to the next two. Six is an even number, so each
-weapon has one opponent left over: its opposite, three steps around
-the circle.
+Each `Inhabitant` kind holds two of six weapon types, ranked around a cycle.
+Each weapon beats the previous two in the ranking and loses to the next two.
+Six is an even number, so each weapon has one opponent left over: its opposite,
+three steps around the circle.
 That pair draws.
 `paper_scissors_rock.py` has three items, an odd count,
 so each item beats half the rest and loses to the other half.
@@ -1536,13 +1590,15 @@ if __name__ == "__main__":
 **Declare the first dispatch on the base.**
 `Weapon` declares `compete()` so that `battle()` can call it on the `Weapon` that `get_weapon()` returns.
 The `eval_*()` methods live in the subclasses alone,
-and their `item` parameters take `Any`, as the chapter's `opponent` and `caller` parameters do.
+and their `item` parameters take `Any`,
+as the chapter's `opponent` and `caller` parameters do.
 
-If you leave `compete()` out of `Weapon`,
-the program prints the same two lines, since every weapon class defines its own.
+If you leave `compete()` out of `Weapon`, the program prints the same two lines,
+since every weapon class defines its own.
 The type checker rejects the change.
 `ty` reports an `invalid-explicit-override` at each of the six `@override` decorators,
-and an `unresolved-attribute` at `battle()`'s call, because `get_weapon()` returns a `Weapon`.
+and an `unresolved-attribute` at `battle()`'s call,
+because `get_weapon()` returns a `Weapon`.
 The solution declares `compete()` on the base,
 which gives that call and every `@override` a method to name.
 
@@ -1559,8 +1615,7 @@ and that second call resolves the second type.
 
 Six weapons take 42 methods:
 a `compete()` and six `eval_*()` methods in each class.
-More than a hundred lines hold 36 answers,
-four times the chapter's nine,
+More than a hundred lines hold 36 answers, four times the chapter's nine,
 because the answers grow with the square of the number of weapons.
 A seventh weapon adds an `eval_*()` method to each of the six classes,
 plus a new class of eight methods.
@@ -1568,14 +1623,17 @@ plus a new class of eight methods.
 weighs the length of the method version against a table.
 Exercise 10 collects the same 36 answers in one place.
 
-The weapon ranking is a cycle. Every weapon loses to two others,
-so no group can count on winning. The same cycle appears at the group
-level. An `Elf` beats a `Dwarf` on three of their four
-weapon pairings, a `Troll` beats an `Elf` on three of four, and a
-`Dwarf` beats a `Troll` on three of four, with the fourth pairing in
-each case the draw. Across two hundred seeds, each of the three kinds
-wins `meeting(5)` at least once, so the outcome depends on the random
-draws each round, as it does in a real rock-paper-scissors tournament.
+The weapon ranking is a cycle.
+Every weapon loses to two others, so no group can count on winning.
+The same cycle appears at the group level.
+An `Elf` beats a `Dwarf` on three of their four weapon pairings,
+a `Troll` beats an `Elf` on three of four,
+and a `Dwarf` beats a `Troll` on three of four,
+with the fourth pairing in each case the draw.
+Across two hundred seeds,
+each of the three kinds wins `meeting(5)` at least once,
+so the outcome depends on the random draws each round,
+as it does in a real rock-paper-scissors tournament.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1606,9 +1664,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table) says a table cell can hold a function, and [One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) shows the lookup.
+[Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
+says a table cell can hold a function,
+and [One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
+shows the lookup.
 Store a callable in every cell and call what the lookup returns with both items.
-To wrap each constant `Outcome`, a helper returns a closure that ignores its arguments.
+To wrap each constant `Outcome`,
+a helper returns a closure that ignores its arguments.
 The `(Paper, Rock)` and `(Rock, Paper)` cells each read `wet` from whichever item is the `Paper`.
 
 <details>
@@ -1670,8 +1732,12 @@ OUTCOME: Final[
 <details>
 <summary>Done when</summary>
 
-a dry `Paper` beats `Rock`, a wet `Paper` draws with `Rock` whichever of the two calls `compete()`, the other seven pairs return the chapter's answers, and `uv run ty check` passes on your file.
-You can also name the chapter's reason the callable cells answer, and the reason that survives.
+a dry `Paper` beats `Rock`,
+a wet `Paper` draws with `Rock` whichever of the two calls `compete()`,
+the other seven pairs return the chapter's answers,
+and `uv run ty check` passes on your file.
+You can also name the chapter's reason the callable cells answer,
+and the reason that survives.
 
 <details>
 <summary>Solution</summary>
@@ -1752,35 +1818,37 @@ for player, opponent in [
 #: Rock <--> Rock : draw
 ```
 
-**Call what the lookup returns.** `compete()` changes by one pair of parentheses. It still finds the
-cell with a single probe keyed on both types, and now calls what it
-finds instead of returning it. The call site stays the same:
-`player.compete(opponent)` reads as it does in
-`paper_scissors_rock.py`, where four method definitions per class
-stand behind it.
+**Call what the lookup returns.**
+`compete()` changes by one pair of parentheses.
+It still finds the cell with a single probe keyed on both types,
+and now calls what it finds instead of returning it.
+The call site stays the same:
+`player.compete(opponent)` reads as it does in `paper_scissors_rock.py`,
+where four method definitions per class stand behind it.
 
-**Wrap the constant answers.** `always()` keeps the table readable. It returns a closure
-that ignores both operands and returns one `Outcome`, so the seven
-combinations with a constant answer stay one line each and still read as
-a table of answers. Only the cells that need code look like code.
+**Wrap the constant answers.**
+`always()` keeps the table readable.
+It returns a closure that ignores both operands and returns one `Outcome`,
+so the seven combinations with a constant answer stay one line each and still read as a table of answers.
+Only the cells that need code look like code.
 
-**Read the state in both orders.** The `(Paper, Rock)` cell receives both items, so it can consult
-`player.wet`. One duel has two orders, and each order has its own
-cell, so the `(Rock, Paper)` cell needs the same test. In that cell
-the paper is the opponent, so the cell reads `opponent.wet`. If the
-`(Rock, Paper)` cell ignores `opponent.wet`, a rock that calls
-`compete()` still loses to wet paper.
+**Read the state in both orders.**
+The `(Paper, Rock)` cell receives both items, so it can consult `player.wet`.
+One duel has two orders, and each order has its own cell,
+so the `(Rock, Paper)` cell needs the same test.
+In that cell the paper is the opponent, so the cell reads `opponent.wet`.
+If the `(Rock, Paper)` cell ignores `opponent.wet`,
+a rock that calls `compete()` still loses to wet paper.
 
 The chapter gives two reasons for preferring the double-dispatch version.
 The first is behavior that reads the object's own state.
-A cell holding a function answers that reason. Whatever
-`Paper.eval_rock()` reads, `rock_vs_paper()` reads too, from the
-same two objects.
+A cell holding a function answers that reason.
+Whatever `Paper.eval_rock()` reads, `rock_vs_paper()` reads too,
+from the same two objects.
 
 The second reason survives:
 a subclass that should override one combination and inherit the rest.
-`paper_scissors_rock_subclass.py`'s `DampPaper`
-gets its special case by overriding `compete()` and `eval_rock()`.
+`paper_scissors_rock_subclass.py`'s `DampPaper` gets its special case by overriding `compete()` and `eval_rock()`.
 In this version `Item` defines `compete()` once and the combinations live in the table,
 so a subclass that overrides `compete()` replaces every combination at once.
 Changing an existing cell changes that combination for every instance,
@@ -1790,8 +1858,9 @@ The lookup still matches types exactly,
 so an `Origami(Paper)` raises a `KeyError` whether the cells hold callables or `Outcome`s.
 The remedy is to write every row for `Origami`.
 
-**Narrow the operand's type.** `paper_vs_rock()` and
-`rock_vs_paper()` take two `Item`s, because every cell must.
+**Narrow the operand's type.**
+`paper_vs_rock()` and `rock_vs_paper()` take two `Item`s,
+because every cell must.
 Each recovers `Paper` with an `isinstance()` test,
 the kind the chapter's ladder version repeats in every class.
 Here each test sits inside one cell, so you write it once,
@@ -1820,9 +1889,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) replaces the `eval_*()` methods with one dictionary keyed on `type(self)` and `type(opponent)`.
-Keep `get_weapon()` and the inhabitant classes as they are, and shrink the weapons to empty classes.
-Write the 36 answers as a grid whose rows and columns follow one `ORDER`, and build `OUTCOME` from it with a comprehension.
+[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
+replaces the `eval_*()` methods with one dictionary keyed on `type(self)` and `type(opponent)`.
+Keep `get_weapon()` and the inhabitant classes as they are,
+and shrink the weapons to empty classes.
+Write the 36 answers as a grid whose rows and columns follow one `ORDER`,
+and build `OUTCOME` from it with a comprehension.
 
 <details>
 <summary>The shape</summary>
@@ -1912,13 +1984,14 @@ def by_methods(a: type[Weapon],
 <details>
 <summary>Done when</summary>
 
-your table holds 36 entries, each matching what your exercise 8 weapons return for the same ordered pair, and with the same seed `meeting()` names the same winning group as your exercise 8.
+your table holds 36 entries,
+each matching what your exercise 8 weapons return for the same ordered pair,
+and with the same seed `meeting()` names the same winning group as your exercise 8.
 
 <details>
 <summary>Solution</summary>
 
-The solution replaces the weapons' `eval_*()` methods with a grid
-of answers:
+The solution replaces the weapons' `eval_*()` methods with a grid of answers:
 
 ```python
 # exercise_10.py
@@ -2043,11 +2116,9 @@ as in `paper_scissors_rock_table.py`.
 **Lay the answers out as a grid.**
 The listing writes the 36 answers by hand,
 as a grid rather than as 36 dictionary rows.
-Each row of `GRID` holds one weapon's results as the caller
-against the weapons in `ORDER`.
+Each row of `GRID` holds one weapon's results as the caller against the weapons in `ORDER`.
 A cell holds what one of exercise 8's `eval_*()` methods returns.
-Row `Jargon`, column `Play`,
-holds the `LOSE` that `Play.eval_jargon()` returns.
+Row `Jargon`, column `Play`, holds the `LOSE` that `Play.eval_jargon()` returns.
 The comprehension turns the grid into the `(caller, opponent)` keys that `compete()` looks up.
 
 **Reuse the game around the table.**
@@ -2070,8 +2141,8 @@ The grid holds in six lines the answers that exercise 8 spreads across 42 method
 A seventh weapon adds an empty class, a row, and a column,
 where exercise 8 needs a method in every existing class and an eight-method class.
 [Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
-reaches the same conclusion: for a ruleset that is a known set of
-answers, the table is shorter and easier to maintain.
+reaches the same conclusion: for a ruleset that is a known set of answers,
+the table is shorter and easier to maintain.
 Exercise 8's version keeps one advantage.
 Its `eval_*()` methods receive the competing objects,
 so a weapon whose result depends on its own state fits there,

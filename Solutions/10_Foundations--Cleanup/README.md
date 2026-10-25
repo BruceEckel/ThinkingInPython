@@ -11,9 +11,11 @@
 <details>
 <summary>Where to look</summary>
 
-[Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them) ends with `counters.clear()` dropping the list's references.
+[Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them)
+ends with `counters.clear()` dropping the list's references.
 Rebinding a name and mutating the object that name references are different operations.
-To see the difference, bind a second name to the same list before you try each form,
+To see the difference,
+bind a second name to the same list before you try each form,
 then print that second name.
 
 <details>
@@ -40,7 +42,8 @@ class Counter:
 <details>
 <summary>Done when</summary>
 
-your edited `weak_value.py` prints `3`, `2`, `1`, `0`, and a short script that binds a second name to the list prints `[1, 2, 3]` through that name after rebinding and `[]` after `clear()`.
+your edited `weak_value.py` prints `3`, `2`, `1`, `0`,
+and a short script that binds a second name to the list prints `[1, 2, 3]` through that name after rebinding and `[]` after `clear()`.
 You can then say why `live_count()` would stay at `1` if that second name existed.
 
 <details>
@@ -81,10 +84,11 @@ print(Counter.live_count())
 #: 0
 ```
 
-**Abandon the old list.** `counters.clear()` empties the existing list
-in place, dropping its reference to the last `Counter` object.
-`counters = []` points the name `counters` at a new, empty list
-and drops the name's reference to the old one.
+**Abandon the old list.**
+`counters.clear()` empties the existing list in place,
+dropping its reference to the last `Counter` object.
+`counters = []` points the name `counters` at a new,
+empty list and drops the name's reference to the old one.
 Here the name `counters` held the old list's sole reference,
 so CPython frees that list at once.
 Freeing the list drops its reference to the one remaining `Counter`.
@@ -106,12 +110,13 @@ print(other)
 #: []
 ```
 
-**Look through a second name.** `clear()` changes the object to which
-every name refers. Rebinding points `counters` at a different object,
-and every other name still refers to the old list. The two forms give
-the same result in `weak_value.py` because that list has a single
-reference. With two references, rebinding leaves the last `Counter`
-object alive, and `live_count()` still returns `1`.
+**Look through a second name.**
+`clear()` changes the object to which every name refers.
+Rebinding points `counters` at a different object,
+and every other name still refers to the old list.
+The two forms give the same result in `weak_value.py` because that list has a single reference.
+With two references, rebinding leaves the last `Counter` object alive,
+and `live_count()` still returns `1`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -129,7 +134,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-In [Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them), a `WeakValueDictionary` reads like a `dict`.
+In [Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them),
+a `WeakValueDictionary` reads like a `dict`.
 Iterate over `cls._instances.values()` in a `@classmethod`, take each `.name`,
 and wrap the result in `sorted()` so the order follows the names, not insertion.
 
@@ -157,13 +163,16 @@ class Counter:
 <details>
 <summary>Done when</summary>
 
-creating `Counter` objects named `"Charlie"`, `"Alpha"`, and `"Bravo"`, in that order, and printing `Counter.live_names()` gives `['Alpha', 'Bravo', 'Charlie']`, not the creation order, and `uv run ty check` passes on your file.
+creating `Counter` objects named `"Charlie"`, `"Alpha"`, and `"Bravo"`,
+in that order, and printing `Counter.live_names()` gives `['Alpha', 'Bravo', 'Charlie']`,
+not the creation order, and `uv run ty check` passes on your file.
 
 <details>
 <summary>Solution</summary>
 
 If you return `[c.name for c in cls._instances.values()]` without `sorted()`,
-the demo prints `['Charlie', 'Alpha', 'Bravo']`, the order in which the demo created the instances.
+the demo prints `['Charlie', 'Alpha', 'Bravo']`,
+the order in which the demo created the instances.
 The type checker accepts that version, since the result is still a `list[str]`,
 so the output alone shows the mistake.
 The solution sorts, so the list depends on which names are live and not on when the program created each instance.
@@ -193,10 +202,12 @@ print(Counter.live_names())
 #: ['Alpha', 'Bravo', 'Charlie']
 ```
 
-**Gather the live names.** A `WeakValueDictionary` reads like a `dict`,
+**Gather the live names.**
+A `WeakValueDictionary` reads like a `dict`,
 so `cls._instances.values()` yields the live `Counter` objects it currently tracks.
 The generator expression reads each object's `.name`.
-Iterating over a dictionary follows insertion order, which is the creation order,
+Iterating over a dictionary follows insertion order,
+which is the creation order,
 so the names need `sorted()` to come out in alphabetical order.
 
 Before you move on, name what separates your attempt from this one:
@@ -216,8 +227,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Why `__del__()` Is Not Cleanup](../../Chapters/10_Foundations--Cleanup.md#why-del-is-not-cleanup) explains why an object survives `del c` while the list still references it.
-A list comprehension builds the same list, so ask what still holds each `Counter` during the loop.
+[Why `__del__()` Is Not Cleanup](../../Chapters/10_Foundations--Cleanup.md#why-del-is-not-cleanup)
+explains why an object survives `del c` while the list still references it.
+A list comprehension builds the same list,
+so ask what still holds each `Counter` during the loop.
 Compare the order of the output lines with the original listing.
 
 <details>
@@ -240,7 +253,10 @@ class Counter:
 <details>
 <summary>Done when</summary>
 
-your `cleanup.py` prints the same five lines the chapter's version prints, ending with `3` and `End of delete loop`, and the three `deleted` lines appear only after `End of delete loop`, when you run the file as a script.
+your `cleanup.py` prints the same five lines the chapter's version prints,
+ending with `3` and `End of delete loop`,
+and the three `deleted` lines appear only after `End of delete loop`,
+when you run the file as a script.
 
 <details>
 <summary>Solution</summary>
@@ -275,14 +291,16 @@ print("End of delete loop")
 #: End of delete loop
 ```
 
-**Build the same list.** The output is identical to the original
-version, which calls `append()` in a `for` loop. A comprehension
-calls `Counter(name)` once per name, in order. The resulting list
-again holds the only references to those three objects.
+**Build the same list.**
+The output is identical to the original version,
+which calls `append()` in a `for` loop.
+A comprehension calls `Counter(name)` once per name, in order.
+The resulting list again holds the only references to those three objects.
 
-**Drop the loop variable's reference.** `del c` inside the loop unbinds the
-name `c` and leaves the list alone.
-However you build the list, it keeps its contents alive until interpreter shutdown.
+**Drop the loop variable's reference.**
+`del c` inside the loop unbinds the name `c` and leaves the list alone.
+However you build the list,
+it keeps its contents alive until interpreter shutdown.
 The `deleted` messages therefore appear there, as before,
 after `End of delete loop` has printed.
 
@@ -303,7 +321,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them) uses a `WeakValueDictionary` so the registry holds its values weakly.
+[Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them)
+uses a `WeakValueDictionary` so the registry holds its values weakly.
 A plain `dict` stores strong references.
 After each `pop()`, ask how many references to the `Counter` remain and what holds them.
 
@@ -328,7 +347,9 @@ class Counter:
 <details>
 <summary>Done when</summary>
 
-your edited `weak_value.py` prints `3` four times, after each `pop()` and after `clear()`, and you can say which container holds the reference that keeps each `Counter` alive.
+your edited `weak_value.py` prints `3` four times,
+after each `pop()` and after `clear()`,
+and you can say which container holds the reference that keeps each `Counter` alive.
 
 <details>
 <summary>Solution</summary>
@@ -365,17 +386,19 @@ print(Counter.live_count())
 #: 3
 ```
 
-**Register each instance strongly.** The count stays at three. A `dict` holds a strong reference to each
-value, so `_instances` alone keeps every `Counter` alive, whatever
-`counters` does. `pop()` removes the list's reference. The registry
-keeps its own, so the `Counter`'s reference count stays above zero
-and the `Counter` survives.
+**Register each instance strongly.**
+The count stays at three.
+A `dict` holds a strong reference to each value,
+so `_instances` alone keeps every `Counter` alive, whatever `counters` does.
+`pop()` removes the list's reference.
+The registry keeps its own,
+so the `Counter`'s reference count stays above zero and the `Counter` survives.
 
-The registry now leaks every `Counter` it tracks. `live_count()`
-reports how many `Counter` objects the program has created,
-because the registry keeps them all alive. A
-`WeakValueDictionary` holds its values weakly, so it counts the
-objects and leaves their lifetimes as they were.
+The registry now leaks every `Counter` it tracks.
+`live_count()` reports how many `Counter` objects the program has created,
+because the registry keeps them all alive.
+A `WeakValueDictionary` holds its values weakly,
+so it counts the objects and leaves their lifetimes as they were.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -397,9 +420,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The `self.close` Trap](../../Chapters/10_Foundations--Cleanup.md#the-self-close-trap) shows why a callback must hold no reference to the object whose collection triggers it.
+[The `self.close` Trap](../../Chapters/10_Foundations--Cleanup.md#the-self-close-trap)
+shows why a callback must hold no reference to the object whose collection triggers it.
 `self.close` is a bound method, so ask what a bound method stores.
-Then ask what holds the callback, and what that means for the reference count when you `del b`.
+Then ask what holds the callback,
+and what that means for the reference count when you `del b`.
 
 <details>
 <summary>The shape</summary>
@@ -419,8 +444,10 @@ class Connection:
 <details>
 <summary>Done when</summary>
 
-running your file as a script prints `End of program` and then `B closed` as its last line, where the chapter's `finalizer.py` prints `B closed` at the `del b`.
-You can name the object that still references the `Connection` after `del b`, and the mechanism that runs the callback at shutdown.
+running your file as a script prints `End of program` and then `B closed` as its last line,
+where the chapter's `finalizer.py` prints `B closed` at the `del b`.
+You can name the object that still references the `Connection` after `del b`,
+and the mechanism that runs the callback at shutdown.
 
 <details>
 <summary>Solution</summary>
@@ -463,35 +490,34 @@ End of program
 B closed
 ```
 
-The listing's markers end at `End of program`
-because `B closed` prints during interpreter shutdown,
+The listing's markers end at `End of program` because `B closed` prints during interpreter shutdown,
 after the book's output checker has finished capturing.
 
 `B closed` now prints after `End of program`,
 where the chapter's version prints it at the `del b`.
-The rest of the output matches the chapter's output, so the mistake is hard to see.
+The rest of the output matches the chapter's output,
+so the mistake is hard to see.
 The callback still runs, at a different time and for a different reason.
 
-**Register the cleanup callback.** The callback keeps the `Connection` alive. `self.close`
-is a bound method, and a bound method holds a strong reference to
-its instance. `finalize()` stores the callback, so the finalizer
-registry now holds a reference to the `Connection` whose collection
-triggers the finalizer.
-`del b` drops the program's last reference,
-but the registry still holds one, so the `Connection` survives.
+**Register the cleanup callback.**
+The callback keeps the `Connection` alive.
+`self.close` is a bound method,
+and a bound method holds a strong reference to its instance.
+`finalize()` stores the callback,
+so the finalizer registry now holds a reference to the `Connection` whose collection triggers the finalizer.
+`del b` drops the program's last reference, but the registry still holds one,
+so the `Connection` survives.
 
-`B closed` prints only because `finalize()`'s `atexit` backstop runs
-every still-alive finalizer as the interpreter shuts down, the
-backstop the chapter describes. Here it runs the callback for an
-object that `del b` should have destroyed.
+`B closed` prints only because `finalize()`'s `atexit` backstop runs every still-alive finalizer as the interpreter shuts down,
+the backstop the chapter describes.
+Here it runs the callback for an object that `del b` should have destroyed.
 
-The chapter's `finalize(self, print, name, "closed")` avoids the trap
-by passing the pieces the callback needs rather than the object that
-has them. `name` is a `str` the `Connection` also holds. The
-finalizer's reference to `name` keeps a string alive, not a connection.
-The rule holds for any finalizer: its callback and arguments may
-reference any object except the finalizer's own object, directly or
-through a chain of references.
+The chapter's `finalize(self, print, name, "closed")` avoids the trap by passing the pieces the callback needs rather than the object that has them.
+`name` is a `str` the `Connection` also holds.
+The finalizer's reference to `name` keeps a string alive, not a connection.
+The rule holds for any finalizer:
+its callback and arguments may reference any object except the finalizer's own object,
+directly or through a chain of references.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -512,9 +538,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Reference Cycles Delay Destruction](../../Chapters/10_Foundations--Cleanup.md#reference-cycles-delay-destruction) shows `__del__()` running only when `gc.collect()` reclaims a cycle.
+[Reference Cycles Delay Destruction](../../Chapters/10_Foundations--Cleanup.md#reference-cycles-delay-destruction)
+shows `__del__()` running only when `gc.collect()` reclaims a cycle.
 Give each of two `Node` objects a `peer` attribute pointing at the other.
-For the second part, consider what triggers an automatic pass of the cycle collector, and what your explicit call to `gc.collect()` still decides.
+For the second part,
+consider what triggers an automatic pass of the cycle collector,
+and what your explicit call to `gc.collect()` still decides.
 
 <details>
 <summary>The shape</summary>
@@ -540,7 +569,8 @@ def self_link() -> None:
 <summary>Done when</summary>
 
 your `cycle.py` prints `a finalized` and `b finalized` between `unreachable, but still alive` and `after collect`.
-You can say what makes the collector run once `gc.disable()` is gone, and why the explicit `gc.collect()` still keeps this run's transcript the same.
+You can say what makes the collector run once `gc.disable()` is gone,
+and why the explicit `gc.collect()` still keeps this run's transcript the same.
 
 <details>
 <summary>Solution</summary>
@@ -575,25 +605,25 @@ print("after collect")
 #: after collect
 ```
 
-**Form a two-object cycle.** Both finalizers run at `gc.collect()`, in creation order.
+**Form a two-object cycle.**
+Both finalizers run at `gc.collect()`, in creation order.
 A cycle through two objects behaves like the self-reference in `cycle.py`,
 which is the smallest cycle.
 Reference counting cannot reclaim either object, because each holds the other.
 The cycle collector reclaims both together when it runs.
 
-**Let the collector run on its own.** Removing the `gc.disable()`/`gc.enable()` pair takes away the
-guarantee about when the finalizers run. The collector then also
-runs on its own schedule, triggered by allocation counts,
-so an automatic pass could in principle reclaim the cycle at
-any allocation after `self_link()` returns. This small program still
-prints the same transcript every run, because the explicit
-`gc.collect()` runs before the program has allocated enough objects
-to start an automatic pass, so that call sets the moment of collection.
-While that call is there, the two `finalized` lines print at that
-call or earlier.
+**Let the collector run on its own.**
+Removing the `gc.disable()`/`gc.enable()` pair takes away the guarantee about when the finalizers run.
+The collector then also runs on its own schedule,
+triggered by allocation counts,
+so an automatic pass could in principle reclaim the cycle at any allocation after `self_link()` returns.
+This small program still prints the same transcript every run,
+because the explicit `gc.collect()` runs before the program has allocated enough objects to start an automatic pass,
+so that call sets the moment of collection.
+While that call is there,
+the two `finalized` lines print at that call or earlier.
 
-The chapter's listing calls `gc.disable()` to get a deterministic transcript
-for a demonstration about unpredictable timing.
+The chapter's listing calls `gc.disable()` to get a deterministic transcript for a demonstration about unpredictable timing.
 The call is a device for the demonstration, not advice,
 so the listing turns the collector back on right after `gc.collect()`.
 
@@ -617,10 +647,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[An `__init__()` That Fails Leaks the Resource](../../Chapters/10_Foundations--Cleanup.md#raising-init-leaks) shows a failure before the object is usable.
-[An Explicit `close()` and a `with` Block](../../Chapters/10_Foundations--Cleanup.md#an-explicit-close-and-a-with-block) describes when `with` calls `__exit__()`.
+[An `__init__()` That Fails Leaks the Resource](../../Chapters/10_Foundations--Cleanup.md#raising-init-leaks)
+shows a failure before the object is usable.
+[An Explicit `close()` and a `with` Block](../../Chapters/10_Foundations--Cleanup.md#an-explicit-close-and-a-with-block)
+describes when `with` calls `__exit__()`.
 The `with` statement calls `__exit__()` only after `__enter__()` returns.
-So release the resource inside `__enter__()`: catch the exception there, release, and re-raise it with a bare `raise`.
+So release the resource inside `__enter__()`: catch the exception there,
+release, and re-raise it with a bare `raise`.
 
 <details>
 <summary>The shape</summary>
@@ -651,7 +684,9 @@ class Guarded:
 <details>
 <summary>Done when</summary>
 
-the unguarded version prints `C opened` then `caught boom`, with no `closed` line, and the guarded version prints `C opened`, `C closed`, `caught boom`, with `C closed` printed once.
+the unguarded version prints `C opened` then `caught boom`,
+with no `closed` line, and the guarded version prints `C opened`, `C closed`,
+`caught boom`, with `C closed` printed once.
 `uv run ty check` passes on your file.
 
 <details>
@@ -664,7 +699,8 @@ so the `with` block runs as though the acquisition succeeded,
 and `__exit__()` releases the resource a second time.
 The type checker (`ty`) reports that version as `invalid-return-type`,
 since `__enter__()` now always implicitly returns `None` where its annotation declares `Guarded`.
-The solution re-raises the exception, so the caller sees `boom` and the `closed` line prints once.
+The solution re-raises the exception,
+so the caller sees `boom` and the `closed` line prints once.
 
 ```python
 # exercise_7.py
@@ -712,23 +748,24 @@ except RuntimeError as e:
 #: caught boom
 ```
 
-**Acquire the resource on entry.** `C closed` does not print for `Faulty`. Moving the acquisition from
-`__init__()` to `__enter__()` moves the leak with it. The `with`
-statement calls `__exit__()` only for a block it has entered, and it
-enters the block only after `__enter__()` returns. An `__enter__()`
-that fails has not returned, so `__exit__()` does not run.
+**Acquire the resource on entry.**
+`C closed` does not print for `Faulty`.
+Moving the acquisition from `__init__()` to `__enter__()` moves the leak with it.
+The `with` statement calls `__exit__()` only for a block it has entered,
+and it enters the block only after `__enter__()` returns.
+An `__enter__()` that fails has not returned, so `__exit__()` does not run.
 
-**Release before re-raising the exception.** `__exit__()` runs in neither class,
-yet `Guarded` releases the resource, in the method that acquired it.
-Its `except` clause prints the `closed` line and then re-raises the
-exception with a bare `raise`, so the caller still sees `boom`.
+**Release before re-raising the exception.**
+`__exit__()` runs in neither class, yet `Guarded` releases the resource,
+in the method that acquired it.
+Its `except` clause prints the `closed` line and then re-raises the exception with a bare `raise`,
+so the caller still sees `boom`.
 
-Acquiring in `__enter__()` still helps. A `Guarded` whose `__init__()`
-fails for some other reason holds no resource at that point.
+Acquiring in `__enter__()` still helps.
+A `Guarded` whose `__init__()` fails for some other reason holds no resource at that point.
 Moving the acquisition leaves the guard just as necessary, though.
 Whichever method acquires a resource,
-a step that can fail after the acquisition must release the resource
-before the exception propagates.
+a step that can fail after the acquisition must release the resource before the exception propagates.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

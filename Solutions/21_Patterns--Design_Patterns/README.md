@@ -1,11 +1,11 @@
 # Design Patterns: Solutions
 
-The first three exercises ask about your own experience, so no answer
-here can be the answer. Each of those solutions works through a single
-example. The method is the transferable part: name the axis,
-subtract Python's share, then take away one more thing and see whether
-anything breaks. The last exercise has an answer you can check against
-the chapter's figure.
+The first three exercises ask about your own experience,
+so no answer here can be the answer.
+Each of those solutions works through a single example.
+The method is the transferable part: name the axis, subtract Python's share,
+then take away one more thing and see whether anything breaks.
+The last exercise has an answer you can check against the chapter's figure.
 
 ## 1. Naming a vector of change
 
@@ -17,8 +17,10 @@ the chapter's figure.
 <details>
 <summary>Where to look</summary>
 
-[The Vector of Change](../../Chapters/21_Patterns--Design_Patterns.md#the-vector-of-change) describes the one axis along which a design keeps shifting.
-Look at your history for the same function edited again and again, since that function marks the axis.
+[The Vector of Change](../../Chapters/21_Patterns--Design_Patterns.md#the-vector-of-change)
+describes the one axis along which a design keeps shifting.
+Look at your history for the same function edited again and again,
+since that function marks the axis.
 Then ask which part absorbed each change and which parts you edited by hand.
 
 <details>
@@ -59,16 +61,19 @@ def render(rows: list[Row], style: str) -> str:
 <details>
 <summary>Done when</summary>
 
-you can state the axis in a few words, name the part that absorbed each change (or say that none did), and list the hand edits each change required.
+you can state the axis in a few words, name the part that absorbed each change
+(or say that none did), and list the hand edits each change required.
 You can also name one change off that axis and the parts it would force you to edit.
 
 <details>
 <summary>Solution</summary>
 
-The example is a small report writer. It prints plain text, then must
-emit CSV for a spreadsheet, then JSON for a web front end. All three
-formats run along one axis, the output format. Everything else stays the
-same through all three: the rows, their source, what the numbers mean.
+The example is a small report writer.
+It prints plain text, then must emit CSV for a spreadsheet,
+then JSON for a web front end.
+All three formats run along one axis, the output format.
+Everything else stays the same through all three: the rows, their source,
+what the numbers mean.
 
 Here is the version that holds the first two formats:
 
@@ -98,15 +103,16 @@ print(render(rows, "csv"))
 #: paper,7
 ```
 
-**Branch on the format.** Nothing absorbs the change. Each new format
-means opening `render()` and adding a `case`, so the third request edits
-the same function the first two did. The branching shape survives as
-long as it does because the `match` reads well, but every new format is
-an edit you make by hand.
+**Branch on the format.**
+Nothing absorbs the change.
+Each new format means opening `render()` and adding a `case`,
+so the third request edits the same function the first two did.
+The branching shape survives as long as it does because the `match` reads well,
+but every new format is an edit you make by hand.
 
-Naming the axis says what to do about those hand edits. If the format
-varies, the format must become a value the program can hold, rather
-than a branch in a function:
+Naming the axis says what to do about those hand edits.
+If the format varies, the format must become a value the program can hold,
+rather than a branch in a function:
 
 ```python
 # exercise_1b.py
@@ -137,23 +143,26 @@ print(render(rows, "json"))
 #: {"name": "paper", "amount": 7}
 ```
 
-**Hold each format as data.** Adding the third format takes one
-assignment. `render()` stays as it was. `STYLES` absorbs the change
-because a format is now data. The assignment that adds the format can
-sit in any module that imports `STYLES`, so adding a format can leave
-the module that defines `STYLES` and `render()` as it was.
+**Hold each format as data.**
+Adding the third format takes one assignment.
+`render()` stays as it was.
+`STYLES` absorbs the change because a format is now data.
+The assignment that adds the format can sit in any module that imports `STYLES`,
+so adding a format can leave the module that defines `STYLES` and `render()` as it was.
 
-Everything outside the axis still needs hand edits. Printing a new
-field of `Row` means editing every entry in `STYLES`. `STYLES` absorbs
-new formats. A field is a different vector of change.
+Everything outside the axis still needs hand edits.
+Printing a new field of `Row` means editing every entry in `STYLES`.
+`STYLES` absorbs new formats.
+A field is a different vector of change.
 
-Two things generalize from the example. First, the axis is visible in
-the history rather than in the code. When the same function appears in
-three consecutive commits, the history shows the axis for you. Second,
-a design absorbs one vector and leaves the others as they were. In this design a
-new format is one assignment. A new field is an edit to every format,
-so the design is the right answer only if formats are what keep
-changing.
+Two things generalize from the example.
+First, the axis is visible in the history rather than in the code.
+When the same function appears in three consecutive commits,
+the history shows the axis for you.
+Second, a design absorbs one vector and leaves the others as they were.
+In this design a new format is one assignment.
+A new field is an edit to every format,
+so the design is the right answer only if formats are what keep changing.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -173,9 +182,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[When a Pattern Dissolves](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) shows a pattern whose parts Python supplies.
-List the interface, the concrete classes, the context, and the wiring the usual form needs.
-Cross out each part that a function or a type annotation covers, and state what remains in one sentence.
+[When a Pattern Dissolves](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
+shows a pattern whose parts Python supplies.
+List the interface, the concrete classes, the context,
+and the wiring the usual form needs.
+Cross out each part that a function or a type annotation covers,
+and state what remains in one sentence.
 
 <details>
 <summary>The shape</summary>
@@ -199,32 +211,36 @@ def checkout(
 <details>
 <summary>Done when</summary>
 
-your list covers every interface, class, method, and call-site construct the usual form requires, each crossed-out part has the Python feature that supplies it written beside it, and the remainder fits in one sentence that states the pattern's intent and names none of its classes.
+your list covers every interface, class, method,
+and call-site construct the usual form requires,
+each crossed-out part has the Python feature that supplies it written beside it,
+and the remainder fits in one sentence that states the pattern's intent and names none of its classes.
 
 <details>
 <summary>Solution</summary>
 
-The pattern is
-[*Strategy*](../../Chapters/27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime),
-in the shape it takes in Java. Its usual form requires:
+The pattern is [*Strategy*](../../Chapters/27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime),
+in the shape it takes in Java.
+Its usual form requires:
 
 - an interface, `ShippingStrategy`, declaring one method, `cost()`
-- a concrete class per algorithm, `FlatRate` and `ByWeight`, each
-  implementing that interface
+- a concrete class per algorithm, `FlatRate` and `ByWeight`,
+  each implementing that interface
 - a context class, `Checkout`, holding a `ShippingStrategy` field
 - a constructor argument or setter on the context to install a `ShippingStrategy`
 - at the call site, a `new FlatRate()` to pass in
 
 Now cross out what Python supplies:
 
-- The interface goes. A function is a value with a call
-  signature, and `Callable[[float], float]` states that signature
-  without declaring an interface.
-- The concrete classes go. Each holds one method and no state, so each
-  becomes one function.
-- The context class goes, along with its field and its setter. The
-  strategy becomes an argument to pass rather than a field to hold.
-- The `new` goes with the classes. You pass a function by its name.
+- The interface goes.
+  A function is a value with a call signature,
+  and `Callable[[float], float]` states that signature without declaring an interface.
+- The concrete classes go.
+  Each holds one method and no state, so each becomes one function.
+- The context class goes, along with its field and its setter.
+  The strategy becomes an argument to pass rather than a field to hold.
+- The `new` goes with the classes.
+  You pass a function by its name.
 
 One sentence remains: make the varying step a parameter.
 
@@ -247,17 +263,16 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 #: 25.0 23.0
 ```
 
-Five constructs become one parameter. The type checker still knows
-what the parameter accepts: `Callable[[float], float]` rejects a
-function taking the wrong arguments as surely as an interface rejects
-a class that does not implement it.
+Five constructs become one parameter.
+The type checker still knows what the parameter accepts:
+`Callable[[float], float]` rejects a function taking the wrong arguments as surely as an interface rejects a class that does not implement it.
 
-The sentence that remains is the pattern. The subtraction keeps the
-pattern's intent and removes the supporting code. Everything crossed
-out serves a language where a method belongs to a class. In such a
-language, passing a behavior means passing an object. The crossed-out
-parts build that object. Python has had the
-[missing piece](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
+The sentence that remains is the pattern.
+The subtraction keeps the pattern's intent and removes the supporting code.
+Everything crossed out serves a language where a method belongs to a class.
+In such a language, passing a behavior means passing an object.
+The crossed-out parts build that object.
+Python has had the [missing piece](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 all along, since a function is a value you can pass.
 
 Before you move on, name what separates your attempt from this one:
@@ -278,7 +293,9 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles) states *Subtraction*: a design is complete when you cannot take anything else away.
+[Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles)
+states *Subtraction*:
+a design is complete when you cannot take anything else away.
 Use *Subtraction* as a test: take one thing away and run the program.
 Choose a class or a level of inheritance that holds a single method and no state.
 If nothing breaks, the piece you removed is supporting code.
@@ -313,14 +330,17 @@ def checkout(weight: float, shipping: Shipping) -> float:
 <details>
 <summary>Done when</summary>
 
-you have removed one piece, run the program and `uv run ty check`, and written down what changed in the output and in the requirement the program meets.
-If nothing changed, you can say what the removed piece wrapped; if something broke, you can name the requirement that piece expresses.
+you have removed one piece, run the program and `uv run ty check`,
+and written down what changed in the output and in the requirement the program meets.
+If nothing changed, you can say what the removed piece wrapped;
+if something broke, you can name the requirement that piece expresses.
 
 <details>
 <summary>Solution</summary>
 
-The design is the same shipping calculation, written the way it looks
-before anyone questions it: an abstract base and two subclasses.
+The design is the same shipping calculation,
+written the way it looks before anyone questions it:
+an abstract base and two subclasses.
 
 ```python
 # exercise_3.py
@@ -348,30 +368,34 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 #: 25.0 23.0
 ```
 
-If you remove the abstract base and turn both subclasses into
-functions, you have exercise 2's version. What stops working? Nothing.
-The numbers are identical, the type checker still rejects a wrongly
-shaped argument, and adding a third rule is still one new definition.
-`Flat` and `ByWeight` each carry a single method and no state, so each
-class is a wrapper around one function. By the rule that a design is
-complete when you cannot take anything else away, the class version has
-three classes left to take away.
+If you remove the abstract base and turn both subclasses into functions,
+you have exercise 2's version.
+What stops working?
+Nothing.
+The numbers are identical,
+the type checker still rejects a wrongly shaped argument,
+and adding a third rule is still one new definition.
+`Flat` and `ByWeight` each carry a single method and no state,
+so each class is a wrapper around one function.
+By the rule that a design is complete when you cannot take anything else away,
+the class version has three classes left to take away.
 
-Taking away one more thing changes the answer. Removing `checkout()`'s
-`shipping` parameter means inlining `5.0` where the call through
-`shipping` was and dropping the second argument from each call. The
-program still runs and still prints a number. What stops working is the
-requirement. Charging by weight now means editing `checkout()`.
-*Subtraction* stops at the parameter. The parameter is the
-last piece that expresses the design's intent, so removing it removes
-the design rather than its supporting code.
+Taking away one more thing changes the answer.
+Removing `checkout()`'s `shipping` parameter means inlining `5.0` where the call through `shipping` was and dropping the second argument from each call.
+The program still runs and still prints a number.
+What stops working is the requirement.
+Charging by weight now means editing `checkout()`.
+*Subtraction* stops at the parameter.
+The parameter is the last piece that expresses the design's intent,
+so removing it removes the design rather than its supporting code.
 
-Both outcomes are the exercise working correctly: a removal that broke
-nothing, and one that broke the requirement. *Subtraction* is a test
-you run, not a rule to remove as much as you can. Take something away,
-run the program, and read the result. If nothing breaks, the piece is
-supporting code. If something breaks, the piece you removed expresses
-the design. Keep it, and give it a name.
+Both outcomes are the exercise working correctly: a removal that broke nothing,
+and one that broke the requirement.
+*Subtraction* is a test you run, not a rule to remove as much as you can.
+Take something away, run the program, and read the result.
+If nothing breaks, the piece is supporting code.
+If something breaks, the piece you removed expresses the design.
+Keep it, and give it a name.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -393,7 +417,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change) compares a design in which `Report` specifies each writer with one in which it specifies a protocol.
+[The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change)
+compares a design in which `Report` specifies each writer with one in which it specifies a protocol.
 In the first version give each writer its own method name.
 In the second give every writer the same method and declare that method in a `Protocol`.
 Add the Markdown writer to each, then count the existing definitions you opened.
@@ -464,14 +489,17 @@ def main(kind: str) -> None:
 <details>
 <summary>Done when</summary>
 
-both files pass `uv run ty check`, asking each `main` for the Markdown writer prints your Markdown text rather than `None`, and your edit lists match the chapter's figure: `Report` and `main` in the first version, `main` alone in the second.
+both files pass `uv run ty check`,
+asking each `main` for the Markdown writer prints your Markdown text rather than `None`,
+and your edit lists match the chapter's figure:
+`Report` and `main` in the first version, `main` alone in the second.
 
 <details>
 <summary>Solution</summary>
 
-The first version gives each writer its own method name, which is the
-usual reason a class like `Report` ends up naming every writer. The
-class must know which method to call on which writer.
+The first version gives each writer its own method name,
+which is the usual reason a class like `Report` ends up naming every writer.
+The class must know which method to call on which writer.
 
 ```python
 # exercise_4a.py
@@ -523,22 +551,22 @@ main("md")
 #: **Q3 sales**
 ```
 
-`MdWriter` is new code, so it stays out of the count. Adding it edits
-three existing things: the `AnyWriter` alias gains a member,
-`Report.render()` gains a `case`, and `main()` gains a `case`. Two of
-those edits belong to `Report`. `render()` is its method, and the alias
-lists the writers `Report` accepts. The change therefore reaches two
-parts, `Report` and `main`, as the left half of the chapter's figure
-shows.
+`MdWriter` is new code, so it stays out of the count.
+Adding it edits three existing things: the `AnyWriter` alias gains a member,
+`Report.render()` gains a `case`, and `main()` gains a `case`.
+Two of those edits belong to `Report`.
+`render()` is its method, and the alias lists the writers `Report` accepts.
+The change therefore reaches two parts, `Report` and `main`,
+as the left half of the chapter's figure shows.
 
-If you add `MdWriter` to the `AnyWriter` alias and to `main()` but
-leave `Report.render()` as it was, `main("md")` prints `None`. The
-writer falls through every `case`, and `render()` reaches its end, where
-Python returns `None` implicitly. `ty` reports that path as
-`invalid-return-type`, since `render()` declares that it returns `str`.
+If you add `MdWriter` to the `AnyWriter` alias and to `main()` but leave `Report.render()` as it was,
+`main("md")` prints `None`.
+The writer falls through every `case`, and `render()` reaches its end,
+where Python returns `None` implicitly.
+`ty` reports that path as `invalid-return-type`,
+since `render()` declares that it returns `str`.
 
-The second version gives every writer the same method and lets
-`Report` specify that method through a protocol:
+The second version gives every writer the same method and lets `Report` specify that method through a protocol:
 
 ```python
 # exercise_4b.py
@@ -586,17 +614,20 @@ main("md")
 #: **Q3 sales**
 ```
 
-Here adding `MdWriter` edits one existing thing, the `case` that
-`main()` gains. `Report` and `Writer` keep their source. No writer lists
-`Writer` as a base. The type checker matches each class to the protocol when
-`main()` assigns an instance to `writer`.
+Here adding `MdWriter` edits one existing thing, the `case` that `main()` gains.
+`Report` and `Writer` keep their source.
+No writer lists `Writer` as a base.
+The type checker matches each class to the protocol when `main()` assigns an instance to `writer`.
 
-The count gives the answer: three edits in two parts against one edit in
-one part. The places matter more than the number, though. In the first
-version a new format means editing `Report`, a class whose subject is
-the report's content. In the second, the one edit is in `main()`, the
-part whose job is to assemble the pieces. The `match` in `main()` names
-every writer class, so `main()`'s heavy edges are the ones that remain.
+The count gives the answer:
+three edits in two parts against one edit in one part.
+The places matter more than the number, though.
+In the first version a new format means editing `Report`,
+a class whose subject is the report's content.
+In the second, the one edit is in `main()`,
+the part whose job is to assemble the pieces.
+The `match` in `main()` names every writer class,
+so `main()`'s heavy edges are the ones that remain.
 A [registry](../../Chapters/26_Patterns--Factory.md#self-registration)
 moves them out of `main()` as well.
 

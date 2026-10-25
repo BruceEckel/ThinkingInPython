@@ -12,9 +12,12 @@
 <details>
 <summary>Where to look</summary>
 
-[Typing the Symbol Set](../../Chapters/35_Patterns--Flyweight.md#typing-the-symbol-set) shows `Symbol` and `SPECS` naming the same kinds, so the two grow together.
+[Typing the Symbol Set](../../Chapters/35_Patterns--Flyweight.md#typing-the-symbol-set)
+shows `Symbol` and `SPECS` naming the same kinds, so the two grow together.
 Add the new symbols to both and leave `tile()` alone.
-For `walkable_neighbors()`, visit each of the four adjacent positions that lies inside the grid, and count the cells whose `walkable` is true.
+For `walkable_neighbors()`,
+visit each of the four adjacent positions that lies inside the grid,
+and count the cells whose `walkable` is true.
 
 <details>
 <summary>The shape</summary>
@@ -64,7 +67,11 @@ def walkable_neighbors(
 <details>
 <summary>Done when</summary>
 
-`uv run ty check` passes on your file (it reports `invalid-assignment` on `SPECS` while `Symbol` lags behind), a map using all five kinds prints five distinct tile objects however many cells it has, and on an all-grass 3x3 map `walkable_neighbors()` returns 2 at a corner, 3 on an edge, and 4 in the center.
+`uv run ty check` passes on your file
+(it reports `invalid-assignment` on `SPECS` while `Symbol` lags behind),
+a map using all five kinds prints five distinct tile objects however many cells it has,
+and on an all-grass 3x3 map `walkable_neighbors()` returns 2 at a corner,
+3 on an edge, and 4 in the center.
 
 <details>
 <summary>Solution</summary>
@@ -138,15 +145,15 @@ print(len(cells), len({id(t) for t in cells}))
 #: 24 5
 ```
 
-**Name each new kind in both tables.** Door and tree tiles need two new symbols in `SPECS` and the same two
-in the `Symbol` literal.
+**Name each new kind in both tables.**
+Door and tree tiles need two new symbols in `SPECS` and the same two in the `Symbol` literal.
 Once both tables name the same kinds, `SPECS` passes the type checker,
 which still flags any key outside `Symbol`.
 `tile()` and `parse_map()` stay as they are.
 
-**Confirm one tile per kind.** The twenty-four cells refer to five
-distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
-`tree`).
+**Confirm one tile per kind.**
+The twenty-four cells refer to five distinct objects, one per kind
+(`grass`, `water`, `rock`, `door`, `tree`).
 The count stays at five however large the map grows,
 because `@cache` keys on the symbol alone.
 
@@ -168,8 +175,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state) compares a map that shares its tiles with one that builds a tile per cell.
-Write two factories, one with `@cache` and one without, and build the same map with each between `tracemalloc.start()` and `tracemalloc.get_traced_memory()`.
+[Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state)
+compares a map that shares its tiles with one that builds a tile per cell.
+Write two factories, one with `@cache` and one without,
+and build the same map with each between `tracemalloc.start()` and `tracemalloc.get_traced_memory()`.
 Repeat for several map sizes and compare the peaks as a ratio.
 
 <details>
@@ -214,7 +223,9 @@ def make_map(size: int) -> str:
 <details>
 <summary>Done when</summary>
 
-your file prints one unshared-to-shared peak ratio per map size, and with the record `Tile` each ratio falls between about six and seven (the solution prints `6.2` at 50x50 and `6.9` at 200x200).
+your file prints one unshared-to-shared peak ratio per map size,
+and with the record `Tile` each ratio falls between about six and seven
+(the solution prints `6.2` at 50x50 and `6.9` at 200x200).
 A ratio well above that means one peak counted both builds.
 
 <details>
@@ -222,8 +233,8 @@ A ratio well above that means one peak counted both builds.
 
 If you leave out the `tracemalloc.stop()` after the shared build,
 tracing runs straight through both builds.
-The unshared peak then counts the shared field, which is still
-alive, on top of its own, so the ratio comes out larger at every size.
+The unshared peak then counts the shared field, which is still alive,
+on top of its own, so the ratio comes out larger at every size.
 The solution stops tracing after each build,
 so each peak measures that build's allocations alone.
 
@@ -290,19 +301,21 @@ for size in (50, 100, 200):
 #: 200 ratio unshared/shared: 6.9
 ```
 
-**Compare the peaks across sizes.** The ratio stays between six and seven at every size: about 6x at a 50x50 map,
-close to 7x at 200x200. Both peaks grow with the number of
-cells, because both versions build the same nested list of references.
-The two versions differ in the memory one cell takes. A cell in the
-shared field takes one reference into a pool of three `Tile` objects,
-while a cell in the unshared field takes a reference plus a new
-`Tile`, roughly six times as much memory. That difference repeats in
-every cell, so the bytes saved grow with the map.
+**Compare the peaks across sizes.**
+The ratio stays between six and seven at every size: about 6x at a 50x50 map,
+close to 7x at 200x200.
+Both peaks grow with the number of cells,
+because both versions build the same nested list of references.
+The two versions differ in the memory one cell takes.
+A cell in the shared field takes one reference into a pool of three `Tile` objects,
+while a cell in the unshared field takes a reference plus a new `Tile`,
+roughly six times as much memory.
+That difference repeats in every cell, so the bytes saved grow with the map.
 
-`Tile` is a record, so each unshared `Tile` is a slotted instance
-with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record`, the
-same run reports a ratio near ten, because every unshared `Tile`
-then carries a dictionary too.
+`Tile` is a record, so each unshared `Tile` is a slotted instance with no `__dict__`.
+With `@dataclass(frozen=True)` in place of `@record`,
+the same run reports a ratio near ten,
+because every unshared `Tile` then carries a dictionary too.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -320,11 +333,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Freezing the Shared Tile](../../Chapters/35_Patterns--Flyweight.md#freezing-the-shared-tile) explains why a flyweight must be immutable.
+[Freezing the Shared Tile](../../Chapters/35_Patterns--Flyweight.md#freezing-the-shared-tile)
+explains why a flyweight must be immutable.
 The pool holds one object per kind,
-so assigning to an attribute through one cell
-is visible through every cell that shares that object.
-In the test, assign through one cell, then assert on a different cell of the same kind.
+so assigning to an attribute through one cell is visible through every cell that shares that object.
+In the test, assign through one cell,
+then assert on a different cell of the same kind.
 
 <details>
 <summary>The shape</summary>
@@ -355,7 +369,9 @@ def mutable_tile(symbol: str) -> MutableTile:
 <details>
 <summary>Done when</summary>
 
-your test passes with `@dataclass` on `Tile`, fails with a `FrozenInstanceError` at the assignment once `@record` is back, and also fails if you remove `@cache` from `tile()`.
+your test passes with `@dataclass` on `Tile`,
+fails with a `FrozenInstanceError` at the assignment once `@record` is back,
+and also fails if you remove `@cache` from `tile()`.
 That last check shows the test detects sharing, not just the assignment it made.
 
 <details>
@@ -363,7 +379,8 @@ That last check shows the test detects sharing, not just the assignment it made.
 
 If you assert on the cell whose `walkable` you set,
 the test passes whether or not the cells share a tile.
-With `@cache` removed from `mutable_tile()`, each cell gets its own `MutableTile`.
+With `@cache` removed from `mutable_tile()`,
+each cell gets its own `MutableTile`.
 `field[0][0].walkable` still reads `False` after the assignment,
 so the test passes on code that shares nothing.
 The test asserts on a different grass cell, `field[1][1]`,
@@ -400,9 +417,9 @@ print(field[0][1].walkable, field[1][0].walkable,
 #: False False False
 ```
 
-**Expose the shared state.** Setting `walkable = False` on the tile at `(0, 0)` changes `walkable`
-for every other grass cell in the map too, because all four cells
-share one `MutableTile` object.
+**Expose the shared state.**
+Setting `walkable = False` on the tile at `(0, 0)` changes `walkable` for every other grass cell in the map too,
+because all four cells share one `MutableTile` object.
 The test asserts that the assignment reaches a different cell:
 
 ```python
@@ -439,8 +456,7 @@ def test_mutation_without_frozen_leaks_across_cells(
 If you restore `@record`, this test fails at its assignment.
 `field[0][0].walkable = False` raises a `FrozenInstanceError`,
 because a record rejects assignment to every attribute.
-The bug depends on that assignment,
-so every cell can share one record safely.
+The bug depends on that assignment, so every cell can share one record safely.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -461,9 +477,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state) separates what a piece is (color and kind) from where it stands.
-Share the color and kind through a `@cache` factory keyed on them, and keep the square as the `dict` key.
-A capture or a promotion then puts a different shared `Piece` on a square, and every `Piece` object stays as it was.
+[Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state)
+separates what a piece is (color and kind) from where it stands.
+Share the color and kind through a `@cache` factory keyed on them,
+and keep the square as the `dict` key.
+A capture or a promotion then puts a different shared `Piece` on a square,
+and every `Piece` object stays as it was.
 
 <details>
 <summary>The shape</summary>
@@ -515,7 +534,9 @@ def promote(
 <details>
 <summary>Done when</summary>
 
-the opening position holds 32 board entries that refer to 12 distinct `Piece` objects, a capture leaves 31 entries and still 12 objects, and a promoted pawn reports the new kind while every other pawn of its color still reports pawn.
+the opening position holds 32 board entries that refer to 12 distinct `Piece` objects,
+a capture leaves 31 entries and still 12 objects,
+and a promoted pawn reports the new kind while every other pawn of its color still reports pawn.
 
 <details>
 <summary>Solution</summary>
@@ -594,25 +615,27 @@ print(queen.color, queen.kind)
 #: Color.WHITE Kind.QUEEN
 ```
 
-**Share one piece per color and kind.** `starting_position()` fills thirty-two squares with twelve
-distinct `Piece` objects: two colors times six kinds. Every white pawn
-is the same object, and so is every piece of any other color-and-kind
-combination. The board is a `dict` mapping squares to
-references. That mapping keeps the extrinsic position separate from
-the intrinsic color-and-kind that `@cache` shares.
+**Share one piece per color and kind.**
+`starting_position()` fills thirty-two squares with twelve distinct `Piece` objects:
+two colors times six kinds.
+Every white pawn is the same object,
+and so is every piece of any other color-and-kind combination.
+The board is a `dict` mapping squares to references.
+That mapping keeps the extrinsic position separate from the intrinsic color-and-kind that `@cache` shares.
 
-**Capture by replacing a reference.** Capturing leaves every `Piece` object alive.
-`move()` pops the moving piece's reference from `src` and writes it
-over the captured piece's reference at `dst`,
+**Capture by replacing a reference.**
+Capturing leaves every `Piece` object alive.
+`move()` pops the moving piece's reference from `src` and writes it over the captured piece's reference at `dst`,
 so a capture leaves the board one entry shorter.
 `@cache` keeps the captured piece's flyweight,
 which represents "a black knight" in the abstract rather than any particular knight on a square.
 The twelve `Piece` objects therefore remain however many captures follow.
 
-**Promote by switching flyweights.** A frozen `Piece` keeps its color and kind for life,
+**Promote by switching flyweights.**
+A frozen `Piece` keeps its color and kind for life,
 so `promote()` changes what the square refers to.
-`piece(current.color, kind)` looks up (or builds) the shared `Piece` for the new kind,
-and the square now points at that one.
+`piece(current.color, kind)` looks up (or builds)
+the shared `Piece` for the new kind, and the square now points at that one.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -631,11 +654,14 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak) builds a pool that holds its flyweights in a `WeakValueDictionary` behind a factory function.
+[A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak)
+builds a pool that holds its flyweights in a `WeakValueDictionary` behind a factory function.
 Apply that shape to `Color`.
 A weak reference needs a `__weakref__` slot, which `weakref_slot=True` adds.
-`record()` forwards `slots=False` alone, so this `Color` needs the `dataclass` call written out.
-To see what the rewrite gives up, compare how callers construct a `Color` here with [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor).
+`record()` forwards `slots=False` alone,
+so this `Color` needs the `dataclass` call written out.
+To see what the rewrite gives up,
+compare how callers construct a `Color` here with [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor).
 
 <details>
 <summary>The shape</summary>
@@ -661,7 +687,10 @@ def make_color(red: int, green: int, blue: int) -> Color:
 <details>
 <summary>Done when</summary>
 
-your file prints the pool's length as `50` after building a fifty-color palette and `0` after `del` drops it, two requests for the same components return the same object (`is` prints `True`), and you can show with one line a guarantee of `interned_color.py` that your version lacks.
+your file prints the pool's length as `50` after building a fifty-color palette and `0` after `del` drops it,
+two requests for the same components return the same object
+(`is` prints `True`),
+and you can show with one line a guarantee of `interned_color.py` that your version lacks.
 
 <details>
 <summary>Solution</summary>
@@ -670,7 +699,8 @@ If you keep `@record` on `Color`,
 the first `make_color()` call raises a `TypeError` at `_pool[key] = found`,
 because the `WeakValueDictionary` cannot create a weak reference to a slotted `Color` with no `__weakref__` slot.
 The solution writes the `dataclass` call out with `weakref_slot=True`.
-That option adds the `__weakref__` slot alone, so the class still has no `__dict__`.
+That option adds the `__weakref__` slot alone,
+so the class still has no `__dict__`.
 
 ```python
 # exercise_5.py
@@ -712,32 +742,29 @@ print(len(_pool))
 #: 0
 ```
 
-**Pool colors weakly behind a factory.** This listing is `weak_pool.py`'s shape applied to colors: a factory
-function, `make_color()`, and a `WeakValueDictionary` for the pool.
-`Color` is a frozen data class, so it gets a generated `__repr__()`,
-`__eq__()`, and `__hash__()`, as the record `Color` in
-`interned_color.py` does. Like `weak_pool.py`'s `Name`, this `Color`
-writes the `dataclass` call in full, because a weak reference needs
-`weakref_slot=True`, and `record()` forwards `slots=False` alone.
+**Pool colors weakly behind a factory.**
+This listing is `weak_pool.py`'s shape applied to colors: a factory function,
+`make_color()`, and a `WeakValueDictionary` for the pool.
+`Color` is a frozen data class, so it gets a generated `__repr__()`, `__eq__()`,
+and `__hash__()`, as the record `Color` in `interned_color.py` does.
+Like `weak_pool.py`'s `Name`, this `Color` writes the `dataclass` call in full,
+because a weak reference needs `weakref_slot=True`,
+and `record()` forwards `slots=False` alone.
 
-**Empty the pool on release.** Once `del` drops the last
-references to the fifty-shade palette and both crimson names, Python
-frees those `Color` objects. The `WeakValueDictionary` then drops
-their entries on its own.
+**Empty the pool on release.**
+Once `del` drops the last references to the fifty-shade palette and both crimson names,
+Python frees those `Color` objects.
+The `WeakValueDictionary` then drops their entries on its own.
 
-The rewrite gives up the constructor syntax, and with it the guarantee
-that every `Color(...)` call returns the pooled object.
-`Color(220, 20, 60)` still runs and
-builds a second object equal to the pooled one.
+The rewrite gives up the constructor syntax,
+and with it the guarantee that every `Color(...)` call returns the pooled object.
+`Color(220, 20, 60)` still runs and builds a second object equal to the pooled one.
 A direct `Tile(...)` call makes the same bypass in the chapter.
 
 The factory function, not the weak references, gives up the constructor syntax.
-As [Choosing a *Flyweight* and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool) says,
-`__new__()` can look in a `WeakValueDictionary` as easily as in a `dict`.
-A `Color` that interns in `__new__()` keeps its constructor syntax
-and needs the same
-`@dataclass(frozen=True, slots=True, weakref_slot=True)` line as
-`exercise_5.py`'s `Color`.
+As [Choosing a *Flyweight* and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool)
+says, `__new__()` can look in a `WeakValueDictionary` as easily as in a `dict`.
+A `Color` that interns in `__new__()` keeps its constructor syntax and needs the same `@dataclass(frozen=True, slots=True, weakref_slot=True)` line as `exercise_5.py`'s `Color`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -756,8 +783,10 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor) puts the pool lookup in `__new__()`.
-Check each component against the range at the top of `__new__()`, before the lookup, so an invalid `Color` stays out of the pool.
+[Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor)
+puts the pool lookup in `__new__()`.
+Check each component against the range at the top of `__new__()`,
+before the lookup, so an invalid `Color` stays out of the pool.
 The test uses `pytest.raises(ValueError)` once for a component above the range and once for one below it.
 
 <details>
@@ -787,7 +816,9 @@ class Color:
 <details>
 <summary>Done when</summary>
 
-your test passes, `Color(256, 0, 0)` and `Color(0, -1, 0)` each raise a `ValueError` naming the bad component, `Color(255, 255, 255)` still succeeds, and `len(Color._pool)` reads the same after a rejected call as before it.
+your test passes, `Color(256, 0, 0)` and `Color(0, -1, 0)` each raise a `ValueError` naming the bad component,
+`Color(255, 255, 255)` still succeeds,
+and `len(Color._pool)` reads the same after a rejected call as before it.
 
 <details>
 <summary>Solution</summary>
@@ -868,13 +899,14 @@ def test_out_of_range_component_raises() -> None:
         Color(0, -1, 0)
 ```
 
-**Validate before the pool lookup.** The range check runs first in `__new__()`,
-so `__new__()` raises a `ValueError` for an out-of-range component
-before the lookup can find a pooled instance or build a new one.
+**Validate before the pool lookup.**
+The range check runs first in `__new__()`,
+so `__new__()` raises a `ValueError` for an out-of-range component before the lookup can find a pooled instance or build a new one.
 Every `Color` that `__new__()` pools or returns has in-range components.
 
 [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
-makes the same *parse, don't validate* move with `__post_init__()`. Here the class validates in `__new__()`,
+makes the same *parse, don't validate* move with `__post_init__()`.
+Here the class validates in `__new__()`,
 because `__post_init__()` runs after `__new__()` has pooled the instance.
 
 Before you move on, name what separates your attempt from this one:
@@ -895,9 +927,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Known Set: Enum](../../Chapters/35_Patterns--Flyweight.md#a-known-set-enum) lets the language hold the pool, so `Tile(symbol)` is the lookup.
+[A Known Set: Enum](../../Chapters/35_Patterns--Flyweight.md#a-known-set-enum)
+lets the language hold the pool, so `Tile(symbol)` is the lookup.
 Move the spec table into the member values and delete `to_symbol()`.
-For the comparison, consider where each version reports a wrong symbol: a misspelled member, and a symbol that arrives as data.
+For the comparison, consider where each version reports a wrong symbol:
+a misspelled member, and a symbol that arrives as data.
 
 <details>
 <summary>The shape</summary>
@@ -924,7 +958,10 @@ def parse_map(text: str) -> list[list[Tile]]:
 <details>
 <summary>Done when</summary>
 
-`tile_map_demo.py`'s map prints `24 3`, `parse_map("?")` raises `ValueError: '?' is not a valid Tile`, and `uv run ty check` reports `unresolved-attribute` on a member missing from the enum, such as `Tile.DOOR`.
+`tile_map_demo.py`'s map prints `24 3`,
+`parse_map("?")` raises `ValueError: '?' is not a valid Tile`,
+and `uv run ty check` reports `unresolved-attribute` on a member missing from the enum,
+such as `Tile.DOOR`.
 You can then say which wrong-symbol mistakes the type checker catches in each version and which stay runtime failures in both.
 
 <details>
@@ -967,35 +1004,34 @@ expect(ValueError, parse_map, "?")
 #: [ValueError] '?' is not a valid Tile
 ```
 
-**Let the enum hold the pool.** `SPECS`, `tile()`, and `to_symbol()` all disappear. The member tuples
-are the spec table, and `Tile(s)` is the pool lookup. `Tile(s)` checks
-membership at runtime against the value-to-member table that the metaclass
-builds.
+**Let the enum hold the pool.**
+`SPECS`, `tile()`, and `to_symbol()` all disappear.
+The member tuples are the spec table, and `Tile(s)` is the pool lookup.
+`Tile(s)` checks membership at runtime against the value-to-member table that the metaclass builds.
 `to_symbol()` makes the same check by hand.
 
 The type checker still catches each `Literal`-version mistake that the enum leaves possible.
-A `match` over `Tile` that leaves out a
-member draws the same `invalid-return-type` as a `match` over `Symbol`
-that leaves out a symbol.
+A `match` over `Tile` that leaves out a member draws the same `invalid-return-type` as a `match` over `Symbol` that leaves out a symbol.
 The `Literal` version's `SPECS` annotation guards against a key outside `Symbol`.
 The enum makes that mismatch impossible,
 because it declares the set once instead of twice.
 
-The enum adds one check. A misspelled or missing member, such as
-`Tile.DOOR`, is an `unresolved-attribute` error. In the `Literal`
-version, the wrapper that `@cache` returns takes any hashable argument
-in place of `tile()`'s `Symbol`, so the matching mistake, `tile("+")`,
+The enum adds one check.
+A misspelled or missing member, such as `Tile.DOOR`,
+is an `unresolved-attribute` error.
+In the `Literal` version,
+the wrapper that `@cache` returns takes any hashable argument in place of `tile()`'s `Symbol`,
+so the matching mistake, `tile("+")`,
 passes the type checker and fails at runtime with a `KeyError`.
 
-An unknown symbol that arrives as data is a runtime failure in both
-versions. The type checker passes `Tile("?")`, and the call raises a
-`ValueError`.
+An unknown symbol that arrives as data is a runtime failure in both versions.
+The type checker passes `Tile("?")`, and the call raises a `ValueError`.
 
-The enum gives up a named place to fail. `to_symbol()` raises a
-`KeyError` at a named boundary, while `Tile("?")` raises a `ValueError`
-from deep inside `parse_map()`'s comprehension.
-If the boundary matters, keep a `to_tile()` wrapper that catches the
-`ValueError` and re-raises it with the offending line and column.
+The enum gives up a named place to fail.
+`to_symbol()` raises a `KeyError` at a named boundary,
+while `Tile("?")` raises a `ValueError` from deep inside `parse_map()`'s comprehension.
+If the boundary matters,
+keep a `to_tile()` wrapper that catches the `ValueError` and re-raises it with the offending line and column.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1018,10 +1054,14 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Sharing, Not Caching](../../Chapters/35_Patterns--Flyweight.md#sharing-not-caching) says a flyweight's factory exists to guarantee identity.
-[Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor) says `@cache` checks the key and stores the result in separate steps.
-The `time.sleep()` widens the gap between those steps, so every thread can miss before any thread stores.
-For the fixes, build every `Tile` into a table before starting any thread, and separately wrap the call to `tile()` in a `threading.Lock`.
+[Sharing, Not Caching](../../Chapters/35_Patterns--Flyweight.md#sharing-not-caching)
+says a flyweight's factory exists to guarantee identity.
+[Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor)
+says `@cache` checks the key and stores the result in separate steps.
+The `time.sleep()` widens the gap between those steps,
+so every thread can miss before any thread stores.
+For the fixes, build every `Tile` into a table before starting any thread,
+and separately wrap the call to `tile()` in a `threading.Lock`.
 
 <details>
 <summary>The shape</summary>
@@ -1074,16 +1114,19 @@ def locked_tile(symbol: Symbol) -> Tile:
 <details>
 <summary>Done when</summary>
 
-four threads calling the slow `tile()` on a cold symbol print `4 4` (four results, four distinct objects), and each fixed version leaves the four threads holding 1 distinct object.
-Give each fix a symbol no earlier call has used, since a warm cache entry hides the race.
+four threads calling the slow `tile()` on a cold symbol print `4 4`
+(four results, four distinct objects),
+and each fixed version leaves the four threads holding 1 distinct object.
+Give each fix a symbol no earlier call has used,
+since a warm cache entry hides the race.
 
 <details>
 <summary>Solution</summary>
 
-If you put the lock inside `tile()`, around the sleep and the
-build, the listing's last line prints `4` instead of `1`.
-`@cache` checks the key before the body runs, so all four threads
-miss and then take turns building their own `Tile`.
+If you put the lock inside `tile()`, around the sleep and the build,
+the listing's last line prints `4` instead of `1`.
+`@cache` checks the key before the body runs,
+so all four threads miss and then take turns building their own `Tile`.
 The lock puts the builds in order, but all four still run.
 The solution wraps the call to `tile()`, so the lookup, the build,
 and the store all run under one lock.
@@ -1162,33 +1205,38 @@ print(len({id(t) for t in gather(locked_tile, "~")}))
 #: 1
 ```
 
-**Expose the cold-key race.** `@cache` looks up the key, misses, calls the
-function, and stores the result. No lock spans those steps.
+**Expose the cold-key race.**
+`@cache` looks up the key, misses, calls the function, and stores the result.
+No lock spans those steps.
 Four threads that miss on the same cold key therefore all run the body.
-Each thread keeps the `Tile` it built, so the four results are four distinct objects.
-Each store overwrites the one before it, so the cache keeps the last thread's `Tile`.
+Each thread keeps the `Tile` it built,
+so the four results are four distinct objects.
+Each store overwrites the one before it,
+so the cache keeps the last thread's `Tile`.
 Every later caller gets that one object,
 while the other three threads hold `Tile` objects that the cache has dropped.
 
-`@cache` works as designed here. A cache that holds a lock across
-the call serializes every miss in the program.
-Serializing every miss is a worse default than occasionally building a value twice. For an ordinary memoized
-computation, a duplicate build wastes time and leaves the results
-correct.
-For a *Flyweight*, the duplicate is a bug, because the pattern exists
-to make `tile("^") is tile("^")` hold.
+`@cache` works as designed here.
+A cache that holds a lock across the call serializes every miss in the program.
+Serializing every miss is a worse default than occasionally building a value twice.
+For an ordinary memoized computation,
+a duplicate build wastes time and leaves the results correct.
+For a *Flyweight*, the duplicate is a bug,
+because the pattern exists to make `tile("^") is tile("^")` hold.
 
-**Fill the pool eagerly.** Only a miss can start a race.
-The eager fix builds every value before any thread exists,
-so every lookup hits.
+**Fill the pool eagerly.**
+Only a miss can start a race.
+The eager fix builds every value before any thread exists, so every lookup hits.
 Each lookup is one `dict` index and takes no lock.
 Eager filling is the better answer whenever the whole value set fits in one small table.
 An `Enum` works under the same condition.
 
-**Guard the factory with a lock.** The lock fix handles an unbounded
-value set. Every lookup now serializes, including the hits, which are
-the overwhelming majority once the pool is warm. If that serialization
-matters, write the pool by hand and lock only on the miss path.
+**Guard the factory with a lock.**
+The lock fix handles an unbounded value set.
+Every lookup now serializes, including the hits,
+which are the overwhelming majority once the pool is warm.
+If that serialization matters,
+write the pool by hand and lock only on the miss path.
 Check the key again inside the lock,
 since another thread may have filled that entry while this one waited.
 

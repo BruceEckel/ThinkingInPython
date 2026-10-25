@@ -9,9 +9,12 @@
 <details>
 <summary>Where to look</summary>
 
-[Sequence Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#sequence-patterns) covers matching by shape, including a starred name for the rest of a sequence.
-Then [Class Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#class-patterns) shows how to test a value for the `Point` type alone.
-`match` tries cases top to bottom, so put the narrow list shapes before the wider one.
+[Sequence Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#sequence-patterns)
+covers matching by shape, including a starred name for the rest of a sequence.
+Then [Class Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#class-patterns)
+shows how to test a value for the `Point` type alone.
+`match` tries cases top to bottom,
+so put the narrow list shapes before the wider one.
 
 <details>
 <summary>The shape</summary>
@@ -32,13 +35,17 @@ def classify(value: object) -> str:
 <details>
 <summary>Done when</summary>
 
-your `classify()` returns `"empty list"` for `[]`, `"singleton"` for a one-element list, `"longer list"` for `[1, 2, 3]`, `"point"` for `Point(1, 2)`, and `"other"` for `"hi"`.
-If `classify([1])` returns `"longer list"`, a wider case sits above a narrower one.
+your `classify()` returns `"empty list"` for `[]`,
+`"singleton"` for a one-element list, `"longer list"` for `[1, 2, 3]`,
+`"point"` for `Point(1, 2)`, and `"other"` for `"hi"`.
+If `classify([1])` returns `"longer list"`,
+a wider case sits above a narrower one.
 
 <details>
 <summary>Solution</summary>
 
-If you drop the parentheses and write `case Point:`, the script stops at compile time.
+If you drop the parentheses and write `case Point:`,
+the script stops at compile time.
 A bare `Point` is a capture pattern that matches any value,
 so Python rejects the `case _` after it with `SyntaxError: name capture 'Point' makes remaining patterns unreachable`.
 The solution writes `case Point():`, a class pattern that tests the type.
@@ -79,28 +86,30 @@ print(classify((1,)))
 #: singleton
 ```
 
-**Tell lists apart by length.** `[]` matches only an empty sequence.
+**Tell lists apart by length.**
+`[]` matches only an empty sequence.
 `[_]` matches a sequence with one element
 (the `_` matches the element and discards it).
 `[_, *_]` matches one or more elements.
 The first `_` matches the first element, and `*_` collects the rest,
 including an empty rest.
 So `[_, *_]` also fits a singleton.
-`[_]` must come before it, or `[_, *_]` matches the one-element list
-first, leaving the "singleton" case unreachable.
+`[_]` must come before it, or `[_, *_]` matches the one-element list first,
+leaving the "singleton" case unreachable.
 
-**Test the type alone.** `Point()` matches any `Point` instance.
-That suits `classify()`, which returns the same string whatever `x`
-and `y` hold.
+**Test the type alone.**
+`Point()` matches any `Point` instance.
+That suits `classify()`,
+which returns the same string whatever `x` and `y` hold.
 
-The string `"hi"` is a sequence of two characters, but a sequence
-pattern excludes `str`, so `classify()` returns "other" for it.
-The tuple `(1,)` does match a sequence pattern. A sequence pattern tests the
-shape, not the type, so a one-element tuple is a "singleton" here.
+The string `"hi"` is a sequence of two characters,
+but a sequence pattern excludes `str`, so `classify()` returns "other" for it.
+The tuple `(1,)` does match a sequence pattern.
+A sequence pattern tests the shape, not the type,
+so a one-element tuple is a "singleton" here.
 
-When "singleton" must mean a `list` alone, wrap the pattern in a
-class pattern. `case list([_]):` first tests for a `list`, then
-matches the one-element shape.
+When "singleton" must mean a `list` alone, wrap the pattern in a class pattern.
+`case list([_]):` first tests for a `list`, then matches the one-element shape.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -118,14 +127,18 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Exhaustive Matching](../../Chapters/13_Techniques--Pattern_Matching.md#exhaustive-matching) ends the `match` with `assert_never()`.
-Add the new data class and include it in the `Shape` union, but leave `area()` alone.
+[Exhaustive Matching](../../Chapters/13_Techniques--Pattern_Matching.md#exhaustive-matching)
+ends the `match` with `assert_never()`.
+Add the new data class and include it in the `Shape` union,
+but leave `area()` alone.
 The type checker's message shows the type left after the `case`s above `assert_never()` narrow `shape`.
 
 <details>
 <summary>Done when</summary>
 
-`uv run ty check` on your edited `exhaustive.py` reports a `type-assertion-failure` at the `assert_never()` call, with the inferred type `Rectangle & ~Circle & ~Square`, and you can say why that type reaches the call.
+`uv run ty check` on your edited `exhaustive.py` reports a `type-assertion-failure` at the `assert_never()` call,
+with the inferred type `Rectangle & ~Circle & ~Square`,
+and you can say why that type reaches the call.
 
 <details>
 <summary>Solution</summary>
@@ -161,11 +174,11 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
 info: `Never` and `Rectangle & ~Circle & ~Square` are not equivalent types
 ```
 
-Once `Rectangle` joins the `Shape` union, the type checker finds that a
-`Rectangle` value falls through both `case`s and reaches `case _`,
+Once `Rectangle` joins the `Shape` union,
+the type checker finds that a `Rectangle` value falls through both `case`s and reaches `case _`,
 so `shape` can be a `Rectangle` at the `assert_never()` call.
-`assert_never()` requires an argument of type `Never`, meaning "this
-code is unreachable."
+`assert_never()` requires an argument of type `Never`,
+meaning "this code is unreachable."
 `Rectangle` differs from `Never`, so the checker reports an error.
 
 The `type-assertion-failure` is the check the chapter describes.
@@ -188,9 +201,14 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Mapping Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#mapping-patterns) matches a dictionary by the keys it must contain.
-The value position in a mapping pattern holds a pattern, so it can hold another mapping pattern, as [Patterns Nest](../../Chapters/13_Techniques--Pattern_Matching.md#patterns-nest) shows.
-Put a mapping pattern inside the `"at"` entry, and keep the flat click case so both shapes still work.
+[Mapping Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#mapping-patterns)
+matches a dictionary by the keys it must contain.
+The value position in a mapping pattern holds a pattern,
+so it can hold another mapping pattern,
+as [Patterns Nest](../../Chapters/13_Techniques--Pattern_Matching.md#patterns-nest)
+shows.
+Put a mapping pattern inside the `"at"` entry,
+and keep the flat click case so both shapes still work.
 
 <details>
 <summary>The shape</summary>
@@ -204,12 +222,14 @@ def handle(event: dict[str, object]) -> str:
 <details>
 <summary>Done when</summary>
 
-your `handle()` returns `Click at (10, 20)` for both `{"type": "click", "at": {"x": 10, "y": 20}}` and `{"type": "click", "x": 10, "y": 20}`, and the four calls in `mapping_patterns.py` still print their original lines.
+your `handle()` returns `Click at (10, 20)` for both `{"type": "click", "at": {"x": 10, "y": 20}}` and `{"type": "click", "x": 10, "y": 20}`,
+and the four calls in `mapping_patterns.py` still print their original lines.
 
 <details>
 <summary>Solution</summary>
 
-If you replace the flat click case with the nested one, a flat click event falls through to `{"type": kind, **rest}`,
+If you replace the flat click case with the nested one,
+a flat click event falls through to `{"type": kind, **rest}`,
 and `handle()` returns `Other event: click {'x': 10, 'y': 20}`.
 The exercise asks for the nested shape in addition to the flat one,
 so the solution keeps both cases.
@@ -238,22 +258,23 @@ print(handle({"type": "key", "key": "Enter"}))
 #: Key Enter
 ```
 
-**Match the inner dictionary.** The new `case` nests a mapping pattern inside a mapping pattern.
-`{"at": {"x": x, "y": y}}` matches when `"at"` maps to a dictionary
-that has `"x"` and `"y"` keys, binding both in one step.
+**Match the inner dictionary.**
+The new `case` nests a mapping pattern inside a mapping pattern.
+`{"at": {"x": x, "y": y}}` matches when `"at"` maps to a dictionary that has `"x"` and `"y"` keys,
+binding both in one step.
 
-**Accept both click shapes.** The two click cases return the same string,
+**Accept both click shapes.**
+The two click cases return the same string,
 but each one matches a different shape of click event.
 A flat event keeps `"x"` and `"y"` at the top level,
 where the flat `{"type": "click", "x": x, "y": y}` case finds them.
-A nested event keeps them under `"at"`,
-where the nested case finds them.
+A nested event keeps them under `"at"`, where the nested case finds them.
 
-**Try the specific cases first.** Any event with a `"type"` key satisfies
-`{"type": kind, **rest}`, so the order of the cases matters.
-`match` tries cases top to bottom and stops
-at the first one that fits, so `{"type": kind, **rest}` sits after the
-specific click and key cases.
+**Try the specific cases first.**
+Any event with a `"type"` key satisfies `{"type": kind, **rest}`,
+so the order of the cases matters.
+`match` tries cases top to bottom and stops at the first one that fits,
+so `{"type": kind, **rest}` sits after the specific click and key cases.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -274,9 +295,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Match Version](../../Chapters/13_Techniques--Pattern_Matching.md#the-match-version) ends both `render()` and `cost()` with `assert_never()`.
+[The Match Version](../../Chapters/13_Techniques--Pattern_Matching.md#the-match-version)
+ends both `render()` and `cost()` with `assert_never()`.
 Add the `Webhook` data class to the `Notification` union first and run the type checker before touching either function.
-The type checker reports one error for each function that matches on the union, until that function gains a `case`.
+The type checker reports one error for each function that matches on the union,
+until that function gains a `case`.
 
 <details>
 <summary>The shape</summary>
@@ -314,8 +337,12 @@ def cost(note: Notification) -> float:
 <details>
 <summary>Done when</summary>
 
-before you add the cases, `uv run ty check` reports two `type-assertion-failure` diagnostics, one at the `assert_never()` in `render()` and one in `cost()`, each naming `Webhook & ~Email & ~Sms & ~Push`.
-After you add both cases, it prints `All checks passed!` and `render()` and `cost()` accept a `Webhook`.
+before you add the cases,
+`uv run ty check` reports two `type-assertion-failure` diagnostics,
+one at the `assert_never()` in `render()` and one in `cost()`,
+each naming `Webhook & ~Email & ~Sms & ~Push`.
+After you add both cases,
+it prints `All checks passed!` and `render()` and `cost()` accept a `Webhook`.
 
 <details>
 <summary>Solution</summary>
@@ -376,9 +403,8 @@ print(cost(hook))
 #: 0.0
 ```
 
-If you add `Webhook` to the union and run `ty` before adding either
-`case`, the checker reports two diagnostics, one per function that
-matches on the union:
+If you add `Webhook` to the union and run `ty` before adding either `case`,
+the checker reports two diagnostics, one per function that matches on the union:
 
 ```
 error[type-assertion-failure]: Argument does not have asserted type `Never`
@@ -393,18 +419,16 @@ info: `Never` and `Webhook & ~Email & ~Sms & ~Push` are not equivalent types
 
 The output above shows the first diagnostic, in `render()`.
 The second is the same diagnostic at line 43, in `cost()`.
-With both cases added, as in `exercise_4.py`, `ty check` reports
-`All checks passed!`.
+With both cases added, as in `exercise_4.py`,
+`ty check` reports `All checks passed!`.
 
-`assert_never()` declares its parameter as `Never`, the type with no
-values, so the call type-checks only when the cases above it have
-eliminated every member of the union. The inferred type is
-what remains after those cases narrow `note`: a `Webhook` that is none of the three
-handled types. A `Webhook` can reach the `assert_never()` call,
-so the checker flags that call.
+`assert_never()` declares its parameter as `Never`, the type with no values,
+so the call type-checks only when the cases above it have eliminated every member of the union.
+The inferred type is what remains after those cases narrow `note`:
+a `Webhook` that is none of the three handled types.
+A `Webhook` can reach the `assert_never()` call, so the checker flags that call.
 
-One new channel produces two diagnostics because adding a type to the match version
-requires a new `case` in every function that matches on the union,
+One new channel produces two diagnostics because adding a type to the match version requires a new `case` in every function that matches on the union,
 as the chapter describes.
 
 Before you move on, name what separates your attempt from this one:
@@ -425,9 +449,13 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Guards](../../Chapters/13_Techniques--Pattern_Matching.md#guards) adds an `if` condition to a `case`.
-For the second version, change the subject of the `match` to a tuple of derived values.
-Then write literal patterns for each combination, and use `|` from [Alternatives and Capture](../../Chapters/13_Techniques--Pattern_Matching.md#alternatives-and-capture) to join the axis cases.
+[Guards](../../Chapters/13_Techniques--Pattern_Matching.md#guards)
+adds an `if` condition to a `case`.
+For the second version,
+change the subject of the `match` to a tuple of derived values.
+Then write literal patterns for each combination,
+and use `|` from [Alternatives and Capture](../../Chapters/13_Techniques--Pattern_Matching.md#alternatives-and-capture)
+to join the axis cases.
 
 <details>
 <summary>The shape</summary>
@@ -464,14 +492,15 @@ def quadrant(p: Point) -> str:
 <details>
 <summary>Done when</summary>
 
-both versions print `Third quadrant Fourth quadrant` for `Point(-3, -4)` and `Point(3, -4)`, and `On an axis` for `Point(0, 7)`.
-`uv run ty check` passes on the version that matches on `sign(p.x), sign(p.y)`, and you can say which version reads better and why.
+both versions print `Third quadrant Fourth quadrant` for `Point(-3, -4)` and `Point(3, -4)`,
+and `On an axis` for `Point(0, 7)`.
+`uv run ty check` passes on the version that matches on `sign(p.x), sign(p.y)`,
+and you can say which version reads better and why.
 
 <details>
 <summary>Solution</summary>
 
-The first version adds a guarded `case` for each of the third and
-fourth quadrants:
+The first version adds a guarded `case` for each of the third and fourth quadrants:
 
 ```python
 # exercise_5.py
@@ -503,8 +532,8 @@ print(quadrant(Point(0, 7)))
 #: On an axis
 ```
 
-The second version replaces every guard with a literal pattern, by
-matching on the pair of signs rather than on the point:
+The second version replaces every guard with a literal pattern,
+by matching on the pair of signs rather than on the point:
 
 ```python
 # exercise_5_signs.py
@@ -542,23 +571,22 @@ print(quadrant(Point(0, 7)))
 ```
 
 If you delete the final `case _` from the second version,
-the script prints the same two lines,
-but `ty` reports `invalid-return-type`.
+the script prints the same two lines, but `ty` reports `invalid-return-type`.
 The type checker finds a path that falls off the end of the function and returns `None`,
 which conflicts with the declared return type, `str`.
 The six cases cover all nine pairs of signs,
 but the type checker knows `sign()` by its declared return type, `int`,
 so it allows a pair such as `(2, 5)`.
 That pair falls through all six cases.
-The solution keeps an unreachable `case _` so every path returns a
-`str`.
+The solution keeps an unreachable `case _` so every path returns a `str`.
 
-The second version reads better. A guard hides the shape of the
-dispatch. You must read four nearly identical `if` clauses one at a
-time to see that they enumerate sign combinations. When the subject is
-`sign(p.x), sign(p.y)`, the cases are literals in a two-column table.
-A missing combination is visible at a glance. The `|` alternation
-then handles both axis cases in one line,
+The second version reads better.
+A guard hides the shape of the dispatch.
+You must read four nearly identical `if` clauses one at a time to see that they enumerate sign combinations.
+When the subject is `sign(p.x), sign(p.y)`,
+the cases are literals in a two-column table.
+A missing combination is visible at a glance.
+The `|` alternation then handles both axis cases in one line,
 more briefly than any arrangement of guards.
 
 The second version adds the `sign()` helper and one layer of indirection.
@@ -584,9 +612,11 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Bare Name Captures, a Dotted Name Compares](../../Chapters/13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares) explains why a module-level constant in a `case` binds instead of comparing.
+[A Bare Name Captures, a Dotted Name Compares](../../Chapters/13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)
+explains why a module-level constant in a `case` binds instead of comparing.
 For the first fix, put the constant in a namespace so the pattern is a dotted name.
-For the second, bind any value and compare it to the constant in a guard, where `FALLBACK` is an ordinary expression.
+For the second, bind any value and compare it to the constant in a guard,
+where `FALLBACK` is an ordinary expression.
 
 <details>
 <summary>The shape</summary>
@@ -675,32 +705,37 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 #: brake fallback
 ```
 
-**Demonstrate the accidental capture.** `act()` takes the fallback case for `Signal.STOP`,
+**Demonstrate the accidental capture.**
+`act()` takes the fallback case for `Signal.STOP`,
 although the fallback value is `Signal.CAUTION`.
 `case FALLBACK:` holds a bare name, so the pattern captures.
-The pattern matches `Signal.STOP`, binds that value to a local named `FALLBACK` inside `act()`,
-and compares nothing. The module-level constant
-holds `Signal.CAUTION` before and after the call,
+The pattern matches `Signal.STOP`,
+binds that value to a local named `FALLBACK` inside `act()`,
+and compares nothing.
+The module-level constant holds `Signal.CAUTION` before and after the call,
 so printing `FALLBACK` shows the expected value and hides the mistake.
 
 Python accepts `case FALLBACK:` because it is the last case,
 and rejects any case after it with a `SyntaxError`.
 
-**Compare through a dotted name.** The first fix gives the constant a dotted name by putting it in a
-namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
-compares against it and returns "brake" for `Signal.STOP`. Any dotted
-name works, including `Signal.CAUTION`.
+**Compare through a dotted name.**
+The first fix gives the constant a dotted name by putting it in a namespace.
+`Defaults.FALLBACK` is a value pattern,
+so `dotted()` compares against it and returns "brake" for `Signal.STOP`.
+Any dotted name works, including `Signal.CAUTION`.
 
-In a program the constant would live in `Defaults` alone, so every
-use reads that one definition. The listing keeps the module-level copy
-because `act()` and `guarded()` need the bare name.
+In a program the constant would live in `Defaults` alone,
+so every use reads that one definition.
+The listing keeps the module-level copy because `act()` and `guarded()` need the bare name.
 
-**Compare in a guard.** The second fix keeps the bare constant and moves the comparison into a
-guard, where `FALLBACK` is an ordinary expression rather than a
-pattern. `case other if other is FALLBACK:` is longer than
-`case Defaults.FALLBACK:`, and more flexible. A value pattern always compares with `==`, while a
-guard holds any expression:
-an `is` test like this one, a membership test, or a call. Choose the guard when the test needs one of those.
+**Compare in a guard.**
+The second fix keeps the bare constant and moves the comparison into a guard,
+where `FALLBACK` is an ordinary expression rather than a pattern.
+`case other if other is FALLBACK:` is longer than `case Defaults.FALLBACK:`,
+and more flexible.
+A value pattern always compares with `==`, while a guard holds any expression:
+an `is` test like this one, a membership test, or a call.
+Choose the guard when the test needs one of those.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

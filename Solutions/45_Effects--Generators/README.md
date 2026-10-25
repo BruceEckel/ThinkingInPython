@@ -10,7 +10,9 @@
 <details>
 <summary>Where to look</summary>
 
-[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) describes the three parameters of `Generator`: what it yields, what it receives, and what it returns.
+[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator)
+describes the three parameters of `Generator`: what it yields, what it receives,
+and what it returns.
 Give each channel its own type so that a swap is a type error.
 After the third `send()`, the generator finishes.
 The total is the `value` of the `StopIteration` that `send()` raises.
@@ -34,8 +36,10 @@ def tally() -> Generator[Prompt, Amount, Total]:
 <details>
 <summary>Done when</summary>
 
-your script prints the three prompts and then the sum of your three sent amounts, read from the `StopIteration`'s `value`, and `uv run ty check` passes.
-If you swap the second and third type parameters of your annotation, the type checker reports errors on your `send()` calls.
+your script prints the three prompts and then the sum of your three sent amounts,
+read from the `StopIteration`'s `value`, and `uv run ty check` passes.
+If you swap the second and third type parameters of your annotation,
+the type checker reports errors on your `send()` calls.
 
 <details>
 <summary>Solution</summary>
@@ -80,23 +84,26 @@ print(total)
 #: 42
 ```
 
-**Keep the three channels apart.** `Generator[Prompt, Amount, Total]` says
-this generator yields a `Prompt`, receives an `Amount`, and finally
-returns a `Total`. Three `NewType` definitions over `str`, `int`, and
-`int` keep the two integer channels apart, so transposing the
-`SendType` and the `ReturnType` is a type checker error.
+**Keep the three channels apart.**
+`Generator[Prompt, Amount, Total]` says this generator yields a `Prompt`,
+receives an `Amount`, and finally returns a `Total`.
+Three `NewType` definitions over `str`, `int`,
+and `int` keep the two integer channels apart,
+so transposing the `SendType` and the `ReturnType` is a type checker error.
 With bare `int` on both channels, the checker accepts the swap.
 
-**Drive the conversation by hand.** `tally()` needs four calls: one
-`next()` and three sends. `next(t)` runs the body up to the first
-`yield` and produces the first prompt. Each `send()` resumes the suspended `yield`, whose
-value becomes `amount`, then runs to the next one. The third `send()`
-resumes the last `yield`, so the loop ends and `tally()` returns. The
-return value arrives as `StopIteration`'s `value` rather than as the
-result of `send()`.
+**Drive the conversation by hand.**
+`tally()` needs four calls: one `next()` and three sends.
+`next(t)` runs the body up to the first `yield` and produces the first prompt.
+Each `send()` resumes the suspended `yield`, whose value becomes `amount`,
+then runs to the next one.
+The third `send()` resumes the last `yield`,
+so the loop ends and `tally()` returns.
+The return value arrives as `StopIteration`'s `value` rather than as the result of `send()`.
 
-`total` is a local of the generator, and it keeps its value across three
-suspensions because the suspended generator preserves its locals. Those locals are the state.
+`total` is a local of the generator,
+and it keeps its value across three suspensions because the suspended generator preserves its locals.
+Those locals are the state.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -119,9 +126,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Generator Is a Description](../../Chapters/45_Effects--Generators.md#a-generator-is-a-description) explains why `interview()` accepts answers from any driver.
-Write the new driver as a loop that fetches the next answer, then calls `send()`.
-Both the answer iterator and the generator signal the end with `StopIteration`, so choose carefully which call sits inside the `try`.
+[A Generator Is a Description](../../Chapters/45_Effects--Generators.md#a-generator-is-a-description)
+explains why `interview()` accepts answers from any driver.
+Write the new driver as a loop that fetches the next answer,
+then calls `send()`.
+Both the answer iterator and the generator signal the end with `StopIteration`,
+so choose carefully which call sits inside the `try`.
 
 <details>
 <summary>The shape</summary>
@@ -158,19 +168,19 @@ def drive_in_order(
 <summary>Done when</summary>
 
 `interview()` runs unchanged under both drivers and each returns `Alice of Wonderland, friend Rabbit` from the chapter's three answers.
-Given one answer for three questions, your iterator driver lets the answers' `StopIteration` reach the caller instead of returning `None`.
+Given one answer for three questions,
+your iterator driver lets the answers' `StopIteration` reach the caller instead of returning `None`.
 
 <details>
 <summary>Solution</summary>
 
-If you put `next(answers)` inside the `try`, as `drive_naive()` does, a
-short answer source ends the run quietly. Given one answer for three
-questions, `drive_naive()` returns `None`. The type checker accepts
-`drive_naive()`. The `except StopIteration` meant for the conversation catches
-the one from the exhausted answers and treats it as a finished
-interview. The solution's `drive_in_order()` fetches each reply
-outside the `try`, so the `StopIteration` from the answers reaches the
-caller.
+If you put `next(answers)` inside the `try`, as `drive_naive()` does,
+a short answer source ends the run quietly.
+Given one answer for three questions, `drive_naive()` returns `None`.
+The type checker accepts `drive_naive()`.
+The `except StopIteration` meant for the conversation catches the one from the exhausted answers and treats it as a finished interview.
+The solution's `drive_in_order()` fetches each reply outside the `try`,
+so the `StopIteration` from the answers reaches the caller.
 
 ```python
 # exercise_2.py
@@ -254,46 +264,54 @@ print(repr(drive_naive(interview(),
 #: None
 ```
 
-**Reuse the generator unchanged.** Nothing in `interview()` changes, and nothing could have. It yields a
-`Question` and receives an `Answer`, whatever the answer's source.
-The generator describes the conversation. The driver interprets it.
+**Reuse the generator unchanged.**
+Nothing in `interview()` changes, and nothing could have.
+It yields a `Question` and receives an `Answer`, whatever the answer's source.
+The generator describes the conversation.
+The driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
-**Find the answer for each request.** The two drivers differ in the
-property on which they rely. The dictionary driver looks each answer
-up by the request, so it answers correctly in whatever order the
-questions arrive, and it answers a repeated question the same way
-twice. The iterator driver goes by position, so it depends on the
-generator asking its questions in the order the driver holds the replies.
-Both drivers take a `conversation` of the same type, `Generator[Question, Answer, Result]`.
-That type declares that a `Question` goes out
-and an `Answer` comes back, and leaves open how the driver chooses each answer.
+**Find the answer for each request.**
+The two drivers differ in the property on which they rely.
+The dictionary driver looks each answer up by the request,
+so it answers correctly in whatever order the questions arrive,
+and it answers a repeated question the same way twice.
+The iterator driver goes by position,
+so it depends on the generator asking its questions in the order the driver holds the replies.
+Both drivers take a `conversation` of the same type,
+`Generator[Question, Answer, Result]`.
+That type declares that a `Question` goes out and an `Answer` comes back,
+and leaves open how the driver chooses each answer.
 
-**Keep the two endings apart.** In `drive_in_order()`, `next(answers)`
-sits outside the `try`, as its comment says, because the
-`except StopIteration` meant for the conversation otherwise catches a
-`StopIteration` raised by an exhausted answer list. Two iterators
-that raise the same exception type are a hazard for a driver that
-holds both.
+**Keep the two endings apart.**
+In `drive_in_order()`, `next(answers)` sits outside the `try`,
+as its comment says,
+because the `except StopIteration` meant for the conversation otherwise catches a `StopIteration` raised by an exhausted answer list.
+Two iterators that raise the same exception type are a hazard for a driver that holds both.
 
-**Test a short answer source.** The last two runs show that hazard. Given one answer and three
-questions, `drive_in_order()` lets the `StopIteration` propagate, so the
-caller's `except` reports that the answer source ran out.
+**Test a short answer source.**
+The last two runs show that hazard.
+Given one answer and three questions,
+`drive_in_order()` lets the `StopIteration` propagate,
+so the caller's `except` reports that the answer source ran out.
 `drive_naive()` puts `next(answers)` and the `print()` after it inside the `try`.
-It therefore catches that same exception, treats it as "the conversation
-finished," and returns `stop.value`, which is `None`.
+It therefore catches that same exception,
+treats it as "the conversation finished," and returns `stop.value`,
+which is `None`.
 
-`None` is wrong twice over. The interview stopped after one
-question, before it built a `Result`, and `None` is not a `Result` in any case.
+`None` is wrong twice over.
+The interview stopped after one question, before it built a `Result`,
+and `None` is not a `Result` in any case.
 
 The type checker accepts `return stop.value` as a declared `Result`,
 because `StopIteration.value` has type `Any`.
 The runtime raises no exception either.
-The program first fails later, when code that expects a string receives that `None`,
+The program first fails later,
+when code that expects a string receives that `None`,
 far from the driver that returned it.
 
-Keeping the two meanings apart is a one-line discipline: put inside the
-`try` only the call whose `StopIteration` you mean to interpret.
+Keeping the two meanings apart is a one-line discipline:
+put inside the `try` only the call whose `StopIteration` you mean to interpret.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -312,9 +330,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Send Channel](../../Chapters/45_Effects--Generators.md#the-send-channel) follows each sent value to the delegated generator suspended at that moment.
-Count how many values one `collect()` consumes, then count how many the loop supplies in total.
-Write the printed lines before you run the script, and note which sends produce one line and which produce two.
+[The Send Channel](../../Chapters/45_Effects--Generators.md#the-send-channel)
+follows each sent value to the delegated generator suspended at that moment.
+Count how many values one `collect()` consumes,
+then count how many the loop supplies in total.
+Write the printed lines before you run the script,
+and note which sends produce one line and which produce two.
 
 <details>
 <summary>The shape</summary>
@@ -333,7 +354,9 @@ def both() -> Generator[str, int]:
 <details>
 <summary>Done when</summary>
 
-you wrote the full sequence of lines before running the modified `yield_from_send.py`, and it matches the run line for line, including which sends print two lines and what `send(6)` prints.
+you wrote the full sequence of lines before running the modified `yield_from_send.py`,
+and it matches the run line for line,
+including which sends print two lines and what `send(6)` prints.
 
 <details>
 <summary>Solution</summary>
@@ -370,24 +393,26 @@ for value in [1, 2, 3, 4, 5, 6]:
 #: send(6) -> total 21
 ```
 
-**Count the values the collectors need.** Each `collect()` consumes two
-values, so the three collectors need six, and the loop supplies six.
+**Count the values the collectors need.**
+Each `collect()` consumes two values, so the three collectors need six,
+and the loop supplies six.
 The `yield` in `both()` gives `send(6)` a value to return,
 so the loop ends with `both()` suspended and no `StopIteration`.
 
-**Read the output in pairs.** The two-line responses mark where one collector ends and the next begins. A send that supplies a collector's
-first value produces one line: that collector's second prompt. A
-send that supplies a collector's second value produces two: the
-completed collector's `print()`, then the next prompt.
+**Read the output in pairs.**
+The two-line responses mark where one collector ends and the next begins.
+A send that supplies a collector's first value produces one line:
+that collector's second prompt.
+A send that supplies a collector's second value produces two:
+the completed collector's `print()`, then the next prompt.
 The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
 so the output alternates between one-line and two-line responses.
 After `gamma` the next prompt comes from `both()` rather than a collector:
 the total, `21`.
 
-`both()` holds three `yield from` statements and leaves all the
-forwarding to them. `yield from`
-relays in both directions on its own: prompts up to the driver, numbers
-down to whichever `yield` is suspended inside the current `collect()`.
+`both()` holds three `yield from` statements and leaves all the forwarding to them.
+`yield from` relays in both directions on its own: prompts up to the driver,
+numbers down to whichever `yield` is suspended inside the current `collect()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -408,15 +433,21 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting) shows `survey()` delegating to `interview()` with `yield from`.
-Without `yield from`, the call to `interview()` builds a generator object, and nothing drives it.
-Compare the declared type of `profile` with what the call produces, then compare the type checker's report with the script's output.
+[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
+shows `survey()` delegating to `interview()` with `yield from`.
+Without `yield from`, the call to `interview()` builds a generator object,
+and nothing drives it.
+Compare the declared type of `profile` with what the call produces,
+then compare the type checker's report with the script's output.
 
 <details>
 <summary>Done when</summary>
 
-your explanation accounts for both results: `ty` reports an `invalid-assignment` on the `profile` line, and the script runs and prints `<generator object interview at ...>, color blue`.
-It says which result locates the mistake and why, and you have confirmed that `ty check` passes once the annotation is gone.
+your explanation accounts for both results:
+`ty` reports an `invalid-assignment` on the `profile` line,
+and the script runs and prints `<generator object interview at ...>, color blue`.
+It says which result locates the mistake and why,
+and you have confirmed that `ty check` passes once the annotation is gone.
 
 <details>
 <summary>Solution</summary>
@@ -450,34 +481,34 @@ request = 'color', answer = 'blue', GEN_SUSPENDED
 ```
 
 Both results describe the same mistake.
-Calling a generator function produces a description rather than a conversation. The call `interview()`
-returns a generator object, suspended before the first line of its body. Nothing calls `next()` or `send()`
-on that object, so the generator asks none of its three questions.
-The `return` statement in `survey()` interpolates the object's repr into the sentence where the
-interview's `Result` belonged.
+Calling a generator function produces a description rather than a conversation.
+The call `interview()` returns a generator object,
+suspended before the first line of its body.
+Nothing calls `next()` or `send()` on that object,
+so the generator asks none of its three questions.
+The `return` statement in `survey()` interpolates the object's repr into the sentence where the interview's `Result` belonged.
 
-The type checker told you more. Its message names the two types and
-points at the assignment that mismatches them.
-That assignment is the defect. The runtime output shows a consequence two lines later,
-in the `return` statement, where the f-string formats the object. A reader
-must work backward from a `<generator object ...>` in a report to the
-missing `yield from`. Worse, the failure is quiet: no exception, an
-exit code of zero, and output that a log scraper accepts. A
-coroutine that nothing awaits draws a `RuntimeWarning` when
-Python reclaims it, as
-[Concurrency](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics)
-shows. Python reclaims a generator that nothing drives, silently.
+The type checker told you more.
+Its message names the two types and points at the assignment that mismatches them.
+That assignment is the defect.
+The runtime output shows a consequence two lines later,
+in the `return` statement, where the f-string formats the object.
+A reader must work backward from a `<generator object ...>` in a report to the missing `yield from`.
+Worse, the failure is quiet: no exception, an exit code of zero,
+and output that a log scraper accepts.
+A coroutine that nothing awaits draws a `RuntimeWarning` when Python reclaims it,
+as [Concurrency](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics)
+shows.
+Python reclaims a generator that nothing drives, silently.
 
-Once you remove the annotation, the type checker accepts `survey()`. For
-`profile = interview()` it infers the expression's own type,
-`Generator[Question, Answer, Result]`, and no declared type contradicts
-that inference. The f-string then accepts any object, since formatting
-one calls `str()` on it.
+Once you remove the annotation, the type checker accepts `survey()`.
+For `profile = interview()` it infers the expression's own type,
+`Generator[Question, Answer, Result]`,
+and no declared type contradicts that inference.
+The f-string then accepts any object, since formatting one calls `str()` on it.
 A generator object's `str()` is its repr, so the output shows the repr.
-The annotation alone gives the checker a declared type to compare
-with the call's type.
-So annotate a local whenever you want the checker to verify
-the type of the call that produces its value.
+The annotation alone gives the checker a declared type to compare with the call's type.
+So annotate a local whenever you want the checker to verify the type of the call that produces its value.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -497,9 +528,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Return Channel](../../Chapters/45_Effects--Generators.md#the-return-channel) shows how `yield from` delivers a delegate's return value to the delegating generator.
-`Iterator[str]` cannot declare a return value, so `report()` needs the full `Generator` annotation.
-The caller binds the count with `yield from`, then yields it as a string of its own.
+[The Return Channel](../../Chapters/45_Effects--Generators.md#the-return-channel)
+shows how `yield from` delivers a delegate's return value to the delegating generator.
+`Iterator[str]` cannot declare a return value,
+so `report()` needs the full `Generator` annotation.
+The caller binds the count with `yield from`,
+then yields it as a string of its own.
 
 <details>
 <summary>The shape</summary>
@@ -521,8 +555,10 @@ def summarize(items: list[str]) -> Generator[str]:
 <details>
 <summary>Done when</summary>
 
-`uv run ty check` passes, and your caller's output for the chapter's `["red", "green", "blue"]` ends with a line carrying `12`.
-Changing `report()`'s annotation back to `Iterator[str]` makes `ty` report `invalid-return-type`, and you can name the type parameter through which each of your two values travels.
+`uv run ty check` passes,
+and your caller's output for the chapter's `["red", "green", "blue"]` ends with a line carrying `12`.
+Changing `report()`'s annotation back to `Iterator[str]` makes `ty` report `invalid-return-type`,
+and you can name the type parameter through which each of your two values travels.
 
 <details>
 <summary>Solution</summary>
@@ -554,11 +590,12 @@ print(list(summarize(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)', 'total: 12']
 ```
 
-**Declare the return channel.** `report()`'s annotation changes from `Iterator[str]` to
-`Generator[str, None, int]`, because a generator that returns something
-needs the long form. Under `Iterator[str]` a generator must return
-`None`, so `ty` rejects `report()`'s `return size` with an
-`invalid-return-type`: expected `None`, found `int`.
+**Declare the return channel.**
+`report()`'s annotation changes from `Iterator[str]` to `Generator[str, None, int]`,
+because a generator that returns something needs the long form.
+Under `Iterator[str]` a generator must return `None`,
+so `ty` rejects `report()`'s `return size` with an `invalid-return-type`:
+expected `None`, found `int`.
 
 If you change `report()`'s annotation but leave out `return size`,
 the script still runs, and the printed list ends with `'total: None'`.
@@ -568,22 +605,25 @@ and the `yield from` in `summarize()` delivers that `None` into `counted`.
 because `report()` declares an `int` and, with no `return` statement,
 returns `None`.
 
-**Keep the strings and the count apart.** The strings and the count
-travel by different channels. The listing shows both at once. Every
-string that `emit()` or `report()` yields travels through the `YieldType` and comes out in the list. The count
-travels through the `ReturnType`: `emit()` returns it, `yield from`
-delivers it into `report()`'s `size`, `report()` returns it again, and
-the second `yield from` delivers it into `summarize()`'s `counted`. The
-`SendType` is `None` throughout, since `list()` drives the chain with
-`next()`, the runtime equivalent of `send(None)`.
+**Keep the strings and the count apart.**
+The strings and the count travel by different channels.
+The listing shows both at once.
+Every string that `emit()` or `report()` yields travels through the `YieldType` and comes out in the list.
+The count travels through the `ReturnType`: `emit()` returns it,
+`yield from` delivers it into `report()`'s `size`, `report()` returns it again,
+and the second `yield from` delivers it into `summarize()`'s `counted`.
+The `SendType` is `None` throughout,
+since `list()` drives the chain with `next()`,
+the runtime equivalent of `send(None)`.
 
 The count `12` therefore reaches `summarize()` through two returns.
-`'(12 characters)'` takes the other route:
-`report()` yields it, the `yield from` in `summarize()` relays it,
-and the driver receives it. No generator binds it to a name.
+`'(12 characters)'` takes the other route: `report()` yields it,
+the `yield from` in `summarize()` relays it, and the driver receives it.
+No generator binds it to a name.
 A generator can yield a number or return it.
 The choice decides which code receives the number:
-a yielded value goes to the driver, and a returned value goes to the delegating generator.
+a yielded value goes to the driver,
+and a returned value goes to the delegating generator.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -603,27 +643,33 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) defines the `SendType`, and `send_none_is_next.py` calls `send(None)` on a generator whose `SendType` is `Answer`.
+[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator)
+defines the `SendType`,
+and `send_none_is_next.py` calls `send(None)` on a generator whose `SendType` is `Answer`.
 Read the signature of `send()` and ask what it accepts for `interview()`.
-Then ask what `next()` accepts, and where a generator that has yet to run would put a sent value.
+Then ask what `next()` accepts,
+and where a generator that has yet to run would put a sent value.
 
 <details>
 <summary>Done when</summary>
 
-your explanation predicts what `ty` reports if you delete the `# type: ignore` in `send_none_is_next.py` (an `invalid-argument-type` on `None`), states the parameter type of `send()` in terms of the `SendType`, and says why priming with `next()` type-checks for any generator.
+your explanation predicts what `ty` reports if you delete the `# type: ignore` in `send_none_is_next.py`
+(an `invalid-argument-type` on `None`),
+states the parameter type of `send()` in terms of the `SendType`,
+and says why priming with `next()` type-checks for any generator.
 
 <details>
 <summary>Solution</summary>
 
-`next(g)` and `g.send(None)` do the same thing at runtime. The
-`SendType` tells them apart.
+`next(g)` and `g.send(None)` do the same thing at runtime.
+The `SendType` tells them apart.
 
-`send()`'s signature is
-`send(self, value: _SendT_contra, /) -> _YieldT_co`, so its parameter
-type is the generator's `SendType`. For `interview()` that
-is `Answer`, and `None` is not an `Answer`, so the priming call is a
-type error. `send_none_is_next.py` carries a `# type: ignore` to
-suppress it. Removing that comment draws:
+`send()`'s signature is `send(self, value: _SendT_contra, /) -> _YieldT_co`,
+so its parameter type is the generator's `SendType`.
+For `interview()` that is `Answer`, and `None` is not an `Answer`,
+so the priming call is a type error.
+`send_none_is_next.py` carries a `# type: ignore` to suppress it.
+Removing that comment draws:
 
 ```text
 error[invalid-argument-type]: Argument to bound method
@@ -634,31 +680,31 @@ error[invalid-argument-type]: Argument to bound method
   |                           ^^^^ Expected `Answer`, found `None`
 ```
 
-`next()` takes the generator alone. It asks for the generator's next
-yielded value and ignores the `SendType`, so priming
-with it type-checks for any generator.
+`next()` takes the generator alone.
+It asks for the generator's next yielded value and ignores the `SendType`,
+so priming with it type-checks for any generator.
 
-The mismatch is real rather than a type checker limitation. A
-generator's `SendType` describes what a suspended `yield` expression
-can receive.
-A just-started generator has no suspended `yield`, so
-nothing receives the value handed to the first `send()`. The runtime
-enforces the same rule. Sending a non-`None`
-value to a fresh generator raises `TypeError: can't send non-None value
-to a just-started generator`. So at runtime the first `send()` accepts
-`None` alone, a value the `SendType` excludes.
+The mismatch is real rather than a type checker limitation.
+A generator's `SendType` describes what a suspended `yield` expression can receive.
+A just-started generator has no suspended `yield`,
+so nothing receives the value handed to the first `send()`.
+The runtime enforces the same rule.
+Sending a non-`None` value to a fresh generator raises `TypeError: can't send non-None value to a just-started generator`.
+So at runtime the first `send()` accepts `None` alone,
+a value the `SendType` excludes.
 
-An annotation cannot express "`None` for the first call, `Answer`
-afterward," because a single `SendType` covers every call. Widening the
-`SendType` to `Answer | None` states the exception in the type, but
-the type checker then applies `Answer | None` to every `yield` expression.
+An annotation cannot express "`None` for the first call, `Answer` afterward,"
+because a single `SendType` covers every call.
+Widening the `SendType` to `Answer | None` states the exception in the type,
+but the type checker then applies `Answer | None` to every `yield` expression.
 The generator must handle a `None` at each `yield` whose value it uses as an `Answer`.
 That `None` exists only in the type,
-because the priming `None` arrives before the generator reaches its first `yield`. `interview()` puts
-what it receives into an f-string, which formats a `None` as readily
-as an `Answer`, so `interview()` passes the check either way. Priming
-with `next()` keeps the `SendType` at `Answer`. The one call that cannot
-carry a value comes from the one function that cannot pass one.
+because the priming `None` arrives before the generator reaches its first `yield`.
+`interview()` puts what it receives into an f-string,
+which formats a `None` as readily as an `Answer`,
+so `interview()` passes the check either way.
+Priming with `next()` keeps the `SendType` at `Answer`.
+The one call that cannot carry a value comes from the one function that cannot pass one.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -683,9 +729,12 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) holds its state in an attribute and a transition table.
-Here the position inside the generator's body is the state, so use loops and `isinstance()` checks on the event that `yield` returns.
-Because `yield` reports the state reached, the driver's `send()` delivers events rather than answers.
+[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
+holds its state in an attribute and a transition table.
+Here the position inside the generator's body is the state,
+so use loops and `isinstance()` checks on the event that `yield` returns.
+Because `yield` reports the state reached,
+the driver's `send()` delivers events rather than answers.
 
 <details>
 <summary>The shape</summary>
@@ -719,7 +768,9 @@ def machine() -> Generator[Report, Event]:
 <details>
 <summary>Done when</summary>
 
-`uv run ty check` passes, and one driven run reports `COLLECTING` after a coin, `SELECTING` after a first digit, `UNAVAILABLE` for an item out of stock, a refusal for too little money, and a sale once the money suffices.
+`uv run ty check` passes, and one driven run reports `COLLECTING` after a coin,
+`SELECTING` after a first digit, `UNAVAILABLE` for an item out of stock,
+a refusal for too little money, and a sale once the money suffices.
 A second, fresh machine starts with the full stock after the first one sells.
 
 <details>
@@ -796,29 +847,29 @@ for event in [Coin(25), Digit("1"), Digit("1"), Digit("1"),
 #: Digit(value='2') -> DISPENSED
 ```
 
-**Let position carry the state.** The machine holds no `state`
-attribute and consults no table. Where the generator pauses is the
-state. A pause in the coin loop means `COLLECTING`, and a pause after
-`yield "SELECTING"` means a first digit has arrived and the machine
-waits for a second. `amount`, `row`, and
-`stock` are locals that keep their values between sends because the
-suspended generator preserves them.
+**Let position carry the state.**
+The machine holds no `state` attribute and consults no table.
+Where the generator pauses is the state.
+A pause in the coin loop means `COLLECTING`,
+and a pause after `yield "SELECTING"` means a first digit has arrived and the machine waits for a second.
+`amount`, `row`, and `stock` are locals that keep their values between sends because the suspended generator preserves them.
 
-**Report the state reached.** The `yield` in `machine()` runs the
-opposite direction from the one in `interview()`. Neither signature
-says so. Both yield strings, but `interview()` yields a request the
-driver must satisfy, while `machine()` yields a report the driver may
-ignore. `send(Coin(25))` delivers an event and answers no question.
-The `COLLECTING` it returns reports the state that event produced. A
-generator's type declares what each channel carries and leaves open
-whether a yielded value is a request or a report.
+**Report the state reached.**
+The `yield` in `machine()` runs the opposite direction from the one in `interview()`.
+Neither signature says so.
+Both yield strings, but `interview()` yields a request the driver must satisfy,
+while `machine()` yields a report the driver may ignore.
+`send(Coin(25))` delivers an event and answers no question.
+The `COLLECTING` it returns reports the state that event produced.
+A generator's type declares what each channel carries and leaves open whether a yielded value is a request or a report.
 
-For another state, take the table. The generator stays compact
-because the states form a line, so control flow can express the
-sequence. The two states here that break the line need extra control
-flow. An `if` chain reaches `UNAVAILABLE` and `NEED_MONEY`. From each
-one, the machine loops back to the top, a `goto` written as a
-`while True`.
+For another state, take the table.
+The generator stays compact because the states form a line,
+so control flow can express the sequence.
+The two states here that break the line need extra control flow.
+An `if` chain reaches `UNAVAILABLE` and `NEED_MONEY`.
+From each one, the machine loops back to the top,
+a `goto` written as a `while True`.
 Suppose you add a state reachable from several others,
 the way the table handles `Quit` from every state but `QUIESCENT`.
 No position in the body corresponds to that state.
@@ -826,14 +877,13 @@ The new state becomes a flag, or a check repeated at several `yield`s.
 Either one breaks the correspondence between position and state,
 the one thing that makes this version readable.
 
-With the table, adding any state means one new `Enum` member and a
-few new rules. Those rules sit next to the existing ones, where you can
-read the whole machine at once.
+With the table, adding any state means one new `Enum` member and a few new rules.
+Those rules sit next to the existing ones,
+where you can read the whole machine at once.
 
-The generator is the better choice for a conversation with a
-beginning and an end, like `interview()`. The table is the better
-choice for a machine that runs forever and can go anywhere from
-anywhere.
+The generator is the better choice for a conversation with a beginning and an end,
+like `interview()`.
+The table is the better choice for a machine that runs forever and can go anywhere from anywhere.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
