@@ -971,6 +971,8 @@ with a `__next__()` that returns one value per call,
 moves its local variables into instance attributes and turns its control flow inside out:
 the position in the loop, which the running function kept,
 becomes an attribute the programmer sets and tests on every call.
+`fibonacci_iterator.py` in [Iterators](22_Patterns--Iterators.md#generators)
+shows `fibonacci()` in that form.
 The producer needed to pause in the middle of its own loop, hand out a value,
 and resume where it stopped.
 

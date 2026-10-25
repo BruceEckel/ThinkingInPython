@@ -193,6 +193,44 @@ def test_total_over_any_iterable() -> None:
     assert total(Countdown(5)) == 15
 ```
 
+`Fibonacci` does by hand what `fibonacci()` does with `yield`:
+
+```python
+# fibonacci_iterator.py
+from collections.abc import Iterator
+from dataclasses import dataclass, field
+from typing import override
+
+@dataclass(eq=False)
+class Fibonacci(Iterator[int]):
+    remaining: int
+    _a: int = field(default=0, init=False)
+    _b: int = field(default=1, init=False)
+
+    @override
+    def __next__(self) -> int:
+        if self.remaining == 0:
+            raise StopIteration
+        self.remaining -= 1
+        value = self._a
+        self._a, self._b = self._b, self._a + self._b
+        return value
+
+print(list(Fibonacci(8)))
+#: [0, 1, 1, 2, 3, 5, 8, 13]
+```
+
+The loop is gone.
+Its local variables `a` and `b` are the fields `_a` and `_b`,
+its `range(n)` counter is `remaining`,
+and `__next__()` tests that counter and advances the pair on every call,
+because the fields are the one place the position can live between calls.
+The generator keeps the loop.
+`yield a` suspends it with `a`, `b`, and the position in the `for` loop intact,
+and `next()` resumes it after the `yield`.
+`eq=False` keeps `object`'s identity comparison,
+for the reason [A Type-Checking Iterator](#a-type-checking-iterator) gives.
+
 Generators are lazy.
 `fibonacci(1_000_000)` starts computing when you iterate over it,
 then produces one value at a time,
