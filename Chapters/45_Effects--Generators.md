@@ -208,7 +208,7 @@ which sends no value and passes the check.
 ## A Generator Is a Description
 
 [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
-shows that calling an `async def` function runs nothing.
+shows that calling an `async def` function leaves its body waiting to run.
 The call returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
 the same three-part shape as a `Generator`.
@@ -617,7 +617,7 @@ As the `ReturnType` it is the value of the whole `yield from` expression in `int
 
 `drive()`, imported unchanged,
 answers a request yielded two generators deep as it answers one from `interview()`'s own body.
-Nothing in `ask()` refers to the driver.
+`ask()` deals in a `Question` and an `Answer` alone.
 A single loop at the edge of the program interprets requests yielded at any depth.
 
 ### Composing Is Not Interpreting
@@ -663,8 +663,7 @@ However deeply the delegations nest, the program has one driver.
 `drive()` answers it.
 The generator yields a `Question`, `drive()` looks it up,
 and the request stops there.
-`yield from` answers nothing.
-It relays the request upward and passes the answer back down intact,
+`yield from` relays the request upward and passes the answer back down intact,
 so `survey()` contains no code that reads a `Question`.
 
 `drive()` and `yield from` also differ in what they do at `StopIteration`.
@@ -958,8 +957,6 @@ It describes a function by what it requests and writes those requests into its r
 
 ## Half a Coroutine by Design
 
-The three channels, the driver, and `yield from` arrived over fourteen years,
-each one answering a request the one before had opened.
 PEP 255 added generators to Python 2.2 in 2001 to solve one problem:
 a producer that keeps state between the values it produces.
 Before that, such a producer took a callback,
