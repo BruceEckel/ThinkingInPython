@@ -108,7 +108,6 @@ The call also appends to `cart`.
 The list put in its place appends nothing.
 The rest of the listing puts the returned list in place of the `add_item()` call that produced it
 (`[1]`).
-`cart` then ends with a single `'eggs'`.
 
 Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
@@ -145,7 +144,6 @@ print(withdraw.cache_info())
 Two withdrawals of `30` should leave `balance` at `40`.
 The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
-`cache_info()` reports that one miss and one hit.
 Nothing warns you about the skipped subtraction.
 `lru_cache` returns the stored result for any repeated arguments,
 and never checks whether the wrapped function is referentially transparent.
@@ -332,7 +330,6 @@ print("1000 random cases passed")
 #: 1000 random cases passed
 ```
 
-The roundtrip law holds for every input the loop tries.
 Every property test has this shape: a law that states what must always be true,
 and a machine that searches for a counterexample.
 
