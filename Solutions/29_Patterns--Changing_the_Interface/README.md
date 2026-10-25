@@ -89,15 +89,10 @@ with expected(TypeError):
 ```
 
 **Forward the rest to the list.**
-The adapter adds the one method the caller needs, `__getitem__()`,
-and forwards everything else to the wrapped list through `__getattr__()`,
-the same shape as `getattr_adapter.py`.
 The adapter defines no `append()`, so the lookup falls through to the list.
 
 **Grow the shared list.**
-Both the adapter and the original `pairs` name see the new entry.
 The record is frozen, but the list it holds stays mutable.
-`append()` changes the list.
 The adapter's `pairs` field refers to the same list as before.
 
 **Show what `__getattr__()` cannot forward.**
@@ -316,8 +311,6 @@ print([name for name in vars(shop)
 
 **Hide the classes behind a function.**
 The caller uses one function.
-Inside the module, `start_car()` holds the assembly order:
-`_Ignition(_FuelPump(_Engine()))`.
 `shop._Engine` and `shop._FuelPump` still reach the classes,
 because Python enforces no privacy.
 The underscore marks them as private, so `from shop import *` skips them.
@@ -594,8 +587,7 @@ WhatIUse2().op(what_i_want=WhatIHave())
 
 **Reproduce the broken override.**
 `Renamed` is `WhatIUse2` from `adapter_variations.py`, unchanged.
-With the `/` removed, `what_i_want` becomes a name callers can pass by keyword,
-and `run()` passes it that way.
+With the `/` removed, `what_i_want` becomes a name callers can pass by keyword.
 `ty` rejects the override:
 
 ```text
@@ -608,18 +600,14 @@ info: This violates the Liskov Substitution Principle
 
 **Call through the base type.**
 The `# type: ignore` suppresses that report so the listing can show what the checker prevents.
-`run()` accepts any `WhatIUse`.
 A `Renamed` is a `WhatIUse`,
 so the type checker accepts the call inside `run()`.
-At runtime `Renamed.op()` has no parameter named `what_i_want`,
-so the call raises a `TypeError`.
 The override breaks `run()`, a caller written against `WhatIUse` alone.
 
 **Keep the base parameter's name.**
 `WhatIUse2.op()` names its parameter `what_i_want`, as the base class does,
 so it accepts the keyword every `WhatIUse` caller may pass.
 It still widens the type to the union, which an override may do.
-`WhatIUse2().op(what_i_want=WhatIHave())` passes a `WhatIHave` by that keyword and reaches the adapter.
 
 With the `/` in place, as in `adapter.py`,
 every caller must pass the parameter by position,
