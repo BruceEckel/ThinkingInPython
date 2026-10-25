@@ -114,7 +114,6 @@ print(list(map(lambda e: e ** 2, filter(is_int, a_list))))
 
 The `TypeIs[int]` return type of `is_int()` declares that every element passing it is an `int`.
 The `lambda` inside `map()` therefore receives an `int`.
-The listing needs no `# type: ignore` comment.
 
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values,
@@ -192,8 +191,6 @@ print(cubes)
 #: [0, 8, 64]
 ```
 
-`(y := cube_if_even(x))` calls `cube_if_even()` once and binds its result to `y`.
-The `if` tests that result, and the output expression reuses `y`.
 Without the walrus, the filter and the output each need their own call:
 `cube_if_even(x) is not None` in the filter and `cube_if_even(x)` in the output.
 `cube_if_even()` then runs twice for every member that passes (see exercise 9).
@@ -224,7 +221,6 @@ print(unique == same)
 #: True
 ```
 
-`same` builds a list with a list comprehension, then passes it to `set()`.
 `same` and `unique` are equal, but `same` first builds a full list,
 spending time and memory on an intermediate object.
 The set comprehension adds each name straight to the set.
@@ -233,8 +229,6 @@ The set comprehension adds each name straight to the set.
 
 A dictionary comprehension builds a `dict`.
 Each member produces a key and a value, with an optional filter.
-Here each name becomes an upper-case key mapped to its length,
-keeping the names longer than three characters:
 
 ```python
 # dict_comprehension.py
@@ -245,10 +239,6 @@ lengths = {name.upper(): len(name)
 print(lengths)
 #: {'ARTHUR': 6, 'LANCELOT': 8, 'BEDEVERE': 8, 'ROBIN': 5}
 ```
-
-The three parts mirror the list comprehension:
-the `for` clause supplies each `name`, the `if` clause drops `"Ni"`,
-and the `key: value` expression before `for` produces each entry.
 
 A common variant swaps a dictionary's keys and values to invert a lookup:
 
@@ -429,18 +419,13 @@ that creates a scratch directory and deletes it, and everything in it,
 when the `with` block exits.
 The scratch directory gives the example a throwaway file tree to walk and leaves the file system as the example found it.
 
-In the `py_paths` comprehension,
-the first `for` walks the directories and the second `for` walks the files in each,
-flattening the tree into one list of paths.
-
 The filter tests `filename.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`.
 Testing the bare filename leaves `Path` construction to the output expression,
 which runs only for the files that pass.
 
 A `with` block, unlike a function body, runs in the enclosing scope.
-The assignment to `py_paths` sits inside the `with`.
-The name stays bound after the block ends,
-so the `for path in sorted(py_paths):` line below it can read `py_paths`.
+`py_paths` stays bound after the block ends,
+so the `for path in sorted(py_paths):` line below the block can read it.
 
 The comprehension finishes building `py_paths`, as strings,
 while the directory still exists.
@@ -507,7 +492,6 @@ for line in report:
 Reading the `report` comprehension means answering several questions at once:
 which items qualify, how the warehouses flatten together,
 how `sorted()` orders the qualifying items, and how each line renders.
-The outer comprehension iterates over `sorted()` of an inner comprehension.
 That one expression does four jobs.
 Giving each stage a name gives each question its own statement:
 
@@ -558,7 +542,6 @@ print(wasted)
 #: [None, None, None]
 ```
 
-The comprehension calls `print()` for its side effect.
 `print()` returns `None`, so `wasted` ends up holding three `None`s,
 one for each call.
 Worse, a reader scanning `[...]` expects a list that later code reads.
@@ -601,8 +584,6 @@ print(list(islice(squares, 3)))
 ```
 
 The generator computes a square each time you pull a value.
-The two `next()` calls pull the first two squares,
-and `itertools.islice()` pulls the next three.
 In all, the generator computes five of its million squares.
 
 Python has no tuple comprehension.
@@ -708,8 +689,6 @@ print(list(gen))
 #: [10, 20, 30]
 ```
 
-`source()` runs as Python builds the generator expression,
-before the `generator created` line prints.
 Because the output expression runs later,
 it reads `factor` when `list()` pulls the values rather than when Python creates the generator.
 `list(gen)` returns `[10, 20, 30]` instead of `[2, 4, 6]`.
