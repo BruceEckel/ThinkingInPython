@@ -1026,8 +1026,8 @@ The keyword came from CLU and Sather,
 where an iterator yields one element at a time to a `for` loop.
 
 The restriction is the design.
-A generator always returns to the code that resumed it,
-because a frame that could transfer anywhere would have to carry the C stack with it,
+Each `yield` hands control back to whoever called `next()` or `send()`.
+Handing control anywhere else would mean carrying the C stack along,
 the obstacle that kept Stackless Python's coroutines out of the core.
 That restriction is why a driver exists.
 Something must call `next()` and `send()`,

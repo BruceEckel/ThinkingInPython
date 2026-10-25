@@ -84,7 +84,7 @@ A *generator* writes them.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn.
 The generator pauses after each value and resumes with its local variables intact.
 [Generators](45_Effects--Generators.md#half-a-coroutine-by-design)
-explains where that pause came from and why a generator always returns to the code that resumed it.
+explains where that pause came from and why each `yield` hands control back to the loop that called `next()`.
 
 The generators in this chapter produce values without receiving any,
 so `Iterator[T]` annotates them.
