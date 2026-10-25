@@ -11,10 +11,9 @@ runs the same loop scoped to that chapter and its Solutions file:
 The steps, in order, mirror `verify` (fixers first, markers before sync):
 
 1. ``check_line_endings --fix`` over the tree (whole-repo, cheap).
-2. ``reflow_prose --write`` on the chapter. Not on the Solutions file:
-   the gate reflows ``Chapters/`` only, and Solutions prose is wrapped
-   at a column, so reflowing it here would rewrite a hundred lines the
-   gate never asked for.
+2. ``reflow_prose --write`` on the chapter and on its Solutions file,
+   the two files the gate's own reflow step would rewrite (it has
+   covered ``Solutions/`` since 2026-10-25).
 3. ``exercise_statements --write`` on the chapter, so the exercise
    statements copied under the Solutions headings match the reflowed
    chapter, then ``solution_steps --write``, so each hinted solution's
@@ -174,7 +173,7 @@ def main(argv: list[str] | None = None) -> int:
     results = [
         run("fix-eol", [*PY, "-m", "tools.check_line_endings", "--fix"]),
         run("reflow", [*PY, "-m", "tools.reflow_prose", "--write",
-                       str(md)]),
+                       str(md), *([str(sol)] if sol.exists() else [])]),
         run("statements", [*PY, "-m", "tools.exercise_statements",
                            "--write", number]),
         run("steps", [*PY, "-m", "tools.solution_steps",

@@ -204,8 +204,8 @@ if the paragraph needs its sentences reordered, leave it for `cohesion`.
 
 ## Verify and report
 
-Touched chapter prose gets `tip reflow CH=NN` (Semantic Line Breaks);
-a Solutions file is never reflowed.
+Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
+which covers the chapter and its Solutions file.
 Then run `tip verify`, and read `git diff Chapters/ Solutions/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 Report each change as the pointer, its candidates, and the noun chosen.

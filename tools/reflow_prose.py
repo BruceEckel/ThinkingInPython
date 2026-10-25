@@ -26,16 +26,22 @@ The tool only moves newlines; it never adds, drops, or alters a word. If that
 invariant ever fails the file is left untouched and reported.
 
 Usage:
-    uv run python -m tools.reflow_prose                  # check all Chapters/, no write
-    uv run python -m tools.reflow_prose --write           # rewrite all Chapters/
-    uv run python -m tools.reflow_prose --write 02        # rewrite one chapter by number
+    uv run python -m tools.reflow_prose                  # check Chapters/ and Solutions/, no write
+    uv run python -m tools.reflow_prose --write           # rewrite Chapters/ and Solutions/
+    uv run python -m tools.reflow_prose --write 02        # rewrite one chapter and its Solutions file
     uv run python -m tools.reflow_prose --diff Tour       # diff a chapter by name part
     uv run python -m tools.reflow_prose --write FILE...   # rewrite specific files
     uv run python -m tools.reflow_prose --width 100       # change the wrap width
 
 A positional argument may be a file path or a chapter selector matched against
 Chapters/: a number or stem prefix ("02", "02_Foundations--Tour") or a
-substring ("Containers").
+substring ("Containers"). A chapter selector also picks the chapter's
+`Solutions/<stem>/README.md` when one exists.
+
+Both trees are covered since 2026-10-25. Before that the tool, the gate,
+and `verify-ch` reflowed `Chapters/` alone, and the Solutions files kept
+their column wrapping until a hand run (commit e33ca13a) brought them to
+one sentence per line; the gate now keeps them there.
 """
 
 import argparse
@@ -44,7 +50,7 @@ import re
 import sys
 from pathlib import Path
 
-from tools.config import CHAPTERS_DIR
+from tools.config import CHAPTERS_DIR, SOLUTIONS_DIR
 from tools.prose import (
     BLOCKQUOTE,
     FENCE,
@@ -60,7 +66,7 @@ from tools.prose import (
     mask,
     unmask,
 )
-from tools.repo import md_files, write_text_lf
+from tools.repo import md_files, solutions_file, write_text_lf
 
 # Sentences wider than this are broken at clause punctuation. Roughly the
 # column at which an editor would otherwise soft-wrap the line.
@@ -419,7 +425,10 @@ def _resolve(selector: str) -> list[Path]:
 
     A selector may be a path to a file, or a chapter selector matched against
     `Chapters/`: a number or stem prefix ("02", "02_Foundations--Tour") or a
-    substring ("Containers"). Matching is case-insensitive.
+    substring ("Containers"). Matching is case-insensitive. A chapter
+    selector also picks each matched chapter's Solutions file, when one
+    exists, so `tip reflow CH=02` keeps the pair in step the way the gate
+    does.
     """
     path = Path(selector)
     if path.is_file():
@@ -430,14 +439,20 @@ def _resolve(selector: str) -> list[Path]:
         matches = sorted(
             p for p in CHAPTERS_DIR.glob("*.md") if low in p.stem.lower()
         )
-    return matches
+    files: list[Path] = []
+    for chapter in matches:
+        files.append(chapter)
+        sol = solutions_file(chapter)
+        if sol.exists():
+            files.append(sol)
+    return files
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="*",
                         help="files or chapter selectors like '02' or 'Tour' "
-                             "(default: all of Chapters/)")
+                             "(default: all of Chapters/ and Solutions/)")
     parser.add_argument("--write", action="store_true", help="rewrite files in place")
     parser.add_argument("--diff", action="store_true", help="print a unified diff")
     parser.add_argument("--width", type=int, default=_DEFAULT_WIDTH,
@@ -453,7 +468,7 @@ def main() -> int:
                 return 2
             files.extend(matched)
     else:
-        files = md_files()
+        files = md_files([CHAPTERS_DIR, SOLUTIONS_DIR])
 
     total_changed = 0
     total_paras = 0

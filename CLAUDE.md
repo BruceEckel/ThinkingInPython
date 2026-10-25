@@ -172,7 +172,9 @@ are never re-proposed.
 Fastest path for one chapter is `tip verify-ch CH=NN`
 (`tools/verify_chapter.py`): the same fixers and gates as `verify`,
 scoped to that chapter and its Solutions file, in a few seconds. It
-reflows the chapter only, since the gate never reflows `Solutions/`,
+reflows both files, as the gate does (the gate has reflowed
+`Solutions/` since 2026-10-25, after a hand run brought the 45
+READMEs to one sentence per line in e33ca13a),
 and it writes no gate stamp; a change that other chapters depend on
 (a renamed listing, a `utils/` helper, a linked heading) still needs
 the whole-book run. That run is `tip verify`: fix line endings, every

@@ -509,9 +509,9 @@ tip verify-ch CH=28              # or CH=27_Patterns--Function_Objects
 tip verify-ch CH=28 ISOLATED=1   # private build trees, for parallel runs
 ```
 
-The steps mirror `verify`. It fixes line endings, reflows the chapter (the
-Solutions file keeps its column wrapping, since the gate reflows
-`Chapters/` alone), regenerates the exercise statements and solution
+The steps mirror `verify`. It fixes line endings, reflows the chapter
+and its Solutions file (the gate reflows both trees since 2026-10-25),
+regenerates the exercise statements and solution
 steps, and rebuilds both build trees whole-book. Then it refreshes both
 files' `#:` markers and checks their placement, syncs and drift-checks,
 and runs the Markdown gates and `ty`, `ruff`, `run`, and `pytest` over the

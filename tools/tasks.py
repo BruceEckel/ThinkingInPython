@@ -199,7 +199,8 @@ def gate(v: Vars) -> None:
     mentions); run `tip prune` to delete those. solutions-gate applies the same
     stray check to Solutions/ against each Solutions/<chapter>/README.md;
     `prune` covers that tree too (and never deletes a Markdown file). reflow_prose.py runs here with --write, so prose that drifts out
-    of Semantic Line Breaks self-heals (rewriting Chapters/) the same way
+    of Semantic Line Breaks self-heals (rewriting Chapters/ and the
+    Solutions/ READMEs, both trees since 2026-10-25) the same way
     fix-eol and validate_output's marker --update do, instead of failing the
     build and forcing a `tip reflow` plus a second full run. The safety valve
     stays: a paragraph that fails reflow's round-trip check is never rewritten,
@@ -750,8 +751,9 @@ also("checks", "pattern-names")
 def reflow(v: Vars) -> None:
     """Rewrite prose paragraphs to one sentence per line (code, tables, lists,
     and headings are left untouched; a file is rewritten only if it
-    round-trips). Target one chapter with CH=, e.g. `tip reflow CH=02` or `tip
-    reflow CH=Tour`.
+    round-trips), over Chapters/ and the Solutions/ READMEs. Target one
+    chapter and its Solutions file with CH=, e.g. `tip reflow CH=02` or
+    `tip reflow CH=Tour`.
     """
     py("tools.reflow_prose", "--write", *v.words("CH"))
 

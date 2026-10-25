@@ -63,8 +63,8 @@ Usage:
     python -m tools.rewrite Chapters/24_Patterns--Template_Method.md --all
     python -m tools.rewrite Solutions/24_Patterns--Template_Method/README.md
 
-A Solutions file named by its path runs the same passes, minus the
-reflow, which the gate never applies to `Solutions/`.
+A Solutions file named by its path runs the same passes, reflow
+included, since the gate reflows `Solutions/` too (2026-10-25).
 """
 
 import argparse
@@ -397,9 +397,6 @@ def changed_lines(chapter: Path) -> str:
 def checks_after(chapter: Path, python: list[str], out: Reporter) -> bool:
     """Reflow the chapter and run the prose gates; False on the first failure."""
     for label, argv, scoped in CHECKS:
-        # The gate never reflows Solutions/, so a pass must not either.
-        if label == "reflow" and chapter.parts[0] == "Solutions":
-            continue
         full = [*python, *argv]
         if scoped:
             full.append(chapter.as_posix())
