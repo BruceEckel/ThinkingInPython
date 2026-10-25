@@ -155,7 +155,7 @@ plus `(Lizard, Lizard)`.
 **Guard the demonstration.**
 The `__main__` guard lets exercise 3 import this module and skip its demonstration.
 The chapter keeps the method version's demonstration in a separate file,
-`methods_demo.py`, so importing `paper_scissors_rock.py` runs nothing.
+`methods_demo.py`, so importing `paper_scissors_rock.py` loads its definitions alone.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
