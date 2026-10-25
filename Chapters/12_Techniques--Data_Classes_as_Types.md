@@ -159,8 +159,7 @@ The object's own methods still mutate `_number`,
 so `f1()` must re-check the result before returning it.
 That check runs after the mutation,
 so it reports the illegal value instead of preventing it.
-`Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`.
-After the caller catches the exception,
+After the caller catches the `TypeFailure`,
 the object still holds that illegal value.
 
 The order is a choice, not something mutation forces.
@@ -229,8 +228,6 @@ display_object(Messenger, INTERESTING_DUNDERS)
 #:   • __repr__(self)
 ```
 
-`@dataclass` generates the dunder methods,
-and the constructor arguments cover all the fields in `Messenger`.
 The trailing `...` is `display_object()` trimming that line to its report width.
 
 `__hash__` is `None`.
@@ -271,8 +268,7 @@ print(m)
 #: Messenger(name='hermes', number=12, depth=3.14)
 ```
 
-`print(m)` uses the generated `__repr__()`,
-which produces the class name followed by each field as `name=value`.
+`print(m)` uses the generated `__repr__()`.
 
 `replace()` returns a copy with some fields changed, leaving the original alone.
 Copying instead of mutating reduces errors.
@@ -365,8 +361,6 @@ The two annotations record in `A.__annotations__` that some future `A` will carr
 Python allocates the storage when code assigns a value.
 `A` has no `__init__()` to assign them,
 so neither the class nor the instance holds an `x` or an `s`.
-`show(A())` reports `None` under both headings,
-and reading `A().x` raises an `AttributeError`.
 
 ### `B`: Class-Level Defaults
 
@@ -700,11 +694,6 @@ A parameter [annotated](08_Foundations--Static_Types.md#how-much-to-annotate)
 
 Four tests show that illegal values cannot exist:
 
-- `Stars(1)` and `Stars(10)`, the ends of the range, are legal.
-- The constructor rejects values outside the set.
-- `f1()` and `f2()` return legal `Stars`.
-- A result outside the set raises `TypeFailure` when `f2()` builds it.
-
 ```python
 # test_stars.py
 import pytest
@@ -769,7 +758,6 @@ Its annotations require a `FullName` and an `EmailAddress`,
 which the type checker enforces.
 Every `FullName` and `EmailAddress` is legal from construction.
 
-`test_person_composes_validated_parts()` builds a `Person` from legal parts and reads them back.
 `test_full_name_needs_first_and_last()` and `test_email_needs_at_sign()` show that the constructors reject an illegal name or email,
 so every `Person` holds legal parts:
 
@@ -883,8 +871,6 @@ Each member's value is its month number, so `Month(7)` looks up `JULY` by value.
 `Month(13)` raises a `ValueError`, because no member holds 13.
 The `Enum`'s lookup performs the range check, so `Month` writes none.
 
-The day counts live in `DAYS`,
-and `max_days` indexes that tuple with `self.value - 1`.
 A day count cannot serve as the member's value,
 because `Enum` treats members with equal values as aliases of one another.
 Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`.
@@ -975,9 +961,7 @@ print(f"{Level.INFO}: ready", Level.WARNING.upper())
 ```
 
 `step()` unpacks `self`, because a `Direction` is a tuple.
-The member keeps everything an enum member has:
-`Direction((0, -1))` looks `DOWN` up by value, `.value` holds the tuple,
-and `len(Direction)` counts four members.
+The member keeps everything an enum member has.
 A member passes wherever code expects the mix-in type,
 and carries its name with it.
 
@@ -1037,8 +1021,6 @@ print(repr(Mode(9)))
 
 `auto()` gives each `Perm` member its own bit, so `READ` is 1, `WRITE` is 2,
 and `EXECUTE` is 4.
-The combination `rw` is a `Perm` with the value 3.
-Its `repr()` joins the member names with `|`.
 Iterating over a combined value yields the members it contains,
 in definition order.
 A `Flag` is still a closed set.
@@ -1047,7 +1029,6 @@ A `Flag` is still a closed set.
 `IntFlag` mixes in `int`, the way `IntEnum` does,
 so a member is an `int` and compares equal to its number.
 That suits the bit patterns a library or an operating system returns as integers.
-`Mode(6)` turns the integer into `R|W`.
 `IntFlag` also keeps unnamed bits,
 so `Mode(9)` holds `X` plus a bare 8 where `Perm(8)` raises an exception.
 
@@ -1294,7 +1275,6 @@ print(hasattr(c, "host"), hasattr(c, "url"))
 #: False False
 ```
 
-Because nothing calls `Connection.__init__()`, neither `host` nor `url` exists.
 The omission is easy to miss because `NamedConnection("db")` still succeeds.
 
 To run the base initializer, call it yourself from `__post_init__()`,
@@ -1581,8 +1561,6 @@ print(lighter)
 so `dataclasses.replace()` rejects it with a `TypeError`.
 Every implementation takes the same shape: recover the constructor arguments,
 override the named ones, rebuild.
-Here `current` holds the constructor arguments,
-and `|` overrides the ones that `changes` names.
 Calling `type(self)(...)` rather than `Color(...)` gives a subclass a copy of its own class,
 and the `Self` return annotation tells the type checker so.
 
@@ -1597,9 +1575,6 @@ Handed a data class instance,
 
 `asdict()` turns the object into a nested dictionary,
 and `json.dumps()` serializes dictionaries.
-Decoding goes the other way.
-`from_json()` parses the JSON into a dictionary,
-then passes its parts to the constructors.
 
 ```python
 # json_round_trip.py
