@@ -41,10 +41,6 @@ The solution still writes the full rule,
 because `Year`'s upper bound follows `date.today()`.
 Once 2100 arrives, `Year` will accept it, and 2100 is a common year.
 
-`Year` gains an `is_leap()` method using the standard rule
-(divisible by 4, and not by 100 unless also by 400).
-`Month.check_day()` takes the `Year` as a second argument so it can raise February's cap to 29 only in a leap year:
-
 ```python
 # test_ch12_leap_year.py
 from dataclasses import dataclass
@@ -144,7 +140,6 @@ def test_feb_30_always_rejected() -> None:
 so it is a leap year too.
 
 **Reject a day past the cap.**
-`Year(2021)` is a common year, so `check_day()` rejects February 29.
 February 30 fails in every year, because February's cap is 29 at most.
 
 Before you move on, name what separates your attempt from this one:
@@ -267,10 +262,6 @@ The original check, `"@" in self.text`,
 confirms that an `@` appears somewhere and accepts any number of them.
 `count("@") == 1` also rejects two-`@` strings like `"b@@x.com"`.
 
-**Require text on both halves.**
-The `partition()` check splits on `@` and requires text on both sides,
-so it rejects `"@x.com"` and `"b@"`.
-
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
@@ -386,8 +377,6 @@ print(copy.replace(Stars(5), number=99))
 ```
 
 **Validate in a subclass.**
-`typing.NamedTuple` refuses a `__new__()` in its own class body but accepts one in a subclass,
-so `Stars(11)` now raises a `TypeFailure`.
 The chapter's `make_stars()` checks the callers that use it,
 while a `__new__()` in the subclass runs on every call to `Stars`.
 
@@ -542,8 +531,7 @@ expect(TypeFailure, from_json, bad_json)
 
 **Let the field types validate.**
 `from_json()` leaves the email check to `EmailAddress`.
-It passes the raw JSON value to `EmailAddress(...)`.
-`EmailAddress`'s own `__post_init__()` then runs the same check it runs for any other caller.
+`EmailAddress`'s own `__post_init__()` runs the same check it runs for any other caller.
 One check, inside `EmailAddress`,
 protects every path that constructs a `Person`,
 and the path from untrusted JSON input is one of those.
@@ -656,10 +644,6 @@ expect(TypeFailure, copy.replace, s, number=99)
 
 **Merge the changes into the arguments.**
 `copy.replace()` looks for `__replace__()` and calls it with the keyword changes.
-This implementation recovers the constructor arguments
-(`{"number": self.number}`),
-uses `|` to override the arguments the changes name,
-and rebuilds through `type(self)(...)`.
 
 **Validate the replacement.**
 The rebuild goes through `__init__()`, so the validation runs.
@@ -801,14 +785,12 @@ expect(Exception, Wrong, 1)
 `@dataclass` reads the annotation, sees `ClassVar`,
 and leaves `built` alone as an ordinary class attribute,
 so `built` stays out of `__init__()`.
-`number` is the one field that `dataclasses.fields()` reports and the one parameter after `self` in the generated signature.
 
 **Count on the class.**
 `frozen=True` installs a `__setattr__()` that rejects assignment to an instance.
 `Stars.built += 1` assigns to the class, so it works.
 
 **Show the instance store failing.**
-`Wrong` tries the same increment through `self` and fails.
 `self.built += 1` reads the class attribute, adds one,
 and then tries to store the result on the instance.
 That store is the assignment `frozen=True` refuses.
@@ -928,8 +910,7 @@ print(Bare().index, Subscripted().index)
 finds an unhashable object, and raises a `ValueError` naming the fix.
 
 **Fix it with a bare factory.**
-`Bare` and `Subscripted` both work.
-They differ in what `ty` verifies.
+`Bare` and `Subscripted` differ in what `ty` verifies.
 `ty` infers `Unknown` for `field(default_factory=dict)`.
 `Unknown` satisfies any annotation,
 so `ty` accepts the bare factory whatever the field's annotation says.
@@ -1061,7 +1042,6 @@ print(issubclass(bool, int), isinstance(True, int))
 **Test the exact class.**
 `bool` is a subclass of `int`,
 so `isinstance(True, int)` is `True` and an `isinstance()` test accepts `True` as the rating 1.
-`type(self.number) is int` compares the class of the value with `int` and rejects a `bool` along with a `float` and a `str`.
 
 **Test the type before the range.**
 Comparing `"five"` with `1` raises a `TypeError`,
