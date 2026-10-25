@@ -958,11 +958,22 @@ It describes a function by what it requests and writes those requests into its r
 
 ## Half a Coroutine by Design
 
-PEP 255 added generators to Python 2.2 in 2001 to solve one problem:
-a producer that keeps state between the values it produces.
-Before that, such a producer took a callback,
-built its whole result list up front,
-or was rewritten as an iterator class with its control flow turned inside out.
+PEP 255 added generators to Python 2.2 in 2001 to solve one problem.
+Python had three ways to write a function that produces values one at a time and must remember where it is between one value and the next.
+Each gave something up.
+Taking a callback and calling it with each value keeps the producer's loop intact,
+but the consumer then runs inside that call and must keep its own state between calls.
+Building the whole result list up front gives the consumer an ordinary `for` loop,
+but every value exists before the consumer sees the first,
+so the sequence must be finite and fit in memory.
+Rewriting the producer as an iterator class,
+with a `__next__()` that returns one value per call,
+moves its local variables into instance attributes and turns its control flow inside out:
+the position in the loop, which the running function kept,
+becomes an attribute the programmer sets and tests on every call.
+The producer needed to pause in the middle of its own loop, hand out a value,
+and resume where it stopped.
+
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
 and the useful part is the frame:
 a suspended generator keeps its frame alive and resumes it on the next call.

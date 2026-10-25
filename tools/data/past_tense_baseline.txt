@@ -204,14 +204,14 @@ Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put 
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
-Chapters/45_Effects--Generators.md	[PAST] built: Before that, such a producer took a callback, built its whole result list up front, or was rewritten as an iterator class with its control flow turned inside out.
 Chapters/45_Effects--Generators.md	[PAST] called: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon for most of the inspiration.
 Chapters/45_Effects--Generators.md	[PAST] came: The keyword came from CLU and Sather, where an iterator yields one element at a time to a CODE loop.
 Chapters/45_Effects--Generators.md	[PAST] credited: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon for most of the inspiration.
+Chapters/45_Effects--Generators.md	[PAST] gave: Each gave something up.
+Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write a function that produces values one at a time and must remember where it is between one value and the next.
+Chapters/45_Effects--Generators.md	[PAST] needed: The producer needed to pause in the middle of its own loop, hand out a value, and resume where it stopped.
 Chapters/45_Effects--Generators.md	[PAST] returned: The driver calls CODE on the generator CODE returned, but CODE prints the CODE line.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
-Chapters/45_Effects--Generators.md	[PAST] took: Before that, such a producer took a callback, built its whole result list up front, or was rewritten as an iterator class with its control flow turned inside out.
-Chapters/45_Effects--Generators.md	[PAST] was rewritten: Before that, such a producer took a callback, built its whole result list up front, or was rewritten as an iterator class with its control flow turned inside out.
 Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's parameter annotation to decide what it answers, so a function annotated CODE and returning CODE hands back a default-constructed instance of the requested class.
 Chapters/46_Effects--Stateless.md	[PAST] came: My understanding of Effects came from work with Bill Frasure and James Ward as we created Effect Oriented Programming.
 Chapters/46_Effects--Stateless.md	[PAST] let: Other Effect systems let you describe the work once and decide later how many times to perform it.
