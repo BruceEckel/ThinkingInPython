@@ -147,8 +147,8 @@ Instead, control goes to the *event loop*,
 which picks the next task that is ready to run.
 
 1. `async def` defines a *coroutine function*.
-   Calling it runs nothing and returns a *coroutine object*,
-   a description of pending work.
+   Calling it returns a *coroutine object*, a description of pending work,
+   and leaves the function body to run later.
 2. `await` starts that work and pauses the awaiting coroutine until the result is ready.
    While that coroutine waits,
    the event loop finds other coroutines ready to run.
@@ -195,7 +195,7 @@ asyncio.run(main())
 #: ['A', 'B', 'C']
 ```
 
-The first printed line proves that calling a coroutine function runs nothing.
+The first printed line proves that calling a coroutine function defers its body.
 `main()`'s first line calls `fetch("a", 0.03)`, yet no "started" line appears,
 only the type of object the call built: `coroutine`.
 `gather()` schedules the work when it receives that object.
@@ -967,7 +967,7 @@ Once both hold their first lock,
 each task's `async with second:` suspends on a lock the other task keeps holding.
 A real deadlock has no `timeout`.
 Both tasks wait forever, the event loop included,
-since nothing remains that can wake them.
+since the one task that could wake each of them is waiting too.
 Here, `asyncio.wait_for()` bounds the wait.
 When its deadline passes, it cancels the `gather()` and raises a `TimeoutError`,
 so the example reports the deadlock instead of hanging.
@@ -1026,7 +1026,7 @@ A real livelock repeats these rounds forever.
 A livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
 A deadlock looks idle, with tasks suspended and waiting.
-In both cases, nothing finishes.
+In both cases, progress stops.
 The usual fix is to break the symmetry,
 for example letting the task with the lower ID give way while the other proceeds.
 
@@ -1495,7 +1495,7 @@ Use a thread pool for I/O when the blocking calls already exist and rewriting th
 `asyncio` is a better choice when you have thousands of waits,
 since tasks are far lighter than threads.
 
-In contrast, a thread that is computing gains nothing when the GIL moves to another thread:
+In contrast, a thread that is computing stalls when the GIL moves to another thread:
 
 ```python
 # gil_threads.py
@@ -1955,7 +1955,7 @@ A queue is the push half of distributing work.
 A producer decides what each consumer gets.
 The pull half looks simpler.
 Every worker gets the same iterator and takes the next item when it is ready.
-Nothing in the language stops you, and nothing in the language makes it work.
+The language permits it and leaves making it work to you.
 An [iterator](22_Patterns--Iterators.md) is not thread-safe:
 
 ```python
