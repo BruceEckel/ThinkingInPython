@@ -268,7 +268,7 @@ C++ and Java call the base-class constructor automatically,
 but when a Python class defines its own constructor,
 Python runs that constructor alone.
 `Broken`'s constructor leaves out the `super().__init__(text)` line,
-so nothing creates `self.text`:
+so `show()` raises an `AttributeError` when it reads `self.text`:
 
 ```python
 # missing_super.py
@@ -292,7 +292,7 @@ Python accepts any method name in a subclass.
 If you misspell the name of a method you mean to override,
 you define a new method.
 Python accepts the new method.
-Renaming or removing the base method later leaves the subclass method overriding nothing.
+Renaming or removing the base method later orphans the subclass method.
 Python accepts the orphaned method too.
 Either bug is easy to miss.
 
@@ -325,7 +325,7 @@ Derived().show()
 ```
 
 A type checker now verifies that declaration.
-The checker reports an error when a decorated method matches nothing in a base class,
+The checker reports an error when a decorated method is an orphan,
 whether from a misspelling or from a base method someone has since renamed or removed.
 With the decorator above `shwo()` uncommented, the type checker (`ty`) reports:
 
