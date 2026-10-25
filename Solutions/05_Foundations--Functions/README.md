@@ -75,7 +75,6 @@ Every call that omits `target` reuses that object.
 **Try an immutable default.**
 `tuple_append()` is `bad_append()` with its default changed to `()`.
 That change removes the shared list and causes a different failure.
-The function appends to `target`.
 A tuple has no `append()`,
 so the first call that omits `target` raises an `AttributeError`.
 
@@ -161,8 +160,6 @@ print(get(prefs, "theme", None))
 
 **Tell an omitted default from `None`.**
 The two calls ask for different things.
-The first supplies no default, so a missing key is an error.
-The second supplies `None` as the default, so a missing key produces `None`.
 With `default=None` as the sentinel,
 `get()` receives the same `None` in both calls,
 so the two calls look identical to it.
@@ -241,8 +238,6 @@ expect(TypeError, divide, 10, 2, "half")  # type: ignore
 #: were given
 ```
 
-`a` and `b` stay positional-only because of the original `/`.
-The new `*` marks `label`, the one parameter after it, as keyword-only.
 Calling `divide(10, 2, "half")` passes three positional arguments to a function that accepts two,
 so Python raises a `TypeError` before the function body runs.
 
@@ -310,11 +305,6 @@ report("nums", 1, 2, 3, total=True)
 #: 6
 ```
 
-`total` sits between `*values` and `**options` in the parameter list,
-so it is keyword-only.
-Every positional argument after the first goes to `values`.
-The keyword `total=True` binds to `total` by name,
-and any other keywords go to `**options`.
 With the flag added,
 `report()` collects its positional and keyword arguments as before.
 
@@ -370,11 +360,6 @@ print(apply_twice(lambda s: s + "!", "hi"))
 print(apply_twice(lambda n: n * n, 3))
 #: 81
 ```
-
-The lambda runs twice, on the original value and then on its own result,
-so `"hi"` gains two exclamation points rather than one.
-The `apply_twice()` call on `3` runs a squaring lambda twice in the same way:
-`3` squares to `9`, which squares to `81`.
 
 A function that takes another function as an argument declares that parameter like any other.
 `func` has one requirement: it must be callable with one argument.
@@ -440,11 +425,6 @@ opts = {"color": "red"}
 report(*args, **opts)
 #: point (3, 4) {'color': 'red'}
 ```
-
-`*args` spreads the tuple into three positional arguments,
-so `"point"` fills `label` and the remaining two collect into `values`.
-`**opts` spreads the dictionary into keyword arguments,
-which `**options` collects again.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -617,7 +597,6 @@ expect(UnboundLocalError, rebinds)
 ```
 
 **Drop the `global` declaration.**
-`writes_global()` raises `UnboundLocalError: cannot access local variable 'count' where it is not associated with a value`.
 Without `global`, the assignment in `count += 1` makes `count` local to `writes_global()`,
 so the read half of `+=` reads that local before any assignment gives it a value.
 
@@ -700,7 +679,6 @@ print(mine)
 #: []
 ```
 
-Only `clear_by_method()` empties the caller's list.
 When a call begins, `target` and `mine` are two names for one list.
 
 **Rebind the local name.**
