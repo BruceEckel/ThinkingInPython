@@ -514,9 +514,7 @@ for module in (table, methods):
 ```
 
 **Check both versions against one mapping.**
-The test imports exercise 1's table and exercise 2's methods,
-the two versions that define `Lizard`.
-Its helper, `compete()`,
+The test's helper, `compete()`,
 looks each class up by name on whichever module it receives,
 so one `EXPECTED` checks both sets of classes.
 
@@ -728,7 +726,6 @@ print(counts["Lizard"])
 **Make the tally optional.**
 `counts` is an optional parameter with a default of `None`,
 so a caller that needs only the pairs writes `random_pairs(Item, 10)`.
-The generator yields a `(player, opponent)` pair each time.
 
 **Tally into the caller's counter.**
 A caller that needs the tally passes its own `Counter`.
@@ -836,8 +833,6 @@ with expected(TypeError):
 
 **Handle each accepted type.**
 `__sub__()` is `__add__()` with the sign changed.
-Its three cases match those of `__add__()`: a `Meters`, a number,
-or `NotImplemented` for anything else.
 `__rsub__()` needs only the numeric case,
 because Python calls the left operand's method first,
 and `Meters.__sub__()` handles `Meters(10) - Meters(3)`.
@@ -849,7 +844,6 @@ The swap is where subtraction differs from addition.
 Python calls `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
 so `self` is the right operand and `other` is the left one.
 The method must put them back in the order the source wrote them.
-`Meters(other - self.n)` gives `Meters(7)`.
 Copying the body of `__sub__()`, `Meters(self.n - other)`, gives `Meters(-7)`.
 The copied `__rsub__()` looks correct and raises no exception,
 yet it returns the negative of every reflected subtraction.
@@ -1820,8 +1814,6 @@ for player, opponent in [
 
 **Call what the lookup returns.**
 `compete()` changes by one pair of parentheses.
-It still finds the cell with a single probe keyed on both types,
-and now calls what it finds instead of returning it.
 The call site stays the same:
 `player.compete(opponent)` reads as it does in `paper_scissors_rock.py`,
 where four method definitions per class stand behind it.
@@ -2108,18 +2100,12 @@ print(Project2(seed=3).meeting(group_size=5))
 #: Troll
 ```
 
-**Look up both types at once.**
-The weapons shrink to six empty classes,
-and `Weapon.compete()` looks up both types in one probe,
-as in `paper_scissors_rock_table.py`.
-
 **Lay the answers out as a grid.**
 The listing writes the 36 answers by hand,
 as a grid rather than as 36 dictionary rows.
 Each row of `GRID` holds one weapon's results as the caller against the weapons in `ORDER`.
 A cell holds what one of exercise 8's `eval_*()` methods returns.
 Row `Jargon`, column `Play`, holds the `LOSE` that `Play.eval_jargon()` returns.
-The comprehension turns the grid into the `(caller, opponent)` keys that `compete()` looks up.
 
 **Reuse the game around the table.**
 The inhabitant classes, `battle()`, and `meeting()` repeat exercise 8's code,
