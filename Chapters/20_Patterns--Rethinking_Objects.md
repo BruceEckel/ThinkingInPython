@@ -1087,8 +1087,8 @@ if __name__ == "__main__":
 
 The type checker requires the guard.
 Without it, `total()` calls `.log()` on `None` and raises an `AttributeError`.
-The `None` branch stays silent.
-Silence is behavior, and behavior belongs in an object.
+The `None` branch does nothing.
+Doing nothing is behavior, and behavior belongs in an object.
 
 The *Null Object* pattern replaces "absent" with an object whose behavior is neutral.
 If you give the silent case a class,
