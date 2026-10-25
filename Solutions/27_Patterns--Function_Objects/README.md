@@ -132,10 +132,7 @@ because an object of type `Command` has no attribute `undo`.
 so the solution gives the list a `Protocol` that declares both operations.
 
 **Name both requests in one type.**
-That `Protocol` is `UndoableCommand`,
-and `Macro` annotates `self.commands` with it.
 `Deposit` matches `UndoableCommand` with no base class.
-`run()` still calls each command with `()`, as it calls a function.
 
 Written the way `command_pattern.py` writes it,
 the *GoF Design Patterns* shape is a base class with two `raise NotImplementedError` bodies.
@@ -332,22 +329,14 @@ first_root(g, 0.0, 2.0, [bisection])
 **Give failure a reason.**
 `None` signals that a handler failed and carries no reason,
 so a handler that reports why it failed needs a failure value that holds the reason.
-`Failed` is that value, a record with one field.
-Each finder now returns `float | Failed`.
 
 **Report each way to fail.**
 A finder can have more than one way to fail,
 and each failing `return` states its own reason.
-`secant()` returns a `Failed` on a flat step,
-and `NO_CONVERGENCE` when its loop finishes `MAX_ITER` iterations.
 `bisection()` has one way to fail:
 it returns a `Failed` at once when `f` has the same sign at both ends of the interval.
 
 **Tell a root from a failure.**
-`first_root()` tells a root from a `Failed` with `match`.
-`case Failed(reason)` prints the reason and lets the loop continue.
-Any other value matches `case root`, which prints the root and returns it.
-
 The chapter's advice about the failure value still holds:
 `first_root()` checks the result's type, not its truthiness.
 A `Failed` is never a root, so `float | Failed` says which result is which.
@@ -729,7 +718,6 @@ For that event, `publish()` iterates over empty lists and returns.
 **Walk the MRO, most specific first.**
 `type(event).__mro__` lists the event's class first and `object` last,
 so iterating over it in order calls the most specific handlers first and the inherited ones after.
-That order meets the "parents last" requirement.
 
 **Look up handlers read-only.**
 `publish()` keeps using `.get()` for the same reason the chapter gives.
