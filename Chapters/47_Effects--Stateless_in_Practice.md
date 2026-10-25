@@ -160,8 +160,7 @@ shows.
 
 Now compare these two listings to `ask_tell.py` in [Effect Management](44_Effects--Effect_Management.md#effects-by-hand).
 The by-hand version puts two objects in every signature.
-The Stateless version threads nothing.
-`greet()` takes no arguments.
+In the Stateless version, `greet()` has an empty parameter list.
 The two Abilities appear in the return type, where a type checker verifies them.
 Python's signatures have no third part for Effects,
 so the return type carries them,
@@ -373,8 +372,8 @@ A clock from `at()` can report the parametrized reading one minute short of a da
 which a real clock cannot produce on demand.
 Against a real clock you must start the test at the right minute,
 but here the margin is a `timedelta`.
-No fixture patches `datetime`, nothing sleeps,
-and each assertion compares values the test chose.
+The tests leave `datetime` as the standard library defines it and run at full speed.
+Each assertion compares values the test chose.
 
 ### A Clock That Crosses Midnight
 
@@ -534,7 +533,7 @@ An `Outlet` request carries the hour so the handler can check which sources are 
 `Ask` carries a prompt for the same reason.
 
 `Source` carries no `@runtime_checkable`,
-because nothing calls `isinstance()` against it.
+because the listings use `Source` in annotations alone.
 `supply()` needs that decorator,
 because it [matches an instance to a requested class](46_Effects--Stateless.md#supplying-an-interface)
 with `isinstance()`.
@@ -682,7 +681,7 @@ which checks each source's `available()` at each request.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 swaps an implementation between runs.
 `microgrid.py` swaps one during a run.
-The consumer names no source, so nothing in it changes.
+The consumer names no source, so its code stays the same.
 
 ## State as an Ability
 
@@ -748,7 +747,7 @@ def ledger(cell: Cell) -> tuple[
 ```
 
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
-`Put` has `Tell`'s shape: payload out, nothing back.
+`Put` has `Tell`'s shape: payload out, `None` back.
 `purchase()`'s comparison sits between the two requests,
 in code that mentions no cell.
 
@@ -858,8 +857,8 @@ def research() -> Effect[
 
 The `research()` signature declares what the program needs and how it can fail.
 The signature is also the only place the three failures appear.
-The body requests each dependency by its type,
-and nothing in it mentions a network, a file, or a print.
+The body requests each dependency by its type and leaves the network, the files,
+and the printing to the implementations you supply.
 Calling `research()` performs no work.
 
 The three `@throws` functions are the pattern for bringing ordinary code in.
@@ -1136,7 +1135,8 @@ print(type(edge(Wire(""))).__name__)
 `latest()` raises it, and the `@throws` on `fetch()` lifts it.
 `Empty` originates here, in the generator,
 where the headline is available to inspect.
-No decorator takes part and nothing raises an exception.
+The generator yields that failure as a value rather than raising it,
+so no decorator takes part.
 `throw(Empty())` yields the failure the way `Ask(prompt)` yields a request,
 and the driver receives it.
 Execution stops there.
@@ -1231,7 +1231,7 @@ An unlifted failure propagates past it as it does past `catch()`.
 ## Dependencies That Need Dependencies
 
 `research()` asks for two things, and both are leaves.
-Nothing needs building before you can supply a `Feed` or an `Encyclopedia`.
+A `Feed` or an `Encyclopedia` is ready to supply as soon as you construct it.
 Real graphs nest.
 Toast needs bread and a toaster, and bread needs dough and an oven.
 
@@ -1288,7 +1288,8 @@ so `supply()` binds one instance of each.
 The loaf is a product.
 `bread()` is an Effect that produces a loaf,
 so `toast()` obtains one by writing `yield from bread()` rather than by asking for a `Need[Bread]`.
-Nothing supplies a loaf, because no loaf exists when `supply()` runs.
+The loaf stays out of `supply()`, because `bread()` bakes it later,
+while `run()` drives `toast()`.
 
 The signature carries the graph, flattened into a union.
 `toast()` declares all three leaves although its body requests one of them.
@@ -1487,7 +1488,7 @@ makes the same swap with one Ability rather than three.
 
 ### The Unmatched Cast
 
-The third run mixes the casts, and nothing reports it.
+The third run mixes the casts.
 The unmatched cast type-checks, and it runs.
 That is a loss compared with the *Abstract Factory*,
 whose purpose is families of matched products.
@@ -1616,7 +1617,7 @@ Read the trace before you use `retry()` on real code.
 Each attempt line is `Database.save()` running again,
 so the decorated function runs its whole body once per attempt.
 Retrying a charge or an append duplicates it.
-Nothing in the type says whether a retry is safe,
+Whether a retry is safe lies outside the type,
 because `Effect[A, E, R]` tracks what a function needs and how it fails,
 not whether running it twice means the same as running it once.
 That judgment stays with you.
@@ -1823,7 +1824,7 @@ Supplying a `ProcessPoolExecutor` moves the same work into processes.
 and `squares()` asks for the general one.
 
 The type checker enforces one restriction.
-A forked Effect must have nothing left to supply.
+A forked Effect must arrive fully supplied.
 `fork()`'s four overloads accept an Effect whose Ability channel holds `Never` or `Async`,
 and whose error channel holds `Never` or an exception type,
 because `fork()` runs the Effect with `run()` inside the worker.
@@ -1888,8 +1889,7 @@ rewriting the type that function declares:
 | `@throws(*E)` | Adds each `E` to the error channel |
 
 Three rows carry a caveat.
-`fork` needs a function whose Effect has nothing left to supply,
-so supply first, then fork.
+`fork` needs a fully supplied function, so supply first, then fork.
 `@throws` also accepts an ordinary function that raises exceptions,
 turning it into one that returns an Effect,
 so it is both an entry point and a transformation.
@@ -2250,8 +2250,8 @@ not a platform for building distributed systems.
 
 [Running Effects in Parallel](#running-effects-in-parallel)
 states the one restriction the type checker enforces on a forked function:
-nothing left to supply.
-The checker enforces nothing about how that function can fail.
+it must arrive fully supplied.
+The checker accepts whatever error channel that function declares.
 Two of `fork()`'s four overloads accept an Effect that still declares an error,
 and every one of the four returns a `Task` with no error type on it:
 
