@@ -202,9 +202,6 @@ expect(ValueError, slope, 10, -1)
 
 Catching the exception keeps `slope()`'s return type, `float`.
 But an `except` clause catches the exceptions it specifies and lets the rest propagate.
-`slope()`'s `except` specifies `ZeroDivisionError`.
-`validate()` raises `ValueError` for a negative `run`.
-The `try` around the `validate()` call lets `ValueError` propagate.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
 
@@ -338,11 +335,9 @@ for text in ["2", "0", "two"]:
 #: 'two': invalid literal for int() with base 10: 'two'
 ```
 
-`parse_run()` receives the bad input.
 `int()` rejects `"two"`,
 and `NonZero` rejects the `0` that `int()` returns for `"0"`,
 each with a `ValueError`.
-The `except` turns either one into an `Err` that `parse_run()`'s caller must unpack.
 The error type in `parse_run()`'s `Result` is `ValueError`,
 the one failure its caller can handle,
 rather than `@safe`'s catch-all `Exception`.
@@ -384,8 +379,6 @@ print(f"burned real CPU time for nothing: "
 #: burned real CPU time for nothing: True
 ```
 
-Both functions return `None` and touch nothing outside themselves,
-so a caller receives `None` from each.
 `compute_and_discard()` takes measurably longer,
 because Python runs every loop you write, worthless or not.
 A perfectly pure computation, followed to its logical end,
@@ -665,8 +658,7 @@ the set of Effects the function performs.
 A Koka function type has three parts: the parameter types, the Effect row,
 and the result type.
 The row sits between the other two.
-`ask` and `tell` become part of the type.
-In `ask_tell.py`, `greet()` receives them as parameters.
+In `ask_tell.py`, `greet()` receives `ask` and `tell` as parameters.
 Here the Effect row carries them, so the parameter list is empty.
 The `()` after the row is the return type: Koka's unit type,
 the counterpart of Python's `None`.
@@ -913,8 +905,6 @@ Effect.runPromise(greet.pipe(Effect.provide(Console)))
 
 Here `greet` reads as straight-line code because `Effect.gen` builds the description from a generator,
 and each `yield*` hands a sub-description to the library and receives its result back.
-The first two `yield*`s request the service objects from the environment,
-the objects the layers supplied, and the next two call their methods.
 Koka's `main()` reads a line with `readline()`.
 The `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
 close the interface,
