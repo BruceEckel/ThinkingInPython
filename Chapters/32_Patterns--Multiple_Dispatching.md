@@ -641,7 +641,7 @@ A direct call such as `Meters(3).__add__("four")` does return it.
 But the type checker also uses the annotation as the type of the `+` expression that calls `__add__()`,
 and no `+` expression evaluates to the sentinel.
 An annotation that names it fits the rare direct call and misdescribes every sum.
-Widening the return to `Any` describes nothing and turns off checking for every caller.
+Widening the return to `Any` tells the type checker that a sum can be any type and turns off checking for every caller.
 
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
 builds the expression system that opens this chapter,
