@@ -626,7 +626,7 @@ Each of the two rats acts on its `True` as if it alone held the shared cell.
 Both move into it.
 That overlap breaks the invariant of one rat per cell.
 The extra `True` sends the second rat into a cell another rat has claimed,
-so the second rat explores nothing new.
+so the second rat repeats the first rat's move.
 Here the shared cell is `(5, 5)`, where the loop closes,
 so both rats find every neighbor claimed and dead-end there.
 
@@ -1271,7 +1271,7 @@ not approximately zero.
 **Confirm that every grain stays put.**
 A zero field means a zero kick.
 `step()` scales each grain's random displacement by the amplitude under that grain,
-so `uniform(-kick, kick) * 0.0` moves nothing.
+so `uniform(-kick, kick) * 0.0` comes to zero and leaves each grain where it is.
 The view shows neither chaos nor a figure because no grain moves.
 It shows the initial random scatter, frozen.
 
