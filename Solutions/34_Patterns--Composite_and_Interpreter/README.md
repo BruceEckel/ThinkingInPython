@@ -1046,7 +1046,7 @@ If you guard the reflected methods and leave `__add__()` and `__mul__()` as the 
 `"a" + x` raises its `TypeError`, but `x + "a"` succeeds.
 `wrap()` passes the string through,
 so `x + "a"` returns `Add(left=Var(name='x'), right='a')`,
-and the listing's second `expected()` block prints nothing.
+and the listing's second `expected()` block exits normally and stays silent.
 The solution guards all four methods,
 since an expression that starts with `x` reaches a forward method first.
 
@@ -1477,8 +1477,8 @@ so it fails before reaching the bottom.
 The recursive `evaluate()` combines two values when its two calls return.
 A stack version must arrange that moment explicitly.
 A loop that pushes children and pops them gives a pre-order walk.
-That walk visits every node and combines nothing,
-because an `Add` combines its children's values after the children have produced them.
+That walk reaches each `Add` before its children,
+but an `Add` combines its children's values after the children have produced them.
 The solution stacks the pending operation behind its own children.
 `work += [Op.ADD, right, left]` puts `Op.ADD` deepest, so it comes off last,
 by which point the two values it needs are on `values`.
