@@ -127,8 +127,7 @@ You can say why `os.getpid()` cannot tell the pool's workers apart.
 <details>
 <summary>Solution</summary>
 
-The listing swaps the executor and trims the previous exercise's program.
-It drops the serial comparison and the core count,
+The listing drops the serial comparison and the core count,
 since the question concerns the IDs.
 It also uses the twenty-times-smaller limits from the end of that exercise,
 which keep the run short.
@@ -367,10 +366,8 @@ def test_upper_leaves_the_micro_sign_in_the_greek_block(
 **Trace the round trip.**
 `µ` is U+00B5 MICRO SIGN,
 a character Latin-1 kept separate from the Greek letter it resembles.
-`µ` is lowercase, so `.lower()` returns the same character.
-But it has no uppercase form of its own,
+It has no uppercase form of its own,
 so `.upper()` maps it to U+039C GREEK CAPITAL LETTER MU.
-Lowering that gives U+03BC GREEK SMALL LETTER MU.
 The round trip ends in a different Unicode block from the one where it started.
 
 Unicode case mapping is not a pair of inverse functions.
@@ -666,8 +663,6 @@ The substitution that breaks `stale()` is replacing a call with the answer it ju
 `made` is midnight on 1 January 2020,
 and on that day `stale(made, timedelta(hours=12))` returns `False` at 11:00 and `True` at 13:00,
 so writing down `False` and substituting it changes the program the moment the clock passes noon.
-The signature declares no time parameter,
-because `stale()` reads the clock through `datetime.now()`.
 
 **Take a setting without declaring it.**
 `timeout()` breaks the same way.
@@ -683,9 +678,7 @@ No argument list records the dependency.
 The repair is the same for `stale()` and `timeout()`,
 and it is the one [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
 describes: pass the implementation in as a parameter.
-`stale_pure()` takes the current time,
-and `timeout_pure()` takes the mapping to read.
-Both are now referentially transparent,
+`stale_pure()` and `timeout_pure()` are now referentially transparent,
 and both are testable without a clock or a monkeypatched environment.
 The read of the real clock or the real `os.environ` moves out of the middle of the program into one line at its edge,
 in the caller.
