@@ -568,8 +568,8 @@ for value in [1, 2, 3, 4]:
 
 `both()` declares the same yield and send types as `collect()`,
 because `yield from` passes the inner generator's yield and send channels through to the driver.
-The return value goes to `both()` instead of the driver.
-Each `yield from` evaluates to the sum that `collect()` returns,
+The value `collect()` returns goes to `both()` instead of the driver.
+Each `yield from` evaluates to that sum,
 as `yield from emit()` evaluates to `12` in `report()`.
 `both()` returns `None`, the default for a `Generator`'s third type parameter.
 
