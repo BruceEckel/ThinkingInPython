@@ -288,7 +288,7 @@ a different design, a detail, or an equivalent alternative.
 > Apply *Subtraction* to a design of your own.
 > Remove one class, one interface, or one level of inheritance,
 > and say what stopped working.
-> If nothing did, leave it out.
+> If everything still works, leave it out.
 
 <details>
 <summary>Where to look</summary>
@@ -298,7 +298,7 @@ states *Subtraction*:
 a design is complete when you cannot take anything else away.
 Use *Subtraction* as a test: take one thing away and run the program.
 Choose a class or a level of inheritance that holds a single method and no state.
-If nothing breaks, the piece you removed is supporting code.
+If everything still works, the piece you removed is supporting code.
 If something breaks, you have found the part that expresses the design's intent.
 
 <details>
@@ -332,7 +332,7 @@ def checkout(weight: float, shipping: Shipping) -> float:
 
 you have removed one piece, run the program and `uv run ty check`,
 and written down what changed in the output and in the requirement the program meets.
-If nothing changed, you can say what the removed piece wrapped;
+If both stayed the same, you can say what the removed piece wrapped;
 if something broke, you can name the requirement that piece expresses.
 
 <details>
@@ -371,7 +371,7 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 If you remove the abstract base and turn both subclasses into functions,
 you have exercise 2's version.
 What stops working?
-Nothing.
+Everything still works.
 The numbers are identical,
 the type checker still rejects a wrongly shaped argument,
 and adding a third rule is still one new definition.
@@ -389,11 +389,11 @@ Charging by weight now means editing `checkout()`.
 The parameter is the last piece that expresses the design's intent,
 so removing it removes the design rather than its supporting code.
 
-Both outcomes are the exercise working correctly: a removal that broke nothing,
-and one that broke the requirement.
+Both outcomes are the exercise working correctly:
+a removal that kept the requirement, and one that broke the requirement.
 *Subtraction* is a test you run, not a rule to remove as much as you can.
 Take something away, run the program, and read the result.
-If nothing breaks, the piece is supporting code.
+If everything still works, the piece is supporting code.
 If something breaks, the piece you removed expresses the design.
 Keep it, and give it a name.
 
