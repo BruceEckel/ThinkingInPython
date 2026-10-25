@@ -49,7 +49,8 @@ The first import of `config` (`[1]`)
 creates a new module object and stores it in `sys.modules` under the name `config`.
 Then Python runs `config.py` top to bottom,
 defining each module-level name in that module object.
-The second import (`[2]`) finds the entry and runs nothing,
+The second import (`[2]`)
+finds the entry and binds `again` to the stored module,
 so the body runs once and builds one `settings` dict.
 The singleton here is not a rule a class enforces,
 but a lookup the import system performs.
@@ -184,7 +185,7 @@ or accept that you built a cache, not a singleton.
 
 A caller can write `Settings()` and get a second instance.
 Naming the class `_Settings` marks it internal and keeps it out of `from module import *`.
-Python enforces nothing more.
+Any caller can still import `_Settings` by name and call it.
 
 A second underscore adds no protection.
 The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
@@ -215,7 +216,7 @@ and `@cache` runs that body once.
 Nesting also breaks the return annotation.
 `def settings() -> Settings` still parses and runs,
 because an annotation evaluates only when something reads it.
-A clean run therefore proves nothing about the name.
+A clean run therefore leaves the name untested.
 Any code that reads the annotation searches the scope containing the function,
 while the class lives in the function's own locals.
 A type checker reports an unresolved reference,
@@ -764,7 +765,7 @@ and namespace to its [metaclass](17_Techniques--Metaprogramming.md#writing-a-met
 and Python takes that metaclass from the type of the base, which is `singleton`.
 Calling `singleton` with those three passes four positional arguments to `singleton.__init__()`,
 which takes two.
-Nothing in `class Sub(Registry)` mentions `singleton`,
+The line `class Sub(Registry)` names `Sub` and `Registry`,
 so the error names a class that does not appear in the failing line.
 The class decorator causes that confusion.
 
