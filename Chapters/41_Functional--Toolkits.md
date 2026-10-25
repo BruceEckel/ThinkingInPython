@@ -54,7 +54,7 @@ and `math.prod()` covers multiplication.
 `reduce()` is the tool for every other fold, such as this dictionary union.
 
 On an empty iterable `reduce()` raises `TypeError: reduce() of empty iterable with no initial value`,
-because it has nothing to return.
+because it needs an item or a starting value to return.
 The third argument, `{}` in the listing, supplies a starting value,
 so `reduce(or_, [], {})` returns `{}`.
 Since Python 3.14 you can pass the starting value by keyword,
@@ -995,7 +995,7 @@ gets a decorator rather than a rewrite as a loop.
 The recursion states the definition, and the cache removes the repetition.
 
 A tree walk branches too, but each subproblem occurs once,
-so a cache saves nothing.
+so a cache would miss on every call.
 The reason to recurse there is shape.
 Code that walks a tree, nested data,
 or a directory can call itself once for each nested level,
