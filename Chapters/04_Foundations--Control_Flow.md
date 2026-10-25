@@ -323,8 +323,9 @@ so `if n := len(text) > 3:` gives `n` the result of the comparison, `True`,
 and not the length.
 
 The walrus helps most in a `while` loop.
-The walrus also moves the fetch and the test in `while_true.py` into that loop's header:
-`while (value := values.pop(0)) != 0:`.
+In `while_true.py` it moves the fetch and the test into the loop's header,
+`while (value := values.pop(0)) != 0:`,
+so `value` holds the popped item when the body starts.
 
 A [comprehension](#comprehensions)
 can use `:=` to name a value in its `if` clause and reuse it in the result.

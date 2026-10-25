@@ -1018,6 +1018,8 @@ asyncio.run(main())
 
 Two equally polite tasks make no progress,
 although the event loop keeps both tasks busy the whole time.
+Each round, both tasks find the other still wanting the resource,
+so both give and neither clears its entry in `wants`.
 A real livelock repeats these rounds forever.
 `range(3)` stops the listing after three rounds so it can report `resolved: False`.
 

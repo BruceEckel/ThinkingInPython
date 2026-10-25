@@ -734,6 +734,8 @@ with expected(CycleError):
 ```
 
 `core` appears once, although both `ui` and `db` depend on it.
+Pointing `core` back at `app` closes a loop,
+and `static_order()` reports the loop as a `CycleError` instead of guessing an order.
 
 A build that runs targets in parallel calls `prepare()` once,
 then alternates `get_ready()` and `done()` in place of `static_order()`.
