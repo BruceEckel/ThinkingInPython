@@ -29,10 +29,8 @@ Chapters/18_Techniques--Performance.md	[R32] CODE packs them into one contiguous
 Chapters/18_Techniques--Performance.md	[R32] Frozen blocks every attribute assignment, new fields included, so a frozen instance cannot gain attributes, the same restriction CODE gives you
 Chapters/18_Techniques--Performance.md	[R35] Each timing includes the cost of calling the lambda
 Chapters/18_Techniques--Performance.md	[R35] The size comparison shows the cost of boxing
-Chapters/19_Techniques--Concurrency.md	[R32] CODE returns CODE and CODE, the same as in a clean run
 Chapters/19_Techniques--Concurrency.md	[R32] CODE sends each order to a worker process and gathers the results in order, printing CODE, the same prices CODE prints
 Chapters/19_Techniques--Concurrency.md	[R32] Guard it with CODE, the same fix CODE gives threads
-Chapters/19_Techniques--Concurrency.md	[R32] The change from CODE is the CODE block wrapped around the read-modify-write, plus the CODE import, the module-level CODE, and a final line that prints the count, the same line CODE prints
 Chapters/20_Patterns--Rethinking_Objects.md	[R32] At runtime, CODE prints CODE, the same as CODE
 Chapters/20_Patterns--Rethinking_Objects.md	[R35] This trade-off is the expression problem
 Chapters/21_Patterns--Design_Patterns.md	[R35] *Command*, *Observer*, *Mediator*, and *Chain of Responsibility* each decouple a sender from a receiver, "but with different trade-offs
@@ -43,7 +41,6 @@ Chapters/30_Patterns--Observer.md	[R32] For CODE, which exists to record every r
 Chapters/30_Patterns--Observer.md	[R32] The window looks the same, but the canvas's list of items grows with every notification, the same quiet accumulation as a lapsed listener
 Chapters/31_Patterns--State_Machines.md	[R32] If you swap the rule order, the same input reports CODE
 Chapters/38_Patterns--Simulation.md	[R32] CODE numbers the frames, the same endless counter that numbered the rats
-Chapters/41_Functional--Toolkits.md	[R32] Called with CODE, the same function schedules trios
 Chapters/41_Functional--Toolkits.md	[R32] The Cartesian product of the input iterables, the same pairs a nested CODE loop builds
 Chapters/42_Functional--Error_Handling.md	[R32] Written with exceptions and one CODE at the top, the same composition is shorter
 Chapters/45_Effects--Generators.md	[R32] A coroutine's annotation is CODE, the same three-part shape as a CODE
@@ -62,7 +59,6 @@ Solutions/19_Techniques--Concurrency/README.md	[R32] The peak falls from CODE to
 Solutions/20_Patterns--Rethinking_Objects/README.md	[R32] CODE supplies the CODE shape for CODE, the same way CODE supplies it for CODE
 Solutions/26_Patterns--Factory/README.md	[R32] CODE then prints CODE, the same list as CODE
 Solutions/29_Patterns--Changing_the_Interface/README.md	[R32] CODE is CODE from CODE, unchanged
-Solutions/29_Patterns--Changing_the_Interface/README.md	[R32] The adapter adds the one method the caller needs, CODE, and forwards everything else to the wrapped list through CODE, the same shape as CODE
 Solutions/30_Patterns--Observer/README.md	[R32] The protocol here is the one from CODE, unchanged
 Solutions/31_Patterns--State_Machines/README.md	[R35] The chapter's Table-Driven *State Machine* section makes the same trade-off over the per-state CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[R32] Sixteen entries cover the four types against each other (4 × 4), the same shape as the original nine (3 × 3)

@@ -27,7 +27,6 @@ Chapters/30_Patterns--Observer.md	[PASSIVE] is connected: A CODE that is still c
 Chapters/30_Patterns--Observer.md	[PASSIVE] is decoupled: A broadcaster that receives its responders at construction is decoupled but not dynamic:
 Chapters/35_Patterns--Flyweight.md	[PASSIVE] is called: A pool of singletons keyed this way is sometimes called *Multiton*.
 Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: That name is now bound to CODE.
-Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: The dump that builds CODE runs while CODE is bound to the one-field class.
 Chapters/40_Functional--Foundations.md	[PASSIVE] is associated: The runtime message names a local variable instead of the missing declaration: "cannot access local variable 'count' where it is not associated with a value."
 Chapters/44_Effects--Effect_Management.md	[PASSIVE] is delayed: The connection between the declaration and its supply is *delayed binding*.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
@@ -37,7 +36,6 @@ Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] is prepackaged: CODE is 
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the run prints CODE, and you can say which slot the surviving CODE occupies and why the loop skipped it.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the swapped CODE prints CODE, and you can say what a single value of CODE would have to do for the order of the two CODE blocks to change the output.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the traceback shows CODE above CODE, and printing the classes of CODE and CODE names two different exceptions: the one you constructed and CODE.
-Solutions/05_Foundations--Functions/README.md	[PASSIVE] is associated: ** CODE raises `UnboundLocalError: cannot access local variable 'count' where it is not associated with a value`.
 Solutions/08_Foundations--Static_Types/README.md	[PASSIVE] is defined: If you name CODE's method CODE, as the chapter's CODE does, CODE rejects CODE with an CODE, reporting that protocol member CODE is not defined on type CODE.
 Solutions/10_Foundations--Cleanup/README.md	[PASSIVE] is gone: You can say what makes the collector run once CODE is gone, and why the explicit CODE still keeps this run's transcript the same.
 Solutions/15_Techniques--Context_Managers/README.md	[PASSIVE] sits nested: CODE's whole lifetime, enter and exit, sits nested inside CODE's lifetime.

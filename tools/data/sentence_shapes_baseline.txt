@@ -9,7 +9,6 @@
 # `tip sentence-shapes` before accepting.
 # See tools/sentence_shapes.py.
 Chapters/01_Introduction.md	[COLON+AND] The next chapter introduces the design-patterns movement, and the question I keep asking through the rest of the part: what problem are you solving, and does the language already do the pattern's job?
-Chapters/12_Techniques--Data_Classes_as_Types.md	[COLON+AND] The member keeps everything an enum member has: CODE looks CODE up by value, CODE holds the tuple, and CODE counts four members.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[IMP] Every method that changes it must re-validate, and a method can leave the object in an illegal state between steps:
 Chapters/17_Techniques--Metaprogramming.md	[COLON+AND] The rest of CODE is presentation: how it formats what CODE reports, and which members it shows.
 Chapters/17_Techniques--Metaprogramming.md	[IMP] Using CODE directly, build a class CODE with a base of CODE, an attribute CODE, and a method CODE returning CODE.
@@ -24,13 +23,11 @@ Chapters/44_Effects--Effect_Management.md	[COLON+AND] Write the production bindi
 Chapters/46_Effects--Stateless.md	[IMP] Explain what each one catches, and why the checker catches assigning a dropped request but not discarding one.
 Chapters/47_Effects--Stateless_in_Practice.md	[IMP] Explain what the types claim, what the run does, and which line restores the guarantee.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[IMP] Compare what CODE and CODE put there.
-Solutions/11_Techniques--Testing/README.md	[COLON+AND] CODE fails with `AttributeError: <module 'ch11_weather' from '...'> has no attribute 'urlopen'`, because CODE looks the name up by string and the string is now wrong.
 Solutions/17_Techniques--Metaprogramming/README.md	[COLON+AND] The prediction: CODE builds cleanly, and CODE holds CODE alone, so CODE stays out.
 Solutions/17_Techniques--Metaprogramming/README.md	[IMP] Then consider what CODE does to a parameter, and print CODE to check your prediction.
 Solutions/18_Techniques--Performance/README.md	[IMP] on a list such as CODE, CODE and CODE return CODE and CODE for the value CODE, and the slice between those indices is CODE.
 Solutions/19_Techniques--Concurrency/README.md	[IMP] Compare each task's delay with the moment CODE and CODE fail to decide which tasks are still running when cancellation starts.
 Solutions/22_Patterns--Iterators/README.md	[IMP] For the explanation, consider what a generator keeps between calls to CODE, and what CODE would have to do to learn a count.
-Solutions/23_Patterns--Singleton/README.md	[COLON+AND] Externally the behavior stays the same: CODE accumulates the same way, CODE is still CODE, and CODE is still CODE.
 Solutions/30_Patterns--Observer/README.md	[COLON+AND] your test passes against your CODE: the first responder raises an exception, CODE raises an CODE holding it, and the second responder has recorded the value.
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[IMP] To let a subclass share its parent's bin, give CODE a class variable that holds the bin's key, and have CODE default that variable for each class.
 Solutions/38_Patterns--Simulation/README.md	[IMP] Make CODE return values from an iterator you script, and have CODE append to a list.

@@ -32,14 +32,10 @@ Chapters/28_Patterns--Data_Transfer_Objects.md	The *Messenger* passes a package 
 Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
 Chapters/30_Patterns--Observer.md	decides which changes it acts on
 Chapters/30_Patterns--Observer.md	set before CODE and cleared after
-Chapters/31_Patterns--State_Machines.md	and the state after
-Chapters/31_Patterns--State_Machines.md	the state before
 Chapters/38_Patterns--Simulation.md	The teleports are not shortcuts but the only way through
 Chapters/38_Patterns--Simulation.md	a single robot walks a maze where each object it meets decides which room the robot ends up in
 Chapters/41_Functional--Toolkits.md	CODE saves each element the first time through
-Chapters/46_Effects--Stateless.md	CODE puts an instance in
 Chapters/46_Effects--Stateless.md	The DI registration key also sets the type an instance answers for
-Chapters/47_Effects--Stateless_in_Practice.md	Two purchases went through
 Chapters/47_Effects--Stateless_in_Practice.md	building a fresh event loop for the call and tearing it down after
 Chapters/a.md	Name the field they sit on
 Solutions/02_Foundations--Tour/README.md	CODE changes the literal text and passes each value through
@@ -51,7 +47,6 @@ Solutions/14_Techniques--Decorators/README.md	so work out which layer prints bef
 Solutions/16_Techniques--Comprehensions/README.md	Stopping there leaves the generator part-way through
 Solutions/18_Techniques--Performance/README.md	one machine measured CODE about 20% faster with the JIT on
 Solutions/21_Patterns--Design_Patterns/README.md	a CODE to pass in
-Solutions/22_Patterns--Iterators/README.md	before iterating or after
 Solutions/27_Patterns--Function_Objects/README.md	now receives more events than before
 Solutions/27_Patterns--Function_Objects/README.md	so iterating over it in order calls the most specific handlers first and the inherited ones after
 Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds no behavior to a call that goes through

@@ -8,7 +8,6 @@
 # `tip subject-gap-accept`; read the delta with `tip subject-gap`
 # before accepting.
 # See tools/subject_gap.py.
-Chapters/02_Foundations--Tour.md	[appos,cc,prep] statements .. stays: An indented block groups statements inside the enclosing scope, so CODE, assigned inside the CODE, stays visible afterward.
 Chapters/02_Foundations--Tour.md	[cc,conj] CODE .. explain: Print CODE and CODE and confirm that CODE changed and CODE still holds CODE, then explain why CODE earlier changed the list bound to CODE, but appending to CODE does not.
 Chapters/05_Foundations--Functions.md	[cc,relcl] function .. does: A function that finishes without a CODE returns CODE, and so does a bare CODE.
 Chapters/06_Foundations--Modules_and_Packages.md	[appos,cc,conj,prep] Windows .. name: Windows and macOS default to case-insensitive filesystems, so CODE and CODE name the same file there.
@@ -25,7 +24,6 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	[prep,relcl] type .. is: A type
 Chapters/14_Techniques--Decorators.md	[prep] CODE .. is: CODE above a bare assignment, or above a CODE alias, is a syntax error rather than a decorator applied to something unusual.
 Chapters/15_Techniques--Context_Managers.md	[prep] defaults .. catch: The constructor's CODE parameter defaults to the CODE sentinel, which makes CODE with no argument catch everything.
 Chapters/16_Techniques--Comprehensions.md	[relcl] CODE .. deletes: That consumer is CODE, which runs after the CODE block exits and the context manager deletes the directory.
-Chapters/17_Techniques--Metaprogramming.md	[advmod,prep] stores .. returns: CODE stores CODE under the key CODE in the CODE of CODE, then returns CODE unchanged.
 Chapters/17_Techniques--Metaprogramming.md	[cc,conj] registry .. needs: A registry or a decorator that keys on a name usually needs the qualified one, combined with CODE.
 Chapters/17_Techniques--Metaprogramming.md	[relcl] body .. dict: Here, CODE holds that class body, which is easier to read and modify than a namespace dict:
 Chapters/18_Techniques--Performance.md	[prep] CODE .. repeat: Time CODE against CODE in a loop for 10,000 short strings, then repeat at 100 strings.
@@ -53,7 +51,6 @@ Chapters/34_Patterns--Composite_and_Interpreter.md	[relcl] build .. alternates: 
 Chapters/40_Functional--Foundations.md	[appos,prep,relcl] Five .. requires: Five of the chapter's ideas work at once: a record for the value, CODE to state that CODE leaves its input unchanged, two pure functions, CODE to turn a two-argument predicate into the one-argument callable CODE requires, and CODE and CODE for the traversal.
 Chapters/40_Functional--Foundations.md	[conj] key .. is: Contents-based equality together with a stable hash is why a dictionary key, a cache entry, or a value shared across threads is normally a tuple or a record.
 Chapters/41_Functional--Toolkits.md	[relcl] CODE .. calls: The CODE that CODE supplies for CODE calls your CODE, then calls CODE too when CODE returns CODE.
-Chapters/42_Functional--Error_Handling.md	[prep] CODE .. become: A CODE from a bad number and a CODE from dividing by zero each become the CODE field of an ordinary CODE.
 Chapters/42_Functional--Error_Handling.md	[prep] prints .. paths: The listing prints with CODE, which renders the message and the notes and leaves out the file paths a full traceback carries.
 Chapters/44_Effects--Effect_Management.md	[prep] Which .. applies: Which of the three conversions from Converting Effectful to Pure applies to the exceptions, and which technique from Effects by Hand applies to the rest?
 Chapters/46_Effects--Stateless.md	[advmod,cc,conj] one .. believes: Then declare a second Ability and request that one too, and report which requests your handler answered at runtime and which ones the type checker believes it answered.
@@ -72,7 +69,6 @@ Solutions/14_Techniques--Decorators/README.md	[relcl] function .. returns: under
 Solutions/15_Techniques--Context_Managers/README.md	[appos,prep] prints .. matching: your edited CODE prints CODE, CODE, CODE before the body line and CODE, CODE, CODE after it, matching the closing order you predicted before running it.
 Solutions/16_Techniques--Comprehensions/README.md	[appos,prep] prints .. passes: your version prints CODE through CODE, then a list of three usable values in place of CODE, and CODE passes on your file.
 Solutions/23_Patterns--Singleton/README.md	[relcl] subclass .. gets: A subclass that binds its own CODE in its class body gets separate storage.
-Solutions/28_Patterns--Data_Transfer_Objects/README.md	[appos,prep] Classes .. makes: [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values) makes CODE the place to check each value the JSON decoder produces.
 Solutions/30_Patterns--Observer/README.md	[cc,prep,relcl] responder .. reports: A responder in a module that nothing imports does not run, and nothing reports its absence.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[advmod,dep,dobj] Count .. rows: Count the methods you wrote, then compare with the seven dictionary rows the table version needs.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[acl] type .. adds: a node type written below your existing classes, with none of them edited, adds its share to CODE for a directory that holds it, and CODE passes.
@@ -84,7 +80,7 @@ Solutions/36_Patterns--Memento/README.md	[cc,conj,relcl] Class .. shows: A Class
 Solutions/36_Patterns--Memento/README.md	[npadvmod,prep] Test .. holds: Test each by saving first, erasing, then checking the earlier state still holds both strokes.
 Solutions/42_Functional--Error_Handling/README.md	[appos,cc,conj] prints .. is: for the input that CODE rejects, your run prints the CODE from CODE and the later step's trace line is missing, while every input that passes CODE still prints that line.
 Solutions/43_Functional--Confidence/README.md	[prep] answer .. is: By that rule, the answer for a roster of two and a size of five is one group of two.
-Solutions/45_Effects--Generators/README.md	[cc,conj,prep] definitions .. is: Three CODE definitions over CODE, CODE, and CODE keep the two integer channels apart, so transposing the CODE and the CODE is a type checker error.
+Solutions/45_Effects--Generators/README.md	[cc,conj,prep] definitions .. is: ** Three CODE definitions over CODE, CODE, and CODE keep the two integer channels apart, so transposing the CODE and the CODE is a type checker error.
 Solutions/46_Effects--Stateless/README.md	[acl,relcl] caller .. draws: A caller that hands CODE to CODE with no CODE supplied draws an CODE.
 Solutions/46_Effects--Stateless/README.md	[appos,dobj,npadvmod] passes .. print: your four passes print CODE and CODE three times: the first pass over the stored Effects prints them, the second prints nothing, and both passes over the functions print them.
 Solutions/46_Effects--Stateless/README.md	[cc,conj,prep] split .. applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.

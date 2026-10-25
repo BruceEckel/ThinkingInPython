@@ -46,7 +46,6 @@ Chapters/13_Techniques--Pattern_Matching.md	[PAST] read: Run CODE before adding 
 Chapters/14_Techniques--Decorators.md	[PAST] let: The annotations let the type checker report the mistake either way, at the decoration rather than at the call.
 Chapters/14_Techniques--Decorators.md	[PAST] looked: A decorator looked up by subscript, as in CODE, was a syntax error.
 Chapters/14_Techniques--Decorators.md	[PAST] re: Write a CODE decorator in the function form that calls the wrapped function again when it raises an exception, up to CODE attempts, and re-raises the last exception when they all fail.
-Chapters/14_Techniques--Decorators.md	[PAST] read: The trace lines read CODE and print CODE.
 Chapters/14_Techniques--Decorators.md	[PAST] was: A decorator looked up by subscript, as in CODE, was a syntax error.
 Chapters/15_Techniques--Context_Managers.md	[PAST] finished: Call the manager's CODE, however the block finished.
 Chapters/15_Techniques--Context_Managers.md	[PAST] included: Without the CODE/CODE, that exception leaves the generator at once, so the code after the CODE, CODE included, never runs.
@@ -72,7 +71,6 @@ Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the
 Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the hoisted version five percent slower, another twenty.
 Chapters/18_Techniques--Performance.md	[PAST] measured: One machine measured the vectorized pass at about 11x faster than the loop.
 Chapters/18_Techniques--Performance.md	[PAST] measured: The CODE holds an 8-byte pointer to a 24-byte CODE object per element, while the CODE uses 8 bytes per element total, roughly a four-to-one difference (one machine measured 325,176 bytes against 80,080).
-Chapters/18_Techniques--Performance.md	[PAST] ran: CODE ran 242,785 times for the same answer.
 Chapters/18_Techniques--Performance.md	[PAST] ran: CODE ran a thousand times.
 Chapters/18_Techniques--Performance.md	[PAST] ran: The callback ran for it once.
 Chapters/18_Techniques--Performance.md	[PAST] set: A million suits a microsecond snippet and is a long wait for anything slower, so always set CODE for a function you are timing for the first time.
@@ -81,7 +79,6 @@ Chapters/18_Techniques--Performance.md	[PAST] was: LLVM 19 had capped its tail-d
 Chapters/18_Techniques--Performance.md	[PAST] was: With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
 Chapters/19_Techniques--Concurrency.md	[PAST] adopted: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency.
 Chapters/19_Techniques--Concurrency.md	[PAST] appeared: Attempts kept failing to meet it, so workarounds appeared instead.
-Chapters/19_Techniques--Concurrency.md	[PAST] awaited: Five awaited sleeps finish together in about the time of one.
 Chapters/19_Techniques--Concurrency.md	[PAST] came: Later came a finer-grained unit of scheduling that lives inside a program: the *thread of execution*.
 Chapters/19_Techniques--Concurrency.md	[PAST] changed: The second changed who schedules parallel work.
 Chapters/19_Techniques--Concurrency.md	[PAST] distributed: Threads already distributed computing resources, so more CPUs simply meant more resources to distribute (of course, it wasn't quite that easy).
@@ -184,7 +181,6 @@ Chapters/38_Patterns--Simulation.md	[PAST] claimed: CODE is a set, so a cell cla
 Chapters/38_Patterns--Simulation.md	[PAST] drew: In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
 Chapters/38_Patterns--Simulation.md	[PAST] made: The bow made the plate ring.
 Chapters/38_Patterns--Simulation.md	[PAST] read: Independent agents read from and write to one common data structure instead of calling each other's methods.
-Chapters/38_Patterns--Simulation.md	[PAST] rejected: CODE tallies every CODE rejected on an open cell.
 Chapters/38_Patterns--Simulation.md	[PAST] sprinkled: In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
 Chapters/38_Patterns--Simulation.md	[PAST] steered: Nothing steered them there.
 Chapters/38_Patterns--Simulation.md	[PAST] wrote: Jeremy Meyer wrote the original Java version of this example.
@@ -192,8 +188,7 @@ Chapters/41_Functional--Toolkits.md	[PAST] consumed: CODE consumed the CODE on i
 Chapters/41_Functional--Toolkits.md	[PAST] discarded: CODE consumed the CODE on its way to the stop index and discarded it.
 Chapters/41_Functional--Toolkits.md	[PAST] found: CODE's first parameter is CODE, so CODE draws CODE: expected CODE, found CODE.
 Chapters/41_Functional--Toolkits.md	[PAST] kept: CODE is CODE with the intermediate results kept.
-Chapters/41_Functional--Toolkits.md	[PAST] was: CODE was the first value computed, so that miss proves the cache evicted it.
-Chapters/42_Functional--Error_Handling.md	[PAST] parameterized: CODE and CODE are both records, CODE parameterized over the answer type and CODE over the error type.
+Chapters/41_Functional--Toolkits.md	[PAST] was: CODE was the first value computed, so the fourth miss, at CODE, proves the cache evicted it.
 Chapters/42_Functional--Error_Handling.md	[PAST] read: An exception from someone else's code may carry no notes, so read CODE with CODE.
 Chapters/42_Functional--Error_Handling.md	[PAST] read: The CODE branch reads CODE, and that read type-checks.
 Chapters/43_Functional--Confidence.md	[PAST] bound: Each test checks a single input against a single answer, so the examples you invent bound what you learn.
@@ -232,10 +227,8 @@ Chapters/47_Effects--Stateless_in_Practice.md	[PAST] got: Python got one Effect 
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] left: An CODE in a revealed type means CODE left the subtraction unfinished.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] put: Add a wind turbine to CODE that is available only during a set windy stretch of the evening, put it between solar and the battery in the CODE order, and confirm CODE needs no change.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] raised: Add a fourth failure to CODE: a CODE raised when an article exceeds some length.
-Chapters/47_Effects--Stateless_in_Practice.md	[PAST] remained: Two purchases went through, and 10 remained.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] spread: The pipeline is in there, spread across three CODE blocks.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] was: Each was a class with a method per product.
-Chapters/47_Effects--Stateless_in_Practice.md	[PAST] went: Two purchases went through, and 10 remained.
 Chapters/A_Effect_Tracking.md	[PAST] delayed: Stateless gets tracking, interface separation, and delayed binding with no new tool.
 Chapters/A_Effect_Tracking.md	[PAST] put: Stateless and ZIO put their rows in the return type too.
 Chapters/B_An_Effect_Checker.md	[PAST] called: CODE called CODE inside a comprehension, and now calls CODE.
@@ -244,6 +237,7 @@ Chapters/B_An_Effect_Checker.md	[PAST] included: A key is an CODE pattern, the w
 Chapters/B_An_Effect_Checker.md	[PAST] passed: A function passed as an argument.
 Chapters/B_An_Effect_Checker.md	[PAST] required: The tool required all four.
 Chapters/B_An_Effect_Checker.md	[PAST] took: Reaching that output took four changes to the checker's own code.
+Solutions/02_Foundations--Tour/README.md	[PAST] included: CODE always shows two digits after the decimal point, a trailing zero included.
 Solutions/03_Foundations--Containers/README.md	[PAST] stored: Reading CODE earlier stored that CODE under CODE.
 Solutions/04_Foundations--Control_Flow/README.md	[PAST] split: Call CODE on the CODE and split the result into lines.
 Solutions/05_Foundations--Functions/README.md	[PAST] arrived: If the output shows CODE, the dictionary arrived as one more positional argument.
@@ -258,12 +252,10 @@ Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote
 Solutions/07_Foundations--Classes/README.md	[PAST] removed: With the decorator removed, CODE prints CODE.
 Solutions/08_Foundations--Static_Types/README.md	[PAST] found: before the widening, CODE reports CODE on the CODE call with CODEExpected CODE, found CODE CODE.
 Solutions/08_Foundations--Static_Types/README.md	[PAST] found: with the comment removed, CODE reports CODE on CODE, marking CODE with CODEExpected CODE, found CODE CODE, and you can say what CODE returns at run time.
-Solutions/08_Foundations--Static_Types/README.md	[PAST] inferred: CODE mirrors CODE: one type parameter CODE, inferred from the CODE the caller passes.
 Solutions/09_Foundations--Class_Attributes/README.md	[PAST-HEADING] shared: A mutable CODE shared down the hierarchy
 Solutions/09_Foundations--Class_Attributes/README.md	[PAST] declared: Combined, the mutable value and the inheritance lookup produce one list, declared on the base class, that every subclass mutates under its own name.
 Solutions/09_Foundations--Class_Attributes/README.md	[PAST] gave: The line CODE gave CODE its own instance attribute, and that attribute shadows the class attribute when you read CODE.
-Solutions/09_Foundations--Class_Attributes/README.md	[PAST] read: Both names report the one shared count, so the three lines read CODE, CODE, and CODE.
-Solutions/09_Foundations--Class_Attributes/README.md	[PAST] read: CODE and CODE both inherit CODE, so both names read through to CODE, and CODE mutates the list stored there.
+Solutions/09_Foundations--Class_Attributes/README.md	[PAST] read: ** CODE and CODE both inherit CODE, so both names read through to CODE, and CODE mutates the list stored there.
 Solutions/10_Foundations--Cleanup/README.md	[PAST-HEADING] guarded: An CODE that fails, unguarded and guarded
 Solutions/11_Techniques--Testing/README.md	[PAST-HEADING] injected: 5. Stubbing a boundary, patched and then injected
 Solutions/11_Techniques--Testing/README.md	[PAST-HEADING] injected: The environment variable, patched and then injected
@@ -299,7 +291,6 @@ Solutions/22_Patterns--Iterators/README.md	[PAST] measured: ** One machine measu
 Solutions/23_Patterns--Singleton/README.md	[PAST] gone: your file prints the same accumulated CODE list and CODE that the chapter's CODE prints, and CODE passes on it with the sentinel and the guard gone.
 Solutions/23_Patterns--Singleton/README.md	[PAST] included: The wrapper takes the lock on every call, cache hits included, because the cache lookup runs inside CODE, which the wrapper calls with the lock held.
 Solutions/23_Patterns--Singleton/README.md	[PAST] reached: You can say which name the assignment changes, and why the original mutation reached both names.
-Solutions/23_Patterns--Singleton/README.md	[PAST] set: CODE is CODE, the value CODE set.
 Solutions/24_Patterns--Template_Method/README.md	[PAST-HEADING] customized: A file-processing framework, customized both ways
 Solutions/26_Patterns--Factory/README.md	[PAST-HEADING] forgot: Finding the class that forgot CODE
 Solutions/26_Patterns--Factory/README.md	[PAST] changed: The CODE runs described next use CODE with CODE added and CODE changed to CODE.
@@ -314,7 +305,6 @@ Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] checked: Freezing 
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] wrote: your file prints CODE for CODE and CODE for CODE, you wrote both predictions down before running it, and you can explain each answer from the CODE each side carries.
 Solutions/30_Patterns--Observer/README.md	[PAST-HEADING] returned: 5. Failures returned as values
 Solutions/30_Patterns--Observer/README.md	[PAST] let: String members also let CODE pass a CODE to CODE.
-Solutions/30_Patterns--Observer/README.md	[PAST] read: They read the same CODE object, so the letters and the counts describe one state of the model.
 Solutions/30_Patterns--Observer/README.md	[PAST] split: The six sizes split three ways.
 Solutions/31_Patterns--State_Machines/README.md	[PAST] blocked: closing the doors with the sensor blocked reopens them, and closing them again unblocked leaves the car idle, through two rules under one CODE key.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] ranked: Each CODE kind holds two of six weapon types, ranked around a cycle.
@@ -330,7 +320,6 @@ Solutions/38_Patterns--Simulation/README.md	[PAST] requested: The one requested 
 Solutions/38_Patterns--Simulation/README.md	[PAST] wrote: you wrote your prediction before running the view, and for mode CODE the rendered plate shows one vertical and two horizontal interior lines plus the four edges, with agitation falling toward zero as in CODE.
 Solutions/40_Functional--Foundations/README.md	[PAST] changed: CODE still raises a CODE, and no calling code changed.
 Solutions/40_Functional--Foundations/README.md	[PAST] consumed: The first CODE, at CODE, consumed the iterator, which stays exhausted, so every later pass gets an empty result.
-Solutions/40_Functional--Foundations/README.md	[PAST] read: ** CODE and CODE both read CODE and leave it as it was.
 Solutions/40_Functional--Foundations/README.md	[PAST] wrote: you wrote a prediction before running, and CODE prints CODE.
 Solutions/43_Functional--Confidence/README.md	[PAST-HEADING] ran: 1. Which process ran each call
 Solutions/43_Functional--Confidence/README.md	[PAST-HEADING] ran: 2. Which thread ran each call
@@ -347,9 +336,8 @@ Solutions/46_Effects--Stateless/README.md	[PAST-HEADING] declared: 2. An undecla
 Solutions/46_Effects--Stateless/README.md	[PAST] added: your six predictions match six runs with the third implementation added.
 Solutions/46_Effects--Stateless/README.md	[PAST] answered: At runtime the handler answered three requests across the two calls, two for CODE and one for CODE, although CODE annotates its parameter CODE.
 Solutions/46_Effects--Stateless/README.md	[PAST] applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.
-Solutions/46_Effects--Stateless/README.md	[PAST] declared: The CODE stays declared, as CODE says, so it is still in the yield channel when CODE wraps CODE.
 Solutions/46_Effects--Stateless/README.md	[PAST] described: Its signature described a different function.
-Solutions/46_Effects--Stateless/README.md	[PAST] did: CODE did the right thing all along.
+Solutions/46_Effects--Stateless/README.md	[PAST] did: ** CODE did the right thing all along.
 Solutions/46_Effects--Stateless/README.md	[PAST] put: Two of the six orderings put CODE first and send the greeting to the screen.
 Solutions/46_Effects--Stateless/README.md	[PAST] read: ** CODE at strength CODE exceeds the robotic nailer's force of CODE, so both its rows read CODE.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] read: Give the Ability fields for the range, and read them off the request in the handler.
