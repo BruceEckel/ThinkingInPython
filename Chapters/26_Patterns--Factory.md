@@ -75,8 +75,8 @@ expect(ValueError, export_svg, "Triangle")
 ```
 
 The two call sites fail in different ways.
-`render()` accepts `"Triangle"` and draws nothing,
-with no error to signal the gap.
+`render()` accepts `"Triangle"`, falls through its `if` chain,
+and returns silently.
 `export_svg()` has a wildcard case that raises an exception,
 so it reports the gap at runtime, the first time someone asks it for a triangle.
 
@@ -190,8 +190,8 @@ The underscore discourages direct construction,
 but it is a convention rather than concealment.
 [*Singleton*](23_Patterns--Singleton.md#nothing-keeps-the-class-private)
 says the same of `_Settings`.
-Its underscore keeps the class out of `from module import *`,
-and Python enforces nothing more.
+Python honors its underscore in one place:
+`from module import *` leaves the class out.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.
@@ -327,7 +327,6 @@ def make(name: str) -> Shape:
 
 [`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 lets each subclass register itself.
-Nothing in the listing calls a register function.
 The two `class` statements fill `Shape.registry` on their own.
 
 `Shape` is an abstract base class rather than a `Protocol` because it registers subclasses through `__init_subclass__()`.
@@ -403,7 +402,7 @@ the registration runs before anything calls `make()`.
 A subclass defined in another module registers itself only when something imports that module.
 The classic failure is a plugin that "never registered."
 The class is fine, the registry is fine,
-and nothing imported the module that defines the class.
+and the module that defines the class still waits for its first import.
 
 A [lazy import](06_Foundations--Modules_and_Packages.md#lazy-imports)
 produces the same failure even when the import statement is in the file.
