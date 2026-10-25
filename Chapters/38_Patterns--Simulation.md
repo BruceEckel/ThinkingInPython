@@ -114,11 +114,8 @@ the generated `__init__()` is `__init__(self, blackboard: Board, x: int, y: int)
 The generated `__init__()` assigns `self.blackboard`, `self.x`, and `self.y`,
 then calls `self.__post_init__()`,
 which fills in `number` and records the rat's start cell.
-A rat writes to the log once, when it dead-ends,
-and that line names its start cell and its end cell.
 
 The maze is a grid of characters.
-A `*` is a wall and a space is an opening.
 Out-of-bounds coordinates count as walls, so the rats stay inside.
 
 ```python
@@ -296,7 +293,6 @@ The rest is the maze.
 *********************
 ```
 
-The demo awaits `explore()`, then prints the log and the mapped maze.
 Each rat logs one line,
 so the closing count of rats is the number of log messages:
 
@@ -414,7 +410,6 @@ asyncio.run(main())
 
 The entry has two open neighbors,
 so rat 1 keeps one neighbor and spawns rat 2 at the other.
-`CountingBlackboard` tallies every `claim()` rejected on an open cell.
 Seven of the nine rejections are backtracking.
 In every cell but the entry,
 the rat standing there tests the cell from which it came.
@@ -437,7 +432,6 @@ Coverage does not depend on atomic claiming.
 `visited` is a set, so a cell claimed twice still counts once.
 Atomicity adds the other guarantee, one rat per cell,
 which only a count like the one in exercise 3 can detect.
-The test checks coverage by comparing the cells the rats visited against a flood fill of the same maze.
 
 ```python
 # rats_and_mazes/test_rats_and_mazes.py
@@ -698,9 +692,6 @@ def item_factory(symbol: str) -> Item:
 ```
 
 Each occupant's `interact()` returns the room in which the robot ends up.
-A wall returns the robot's current room,
-food replaces itself with `Empty` and returns its own room,
-and a teleport returns its paired room.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
@@ -802,7 +793,6 @@ so each runs as its own labeled pass instead of all three interleaving in one lo
 [Factory](26_Patterns--Factory.md#builder)
 counts `GameBuilder` among the cases where *Builder* remains useful in Python,
 because construction here takes three ordered stages rather than a single call.
-`run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
 # robot_explorer/game.py
@@ -862,8 +852,7 @@ class GameBuilder:
 Stage 1 stores each teleport beside its room, as a `(Teleport, Room)` tuple,
 so the `Teleport` type that `isinstance()` establishes stays in the list's type.
 
-Stage 3 pairs the teleports.
-Sorting by target letter puts each pair of partners side by side.
+In Stage 3, sorting by target letter puts each pair of partners side by side.
 `groupby()`, with the same key, then walks the sorted list in one pass,
 yielding each run of matching letters,
 and `pair = list(group)` collects each run.
@@ -876,7 +865,6 @@ If you remove the check, the build still stops,
 at the unpacking `(t1, room1), (t2, room2) = pair`.
 The `ValueError` that unpacking raises says how many values it expected and leaves you to find the letter.
 
-The unpacking names each teleport beside its room.
 The list's type tells the type checker that `t1` and `t2` are `Teleport`s,
 so the code assigns `target_room` with no runtime check.
 
@@ -942,9 +930,6 @@ so it works in rooms and the moves between them rather than in grid coordinates.
 
 `landing()` decides whether a door is passable by testing the occupant's type with `isinstance()`.
 That test reproduces what `Room.enter()` gets from `interact()`.
-For a `Wall`, including the one in `EDGE`, `landing()` returns `None`,
-for a `Teleport` the target room,
-and for anything else the room beyond the door:
 
 ```python
 # robot_explorer/solver.py
@@ -998,8 +983,6 @@ So `landing()` repeats the rules as a type switch,
 the construct that polymorphism replaces in the movement code.
 A new kind of item that blocks the robot or moves it needs a branch in `landing()` as well as its own `interact()`.
 
-The path `solve()` returns is the string `run()` expects:
-
 ```python
 # robot_explorer/robot_demo.py
 from game import GameBuilder
@@ -1048,12 +1031,6 @@ because every route to the `!` passes through a teleport.
 ### Testing the Walk
 
 A test can check the model without opening a window.
-`test_search_walks_the_robot_to_the_end()` builds the maze, searches it,
-walks the result, and checks that the robot finished in the `!` room.
-`test_walls_block_and_food_is_eaten()` walks a three-cell maze east twice.
-The first move eats the food.
-The second leaves the robot where it was, because a wall blocks it.
-A last step back west shows the room that held the food now empty:
 
 ```python
 # robot_explorer/test_robot.py
@@ -1085,9 +1062,6 @@ def test_walls_block_and_food_is_eaten() -> None:
 ### Watching the Robot
 
 The same model drives a graphical view.
-`maze_view.py` builds the maze, calls `solve()` for the route,
-draws each room as a colored cell,
-and steps the robot along that route on a timer.
 The view is the one module that imports `tkinter`.
 The imports point one way, from `maze_view.py` into the model's modules.
 
@@ -1275,8 +1249,6 @@ One number says how settled the sand is.
 `render()` draws grain density as characters, as `Blackboard.render()` does,
 so the model can show its state without a window.
 
-The demo calls `step()` 1200 times, printing agitation at four checkpoints:
-
 ```python
 # chladni_plate/chladni_demo.py
 from chladni import Plate
@@ -1342,8 +1314,6 @@ The randomness produces the order instead of opposing it.
 
 A test cannot predict where a particular grain ends up after hundreds of random kicks.
 It checks the aggregate.
-Four hundred steps must cut agitation below a tenth of its starting value,
-and the kicks must keep every grain on the plate.
 Seeding `random.Random` makes any failure reproducible.
 
 ```python
@@ -1429,7 +1399,6 @@ if __name__ == "__main__":
 It yields the source's elements in sequence and starts over when it reaches the end.
 After `(3, 5)`, `modes` returns to `(1, 2)`,
 so the view keeps changing modes for as long as it runs.
-`palette` assigns the five `COLORS` to the dots in rotation.
 `itertools.count(1)` numbers the frames,
 the same endless counter that numbered the rats.
 
