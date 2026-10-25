@@ -102,7 +102,6 @@ and the other parameter keeps its binding.
 
 **Declare what the function needs.**
 `greet()` requires no change, and could not have required one.
-It declares the two Effects it performs and calls methods on them.
 Its body names none of `Console`, `input()`, `print()`, or `Scripted`,
 so changing the binding leaves that body as it is.
 Delayed binding moves the choice of implementation to the call site,
@@ -273,8 +272,6 @@ to hand down to `format_greeting()`.
 **Hand the Effect down the call chain.**
 The other three of the five, `session()`, `menu()`, and `main()`,
 each gain a `log` parameter whose one use is passing it to the next function.
-They sit between `greet()`, which uses the `Log`,
-and the call site that binds it.
 Their signatures now declare an Effect they do not perform,
 so a reader of `menu()` learns something false about what `menu()` does.
 
@@ -523,7 +520,6 @@ A `PositiveInt` holds a value of 1 or more.
 Dividing by it always succeeds, so the `try`/`except ZeroDivisionError` goes.
 The same value always passes `validate()`, so the call to `validate()` goes,
 and `validate()` along with it.
-Only the division remains.
 
 **Fail at the construction site.**
 The failure now comes from the constructor rather than from `slope()`.
@@ -651,7 +647,6 @@ because a generator expression with an `await` inside it is an asynchronous gene
 and `sum()` requires a synchronous iterable.
 Without the brackets, `ty` reports `no-matching-overload`,
 and the `sum()` call raises a `TypeError`.
-With them, the list comprehension awaits each price and hands `sum()` a list.
 
 **Run the coroutine at the edge.**
 The callers of `total_price_async()` must then become `async` in turn,
