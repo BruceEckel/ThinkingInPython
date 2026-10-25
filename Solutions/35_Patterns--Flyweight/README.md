@@ -379,7 +379,7 @@ the test passes whether or not the cells share a tile.
 With `@cache` removed from `mutable_tile()`,
 each cell gets its own `MutableTile`.
 `field[0][0].walkable` still reads `False` after the assignment,
-so the test passes on code that shares nothing.
+so the test passes on code with one tile per cell.
 The test asserts on a different grass cell, `field[1][1]`,
 whose `walkable` turns `False` only when the cells share one `MutableTile`.
 
