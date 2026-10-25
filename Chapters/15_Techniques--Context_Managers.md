@@ -65,11 +65,9 @@ if __name__ == "__main__":
 #: '_GeneratorContextManager' object has no attribute 'args'
 ```
 
-`with trace("A") as t:` runs the body of `trace()` up to the `yield`,
-printing `enter A`.
 `as` binds the yielded value, so `t` is `"A"`.
-The block under the `with` then runs.
-When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
+When the block finishes,
+`trace()` resumes just after the `yield` and prints `exit A`.
 
 The manager object `trace()` returns is single-use.
 Its generator runs once,
@@ -280,8 +278,6 @@ except ValueError as error:
 ```
 
 `KeyError('original')` never propagates to the `except`.
-`BrokenCleanup.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
-so the caller catches the cleanup's `ValueError` instead of the block's `KeyError`.
 Python keeps the `KeyError` as `error.__context__`,
 the same chaining it applies when an `except` block raises an exception.
 
@@ -366,9 +362,7 @@ print("survived")
 `suppress` is a class [named like a function](02_Foundations--Tour.md#naming-conventions)
 because you use it like one.
 
-A class manager suppresses through the return value of `__exit__()`.
-`expected_one` returns `True` for one exception type,
-after printing the exception it caught:
+A class manager suppresses through the return value of `__exit__()`:
 
 ```python
 # expected_one.py
@@ -532,10 +526,6 @@ with expected() as x:  # [1]
 #: x = None
 ```
 
-The `1 / 0` raises an exception.
-`__exit__()` prints the exception it caught and returns `True`,
-so the `with` statement suppresses the error and `survived` prints.
-
 In the `with` at `[1]`, `as` binds `x` to the return value of `__enter__()`,
 which for `expected()` is `None`.
 
@@ -580,7 +570,6 @@ The message from `[2]` is too long for one line, so it wraps.
 
 `aexpect()` is the `async` form,
 for a coroutine function whose failure is the demonstration.
-It calls `fn` and awaits the coroutine the call returns.
 
 Where a demonstration needs several statements or an assignment in the guarded block,
 `expected` remains the right tool.
@@ -627,7 +616,6 @@ if __name__ == "__main__":
 #: === meeting ends ===
 ```
 
-`banner` works both as a decorator for `quarterly()` and in a `with` in `__main__`.
 `ContextDecorator` applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
 so `quarterly()` keeps its name and docstring.
 
@@ -815,7 +803,6 @@ if __name__ == "__main__":
 #: </a>
 ```
 
-`exit_stack.py` imports `tag()` from `multiple.py`.
 The main guard in `multiple.py` keeps that listing's demo from running on import.
 
 `wrap()` enters one manager per name in `names`,
@@ -825,8 +812,6 @@ A comma-separated `with` sets its count when you write it.
 `wrap()` shows the case where every entry succeeds.
 `ExitStack` makes a second guarantee, for a later entry that fails:
 the stack unwinds the managers that entered earlier.
-The stack below enters two `tag()` managers from `multiple.py`,
-then a third manager, `broken()`, that fails to enter:
 
 ```python
 # exit_stack_fails.py
@@ -1038,15 +1023,9 @@ class Pool[R]:
         return self._available.qsize()
 ```
 
-`lease()` takes an item out of the queue and yields it to the `with` block.
-The `finally` puts it back.
-
 `Pool` is generic over the pooled type,
 and it neither creates nor destroys anything.
 Its one job is holding the items between leases.
-
-The first lease runs a query,
-and then a second lease raises a `RuntimeError` inside its block:
 
 ```python
 # pool_demo.py
@@ -1067,7 +1046,6 @@ print("available after crash:", pool.available())
 #: available after crash: 2
 ```
 
-The second `with` block raises a `RuntimeError`.
 The `finally` in `lease()` still returns the connection,
 so the count is back to two.
 
@@ -1095,8 +1073,6 @@ so an async pool holds an `asyncio.Queue`, awaits its `get()`,
 and builds `lease()` with `asynccontextmanager`.
 
 Eight threads contend for the pool.
-They share its two connections,
-and each thread leases and returns a connection two hundred times.
 
 ```python
 # pool_contention.py
@@ -1136,12 +1112,9 @@ print("pool size after:", pool.available())
 ```
 
 `held` counts the threads holding a lease.
-Each thread increments it once the lease begins and decrements it just before the lease ends.
 `peak` records the highest count `held` reaches.
 The `time.sleep()` keeps each lease open long enough for other threads to call `lease()`,
 so both connections are out at once.
-Across sixteen hundred lease-and-return cycles,
-spread over eight threads competing for two connections, `peak` tops out at two.
 A thread that calls `lease()` while the pool is empty blocks in `get()` until another thread returns a connection.
 With a pool that has no limit, all eight threads hold a lease together,
 so the demo prints a peak of eight.
@@ -1219,10 +1192,7 @@ With no assignment, `first` is the stale reference too.
 so `first` still names the connection after its block ends.
 `test_lease_hands_out_same_object()` relies on that binding when it compares `second` with `first`.
 
-`stale` still refers to the `Connection` that `second` now legitimately holds.
-Calling `stale.query()` after the first `with` block ended works as if `second` had called it,
-because they are the same object.
-For a mutable pooled resource, that is the source of corruption.
+For a mutable pooled resource, a stale reference is the source of corruption.
 Two borrowers each use one connection as if they held it alone.
 
 Guarding against a stale reference takes a wrapper that invalidates the borrower's handle on exit.
