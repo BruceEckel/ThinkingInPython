@@ -138,8 +138,6 @@ print(total(Countdown(5)))  # and a custom iterable
 #: 15
 ```
 
-`total(numbers: Iterable[int]) -> int` accepts any `Iterable`,
-so it works on the generator, the list, and the custom `Countdown`.
 The figure follows one loop over `nums` through the protocol,
 then puts `total()` in the loop's place:
 
@@ -155,14 +153,6 @@ A caller learns that the items have run out by asking for one more.
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
 so you can iterate over it repeatedly.
-
-The test file confirms that:
-
-- `fibonacci()` produces the expected sequence,
-  including the empty and one-item cases.
-- `Countdown` counts down to 1, and `list(Countdown(0))` is empty.
-- A `Countdown` produces the same values on a second pass.
-- `total()` sums a list, a generator, and a `Countdown`.
 
 ```python
 # test_iterators.py
@@ -242,7 +232,6 @@ print(list(sq))  # Exhausted: empty, and no error
 
 ### The Body Waits for the First `next()`
 
-Calling `squares(6)` runs none of its body.
 The `print()` at the top runs once,
 when the first `next()` call requests a value.
 Each later `next()` resumes the body just after the `yield` instead of restarting it.
@@ -253,7 +242,6 @@ far from the call that passed the bad argument.
 
 In `eager_validation.py`, `lazy_squares()` shows the delay.
 `squares()` removes the delay by being a plain function.
-It checks its argument, then returns an inner generator.
 
 ```python
 # eager_validation.py
@@ -287,7 +275,6 @@ expect(ValueError, squares, -1)
 
 `lazy_squares()` contains a `yield`,
 so the call `lazy_squares(-1)` runs none of its body.
-The check waits for `next()`.
 `squares()` has no `yield`, so calling it runs the check immediately.
 Only `produce()` waits.
 
@@ -296,7 +283,6 @@ Only `produce()` waits.
 The second surprise in `generator_lifecycle.py` is its second call to `list(sq)`.
 An exhausted generator answers every `next()` with `StopIteration`,
 which `list()` absorbs as the normal end.
-The second `list(sq)` therefore returns `[]`.
 No exception reports the bug.
 
 When you must walk data twice, collect it into a list once,
@@ -413,8 +399,6 @@ and the `buffered.current > listed.current * 0.9` comparison confirms it
 (one machine measured 4,096,384 bytes buffered against 4,000,672 for the list).
 The last block advances `first2` and `second2` together,
 one `zip()` step at a time, so `tee()` buffers at most the gap between them.
-That gap stays near zero,
-and the `lockstep.peak < listed.current * 0.1` comparison confirms it.
 Use `tee()` when two branches advance together,
 not when one finishes before the other starts.
 
@@ -470,12 +454,6 @@ print(list(flatten_loop(data)) == list(flatten(data)))
 #: True
 ```
 
-Both functions call themselves on each nested sequence,
-and both pass each value from the recursive call out to the caller.
-`flatten_loop()` passes the values out by hand.
-It starts the recursive call, then re-yields each value that call produces.
-`flatten()` replaces those two lines with `yield from`.
-
 `flatten_loop()` carries a `# noqa` because of ruff's `UP028` rule.
 That rule reports a `for` loop whose body is a lone `yield` of the loop variable,
 and tells you to write `yield from` instead.
@@ -489,8 +467,6 @@ The hand-written loop drops that value.
 The hand-written loop forwards neither.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 uses all three channels: the yielded values, the return value, and `send()`.
-
-`test_flatten()` runs `flatten()` and `flatten_loop()` over the same inputs and expects the same flat list from each:
 
 ```python
 # test_yield_from.py
@@ -565,8 +541,6 @@ The `if` clause runs forever.
 A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
 In `test_endless.py`, `counter()` stands in for `count(1)`.
-It counts up the same way,
-then raises a `Tripwire` when its consumer asks for value number `LIMIT + 1`:
 
 ```python
 # test_endless.py
@@ -610,9 +584,6 @@ In `test_the_if_clause_skips_but_never_stops()`,
 nothing after `2` satisfies `n < 3`,
 yet the generator expression keeps pulling from `counter()` to find another match,
 until `counter()` raises the same `Tripwire`.
-The `takewhile()` test stops when it pulls `3`,
-and the `islice()` test stops after three values,
-both before `counter()` reaches its limit.
 
 Failing at 1,000 values stands in for how a real program fails.
 A real program hangs, or it dies when it exhausts memory.
@@ -733,9 +704,6 @@ The type checker also accepts a parameterized generic such as `list[int]`,
 but `isinstance()` raises a `TypeError` when it receives one,
 so either wrapper fails at the first item.
 
-Each test passes a list of `int` through one wrapper and gets it back unchanged,
-then expects a `TypeError` once a `str` appears:
-
 ```python
 # test_typed.py
 import pytest
@@ -834,19 +802,14 @@ print(stream.seen)
 It drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Patterns--Rethinking_Objects.md#protocols)
 rather than a base class.
-The first pass spends the generator,
-yet `first()` rewinds and `traverse()` produces the same three values.
 
-The `seen` list makes that rewind possible.
-`is_done()` pulls from the source when the current index lies past the end of `seen`,
-and keeps every item it reads.
-It pulls with `next(self.source, DONE)`.
+The `seen` list makes the rewind in `first()` possible.
+`is_done()` pulls with `next(self.source, DONE)`.
 Given a second argument,
 `next()` returns that argument when the source runs out,
 in place of raising `StopIteration`.
 `current_item()` then indexes `seen` instead of calling `next()` on the source,
 so reading a value leaves the position where it was.
-`print(stream.seen)` shows that `seen` holds every item the source produced.
 Supporting the four methods takes more than a small lookahead buffer.
 `OverStream` rebuilds the list.
 
@@ -886,7 +849,6 @@ print("c" in letters, list(letters))
 #: True ['d']
 ```
 
-A membership test consumes items the same way.
 `"c" in letters` pulls items until it finds a match,
 and consumes the match along with every item before it.
 
@@ -936,7 +898,6 @@ Every other construct here absorbs the exception.
 It passes each value through unchanged, though,
 so per-item work such as doubling needs a loop.
 That is why `doubled_ok()` uses `for`.
-The loop absorbs the exception as every `for` loop in this chapter does.
 The fix is rarely a `try`.
 Let a `for` loop call `next()`.
 
