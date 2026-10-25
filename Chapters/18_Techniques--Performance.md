@@ -26,7 +26,7 @@ It might be fine.
 
 The opposite assumption fails just as often.
 A program that is fast in the small can be slow at scale.
-A run over a hundred records says nothing about a million,
+A run over a hundred records is a poor guide to a million,
 because costs grow at different rates.
 An algorithm that revisits its data looks instant at one size and takes hours at another.
 Every layer of abstraction also hides work that only a realistic load reveals,
@@ -87,7 +87,8 @@ Running it under the profiler prints a table like this one
 
 `tottime` is the time spent inside that function alone.
 `cumtime` adds the time spent in everything it called.
-Sorting by `cumtime` puts `exec` and `<module>` on top, which tells you nothing.
+Sorting by `cumtime` puts `exec` and `<module>` on top,
+as it does for every program.
 They call everything, so they contain everything.
 Scan down to the first row where `tottime` is large: here, `slow()`.
 That is the function to speed up, since its own loop, not anything it calls,
@@ -462,8 +463,7 @@ buying new hardware might solve the problem sooner and for less money.
 
 ## The Tail-Calling Interpreter
 
-The tail-calling interpreter is a build-time choice,
-and nothing at run time turns it on or off.
+The tail-calling interpreter is a build-time choice that holds for every run of that build.
 A standard build dispatches every bytecode instruction through one large C `switch`.
 Since 3.14, a CPython build can make each instruction a small C function that ends by calling the function for the next instruction.
 The C compiler turns each of those calls into a jump,
@@ -473,7 +473,7 @@ It is a separate mechanism from [tail-call optimization of Python functions](41_
 which CPython does not do.
 
 The tail-calling interpreter runs your program as written,
-and nothing in your program can tell.
+so your program behaves the same under either dispatch.
 No `sys` function reports it, and the documentation calls it an internal detail.
 The python.org Windows 64-bit binaries for 3.15 use it,
 as do the python-build-standalone 3.15 builds that `uv` installs,
@@ -672,7 +672,7 @@ print(f"hoisting did not halve the time: "
 #: hoisting did not halve the time: True
 ```
 
-Here the hoist saves nothing, and it can slow the loop.
+Here the hoist at best ties the attribute lookup, and it can slow the loop.
 `out.append(i)` compiles to a method load that pushes the function and its `self` separately,
 building no bound method.
 `append = out.append` builds one, and every call then goes through it.
@@ -952,7 +952,7 @@ so measure with data shaped like production data.
 `heap_queue.py` introduced `nsmallest()`,
 and `nsmallest()` is the tool to use before hand-rolling either version here.
 The heap fits a different shape of problem:
-pushes and pops interleaved over time, with nothing to presort in advance.
+pushes and pops interleaved over time, on data that arrives a piece at a time.
 Re-sorting after every insertion costs far more than one incremental `heappush()`/`heappop()` pair.
 
 ## Lazy Evaluation with Generators
@@ -1285,7 +1285,7 @@ because it rejects every assignment to an instance.
 
 A class whose base declares no `__slots__` writes `@record(slots=False)`.
 The base gives every instance its `__dict__` back,
-so slots on the subclass remove nothing.
+so slots on the subclass leave the `__dict__` in place.
 The flag states that at the class.
 That form is for a base someone else owns, such as a library class,
 and for the rare class whose code reads the instance dict on purpose.
@@ -1431,7 +1431,7 @@ print(data)
 ```
 
 `bytes(chunk)` copies, but only to print the slice.
-The view copies nothing.
+The view and `chunk` share `data`'s memory.
 
 A view can also read fields out of a buffer without copying it,
 the way a real protocol parser reads a header:
