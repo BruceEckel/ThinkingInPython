@@ -66,8 +66,7 @@ Two failures carrying the same text are still two separate failures.
 ## A Value to Check Everywhere
 
 Suppose a "stars" rating is an integer from one to ten.
-If you represent it as an `int`, nothing stops a caller from passing eleven,
-or minus one.
+If you represent it as an `int`, a caller can pass eleven, or minus one.
 To prevent that, every function that takes a rating must check it:
 
 ```python
@@ -1159,7 +1158,7 @@ print(Checked().data)
 #: {}
 ```
 
-Nothing objects to `Unchecked`.
+`Unchecked` passes every check.
 `ty` accepts it, the linter (`ruff`) accepts it,
 and the declaration says `dict[str, str]`, so every reader expects a dict.
 What arrives is a `set`.
