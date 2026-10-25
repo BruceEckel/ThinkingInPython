@@ -95,7 +95,7 @@ for path in root.walk():
 whether the entry is a `File` or another `Directory`.
 
 Adding a node type is one class.
-A plugin writes it and edits nothing above it.
+A plugin writes it and leaves the classes above it as they are.
 Adding an operation exposes the weakness.
 `walk()` needs a method in every class,
 and counting files or finding an entry by name each needs another.
@@ -344,8 +344,8 @@ If you annotate `evaluate()` with `Operators` instead,
 
 ### Operators That Build Nodes
 
-Every node inherits `__add__()` and `__mul__()`, which compute nothing.
-They build nodes.
+Every node inherits `__add__()` and `__mul__()`,
+which build nodes instead of computing a value.
 Annotating `self` as `Expr` lets `Add(self, ...)` type-check.
 An implicit `self` means "some subclass of `Operators`."
 The `Expr` annotation declares to the type checker that `self` is a member of the union.
@@ -434,7 +434,7 @@ so no class can make them build a node.
 Python tests the operand's truth value.
 Then `and` and `or` return one of their two operands,
 and `not` returns a `bool`.
-`x and y` evaluates to `y`, builds nothing, and reports no error.
+`x and y` evaluates to `y` and quietly drops `x` from the expression.
 An expression language that needs boolean operators overloads `&` and `|`,
 so a Pandas filter reads `(a > 1) & (b > 2)`.
 The parentheses change the parse.
