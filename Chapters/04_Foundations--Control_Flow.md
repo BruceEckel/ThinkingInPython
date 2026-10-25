@@ -62,7 +62,7 @@ The `pass` statement does nothing.
 Use it where Python's syntax requires a statement before you have written the real one.
 
 `...` (the *Ellipsis* literal) is a second placeholder.
-On its own as a statement it does nothing, the same as `pass`:
+On its own as a statement it acts the same as `pass`:
 
 ```python
 # placeholders.py
@@ -532,7 +532,7 @@ Python attaches the handled exception to the new one.
 |---|---|
 | `raise X` | During handling of the above exception, another exception occurred: |
 | `raise X from e` | The above exception was the direct cause of the following exception: |
-| `raise X from None` | Nothing: only `X` appears |
+| `raise X from None` | The report starts at `X` |
 
 All three raise the same exception.
 They differ in three attributes of that exception,
@@ -590,7 +590,7 @@ which hides `__context__` from the report.
 `from e` also sets `__cause__`,
 and Python prints the cause with the "direct cause" line.
 `from None` leaves `__cause__` as `None`,
-so nothing appears above the new exception.
+so the report starts at the new exception.
 
 Use `from e` when the earlier exception explains the new exception,
 and `from None` when the earlier exception distracts from your own message.
