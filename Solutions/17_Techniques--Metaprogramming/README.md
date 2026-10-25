@@ -1041,7 +1041,7 @@ and neither can `__init_subclass__()` or `__set_name__()`.
 All three receive the class after its body has finished executing.
 By then the body has run `on_open = <second function>` as an ordinary assignment into the namespace mapping.
 That assignment drops the last reference to the first function,
-so nothing refers to it when any of the three runs.
+so Python frees the first function before any of the three runs.
 Among the class-creation steps,
 `__prepare__()` alone supplies the mapping that receives the assignments one at a time,
 as the body makes them.
