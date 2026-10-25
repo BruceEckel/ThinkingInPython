@@ -38,8 +38,6 @@ You can also name at least two choices the loop makes that the recursive version
 <details>
 <summary>Solution</summary>
 
-The loop version pops from a stack it manages:
-
 ```python
 # exercise_1.py
 type Nested = int | list[Nested]
@@ -73,8 +71,6 @@ If you seed the stack with `items` instead of `list(items)`,
 `deep_sum()` still returns `21`, but afterward the caller's list prints as `[]`.
 The stack and the argument are one list,
 so every `pop()` removes an element from the caller's list.
-The solution copies `items` with `list()`,
-which gives the loop a list of its own to consume.
 
 **Pick which item comes next.**
 The pop end decides the visiting order,
@@ -155,7 +151,6 @@ print(square.cache_info())
 #: CacheInfo(hits=2, misses=3, maxsize=3, currsize=3)
 ```
 
-The prediction: `hits=2, misses=3, maxsize=3, currsize=3`.
 Three distinct arguments arrive,
 so the cache misses three times and keeps all three results.
 The repeat calls to `square(2)` and `square(1)` both find their stored answers,
@@ -216,8 +211,6 @@ and `uv run ty check` passes on your file with `batch_totals()` annotated to ret
 <details>
 <summary>Solution</summary>
 
-The solution returns a generator expression over `batched()`:
-
 ```python
 # exercise_3.py
 from collections.abc import Iterable, Iterator
@@ -232,8 +225,8 @@ print(list(islice(batch_totals(count(1), 3), 5)))
 ```
 
 **Total each batch.**
-`batched()` chunks the source, and a generator expression sums each batch,
-so the body fits on one line with no hand-written loop.
+With `batched()` doing the chunking,
+the body fits on one line with no hand-written loop.
 
 **Test laziness on an infinite source.**
 Passing `count(1)` proves the function is lazy.
@@ -301,8 +294,6 @@ You can also name a kind of input that `groupby()` handles and `grouped()` canno
 <details>
 <summary>Solution</summary>
 
-The solution accumulates into a `defaultdict(list)`:
-
 ```python
 # exercise_4.py
 from collections import defaultdict
@@ -332,8 +323,8 @@ the demo prints `{'B': ['b'], 'A': ['a']}`.
 The second `"b"` group replaces the first under the same key,
 so the result holds one of the two `"b"` items.
 Python raises no exception, and the type checker accepts the function.
-The solution's `defaultdict` appends each item to the list stored under its key,
-so a key that appears again adds its item to the existing group instead of replacing it.
+In the solution's `defaultdict`,
+a key that appears again adds its item to the existing group instead of replacing it.
 
 `grouped()` loses the streaming that `groupby()` provides.
 It reads the whole input before returning anything,
@@ -437,7 +428,6 @@ so both calls draw `invalid-argument-type`.
 On the recursive call it reads "Expected `Hashable`, found `list[Nested]`".
 On the list passed through `expect()`,
 the same diagnostic names the literal's inferred type.
-The two `# type: ignore` comments silence those diagnostics so the listing can run and show the exception.
 
 For caching to be possible, `Nested` must describe an immutable structure:
 `type Nested = int | tuple[Nested, ...]`,
