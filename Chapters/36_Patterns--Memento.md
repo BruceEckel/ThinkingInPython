@@ -38,11 +38,6 @@ print(copied)
 #: ['eggs', 'milk', 'bread']
 ```
 
-`saved = todo` binds a second name to the same list,
-so every later append to `todo` appears in `saved`.
-`list(todo)` makes a real copy,
-so later appends to `todo` leave `copied` as it was.
-
 A one-level copy is enough here because the elements are immutable strings.
 When state nests mutable objects inside mutable objects,
 `copy.deepcopy()` copies every level of nesting:
@@ -69,10 +64,6 @@ print(deep)
 so `shallow` and `todo` are different objects.
 But their elements are the same inner lists,
 so `todo[0].append("cheese")` changes the first element of `shallow` too.
-`copy.deepcopy()` walks the whole structure and copies every nested container,
-so `deep` holds inner lists of its own.
-The later `todo[0].append("jam")` grows `todo[0]` to four elements.
-`deep[0]` keeps its three.
 
 `copy.deepcopy()` takes time and memory proportional to the whole nested structure it rebuilds,
 however small the change.
@@ -111,8 +102,6 @@ class Sketch:
     def __str__(self) -> str:
         return " ".join(self.strokes) or "(blank)"
 ```
-
-A `Sketch` draws two strokes, saves, draws a third, and restores the checkpoint:
 
 ```python
 # sketch_demo.py
@@ -213,19 +202,14 @@ with expected(FrozenInstanceError):
 
 `restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`,
 so it installs the stray tuple as the sketch's state with no complaint.
-`restore()` accepts the memento and brings back `circle`.
 The type checker reports the plain tuple before the program runs.
 At runtime, `restore()` raises an `AttributeError` when it reads `memento.strokes`.
-The checker rejects the assignment to `checkpoint.strokes` too,
-and the runtime raises `FrozenInstanceError`.
 The `strokes` tuple is immutable on its own.
 The record makes the attribute that holds it read-only too.
 
 ### Testing the Sketch
 
-Three tests check the copying: `restore()` brings back the saved strokes,
-a memento keeps its strokes when the sketch draws more,
-and drawing after a restore leaves the memento as it was:
+Three tests check the copying:
 
 ```python
 # test_sketch.py
@@ -290,7 +274,6 @@ Its extra `title` field lets [a partial restore](#restoring-part-of-a-state)
 later in this chapter rewind one field and keep the other.
 `draw()` returns a new `Drawing`,
 using `dataclasses.replace()` to change one field and copy the rest.
-Since each call returns a `Drawing`, the calls chain:
 
 ```python
 # frozen_demo.py
@@ -389,7 +372,7 @@ So does a state whose class belongs to someone else: a widget tree,
 a database row, or any object whose class is theirs to design.
 Everywhere else, prefer the frozen value.
 
-Two tests check that `draw()` leaves the old `Drawing` as it was and keeps the title:
+Two tests check `draw()`:
 
 ```python
 # test_frozen_sketch.py
@@ -458,9 +441,6 @@ class History[S]:
         return bool(self._future)
 ```
 
-A `History` of `Drawing` states records two edits,
-then undoes the second and redoes it:
-
 ```python
 # history_frozen.py
 from frozen_sketch import Drawing
@@ -480,8 +460,6 @@ print(history.redo())
 `do()` pushes the present onto the past and clears the future,
 so an edit after an undo discards the undone states for good,
 as it does in editors.
-`undo()` and `redo()` each pop one stack, push the present onto the other,
-and make the popped state the present.
 
 `apply()` exists because `do()` alone leaves work to the caller.
 `do()` takes a finished state,
@@ -534,13 +512,7 @@ print(sketch)
 #: circle
 ```
 
-The test file confirms that:
-
-- `undo()` and `redo()` step back and forward through the recorded states.
-- `apply()` makes the edit's result the present and records it,
-  so `undo()` returns the state before the edit.
-- An edit after an undo discards the undone states, so `can_redo()` is false.
-- `can_undo()` and `can_redo()` report when the past or the future is empty.
+Four tests check `History`:
 
 ```python
 # test_history.py
@@ -620,8 +592,6 @@ print(history.undo())
 
 `checkpoint` names a past `Drawing`.
 Immutability keeps that name accurate, since the state it names keeps its value.
-The restore takes the strokes from that past state and the title from the present one,
-producing a state new to the history.
 The restore goes through `apply()` like any other action,
 so `history.undo()` takes it back.
 The edit that `apply()` receives is a lambda here because a partial restore combines two states,
@@ -651,7 +621,6 @@ print(restored == drawing, restored is drawing)
 #: True False
 ```
 
-The round trip produces a different object with the same value.
 A record compares by value,
 so `restored == drawing` is `True` while `restored is drawing` is `False`.
 A different object with the same value is all a memento needs,
@@ -712,7 +681,6 @@ with expected(AttributeError):
 #: 'title'
 ```
 
-The dump that builds `blob` runs while `sketch_v1.SketchV1` is bound to the one-field class.
 `sketch_v1.SketchV1 = SketchV2` stands in for an edit and reload of that module,
 with a field added between the save and the load.
 
