@@ -694,9 +694,8 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 `act()` takes the fallback case for `Signal.STOP`,
 although the fallback value is `Signal.CAUTION`.
 `case FALLBACK:` holds a bare name, so the pattern captures.
-The pattern matches `Signal.STOP`,
-binds that value to a local named `FALLBACK` inside `act()`,
-and compares nothing.
+The pattern matches `Signal.STOP` as it matches any value,
+and binds that value to a local named `FALLBACK` inside `act()`.
 The module-level constant holds `Signal.CAUTION` before and after the call,
 so printing `FALLBACK` shows the expected value and hides the mistake.
 
