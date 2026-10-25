@@ -64,8 +64,6 @@ if __name__ == "__main__":
 #: WhatIHave.h()
 ```
 
-Because `WhatIUse` calls `f()` and `WhatIHave` has no `f()`,
-`ProxyAdapter` supplies one and implements it with the methods the adaptee does have.
 `WhatIWant` is a bare placeholder,
 because this listing is about where the adaptation lives.
 For declaring the target interface,
@@ -129,7 +127,6 @@ WhatIUse().op(WhatIHave2())  # Approach 3
 Counting the *object adapter* in `adapter.py`
 (an adapter that wraps an instance of the adaptee),
 three structures produce one behavior.
-Each call ends in the same `g()` and `h()` on a `WhatIHave`.
 The approaches differ in where the adaptation lives.
 The first line of each trace names that place:
 `ProxyAdapter.f()` for the object adapter,
@@ -171,10 +168,6 @@ because mypy compares the types in an override and ignores the name of any param
 The rename is the smaller of the two changes.
 `WhatIUse2.op()` also changes the parameter's type,
 from `what_i_want: WhatIWant` to `item: WhatIWant | WhatIHave`.
-The base version accepts a `WhatIWant`.
-The override accepts a `WhatIWant` or a `WhatIHave`.
-Both `case` branches call the inherited `op()`,
-with a `WhatIWant` as it is and a `WhatIHave` wrapped in a `ProxyAdapter`.
 An override may widen what it accepts.
 Every call that is legal on a `WhatIUse` is still legal on a `WhatIUse2`,
 so code holding a `WhatIUse` can safely receive a `WhatIUse2`.
@@ -444,7 +437,6 @@ print(Facade.start_car())
 #: Ignition(pump=FuelPump(engine=Engine()))
 ```
 
-Turning the key primes the pump, and priming starts the engine.
 An `Ignition` holds a `FuelPump` and a `FuelPump` holds an `Engine`,
 so a caller builds the three from the inside out,
 as `Ignition(FuelPump(Engine()))`.
@@ -454,8 +446,6 @@ small enough here to read at a glance.
 In real code, the construction order of three or thirty classes belongs inside the subsystem,
 and a façade keeps it there.
 `Facade.start_car()` is the static factory method.
-One call runs the three constructors from the inside out, starts the car,
-and returns the assembled `Ignition`, which the last output line shows.
 
 The figure shows each pattern as a before-and-after pair:
 
@@ -510,7 +500,6 @@ print(f"{checkout.total(100.0):.2f}")
 #: 97.20
 ```
 
-The caller imports the module and calls one function, `total()`.
 The three classes carry leading underscores,
 and their required assembly order appears only inside `total()`.
 The façade can rearrange both while every caller's code stays the same.
