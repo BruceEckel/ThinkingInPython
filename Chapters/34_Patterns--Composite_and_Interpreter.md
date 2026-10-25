@@ -193,6 +193,12 @@ demonstrates, a list in that field keeps its `append()`,
 so a `list` there leaves the tree mutable.
 With the tuple, two trees can share a subtree, and neither can change it.
 
+The test file confirms that:
+
+- `disk_usage()` returns the size of the whole tree, a subtree, or a lone file.
+- `walk()` yields each file's full path.
+- An empty directory has size 0 and yields no paths.
+
 ```python
 # test_filesystem.py
 from typing import Final
@@ -475,6 +481,12 @@ so `expr` is a value you can pass to `evaluate()` under different variable bindi
 as many times as you like.
 An unbound variable raises a `KeyError`, naming the variable.
 
+The test file confirms that:
+
+- A `Num` evaluates to its value and a `Var` to its binding.
+- One tree evaluates under different bindings.
+- An unbound variable raises a `KeyError` that names the variable.
+
 ```python
 # test_evaluate.py
 import pytest
@@ -647,6 +659,15 @@ The `if` inside each `case _` tests identity with `is` rather than equality with
 Sharing means the same object.
 `is` answers with one comparison,
 where a record's `==` compares fields and descends into any subtree that changed.
+
+The test file confirms that:
+
+- Adding zero or multiplying by one returns the other operand.
+- Multiplying by zero returns `Num(0)`.
+- Constant subtrees fold into one `Num`.
+- The rules apply at every level of the tree.
+- An expression in simplest form comes back as the same object.
+- The result shares an unchanged subtree with the input.
 
 ```python
 # test_simplify.py

@@ -663,7 +663,14 @@ here the `sold_out()` rule, also passes.
 ### Testing the Vending Machine
 
 Because the machine is deterministic,
-a test can drive it through a sequence of inputs and check which state it reaches:
+a test can drive it through a sequence of inputs and check which state it reaches.
+The tests cover:
+
+- A successful purchase
+- The too-expensive conditional branch
+- The sold-out conditional branch
+- A refund
+- The error when no transition matches
 
 ```python
 # test_vending.py

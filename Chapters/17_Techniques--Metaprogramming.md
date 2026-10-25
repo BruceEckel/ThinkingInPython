@@ -524,6 +524,9 @@ so a base further up can take the keywords it declared.
 If a keyword remains when the chain reaches `object.__init_subclass__()`,
 that method raises a `TypeError`.
 
+Testing shows that each registry holds only its current leaf classes,
+and that the two registries are disjoint:
+
 ```python
 # test_init_subclass.py
 import init_subclass
@@ -725,6 +728,12 @@ Use the runtime version in the rare case where the interpreter must refuse the s
 
 A decorator like `@final` is a *marker*.
 It sets an attribute and leaves enforcement to the type checker.
+
+The test file confirms that:
+
+- The `@final` marker is present.
+- The runtime-final class refuses subclassing.
+- Its non-final base still allows it.
 
 ```python
 # test_final.py
@@ -987,6 +996,12 @@ and the precedence reverses.
 The instance's `__dict__` comes first.
 That is why assigning to `greet` on a `Person` instance shadows the method on that one instance,
 while `p.x = 3` cannot shadow `Field`, because `Field` defines `__set__()`.
+
+The test file confirms that:
+
+- `__set_name__()` gives the descriptor its name.
+- The descriptor stores each value under the storage key built from that name.
+- The descriptor returns itself when you read it through the class.
 
 ```python
 # test_set_name.py

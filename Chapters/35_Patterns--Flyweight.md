@@ -232,6 +232,13 @@ Prefer a guard that lets the type checker narrow.
 Keep `cast()` for the cases where no guard exists,
 because the type checker accepts whatever a `cast()` asserts.
 
+The test file confirms that:
+
+- `tile()` returns one object per symbol and different objects for different symbols.
+- A parsed map shares one `Tile` among the cells of each kind.
+- `to_symbol()` raises a `KeyError` for a character outside `SPECS`.
+- A direct `Tile(...)` call builds an object equal to the pooled tile and distinct from it.
+
 ```python
 # test_tile_map.py
 import pytest
@@ -482,6 +489,9 @@ not as a flyweight factory.
 The weak pool releases entries and keeps the identity guarantee.
 An entry lives as long as something references its `Name`,
 so every request during that life returns the one `Name`.
+
+The tests confirm that `name()` returns the live `Name` for a repeated text and a different object for a different text,
+and that the pool removes an entry once the last reference to its `Name` goes away:
 
 ```python
 # test_weak_pool.py

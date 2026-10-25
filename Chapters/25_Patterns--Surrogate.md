@@ -656,6 +656,9 @@ The proxy therefore keeps state of its own and forwards the methods the implemen
 The same few lines serve lazy initialization (a virtual proxy), access checks
 (a protection proxy), or call tracking (a smart reference), over any object.
 
+The tests confirm that a call reaches the implementation and returns its result,
+and that the proxy counts calls and leaves attribute reads out of the tally:
+
 ```python
 # test_counting_proxy.py
 from counting_proxy import CountingProxy
@@ -773,6 +776,10 @@ for the races an unsynchronized swap allows.
 If `run()` declares `surrogate: Behavior`, the checker rejects `run(surrogate)`,
 because `Surrogate` defines no `f()` of its own.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
+
+The test passes the *State* surrogate two small implementations,
+`StateA` and `StateB`,
+and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
 ```python
 # test_state.py

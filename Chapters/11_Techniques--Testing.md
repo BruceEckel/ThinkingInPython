@@ -138,6 +138,15 @@ class Account:
 
 By convention, tests live in a file whose name starts with `test_`.
 
+The test file confirms that:
+
+- A new account starts empty.
+- A deposit increases the balance.
+- A deposit of zero or less raises a `ValueError`.
+- A withdrawal reduces the balance.
+- An overdraft raises `InsufficientFunds`.
+- Interest adds to the balance.
+
 ```python
 # test_account.py
 import pytest

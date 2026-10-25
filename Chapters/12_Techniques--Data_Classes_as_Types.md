@@ -694,6 +694,11 @@ A parameter [annotated](08_Foundations--Static_Types.md#how-much-to-annotate)
 
 Four tests show that illegal values cannot exist:
 
+- `Stars(1)` and `Stars(10)`, the ends of the range, are legal.
+- The constructor rejects values outside the set.
+- `f1()` and `f2()` return legal `Stars`.
+- A result outside the set raises `TypeFailure` when `f2()` builds it.
+
 ```python
 # test_stars.py
 import pytest
@@ -758,6 +763,7 @@ Its annotations require a `FullName` and an `EmailAddress`,
 which the type checker enforces.
 Every `FullName` and `EmailAddress` is legal from construction.
 
+`test_person_composes_validated_parts()` builds a `Person` from legal parts and reads them back.
 `test_full_name_needs_first_and_last()` and `test_email_needs_at_sign()` show that the constructors reject an illegal name or email,
 so every `Person` holds legal parts:
 

@@ -71,6 +71,10 @@ MyApp().run()
 The inherited `run()` holds the loop and calls the steps `MyApp` supplies,
 so `MyApp().run()` starts the engine that drives the application.
 
+A test supplies steps that record their calls,
+confirms that the record stays empty after construction,
+then checks the order in which `run()` makes them:
+
 ```python
 # test_template_method.py
 from typing import override

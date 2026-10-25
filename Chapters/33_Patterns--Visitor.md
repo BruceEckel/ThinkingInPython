@@ -321,7 +321,10 @@ instead.
 ### Testing the Operations
 
 Because each operation is a plain function,
-a test calls it with each flower type and asserts the result:
+a test calls it with each flower type and asserts the result.
+The tests cover the registered types,
+the `@singledispatch` default for an unregistered type,
+and a subclass that resolves to its nearest registered ancestor:
 
 ```python
 # test_visitor.py

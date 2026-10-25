@@ -154,6 +154,14 @@ A caller learns that the items have run out by asking for one more.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
 so you can iterate over it repeatedly.
 
+The test file confirms that:
+
+- `fibonacci()` produces the expected sequence,
+  including the empty and one-item cases.
+- `Countdown` counts down to 1, and `list(Countdown(0))` is empty.
+- A `Countdown` produces the same values on a second pass.
+- `total()` sums a list, a generator, and a `Countdown`.
+
 ```python
 # test_iterators.py
 import pytest
@@ -468,6 +476,8 @@ The hand-written loop forwards neither.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 uses all three channels: the yielded values, the return value, and `send()`.
 
+`test_flatten()` runs `flatten()` and `flatten_loop()` over the same inputs and expects the same flat list from each:
+
 ```python
 # test_yield_from.py
 from collections.abc import Callable, Iterator, Sequence
@@ -703,6 +713,9 @@ so the type checker infers the element type from the `expected` argument.
 The type checker also accepts a parameterized generic such as `list[int]`,
 but `isinstance()` raises a `TypeError` when it receives one,
 so either wrapper fails at the first item.
+
+Each test passes a list of `int` through one wrapper and gets it back unchanged,
+then expects a `TypeError` once a `str` appears:
 
 ```python
 # test_typed.py
