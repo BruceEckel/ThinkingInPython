@@ -32,7 +32,7 @@ A *Proxy* forwards to one implementation for its whole life.
 
 ### Explicit Forwarding
 
-Here the *Proxy* drops the shared base and forwards each call by hand:
+Here the *Proxy* drops the shared base and forwards each call through a method of its own:
 
 ```python
 # proxy_forwarding.py
@@ -363,9 +363,10 @@ print(p.level, settings.level)
 because a declared `__setattr__()` makes the type checker accept assignment to any attribute name.
 
 `WriteProxy` names its attribute `_implementation`, with one underscore.
-Mangling rewrites identifiers, not string literals,
-so storing a double-underscore name through `object.__setattr__()` means writing the mangled form,
-`"_WriteProxy__implementation"`, by hand.
+Mangling rewrites identifiers, not string literals.
+To store a double-underscore name through `object.__setattr__()`,
+you write the mangled form in the string literal,
+`"_WriteProxy__implementation"`.
 The single underscore keeps the name as written.
 If the implementation has an `_implementation` of its own,
 `p._implementation` finds the proxy's attribute,

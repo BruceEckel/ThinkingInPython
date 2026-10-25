@@ -336,7 +336,7 @@ which can jump when the system corrects its time.
 One call is also one sample, with all of its interference.
 `timeit` times with `time.perf_counter()`,
 a high-resolution clock that moves forward steadily.
-When you time code by hand, use that clock and repeat the run.
+When you write your own timing code, use that clock and repeat the run.
 
 `timeit` also has a command-line form for one-off questions:
 
@@ -418,7 +418,7 @@ so each listing labels its own measurements.
 Your ratio differs from the one above.
 
 `traced()` measures memory instead of time.
-It wraps the `tracemalloc` calls that `lazy_pipeline.py` makes by hand in [Lazy Evaluation with Generators](#lazy-evaluation-with-generators):
+It wraps the `tracemalloc` calls that `lazy_pipeline.py` makes in [Lazy Evaluation with Generators](#lazy-evaluation-with-generators):
 `start()` before the `with` block,
 then `get_traced_memory()` and `stop()` after it.
 The `Traced` object it yields fills in when the block ends.

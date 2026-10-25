@@ -540,7 +540,7 @@ class Tile(Enum):
 
 `walkable` is a bare annotation, not a `ClassVar`.
 It declares a per-member attribute, the role a dataclass field plays.
-Here `__new__()` assigns the attribute by hand,
+Here `__new__()` assigns the attribute,
 where a dataclass assigns it in a generated `__init__()`.
 `__new__()` runs during class creation,
 before the `class` statement binds the name `Tile`,

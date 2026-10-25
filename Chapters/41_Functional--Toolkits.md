@@ -446,7 +446,7 @@ just as it does for the plain `describe()` in `functools_singledispatch.py`.
 
 Each `itertools` function produces values on demand instead of building a list up front.
 [Lazy Evaluation](#lazy-evaluation) revisits that property below.
-Each is also a loop you would otherwise write by hand.
+Each is also a loop you would otherwise write yourself.
 The `itertools` version of that loop runs as C code in CPython,
 and it handles the edge cases a hand-written version can get wrong:
 the empty iterable, the single element,

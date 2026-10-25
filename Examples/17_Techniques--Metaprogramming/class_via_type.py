@@ -2,7 +2,7 @@
 class C:
     pass
 
-D = type("D", (), {})  # The same construction, by hand
+D = type("D", (), {})  # The class statement, as a call
 
 print(type(C), type(D))
 #: <class 'type'> <class 'type'>

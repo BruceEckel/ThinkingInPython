@@ -998,7 +998,7 @@ expect(ValueError, parse_map, "?")
 `SPECS`, `tile()`, and `to_symbol()` all disappear.
 The member tuples are the spec table, and `Tile(s)` is the pool lookup.
 `Tile(s)` checks membership at runtime against the value-to-member table that the metaclass builds.
-`to_symbol()` makes the same check by hand.
+`to_symbol()` makes the same check in its own body.
 
 The type checker still catches each `Literal`-version mistake that the enum leaves possible.
 A `match` over `Tile` that leaves out a member draws the same `invalid-return-type` as a `match` over `Symbol` that leaves out a symbol.
@@ -1226,7 +1226,7 @@ The lock fix handles an unbounded value set.
 Every lookup now serializes, including the hits,
 which are the overwhelming majority once the pool is warm.
 If that serialization matters,
-write the pool by hand and lock only on the miss path.
+write your own pool and lock only on the miss path.
 Check the key again inside the lock,
 since another thread may have filled that entry while this one waited.
 

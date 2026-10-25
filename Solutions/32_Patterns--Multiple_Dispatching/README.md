@@ -2101,7 +2101,7 @@ print(Project2(seed=3).meeting(group_size=5))
 ```
 
 **Lay the answers out as a grid.**
-The listing writes the 36 answers by hand,
+The listing writes the 36 answers out,
 as a grid rather than as 36 dictionary rows.
 Each row of `GRID` holds one weapon's results as the caller against the weapons in `ORDER`.
 A cell holds what one of exercise 8's `eval_*()` methods returns.

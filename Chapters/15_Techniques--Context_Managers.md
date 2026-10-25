@@ -848,7 +848,7 @@ A comma-separated `with` follows the same rule.
 ## The `contextlib` Toolkit
 
 The `contextlib` module provides ready-made managers.
-Choose these before writing `__enter__()` and `__exit__()` by hand.
+Choose these before writing your own `__enter__()` and `__exit__()`.
 
 - `suppress(*exceptions)` suppresses the listed exceptions,
   as `expected` does for the types it lists,
@@ -1211,7 +1211,7 @@ or when several places need the same setup and teardown.
 Four forms give you a context manager, once you decide you want one.
 Try them in this order.
 Use a `contextlib` manager when one fits, since `suppress`, `closing`,
-`nullcontext`, and `ExitStack` cover most of what people write by hand.
+`nullcontext`, and `ExitStack` cover most of the managers people write themselves.
 Otherwise write a generator with `@contextmanager`,
 which is the shortest form that can express setup, teardown,
 and a `try`/`finally` between them.

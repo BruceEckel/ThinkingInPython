@@ -172,13 +172,13 @@ Solutions/40_Functional--Foundations/README.md	the first call	With `nonlocal` de
 Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` group replaces the first under the same key, so the result holds one of the two `"b"` items.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` fills the third slot and the second `square(1)` becomes a hit.
-Solutions/45_Effects--Generators/README.md	The third `send()`	**Drive the conversation by hand.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
+Solutions/45_Effects--Generators/README.md	The third `send()`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first `send()`	So at runtime the first `send()` accepts `None` alone, a value the `SendType` excludes.
 Solutions/45_Effects--Generators/README.md	the first call	An annotation cannot express "`None` for the first call, `Answer` afterward," because a single `SendType` covers every call.
 Solutions/45_Effects--Generators/README.md	the first line	The call `interview()` returns a generator object, suspended before the first line of its body.
 Solutions/45_Effects--Generators/README.md	the last `send()`	If you read the total as the result of the last `send()`, writing `total: Total = t.send(Amount(12))` with no `try`, the script prints the three prompts and then stops with `StopIteration: 42`.
-Solutions/45_Effects--Generators/README.md	the last `yield`	**Drive the conversation by hand.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
+Solutions/45_Effects--Generators/README.md	the last `yield`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	the next `"12"`	After three `"12"` sales, by any mix of machines, a fresh `machine()` answers the next `"12"` order with `UNAVAILABLE`.
 Solutions/45_Effects--Generators/README.md	the second `yield from`	The count travels through the `ReturnType`: `emit()` returns it, `yield from` delivers it into `report()`'s `size`, `report()` returns it again, and the second `yield from` delivers it into `summarize()`'s `counted`.
 Solutions/45_Effects--Generators/README.md	two lines later	The runtime output shows a consequence two lines later, in the `return` statement, where the f-string formats the object.

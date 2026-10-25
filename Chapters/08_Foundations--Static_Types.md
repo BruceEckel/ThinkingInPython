@@ -60,7 +60,7 @@ The type checker rejects every operation beyond those methods.
 `Any` permits every operation,
 so it switches the checker off for that value rather than describing a wide set of values.
 Choose `object` for a value you store or pass along untouched,
-and `Any` for one whose operations you would rather check by hand.
+and `Any` for one whose operations you would rather check yourself.
 
 ## Type Hints
 

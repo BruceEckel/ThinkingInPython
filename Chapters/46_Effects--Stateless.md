@@ -298,7 +298,7 @@ so a function body's `console.print()` calls the method,
 and no library code runs in between.
 A library acts only on objects handed to it,
 so the request for a `Console` must be an object the function hands out.
-Driving `greet()` by hand shows that object,
+Driving `greet()` with `next()` and `send()` shows that object,
 the way [Generators](45_Effects--Generators.md#annotating-a-generator)
 drove `interview()`:
 
@@ -667,7 +667,8 @@ In Python it is `yield from`.
 The description/execution split causes the hazard, not generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
-You declare the Ability by hand, and the type checker verifies the declaration.
+You declare the Ability in the annotation,
+and the type checker verifies the declaration.
 If you annotate `greet_all()` as pure, the checker reports the mismatch:
 
 ```python

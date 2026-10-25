@@ -285,7 +285,7 @@ a class attribute listing field names in order.
 `@dataclass` generates it from the field order,
 so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
 `NamedTuple` generates it too.
-An ordinary class must assign it by hand.
+An ordinary class assigns `__match_args__` in its body.
 When `__match_args__` is too short to name every position you supply,
 a positional pattern raises a `TypeError`.
 For an ordinary class `R` that lacks `__match_args__`,

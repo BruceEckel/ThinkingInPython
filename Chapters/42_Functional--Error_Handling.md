@@ -309,7 +309,7 @@ def func_c(i: int) -> Result[int, str]:
     return Ok(i)
 ```
 
-`composed()` runs the three steps in order and checks each `Result` by hand:
+`composed()` runs the three steps in order and checks each `Result` with `isinstance()`:
 
 ```python
 # composing.py
@@ -554,7 +554,7 @@ def test_combined_returns_answer_or_first_failure(
 
 ## Turning Exceptions into Results
 
-In `steps.py`, `func_c()` wraps a division in a `try`/`except` and returns an `Err` by hand when the division raises a `ZeroDivisionError`.
+In `steps.py`, `func_c()` wraps a division in a `try`/`except` and returns an `Err` from the `except` clause when the division raises a `ZeroDivisionError`.
 A decorator can capture that pattern.
 `@safe` takes a function that can raise an exception and produces one that returns a `Result`,
 with the exception as the error the `Err` wraps.
@@ -611,7 +611,7 @@ The signature therefore says that something can go wrong and not what,
 which is all an `except Exception` clause says.
 `@safe` catches `Exception` because it writes one `try`/`except` for every function it wraps,
 and the base class is the one type that covers every exception those functions raise.
-A wrapper written by hand can be narrower.
+A `try`/`except` written for one function can be narrower.
 `func_c()` in `steps.py` catches `ZeroDivisionError` alone,
 and a `parse()` that catches `ValueError` the same way can return `Result[int, ValueError]`.
 Write the wrapper yourself when the caller needs to know which exception type the `Err` holds,

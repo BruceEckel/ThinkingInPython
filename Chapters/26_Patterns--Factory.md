@@ -617,7 +617,7 @@ one registry for the whole process,
 so `test_unknown_name_raises_key_error()` there asks for `"Hexagon"`.
 
 The ordinary Python factory is a dictionary of classes,
-whether you fill it by hand, the classes fill it themselves,
+whether you write it as a literal, the classes fill it themselves,
 or the factory's own decorator fills it.
 That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes.
@@ -1289,7 +1289,7 @@ Match the machinery to what varies:
 
 - When a name maps to a class, use a dictionary.
   When the set of classes is closed,
-  write the table by hand and key it by a `Literal`, as in `shape_table.py`,
+  write the table out and key it by a `Literal`, as in `shape_table.py`,
   so a bad name fails at the check.
   When the set is open-ended or spread across modules,
   let the classes fill the table:

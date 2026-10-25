@@ -335,7 +335,7 @@ and a machine that searches for a counterexample.
 
 A bare `assert` like this one reports a broken law as an `AssertionError`.
 The traceback shows the assert's source line and leaves out the value that broke the law.
-To find that value, you add a `print()` and rerun by hand.
+To find that value, you add a `print()` and rerun.
 A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
 runs the same search with inputs it chooses at boundaries and unusual values,
 and shrinks any failure to a minimal counterexample.

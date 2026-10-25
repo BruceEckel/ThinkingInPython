@@ -570,14 +570,14 @@ def test_stub_not_called(balance: float) -> None:
 `assert_not_called()` fails if `send` received any call,
 so a mistaken `<=` that sends at zero fails the zero case.
 
-**Record the calls by hand.**
+**Record the calls in the stub.**
 A stub like exercise 5's `fake_fetch()` answers each call and forgets it.
 A test with a `send` stub built that way passes whether or not `send` runs,
 including against a `notify_negative_balance()` that always sends.
 To make the check, the stub must gain a record of its calls.
 Here that record is the list `sent`.
 
-A stub that records its calls is a mock written by hand.
+A stub that records its calls is a mock you write yourself.
 `Mock` builds that recording for you, along with the assertions that read it.
 
 The hand-written stub declares its signature, `(message: str) -> None`,

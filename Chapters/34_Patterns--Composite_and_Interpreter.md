@@ -361,7 +361,7 @@ and `wrap()` promotes an integer on the right to a `Num` node.
 `2 * x + 1` is therefore a valid sentence in the little language.
 Python has parsed it, applying its precedence rules,
 before the interpreter runs.
-Compare the tree the operators build with one assembled by hand:
+Compare the tree the operators build with one built from constructor calls:
 
 ```python
 # build_tree.py
@@ -369,13 +369,13 @@ from expr import Add, Mul, Num, Var
 
 x = Var("x")
 expr = 2 * x + 1
-by_hand = Add(Mul(Num(2), x), Num(1))
-print(expr == by_hand, type(expr).__name__, expr.left)
+nested = Add(Mul(Num(2), x), Num(1))
+print(expr == nested, type(expr).__name__, expr.left)
 #: True Add Mul(left=Num(value=2), right=Var(name='x'))
 ```
 
 Records generate `__eq__()`,
-so `expr == by_hand` compares the two trees by value.
+so `expr == nested` compares the two trees by value.
 
 `build_tree.py` puts the integer on the left of `*` and on the right of `+`.
 The test checks the integer on either side of `+`,

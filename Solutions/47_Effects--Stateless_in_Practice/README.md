@@ -250,7 +250,7 @@ so the annotation and the returned object agree.
 A language that tracks Effects puts the side effect in the signature.
 [Stateless](../../Chapters/46_Effects--Stateless.md)
 and [Stateless in Practice](../../Chapters/47_Effects--Stateless_in_Practice.md)
-simulate that tracking by hand,
+simulate that tracking with a library and an annotation,
 so the guarantee holds only for Effects that the body requests with `yield`.
 
 The error side has the same limit:

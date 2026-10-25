@@ -12,7 +12,7 @@ The last exercise has an answer you can check against the chapter's figure.
 > Pick a program you have written that changed more than once.
 > Name its vector of change: the thing that shifted every time.
 > Say which part of the design absorbed the change,
-> and which parts you edited by hand.
+> and which parts you edited.
 
 <details>
 <summary>Where to look</summary>
@@ -21,7 +21,7 @@ The last exercise has an answer you can check against the chapter's figure.
 describes the one axis along which a design keeps shifting.
 Look at your history for the same function edited again and again,
 since that function marks the axis.
-Then ask which part absorbed each change and which parts you edited by hand.
+Then ask which part absorbed each change and which parts you edited.
 
 <details>
 <summary>The shape</summary>
@@ -108,7 +108,7 @@ Nothing absorbs the change.
 Each new format means opening `render()` and adding a `case`,
 so the third request edits the same function the first two did.
 The branching shape survives as long as it does because the `match` reads well,
-but every new format is an edit you make by hand.
+but every new format is an edit to the `match`.
 
 Naming the axis says what to do about those hand edits.
 If the format varies, the format must become a value the program can hold,

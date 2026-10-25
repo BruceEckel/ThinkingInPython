@@ -208,18 +208,18 @@ Because `slope()` calls `validate()`,
 `slope_catch.py` puts `validate()` directly above `slope()`,
 so the uncaught `ValueError` is easy to spot.
 In a real call stack the `raise` is usually in another file, several calls down.
-Catching by hand covers the exceptions you know a callee can raise.
+A `try`/`except` you write covers the exceptions you know a callee can raise.
 The rest reach the caller.
 Knowing every exception that can reach the caller means reading the code for every callee.
 An Effect Management System replaces that tedious, error-prone work.
 
-*Exception specifications* in C++ and Java track exceptions with a list written by hand on each function.
+*Exception specifications* in C++ and Java track exceptions with a list the programmer writes on each function.
 Java's compiler checks the list
 (Java calls the listed exceptions *checked exceptions*), while C++,
 before C++17 removed them,
 checked it at runtime and ended the program on an exception the list left out.
 Neither language infers the list from the functions a body calls,
-so an exception introduced three levels down means editing every signature above it by hand.
+so an exception introduced three levels down means editing every signature above it.
 Programmers usually avoid that work by widening the specification until it permits every exception.
 The specifications expose implementation details.
 Most people now count them a failure.
@@ -576,7 +576,7 @@ print(captured.messages)
 `session()`, `menu()`,
 and `main()` each declare both parameters and use them for one thing:
 passing them to the function below.
-You propagate every parameter by hand.
+You pass every parameter down at every call.
 If a new helper that `greet()` calls needs a `Log` Effect,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
 and `main()`.
@@ -601,7 +601,7 @@ raises a `LookupError` at runtime, in the frame that reads the `ContextVar`.
 A `ContextVar` created with a default returns that default,
 so the read succeeds and the mistake appears later,
 as the incorrect result the default produces.
-You must still set every `ContextVar` by hand,
+You must still remember to set every `ContextVar`,
 and the type checker cannot verify that you did.
 
 An EMS moves the bookkeeping into the type system.
@@ -668,7 +668,7 @@ The compiler infers the row from what the body calls
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
 Since the compiler computes each row from the calls in the body,
-you rarely write a row by hand.
+you rarely write a row yourself.
 You annotate explicitly to specify a constraint,
 such as declaring that a function must remain Effect-free.
 
@@ -1087,7 +1087,7 @@ and a generation later, nobody can imagine doing it by hand.
 
 Namespaces are an example.
 Early languages put every name in one global namespace,
-and the programmer prevented collisions by hand.
+and the programmer prevented collisions by choosing distinct names.
 Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
 The solution divided names among separate namespaces.
@@ -1128,7 +1128,7 @@ The compiler checks every composition,
 comparing each callee's Effects with the caller's declaration at each call.
 
 Languages that track Effects today are young.
-Libraries that retrofit Effect tracking make you package each Effect's interface and implementation by hand,
+Libraries that retrofit Effect tracking make you package each Effect's interface and implementation yourself,
 and wrap every effectful call.
 Effect tracking will look obvious in hindsight.
 Future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.

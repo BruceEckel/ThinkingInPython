@@ -83,7 +83,7 @@ A class definition is shorthand for calling `type()`:
 class C:
     pass
 
-D = type("D", (), {})  # The same construction, by hand
+D = type("D", (), {})  # The class statement, as a call
 
 print(type(C), type(D))
 #: <class 'type'> <class 'type'>
@@ -770,7 +770,7 @@ At runtime each sets a single attribute, `__final__` or `__override__`,
 that the interpreter ignores and your own code can read, as `near_miss.py` does.
 The type checker enforces each marker's rule,
 and [Making a Class Final](#making-a-class-final)
-builds the runtime half by hand with `__init_subclass__()`.
+builds the runtime half with `__init_subclass__()`.
 
 [`@dataclass`](12_Techniques--Data_Classes_as_Types.md) is *mirrored machinery*.
 At runtime it is a code generator,
@@ -911,7 +911,7 @@ print(plain.__get__(p, Person)())
 #: Hello, Ann
 ```
 
-`plain.__get__(p, Person)()` performs by hand what `p.greet()` does automatically.
+`plain.__get__(p, Person)()` is `p.greet()` with the binding written out.
 Method binding is the descriptor protocol at work.
 
 ### A Descriptor That Learns Its Name

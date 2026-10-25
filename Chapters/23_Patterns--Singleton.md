@@ -314,7 +314,7 @@ and the sleep makes that result likely.
 The fix puts the check inside a lock.
 `@cache` runs its check inside its own wrapper,
 where your code cannot put a lock around it.
-So the locked version drops `@cache` and writes the check by hand:
+So the locked version drops `@cache` and puts its own check inside the lock:
 
 ```python
 # singleton_locked_settings.py
@@ -609,7 +609,7 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 #: spam False True
 ```
 
-`Singleton` writes its `__init__()` by hand, and it cannot be a `@dataclass`.
+`Singleton` defines its own `__init__()`, and it cannot be a `@dataclass`.
 The sharing depends on `super().__init__()` rebinding `self.__dict__` to `_shared_state`.
 A dataclass generates its own `__init__()`,
 which assigns the fields and [skips the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),

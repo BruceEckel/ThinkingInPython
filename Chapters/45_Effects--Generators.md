@@ -97,7 +97,7 @@ and a type checker rejects a value on the wrong channel.
 The distinction exists for the type checker.
 At runtime, `Question("name")` returns the same `str` you passed in.
 
-Driving the generator by hand sends one `Answer` at a time:
+Driving the generator with `next()` and `send()` sends one `Answer` at a time:
 
 ```python
 # drive_by_hand.py
@@ -1015,7 +1015,7 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
 1.  Write `tally()`, a generator that yields a prompt string,
     receives an `int` for each prompt, and returns the total once it has three.
     Give it the full three-parameter annotation,
-    then drive it by hand with `next()` and `send()` and read the total off `StopIteration`.
+    then drive it with `next()` and `send()` and read the total off `StopIteration`.
 2.  `drive()` answers from a `dict`.
     Write a second driver that answers from an `Iterator[Answer]`, in order,
     and run `interview()` under both.

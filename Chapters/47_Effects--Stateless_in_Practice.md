@@ -2169,7 +2169,7 @@ Trust a green check only where you have seen the same construct produce a red on
 `success()` lifts a value into it, `yield from` chains two of them together,
 and the generator body is syntax that hides the chaining.
 `Result` in [Error Handling](42_Functional--Error_Handling.md#composing-with-bind)
-has the same two operations, written out by hand.
+has the same two operations, with the chaining written as `bind()` calls.
 Stateless's documentation calls the library an algebraic effect system,
 and both descriptions are right.
 A monad plus handlers is how you build algebraic effects in a language with no native support for them.
@@ -2225,7 +2225,7 @@ so constructing a dependency cannot be an Effect.
 ZIO's `ZLayer` is a constructor that can read configuration, fail, and retry.
 It resolves a dependency graph at compile time,
 reporting a cycle or a missing provider by name.
-Stateless has no equivalent, so you write the wiring at the edge by hand.
+Stateless has no equivalent, so you write the wiring at the edge yourself.
 The type checker verifies that a `supply()` call is complete but leaves the assembly of the graph to you.
 
 The operator set is small in the same way.

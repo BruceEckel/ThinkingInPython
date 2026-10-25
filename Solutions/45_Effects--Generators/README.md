@@ -1,11 +1,11 @@
 # Generators: Solutions
 
-## 1. `tally()`, driven by hand
+## 1. `tally()`, driven with `next()` and `send()`
 
 > Write `tally()`, a generator that yields a prompt string,
 > receives an `int` for each prompt, and returns the total once it has three.
 > Give it the full three-parameter annotation,
-> then drive it by hand with `next()` and `send()` and read the total off `StopIteration`.
+> then drive it with `next()` and `send()` and read the total off `StopIteration`.
 
 <details>
 <summary>Where to look</summary>
@@ -90,7 +90,7 @@ and `int` keep the two integer channels apart,
 so transposing the `SendType` and the `ReturnType` is a type checker error.
 With bare `int` on both channels, the checker accepts the swap.
 
-**Drive the conversation by hand.**
+**Drive the conversation with `next()` and `send()`.**
 The third `send()` resumes the last `yield`,
 so the loop ends and `tally()` returns.
 

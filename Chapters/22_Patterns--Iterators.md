@@ -79,7 +79,7 @@ Write `__iter__()` in new code.
 
 ## Generators {#generators}
 
-You rarely write `__iter__()`/`__next__()` by hand.
+You rarely write `__iter__()` and `__next__()` yourself.
 A *generator* writes them.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn.
 The generator pauses after each value and resumes with its local variables intact.

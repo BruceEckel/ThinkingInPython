@@ -171,7 +171,7 @@ Chapters/35_Patterns--Flyweight.md	[PAST] set: Replace CODE on CODE with CODE an
 Chapters/35_Patterns--Flyweight.md	[PAST] split: First, split each object's state in two.
 Chapters/36_Patterns--Memento.md	[PAST] bound: For a field that grows with every edit, bound the history's depth (see exercise 2), coalesce edits before CODE stores them, use a persistent structure that shares more than a flat tuple, or switch to *Command*-based undo, which stores an edit instead of a state.
 Chapters/36_Patterns--Memento.md	[PAST] had: CODE builds a bare CODE with CODE, skipping CODE, and copies in the fields the old bytes had.
-Chapters/36_Patterns--Memento.md	[PAST] let: The checker and the frozen field both let code holding a CODE read CODE, unpack that tuple, or build a CODE by hand.
+Chapters/36_Patterns--Memento.md	[PAST] let: The checker and the frozen field both let code holding a CODE read CODE, unpack that tuple, or build a CODE of its own.
 Chapters/36_Patterns--Memento.md	[PAST] read: All three read the bytes as data and run no code from them, which removes pickle's security risk.
 Chapters/36_Patterns--Memento.md	[PAST] scoped: Databases provide savepoints, mementos scoped to a transaction.
 Chapters/38_Patterns--Simulation.md	[PAST] adapted: This second example, adapted from my *Atomic Kotlin* book, walks a single robot through a maze.
@@ -199,8 +199,8 @@ Chapters/44_Effects--Effect_Management.md	[PAST] divided: The solution divided n
 Chapters/44_Effects--Effect_Management.md	[PAST] ended: *checked exceptions*), while C++, before C++17 removed them, checked it at runtime and ended the program on an exception the list left out.
 Chapters/44_Effects--Effect_Management.md	[PAST] faced: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] followed: A perfectly pure computation, followed to its logical end, is a space heater with extra steps.
-Chapters/44_Effects--Effect_Management.md	[PAST] introduced: Neither language infers the list from the functions a body calls, so an exception introduced three levels down means editing every signature above it by hand.
-Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put every name in one global namespace, and the programmer prevented collisions by hand.
+Chapters/44_Effects--Effect_Management.md	[PAST] introduced: Neither language infers the list from the functions a body calls, so an exception introduced three levels down means editing every signature above it.
+Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put every name in one global namespace, and the programmer prevented collisions by choosing distinct names.
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.

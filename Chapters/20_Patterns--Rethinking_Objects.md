@@ -545,7 +545,7 @@ print(f"{len(box)=}, {box.appends=}")
 
 `CountingBox` holds its `list` in a field,
 so every method that adds items is one it defines.
-It forwards each operation it offers by hand.
+It writes a forwarding method for each operation it offers.
 `CountingList` inherits dozens of methods from `list`,
 and more than one of them adds items and bypasses `append()`.
 

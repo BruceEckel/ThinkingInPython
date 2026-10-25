@@ -561,7 +561,7 @@ because positional arguments fill from the left.
 Called with 5, that partial computes `2 ** 5`.
 
 Partial application turns a general function into the specific one a caller needs.
-[`multiplier()`](#closures) does the same by hand.
+[`multiplier()`](#closures) does the same with a closure.
 It is a factory that presets one argument and returns a function expecting the rest.
 When the general function exists, as `power()` does here,
 `partial()` removes the factory.

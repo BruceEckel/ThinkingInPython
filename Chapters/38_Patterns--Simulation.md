@@ -557,7 +557,7 @@ A stack of frontiers, popped and pushed in a loop, visits the same 139 cells.
 
 `asyncio` provides control flow.
 Each rat's own path through the maze stays one `while` loop in `run()`,
-instead of a stack of pending frontiers that one function pushes and pops by hand.
+instead of a stack of pending frontiers that one function pushes and pops.
 The design adds an event loop,
 a component whose one job here is to resume each waiting rat in turn.
 

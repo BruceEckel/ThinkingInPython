@@ -126,7 +126,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 
-## 2. Threading a `Log` Effect through by hand
+## 2. Threading a `Log` Effect through every signature
 
 > Do the bookkeeping the chapter describes.
 > Starting from `bookkeeping_scales.py`, add a `Log` Effect
@@ -680,7 +680,8 @@ where `greet()` specifies the interface and leaves the implementation to the cal
 That choice sounds like late binding until you ask what it lets you swap.
 A different loop runs the same awaits on a different schedule.
 You settle what those awaits mean when you write the coroutine,
-so a test that needs fake prices must inject `price_of_async` by the same hand-threading this chapter's exercise 2 measures.
+so a test that needs fake prices must inject `price_of_async` through every signature,
+the threading this chapter's exercise 2 measures.
 The event loop is a scheduler, not a handler.
 
 So `async` is an Effect-tracking system rather than a full EMS,

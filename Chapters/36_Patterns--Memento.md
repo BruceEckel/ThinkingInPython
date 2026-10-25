@@ -141,7 +141,7 @@ Every call to `save()` and `restore()` still type-checks,
 once `restore()` copies the tuple it receives in place of `memento.strokes`.
 But an alias is a second name for an existing type.
 Any `tuple[str, ...]` in the program satisfies it,
-including one a caretaker builds or unpacks by hand.
+including one a caretaker builds or unpacks on its own.
 `NewType("Memento", tuple[str, ...])` exists only for the type checker.
 At runtime it is a callable that returns its argument,
 so the caretaker still holds a plain tuple it can index, unpack,
@@ -158,7 +158,7 @@ so every `Memento` a caretaker builds is deliberate.
 so reassigning `checkpoint.strokes` raises `FrozenInstanceError` at runtime.
 
 The checker and the frozen field both let code holding a `Memento` read `.strokes`,
-unpack that tuple, or build a `Memento` by hand.
+unpack that tuple, or build a `Memento` of its own.
 The caretaker's side of the contract remains a convention,
 the one on which the classic pattern relies.
 The type checker catches the accidental case:

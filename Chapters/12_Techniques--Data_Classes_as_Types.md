@@ -974,7 +974,7 @@ The standard library mixes `str` into `StrEnum`,
 so a member answers every `str` method.
 Its `__str__()` is `str.__str__()`,
 so an f-string shows `info` rather than `Level.INFO`.
-A class written as `(str, Enum)` by hand keeps `Enum`'s `__str__()` and prints `Level.INFO`;
+A class that lists `(str, Enum)` as its bases keeps `Enum`'s `__str__()` and prints `Level.INFO`;
 ruff's `UP042` rewrites that form to `StrEnum`.
 `IntEnum` mixes `int` into `Enum`, so each member is an `int`.
 

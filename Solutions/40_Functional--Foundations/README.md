@@ -229,7 +229,7 @@ defines `compose()`,
 which returns a function that applies one function to the result of another.
 The result of `compose()` is a one-argument function,
 so it can be an argument to `compose()` again.
-Work out by hand the order in which the three functions run,
+Predict the order in which the three functions run,
 then compare with the output.
 
 <details>

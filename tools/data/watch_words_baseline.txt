@@ -622,7 +622,7 @@ Solutions/44_Effects--Effect_Management/README.md	only: Only an CODE may contain
 Solutions/44_Effects--Effect_Management/README.md	only: so CODE needs only methods with matching signatures
 Solutions/44_Effects--Effect_Management/README.md	price: CODE has no equivalent of writing a function against "something awaitable that yields a price" and choosing the implementation later
 Solutions/44_Effects--Effect_Management/README.md	prices: CODE receives a list of coroutines rather than prices
-Solutions/44_Effects--Effect_Management/README.md	prices: so a test that needs fake prices must inject CODE by the same hand-threading this chapter's exercise 2 measures
+Solutions/44_Effects--Effect_Management/README.md	prices: so a test that needs fake prices must inject CODE through every signature
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
 Solutions/45_Effects--Generators/README.md	want: So annotate a local whenever you want the checker to verify the type of the call that produces its value

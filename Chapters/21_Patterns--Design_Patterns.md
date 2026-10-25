@@ -589,7 +589,7 @@ Try each exercise before opening its [solution](../Solutions/21_Patterns--Design
 1.  Pick a program you have written that changed more than once.
     Name its vector of change: the thing that shifted every time.
     Say which part of the design absorbed the change,
-    and which parts you edited by hand.
+    and which parts you edited.
 2.  Take a pattern you know from another language and list its parts:
     the classes, the interfaces, and the methods its usual form requires.
     Cross out every part Python supplies for you.

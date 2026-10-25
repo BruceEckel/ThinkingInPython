@@ -260,7 +260,8 @@ Every piece in `trash.dat` reaches a bin,
 but `sort_by_match()` has a classic flaw.
 It tests for every type.
 Testing for one type, or a small subset that needs special handling, is fine.
-Testing for all of them means you write the type-to-bin lookup by hand.
+Testing for all of them means you write the type-to-bin lookup as a `match`,
+one `case` per type.
 When a new material joins the system, say `Plastic`,
 you must find every `match` statement that enumerates specific types.
 Each one you miss silently leaves the new material out of every bin.

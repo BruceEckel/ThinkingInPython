@@ -3,7 +3,7 @@
 > Two objects meet, and the right action depends on the type of each.
 > *Multiple Dispatching* chooses the action from both types at once.
 
-Code that combines several interacting types can end up testing a type by hand for every combination.
+Code that combines several interacting types can end up with a type test for every combination.
 Consider a system that parses and executes mathematical expressions.
 You want to say `Number + Number`, `Number * Number`, etc.,
 where `Number` is the base class for a family of numerical objects.
@@ -14,7 +14,7 @@ how does the code choose the operation that fits both types?
 Python dispatches on one type at a time.
 When two objects of unknown type interact,
 a method call resolves its receiver's type alone.
-You end up testing the other type by hand,
+You end up testing the other type in your own code,
 writing out the dispatch the language performs for the receiver.
 
 That dispatch is one form of [polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism),
@@ -366,7 +366,7 @@ because the `Paper()` pattern matches the subclass first.
 supplies the second dispatch for a method.
 Ordinary method resolution dispatches on `self` and finds the decorated method,
 which then dispatches on the first argument after `self` through `singledispatch`.
-That is the pair of dispatches the `eval_*()` family writes out by hand.
+That is the pair of dispatches the `eval_*()` family writes out.
 `singledispatchmethod` matches on the MRO, like `singledispatch`,
 rather than exactly.
 
@@ -421,7 +421,7 @@ testing the opponent's type case by case.
 It works.
 The type tests repeat in every class,
 as the `eval_*()` methods do in the method version.
-The programmer resolves by hand what dispatch resolves on its own.
+The programmer writes the type tests that dispatch performs on its own.
 Every new `Item` requires an edit to every ladder.
 Both versions in this chapter replace the ladder.
 
