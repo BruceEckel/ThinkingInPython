@@ -561,7 +561,7 @@ def add(a: int, b: int) -> int:
 <summary>Done when</summary>
 
 a function under `@memo` and another under `@memo(maxsize=2)` print when their bodies run.
-A repeated call prints nothing,
+A repeated call returns its cached result silently,
 a third distinct call evicts the first so repeating the first call prints again,
 a call with a keyword argument works, and both functions keep their `__name__`.
 `uv run ty check` passes.
