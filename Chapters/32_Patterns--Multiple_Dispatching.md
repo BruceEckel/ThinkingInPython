@@ -82,8 +82,7 @@ def duel(player: Any, opponent: Any) -> None:
     print(f"{player} <--> {opponent} : {result}")
 ```
 
-`all_pairs()` is generic over whichever base class it receives.
-`__subclasses__()` lists that base's direct subclasses,
+`__subclasses__()` lists the base's direct subclasses,
 as [`shape_name()`](26_Patterns--Factory.md#simple-factory-method) does.
 `itertools.product()` pairs each subclass with every subclass, itself included,
 so a demo prints each of the nine answers once.
@@ -244,8 +243,7 @@ OUTCOME: Final[Table] = {
 
 The table version keeps the checking and repeats no method names.
 Its `Item` declares the one method the dispatch needs,
-so `compete()` takes its opponent as an `Item`:
-`compete(self, opponent: Item) -> Outcome`.
+so `compete()` takes its opponent as an `Item`.
 Its answers are rows in one dictionary,
 so a new class inherits `compete()` and needs rows instead of methods.
 The type checker accepts a table that lacks a row, though,
@@ -280,9 +278,7 @@ the fail-fast policy that suits a table you are still filling in
 Here the failure is the dictionary's own `KeyError`,
 where the state machine's engine raises `NoTransition`.
 
-The lookup raises a `KeyError` for a subclass.
-`Origami` derives from `Paper` and inherits its `compete()`,
-but the table has no row for `Origami`:
+The lookup raises a `KeyError` for a subclass:
 
 ```python
 # exact_match.py
@@ -474,8 +470,6 @@ so its `compete()` returns `DRAW` before making that call.
 Because `Rock` has no `eval_damp_paper()` method to receive the dispatch,
 that answer takes one `isinstance()` test,
 one rung of the ladder that double dispatch replaces.
-`Rock`'s result against a `DampPaper` comes from `DampPaper.eval_rock()`,
-an ordinary override.
 Both overrides are necessary.
 With the `compete()` override alone,
 the inherited `Paper.eval_rock()` reports that the rock loses,
@@ -540,7 +534,6 @@ so one dictionary of nine expected answers, `EXPECTED`,
 drives two independent sets of `Paper`, `Scissors`, and `Rock` classes.
 Iterating over `EXPECTED` yields its keys,
 so `pytest` parametrizes the test with the nine `(player, opponent)` pairs.
-The test then reads each expected answer from `EXPECTED`.
 
 `compete()` also checks the result's type.
 A `StrEnum` member equals its string,
@@ -611,16 +604,12 @@ with expected(TypeError):
 #: and 'str'
 ```
 
-The first two additions resolve inside `__add__()`.
-One of the left operand's `isinstance()` tests matches the right operand.
 `4 + Meters(3)` calls `int.__add__()` first,
 which returns `NotImplemented` for a `Meters` operand.
 The sentinel is a decline rather than an error,
 so Python tries `Meters.__radd__()` next.
 Its trace line shows the operands in swapped order.
 The last case shows why the sentinel exists.
-`Meters.__add__()` runs and declines the string,
-and `str` defines no `__radd__()`.
 With the left operand declining and no reflected method to try,
 Python raises `TypeError`.
 
