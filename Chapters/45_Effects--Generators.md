@@ -617,7 +617,8 @@ As the `ReturnType` it is the value of the whole `yield from` expression in `int
 
 `drive()`, imported unchanged,
 answers a request yielded two generators deep as it answers one from `interview()`'s own body.
-`ask()` deals in a `Question` and an `Answer` alone.
+`ask()` works with a `Question` and an `Answer` alone,
+so the same `ask()` runs under any driver.
 A single loop at the edge of the program interprets requests yielded at any depth.
 
 ### Composing Is Not Interpreting
