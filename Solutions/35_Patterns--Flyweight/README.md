@@ -146,7 +146,6 @@ print(len(cells), len({id(t) for t in cells}))
 ```
 
 **Name each new kind in both tables.**
-Door and tree tiles need two new symbols in `SPECS` and the same two in the `Symbol` literal.
 Once both tables name the same kinds, `SPECS` passes the type checker,
 which still flags any key outside `Symbol`.
 `tile()` and `parse_map()` stay as they are.
@@ -302,8 +301,6 @@ for size in (50, 100, 200):
 ```
 
 **Compare the peaks across sizes.**
-The ratio stays between six and seven at every size: about 6x at a 50x50 map,
-close to 7x at 200x200.
 Both peaks grow with the number of cells,
 because both versions build the same nested list of references.
 The two versions differ in the memory one cell takes.
@@ -620,13 +617,10 @@ print(queen.color, queen.kind)
 two colors times six kinds.
 Every white pawn is the same object,
 and so is every piece of any other color-and-kind combination.
-The board is a `dict` mapping squares to references.
-That mapping keeps the extrinsic position separate from the intrinsic color-and-kind that `@cache` shares.
+The board's `dict` keeps the extrinsic position separate from the intrinsic color-and-kind that `@cache` shares.
 
 **Capture by replacing a reference.**
 Capturing leaves every `Piece` object alive.
-`move()` pops the moving piece's reference from `src` and writes it over the captured piece's reference at `dst`,
-so a capture leaves the board one entry shorter.
 `@cache` keeps the captured piece's flyweight,
 which represents "a black knight" in the abstract rather than any particular knight on a square.
 The twelve `Piece` objects therefore remain however many captures follow.
@@ -634,8 +628,6 @@ The twelve `Piece` objects therefore remain however many captures follow.
 **Promote by switching flyweights.**
 A frozen `Piece` keeps its color and kind for life,
 so `promote()` changes what the square refers to.
-`piece(current.color, kind)` looks up (or builds)
-the shared `Piece` for the new kind, and the square now points at that one.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -900,8 +892,6 @@ def test_out_of_range_component_raises() -> None:
 ```
 
 **Validate before the pool lookup.**
-The range check runs first in `__new__()`,
-so `__new__()` raises a `ValueError` for an out-of-range component before the lookup can find a pooled instance or build a new one.
 Every `Color` that `__new__()` pools or returns has in-range components.
 
 [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
