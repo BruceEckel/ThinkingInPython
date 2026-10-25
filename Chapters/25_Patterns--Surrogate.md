@@ -113,11 +113,7 @@ with expected(TypeError):
 #: without an implementation for abstract method 'g'
 ```
 
-Because `Proxy` accepts any `Service` and `Complete` implements both methods,
-the proxy can forward either call.
-Because `Partial` defines `f()` and leaves `g()` abstract,
-constructing a `Partial` raises a `TypeError` before the first call.
-The type checker reports that construction before the program runs,
+The type checker reports the `Partial()` construction before the program runs,
 so the line has a `# type: ignore` and the listing can show the runtime refusal.
 
 The inheritance makes a `Proxy` acceptable wherever code expects a `Service`.
@@ -203,8 +199,6 @@ p.h()
 `__getattr__()` makes the forwarding generic.
 Because `Proxy` passes every name it lacks to the implementation,
 it keeps working when you add a method to the implementation.
-`Implementation` here has an `h()` that the `Implementation` in `proxy_forwarding.py` lacks,
-and the same `Proxy` forwards `p.h()`.
 
 The double underscore on `self.__implementation` [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 the name to `_Proxy__implementation`,
@@ -300,8 +294,6 @@ so `len(p)` passes the check and fails at runtime.
 `str(p)` succeeds.
 `object` defines `__str__()`,
 so the lookup on `type(p)` finds `object`'s version.
-`w` prints as `spam eggs`.
-The proxy prints as `<proxy_getattr.Proxy object at ...>`.
 Whenever `object` defines the dunder,
 Python calls `object`'s version instead of the implementation's version.
 A proxy that must forward special methods therefore defines each one in its class body.
@@ -333,7 +325,6 @@ which `Proxy` inherits from `object`.
 The implementation keeps its own `level`.
 The next `p.level` lookup finds the proxy's `level`,
 so Python skips `__getattr__()`.
-The proxy reports `"high"` and the implementation reports `"low"`.
 
 The type checker rejects the assignment because `Proxy` declares no `level` and no `__setattr__()` that accepts one.
 
@@ -368,8 +359,6 @@ print(p.level, settings.level)
 ```
 
 `object.__setattr__()` stores `_implementation` on the proxy without going through `__setattr__()`.
-Every later assignment reaches the implementation through `__setattr__()`,
-so the proxy and the implementation report the same value.
 `WriteProxy` needs no `# type: ignore`,
 because a declared `__setattr__()` makes the type checker accept assignment to any attribute name.
 
@@ -546,8 +535,7 @@ print(p.query())  # [1]
 ```
 
 Building `Lazy` defers `Expensive`, so `proxy ready` prints first.
-`__getattr__()` builds `Expensive` on the first forwarded access.
-Every later access reuses that instance,
+Every later access reuses the `Expensive` instance,
 so the `query()` at `[1]` prints `result` alone.
 
 ### Protection Proxy
@@ -588,7 +576,6 @@ Guarded(Document(), admin=True).erase()
 #: erased
 ```
 
-A guest reaches only the names in `READ_ONLY`, so `erase()` requires `admin`.
 The protection is a convention, like the underscore on `_doc`.
 Normal lookup finds `guest._doc`, so Python skips `__getattr__()` and its check,
 and `guest._doc.erase()` reaches the document.
@@ -648,16 +635,12 @@ print("calls:", p.calls)
 #: calls: 3
 ```
 
-Here `__getattr__()` returns a new function.
 `counted` closes over `attr`, the implementation's bound method,
 so `self.calls` increments when code calls `counted`,
 not when `__getattr__()` returns it.
-A data attribute comes back unchanged, so reading one leaves `calls` as it was.
 
 Normal lookup fails on every `p.f`,
 so every access calls `__getattr__()` and builds another `counted`.
-Two lookups of the same name therefore produce two different objects.
-The wrapper reports its own name, `counted`, rather than `f`.
 Building a `counted` leaves the tally alone,
 so the `p.f is p.f` test and the `__name__` read leave it at three.
 
@@ -672,9 +655,6 @@ and finds the proxy's own attributes, such as `calls`, by normal lookup.
 The proxy therefore keeps state of its own and forwards the methods the implementation has.
 The same few lines serve lazy initialization (a virtual proxy), access checks
 (a protection proxy), or call tracking (a smart reference), over any object.
-
-The tests confirm that a call reaches the implementation and returns its result,
-and that the proxy counts calls and leaves attribute reads out of the tally:
 
 ```python
 # test_counting_proxy.py
@@ -793,10 +773,6 @@ for the races an unsynchronized swap allows.
 If `run()` declares `surrogate: Behavior`, the checker rejects `run(surrogate)`,
 because `Surrogate` defines no `f()` of its own.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
-
-The test passes the *State* surrogate two small implementations,
-`StateA` and `StateB`,
-and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
 ```python
 # test_state.py
