@@ -107,17 +107,12 @@ Because `func_d()` sits before `func_c()` in the chain,
 an `Err` from `func_d()` has a later step to skip.
 
 **Make the skipped step visible.**
-`func_c()` prints a line when it runs.
-The line appears for `0` and `3` and is missing for `4`,
+`func_c()`'s trace line appears for `0` and `3` and is missing for `4`,
 which confirms the skip.
-`4` reaches `func_d()` because `func_a()` and `func_b()` both return an `Ok` for it.
 `func_d(4)` returns an `Err`,
 and `Err.bind()` returns `self` without calling `func_c()`,
 so that `Err` is the chain's result.
 
-`1` and `2` fail earlier and stop the chain before it calls `func_d()`.
-`func_d(3)` returns `Ok(3)`, so `3` fails in `func_c()`.
-Inputs `1` through `4` each fail at a different step.
 A chain short-circuits at the first step that fails,
 so the order of the steps decides where the chain stops.
 
@@ -286,7 +281,8 @@ and its counterpart to `map_error()` is `alt()`.
 because an `Ok` holds an answer and `func` transforms errors.
 
 **Transform the failure.**
-`Err`'s version applies `func` to `self.error` and wraps `func`'s return value in a new `Err`.
+`Err`'s version builds a new `Err` because `func` can change the error's type,
+from `E` to `F`.
 
 **Prefix errors at the boundary.**
 To prefix every error in a chain, you call `result.map_error(prefix)` once,
@@ -389,15 +385,8 @@ So `func_c()` here takes `i + j`, built from the caller's arguments,
 rather than a value that `func_a()` or `func_b()` produces.
 
 **Gather the failures.**
-`combined()` matches the three results as one tuple.
-When all three are `Ok`s, `case Ok(a), Ok(b), Ok(c)` binds their answers.
-Every other combination matches `case results`,
-which gathers every `Err`'s `.error` into one list.
-
-`combined(1, 5)` now reports a single-item list, `["func_a(1)"]`,
-because `func_b(5)` and `func_c(6)` both succeed.
-`combined(1, 2)` reports all three failures at once: `i=1` fails `func_a()`,
-`j=2` fails `func_b()`, and `i+j=3` fails `func_c()`.
+`case Ok(a), Ok(b), Ok(c)` takes the all-`Ok` combination,
+so every tuple that reaches `case results` holds at least one `Err` and produces an error list with at least one entry.
 
 **Widen the error type.**
 The three steps return `Result[int, str]`, an `int` or one error string,
@@ -541,19 +530,16 @@ It gives the decorator's shape a name,
 so `safe()`'s return annotation reads `SafeDecorator` and the revealed signature keeps the `Result` alias.
 
 **Accept the types to catch.**
-`safe()` gains a layer.
-It now takes the exception types and returns the decorator,
-instead of being the decorator.
+Python evaluates `safe(ValueError)` before it decorates anything,
+so `safe()` must return the decorator.
 
 **Catch only the named types.**
 Because the `except catch` clause accepts a tuple of exception types,
 `wrapper()` changes by one word.
 
 **Let everything else propagate.**
-`parse("42")` comes back as an `Ok`.
 `parse("oops")` raises a `TypeError`,
-which `@safe(ValueError)` lets propagate out of `wrapper()`.
-`expect()` catches it outside `parse()` and prints it.
+which `@safe(ValueError)` lets propagate out of `wrapper()` to the `expect()` call outside `parse()`.
 
 A caller of `parse("oops")` receives the `TypeError` like any other exception.
 The chapter's `@safe` returns the `TypeError` as `Err(TypeError(...))`,
@@ -652,7 +638,6 @@ A note therefore travels with a failure,
 the one result that has something to explain.
 
 **Report without a traceback.**
-The second and third runs name a different setting and a different text in their notes.
 The `Err` holds the exception,
 and the exception holds the note as ordinary data,
 so `report()` prints the note from that data after `load_setting()` has returned.
@@ -665,7 +650,6 @@ The lambdas ignore their parameter,
 since the second load works from its own name and text.
 `bind()` exists to pass one step's answer to the next step,
 so it reads worst when the next step ignores that answer.
-Here it sequences the two calls while the lambda discards the answer.
 The `returns` library's [do-notation](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
 reads better.
 
@@ -770,7 +754,6 @@ for i in range(5):
 
 The three failures become one result.
 Inputs `1`, `2`, and `3` fail in three different functions for three different reasons.
-`composed()` returns the same `None` for all three.
 Compare the `Result` version, where the same three inputs report `func_a(1)`,
 `func_b(2)`, and `func_c(3): division by zero`.
 
