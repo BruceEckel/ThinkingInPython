@@ -38,8 +38,6 @@ The example also shows a *conditional expression*:
 a one-line `if`/`else` that produces a value.
 It does the job of the `?:` operator in C++ and Java,
 but it puts the condition in the middle.
-The value for a true test comes first, then `if` and the test,
-then `else` and the value for a false test.
 
 Adding `elif` to an `if` statement tests several conditions in order:
 
@@ -125,12 +123,8 @@ print()  # The newline that end=" " left off
 #: 0 1 2 4 5
 ```
 
-The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
-then stops at `6` with `break`, so `6` through `9` never print.
-
 `print()` ends with a newline by default.
 `end=" "` replaces that newline with a space, so the numbers print on one line.
-A bare `print()` ends the line afterward.
 
 `break` and `continue` both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
@@ -259,17 +253,13 @@ print(list(enumerate(names, start=1)))
 #: [(1, 'Alice'), (2, 'Bob'), (3, 'Carol'), (4, 'Ted')]
 ```
 
-`enumerate()` yields `(index, item)` pairs counting from zero,
-and the loop here unpacks each pair into `index` and `name`.
-A `for i in range(len(names)):` loop with `names[i]` inside does the same job.
+A `for i in range(len(names)):` loop with `names[i]` inside does the same job as the `enumerate()` loop.
 That loop binds the index and leaves the item to a lookup,
 so every line that needs the item repeats `names[i]`.
 `enumerate()` supplies both the index and the item.
 
 `start=1` begins the index at one, the usual count in output that people read,
 so a loop body can print the index as it comes.
-`list()` collects the pairs that the `start=1` form yields,
-each index one higher than in the loop.
 
 `zip()` walks several sequences at once:
 
@@ -294,8 +284,7 @@ except ValueError as e:
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so it drops the extra score.
 Stopping silently is convenient when the lengths differ on purpose and a bug when you expect them to match.
-With `strict=True`, `zip()` raises a `ValueError` when the lengths differ.
-`zip()` checks the lengths during iteration,
+With `strict=True`, `zip()` checks the lengths during iteration,
 when one argument runs out while another still has items,
 so the listing consumes the `zip()` with `list()`.
 
@@ -334,8 +323,6 @@ so `if n := len(text) > 3:` gives `n` the result of the comparison, `True`,
 and not the length.
 
 The walrus helps most in a `while` loop.
-The header checks that the stack has an item, pops it, names it, and tests it,
-so `item` holds the popped value when the body starts.
 The walrus also moves the fetch and the test in `while_true.py` into that loop's header:
 `while (value := values.pop(0)) != 0:`.
 
@@ -419,7 +406,6 @@ A C `switch` falls through from one `case` into the next until a `break` stops i
 A Python `case` ends on its own.
 
 The first `case` destructures the split command.
-It matches a two-item list starting with `"go"` and binds the second item to `direction`.
 A bare name in a `case` captures rather than compares.
 `case direction:` binds anything to `direction` and matches every value.
 Write a constant as a literal (`case "quit":`) or as a dotted name
@@ -508,7 +494,6 @@ print(risky())
 
 `risky()` raises a `ValueError`,
 but the `return` in `finally` discards the exception before it reaches the caller.
-The caller receives `"swallowed"` and no exception.
 Python also flags the `return` in `finally` at compile time.
 Running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
@@ -595,11 +580,6 @@ Its body is `pass` because it inherits all its behavior from `Exception`.
 The `except BadNumber` handler matches on the class.
 [Classes](07_Foundations--Classes.md) covers class definitions in full.
 
-Each output line starts with a function's name, then shows the `__cause__`,
-`__context__`, and `__suppress_context__` of the `BadNumber` it raised.
-`name()` gives the class name of the exception an attribute holds,
-or `None` when the attribute is empty.
-
 In all three functions,
 Python records the handled `ValueError` in `__context__`.
 In `implicit()`, that is the one link,
@@ -655,8 +635,6 @@ and `isdigit()` accepts `"²"`, which `int()` refuses with a `ValueError`.
 is the EAFP version of `look_first()`.
 Its `try` block runs the conversion and catches the failure,
 so the test and the operation are one call and cannot disagree.
-The output shows `parse_int()` returning `-5` for `"-5"` and `None` for `"²"`,
-the two answers `look_first()` gets wrong.
 
 The file system can also change between the test and the operation.
 A file that exists at the `if` can disappear before the `open()`.
