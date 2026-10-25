@@ -143,11 +143,6 @@ Every change the exercise requires sits at the call site.
 `expected` takes one `types` argument that is either an exception class or a tuple of them,
 and `issubclass(exc_type, self.types)` accepts either shape.
 Passing `(ZeroDivisionError, TypeError)` therefore suppresses both.
-The `TypeError` block prints a `[Type] message` line in the same form the `ZeroDivisionError` block printed before the change.
-
-**Check that the original type still matches.**
-The second block divides by zero and prints `[ZeroDivisionError] division by zero`,
-so the tuple still covers the original exception.
 
 If you write `expected(ZeroDivisionError, TypeError)` without the inner parentheses,
 the script stops before printing `before`,
@@ -231,9 +226,7 @@ with (tag("ul") as outer, tag("li") as inner1,
 #: </ul>
 ```
 
-All three managers enter left to right (`ul`, then `li`, then `li` again)
-and exit in reverse order.
-The reversal holds for any number of managers on the line.
+The exit order reverses the entry order for any number of managers on the line.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -305,10 +298,7 @@ def test_both_leased_at_once() -> None:
 ```
 
 **Hold both connections at once.**
-The `lease()` at `[1]` takes one connection out of the queue,
-and the nested `lease()` at `[2]` takes the other,
-so `pool.available()` is `0` inside the inner `with`.
-The `0` confirms that the pool hands out one concurrent lease for each item you gave its constructor.
+`pool.available() == 0` inside the `with` at `[2]` confirms that the pool hands out one concurrent lease for each item you gave its constructor.
 A third nested `lease()` blocks forever in `get()`,
 since the one thread that can return a connection is the thread waiting for it.
 
@@ -467,8 +457,6 @@ and `uv run ty check` passes on your file.
 <details>
 <summary>Solution</summary>
 
-The solution tests `exc_type is not None` before calling `issubclass()`:
-
 ```python
 # ignore_missing.py
 from types import TracebackType
@@ -506,10 +494,6 @@ The return value of `__exit__()` determines whether the exception continues.
 A truthy value suppresses the exception.
 A falsy value lets it continue.
 Returning `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and lets every other exception propagate.
-
-**Check that other exceptions propagate.**
-In the `ValueError` block, `ignore_missing`'s `__exit__()` returns `False`,
-so the exception propagates to the chapter's `expected`, which prints it.
 
 **Handle a clean exit.**
 The `exc_type is not None` test keeps the normal path working.
@@ -611,8 +595,7 @@ using []
 Leaving the `with` unwinds that stack, so the closing tags print in reverse.
 The reversal holds for any number of names.
 
-In the empty run, nothing opens, so nothing closes.
-`with ExitStack() as stack:` still enters and exits around a body whose stack stays empty.
+In the empty run, `with ExitStack() as stack:` still enters and exits around a body whose stack stays empty.
 
 The empty run shows why `ExitStack` exists.
 A written-out `with a, b, c:` line settles its count in the source.
@@ -726,7 +709,6 @@ except ValueError as error:
 ```
 
 **Clean up before the exception propagates.**
-`exit A` now prints, and it prints before `caught: boom`.
 Python raises the block's `ValueError` inside the generator, at the `yield`.
 The `finally` runs as the exception propagates out of the generator,
 and only then does the exception propagate out of the `with` statement to the `except`.
