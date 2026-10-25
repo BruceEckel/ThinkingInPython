@@ -95,7 +95,6 @@ a call to `input()` has no terminal from which to read.
 `ask_and_greet()` stays character-for-character the same function under both bindings.
 
 **Request an interface, not a class.**
-`ask_and_greet()` declares an interface in its return type and calls two methods on the object that answers.
 `Terminal`, `Scripted`,
 and any third implementation are interchangeable because none of them appears in the Effect.
 Adding `read()` to the protocol changed which classes qualify.
@@ -215,7 +214,6 @@ run(supply(Console())(greet_all)(["Alice", "Bob"]))
 ```
 
 **Fix the signature, not the body.**
-The body stays as it is.
 `greet_all()` did the right thing all along.
 Its signature described a different function.
 
@@ -348,14 +346,12 @@ They differ in the return channel: `str` for `all_handled()`,
 
 **Consume every caught error.**
 The difference is which function consumes each caught error.
-`all_handled()` catches both errors, then consumes both in its `match`,
-turning each into a sentence and returning a `str`.
-The `match` covers every case inside the function, so no error remains,
+The `match` in `all_handled()` covers every case, so no error remains,
 and the `assert_never()` proves it.
 
 **Pass the remaining error up.**
-`one_unhandled()` catches the `KeyError` and consumes that one.
-The `ValueError` stays declared, as `Try[ValueError, str]` says,
+The `ValueError` in `one_unhandled()` stays declared,
+as `Try[ValueError, str]` says,
 so it is still in the yield channel when `catch(ValueError)` wraps `one_unhandled()`.
 `catch()` does not delete an error.
 It moves the error from the yield channel to the return channel, as a value.
@@ -475,7 +471,6 @@ print(recorder.printed, recorder.entries)
 ```
 
 **Fill both roles with one object.**
-One object satisfies both protocols.
 In `audit_log.py`, `Log` is a `dataclass` that holds its own entries,
 so a test constructs one and reads `log.entries` afterward.
 For one object to fill both roles there,
@@ -492,9 +487,7 @@ Each wrapper names the role this instance fills.
 
 **Check the greeting and the log together.**
 One test holds both assertions because it supplies the whole environment.
-It checks, in one function,
-that `print()` received the greeting and `write()` received the log entry,
-with no capture of stdout and no temporary file.
+The test reads both recorders, with no capture of stdout and no temporary file.
 Each `need()` yields a request that the supplied object answers,
 so the test chooses what printing and logging do.
 
@@ -586,14 +579,10 @@ print(run(supply(METAL, ROBOTIC)(holds)()))
 **Pick a strength above both forces.**
 `METAL` at strength `20` exceeds the robotic nailer's force of `11`,
 so both its rows read `True`.
-`METAL` is the first material in the table that survives both nailers.
 
 **Build each environment from a row.**
 The test function body needs no change because every material and nailer arrives as an argument.
-The body receives two objects and an expectation,
-builds an environment from them with `supply()`,
-and asks whether the answer matches.
-The `parametrize` table decides which two objects those are,
+The `parametrize` table decides which material and nailer the body receives,
 so adding a row adds a case and leaves the function body that runs it as it is.
 
 That split between the table and the body is the chapter's split between an Effect and its environment,
@@ -872,7 +861,6 @@ Removing the body's one `yield from` removes its last `yield`,
 so `greet()` returns `None` where its annotation declares a `Generator`.
 The `unresolved-attribute` error says the value in `console` has the wrong type,
 a `Generator` rather than a `Console`.
-Generators have no `print()`.
 
 The difference between the two cases is whether anything later uses the dropped value.
 The discarded `greet(name)` ends at its statement,
@@ -994,8 +982,8 @@ for builder in builders.values():
 ```
 
 **Run each stored Effect twice.**
-The first pass over `built` greets both names.
-The second prints nothing, and `run()` returns `None` for each entry.
+The second pass over `built` prints nothing,
+and `run()` returns `None` for each entry.
 An Effect is a generator, and a generator runs once.
 Resuming a finished generator raises `StopIteration` immediately,
 which `run()` reads as "already returned, with no value."
@@ -1003,9 +991,6 @@ So a spent Effect looks the same as one that succeeded and returned `None`,
 and nothing reports the difference.
 
 **Build a fresh Effect per run.**
-The dictionary of builders behaves as a reader expects.
-Each pass calls each entry, each call builds a new generator,
-and each generator runs its body once.
 The stored value changes from a generator, which `run()` consumes once,
 to a function, which a caller can call each time it needs a fresh Effect.
 
@@ -1129,7 +1114,6 @@ asyncio.run(main())
 ```
 
 **Relay the request, collect the results.**
-The annotation is `Depend[Async, list[str]]`.
 `report()` needs `Async`,
 and `yield from` relays each `Async` request to `report_all()`'s caller,
 so `report_all()` needs it too.
@@ -1139,8 +1123,6 @@ The return type changes, from one `str` to a `list[str]`,
 since `report_all()` collects the results rather than relaying them.
 
 **Drive the Effect from a coroutine.**
-`run()` raises a `RuntimeError`.
-`await run_async(...)` works.
 `run(effect)` is `asyncio.run(run_async(effect))`.
 `asyncio.run()` refuses to start an event loop inside a running one,
 so calling `run()` from `main()` fails.
@@ -1291,7 +1273,6 @@ not because the type checker requires them.
 and specifying that type makes the type checker compare its inference with the annotation.
 
 **Let `run()` raise each failure.**
-Each failure comes out of `run()` as an exception.
 `Cyd` has a score, so the lookup succeeds and `format_score()` fails.
 `Dana` has none, so the lookup fails and the Effect ends before `format_score()`.
 In both cases each `yield from` relays the error value as is,
