@@ -69,11 +69,6 @@ print(vars(A)["x"])  # The class entry is unchanged
 #: 100
 ```
 
-Before the assignment, `vars(a)` is empty,
-so `a.x` falls back to the class and reads `100`.
-After `a.x = 1`, the instance's own entry shadows the class entry,
-so `a.x` reads `1` while `vars(A)["x"]` still holds `100`.
-
 The listing subscripts `vars(A)` instead of printing it whole,
 because a class's dictionary also holds entries the compiler adds,
 such as `__module__` and `__doc__`.
@@ -142,9 +137,7 @@ show(b)
 #: 9
 ```
 
-`rerate(9)` changes the rating for every `Stars`.
-`show(a)` still prints `1`.
-Someone debugging that stale `1` finds `rerate()` and `show()` both correct.
+Someone debugging the stale `1` finds `rerate()` and `show()` both correct.
 The cause is the assignment inside `sell()`,
 which gave `a` its own `rating` before the class attribute changed.
 Neither `rerate()` nor `show()` calls `sell()`,
@@ -186,9 +179,6 @@ so `b.items` holds the pear too.
 The augmented assignment then stores that same list on `a`,
 creating an instance attribute that shadows the class list.
 Because both attributes refer to one list, the two printed values match.
-The plain assignment shows the split:
-`a.items = ["plum"]` rebinds `a`'s own attribute to a new list,
-while `b` still reads the shared one.
 
 A per-object list belongs in `__init__()`,
 as [Real Per-Object Defaults](#real-per-object-defaults) shows,
@@ -242,11 +232,9 @@ The annotation goes into `Tally.__annotations__` beside `total`'s entry and reco
 `display_object()` reports attributes that exist,
 so the declaration stays out of its report.
 
-Once an instance exists, `display_object(a)` reports both names:
-`label: str = 'a'` and `total: typing.ClassVar[int] = 1`.
 Constructing `a` runs `self.label = label`,
 which creates a real `label` attribute on `a`, not on `Tally`.
-`total` shows up too, by fallback.
+`display_object(a)` reports `total` too, by fallback.
 Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrates in `class_attribute_confusion.py`.
 The `total` that `a` reports is `Tally.total`.
@@ -309,8 +297,6 @@ print(Registry().count)  # Found by fallback
 `count: ClassVar[int]` records that a count belongs to `Registry`.
 No attribute exists until something assigns one,
 so the first read raises an `AttributeError`.
-`Registry.count = 0` creates the attribute on the class.
-An instance then finds it by fallback.
 
 The type checker (`ty`) accepts that first read,
 for the reason it accepts a read of `label`.
@@ -353,10 +339,8 @@ with expected(AttributeError):
 #: 'sides'
 ```
 
-`Shape` states that every shape carries a `sides`, `Square` supplies one,
-and `Blob` supplies none.
 A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
-declares its attributes in the same form, a bare annotation,
+declares its attributes in the same form as `Shape`, a bare annotation,
 since it describes what a class must have and leaves the value to the class.
 
 `ty` 0.0.91 enforces what the declaration states about the value.
@@ -404,7 +388,6 @@ print(a.total, b.total, Tally.total)
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
-Every `Tally` counts itself once, while the shared counter stays at `0`.
 The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 
@@ -464,13 +447,6 @@ print(Base.shared, Left.shared, Right.shared)
 #: 9 5 100
 ```
 
-Each line prints `Base`, `Left`, and `Right` in that order.
-`Left` inherits `shared`,
-so its column follows `Base.shared` until `Left.shared = 5` creates `Left`'s own attribute,
-which leaves `Base.shared` at `9`.
-`Right` shadows `shared` at class-definition time,
-so it keeps `100` when `Base.shared` changes.
-
 Attribute lookup on a subclass is the shadowing rule from `class_attribute_confusion.py`,
 one level up.
 `Left` reads through to `Base` until an assignment gives `Left` its own copy,
@@ -523,7 +499,6 @@ The first `Sub()` (`[2]`) reads the same `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
 The second `Sub()` (`[3]`) increments that separate copy to `3`.
-`Base.total` stays at `1`.
 
 The type checker accepts every line.
 The augmented assignment is a valid `ClassVar[int]` update either way,
@@ -572,7 +547,6 @@ In `real_defaults.py` the `100` is a default argument,
 `__init__(self, x: int = 100) -> None`.
 `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
-A new `A()` holds `x` in its own dictionary from the start.
 `vars(A())` prints `{'x': 100}`,
 where `inside_objects.py`'s `vars(a)` prints `{}` until `a.x = 1` runs.
 
@@ -609,7 +583,6 @@ print(vars(b), B().x)  # The same shadowing as Stars
 The name stays an ordinary shared class attribute,
 so the generated `__init__()` is `__init__(self)`.
 Neither Python nor the type checker reports an error.
-`b.x = -1` shadows the class attribute for that one instance.
 An assignment through the class changes every instance that falls back to the class,
 the hazard `Stars` demonstrates.
 
