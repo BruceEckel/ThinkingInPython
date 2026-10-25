@@ -48,8 +48,6 @@ the same call and the same rebinding,
 written above the function instead of after it.
 `hijack` returns `doesnt_matter`, which Python assigns to the name `cheese`,
 so `cheese` now refers to `doesnt_matter`.
-Calling `cheese()` runs `doesnt_matter`,
-which ignores `func` and prints its own message.
 The original body of `cheese()` never runs.
 
 Since Python binds the returned function to the name `cheese`, the local name
@@ -113,9 +111,6 @@ cheese()
 #: Wensleydale
 ```
 
-`Decorating` prints before `Definitions done`,
-so `announce` runs when Python executes the `def` for `cheese()`,
-before any call.
 The body of `wrapper()` is the one part that runs at the call.
 
 `wrapper()` is a [*closure*](40_Functional--Foundations.md#closures).
@@ -194,7 +189,6 @@ Nearly every wrapper should use it.
 `tracer.py` relies on that copy.
 Inside `wrapper()`, the name `wrapper` refers to the wrapper function itself,
 the same object now bound to `add`, and `wraps` has set its `__name__` to `add`.
-The trace lines read `wrapper.__name__` and print `add`.
 
 `wraps` also sets `__wrapped__` on the wrapper, pointing at the original.
 A call to `add.__wrapped__(2, 3)` runs the original `add` and bypasses the tracing.
@@ -441,14 +435,7 @@ if __name__ == "__main__":
 #: [TAG] two
 ```
 
-The implementation declares `func: Callable[P, R] | None = None` and branches on `func is None` in its last line,
-`return decorate if func is None else decorate(func)`.
-Called bare, `func` is `one`, so `func is None` is `False`,
-and the line returns `decorate(func)`, decorating `one` immediately.
-Called with arguments, `func` stays `None`,
-so the line returns `decorate` for Python to apply to `two`.
-
-The two `@overload` declarations state for the type checker what the runtime branch does:
+The two `@overload` declarations state for the type checker what the runtime `func is None` branch does:
 given a function, `label` returns a function of the same signature;
 given keyword arguments alone, it returns a decorator.
 The second overload gives that decorator the type `Decorator[P, R]`,
@@ -772,9 +759,7 @@ Its `wrapper()` makes the first call before the loop,
 so `result` holds a value before the loop starts.
 `repeat.py` relies on the `times >= 1` check for that guarantee.
 
-The class form's tests differ from `test_repeat.py` in their import alone.
-`test_repeat_call_count` parametrizes over `times`,
-and `test_repeat_rejects_times_below_one` covers the rejection in the constructor:
+The class form's tests differ from `test_repeat.py` in their import alone:
 
 ```python
 # test_repeat_class.py
@@ -1076,9 +1061,7 @@ if __name__ == "__main__":
 #: str
 ```
 
-`run_once` calls `greeting` immediately, at decoration time,
-and returns the value `greeting()` produced.
-After decoration the name `greeting` refers to that `str`,
+After decoration the name `greeting` refers to a `str`,
 so `greeting()` raises a `TypeError`, because a `str` is not callable.
 
 `run_once` suits a value that needs one-time setup logic but stays constant afterward.
@@ -1202,10 +1185,7 @@ if __name__ == "__main__":
 ```
 
 `Feta(Olives(Margherita()))` is the object version of stacked `@` decorators.
-Each topping wraps the pizza inside it and forwards through the same two-property interface,
-`cost` and `description`.
-The `Pizza` `Protocol` describes that interface.
-Both the plain pizzas and the toppings satisfy it structurally,
+Both the plain pizzas and the toppings satisfy the `Pizza` `Protocol` structurally,
 with no shared base class required.
 Satisfying a `Protocol` by shape alone is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 
