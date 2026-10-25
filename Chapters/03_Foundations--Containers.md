@@ -160,7 +160,7 @@ print(grid)
 ```
 
 The grid at `[1]` repeats the lesson of [Variables and References](02_Foundations--Tour.md#variables-and-references).
-Assignment binds a name and copies nothing,
+Assignment binds a name and shares the object,
 so `*` binds the same object into every slot.
 
 The second `grid` (`[2]`) comes from a *comprehension*:
