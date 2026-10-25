@@ -633,21 +633,13 @@ if __name__ == "__main__":
 #: Alice of Wonderland, friend Rabbit
 ```
 
-`ask()` uses `Answer` in two of the three positions, in two different roles.
-As the `SendType`, `Answer` types each value the driver sends,
-which arrives as the value of the `yield` expression and binds to `answer`.
-As the `ReturnType`, `Answer` types the value `ask()` returns when it finishes.
-That value becomes the value of the whole `yield from` expression,
-so each of `interview()`'s three assignments binds an `Answer`.
-`interview()` keeps `Result` as its `ReturnType`,
-because it returns a sentence built from all three answers,
-a different kind of value from the answer to any one question.
+`Answer` fills two of `ask()`'s three positions, in two roles.
+As the `SendType` it is the value of the `yield` expression, sent by the driver.
+As the `ReturnType` it is the value of the whole `yield from` expression in `interview()`.
 
-`drive()`, imported unchanged from `drive.py`,
-receives a request that `ask()` yielded inside `interview()`,
-and looks it up in `answers` as it would one that `interview()` yielded in its own body.
-The answer `drive()` sends back becomes the value of the `yield` inside `ask()`.
-Nothing in `ask()` refers to the driver that sent the answer.
+`drive()`, imported unchanged,
+answers a request yielded two generators deep as it answers one from `interview()`'s own body.
+Nothing in `ask()` refers to the driver.
 A single loop at the edge of the program interprets requests yielded at any depth.
 
 ### Composing Is Not Interpreting
