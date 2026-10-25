@@ -139,6 +139,17 @@ flourishes, nothing that obscures the point.
   that sits beside its mechanism stay. The `literal` skill's "Vague
   descriptions" section has the test and the calibration pairs (Bruce,
   2026-10-22, from chapter 45 and the book-wide sweep that followed).
+- **Restating:** a sentence beside a listing that says what the listing
+  or its `#:` markers already show: a line narrated ("`next(conversation)`
+  starts the generator and produces a `Question`"), an annotation read
+  aloud, a clause paraphrased ("`worker()` catches the exception, prints
+  the message, and yields again"). A sentence goes if the code already
+  shows it, and stays if it tells the reader something the code cannot:
+  where an exception lands, why two output lines sit together, which way
+  a value travels through a chain, what would happen without a line, why
+  an annotation is what it is, what a driver must do. Rule R47 in
+  `bruce_edit_db.md` has the test and the chapter 45 pairs (Bruce,
+  2026-10-25). A cut must not orphan a `[n]` tag.
 
 The style rules and watch list in the global `~/.claude/CLAUDE.md` are
 the standard for this pass. `banned_phrases.py` gates a handful of them;

@@ -1829,6 +1829,69 @@ raising an exception. just say 'raises StopIteration'"):
 
 **Home.** CLAUDE.md watch list (global, the "Raise" bullet), beside R1.
 
+### R47. A sentence beside a listing goes if the listing or its markers already show it
+
+**Test.** Read a sentence that follows (or introduces) a listing and ask
+what the reader learns from it that the code and its `#:` markers do not
+state. Three shapes answer "nothing": a line-by-line narration of what the
+code does ("`next(conversation)` starts the generator and produces a
+`Question`"), an annotation read aloud ("`Question` fills the `YieldType`
+position, `Answer` the `SendType`"), and a control-flow paraphrase of a
+clause that is on the page ("`worker()` catches the exception, prints the
+message, and yields again"). Cut those. A cut that would orphan a `[n]`
+tag keeps the reference in a surviving sentence; the listing is not
+edited.
+
+**Keep when.** The sentence states what the code cannot: where an
+exception lands ("`g.throw()` raises that exception at the suspended
+`yield "ready"`"), why two output lines sit together (one `send()` ends
+one inner generator and prompts the next), which way a value travels
+through a chain (yielded items go to the driver, the return value to the
+delegating generator), what would happen without a line (without `[3]`,
+`send(4)` raises `StopIteration`), why an annotation is what it is
+(`yield from` passes both channels through, so the types match), what a
+design must do (a driver must prime with `next()`), or a forward
+reference that looks wrong until explained (`watch()` names `watched`
+before the module binds it). R18 is the special case of a verdict on
+output that is on the page; R7 the sentence that only points at the
+next listing.
+
+**Sightings.** 3 rounds, 1 chapter, 2026-10-25, Bruce's ruling on two
+pasted passages ("Most of this seems to reiterate what's in the code.
+Strip it down to the essential observations.") and then "look through
+the rest of the chapter for similar issues"; 15 passages cut in
+`45_Effects--Generators` (`457761fe`, `9bee1fcb`, `64c1c4c8`):
+- "`g.send(1)` becomes `first` inside `collect("alpha")` with no
+  forwarding code in `both()`." -> deleted
+- "`ask()` uses `Answer` in two of the three positions, in two different
+  roles. As the `SendType`, `Answer` types each value the driver sends,
+  which arrives as the value of the `yield` expression and binds to
+  `answer`. As the `ReturnType`, `Answer` types the value `ask()`
+  returns when it finishes. That value becomes the value of the whole
+  `yield from` expression, so each of `interview()`'s three assignments
+  binds an `Answer`." -> "`Answer` fills two of `ask()`'s three
+  positions, in two roles. As the `SendType` it is the value of the
+  `yield` inside `ask()`, sent by the driver. As the `ReturnType` it is
+  the value of the whole `yield from` expression in `interview()`."
+- "`task_runner()` gives the front job one `next()` per turn. When a
+  job yields, the runner appends it to the back of the queue. When a
+  job finishes, `next()` raises `StopIteration`, and the runner drops
+  the job." -> deleted; kept "Each `yield` suspends its job and returns
+  control to `task_runner()`, which then runs the next job. The output
+  interleaves the two jobs in a single thread, although neither names
+  the other."
+- "`stubborn()` answers `GeneratorExit` with another `yield`, so
+  `close()` raises `RuntimeError: generator ignored GeneratorExit`." ->
+  deleted; kept "`close()` requires the generator to finish."
+- Kept on the test: "`GEN_CREATED` shows that calling `interview()`
+  created the generator and ran none of its body." (what the marker
+  means); "`watch()` names `watched` before the module binds it."
+
+**Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
+deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the
+way R46 was; the 2026-10-25 book sweep that followed is its second
+sighting.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
