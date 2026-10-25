@@ -53,7 +53,7 @@ and each machine's transition functions declare the input type they accept.
 
 This is a *Moore machine*, where what a state does depends on the state alone.
 `run()` calls `self.action()` with no arguments.
-`action` defaults to a do-nothing function.
+`action` defaults to `lambda: None`, an empty action.
 A state that does more than print its message supplies an `action` as the third constructor argument.
 
 `self.action()` has the form of a method call.
@@ -595,7 +595,7 @@ and `_slot()` then uses that column's `value` as the row index.
 
 Adding a state or an input is now a local change:
 a rule in the list and a method or two.
-Nothing here needs a `switch`, reflection,
+Two language features do the work of a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
 The `dict` does the dispatch,
 and a bound method stored in a rule is the condition or the action.
