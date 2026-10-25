@@ -858,7 +858,7 @@ Try each exercise before opening its [solution](../Solutions/25_Patterns--Surrog
     a `description` string given at construction, without building `Expensive`.
     Count the accesses it answers that way,
     and report the count when `Lazy` builds `Expensive`.
-    Confirm that reading `description` several times builds nothing,
+    Confirm that `Lazy` answers several reads of `description` before it builds `Expensive`,
     and that the first `query()` reports the count.
 2.  Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.
     Confirm the tally reports `f` called twice and `g` called once.
