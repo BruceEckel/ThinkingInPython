@@ -249,12 +249,16 @@ ANSWERS: Final[dict[Question, Answer]] = {
 }
 
 def drive(conversation: Generator[Question, Answer, Result],
-          answers: dict[Question, Answer]) -> Result:
+          answers: dict[Question, Answer],
+          *, show_state: bool = False) -> Result:
     request = next(conversation)
     while True:
         answer = answers[request]
-        state = inspect.getgeneratorstate(conversation)
-        print(f"{request = }, {answer = }, {state}")
+        line = f"{request = }, {answer = }"
+        if show_state:
+            state = inspect.getgeneratorstate(conversation)
+            line += f", {state}"
+        print(line)
         try:
             request = conversation.send(answer)
         except StopIteration as stop:
@@ -265,6 +269,10 @@ def drive(conversation: Generator[Question, Answer, Result],
 `next()` produces the first `Question`,
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
+
+`show_state` adds the generator's state to each line of the trace.
+The default leaves it out,
+so an ordinary call shows the requests and the answers.
 
 The type checker verifies each `Question` the generator yields and each `Answer` that `drive()` sends.
 `StopIteration.value` has type `Any`,
@@ -278,7 +286,8 @@ gets `StopIteration` from `next()` when the answers run out.
 Inside the `try`, that exception would look like the end of the conversation.
 The driver would then return `None` as the result.
 
-`drive()` runs the conversation:
+`drive()` runs the conversation.
+`show_state=True` puts the generator's state on each line of the trace:
 
 ```python
 # two_way_generator.py
@@ -290,7 +299,7 @@ from interview_generator import Answer, interview
 conversation = interview()
 print(inspect.getgeneratorstate(conversation))
 #: GEN_CREATED
-result = drive(conversation, ANSWERS)
+result = drive(conversation, ANSWERS, show_state=True)
 #: request = 'name', answer = 'Alice', GEN_SUSPENDED
 #: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
 #: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
@@ -615,11 +624,11 @@ def interview() -> Generator[Question, Answer, Result]:
 
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
-#: request = 'name', answer = 'Alice', GEN_SUSPENDED
+#: request = 'name', answer = 'Alice'
 #:   ask() received Alice
-#: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
+#: request = 'town', answer = 'Wonderland'
 #:   ask() received Wonderland
-#: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
+#: request = 'friend', answer = 'Rabbit'
 #:   ask() received Rabbit
 #: Alice of Wonderland, friend Rabbit
 ```
@@ -662,13 +671,13 @@ def survey() -> Generator[Question, Answer, Result]:
 
 print(drive(survey(),
             ANSWERS | {Question("color"): Answer("blue")}))
-#: request = 'name', answer = 'Alice', GEN_SUSPENDED
+#: request = 'name', answer = 'Alice'
 #:   ask() received Alice
-#: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
+#: request = 'town', answer = 'Wonderland'
 #:   ask() received Wonderland
-#: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
+#: request = 'friend', answer = 'Rabbit'
 #:   ask() received Rabbit
-#: request = 'color', answer = 'blue', GEN_SUSPENDED
+#: request = 'color', answer = 'blue'
 #:   ask() received blue
 #: Alice of Wonderland, friend Rabbit, color blue
 ```

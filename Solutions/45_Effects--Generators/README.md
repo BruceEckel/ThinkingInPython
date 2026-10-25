@@ -475,7 +475,7 @@ error[invalid-assignment]: Object of type
 The script still runs, and produces:
 
 ```text
-request = 'color', answer = 'blue', GEN_SUSPENDED
+request = 'color', answer = 'blue'
   ask() received blue
 <generator object interview at 0x000001C5FB3FDE40>, color blue
 ```

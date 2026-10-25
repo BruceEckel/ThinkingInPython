@@ -7,7 +7,7 @@ from interview_generator import Answer, interview
 conversation = interview()
 print(inspect.getgeneratorstate(conversation))
 #: GEN_CREATED
-result = drive(conversation, ANSWERS)
+result = drive(conversation, ANSWERS, show_state=True)
 #: request = 'name', answer = 'Alice', GEN_SUSPENDED
 #: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
 #: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED

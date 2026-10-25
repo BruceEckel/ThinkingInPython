@@ -11,12 +11,16 @@ ANSWERS: Final[dict[Question, Answer]] = {
 }
 
 def drive(conversation: Generator[Question, Answer, Result],
-          answers: dict[Question, Answer]) -> Result:
+          answers: dict[Question, Answer],
+          *, show_state: bool = False) -> Result:
     request = next(conversation)
     while True:
         answer = answers[request]
-        state = inspect.getgeneratorstate(conversation)
-        print(f"{request = }, {answer = }, {state}")
+        line = f"{request = }, {answer = }"
+        if show_state:
+            state = inspect.getgeneratorstate(conversation)
+            line += f", {state}"
+        print(line)
         try:
             request = conversation.send(answer)
         except StopIteration as stop:

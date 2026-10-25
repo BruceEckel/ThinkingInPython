@@ -18,10 +18,10 @@ def interview() -> Generator[Question, Answer, Result]:
 
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
-#: request = 'name', answer = 'Alice', GEN_SUSPENDED
+#: request = 'name', answer = 'Alice'
 #:   ask() received Alice
-#: request = 'town', answer = 'Wonderland', GEN_SUSPENDED
+#: request = 'town', answer = 'Wonderland'
 #:   ask() received Wonderland
-#: request = 'friend', answer = 'Rabbit', GEN_SUSPENDED
+#: request = 'friend', answer = 'Rabbit'
 #:   ask() received Rabbit
 #: Alice of Wonderland, friend Rabbit
