@@ -173,8 +173,7 @@ shows the shape: a `State` record with a message and a stored `next`,
 mixed into an `Enum` and driven by the chapter's engine.
 Make the inputs a `StrEnum`,
 so each transition function can `match` on them and the trace prints them as words.
-Inline `state.py` and `state_machine.py`,
-since a solution imports nothing from the chapter.
+Inline `state.py` and `state_machine.py`, since each solution stands alone.
 
 <details>
 <summary>The shape</summary>
@@ -338,7 +337,8 @@ The moods are a closed set the program and the type checker both know.
 `list(Mood)` enumerates them, a reader can search for the name `Mood.PROZAC`,
 and a parameter typed `Mood` accepts a member and rejects a stray `Happy()` instance of the kind exercise 1 constructs.
 Exercise 1's `UnpredictablePerson` accepts any object with a `hello()`,
-so the set of moods there is open and nothing lists it.
+so the set of moods there is open,
+scattered across every class that defines a `hello()`.
 
 **What a mood loses.**
 A member is one object shared by every machine in the program,
@@ -530,8 +530,8 @@ Fed the same words, your file prints the same sequence of states as your exercis
 <summary>Solution</summary>
 
 If the table holds the two rows that change the state and no others,
-nothing in the table stands in for exercise 3's `"*"` entries,
-and the first word, `push` while locked, raises `KeyError: ('locked', 'push')`.
+exercise 3's `"*"` entries drop out, so the first word, `push` while locked,
+raises `KeyError: ('locked', 'push')`.
 A dictionary keyed on `(state, word)` has no wildcard,
 so the solution writes out the two rows that leave the state unchanged.
 
