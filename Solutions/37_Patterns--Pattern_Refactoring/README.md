@@ -216,8 +216,6 @@ and you can say for each function whether its body reads anything that differs b
 <details>
 <summary>Solution</summary>
 
-The solution writes `price()` and `heaviest()` as functions over a list of `Trash`:
-
 ```python
 # exercise_2.py
 from typing import ClassVar
@@ -264,13 +262,9 @@ If you call `max(items)` without the `key=` argument,
 `'>' not supported between instances of 'Aluminum' and 'Plastic'`.
 `ty` reports the same call as an `invalid-argument-type`,
 because a record defines no ordering for `max()` to use.
-The solution passes `key=lambda t: t.weight`,
-so `max()` compares the weights and returns the whole piece.
 
 Neither `price()` nor `heaviest()` needs `singledispatch`.
-`price()` reads `t.weight` and `t.value`,
-and `heaviest()` reads `t.weight` alone.
-Every `Trash` subclass carries both attributes,
+Every `Trash` subclass carries `weight` and `value`,
 so the same code runs for `Aluminum`, `Plastic`, or any future material.
 Each is a single function, like `sum_value()`.
 
@@ -365,8 +359,6 @@ You can say when the method form improves on the function.
 <details>
 <summary>Solution</summary>
 
-The solution moves `recycling_note()` onto a `Sorter` class:
-
 ```python
 # exercise_3.py
 from functools import singledispatchmethod
@@ -440,7 +432,6 @@ The dispatch is the same as in the function version.
 
 **Move the operation onto an object.**
 What changes is where you define the operation.
-`recycling_note()` is now a method you call as `sorter.recycling_note(t)`.
 
 The method form matters if `Sorter` holds state of its own alongside the dispatch:
 a log of notes issued, a configuration, statistics.
@@ -533,9 +524,6 @@ and the sorting loop specifies no material.
 <details>
 <summary>Solution</summary>
 
-The listing sorts three pieces by exact class, prints a note,
-and then sorts the pieces again by a declared `bin`:
-
 ```python
 # exercise_4.py
 from collections import defaultdict
@@ -598,7 +586,6 @@ the shared sort still prints three bins,
 `['Aluminum', 'CrushedAluminum', 'Glass']`.
 `__init_subclass__()` runs after the class body,
 so the assignment overwrites the `bin = Aluminum` that `CrushedAluminum` declares.
-The `"bin" not in cls.__dict__` test leaves a declared `bin` in place and fills in the default for every other class.
 
 **Key the bins on the exact class.**
 `exact[type(t)]` is a dictionary probe on the exact class,
@@ -620,12 +607,11 @@ A `bin` class variable supplies that key.
 so every material keeps a bin of its own.
 
 **Let a subclass share its parent's bin.**
-`CrushedAluminum` opts in by setting `bin` to `Aluminum`.
-It restates the `ClassVar` annotation the way the chapter's subclasses restate `value`'s annotation.
+`CrushedAluminum` restates the `ClassVar` annotation the way the chapter's subclasses restate `value`'s annotation.
 The type checker treats that restatement as optional.
 
 **Sort by the declared key.**
-The sorting loop becomes `shared[t.bin].append(t)` and still specifies no material.
+The sorting loop still specifies no material.
 
 `type(t)` is a convenient key, not an inevitable one.
 A design that declares its own key can group classes that `type(t)` keeps apart,
@@ -716,9 +702,6 @@ and you can say what your file needed for `Paper` that `hazard()` gets from its 
 
 <details>
 <summary>Solution</summary>
-
-The listing runs both forms,
-the default `hazard()` first and then `strict_hazard()`:
 
 ```python
 # exercise_5.py
