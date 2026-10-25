@@ -209,8 +209,6 @@ so the wildcard stays to satisfy the declared return type.
 
 A starred name can appear anywhere in a sequence pattern,
 as long as the pattern has at most one.
-`[first, *middle, last]` puts it in the middle,
-binding the two ends by name and everything between them to `middle`.
 `[*init, last]` puts it first and binds every element but the last to `init`.
 
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
@@ -278,9 +276,6 @@ print(locate(Point(3, 4)))
 #: At (3, 4)
 ```
 
-`Point(0, 0)` matches a point whose fields are both zero.
-`Point(0, y)` matches when `x` is zero and captures `y`.
-
 Despite the call syntax, a class pattern builds nothing.
 It tests the subject's type and reads its attributes.
 
@@ -323,7 +318,6 @@ print(describe(Point(3, 4)))
 #: Just some point
 ```
 
-`Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y`.
 A positional pattern can also check a subset of fields.
 `Point(0)` supplies one sub-pattern, which goes to `x`,
 the first name in `__match_args__`.
@@ -542,8 +536,6 @@ so `start` is the whole `Point` while `0, 0` checks its fields.
 With `as`, one pattern both tests the shape and keeps the object.
 
 The case at `[2]` is a one-element sequence pattern whose element alternates two class patterns.
-`survey([Point(0, 5)])` matches.
-For a list of two points, `match` moves on to the next `case`.
 Either alternative binds `n`.
 The compiler enforces the [same-names rule](#alternatives-and-capture).
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
@@ -607,8 +599,6 @@ expect(AssertionError, area, "x")  # type: ignore
 `assert_never()` acts at runtime as well as at check time.
 The string `"x"` is no `Shape`,
 so the `expect()` line carries `# type: ignore` to get past the type checker.
-At runtime the string reaches `assert_never()`,
-which raises an `AssertionError` naming the value it received.
 
 `act()` in `value_patterns.py` gets its coverage check from the return type instead of from `assert_never()`.
 If one `Signal` member lacked a `case`,
@@ -675,9 +665,7 @@ print(describe(301))
 #: Status 301
 ```
 
-`STATUS.get(status)` returns `None` for a missing key,
-and `or` builds the default string for that miss.
-A falsy value in the table counts as a miss too,
+The `or` treats a falsy value from the table like the `None` of a missing key,
 but every value in `STATUS` is a nonempty string.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
