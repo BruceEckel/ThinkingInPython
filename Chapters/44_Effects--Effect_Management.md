@@ -114,7 +114,7 @@ The question has two answers:
     Computer science theory backs this view.
     Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
     A bottom value stands for a computation that never produces an ordinary value.
-    Because ⊥ is a value in the theory, raising an error that nothing catches
+    Because ⊥ is a value in the theory, raising an error that crashes the program
     is referentially transparent.
     Replacing the function call with the crash leaves the program's behavior the same.
 
@@ -949,7 +949,7 @@ A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes with a value.
 That makes a suspended generator a continuation you can resume once or discard,
 but not resume twice,
-because nothing can copy a paused generator's position and local variables.
+because a paused generator holds the one copy of its position and local variables.
 
 ### Custom AI Languages with Effects
 
