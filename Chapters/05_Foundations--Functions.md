@@ -103,8 +103,6 @@ print(flexible_args_and_returns(2))
 Every Python function returns a value.
 A function that finishes without a `return` returns `None`,
 and so does a bare `return`.
-The third call matches neither test,
-so execution reaches the end of the body and the function returns `None`.
 
 A `return` with several expressions produces a tuple,
 which the caller usually unpacks:
@@ -300,9 +298,6 @@ print(get(prefs, "theme", "dark"))
 `prefs` stores `mute` as `None`,
 so a `None` from `get()` cannot also mean "no such key."
 With the `MISSING` sentinel, `get()` tells the two cases apart.
-A stored `None` comes back as `None`,
-and a missing key with no default comes back as `MISSING`
-(a real `get()` re-raises `KeyError` there, as the comment says).
 Because `get()` tests `default` against `MISSING`,
 a caller can also pass `None` as a real default.
 
@@ -356,9 +351,6 @@ writes_global()
 print(count)
 #: 1
 ```
-
-The `count = 99` in `rebinds()` binds a local and leaves the module-level `count` alone,
-as the `0` printed after `99` shows.
 
 `+=` is an assignment too.
 If you drop the `global` from `writes_global()`,
@@ -467,7 +459,6 @@ It receives a function and the arguments for it, and makes the call.
 
 A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
 so you can pass `report` to `trace()` as an argument.
-Inside `trace()`, `func.__name__` reads the name of the function the caller passed.
 
 A forwarded `**kwargs` can name a parameter that the wrapped function also receives another way.
 When a key in the unpacked dictionary names a parameter that a positional argument fills,
@@ -548,14 +539,10 @@ tally("nums", 1, 2, total=True)
 #: nums (1, 2) True
 ```
 
-Calling `divide(a=10, b=2)` is an error,
-because `a` and `b` are positional-only.
-Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
-The type checker reports both mistakes before the code runs,
-so each line carries a `# type: ignore` saying the misuse is deliberate.
+The type checker reports the `divide()` and `make_user()` mistakes before the code runs,
+so each of those lines carries a `# type: ignore` saying the misuse is deliberate.
 
 The `True` in the `tally()` call at `[1]` joins `values` like any other positional argument.
-Only the named form, `total=True`, binds `total`.
 
 A signature can use every form at once, in one set order: positional-only,
 positional-or-keyword, `*args`, keyword-only, `**kwargs`.
@@ -571,11 +558,6 @@ f(1, 2, 3, 4, c=5, d=6)
 f(1, b=2, c=5)
 #: 1 2 () 5 {}
 ```
-
-`a` must arrive positionally, `c` must arrive by name,
-and `b` can arrive either way:
-by position in `f(1, 2, 3, 4, c=5, d=6)` and by name in `f(1, b=2, c=5)`.
-With no extra arguments, `args` and `kwargs` stay empty.
 
 In the standard library,
 many built-in functions and methods take positional-only parameters,
