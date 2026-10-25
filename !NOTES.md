@@ -1,5 +1,7 @@
 Are there any unresolved claude artifacts
 
+Reading level
+
 Implementation is Friction
 
 How can I improve the process on this book?
