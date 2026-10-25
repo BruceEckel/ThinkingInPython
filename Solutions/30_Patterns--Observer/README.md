@@ -75,14 +75,8 @@ print(calls)
 #: [('A', 42), ('B', 42)]
 ```
 
-**Collect the responders.**
 Like `broadcaster.py`, this solution has no separate `Observer` class.
 Any callable, here two `lambda`s, is a responder.
-`connect()` collects them in a list.
-
-**Deliver one update to every responder.**
-`announce()` then hands its one argument to each responder in turn,
-so every connected responder sees the same update, in connection order.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -334,7 +328,7 @@ because a parameter is contravariant.
 An observer that reads `celsius` must declare `Thermometer`,
 and it attaches to a `Thermometer` alone.
 
-Both versions print the same line, and both ignore `arg`.
+Both versions ignore `arg`.
 Under pull, each observer's own code selects what to read from the subject,
 so each observer must specify the type of the subject it watches.
 
@@ -400,8 +394,6 @@ the test fails with `DID NOT RAISE`.
 <details>
 <summary>Solution</summary>
 
-The solution keeps each exception in a list and raises the list as one `ExceptionGroup` once the loop ends.
-
 ```python
 # exercise_3.py
 from collections.abc import Callable
@@ -460,11 +452,6 @@ def test_later_responder_still_runs_after_a_failure(
         broadcaster.announce(1)
     assert received == [1]
 ```
-
-**Keep the loop going past a failure.**
-The loop catches each failure and keeps going,
-so every responder receives the notification,
-wherever it sits in the connection order.
 
 **Catch any ordinary failure.**
 Catching bare `Exception` here is deliberate.
@@ -686,7 +673,6 @@ The results come back in argument order,
 so the list shows which responder produced what.
 This version needs the failures alone,
 so its comprehension keeps each result for which `isinstance(r, BaseException)` is true.
-A successful responder returns `None`, and the comprehension drops it.
 
 **Report a cancelled responder too.**
 If another task cancels the awaiting task while `gather()` waits,
@@ -848,7 +834,6 @@ def test_later_responder_runs_after_an_err() -> None:
 **Collect the failures as values.**
 Each responder reports a failure by returning an `Err`,
 so `announce()` needs no `try`.
-It calls every responder and keeps each result that is an `Err`.
 The caller receives the failures as an ordinary list and decides what to do with them,
 where exercise 3's caller must catch an `ExceptionGroup`.
 An empty list means every responder succeeded.
@@ -857,8 +842,7 @@ An empty list means every responder succeeded.
 The type change applies to every responder.
 `received.append` returns `None`, and a `Responder[int]` must return a `Result`,
 so the type checker rejects `broadcaster.connect(received.append)`.
-`succeeds()` adapts any `None`-returning callable by calling it and returning `Ok(None)`.
-The adapter assumes the wrapped callable always succeeds.
+The adapter, `succeeds()`, assumes the wrapped callable always succeeds.
 An exception the callable does raise propagates out of `announce()` as it does in the chapter's version.
 
 Returning errors as values works when you write the responders.
@@ -1033,14 +1017,9 @@ print("solved in", game.moves, "moves")
 
 **Find the owned patch.**
 `_flood()` is a depth-first search that keeps its pending cells on a stack.
-It starts at `origin` and walks from each cell to every neighbor `adjacent()` reports,
-as long as that neighbor has the patch's color.
 
 **Grow the patch by recoloring.**
 `select()` is the game move.
-It repaints every cell in the currently owned patch to the selected cell's color,
-then re-runs `_flood()`,
-which absorbs the neighbors that now match the new color.
 
 If you repaint the patch and stop there, `owned` stays `{(0, 0)}`,
 which the demo's first move recolors to match the first unowned cell.
@@ -1187,8 +1166,6 @@ print(initials(recolored(grid, (1, 2)), 4))
 **Advance the selection's row and column.**
 `Color` and `new_grid()` come from `grid_observer.py` unchanged,
 and `recolored()` is the one function that differs.
-It keeps every cell whose column matches the selection's `x` or whose row matches its `y`,
-and advances each one.
 The cells come from `grid`,
 so every one lies inside it and the comprehension needs no `in grid` test.
 
@@ -1393,14 +1370,10 @@ and a `Broadcaster` trimmed to the two methods this example calls.
 `letters()` and `tally()` are the two views.
 Each takes a `Grid` and returns `None`, the shape `connect()` requires,
 so each is a responder the same way `draw()` is.
-`letters()` prints the first character of each color, one row per line,
-and `tally()` counts the colors with a `Counter`.
 Neither one names the other, and neither contains the model's rule.
 
 **Update both views from one change.**
-`model.select((1, 1))` calls `recolored()` once and `announce()` once,
-and `announce()` calls both views in connection order.
-They read the same `Grid` object,
+Both views read the same `Grid` object,
 so the letters and the counts describe one state of the model.
 
 The first selection advances the five cells of the cross:
@@ -1692,8 +1665,6 @@ assigning `celsius` twice and `humidity` once on one `Thermometer` leaves two re
 <details>
 <summary>Solution</summary>
 
-The solution tests for `obj is None` and returns the descriptor.
-
 ```python
 # exercise_10.py
 from collections.abc import Callable
@@ -1775,9 +1746,8 @@ since the overloads still declare that class access returns the descriptor.
 The failure appears only when the program runs.
 
 **Type each kind of access.**
-The two `@overload` declarations tell the type checker which result each access gets:
-`Notifying[T]` from the class, `T` from an instance.
-If you remove them, the declared return type is the union.
+If you remove the two `@overload` declarations,
+the declared return type is the union.
 The type checker then rejects `t.celsius * 2`,
 and `Thermometer.celsius.connect()` as well, since `float` has no `connect()`.
 The overloads also check the responder against the attribute:
@@ -1791,8 +1761,7 @@ A codebase on Pyright looks the descriptor up in `type(obj).__dict__`,
 which Pyright accepts.
 
 **Announce on assignment.**
-`__set__()` stores the value and then calls each responder connected to that attribute.
-`Thermometer`'s property setter does the same work with `self.announce(value)`.
+`Thermometer`'s property setter does the work of `__set__()` with `self.announce(value)`.
 
 **Keep each instance's responders apart.**
 `connect()` writes the responder list into the instance's `__dict__` rather than declaring it on the class,
@@ -1873,8 +1842,6 @@ and three it brings that `Broadcaster` avoids.
 
 <details>
 <summary>Solution</summary>
-
-The registry is a module-level list that `responds()` fills:
 
 ```python
 # exercise_11.py
@@ -2160,8 +2127,6 @@ so the closure tells `Broadcasting` which field changed.
 **Filter in the responder.**
 `announce()` calls every responder for every field,
 as `WeatherStation.__setattr__()` does.
-`report()` unpacks each pair it receives, appends the name to `calls`,
-and prints when the name is `"celsius"`.
 The one `report:` line comes from the `celsius` assignment,
 and `calls` shows that both assignments called `report()`,
 including the one to `humidity`.
@@ -2365,8 +2330,6 @@ for char in "kkj":
 ```
 
 Each key press updates both views through the model.
-`Controller.key()` calls `increment()` or `decrement()`,
-and the `Counter` announces its new count to every connected responder.
 The views print in the order they connected.
 The controller holds no reference to either view.
 
