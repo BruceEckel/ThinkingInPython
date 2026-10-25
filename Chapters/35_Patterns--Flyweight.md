@@ -68,8 +68,6 @@ print(intern(joined) is intern(joined2))
 #: True
 ```
 
-The two `join()` calls build equal but distinct strings.
-`intern()` maps both to one shared copy.
 CPython's `==` on two strings checks identity before it compares characters.
 For interned strings, equal means identical,
 so equal interned strings compare in one step.
@@ -165,8 +163,6 @@ def parse_map(text: str) -> list[list[Tile]]:
             for line in text.split()]
 ```
 
-The demo below parses a small map and counts the objects behind it:
-
 ```python
 # tile_map_demo.py
 from tile_map import parse_map
@@ -226,8 +222,7 @@ The call then raises a `KeyError` at runtime when it indexes `SPECS`.
 That leaves `to_symbol()` as the boundary,
 the one function that takes a `str` and returns a `Symbol`.
 
-`to_symbol()` guards on membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
-The type checker narrows on the same guard.
+The type checker narrows on the membership guard in `to_symbol()`.
 `SPECS` has key type `Symbol`, so past the guard `char` is a `Symbol`,
 and `return char` satisfies the declared return type as written.
 
@@ -236,13 +231,6 @@ asserts.
 Prefer a guard that lets the type checker narrow.
 Keep `cast()` for the cases where no guard exists,
 because the type checker accepts whatever a `cast()` asserts.
-
-The test file confirms that:
-
-- `tile()` returns one object per symbol and different objects for different symbols.
-- A parsed map shares one `Tile` among the cells of each kind.
-- `to_symbol()` raises a `KeyError` for a character outside `SPECS`.
-- A direct `Tile(...)` call builds an object equal to the pooled tile and distinct from it.
 
 ```python
 # test_tile_map.py
@@ -495,9 +483,6 @@ The weak pool releases entries and keeps the identity guarantee.
 An entry lives as long as something references its `Name`,
 so every request during that life returns the one `Name`.
 
-The tests confirm that `name()` returns the live `Name` for a repeated text and a different object for a different text,
-and that the pool removes an entry once the last reference to its `Name` goes away:
-
 ```python
 # test_weak_pool.py
 from weak_pool import _pool, name
@@ -568,9 +553,6 @@ With `_value_` set in `__new__()`, `Tile(".")` returns `Tile.GRASS`.
 `object.__new__(cls)` builds a bare instance by going straight to `object`,
 past `Tile.__new__()`, so the call cannot recurse.
 
-The demo below reaches one member by attribute, by name, and by symbol,
-reads a member's value and walkability, and iterates over the members:
-
 ```python
 # tile_enum_demo.py
 from tile_enum import Tile
@@ -583,7 +565,6 @@ print([t.value for t in Tile])
 #: ['.', '~', '#']
 ```
 
-Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and a closed set of members.
 `Tile("?")` raises a `ValueError`, and `Tile.DOOR` raises an `AttributeError`.
