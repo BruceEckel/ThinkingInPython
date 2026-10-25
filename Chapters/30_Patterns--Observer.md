@@ -187,7 +187,7 @@ and `notify()` calls `update()` on each observer.
 Those two names describe one change from its two ends.
 `notify()` is the subject sending a change,
 and `update()` is an observer receiving that change.
-Nothing in the two words pairs them,
+The two words look unrelated,
 so you must remember that `update()` is the receiving end of `notify()`.
 The word "update" also fits the subject better than the observer.
 `Thermometer`'s setter updates the reading,
@@ -768,7 +768,7 @@ The `@record` freezes the field,
 and a tuple keeps the items it holds at creation,
 so the set of responders stays the same.
 `announce()` needs no `list()` copy of the tuple,
-since nothing can change it mid-loop.
+since the tuple holds the same responders for the whole loop.
 The broadcaster still holds strong references to its responders,
 so each responder stays alive as long as the broadcaster does.
 
@@ -1096,7 +1096,7 @@ Because `announce()` awaits, it must also be a coroutine,
 and its caller must `await` it in turn.
 A property setter cannot await the asynchronous `announce()`.
 The assignment `t.celsius = value` calls the setter and discards its return value,
-so an `async def` setter returns a coroutine that nothing runs.
+so with an `async def` setter the assignment discards the coroutine before it starts.
 An ordinary `def` setter cannot await,
 since an `await` inside an ordinary `def` is a `SyntaxError`.
 The asynchronous `Thermometer` therefore replaces the setter with a coroutine method,
@@ -1230,8 +1230,9 @@ but the `gather()` call has returned,
 so no `await` remains to collect the task's result.
 `main()` sleeps for 0.25 seconds afterward, long enough for `slow` to finish,
 but a real caller rarely adds that wait.
-The program moves on before the orphan finishes,
-and nothing reports an exception the orphan raises.
+The program moves on before the orphan finishes.
+`gather()` marks any exception the orphan raises as retrieved,
+so that exception disappears silently.
 
 `gather(*coros, return_exceptions=True)` returns the failures as data,
 the async form of exercise 3's catch-collect-continue.
@@ -1697,7 +1698,7 @@ Either way, you change the class that holds the display code.
 
 Split the controller out when input handling varies on its own,
 when the same displays must work with more than one input scheme,
-or when interpreting input needs tests that draw nothing.
+or when interpreting input needs tests that run apart from the display code.
 
 ## Deciding What Matters
 
@@ -1796,7 +1797,7 @@ but the half degree is a judgment about what `display` needs.
 For `log`, which exists to record every reading, the same half degree is wrong.
 `log` misses two of the four readings.
 `ThresholdThermometer` applies `_delta` to every responder alike.
-Nothing in its code shows that the threshold serves `display`.
+Its code hides the link between the threshold and `display`.
 
 The alternative moves the comparison out of the thermometer and into `display`,
 the responder that the threshold serves.
