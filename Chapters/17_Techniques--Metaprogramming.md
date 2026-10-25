@@ -36,7 +36,6 @@ print(vars(x))
 #: {}
 ```
 
-Lookups on `x` find the members you add to the class after `x`'s creation.
 Attribute lookup on an instance falls through to its class,
 so a lookup on any object of that class finds a change to the class,
 including on objects created before the change.
@@ -137,8 +136,6 @@ print(ml.__class__.__class__)
 #: <class 'type'>
 ```
 
-`MyList` inherits every method of `list`.
-
 Printing the class of the class produces the metaclass.
 
 ### A Family of Generated Classes
@@ -193,10 +190,7 @@ print(type(light) is type(water))
 ```
 
 Each generated class is a real type, not a label.
-`light` and `water` are both `Event` instances,
-so `isinstance(light, Event)` is `True`,
-but `type(light) is type(water)` is `False`.
-They belong to distinct subclasses,
+`light` and `water` belong to distinct subclasses of `Event`,
 so `isinstance()` with one of those subclasses tells them apart.
 
 Type checkers read different amounts of a `type()` call.
@@ -255,22 +249,15 @@ class EventMakers(dict[str, EventMaker]):
 `EventMakers` subclasses `dict`,
 so the call site `makers[name]` reads as an ordinary lookup.
 When the key is absent,
-`dict.__getitem__()` calls `__missing__()` and returns its result,
-so `__missing__()` builds the class, stores it under its name, and returns it.
+`dict.__getitem__()` calls `__missing__()` and returns its result.
 The next lookup of that name finds the stored class,
 so `__missing__()` builds each class once.
 Without `__missing__()`,
 every caller checks for the name and builds the missing class.
 
 A new `EventMakers` starts out empty.
-`NAMES`, imported from `events.py`, holds the seven legitimate event names.
 `__missing__()` checks a name against `NAMES` before building anything,
 so every key the dict acquires names a declared event.
-
-The demo holds the schedule in `SCHEDULE`,
-one `(name, hour, minute)` tuple per event.
-Building the events prints a line for each class as `EventMakers` builds it,
-then a count of the classes built, then the events in time order:
 
 ```python
 # greenhouse_demo.py
@@ -303,21 +290,13 @@ for event in sorted(
 #: 8:00: LightOn
 ```
 
-`makers[name]` gets the class object that builds each `Event`.
 On the first lookup of an event type,
 `EventMakers` builds the class and registers it under its name,
 so `LightOn` gets one `Creating` line though `SCHEDULE` names it twice.
 An unknown name raises a `KeyError`, as a missing key in any `dict` does,
 so a `try: ... except KeyError` around a lookup catches it.
 
-The schedule lists three of the seven declared event types.
-`built()` counts the classes in the dict against the names in `NAMES`,
-so its line reports three of the seven built.
-
 The demo's loop over the sorted events uses the type distinction.
-The demo fetches the `RingBell` class through `makers`,
-the same lookup the comprehension uses,
-and prefixes `* ` to every event that `isinstance()` reports as a `RingBell`.
 A distinct subclass lets each event carry its kind as its type,
 where `isinstance()` or a `match` class pattern can test it.
 
@@ -524,15 +503,8 @@ print(sorted(c.__name__ for c in Shape.registry))
 #: ['Circle', 'Square']
 ```
 
-For each new subclass,
-`__init_subclass__()` adds it to the registry and removes its base classes,
-so only the current leaves remain.
-That is why `Blue` is absent from the `Color` print at `[1]`.
-Creating `PhthaloBlue` and `CeruleanBlue` removes their base `Blue`,
-leaving those two leaves beside `Green` and `Red`.
-For the same reason, `Round` is missing from the `Shape` registry.
-Creating `Circle`, a subclass of `Round`, removes `Round`,
-leaving `Circle` and `Square`.
+Each new subclass removes its base classes from the registry,
+which is why `Blue` is absent from the `Color` print at `[1]` and `Round` is absent from the `Shape` registry.
 None of this needs a metaclass.
 
 `__init_subclass__()` is implicitly a class method.
@@ -551,9 +523,6 @@ so the keyword binds to `shade` and `kwargs` collects the rest.
 so a base further up can take the keywords it declared.
 If a keyword remains when the chain reaches `object.__init_subclass__()`,
 that method raises a `TypeError`.
-
-Testing shows that each registry holds only its current leaf classes,
-and that the two registries are disjoint:
 
 ```python
 # test_init_subclass.py
@@ -661,19 +630,12 @@ print(Button.press.__dict__)
 # print(Button.press.event)
 ```
 
-`on()` takes the event name and returns `mark()`,
-the decorator that stores the event name on the function.
-`on()`'s type parameter `F` has the bound `Callable[..., object]`,
-which any function satisfies.
 `mark()` returns the same `F` it receives,
 so `press()` keeps its own signature through the decoration.
 
-`@on("click")` stores `"click"` under the key `"event"` in the `__dict__` of `press()`,
-then returns `press()` unchanged.
 When the `class Button` statement finishes,
 `__init_subclass__()` walks `vars(cls)`, the new class's own namespace,
 and files each function that carries an `"event"` key under its event.
-`label()` carries no mark, so `handlers` leaves it out.
 The namespace also holds the bookkeeping entries every class carries,
 such as `__module__`, a string with no `__dict__`.
 For those entries, the `{}` default in `getattr()` makes the `"event"` test false.
@@ -681,7 +643,6 @@ For those entries, the `{}` default in `getattr()` makes the `"event"` test fals
 On the right side of the assignment,
 `cls.handlers` still resolves to the base class's dictionary,
 so each new table starts from the inherited handlers.
-`SubmitButton` keeps `click` and `hover` and adds `submit`.
 `handlers` holds the functions the class body defined, not bound methods,
 so `dispatch()` passes `self` to the function it finds.
 
@@ -764,12 +725,6 @@ Use the runtime version in the rare case where the interpreter must refuse the s
 
 A decorator like `@final` is a *marker*.
 It sets an attribute and leaves enforcement to the type checker.
-
-The test file confirms that:
-
-- The `@final` marker is present.
-- The runtime-final class refuses subclassing.
-- Its non-final base still allows it.
 
 ```python
 # test_final.py
@@ -1010,7 +965,6 @@ Python calls `__set_name__()` as it finishes executing the `class Point` stateme
 once for each `Field`,
 passing each one the new class and its own attribute name.
 From then on, every read and write routes through the descriptor instead of going to the instance's `__dict__`.
-`p.x = 3` prints `x.__set__ = 3` before storing anything.
 In `print(p.x, p.y)`, Python evaluates both arguments before calling `print()`,
 so both `__get__` lines appear ahead of `3 4`.
 The final access, `Point.x`, goes through the class rather than an instance,
@@ -1033,12 +987,6 @@ and the precedence reverses.
 The instance's `__dict__` comes first.
 That is why assigning to `greet` on a `Person` instance shadows the method on that one instance,
 while `p.x = 3` cannot shadow `Field`, because `Field` defines `__set__()`.
-
-The test file confirms that:
-
-- `__set_name__()` gives the descriptor its name.
-- The descriptor stores each value under the storage key built from that name.
-- The descriptor returns itself when you read it through the class.
 
 ```python
 # test_set_name.py
@@ -1163,8 +1111,6 @@ print(Simple().uses_metaclass())  # type: ignore
 
 `SimpleMeta.__init__()` runs once, as the `class Simple` statement finishes,
 and patches a new method onto the freshly built class.
-In the `display_object()` output,
-`uses_metaclass(self)` sits alongside `ping()` and `pong()` and looks like the methods the class body defines.
 The injected value is a lambda,
 but a function is a [descriptor](#learning-a-name-with-__set_name__),
 so `Simple().uses_metaclass()` binds it like any other method.
@@ -1474,7 +1420,6 @@ The `expected()` helper wraps the message across three lines to fit the page.
 Python reports it as a single line, and that line states the fix.
 `D`'s metaclass, `MetaC`, must be a subclass of every base's metaclass,
 `MetaA` and `MetaB` both.
-Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.
 
 As with the layout conflict, `ty` catches this one statically.
 It reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
@@ -1524,11 +1469,7 @@ for c in Color:
 
 Python calls `IterableMeta.__iter__()` when you write `for c in Color`,
 which iterates over the class object, not an instance of it.
-`__iter__()` walks `vars(cls)`, the class's own namespace,
-and skips every underscore-prefixed name.
-For `Color` those names are the dunder bookkeeping every class carries,
-so `__iter__()` yields the three values the body assigned: `"red"`, `"green"`,
-`"blue"`.
+In `Color`'s namespace the underscore-prefixed names that `__iter__()` skips are the dunder bookkeeping every class carries.
 The values come out in source order because a class's namespace keeps the order in which the body defines its names,
 a guarantee since Python 3.6 (PEP 520).
 A metaclass, a class decorator,
@@ -1780,11 +1721,8 @@ print(get_annotations(Order)["buyer"] is Customer)
 
 `Order` specifies `Customer` before `Customer` exists.
 The `VALUE` request raises the same `NameError` that a decorator applied to `Order` would get.
-`FORWARDREF` resolves `item` to the `str` class and puts a `ForwardRef` in place of `buyer`.
-The reference's `__forward_arg__` holds the missing name.
 `STRING` evaluates nothing, so it cannot fail,
 and it returns text instead of objects.
-You get the text `'str'` rather than the class `str`.
 Once `Customer` exists, the default `VALUE` request succeeds,
 because the failed attempt cached nothing.
 
@@ -1854,13 +1792,10 @@ class Derived(Base):
 `Base`'s four lines are the bare sequence.
 They also show that `Base.__init_subclass__()` does not run for `Base`,
 the rule [Making a Class Final](#making-a-class-final) needs.
-`Derived` adds four lines: `class body`, `__set_name__(Derived, field)`,
-`__init_subclass__ Derived`, and `decorator Derived`.
 `__prepare__()` runs before the body, so its line comes first.
-The body then executes, printing `class body`.
-`__set_name__()` and `__init_subclass__()` both run between `__new__ Derived enter` and `__new__ Derived exit`.
-`type.__new__()` calls them as it assembles the class,
-so they run inside the metaclass's own construction step.
+`type.__new__()` calls `__set_name__()` and `__init_subclass__()` as it assembles the class,
+so their lines sit between `__new__ Derived enter` and `__new__ Derived exit`,
+inside the metaclass's own construction step.
 The decorator is last, because it receives a finished class.
 
 - React to each new subclass: `__init_subclass__()`.
@@ -1957,11 +1892,7 @@ and the report lists an inherited dunder the same way as one the class wrote.
 Among those same four,
 it keeps only the ones whose value differs from `object`'s version,
 so a class that overrides none of them shows no dunders.
-`_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing.
 
-Every class, even an empty one, has its own `__module__`, `__dict__`,
-and a handful of other bookkeeping dunders that always differ from the ones on `object`,
-so comparing every dunder this way shows that bookkeeping instead of filtering it out.
 The comparison uses `is`, not `==`,
 since a dunder inherited unchanged from `object` is the same function object,
 not merely an equal one.
@@ -2033,9 +1964,7 @@ passes `exclude=("__hash__",)`.
 and it applies to every member, dunder or ordinary.
 The `exclude` check runs before the `dunder` test,
 so an excluded name stays out of `[Attributes]` and `[Methods]` no matter which mode selects it.
-`display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows what `REDEFINED_DUNDERS` finds redefined,
-minus `__hash__`.
-That form helps when an earlier listing has explained the `__hash__` row and repeating the row would add noise.
+Excluding `__hash__` helps when an earlier listing has explained its row and repeating the row would add noise.
 
 The rest of the file selects the members, formats each one,
 and prints the report:
