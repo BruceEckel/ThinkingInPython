@@ -79,11 +79,6 @@ Both `decorating` lines print before anything else,
 because a class decorator runs when the `class` statement finishes,
 not at instantiation.
 
-**Hand back the same class.**
-`announce` returns `cls` unchanged,
-so `Point` is the class object the `class` statement created.
-The printed line is the decorator's one effect.
-
 `register` returns its argument the same way,
 so the two decorators can do the same kinds of work.
 A class decorator that returns the class it received can observe and record.
@@ -223,11 +218,6 @@ so `trace`'s wrapper is the outermost layer and `timing`'s wrapper is inside it.
 
 **Run the layers outside in.**
 Calling `add(2, 3)` enters `trace`'s wrapper first.
-That wrapper prints the `->` line, then calls the function it wraps,
-`timing`'s wrapper.
-`timing`'s wrapper times the real `add()` call and prints its timing line.
-Control then returns outward to `trace`'s wrapper,
-which prints the `<-` line last.
 The output order follows the wrapping order.
 The outermost decorator prints first and last,
 and each inner layer's output appears nested in between.
@@ -364,18 +354,11 @@ print(f"{decaf.description}: ${decaf.cost:.2f}")
 ```
 
 **Share one interface.**
-The listing has `pizza_decorator.py`'s shape with the menu changed:
-a `Drink` `Protocol` declaring the two readable properties,
-plain drinks that satisfy it with class attributes,
-and an `Extra` base that wraps one `Drink` and forwards through the same interface.
+The listing has `pizza_decorator.py`'s shape with the menu changed.
 `Espresso`, `Cappuccino`,
 and `Extra` satisfy `Drink` by providing `cost` and `description`.
 The type checker matches a `Protocol` structurally,
 so none of the three needs to inherit from `Drink`.
-
-**Change the name, keep the price.**
-`Decaf`'s `add_cost` is `0.0`,
-so `Decaf` changes the description and leaves the price alone.
 
 A class-per-combination design needs a separate class for every decaf variant.
 Here, adding a fourth extra means writing one class with one number in it.
@@ -507,17 +490,6 @@ print(f.count, g.count, trace_counting.total_calls)
 As with `count_calls`,
 each decorated function gets its own instance of `trace_counting`,
 so `f.count` and `g.count` track their own function's calls: `2` and `1`.
-
-**Share one total across functions.**
-`total_calls` is a class attribute, annotated `ClassVar[int]`,
-so it belongs to the `trace_counting` class, not to any one instance.
-Every decorated function's `__call__()` increments the same shared counter through `trace_counting.total_calls += 1`.
-The counter therefore accumulates across every function decorated with `@trace_counting`,
-reaching `3` after the three calls above.
-
-**Trace every call.**
-`__call__()` prints the chapter's arrow lines around the forwarded call,
-so the decorator traces every call as well as counting it.
 
 The two counters show the [class-attribute-versus-instance-attribute distinction](../../Chapters/09_Foundations--Class_Attributes.md).
 `self.count` lives on each instance, one per decorated function.
@@ -668,8 +640,6 @@ print(square.__name__, add.__name__)
 
 **Describe both call shapes.**
 The two `@overload` declarations tell the type checker which of the two shapes a given call has.
-The first says "given a function, return a function of the same signature."
-The second says "given `maxsize` alone, return a decorator."
 The implementation returns `Any` because `Any` satisfies both overloads.
 The type checker verifies each call against the overloads,
 not the implementation.
@@ -691,9 +661,7 @@ so a positional argument always binds to it.
 `maxsize` is keyword-only and must arrive by name.
 
 **Key on every argument.**
-The cache key pairs the positional arguments with the keyword items,
-so the key includes an argument passed by name.
-The key also records how each argument arrived.
+The key records how each argument arrived.
 `add(1, 2)` and `add(a=1, b=2)` make different keys,
 so `memo` computes and caches each call separately.
 
@@ -824,10 +792,6 @@ Without `@wraps`, a log line or a test report that reads `__name__` shows `wrapp
 A traceback is the same either way.
 It names each frame from the code object, which `wraps` leaves alone,
 so the `wrapper` frame appears with or without `@wraps`.
-
-**Retry all but the last attempt.**
-The loop runs `times - 1` attempts inside a `try`.
-The final attempt sits outside it.
 
 **Make the last attempt unguarded.**
 The final attempt meets two requirements at once.
@@ -991,10 +955,6 @@ Calling `counter.peek()` then runs `peek()` with no `self`.
 The call fails the way `method_decoration.py` fails,
 but the `TypeError` from `counter.peek()` reports a missing `self`,
 since `self` is `peek()`'s one parameter.
-
-**Call through an instance.**
-`counter.bump(2)` works.
-The body runs three times with `counter` as `self`, and the total reaches `6`.
 
 **Read what the class stores.**
 Reading the two names from `Counter.__dict__` gets each entry from the class namespace,
