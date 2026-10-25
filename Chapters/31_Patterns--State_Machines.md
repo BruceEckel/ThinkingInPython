@@ -802,6 +802,8 @@ Try each exercise before opening its [solution](../Solutions/31_Patterns--State_
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.
+    Say where this machine's state lives,
+    and how that differs from where `trap_states.py` keeps its state.
 6.  Apply the table-driven `StateMachine` from `table_machine.py` to a washing-machine problem.
     Give one `(state, input)` pair two rules told apart by a condition,
     such as a load too heavy for the fast spin.

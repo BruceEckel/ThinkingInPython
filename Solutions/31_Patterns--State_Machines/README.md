@@ -592,6 +592,8 @@ a different design, a detail, or an equivalent alternative.
 > where each possible move depends on the previous one
 > (it is another state machine).
 > Have it accept an `int` for the number of moves to produce, then stop.
+> Say where this machine's state lives,
+> and how that differs from where `trap_states.py` keeps its state.
 
 <details>
 <summary>Where to look</summary>
@@ -602,6 +604,8 @@ Write those legal successors as a `dict` from the previous action to a list of a
 with a starting key for "nothing yet."
 Loop `count` times, pick from the list with `random.choice()`,
 and `yield` the pick, which becomes the previous action.
+For the last question,
+compare what the generator keeps between yields with what `StateMachine.step()` assigns.
 
 <details>
 <summary>The shape</summary>
@@ -709,9 +713,24 @@ including the special `None` key for "no action yet,"
 whose one successor is `APPEARS`.
 
 **Remember the last move.**
-The generator's own state is just `previous`, the last action it yielded.
 `NEXT_ACTIONS` constrains every choice,
 so every sequence this generator produces is legal by construction.
+
+**Where the state lives.**
+The machine's state is `previous`,
+a local variable in the generator's suspended frame.
+`yield` leaves the frame alive between one move and the next,
+so the variable survives with it,
+and the loop over `range(count)` is the engine: each pass reads the state,
+picks a successor, and stores the pick back.
+`trap_states.py` keeps its state outside any frame.
+The current state is a `TrapState` member held in the `StateMachine`'s `current_state` field,
+and `step()` replaces that field with the result of the member's transition function.
+The enum design makes the states visible and nameable:
+a caller can read `current_state`, print it,
+and compare it with `TrapState.HOLDING`.
+The generator keeps its state in the frame, where no caller can read it.
+The whole machine reads as one loop.
 
 `trap_states.py` accepts any move in any state,
 and each `case _` returns the current state on the moves that make no sense there,
