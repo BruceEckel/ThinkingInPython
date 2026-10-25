@@ -227,7 +227,7 @@ Existing callers stay as they are,
 so a codebase could adopt rows one function at a time.
 
 That same rule is the design's weakness.
-`shout()` calls `tell()` and declares nothing.
+`shout()` calls `tell()` under a bare `None` return annotation.
 The type checker accepts `shout()`,
 because the PEP instructs every type checker to ignore metadata,
 including the `Tell` in the return annotation of `tell()`.
@@ -435,7 +435,7 @@ so the `greet()` call inside the block passes.
 The runtime check needs no call resolution, because running a call resolves it.
 Its limit is coverage.
 A runtime check covers the paths a run executes,
-so it verifies what your tests exercise and reports nothing about the rest.
+so it verifies what your tests exercise and stays silent about the rest.
 It stands to the static tool as `isinstance()` assertions stand to the type checker.
 
 ## Tracking Is Not Management
@@ -483,7 +483,7 @@ Stateless requires the generator syntax and the description/execution split that
 describes.
 
 `Annotated` keeps the code ordinary and eager.
-Nothing verifies the row.
+The type checker ignores the row.
 A native system keeps ordinary code and a verified row,
 because the compiler that compiles the code also computes and checks its rows.
 That is the case for putting algebraic effect tracking in the language,
