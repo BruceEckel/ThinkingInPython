@@ -167,8 +167,6 @@ asyncio.run(main())
 ```
 
 **Await each coroutine in turn.**
-Each `started` line has its own `resumed` line directly beneath it,
-so the trace shows the waits in sequence.
 The comprehension awaits one coroutine at a time.
 `await` waits for that coroutine to finish, so `b` starts once `a` finishes.
 The later coroutines stay unscheduled while the current one waits.
@@ -520,7 +518,6 @@ asyncio.run(main())
 ```
 
 **Admit a second holder.**
-Exactly half the increments survive.
 Two tasks now sit inside the critical section together,
 both reading `counter` before either writes,
 so each pair of increments adds one to `counter` instead of two.
@@ -813,8 +810,7 @@ The order in which the six jobs enter the queue can therefore vary,
 but `PriorityQueue` orders its items by comparing the tuples.
 The drain order is always priority first, `1` before `2` before `3`,
 then alphabetically by the description within a priority
-(the tuple's second field): `"alert"` before `"page oncall"` before `"zzz"`,
-and `"aaa"` before `"backup"`.
+(the tuple's second field).
 The final order is the same whichever thread submits a job first,
 because `consume()` starts after all three producers finish.
 
@@ -962,10 +958,8 @@ asyncio.run(main())
 ```
 
 **Let one task finish first.**
-Only `f` reports `cancelled` now.
 With `e` at `0.005` its timer fires long before `c` and `d` fail at `0.03`,
-so `e` prints `fetched`, returns `"E"`,
-and has finished by the time the group starts cancelling.
+so `e` has finished by the time the group starts cancelling.
 `f` still sleeps for `0.3`,
 so the group cancels it during that sleep and its task ends cancelled.
 
@@ -1054,12 +1048,10 @@ asyncio.run(main())
 
 Two `fetched` lines print, `a` and `b`,
 the two whose timers fire before `c` fails at `0.03`.
-`e` and `f` print nothing.
 Control passes from the `await` to the `except` block,
 because the `await` raises `ValueError` instead of returning a value.
 
-The `return` in the `except` block ends `main()` there.
-If you leave it out,
+If you leave out the `return` in the `except` block,
 the handler prints its line and execution falls through to `print(results)`.
 `results` is unbound at that point,
 so the line raises an `UnboundLocalError` right after the `gather raised` line.
@@ -1413,7 +1405,6 @@ distribute(Tickets(LIMIT))
 #: 200 distinct, duplicates True
 ```
 
-`duplicates` stays `True`.
 The lock leaves the race in place, because the race is in `__next__()`,
 outside the loop body.
 
@@ -1527,8 +1518,7 @@ asyncio.run(main())
 #: both workers finished
 ```
 
-The program prints `both workers finished`,
-and finishes in about twenty milliseconds rather than waiting out the half-second timeout.
+The program finishes in about twenty milliseconds rather than waiting out the half-second timeout.
 
 **Acquire the locks in one order.**
 Follow who waits for whom.
