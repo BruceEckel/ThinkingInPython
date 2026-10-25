@@ -222,7 +222,6 @@ print(describe(42))
 #: 42
 ```
 
-Inside the `if`, `value` is a `str`, so `upper()` checks.
 `repr()` accepts every object, so the `return` at `[1]` needs no test.
 If you annotate `value` as `Any` and uncomment the `return` above the `if`,
 the type checker accepts it,
@@ -368,10 +367,6 @@ A `draw()` that returns an `int`, or that requires an argument,
 gives its class a different shape.
 The type checker rejects that class where an annotation specifies `Drawable`.
 
-Outside its definition, `Drawable` appears in one place,
-the annotation on `render()`'s parameter.
-If you pass an object without a `draw()` to `render()`,
-the type checker rejects the call.
 `Blob` draws, in the everyday sense, but its method's name is `paint()`.
 A protocol matches on names and signatures rather than on intent.
 A protocol accepts any class with the right methods, as dynamic typing does,
@@ -411,10 +406,7 @@ print(type(shape).__name__)
 #: Circle
 ```
 
-`make()` takes the class, not an instance,
-so the argument's annotation is `type[Shape]`.
 Passing `Circle` works because `Circle` is a subclass of `Shape`.
-Calling `kind()` then produces an instance.
 
 The word `type` plays two roles in this listing:
 the annotation `type[Shape]` names the class to the type checker,
@@ -550,9 +542,7 @@ print(s.upper())
 
 `T` is a placeholder, filled in separately at each call.
 The type checker infers `T` from the argument and substitutes it into the return type.
-Both `n + 1` and `s.upper()` pass the type checker,
-while the commented-out `n.upper()` fails.
-In `first_any.py` the same call type-checks and then fails at runtime.
+In `first_any.py` the same `n.upper()` call type-checks and then fails at runtime.
 
 A class declares type parameters in square brackets after the class name:
 
@@ -570,9 +560,6 @@ box = Box("gift")  # A Box[str]
 print(box.get().upper())
 #: GIFT
 ```
-
-Constructing `Box("gift")` binds `T` to `str` for that instance,
-so `get()` returns a `str` and the call to `upper()` checks.
 
 A *bound* limits the parameter to one hierarchy.
 `class Box[T: Shape]` accepts `Shape` and its subclasses.
@@ -652,11 +639,6 @@ counts.push(2)
 print(counts.top() + 1)
 #: 3
 ```
-
-`words: Stack` specifies the class without its brackets.
-The default makes that annotation mean `Stack[str]`,
-so `words.top()` is a `str` and `upper()` checks.
-At the `reveal_type()` call, the type checker reports that inferred type, `str`.
 
 A default matters most for a class whose type parameter is usually the same type.
 Callers who use that type omit the brackets and still get a precise annotation.
