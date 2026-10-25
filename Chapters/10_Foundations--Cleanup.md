@@ -44,9 +44,6 @@ print("End of delete loop")
 It unbinds the name `c` and drops the one reference that name held.
 The `counters` list still references each `Counter`,
 so every `Counter`'s reference count stays above zero during the loop.
-No `deleted` lines appear while the loop runs,
-`Counter.count` still reads `3` after the loop,
-and `End of delete loop` prints before any deletion.
 
 Python destroys the objects later, at interpreter shutdown,
 when it tears down the global `counters` list.
@@ -130,8 +127,7 @@ print("still running")
 #: still running
 ```
 
-`Resource.__del__()` raises a `RuntimeError`, so the release fails.
-Nothing printed to stdout reports the failure.
+Nothing printed to stdout reports the `RuntimeError`.
 Python prints a traceback to `sys.stderr`, labeled `Exception ignored`,
 and discards the exception.
 No caller can catch the `RuntimeError`, the exit status is still `0`,
@@ -260,13 +256,10 @@ except RuntimeError as e:
 at a line you can identify.
 Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
-The `Socket("B")` block shows `close()` running when the body raises an exception.
 [Context Managers](15_Techniques--Context_Managers.md) covers the protocol,
 the `@contextmanager` shorthand, and what `__exit__()`'s arguments mean.
 
 `close()` also guards against a second call.
-The explicit `sock.close()` after the `with` block returns at once,
-because `__exit__()` set `self.closed` to `True`.
 `__exit__()` calls `close()` for you once.
 Your own code can call `close()` a second time,
 so a real `close()` must accept a repeat call and return at once,
@@ -411,8 +404,8 @@ print("Safe alive:", safe() is not None)
 `ref()` creates a weak reference of your own.
 Calling the weak reference returns the object while it lives,
 and `None` once Python destroys it.
-`Safe` prints `S closed` at the `ref()` line.
-Reference counting reclaims it there, before `gc.collect()` runs.
+Reference counting reclaims `Safe` at the `ref()` line,
+before `gc.collect()` runs.
 
 `gc.collect()` cannot reclaim `Leaky`, because `Leaky` is still reachable.
 `finalize()` keeps every callback in a registry, `self.close` among them.
@@ -470,8 +463,7 @@ since CPython lists every weak reference to an object in that object's `__weakre
 
 `WeakSlot` lists `__weakref__` among its slots,
 so its instances accept weak references.
-`finalize()` accepts the `WeakSlot` instance.
-The instance is a temporary that Python destroys as soon as the statement ends,
+The `WeakSlot` instance is a temporary that Python destroys as soon as the statement ends,
 so the callback prints `y closed` at that moment.
 
 ## Watching Objects Without Holding Them
@@ -528,8 +520,6 @@ Python can give a new object the `id()` of a destroyed one.
 That reuse is harmless here,
 since the dictionary holds only live objects and each live object has a distinct id.
 
-`live_count()` returns the size of that registry,
-so it reports how many `Counter` objects currently exist.
 Here `pop()` or `clear()` removes an instance from the `counters` list,
 which drops the instance's last strong reference.
 The interpreter collects the instance at once,
