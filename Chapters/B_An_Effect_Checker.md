@@ -333,7 +333,6 @@ and calling a variable calls the value it holds at runtime.
 The source does not say what that value is, so `name()` answers `UNRESOLVED`.
 
 `callee()` handles the two shapes a resolvable call takes.
-A bare name goes to `name()`.
 An attribute is either a path through an import, such as `time.sleep`,
 or a method on a receiver.
 `type_of()` finds the receiver's type where the source makes it evident:
@@ -345,8 +344,6 @@ and `p.read_text()` becomes `pathlib.Path.read_text`,
 which a pattern in the table matches.
 
 `annotation()` reads a written type.
-It drops the subscript from `list[str]`,
-and for `Final[...]` it reads the type inside the brackets.
 
 The test file confirms that `imports_of()` maps each local name to its full one,
 and that `callee()` resolves each shape of call or answers `UNRESOLVED`:
@@ -478,13 +475,8 @@ def marked(
     return None
 ```
 
-`marked()` is two nested patterns,
-the second inside a loop over the first one's `extras`.
-It matches a return annotation of the form `Annotated[T, ...]`,
-binds everything after `T` to `extras`,
-and returns the argument names of the first call to `marker`.
-The guard, `if found == marker`, compares a captured name with a parameter,
-which a pattern alone cannot do.
+In `marked()`, the guard, `if found == marker`,
+compares a captured name with a parameter, which a pattern alone cannot do.
 
 For a function that declares no row, `marked(func, "performs")` returns `None`,
 which means "inferred."
@@ -550,14 +542,10 @@ def facts_of(module: str, tree: ast.Module) -> list[Facts]:
 ```
 
 `calls_in()` collects the third fact.
-`ast.walk()` yields a statement and every node beneath it,
-and `callee()` names each `ast.Call` among them.
-The walk descends into a nested function or a `lambda`,
+`ast.walk()` descends into a nested function or a `lambda`,
 so the calls inside one count toward the function that contains it.
 
-`facts_of()` records every top-level function,
-every method under `module.Class.method`, and each class under its own name.
-The class's entry holds a call to its `__init__()` when the class defines one,
+A class's entry holds a call to its `__init__()` when the class defines one,
 so `Log()` performs what `Log.__init__()` performs.
 
 The module's top-level statements become a function named `module.<module>`.
@@ -652,7 +640,6 @@ An annotation overrides `UNRESOLVED` in both cases.
 
 The or-pattern in `assigned()` matches every one of those binding nodes.
 Each alternative binds `name`, as an or-pattern requires.
-`values` supplies the name's type.
 `ast.walk()` visits an assignment before its target,
 so `values` holds the type of the right side when the walk reaches the target's `Name`.
 
@@ -690,8 +677,7 @@ def module_scope(module: str, tree: ast.Module) -> Scope:
     return Scope(module, named.names, defined, types)
 ```
 
-`module_scope()` fills `types` for a module by calling `assigned()` on its top-level statements outside any function or class.
-It reads each `type` statement separately,
+`module_scope()` reads each `type` statement separately,
 so a parameter annotated `Table` resolves to `builtins.dict`.
 It also keeps those statements out of `assigned()`,
 which would otherwise record an alias's name as a variable.
@@ -825,9 +811,8 @@ In `save()`, `log` gets its type from a constructor call,
 the string by being a constant, `names` through a `type` alias,
 `LIMIT` through `Final[...]`, and `p` by its annotation.
 
-`test_a_binding_shadows_the_builtin()` binds the name `str` in nine ways.
-Each time, `str.upper()` comes back `UNRESOLVED` instead of resolving to `builtins.str.upper`.
-`test_a_packed_parameter_shadows_the_builtin()` does the same for a function's own `*args` and `**kwargs` parameters.
+In `test_a_binding_shadows_the_builtin()`,
+`str.upper()` comes back `UNRESOLVED` after each binding instead of resolving to `builtins.str.upper`.
 
 ## Rows to a Fixed Point
 
@@ -872,8 +857,6 @@ def infer(known: dict[str, Facts], table: Table) -> Rows:
     return rows
 ```
 
-`call_row()` looks for a call among the functions the checker has read,
-then in the table.
 An unresolved call has the name `"?"`, which matches no pattern,
 so `lookup()` answers `UNKNOWN`.
 
@@ -993,8 +976,6 @@ def check(
     return Report(rows, findings)
 ```
 
-`check()` receives each module's source text keyed by module name, plus a table,
-and returns a `Report`.
 Everything `check()` reads arrives as an argument,
 and everything it produces leaves in the `Report`,
 so a test passes it a string and checks the returned value.
@@ -1019,17 +1000,13 @@ def lines(report: Report) -> list[str]:
     return rows + [describe(f) for f in report.findings]
 ```
 
-The `match` on `read_module()`'s result turns a parse failure into an `Unparsed` finding.
-`undeclared()` reports each Effect a row omits as an `Undeclared` finding.
-`Finding` is the union of the two records,
+`Finding` is the union of `Undeclared` and `Unparsed`,
 so a caller matches on the kind of finding and reads the fields of that kind:
 the Effect name of an `Undeclared`, the parse error of an `Unparsed`.
 `describe()` is one such caller,
 and turns each kind of finding into a line of text.
 
-`lines()` formats a whole `Report`: one line for each nonempty row,
-then one for each finding.
-It returns the strings and leaves the printing to the program that runs the checker,
+`lines()` returns strings and leaves the printing to the program that runs the checker,
 so the core stays pure.
 
 Here is the checker on the greeting program from [Effect Tracking](A_Effect_Tracking.md#a-row-inside-annotated):
