@@ -665,8 +665,8 @@ Check it for a specific name you marked lazy.
 
 Before 3.15, deferring a slow import meant moving it inside the function that needed it.
 That works, but it hides the dependency.
-Nothing at the top of the file mentions the module,
-and tools that read imports miss it.
+The module's name moves from the top of the file into a function body,
+where tools that read imports miss it.
 The `import` statement also re-runs its `sys.modules` lookup on every call.
 `lazy import` keeps the declaration at the top,
 where a reader and a tool look for imports, and loads the module once,
