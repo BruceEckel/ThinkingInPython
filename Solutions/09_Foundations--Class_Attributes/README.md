@@ -107,13 +107,10 @@ print(Base.shared, Left.shared, Middle.shared, Right.shared)
 #: 9 5 9 100
 ```
 
-`Middle` behaves like `Left`.
-Both inherit `shared` from `Base`,
+`Middle` and `Left` both inherit `shared` from `Base`,
 so both track `Base.shared` through attribute lookup until something assigns to `Left.shared` or `Middle.shared`.
 In the last step, `Left.shared = 5` gives `Left` its own entry,
 and `Middle` still reads `Base`'s `9`.
-`Right` holds `100` throughout,
-because its class body creates its own class attribute with `shared = 100`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -163,9 +160,6 @@ print(b.x, b2.x)
 
 Each call to `B()` runs the generated `__init__()`,
 which assigns `100` to `self.x` as a fresh instance attribute for that object.
-`b.x = -1` replaces the value of `b`'s own attribute.
-`b2` comes from a separate `B()` call and keeps its `100`,
-the way each `A()` in `real_defaults.py` holds its own `x`.
 A constructor default creates one value per instance,
 unlike a plain class attribute,
 which creates one value shared by all instances until something shadows it.
@@ -245,7 +239,6 @@ which then shadows `Tally.total` for `a`.
 
 **Check where the write went.**
 `vars(a)` shows the shadow: a `total` entry in `a`'s own dictionary.
-`Tally.total`, read through the class, still reports `2`.
 
 This shadow is the bug `ClassVar` exists to catch.
 With `total: ClassVar[int] = 0` declared instead,
@@ -307,8 +300,6 @@ print(a.items, b.items)
 **Build a list per instance.**
 `default_factory=list` calls `list()` once per construction,
 so the generated `__init__()` assigns a brand-new list to `self.items` on every `Cart`.
-Because each object holds its own list from construction,
-`a`'s append leaves `b.items` empty.
 
 For the same class written with `items: list[str] = []`,
 `@dataclass` raises a `ValueError`,
@@ -332,7 +323,6 @@ with expected(ValueError):
 because it inspects every default before generating the constructor.
 `shared_mutable.py`'s `Cart` has no decorator to inspect its defaults,
 so `Cart` gets its shared list silently.
-The `ValueError` message ends with the remedy: `use default_factory`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -394,7 +384,7 @@ print(vars(A)["x"])
 **Remove the shadow.**
 `del a.x` (`[1]`) removes the entry from the instance dictionary,
 which is where assignment writes.
-`vars(a)` is empty again, and `a.x` reads `100`,
+`a.x` reads `100` again,
 because the lookup falls back to the class the way it did before any assignment.
 
 **Show that deletes stop at the instance.**
@@ -490,8 +480,6 @@ print(vars(c), vars(Counting)["total"])
 ```
 
 **Show where each write went.**
-`vars(a)` holds `{'total': 1}` while the class still holds `0`.
-Those two facts explain the output.
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read finds the instance dictionary empty, falls back to the class,
 and gets `0`.
@@ -513,7 +501,6 @@ The `ClassVar` declaration catches the mistake at check time.
 The listing suppresses the report so it can demonstrate what the write does at runtime.
 
 **Send the write to the class.**
-The fix names the class on the left.
 `Counting.total += 1` reads and writes the same class dictionary,
 so both instances report `2`.
 `vars(c)` is empty because the constructor writes to the class.
@@ -604,7 +591,6 @@ print(Right2.shared is Base2.shared)
 ```
 
 **Share one list across the hierarchy.**
-`Base.shared` holds `[1, 2]`, and so do both subclasses.
 `Left` and `Right` both inherit `shared`, so both names read through to `Base`,
 and `.append()` mutates the list stored there.
 `Left.shared is Base.shared` and `Right.shared is Base.shared` together prove that the three names share one object,
@@ -620,8 +606,7 @@ Combined, the mutable value and the inheritance lookup produce one list,
 declared on the base class, that every subclass mutates under its own name.
 
 **Give one subclass its own list.**
-Giving `Right2` its own `shared = []` changes `Right2` alone.
-The assignment in the class body creates a new entry in `Right2`'s own dictionary,
+The assignment `shared = []` in `Right2`'s class body creates a new entry in `Right2`'s own dictionary,
 so `Right2.shared` reads that entry.
 `Left2` still shares `Base2`'s list.
 The result, `[1] [1] [2]`,
@@ -708,14 +693,11 @@ print(vars(t), t.seat)
 
 **Declare the attribute without creating it.**
 The type checker passes this file.
-The annotation `seat: str` states that a `Ticket` carries a `seat`.
-The checker accepts that declaration and never checks that a method assigns `seat`.
+The checker accepts the declaration `seat: str` and never checks that a method assigns `seat`.
 At runtime the declaration creates nothing.
-`vars(t)` holds `holder` alone, and reading `t.seat` raises an `AttributeError`.
 
 **Create the attribute from outside.**
-`t.seat = "14C"` creates the attribute on the instance.
-The type checker verifies that assignment against the declared `str`.
+The type checker verifies `t.seat = "14C"` against the declared `str`.
 
 A bare annotation is safe when the code that assigns the attribute runs before any code that reads it.
 The type checker cannot confirm that order,
@@ -850,9 +832,6 @@ moves it to `3` while `Base.total` stays at `1`.
 **Keep one counter for the hierarchy.**
 `Counted` names the class on the left,
 so every construction reads and writes `Counted`'s dictionary.
-`vars(SubCounted)` holds no `total` at any point.
-Both names report the one shared count, so the three lines read `1 1`, `2 2`,
-and `3 3`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
