@@ -145,8 +145,6 @@ for flower in (Chrysanthemum(), Gladiolus()):
 
 The first dispatch resolves to `Predator.visit` rather than `Worm.visit`,
 because `Worm` inherits the operation from the class that defines it.
-For `Chrysanthemum` the second dispatch resolves to the override,
-and for `Gladiolus` to the inherited `Flower.eat`.
 
 ## Two Departures from the Classic Shape
 
@@ -252,7 +250,6 @@ if __name__ == "__main__":
 ```
 
 Nothing edits `Flower`.
-Each operation is a separate function.
 
 `@nectar.register` reads the annotation on the implementation's first parameter.
 For `flower: Gladiolus`,
@@ -260,8 +257,7 @@ it stores that implementation in the dispatch table under the key `Gladiolus`.
 A union annotation, `flower: Gladiolus | Ranunculus`,
 registers one implementation for several types at once.
 
-Each registered implementation takes the name `_`.
-The name can be anything,
+A registered implementation's name can be anything,
 since a call to `nectar()` finds that implementation through the dispatch table.
 `_` is the conventional placeholder for a name that exists only to satisfy `def`.
 Reusing `_` for every registration is safe.
@@ -325,10 +321,7 @@ instead.
 ### Testing the Operations
 
 Because each operation is a plain function,
-a test calls it with each flower type and asserts the result.
-The tests cover the registered types,
-the `@singledispatch` default for an unregistered type,
-and a subclass that resolves to its nearest registered ancestor:
+a test calls it with each flower type and asserts the result:
 
 ```python
 # test_visitor.py
@@ -377,9 +370,7 @@ Both cases are rare in Python.
 draws the same conclusion from its `recycling_note.py` example.
 
 A minimal example shows the first of those cases,
-a loop that runs inside `accept()`.
-`Corsage.accept()` calls `accept()` on each of its elements and recurses into any nested `Corsage`,
-so the loop over the elements stays inside the object:
+a loop that runs inside `accept()`:
 
 ```python
 # recursive_accept.py
@@ -421,7 +412,6 @@ at module level, and takes one flower at a time from a tuple.
 In `recursive_accept.py` the loop runs inside `accept()`,
 the situation where the classic pattern still fits.
 Every visitor reuses that one loop.
-The `Bee` and the `Worm` both reach the nested `Ranunculus` through it.
 A new visitor defines `visit()` for a single flower.
 `Corsage.accept()` passes that visitor to every nested element.
 
