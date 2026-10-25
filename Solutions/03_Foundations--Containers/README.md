@@ -298,9 +298,6 @@ print(xs[3:0:-1])  # The same three, in one slice
 ```
 
 A negative `start` counts from the end, so `xs[-2:]` needs no length.
-`xs[1:-1]` trims one item from each end.
-The reversed middle has two forms: slice, then reverse the copy,
-or count the indices down with a negative `step`.
 The one-slice form is harder to read because the bounds swap roles.
 `3` is now the first index visited and `0` is the stop,
 which the slice excludes, so the slice ends at index `1`.
@@ -433,8 +430,7 @@ print(person[0], type(person[0]).__name__)
 The unpacking line stays the same,
 because a `namedtuple` is a tuple subclass and unpacks by position like any other tuple.
 
-Line `[1]` reads fields by name.
-`person.height` names the field that `person[2]` reads by position.
+In line `[1]`, `person.height` names the field that `person[2]` reads by position.
 Unpacking and `person[0]` still work beside the names,
 so code written for the tuple runs unchanged.
 A heterogeneous tuple that passes between functions is usually better as a `namedtuple` or a data class,
@@ -506,8 +502,7 @@ The right operand wins because `a | b` reads as "start from `a`,
 then apply `b`," the same order `a.update(b)` has always used.
 
 **Build a new dictionary.**
-`|` builds a new dictionary and leaves the left operand alone,
-so `counts` prints unchanged after the merge.
+`|` builds a new dictionary and leaves the left operand alone.
 `|=` updates the left dictionary in place.
 
 Letting the right operand win makes `|` on dictionaries depend on operand order.
@@ -587,8 +582,6 @@ A starred target collects however many items remain,
 so one assignment reaches any of the three positions without an index.
 The star may appear anywhere in the target list,
 so `first, *middle, last = row` works.
-`first` and `last` each take one item and `middle` takes the rest,
-however many that is.
 
 **Reject a count mismatch.**
 `a, b = row` fails because an unstarred target list states an exact count, two,
