@@ -829,7 +829,7 @@ With the check restored, the same payload raises a `ValueError` starting `Unknow
 <summary>Solution</summary>
 
 If you end the payload after `print("injected code ran")` and leave
-out the triple-quoted line, the script prints nothing and stops with a
+out the triple-quoted line, the script stops at once with a
 `SyntaxError`, `unterminated string literal`.
 The second splice puts a newline inside the `super().__init__("...")` literal.
 `exec()` compiles the whole spliced source before running any of it,
@@ -964,7 +964,7 @@ If you leave `@classmethod` off `__prepare__()`,
 Python's call fills `cls` with the class name and `name` with the bases.
 The `class Handlers` statement then fails with
 `TypeError: First.__prepare__() missing 1 required positional argument: 'bases'`,
-a message that says nothing about the missing decorator.
+a message that blames a missing `bases` argument rather than the missing decorator.
 Python calls `__prepare__()` on the metaclass before any class object exists,
 so the solution keeps the decorator, as [When You Still Need a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#when-you-still-need-a-metaclass) requires.
 

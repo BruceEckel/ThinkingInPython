@@ -580,8 +580,8 @@ info: This violates the Liskov Substitution Principle
 
 **Call through the base type.** The `# type: ignore` suppresses that report so the listing can show
 what the checker prevents. `run()` accepts any `WhatIUse`.
-A `Renamed` is a `WhatIUse`, so the type checker reports nothing about the call
-inside `run()`. At runtime `Renamed.op()` has no parameter named
+A `Renamed` is a `WhatIUse`, so the type checker accepts the call inside `run()`.
+At runtime `Renamed.op()` has no parameter named
 `what_i_want`, so the call raises a `TypeError`. The override breaks
 `run()`, a caller written against `WhatIUse` alone.
 

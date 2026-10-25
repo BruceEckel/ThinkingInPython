@@ -263,7 +263,7 @@ class Lizard(Item):
 <summary>Solution</summary>
 
 If you forget `eval_lizard()` on one existing class, say `Rock`,
-the type checker reports nothing, because every `opponent` and `caller` parameter takes `Any`.
+the type checker accepts the call to the missing method, because every `opponent` and `caller` parameter takes `Any`.
 The demo then raises an `AttributeError` at `Lizard().compete(Rock())`,
 the first duel that calls the missing method.
 That `AttributeError` is the first sign of the mistake,

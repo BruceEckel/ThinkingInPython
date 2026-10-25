@@ -355,7 +355,7 @@ OnlyOnce().run()
 `run()` calls `customize1()` twice.
 `OnlyOnce` performs the step once.
 The name, the parameters, and the return type all match the base,
-so the type checker accepts `@override` and reports nothing.
+so the type checker accepts `@override` on both methods.
 The base states its algorithm in the loop, not in any type.
 Each pass calls the step, so each pass must perform it.
 

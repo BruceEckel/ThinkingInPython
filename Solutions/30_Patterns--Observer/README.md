@@ -1860,7 +1860,7 @@ so the registry is complete before any thermometer exists.
 **Keep the function callable.** `responds()` returns `fn` unchanged,
 so `display` is still a function you can call by name.
 
-If `responds()` appends the function and returns nothing,
+If `responds()` appends the function and returns `None`,
 the demo still prints its three lines,
 because `RESPONDERS` holds each function.
 The decorator's result replaces the name, though,

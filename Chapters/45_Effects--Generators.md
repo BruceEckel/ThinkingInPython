@@ -1037,7 +1037,7 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     Run `ty check` and the script, and explain both results.
     Which one told you more,
     and what does the type checker say once you remove `profile`'s annotation?
-5.  `report()` in `yield_from_return.py` yields but returns nothing.
+5.  `report()` in `yield_from_return.py` yields its lines and returns `None`.
     Rewrite it to return the character count as well,
     and give it the full annotation.
     Then write a caller that delegates to it with `yield from` and yields that count in a line of its own,

@@ -918,7 +918,7 @@ a different design, a detail, or an equivalent alternative.
 > the one goal it can express.
 > Replace that `isinstance()` test with a `Callable[[Room], bool]` parameter,
 > so the caller says what counts as arriving,
-> and change nothing else in the search,
+> and leave the rest of the search as it is,
 > beyond letting `solve()` return `None` when no room matches.
 > Then use the new parameter to feed the robot:
 > search for the nearest room holding a `Food`, walk there,

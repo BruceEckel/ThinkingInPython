@@ -141,8 +141,8 @@ print(person.hello())
 #: Everything is wonderful. Just wonderful.
 ```
 
-`Prozac` needs nothing beyond `Happy` and `Grumpy`'s own shape: one
-`hello()` method. `UnpredictablePerson` names no specific mood, so
+`Prozac` has the same shape as `Happy` and `Grumpy`: one `hello()` method.
+`UnpredictablePerson` names no specific mood, so
 adding a third mood changes which `Mood` object `change_to()`
 installs and leaves every line of `UnpredictablePerson` as it was.
 `UnpredictablePerson` is the
@@ -447,7 +447,7 @@ so each value is a one-element tuple holding the function.
 `Enum` unpacks the tuple into the row's constructor,
 as it unpacks the tuples in `trap_states.py`.
 
-The machine is the classic turnstile: `push` while locked does nothing (the
+The machine is the classic turnstile: `push` while locked keeps it locked (the
 `"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
 again.
 
@@ -877,7 +877,9 @@ own, so the condition reads `load_kg` off the machine, where
 `begin()` recorded it when the cycle started.
 
 **Reject an input with no rule.** A second `Start` during `FILLING` finds no rule, so `handle()` raises
-`NoTransition`. The press changes nothing. The state is still
+`NoTransition`.
+The press leaves the machine as it was.
+The state is still
 `FILLING` and `load_kg` is still 3, because the engine runs an
 action only after it finds a matching rule.
 

@@ -995,7 +995,8 @@ def check(
 
 `check()` receives each module's source text keyed by module name, plus a table,
 and returns a `Report`.
-It reads no file and prints nothing,
+Everything `check()` reads arrives as an argument,
+and everything it produces leaves in the `Report`,
 so a test passes it a string and checks the returned value.
 
 The last two functions turn findings and rows into text:

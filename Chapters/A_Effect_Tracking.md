@@ -230,7 +230,7 @@ so a codebase could adopt rows one function at a time.
 That same rule is the design's weakness.
 `shout()` calls `tell()` and declares nothing.
 `row(shout)` returns an empty list.
-The type checker reports nothing,
+The type checker accepts `shout()`,
 because the PEP instructs every type checker to ignore metadata,
 including the `Tell` in the return annotation of `tell()`.
 Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it),
@@ -419,7 +419,8 @@ The four problems before this section apply in full to a separate tool.
 [An Effect Checker](B_An_Effect_Checker.md) builds a small one.
 That checker reports `Unknown` for a call it cannot resolve.
 That appendix's [closing section](B_An_Effect_Checker.md#what-the-checker-resolves-and-what-it-cannot-see)
-lists the cases where the checker reports nothing.
+lists the cases where the checker passes over a call or misreads it as pure,
+so the row looks complete.
 
 The third is the runtime.
 A decorator reads each function's row once with `row()`,

@@ -407,7 +407,7 @@ for cls in Trash.registry.values():
 
 If you decorate the `Sorter` methods with `@singledispatch` instead of `@singledispatchmethod`,
 the loop prints "no special handling" for all five materials, `Aluminum` included,
-and the type checker reports nothing.
+and the type checker accepts the class.
 `singledispatch` dispatches on the first argument, which in a method call is the `Sorter` instance.
 The one registration that matches a `Sorter` is the base method's registration, so the base method handles every call.
 

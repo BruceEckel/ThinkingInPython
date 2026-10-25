@@ -510,7 +510,7 @@ through a chain of scopes that ends at the builtins.
 Assignment and `del` act on the first dictionary,
 so `defaults` keeps its values.
 
-The `list` in `remove_while_iterating.py` skips elements and reports nothing.
+The `list` in `remove_while_iterating.py` skips elements silently.
 Changing the size of a `dict` or a `set` while iterating over it raises a `RuntimeError`:
 
 ```python

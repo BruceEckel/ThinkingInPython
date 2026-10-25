@@ -24,7 +24,7 @@ def test_output_is_ordered(xs: list[int]) -> None:
 
 @given(numbers)
 def test_sorting_is_idempotent(xs: list[int]) -> None:
-    "Idempotence: sorting a sorted list changes nothing."
+    "Idempotence: sorting twice equals sorting once."
     once = sorted(xs)
     assert sorted(once) == once
 

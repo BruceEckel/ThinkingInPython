@@ -308,7 +308,7 @@ the same character marks a [decorator](14_Techniques--Decorators.md).
 ## Booleans, None, and Truthiness
 
 `None` is Python's single "no value" object, like `null` elsewhere.
-It is the default return value of a function that returns nothing.
+It is every function's default return value.
 
 You can test any object in a boolean context.
 Numbers are false when zero, containers are false when empty,
@@ -361,7 +361,7 @@ so the empty string appears as a visible `''`.
 `Bucket` is a small [class](07_Foundations--Classes.md).
 Its `count: int` and `-> int` are [type hints](08_Foundations--Static_Types.md#type-hints).
 They state the types for the reader and the type checker.
-They change nothing about how the code runs.
+The code runs the same with or without them.
 
 Python's logical operators are the words `and`, `or`, and `not`,
 where C and Java write `&&`, `||`, and `!`.

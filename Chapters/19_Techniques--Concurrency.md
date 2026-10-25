@@ -1010,7 +1010,7 @@ so the example reports the deadlock instead of hanging.
 The fix is the same one that works for threads:
 have every task acquire shared locks in the same global order.
 If both tasks acquire `lock_a` first,
-the second task waits for `lock_a` while holding nothing,
+the second task waits for `lock_a` before taking either lock,
 so the first task takes `lock_b`, finishes, and releases both.
 
 ### Livelock
@@ -1554,7 +1554,7 @@ print(f"threads no faster: {thr > seq * 0.9}")
 #: threads no faster: True
 ```
 
-Swapping the loop for a thread pool changes nothing.
+Swapping the loop for a thread pool leaves the time where it was.
 Five threads still take turns holding the one GIL,
 so the threaded run takes as long as the sequential one,
 sometimes a little more because of the added scheduling.

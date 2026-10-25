@@ -210,8 +210,7 @@ If `init()` gains a third parameter,
 Pyright builds the class from its bases alone,
 so it gives the class `Event`'s three-argument constructor and rejects `return new_cls`.
 Under Pyright `make()` needs `cast(EventMaker, new_cls)`.
-Under mypy the result is an unknown class,
-so mypy checks nothing and accepts either form.
+Under mypy the result is an unknown class, so mypy accepts either form.
 
 Under `ty` a cast replaces a check with a claim,
 the distinction [Where Enforcement Lives](#where-enforcement-lives) draws.
@@ -1257,7 +1256,7 @@ so mutating the original dict leaves the class unchanged.
 Override `__new__()` when you must change `name`, `bases`, or the namespace
 (including special members like `__slots__`) before Python builds the class.
 Otherwise, prefer `__init__()`,
-which receives the finished class and returns nothing.
+which receives the finished class and returns `None`.
 
 ## Intercepting Instance Creation
 
@@ -1330,8 +1329,8 @@ The `[T]` on `__call__()` ties its return type to `cls`,
 so `ty` infers `ASingleton` as the type of `ASingleton()` instead of `Any`.
 Without the `[T]`, every singleton comes back as `Any` under `ty` and Pyright.
 A misspelled attribute access on the result then passes the check.
-Under mypy the `[T]` changes nothing,
-because mypy ignores a metaclass `__call__()` return type and keeps `ASingleton` either way.
+Under mypy `ASingleton()` has the type `ASingleton` with or without the `[T]`,
+because mypy ignores a metaclass `__call__()` return type.
 
 That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` drops `Singleton` from the type of `cls`.
@@ -2023,7 +2022,7 @@ display_object(Point, REDEFINED_DUNDERS,
 ```
 
 `Plain` writes none of the four,
-so `INTERESTING_DUNDERS` shows `object`'s versions and `REDEFINED_DUNDERS` shows nothing.
+so `INTERESTING_DUNDERS` shows `object`'s versions and `REDEFINED_DUNDERS` shows `None` under both headings.
 `@dataclass` writes three of them and sets `__hash__` to `None`,
 so `Point` reports a `__hash__` attribute rather than a method.
 The last call drops that row,

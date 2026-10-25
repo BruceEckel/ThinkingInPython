@@ -172,7 +172,7 @@ print(a.items, b.items)
 #: ['plum'] ['apple', 'pear']
 ```
 
-`a.items.append("apple")` reads `items`, finds nothing on `a`,
+`a.items.append("apple")` reads `items`, finds `a`'s own dictionary empty,
 falls back to the class, and mutates the one list stored there.
 Shadowing starts with an assignment.
 `.append()` leaves `a`'s dictionary empty,
@@ -477,8 +477,8 @@ one level up.
 the way `a` reads through to `Stars` until `a.rating = 1`.
 
 `ClassVar` leaves that lookup alone.
-It tells the type checker that `shared` belongs to the class,
-and says nothing about whether subclasses share storage.
+It tells the type checker that `shared` belongs to the class.
+Attribute lookup alone decides whether subclasses share storage.
 `Right` writes `shared = 100` and leaves the annotation to `Base`.
 The override is still a `ClassVar`.
 The type checker applies the base's declaration to it,

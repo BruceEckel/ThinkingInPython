@@ -97,7 +97,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[`async def`, `await`, and the Event Loop](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics) explains that a coroutine object does nothing until something awaits it.
+[`async def`, `await`, and the Event Loop](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics) explains that a coroutine object describes pending work, which starts when something awaits it.
 In `[await c for c in coroutines]`, ask what the comprehension does with the first `await` before it moves to the second `c`.
 Compare that with `gather()`, which wraps every coroutine in a task before it waits on any of them.
 
@@ -1015,7 +1015,7 @@ including `a` and `b`, which had succeeded.
 running when the exception propagates, so `e` and
 `f` are still sleeping when `main()` returns. `asyncio.run()` then
 cancels the tasks that remain as it shuts the loop down, which is why
-`e` and `f` print nothing further. If `main()` goes on to other work,
+the trace ends at the `gather raised` line. If `main()` goes on to other work,
 they run to completion in the background with no code awaiting their
 results.
 
@@ -1446,8 +1446,8 @@ twenty milliseconds rather than waiting out the half-second timeout.
 **Acquire the locks in one order.** Follow who waits for whom. The first task takes `lock_a`, sleeps, then
 takes `lock_b`, which is free. Meanwhile the second task reaches
 `async with lock_a` and suspends, because the first task has it. That
-suspension is a wait, but the first task needs nothing the second
-task holds. The first task finishes and releases both locks. The
+suspension is a wait, but every lock the first task needs is either
+its own or free. The first task finishes and releases both locks. The
 second task then finds both locks free.
 
 The deadlock version makes the waiting circular. Task one holds

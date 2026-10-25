@@ -91,12 +91,12 @@ A tuple annotation specifies one type per position,
 so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
 The `...` in `tuple[int, ...]` means zero or more `int`s.
 
-A function that returns nothing declares `-> None`,
-so every `__init__()` in this chapter's listings carries that annotation.
+A function that returns `None`, explicitly or by reaching its end,
+declares `-> None`, so every `__init__()` in this chapter's listings carries that annotation.
 
 ## The Type Checker: `ty`
 
-The hints do nothing on their own.
+Python runs the code the same with or without the hints.
 You need a tool to check them:
 
     ty check
@@ -501,7 +501,7 @@ whatever that type is.
 
 `Any` loses that connection.
 `first_any()` accepts any list,
-but its return type says nothing about what the list holds:
+but its return type is `Any` whatever the list holds:
 
 ```python
 # first_any.py

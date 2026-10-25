@@ -462,7 +462,7 @@ print(vars(c), vars(Counting)["total"])
 
 **Show where each write went.** `vars(a)` holds `{'total': 1}` while the class still holds `0`.
 Those two facts explain the output. `self.total += 1` expands to
-`self.total = self.total + 1`. The read finds nothing on the instance,
+`self.total = self.total + 1`. The read finds the instance dictionary empty,
 falls back to the class, and gets `0`. The write then stores `1`
 in the instance dictionary, where every write through an instance goes. Each object ends up
 with its own `total` of `1`, shadowing a class attribute that still
@@ -664,7 +664,7 @@ print(vars(t), t.seat)
 #: {'holder': 'Ada', 'seat': '14C'} 14C
 ```
 
-**Declare the attribute without creating it.** The type checker reports nothing for this file. The annotation `seat: str` states
+**Declare the attribute without creating it.** The type checker passes this file. The annotation `seat: str` states
 that a `Ticket` carries a `seat`.
 The checker accepts that declaration and never checks that a method assigns `seat`. At runtime the declaration
 creates nothing. `vars(t)` holds `holder` alone, and reading `t.seat`

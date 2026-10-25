@@ -150,7 +150,7 @@ new formats. A field is a different vector of change.
 Two things generalize from the example. First, the axis is visible in
 the history rather than in the code. When the same function appears in
 three consecutive commits, the history shows the axis for you. Second,
-absorbing one vector says nothing about the others. In this design a
+a design absorbs one vector and leaves the others as they were. In this design a
 new format is one assignment. A new field is an edit to every format,
 so the design is the right answer only if formats are what keep
 changing.

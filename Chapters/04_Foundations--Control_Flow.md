@@ -163,7 +163,7 @@ so the test sits between the `pop()` and the addition.
 A loop may have an `else` clause.
 It runs when the loop runs to the end, but a `break` skips it.
 A search loop `break`s when it finds its target,
-so its `else` clause runs only when the search finds nothing:
+so its `else` clause runs only when the search comes up empty:
 
 ```python
 # loop_else.py

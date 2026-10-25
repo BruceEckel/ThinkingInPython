@@ -75,7 +75,7 @@ print(70 + withdraw(30))
 ```
 
 The first `withdraw(30)` evaluates to `70`,
-so substituting `70` for it ought to change nothing.
+so substituting `70` for it ought to leave the result at `110`.
 The substitution changes `110` into `140`.
 `withdraw()` is not referentially transparent.
 Every expression that calls it fails the same substitution.
@@ -444,7 +444,7 @@ The roundtrip law belongs to a small family of reusable property shapes.
 Knowing the family is most of the skill.
 An *invariant* states a fact about every output.
 Sorting produces an ordered list.
-*Idempotence* states that repeating an operation changes nothing.
+*Idempotence* states that running an operation twice gives the same result as running it once.
 Sorting a sorted list returns the same order.
 An *oracle* states that two implementations agree.
 The simple version you can check by reading matches the fast one.
@@ -499,7 +499,7 @@ Try each exercise before opening its [solution](../Solutions/43_Functional--Conf
 2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
 3.  Write Hypothesis properties for `sorted()` using two shapes from [A Family of Property Shapes](#a-family-of-property-shapes):
     an invariant (every adjacent pair of the output is in order) and idempotence
-    (sorting a sorted list changes nothing).
+    (sorting a sorted list returns an equal list).
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.

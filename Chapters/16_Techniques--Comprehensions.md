@@ -94,7 +94,7 @@ compares what the two forms return.
 
 A `lambda` predicate leaves the element type of `filter()`'s result at `int | str`,
 so `ty` rejects `e ** 2`.
-Pyright infers the mixed list literal as `list[Unknown]` and checks nothing there.
+Pyright infers the mixed list literal as `list[Unknown]` and accepts any operation on its elements.
 The comprehension's `if isinstance(e, int)` narrows the element type to `int`,
 so `list_comprehension.py` needs no `# type: ignore` comment.
 `filter()` narrows when its predicate is a named function annotated to return [`TypeIs[int]` or `TypeGuard[int]`](08_Foundations--Static_Types.md#type-narrowing)

@@ -545,7 +545,7 @@ print(p.query())  # [1]
 #: result
 ```
 
-Building `Lazy` prints nothing.
+Building `Lazy` defers `Expensive`, so `proxy ready` prints first.
 `__getattr__()` builds `Expensive` on the first forwarded access.
 Every later access reuses that instance,
 so the `query()` at `[1]` prints `result` alone.

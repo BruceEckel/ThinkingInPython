@@ -59,7 +59,7 @@ For example:
 Effect[Need[Console], KeyError, None]
 ```
 
-This Effect needs a `Console`, can fail with a `KeyError`, and produces nothing.
+This Effect needs a `Console`, can fail with a `KeyError`, and produces `None`.
 The first parameter is `Need[Console]` rather than `Console`.
 The Effect asks for a console, and a later `supply()` call provides one.
 [Nothing Runs Yet](#nothing-runs-yet)
@@ -663,7 +663,7 @@ A function with a second `yield` stays a generator function after the deletion.
 `greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
 makes two requests, one for the greeting and one for the log.
 If you write its first line as a bare `greet(name)`, every check passes.
-The type checker and `ruff` report nothing, the program runs,
+The type checker and `ruff` accept the code, the program runs,
 the log gains both entries, and no greeting prints.
 The call still builds a description, and the body discards it unrun.
 
@@ -1074,7 +1074,7 @@ print(capture.messages)
 Both satisfy `Console` structurally, so `isinstance()` accepts either.
 `supply()` hands over whichever it examines first.
 `Terminal` prints Alice's greeting and `capture` stays empty.
-Swapping the two arguments appends Bob's greeting to `capture` and prints nothing.
+Swapping the two arguments sends Bob's greeting to `capture` rather than `screen`.
 `greet()` runs the same body in both runs.
 The type checker accepts both runs alike,
 because both bindings have the same type.
@@ -1545,7 +1545,7 @@ def announce(
 ```
 
 `announce()` uses all three parameters of `Effect[A, E, R]`:
-it needs a `Console`, can fail with `KeyError`, and produces nothing.
+it needs a `Console`, can fail with `KeyError`, and produces `None`.
 If you drop the `KeyError` from the annotation,
 the type checker reports an error at the `yield from score(name)` line.
 Every function on the path must declare the `KeyError`.

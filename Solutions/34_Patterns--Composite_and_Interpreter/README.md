@@ -49,7 +49,7 @@ A directory named `"src"` holding a file named `"src"` yields both paths, `'src'
 <summary>Solution</summary>
 
 If you copy `walk()` and add a name test to the `File` case alone,
-`find(root, "main.py")` still works, but `find(root, "src")` yields nothing.
+`find(root, "main.py")` still works, but `list(find(root, "src"))` is `[]`.
 The copied `Directory` case descends straight into its children,
 so every path it yields lies beneath the directory.
 The exercise says a directory can match,

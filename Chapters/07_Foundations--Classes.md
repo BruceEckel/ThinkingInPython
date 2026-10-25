@@ -299,9 +299,9 @@ Python runs the constructor the derived class inherits from the base class.
 Python accepts any method name in a subclass.
 If you misspell the name of a method you mean to override,
 you define a new method.
-Python reports nothing.
-Renaming or removing the base method later leaves the subclass method overriding nothing,
-and Python again reports nothing.
+Python accepts the new method.
+Renaming or removing the base method later leaves the subclass method overriding nothing.
+Python accepts the orphaned method too.
 Either bug is easy to miss.
 
 To let a type checker report either bug,
@@ -553,7 +553,7 @@ Cache only answers whose inputs stay the same.
 
 By default, printing an object shows its class and its address,
 as in `<__main__.Point object at 0x7f2dd669cd70>`.
-That display says nothing about the value the object holds.
+That display identifies the object, not the value it holds.
 Two dunder methods control how an object displays.
 `__str__()` is the readable form for users,
 while `__repr__()` is the unambiguous form for developers:
@@ -661,8 +661,7 @@ Writing `return Temperature(...)` hard-codes the class.
 
 `is_freezing()` also works as a module-level function,
 and that is the usual choice.
-It reads nothing from the class or an instance,
-so its result depends on its `celsius` argument alone.
+Its result depends on its `celsius` argument alone.
 Make it a `@staticmethod` when it belongs with the class's interface,
 where a reader looks for it,
 or when a subclass should be able to replace it like any other method.
@@ -699,4 +698,4 @@ Try each exercise before opening its [solution](../Solutions/07_Foundations--Cla
     then run the type checker
     ([Static Types](08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
     and read what it reports.
-    Remove `@override` and confirm the program runs the same way while the type checker reports nothing.
+    Remove `@override` and confirm the program runs the same way while the type checker prints `All checks passed!`.

@@ -80,7 +80,7 @@ In the caller, the side effect is invisible.
 The second is a *side cause*, the counterpart of a side effect:
 what the environment does to the function.
 Suppose your function reads the time of day.
-The read changes nothing in the environment,
+The read leaves the environment as it was,
 yet the result of your function differs from one call to the next.
 Information a function uses beyond its arguments is a side cause whenever that information changes between calls.
 The usual sources are I/O,
@@ -109,7 +109,7 @@ The question has two answers:
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
     Purity says the outcome depends on the arguments alone.
     The same arguments still produce that same exception every time.
-    The function reads nothing outside itself and changes nothing outside itself.
+    The function reads its arguments alone and leaves everything outside itself as it was.
 
     Computer science theory backs this view.
     Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
@@ -355,7 +355,7 @@ because `NonZero` guarantees that `run.value` is nonzero.
 ## A Program Can Never Be Pure
 
 A completely pure program computes a result and keeps it in the process's memory.
-It takes its inputs from its own source code and changes nothing in its environment,
+It takes its inputs from its own source code and leaves its environment as it was,
 so no screen, file, or socket ever receives the result.
 The exit code the operating system checks is the same regardless of what the program computed.
 From outside the process,

@@ -158,7 +158,7 @@ The test file confirms that:
 
 - `fibonacci()` produces the expected sequence,
   including the empty and one-item cases.
-- `Countdown` counts down to 1, and `Countdown(0)` produces nothing.
+- `Countdown` counts down to 1, and `list(Countdown(0))` is empty.
 - A `Countdown` produces the same values on a second pass.
 - `total()` sums a list, a generator, and a `Countdown`.
 
@@ -944,7 +944,7 @@ Both surprises in [What Laziness Hides](#what-laziness-hides)
 come from the same rule.
 The only way to find out whether the body accepts its arguments is to pull a value and let the body run.
 The only way to find out whether the source has run out is to pull and receive `StopIteration`.
-`for` and `list()` catch that second answer and report nothing,
+`for` and `list()` catch that second answer and stop,
 so an exhausted source and an empty one produce identical output.
 The protocol buffers nothing and reports nothing in advance.
 Each tool in this chapter that answers in advance holds a buffer to give that answer:

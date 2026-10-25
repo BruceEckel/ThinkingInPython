@@ -515,7 +515,7 @@ into a value, the program type-checks and the run prints the same
 trace through `Turbine offline`.
 Then the `Blackout` escapes `run()`,
 and the traceback ends with `grid.Blackout: 20`.
-The wrapper changes nothing, so the solution drops it
+The run is the same with or without the wrapper, so the solution drops it
 and uses `expect()` to show the `Blackout` arriving at `run()`.
 
 Exercise 2 draws the same distinction from the other side.
@@ -785,7 +785,7 @@ def report() -> Depend[
 <summary>Where to look</summary>
 
 [Composing a Program](../../Chapters/47_Effects--Stateless_in_Practice.md#composing-a-program) builds `research()` from `yield from` steps, and [The Success Path](../../Chapters/47_Effects--Stateless_in_Practice.md#the-success-path) writes the same pipeline with ordinary calls.
-In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until the type checker reports nothing.
+In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until the program type-checks again.
 In the by-hand version, ask which tool, if any, reports the changes.
 
 <details>
@@ -1390,7 +1390,7 @@ print(run(scripted((60, 50, 30, 20))), written)
 
 **Replay the balances.** The scripted balances are the four the `Cell` version produces:
 `100` before the first purchase, `40` after it, `40` again because `purchase()`
-refuses the `50` and writes nothing, and `10` after the `30` goes through.
+refuses the `50` and returns `False` before its `Put`, and `10` after the `30` goes through.
 
 **Prove the loop tries every price.** The test proves from both sides
 that `spree()` attempts all four prices. A `spree()` that makes a fifth
@@ -1555,7 +1555,7 @@ exercise 2 finds. If you change `throw(Empty())` to `throw(ValueError())`, the t
 reports an `invalid-yield` at that line. The yielded type is `ValueError`, and the
 annotation allows `Need[Ticker] | Unavailable | Empty`. If you change
 `lifted()`'s `raise Empty()` to `raise ValueError()` while its
-decorator still says `@throws(Empty)`, the checker reports nothing.
+decorator still says `@throws(Empty)`, the checker accepts the change.
 At runtime the `ValueError` propagates through `catch(Unavailable, Empty)` and out of
 `run()` as an ordinary exception.
 The decorator's argument is a claim about the function, not a check on it.
@@ -1827,8 +1827,8 @@ the handler reads `request.low`.
 It is a closure over an iterator rather than a class,
 because a handler is an ordinary function.
 
-Deleting `low: int` from the accessor changes nothing that the type checker reports about
-this file. It changes what the checker reports about callers. With the annotation,
+Deleting `low: int` from the accessor leaves the type checker's report on
+this file as it was. It changes what the checker reports about callers. With the annotation,
 `roll("a", 6)` is `error[invalid-argument-type]`. Without it, the parameter's type is `Unknown`,
 and `roll("a", 6)` type-checks.
 At runtime, `random.randint()` raises a `TypeError`
@@ -2201,12 +2201,12 @@ Independence from the family is the property the pattern exists to provide. Pyth
 type. Saying so takes no abstract factory class.
 
 **Show the mismatch getting through.** The shared signature does not recover the guarantee that makes the pattern worth naming.
-`Cast` says "give me a narrator and I will stage something." It says nothing
-about the actors inside agreeing with each other.
+`Cast` says "give me a narrator and I will stage something." It leaves
+the actors inside free to come from different worlds.
 The listing's last call is the proof: `play(Loud(), Kitty(), Weapon())`,
 which the chapter also runs in `two_games.py`.
 `play()` accepts a `Kitty` facing a `Weapon`.
-Both satisfy their `Protocol`s, so the type checker reports nothing. An *Abstract Factory* in a language with a family type expresses "these
+Both satisfy their `Protocol`s, so the type checker accepts the call. An *Abstract Factory* in a language with a family type expresses "these
 come from one world" in the type. Here the matching is in
 `kitties_and_puzzles()`'s body, a fact about how someone wrote that function.
 Nothing checks it.

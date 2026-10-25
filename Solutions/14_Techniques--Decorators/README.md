@@ -150,7 +150,7 @@ Swapping the two decorators moves your timing line after the `<-` line.
 If `timing`'s wrapper calls `func(*args, **kwargs)` and discards its value,
 the timing line still prints, but `add(2, 3)` returns `None`.
 `trace` then prints `<- add = None`.
-`ty` reports an `invalid-return-type`, because the wrapper declares `-> R` and returns nothing.
+`ty` reports an `invalid-return-type`, because the wrapper declares `-> R` and implicitly returns `None`.
 The solution's wrapper saves the call's value in `result` before it reads the clock again,
 and returns `result` after the report.
 

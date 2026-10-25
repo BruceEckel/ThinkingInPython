@@ -627,7 +627,7 @@ a different design, a detail, or an equivalent alternative.
 ## 6. A `NullCache`, following `NullLogger`'s shape
 
 > In `null_logger.py`, write a second null-object style class, `NullCache`,
-> whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
+> whose `get(key)` always returns `None` and whose `set(key, value)` discards the value,
 > following the same shape as `NullLogger`.
 
 <details>

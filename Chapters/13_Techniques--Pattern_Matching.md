@@ -158,7 +158,7 @@ so `broken()` needs no `return` after its `match`.
 `ruff` flags the line only when you enable its pep8-naming rules.
 Then N806 reports `DEFAULT` as an uppercase variable inside a function.
 That message is about naming style rather than the capture,
-so `ruff` reports nothing for a constant with a lowercase name.
+so `ruff` accepts the same capture when the constant has a lowercase name.
 This book's `ruff` configuration turns N806 off for `value_patterns.py`,
 since the capture is the mistake the listing exists to show.
 

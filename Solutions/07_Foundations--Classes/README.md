@@ -504,7 +504,7 @@ a different design, a detail, or an equivalent alternative.
 > then run the type checker
 > ([Static Types](../../Chapters/08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
 > and read what it reports.
-> Remove `@override` and confirm the program runs the same way while the type checker reports nothing.
+> Remove `@override` and confirm the program runs the same way while the type checker prints `All checks passed!`.
 
 <details>
 <summary>Where to look</summary>

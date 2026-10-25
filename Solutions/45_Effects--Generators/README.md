@@ -165,8 +165,8 @@ Given one answer for three questions, your iterator driver lets the answers' `St
 
 If you put `next(answers)` inside the `try`, as `drive_naive()` does, a
 short answer source ends the run quietly. Given one answer for three
-questions, `drive_naive()` returns `None`. The type checker reports
-nothing. The `except StopIteration` meant for the conversation catches
+questions, `drive_naive()` returns `None`. The type checker accepts
+`drive_naive()`. The `except StopIteration` meant for the conversation catches
 the one from the exhausted answers and treats it as a finished
 interview. The solution's `drive_in_order()` fetches each reply
 outside the `try`, so the `StopIteration` from the answers reaches the
@@ -488,7 +488,7 @@ a different design, a detail, or an equivalent alternative.
 
 ## 5. `report()` with a return value
 
-> `report()` in `yield_from_return.py` yields but returns nothing.
+> `report()` in `yield_from_return.py` yields its lines and returns `None`.
 > Rewrite it to return the character count as well,
 > and give it the full annotation.
 > Then write a caller that delegates to it with `yield from` and yields that count in a line of its own,

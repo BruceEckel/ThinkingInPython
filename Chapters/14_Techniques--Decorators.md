@@ -336,7 +336,8 @@ Forgetting the parentheses is the common mistake here.
 passing the function where `repeat` expects `times`.
 The `times < 1` check makes that mistake raise a `TypeError` at decoration,
 since it compares a function with an `int`.
-The message says nothing about parentheses.
+The message describes the failed comparison,
+so you must trace the comparison back to the missing parentheses.
 A `repeat` without that comparison fails silently.
 Python binds `greet` to `decorate`.
 Calling `greet("Bob")` then runs `decorate("Bob")`,
@@ -846,7 +847,7 @@ The printed `args=(5,)` shows what arrives: `5`, and no `Ex` instance.
 `self.func` runs with `5` as its only argument,
 so `5` fills `method`'s own `self` parameter and leaves nothing for `x`.
 The `TypeError` reports a missing `x`,
-and its message says nothing about the real cause, a missing `__get__()`.
+while the real cause is a missing `__get__()`.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 shows the full descriptor protocol,
 including the `__get__()` that `logged` needs to work on methods.

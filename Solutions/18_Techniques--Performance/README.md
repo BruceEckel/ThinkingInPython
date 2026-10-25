@@ -965,7 +965,7 @@ The listing carries no `#:` line, because its output depends on the interpreter.
 The book's build prints `False False`.
 
 The two flags identify the state.
-`False False` means the build has no JIT compiled in, so `PYTHON_JIT` does nothing.
+`False False` means the build has no JIT compiled in, so the interpreter ignores `PYTHON_JIT`.
 The python.org Windows and macOS builds report `True False`,
 because python.org compiles them with `--enable-experimental-jit=yes-off`.
 A `True False` binary contains the JIT compiler,

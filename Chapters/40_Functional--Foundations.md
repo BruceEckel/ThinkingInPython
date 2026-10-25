@@ -39,7 +39,8 @@ then build a checked Effect system on that mechanism.
 ## Pure Functions
 
 A *pure function* computes its result from its arguments alone.
-It reads nothing that can change, and it changes nothing outside itself.
+It reads only values that stay the same,
+and it leaves everything outside itself as it was.
 Given the same arguments, it always produces the same outcome,
 whether that outcome is a returned value or a raised exception.
 A *side effect* is anything a function does beyond producing that outcome,
@@ -408,7 +409,7 @@ An iterator computes each value only when a consumer asks for it.
 `print()` displays the iterator's `repr()` instead of consuming it,
 so `print(map(...))` shows `<map object at 0x...>` rather than values.
 Once a `list()` call or a `for` loop has consumed the iterator,
-a second pass over the same object silently produces nothing.
+a second pass over the same object finds it silently empty.
 `sorted()` must read every element before it can order any of them,
 so it returns a list rather than an iterator.
 
@@ -759,7 +760,7 @@ Try each exercise before opening its [solution](../Solutions/40_Functional--Foun
     and explain why that is impossible.
 6.  In `immutable_types.py`,
     add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
-    Run `ty`, which reports nothing.
+    Run `ty`, which accepts the append.
     Then add `MAX_SIZE = 200`, run `ty` again,
     and explain why the rebinding is an error while the append is not.
     Then change the annotation so `ty` rejects the append.

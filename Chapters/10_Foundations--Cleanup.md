@@ -265,8 +265,8 @@ The `Socket("B")` block shows `close()` running when the body raises an exceptio
 the `@contextmanager` shorthand, and what `__exit__()`'s arguments mean.
 
 `close()` also guards against a second call.
-The explicit `sock.close()` after the `with` block prints nothing,
-because `close()` returns at once when `self.closed` is `True`.
+The explicit `sock.close()` after the `with` block returns at once,
+because `__exit__()` set `self.closed` to `True`.
 `__exit__()` calls `close()` for you once.
 Your own code can call `close()` a second time,
 so a real `close()` must accept a repeat call and return at once,

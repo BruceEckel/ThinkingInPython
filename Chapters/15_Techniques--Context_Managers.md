@@ -20,7 +20,7 @@ with pool.lease() as conn:
 
 `lease()` puts the connection back in the [pool](#an-object-pool)
 on every path out of that block, including the exception path.
-The borrower writes nothing to arrange it.
+The two lines above are all the borrower writes.
 
 ## A Basic Context Manager
 
@@ -924,8 +924,8 @@ path.unlink()
 `AbstractContextManager[IO[str]]` is the type of any context manager whose `__enter__()` returns an `IO[str]`,
 so one variable can hold the open file in one branch and a `nullcontext` in the others.
 
-Exiting a `nullcontext` does nothing,
-so the same `with` block closes the file in the `Path` branch and leaves `sys.stdout` and the caller's stream open,
+Exiting a `nullcontext` leaves its object as it was,
+so the same `with` block closes the file in the `Path` branch and keeps `sys.stdout` and the caller's stream open,
 as the caller expects.
 
 `chdir()` is a class manager like `Trace`,

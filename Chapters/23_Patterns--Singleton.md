@@ -212,8 +212,8 @@ A type outsiders must name is public, whatever its first character.
 `_Settings` fits a type that stays inside the module.
 
 Two stronger-looking moves also leave the class reachable.
-Deleting the class name after `settings()` builds the instance changes nothing,
-since `type(settings())` returns the class.
+Deleting the class name after `settings()` builds the instance removes the name alone,
+since `type(settings())` still returns the class.
 Defining the class inside `settings()` puts its name in the function's locals,
 and `@cache` runs that body once.
 `type(settings())` still recovers the class.
@@ -256,7 +256,7 @@ built outside the cache.
 
 3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
    is the other fix for that race.
-   A `threading.Lock` around the constructor function's body changes nothing,
+   A `threading.Lock` around the constructor function's body leaves the race in place,
    because every thread misses the cache before reaching the lock.
    The threads serialize, but each still builds an object.
    The cache keeps whichever finished last.
@@ -526,7 +526,7 @@ so `Any` is the one annotation that fits.
 Delegation gives up static knowledge to forward every name,
 as it does throughout [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr).
 
-When the inner object needs nothing from that first call,
+When the inner object can be built before the first call,
 you can create it eagerly in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Eager creation removes the sentinel, the guard,

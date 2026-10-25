@@ -151,7 +151,7 @@ if __name__ == "__main__":
 The thread pool reports `1`. Threads share their process, so
 `os.getpid()` returns the same value in every one of them. Counting
 distinct process IDs reveals process parallelism, as in the previous
-exercise, but says nothing about thread parallelism.
+exercise, but reports a whole thread pool as one process.
 For threads, the equivalent is `threading.get_ident()`.
 
 `ProcessPoolExecutor` and `ThreadPoolExecutor` share
@@ -170,7 +170,7 @@ a different design, a detail, or an equivalent alternative.
 
 > Write Hypothesis properties for `sorted()` using two shapes from [A Family of Property Shapes](../../Chapters/43_Functional--Confidence.md#a-family-of-property-shapes):
 > an invariant (every adjacent pair of the output is in order) and idempotence
-> (sorting a sorted list changes nothing).
+> (sorting a sorted list returns an equal list).
 > Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 
 <details>
@@ -224,7 +224,7 @@ def test_output_is_ordered(xs: list[int]) -> None:
 
 @given(numbers)
 def test_sorting_is_idempotent(xs: list[int]) -> None:
-    "Idempotence: sorting a sorted list changes nothing."
+    "Idempotence: sorting twice equals sorting once."
     once = sorted(xs)
     assert sorted(once) == once
 
@@ -237,10 +237,10 @@ def test_agrees_with_insertion_sort(xs: list[int]) -> None:
 **State a fact about every output.** The invariant is the weakest of the three.
 A function that ignores its argument and returns `[]` passes
 `test_output_is_ordered()` on every input, and so does one that returns
-the first element alone. "Ordered" says nothing about the elements
-being the same ones you supplied.
+the first element alone. "Ordered" leaves open whether the elements
+are the same ones you supplied.
 
-**Check that repeating changes nothing.** Idempotence on its own
+**Check that running twice matches running once.** Idempotence on its own
 catches little more. The same `[]`-returning function passes it too.
 Idempotence adds a different kind of check, one about the operation
 rather than the output. It catches a sort that drops the last element.

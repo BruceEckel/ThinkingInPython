@@ -250,7 +250,7 @@ The callback ran for it once.
 
 `DISABLE` keeps coverage measurement fast.
 The question is "was this reached,"
-so a second report from the same location adds nothing,
+so the first report from a location answers it,
 and after the first hit the monitored code runs at full speed again.
 
 A profiler gives you a ranked table with no code to write.
@@ -475,7 +475,7 @@ The tail call is in C, inside the interpreter.
 It is a separate mechanism from [tail-call optimization of Python functions](41_Functional--Toolkits.md#recursion),
 which CPython does not do.
 
-The tail-calling interpreter changes nothing in your program,
+The tail-calling interpreter runs your program as written,
 and nothing in your program can tell.
 No `sys` function reports it, and the documentation calls it an internal detail.
 The python.org Windows 64-bit binaries for 3.15 use it,
@@ -509,7 +509,7 @@ CPython includes an experimental just-in-time compiler.
 and 3.15 rebuilt much of it.
 The JIT counts how often each path through a program's bytecode runs,
 and once a path runs often enough, it compiles that path to machine code.
-You change nothing.
+Your code stays as you wrote it.
 The same file runs, and the interpreter runs its busiest paths as machine code.
 
 Your program runs that machine code only when three conditions hold:
@@ -1080,7 +1080,7 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 #: 75025 26
 ```
 
-`cache_info().misses` counts the calls that found nothing stored and ran the body,
+`cache_info().misses` counts the calls that ran the body to compute a new result,
 one for each `n` from 0 through 25.
 `fib_plain()` ran 242,785 times for the same answer.
 Each step up in `n` multiplies `fib_plain()`'s count by about 1.6 and adds one to the cached count,
@@ -1290,8 +1290,8 @@ with expected(AttributeError):
 The checker treats `Point` as frozen and reports `p.x = 3` before the program runs.
 `@dataclass_transform` has no parameter that describes slots,
 so the checker cannot tell that `Point` has slots.
-On a record that missing information changes nothing,
-because the checker rejects every assignment to an instance.
+On a record the checker still reaches the right verdict,
+because it rejects every assignment to an instance.
 
 A class whose base declares no `__slots__` writes `@record(slots=False)`.
 The base gives every instance its `__dict__` back,

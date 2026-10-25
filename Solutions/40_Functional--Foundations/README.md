@@ -45,8 +45,9 @@ print(deposit(30), deposit(30))
 ```
 
 `deposit()` reads and mutates `balance`, a name outside its own scope.
-A pure function reads nothing that can change and changes nothing
-outside itself, so `deposit()` breaks both halves of that definition.
+A pure function reads only values that stay the same
+and leaves everything outside itself as it was,
+so `deposit()` breaks both halves of that definition.
 What `deposit(30)` returns depends on how many times `deposit()` (or
 `withdraw()`) has run. Two identical calls to `deposit(30)` return
 `130` and then `160`, where a pure function returns the same value
@@ -402,7 +403,7 @@ a different design, a detail, or an equivalent alternative.
 
 > In `immutable_types.py`,
 > add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
-> Run `ty`, which reports nothing.
+> Run `ty`, which accepts the append.
 > Then add `MAX_SIZE = 200`, run `ty` again,
 > and explain why the rebinding is an error while the append is not.
 > Then change the annotation so `ty` rejects the append.

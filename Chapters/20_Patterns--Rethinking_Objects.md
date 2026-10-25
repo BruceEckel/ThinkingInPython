@@ -126,7 +126,7 @@ expect(OverflowError, fill, BoundedStack(), 5)
 `BoundedStack.push()` takes the same argument and returns the same type as `Stack.push()`,
 so the signatures match.
 `@override` finds a `push()` in `Stack` to override.
-The type checker reports nothing.
+The type checker accepts `BoundedStack` as a `Stack`.
 `fill()` takes a `Stack` and relies on its `push()` always succeeding.
 A `BoundedStack` handed to `fill()` raises an `OverflowError` on the third item.
 The subclass matches the signature and breaks the contract behind it.
@@ -1283,7 +1283,7 @@ Try each exercise before opening its [solution](../Solutions/20_Patterns--Rethin
     and confirm `ty check` still passes.
     Then temporarily comment out the new `case` and observe what `assert_never()` causes the type checker to report.
 6.  In `null_logger.py`, write a second null-object style class, `NullCache`,
-    whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
+    whose `get(key)` always returns `None` and whose `set(key, value)` discards the value,
     following the same shape as `NullLogger`.
 7.  In `counting_list.py`, count `__setitem__` as well,
     then find a second `list` method that changes the contents without going through either override.

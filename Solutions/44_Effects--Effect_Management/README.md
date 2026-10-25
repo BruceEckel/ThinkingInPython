@@ -340,8 +340,8 @@ Each remaining Effect points to the technique from Effects by Hand.
 | `Thermometer` | `_celsius` read by `celsius` | Side cause | Pass the implementation in as a parameter |
 
 Neither function in `slope_catch.py` has a side effect or a side
-cause. Both read only their arguments and change nothing outside
-themselves. The two Effects are both exceptions.
+cause. Both read their arguments alone and leave everything outside
+themselves as it was. The two Effects are both exceptions.
 
 The chapter demonstrates both conversions the table lists for those exceptions.
 `slope()` catches the `ZeroDivisionError`,
@@ -449,7 +449,7 @@ If you keep `NonZero`'s `self.value == 0` test under the new name,
 `PositiveInt(-1)` constructs successfully,
 and `slope(10, PositiveInt(-1))` returns `-10.0`.
 The demo's `expect()` loop then raises an `AssertionError` ("no exception raised") on `-1`,
-and the type checker reports nothing, because every argument has the right type.
+and the type checker accepts the file, because every argument has the right type.
 The solution's `__post_init__()` tests `value <= 0`, which rejects both bad values.
 
 ```python

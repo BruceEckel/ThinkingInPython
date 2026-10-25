@@ -22,7 +22,7 @@ In the test, pass `supply()` a scripted object that returns a canned answer, and
 <summary>Done when</summary>
 
 `uv run pytest` passes your test, which asserts that a scripted `Console` printed the greeting built from its canned answer, and your demo greets the name it reads.
-`uv run ty check` reports nothing at either `run()` call, and `ask_and_greet()` is the same text in both.
+`uv run ty check` accepts both `run()` calls, and `ask_and_greet()` is the same text in both.
 
 <details>
 <summary>Solution</summary>
@@ -178,7 +178,7 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 `Success[None]` is `Effect[Never, Never, None]`: an Effect that needs
-nothing, fails with nothing, and returns nothing. `Never` in the yield
+nothing, fails with nothing, and returns `None`. `Never` in the yield
 channel means the function may yield no value of any type, so the
 `Need[Console]` that `yield from greet(name)` relays contradicts the annotation.
 
@@ -212,7 +212,7 @@ run(supply(Console())(greet_all)(["Alice", "Bob"]))
 different function.
 
 The new annotation changes what `greet_all()`'s callers must declare. Before,
-`greet_all()` claimed to need nothing, so a caller could hand it
+`greet_all()` claimed to be pure, so a caller could hand it
 to `run()` with no environment: `run(greet_all(names))`. Now every caller has two
 options, the same two `greet()`'s callers have. A caller can supply a
 `Console`, which ends the requirement, or declare `Need[Console]` in its
@@ -380,7 +380,7 @@ Pass both instances to `supply()` in one call, run the Effect, and assert on eac
 <summary>Done when</summary>
 
 `uv run pytest` passes your test, which runs `greet_all()` under one `supply()` call and asserts both the greetings (`Hello, Alice!`, `Hello, Bob!`) and the log entries (`greeted Alice`, `greeted Bob`).
-`uv run ty check` reports nothing on the file, and `Log` is a `Protocol`.
+`uv run ty check` accepts the file, and `Log` is a `Protocol`.
 
 <details>
 <summary>Solution</summary>
@@ -763,7 +763,7 @@ def greet_logged(
     log.write(f"greeted {name}")
 ```
 
-`ty check` reports nothing. `ruff check` reports nothing. The script
+`ty check` and `ruff check` both accept the file. The script
 runs to completion and prints:
 
 ```text

@@ -200,7 +200,7 @@ which describes both variables.
 yet `exercise_4_constants.py` reassigns both, with `+=` and `|=`.
 Python and the linter both accept the reassignment,
 so the name misleads every reader who trusts it.
-`totalSum` and `flagBits` say nothing about the value.
+`totalSum` and `flagBits` describe the author rather than the value.
 They say the author came from Java or JavaScript.
 
 A linter flags the camelCase form.

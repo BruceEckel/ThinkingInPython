@@ -144,7 +144,7 @@ Each miss runs the body and prints a `computing` line.
 A hit returns the stored result and skips the `print()`,
 the skipped side effect the `cache` section describes.
 The single hit is the second `square(2)` (`[1]`),
-which prints nothing because `2` is still in the cache.
+which returns the stored `4` because `2` is still in the cache.
 The second `square(1)` (`[2]`) prints `computing 1` again, the fourth miss.
 `1` was the first value computed, so that miss proves the cache evicted it.
 The cache discards the least recently used entry before it stores a new one,
@@ -507,8 +507,7 @@ and an iterator may have no end.
 And it consumes every element it passes.
 An iterator you pass to `islice()` resumes where the slice stopped,
 so `next(it)` returns `8`.
-`islice()` consumed the `7` on its way to the stop index,
-although it yielded nothing for it.
+`islice()` consumed the `7` on its way to the stop index and discarded it.
 A list slice leaves the list as it was.
 
 ### `count`

@@ -527,8 +527,7 @@ the way a client does.
 
 In a language with access control, the compiler enforces the difference.
 Python has no access control, so every attribute is reachable.
-A single leading underscore, as in `self._balance`,
-changes nothing at the language level.
+To the language, the single leading underscore in `self._balance` is one more character in the attribute's name.
 Python stores `_balance` under that name, reachable like any other attribute.
 Only convention says, "this is private, do not rely on it."
 

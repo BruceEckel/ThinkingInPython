@@ -153,7 +153,7 @@ If you leave the annotation off,
 since that annotation specifies the type a request must match.
 
 Each `handle()` subtracts one Ability,
-so `half` still needs an `Ask` and `full` needs nothing.
+so `half` still needs an `Ask` and `full` is ready for `run()`.
 Naming the two stages also gives the type checker a place to report what remains,
 as [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
 shows.
@@ -896,7 +896,7 @@ Calling `research()` performs no work.
 The three `@throws` functions are the pattern for bringing ordinary code in.
 `fetch()` and `look_up()` call ordinary methods rather than Effects,
 and the decorator lifts what they raise into the channel.
-`topic_of()` reads nothing from outside and writes nothing,
+`topic_of()` computes its answer from its argument and a module constant,
 so it declares no Ability.
 
 `fetch()` and `look_up()` take their dependencies as parameters,
@@ -1024,7 +1024,7 @@ Here a scenario is nothing more than arguments to `supply()`.
 
 Each run's last line is the outcome that `report()` returns.
 Every line above it comes from a supplied implementation,
-because the pipeline prints nothing of its own.
+because the pipeline leaves every `print()` to the implementations you supply.
 Those lines therefore record where each run stopped.
 The run at `[2]` stops after `feed: fetching`.
 `topic_of()` yields a `NotInteresting`,
@@ -1037,7 +1037,7 @@ A failure ends the remaining steps the way a raised exception does,
 and no step tests for it.
 Where the run stops depends on where the failure arises.
 The run at `[4]` prints its outcome alone,
-since `DeadWire.latest()` raises `Unavailable` and prints nothing.
+since `DeadWire.latest()` raises `Unavailable` where `Wire.latest()` prints `feed: fetching`.
 The run at `[3]` reaches the library and fails there.
 
 `report()` handles the two channels differently.
@@ -1107,7 +1107,7 @@ At this size the by-hand version is respectable, and a reader may prefer it.
 Two differences hold at any size.
 The by-hand signature, `(Feed, Encyclopedia) -> str`,
 mentions none of the three failures,
-so adding a fourth failure changes nothing in the signature.
+so adding a fourth failure leaves the signature as it is.
 And the handling interleaves with the logic.
 `research_and_report()` decides both what to do about a failure and what to say about it.
 The Effect version separates the handling from the logic,
@@ -1415,7 +1415,7 @@ def encounter() -> Depend[
 `encounter()` holds all the engine's logic.
 It constructs no `GameEnvironment`, holds no factory,
 and mentions only the three Protocols.
-It prints nothing itself.
+It sends every line of output through `narrator.say()`.
 Output is a requested type like `Hero` and `Obstacle`.
 `Narrator` is one of the three requests,
 so the code that supplies it chooses whether a line prints, goes into a list,
@@ -1700,7 +1700,7 @@ Every caller that runs the retried function without a `Time` fails the check.
 
 The renamed error allows a mistake the type checker accepts.
 If you write `catch(Crashed)(retried)`, catching the original error,
-the checker reports nothing.
+the checker accepts the call.
 The result type gains a `Crashed` branch that cannot occur,
 while `RetryError[Crashed]` stays in the error channel.
 At runtime the failure propagates past the useless `catch()` and out of `run()`.
@@ -1775,7 +1775,7 @@ so it keeps every result as long as the memoized function exists.
 
 That cache key is the argument, not the scenario.
 `memoize()` wraps `save_user()` before `supply()` runs,
-so a different `Database` supplied to the same memoized call changes nothing in the cache:
+so the memoized call returns the same cache entry whichever `Database` you supply:
 
 ```python
 # memoize_environment.py
@@ -1870,9 +1870,8 @@ If you decorate a function that still declares a `Need`, the checker rejects it,
 listing the overloads it failed to match.
 Supply first, then fork.
 
-That restriction is the only one the checker enforces,
-and it says nothing about a declared error.
-Two of those same four overloads accept an Effect that declares one,
+That restriction is the only one the checker enforces.
+Two of those same four overloads accept an Effect that declares an error,
 and both return a `Task` with [no error type on it](#fork-drops-the-error-channel).
 
 The `with` block that manages the pool's lifetime sits outside `run()`,
@@ -1894,7 +1893,7 @@ which covers part of what the missing scope mechanism would do.
 Here is every tool from both chapters that acts on a description.
 Each one builds a description, rewrites a description's type, or executes one.
 Three sit outside the tables.
-`as_type()` relabels a value for the type checker and does nothing at runtime.
+`as_type()` relabels a value for the type checker and hands the value back unchanged at runtime.
 `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
 `print_line()`, `read_line()`, and `read_file()`,
 the accessors for the library's own dependencies,
@@ -2064,7 +2063,7 @@ so the `ZeroDivisionError` propagates as an ordinary raised exception,
 untracked.
 `catch()` matches the values an Effect yields, not exceptions the body raises,
 so a failure that no `@throws` lifts goes past `catch()` untouched.
-The `catch(ZeroDivisionError)` in `caller()` type-checks and then does nothing,
+The `catch(ZeroDivisionError)` in `caller()` type-checks and then lets the `ZeroDivisionError` through,
 so the protection appears to be there.
 The channel carries only what you put into it.
 
@@ -2129,7 +2128,7 @@ info[revealed-type]: Revealed type
    |                 ^^^^ `() -> Generator[Never, Any, None]`
 ```
 
-`half` still needs an `Ask`, and `full` and `nested` need nothing,
+`half` still needs an `Ask`, and `full` and `nested` have every Ability handled,
 so `run()` reports a handler left out of either form.
 `ask_tell_demo.py` binds `half` and `full` instead of nesting the calls,
 because a named intermediate is where you read the Ability that remains.
@@ -2266,7 +2265,7 @@ ZIO's `ZLayer` is a constructor that can read configuration, fail, and retry.
 It resolves a dependency graph at compile time,
 reporting a cycle or a missing provider by name.
 Stateless has no equivalent, so you write the wiring at the edge by hand.
-The type checker verifies that a `supply()` call is complete but says nothing about how you assembled the graph.
+The type checker verifies that a `supply()` call is complete but leaves the assembly of the graph to you.
 
 The operator set is small in the same way.
 The library has `retry()` and `repeat()`.

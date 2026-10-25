@@ -390,7 +390,7 @@ knowing each one through that interface.
 *Visitor* is the reverse of the others.
 The visitor specifies every concrete element.
 The pattern concentrates the heavy edges in one place on purpose.
-Adding an operation means writing one new visitor and changing nothing else,
+Adding an operation means writing one new visitor and leaving every other part as it was,
 while adding an element type means changing every visitor.
 That choice defines [*Visitor*](33_Patterns--Visitor.md).
 The diagram shows where the choice puts the heavy edges.
@@ -518,7 +518,7 @@ The rest are here for your own designs.
     "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message's second paragraph begins "The big idea is 'messaging'."]
     A `Protocol` is that design made literal.
     It describes what a caller needs from the object on the other side of a call,
-    and says nothing about what that object is.
+    and leaves open what that object is.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
     builds on this.
     [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
