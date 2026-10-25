@@ -8,7 +8,5 @@
 # read the delta with `tip possessives` before accepting.
 # See tools/stranded_possessives.py.
 Chapters/02_Foundations--Tour.md	the same as C's and Java's CODE
-Chapters/17_Techniques--Metaprogramming.md	which is CODE's do-nothing default
-Chapters/24_Patterns--Template_Method.md	CODE ('s' instead of 'z') adds a new method and leaves the base's do-nothing version in place
 Solutions/32_Patterns--Multiple_Dispatching/README.md	keyed on the player's and opponent's class names
 Solutions/42_Functional--Error_Handling/README.md	The CODE library's do-notation reads better

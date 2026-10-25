@@ -85,7 +85,6 @@ Chapters/19_Techniques--Concurrency.md	[PAST] distributed: Threads already distr
 Chapters/19_Techniques--Concurrency.md	[PAST] emerged: Another benefit of threads emerged when more CPUs became available on a single machine.
 Chapters/19_Techniques--Concurrency.md	[PAST] gave: Reference counting gave Python deterministic cleanup with no collector pauses.
 Chapters/19_Techniques--Concurrency.md	[PAST] had: Early machines had a single CPU, and early operating systems (OS) were little more than program loaders.
-Chapters/19_Techniques--Concurrency.md	[PAST] included: Both tasks wait forever, the event loop included, since nothing remains that can wake them.
 Chapters/19_Techniques--Concurrency.md	[PAST] included: CODE is the newer, composable form, scoping the deadline over an entire block, CODE included, instead of one call.
 Chapters/19_Techniques--Concurrency.md	[PAST] kept: Single-threaded code kept nearly all its speed.
 Chapters/19_Techniques--Concurrency.md	[PAST] learned: Engineers learned tricks to make programs run faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
@@ -153,7 +152,6 @@ Chapters/23_Patterns--Singleton.md	[PAST] wrote: Martelli wrote CODE instead of 
 Chapters/24_Patterns--Template_Method.md	[PAST] read: In frame 3 the arrow labels read CODE and CODE, with no CODE.
 Chapters/25_Patterns--Surrogate.md	[PAST] typed: Because it inherits CODE, code typed against CODE accepts it.
 Chapters/26_Patterns--Factory.md	[PAST] clone: Instead of a registry of classes, keep a registry of prototypical instances and clone the chosen one:
-Chapters/26_Patterns--Factory.md	[PAST] imported: The class is fine, the registry is fine, and nothing imported the module that defines the class.
 Chapters/26_Patterns--Factory.md	[PAST] read: Write that version and read what CODE reports.
 Chapters/27_Patterns--Function_Objects.md	[PAST] carried: A function pointer carried none, and closures did not exist yet.
 Chapters/27_Patterns--Function_Objects.md	[PAST] passed: The CODE argument passed to CODE, CODE, and CODE is a strategy.
@@ -182,7 +180,6 @@ Chapters/38_Patterns--Simulation.md	[PAST] drew: In 1787 Ernst Chladni sprinkled
 Chapters/38_Patterns--Simulation.md	[PAST] made: The bow made the plate ring.
 Chapters/38_Patterns--Simulation.md	[PAST] read: Independent agents read from and write to one common data structure instead of calling each other's methods.
 Chapters/38_Patterns--Simulation.md	[PAST] sprinkled: In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
-Chapters/38_Patterns--Simulation.md	[PAST] steered: Nothing steered them there.
 Chapters/38_Patterns--Simulation.md	[PAST] wrote: Jeremy Meyer wrote the original Java version of this example.
 Chapters/41_Functional--Toolkits.md	[PAST] consumed: CODE consumed the CODE on its way to the stop index and discarded it.
 Chapters/41_Functional--Toolkits.md	[PAST] discarded: CODE consumed the CODE on its way to the stop index and discarded it.
@@ -192,7 +189,7 @@ Chapters/41_Functional--Toolkits.md	[PAST] was: CODE was the first value compute
 Chapters/42_Functional--Error_Handling.md	[PAST] read: An exception from someone else's code may carry no notes, so read CODE with CODE.
 Chapters/42_Functional--Error_Handling.md	[PAST] read: The CODE branch reads CODE, and that read type-checks.
 Chapters/43_Functional--Confidence.md	[PAST] bound: Each test checks a single input against a single answer, so the examples you invent bound what you learn.
-Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place appends nothing.
+Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place leaves CODE as it was.
 Chapters/44_Effects--Effect_Management.md	[PAST] added: Each swap of an implementation, and each layer added around one, happens at the edge of the program.
 Chapters/44_Effects--Effect_Management.md	[PAST] checked: *checked exceptions*), while C++, before C++17 removed them, checked it at runtime and ended the program on an exception the list left out.
 Chapters/44_Effects--Effect_Management.md	[PAST] committed: A team committed to Scala or TypeScript cannot use native Effects, so designers build *library* Effect systems on top of existing type systems.
@@ -207,7 +204,6 @@ Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put 
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
-Chapters/45_Effects--Generators.md	[PAST] arrived: The three channels, the driver, and CODE arrived over fourteen years, each one answering a request the one before had opened.
 Chapters/45_Effects--Generators.md	[PAST] built: Before that, such a producer took a callback, built its whole result list up front, or was rewritten as an iterator class with its control flow turned inside out.
 Chapters/45_Effects--Generators.md	[PAST] called: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon for most of the inspiration.
 Chapters/45_Effects--Generators.md	[PAST] came: The keyword came from CLU and Sather, where an iterator yields one element at a time to a CODE loop.
@@ -259,7 +255,6 @@ Solutions/09_Foundations--Class_Attributes/README.md	[PAST] read: ** CODE and CO
 Solutions/10_Foundations--Cleanup/README.md	[PAST-HEADING] guarded: An CODE that fails, unguarded and guarded
 Solutions/11_Techniques--Testing/README.md	[PAST-HEADING] injected: 5. Stubbing a boundary, patched and then injected
 Solutions/11_Techniques--Testing/README.md	[PAST-HEADING] injected: The environment variable, patched and then injected
-Solutions/11_Techniques--Testing/README.md	[PAST] built: A CODE stub built that way gives the test nothing to inspect.
 Solutions/11_Techniques--Testing/README.md	[PAST] put: Create and fund the CODE before the CODE, and put the CODE on its balance after the CODE.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[PAST] Built: Defaults Built Fresh, Not Shared shows CODE rejecting a mutable default and CODE as the fix.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[PAST] put: A subclass is free to define one, so put the check there and call CODE afterward.

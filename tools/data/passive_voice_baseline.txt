@@ -53,4 +53,5 @@ Solutions/43_Functional--Confidence/README.md	[PASSIVE] is SIGN: ** CODE is U+00
 Solutions/43_Functional--Confidence/README.md	[PASSIVE] is ordered: That sort's output is always ordered, so the invariant passes.
 Solutions/44_Effects--Effect_Management/README.md	[PASSIVE] was awaited: The CODE call raises a CODE for adding an CODE and a CODE, with a CODE that CODE was never awaited.
 Solutions/45_Effects--Generators/README.md	[PASSIVE] is suspended: CODE relays in both directions on its own: prompts up to the driver, numbers down to whichever CODE is suspended inside the current CODE.
+Solutions/45_Effects--Generators/README.md	[PASSIVE] sits suspended: Without CODE, the call to CODE builds a generator object, and that object sits suspended before its first line.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[PASSIVE] is required: The guard is now required, because a process pool starts workers by re-importing the module.

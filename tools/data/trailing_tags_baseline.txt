@@ -10,7 +10,6 @@
 # See tools/trailing_tags.py.
 Chapters/02_Foundations--Tour.md	[R32] A CODE is a 64-bit IEEE 754 double, the same as C's and Java's CODE
 Chapters/02_Foundations--Tour.md	[R32] In front of a CODE or a CODE, the same character marks a decorator
-Chapters/04_Foundations--Control_Flow.md	[R32] On its own as a statement it does nothing, the same as CODE
 Chapters/06_Foundations--Modules_and_Packages.md	[R32] Python names the offending file by its full path, abbreviated here as CODE
 Chapters/08_Foundations--Static_Types.md	[R32] CODE checks and runs, the same as it does on any list
 Chapters/08_Foundations--Static_Types.md	[R32] CODE is a placeholder, filled in separately at each call

@@ -122,7 +122,7 @@ Solutions/13_Techniques--Pattern_Matching/README.md	the final `case _`	If you de
 Solutions/13_Techniques--Pattern_Matching/README.md	the last case	Python accepts `case FALLBACK:` because it is the last case, and rejects any case after it with a `SyntaxError`.
 Solutions/14_Techniques--Decorators/README.md	The outermost decorator	The outermost decorator prints first and last, and each inner layer's output appears nested in between.
 Solutions/14_Techniques--Decorators/README.md	the final `print()`	Both `decorating` lines still print, but the final `print()` raises an `AttributeError`, since `None` has no `__name__`.
-Solutions/14_Techniques--Decorators/README.md	the first call	A repeated call prints nothing, a third distinct call evicts the first so repeating the first call prints again, a call with a keyword argument works, and both functions keep their `__name__`.
+Solutions/14_Techniques--Decorators/README.md	the first call	A repeated call returns its cached result silently, a third distinct call evicts the first so repeating the first call prints again, a call with a keyword argument works, and both functions keep their `__name__`.
 Solutions/14_Techniques--Decorators/README.md	the first call	If you key the cache on `(args, kwargs)`, the first call, `square(4)`, raises a `TypeError`.
 Solutions/14_Techniques--Decorators/README.md	the last line	That instance attribute shadows the class attribute, so `trace_counting.total_calls` stays at `0` and the last line prints `2 1 0`.
 Solutions/15_Techniques--Context_Managers/README.md	the `with` statement	Python makes that call before the `with` statement enters the manager, so the `TypeError` propagates straight out of the script.
@@ -171,7 +171,7 @@ Solutions/40_Functional--Foundations/README.md	the first `tally()`	Running the p
 Solutions/40_Functional--Foundations/README.md	the first call	With `nonlocal` deleted, `ty` reports `unresolved-reference` on `count += step`, and the first call raises an `UnboundLocalError`.
 Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` group replaces the first under the same key, so the result holds one of the two `"b"` items.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
-Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` evicts nothing and the second `square(1)` becomes a hit.
+Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` fills the third slot and the second `square(1)` becomes a hit.
 Solutions/45_Effects--Generators/README.md	The third `send()`	**Drive the conversation by hand.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first `send()`	So at runtime the first `send()` accepts `None` alone, a value the `SendType` excludes.

@@ -69,7 +69,6 @@ Solutions/14_Techniques--Decorators/README.md	[relcl] function .. returns: under
 Solutions/15_Techniques--Context_Managers/README.md	[appos,prep] prints .. matching: your edited CODE prints CODE, CODE, CODE before the body line and CODE, CODE, CODE after it, matching the closing order you predicted before running it.
 Solutions/16_Techniques--Comprehensions/README.md	[appos,prep] prints .. passes: your version prints CODE through CODE, then a list of three usable values in place of CODE, and CODE passes on your file.
 Solutions/23_Patterns--Singleton/README.md	[relcl] subclass .. gets: A subclass that binds its own CODE in its class body gets separate storage.
-Solutions/30_Patterns--Observer/README.md	[cc,prep,relcl] responder .. reports: A responder in a module that nothing imports does not run, and nothing reports its absence.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[advmod,dep,dobj] Count .. rows: Count the methods you wrote, then compare with the seven dictionary rows the table version needs.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[acl] type .. adds: a node type written below your existing classes, with none of them edited, adds its share to CODE for a directory that holds it, and CODE passes.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[appos,cc,prep] prints .. keeps: your CODE prints CODE and CODE for the exercise's two expressions, and CODE keeps its parentheses while CODE gets none.
@@ -82,7 +81,6 @@ Solutions/42_Functional--Error_Handling/README.md	[appos,cc,conj] prints .. is: 
 Solutions/43_Functional--Confidence/README.md	[prep] answer .. is: By that rule, the answer for a roster of two and a size of five is one group of two.
 Solutions/45_Effects--Generators/README.md	[cc,conj,prep] definitions .. is: ** Three CODE definitions over CODE, CODE, and CODE keep the two integer channels apart, so transposing the CODE and the CODE is a type checker error.
 Solutions/46_Effects--Stateless/README.md	[acl,relcl] caller .. draws: A caller that hands CODE to CODE with no CODE supplied draws an CODE.
-Solutions/46_Effects--Stateless/README.md	[appos,dobj,npadvmod] passes .. print: your four passes print CODE and CODE three times: the first pass over the stored Effects prints them, the second prints nothing, and both passes over the functions print them.
 Solutions/46_Effects--Stateless/README.md	[cc,conj,prep] split .. applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[appos,prep] all .. timing: The code around CODE did change, all of it outside the Effect: the executor class, the timing the chapter's version prints, and the CODE guard.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[appos] prints .. makes: your process-pool version prints CODE with CODE unchanged character for character, and removing the CODE guard makes CODE fail with a CODE.

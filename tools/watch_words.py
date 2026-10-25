@@ -150,9 +150,41 @@ NOTHING_VERBS: Final = (
     r"|needs?|needed|needing|holds?|held|holding|learns?|learned"
     r"|learning|receives?|received|receiving|emits?|emitted|emitting"
     r"|writes?|wrote|written|writing|reads?|reading|adds?|added|adding"
-    r"|requires?|required|requiring)"
+    r"|requires?|required|requiring"
+    # The 2026-10-25 book sweep's verbs (294 sites read; Bruce's "declares
+    # nothing" in appendix A started it).
+    r"|runs?|ran|running|builds?|built|building|raises?|raised|raising"
+    r"|saves?|saved|saving|enforces?|enforced|enforcing|declares?"
+    r"|declared|declaring|cop(?:y|ies|ied|ying)|overrid(?:es?|ing|den)"
+    r"|gains?|gained|gaining|records?|recorded|recording|sends?|sent"
+    r"|sending|binds?|bound|binding|registers?|registered|registering"
+    r"|evaluates?|evaluated|evaluating|inherits?|inherited|inheriting"
+    r"|computes?|computed|computing|consumes?|consumed|consuming"
+    r"|reach(?:es)?|reached|reaching|imports?|imported|importing"
+    r"|tests?|tested|testing|answers?|answered|answering|converts?"
+    r"|converted|converting|match(?:es)?|matched|matching|fetch(?:es)?"
+    r"|fetched|fetching|leaves?|left|leaving|suppress(?:es)?|suppressed"
+    r"|suppressing|opens?|opened|opening|generates?|generated|generating"
+    r"|redefines?|redefined|redefining|removes?|removed|removing"
+    r"|guarantees?|guaranteed|guaranteeing|buffers?|buffered|buffering"
+    r"|proves?|proved|proven|proving|draws?|drew|drawn|drawing"
+    r"|describes?|described|describing|edits?|edited|editing|decides?"
+    r"|decided|deciding|appends?|appended|appending|captures?|captured"
+    r"|capturing|mocks?|mocked|mocking|constrains?|constrained"
+    r"|constraining|creates?|created|creating|compares?|compared"
+    r"|comparing|calls?|called|calling|fix(?:es)?|fixed|fixing"
+    r"|protects?|protected|protecting|assigns?|assigned|assigning"
+    r"|keeps?|kept|keeping|combines?|combined|combining|shares?|shared"
+    r"|sharing|explores?|explored|exploring|moves?|moved|moving"
+    r"|evicts?|evicted|evicting|contradicts?|contradicted|contradicting"
+    r"|pass(?:es)?|passed|passing|gives?|gave|given|giving|breaks?"
+    r"|broke|broken|breaking|stores?|stored|storing|accepts?|accepted"
+    r"|accepting|means?|meant|meaning|touch(?:es)?|touched|touching"
+    r"|loses?|lost|losing|owns?|owned|owning|verif(?:y|ies|ied|ying)"
+    r"|steers?|steered|steering|threads?|threaded|threading|edits?)"
 )
-"""A verb whose object is "nothing" (Tier 2, since 2026-10-24)."""
+"""A verb whose object is "nothing" (Tier 2, since 2026-10-24; the verb
+list grew on 2026-10-25 from the book sweep)."""
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
