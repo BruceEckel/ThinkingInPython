@@ -178,9 +178,6 @@ x.show_twice()  # Inherited from Simple
 #: Derived constructor argument
 ```
 
-`Derived` inherits from `Simple`.
-In the constructor, `super().__init__(text)` calls the base-class constructor.
-`display()` calls `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as `Derived`'s `show()` does.
 
@@ -191,7 +188,6 @@ not at the class that defines the calling method,
 so base-class code reaches a method the subclass replaced.
 
 `f()` in `any_show.py` demonstrates dynamic typing.
-It requires one thing of `obj`, a `show()` it can call.
 The class `Different` also has a method named `show()`,
 but does not derive from `Simple`:
 
@@ -214,8 +210,6 @@ f(Derived("Derived constructor argument"))
 f(Different())
 #: Not derived from Simple
 ```
-
-`f()` accepts a `Derived` and a `Different` alike.
 
 An `import` inside a class body binds the imported name like any other assignment,
 so importing a module-level function there makes it a method of the class.
@@ -263,8 +257,6 @@ C().show()  # A comes first in the MRO
 #: A.show
 ```
 
-`C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s `show()`,
-not `B`'s `show()`.
 The bases appear in the order the `class` statement lists them.
 Writing `class C(B, A)` puts `B` first.
 `C().show()` then runs `B`'s version.
@@ -383,8 +375,6 @@ print(c.area)  # Properties don't use parentheses
 #: 314.159
 ```
 
-Here `radius` is a plain attribute, while `area` is a computation.
-The call site reads both with attribute syntax, `c.radius` and `c.area`.
 Writing `c.area()` reads the property and then calls the `float` it produced,
 which raises a `TypeError`.
 
@@ -432,7 +422,6 @@ expect(ValueError, Circle, -1)
 
 `property_setter.py` completes the conversion.
 `radius` began as a plain attribute and is now a validated property.
-The two lines that read `c.radius` and `c.area` are unchanged from `properties.py`.
 Because code outside the class reads both versions the same way,
 you can wait to convert an attribute into a property until you need the validation.
 
@@ -522,8 +511,6 @@ print(n.total)
 #: 50
 ```
 
-The first access runs the method.
-The second access produces the same result from the stored value.
 `total` is *lazily initialized*, created on first use,
 so the method runs at the first read rather than when the constructor runs.
 
@@ -543,9 +530,7 @@ That entry also gives every instance the per-instance dictionary that slots exis
 
 Because `cached_property` keeps returning the stored value,
 `total` becomes stale when `n.values` changes.
-The appended `20` in `cached_property_demo.py` leaves the printed sum at `30`.
 `del n.total` removes the stored value from `__dict__`.
-Reading `n.total` again then runs the method.
 Because a plain `@property` recomputes every time, its answer is always current.
 Cache only answers whose inputs stay the same.
 
@@ -653,9 +638,6 @@ print(type(r).__name__)
 `from_fahrenheit()` builds its result with `cls(...)` rather than `Temperature(...)`.
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
 so the alternative constructor returns an instance of that subclass.
-`Reading` inherits the method unchanged.
-`Reading.from_fahrenheit(212)` passes `Reading` as `cls`,
-so `type(r).__name__` reports `'Reading'`.
 Writing `return Temperature(...)` hard-codes the class.
 `Reading.from_fahrenheit()` then returns a `Temperature`.
 
