@@ -208,7 +208,8 @@ Under mypy the result is an unknown class, so mypy accepts either form.
 
 Under `ty` a cast replaces a check with a claim,
 the distinction [Where Enforcement Lives](#where-enforcement-lives) draws.
-The cast states the signature, and nothing confirms it.
+The cast states the signature.
+The checker takes that statement on trust.
 
 `make()` exists so that each `init()` closes over its own `name`.
 A lambda written inline in the comprehension closes over the comprehension's variable,
@@ -549,7 +550,8 @@ def test_independent_hierarchies_have_separate_registries(
 ```
 
 `__init_subclass__()` runs for every subclass definition Python executes.
-The registries built on it fail in two ways that have nothing to do with `__init_subclass__()`.
+The registries built on it fail in two ways that every self-registering design shares,
+with or without `__init_subclass__()`.
 [Factory](26_Patterns--Factory.md#hazards-of-self-registration) covers both:
 a class in a module nobody imports stays out of the registry,
 and keying on `cls.__name__` lets two same-named classes overwrite each other.
@@ -723,7 +725,7 @@ The check runs at class-creation time.
 Python builds `B` normally.
 A class's own `__init_subclass__()` does not run for that class.
 At `B`'s creation, Python runs the version `B` inherits from `A`,
-which is `object`'s do-nothing default.
+which is `object`'s default and accepts every subclass.
 Use the runtime version in the rare case where the interpreter must refuse the subclass too.
 
 A decorator like `@final` is a *marker*.
@@ -827,7 +829,8 @@ The checker synthesizes `User.__init__(self, name: str, age: int = 0)` from the 
 as it does for `@dataclass`.
 It accepts the declaration and never runs `model()`,
 so the call passes the check and fails at runtime.
-This `model()` generates nothing, and `object`'s constructor takes no arguments.
+This `model()` returns the class unchanged,
+so `User` keeps `object`'s constructor, which takes no arguments.
 The declaration is a claim, and this one is false.
 
 Libraries like attrs and Pydantic make the claim true by generating the methods their `@dataclass_transform` declares.
@@ -1337,7 +1340,7 @@ with expected(TypeError):
 #: [TypeError] multiple bases have instance lay-out conflict
 ```
 
-The failure has nothing to do with metaclasses.
+The failure comes from the instance layouts, not from metaclasses.
 `class X(list, dict): pass` fails the same way.
 Neither base is a metaclass.
 Because `type`, `list`, and `dict` each bring a layout of their own,
@@ -1556,8 +1559,8 @@ A class decorator also cannot give the class object behavior of its own.
 Setting `__call__` from a decorator makes instances callable.
 Only a metaclass makes the class callable in a new way.
 The case for a metaclass rests on that limit.
-The class object needs behavior,
-and nothing that runs after the class exists can give it any.
+The class object needs behavior that only its metaclass,
+chosen before the class exists, can supply.
 
 Subscripting a class is the exception.
 For a class `Box`, `Box[int]` uses the metaclass's `__getitem__()` if the metaclass defines one,
@@ -1736,10 +1739,10 @@ print(get_annotations(Order)["buyer"] is Customer)
 
 `Order` specifies `Customer` before `Customer` exists.
 The `VALUE` request raises the same `NameError` that a decorator applied to `Order` would get.
-`STRING` evaluates nothing, so it cannot fail,
-and it returns text instead of objects.
+`STRING` returns text instead of objects,
+so it succeeds before `Customer` exists.
 Once `Customer` exists, the default `VALUE` request succeeds,
-because the failed attempt cached nothing.
+because the class caches its annotations only after an evaluation succeeds.
 
 A tool that reads annotations at definition time therefore requests `FORWARDREF`.
 It keeps the real objects it gets back,
@@ -1918,7 +1921,7 @@ so a type checker narrows `dunder` to `Sequence[str]` once it rules out both sen
 `name in dunder` then needs no further guard.
 
 `display_object()` reports differently under `INTERESTING_DUNDERS` and `REDEFINED_DUNDERS`,
-on a class that redefines nothing and on one that redefines almost everything:
+on an empty class and on one that redefines almost everything:
 
 ```python
 # dunder_modes.py
