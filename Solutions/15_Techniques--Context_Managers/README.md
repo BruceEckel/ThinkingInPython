@@ -527,7 +527,7 @@ a different design, a detail, or an equivalent alternative.
 > Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,
 > run it with no arguments and with three,
 > and confirm that with three names the close order reverses the open order,
-> and that with none the stack opens nothing.
+> and that with none the program prints `using []` alone.
 
 <details>
 <summary>Where to look</summary>
