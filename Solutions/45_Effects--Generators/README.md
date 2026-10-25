@@ -258,8 +258,9 @@ print(repr(drive_naive(interview(),
 ```
 
 **Reuse the generator unchanged.**
-Nothing in `interview()` changes, and nothing could have.
-It yields a `Question` and receives an `Answer`, whatever the answer's source.
+`interview()` stays as it was,
+because it yields a `Question` and receives an `Answer`,
+whatever the answer's source.
 The generator describes the conversation.
 The driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
@@ -415,7 +416,7 @@ a different design, a detail, or an equivalent alternative.
 [Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
 shows `survey()` delegating to `interview()` with `yield from`.
 Without `yield from`, the call to `interview()` builds a generator object,
-and nothing drives it.
+and that object sits suspended before its first line.
 Compare the declared type of `profile` with what the call produces,
 then compare the type checker's report with the script's output.
 
@@ -463,8 +464,8 @@ Both results describe the same mistake.
 Calling a generator function produces a description rather than a conversation.
 The call `interview()` returns a generator object,
 suspended before the first line of its body.
-Nothing calls `next()` or `send()` on that object,
-so the generator asks none of its three questions.
+The generator stays suspended for the rest of the run,
+so it asks none of its three questions.
 The `return` statement in `survey()` interpolates the object's repr into the sentence where the interview's `Result` belonged.
 
 The type checker told you more.
