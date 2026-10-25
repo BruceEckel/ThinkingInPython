@@ -120,8 +120,8 @@ def render() -> str:
         b += text(LX + 12, cy + 24, f"x = {v}", 11, RED)
 
     y0 = y[2]
-    b += frame(2, y0, "stop", ("the only way to", "ask is to take;",
-                               "the loop ends"),
+    b += frame(2, y0, "stop", ("asking for one", "more item ends",
+                               "the loop"),
                "for x in nums", "it")
     b += nums(y0, MUTED)
     b += call(y0 + 56, "next(it)")

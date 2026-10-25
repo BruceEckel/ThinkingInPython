@@ -193,7 +193,8 @@ def test_total_over_any_iterable() -> None:
     assert total(Countdown(5)) == 15
 ```
 
-`Fibonacci` does by hand what `fibonacci()` does with `yield`:
+`Fibonacci` produces the same sequence as `fibonacci()`,
+with a written-out `__next__()` in place of `yield`:
 
 ```python
 # fibonacci_iterator.py
