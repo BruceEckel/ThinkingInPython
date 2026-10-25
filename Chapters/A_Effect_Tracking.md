@@ -171,7 +171,6 @@ imports it too.
 because every tool shares the metadata.
 A validation library may put its own objects in the same `Annotated`.
 The PEP directs every consumer to act on the objects it recognizes and ignore the rest.
-The `isinstance()` test in `row()` skips every piece that is not a `Performs`.
 
 `get_type_hints()` strips the metadata unless you pass `include_extras=True`.
 `Annotated` stores the metadata in its `__metadata__` tuple.
@@ -229,7 +228,6 @@ so a codebase could adopt rows one function at a time.
 
 That same rule is the design's weakness.
 `shout()` calls `tell()` and declares nothing.
-`row(shout)` returns an empty list.
 The type checker accepts `shout()`,
 because the PEP instructs every type checker to ignore metadata,
 including the `Tell` in the return annotation of `tell()`.
@@ -249,7 +247,6 @@ so an empty list can mean either a function declared pure or [one that declares 
 `row()` reads each declaration alone,
 so it returns the empty row `quiet()` declares.
 
-`ask()` calls `input()` in its own body.
 `Ask` is a label here, an empty class,
 so `input()` stays the one implementation `ask()` can run.
 The row tracks the Effect.
