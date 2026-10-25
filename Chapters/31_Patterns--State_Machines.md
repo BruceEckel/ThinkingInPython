@@ -47,8 +47,7 @@ The name is `input_`, with a trailing underscore,
 because a bare `input` shadows the builtin `input()`.
 The state plus input decides the next state.
 
-`State` is generic in `I`, the type of input the machine reads.
-`next` takes an `I` and returns another `State[I]`,
+`State` is generic in `I`, the type of input the machine reads,
 so one engine serves machines with different input types,
 and each machine's transition functions declare the input type they accept.
 
@@ -146,9 +145,6 @@ def holding(input_: Mouse) -> TrapState:
             return TrapState.HOLDING
 ```
 
-Each transition function contains a `case` for every input that moves the trap out of its state,
-and produces the state the trap enters next.
-The default `case _` returns the current state, so the state stays the same.
 The four functions use `TrapState` before the file defines it.
 A function body runs at the call, and Python evaluates an annotation lazily,
 so by the first call the whole module has loaded and `TrapState` exists.
@@ -177,8 +173,6 @@ Each member's definition assigns it a tuple,
 and `Enum` passes the tuple to `State`'s constructor,
 so `TrapState.WAITING` is both a `TrapState` member and a `State`,
 with `message` and `next` as attributes.
-`HOLDING`'s tuple has a third element, so its `action` becomes `chime()`,
-which sounds when the trap catches a mouse.
 
 The `StateMachine` holds the current state and advances it on each input.
 The *State* pattern combined with automated transitions is *State Machine*:
@@ -204,25 +198,17 @@ def run_all[I](machine: StateMachine[I],
         machine.step(input_)
 ```
 
-`step()` prints the transition (the old state, the input, and the new state),
-then calls `run()` on the new state, the one the machine has just entered.
 `run()` is an entry action:
 each transition arrives in a state and calls that state's `run()`.
 The constructor calls the initial state's `run()`,
 because constructing the machine enters that state.
 
-`run_all()` is a convenience function that feeds an iterable of inputs to the machine.
-
-A `StateMachine[I]` holds `State[I]` states, and its `step()` takes an `I`.
 The type checker infers `I` from the initial state,
 so `StateMachine(TrapState.WAITING)` is a `StateMachine[Mouse]` whose `step()` accepts only a `Mouse`.
 
 `run()`'s behavior depends on the current state.
-Every state prints its message, and `HOLDING` also calls `chime()`.
 `step()` defines the flow,
 while each `State`'s fields supply the varying behavior.
-`next` chooses the next state,
-and `action` holds the behavior particular to one state.
 
 The demo runs one trap through every move in `MOVES`,
 then feeds a fresh trap an input that matches only `waiting()`'s `case _`:
@@ -401,7 +387,6 @@ The checker matches each input class to its methods at the `Rule(...)` call.
 
 Several rules can share one `(state, input_type)` key.
 Their conditions tell them apart.
-The engine tries them in order and runs the first rule whose condition passes.
 In this [*Chain of Responsibility*](27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 shape, a single input can lead to different states,
 depending on which condition passes.
@@ -615,10 +600,7 @@ or a `Condition`/`Transition` class hierarchy.
 The `dict` does the dispatch,
 and a bound method stored in a rule is the condition or the action.
 
-The demo feeds a `VendingMachine` a list of inputs.
-For each input it prints the transition in the mousetrap's form,
-the state before, the input, and the state after,
-then the `message` that the rule's action wrote:
+The demo feeds a `VendingMachine` a list of inputs:
 
 ```python
 # vending_demo.py
@@ -681,14 +663,7 @@ here the `sold_out()` rule, also passes.
 ### Testing the Vending Machine
 
 Because the machine is deterministic,
-a test can drive it through a sequence of inputs and check which state it reaches.
-The tests cover:
-
-- A successful purchase
-- The too-expensive conditional branch
-- The sold-out conditional branch
-- A refund
-- The error when no transition matches
+a test can drive it through a sequence of inputs and check which state it reaches:
 
 ```python
 # test_vending.py
