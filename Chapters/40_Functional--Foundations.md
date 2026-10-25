@@ -156,8 +156,6 @@ print(p, moved)
 The type checker rejects the direct form `p.x = 5` before the program runs.
 To show that the runtime rejects the assignment too,
 the listing writes it as `setattr(p, "x", 5)`, which the type checker accepts.
-The output shows the original `p` still holding `x=1`, beside `moved`,
-a separate value.
 
 Restating every field works for a two-field `Point`.
 For a record with many fields,
@@ -207,9 +205,6 @@ def total(values: Sequence[int]) -> int:
 print(MAX_SIZE, total([1, 2, 3]))
 #: 100 6
 ```
-
-The type checker rejects `MAX_SIZE = 200` written later in the module,
-and rejects `values.append(4)` inside `total()`.
 
 The `Sequence[int]` constraint declares that `total()` reads its argument and leaves it as it was.
 The constraint governs `total()`, not the caller,
@@ -304,10 +299,8 @@ print(table["title"]("functional python"))
 #: Functional Python
 ```
 
-The dictionary holds functions as values,
-so a lookup yields a function you can immediately call.
 The [Function Objects](27_Patterns--Function_Objects.md)
-chapter treats the same capability as a design pattern.
+chapter treats first-class functions as a design pattern.
 
 Treating functions as values lets a data lookup select which function runs,
 so a dictionary of functions can replace a long `if`/`elif` chain:
@@ -344,9 +337,6 @@ with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'
 ```
-
-A lookup of a missing key raises a `KeyError`,
-the case an `if`/`elif` chain handles with a trailing `else`.
 
 Supporting a new operator means adding a row to the table,
 whether the literal holds that row or a later line adds it,
@@ -400,8 +390,6 @@ words = ["banana", "pie", "kiwi", "watermelon"]
 print(sorted(words, key=len))
 #: ['pie', 'kiwi', 'banana', 'watermelon']
 ```
-
-Each call passes a function to another function, which runs the loop.
 
 The `list()` calls are necessary.
 `map()` and `filter()` return [one-shot iterators](22_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty).
@@ -472,9 +460,6 @@ print(inspect.getclosurevars(triple).nonlocals)
 #: {'factor': 3}
 ```
 
-`multiplier()` returns `multiply()`,
-and each returned function holds its own `factor`.
-The two `inspect.getclosurevars()` calls read the captured values.
 `double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
@@ -512,7 +497,6 @@ print(fresh())
 ```
 
 Each call to `make_counter()` builds an independent counter with its own `count`.
-`fresh` starts at 1 after `tally` has reached 3.
 
 `increment()` is impure on purpose, to contrast with `withdraw()`.
 `withdraw()` mutates a module-level name that any code can assign.
@@ -572,8 +556,6 @@ print(square.func.__name__, square.keywords)
 #: power {'exponent': 2}
 ```
 
-`square` and `cube` are specializations of `power()`,
-each with one argument already supplied.
 Without the keyword, `partial(power, 2)` presets `base`,
 because positional arguments fill from the left.
 Called with 5, that partial computes `2 ** 5`.
@@ -615,8 +597,7 @@ print(percent(150), percent(-5), percent(42))
 #: 100 0 42
 ```
 
-`percent` presets the bounds and leaves the middle argument open.
-Before 3.14, a hand-written wrapper supplied that specialization.
+Before 3.14, a hand-written wrapper supplied `percent`.
 
 Calling `percent()` with no argument raises a `TypeError`.
 The library also rejects a trailing placeholder as redundant.
@@ -668,8 +649,6 @@ print(compose(label, increment_then_double)(10))  # [1]
 #: <22>
 ```
 
-`compose(double, increment)` returns a function that increments first,
-then doubles.
 Each piece stays small and pure.
 `compose()` combines them without changing either one.
 
@@ -726,8 +705,6 @@ two pure functions, `partial()` to turn a two-argument predicate into the one-ar
 and `map()` and `filter()` for the traversal.
 
 The `print()` at `[1]` shows that the pipeline leaves `data` as it was.
-Sensor `"b"` passed through `to_fahrenheit()` and appears as 77.0 in the report,
-yet its record in `data` still holds 25.0 Celsius.
 Because the input list stays as built, you can recompute the whole report,
 cache it, or run it on another core with no coordination.
 
