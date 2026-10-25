@@ -47,12 +47,8 @@ print(result)
 #: [16]
 ```
 
-The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`.
-`int(e)` runs when both are true.
 `"a"` fails `isdigit()`,
 so the comprehension drops it before `int()` can raise a `ValueError` on it.
-`"4"` is the only element that is both a string and all digits,
-so `result` holds its square, `16`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -106,8 +102,6 @@ for row in matrix:
 ```
 
 The one change is the literal in the conditional expression, from `1` to `2`.
-The two nested comprehensions still produce a list of lists,
-now with `2` on the diagonal.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -156,9 +150,6 @@ print(lengths["GALAHAD"], "NI" in lengths)
 ```
 
 **Filter before building each entry.**
-`"Galahad"` has seven characters,
-so it passes the `len(name) > 3` filter and adds one entry.
-The filter drops `"Ni"`, as before, and keeps the other five names.
 The filter runs before the output expression, so it tests the original name,
 not the upper-cased key.
 That ordering matters when the output expression changes the length,
@@ -225,10 +216,8 @@ so the duplicates and the case variants collapse to `Bob`, `John`, and `Alice`.
 
 **Change the case and keep every character.**
 `"J"` stays apart from `"JOHN"` because the normalization changes case and keeps every character.
-`"JOHN"` becomes `"John"`.
 `"J"` stays `"J"`, because `capitalize()` lower-cases every character after the first,
 and `"J"` has one character.
-`"J"` and `"John"` are distinct strings, so the set keeps both.
 
 The filter exists to drop the initial `"J"` as noise.
 Removing the filter shows what the set does on its own.
@@ -316,8 +305,7 @@ The brackets tell the reader that the list matters,
 but the printing is the purpose.
 When the output expression calls a function that returns a useful value,
 the list holds those values instead of `None`s and becomes the point.
-`show()` prints the line and returns it,
-so `lines` holds the three strings a caller can check, write to a file, or join.
+A caller can check the strings in `lines`, write them to a file, or join them.
 
 **Choose the shape by the result.**
 The right shape depends on whether you want the list.
@@ -376,8 +364,6 @@ print({**d for d in dicts})
 `**` merges the dictionaries in iteration order.
 When the same key appears more than once,
 the value from the later dictionary overwrites the earlier value.
-The key `"a"` appears in the first, third, and fourth dictionaries
-(`1`, then `3`, then `5`), so the final value is `5`, the last one written.
 
 The key `"a"` takes its value from the last dictionary but its position from the first.
 The result orders keys by first insertion, so `"a"` prints first,
@@ -497,8 +483,6 @@ because the generator expression there also calls `source()` on the line where i
 `exercise_8.py` renames the second message to `list created`.
 The last line changes from `[10, 20, 30]` to `[2, 4, 6]`,
 because a list comprehension does all its work on the line where it appears.
-The comprehension calls `source()`, reads `factor` while `factor` is still `2`,
-and stores the three products in `built`.
 The later `factor = 10` leaves `built` as it was,
 because `built` holds computed numbers rather than code that reads `factor`.
 
@@ -573,8 +557,6 @@ print(calls)
 ```
 
 **One call per element with the walrus.**
-`cubes` calls `cube_if_even()` once for each of the six values in `data`,
-so `calls` holds six arguments.
 The output expression reads each result back from `y` instead of calling again.
 
 **A second call for each element that passes.**
