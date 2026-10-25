@@ -151,8 +151,7 @@ if __name__ == "__main__":
 #: Square.draw
 ```
 
-The `factory()` argument indicates the type of `Shape` to create.
-Here that argument is a string, but it could be any sort of data.
+Here the `factory()` argument is a string, but it could be any sort of data.
 Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
 
@@ -171,9 +170,7 @@ A factory takes information that tells it what to build.
 A generator object needs no argument to produce its next value,
 because it holds the algorithm that decides what comes next.
 
-`shape_name(n: int) -> Iterator[str]` returns a generator object that produces `n` names on demand.
-Those names are the arguments to `Shape.factory()`.
-Normally the initialization data comes from outside the system rather than from a random number generator.
+Normally the data passed to `factory()` comes from outside the system rather than from a random number generator.
 
 Inside `shape_name()`,
 `Shape.__subclasses__()` produces a list of `Shape`'s direct subclasses.
@@ -289,8 +286,7 @@ keeps a table of instances on purpose and copies one for each caller.
 
 Adding a `Triangle` means one new class, one new line in `SHAPES`,
 and one new member in `Kind`.
-`Kind` lists the two keys in `SHAPES`.
-The checker rejects any other key,
+The checker rejects a `SHAPES` key outside `Kind`,
 so a new shape name goes into the `Literal` before it can go into `SHAPES`.
 Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a runtime `KeyError` to a check-time error,
 as [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
@@ -381,8 +377,6 @@ expect(KeyError, make, "Triangle")
 #: [KeyError] 'Triangle'
 ```
 
-`make("Triangle")` fails with a `KeyError` naming the missing key,
-because no class has registered under that name.
 The closed `Literal` in `shape_table.py` rejects `"Hexagon"` before the program runs.
 An open registry cannot do that.
 A name becomes valid the moment some module defines its class,
@@ -447,9 +441,6 @@ set out to remove.
 
 ### Testing the Registry
 
-Testing confirms that every subclass registers itself,
-that `make()` builds the class registered under each name,
-and that a new subclass needs no change to `make()`.
 Defining a fresh subclass of `Shape` inside `test_new_subclass_registers_itself()` is enough to put it in the registry:
 
 ```python
@@ -594,9 +585,7 @@ Choose the failure you prefer.
 The ABC registers every subclass and catches an incomplete one at construction.
 The Protocol catches an incomplete class at check time and leaves registration to you.
 
-A factory that is an object also gives each test its own table.
-The test file confirms that `register()` stores the class and returns it,
-that the factory builds a registered class, and that a new factory starts empty:
+A factory that is an object also gives each test its own table:
 
 ```python
 # test_protocol_registry.py
@@ -683,12 +672,9 @@ for kind in ["Circle", "Square", "Circle"]:
 #: Circle.draw
 ```
 
-Each type of shape defines its own nested `Factory` class whose `create()` method builds an object of that type.
-`ShapeMaker` is the interface those factories share.
+`ShapeMaker` is the interface the nested `Factory` classes share.
 Here it is a `Protocol`,
-so the two nested `Factory` classes conform by defining a matching `create()`.
-`FACTORIES` maps each shape's name to an instance of its factory,
-and `create_shape()` looks up that factory and calls its `create()`.
+so the two classes conform by defining a matching `create()`.
 
 Python does not need a `Factory` class nested in every shape.
 `shape_factory_objects.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
@@ -759,7 +745,6 @@ for sketch in (CircleSketch(), SquareSketch()):
 #: Square.draw
 ```
 
-`render()` draws whichever `Shape` `new_shape()` returns.
 `new_shape()` is the factory method,
 and the only method `CircleSketch` and `SquareSketch` override.
 Adding a `Triangle` means one new `Shape` subclass and one new `Sketch` subclass,
@@ -885,9 +870,6 @@ Thus, the line `play()` prints depends on both types.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
-`Obstacle`, `Character`, and `GameElementFactory` are abstract base classes.
-Each one lists the methods its subclasses must supply,
-as `@abstractmethod`s whose body is `...`.
 Suppose you write a factory subclass and forget `make_obstacle()`.
 Python defines the class and raises a `TypeError` when you create an instance,
 before `GameEnvironment.__init__()` calls anything.
@@ -958,10 +940,6 @@ g2.play()
 ```
 
 The type checker verifies that each concrete class satisfies the appropriate `Protocol`.
-A `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
-a `Character` must supply `interact_with()`,
-and an `Obstacle` must supply `description()`.
-`BrokenFactory` supplies `make_character()` and omits `make_obstacle()`.
 If you uncomment `[1]`, which passes a `BrokenFactory` to `GameEnvironment`,
 the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.
 
@@ -1031,7 +1009,6 @@ print(goblin.powers)  # The original changed too
 
 Because the `clone()` method wraps `copy.deepcopy()`,
 `captain` gets its own `powers` list.
-Appending to that list leaves `goblin.powers` unchanged.
 
 `deepcopy()` restores the clone's state without running the constructor,
 so a clone [skips the `__post_init__()` check](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor).
@@ -1251,10 +1228,6 @@ For a [record](18_Techniques--Performance.md#record),
 copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the [general form of the operation](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace),
 and works on any object that defines `__replace__()`.
-
-Testing confirms that the two forms produce the same pizza,
-that `replace()` changes one field of a copy and keeps the rest,
-and that a second `build()` on the same builder carries the first pizza's toppings:
 
 ```python
 # test_pizza.py
