@@ -60,8 +60,6 @@ import use_module
 #: use_module body runs
 ```
 
-Importing `use_module` runs its top-level code, including the `print()`,
-but not its `"__main__"` block.
 Python runs a module's top-level code once,
 however many times the program imports the module:
 
@@ -78,7 +76,6 @@ print(sys.modules["use_module"] is use_module)
 #: True
 ```
 
-`use_module`'s body runs once, although two `import` statements name it.
 The first `import` creates the module object, stores it in `sys.modules`,
 and then runs the file's body to fill it.
 `sys.modules` is a dict keyed by dotted module name.
@@ -288,8 +285,6 @@ expect(AttributeError, lambda: a_package.module1)  # type: ignore
 #: 'module1'
 ```
 
-Reading `a_package.module1` raises an `AttributeError`,
-so `a_package.module1.function1()` fails here too.
 The submodule becomes an attribute of the package only when something imports it by name.
 The type checker reports the same missing attribute before the program runs,
 flagging `a_package.module1` as a `possibly-missing-submodule`.
@@ -311,8 +306,6 @@ print(module1.function1())
 print(module2.function2())
 #: function2 in module2 in a_package
 ```
-
-Here the module name alone qualifies each function.
 
 You can bring specific functions into the namespace by specifying both the package and the module:
 
@@ -500,7 +493,6 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 #: ['_helper', 'public']
 ```
 
-With `__all__`, the star import binds the two listed names, including `_helper`.
 `undeclared` stays in `exporting` with `_internal`,
 although its name has no underscore.
 
@@ -635,7 +627,6 @@ print("after first use")
 #: after first use
 ```
 
-Nothing loads at the `lazy import` line.
 The body of `noisy` runs at `noisy.announce()`, the first access,
 so `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
