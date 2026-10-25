@@ -587,7 +587,7 @@ print(counts)
 
 With `set_events()` in place of the local attachment,
 the new entry is `'square': 1`.
-Nothing else appears,
+It is the only addition,
 because the interpreter reports `PY_START` when a Python code object starts running,
 and the module's own frame starts before the tool attaches.
 CPython implements `print()` in C, so it starts no Python frame.
@@ -685,7 +685,7 @@ It is slow because of what it calls, so the gains are in its callees,
 and in how often it calls them.
 
 The two columns hold the same value only for a leaf function,
-one that calls nothing else.
+one that does all of its work in its own frame.
 The top of the `cumtime` ranking is the outermost frame,
 which calls everything and does almost none of the work,
 so the two rankings usually open on different functions.
