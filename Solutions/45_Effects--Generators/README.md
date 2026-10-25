@@ -85,21 +85,14 @@ print(total)
 ```
 
 **Keep the three channels apart.**
-`Generator[Prompt, Amount, Total]` says this generator yields a `Prompt`,
-receives an `Amount`, and finally returns a `Total`.
 Three `NewType` definitions over `str`, `int`,
 and `int` keep the two integer channels apart,
 so transposing the `SendType` and the `ReturnType` is a type checker error.
 With bare `int` on both channels, the checker accepts the swap.
 
 **Drive the conversation by hand.**
-`tally()` needs four calls: one `next()` and three sends.
-`next(t)` runs the body up to the first `yield` and produces the first prompt.
-Each `send()` resumes the suspended `yield`, whose value becomes `amount`,
-then runs to the next one.
 The third `send()` resumes the last `yield`,
 so the loop ends and `tally()` returns.
-The return value arrives as `StopIteration`'s `value` rather than as the result of `send()`.
 
 `total` is a local of the generator,
 and it keeps its value across three suspensions because the suspended generator preserves its locals.
@@ -278,9 +271,7 @@ so it answers correctly in whatever order the questions arrive,
 and it answers a repeated question the same way twice.
 The iterator driver goes by position,
 so it depends on the generator asking its questions in the order the driver holds the replies.
-Both drivers take a `conversation` of the same type,
-`Generator[Question, Answer, Result]`.
-That type declares that a `Question` goes out and an `Answer` comes back,
+The `conversation` type the two drivers share declares that a `Question` goes out and an `Answer` comes back,
 and leaves open how the driver chooses each answer.
 
 **Keep the two endings apart.**
@@ -291,13 +282,6 @@ Two iterators that raise the same exception type are a hazard for a driver that 
 
 **Test a short answer source.**
 The last two runs show that hazard.
-Given one answer and three questions,
-`drive_in_order()` lets the `StopIteration` propagate,
-so the caller's `except` reports that the answer source ran out.
-`drive_naive()` puts `next(answers)` and the `print()` after it inside the `try`.
-It therefore catches that same exception,
-treats it as "the conversation finished," and returns `stop.value`,
-which is `None`.
 
 `None` is wrong twice over.
 The interview stopped after one question, before it built a `Result`,
@@ -405,12 +389,7 @@ A send that supplies a collector's first value produces one line:
 that collector's second prompt.
 A send that supplies a collector's second value produces two:
 the completed collector's `print()`, then the next prompt.
-The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
-so the output alternates between one-line and two-line responses.
-After `gamma` the next prompt comes from `both()` rather than a collector:
-the total, `21`.
 
-`both()` holds three `yield from` statements and leaves all the forwarding to them.
 `yield from` relays in both directions on its own: prompts up to the driver,
 numbers down to whichever `yield` is suspended inside the current `collect()`.
 
@@ -607,7 +586,6 @@ returns `None`.
 
 **Keep the strings and the count apart.**
 The strings and the count travel by different channels.
-The listing shows both at once.
 Every string that `emit()` or `report()` yields travels through the `YieldType` and comes out in the list.
 The count travels through the `ReturnType`: `emit()` returns it,
 `yield from` delivers it into `report()`'s `size`, `report()` returns it again,
