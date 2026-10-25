@@ -239,11 +239,9 @@ print(f"lazy peak under 1% of one list: "
 **Build one list.**
 `one_list()` filters `x * x` instead of first building a `squares` list and then an `evens` list from it,
 so the million-element `squares` list disappears.
-Peak memory drops to about half of the two-list version's peak.
-That is as close as an eager version gets.
+One list is as close as an eager version gets.
 
 **Measure the remaining gap.**
-The last line shows that the lazy peak is under one percent of the one-list peak.
 The comprehension must build and hold the whole list of half a million even squares before `[:5]` discards nearly all of them.
 Restructuring the eager version cannot close that gap,
 because an eager version computes every value up front.
@@ -315,7 +313,6 @@ print(noisy(3))
 #: 9
 ```
 
-The `"computing noisy(3)"` message prints once, on the first call.
 Every later call with the same argument returns the cached result and skips the function body,
 along with its `print()` call and any other side effect.
 
@@ -387,8 +384,6 @@ for _ in range(3):
 ```
 
 **Check the invariant after each pop.**
-Each pop returns the true smallest remaining value: `3`, then `4`, then `5`.
-After every pop, `heap[0]` is the minimum.
 `heap.pop(0)` in the original returns the right value on the first pop,
 but it shifts `6` to the front, ahead of the smaller `4`,
 so the second pop returns `6`.
@@ -953,15 +948,12 @@ print(xs)
 ```
 
 **Find the start of the run.**
-`bisect_left()` finds the first occurrence.
-It returns the position before any equal elements,
+`bisect_left()` returns the position before any equal elements,
 so `xs[left]` is the target when the target is present.
 A membership test needs that, and `search_comparison.py` relies on it.
 
 **Find the end of the run.**
-`bisect()`, the alias for `bisect_right()`,
-returns the position after the last equal element.
-That position is where a new duplicate goes, after the existing ones,
+`right` is where a new duplicate goes, after the existing ones,
 and it is the wrong index to read.
 `xs[right]` is the next larger value,
 or an `IndexError` when the target is the largest element in the list.
