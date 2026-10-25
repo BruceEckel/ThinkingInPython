@@ -109,8 +109,7 @@ except ValueError as error:
 which resumes the generator by raising the block's exception at the `yield`.
 Without the `try`/`finally`, that exception leaves the generator at once,
 so the code after the `yield`, `exit A` included, never runs.
-On the exception path the generator skips the cleanup,
-and nothing reports the skip.
+On the exception path the generator skips the cleanup in silence.
 Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator.
 
 ## The Protocol
@@ -494,7 +493,7 @@ so a long message wraps to fit the listing width.
 so every exception the book demonstrates through `expected` or `expect()` has one form.
 
 `suppress` treats the no-argument call the opposite way.
-`suppress()` suppresses nothing,
+`suppress()` lets every exception propagate,
 because a raised exception has no listed type to match.
 An `expected()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
 so name the types you expect unless you want the block to suppress every exception.
@@ -538,7 +537,7 @@ and prints the exception as `[Type] message`,
 wrapped by `textwrap.fill()` when that line is wider than `WIDTH`.
 `WIDTH` is 57 because this book's listings are 60 columns wide and a `#:` output line uses three of them for its prefix.
 An exception of another type propagates.
-A call that raises nothing fails with an `AssertionError`,
+A call that returns normally fails with an `AssertionError`,
 so `expect()` reports a demo that stops failing as an error.
 
 The `/` makes `types` and `fn` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
@@ -1248,7 +1247,7 @@ Try each exercise before opening its [solution](../Solutions/15_Techniques--Cont
 7.  Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,
     run it with no arguments and with three,
     and confirm that with three names the close order reverses the open order,
-    and that with none the stack opens nothing.
+    and that with none the program prints `using []` alone.
 8.  Wrap the `yield` in `careless()` from `no_finally.py` in `try`/`finally`,
     with the `exit` line in the `finally`.
     Before running it, predict where `exit A` appears relative to `caught: boom`.
