@@ -827,7 +827,8 @@ Those are the places where the code's reader and writer are different people,
 and where a wrong assumption and the failure it causes sit farthest apart.
 
 Let the type checker infer the rest.
-A local variable whose type is obvious from its initializer gains nothing from a hint.
+For a local variable whose type is obvious from its initializer,
+a hint repeats what the initializer says.
 `count: int = 0` says the same as `count = 0`, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
 A hint helps in proportion to the distance between a value's creation and its use.
@@ -976,7 +977,7 @@ The abstract container types come from `collections.abc`.
 | `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Modules and Packages](06_Foundations--Modules_and_Packages.md#circular-imports) |
 
 These decorators and directives exist for the type checker and the reader.
-At runtime most of them do nothing.
+At runtime most of them return their argument.
 Two act when a call reaches them: `assert_never()` raises an `AssertionError`,
 and `reveal_type()` prints its argument's runtime type.
 
