@@ -59,19 +59,16 @@ The conditional clause ends with a colon.
 A group of indented statements follows: the "then" part of the `if` statement.
 The `print()` function sends its arguments to standard output,
 separated by spaces and followed by a newline.
-The line at `[1]` assigns to a variable named `val`.
 The statement at `[2]` starts at the left margin again,
 and that change in indentation ends the `if`.
 
-An indented block groups statements inside the enclosing scope, so `val`,
-assigned inside the `if`, stays visible afterward.
+An indented block groups statements inside the enclosing scope,
+so the `val` assigned at `[1]` stays visible after the `if`.
 In C++ or Java, a variable declared inside braces goes out of scope at the closing brace.
 In Python, an `if` or a `for` block shares the scope around it.
 New scopes come from functions, classes, modules, and comprehensions.
 
 Python binds a name only when the assignment runs.
-With `response` set to `"no"`, the `if` skips `val = 1`.
-`print(val)` then raises a `NameError`.
 
 ```python
 # unbound_val.py
@@ -152,8 +149,6 @@ Reserve `is` for `None` and other singletons.
 `a[:]` is a *shallow* copy.
 It duplicates the outer list.
 The copy shares the outer list's inner objects.
-Because `nested` and `shallow` still share the same inner list,
-`shallow[1].append(99)` also changes `nested[1]`.
 The standard library's `copy.deepcopy()` duplicates the inner objects as well.
 
 Numbers, strings, and tuples are *immutable*.
@@ -176,9 +171,8 @@ print(first, rest)
 #: 10 [20, 30, 40]
 ```
 
-`*rest` collects the remaining items.
 [Containers](03_Foundations--Containers.md#tuples-and-unpacking)
-covers the general form.
+covers the general form of `*rest`.
 
 ## Numbers and Arithmetic
 
@@ -219,14 +213,12 @@ print(True + True, True == 1)  # A bool is an int
 #: 2 True
 ```
 
-`round()` breaks a tie to the nearest even value,
-so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`.
+`round()` breaks a tie to the nearest even value.
 C's `round()` rounds half away from zero.
 The format spec of an [f-string](#f-strings), later in this chapter,
 rounds ties the way `round()` does.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
-Arithmetic treats them as numbers too, so `True + True` is `2`.
 
 Python has no `++` or `--`.
 Use `+= 1` and `-= 1`.
@@ -257,8 +249,6 @@ print(alias, items)
 Augmented assignment on a mutable object changes it in place,
 so every other name bound to that object refers to the changed object.
 For a list, `+=` does what `extend()` does.
-`items = items + [4]` builds a new list and rebinds `items` to it,
-which leaves `alias` bound to the old one.
 For an `int`, both forms rebind the name,
 so `total += 5` behaves the way `+=` does in any other language.
 
@@ -356,7 +346,6 @@ if not items:
 `repr()` returns a value's unambiguous representation,
 so the empty string appears as a visible `''`.
 `Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`.
-`Bucket(0)` is false and `Bucket(3)` is true.
 
 `Bucket` is a small [class](07_Foundations--Classes.md).
 Its `count: int` and `-> int` are [type hints](08_Foundations--Static_Types.md#type-hints).
@@ -497,16 +486,13 @@ print("notes.txt".removesuffix(".txt"))
 String methods return new values and leave the original string intact.
 After three calls on `s`, `repr(s)` still shows its surrounding spaces,
 and the quotes that `repr()` adds make those spaces visible.
-`replace()` replaces every occurrence, as `XbXbXb` shows.
-An optional third argument limits how many it replaces.
+An optional third argument to `replace()` limits how many occurrences it replaces.
 
 `strip()` and its one-sided forms `lstrip()` and `rstrip()` take an optional argument,
 but that argument is a set of characters, not a prefix or suffix.
 `"test_setup".lstrip("test_")` removes every leading `t`, `e`, `s`, and `_`,
 leaving `"up"`.
 To remove one exact piece from an end, use `removeprefix()` or `removesuffix()`.
-`"test_setup".removeprefix("test_")` is `"setup"`,
-and `"notes.txt".removesuffix(".txt")` is `"notes"`.
 
 `+` joins two strings, and it converts nothing:
 
@@ -616,8 +602,6 @@ Because `message` opens with a value,
 `message.interpolations` holds one `Interpolation` per value.
 Each `Interpolation` keeps the value,
 the source text of the expression that produced it, and its format spec.
-The `for` loop over `message.interpolations` prints those three attributes:
-`expression`, `value`, and `format_spec`.
 
 Iterating over a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation`.
@@ -629,7 +613,6 @@ Iterating over `t"{first}{last}"`, with two interpolations side by side,
 produces two `Interpolation`s in a row.
 
 Two consumers, `shout()` and `safe()`, each walk a `Template` piece by piece.
-The listing rebuilds `message` from the same t-string for `shout()` and passes `safe()` two new templates:
 
 ```python
 # template_consumers.py
@@ -675,16 +658,14 @@ except ValueError as e:
 #: unsafe value: "Bob'; rm -rf /"
 ```
 
-`shout()` uppercases the literal text and leaves the interpolated values in their original case.
 `shout()` turns each value into text with the built-in `format()` and the format spec stored in the `Interpolation`,
 so `score` still prints as `92`.
 A finished f-string is a single `str` in which the values have merged into the literal text,
 so code that processes it afterward must guess which characters came from a value.
 
 `safe()` uses the same separation to check each value.
-It copies the literal text into the result as written and raises a `ValueError` for an interpolated value that contains a single quote.
 `trouble` holds a single quote,
-so `safe(t"Hello, {trouble}")` raises the exception before any result exists.
+so `safe(t"Hello, {trouble}")` raises a `ValueError` before any result exists.
 An f-string finishes assembling the result, quote and all,
 before any code can inspect the values.
 
