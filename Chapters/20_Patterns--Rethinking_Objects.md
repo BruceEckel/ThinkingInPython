@@ -37,7 +37,7 @@ Everything is an object, and you act on objects only by sending messages,
 always late-bound.
 Smalltalk was emphatically dynamic.
 You built a program at runtime by finding the closest existing class and inheriting from it to add behavior.
-That style guarantees nothing about substitutability.
+That style leaves substitutability up to each subclass's author.
 
 *C++* drew from Simula.
 Objects were optional.
@@ -543,7 +543,7 @@ print(f"{len(box)=}, {box.appends=}")
 #: len(box)=3, box.appends=3
 ```
 
-`CountingBox` inherits nothing from `list`,
+`CountingBox` holds its `list` in a field,
 so every method that adds items is one it defines.
 It forwards each operation it offers by hand.
 `CountingList` inherits dozens of methods from `list`,
@@ -598,7 +598,7 @@ print({c: "found"}[twin])
 #: found
 ```
 
-`Contact` inherits nothing and gains only the methods `@record` generates for it.
+`Contact`'s methods are the ones `@record` generates for it.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
 Value equality and hashing follow from the fields rather than from a base class.
 
@@ -1087,11 +1087,11 @@ if __name__ == "__main__":
 
 The type checker requires the guard.
 Without it, `total()` calls `.log()` on `None` and raises an `AttributeError`.
-The `None` branch does nothing.
-Doing nothing is behavior, and behavior belongs in an object.
+The `None` branch stays silent.
+Silence is behavior, and behavior belongs in an object.
 
 The *Null Object* pattern replaces "absent" with an object whose behavior is neutral.
-If you give the do-nothing case a class,
+If you give the silent case a class,
 an instance of that class replaces `None` as the default:
 
 ```python
