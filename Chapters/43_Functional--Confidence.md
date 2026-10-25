@@ -105,7 +105,7 @@ Each call to `add_item()` returns the same list the caller passed in,
 so replacing the call with that list looks safe.
 It is not.
 The call also appends to `cart`.
-The list put in its place appends nothing.
+The list put in its place leaves `cart` as it was.
 The rest of the listing puts the returned list in place of the `add_item()` call that produced it
 (`[1]`).
 
@@ -144,7 +144,7 @@ print(withdraw.cache_info())
 Two withdrawals of `30` should leave `balance` at `40`.
 The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
-Nothing warns you about the skipped subtraction.
+The skipped subtraction passes silently.
 `lru_cache` returns the stored result for any repeated arguments,
 and never checks whether the wrapped function is referentially transparent.
 
@@ -448,8 +448,8 @@ The simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 
 Avoid a law that restates the implementation.
-Asserting `encode(text) == text.encode().hex()` tests nothing,
-because the test and the code share any bug.
+Asserting `encode(text) == text.encode().hex()` compares `encode()` with a copy of its own body,
+so the test and the code share any bug.
 A good law, like the roundtrip law,
 constrains what the function computes and leaves the body to decide how.
 
