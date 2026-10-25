@@ -53,10 +53,20 @@ SPACY_MODEL: Final = (
 )
 PARSER_CMD: Final[tuple[str, ...]] = (
     "uv", "run", "--no-project", "--python", "3.12",
-    "--with", "spacy>=3.8,<3.9", "--with", SPACY_MODEL,
+    "--with", "spacy>=3.8,<3.9", "--with", "preshed<3.0.14",
+    "--with", SPACY_MODEL,
     "python", str(SPACY_PARSE),
 )
-"""The throwaway environment the spaCy half runs in."""
+"""The throwaway environment the spaCy half runs in.
+
+`preshed` is pinned because 3.0.14 (resolved on 2026-10-24) makes
+spaCy 3.8.16 fail to load any model on Windows with `OverflowError:
+Python int too large to convert to C ssize_t` in
+`Tokenizer._flush_specials`; 3.0.13 loads it. The failure reached the
+checks as `parser unavailable ...; nothing checked`, an exit 0, so
+every spaCy check was silently off. Lift the pin when a `preshed`
+release loads the model again.
+"""
 CACHE_DIR: Path = ROOT / "build" / "parses"
 """Where each document's parse is kept; tests point this at a tmp dir."""
 
