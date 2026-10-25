@@ -57,8 +57,6 @@ for command in macro:
 ```
 
 `Command` names the signature every entry must have.
-Its definition, `type Command = Callable[[], None]`,
-describes an entry that takes no arguments and returns `None`.
 The classic object form turns that name into a base class and wraps each action in a `Command` subclass with an `execute()` method:
 
 ```python
@@ -405,9 +403,7 @@ for tolerance in (0.1, 1e-9):
 ```
 
 Each call to `bisection_within()` returns a new finder whose closure holds that call's tolerance.
-The finder built with `0.1` stops within a tenth and reports 1.406250.
-The finder built with `1e-9` agrees with the true root to six places.
-Because both satisfy `RootFinder`, `solve()` accepts either unchanged.
+Because both finders satisfy `RootFinder`, `solve()` accepts either unchanged.
 So does `first_root()`, which the next section defines in `chain.py`.
 
 Because `bisection_tol()` takes the setting as an ordinary parameter,
@@ -573,10 +569,6 @@ def test_all_fail_returns_none() -> None:
     assert first_root(g, 0.0, 2.0, chain) is None
 ```
 
-`watched()` wraps a finder and records the finder's name each time the wrapper runs.
-`test_first_successful_finder_wins()` and `test_chain_falls_through_to_a_later_method()` wrap every finder this way,
-so they assert which finders ran as well as the root.
-
 `watched()` carries a `# type: ignore` because `RootFinder` is a `Callable`,
 and a `Callable` declares no `__name__`.
 The type checker is right about the type.
@@ -601,9 +593,6 @@ and *Chain of Responsibility* in Python.
 *Chain of Responsibility* keeps its handlers in a list and tries them in order.
 If you key that structure by type instead of by position,
 you have an *event bus*.
-The bus is a `dict` keyed by event type.
-Each key maps to a list of handlers.
-`subscribe()` appends a handler to the list under the event type it handles.
 Publishing an event looks up its type and calls every handler registered for that type.
 Calling every handler is the second difference from the chain,
 which stops at the first handler that succeeds.
@@ -659,9 +648,6 @@ The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.
 One annotation covers every list.
 No single event class fits all of them, so the element type is `Handler[Any]`.
-
-The demo subscribes two handlers for `Deposit` and one for `Withdraw`,
-then publishes one event of each of the three types:
 
 ```python
 # event_bus_demo.py
@@ -809,16 +795,10 @@ class EventBus:
             handler(event)
 ```
 
-`@event` registers its class in `EVENTS`.
 `@handler` makes a class whose instances are function objects,
 with fields that hold their configuration.
-It also records in `HANDLES` the event type that the class's `__call__()` accepts.
-
 `Handler` keeps its `Callable` definition,
 which accepts a callable object as `Command` accepts `Repeat` in `callable_command.py`.
-`subscribe()` then takes one argument, a handler,
-and looks up the handler's event type in `HANDLES`.
-`publish()` checks that each event's class is in `EVENTS`.
 
 `handler()` looks for `__call__()` in `vars(cls)`, the class's own namespace.
 `hasattr(cls, "__call__")` cannot make that test,
@@ -885,9 +865,6 @@ so it cannot check what those two collections hold.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
 the same annotation the type checker reads,
 so a handler specifies its event once.
-
-The demo subscribes each handler with one argument,
-and the bus routes each event by its type:
 
 ```python
 # tagged_bus_demo.py
