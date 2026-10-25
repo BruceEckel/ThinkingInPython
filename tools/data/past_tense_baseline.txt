@@ -188,7 +188,8 @@ Chapters/38_Patterns--Simulation.md	[PAST] rejected: CODE tallies every CODE rej
 Chapters/38_Patterns--Simulation.md	[PAST] sprinkled: In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
 Chapters/38_Patterns--Simulation.md	[PAST] steered: Nothing steered them there.
 Chapters/38_Patterns--Simulation.md	[PAST] wrote: Jeremy Meyer wrote the original Java version of this example.
-Chapters/41_Functional--Toolkits.md	[PAST] consumed: CODE consumed the CODE on its way to the stop index, although it yielded nothing for it.
+Chapters/41_Functional--Toolkits.md	[PAST] consumed: CODE consumed the CODE on its way to the stop index and discarded it.
+Chapters/41_Functional--Toolkits.md	[PAST] discarded: CODE consumed the CODE on its way to the stop index and discarded it.
 Chapters/41_Functional--Toolkits.md	[PAST] found: CODE's first parameter is CODE, so CODE draws CODE: expected CODE, found CODE.
 Chapters/41_Functional--Toolkits.md	[PAST] kept: CODE is CODE with the intermediate results kept.
 Chapters/41_Functional--Toolkits.md	[PAST] was: CODE was the first value computed, so that miss proves the cache evicted it.
@@ -211,7 +212,6 @@ Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put 
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
-Chapters/45_Effects--Generators.md	[PAST] resumed: A generator resumed from two threads at once raises CODE rather than interleaving.
 Chapters/45_Effects--Generators.md	[PAST] returned: The driver calls CODE on the generator CODE returned, but CODE prints the CODE line.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
 Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's parameter annotation to decide what it answers, so a function annotated CODE and returning CODE hands back a default-constructed instance of the requested class.
@@ -318,7 +318,7 @@ Solutions/35_Patterns--Flyweight/README.md	[PAST-HEADING] shared: 2. CODE, share
 Solutions/35_Patterns--Flyweight/README.md	[PAST] saved: That difference repeats in every cell, so the bytes saved grow with the map.
 Solutions/36_Patterns--Memento/README.md	[PAST] included: ** CODE copies the strokes into an immutable CODE, so each memento keeps the strokes it held when CODE returned it, through every later call, CODE included.
 Solutions/36_Patterns--Memento/README.md	[PAST] undid: After CODE, CODE returns CODE, then CODE, the states CODE undid, in the order CODE recorded them.
-Solutions/37_Patterns--Pattern_Refactoring/README.md	[PAST] included: If you decorate the CODE methods with CODE instead of CODE, the loop prints "no special handling" for all five materials, CODE included, and the type checker reports nothing.
+Solutions/37_Patterns--Pattern_Refactoring/README.md	[PAST] included: If you decorate the CODE methods with CODE instead of CODE, the loop prints "no special handling" for all five materials, CODE included, and the type checker accepts the class.
 Solutions/38_Patterns--Simulation/README.md	[PAST] requested: The one requested change forces three more edits, because a caller must CODE an CODE to get its result.
 Solutions/38_Patterns--Simulation/README.md	[PAST] wrote: you wrote your prediction before running the view, and for mode CODE the rendered plate shows one vertical and two horizontal interior lines plus the four edges, with agitation falling toward zero as in CODE.
 Solutions/40_Functional--Foundations/README.md	[PAST] changed: CODE still raises a CODE, and no calling code changed.
@@ -331,10 +331,11 @@ Solutions/43_Functional--Confidence/README.md	[PAST] ran: The number is greater 
 Solutions/43_Functional--Confidence/README.md	[PAST] re: It therefore re-finds the failure you are in the middle of fixing instead of leaving it to chance.
 Solutions/43_Functional--Confidence/README.md	[PAST] reported: Three consecutive runs on one 32-core machine reported CODE distinct process IDs each time.
 Solutions/43_Functional--Confidence/README.md	[PAST] reported: With limits twenty times smaller, CODE, the same machine reported CODE on each of three runs.
+Solutions/44_Effects--Effect_Management/README.md	[PAST] read: Both read their arguments alone and leave everything outside themselves as it was.
 Solutions/45_Effects--Generators/README.md	[PAST] found: Under CODE a generator must return CODE, so CODE rejects CODE's CODE with an CODE: expected CODE, found CODE.
 Solutions/45_Effects--Generators/README.md	[PAST] stopped: The interview stopped after one question, before it built a CODE, and CODE is not a CODE in any case.
 Solutions/45_Effects--Generators/README.md	[PAST] told: The type checker told you more.
-Solutions/45_Effects--Generators/README.md	[PAST] wrote: you wrote the full sequence of lines before running the modified CODE, and it matches the run line for line, including which sends print two lines and what the final CODE after the loop prints.
+Solutions/45_Effects--Generators/README.md	[PAST] wrote: you wrote the full sequence of lines before running the modified CODE, and it matches the run line for line, including which sends print two lines and what CODE prints.
 Solutions/46_Effects--Stateless/README.md	[PAST-HEADING] declared: 2. An undeclared need, declared
 Solutions/46_Effects--Stateless/README.md	[PAST] added: your six predictions match six runs with the third implementation added.
 Solutions/46_Effects--Stateless/README.md	[PAST] answered: At runtime the handler answered three requests across the two calls, two for CODE and one for CODE, although CODE annotates its parameter CODE.

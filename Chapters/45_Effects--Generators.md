@@ -366,7 +366,7 @@ passing every yielded request out to the outer driver and every sent answer back
 
 In the simplest case,
 each generator yields values and leaves its send and return channels at `None`,
-so `Iterator[str]` can be used instead of `Generator[str]`.
+so its annotation can be `Iterator[str]` instead of `Generator[str]`.
 The driver is `list()`,
 which calls `next()` until the outermost generator finishes:
 
@@ -509,8 +509,8 @@ For each nested `Tree`, `visit()` calls itself through `yield from`.
 A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`,
 and reaches the `for` loop at the bottom of the listing.
 
-A [`Counter`](03_Foundations--Containers.md#counter)
-is returned to its calling `visit()`.
+Each `visit()` returns a [`Counter`](03_Foundations--Containers.md#counter)
+to the `visit()` that called it.
 The `yield from` expression evaluates to the subtree's `Counter`.
 The parent adds it to its own counts with `+=`.
 `census()` receives the count for the whole garden through its own `yield from` and yields one line per color.

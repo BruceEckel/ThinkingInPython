@@ -29,7 +29,7 @@ Chapters/07_Foundations--Classes.md	The first read	The first read of a `cached_p
 Chapters/07_Foundations--Classes.md	the first read	`total` is *lazily initialized*, created on first use, so the method runs at the first read rather than when the constructor runs.
 Chapters/08_Foundations--Static_Types.md	the line that	The wrong value causes a failure later, often far from the line that produced it.
 Chapters/09_Foundations--Class_Attributes.md	the first read	No attribute exists until something assigns one, so the first read raises an `AttributeError`.
-Chapters/10_Foundations--Cleanup.md	the `with` block	The explicit `sock.close()` after the `with` block prints nothing, because `close()` returns at once when `self.closed` is `True`.
+Chapters/10_Foundations--Cleanup.md	the `with` block	The explicit `sock.close()` after the `with` block returns at once, because `__exit__()` set `self.closed` to `True`.
 Chapters/10_Foundations--Cleanup.md	the `with` block	`__exit__()` calls `close()`, so `close()` runs at the end of the `with` block, at a line you can identify.
 Chapters/13_Techniques--Pattern_Matching.md	the last `case`	When the capture is the last `case`, as here, Python compiles the `match` silently, and the type checker accepts it.
 Chapters/13_Techniques--Pattern_Matching.md	the next `case`	For a list of two points, `match` moves on to the next `case`.
@@ -66,6 +66,7 @@ Chapters/23_Patterns--Singleton.md	the first assignment	If you drop the inner te
 Chapters/23_Patterns--Singleton.md	the first call	Only the first call constructs a `Registry`.
 Chapters/23_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list, where the metaclass form discards it.
 Chapters/23_Patterns--Singleton.md	the first call	That override skips `__new__()` and `__init__()` on every later construction, so only the first call's arguments reach the constructor.
+Chapters/23_Patterns--Singleton.md	the first call	When the inner object is ready to build before the first call, you can create it eagerly in the class body instead, `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Chapters/24_Patterns--Template_Method.md	the closing `run_framework()`	In `template_function.py`, `customize2` defaults to the do-nothing `lambda: None`, so the closing `run_framework()` call passes one step and the loop prints `one` twice.
 Chapters/25_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup finds the proxy's `level`, so Python skips `__getattr__()`.
 Chapters/25_Patterns--Surrogate.md	the first call	Because `Partial` defines `f()` and leaves `g()` abstract, constructing a `Partial` raises a `TypeError` before the first call.
@@ -100,12 +101,12 @@ Chapters/41_Functional--Toolkits.md	the third `computing square`	`islice()` requ
 Chapters/42_Functional--Error_Handling.md	The `except` clause	The `except` clause that caught the exception returns it as a value, so every caller above that clause receives an `Err`, an ordinary return value.
 Chapters/42_Functional--Error_Handling.md	the first `Err`	In `combining.py`, the three steps take their inputs from `i` and `j` rather than from an earlier step's answer, so stopping at the first `Err` discards whatever the later steps would have found.
 Chapters/42_Functional--Error_Handling.md	the first call	`add_note()` appends each note to a list, `__notes__`, which the first call creates.
-Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdraw(30)` evaluates to `70`, so substituting `70` for it ought to change nothing.
+Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdraw(30)` evaluates to `70`, so substituting `70` for it ought to leave the result at `110`.
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
-Chapters/45_Effects--Generators.md	The `for` loop	The `for` loop then resumes `collect()` with `next()`, so both of `collect()`'s `yield` expressions produce `None`.
 Chapters/45_Effects--Generators.md	The first call	The first call, which runs the body to its first `yield`, *primes* the generator.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes the body, which reaches `return` instead of another `yield`, so the generator returns its `Result`.
+Chapters/45_Effects--Generators.md	the `for` loop	A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`, and reaches the `for` loop at the bottom of the listing.
 Chapters/45_Effects--Generators.md	the `yield` expression	As the `SendType`, `Answer` types each value the driver sends, which arrives as the value of the `yield` expression and binds to `answer`.
 Chapters/45_Effects--Generators.md	the first `Question`	`drive()` uses all three type parameters: `next()` produces the first `Question`, `send()`'s argument supplies the `Answer`, and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
@@ -123,7 +124,7 @@ Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except
 Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs, since `finally` runs whether or not an exception is propagating.
 Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` shifts down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
 Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in automatically.
-Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so it prints nothing here.
+Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the `TypeError` bypasses the `else` clause too.
 Solutions/05_Foundations--Functions/README.md	the first call	A tuple has no `append()`, so the first call that omits `target` raises an `AttributeError`.
 Solutions/05_Foundations--Functions/README.md	the line that	You can name the line that makes `count` local in each function.
 Solutions/05_Foundations--Functions/README.md	the third `bad_append(3)`	the third `bad_append(3)` prints `[1, 2, 3]`, matching the prediction you wrote down first.
@@ -199,7 +200,6 @@ Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` gr
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` evicts nothing and the second `square(1)` becomes a hit.
 Solutions/45_Effects--Generators/README.md	The third `send()`	The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
-Solutions/45_Effects--Generators/README.md	the final `send()`	you wrote the full sequence of lines before running the modified `yield_from_send.py`, and it matches the run line for line, including which sends print two lines and what the final `send()` after the loop prints.
 Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first `send()`	So at runtime the first `send()` accepts `None` alone, a value the `SendType` excludes.
 Solutions/45_Effects--Generators/README.md	the first `yield`	`next(t)` runs the body up to the first `yield` and produces the first prompt.

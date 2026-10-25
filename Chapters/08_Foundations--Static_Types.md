@@ -91,8 +91,9 @@ A tuple annotation specifies one type per position,
 so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
 The `...` in `tuple[int, ...]` means zero or more `int`s.
 
-A function that returns `None`, explicitly or by reaching its end,
-declares `-> None`, so every `__init__()` in this chapter's listings carries that annotation.
+A function declares `-> None` when it returns `None`,
+explicitly or by reaching its end,
+so every `__init__()` in this chapter's listings carries that annotation.
 
 ## The Type Checker: `ty`
 

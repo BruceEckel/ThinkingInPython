@@ -372,7 +372,7 @@ for value in [1, 2, 3, 4, 5, 6]:
 
 **Count the values the collectors need.** Each `collect()` consumes two
 values, so the three collectors need six, and the loop supplies six.
-The final `yield` in `both()` gives `send(6)` a value to return,
+The `yield` in `both()` gives `send(6)` a value to return,
 so the loop ends with `both()` suspended and no `StopIteration`.
 
 **Read the output in pairs.** The two-line responses mark where one collector ends and the next begins. A send that supplies a collector's

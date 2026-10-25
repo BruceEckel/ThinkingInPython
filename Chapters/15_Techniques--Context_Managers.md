@@ -20,7 +20,7 @@ with pool.lease() as conn:
 
 `lease()` puts the connection back in the [pool](#an-object-pool)
 on every path out of that block, including the exception path.
-The two lines above are all the borrower writes.
+That `with` block is all the borrower writes.
 
 ## A Basic Context Manager
 

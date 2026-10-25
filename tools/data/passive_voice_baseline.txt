@@ -16,7 +16,7 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	[PASSIVE] is decorated: CODE is
 Chapters/17_Techniques--Metaprogramming.md	[PASSIVE] are called: Such methods are sometimes called *metamethods*.
 Chapters/17_Techniques--Metaprogramming.md	[PASSIVE] gets built: Decide whether an instance gets built: a metaclass CODE.
 Chapters/18_Techniques--Performance.md	[PASSIVE] 're done: Once you're done, you import a module that looks from the outside like any other Python module, except that it runs faster.
-Chapters/18_Techniques--Performance.md	[PASSIVE] was reached: The question is "was this reached," so a second report from the same location adds nothing, and after the first hit the monitored code runs at full speed again.
+Chapters/18_Techniques--Performance.md	[PASSIVE] was reached: The question is "was this reached," so the first report from a location answers it, and after the first hit the monitored code runs at full speed again.
 Chapters/19_Techniques--Concurrency.md	[PASSIVE] are suspended: The CODE responds by cancelling CODE and CODE, which are still suspended with far more sleep to go, so both stop before their CODE print.
 Chapters/20_Patterns--Rethinking_Objects.md	[PASSIVE] is compiled: Java is statically compiled, so substitutability matters.
 Chapters/21_Patterns--Design_Patterns.md	[PASSIVE] is reached: A design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".

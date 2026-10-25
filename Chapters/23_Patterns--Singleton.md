@@ -526,7 +526,7 @@ so `Any` is the one annotation that fits.
 Delegation gives up static knowledge to forward every name,
 as it does throughout [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr).
 
-When the inner object can be built before the first call,
+When the inner object is ready to build before the first call,
 you can create it eagerly in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Eager creation removes the sentinel, the guard,
