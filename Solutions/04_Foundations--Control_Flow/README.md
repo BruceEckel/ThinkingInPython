@@ -125,11 +125,6 @@ print(collatz_sequence(10))
 #: (6, 1)
 ```
 
-The sequence takes six steps, and one of them (`5 -> 16`)
-starts from an odd `n`.
-`odd_count` increments in the `else` branch,
-which computes `3 * n + 1` and runs only when `n` is odd.
-
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
@@ -263,7 +258,6 @@ The `finally` block still runs,
 since `finally` runs whether or not an exception is propagating.
 The `else` clause runs only when the `try` block finishes without an exception,
 so the `TypeError` bypasses the `else` clause too.
-The two lines of output come from `finally` and from the caller.
 
 **Catch the exception at the caller.**
 Because the `TypeError` propagates up past `divide_and_report()`,
@@ -506,9 +500,7 @@ An exception constructed in the `raise` statement joins the report the same way 
 A name bound by `except` is one such expression.
 
 **Compare the cause with the context.**
-The `print()` at `[1]` shows that both attributes hold an exception,
-and different ones.
-`__cause__` is the `ArithmeticError` you supplied,
+At `[1]`, `__cause__` is the `ArithmeticError` you supplied,
 and `__context__` is still the `ValueError` Python recorded on its own when `raise` ran inside a handler.
 The traceback reports the cause when one exists,
 so the context stays in its attribute and out of the report.
@@ -639,7 +631,6 @@ At position 0 the loop sees `2` and `remove()` deletes the first equal item,
 which is that same position-0 element.
 The second `2` shifts down into slot 0, which the loop has passed,
 so the next iteration looks at position 1 and finds `1`.
-The loop leaves the survivor behind in slot 0.
 
 The prediction covers more than "one survives."
 It says which item and where.
@@ -707,8 +698,6 @@ for text in (" 42 ", "4_2"):
 #: '4_2' None 42
 ```
 
-`int()` accepts both strings.
-`look_first()` rejects both.
 `int()` strips surrounding whitespace,
 and it allows an underscore between digits,
 the same rule that makes `10_000_000` a valid literal.
