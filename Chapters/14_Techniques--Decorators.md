@@ -336,7 +336,8 @@ A `repeat` without that comparison fails silently.
 Python binds `greet` to `decorate`.
 Calling `greet("Bob")` then runs `decorate("Bob")`,
 which wraps the string where it expects a function and returns the wrapper.
-Nothing prints, and that missing output is the only symptom.
+The call runs silently.
+That silence is the only symptom.
 
 The annotations let the type checker report the mistake either way,
 at the decoration rather than at the call.
