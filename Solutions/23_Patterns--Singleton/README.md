@@ -399,7 +399,7 @@ Assigning to `settings` points this module's name at a new dict.
 The name in `config` still points at the original empty dict,
 so the print at `[2]` shows `{}`.
 
-Nothing warns you at runtime.
+The runtime accepts the rebinding.
 The module still imports, the assignment succeeds,
 and the local `settings` holds what you put in it.
 But the sharing has ended.
@@ -544,7 +544,7 @@ With it they queue, so the run takes about 400.
 Each thread still builds its own `Settings` and still returns the one it built.
 `@cache` keeps whichever finished last,
 so seven callers hold objects the cache has overwritten.
-The lock makes the program slower and fixes nothing.
+The lock makes the program slower and leaves the race in place.
 
 The check and the store run inside `functools.cache`,
 which is where a per-key lock would go.
@@ -684,7 +684,7 @@ print(a.val, b.val, a.__dict__ is b.__dict__)
 ```
 
 Constructing an unrelated subclass overwrites a value belonging to `Singleton`.
-Nothing reports the overwrite.
+The overwrite passes silently.
 
 **Inherit the base's one dict.**
 `_shared_state` is one dict, and it lives on `Borg`.
