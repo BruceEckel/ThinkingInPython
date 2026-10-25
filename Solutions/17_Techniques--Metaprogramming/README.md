@@ -91,13 +91,12 @@ print(sorted(c.__name__ for c in Color.registry))
 ```
 
 **Register a new leaf.**
-Creating `Yellow` adds it to the registry and subtracts its one base, `Color`.
-The registry holds no `Color`, so the subtraction leaves the set as it was.
+The registry holds no `Color`,
+so subtracting `Yellow`'s one base leaves the set as it was.
 `Yellow` stays until Python creates a subclass of it.
 
 **Drop a base that gains a child.**
-Creating `Gold` adds it and removes its base, `Yellow`.
-Creating `PhthaloBlue` removes `Blue` the same way.
+Creating `PhthaloBlue` removes `Blue` the same way `Gold` removes `Yellow`.
 `__init_subclass__()` runs for every new subclass,
 so each new generation adds itself and prunes its parent.
 The `Color` class stays as written.
@@ -194,8 +193,6 @@ print(p.__dict__)
 because `__set_name__()` runs once per descriptor, at class-creation time.
 Python calls `__set_name__()` separately for `x`, `y`, and `z`,
 passing each descriptor its own attribute name.
-The `Field` instance bound to `z` receives the name `"z"` and stores the value of `p.z` under `"_z"`,
-apart from `"_x"` and `"_y"`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -306,9 +303,6 @@ instead.
 **Keep one instance per class.**
 `Singleton._instances` is a dictionary keyed by the class,
 so each class using the `Singleton` metaclass gets its own entry.
-The chapter's `singleton.py` stores one entry for `ASingleton` and one for `BSingleton`.
-This solution keeps both and adds an entry for `CSingleton`.
-Calling `CSingleton()` twice returns the same object both times.
 `ASingleton` is a separate key in that dictionary,
 so its instance is a separate object.
 
@@ -418,8 +412,6 @@ with expected(TypeError):
 **Accept the header keyword.**
 Python passes the keywords in a class header to `__init_subclass__()`,
 so creating `B` calls `A.__init_subclass__()` with `final=True` from the header `class B(A, final=True):`.
-Declaring `final` with a default, `final: bool = False`,
-gives every other subclass `False` and keeps its header short.
 
 **Pass the other keywords up.**
 The remaining `**kwargs` go on to `super().__init_subclass__()`,
@@ -428,7 +420,6 @@ which turns a misspelled keyword into a `TypeError` instead of a silent no-op.
 **Refuse any descendant of a final class.**
 The chapter's `final_runtime.py` hard-codes the refusal into `B`'s own `__init_subclass__()`.
 This version moves the decision into a set that `A` owns.
-`A.__init_subclass__()` walks `cls.__mro__` to check whether any ancestor declared itself final.
 
 `A.__init_subclass__()` refuses the first subclass of a final class as Python creates that subclass,
 so the hierarchy below a final class stays empty.
@@ -438,7 +429,6 @@ The `__mro__` walk stays because it states the rule as written,
 
 **Confirm a sibling stays open.**
 `Open` and `Sub` show that the rest of the hierarchy still subclasses freely.
-`A.__init_subclass__()` refuses only a class whose `__mro__` holds one of the classes in `A._final`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -700,9 +690,8 @@ the attribute lookup binds it to the instance.
 `Celsius` gets the default metaclass, the same one a `class` statement uses.
 
 **Inherit the base's arithmetic.**
-`Celsius` inherits `float`'s arithmetic, so `c + 0.5` works.
 Because `float.__add__()` builds its result from `float`,
-the sum is a `float` rather than a `Celsius`.
+the sum `c + 0.5` is a `float` rather than a `Celsius`.
 A numeric subclass therefore usually overrides every operator whose result should keep the subclass's type.
 
 Before you move on, name what separates your attempt from this one:
@@ -790,7 +779,6 @@ and computes its `__mro__` from those bases.
 The `bases` parameter of `__init__()` holds the same tuple `__new__()` received.
 A tuple is immutable,
 so `bases += (Tag,)` builds a new tuple and rebinds the local name `bases` to it.
-`Demo.__bases__` stays the same.
 Passing the longer tuple on to `type.__init__()` leaves the class as it was too,
 since `type.__init__()` checks its arguments and then ignores them.
 
@@ -1047,8 +1035,6 @@ Handlers().on_open()
 `KeepFirst.__setitem__()` returns early.
 Python still builds the second `on_open` function and passes it to `__setitem__()`,
 where the early return discards it.
-The name `on_open` still refers to the first function when the body finishes,
-as `Handlers().on_open()` proves.
 
 No class decorator can keep the first definition,
 and neither can `__init_subclass__()` or `__set_name__()`.
