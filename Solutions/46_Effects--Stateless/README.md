@@ -183,8 +183,8 @@ error[invalid-yield]: Yield expression type does not match annotation
   |                    expected `Never`
 ```
 
-`Success[None]` is `Effect[Never, Never, None]`: an Effect that needs nothing,
-fails with nothing, and returns `None`.
+`Success[None]` is `Effect[Never, Never, None]`:
+an Effect with empty Ability and error channels and a `None` result.
 `Never` in the yield channel means the function may yield no value of any type,
 so the `Need[Console]` that `yield from greet(name)` relays contradicts the annotation.
 
@@ -928,7 +928,7 @@ def make(name: str) -> Success[None]:
 <summary>Done when</summary>
 
 your four passes print `Hello, Alice!` and `Hello, Bob!` three times:
-the first pass over the stored Effects prints them, the second prints nothing,
+the first pass over the stored Effects prints them, the second runs silently,
 and both passes over the functions print them.
 You can say why a retry needs something it can call once per attempt.
 
@@ -982,7 +982,7 @@ for builder in builders.values():
 ```
 
 **Run each stored Effect twice.**
-The second pass over `built` prints nothing,
+The second pass over `built` runs silently,
 and `run()` returns `None` for each entry.
 An Effect is a generator, and a generator runs once.
 Resuming a finished generator raises `StopIteration` immediately,
@@ -1277,7 +1277,8 @@ and specifying that type makes the type checker compare its inference with the a
 `Dana` has none, so the lookup fails and the Effect ends before `format_score()`.
 In both cases each `yield from` relays the error value as is,
 through `announce()` and the `supply()` handler, to the driver.
-`run()` raises it as an ordinary exception because nothing along the way catches it.
+`run()` is the first code to act on the error,
+and it raises the error as an ordinary exception.
 Declaring a failure is not handling it.
 The declaration says the failure can occur.
 `catch()` turns it into a value the program handles.
