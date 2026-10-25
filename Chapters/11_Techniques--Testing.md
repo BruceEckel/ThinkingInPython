@@ -510,8 +510,8 @@ def test_bank_name_from_conftest(bank_name: str) -> None:
     assert bank_name == "Crunchy Frog Credit Union"
 ```
 
-Nothing imports either fixture.
-`pytest` finds them in `conftest.py` and supplies them by name.
+`test_fixtures.py` imports `Account` alone.
+`pytest` finds both fixtures in `conftest.py` and supplies them by name.
 
 `parametrize` multiplies the one test it marks.
 A parametrized fixture multiplies every test that requests it,
@@ -740,7 +740,7 @@ while the test hands it `Random(0)`.
 The randomness is now an input, not a hidden dependency.
 This technique is *dependency injection*:
 the caller hands the function its dependencies.
-The function fetches nothing on its own.
+The function works with whatever the caller supplies.
 
 The `4` in `test_dice_rng.py` is what `Random(0)` produces first.
 Its match with the stubbed value in `test_dice.py` is a coincidence.
@@ -903,7 +903,7 @@ and assert against what the calling code returns.
 ### Stubs and Mocks
 
 A stand-in like `fake_urlopen()` is a stub.
-It answers with a canned value and records nothing.
+It answers with a canned value and forgets each call.
 The standard library's `unittest.mock` appears in most existing test code.
 It builds stubs for you, and it builds *mocks*.
 A `Mock` goes further than a stub.
@@ -938,8 +938,7 @@ def test_negative_balance_sends_message() -> None:
 which is another `Mock` by default.
 `assert_called_once_with()` checks two things at once:
 that `send` ran exactly once, and that it ran with this argument.
-A stub such as `fake_urlopen()` records nothing about its calls,
-so it cannot make that check.
+A stub such as `fake_urlopen()` forgets its calls, so it cannot make that check.
 
 A `Mock` accepts a call the real function rejects,
 so a test keeps passing after the real signature changes.
