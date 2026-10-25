@@ -153,7 +153,6 @@ info: Function defined here
 ```
 
 The diagnostic marks the mistake the chapter describes.
-`"3"` is a `str`, not an `int`, so it violates `width: int`.
 At run time the call returns `"3333"`,
 because `"3" * 4` is valid string repetition.
 
@@ -225,11 +224,8 @@ print(last(["a", "b", "c"]))
 #: c
 ```
 
-`last()` mirrors `first()`: one type parameter `T`,
-inferred from the `list[T]` the caller passes.
 A call on a `list[int]` binds `T` to `int` for that call,
 and a call on a `list[str]` binds `T` to `str`.
-The type checker therefore infers that `last([10, 20, 30])` returns an `int` and `last(["a", "b", "c"])` returns a `str`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -406,7 +402,6 @@ print(words.top().upper())
 #: BETA
 ```
 
-With `= str` in place, `ty check` reports `str` for `reveal_type(words.top())`.
 Without the default, `ty` reports `Unknown` and finds no errors in the file.
 An unsolved type parameter becomes `Unknown`.
 The checker accepts any operation on an `Unknown` value,
@@ -684,7 +679,6 @@ The type checker accepts either version, because truthiness narrows too.
 The change is in which values reach which branch.
 `is not None` tests one condition, whether the value is missing.
 `if text:` tests whether the value is missing or empty.
-The function returns `"(nothing)"` for both.
 The function now treats an empty string the same as a missing value,
 including one a caller passed on purpose.
 
