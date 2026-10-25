@@ -106,7 +106,7 @@ In the direct run, shutdown destroys the objects,
 and shutdown is the precarious moment the warning describes.
 `Counter` and `print()` were still available,
 so each `__del__()` printed its line.
-Nothing guarantees the teardown order that kept them available.
+The teardown order that kept them available is an implementation detail.
 Make `__del__()` do as little as possible, and do not depend on it.
 
 The ignored exception the warning describes is the failure most likely to go unnoticed in production:
@@ -127,7 +127,7 @@ print("still running")
 #: still running
 ```
 
-Nothing printed to stdout reports the `RuntimeError`.
+The `RuntimeError` stays out of stdout.
 Python prints a traceback to `sys.stderr`, labeled `Exception ignored`,
 and discards the exception.
 No caller can catch the `RuntimeError`, the exit status is still `0`,
@@ -186,7 +186,8 @@ as it shows the cycle in this listing.
 
 The cyclic garbage collector frees the node.
 The collector is a separate mechanism that runs on allocation counts rather than when the object becomes unreachable,
-so in a real program nothing tells you when the collector runs.
+so in a real program the allocation counts, rather than your code,
+decide when the collector runs.
 `gc.disable()` above turns off that collector's automatic runs,
 and `gc.collect()` then forces a run,
 so the `a finalized` line marks the moment of destruction.
@@ -299,10 +300,10 @@ except RuntimeError as e:
 ```
 
 `C opened` has no matching `closed`.
-Nothing releases what `__init__()` acquired before it failed.
+The resource that `__init__()` opened before it failed stays open.
 
 One fix keeps `__init__()` free of resources and acquires them in `__enter__()`,
-so a failed construction has nothing to leak.
+so a failed construction ends before the first acquisition.
 A failure in `__enter__()` leaks the same way, though,
 because `__exit__()` runs only after `__enter__()` returns (see exercise 7).
 Whichever method acquires the resource,
@@ -414,7 +415,7 @@ so whatever holds `self.close` holds `Leaky` through it.
 A lambda that uses `self`, such as `lambda: print(self.name, "closed")`,
 holds the object through its closure.
 
-`Leaky` prints nothing, since its callback is waiting in the registry.
+`Leaky` stays silent, since its callback is waiting in the registry.
 No error reports the leak.
 With `atexit` left on, the callback runs as the program exits.
 A late `L closed` is then the one sign of the leak.
