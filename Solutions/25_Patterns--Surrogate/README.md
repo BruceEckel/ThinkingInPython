@@ -108,15 +108,12 @@ print(p.query())  # [2]
 **Answer `description` without building.**
 `description` is a property of `Lazy`,
 so normal lookup finds it on the class and stops there.
-The three reads build nothing, and each one increments `_answered`.
 
 **Build the real object on demand.**
 At `[1]`, `query` is the first name missing from the proxy,
-so `__getattr__()` runs, reports the count, and builds the real object.
-At `[2]`, `__getattr__()` runs again, finds `_real` set,
-and forwards the lookup with no report and no build.
+so `__getattr__()` runs and builds the real object.
+At `[2]`, `__getattr__()` runs again and finds `_real` set.
 
-The counter records how many requests the proxy answered without building `Expensive`.
 The proxy serves three requests from a string it holds from the start and defers the slow construction until the first `query()`.
 GoF's image proxy is the same design.
 It answers an image's size from stored numbers and loads the pixels when something first draws the image.
@@ -220,9 +217,6 @@ as it does in the chapter's `CountingProxy`.
 **Tally each call by name.**
 Where the chapter's `CountingProxy` keeps one total in an integer `calls`,
 this one keeps a `Counter` keyed by method name.
-`__getattr__()` receives the name of the attribute,
-so the wrapper adds one to that name's entry before forwarding the call.
-The final `print()` shows `f` called twice and `g` once.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -348,16 +342,11 @@ A new `Box` gives `b` its own owner count and leaves the data shared,
 so the solution copies the list before the write.
 
 **Share the data and count its owners.**
-`a` and `b` start out sharing one `Box`, and through it one list.
-`owners` counts the `CowList`s that point at that `Box`.
-`share()` copies a reference to the `Box` and increments `owners`.
+`owners` counts the `CowList`s that point at a `Box`.
 
 **Copy before a shared write.**
-`append()` copies the data only when `owners > 1`.
 `b.append(4)` decrements the shared `Box`'s count,
 since `b` stops referring to that `Box`.
-Then `append()` points `b` at a private `Box` holding a fresh copy of the data and appends to that private copy.
-`a` keeps the original `Box`, whose list still holds `[1, 2, 3]`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -631,8 +620,7 @@ so a released proxy raises a `RuntimeError` instead.
 with the limit set at `POOL_SIZE` objects instead of one.
 
 **Hand out a stand-in.**
-`acquire()` hands the client a `ConnectionProxy` in place of a `Connection`.
-The proxy forwards `query()` through `__getattr__()` and adds one action of its own:
+The `ConnectionProxy` that `acquire()` returns forwards `query()` through `__getattr__()` and adds one action of its own:
 returning that connection to the pool.
 [*Singleton*](../../Chapters/23_Patterns--Singleton.md)'s exercise 2 builds [the same pool](../23_Patterns--Singleton/README.md#a-pool-of-connections-instead-of-one-instance)
 without a proxy, so each caller there must remember to call `release()`.
@@ -648,7 +636,6 @@ so "must check that connection back in" becomes a guarantee.
 which the pool may lend to someone else.
 The check in `__getattr__()` then raises a `RuntimeError` on any later use of the proxy,
 so each connection serves one client at a time.
-The call to `c1.query()` after both blocks shows that error.
 
 `ConnectionProxy` is a protection proxy and a smart reference at once.
 It controls access, and it adds an action (the check-in)
@@ -871,8 +858,6 @@ the set a caller can reach through the surrogate's `__getattr__()`.
 
 **Refuse a narrower replacement.**
 `change_to()` compares the two sets and refuses the swap when the replacement drops a name the current implementation answers.
-The surrogate keeps its current implementation,
-so `s.g()` still works after the rejected swap.
 
 The type checker cannot make this decision.
 To make it, the checker would compare the type of the implementation the surrogate holds with the type of `new`.
