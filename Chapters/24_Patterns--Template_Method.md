@@ -14,7 +14,7 @@ You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.
 `TestCase.run()` is the template method.
 It calls `setUp()`, then your test method, then `tearDown()`.
-Constructing a `TestCase` runs nothing.
+Constructing a `TestCase` records the name of the test method to run.
 The test runner calls `run()` on the finished object.
 
 ## The Anchored Algorithm
@@ -107,7 +107,7 @@ rather than your code calling into a library.
 
 Only the type checker enforces `@final`.
 At runtime the decorator sets `__final__ = True` on the function.
-Nothing in the interpreter reads that attribute.
+The interpreter ignores that attribute.
 Your own code can read it.
 If you want an override to fail at runtime,
 the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
@@ -124,10 +124,10 @@ The `setUp()` and `tearDown()` in the opening example are hooks.
 `TestCase` supplies empty versions,
 so a test class overrides `setUp()` only when it has setup work to do.
 
-A forgotten step runs the base's `...` body, and nothing reports the omission.
-The do-nothing default also hides a misspelling.
+A forgotten step silently runs the base's `...` body.
+The empty default also hides a misspelling.
 `def customise1()` ('s' instead of 'z')
-adds a new method and leaves the base's do-nothing version in place.
+adds a new method and leaves the base's empty version in place.
 So every step override in these listings carries [`@override`](07_Foundations--Classes.md#marking-overrides-with-override).
 The type checker then rejects a method that overrides nothing.
 
@@ -410,7 +410,7 @@ passing functions takes fewer lines and needs no class hierarchy.
 The subclass form also makes each step optional,
 since the base supplies the `...` default.
 The function form makes a step optional by giving its parameter a default.
-With a do-nothing default,
+With `lambda: None` as the default,
 the loop calls both steps on every pass and needs no `None` test.
 `customize1` is a required parameter,
 so the type checker reports a call that omits it.
