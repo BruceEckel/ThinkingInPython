@@ -94,8 +94,6 @@ it gives all three channels the same `str`.
 `NewType` gives each channel a distinct type,
 so the annotation says which kind of value each channel carries,
 and a type checker rejects a value on the wrong channel.
-`Question` fills the `YieldType` position, `Answer` the `SendType`,
-and `Result` the `ReturnType`.
 The distinction exists for the type checker.
 At runtime, `Question("name")` returns the same `str` you passed in.
 
@@ -134,8 +132,6 @@ the type checker flags each `yield` in the body,
 because each one yields a `Question` where the annotation declares an `Answer`.
 It also flags each `next()` and `send()` in `drive_by_hand.py`.
 
-`next(conversation)` starts the generator and produces a `Question`.
-`conversation.send(Answer("Alice"))` provides an answer and produces the next question.
 The last `send()` resumes the body,
 which reaches `return` instead of another `yield`,
 so the generator returns its `Result`.
@@ -265,11 +261,6 @@ def drive(conversation: Generator[Question, Answer, Result],
             return stop.value
 ```
 
-`drive()` uses all three type parameters:
-`next()` produces the first `Question`,
-`send()`'s argument supplies the `Answer`,
-and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
-
 `show_state` adds the generator's state to each line of the trace.
 The default leaves it out,
 so an ordinary call shows the requests and the answers.
@@ -312,7 +303,6 @@ expect(StopIteration, conversation.send, Answer("Bob"))
 ```
 
 `GEN_CREATED` shows that calling `interview()` created the generator and ran none of its body.
-`drive()` then runs the body through all three questions.
 Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
 because whenever `drive()`'s code runs, the generator waits at a `yield`.
 After the `return`, the generator is `GEN_CLOSED`,
@@ -408,12 +398,10 @@ print(list(top()))
 ```
 
 "To exhaustion" means each `yield from` runs its target until that generator finishes.
-Until then, the inner generator yields its values one at a time.
 
 Exhaustion is transitive.
-`top()` delegates to `outer()`, which delegates to `one()` and `three()`.
-`list(top())` still receives one flat sequence.
-`top()`'s single `yield from` finishes when the last generator beneath it finishes.
+`list(top())` receives one flat sequence,
+and `top()`'s single `yield from` finishes when the last generator beneath it finishes.
 
 Without `from`, a bare `yield one()` yields the generator object as a single value,
 so `list(outer())` shows `<generator object one at ...>` in place of `'only'`.
@@ -441,9 +429,9 @@ print(list(report(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)']
 ```
 
-Each `item` `emit()` yields passes through `report()` to `list()`.
-`emit()`'s `return total` goes to `report()` alone,
-as the value of the `yield from` expression, which `report()` binds to `size`.
+The items `emit()` yields pass through `report()` to `list()`,
+but its `return total` goes to `report()` alone,
+as the value of the `yield from` expression.
 A `yield from` therefore works like a function call:
 `report()` calls `emit()` and gets its result back,
 while the values `emit()` yields still go to the driver.
@@ -451,8 +439,7 @@ while the values `emit()` yields still go to the driver.
 `drive_by_hand.py` and `drive()` read a generator's result by catching `StopIteration` and taking its `value`.
 `report()` has no `try`, because `yield from` manages the result for you.
 When `emit()` finishes,
-`yield from` catches the `StopIteration` and evaluates to the exception's `value`,
-the `12` that `emit()` returns.
+`yield from` catches the `StopIteration` and evaluates to the exception's `value`.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
@@ -510,18 +497,11 @@ for line in census(garden):
 #: 1 blue
 ```
 
-Each value in a `Tree` is a `Color` or another `Tree`,
-so a dictionary can hold plants and `Tree`s to any depth.
-For each nested `Tree`, `visit()` calls itself through `yield from`.
-
 A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`,
 and reaches the `for` loop at the bottom of the listing.
-
-Each `visit()` returns a [`Counter`](03_Foundations--Containers.md#counter)
-to the `visit()` that called it.
-The `yield from` expression evaluates to the subtree's `Counter`.
-The parent adds it to its own counts with `+=`.
-`census()` receives the count for the whole garden through its own `yield from` and yields one line per color.
+Each [`Counter`](03_Foundations--Containers.md#counter) travels the other way.
+A `visit()` returns its subtree's count to the `visit()` that called it,
+and the count for the whole garden reaches `census()`.
 
 Any iterable can follow `yield from`, including a list:
 
@@ -558,9 +538,6 @@ def collect(name: str) -> Generator[str, int, int]:
     return first + second
 ```
 
-Each `yield` produces a prompt for the driver,
-and the value the driver sends in reply becomes the result of that `yield`,
-so two `send()` calls bind `first` and `second`.
 `both()` delegates to `collect()` twice:
 
 ```python
@@ -675,13 +652,8 @@ print(drive(survey(),
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
-The listing imports `interview()` unchanged from `yield_from_delegates.py`,
-where `drive()` runs it directly.
 Here `interview()`'s `Result` arrives as the value of `yield from interview()` instead of as `stop.value` in the driver.
 `interview()`'s questions reach `drive()` through three generators rather than two.
-
-`survey()` then asks about a color,
-so the argument to `drive()` uses the dictionary union operator to add one more pair to a copy of `ANSWERS`.
 
 The outermost generator still needs code that calls `next()` and `send()`,
 so the listing ends with a `drive()` call.
@@ -740,10 +712,7 @@ g.close()
 
 `g.throw(ValueError("bad input"))` raises that exception at the suspended `yield "ready"`,
 inside `worker()`'s body, the same way the `with` block's exception does.
-`worker()` catches the exception, prints the message, and yields again,
-so the generator keeps running.
-Like `send()`, `throw()` returns the next value the generator yields,
-here `"recovered"`.
+Like `send()`, `throw()` returns the next value the generator yields.
 An exception that escapes the generator's body ends the generator and propagates out of `throw()` into the driver.
 
 `g.close()` raises `GeneratorExit` at the `yield` on which the generator now waits,
@@ -788,8 +757,6 @@ g.close()
 The driver calls `throw()` on the generator `outer()` returned,
 but `inner()` prints the `caught` line.
 `yield from` passes the exception down to the `yield` where `inner()` waits.
-`inner()`'s `except` clause handles it,
-so the `ValueError` stays inside `inner()`.
 `g.close()` raises `GeneratorExit` in `inner()` first,
 so the cleanup lines print from the inside out.
 A driver that holds the outermost generator can stop and clean up every generator beneath it.
@@ -816,8 +783,6 @@ expect(RuntimeError, s.close)
 ```
 
 `close()` requires the generator to finish.
-`stubborn()` answers `GeneratorExit` with another `yield`,
-so `close()` raises `RuntimeError: generator ignored GeneratorExit`.
 
 When a driver stops using a live generator before the generator finishes,
 the driver shuts it down with `close()`.
@@ -871,10 +836,6 @@ task_runner(deque([download(), index()]))
 #: download: checksum
 ```
 
-`task_runner()` gives the front job one `next()` per turn.
-When a job yields, the runner appends it to the back of the queue.
-When a job finishes, `next()` raises `StopIteration`,
-and the runner drops the job.
 Each `yield` suspends its job and returns control to `task_runner()`,
 which then runs the next job.
 The output interleaves the two jobs in a single thread,
@@ -927,16 +888,10 @@ task_runner([download(), index()])
 #: index: merge
 ```
 
-The queue holds each job paired with its latest request.
 `task_runner()` primes every job with `next()`, as a driver must.
-On each turn it prints the request and sends back the answer.
-That `send()` resumes the job until the job yields its next request.
-`answer()` looks the request up in `REPLIES` and returns `"ok"` for every other request.
-The queue rotates job to job as before.
 Now the runner also does `drive()`'s work,
 answering each request before the next turn.
 
-`download()` binds what it receives to `reply` and prints it.
 `index()` discards what it receives.
 A job that yields only to take turns can ignore the answer.
 
@@ -985,8 +940,6 @@ asyncio.run(main())
 ```
 
 `asyncio.sleep(0)` stands in for real I/O.
-In `countdown()`, the `await` goes to the event loop.
-The `yield` goes to `main()`.
 
 On each pass, `async for` awaits the generator's `__anext__()`,
 so the `async for` loop must appear inside an `async def`.
