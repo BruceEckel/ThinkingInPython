@@ -48,9 +48,7 @@ with expected(AttributeError):
 The constructor replaces the object's `__dict__` with the `dict` that the `**kwargs` parameter automatically creates.
 `m.more = 11` adds a key to that `dict`,
 as passing `more=11` to the constructor does.
-`vars(m)` returns the same `__dict__`,
-so its output lists every attribute `m` holds:
-the two keyword arguments and `more`.
+`vars(m)` returns that same `__dict__`.
 
 Because `**kwargs` is the only parameter after `self`,
 `Messenger` accepts keyword arguments alone.
@@ -68,8 +66,7 @@ With `Any`, the type checker accepts every operation on `m`.
 
 An ad-hoc attribute bag declares none of your attribute names,
 so the type checker cannot verify them.
-The `expected(AttributeError)` block reads `m.inof`, a typo for `m.info`.
-The type checker accepts `m.inof` because `m` is `Any`.
+The type checker accepts the typo `m.inof` because `m` is `Any`.
 At runtime the read raises an `AttributeError`.
 
 Instead of annotating every variable that holds a `Messenger`,
@@ -248,9 +245,7 @@ so a call site reads `result.mean` instead of `result[0]`.
 Because a `NamedTuple` is a tuple, you can also unpack it.
 Unpacking assigns by position,
 so a caller can still swap the mean and the count.
-`count, mean = summarize([1.0, 5.0])` runs, passes the type checker,
-and binds each name to the other's value,
-as `mean=2 count=3.0` in the output shows.
+`count, mean = summarize([1.0, 5.0])` runs and passes the type checker.
 Reading `result.mean` picks the field by name, whatever its position.
 
 Unpacking sets a `NamedTuple` apart from a data class.
@@ -310,7 +305,6 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
 Equal tuples hash alike,
 so the two are also the same `set` element or `dict` key.
-The `in` test finds a `Dimensions` in a `set` that holds a `Color`.
 The frozen data classes compare unequal,
 because a data class's generated `__eq__()` tests `other.__class__ is self.__class__` before it compares the fields.
 
@@ -373,10 +367,7 @@ as `Color(1, 2, 3) < Dimensions(1, 2, 4)` shows.
 Sorting a list of `Color`s orders them by `r`, then `g`, then `b`.
 The sequence of the field declarations sets that order implicitly.
 A frozen data class generates ordering methods only when the decorator receives `order=True`.
-`FrozenColor` leaves `order` at its default, `False`,
-so `<` between two `FrozenColor`s raises a `TypeError`.
-`OrderedColor` orders instances of its own class.
-Its generated `__lt__()` runs the same class test as `__eq__()`,
+The generated `__lt__()` runs the same class test as `__eq__()`,
 so comparing an `OrderedColor` with an `OrderedDimensions` raises a `TypeError`.
 
 Both listings write `@dataclass(frozen=True)` in full instead of `@record`,
@@ -435,8 +426,7 @@ so a `Point` works anywhere code expects a tuple.
 A `Point` also equals the bare `(1.0, 2.0)`,
 the same structural equality that `still_a_tuple.py` shows.
 
-Tuple operations return plain tuples: `p + (3.0,)` and `p[:1]` are `tuple`s,
-not `Point`s.
+Tuple operations return plain tuples.
 A subclass whose `+` and slicing must return its own type overrides `__add__()` and `__getitem__()`.
 The empty `__slots__ = ()` keeps a `Point` as small as a tuple.
 A subclass that declares no `__slots__` gives each instance a `__dict__`,
