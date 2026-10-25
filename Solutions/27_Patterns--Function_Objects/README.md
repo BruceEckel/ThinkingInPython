@@ -66,7 +66,7 @@ including the line that calls each command's `undo()`.
 <summary>Solution</summary>
 
 `command.py`'s commands print a line.
-A printed line has nothing to undo.
+A printed line stays printed.
 The solution therefore swaps in `Deposit`, a command that changes state,
 and borrows `command_pattern.py`'s `Macro` to hold the list.
 
@@ -857,7 +857,7 @@ A `for` loop runs in its enclosing scope,
 so `n` is one variable that the loop rebinds three times.
 All three lambdas close over that one variable rather than over its value.
 By the time anything calls them, the loop has finished and `n` holds 2.
-Nothing is wrong with the lambdas.
+The lambdas work correctly.
 They read the variable they name, at the moment of the call.
 
 **Capture the value at build time.**
