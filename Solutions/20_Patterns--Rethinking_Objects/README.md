@@ -159,10 +159,7 @@ print(plugged.tags)
 ```
 
 **Isolate the internal list.**
-The `tags` property now returns `self._tags.copy()`,
-as `numbers` returns a copy of its list and `bob` returns a `deepcopy()`.
 The caller mutates a throwaway copy.
-`plugged`'s real `_tags` keeps the items it had.
 
 Every new mutable field needs its own defensive copy.
 That repetition is the tedium that motivates freezing the data.
@@ -232,7 +229,6 @@ expect(TypeError, hash, immutable)
 ```
 
 **Mutate past the frozen field.**
-The type checker accepts the assignment, and Python runs it.
 `frozen=True` on `Immutable` blocks rebinding `immutable.bob`.
 The block applies to the field, not to the object to which `bob` refers.
 That object is now a mutable `Bob`.
@@ -383,7 +379,6 @@ info:     └── incompatible return types: `Weight` is not assignable to `Pr
 The comment lets the listing pass the book's type check while the call still runs and prints `4.5`.
 
 **Give each meaning its own type.**
-`Package.total()` still takes no arguments and returns the same float at runtime.
 The two `NewType` declarations make the two return types distinct,
 so the type checker now rejects a weight where `Priced` declares a price.
 
@@ -506,10 +501,7 @@ print(distance(TripleCoord(Triple(3, 0, 99)),
 #: 5.0
 ```
 
-`Triple` names its fields `a`, `b`, and `c`.
-A 2D distance uses two of them.
-`TripleCoord` wraps a `Triple` and exposes its `a` as `x` and its `b` as `y`,
-the two properties `distance()` reads.
+A 2D distance uses two of `Triple`'s three fields.
 `TripleCoord` supplies the `Coord` shape for `Triple`,
 the same way `PairCoord` supplies it for `Pair`.
 `distance()` stays as it is, because it reads `.x` and `.y` alone.
@@ -740,14 +732,12 @@ print(render("home"))
 ```
 
 `NullCache` is neutral the same way `NullLogger` is.
-`set()` discards the value, and `get()` always reports a miss.
 
 The `cache` parameter of `render()` has the type `Cache`, not `Cache | None`.
 It defaults to the shared `NO_CACHE`, the way `total()` defaults to `SILENT`,
 so `render()` has no `is None` branch on the cache.
 The `None` that `get()` returns stays in its return type,
 because a miss is information on which the caller acts.
-`render()` tests `cached` before using it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -895,8 +885,6 @@ once for an index and once for a slice.
 The counter treats both forms alike.
 
 **Find the routes past the overrides.**
-The subclass holds four elements and counts one append,
-the element that `append()` added.
 `extend()` and `insert()` both add elements through `list`'s own C implementation.
 That implementation writes the list's storage,
 bypassing the Python-level `append()` and `__setitem__()` you overrode.
@@ -904,8 +892,7 @@ Other routes past the counters include `+=` and `*=`.
 A future CPython could add another.
 
 **Route every mutation through a counter.**
-`CountingBox` reports `3 3 1`.
-The class holds a list rather than being one,
+`CountingBox` holds a list rather than being one,
 so every mutation made through `CountingBox` runs a method this class wrote.
 Each of those methods updates a counter.
 
@@ -1045,8 +1032,6 @@ Callers who care about the limit ask `full()` before pushing.
 **Keep the base guarantee.**
 `fill()` assumes a `Stack` whose `push()` always succeeds,
 so the fix keeps that guarantee.
-`BoundedStack.push()` accepts every item and discards the oldest to stay inside the limit.
-`fill()` now runs to completion on both classes.
 
 You give up the refusal.
 The original `BoundedStack` guarantees that it accepts at most two items.
