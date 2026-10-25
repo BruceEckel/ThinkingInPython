@@ -45,14 +45,12 @@ print(config is again is sys.modules["config"])
 #: True
 ```
 
-Two imports of `config`, but `config body runs` prints once.
 The first import of `config` (`[1]`)
 creates a new module object and stores it in `sys.modules` under the name `config`.
 Then Python runs `config.py` top to bottom,
 defining each module-level name in that module object.
 The second import (`[2]`) finds the entry and runs nothing,
 so the body runs once and builds one `settings` dict.
-The printed `True` shows that both names and the `sys.modules` entry are one object.
 The singleton here is not a rule a class enforces,
 but a lookup the import system performs.
 
@@ -72,10 +70,6 @@ print(settings)
 print(config.settings)
 #: {'theme': 'dark'}
 ```
-
-The write goes through the name `settings`,
-and the read through `config.settings` finds it,
-because both names refer to one `dict`.
 
 No class, no ceremony.
 For most singleton needs, a module solves the problem.
@@ -343,9 +337,6 @@ print(distinct_objects(settings))
 
 One thread finds `_instance` empty and builds it.
 The rest wait on the lock, and each finds `_instance` filled.
-Under the same eight-thread race,
-the cached version produces more than one object, usually eight.
-The locked version produces one, as the printed count confirms.
 
 `settings()` declares `global` for `_instance` and leaves `_lock` undeclared.
 The [mutate-versus-rebind distinction](#a-module-is-already-a-singleton)
@@ -426,7 +417,6 @@ print(distinct_objects(settings))
 
 Apart from the line it prints,
 the listing is `singleton_cached_race.py` plus the priming call.
-The eight threads now get back one object.
 The priming call runs in the module body,
 so the call is safe for the same reason the module form is.
 The import system runs a module body once,
@@ -498,17 +488,10 @@ while the class stores the attribute as `_OnlyOne__OnlyOne`.
 That lookup fails at runtime with an `AttributeError`,
 not at type-checking time.
 
-The outer class controls creation through its constructor.
-The first construction of an `OnlyOne` initializes `instance`.
-Every later construction reuses that inner object.
-Each construction, the first included,
-appends its argument to that object's shared list.
-
 `__getattr__()` delegates access.
 Python calls it only when ordinary attribute lookup fails,
 so a name the wrapper does not have, such as `val`,
 falls through to the inner object.
-The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 
 The proxying covers reads.
 An assignment such as `x.val = []` goes into the wrapper's own `__dict__`.
@@ -546,7 +529,6 @@ while a module shares its state with no class.
 The nested private class is optional.
 `SingletonClassVar` keeps the single instance in a class variable.
 `__new__()` is the method that creates an instance.
-Here it builds the single instance on the first construction and returns that instance from every construction:
 
 ```python
 # singleton_class_variable.py
@@ -614,9 +596,6 @@ class Singleton(Borg):
         self.val = arg
 ```
 
-Three `Singleton` objects, each built with its own argument,
-share one `__dict__`:
-
 ```python
 # singleton_borg_demo.py
 from singleton_borg import Singleton
@@ -680,7 +659,6 @@ def test_fixture_clears_shared_state() -> None:
     assert not hasattr(y, "extra")  # Reset ran
 ```
 
-`test_borg_shares_state_but_not_identity` confirms that the objects differ but share one set of state.
 `test_leaves_an_attribute_behind` writes an attribute into the shared dict,
 and `test_fixture_clears_shared_state` confirms that the next test finds it gone.
 
@@ -731,8 +709,6 @@ the machinery that invokes `__new__()` and then `__init__()`.
 After decoration, `type(Registry)` is `singleton`,
 so the same parentheses run `singleton.__call__()` instead.
 The wrapped class's constructor runs only when that method calls it.
-`__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
-so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 
 ```python
 # singleton_class_demo.py
@@ -752,12 +728,7 @@ print(first is second, second.name,
 #: True primary 3 ['spam', 'eggs']
 ```
 
-Only the first call constructs a `Registry`.
-Every later constructor call returns the cached instance,
-so `Registry("secondary", limit=99)` creates no new object.
-Its arguments appear once in the trace, on the `singleton.__call__()` line,
-and `__call__()` discards them.
-A caller who believes those arguments took effect holds an object configured by someone else.
+A caller who believes the arguments to `Registry("secondary", limit=99)` took effect holds an object configured by someone else.
 
 `isinstance()` requires a class, a tuple of classes,
 or a union as its second argument,
