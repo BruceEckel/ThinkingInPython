@@ -148,9 +148,7 @@ s.draw()
 #: Triangle.draw
 ```
 
-`shape_factory_objects.py`'s factory-object version needs a `_Triangle` that carries its own nested `Factory`,
-plus one `FACTORIES` entry mapping the name to an instance of that `Factory`.
-In the chapter file the `_Triangle` entry joins the entries for `_Circle` and `_Square`,
+In `shape_factory_objects.py` the `FACTORIES` entry for `_Triangle` joins the entries for `_Circle` and `_Square`,
 and `"Triangle"` joins the demo's list.
 The listing below shows the new shape alone:
 
@@ -369,11 +367,10 @@ GameEnvironment(GnomesAndFairies()).play()
 
 **Ask the factory for each product.**
 `GameEnvironment` does not name `Kitty`, `Warrior`, `Puzzle`, or `Weapon`.
-It calls `make_character()` and `make_obstacle()` on the `GameElementFactory` it receives.
 `GameEnvironment` stays as it was while a third concrete factory joins `KittiesAndPuzzles` and `WarriorsAndWeapons`.
 
-In `abstract_factory_protocol.py` the same factory declares no base class.
-In this second half you leave `make_obstacle()` out at first, then add it back:
+In `abstract_factory_protocol.py` you leave `make_obstacle()` out at first,
+then add it back:
 
 ```python
 # exercise_3_protocol.py
@@ -438,7 +435,6 @@ Python raises a `TypeError` at that construction, before the game runs.
 In `abstract_factory_protocol.py` no class declares that it satisfies the protocol,
 so constructing the factory is legal.
 The type checker reports the call that needs the protocol.
-Its diagnostic names the missing method.
 At runtime that version fails later, inside the game.
 `GameEnvironment.__init__()` raises an `AttributeError` when it calls `make_obstacle()`.
 
@@ -740,8 +736,6 @@ again: illegal values are unrepresentable.
 **Check before each change.**
 Placing the check in `topping()`, as `exercise_5.py` does,
 gives `PizzaBuilder` the same guarantee.
-The fifth `.topping()` call raises a `ValueError` before appending,
-so `self._toppings` holds at most four.
 Placing the check in `build()` lets the builder accept a fifth, sixth,
 or tenth `.topping()` call and silently accumulate an overlong list.
 That builder checks the count when `build()` runs,
@@ -1230,7 +1224,6 @@ and can load any module through `__import__()`.
 **Look the name up as a key.**
 `create_shape()` is the chapter's version,
 which looks `kind` up in a dictionary keyed on the same names.
-A `kind` missing from the table raises a `KeyError` that names the string.
 Nothing evaluates the string.
 
 The type checker verifies that every value in the table is a `ShapeMaker`,
@@ -1399,8 +1392,8 @@ The new `case` in `factory()` works when you call `Shape.factory("Oval")`,
 but the demo never makes that call.
 
 **Walk the whole hierarchy.**
-`all_subclasses()` yields a direct subclass and recurses into it before moving to the next one.
-The walk is depth first, so `Oval` comes out between `Circle` and `Square`.
+`all_subclasses()` walks depth first,
+so `Oval` comes out between `Circle` and `Square`.
 
 The generic `T` keeps the yielded classes typed as `type[Shape]` when the argument is `Shape`,
 the type `names()` requires.
@@ -1559,11 +1552,9 @@ print(unregistered(globals()))
 The type checker accepts `Hexagon` wherever code takes a `Shape`.
 Both the checker and ruff accept the module,
 since `Hexagon` is an ordinary class definition.
-`make("Hexagon")` raises a `KeyError` because the table has no entry for `Hexagon`.
-The error names the key rather than the class or the missing line.
+The `KeyError` from `make("Hexagon")` names the key rather than the class or the missing line.
 
 **Report the unregistered classes.**
-`unregistered()` walks a namespace and keeps every class that `issubclass()` accepts as a `Shape` and that `make.registry` lacks.
 `@runtime_checkable` allows the `issubclass()` call.
 The `obj is not Shape` guard drops the Protocol, which passes its own test.
 Calling `unregistered(globals())` at the end of the module, or from a test,
@@ -1716,9 +1707,6 @@ print(spawn("troll"))
 **Store each builder's prototype.**
 `prototype()` is a decorator factory,
 a [decorator that takes arguments](../../Chapters/14_Techniques--Decorators.md#decorators-that-take-arguments).
-The outer call takes the name and returns `register()`,
-which runs the builder once, stores the result,
-and returns the builder unchanged.
 The table is empty at its declaration and full by the time `spawn()` runs,
 because each `@prototype` line executes as the module loads.
 The chapter's `registry.py` relies on the same timing.
