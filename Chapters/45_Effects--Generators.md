@@ -628,8 +628,7 @@ except StopIteration:
 Each `send()` delivers its value to `manual()`'s own `yield`, which discards it.
 The `for` loop then resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
-The type checker reports nothing,
-because `manual()` is a valid `Generator[str, int]`.
+The type checker accepts `manual()` as a valid `Generator[str, int]`.
 The send channel appears in the declaration and goes unused.
 `yield from` forwards the values this loop drops.
 
