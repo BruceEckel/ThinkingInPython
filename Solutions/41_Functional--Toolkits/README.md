@@ -160,7 +160,7 @@ The difference from the chapter's `maxsize=2` run is the second `square(1)`.
 Under `maxsize=2` that call is a fourth miss,
 because computing `square(3)` has evicted `1` to make room.
 With a third slot the cache keeps every result,
-so `square(3)` evicts nothing and the second `square(1)` becomes a hit.
+so `square(3)` fills the third slot and the second `square(1)` becomes a hit.
 The comment on the `square(3)` call in `functools_lru_cache.py` says "Evicts 1,
 the least recently used," which is true of `maxsize=2` alone.
 
