@@ -1889,8 +1889,17 @@ the rest of the chapter for similar issues"; 15 passages cut in
 
 **Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
 deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the
-way R46 was; the 2026-10-25 book sweep that followed is its second
-sighting.
+way R46 was. The 2026-10-25 book sweep that followed (one Opus agent
+per file, 93 files, brief in `build/restate-2026-10-25/`) cut about
+1,700 lines of prose across 88 files, 1,949 deletions against 248
+insertions, and is the second sighting. Three keeps the sweep settled:
+a one-sentence lead-in above a test listing stays (it introduces the
+listing); a bold R22 step label stays with one reason sentence rather
+than going with its narration; and a cut that takes the only prose
+mention of a class name draws an `internal-names` hit, so the agent
+restores a sentence or the name joins that baseline. Four cuts took a
+reason along (chapters 04, 19, 30, 34, commit `73b3a3e9`), the shape
+to reread for: a narration whose last clause was the mechanism.
 
 ## Candidates
 
