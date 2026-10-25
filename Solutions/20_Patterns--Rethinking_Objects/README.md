@@ -252,7 +252,7 @@ They are one problem: a frozen wrapper around a mutable value.
 `frozen_leaky.py` shows the same two symptoms for a `list` field.
 
 The author of each class must make immutability go all the way down,
-one field at a time, because nothing enforces deep immutability.
+one field at a time, because `frozen=True` freezes a single level.
 Declare `tuple` rather than `list`, `frozenset` rather than `set`,
 `frozendict` rather than `dict`,
 and a frozen data class rather than a mutable one for any nested value.
