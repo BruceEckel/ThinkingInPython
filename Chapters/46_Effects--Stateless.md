@@ -155,7 +155,6 @@ import it.
 This chapter builds its own `Console` rather than using the one Stateless provides.
 [Built-in Dependencies](#builtin-dependencies), below, says why.
 
-`greet()` needs a `Console`, cannot fail, and produces `None`.
 Compare `greeter.py`'s `greet()` to the version that calls the built-in `print()`:
 
 ```python
@@ -322,12 +321,9 @@ except StopIteration:
 `need(Console)` builds a small generator that yields a `Need[Console]`,
 a frozen data class whose `t` field holds the requested class.
 `yield from` passes that `Need` out of `greet()`'s body.
-`next()` runs `greet()` up to that request and produces it.
 Nothing has printed at that point,
 because `greet()` has suspended inside `need()`,
 at the `yield` its `yield from` reaches.
-`send(Console())` answers the request and resumes the function,
-which prints its greeting and finishes, raising `StopIteration`.
 
 ## Supplying the Dependency
 
@@ -435,8 +431,6 @@ run(fallback(chosen)("Bob"))
 ```
 
 `fallback` is an ordinary handler, applied at the edge.
-`chosen` is `greet` with a second handler applied.
-The first run has `fallback` as its one handler, so the default answers.
 The second run wraps `greet()` in its own `supply()` first,
 and that inner `supply()` empties the Ability channel before any request reaches `fallback`.
 The handler nearest the Effect answers first,
@@ -478,7 +472,6 @@ print(run(constant), run(constant))
 
 The `run()` at `[1]` exhausts the generator.
 The `run()` at `[2]` drives that same exhausted object and gets an immediate `StopIteration` whose value is `None`.
-The generator stays finished, so it greets nobody and produces `None`.
 Calling `bound("Bob")` builds a fresh description, and that one runs.
 A second `bound("Alice")` builds a fresh one too.
 
@@ -532,7 +525,6 @@ with expected(MissingAbilityError):
 #: [MissingAbilityError] Need(t=<class 'greeter.Console'>)
 ```
 
-Running it raises a `MissingAbilityError`.
 If you remove the `# type: ignore`, `ty` rejects the program before it runs:
 
 ```text
@@ -754,7 +746,6 @@ The new Effect is the `Log` write inside `greet_logged()`.
 Every function on the path to it gains a `Need[Log]`,
 here `greet_logged()` and its caller `greet_all()`,
 while `greet()` keeps its signature.
-`supply()` now provides both a `Console` and a `Log`.
 
 Stateless still requires those edits.
 The type checker names each place that needs changing,
@@ -820,7 +811,6 @@ def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
     return nailer.force < material.strength
 ```
 
-`holds()` decides whether a nailer's force stays under a material's strength.
 `Material` and `Nailer` are distinct types,
 so `supply()` matches each request to one of them.
 [When Two Implementations Match](#when-two-implementations-match)
@@ -853,7 +843,6 @@ def test_holds(
 ```
 
 One test function covers four environments.
-`holds()` takes no arguments.
 `supply()` binds `material` and `nailer`,
 so the table reads as a matrix of environments rather than a list of arguments.
 A new `Material` adds one row for each nailer.
@@ -885,9 +874,6 @@ def test_greet_all(console: Console) -> None:
     assert log.entries == ["greeted Alice"]
 ```
 
-The test varies the console and checks the log,
-which holds the same entry under either `Console`.
-The test has two rows and two `Console` implementations.
 `greet_all()` and `greet_logged()` keep their parameter lists.
 The parameter-passed version adds a `console` argument to both,
 although `greet()`, one level further down, is the one function that uses it.
@@ -1073,8 +1059,6 @@ print(capture.messages)
 `Terminal` and `Capture` share no base class, and neither names the other.
 Both satisfy `Console` structurally, so `isinstance()` accepts either.
 `supply()` hands over whichever it examines first.
-`Terminal` prints Alice's greeting and `capture` stays empty.
-Swapping the two arguments sends Bob's greeting to `capture` rather than `screen`.
 `greet()` runs the same body in both runs.
 The type checker accepts both runs alike,
 because both bindings have the same type.
@@ -1132,8 +1116,6 @@ greet("Alice")  # [2]
 #: Hello, Alice!
 ```
 
-`register()` puts an instance in.
-`get()` looks up an instance by type, at the point where the program needs it.
 The type is the registration key,
 so `register(Console, Recorder())` binds an implementation to the type the caller requests.
 A dictionary matches the key exactly,
@@ -1258,7 +1240,6 @@ if __name__ == "__main__":
 #: body = 'fetched http://example.com'
 ```
 
-`Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
 Every `Depend` signature so far reads `Depend[Need[...], ...]`,
 while this one writes the Ability bare.
 One rule covers both cases: the channel holds Abilities.
@@ -1378,10 +1359,8 @@ def test_clock_never_waits() -> None:
     assert clock.waited == [0.01, 0.01, 0.01]
 ```
 
-`Instant.sleep()` records the request and returns.
 The same three sleeps take at least 30 milliseconds in `real_clock.py`.
-Here `clock.waited` records all three requests,
-and `Instant` answers each one at once.
+Here `Instant` answers each one at once.
 
 `delayed_sum()` runs the same body with either clock.
 The subclass goes through [`as_type(Time)`](#supplying-an-interface),
@@ -1484,7 +1463,6 @@ info[revealed-type]: Revealed type
 
 The revealed type is `Try[KeyError, int]` with [the alias](#the-effect-type)
 expanded.
-It needs nothing, can fail with a `KeyError`, and produces an `int`.
 The `Generator`'s first parameter carries [`A | E`](#the-effect-definition).
 `Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`.
 
@@ -1544,8 +1522,6 @@ def announce(
     console.print(f"{name}: {value}")
 ```
 
-`announce()` uses all three parameters of `Effect[A, E, R]`:
-it needs a `Console`, can fail with `KeyError`, and produces `None`.
 If you drop the `KeyError` from the annotation,
 the type checker reports an error at the `yield from score(name)` line.
 Every function on the path must declare the `KeyError`.
@@ -1712,12 +1688,6 @@ The Effect "succeeds" at producing either a score or a `KeyError` that reports t
 A raised `KeyError` is a failure.
 A returned `KeyError` is data.
 
-`reporter` is a function that builds an Effect,
-as its `Callable[[str], Success[None]]` annotation states.
-Given a `str`, `reporter` produces an Effect that needs nothing and cannot fail.
-`run()` drives that Effect,
-so `reporter("Alice")` comes first and `run()` second.
-
 `catch_score.py` has the same shape as `handler_blocks_except.py`.
 `supply()` wraps a function `run()` drives.
 The `catch()` here still works,
@@ -1761,7 +1731,6 @@ def read_score(name: str) -> int:
     return int(text)  # ValueError
 ```
 
-`read_score()` takes two steps, with one potential failure in each.
 The lookup raises a `KeyError` for an unknown name,
 and the conversion raises a `ValueError` for text `int()` rejects,
 like Bob's `"seven"`.
@@ -1810,7 +1779,6 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure moves into the result, so the error channel is empty.
 Each failure reaches the `match` in `all_handled()` as a value.
-`all_handled()` returns `Success[str]`.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moves to the result.
@@ -1842,7 +1810,6 @@ def test_one_unhandled() -> None:
         run(one_unhandled("Bob"))
 ```
 
-In `test_one_unhandled()`, Bob's assertion is `pytest.raises(ValueError)`.
 The failure the signature declares is the one the caller sees.
 A failure leaves the error channel in one of two ways:
 `catch()` moves it into the result, or `run()` raises it at the edge.
