@@ -66,8 +66,6 @@ and your explanation counts the clock readings in each version.
 <details>
 <summary>Solution</summary>
 
-The handler keeps the stored moment in the enclosing scope and updates it with `nonlocal`:
-
 ```python
 # advancing_clock.py
 from collections.abc import Callable
@@ -121,8 +119,6 @@ print(run(
 
 **Keep the moment between requests.**
 `ticking()` is a handler factory that stores a moment.
-The handler it returns answers each request with the current value,
-then advances the stored moment by `step`.
 `nonlocal` makes the handler stateful.
 Where `crossing` in `midnight.py` walks a two-element list and stops there,
 `ticking()` answers any number of requests,
@@ -140,9 +136,8 @@ so each request rebinds the enclosing variable and the stored moment carries ove
 
 **Reproduce the bug under the new handler.**
 `archive_twice()` is the original function.
-The first request names the file for January 1 and the second stamps the entry January 2,
-so the new handler reproduces the bug.
-It should, because the bug is in the function, not in the handler.
+The new handler reproduces the bug, because the bug is in the function,
+not in the handler.
 
 **Make the two strings agree.**
 `archive_once()` reads the clock one time and derives both strings from that value.
@@ -510,7 +505,6 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 **Slot a new source into the order.**
 The turbine takes 19:00 through 21:00,
 the hours the battery and the grid cover in the chapter's `sun_first` run.
-The battery supplies one hour, 22:00, after the windy range ends.
 
 `run_load()` needs no change.
 It asks for a `Source` at an hour and uses the source the handler returns.
@@ -648,10 +642,8 @@ run(handle(scripted(sequence))(run_load)(10, 2))
 
 **Force a re-request.**
 The run makes three requests for two hours of power.
-The first two return a `Dead` source that fails immediately.
-Each time, `run_load()` breaks out of the inner loop,
+Each time a draw fails, `run_load()` breaks out of the inner loop,
 leaves the `connected` block, and asks for another source.
-The third request produces a working one, which then covers both hours.
 The test checks that re-request behavior with a handler that answers from a list instead of weather,
 a clock, or a battery.
 
@@ -1171,11 +1163,7 @@ if isinstance(outcome, RetryError):
 ```
 
 **Run out of attempts.**
-Under `WEATHER`, `fetch()` reads the feed three times,
-and each attempt fails with the same `NotInteresting`.
-`retry()` stops with a `RetryError` carrying three identical failures.
-
-Retrying is the wrong behavior because this failure is deterministic.
+Retrying is the wrong behavior because this `NotInteresting` failure is deterministic.
 `WEATHER`'s headline is the same on every attempt,
 and `TOPICS` holds the same two topics,
 so `topic_of()` returns the same answer however many times it runs.
@@ -1601,7 +1589,6 @@ for version in (thrown, lifted):
 ```
 
 **Give both versions one type.**
-The two versions produce the same results, as the loop demonstrates.
 `reveal_type()` reports the same return type for both:
 `Generator[Need[Ticker] | Unavailable | Empty, Any, str]`.
 `thrown()` writes that union in its annotation.
