@@ -205,7 +205,6 @@ print(Counter.live_names())
 **Gather the live names.**
 A `WeakValueDictionary` reads like a `dict`,
 so `cls._instances.values()` yields the live `Counter` objects it currently tracks.
-The generator expression reads each object's `.name`.
 Iterating over a dictionary follows insertion order,
 which is the creation order,
 so the names need `sorted()` to come out in alphabetical order.
@@ -294,7 +293,6 @@ print("End of delete loop")
 **Build the same list.**
 The output is identical to the original version,
 which calls `append()` in a `for` loop.
-A comprehension calls `Counter(name)` once per name, in order.
 The resulting list again holds the only references to those three objects.
 
 **Drop the loop variable's reference.**
@@ -387,7 +385,6 @@ print(Counter.live_count())
 ```
 
 **Register each instance strongly.**
-The count stays at three.
 A `dict` holds a strong reference to each value,
 so `_instances` alone keeps every `Counter` alive, whatever `counters` does.
 `pop()` removes the list's reference.
@@ -606,7 +603,6 @@ print("after collect")
 ```
 
 **Form a two-object cycle.**
-Both finalizers run at `gc.collect()`, in creation order.
 A cycle through two objects behaves like the self-reference in `cycle.py`,
 which is the smallest cycle.
 Reference counting cannot reclaim either object, because each holds the other.
@@ -749,7 +745,6 @@ except RuntimeError as e:
 ```
 
 **Acquire the resource on entry.**
-`C closed` does not print for `Faulty`.
 Moving the acquisition from `__init__()` to `__enter__()` moves the leak with it.
 The `with` statement calls `__exit__()` only for a block it has entered,
 and it enters the block only after `__enter__()` returns.
@@ -758,8 +753,6 @@ An `__enter__()` that fails has not returned, so `__exit__()` does not run.
 **Release before re-raising the exception.**
 `__exit__()` runs in neither class, yet `Guarded` releases the resource,
 in the method that acquired it.
-Its `except` clause prints the `closed` line and then re-raises the exception with a bare `raise`,
-so the caller still sees `boom`.
 
 Acquiring in `__enter__()` still helps.
 A `Guarded` whose `__init__()` fails for some other reason holds no resource at that point.
