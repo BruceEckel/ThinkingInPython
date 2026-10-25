@@ -112,20 +112,14 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
 **Stand in for the blackboard.**
 `Rat` depends on the `Board` `Protocol`, not on `Blackboard`,
 so any class with the right methods can stand in.
-`FakeBlackboard` defines `claim()`, `spawn()`, `log()`, and `next_number()`,
-which satisfies the `Protocol` by shape.
-None of the four uses a real `Maze` or a `TaskGroup`.
 
 **Script the rat's choices.**
 The scripted return values from `claim()` decide which neighbor the rat keeps and where it spawns new rats.
-The rat keeps the first cell the loop finds open, `(0, -1)`,
-and spawns a rat at every open cell after that, here `(1, 0)` alone.
 
 **Stop the rat when the script ends.**
 Once the script runs out, `claim()` returns `False` for every cell,
 so the rat dead-ends on its second turn, the way it does against walls,
 and `run()` returns.
-The `False` default in `next(self.claim_results, False)` supplies those returns.
 If you call `next(self.claim_results)` without the `False` default,
 the fake works for the rat's first turn and fails on its second.
 The fifth `claim()` finds the script empty,
@@ -337,8 +331,8 @@ asyncio.run(main())
 #: 9 (5, 1) (7, 3)
 ```
 
-The listing prints the size of `unreached` and its smallest and largest cells,
-`(5, 1)` and `(7, 3)`, the corners of the right room.
+The smallest and largest unreached cells, `(5, 1)` and `(7, 3)`,
+are the corners of the right room.
 
 **Reuse the chapter's classes.**
 The classes come from the chapter, with six parts removed: rat numbers, logging,
@@ -369,8 +363,7 @@ Walls on all four sides of one cell are the smallest case.
 Every cell of the right room has open neighbors,
 yet the wall between the rooms separates each one from the entry.
 
-`Maze.entry()` scans row by row and returns the first open cell it finds.
-The first rat starts there,
+The first rat starts on the cell `Maze.entry()` returns,
 and every later rat starts on an open cell next to one that a rat occupies.
 The rats therefore stay inside the region of open cells joined to the entry,
 however many of them spawn.
@@ -617,10 +610,6 @@ asyncio.run(main())
 **Carry the `async` to every caller.**
 The one requested change forces three more edits,
 because a caller must `await` an `async def` to get its result.
-Once `claim()` is an `async def`,
-the `Board` protocol must declare it `async` too,
-`Rat.run()`'s comprehension needs `if await self.blackboard.claim(*pos)`,
-and `explore()` must `await` its own first claim.
 `spawn()` stays synchronous,
 because `create_task()` schedules the new rat and returns at once.
 
@@ -669,8 +658,6 @@ a different design, a detail, or an equivalent alternative.
 Exercises 4 and 5 both build on the same `robot_explorer` world,
 so `robot_world.py` holds that shared apparatus once,
 and each exercise imports the module.
-The module defines `Item` and its subclasses, `Room`, `Doors`,
-and `GameBuilder`:
 
 ```python
 # robot_world.py
@@ -902,21 +889,17 @@ print(game.robot.coins)
 
 **Register the item by subclassing.**
 `item_factory()` stays as it is.
-It searches `Item.__subclasses__()` for a class whose `symbol` matches the character it receives.
 `__subclasses__()` reports the subclasses that exist at the time of the call,
 so `class Coin(Item)` in `exercise_4.py` puts `Coin` on the list the factory searches.
 
 **Act through the shared interface.**
 `Room` and `GameBuilder` stay as they are too.
-`Room.enter()` calls `occupant.interact(robot, self)` through the shared `Item` interface,
-and `GameBuilder` gets each occupant from `item_factory()`.
 `GameBuilder` singles out `Robot` and `Teleport`, which need extra wiring,
 and accepts every other item as the factory returns it.
 
 **Give the robot a counter.**
-`Robot.__init__()` needs one new line, `self.coins = 0`, to hold the count.
-`robot_world.py` above carries that line,
-so `exercise_4.py` holds the `Coin` class and the demo.
+`robot_world.py` above carries the one new line in `Robot.__init__()`,
+`self.coins = 0`, so `exercise_4.py` holds the `Coin` class and the demo.
 
 Deriving `Coin` from `Food` instead breaks the maze.
 The cause is where the factory searches, not what `Coin` inherits.
@@ -1107,7 +1090,6 @@ A working maze always has a reachable `!`,
 so an exhausted search signals a broken maze.
 Here, running out of rooms is the ordinary way the food loop ends,
 so `solve()` returns `None`.
-The `while` loop's `is not None` test then ends the loop once the robot has eaten the last food.
 
 **Replan after every meal.**
 The search must run again after every meal because each meal changes both the search's start and its goal.
@@ -1290,7 +1272,6 @@ not approximately zero.
 A zero field means a zero kick.
 `step()` scales each grain's random displacement by the amplitude under that grain,
 so `uniform(-kick, kick) * 0.0` moves nothing.
-After 1200 steps every grain sits where the constructor scattered it.
 The view shows neither chaos nor a figure because no grain moves.
 It shows the initial random scatter, frozen.
 
@@ -1384,10 +1365,6 @@ print(plate.render(width=40, height=20))
 #: ##############**##:##.#:##############.#
 ```
 
-The figure is a grid:
-one vertical line down the middle of the plate and two horizontal lines cutting it into thirds,
-with the four edges filled in as well.
-
 The nodal lines are straight because the new field is a product of one function of `x` and one function of `y`.
 The product vanishes when either factor does.
 For `m = 2`, `sin(mπx)` is zero at `x = 0, 1/2, 1`, whatever `y` is,
@@ -1475,9 +1452,6 @@ for kick in (0.005, 0.05, 0.5):
 `kick=0.005` produces order too slowly.
 Each step displaces a grain by at most one percent of the plate,
 so a grain starting in the middle of a loud region needs hundreds of steps to walk anywhere near a nodal line.
-After 1200 steps agitation has fallen from `0.58` to `0.38`,
-roughly a third of the way,
-while the default kick was down to `0.00` by step 400.
 Rendered, this run still looks like noise with a faint trace of structure in it.
 The physics is correct, but the run needs more steps to finish,
 more than anyone wants to watch.
