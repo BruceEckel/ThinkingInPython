@@ -578,22 +578,16 @@ for value in [1, 2, 3, 4]:
 ```
 
 `both()` declares the same yield and send types as `collect()`,
-because `yield from` passes the inner generator's yield and send channels through to the driver.
-The sum each `collect()` returns goes to `both()`,
-which returns `None` and leaves the third type parameter at its default.
+because `yield from` passes both channels through to the driver.
+Its return type stays at the default, since `both()` returns `None`.
 
-`g.send(1)` becomes `first` inside `collect("alpha")` with no forwarding code in `both()`.
-`g.send(2)` supplies `second`, so `collect("alpha")` finishes,
-the `yield from` at `[1]` completes,
-and `both()` starts the `yield from` at `[2]` in the same call.
+`g.send(2)` supplies `second`,
+so `collect("alpha")` finishes and the `yield from` at `[1]` completes.
+`both()` starts the `yield from` at `[2]` in the same call.
 One `send()` therefore ends one inner generator and produces the first prompt of the next,
 which is why `alpha got 1 and 2` and `beta needs a value` sit on adjacent output lines.
-
-After its two delegations,
-`both()` adds the two sums and yields the total at `[3]`,
-which gives `send(4)` a value to return.
-Without `[3]`, `send(4)` would finish `both()`,
-and the loop would need a `try` for `StopIteration`.
+The `yield` at `[3]` gives `send(4)` a value to return.
+Without it, `send(4)` would finish `both()` and raise `StopIteration` in the loop.
 
 ### All Three Channels
 
