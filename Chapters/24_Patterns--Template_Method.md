@@ -300,7 +300,7 @@ That works, but it inverts the convention Python programmers expect.
 The next subclass author might restore the usual order out of habit.
 The reliable repair changes the framework.
 Separate construction from starting,
-and have the client call `run()` explicitly on a fully built object.
+and have the client call `run()` on a fully built object.
 So `ApplicationFramework` has no `__init__()`,
 and the client calls `MyApp().run()`.
 
@@ -469,7 +469,7 @@ Try each exercise before opening its [solution](../Solutions/24_Patterns--Templa
 2.  Repair `premature_engine.py` both ways:
     first reorder the two lines in `Greeter.__init__()`,
     then redesign `Framework` instead,
-    so clients construct the object and call `run()` explicitly.
+    so clients construct the object and then call `run()`.
     Which repair still protects a second subclass author who has not read this chapter?
 3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
     Run it, then run `ty` over it.

@@ -38,6 +38,7 @@ Chapters/05_Foundations--Functions.md	passed nothing: a value chosen to mean "th
 Chapters/06_Foundations--Modules_and_Packages.md	even: even inside a standard-library module
 Chapters/06_Foundations--Modules_and_Packages.md	even: even on a filesystem that treats the two names as one
 Chapters/06_Foundations--Modules_and_Packages.md	ever: not names your program ever deferred
+Chapters/06_Foundations--Modules_and_Packages.md	explicit: This book uses an explicit CODE by default
 Chapters/06_Foundations--Modules_and_Packages.md	never: Callers then never write the name of the submodule that defines CODE
 Chapters/06_Foundations--Modules_and_Packages.md	never: so that work never happens
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
@@ -186,7 +187,6 @@ Chapters/19_Techniques--Concurrency.md	only: Before 3.14 the guard was a Windows
 Chapters/19_Techniques--Concurrency.md	only: CODE switches only at an CODE
 Chapters/19_Techniques--Concurrency.md	only: CODE unifies backends that share only a result that arrives later
 Chapters/19_Techniques--Concurrency.md	only: Code reaches a heap allocation only through a reference
-Chapters/19_Techniques--Concurrency.md	only: Independent processes that communicate only over explicit
 Chapters/19_Techniques--Concurrency.md	only: It is a suspended function that runs only when the event loop resumes it
 Chapters/19_Techniques--Concurrency.md	only: It starts essentially empty and grows only as the program asks for more
 Chapters/19_Techniques--Concurrency.md	only: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency
@@ -258,6 +258,7 @@ Chapters/24_Patterns--Template_Method.md	overrides nothing: The type checker the
 Chapters/24_Patterns--Template_Method.md	want: If you want an override to fail at runtime
 Chapters/25_Patterns--Surrogate.md	even: even when the implementation defines a CODE of its own
 Chapters/25_Patterns--Surrogate.md	expensive: Provides "lazy initialization" to create expensive objects on demand
+Chapters/25_Patterns--Surrogate.md	explicit: With explicit forwarding
 Chapters/25_Patterns--Surrogate.md	itself: CODE calls itself when the name it reads is also missing
 Chapters/25_Patterns--Surrogate.md	itself: so a CODE that reads CODE calls itself forever
 Chapters/25_Patterns--Surrogate.md	names the cause: not the CODE that names the cause
@@ -267,6 +268,10 @@ Chapters/25_Patterns--Surrogate.md	only: Only the surrogate's current implementa
 Chapters/25_Patterns--Surrogate.md	only: Python calls it only after normal lookup fails
 Chapters/26_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
 Chapters/26_Patterns--Factory.md	even: even momentarily
+Chapters/26_Patterns--Factory.md	explicit: Explicit Registration with a Protocol makes the checker report a class that lacks CODE at the line that registers it
+Chapters/26_Patterns--Factory.md	explicit: Explicit registration fails the opposite way
+Chapters/26_Patterns--Factory.md	explicit: If registration is explicit instead
+Chapters/26_Patterns--Factory.md	explicit: as Explicit Registration with a Protocol does for a class that lacks CODE
 Chapters/26_Patterns--Factory.md	itself: CODE lets each subclass register itself
 Chapters/26_Patterns--Factory.md	itself: a new CODE subclass can register itself with no edit to existing code
 Chapters/26_Patterns--Factory.md	never: An import written only to trigger registration never uses that name
@@ -316,6 +321,8 @@ Chapters/33_Patterns--Visitor.md	only: Only mypy rejects it
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE receives CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
+Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: The alternative is an iterative walk with an explicit stack of pending nodes (see exercise 8)
+Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: which walks the same tree with an explicit stack and no recursion
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
@@ -367,6 +374,7 @@ Chapters/40_Functional--Foundations.md	want: A closure fits when you want to con
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
 Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to schedule so that every pair meets exactly once
 Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pair into rounds in which each player appears exactly once
+Chapters/41_Functional--Toolkits.md	explicit: using a list as an explicit stack
 Chapters/41_Functional--Toolkits.md	itself: *Recursion* expresses a repeated computation as a function that calls itself
 Chapters/41_Functional--Toolkits.md	itself: CODE states what to do with one element and delegates the nesting to itself
 Chapters/41_Functional--Toolkits.md	names the role: so the call names the role of the CODE
@@ -396,6 +404,9 @@ Chapters/43_Functional--Confidence.md	never: and never checks whether the wrappe
 Chapters/43_Functional--Confidence.md	only: CODE prints the two times only when you run the listing with CODE
 Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the counts
 Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result you want
+Chapters/44_Effects--Effect_Management.md	by hand: Something the programmer tracks by hand works in small programs
+Chapters/44_Effects--Effect_Management.md	by hand: and which technique from Effects by Hand applies to the rest
+Chapters/44_Effects--Effect_Management.md	by hand: nobody can imagine doing it by hand
 Chapters/44_Effects--Effect_Management.md	does it: Does it behave differently in a different environment
 Chapters/44_Effects--Effect_Management.md	does it: and does it fail silently or loudly
 Chapters/44_Effects--Effect_Management.md	does it: what does it change
@@ -464,6 +475,8 @@ Chapters/47_Effects--Stateless_in_Practice.md	only: and only the function can bu
 Chapters/47_Effects--Stateless_in_Practice.md	only: and whose body is only the success path
 Chapters/47_Effects--Stateless_in_Practice.md	only: so the only evidence is a bug report saying the log file is occasionally short by a few lines
 Chapters/47_Effects--Stateless_in_Practice.md	price: Assert that CODE attempts every price and writes once per purchase
+Chapters/A_Effect_Tracking.md	by hand: Effects by Hand counts five signatures to edit when a helper four calls below CODE needs a CODE Effect
+Chapters/A_Effect_Tracking.md	by hand: such as the CODE in Effects by Hand
 Chapters/A_Effect_Tracking.md	declares nothing: so an empty list can mean either a function declared pure or one that declares nothing
 Chapters/A_Effect_Tracking.md	names an effect: The row names an Effect
 Chapters/A_Effect_Tracking.md	never: or never
@@ -491,6 +504,8 @@ Solutions/07_Foundations--Classes/README.md	only: so the trace shows only the CO
 Solutions/07_Foundations--Classes/README.md	want: the form you want in a traceback or a debugger
 Solutions/07_Foundations--Classes/README.md	want: the form you want in output a user reads
 Solutions/09_Foundations--Class_Attributes/README.md	never: The checker accepts the declaration CODE and never checks that a method assigns CODE
+Solutions/10_Foundations--Cleanup/README.md	explicit: An Explicit CODE and a CODE Block describes when CODE calls CODE
+Solutions/10_Foundations--Cleanup/README.md	explicit: because the explicit CODE runs before the program has allocated enough objects to start an automatic pass
 Solutions/10_Foundations--Cleanup/README.md	only: CODE prints only because CODE's CODE backstop runs every still-alive finalizer as the interpreter shuts down
 Solutions/10_Foundations--Cleanup/README.md	only: Reference Cycles Delay Destruction shows CODE running only when CODE reclaims a cycle
 Solutions/10_Foundations--Cleanup/README.md	only: The CODE statement calls CODE only after CODE returns
@@ -559,6 +574,7 @@ Solutions/25_Patterns--Surrogate/README.md	only: CODE runs only when normal look
 Solutions/25_Patterns--Surrogate/README.md	only: Let only a CODE class create the CODE objects
 Solutions/25_Patterns--Surrogate/README.md	only: The Recursion Trap and Forwarding with CODE describe a method that Python calls only after normal lookup fails
 Solutions/25_Patterns--Surrogate/README.md	only: which runs only when normal lookup fails
+Solutions/26_Patterns--Factory/README.md	explicit: Explicit Registration with a Protocol registers classes with CODE
 Solutions/26_Patterns--Factory/README.md	itself: Each class registers itself
 Solutions/26_Patterns--Factory/README.md	never: The demo never uses the name CODE
 Solutions/26_Patterns--Factory/README.md	never: but the demo never makes that call
@@ -611,12 +627,19 @@ Solutions/41_Functional--Toolkits/README.md	exactly: so CODE yields exactly fift
 Solutions/41_Functional--Toolkits/README.md	only: Lazy Evaluation explains why CODE over an infinite CODE pulls only what it needs
 Solutions/41_Functional--Toolkits/README.md	only: The CODE version accepts only an integer
 Solutions/41_Functional--Toolkits/README.md	only: The chapter's CODE entry states that "CODE works correctly only for pure functions
+Solutions/42_Functional--Error_Handling/README.md	by hand: and Composing by Hand has the chain to adapt
 Solutions/42_Functional--Error_Handling/README.md	never: A successful CODE returns its CODE from inside the CODE block and never reaches CODE
 Solutions/42_Functional--Error_Handling/README.md	never: so it never propagates to the top-level handler that prints a traceback
 Solutions/42_Functional--Error_Handling/README.md	only: **Catch only the named types
 Solutions/42_Functional--Error_Handling/README.md	only: **Note only the failing path
+Solutions/43_Functional--Confidence/README.md	by hand: and it is the one Effects by Hand describes
 Solutions/43_Functional--Confidence/README.md	even: The exercise's comparison therefore comes out even at either precision
 Solutions/43_Functional--Confidence/README.md	never: A hand-written loop over CODE never tests CODE
+Solutions/44_Effects--Effect_Management/README.md	by hand: Each remaining Effect points to the technique from Effects by Hand
+Solutions/44_Effects--Effect_Management/README.md	by hand: Effects by Hand shows CODE taking its CODE and CODE Effects as parameters
+Solutions/44_Effects--Effect_Management/README.md	by hand: Effects by Hand shows the bookkeeping that each new Effect adds to every signature on the path
+Solutions/44_Effects--Effect_Management/README.md	by hand: and Effects by Hand covers the rest
+Solutions/44_Effects--Effect_Management/README.md	by hand: the technique from Effects by Hand applies instead
 Solutions/44_Effects--Effect_Management/README.md	never: with a CODE that CODE was never awaited
 Solutions/44_Effects--Effect_Management/README.md	only: Only an CODE may contain CODE
 Solutions/44_Effects--Effect_Management/README.md	only: so CODE needs only methods with matching signatures

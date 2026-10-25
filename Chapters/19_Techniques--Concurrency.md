@@ -1263,7 +1263,7 @@ if __name__ == "__main__":
     print([price for _, price in pairs])
 ```
 
-Everything `pool.map()` does is now explicit: starting each worker,
+The listing now writes out everything `pool.map()` does: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result carries its `order`).
 
@@ -2549,8 +2549,8 @@ is a small corner of the territory.
   built at Ericsson for telephone switches.
   Elixir is newer and built on Erlang's BEAM virtual machine.
 - **Communicating Sequential Processes
-  (CSP):** Independent processes that communicate only over explicit,
-  shared channels, rather than an actor's private mailbox.
+  (CSP):** Independent processes that communicate only over shared channels,
+  rather than an actor's private mailbox.
   This is the approach behind Go's goroutines and channels.
 - **Software transactional memory
   (STM):** Runs a block of code as an atomic transaction against shared memory,

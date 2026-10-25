@@ -369,8 +369,7 @@ an assignment to `crimson.red` would change every crimson in the program.
 The record's frozen fields reject that assignment,
 which makes sharing a `Color` safe for the same reason sharing a `Tile` is safe.
 
-`_pool` stays a plain dict with an explicit membership test,
-not a `defaultdict`.
+`_pool` stays a plain dict with a membership test, not a `defaultdict`.
 A `defaultdict` calls its `default_factory` with no arguments.
 `super().__new__(cls)` needs the class that asked.
 

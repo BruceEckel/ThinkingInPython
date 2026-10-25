@@ -739,7 +739,7 @@ which Python calls after a failed lookup on the instance.
 Python's operators and built-in functions look up an implicitly invoked special method this way,
 so the method must exist on the proxy's class.
 
-**Forward the special method explicitly.**
+**Define the special method on the proxy.**
 `__len__()` here delegates with `len(self.__implementation)` rather than `self.__implementation.__len__()`.
 Both give the same answer.
 `len()` reads better.

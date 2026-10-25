@@ -250,7 +250,7 @@ A surrogate that supplies its methods through `__getattr__()` fails an `isinstan
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
 not on the instance.
 `len(p)` and `print(p)` therefore skip the delegation,
-while an explicit `p.__len__()` delegates:
+while a direct `p.__len__()` call delegates:
 
 ```python
 # dunder_bypass.py
@@ -415,7 +415,7 @@ Both get an `AttributeError`, treat it as a missing `__setstate__()`,
 and copy the saved state into the new instance's `__dict__` instead of recursing.
 
 The guard raises an `AttributeError` for every name that starts with an underscore,
-though, including an implementation's `_helper()` and an explicit `p.__len__()` like the one in `dunder_bypass.py`.
+though, including an implementation's `_helper()` and a direct `p.__len__()` call like the one in `dunder_bypass.py`.
 A narrower guard, `if name == "_implementation"`,
 keeps forwarding those names and still works with `copy` and `pickle`,
 but a typo like `self._imp` recurses again.

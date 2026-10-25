@@ -255,7 +255,7 @@ a different design, a detail, or an equivalent alternative.
 > Repair `premature_engine.py` both ways:
 > first reorder the two lines in `Greeter.__init__()`,
 > then redesign `Framework` instead,
-> so clients construct the object and call `run()` explicitly.
+> so clients construct the object and then call `run()`.
 > Which repair still protects a second subclass author who has not read this chapter?
 
 <details>

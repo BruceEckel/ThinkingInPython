@@ -1470,8 +1470,8 @@ A slice of `view`, such as `payload`, holds the export open too.
 `bytearray.append()` needs to resize the buffer,
 so it raises a `BufferError` while an export is open.
 `data.append(1)` fails here because `view` and `payload` are both still alive.
-Release every view before resizing the buffer it reads, either explicitly
-(`view.release()`) or by letting the views go out of scope.
+Release every view before resizing the buffer it reads,
+either with `view.release()` or by letting the views go out of scope.
 
 The second trap is about direction, not lifetime.
 A `memoryview` over immutable `bytes` supports reading and slicing,
@@ -1594,7 +1594,7 @@ print(f"Numba at least 3x faster: {t_numba * 3 < t_python}")
 ```
 
 `njit(count_primes)` is the call that `@njit` above the `def` makes.
-The explicit call keeps the original `count_primes()` as the Python baseline.
+The function-call form keeps the original `count_primes()` as the Python baseline.
 Numba compiles `fast_count_primes()` at its first call.
 The `assert` makes that first call on a small input, before the timing starts.
 That call compiles `fast_count_primes()` and checks its answer against the Python version's answer,

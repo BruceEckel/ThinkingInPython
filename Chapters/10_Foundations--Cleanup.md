@@ -208,7 +208,7 @@ Two approaches are more reliable than `__del__()`.
 
 ### An Explicit `close()` and a `with` Block
 
-The first is an explicit cleanup method,
+The first is a cleanup method the caller invokes,
 such as the `close()` that file objects provide,
 which a [`with` block](04_Foundations--Control_Flow.md#context-managers)
 runs as the block ends.
@@ -526,7 +526,7 @@ which drops the instance's last strong reference.
 The interpreter collects the instance at once,
 and the weak reference's callback removes the instance's entry from the dictionary.
 The count falls `3, 2, 1, 0` as the list releases the objects,
-with no `__del__()` and no explicit cleanup call.
+with no `__del__()` and no cleanup call.
 
 A `dict` or `list` as the registry keeps every instance alive forever,
 so the count stays at its peak.

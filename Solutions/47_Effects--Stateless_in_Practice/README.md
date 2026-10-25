@@ -1912,7 +1912,7 @@ The accessor is the only place where the type checker verifies a caller's argume
 since once the accessor builds the request,
 the arguments are fields that the handler alone reads.
 
-Deleting the annotation on the handler's parameter produces an exception with an explicit message,
+Deleting the annotation on the handler's parameter produces an exception whose message says what to annotate,
 and it comes earlier:
 
 ```text

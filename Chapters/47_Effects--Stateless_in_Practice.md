@@ -1218,7 +1218,7 @@ an annotation that writes the union out, as `outcome()`'s return type does,
 or a `match` that ends with `assert_never()`.
 Without such a guard,
 the new failure becomes a value that reaches the caller unexamined.
-`catch()` makes each failure an explicit decision.
+`catch()` makes each failure a decision the source states.
 `catch_all()` decides for all of them at once.
 
 Two cautions.
@@ -1340,7 +1340,7 @@ Stateless has no such thing.
 and `handle()` answers an Ability with an ordinary function,
 so a constructor cannot be an Effect.
 That is why `bakery.py` has the shape it has.
-Leaves bind at the edge, products come from an explicit `yield from`,
+Leaves bind at the edge, products come from a `yield from` in the body,
 and the graph you can read is the union in the signature.
 
 ## Supplying a Whole Cast

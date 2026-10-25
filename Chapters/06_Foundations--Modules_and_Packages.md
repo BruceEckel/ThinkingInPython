@@ -460,7 +460,7 @@ and `from accounting import _Engine` works.
 The underscore changes one mechanical thing:
 `from accounting import *` skips every name that begins with one.
 
-`__all__` states the export list explicitly.
+`__all__` lists the exports.
 You assign it at module level as a list of strings naming the public names.
 `from module import *` then binds every name on that list,
 including one that begins with an underscore.

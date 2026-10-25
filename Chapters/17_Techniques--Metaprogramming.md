@@ -378,7 +378,7 @@ and `namespace[class_name]` is an `object`.
 Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
 `cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
-The explicit `namespace` also lets `make_class()` read the generated class back as `namespace[class_name]`.
+The `namespace` argument also lets `make_class()` read the generated class back as `namespace[class_name]`.
 Called inside a function with no namespace argument,
 `exec()` writes into a snapshot of the function's local variables.
 Since Python 3.13 (PEP 667), each `locals()` call in a function returns a new,

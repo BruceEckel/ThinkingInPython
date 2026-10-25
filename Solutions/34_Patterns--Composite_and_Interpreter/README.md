@@ -1475,7 +1475,7 @@ so it fails before reaching the bottom.
 
 **Defer the combine behind its children.**
 The recursive `evaluate()` combines two values when its two calls return.
-A stack version must arrange that moment explicitly.
+A stack version must arrange that moment in its own loop.
 A loop that pushes children and pops them gives a pre-order walk.
 That walk reaches each `Add` before its children,
 but an `Add` combines its children's values after the children have produced them.

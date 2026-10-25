@@ -965,7 +965,7 @@ since `flatten()` and `flatten_loop()` differ only in how they re-yield.
 The fix is the same `if isinstance(item, int | str)` test in the same place,
 and the `for x in flatten_loop(item)` branch stays as it is.
 The bug is in the test each version applies, not in the delegation,
-so `yield from` and the explicit `for` loop fail alike.
+so `yield from` and `for x in flatten_loop(item)` fail alike.
 
 `ty` accepts the list that triggers the bug.
 `Nested` reads as though a leaf must be an `int`.

@@ -540,7 +540,7 @@ shows `__del__()` running only when `gc.collect()` reclaims a cycle.
 Give each of two `Node` objects a `peer` attribute pointing at the other.
 For the second part,
 consider what triggers an automatic pass of the cycle collector,
-and what your explicit call to `gc.collect()` still decides.
+and what your call to `gc.collect()` still decides.
 
 <details>
 <summary>The shape</summary>
@@ -567,7 +567,7 @@ def self_link() -> None:
 
 your `cycle.py` prints `a finalized` and `b finalized` between `unreachable, but still alive` and `after collect`.
 You can say what makes the collector run once `gc.disable()` is gone,
-and why the explicit `gc.collect()` still keeps this run's transcript the same.
+and why the `gc.collect()` call still keeps this run's transcript the same.
 
 <details>
 <summary>Solution</summary>

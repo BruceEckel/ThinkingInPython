@@ -47,7 +47,7 @@ and that coexistence is *gradual typing*.
 You can slowly add hints where they help most: the public interfaces,
 the tricky data, the code on which other people depend.
 
-An explicit `Any` marks a value as dynamic.
+An `Any` you write marks a value as dynamic.
 `ty` reports the `Any` that comes from a missing annotation as `Unknown`,
 to distinguish it from an `Any` you wrote yourself.
 The two behave the same.
@@ -92,7 +92,7 @@ so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
 The `...` in `tuple[int, ...]` means zero or more `int`s.
 
 A function declares `-> None` when it returns `None`,
-explicitly or by reaching its end,
+by a `return` with no value or by reaching its end,
 so every `__init__()` in this chapter's listings carries that annotation.
 
 ## The Type Checker: `ty`
@@ -300,7 +300,7 @@ For a collection that must stay as it is,
 hold a tuple or a `frozenset` under the `Final` name,
 since neither type has a method that changes its contents (see exercise 10).
 
-You can give the type explicitly, as in `GREETING`,
+You can write the type in the annotation, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
 The two forms differ when the initializer says less than you mean.
 `CACHE: Final = []` infers `list[Unknown]`,

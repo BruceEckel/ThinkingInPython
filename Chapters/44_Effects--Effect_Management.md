@@ -123,7 +123,7 @@ The question has two answers:
     That bypass makes it difficult to reason about code.
     Functional programming avoids them altogether for that reason.
     A [*Total Function*](42_Functional--Error_Handling.md#total-functions)
-    returns errors as data in explicit wrapper types instead of raising them.
+    returns errors as data in wrapper types instead of raising them.
 
 For Effects, a different question matters more:
 does the exception pass from callee to caller?
@@ -491,7 +491,7 @@ happens at the edge of the program.
 ### Effects by Hand
 
 Every technique in [Converting Effectful to Pure](#converting-effectful-to-pure)
-manually manages one Effect, the exception.
+manages one Effect, the exception, in code you write.
 A `Result` tracks failure in the return type.
 A `try` binds the failure to a handler.
 A `NonZero` raises a `ValueError` in `__post_init__()`,
@@ -664,12 +664,12 @@ The `()` after the row is the return type: Koka's unit type,
 the counterpart of Python's `None`.
 
 The compiler infers the row from what the body calls
-(this listing explicitly writes the rows for `greet()` and `main()` so you can see them).
+(this listing writes the rows for `greet()` and `main()` out so you can see them).
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
 Since the compiler computes each row from the calls in the body,
 you rarely write a row yourself.
-You annotate explicitly to specify a constraint,
+You write one to specify a constraint,
 such as declaring that a function must remain Effect-free.
 
 A *handler* fulfills an Effect.

@@ -138,7 +138,7 @@ The `"os.*"` below it is `FileSystem`.
 Whole modules take one line each, which keeps the table short.
 
 A name that matches no pattern gets `UNKNOWN`.
-Because the table lists pure modules explicitly,
+Because the table lists pure modules by name,
 leaving a module out can add an `Unknown` and cannot hide an Effect.
 
 The key is the name as a programmer imports it,

@@ -106,7 +106,7 @@ whatever types the answer and the error have.
 
 ## A Result Type
 
-Defining success and failure as types makes them explicit.
+Defining success and failure as types puts them in the signature.
 `Ok` wraps an answer, `Err` wraps an error,
 and `Result` is the union of the two.
 The value's class is now the tag that tells the two cases apart,

@@ -17,7 +17,15 @@ stays), and a verb whose object is `nothing` (since 2026-10-24:
 "reports nothing", "changes nothing", "prints nothing", the verbs in
 `NOTHING_VERBS`; the positive form usually exists, "accepts", "leaves
 the list as it was", "prints an empty line", and a negation that is
-the claim stays). Tier 1 ("Consider rewriting") is a word with
+the claim stays), and the who-does-it family (since 2026-10-25, after
+the "by hand" sweep): `by hand`, `manually`, `explicit`, `explicitly`.
+Each says who writes something where the sentence could name what
+gets written: "checks each `Result` by hand" is "with `isinstance()`",
+"an explicit type test" is "a `match` with one `case` per type", and
+"passed explicitly" is "passed as an argument". A hit stays where the
+contrast with an implicit or generated form is the claim ("explicit
+is better than implicit", the explicit `self` parameter, an explicit
+`{#id}` on a heading against the auto-slug). Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -237,6 +245,9 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"earns?|earned|earning"),
         (2, r"bargains?"),
         (2, NOTHING_VERBS + r" nothing"),
+        (2, r"by hand"),
+        (2, r"manually"),
+        (2, r"explicit(?:ly)?"),
     ]
 )
 EVEN_AFTER: Final = re.compile(

@@ -639,7 +639,7 @@ as it does for `once` in `self_removing_responder.py`.
 
 For most programs, strong connections are fine.
 A broadcaster that lives no longer than its responders releases them when Python collects it.
-An explicit `disconnect()` covers a responder that leaves early.
+A `disconnect()` call covers a responder that leaves early.
 Use a weak responder only when a long-lived broadcaster holds short-lived responders that the program drops while they are still connected.
 
 ### Re-entrant Notification

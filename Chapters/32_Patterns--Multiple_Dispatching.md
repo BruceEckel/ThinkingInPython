@@ -206,7 +206,7 @@ Together the answers form a table spread across the classes.
 That table is hard to maintain.
 Changing who wins one pairing means editing two methods in two classes,
 and a new `Item` class needs a new method in every existing class.
-Making the table explicit puts all nine answers in one place:
+Writing the table out as data puts all nine answers in one place:
 
 ```python
 # paper_scissors_rock_table.py

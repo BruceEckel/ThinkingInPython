@@ -53,8 +53,7 @@ Python calls the constructor automatically when it creates an object.
 In the demo, `Simple("Constructor argument")` creates an object with what looks like a call to a function named after the class.
 
 Ordinary methods require a reference to the current object.
-When you define a method,
-you must explicitly specify the reference as the first parameter.
+When you define a method, you write the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
 but you can use any identifier (though anything else probably confuses people).
 To refer to the object's attributes or its other methods,

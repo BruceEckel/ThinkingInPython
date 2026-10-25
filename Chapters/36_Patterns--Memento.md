@@ -367,7 +367,7 @@ shares immutable values among objects that exist at once.
 
 Two kinds of state still need the classic form.
 Because freezing rebuilds the changed field on every edit,
-a state too large to copy per keystroke needs a mutable originator and an explicit `save()`.
+a state too large to copy per keystroke needs a mutable originator and a `save()` the caller invokes.
 So does a state whose class belongs to someone else: a widget tree,
 a database row, or any object whose class is theirs to design.
 Everywhere else, prefer the frozen value.
@@ -770,7 +770,7 @@ other libraries address both.
 A shape mismatch raises the library's `ValidationError` inside the load call,
 instead of the delayed `AttributeError` from `pickle_drift.py`.
 Protocol Buffers goes further.
-A schema shared across languages gives every field an explicit number.
+A schema shared across languages gives every field a number written in the schema.
 Old and new versions can then read each other's messages by design.
 All three read the bytes as data and run no code from them,
 which removes pickle's security risk.

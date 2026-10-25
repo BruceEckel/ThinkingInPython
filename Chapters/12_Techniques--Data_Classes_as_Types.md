@@ -49,7 +49,7 @@ An exception is a value like any other, and the values it carries deserve names.
 such as `needs an @`.
 A handler can read `e.subject` and `e.reason` rather than parsing them from the exception text.
 
-`check()` uses an explicit `raise` instead of `assert 1 <= stars <= 10`.
+`check()` uses a `raise` statement instead of `assert 1 <= stars <= 10`.
 Python strips every `assert` when you run with `-O` or `-OO`.
 `assert` is a debugging aid for an invariant the program's own logic guarantees,
 so the optimizer may remove it.

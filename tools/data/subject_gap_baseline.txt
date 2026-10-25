@@ -36,7 +36,7 @@ Chapters/21_Patterns--Design_Patterns.md	[dobj,prep] mapping .. is: A dictionary
 Chapters/21_Patterns--Design_Patterns.md	[prep] change .. force: Read the heavy edges first, because a change to the class at the head of a heavy edge can force an edit in the part at its tail.
 Chapters/22_Patterns--Iterators.md	[relcl] way .. is: The only way to find out whether the body accepts its arguments is to pull a value and let the body run.
 Chapters/22_Patterns--Iterators.md	[relcl] way .. is: The only way to find out whether the source has run out is to pull and receive CODE.
-Chapters/24_Patterns--Template_Method.md	[appos,npadvmod] CODE .. redesign: Repair CODE both ways: first reorder the two lines in CODE, then redesign CODE instead, so clients construct the object and call CODE explicitly.
+Chapters/24_Patterns--Template_Method.md	[appos,npadvmod] CODE .. redesign: Repair CODE both ways: first reorder the two lines in CODE, then redesign CODE instead, so clients construct the object and then call CODE.
 Chapters/25_Patterns--Surrogate.md	[acl,appos] identifiers .. means: Mangling rewrites identifiers, not string literals, so storing a double-underscore name through CODE means writing the mangled form, CODE, by hand.
 Chapters/25_Patterns--Surrogate.md	[advcl,appos,prep] calls .. stay: The two calls to CODE print different verses, though CODE and CODE stay the same between them.
 Chapters/26_Patterns--Factory.md	[relcl] language .. wrap: CODE includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.

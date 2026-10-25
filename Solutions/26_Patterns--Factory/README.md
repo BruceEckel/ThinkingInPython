@@ -900,8 +900,7 @@ The registry is correct, the subclass is correct, and the program still fails,
 because registration is a side effect of import and nobody imported the module.
 
 Real systems run the import deliberately.
-They import the plugin package explicitly at startup,
-walk a directory with `importlib`,
+They import the plugin package at startup, walk a directory with `importlib`,
 or declare entry points that the packaging system imports for them.
 
 `registry_demo.py` imports `Shape` and `make` from `registry`,

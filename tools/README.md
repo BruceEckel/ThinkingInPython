@@ -1444,7 +1444,9 @@ Lists the words in the style guide's three watch tiers, matched as whole
 words and phrases, case-insensitively, with the tier label on each
 hit. `[T3]` ("Don't use": `ships`, `lands`, `wants`, and the other
 metaphors) is a defect unless a human reads it as literal. `[T2]`
-("Avoid if possible": `already`, `even`, `never`, the commerce family)
+("Avoid if possible": `already`, `even`, `never`, the commerce family,
+and the who-does-it family `by hand`, `manually`, `explicit`,
+`explicitly`, since 2026-10-25)
 stays where the word changes the meaning. Tier 1 ("Consider
 rewriting": `only`, `itself`, `once`, `names`, and the rest) is
 advisory. A default run
