@@ -522,7 +522,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Marking Overrides with `@override`](../../Chapters/07_Foundations--Classes.md#marking-overrides-with-override)
 shows the decorator from `typing` on a method that replaces a base-class method.
-The renamed base leaves `Derived.show()` overriding nothing.
+The renamed base orphans `Derived.show()`.
 The program never calls `display()`, so its output stays the same.
 The decorator is for the type checker,
 so run the checker with and without `@override` and compare.
