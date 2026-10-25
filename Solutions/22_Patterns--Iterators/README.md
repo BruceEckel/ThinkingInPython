@@ -152,10 +152,6 @@ print(len(c))  # Still works after iterating over c
 Each `for` loop or `list()` call gets a fresh generator from a fresh call to `__iter__()`,
 so iterating over `c` leaves `c.start` alone.
 
-**Count from the `start` field.**
-`len(c)` computes its answer from `c.start`,
-so it returns the same count any number of times, before iterating or after.
-
 A generator cannot support `len()`.
 Once you call a generator function, you have the iterator,
 and an iterator's whole state is "how far through have I gotten."
@@ -330,8 +326,6 @@ print(list(sq))
 
 This `squares()` leaves out the chapter's trace line,
 since the exercise is about the second pass.
-Both fixes produce the values again on a second pass,
-one by storing and one by recomputing.
 The list holds every value for as long as the name lives,
 so a million items is a million items in memory.
 `Squares` holds one integer, `n`.
@@ -441,11 +435,6 @@ whatever the length of the stream.
 The two measurements in `tee.py` are this rule at its limits.
 Draining one branch first stretches the gap to the whole stream.
 Lockstep consumption shrinks it to a single item.
-
-**Hold the gap at `k` items.**
-`islice(ahead, k)` opens the gap, and the `zip()` loop holds it there.
-Each step takes one item from each branch,
-so the buffer keeps its size through the rest of the run.
 
 **Compare two gap widths.**
 One machine measured about 9,300 bytes at `k` of 100 and about 416,000 at `k` of 10,000.
@@ -633,9 +622,6 @@ If you pass the endless `OverStream` to `traverse()`, the call runs forever.
 `traverse()` stops only when `is_done()` reports the end.
 `count(1)` counts forever.
 `seen` gains an item on every step for as long as the call runs.
-The solution calls `is_done()`, `current_item()`,
-and `advance()` in a loop of 50,000 steps,
-so the run ends and the listing prints `len(endless.seen)`.
 
 ```python
 # exercise_7.py
@@ -851,9 +837,6 @@ Every path to the next value advances the iterator.
 `Peekable` adds one piece of state to a bare iterator: the next item,
 pulled early.
 That stored item restores the `current_item()` that GoF had and Python dropped.
-`peek()` reads a field rather than the source,
-so it consumes nothing and gives the same answer each time,
-as the three identical `2`s show.
 
 **Fill the buffer at construction.**
 `Peekable` pulls from the source before any caller asks for a value,
@@ -961,7 +944,6 @@ print(list(flatten_str([1, ["ab", [2]], 3])))
 ```
 
 **Descend until a leaf.**
-`flatten()` yields each item that is an `int` and recurses into every other item.
 `"ab"` is a `str`, so it goes to `flatten("ab")`,
 which iterates over it and gets `"a"`.
 That `"a"` is a `str` too, so `flatten("ab")` recurses into `flatten("a")`,
@@ -977,9 +959,6 @@ so it runs until Python raises a `RecursionError`.
 
 **Treat a string as a leaf.**
 The fix widens the base case rather than the recursive one.
-Testing `isinstance(item, int | str)` makes `str` a leaf,
-so `flatten_str()` yields each string whole instead of iterating over it.
-The return type widens to `Iterator[int | str]` to say so.
 
 `flatten_loop()` takes the identical fix,
 since `flatten()` and `flatten_loop()` differ only in how they re-yield.
@@ -1139,8 +1118,6 @@ If you take the skipping version, count what it drops and report the count.
 **Keep pulling until a match.**
 The skipping version is harder to write as a class.
 A generator can pass over an item.
-When `typed_skipping()` reaches an item of the wrong type,
-it skips the `yield` and its `for` loop moves on.
 A generator pauses inside its `for` loop at each `yield` and resumes there on the next call,
 so the loop that skips is the loop that yields.
 A class's `__next__()` starts over at the top on every call,
