@@ -143,12 +143,8 @@ with expected(KeyError):
 #: [KeyError] '^'
 ```
 
-The loop calls `operations["*"](6, 4)` the way it calls the other four entries.
 The calling code stays as it was.
 Supporting the new operator takes one function and one row in the table.
-
-`expected()` from the shared `exceptions` helper catches the missing-key `KeyError`,
-as it does in the chapter's `dispatch.py`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -208,8 +204,6 @@ print(double(10), triple(10), quadruple(10))
 ```
 
 Each call to `multiplier()` creates a new `multiply` closure with its own private `factor`.
-`quadruple` holds `4` independently of `double`'s `2` and `triple`'s `3`,
-the same way `double` and `triple` are independent of each other.
 Each function keeps its `factor` in its own closure cell, `__closure__[0]`,
 so `inspect.getclosurevars(quadruple).nonlocals` reports `{'factor': 4}`.
 
@@ -358,8 +352,6 @@ You can say why passing `high` by position defeats the goal.
 <details>
 <summary>Solution</summary>
 
-The solution presets `low` with one positional argument:
-
 ```python
 # exercise_5.py
 from functools import partial
@@ -393,7 +385,6 @@ The library rejects that placeholder as redundant, as the chapter says.
 Presetting `high` alone needs a `Placeholder`.
 `partial()` stores its arguments, and the signature check waits for the call,
 so building `partial(clamp, high=100)` succeeds.
-The partial fails at the call.
 `high` is positional-only, so the call must pass it by position.
 
 Passing `high` positionally means passing `low` and `value` first,
@@ -562,8 +553,6 @@ print(sorted(words, key=lambda w: w[-1]))
 ```
 
 **Write the expressions inline.**
-Both comprehensions compute what `map()` and `filter()` compute,
-with the expression written inline where the original passed a lambda.
 The chapter's rule of thumb picks the comprehension for an expression you write inline.
 
 **Change the sort key.**
@@ -665,8 +654,6 @@ print(tally(), tally(), tally())
 ```
 
 **Declare the name you assign.**
-`increment()` captures two names, `step` and `count`,
-but `count` alone needs the `nonlocal` declaration.
 `increment()` reads `step` the way `multiply()` reads `factor` in `multiplier()`,
 so Python finds `step` in the enclosing scope.
 `count` differs because `increment()` assigns it.
@@ -798,8 +785,6 @@ print([r.celsius for r in data])
 and `partial()` turns each into the one-argument callable `filter()` requires.
 
 **Narrow to the band.**
-Chaining the two filters keeps `b`, whose 25.0 Celsius sits inside the band.
-`a` falls below the band and `c` above it.
 The two filters commute, because each one tests the same original Celsius value.
 Applying the `colder_than()` filter first reports the same reading.
 
@@ -819,7 +804,6 @@ so the field's name and its value disagree.
 A stage that changes what a value means must run after every stage that reads the old meaning.
 
 **Show the input untouched.**
-`report()` and `converted_first()` both read `data` and leave it as it was.
 The Celsius values stay the same after both calls,
 so running either function again gives the same answer.
 
