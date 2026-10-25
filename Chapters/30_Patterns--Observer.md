@@ -68,9 +68,6 @@ class Subject[T]:
             observer.update(self, arg)
 ```
 
-`notify()` calls `update()` on every observer in the list,
-so one change to the subject's state runs every observer's `update()`.
-
 `Thermometer`'s `celsius` setter stores the new reading and calls `notify()`.
 Because a setter runs on every assignment to its attribute,
 every assignment to `celsius` notifies the observers:
@@ -253,8 +250,6 @@ class Broadcaster[T]:
 ```
 
 `Broadcaster` is `classic_observer.py`'s `Subject` with its three methods renamed.
-GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
-and `announce()`.
 The call inside `announce()`'s `for` loop changes as well.
 `Broadcaster.announce()` calls `responder(data)` where `Subject.notify()` calls `observer.update(self, arg)`,
 so a responder is any callable, a function included,
@@ -266,11 +261,6 @@ When a change has two parts to report,
 such as an attribute's name and its new value,
 the broadcaster packs them in a tuple and each responder unpacks it.
 A responder that needs no data ignores the argument it receives.
-
-`Broadcaster` announces data of any type.
-Its type parameter `T` sets the type of each notification.
-A class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
-and `announce()`.
 
 A responder returns `None`, as the `Responder` `type` alias declares.
 At runtime, `announce()` discards a responder's return value,
@@ -541,14 +531,9 @@ print(trace(Skipping()))
 #: ['once: 1', 'always: 2']
 ```
 
-`trace()` connects the same pair of responders to the broadcaster it receives,
-announces twice, and returns what the responders recorded.
-`once` receives the first change and disconnects itself.
-The `disconnect()` call removes `once` from the broadcaster's list,
+The `disconnect()` call inside `once` removes `once` from the broadcaster's list,
 while `announce()`'s loop goes on reading the copy,
-so `always` still receives this first notification.
-The second `announce()` copies the shortened list,
-so `always` receives both changes and `once` receives one.
+so `always` still receives the first notification.
 
 `Skipping` overrides `announce()` with a loop that reads `_responders`,
 the list that `disconnect()` changes.
@@ -637,24 +622,18 @@ and that leaves the weak reference dead.
 `WeakMethod` stores the instance and the function separately, both weakly,
 and rebuilds the bound method each time you call `ref()`.
 
-`announce(25.0)` runs while `plot` is alive,
-so the weak reference still has its target.
-`ref()` rebuilds the bound method `plot.redraw`, and `weak` stores it in `live`.
-`live` is a strong reference,
-so the `Plot` object stays alive while `live(celsius)` runs `redraw()` and prints `plot: 25.0C`.
+During `announce(25.0)`, `live` is a strong reference,
+so the `Plot` object stays alive while `live(celsius)` runs `redraw()`.
 When `weak` returns, Python discards the local `live`,
 and the responder again holds the `Plot` object through the weak reference alone.
 
-`del plot` removes the one strong reference to the `Plot` object.
-CPython's reference counting collects the object at once.
+After `del plot`, CPython's reference counting collects the `Plot` object at once.
 An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 such as PyPy, collects the object when its collector runs.
 The `gc.collect()` call runs that collector before `announce(30.0)`.
 In a program that leaves the timing to the collector,
 `weak` keeps calling `redraw()` until the collector runs.
 
-During `announce(30.0)`, `ref()` returns `None`,
-so `weak` prints its last line and disconnects itself.
 The copy that `announce()` iterates over makes a mid-notification disconnect safe,
 as it does for `once` in `self_removing_responder.py`.
 
@@ -681,9 +660,6 @@ with expected(RecursionError):
     t.celsius = 25.0
 #: [RecursionError] maximum recursion depth exceeded
 ```
-
-The responder assigns each reading back to `celsius`,
-so `Thermometer`'s setter calls `announce()` again from inside `announce()`.
 
 A guard breaks the cycle.
 `TwoWay` is a two-way binding whose setter returns early when the new value equals the stored one:
@@ -721,10 +697,6 @@ model.value = 1
 #: unchanged: 1
 ```
 
-The assignment `model.value = 1` announces 1,
-and `echo` prints `echo: 1` and writes 1 back.
-The setter finds the value unchanged, prints `unchanged: 1`,
-and returns before it reaches `announce()` a second time.
 `announce()` runs once, for the original assignment.
 
 The alternative is a re-entry flag, set before `announce()` and cleared after,
@@ -954,11 +926,8 @@ The `@property` form needs a method written in the class body for each attribute
 `published()` writes the pair once, as nested functions,
 and builds the property for any field name.
 
-`published()` takes a field name and builds the two functions a `property` needs.
-`read()` returns `self.__dict__[name]`, the value stored under that name.
 `write()` stores a new value (`[1]`) and then calls `announce()` with it
 (`[2]`), so every assignment to the field notifies the responders.
-`[3]` returns the pair as a `property()`.
 
 `announce()` comes from outside this file.
 It is a method of `Broadcasting`,
@@ -1221,12 +1190,6 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`announce(1)` builds its tuple of coroutines before either coroutine runs,
-so `always` stays in the tuple after `once` disconnects itself,
-and receives the first change.
-`announce(2)` builds its tuple from the shortened list,
-so `always` is the one responder left to receive the second change.
-
 ### A Failing Responder Orphans the Rest
 
 A failing asynchronous responder behaves differently from a failing synchronous one.
@@ -1351,15 +1314,9 @@ so the view can pass a `Color` to `tkinter` as a color name.
 
 `list(Color)` is the cycle of colors,
 because iterating over an enum produces its members in definition order.
-`Color.at(n)` counts `n` places around that cycle,
-and `n % len(members)` wraps a count past the last member back to the start.
 `at()` is a classmethod because it works on the whole set rather than a single member.
 (A class attribute holding the list becomes another member, because an ordinary assignment in an `Enum` body creates one.)
-Calling `next()` on a member finds that member's position with `index()`,
-then calls `at()` with the position after it,
-so `Color.KHAKI.next()` is `Color.SKYBLUE`.
 
-A `Grid` maps each `(column, row)` coordinate to a `Color`.
 `new_grid()` builds a square grid, `size` cells on a side,
 banded into three colors.
 A cell's color is `Color.at(x + y)`, so the cells along a diagonal,
@@ -1373,7 +1330,6 @@ Because a `Grid`'s keys are coordinates,
 `cell in grid` is `True` only for a coordinate inside the grid.
 The comprehension's `if` clause applies that test and skips any outside coordinates,
 so `recolored()` needs no grid size.
-The comprehension maps each cell that passes the test to its color's `next()`.
 The [dictionary merge](03_Foundations--Containers.md#dictionaries)
 builds the new grid.
 Every key on the right is also in `grid`,
@@ -1479,20 +1435,16 @@ if __name__ == "__main__":
     show(GridModel(8))
 ```
 
-`show()` makes a square canvas, `model.size` cells on a side,
-each cell `cell_px` pixels wide.
 `show()` defines `draw()` in its body,
 so `draw()` is a [closure](40_Functional--Foundations.md#closures)
 that reads `canvas` and `cell_px`.
-`draw()` paints one rectangle per cell,
-and the pixel corners come from multiplying the cell's column and row by `cell_px`.
 `draw(grid: Grid) -> None` is the shape `connect()` requires of a responder,
 and the view connects `draw()` to the model, so every change repaints.
 When the window opens,
 `show()` calls `draw(model.grid)` once to paint the starting grid.
 
-`draw()` starts with `canvas.delete("all")` to clear the canvas before repainting.
-Otherwise, each notification adds another `size * size` rectangles on top of the previous ones.
+Without `canvas.delete("all")`,
+each notification adds another `size * size` rectangles on top of the previous ones.
 The window looks the same,
 but the canvas's list of items grows with every notification,
 the same quiet accumulation as a [lapsed listener](#lapsed-listeners).
@@ -1622,13 +1574,8 @@ for char in "++-x":
 #: keys: ++-x
 ```
 
-`__post_init__()` connects a display method to each model,
-so each `View` connects itself to both models when you create it.
-`key()` is the controller, contained within `View` as a method.
 `key()` records the character in the history model and sends a request to the counter model,
 and each model pushes its new state to its display method.
-In the wildcard case matched by `x`, `key()` leaves the counter alone,
-so the four characters of `"++-x"` display four histories and three counts.
 
 Because `key()` writes to both models, `View` holds a field for each.
 `View` is also the one class that displays,
@@ -1711,14 +1658,11 @@ and the view connected to that model displays it.
 No view holds a reference to the controller, and the controller holds no view.
 The controller holds both models because it writes to both,
 while each view holds the one model it displays.
-`CountView` refers to `Counter` alone, and `HistoryView` to `History` alone.
 Each model announces to the responders it holds.
 
 That one-way flow is the benefit.
 Because each view receives announcements from its model alone,
 replacing the controller leaves the views working as before.
-`vim` reads `k` and `j` where `controller` reads `+` and `-`.
-`vim` takes the same two models.
 The views built earlier go on displaying,
 since the announcements they receive come from the models,
 whichever controller sent the request.
@@ -1726,8 +1670,7 @@ whichever controller sent the request.
 because the keys live in the `History` model,
 not in the controller that recorded them.
 
-`Controller` takes its keys as two fields, `up` and `down`.
-`key()` compares the character with them through [value patterns](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares),
+`key()` compares the character with `self.up` and `self.down` through [value patterns](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares),
 since `self.up` is a dotted name.
 
 The controller alone defines what the keys mean.
@@ -1849,8 +1792,7 @@ print(log)
 `_delta` is the thermometer's field,
 but the half degree is a judgment about what `display` needs.
 For `log`, which exists to record every reading, the same half degree is wrong.
-The thermometer announces two of the four readings.
-`log` misses the other two.
+`log` misses two of the four readings.
 `ThresholdThermometer` applies `_delta` to every responder alike.
 Nothing in its code shows that the threshold serves `display`.
 
