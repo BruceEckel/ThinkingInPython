@@ -208,7 +208,7 @@ so specify the requirement with a [`Protocol`](08_Foundations--Static_Types.md#s
 that lists `f()`, not with a base class to inherit.
 [*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
 makes the same substitution for a proxy's implementation.
-Here, `WhatIWant` is a `Protocol`, and the adapter inherits from nothing:
+Here, `WhatIWant` is a `Protocol` that the adapter matches by structure:
 
 ```python
 # protocol_adapter.py
@@ -272,7 +272,7 @@ print(Path(logo).suffix)
 #: .svg
 ```
 
-`Asset` inherits from nothing,
+`Asset` inherits from `object` alone,
 yet `isinstance()` reports it as an `os.PathLike`.
 At runtime, `os.PathLike` is an abstract base class whose `__subclasshook__()` accepts any class that defines `__fspath__()`.
 The type checker treats `os.PathLike` as a `Protocol`,
