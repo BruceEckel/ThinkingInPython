@@ -27,9 +27,9 @@
   <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
   <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">iter</text>
   <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">once, before</text>
-  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">the loop; the</text>
-  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">iterator keeps</text>
-  <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">the place</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">the loop; it</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">remembers which</text>
+  <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">item is next</text>
   <text x="657" y="34" font-size="10" fill="#7a6e62" text-anchor="end">hidden from the loop</text>
   <text x="552" y="52" font-size="10" fill="#7a6e62" text-anchor="start">nums</text>
   <rect x="552" y="60" width="40" height="30" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="3"/>

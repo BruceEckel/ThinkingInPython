@@ -1,8 +1,8 @@
 """Chapter 23, Iterators: four frames of one loop and its iterator.
 
 Four frames of one layout, so only the changes stand out. A `for` loop
-calls `iter()` once and gets an iterator that keeps the place in the
-list; each `next()` hands over one item; the next `next()` raises
+calls `iter()` once and gets an iterator that remembers which item of
+the list is next; each `next()` hands over one item; the next `next()` raises
 `StopIteration`, which the loop takes as its end; and `total()` makes
 the same calls on a list, a generator, or `Countdown` with no edit. The
 shaded region is what the loop cannot see: where the items come from.
@@ -98,8 +98,8 @@ def render() -> str:
     b = ""
 
     y0 = y[0]
-    b += frame(0, y0, "iter", ("once, before", "the loop; the", "iterator keeps",
-                               "the place"),
+    b += frame(0, y0, "iter", ("once, before", "the loop; it",
+                               "remembers which", "item is next"),
                "for x in nums", "it")
     b += text(HIDE_X + HIDE_W - 8, y0 + 24, "hidden from the loop", 10,
               MUTED, "end")
