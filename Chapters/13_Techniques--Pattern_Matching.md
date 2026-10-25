@@ -100,7 +100,8 @@ print(step("jump"))
 #: unknown command: jump
 ```
 
-The alternatives in `step()` are literals, which bind nothing.
+The alternatives in `step()` are literals,
+which compare the subject with a value.
 When alternatives do capture, each one must bind the same set of names,
 so the body can use those names whichever alternative matched.
 
@@ -276,8 +277,8 @@ print(locate(Point(3, 4)))
 #: At (3, 4)
 ```
 
-Despite the call syntax, a class pattern builds nothing.
-It tests the subject's type and reads its attributes.
+A class pattern looks like a constructor call,
+but it tests the subject's type and reads its attributes.
 
 Positional matching depends on `__match_args__`,
 a class attribute listing field names in order.
@@ -426,7 +427,7 @@ so it can use the names the pattern bound.
 When a guard is false, `match` tries the next `case`, but the names stay bound.
 Once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
-In `leaky()`, `case _:` binds nothing, yet `x` still holds `3`,
+In `leaky()`, the `x` that `case _:` returns holds `3`,
 left over from the failed guard in the case above it.
 Any name a later case leaves alone keeps the value an earlier,
 failed case bound.
@@ -538,7 +539,7 @@ With `as`, one pattern both tests the shape and keeps the object.
 The case at `[2]` is a one-element sequence pattern whose element alternates two class patterns.
 Either alternative binds `n`.
 The compiler enforces the [same-names rule](#alternatives-and-capture).
-Adding a third alternative `| Point(1, 1)`, which binds nothing,
+Adding a third alternative of literals alone, `| Point(1, 1)`,
 fails with `SyntaxError: alternative patterns bind different names`.
 
 Nesting has a set depth, the depth you write into the pattern.
@@ -857,7 +858,7 @@ Try growing the system in each direction.
 First, add a new type: a `Webhook` channel.
 In the inheritance version,
 you write one new subclass with its own `render()` and `cost()`.
-Nothing else changes.
+The rest of the program stays as it was.
 In the match version,
 you add a `Webhook` data class to the `Notification` union.
 The type checker then reports an error at `assert_never()` in both `render()` and `cost()`.
