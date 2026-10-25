@@ -144,7 +144,6 @@ print(person.hello())
 #: Everything is wonderful. Just wonderful.
 ```
 
-`Prozac` has the same shape as `Happy` and `Grumpy`: one `hello()` method.
 `UnpredictablePerson` names no specific mood,
 so adding a third mood changes which `Mood` object `change_to()` installs and leaves every line of `UnpredictablePerson` as it was.
 `UnpredictablePerson` is the [*State* surrogate](../../Chapters/25_Patterns--Surrogate.md#state),
@@ -328,14 +327,8 @@ print([mood.name for mood in Mood])
 `Mood.HAPPY` holds its greeting and `happy()`,
 the function that names its successors,
 so reading the member tells you what the mood says and where it can go.
-`PROZAC` needs no function of its own:
-its transition is a lambda that answers every input with `Mood.PROZAC`.
-The engine is the chapter's `StateMachine`,
-and the trace prints the inputs as the `StrEnum`'s words.
 
 **Let each mood pick its successor.**
-`happy()` answers `ANNOY` with `GRUMPY`, `grumpy()` answers `CALM` with `HAPPY`,
-and both answer `TAKE_PILL` with `PROZAC`, which stays put for everything after.
 The moods alone hold the transition rules,
 which distinguishes this design from the chapter's table-driven one,
 where the rules live in a dictionary a reader can audit in one place.
@@ -479,10 +472,6 @@ and `Enum` leaves a name whose value is a descriptor as a method rather than a m
 so each value is a one-element tuple holding the function.
 `Enum` unpacks the tuple into the row's constructor,
 as it unpacks the tuples in `trap_states.py`.
-
-The machine is the classic turnstile: `push` while locked keeps it locked
-(the `"*"` fallback), `coin` unlocks it,
-and `push` while unlocked locks it again.
 
 Reading the words from a file, one per line, takes one line of code:
 `words = Path("moves.txt").read_text().split()`.
@@ -721,8 +710,6 @@ whose one successor is `APPEARS`.
 
 **Remember the last move.**
 The generator's own state is just `previous`, the last action it yielded.
-Each time `list()` calls `next()` on the generator,
-the generator picks a legal successor and remembers it for the following call.
 `NEXT_ACTIONS` constrains every choice,
 so every sequence this generator produces is legal by construction.
 
@@ -913,8 +900,6 @@ print(busy.state.name, busy.load_kg)
 **Split one input on a condition.**
 The `(RINSING, RinseDone)` key holds the two rules the exercise requires,
 and `too_heavy()` tells them apart.
-A load over six kilograms takes the slow spin,
-and anything lighter falls through to the unconditional fast-spin rule below it.
 The rest of the cycle is a straight line, one input type per state,
 and the machine is still the chapter's `table_machine.py` engine unchanged.
 
@@ -924,9 +909,7 @@ so the condition reads `load_kg` off the machine,
 where `begin()` recorded it when the cycle started.
 
 **Reject an input with no rule.**
-A second `Start` during `FILLING` finds no rule,
-so `handle()` raises `NoTransition`.
-The press leaves the machine as it was.
+A second `Start` during `FILLING` leaves the machine as it was.
 The state is still `FILLING` and `load_kg` is still 3,
 because the engine runs an action only after it finds a matching rule.
 
@@ -1118,14 +1101,10 @@ The `(IDLE, CallButton)` key holds three candidate rules,
 in the vending machine's `(State.SELECTING, Column)` shape:
 candidate transitions share one key, `handle()` tries them in order,
 and the first whose condition passes wins.
-`above()` and `below()` pick `MOVING_UP` or `MOVING_DOWN`,
-and a call for the current floor falls through both conditions to open the doors with no travel.
 
 **Reopen the doors on an obstruction.**
-The "doors closing" state carries the two rules the exercise requires.
-Under `(DOORS_CLOSING, DoorSensor)`,
-the first rule reopens the doors when `obstructed()` passes,
-and the unconditional rule below it finishes the close in `IDLE`.
+The "doors closing" state carries the two rules the exercise requires,
+and `obstructed()` tells them apart.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1258,20 +1237,14 @@ for degrees in [15, 17, 21, 30, 20]:
 ```
 
 **Decide among three outcomes.**
-The machine has one input type.
 The `(IDLE, TemperatureReading)` key holds three rules,
 so a single reading leads to heating, cooling, or staying idle,
 and the two conditions decide which, as the exercise requires.
 
 **Run until back inside the band.**
 The running states carry their own two-rule groups.
-A reading still outside the band keeps the system running,
-and one inside the band falls through to the unconditional rule back to `IDLE`.
 
 Every decision in the machine is a condition on the one input type.
-Both fields are optional,
-so every rule here leaves its action at the `None` default,
-and the fall-through rules leave their condition at `None` too.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1416,8 +1389,7 @@ That lookup is the exact-type dispatch the chapter describes,
 and a subclass of an input type is how most readers first meet it.
 
 **Give the subclass its own rules.**
-Fix 1 adds `(state, Nickel)` rules.
-Those rules work, and they scale badly.
+Fix 1's `(state, Nickel)` rules work, and they scale badly.
 Every new denomination needs a rule for every state that accepts money,
 so a machine with five states and six coins carries thirty rules that all do the same thing.
 
