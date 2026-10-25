@@ -325,7 +325,7 @@ You can answer the closing question by stating what a later subclass author must
 <summary>Solution</summary>
 
 If you drop the `super().__init__()` call from `Greeter.__init__()` to avoid the trap,
-`Greeter("Brian")` completes and prints nothing,
+`Greeter("Brian")` completes silently,
 because the engine starts in `Framework.__init__()`,
 which `Greeter` now bypasses.
 The type checker accepts the class too.
@@ -511,7 +511,7 @@ Reversed().run()
 #: one
 ```
 
-Python objects to nothing.
+Python accepts the override.
 The anchored algorithm is no longer anchored.
 
 The type checker objects.
@@ -525,12 +525,11 @@ info: `ApplicationFramework.run` is decorated with `@final`, forbidding override
 
 The guarantee comes from the type checker, not the language.
 `@final` sets `__final__ = True` on the function.
-Nothing in the interpreter consults that attribute.
+The interpreter ignores that attribute.
 The *Template Method*'s central guarantee is therefore in the same category as every other annotation in this book.
 A tool enforces it before the program executes, and only when you run that tool.
 
-`@final` protects a codebase whose build runs a type checker,
-and protects nothing in a codebase that does not.
+`@final` protects a codebase only when its build runs a type checker.
 When the interpreter must refuse the override,
 use the `__init_subclass__()` check from the chapter's `near_miss.py`,
 which reads `__final__` from each method a subclass replaces.
@@ -600,7 +599,7 @@ class HalfDone(ApplicationFramework):
 `run()` on the first subclass lets your exception propagate out of `run()`,
 and `run()` on the second returns normally while printing evidence that `customize2()` never did its share.
 You can name a base-class change that makes the type checker report one subclass,
-and say why nothing reports the other.
+and say why the type checker accepts the other.
 
 <details>
 <summary>Solution</summary>
@@ -931,8 +930,8 @@ A misspelled step still fails at any depth of the hierarchy,
 because the check compares the methods of every subclass with the framework's three names.
 
 A misspelling of a name that a subclass introduced now passes the narrower check.
-If `Audited` meant to override `report()`,
-its `reports()` is a new method that nothing calls.
+If `Audited` meant to override `report()`, its `reports()` is a new method,
+and every call to `report()` still reaches `MyApp`'s version.
 The framework accepts it.
 `Audited`'s author must catch that misspelling,
 using the protection the chapter recommends for steps:
