@@ -1224,7 +1224,8 @@ and can load any module through `__import__()`.
 **Look the name up as a key.**
 `create_shape()` is the chapter's version,
 which looks `kind` up in a dictionary keyed on the same names.
-Nothing evaluates the string.
+The string stays data,
+so `create_shape(ATTACK)` raises a `KeyError` for an unknown key.
 
 The type checker verifies that every value in the table is a `ShapeMaker`,
 but it accepts the annotation on `maker` as written,
@@ -1736,7 +1737,7 @@ and leave `PROTOTYPES` as it was.
 The key type widens from the chapter's `Kind` to `str`,
 because an open table cannot list its names in advance.
 The builder is also a function,
-so `goblin()` still produces a fresh prototype on demand when a test needs one that nothing has touched.
+so `goblin()` still produces a fresh prototype on demand when a test needs one straight from its builder.
 
 Against that, the decorated form turns the table literal into a decorator plus a function for each monster,
 and repeats the name at every definition.
