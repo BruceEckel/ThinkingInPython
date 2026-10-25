@@ -24,7 +24,7 @@ a shared coordination object, and structural typing in one small program.
 A *maze* holds its own layout.
 Given a coordinate, it reports whether that cell is a wall or an opening,
 and it hands out an entry point.
-The maze decides nothing.
+The maze answers questions and leaves every decision to the rats.
 
 A *blackboard* is the shared surface on which every rat writes.
 *Blackboard* is a classic coordination pattern.
@@ -626,7 +626,7 @@ so no line of `items.py` looks `Room` up at runtime.
 The rats avoid the same kind of cycle with a `Protocol`.
 `blackboard.py` imports `Rat`.
 `rat.py` states what it needs from a blackboard in the `Board` `Protocol`,
-so it imports nothing from `blackboard.py`.
+so `rat.py` imports from the standard library alone.
 
 `Robot` holds its two pieces of state in different ways.
 `__init__()` assigns `finished`, so each robot owns its own flag from the start.
@@ -1302,7 +1302,7 @@ print(plate.render())
 
 Agitation collapses toward zero, and the picture shows why.
 The grains have gathered on the nodal lines of mode `(2, 3)`.
-Nothing steered them there.
+Random kicks alone carry them there.
 In a loud region the kicks stay large,
 so a grain keeps moving until a random step puts it near a nodal line,
 where the kicks shrink toward zero.
