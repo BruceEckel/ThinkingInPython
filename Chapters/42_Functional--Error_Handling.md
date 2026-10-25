@@ -59,7 +59,6 @@ except ValueError as e:
 
 Function calls 0-2 produce correct values,
 but the exception ends the comprehension before it produces the list.
-Control jumps past the assignment to `results` into the `except` clause.
 To keep the good results you must wrap each call in its own `try`.
 That repeats the handling at every call,
 the way [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
@@ -148,8 +147,7 @@ class Err[E]:
 type Result[A, E] = Ok[A] | Err[E]
 ```
 
-`Ok` and `Err` are both [records](18_Techniques--Performance.md#record),
-`Ok` parameterized over the answer type and `Err` over the error type.
+`Ok` and `Err` are both [records](18_Techniques--Performance.md#record).
 `@final` states that neither can have subclasses,
 so no class can inherit from both.
 The type checker therefore knows that an `Err` cannot also be an `Ok`,
@@ -160,7 +158,6 @@ placeholders for concrete types.
 `Ok[A]` declares `A` on its class and `Err[E]` declares `E`,
 so those two take concrete types when you use the class.
 Each `bind()` declares its own type parameters after its name.
-`Ok.bind()` declares `B` and `E`, and `Err.bind()` declares `B` and `F`.
 Those take concrete types at each call.
 The `E` of `Ok.bind()` is a separate parameter from the `E` that `Err` declares.
 Here the type parameters have no bounds or constraints,
@@ -192,8 +189,6 @@ if __name__ == "__main__":
 
 ### Reaching the Answer
 
-`func_a()`'s return type, `Result[int, str]`,
-says it returns an `int` on success or a `str` on failure.
 To get the answer, the caller must unpack the `Result`.
 `unwrap()`, a name borrowed from Rust, returns the answer an `Ok` holds.
 Reading the `answer` field returns the same value.
@@ -271,9 +266,7 @@ with expected(RuntimeError):
 #: [RuntimeError] not total after all
 ```
 
-`func_a(1)` returns a `Result` that the listing discards,
-and `lies()` raises an exception instead of returning the `Result` its signature declares.
-The type checker accepts both.
+The type checker accepts both the discarded `Result` and `lies()`.
 Discarding a return value is legal Python.
 A function that always raises an exception satisfies any declared return type,
 since the checker finds no returned value to compare with that type.
@@ -342,8 +335,6 @@ if __name__ == "__main__":
 #: 4 Ok(answer=4)
 ```
 
-`composed()` returns early when a step returns an `Err`,
-so each check tests for `Err`, the failure class.
 `Result` is a `type` alias rather than a class,
 so the type checker rejects `isinstance(a, Result)`,
 and at runtime the call raises a `TypeError`.
@@ -423,8 +414,6 @@ if __name__ == "__main__":
 #: 4 Ok(answer=4)
 ```
 
-The body is now one line that reads in order: `func_a()`, then `func_b()`,
-then `func_c()`.
 `bind()` replaces the `isinstance()` checks and early returns of `composing.py` with a chain of calls.
 
 Functional programmers call a type a *monad* when it has two operations:
@@ -521,15 +510,10 @@ if __name__ == "__main__":
 #: (7, 5) Ok(answer='add(7 + 5 + 12): 24')
 ```
 
-Each lambda's parameter is the previous step's answer.
 Because the nesting keeps every earlier answer in scope,
 `a` and `b` are still visible inside the innermost lambda that receives `c`.
 A flat sequence of `bind()` calls drops the earlier answers from scope,
 because each step's function receives one argument, the previous answer.
-
-An `Err` anywhere short-circuits to the end.
-`(7, 5)` is the one input of the five that passes all three steps,
-so `add()` runs for that input alone.
 
 Short-circuiting is right for a dependent chain,
 where each step needs the previous step's answer,
@@ -709,7 +693,6 @@ if __name__ == "__main__":
 
 `@safe` wraps both `parse()`, imported from `safe_demo.py`, and `reciprocal()`,
 so each returns a `Result` and `bind()` chains them.
-A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero each become the `error` field of an ordinary `Err`.
 
 `compute()` returns a `Result`, a value the caller keeps after the call returns,
 so the dict comprehension collects all three results before `describe()` matches any of them.
@@ -776,8 +759,7 @@ Notes accumulate.
 As the exception propagates,
 each `except` clause that catches and re-raises it can add a line built from its own frame's locals.
 The frame that raised the exception cannot see those locals.
-In `add_note.py`, `parse_seconds()` adds the first note,
-and `read_setting()` adds the second from its own parameter `name`,
+In `add_note.py`, `read_setting()` builds its note from its own parameter `name`,
 which `parse_seconds()` never receives.
 
 `add_note()` appends each note to a list, `__notes__`,
