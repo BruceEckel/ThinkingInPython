@@ -194,7 +194,7 @@ def test_total_over_any_iterable() -> None:
 ```
 
 Generators are lazy.
-`fibonacci(1_000_000)` computes nothing until you iterate over it,
+`fibonacci(1_000_000)` starts computing when you iterate over it,
 then produces one value at a time,
 so a generator works on streams too large to hold in memory.
 Iterating over a generator keeps one value alive at a time,
@@ -591,7 +591,7 @@ def test_islice_stops_after_its_count() -> None:
 
 `test_list_keeps_pulling_from_an_infinite_source()` is `list(count(1))` with a stopping point built into the source.
 In `test_the_if_clause_skips_but_never_stops()`,
-nothing after `2` satisfies `n < 3`,
+every value after `2` is 3 or more,
 yet the generator expression keeps pulling from `counter()` to find another match,
 until `counter()` raises the same `Tripwire`.
 
@@ -846,7 +846,7 @@ which the `for` loop absorbs on your behalf.
 You can catch that exception yourself,
 or hand `next()` a default to return at the end.
 Either way, the call that tests for the end consumes an item,
-where the GoF *Iterator*'s `is_done()` consumes nothing:
+where the GoF *Iterator*'s `is_done()` leaves every item in place:
 
 ```python
 # asking_consumes.py
@@ -922,7 +922,8 @@ The only way to find out whether the body accepts its arguments is to pull a val
 The only way to find out whether the source has run out is to pull and receive `StopIteration`.
 `for` and `list()` catch that second answer and stop,
 so an exhausted source and an empty one produce identical output.
-The protocol buffers nothing and reports nothing in advance.
+The protocol answers only after a pull,
+and it passes each value on as it arrives.
 Each tool in this chapter that answers in advance holds a buffer to give that answer:
 `tee()`, `OverStream`, and a `Peekable` wrapper (see exercise 8).
 
