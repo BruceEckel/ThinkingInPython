@@ -87,10 +87,8 @@ def test_transfer_overdraft_leaves_both_unchanged(
 ```
 
 **Fail before changing either account.**
-`transfer()` calls `self.withdraw(amount)` before `other.deposit(amount)`.
 `withdraw()` checks the balance and raises `InsufficientFunds` before touching `self.balance`,
 so an overdrafting transfer stops before the `deposit()` call.
-Both accounts keep the balances they had.
 
 **Pin the order with a test.**
 Writing the overdraft test first makes this ordering a deliberate decision rather than an accident.
@@ -255,7 +253,6 @@ def test_never_negative_after_deposit(
 Code after a fixture's `yield` runs as teardown,
 once the test function that uses the fixture finishes,
 whether it passes or raises an exception.
-Here that teardown is an assertion on the account's balance.
 Whatever either test does to the account,
 the balance must be zero or more once the test body returns control to the fixture.
 
@@ -580,8 +577,6 @@ The test then passes whether or not `send` runs,
 including against a `notify_negative_balance()` that always sends.
 To make the check, the stub must gain a record of its calls.
 Here that record is the list `sent`.
-The stub appends each message to it,
-and the test asserts that the list stays empty.
 
 A stub that records its calls is a mock written by hand.
 `Mock` builds that recording for you, along with the assertions that read it.
