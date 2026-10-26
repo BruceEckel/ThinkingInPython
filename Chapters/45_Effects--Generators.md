@@ -1032,7 +1032,7 @@ Simulations, games, and asynchronous I/O need to pass a value or an exception in
 so `send()`, `throw()`, and `close()` arrived together,
 and the PEP describes a scheduler that runs many generators as a "trampoline,"
 the shape of `task_runner_send.py`.
-`yield from` (PEP 380, Python 3.3) completed the set.
+`yield from` (PEP 380, Python 3.3, 2012) completed the set.
 A delegating generator passes all three channels through to the innermost generator,
 so you can compose a conversation from parts that never refer to their driver.
 
