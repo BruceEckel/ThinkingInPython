@@ -120,7 +120,7 @@ print(run(
 **Keep the moment between requests.**
 `ticking()` is a handler factory that stores a moment.
 `nonlocal` makes the handler stateful.
-Where `crossing` in `midnight.py` walks a two-element list and stops there,
+Where `crossing` in `midnight.py` walks a two-element list,
 `ticking()` answers any number of requests,
 so the same handler serves an Effect that reads the clock three times or thirty.
 Each call to `ticking()` builds a fresh handler with its own stored moment,

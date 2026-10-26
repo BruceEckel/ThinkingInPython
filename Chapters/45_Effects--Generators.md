@@ -1180,12 +1180,11 @@ the iterable is `[1, 2, 3, 4]` and each step adds its element to the running tot
 each step needs the previous pair alone.
 The iterable's one job here is to decide how many steps `accumulate()` takes,
 and `repeat(None)` is endless, so the chain of pairs is endless too.
-[`islice()`](41_Functional--Toolkits.md#islice)
-takes the first `n` pairs and stops asking,
+[`islice()`](41_Functional--Toolkits.md#islice) takes the first `n` pairs,
 and the comprehension keeps the first number of each pair.
 
-The placeholder shows what the toolkit lacks.
-A fold consumes an input.
+Needing `repeat(None)` as a placeholder shows that `itertools` lacks the right operation.
+A fold like `accumulate()` consumes an input.
 A sequence built from a start value and a step needs the opposite operation,
 an *unfold*, and `itertools` has no function for it.
 The third-party `more-itertools` package supplies one as `iterate(func, start)`,

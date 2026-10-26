@@ -412,8 +412,8 @@ print(list(nums))
 #: []
 ```
 
-`any()` pulls values until one matches, so it consumes `0` through `5`,
-reports `True`, and stops.
+`any()` pulls values until one matches,
+so it consumes `0` through `5` and reports `True`.
 Stopping there leaves the generator part-way through, not empty.
 `sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
 giving `230` of the full range's `285`.

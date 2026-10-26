@@ -1393,7 +1393,7 @@ the best any number of cores can do is:
 
     speedup(n) = 1 / (s + (1 − s) / n)
 
-As *n* → ∞, that ceiling approaches 1 / *s* and stops climbing.
+As *n* → ∞, that ceiling approaches 1 / *s*.
 A job that spends 10 percent of its time in serial overhead speeds up at most tenfold,
 on 16 cores or 1,600.
 

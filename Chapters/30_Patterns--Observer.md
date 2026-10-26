@@ -539,7 +539,7 @@ so `always` still receives the first notification.
 the list that `disconnect()` changes.
 `once` is at index 0 and `always` at index 1.
 Removing `once` moves `always` to index 0, which the loop has visited,
-so the loop looks for index 1, finds the list ended there, and stops.
+so the loop looks for index 1 and finds the list ended there.
 The second marker shows `always` missing the first change,
 with no exception to report the skipped responder.
 

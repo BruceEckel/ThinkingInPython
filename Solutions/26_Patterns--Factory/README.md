@@ -1385,7 +1385,7 @@ for shape in [Shape.factory(s) for s in shape_name(6)]:
 **Show what one level misses.**
 `_Oval` is a direct subclass of `_Circle`,
 one level below `Shape`'s direct subclasses,
-so `Shape.__subclasses__()` lists `_Circle` and `_Square` and stops.
+so `Shape.__subclasses__()` lists `_Circle` and `_Square`, leaving `_Oval` out.
 The original `shape_name()` draws from that list,
 so every name it yields is `"Circle"` or `"Square"`.
 The new `case` in `factory()` works when you call `Shape.factory("Oval")`,
