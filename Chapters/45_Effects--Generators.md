@@ -1176,9 +1176,9 @@ so the state travels as a value instead of living in a stack frame.
 
 In `itertools_accumulate.py` from [Toolkits](41_Functional--Toolkits.md#accumulate),
 the iterable is `[1, 2, 3, 4]` and each step adds its element to the running total.
-`fibonacci()` has no list of elements to fold:
+`fibonacci()` folds `repeat(None)`, whose elements carry no information:
 each step needs the previous pair alone.
-The iterable's job here is to decide how many steps `accumulate()` takes,
+The iterable's one job here is to decide how many steps `accumulate()` takes,
 and `repeat(None)` is endless, so the chain of pairs is endless too.
 [`islice()`](41_Functional--Toolkits.md#islice)
 takes the first `n` pairs and stops asking,
