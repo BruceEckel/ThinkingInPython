@@ -1107,12 +1107,12 @@ the shape of `task_runner_send.py`.
 A delegating generator passes all three channels through to the innermost generator,
 so you can compose a conversation from parts that never refer to their driver.
 
-An event loop is one such driver, and `async`/`await`
-(PEP 492, Python 3.5, 2015)
-is the same machinery under a syntax that tells the reader which driver runs it.
-An Effect system builds on a generator rather than a coroutine for the reason the 2001 design chose the half it did:
-a generator hands each request to whoever resumes it,
-and that caller is yours to write.
+An event loop is one such driver.
+`async`/`await` (PEP 492, Python 3.5, 2015)
+is the same machinery with a syntax that marks a function as one the event loop resumes.
+An Effect system builds on a generator rather than a coroutine for the reason the 2001 design chose the half it did.
+A generator hands each request to the code that resumed it.
+That code is the driver you write.
 
 ## Exercises
 
