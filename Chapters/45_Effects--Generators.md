@@ -803,7 +803,8 @@ This chapter rests on three ideas:
 - `yield` carries a request out of the body and `send()` carries the answer back in,
   so the body can ask for something and receive the answer.
 - `yield from` composes those conversations.
-  No generator in the chain refers to its driver.
+  Each generator in the chain yields to whatever code resumed it,
+  so the whole chain runs unchanged under any driver.
 
 The first two ideas are enough to build a task runner.
 A queue holds the live generators.
