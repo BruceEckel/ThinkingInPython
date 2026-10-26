@@ -208,6 +208,7 @@ Chapters/45_Effects--Generators.md	[PAST] had: Each had an undesirable compromis
 Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write such a function.
 Chapters/45_Effects--Generators.md	[PAST] returned: The driver calls CODE on the generator CODE returned, but CODE prints the CODE line.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
+Chapters/45_Effects--Generators.md	[PAST] wanted: The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
 Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's parameter annotation to decide what it answers, so a function annotated CODE and returning CODE hands back a default-constructed instance of the requested class.
 Chapters/46_Effects--Stateless.md	[PAST] came: My understanding of Effects came from work with Bill Frasure and James Ward as we created Effect Oriented Programming.
 Chapters/46_Effects--Stateless.md	[PAST] let: Other Effect systems let you describe the work once and decide later how many times to perform it.

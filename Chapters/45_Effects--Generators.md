@@ -1076,12 +1076,16 @@ the running frame holds the `for` loop's count of values.
 In the class, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
 
-All three stand in for that one ability:
+All three approaches stand in for that one ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
-The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
-and the useful part is the frame:
-a suspended generator keeps its frame alive and resumes it on the next call.
+The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
+The useful part is that a suspended generator keeps its frame alive and resumes it on the next call.
+A frame holds a function's locals and its position in the code,
+and Python discards a function's frame when the function returns.
+A generator's frame leaves the call stack at `yield`,
+survives as the generator object's `gi_frame` with its locals and position intact,
+and returns to the call stack on the next `next()`.
 The PEP names Ralph Griswold's Icon language, with CLU and Sather,
 as the models.
 Icon's `suspend` statement produces a value and leaves the procedure ready to produce another.
