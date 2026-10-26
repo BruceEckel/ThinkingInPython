@@ -14,7 +14,7 @@
 
 [Typing the Symbol Set](../../Chapters/35_Patterns--Flyweight.md#typing-the-symbol-set)
 shows `Symbol` and `SPECS` naming the same kinds, so the two grow together.
-Add the new symbols to both and leave `tile()` alone.
+Add the new symbols to `Symbol` and `SPECS`, leaving `tile()` alone.
 For `walkable_neighbors()`,
 visit each of the four adjacent positions that lies inside the grid,
 and count the cells whose `walkable` is true.

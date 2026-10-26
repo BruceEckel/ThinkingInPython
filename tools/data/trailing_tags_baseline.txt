@@ -45,7 +45,6 @@ Chapters/42_Functional--Error_Handling.md	[R32] Written with exceptions and one 
 Chapters/45_Effects--Generators.md	[R32] A coroutine's annotation is CODE, the same three-part shape as a CODE
 Chapters/45_Effects--Generators.md	[R32] CODE raises that exception at the suspended CODE, inside CODE's body, the same way the CODE block's exception does
 Chapters/45_Effects--Generators.md	[R32] Through a CODE, the same two calls reach the innermost generator
-Chapters/47_Effects--Stateless_in_Practice.md	[R32] CODE in Error Handling has the same two operations, written out by hand
 Chapters/A_Effect_Tracking.md	[R32] The row names an Effect, but CODE holds both the Effect's interface and its implementation, bound together when you write CODE
 Solutions/03_Foundations--Containers/README.md	[R32] The right operand wins because CODE reads as "start from CODE, then apply CODE," the same order CODE has always used
 Solutions/03_Foundations--Containers/README.md	[R35] CODE compares the cost of operations at the left end of a CODE and of a CODE

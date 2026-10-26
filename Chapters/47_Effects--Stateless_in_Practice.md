@@ -1327,8 +1327,8 @@ shows, now arising from a dependency two levels down.
 so the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match)
 cannot arise here.
 [Effect Oriented Programming](https://effectorientedprogramming.com/)
-builds this same toast in ZIO,
-where both appliances are a `HeatSource` and ZIO must report the clash.
+builds this same toast in ZIO, where both appliances are a `HeatSource`,
+so ZIO must report the clash.
 
 Here is what ZIO does that Stateless cannot.
 In that book's version, `Bread.homeMade` is a `ZLayer`:
@@ -2241,7 +2241,7 @@ Concurrency is `fork()` and `wait()` with no guarded mutable cell.
 Two forked Effects that share the `Cell` of [State as an Ability](#state-as-an-ability)
 race on it.
 No type reports the race.
-The library leaves shared state between forked Effects to you and to Python.
+The library leaves state shared across forked Effects to you and to Python.
 Above that sit the resilience patterns a production system eventually needs
 (rate limiting, bulkheads, and circuit breakers), none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,

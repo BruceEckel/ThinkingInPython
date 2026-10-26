@@ -2206,7 +2206,7 @@ def run_season(casts: list[Cast]) -> None:
 <details>
 <summary>Done when</summary>
 
-a caller annotated with your named shape accepts both factories and `ty` passes,
+a caller annotated with your named shape accepts both factories, `ty` passes,
 and `play(Loud(), Kitty(), Weapon())` still type-checks and prints `and bats at the nasty weapon`.
 Your fourth-actor count puts the most edits in `casts.py`, fewer in `quest.py`,
 two in `two_games.py`, and none in the named shape.

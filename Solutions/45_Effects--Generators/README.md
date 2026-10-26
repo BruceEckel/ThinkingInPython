@@ -160,7 +160,8 @@ def drive_in_order(
 <details>
 <summary>Done when</summary>
 
-`interview()` runs unchanged under both drivers and each returns `Alice of Wonderland, friend Rabbit` from the chapter's three answers.
+`interview()` runs the same under both drivers,
+and each driver returns `Alice of Wonderland, friend Rabbit` from the chapter's three answers.
 Given one answer for three questions,
 your iterator driver lets the answers' `StopIteration` reach the caller instead of returning `None`.
 

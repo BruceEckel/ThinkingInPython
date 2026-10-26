@@ -679,7 +679,8 @@ def look_first(text):
 <summary>Done when</summary>
 
 your four predictions match the run,
-where `look_first()` returns `None` for both strings and `int()` returns `42` for both,
+where `look_first()` returns `None` for both strings,
+while `int()` returns `42` for both,
 and you can name the test `look_first()` would need for each string and say why `parse_int()` needs none.
 
 <details>
