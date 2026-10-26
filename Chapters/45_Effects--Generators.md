@@ -1148,6 +1148,8 @@ Icon's `suspend` statement produces a value and leaves the procedure ready to pr
 CLU and Sather use the word `yield` for the same step inside an iterator,
 which hands one element at a time to a loop.
 
+### The Restriction Behind the Driver
+
 The design is a restriction:
 each `yield` hands control back to whoever called `next()` or `send()`.
 Handing control anywhere else would mean carrying the C stack as well,
