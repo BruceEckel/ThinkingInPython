@@ -676,6 +676,61 @@ but they hand that value to different places.
 `yield from` makes the `Result` the value of the expression in the enclosing generator,
 after which that generator keeps running.
 
+A generator between the two can do both:
+answer the requests it knows and relay the rest.
+`proxy()` has the same annotation as `interview()`, so `drive()` accepts either,
+and `survey()` could delegate to either with `yield from`:
+
+```python
+# answering_proxy.py
+from collections.abc import Generator
+from drive import ANSWERS, drive
+from interview_generator import (
+    Answer, Question, Result, interview
+)
+
+def proxy(
+    inner: Generator[Question, Answer, Result],
+    known: dict[Question, Answer],
+) -> Generator[Question, Answer, Result]:
+    request = next(inner)
+    while True:
+        if request in known:
+            answer = known[request]  # [1]
+            print(f"  proxy answers {request}")
+        else:
+            answer = yield request  # [2]
+        try:
+            request = inner.send(answer)
+        except StopIteration as stop:
+            return stop.value
+
+print(drive(interview(), ANSWERS))
+#: request = 'name', answer = 'Alice'
+#: request = 'town', answer = 'Wonderland'
+#: request = 'friend', answer = 'Rabbit'
+#: Alice of Wonderland, friend Rabbit
+print(drive(
+    proxy(interview(), {Question("town"): Answer("Oz")}),
+    ANSWERS,
+))
+#: request = 'name', answer = 'Alice'
+#:   proxy answers town
+#: request = 'friend', answer = 'Rabbit'
+#: Alice of Oz, friend Rabbit
+```
+
+`proxy()` drives `inner` the way `drive()` does, with `next()` and `send()`,
+and relays a request with a `yield` of its own at `[2]` instead of a `yield from`,
+because `yield from` would relay every request.
+In the second run, `drive()` sees two requests instead of three.
+The proxy answers `town` at `[1]`, so the driver sees no request for it,
+and the result changes while `interview()` and `drive()` stay the same.
+`proxy()` is a [*Proxy*](25_Patterns--Surrogate.md#proxy):
+the same interface as the object it wraps, with a forwarding loop of its own.
+It is also the shape of [layering handlers](46_Effects--Stateless.md#layering-handlers)
+in Stateless, where a handler answers the requests `supply()` gave it and re-yields the rest to the handler outside it.
+
 ### `throw()` and `close()` Reach the Innermost Generator
 
 A driver can `throw()` an exception into a generator or `close()` it.

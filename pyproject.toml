@@ -158,6 +158,7 @@ lines-after-imports = 1
 "**/test_trash.py" = ["I001"]
 "**/two_way_generator.py" = ["I001"]
 "**/drive_by_hand.py" = ["I001"]
+"**/answering_proxy.py" = ["I001"]
 "**/catch_score.py" = ["I001"]
 "**/tagged_bus_demo.py" = ["I001"]
 "**/fetch_guarded.py" = ["I001"]
