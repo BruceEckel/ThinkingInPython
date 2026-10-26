@@ -1045,15 +1045,15 @@ so the sequence must be finite and fit in memory.
 
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
 is a `reduce()` that keeps every intermediate result.
-Its first argument is the iterable whose elements it folds.
-Here that argument is [`repeat(None)`](41_Functional--Toolkits.md#repeat),
-an iterator that yields `None` every time something asks it for an element,
-and with no count argument it yields `None` forever.
-Each step of `accumulate()` takes one element from the iterable,
-so here each step takes a `None`,
-calls the lambda with the current pair and that `None` to get the next pair,
+[`repeat(None)`](41_Functional--Toolkits.md#repeat)
+is an iterator that yields `None` every time something asks it for an element.
+With no count argument it yields `None` forever.
+Each step of `accumulate()` takes one element from the first argument,
+so here each step takes a `None`.
+It calls the lambda with the current pair and that `None` to get the next pair,
 and yields the new pair.
-The lambda names the `None` `_` because it ignores it.
+The lambda's second parameter always receives that `None`,
+so the lambda ignores it with the name `_`.
 The pair is the state `a, b` from the callback version,
 carried as a value from one call of the lambda to the next instead of held in an execution frame.
 In `itertools_accumulate.py` from [Toolkits](41_Functional--Toolkits.md#accumulate),
