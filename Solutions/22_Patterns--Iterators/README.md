@@ -1051,6 +1051,8 @@ Over the demo's `items`, the class produces `[1, None, 3, None, 4]`.
 since the method can implicitly return `None`.
 The solution loops until an item matches,
 so every call returns a value or raises `StopIteration`.
+`SkippingIterator` carries `eq=False` for the reason `TypedIterator` does in the chapter:
+an iterator wrapper keeps identity comparison and stays hashable.
 
 ```python
 # exercise_10.py
