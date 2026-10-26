@@ -16,7 +16,7 @@ def download() -> Generator[str, str]:
     yield "download: checksum"
 
 def index() -> Generator[str, str]:
-    # Each yield receives the runner's str and discards it
+    # Discard the send() argument:
     yield "index: build"
     yield "index: merge"
 

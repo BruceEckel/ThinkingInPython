@@ -9,12 +9,14 @@ async def countdown(n: int) -> AsyncGenerator[int]:
         n -= 1
 
 async def main() -> None:
-    async for n in countdown(3):
+    async for n in countdown(5):
         print(f"{n = }")
-    print([n * n async for n in countdown(3)])
+    print([n * n async for n in countdown(5)])
 
 asyncio.run(main())
+#: n = 5
+#: n = 4
 #: n = 3
 #: n = 2
 #: n = 1
-#: [9, 4, 1]
+#: [25, 16, 9, 4, 1]

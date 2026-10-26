@@ -870,7 +870,7 @@ def download() -> Generator[str, str]:
     yield "download: checksum"
 
 def index() -> Generator[str, str]:
-    # Each yield receives the runner's str and discards it
+    # Discard the send() argument:
     yield "index: build"
     yield "index: merge"
 
@@ -895,20 +895,20 @@ task_runner([download(), index()])
 #: index: merge
 ```
 
-`task_runner()` primes every job with `next()`, as a driver must.
-Now the runner also does `drive()`'s work,
-answering each request before the next turn.
+`ready` uses a generator expression to pair every `job` with `next(job)`,
+that job's next request.
+When sending the last request for that `job` fails,
+the `while` loop continues without appending the `job` to `ready`,
+de-scheduling that `job`.
 
-`index()` discards what it receives.
-A job that yields only to take turns can ignore the answer.
+`index()` discards what it receives; it yields only to take turns.
 
 `asyncio.run()` starts an event loop,
 a driver like the one in `task_runner_send.py`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 describes `await` as suspending a task until the event loop resumes it.
 The event loop gives each task a turn and answers the request each task yields.
-A coroutine object offers `send()`, `throw()`, and `close()`,
-as a generator does.
+Like a generator, a coroutine object offers `send()`, `throw()`, and `close()`.
 `await` suspends the coroutine and yields a request, a `Future`,
 to the task that drives it.
 When the `Future` has a result, the loop resumes the coroutine,
@@ -935,23 +935,71 @@ async def countdown(n: int) -> AsyncGenerator[int]:
         n -= 1
 
 async def main() -> None:
-    async for n in countdown(3):
+    async for n in countdown(5):
         print(f"{n = }")
-    print([n * n async for n in countdown(3)])
+    print([n * n async for n in countdown(5)])
 
 asyncio.run(main())
+#: n = 5
+#: n = 4
 #: n = 3
 #: n = 2
 #: n = 1
-#: [9, 4, 1]
+#: [25, 16, 9, 4, 1]
 ```
 
-`asyncio.sleep(0)` stands in for real I/O.
+`asyncio.sleep(0)` models a wait for real I/O.
 
 On each pass, `async for` awaits the generator's `__anext__()`,
 so the `async for` loop must appear inside an `async def`.
-The *asynchronous comprehension* `[n * n async for n in countdown(3)]` collects the values through the same `__anext__()` calls,
+The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls,
 and it also requires an enclosing `async def`.
+
+A class can supply that `__anext__()` directly,
+the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
+supplies `__next__()`:
+
+```python
+# async_iterator_class.py
+import asyncio
+from collections.abc import AsyncIterator
+from dataclasses import dataclass
+from typing import override
+
+@dataclass
+class Countdown(AsyncIterator[int]):
+    n: int
+
+    @override
+    async def __anext__(self) -> int:
+        if self.n == 0:
+            raise StopAsyncIteration
+        await asyncio.sleep(0)
+        value = self.n
+        self.n -= 1
+        return value
+
+async def main() -> None:
+    it = Countdown(3)
+    print(await it.__anext__())
+    print(await it.__anext__())
+    async for n in it:
+        print(f"{n = }")
+
+asyncio.run(main())
+#: 3
+#: 2
+#: n = 1
+```
+
+`AsyncIterator` supplies an `__aiter__()` that returns `self`,
+so the class writes `__anext__()` alone.
+`__anext__()` is a coroutine function,
+which is why `async for` must await what it returns.
+`main()` makes the first two calls itself, and the `async for` makes the rest,
+ending when `__anext__()` raises `StopAsyncIteration`,
+the asynchronous counterpart of `StopIteration`.
+The asynchronous generator `countdown()` writes the same loop as a body with `yield` and leaves the two methods to Python.
 
 An asynchronous generator has no return channel,
 so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
