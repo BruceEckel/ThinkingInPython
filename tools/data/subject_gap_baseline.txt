@@ -53,7 +53,6 @@ Chapters/40_Functional--Foundations.md	[conj] key .. is: Contents-based equality
 Chapters/41_Functional--Toolkits.md	[relcl] CODE .. calls: The CODE that CODE supplies for CODE calls your CODE, then calls CODE too when CODE returns CODE.
 Chapters/42_Functional--Error_Handling.md	[prep] prints .. paths: The listing prints with CODE, which renders the message and the notes and leaves out the file paths a full traceback carries.
 Chapters/44_Effects--Effect_Management.md	[prep] Which .. applies: Which of the three conversions from Converting Effectful to Pure applies to the exceptions, and which technique from Effects by Hand applies to the rest?
-Chapters/45_Effects--Generators.md	[prep,relcl] generators .. writing: PEP 255 added generators to Python 2.2 in 2001 to solve one problem: writing a function that produces values one at a time, pausing after each value and resuming where it stopped when the caller asks for the next one.
 Chapters/46_Effects--Stateless.md	[advmod,cc,conj] one .. believes: Then declare a second Ability and request that one too, and report which requests your handler answered at runtime and which ones the type checker believes it answered.
 Chapters/46_Effects--Stateless.md	[cc,conj,dobj,prep] Supply .. stays: Supply a scripted CODE in a test and a real one in a demo, and confirm CODE stays unchanged between them.
 Chapters/47_Effects--Stateless_in_Practice.md	[cc,conj,dobj,xcomp] Change .. stays: Change CODE to use a CODE instead of a CODE, and confirm CODE stays unchanged.
