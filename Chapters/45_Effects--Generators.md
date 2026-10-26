@@ -1115,15 +1115,15 @@ fibonacci(7, summing())
 #: value=8 total=20
 ```
 
-`consume()` runs as a nested call while `fibonacci()` moves through its loop.
-When `consume()` returns, the loop moves on to the next value.
-The running total needs a variable that survives from one call to the next.
-The returned `consume` captures `total` as a [closure](40_Functional--Foundations.md#closures)
+The callback needs a variable that survives from one call to the next,
+to hold the running `total`.
+`summing()` returns the `consume` function,
+which captures `total` as a [closure](40_Functional--Foundations.md#closures)
 variable, so `total` outlives `summing()`'s call.
 The `nonlocal` statement lets `consume()` assign to the captured `total`.
 
 `fibonacci()` is in charge of how many times `consume()` runs and when the sequence ends.
-`consume()` receives one value per call and has no way to ask for the next one or to stop the loop early.
+`consume()` receives one value per call and has no way to ask for the next value or to stop the loop early.
 
 The second way is for `fibonacci()` to return a list containing every computed value:
 
@@ -1153,11 +1153,10 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
-`fibonacci_list.py` is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
-which keeps `a` and `b` in its suspended execution frame and hands out one value per `next()`.
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
 
+This is a functional version of the generator `fibonacci()` in `iterators.py`.
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
 is a `reduce()` that keeps every intermediate result.
 [`repeat(None)`](41_Functional--Toolkits.md#repeat)
@@ -1166,12 +1165,14 @@ With no count argument it produces `None` forever.
 Each step of `accumulate()` takes one element from the first argument,
 so here each step takes a `None`.
 It calls the lambda,
-passing the current pair together with `None` to get the next pair,
-and hands out the new pair.
+passing the current pair together with `None` to get the next pair.
+It hands out the new pair as the `yield` value from the `pairs` iterator.
 The lambda's second parameter always receives that `None`,
-so the lambda ignores it with the name `_`.
-The pair is the state `a, b` from the callback version,
-carried as a value from one call of the lambda to the next instead of held in an execution frame.
+so the lambda ignores it with the parameter `_`.
+The pair holds the same state as `a` and `b` in `fibonacci_callback.py`.
+There, the stack frame of the running `fibonacci()` keeps `a` and `b` between calls of `consume()`.
+Here, `accumulate()` passes the pair into each lambda call and takes the new pair out,
+so the state travels as a value instead of living in a stack frame.
 
 In `itertools_accumulate.py` from [Toolkits](41_Functional--Toolkits.md#accumulate),
 the iterable is `[1, 2, 3, 4]` and each step adds its element to the running total.
