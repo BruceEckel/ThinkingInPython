@@ -993,13 +993,17 @@ fibonacci(7, summing())
 #: value=8 total=20
 ```
 
-The loop in `fibonacci()` stays intact,
-but `consume()` runs inside `fibonacci()`'s call and must keep its own state between calls:
-every call to `consume()` starts with a fresh frame,
-so `total` lives in the closure that `summing()` returns.
-`fibonacci()` also holds the control.
-It decides when `consume()` runs and when the sequence ends.
-`consume()` answers each call as it comes.
+`callback(a)` is a line in `fibonacci()`'s loop,
+so `consume()` runs as a nested call while `fibonacci()` is partway through the loop,
+returns, and the loop moves on to the next value.
+Each of those calls gets a new stack frame whose locals vanish when `consume()` returns,
+so the running total needs a variable that survives from one call to the next.
+That variable is `total` in `summing()`.
+Python keeps it alive after `summing()` returns,
+because the returned `consume` captures it as a [closure](40_Functional--Foundations.md#closures)
+variable, and `nonlocal` lets `consume()` assign to it.
+The loop also puts `fibonacci()` in charge of how many times `consume()` runs and when the sequence ends.
+`consume()` receives one value per call and has no way to ask for the next one or to stop the loop early.
 
 Having `fibonacci()` build the whole result list up front gives its caller an ordinary `for` loop,
 but every value exists before the caller sees the first,
