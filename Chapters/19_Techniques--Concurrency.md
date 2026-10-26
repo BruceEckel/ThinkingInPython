@@ -200,8 +200,8 @@ The first printed line proves that calling a coroutine function defers its body.
 only the type of object the call built: `coroutine`.
 `gather()` schedules the work when it receives that object.
 If you discard that coroutine object instead of handing it to `gather()`
-(or `create_task()`), its body never runs,
-and Python emits a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
+(or `create_task()`), its body never runs.
+Python emits a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
 
 `gather()` wraps each coroutine in a *task*,
 the event loop's unit of scheduling, and schedules the tasks in the order given.

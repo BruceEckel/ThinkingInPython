@@ -473,8 +473,8 @@ If you keep `NonZero`'s `self.value == 0` test under the new name,
 `PositiveInt(-1)` constructs successfully,
 and `slope(10, PositiveInt(-1))` returns `-10.0`.
 The demo's `expect()` loop then raises an `AssertionError`
-("no exception raised") on `-1`, and the type checker accepts the file,
-because every argument has the right type.
+("no exception raised") on `-1`.
+The type checker accepts the file, because every argument has the right type.
 The solution's `__post_init__()` tests `value <= 0`,
 which rejects both bad values.
 

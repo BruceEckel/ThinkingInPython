@@ -290,8 +290,8 @@ You decide how far up the spectrum to go.
    but it checks a sample of the inputs.
 5. At the top is formal proof.
    In a dependently typed language such as Lean, Idris, or Rocq (formerly Coq),
-   you prove a program correct for every possible input,
-   and a machine checks the proof.
+   you prove a program correct for every possible input.
+   A machine checks the proof.
    Formal proof is real, but rare outside specialized work.
 
 ## Property-Based Testing

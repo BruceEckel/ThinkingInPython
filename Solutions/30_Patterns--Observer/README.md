@@ -1552,7 +1552,8 @@ with `b` in the last column.
 which is all the question asks: which colors are reachable, not how.
 It is Gaussian elimination, with two changes for arithmetic mod 3.
 Dividing by a pivot is multiplying by its inverse,
-which `pow(x, -1, MOD)` supplies, and every subtraction ends in `% MOD`.
+which `pow(x, -1, MOD)` supplies.
+Every subtraction ends in `% MOD`.
 
 If you leave the `% MOD` off the subtraction, as ordinary elimination would,
 an entry can become a nonzero multiple of three.

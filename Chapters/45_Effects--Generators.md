@@ -1189,7 +1189,8 @@ A sequence built from a start value and a step needs the opposite operation,
 an *unfold*, and `itertools` has no function for it.
 The third-party `more-itertools` package supplies one as `iterate(func, start)`,
 which produces `start`, `func(start)`, `func(func(start))`,
-and so on without end, and `toolz` has an `iterate()` of the same shape.
+and so on without end.
+`toolz` has an `iterate()` of the same shape.
 Each is a generator:
 a loop that yields the current value and then applies the step to it.
 A generator is the direct way to write an unfold,
