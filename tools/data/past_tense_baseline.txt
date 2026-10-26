@@ -205,7 +205,7 @@ Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its vers
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
 Chapters/45_Effects--Generators.md	[PAST] had: Each had an undesirable compromise.
-Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write a function producing values one at a time and remembering where it is between one value and the next.
+Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write such a function.
 Chapters/45_Effects--Generators.md	[PAST] returned: The driver calls CODE on the generator CODE returned, but CODE prints the CODE line.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
 Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's parameter annotation to decide what it answers, so a function annotated CODE and returning CODE hands back a default-constructed instance of the requested class.

@@ -958,8 +958,10 @@ It describes a function by what it requests and writes those requests into its r
 
 ## Half a Coroutine by Design
 
-PEP 255 added generators to Python 2.2 in 2001 to solve one problem.
-Python had three ways to write a function producing values one at a time and remembering where it is between one value and the next.
+PEP 255 added generators to Python 2.2 in 2001 to solve one problem:
+writing a function that produces values one at a time,
+pausing after each value and resuming where it stopped when the caller asks for the next one.
+Python had three ways to write such a function.
 Each had an undesirable compromise.
 The first way is for the function to take a callback as an argument and call it with each value its loop computes:
 
@@ -1077,7 +1079,7 @@ how far the loop has gone through `range(n)`,
 which the function form of `fibonacci()` keeps in its frame while it runs,
 becomes `remaining`, which `__next__()` decrements and tests on every call.
 
-All three stand in for one ability:
+All three stand in for that one ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
