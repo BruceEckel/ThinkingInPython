@@ -208,7 +208,7 @@ Chapters/45_Effects--Generators.md	[PAST] called: Tim Peters called the result a
 Chapters/45_Effects--Generators.md	[PAST] came: The keyword came from CLU and Sather, where an iterator yields one element at a time to a CODE loop.
 Chapters/45_Effects--Generators.md	[PAST] credited: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon for most of the inspiration.
 Chapters/45_Effects--Generators.md	[PAST] gave: Each gave something up.
-Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write a function that produces values one at a time and must remember where it is between one value and the next.
+Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write a function producing values one at a time and remembering where it is between one value and the next.
 Chapters/45_Effects--Generators.md	[PAST] needed: The producer needed to pause in the middle of its own loop, hand out a value, and resume where it stopped.
 Chapters/45_Effects--Generators.md	[PAST] returned: The driver calls CODE on the generator CODE returned, but CODE prints the CODE line.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?

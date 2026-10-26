@@ -961,9 +961,42 @@ It describes a function by what it requests and writes those requests into its r
 PEP 255 added generators to Python 2.2 in 2001 to solve one problem.
 Python had three ways to write a function producing values one at a time and remembering where it is between one value and the next.
 Each gave something up.
-The producer can take a callback as an argument and call it with each value its loop computes.
+The producer can take a callback as an argument and call it with each value its loop computes:
+
+```python
+# fibonacci_callback.py
+from collections.abc import Callable
+
+def fibonacci(n: int, use: Callable[[int], None]) -> None:
+    a, b = 0, 1
+    for _ in range(n):
+        use(a)
+        a, b = b, a + b
+
+def summing() -> Callable[[int], None]:
+    total = 0
+    def consume(value: int) -> None:
+        nonlocal total
+        total += value
+        print(f"{value=} {total=}")
+    return consume
+
+fibonacci(5, summing())
+#: value=0 total=0
+#: value=1 total=1
+#: value=1 total=2
+#: value=2 total=4
+#: value=3 total=7
+```
+
 The loop stays intact, but the consumer is now the callback,
-so it runs inside the producer's call and must keep its own state between calls.
+so it runs inside `fibonacci()`'s call and must keep its own state between calls:
+every call to `consume()` starts with a fresh frame,
+so `total` lives in the closure that `summing()` returns.
+The producer also holds the control.
+It decides when the consumer runs and when the sequence ends.
+The consumer answers each call as it comes.
+
 Building the whole result list up front gives the consumer an ordinary `for` loop,
 but every value exists before the consumer sees the first,
 so the sequence must be finite and fit in memory.
