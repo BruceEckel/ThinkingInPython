@@ -1057,9 +1057,11 @@ so each element is a placeholder that the lambda receives as `_`.
 [`islice()`](41_Functional--Toolkits.md#islice)
 takes the first `n` pairs and stops asking,
 and the comprehension keeps the first number of each pair.
-The comprehension's list is complete before `fibonacci()` returns.
-Every value exists before the caller sees the first,
-so the sequence must be finite and fit in memory.
+`fibonacci_list.py` is a function version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
+which keeps `a` and `b` in its suspended execution frame and hands out one value per `next()`.
+The function version returns after the comprehension's list is complete,
+so every value exists before the caller sees the first,
+and the sequence must be finite and fit in memory.
 
 The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
 
