@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""Report sentences with an imperative-plus-consequence, a split-worthy "and", or a colon-led clause.
+"""Report sentences with an imperative-plus-consequence, a split-worthy "and", a colon-led clause, or a pair word's stray conjunction.
 
-Three sentence shapes from the author's style rules, found with the
+Four sentence shapes from the author's style rules, found with the
 dependency parse that `tools/parsed_prose.py` caches under
 `build/parses/` (spaCy, run in a throwaway Python 3.12 environment; see
 that module). Each hit carries its rule label at the start of the
@@ -50,8 +50,32 @@ when a non-punctuation word before it is a number (pos `NUM`) or one of
 word is one of `POINTER_WORDS` ("this", "these", "following", "here").
 A bare noun lead-in ("The prediction:") stays a hit.
 
-Two rules run by default, `RULES`: `[IMP]` and `[COLON+AND]`, judged
-against a baseline. Two are survey rules, `SURVEY_RULES`: `[AND]` and
+`[PAIR]`, a pair word whose conjunction arrives from the next clause
+(2026-10-26, from a sentence the author marked in chapter 45): a word
+that promises a pair, "between", "both", "either", or "neither"
+(`PAIR_WORDS`, each with the conjunction that completes it), whose
+governed phrase holds no such conjunction, followed by that
+conjunction with no punctuation (`PAIR_BREAKS`) and no verb between,
+and then a noun phrase (`PAIR_NOUN_START`). "The producer keeps state
+between values and the consumer has a loop of its own": the reader
+joins "the consumer" to "values" as the pair's second half and backs
+up at "has". The repair closes the pair word's phrase before the next
+clause starts ("from one value to the next while the consumer has"),
+or puts a comma before the conjunction. The phrase is the object's
+subtree for "between" and the head's subtree for the other three, so
+"both" before a verb ("CODE both creates X and appends Y") holds its
+own "and" and is quiet. Two shapes are quiet by design, from the
+book-wide read that day (52 hits, 6 real): a verb between the phrase
+and the conjunction settles the pair word first ("both forms keep the
+result and the name"), and a verb after the conjunction resolves the
+misreading at once ("leaves both loops in one step and skips CODE"),
+so only a noun phrase after the conjunction counts. A complete pair
+the parser attaches elsewhere ("between the check and the use can
+reset", "either a CODE the author typed or an CODE") still reports,
+and the baseline holds those.
+
+Three rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, and
+`[PAIR]`, judged against a baseline. Two are survey rules, `SURVEY_RULES`: `[AND]` and
 plain `[COLON]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
@@ -94,7 +118,7 @@ the stale entries. A run given paths compares against those files' entries alone
 with paths adds and drops entries for those files and keeps
 every other file's entries.
 
-`--calibrate` checks all four rules against `tools/data/edit_pairs.json`
+`--calibrate` checks all five rules against `tools/data/edit_pairs.json`
 (the sentences the author rewrote, 72 records of `before`, `after`, and
 `fault`): each before and after text is parsed as a one-paragraph
 document, and each rule reports the pairs where it fires on the before
@@ -146,6 +170,7 @@ from tools.parse_check import (
     skipped,
 )
 from tools.parsed_prose import (
+    FINITE_TAGS,
     Paragraph,
     Parser,
     Sentence,
@@ -182,6 +207,7 @@ CLOSERS: Final = frozenset("\"'”’)]*_")
 RULES: Final = {
     "IMP": "imperative plus consequence",
     "COLON+AND": "colon, then a clause with an and-joined clause",
+    "PAIR": "a pair word whose and or or arrives from the next clause",
 }
 """The default rules: judged against the baseline."""
 SURVEY_RULES: Final = {
@@ -198,6 +224,14 @@ POINTER_WORDS: Final = frozenset(
     "this these that those following so here".split())
 """Last words that make a colon lead-in a demonstrative ("this shape:")."""
 WH_TAGS: Final = frozenset({"WP", "WDT", "WRB"})
+PAIR_WORDS: Final = {
+    "between": "and", "both": "and", "either": "or", "neither": "nor"}
+"""A word that promises a pair, and the conjunction that completes it."""
+PAIR_BREAKS: Final = frozenset(",;:.()?!")
+"""Punctuation that closes a pair word's phrase before its conjunction."""
+PAIR_NOUN_START: Final = frozenset(
+    {"DET", "NOUN", "PROPN", "PRON", "ADJ", "NUM"})
+"""Parts of speech that open a noun phrase after the stray conjunction."""
 
 CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     # (rule, text, should it fire)
@@ -221,6 +255,15 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
      "Python supplies `self` only when the lookup finds the function "
      "on the class. A function stored there is a descriptor, and "
      "reading it through an instance binds that instance.", False),
+    ("PAIR", "The problem appears whenever the producer keeps state "
+             "between values and the consumer has a loop of its own.",
+     True),
+    ("PAIR", "The problem appears whenever the producer keeps state "
+             "from one value to the next while the consumer has a loop "
+             "of its own.", False),
+    ("PAIR", "Both forms keep the result and the name.", False),
+    ("PAIR", "A `break` at the match leaves both loops in one step and "
+             "skips `else` along with them.", False),
 )
 """The style rules' own examples: (rule, text, should it fire)."""
 
@@ -331,6 +374,104 @@ def and_joins_subjects(sentence: Sentence) -> bool:
     return False
 
 
+def pair_noun(tok: Token, sentence: Sentence) -> Token | None:
+    """The noun a pair word governs, or None.
+
+    "between" governs its object. "both", "either", and "neither"
+    govern the noun they determine ("both loops"); before a verb
+    ("CODE both creates X and appends Y") the verb holds the pair's
+    own conjunction, so there is nothing to check.
+    """
+    if tok.text.lower() == "between":
+        return next((c for c in children(tok, sentence) if c.dep == "pobj"),
+                    None)
+    if tok.head == tok.i:
+        return None
+    head = sentence.tokens[tok.head]
+    return head if head.pos in PAIR_NOUN_START else None
+
+
+def is_finite(tok: Token) -> bool:
+    """A clause verb: finite or modal by tag, not a noun's participle."""
+    return tok.pos in ("VERB", "AUX") and (
+        tok.tag in FINITE_TAGS or tok.tag == "MD"
+    ) and tok.dep not in ("acl", "amod")
+
+
+def clause_boundary(tok: Token) -> bool:
+    """Punctuation, a conjunction, or a wh-word that starts a clause."""
+    if tok.punct:
+        return tok.text in PAIR_BREAKS
+    return tok.pos in ("CCONJ", "SCONJ") or tok.tag in WH_TAGS
+
+
+def noun_phrase_start(tok: Token) -> bool:
+    """A token that opens or continues a noun phrase after "and"."""
+    return (tok.pos in PAIR_NOUN_START or tok.tag == "POS") and (
+        tok.tag not in WH_TAGS)
+
+
+def pair_gap(sentence: Sentence) -> bool:
+    """A pair word whose "and" arrives from the next clause.
+
+    "keeps state between values and the consumer has a loop":
+    "between" promises "between X and Y", and the clause
+    coordination's "and" followed by a noun phrase reads as the pair's
+    second half until the verb arrives. The parser misreads the
+    sentence the same way, hanging "the consumer" on "values", and
+    hangs a complete pair's second half elsewhere just as often, so
+    the test reads the token line instead of the attachment: a finite
+    verb earlier in the pair word's own clause (back to the nearest
+    punctuation, conjunction, or wh-word), so the clause is complete
+    up to the pair phrase; the conjunction after the pair noun with
+    no verb, subordinator, or punctuation between; a noun phrase after
+    the conjunction; and a finite verb right after that noun phrase,
+    which makes it a subject. A verb between the noun and the
+    conjunction settles the pair word first ("both forms keep the
+    result and the name"), and a verb right after the conjunction
+    resolves the misreading at once ("leaves both loops in one step
+    and skips"), so neither is a hit. "A call between the check and
+    the use can reset" has no verb before "between", so "the use"
+    completes the pair; "so neither the class nor the instance holds"
+    starts its clause at "so".
+    """
+    toks = sentence.tokens
+    for tok in toks:
+        want = PAIR_WORDS.get(tok.text.lower())
+        if want is None:
+            continue
+        noun = pair_noun(tok, sentence)
+        if noun is None or noun.i < tok.i:
+            continue
+        before = toks[:tok.i]
+        clause_start = next(
+            (i + 1 for i in range(len(before) - 1, -1, -1)
+             if clause_boundary(before[i])), 0)
+        if not any(is_finite(t) for t in before[clause_start:]):
+            continue
+        conj = None
+        for later in toks[noun.i + 1:]:
+            if later.punct and later.text in PAIR_BREAKS:
+                break
+            if later.pos in ("VERB", "AUX", "SCONJ"):
+                break
+            if later.text.lower() == want:
+                conj = later
+                break
+        if conj is None:
+            continue
+        rest = toks[conj.i + 1:]
+        if not rest or not noun_phrase_start(rest[0]):
+            continue
+        phrase_end = 0
+        while phrase_end < len(rest) and noun_phrase_start(rest[phrase_end]):
+            phrase_end += 1
+        if phrase_end < len(rest) and is_finite(rest[phrase_end]):
+            return True
+    return False
+
+
+
 def ends_on_colon(sentence: Sentence) -> bool:
     """Does the sentence's last word-like token equal ':'?"""
     tail = [t for t in sentence.tokens
@@ -404,6 +545,8 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
             yield "IMP", sentence
         if and_joins_subjects(sentence):
             yield "AND", sentence
+        if pair_gap(sentence):
+            yield "PAIR", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:

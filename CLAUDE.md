@@ -296,10 +296,17 @@ subjects, a short appositive, a relative clause that is the claim
 and reads once, a parser error. Chapter 31's hits stay out of it
 while its editing pass is open.
 `tip sentence-shapes` (`tools/sentence_shapes.py`, 2026-10-18) uses the
-same shared parse for four shapes from the style rules. The default
+same shared parse for five shapes from the style rules. The default
 rules have a baseline: `[IMP]`, a command plus its consequence
-("Remove `frozen=True` and the pattern fails"), and `[COLON+AND]`, a
-colon followed by a clause that joins a second clause with "and". A
+("Remove `frozen=True` and the pattern fails"), `[COLON+AND]`, a
+colon followed by a clause that joins a second clause with "and", and
+`[PAIR]` (2026-10-26), a pair word ("between", "both", "either",
+"neither") whose own phrase holds no conjunction and whose "and" or
+"or" then arrives from the next clause followed by a noun phrase
+("keeps state between values and the consumer has a loop": the reader
+joins "the consumer" to "values" until the verb). A verb between the
+phrase and the conjunction, or right after it, is quiet by design;
+the book-wide read that day had 52 raw hits and 6 real ones. A
 colon after a count or a demonstrative ("three parts:", "this
 shape:") is skipped. The survey rules print only under `ARGS=--survey`
 and never enter the baseline: `[AND]`, an "and" that joins two clauses
@@ -307,7 +314,7 @@ with different subjects, and `[COLON]`, a colon followed by an
 independent clause. The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
-pass. `ARGS=--calibrate` runs all four rules over
+pass. `ARGS=--calibrate` runs all five rules over
 `tools/data/edit_pairs.json` and the style rules' own examples.
 `tip passive` (`tools/passive_voice.py`, 2026-10-19) reads the same
 parse for passive clauses: a verb with a passive auxiliary and a passive

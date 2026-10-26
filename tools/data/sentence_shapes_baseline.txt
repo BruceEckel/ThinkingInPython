@@ -27,6 +27,7 @@ Solutions/17_Techniques--Metaprogramming/README.md	[COLON+AND] The prediction: C
 Solutions/17_Techniques--Metaprogramming/README.md	[IMP] Then consider what CODE does to a parameter, and print CODE to check your prediction.
 Solutions/18_Techniques--Performance/README.md	[IMP] on a list such as CODE, CODE and CODE return CODE and CODE for the value CODE, and the slice between those indices is CODE.
 Solutions/19_Techniques--Concurrency/README.md	[IMP] Compare each task's delay with the moment CODE and CODE fail to decide which tasks are still running when cancellation starts.
+Solutions/19_Techniques--Concurrency/README.md	[PAIR] The original CODE has both CODE and CODE cancelled because both are still sleeping when CODE and CODE fail.
 Solutions/22_Patterns--Iterators/README.md	[IMP] For the explanation, consider what a generator keeps between calls to CODE, and what CODE would have to do to learn a count.
 Solutions/30_Patterns--Observer/README.md	[COLON+AND] your test passes against your CODE: the first responder raises an exception, CODE raises an CODE holding it, and the second responder has recorded the value.
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[IMP] To let a subclass share its parent's bin, give CODE a class variable that holds the bin's key, and have CODE default that variable for each class.

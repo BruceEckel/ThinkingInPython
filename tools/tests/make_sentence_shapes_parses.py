@@ -67,6 +67,18 @@ SOURCES: Final[tuple[str, ...]] = (
     "The handler nearest the Effect answers first, and the outer one "
     "handles the requests that remain.",
     "The prediction: the lease returns the item.",
+    "The problem appears whenever the producer keeps state between "
+    "values and the consumer has a loop of its own.",
+    "The problem appears whenever the producer keeps state from one "
+    "value to the next while the consumer has a loop of its own.",
+    "`interview()` runs the same under both drivers and each returns "
+    "the result.",
+    "Both forms keep the result and the name.",
+    "A `break` at the match leaves both loops in one step and skips "
+    "`else` along with them.",
+    "A call between the check and the use can reset that attribute.",
+    "`Temperature` has no `__dict__` to assign them, so neither the "
+    "class nor the instance holds an `celsius`.",
     "Intro paragraph.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""

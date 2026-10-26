@@ -81,6 +81,19 @@ def rules(source: str) -> list[str]:
      "reading it through an instance binds that instance.",
      ["COLON+AND"]),
     ("Hint: Remove `frozen=True` and the pattern fails.", []),
+    ("The problem appears whenever the producer keeps state between "
+     "values and the consumer has a loop of its own.", ["PAIR"]),
+    ("The problem appears whenever the producer keeps state from one "
+     "value to the next while the consumer has a loop of its own.", []),
+    ("`interview()` runs the same under both drivers and each returns "
+     "the result.", ["AND", "PAIR"]),
+    ("Both forms keep the result and the name.", []),
+    ("A `break` at the match leaves both loops in one step and skips "
+     "`else` along with them.", []),
+    ("A call between the check and the use can reset that attribute.",
+     []),
+    ("`Temperature` has no `__dict__` to assign them, so neither the "
+     "class nor the instance holds an `celsius`.", []),
     ("Intro paragraph.", []),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
@@ -116,7 +129,7 @@ def test_the_reported_line_is_the_sentences_first_character() -> None:
 
 def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
-    assert set(RULES) == {"IMP", "COLON+AND"}
+    assert set(RULES) == {"IMP", "COLON+AND", "PAIR"}
     assert set(SURVEY_RULES) == {"AND", "COLON"}
 
 

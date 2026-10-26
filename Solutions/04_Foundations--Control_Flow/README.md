@@ -175,7 +175,7 @@ The output is the same as with the original order.
 The two `if` blocks test for different values of `n` (`6` and `3`),
 so at most one of them is true on any iteration.
 Each block's outcome therefore stays the same whichever runs first.
-Order matters only when one value satisfies both conditions and the two blocks do different things with it,
+Order matters only when one value satisfies both conditions while the two blocks do different things with it,
 as when one ends the loop and the other skips to the next iteration.
 
 Before you move on, name what separates your attempt from this one:

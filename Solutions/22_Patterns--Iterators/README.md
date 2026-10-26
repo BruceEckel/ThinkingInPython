@@ -446,7 +446,7 @@ about 41 bytes per buffered item.
 
 **Report what holds across machines.**
 The script prints a boolean rather than the byte counts,
-since the sizes shift between machines and Python builds while their ordering holds.
+since the sizes shift between machines and between Python builds while their ordering holds.
 Pass `--numbers` to see the figures your machine reports.
 
 Before you move on, name what separates your attempt from this one:
