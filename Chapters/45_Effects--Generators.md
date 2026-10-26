@@ -1076,7 +1076,7 @@ the running function's stack frame holds the `for` loop's count of values.
 In the class, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
 
-All three approaches stand in for that one ability:
+All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.

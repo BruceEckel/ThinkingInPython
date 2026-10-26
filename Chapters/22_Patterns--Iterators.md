@@ -634,7 +634,7 @@ every value after `2` is 3 or more,
 yet the generator expression keeps pulling from `counter()` to find another match,
 until `counter()` raises the same `Tripwire`.
 
-Failing at 1,000 values stands in for how a real program fails.
+Failing at 1,000 values models how a real program fails.
 A real program hangs, or it dies when it exhausts memory.
 
 No tool in the toolchain reports `list(count(1))`.

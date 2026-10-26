@@ -443,7 +443,8 @@ No signature between `handle()` and the request mentions it.
 in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect):
 the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
-stands in for a side effect, where the function writes something outward.
+covers the other kind, a side effect,
+where the function writes something outward.
 The technique is the same for both.
 Name each contact with the outside as an Ability and bind it at the edge to the implementation the context needs.
 An EMS adds one thing: the type checker enforces the declaration.

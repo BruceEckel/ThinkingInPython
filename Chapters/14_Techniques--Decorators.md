@@ -611,7 +611,7 @@ and calling `add(2, 3)` invokes `__call__()`.
 `functools.update_wrapper(self, func)` copies `func`'s metadata onto an existing object.
 `wraps` is the decorator form of that same call.
 `@wraps(func)` above `def wrapper` runs `update_wrapper(wrapper, func)`.
-In the class form, the object that stands in for the function is `self`,
+In the class form, the object that takes the function's place is `self`,
 so `__init__()` calls `update_wrapper(self, func)`.
 
 The `__name__: str` declaration tells the type checker about the attribute `update_wrapper()` sets,
