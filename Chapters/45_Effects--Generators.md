@@ -1070,8 +1070,10 @@ It describes a function by what it requests and writes those requests into its r
 ## Half a Coroutine by Design
 
 PEP 255 added generators to Python 2.2 in 2001 so that a function can produce values one at a time.
-The function pauses after each value and resumes from that point when the caller asks for the next one.
-The problem appears whenever the producer keeps state between values and the consumer has a loop of its own.
+The function pauses after each value.
+When the caller asks for the next value,
+it resumes from the point where it paused.
+The problem appears whenever the producer keeps state from one value to the next while the consumer has a loop of its own.
 The PEP's example, the standard library's `tokenize()`,
 keeps its place in the source text,
 and a recursive tree walk keeps a whole recursion in progress between one node and the next.
