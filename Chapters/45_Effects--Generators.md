@@ -1076,7 +1076,7 @@ but the rewrite moves the locals `a` and `b` into the attributes `_a` and `_b` a
 how far the loop has gone through `range(n)`,
 which the function form of `fibonacci()` keeps in its frame while it runs,
 becomes `remaining`, which `__next__()` decrements and tests on every call.
-`fibonacci()` needed to pause in the middle of its own loop, hand out a value,
+`fibonacci()` must pause in the middle of its own loop, hand out a value,
 and resume where it stopped.
 
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
