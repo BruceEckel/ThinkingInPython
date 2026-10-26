@@ -1082,8 +1082,8 @@ and resume where it stopped.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
 and the useful part is the frame:
 a suspended generator keeps its frame alive and resumes it on the next call.
-Tim Peters called the result a semi-coroutine, after Knuth,
-and credited Ralph Griswold's Icon language for most of the inspiration.
+The PEP names Ralph Griswold's Icon language, with CLU and Sather,
+as the models.
 Icon's `suspend` statement produces a value and leaves the procedure ready to produce another.
 The keyword came from the CLU and Sather languages,
 where an iterator yields one element at a time to a `for` loop.
@@ -1095,8 +1095,10 @@ the obstacle that kept Stackless Python's coroutines out of the core.
 That restriction is why a driver exists.
 Something must call `next()` and `send()`,
 and since a generator cannot name that something, you write it.
-In 1999 Tim Peters called generators "half a coroutine."
-The other half came in 2005, when PEP 342 added the send channel for Python 2.5.
+In May 1999, two years before the PEP,
+Tim Peters called generators "half a coroutine" on python-dev,
+and "semi-coroutines" in his next message.
+The other half came in 2005, when PEP 342 added the send channel to Python 2.5.
 Simulations, games, and asynchronous I/O need to pass a value or an exception into a generator at its suspension point,
 so `send()`, `throw()`, and `close()` arrived together,
 and the PEP describes a scheduler that runs many generators as a "trampoline,"
