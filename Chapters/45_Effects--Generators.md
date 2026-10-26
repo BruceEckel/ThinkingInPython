@@ -1073,8 +1073,9 @@ for value in Fibonacci(7):
 
 The caller keeps its `for` loop and receives the values one at a time,
 but the rewrite moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out:
-the position in the loop, which the running function kept, becomes `remaining`,
-which `__next__()` decrements and tests on every call.
+how far the loop has gone through `range(n)`,
+which the function form of `fibonacci()` keeps in its frame while it runs,
+becomes `remaining`, which `__next__()` decrements and tests on every call.
 `fibonacci_iterator.py` in [Iterators](22_Patterns--Iterators.md#generators)
 is the same class.
 `fibonacci()` needed to pause in the middle of its own loop, hand out a value,
