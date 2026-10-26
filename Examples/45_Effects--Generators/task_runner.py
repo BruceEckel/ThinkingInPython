@@ -10,14 +10,14 @@ def index() -> Iterator[str]:
     yield "index: build"
     yield "index: merge"
 
-def task_runner(ready: deque[Iterator[str]]) -> None:
-    while ready:
-        job = ready.popleft()
+def task_runner(jobs: deque[Iterator[str]]) -> None:
+    while jobs:
+        job = jobs.popleft()
         try:
             print(next(job))
         except StopIteration:
             continue
-        ready.append(job)
+        jobs.append(job)
 
 task_runner(deque([download(), index()]))
 #: download: headers
