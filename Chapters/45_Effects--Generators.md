@@ -1066,6 +1066,18 @@ and `repeat(None)` is endless, so the chain of pairs is endless too.
 takes the first `n` pairs and stops asking,
 and the comprehension keeps the first number of each pair.
 
+The placeholder shows what the toolkit lacks.
+A fold consumes an input.
+A sequence built from a start value and a step needs the opposite operation,
+an *unfold*, and `itertools` has no function for it.
+The third-party `more-itertools` package supplies one as `iterate(func, start)`,
+which produces `start`, `func(start)`, `func(func(start))`,
+and so on without end, and `toolz` has an `iterate()` of the same shape.
+Each is a generator:
+a loop that yields the current value and then applies the step to it.
+The unfold is the first thing a generator gives the functional toolkit,
+and in 2001 Python had no way to write one.
+
 `fibonacci_list.py` is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
 which keeps `a` and `b` in its suspended execution frame and hands out one value per `next()`.
 
