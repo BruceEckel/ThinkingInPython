@@ -10,8 +10,9 @@ class Color(StrEnum):
 
 type Tree = dict[str, Tree | Color]
 
-def visit(tree: Tree, at: str = ""
-          ) -> Generator[str, None, Counter[Color]]:
+def visit(
+    tree: Tree, at: str = ""
+) -> Generator[str, None, Counter[Color]]:
     counts = Counter[Color]()
     for name, node in tree.items():
         if isinstance(node, dict):  # node is a Tree

@@ -364,7 +364,7 @@ passing every yielded request out to the outer driver and every sent answer back
 
 In the simplest case,
 each generator yields values and leaves its send and return channels at `None`,
-so its annotation can be `Iterator[str]` instead of `Generator[str]`.
+so its annotation can be `Iterator[str]` instead of `Generator[str, None, None]`.
 The driver is `list()`,
 which calls `next()` until the outermost generator finishes:
 
@@ -397,9 +397,8 @@ print(list(top()))
 #: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
 ```
 
-"To exhaustion" means each `yield from` runs its target until that generator finishes.
-
-Exhaustion is transitive.
+"To exhaustion" means each `yield from` runs its target until that generator finishes,
+and exhaustion is transitive.
 `list(top())` receives one flat sequence,
 and `top()`'s single `yield from` finishes when the last generator beneath it finishes.
 
@@ -459,8 +458,9 @@ class Color(StrEnum):
 
 type Tree = dict[str, Tree | Color]
 
-def visit(tree: Tree, at: str = ""
-          ) -> Generator[str, None, Counter[Color]]:
+def visit(
+    tree: Tree, at: str = ""
+) -> Generator[str, None, Counter[Color]]:
     counts = Counter[Color]()
     for name, node in tree.items():
         if isinstance(node, dict):  # node is a Tree
@@ -616,7 +616,7 @@ sent by the driver.
 As the `ReturnType` it is the value of the whole `yield from` expression in `interview()`.
 
 `drive()`, imported unchanged,
-answers a request yielded two generators deep as it answers one from `interview()`'s own body.
+answers a request yielded two generators deep the same way it answers one from `interview()`'s own body.
 `ask()` works with a `Question` and an `Answer` alone,
 so the same `ask()` runs under any driver.
 A single loop at the edge of the program interprets requests yielded at any depth.
@@ -783,7 +783,6 @@ expect(RuntimeError, s.close)
 ```
 
 `close()` requires the generator to finish.
-
 When a driver stops using a live generator before the generator finishes,
 the driver shuts it down with `close()`.
 Python also calls `close()` on a live generator when it reclaims the generator's memory.
