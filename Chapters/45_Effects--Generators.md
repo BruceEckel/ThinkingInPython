@@ -1085,8 +1085,8 @@ a suspended generator keeps its frame alive and resumes it on the next call.
 The PEP names Ralph Griswold's Icon language, with CLU and Sather,
 as the models.
 Icon's `suspend` statement produces a value and leaves the procedure ready to produce another.
-The keyword came from the CLU and Sather languages,
-where an iterator yields one element at a time to a `for` loop.
+CLU and Sather use the word `yield` for the same step inside an iterator,
+which hands one element at a time to a loop.
 
 The restriction is the design.
 Each `yield` hands control back to whoever called `next()` or `send()`.
