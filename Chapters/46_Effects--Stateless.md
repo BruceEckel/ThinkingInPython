@@ -401,6 +401,9 @@ Binding an implementation and satisfying the type checker are the same act.
 
 A handler answers the Abilities `supply()` gave it and re-yields the rest to the next handler out.
 A second `supply()` wrapped around the first answers what the inner one re-yielded.
+`answering_proxy.py` in [Generators](45_Effects--Generators.md#composing-is-not-interpreting)
+is the same mechanism as a generator written out:
+`proxy()` answers the questions in its table and yields the rest up to `drive()`.
 
 A dependency injection container often lets you register a fallback for a type nobody else provides.
 Stateless has no such registration, and `need()` takes no default argument.
