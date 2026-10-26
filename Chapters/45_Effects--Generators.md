@@ -1045,7 +1045,8 @@ so the sequence must be finite and fit in memory.
 
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
 is a `reduce()` that keeps every intermediate result.
-Its first argument is the iterable whose elements it folds.
+The first argument to `accumulate()`, here `repeat(None)`,
+is the iterable whose elements it folds.
 Each step takes one element from that iterable,
 calls the lambda with the current pair and that element to get the next pair,
 and yields the new pair.
