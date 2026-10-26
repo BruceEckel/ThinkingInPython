@@ -204,9 +204,9 @@ Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put 
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
-Chapters/45_Effects--Generators.md	[PAST] called: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon for most of the inspiration.
-Chapters/45_Effects--Generators.md	[PAST] came: The keyword came from CLU and Sather, where an iterator yields one element at a time to a CODE loop.
-Chapters/45_Effects--Generators.md	[PAST] credited: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon for most of the inspiration.
+Chapters/45_Effects--Generators.md	[PAST] called: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon language for most of the inspiration.
+Chapters/45_Effects--Generators.md	[PAST] came: The keyword came from the CLU and Sather languages, where an iterator yields one element at a time to a CODE loop.
+Chapters/45_Effects--Generators.md	[PAST] credited: Tim Peters called the result a semi-coroutine, after Knuth, and credited Ralph Griswold's Icon language for most of the inspiration.
 Chapters/45_Effects--Generators.md	[PAST] gave: Each gave something up.
 Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write a function producing values one at a time and remembering where it is between one value and the next.
 Chapters/45_Effects--Generators.md	[PAST] needed: The producer needed to pause in the middle of its own loop, hand out a value, and resume where it stopped.

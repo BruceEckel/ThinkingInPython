@@ -1014,9 +1014,9 @@ The PEP's authors wanted the useful part of a coroutine without the whole mechan
 and the useful part is the frame:
 a suspended generator keeps its frame alive and resumes it on the next call.
 Tim Peters called the result a semi-coroutine, after Knuth,
-and credited Ralph Griswold's Icon for most of the inspiration.
+and credited Ralph Griswold's Icon language for most of the inspiration.
 Icon's `suspend` statement produces a value and leaves the procedure ready to produce another.
-The keyword came from CLU and Sather,
+The keyword came from the CLU and Sather languages,
 where an iterator yields one element at a time to a `for` loop.
 
 The restriction is the design.
