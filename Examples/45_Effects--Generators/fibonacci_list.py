@@ -1,8 +1,9 @@
 # fibonacci_list.py
+from collections.abc import Iterator
 from itertools import accumulate, islice, repeat
 
 def fibonacci(n: int) -> list[int]:
-    pairs = accumulate(
+    pairs: Iterator[tuple[int, int]] = accumulate(
         repeat(None),
         lambda pair, _: (pair[1], pair[0] + pair[1]),
         initial=(0, 1),
