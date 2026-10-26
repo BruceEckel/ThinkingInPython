@@ -963,7 +963,8 @@ writing a function that produces values one at a time,
 pausing after each value and resuming where it stopped when the caller asks for the next one.
 Python had three ways to write such a function.
 Each had an undesirable compromise.
-The first way is for the function to take a callback as an argument and call it with each value its loop computes:
+
+The first way is for the function to invoke a callback with each value its loop computes:
 
 ```python
 # fibonacci_callback.py
@@ -995,16 +996,14 @@ fibonacci(7, summing())
 #: value=8 total=20
 ```
 
-`callback(a)` is a line in `fibonacci()`'s loop,
-so `consume()` runs as a nested call while `fibonacci()` is partway through the loop,
-returns, and the loop moves on to the next value.
-Each of those calls gets a new stack frame whose locals vanish when `consume()` returns,
-so the running total needs a variable that survives from one call to the next.
-That variable is `total` in `summing()`.
+`consume()` runs as a nested call while `fibonacci()` is partway through the loop.
+When `consume()` returns, the loop moves on to the next value.
+The running total needs a variable that survives from one call to the next.
 The returned `consume` captures `total` as a [closure](40_Functional--Foundations.md#closures)
 variable, so `total` outlives `summing()`'s call.
 The `nonlocal` statement lets `consume()` assign to the captured `total`.
-The loop also puts `fibonacci()` in charge of how many times `consume()` runs and when the sequence ends.
+
+`fibonacci()` is in charge of how many times `consume()` runs and when the sequence ends.
 `consume()` receives one value per call and has no way to ask for the next one or to stop the loop early.
 
 The second way is for `fibonacci()` to compute every value into a list and return the list:
@@ -1032,9 +1031,7 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
-The caller has an ordinary `for` loop,
-and `total` is an ordinary variable beside the loop,
-but every value exists before the caller sees the first,
+Every value exists before the caller sees the first,
 so the sequence must be finite and fit in memory.
 
 The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
@@ -1073,11 +1070,11 @@ for value in Fibonacci(7):
 #: value=8 total=20
 ```
 
-The caller keeps its `for` loop and receives the values one at a time,
-but the rewrite moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out:
-how far the loop has gone through `range(n)`,
-which the function form of `fibonacci()` keeps in its frame while it runs,
-becomes `remaining`, which `__next__()` decrements and tests on every call.
+This moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out.
+In the function version,
+the running frame holds the `for` loop's count of values.
+In the class, that count is the attribute `remaining`,
+which `__next__()` decrements and tests on every call.
 
 All three stand in for that one ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
