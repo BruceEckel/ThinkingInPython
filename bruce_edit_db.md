@@ -2567,6 +2567,50 @@ Bruce chose the word ("or 'preserves'", over "retains") and confirmed it
 
 **Home.** this file only.
 
+### C47. Close a pair word's phrase before the next clause starts
+
+**Test.** A word that promises a pair ("between X", "both X", "either
+X", "neither X") whose own phrase holds no "and"/"or"/"nor", followed
+by that conjunction with no punctuation or verb between, and then a
+noun phrase that is the next clause's subject. The reader takes the
+noun phrase as the pair's second half and backs up at its verb:
+"keeps state between values and the consumer has a loop of its own".
+Repair by closing the phrase before the conjunction ("from one value
+to the next while the consumer has"), by a comma plus "so"/"while"
+that states the relation, or by repeating the pair word ("between
+machines and between Python builds"). `tools/sentence_shapes.py`'s
+`[PAIR]` rule finds the shape (`tip sentence-shapes`, in `tip prose`).
+
+**Keep when.** A verb sits between the pair noun and the conjunction
+("both forms keep the result and the name": "keep" has settled "both"
+as a determiner), or a verb follows the conjunction at once ("leaves
+both loops in one step and skips `else`"): the misreading never forms,
+or ends within a word. A complete pair that happens to be a subject
+("neither the class nor the instance holds") is the ordinary
+construction.
+
+**Sightings.** 1 marked by Bruce, `45_Effects--Generators` 2026-10-26
+(`33d228b9`), was Claude-written ("kind of jumbles together"):
+- "The problem appears whenever the producer keeps state between
+  values and the consumer has a loop of its own." -> "The problem
+  appears whenever the producer keeps state from one value to the next
+  while the consumer has a loop of its own."
+
+The same-day book sweep (`d957111a` and the `[PAIR]` commit) found
+and fixed seven more, which count as the detector's sightings rather
+than Bruce's: `47_Effects--Stateless_in_Practice` ("both appliances are
+a `HeatSource` and ZIO must report" -> ", so ZIO must report"),
+Solutions 04 ("for both strings and `int()` returns" -> ", while
+`int()` returns"; "satisfies both conditions and the two blocks do" ->
+"while the two blocks do"), Solutions 22 ("between machines and
+Python builds" -> "between machines and between Python builds"),
+Solutions 35 ("to both and leave `tile()` alone" -> "to `Symbol` and
+`SPECS`, leaving `tile()` alone"), Solutions 45 ("under both drivers
+and each returns" -> ", and each driver returns"), Solutions 47
+("accepts both factories and `ty` passes" -> ", `ty` passes,").
+
+**Home.** this file only | `tools/sentence_shapes.py` `[PAIR]`.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
