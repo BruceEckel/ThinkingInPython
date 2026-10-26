@@ -1272,6 +1272,7 @@ so it stops being a stack frame.
 The execution frame lives on the heap inside the generator object,
 which exposes it as `gi_frame`, with its locals and position intact.
 The next `next()` links that frame back into the call stack.
+
 The PEP names Ralph Griswold's Icon language, with CLU and Sather,
 as the models.
 Icon's `suspend` statement produces a value and leaves the procedure ready to produce another.
@@ -1280,7 +1281,7 @@ which hands one element at a time to a loop.
 
 ### The Restriction Behind the Driver
 
-The design is a restriction:
+PEP 255's generator is a coroutine with one restriction:
 each `yield` hands control back to whoever called `next()` or `send()`.
 Handing control anywhere else would mean carrying the C stack as well,
 which is why the PEP calls Stackless Python, whose coroutines do that,
