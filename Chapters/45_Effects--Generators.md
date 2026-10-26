@@ -1005,16 +1005,78 @@ The `nonlocal` statement lets `consume()` assign to the captured `total`.
 The loop also puts `fibonacci()` in charge of how many times `consume()` runs and when the sequence ends.
 `consume()` receives one value per call and has no way to ask for the next one or to stop the loop early.
 
-The second way is for `fibonacci()` to compute every value into a list and return the list.
-Its caller then has an ordinary `for` loop,
+The second way is for `fibonacci()` to compute every value into a list and return the list:
+
+```python
+# fibonacci_list.py
+def fibonacci(n: int) -> list[int]:
+    result: list[int] = []
+    a, b = 0, 1
+    for _ in range(n):
+        result.append(a)
+        a, b = b, a + b
+    return result
+
+total = 0
+for value in fibonacci(7):
+    total += value
+    print(f"{value=} {total=}")
+#: value=0 total=0
+#: value=1 total=1
+#: value=1 total=2
+#: value=2 total=4
+#: value=3 total=7
+#: value=5 total=12
+#: value=8 total=20
+```
+
+The caller has an ordinary `for` loop,
+and `total` is a local of the code that uses it,
 but every value exists before the caller sees the first,
 so the sequence must be finite and fit in memory.
-The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call.
-The rewrite moves the locals `a` and `b` into instance attributes and turns the control flow inside out:
-the position in the loop, which the running function kept,
-becomes an attribute that `__next__()` sets and tests on every call.
+
+The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
+
+```python
+# fibonacci_class.py
+from collections.abc import Iterator
+from dataclasses import dataclass, field
+from typing import override
+
+@dataclass(eq=False)
+class Fibonacci(Iterator[int]):
+    remaining: int
+    _a: int = field(default=0, init=False)
+    _b: int = field(default=1, init=False)
+
+    @override
+    def __next__(self) -> int:
+        if self.remaining == 0:
+            raise StopIteration
+        self.remaining -= 1
+        value = self._a
+        self._a, self._b = self._b, self._a + self._b
+        return value
+
+total = 0
+for value in Fibonacci(7):
+    total += value
+    print(f"{value=} {total=}")
+#: value=0 total=0
+#: value=1 total=1
+#: value=1 total=2
+#: value=2 total=4
+#: value=3 total=7
+#: value=5 total=12
+#: value=8 total=20
+```
+
+The caller keeps its `for` loop and receives the values one at a time,
+but the rewrite moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out:
+the position in the loop, which the running function kept, becomes `remaining`,
+which `__next__()` decrements and tests on every call.
 `fibonacci_iterator.py` in [Iterators](22_Patterns--Iterators.md#generators)
-shows `Fibonacci` in that form, with `remaining` as that attribute.
+is the same class.
 `fibonacci()` needed to pause in the middle of its own loop, hand out a value,
 and resume where it stopped.
 
