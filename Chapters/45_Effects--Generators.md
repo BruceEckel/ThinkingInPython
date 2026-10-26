@@ -961,8 +961,15 @@ It describes a function by what it requests and writes those requests into its r
 PEP 255 added generators to Python 2.2 in 2001 to solve one problem:
 writing a function that produces values one at a time,
 pausing after each value and resuming where it stopped when the caller asks for the next one.
-Python had three ways to write such a function.
-Each had an undesirable compromise.
+The problem appears whenever the producer keeps state between values and the consumer has a loop of its own.
+`fibonacci()` keeps two numbers and a count.
+The PEP's example, the standard library's `tokenize()`,
+keeps its place in the source text,
+and a recursive tree walk keeps a whole recursion in progress between one node and the next.
+The consumer needs its own local variables and loops to track what it has seen,
+and it may stop early.
+Python had three ways to write such a producer.
+Each comes with an undesirable compromise.
 
 The first way is for the function to invoke a callback with each value its loop computes:
 
@@ -1076,9 +1083,16 @@ the running function's stack frame holds the `for` loop's count of values.
 In the class, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
 
+Each approach gives up one side's loop.
+The callback turns the consumer inside out:
+the body of its loop becomes `consume()`, a function the producer's loop calls.
+The list keeps both loops but runs the producer's loop to completion before the consumer's loop starts.
+The class turns the producer inside out:
+its loop becomes the bookkeeping in `__next__()`.
 All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
+A generator lets the producer and the consumer each keep its own loop.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
 alive and resumes it on the next call.
@@ -1097,6 +1111,9 @@ each `yield` hands control back to whoever called `next()` or `send()`.
 Handing control anywhere else would mean carrying the C stack as well,
 which is why the PEP calls Stackless Python, whose coroutines do that,
 "a controversial rethinking of the Python core."
+The suspended generator is the one-shot continuation that [Annotating a Generator](#annotating-a-generator)
+describes, and the restriction says who resumes it:
+the code that called `next()` or `send()`.
 That restriction is why a driver exists.
 Something must call `next()` and `send()`,
 and since a generator cannot name that something, you write it.

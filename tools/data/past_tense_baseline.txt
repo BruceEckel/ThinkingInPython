@@ -204,8 +204,7 @@ Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put 
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
-Chapters/45_Effects--Generators.md	[PAST] had: Each had an undesirable compromise.
-Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write such a function.
+Chapters/45_Effects--Generators.md	[PAST] had: Python had three ways to write such a producer.
 Chapters/45_Effects--Generators.md	[PAST] returned: The driver calls CODE on the generator CODE returned, but CODE prints the CODE line.
 Chapters/45_Effects--Generators.md	[PAST] told: Which one told you more, and what does the type checker say once you remove CODE's annotation?
 Chapters/45_Effects--Generators.md	[PAST] wanted: The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
