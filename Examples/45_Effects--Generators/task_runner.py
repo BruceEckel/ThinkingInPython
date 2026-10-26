@@ -12,12 +12,12 @@ def index() -> Iterator[str]:
 
 def task_runner(jobs: deque[Iterator[str]]) -> None:
     while jobs:
-        job = jobs.popleft()
+        job = jobs.popleft()  # [1]
         try:
             print(next(job))
         except StopIteration:
-            continue
-        jobs.append(job)
+            continue  # [2]
+        jobs.append(job)  # [3]
 
 task_runner(deque([download(), index()]))
 #: download: headers

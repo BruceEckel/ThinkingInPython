@@ -825,12 +825,12 @@ def index() -> Iterator[str]:
 
 def task_runner(jobs: deque[Iterator[str]]) -> None:
     while jobs:
-        job = jobs.popleft()
+        job = jobs.popleft()  # [1]
         try:
             print(next(job))
         except StopIteration:
-            continue
-        jobs.append(job)
+            continue  # [2]
+        jobs.append(job)  # [3]
 
 task_runner(deque([download(), index()]))
 #: download: headers
@@ -840,6 +840,15 @@ task_runner(deque([download(), index()]))
 #: download: checksum
 ```
 
+`deque([download(), index()])` holds two generator objects.
+Calling `download()` and `index()` runs none of their bodies.
+`[1]` takes the job at the front of the queue,
+and `next()` runs it to its next `yield`.
+`[3]` puts that job at the back of the queue, behind the other job,
+so the two jobs alternate.
+A finished job raises `StopIteration` at its `next()`,
+and the `continue` at `[2]` skips `[3]`, so the finished job leaves the queue.
+The loop ends when the queue is empty.
 Each `yield` suspends its job and returns control to `task_runner()`,
 which then runs the next job.
 The output interleaves the two jobs in a single thread,
