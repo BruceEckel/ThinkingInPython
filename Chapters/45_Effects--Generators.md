@@ -1041,6 +1041,8 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
+`fibonacci_list.py` is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
+which keeps `a` and `b` in its suspended execution frame and hands out one value per `next()`.
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
 
@@ -1058,6 +1060,7 @@ The lambda's second parameter always receives that `None`,
 so the lambda ignores it with the name `_`.
 The pair is the state `a, b` from the callback version,
 carried as a value from one call of the lambda to the next instead of held in an execution frame.
+
 In `itertools_accumulate.py` from [Toolkits](41_Functional--Toolkits.md#accumulate),
 the iterable is `[1, 2, 3, 4]` and each step adds its element to the running total.
 `fibonacci()` has no list of elements to fold:
@@ -1078,10 +1081,7 @@ and so on without end, and `toolz` has an `iterate()` of the same shape.
 Each is a generator:
 a loop that yields the current value and then applies the step to it.
 A generator is the direct way to write an unfold,
-and in 2001 Python had no generator.
-
-`fibonacci_list.py` is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
-which keeps `a` and `b` in its suspended execution frame and hands out one value per `next()`.
+and before PEP 255 Python had no generator.
 
 The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
 
@@ -1119,8 +1119,8 @@ for value in Fibonacci(7):
 #: value=8 total=20
 ```
 
-This moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out.
-In the function version,
+The class moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out.
+In `fibonacci_callback.py`,
 the running function's stack frame holds the `for` loop's count of values.
 In the class, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
