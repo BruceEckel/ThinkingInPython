@@ -960,17 +960,19 @@ It describes a function by what it requests and writes those requests into its r
 
 PEP 255 added generators to Python 2.2 in 2001 to solve one problem.
 Python had three ways to write a function producing values one at a time and remembering where it is between one value and the next.
-Each gave something up.
-The producer can take a callback as an argument and call it with each value its loop computes:
+Each had an undesirable compromise.
+The function can take a callback as an argument and call it with each value its loop computes:
 
 ```python
 # fibonacci_callback.py
 from collections.abc import Callable
 
-def fibonacci(n: int, use: Callable[[int], None]) -> None:
+def fibonacci(
+    n: int, callback: Callable[[int], None]
+) -> None:
     a, b = 0, 1
     for _ in range(n):
-        use(a)
+        callback(a)
         a, b = b, a + b
 
 def summing() -> Callable[[int], None]:

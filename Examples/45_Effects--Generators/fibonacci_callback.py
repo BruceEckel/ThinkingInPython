@@ -1,10 +1,12 @@
 # fibonacci_callback.py
 from collections.abc import Callable
 
-def fibonacci(n: int, use: Callable[[int], None]) -> None:
+def fibonacci(
+    n: int, callback: Callable[[int], None]
+) -> None:
     a, b = 0, 1
     for _ in range(n):
-        use(a)
+        callback(a)
         a, b = b, a + b
 
 def summing() -> Callable[[int], None]:
