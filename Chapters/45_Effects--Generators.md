@@ -1252,6 +1252,17 @@ pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
 A generator lets the producer and the consumer each keep their own loop.
 
+Two loops passing values in both directions resembles a queue like the ones in [Coordinating Threads with Queues](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
+with three differences:
+
+1. A generator holds no items: a value goes out,
+   the generator stays suspended until the driver sends a value,
+   and only then does the next value go out.
+2. Control moves with the value,
+   so at any moment either the driver or the generator body is running.
+3. The generator cannot start an exchange.
+   It runs when its driver resumes it, and it answers that driver alone.
+
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
 alive and resumes it on the next call.
