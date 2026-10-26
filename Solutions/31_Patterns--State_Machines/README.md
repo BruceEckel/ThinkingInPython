@@ -718,7 +718,7 @@ so every sequence this generator produces is legal by construction.
 
 **Where the state lives.**
 The machine's state is `previous`,
-a local variable in the generator's suspended [execution frame](../../Chapters/45_Effects--Generators.md#half-a-coroutine-by-design).
+a local variable in the generator's suspended [execution frame](../../Chapters/05_Foundations--Functions.md#names-inside-a-function).
 `yield` leaves the execution frame alive between one move and the next,
 so the variable survives with it,
 and the loop over `range(count)` is the engine: each pass reads the state,

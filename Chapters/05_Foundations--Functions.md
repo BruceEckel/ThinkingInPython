@@ -365,6 +365,15 @@ not when `def` runs.
 The module binds `limit` before it calls `reads_later()`,
 so the lookup succeeds.
 
+Each call to a function gets its own *execution frame*,
+the object Python creates to hold that call's local variables and its position in the body.
+While the call runs, the frame is an entry on the call stack,
+the call's *stack frame*, and Python discards it when the function returns,
+so the local `count` in `rebinds()` exists only during a call to `rebinds()`.
+A generator's frame outlives a `yield`,
+and [Generators](45_Effects--Generators.md#half-a-coroutine-by-design)
+shows what that makes possible.
+
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
 

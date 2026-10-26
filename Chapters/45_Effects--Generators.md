@@ -1080,11 +1080,10 @@ All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
-An *execution frame* is the object Python creates for each call to hold the function's locals and its position in the code.
-While the function runs, that object is its stack frame,
-an entry on the call stack, and Python discards it when the function returns.
-The useful part is that a suspended generator keeps its execution frame alive and resumes it on the next call.
-A generator's execution frame leaves the call stack at `yield`,
+The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
+alive and resumes it on the next call.
+Python discards a function's frame when the function returns.
+A generator's frame leaves the call stack at `yield`,
 survives as the generator object's `gi_frame` with its locals and position intact,
 and returns to the call stack on the next `next()`.
 The PEP names Ralph Griswold's Icon language, with CLU and Sather,
