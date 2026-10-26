@@ -1040,28 +1040,32 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
-This version threads the state between values through a chain of three `itertools` functions from [Toolkits](41_Functional--Toolkits.md#the-itertools-toolkit).
+Every value exists after the call to `fibonacci()`,
+so the sequence must be finite and fit in memory.
+
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
-is `reduce()` with every intermediate result kept.
-It starts from `initial=(0, 1)`,
-calls the lambda with the current pair and the next input element to get the next pair,
-and yields each pair in turn.
+is a `reduce()` that keeps every intermediate result.
+Its first argument is the iterable whose elements it folds.
+Each step takes one element from that iterable,
+calls the lambda with the current pair and that element to get the next pair,
+and yields the new pair.
 The pair is the state `a, b` from the callback version,
 carried as a value from one call of the lambda to the next instead of held in an execution frame.
+A running total folds over a list of numbers and adds each element to the total.
+`fibonacci()` has no list of elements to fold:
+each step needs the previous pair alone.
+The iterable's job here is to decide how many steps `accumulate()` takes.
 [`repeat(None)`](41_Functional--Toolkits.md#repeat)
-supplies those input elements.
-`accumulate()` consumes one per step,
-and this computation has no input of its own,
-so each element is a placeholder that the lambda receives as `_`.
-`repeat()` with no count is endless, so the chain of pairs is endless too.
+is an endless iterable whose every element is `None`,
+so `accumulate()` takes a step for each one,
+and the lambda names the element `_` because it ignores it.
+With no count, `repeat()` is endless, so the chain of pairs is endless too.
 [`islice()`](41_Functional--Toolkits.md#islice)
 takes the first `n` pairs and stops asking,
 and the comprehension keeps the first number of each pair.
-`fibonacci_list.py` is a function version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
+
+`fibonacci_list.py` is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
 which keeps `a` and `b` in its suspended execution frame and hands out one value per `next()`.
-The function version returns after the comprehension's list is complete,
-so every value exists before the caller sees the first,
-and the sequence must be finite and fit in memory.
 
 The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
 
