@@ -999,18 +999,18 @@ returns, and the loop moves on to the next value.
 Each of those calls gets a new stack frame whose locals vanish when `consume()` returns,
 so the running total needs a variable that survives from one call to the next.
 That variable is `total` in `summing()`.
-Python keeps it alive after `summing()` returns,
-because the returned `consume` captures it as a [closure](40_Functional--Foundations.md#closures)
-variable, and `nonlocal` lets `consume()` assign to it.
+The returned `consume` captures `total` as a [closure](40_Functional--Foundations.md#closures)
+variable, so `total` outlives `summing()`'s call.
+The `nonlocal` statement lets `consume()` assign to the captured `total`.
 The loop also puts `fibonacci()` in charge of how many times `consume()` runs and when the sequence ends.
 `consume()` receives one value per call and has no way to ask for the next one or to stop the loop early.
 
-Having `fibonacci()` build the whole result list up front gives its caller an ordinary `for` loop,
+The second way is for `fibonacci()` to compute every value into a list and return the list.
+Its caller then has an ordinary `for` loop,
 but every value exists before the caller sees the first,
 so the sequence must be finite and fit in memory.
-Rewriting `fibonacci()` as an iterator class,
-with a `__next__()` that returns one value per call,
-moves its locals `a` and `b` into instance attributes and turns its control flow inside out:
+The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call.
+The rewrite moves the locals `a` and `b` into instance attributes and turns the control flow inside out:
 the position in the loop, which the running function kept,
 becomes an attribute that `__next__()` sets and tests on every call.
 `fibonacci_iterator.py` in [Iterators](22_Patterns--Iterators.md#generators)
