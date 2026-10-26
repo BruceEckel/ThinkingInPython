@@ -804,7 +804,7 @@ This chapter rests on three ideas:
   so the body can ask for something and receive the answer.
 - `yield from` composes those conversations.
   Each generator in the chain yields to whatever code resumed it,
-  so the whole chain runs unchanged under any driver.
+  so one chain serves every driver.
 
 The first two ideas are enough to build a task runner.
 A queue holds the live generators.
