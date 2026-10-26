@@ -1292,15 +1292,15 @@ the code that called `next()` or `send()`.
 That restriction is why a driver exists.
 Something must call `next()` and `send()`,
 and since a generator cannot name that something, you write it.
+
 In May 1999, two years before the PEP,
-Tim Peters called generators "half a coroutine" on python-dev,
-and "semi-coroutines" in his next message.
+Tim Peters called generators "half a coroutine" on python-dev.
 The other half came in 2005, when PEP 342 added the send channel to Python 2.5.
 Simulations, games, and asynchronous I/O need to pass a value or an exception into a generator at its suspension point,
 so `send()`, `throw()`, and `close()` arrived together,
 and the PEP describes a scheduler that runs many generators as a "trampoline,"
 the shape of `task_runner_send.py`.
-`yield from` (PEP 380, Python 3.3, 2012) completed the set.
+`yield from` (PEP 380, Python 3.3, 2012) completes the set.
 A delegating generator passes all three channels through to the innermost generator,
 so you can compose a conversation from parts that never refer to their driver.
 
