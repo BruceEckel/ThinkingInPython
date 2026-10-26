@@ -205,14 +205,16 @@ because the annotation applies one `SendType` to every call, the first included.
 A driver therefore primes with `next()`,
 which sends no value and passes the check.
 
-## A Generator Is a Description
+## A Generator Waits for Its Driver {#a-generator-is-a-description}
 
 [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
 shows that calling an `async def` function leaves its body waiting to run.
-The call returns a coroutine: a description of work.
+The call returns a coroutine object that holds the body.
+That chapter calls the object a description of work,
+since building it and running it are separate steps.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
 the same three-part shape as a `Generator`.
-The shapes match because `async def` and generator functions both build descriptions for a driver to run.
+The shapes match because `async def` and generator functions both return an object that holds a body for a driver to run.
 Calling `interview()` returns a generator object and runs none of the function body.
 `next()` and `send()` run the body, one `yield` at a time.
 
@@ -355,7 +357,7 @@ reproduces the `ValueError` with several threads.
 It also shows `threading.synchronized_iterator()`,
 which lets those threads share one generator by serializing their calls.
 
-## `yield from` Composes Descriptions
+## `yield from` Composes Generators {#yield-from-composes-descriptions}
 
 An EMS needs a request made deep inside a program to reach the one driver at its edge.
 Generators provide that path because they nest.

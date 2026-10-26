@@ -119,7 +119,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Generator Is a Description](../../Chapters/45_Effects--Generators.md#a-generator-is-a-description)
+[A Generator Waits for Its Driver](../../Chapters/45_Effects--Generators.md#a-generator-is-a-description)
 explains why `interview()` accepts answers from any driver.
 Write the new driver as a loop that fetches the next answer,
 then calls `send()`.
