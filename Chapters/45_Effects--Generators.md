@@ -1266,9 +1266,10 @@ with three differences:
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
 alive and resumes it on the next call.
-Python discards a function's frame when the function returns.
-At `yield`, Python unlinks the generator's frame from the call stack.
-The frame lives on the heap inside the generator object,
+Python discards a function's stack frame when the function returns.
+At `yield`, Python unlinks the generator's execution frame from the call stack,
+so it stops being a stack frame.
+The execution frame lives on the heap inside the generator object,
 which exposes it as `gi_frame`, with its locals and position intact.
 The next `next()` links that frame back into the call stack.
 The PEP names Ralph Griswold's Icon language, with CLU and Sather,
