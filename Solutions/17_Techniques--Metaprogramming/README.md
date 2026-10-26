@@ -934,7 +934,7 @@ The injected statement runs before that lookup,
 so the lookup fails too late to stop it.
 
 Restoring the `if class_name not in cls.KNOWN_COMMANDS` check rejects the payload before `make_class()` builds the string,
-so the injected code never reaches `exec()`.
+so the injected code stops at the check, before `exec()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

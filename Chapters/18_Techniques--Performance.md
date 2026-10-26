@@ -253,7 +253,7 @@ so the first report from a location answers it,
 and after the first hit the monitored code runs at full speed again.
 
 A profiler gives you a ranked table with no code to write.
-`sys.monitoring` gives you the counts you ask for, about the code you choose.
+`sys.monitoring` gives you the counts you request, about the code you choose.
 It is the better tool when you already know which function to measure and the profiler's overhead changes the answer.
 
 ## Benchmark Alternatives with `timeit`

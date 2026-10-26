@@ -427,6 +427,7 @@ def prose(v: Vars) -> None:
     py("tools.positional_refs", *prose_files(v))
     py("tools.italics", *prose_files(v))
     py("tools.trailing_tags", *prose_files(v))
+    py("tools.overclaims", *prose_files(v))
     for module in PROSE_CHECKS:
         py(module, *prose_files(v))
     py("tools.internal_names")
@@ -488,6 +489,26 @@ def trailing(v: Vars) -> None:
       "entries", secondary=True)
 def trailing_accept(v: Vars) -> None:
     py("tools.trailing_tags", "--accept", *prose_files(v))
+
+
+@task("Report new clauses that bound a set with a count or exclusivity "
+      "word (report-only; accept with `tip overclaims-accept`)")
+def overclaims(v: Vars) -> None:
+    """Report prose clauses that bound a set with a count or
+    exclusivity word ("one restriction", "the only way", "nothing
+    else", "all it does"), the overclaim candidates. It reports and
+    never gates; `tip prose` runs it after the trailing-tag scan. CH=
+    picks one chapter and its Solutions file. Hits judged keeps live in
+    tools/data/overclaims_baseline.txt, so the run prints only new
+    ones; ARGS=--all lists every hit.
+    """
+    py("tools.overclaims", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new overclaim hits to the baseline and drop stale entries",
+      secondary=True)
+def overclaims_accept(v: Vars) -> None:
+    py("tools.overclaims", "--accept", *prose_files(v))
 
 
 @task("Report new sentences whose subject is held open from its verb "

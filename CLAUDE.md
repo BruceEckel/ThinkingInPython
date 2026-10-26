@@ -244,7 +244,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Twelve report-only
+Thirteen report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -399,11 +399,31 @@ stressed at its first use ("*suppresses*") is beyond it. The baseline
 holds the judged keeps: a defining sentence for a term the earlier
 prose used loosely, and a principle or pattern name (*Subtraction*,
 *Reactor*) italic on every mention.
+`tip overclaims` (`tools/overclaims.py`, 2026-10-26) lists a clause
+that bounds a set with a count or an exclusivity word, `[BOUND]`: "one
+restriction", "the only way", "a single X", "two jobs", "X alone", "no
+other", "nothing else", "everything else", "the rest is", "all it
+does". The test is whether you can point at the second member. If you
+can, the bound is false and the sentence needs rewording. If you
+cannot, the hit is a keep. The shape came from chapter 45, which said
+"PEP 255's generator is a coroutine with one restriction" while the
+same paragraph called the send channel "the other half". The sweep
+that day (280ead51) had 49 Opus agents read the 1506 candidates and
+reword 75; the second member was usually in the same section, a
+paragraph away, or in the listing (`_make()` beside `_replace()`, the
+`@cache` store as a third step), or a Python fact (`next(it,
+default)`, `zip()` with any number of iterables). The baseline holds
+the judged keeps: a count followed by a list of that length, an idiom
+("one at a time"), a thesis sentence, an "X alone" whose contrast is
+the claim, and a bound the next sentence qualifies. The 141 hits left
+NEW are the agents' "unsure" items, kept out of the baseline for
+Bruce's read.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
 `tip trailing-accept`, `tip subject-gap-accept`,
 `tip sentence-shapes-accept`, `tip passive-accept`,
-`tip past-tense-accept`, `tip expletives-accept`, and `tip italics-accept` add the current
+`tip past-tense-accept`, `tip expletives-accept`, `tip italics-accept`,
+and `tip overclaims-accept` add the current
 new hits to the baseline after a human read; `ARGS=--all`
 lists every hit.
 `CH=NN` scopes an accept the way it scopes the report (since

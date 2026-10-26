@@ -1527,6 +1527,19 @@ tip trailing CH=31          # new hits
 tip trailing-accept CH=31   # baseline the judged keeps
 ```
 
+## overclaims.py
+
+Lists clauses that bound a set with a count or exclusivity word (`[BOUND]`):
+"one restriction", "the only way", "nothing else", "all it does", "alone".
+The test a reader applies is whether the text can point at a second member
+of the set; if it can, the bound is an overclaim. The patterns live in
+`PATTERNS` and `NOUNS`. The baseline is `tools/data/overclaims_baseline.txt`.
+
+```
+tip overclaims CH=45          # new hits
+tip overclaims-accept CH=45   # baseline the judged keeps
+```
+
 ## internal_names.py
 
 Lists public class names that nothing outside their class uses, each a

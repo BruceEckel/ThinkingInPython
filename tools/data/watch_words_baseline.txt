@@ -311,7 +311,6 @@ Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior f
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: It matches classes exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: The lookup matches classes exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	only: CODE needs only the CODE and CODE cases
-Chapters/32_Patterns--Multiple_Dispatching.md	only: Only a returned sentinel makes Python try the right operand's CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	only: The counter fills only as you consume the generator
 Chapters/32_Patterns--Multiple_Dispatching.md	only: and CODE and battles the groups against each other until only members of one group remain
 Chapters/32_Patterns--Multiple_Dispatching.md	want: You want to say CODE
@@ -395,7 +394,6 @@ Chapters/41_Functional--Toolkits.md	want: Keeping one is right when you want eac
 Chapters/42_Functional--Error_Handling.md	names a structure: but the word names a structure that many types share
 Chapters/42_Functional--Error_Handling.md	never: and it never sees a field name
 Chapters/42_Functional--Error_Handling.md	never: which CODE never receives
-Chapters/42_Functional--Error_Handling.md	only: The only way to the answer is narrowing to one of the two classes
 Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type says which side you received
 Chapters/42_Functional--Error_Handling.md	wants: A caller who wants the original must read it from the new exception's CODE
 Chapters/43_Functional--Confidence.md	even: and perhaps some should even be mathematically provable
@@ -488,7 +486,6 @@ Solutions/02_Foundations--Tour/README.md	only: A post-processor has only the cha
 Solutions/03_Foundations--Containers/README.md	cost: CODE compares the cost of operations at the left end of a CODE and of a CODE
 Solutions/03_Foundations--Containers/README.md	costs: so the CODE loop costs O(n)
 Solutions/03_Foundations--Containers/README.md	costs: so the whole loop costs O(n²)
-Solutions/03_Foundations--Containers/README.md	is what: The rest is what CODE supplies after the tally
 Solutions/04_Foundations--Control_Flow/README.md	only: A list pattern matches only a sequence of its own length
 Solutions/04_Foundations--Control_Flow/README.md	only: Order matters only between patterns that could both match the same value
 Solutions/04_Foundations--Control_Flow/README.md	only: and increment it only in the branch that handles an odd CODE

@@ -48,7 +48,7 @@ Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Behavioral* :: One of those g
 Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Creational* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
 Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Structural* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*
 Chapters/40_Functional--Foundations.md	[EARLIER] *immutable* :: An *immutable* value cannot change after creation
-Chapters/40_Functional--Foundations.md	[EARLIER] *pure function* :: A *pure function* computes its result from its arguments alone
+Chapters/40_Functional--Foundations.md	[EARLIER] *pure function* :: A *pure function* computes its result from its arguments
 Chapters/41_Functional--Toolkits.md	[EARLIER] *Lazy evaluation* :: *Lazy evaluation* computes a value only when something needs it
 Chapters/41_Functional--Toolkits.md	[EARLIER] *Recursion* :: *Recursion* expresses a repeated computation as a function that calls itself
 Chapters/44_Effects--Effect_Management.md	[EARLIER] *Effect* :: An *Effect* is anything a caller takes on by making a call, beyond receiving the return value

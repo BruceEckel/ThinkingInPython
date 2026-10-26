@@ -535,7 +535,7 @@ An `Outlet` request carries the hour so the handler can check which sources are 
 
 `Source` carries no `@runtime_checkable`,
 because the listings name `Source` in annotations and in `Outlet`'s base,
-never in an `isinstance()` check.
+with no `isinstance()` check on it.
 `supply()` needs that decorator,
 because it [matches an instance to a requested class](46_Effects--Stateless.md#supplying-an-interface)
 with `isinstance()`.
