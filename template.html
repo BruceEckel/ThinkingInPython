@@ -206,6 +206,13 @@
       text-decoration: none;
     }
     .section-drop a:hover { color: var(--accent); }
+    /* The first entry is the chapter itself, a way back to the top. */
+    .section-drop .section-top a {
+      font-weight: 600;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 0.3rem;
+      padding-bottom: 0.35rem;
+    }
     .section-drop a[aria-current] { color: var(--accent); font-weight: 600; }
     /* A touch screen has no hover: only a tap (data-open) opens the
        list. This rule comes last so [data-open] wins the tie. */
@@ -592,6 +599,15 @@
       menu.removeAttribute("hidden");
 
       var chapterTitle = label.textContent;
+      // The chapter itself heads the list: "#top" scrolls to the top
+      // of the page when no element carries that id.
+      var topItem = document.createElement("li");
+      topItem.className = "section-top";
+      var topLink = document.createElement("a");
+      topLink.href = "#top";
+      topLink.textContent = chapterTitle;
+      topItem.appendChild(topLink);
+      list.insertBefore(topItem, list.firstChild);
       var heads = [];
       var lastH2 = "";
       Array.prototype.forEach.call(list.querySelectorAll("a"), function (link) {
@@ -624,6 +640,9 @@
             ? found.parent + " › " + found.text
             : found.text;
           found.link.setAttribute("aria-current", "true");
+          topLink.removeAttribute("aria-current");
+        } else {
+          topLink.setAttribute("aria-current", "true");
         }
         label.textContent = text;
         button.title = text;
@@ -641,8 +660,8 @@
       update();
 
       function centerCurrent() {
-        if (!current) return;
-        list.scrollTop = current.link.offsetTop - list.clientHeight / 2;
+        var link = current ? current.link : topLink;
+        list.scrollTop = link.offsetTop - list.clientHeight / 2;
       }
       function close() {
         menu.removeAttribute("data-open");
