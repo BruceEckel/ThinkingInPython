@@ -795,9 +795,11 @@ A generator written for others to drive must therefore let `GeneratorExit` end i
 
 This chapter rests on three ideas:
 
-- A generator function builds a description instead of doing work.
-- `yield` and `send()` make that description two-way,
-  so the description can ask for something and receive the answer.
+- Calling a generator function runs none of its body.
+  The call returns a generator object that holds the body and its state,
+  and a driver runs that body one `yield` at a time with `next()` and `send()`.
+- `yield` carries a request out of the body and `send()` carries the answer back in,
+  so the body can ask for something and receive the answer.
 - `yield from` composes those conversations.
   No generator in the chain refers to its driver.
 
