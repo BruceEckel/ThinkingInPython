@@ -1040,18 +1040,19 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
-Every value exists after the call to `fibonacci()`,
-so the sequence must be finite and fit in memory.
+Because the list holds all the values,
+the sequence must be finite and fit in memory.
 
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
 is a `reduce()` that keeps every intermediate result.
 [`repeat(None)`](41_Functional--Toolkits.md#repeat)
-is an iterator that yields `None` every time something asks it for an element.
-With no count argument it yields `None` forever.
+is an iterator that produces `None` every time something asks it for an element.
+With no count argument it produces `None` forever.
 Each step of `accumulate()` takes one element from the first argument,
 so here each step takes a `None`.
-It calls the lambda with the current pair and that `None` to get the next pair,
-and yields the new pair.
+It calls the lambda,
+passing the current pair together with `None` to get the next pair,
+and hands out the new pair.
 The lambda's second parameter always receives that `None`,
 so the lambda ignores it with the name `_`.
 The pair is the state `a, b` from the callback version,
