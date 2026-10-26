@@ -495,8 +495,8 @@ print(Base.total, Sub.total)
 `type(self)` is `Base` for the one `Base()` call and `Sub` for both `Sub()` calls.
 `Base()` (`[1]`) increments `Base.total` to `1`.
 `Sub.total` reads through to that `1`.
-The first `Sub()` (`[2]`) reads the same `1`, adds one,
-and the assignment creates `Sub.total = 2` on `Sub` alone,
+The first `Sub()` (`[2]`) reads the same `1` and adds one.
+The assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
 The second `Sub()` (`[3]`) increments that separate copy to `3`.
 

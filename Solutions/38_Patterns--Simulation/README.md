@@ -1367,8 +1367,8 @@ print(plate.render(width=40, height=20))
 
 The nodal lines are straight because the new field is a product of one function of `x` and one function of `y`.
 The product vanishes when either factor does.
-For `m = 2`, `sin(mπx)` is zero at `x = 0, 1/2, 1`, whatever `y` is,
-and those three zeros give vertical lines.
+For `m = 2`, `sin(mπx)` is zero at `x = 0, 1/2, 1`, whatever `y` is.
+Those three zeros give vertical lines.
 For `n = 3`, `sin(nπy)` is zero at `y = 0, 1/3, 2/3, 1`, whatever `x` is,
 giving horizontal lines.
 Every nodal point lies on one of those seven lines.

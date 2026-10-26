@@ -306,7 +306,14 @@ colon followed by a clause that joins a second clause with "and", and
 ("keeps state between values and the consumer has a loop": the reader
 joins "the consumer" to "values" until the verb). A verb between the
 phrase and the conjunction, or right after it, is quiet by design;
-the book-wide read that day had 52 raw hits and 6 real ones. A
+the book-wide read that day had 52 raw hits and 6 real ones. The
+fourth default rule is `[AND+REL]` (2026-10-26): the `[AND]` shape
+where the first clause already carries a relative clause or a
+parenthetical before the ", and" brings in a second subject ("which
+produces `start`, …, and so on without end, and `toolz` has an
+`iterate()` of the same shape"), the "weight" tell of the style
+rule's "and" bullet; 11 of that day's 927 `[AND]` hits had it, 5
+were split, and the keeps are Done-when criteria. A
 colon after a count or a demonstrative ("three parts:", "this
 shape:") is skipped. The survey rules print only under `ARGS=--survey`
 and never enter the baseline: `[AND]`, an "and" that joins two clauses

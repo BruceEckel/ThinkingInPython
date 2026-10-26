@@ -94,6 +94,14 @@ def rules(source: str) -> list[str]:
      []),
     ("`Temperature` has no `__dict__` to assign them, so neither the "
      "class nor the instance holds an `celsius`.", []),
+    ("The third-party `more-itertools` package supplies one as "
+     "`iterate(func, start)`, which produces `start`, `func(start)`, "
+     "`func(func(start))`, and so on without end, and `toolz` has an "
+     "`iterate()` of the same shape.", ["AND+REL"]),
+    ("The third-party `more-itertools` package supplies one as "
+     "`iterate(func, start)`, which produces `start`, `func(start)`, "
+     "`func(func(start))`, and so on without end. `toolz` has an "
+     "`iterate()` of the same shape.", []),
     ("Intro paragraph.", []),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
@@ -129,7 +137,7 @@ def test_the_reported_line_is_the_sentences_first_character() -> None:
 
 def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
-    assert set(RULES) == {"IMP", "COLON+AND", "PAIR"}
+    assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL"}
     assert set(SURVEY_RULES) == {"AND", "COLON"}
 
 

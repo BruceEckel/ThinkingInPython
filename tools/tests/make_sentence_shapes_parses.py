@@ -79,6 +79,14 @@ SOURCES: Final[tuple[str, ...]] = (
     "A call between the check and the use can reset that attribute.",
     "`Temperature` has no `__dict__` to assign them, so neither the "
     "class nor the instance holds an `celsius`.",
+    "The third-party `more-itertools` package supplies one as "
+    "`iterate(func, start)`, which produces `start`, `func(start)`, "
+    "`func(func(start))`, and so on without end, and `toolz` has an "
+    "`iterate()` of the same shape.",
+    "The third-party `more-itertools` package supplies one as "
+    "`iterate(func, start)`, which produces `start`, `func(start)`, "
+    "`func(func(start))`, and so on without end. `toolz` has an "
+    "`iterate()` of the same shape.",
     "Intro paragraph.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""

@@ -9,6 +9,8 @@
 # `tip sentence-shapes` before accepting.
 # See tools/sentence_shapes.py.
 Chapters/01_Introduction.md	[COLON+AND] The next chapter introduces the design-patterns movement, and the question I keep asking through the rest of the part: what problem are you solving, and does the language already do the pattern's job?
+Chapters/04_Foundations--Control_Flow.md	[AND+REL] There the CODE matches, the inner CODE (CODE) skips the CODE, and the outer CODE (CODE) runs right after.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[AND+REL] CODE accepts it, the linter (CODE) accepts it, and the declaration says CODE, so every reader expects a dict.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[IMP] Every method that changes it must re-validate, and a method can leave the object in an illegal state between steps:
 Chapters/17_Techniques--Metaprogramming.md	[COLON+AND] The rest of CODE is presentation: how it formats what CODE reports, and which members it shows.
 Chapters/17_Techniques--Metaprogramming.md	[IMP] Using CODE directly, build a class CODE with a base of CODE, an attribute CODE, and a method CODE returning CODE.
@@ -22,18 +24,27 @@ Chapters/44_Effects--Effect_Management.md	[COLON+AND] With it you know what a fu
 Chapters/44_Effects--Effect_Management.md	[COLON+AND] Write the production bindings for CODE: a CODE class whose CODE calls CODE and whose CODE calls CODE.
 Chapters/46_Effects--Stateless.md	[IMP] Explain what each one catches, and why the checker catches assigning a dropped request but not discarding one.
 Chapters/47_Effects--Stateless_in_Practice.md	[IMP] Explain what the types claim, what the run does, and which line restores the guarantee.
+Solutions/04_Foundations--Control_Flow/README.md	[AND+REL] your four predictions match the run, where CODE returns CODE for both strings, while CODE returns CODE for both, and you can name the test CODE would need for each string and say why CODE needs none.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[IMP] Compare what CODE and CODE put there.
+Solutions/09_Foundations--Class_Attributes/README.md	[AND+REL] The second CODE raises an CODE (CODE), and CODE still prints CODE afterward.
 Solutions/17_Techniques--Metaprogramming/README.md	[COLON+AND] The prediction: CODE builds cleanly, and CODE holds CODE alone, so CODE stays out.
 Solutions/17_Techniques--Metaprogramming/README.md	[IMP] Then consider what CODE does to a parameter, and print CODE to check your prediction.
 Solutions/18_Techniques--Performance/README.md	[IMP] on a list such as CODE, CODE and CODE return CODE and CODE for the value CODE, and the slice between those indices is CODE.
 Solutions/19_Techniques--Concurrency/README.md	[IMP] Compare each task's delay with the moment CODE and CODE fail to decide which tasks are still running when cancellation starts.
 Solutions/19_Techniques--Concurrency/README.md	[PAIR] The original CODE has both CODE and CODE cancelled because both are still sleeping when CODE and CODE fail.
 Solutions/22_Patterns--Iterators/README.md	[IMP] For the explanation, consider what a generator keeps between calls to CODE, and what CODE would have to do to learn a count.
+Solutions/29_Patterns--Changing_the_Interface/README.md	[AND+REL] before your fix, CODE reports CODE on CODE (the parameter CODE does not match CODE), and the keyword call raises a CODE for CODE.
 Solutions/30_Patterns--Observer/README.md	[COLON+AND] your test passes against your CODE: the first responder raises an exception, CODE raises an CODE holding it, and the second responder has recorded the value.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[AND+REL] CODE returns CODE, CODE, CODE, CODE against CODE, CODE, CODE, and CODE, each reversed duel returns the opposite result (a draw stays a draw), and you can state how many methods you added against exercise 1's seven rows.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[AND+REL] for each of the 36 ordered pairs of your six weapons, the two orders give opposite results (a draw stays a draw), CODE returns one group's name, more than one group wins across many seeds, and CODE passes on your file.
+Solutions/35_Patterns--Flyweight/README.md	[AND+REL] CODE passes on your file (it reports CODE on CODE while CODE lags behind), a map using all five kinds prints five distinct tile objects however many cells it has, and on an all-grass 3x3 map CODE returns 2 at a corner, 3 on an edge, and 4 in the center.
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[IMP] To let a subclass share its parent's bin, give CODE a class variable that holds the bin's key, and have CODE default that variable for each class.
+Solutions/38_Patterns--Simulation/README.md	[AND+REL] after 1200 steps CODE still reads far above zero (the solution, with mode CODE and CODE, prints CODE), CODE reads CODE like the default, and rendering the CODE plate shows nearly every grain heaped in the corners at CODE and CODE, off the nodal lines.
+Solutions/38_Patterns--Simulation/README.md	[AND+REL] on the seven-by-nine maze from CODE, your count of CODE returns exceeds CODE (the solution prints 25 against 24), CODE gives equal counts, and taking the CODE back out of CODE makes the counts agree again.
 Solutions/38_Patterns--Simulation/README.md	[IMP] Make CODE return values from an iterator you script, and have CODE append to a list.
 Solutions/40_Functional--Foundations/README.md	[COLON+AND] That split is the chapter's point: CODE makes the checker reject a rebinding of the name, and the value's own type makes it reject a change to the contents.
 Solutions/45_Effects--Generators/README.md	[COLON+AND] CODE takes the other route: CODE yields it, the CODE in CODE relays it, and the driver receives it.
 Solutions/45_Effects--Generators/README.md	[COLON+AND] The choice decides which code receives the number: a yielded value goes to the driver, and a returned value goes to the delegating generator.
 Solutions/45_Effects--Generators/README.md	[COLON+AND] The count travels through the CODE: CODE returns it, CODE delivers it into CODE's CODE, CODE returns it again, and the second CODE delivers it into CODE's CODE.
+Solutions/46_Effects--Stateless/README.md	[AND+REL] CODE passes your test, which asserts that a scripted CODE printed the greeting built from its canned answer, and your demo greets the name it reads.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[IMP] Give the shared signature a CODE alias over CODE, and have the caller take that alias.

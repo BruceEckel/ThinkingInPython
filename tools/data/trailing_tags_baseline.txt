@@ -15,7 +15,7 @@ Chapters/08_Foundations--Static_Types.md	[R32] CODE checks and runs, the same as
 Chapters/08_Foundations--Static_Types.md	[R32] CODE is a placeholder, filled in separately at each call
 Chapters/08_Foundations--Static_Types.md	[R32] Checking is a separate step you run, the same way you run tests
 Chapters/09_Foundations--Class_Attributes.md	[R32] A CODE with no value stays a declaration, the same as CODE in CODE
-Chapters/09_Foundations--Class_Attributes.md	[R32] The first CODE (CODE) reads the same CODE, adds one, and the assignment creates CODE on CODE alone, the same shadowing CODE demonstrates in CODE
+Chapters/09_Foundations--Class_Attributes.md	[R32] The assignment creates CODE on CODE alone, the same shadowing CODE demonstrates in CODE
 Chapters/09_Foundations--Class_Attributes.md	[R32] Writing the same increment through CODE forks the counter when the base class has subclasses, the same way CODE forks CODE
 Chapters/13_Techniques--Pattern_Matching.md	[R35] Rethinking Objects works through the same tradeoff with shapes, and *Multiple Dispatching* and *Visitor* explore it further
 Chapters/13_Techniques--Pattern_Matching.md	[R35] The tradeoff has a name

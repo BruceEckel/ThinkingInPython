@@ -74,8 +74,21 @@ the parser attaches elsewhere ("between the check and the use can
 reset", "either a CODE the author typed or an CODE") still reports,
 and the baseline holds those.
 
-Three rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, and
-`[PAIR]`, judged against a baseline. Two are survey rules, `SURVEY_RULES`: `[AND]` and
+`[AND+REL]` (2026-10-26, from a sentence the author marked in chapter
+45) is the `[AND]` shape where the first clause already carries a
+relative clause (a `relcl` token) or an opening parenthesis before the
+second subject: "CODE supplies one as CODE, which produces CODE, CODE,
+CODE, and so on without end, and CODE has an CODE of the same shape".
+The second claim rides as an afterthought on a sentence that was
+already full, so the first takes a period. It is the "weight" tell of
+the style rule's "and" bullet, and the only part of the `[AND]` shape
+precise enough to baseline: of the 927 `[AND]` hits that day, 11 had
+this shape, 5 were split, and the 6 keeps are Done-when criteria,
+which list several conditions in one sentence by design. A sentence
+earns `[AND+REL]` or `[AND]`, never both.
+
+Four rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
+and `[AND+REL]`, judged against a baseline. Two are survey rules, `SURVEY_RULES`: `[AND]` and
 plain `[COLON]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
@@ -118,7 +131,7 @@ the stale entries. A run given paths compares against those files' entries alone
 with paths adds and drops entries for those files and keeps
 every other file's entries.
 
-`--calibrate` checks all five rules against `tools/data/edit_pairs.json`
+`--calibrate` checks all six rules against `tools/data/edit_pairs.json`
 (the sentences the author rewrote, 72 records of `before`, `after`, and
 `fault`): each before and after text is parsed as a one-paragraph
 document, and each rule reports the pairs where it fires on the before
@@ -208,6 +221,7 @@ RULES: Final = {
     "IMP": "imperative plus consequence",
     "COLON+AND": "colon, then a clause with an and-joined clause",
     "PAIR": "a pair word whose and or or arrives from the next clause",
+    "AND+REL": "an and-joined second subject after a relative clause",
 }
 """The default rules: judged against the baseline."""
 SURVEY_RULES: Final = {
@@ -261,6 +275,16 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("PAIR", "The problem appears whenever the producer keeps state "
              "from one value to the next while the consumer has a loop "
              "of its own.", False),
+    ("AND+REL",
+     "The third-party `more-itertools` package supplies one as "
+     "`iterate(func, start)`, which produces `start`, `func(start)`, "
+     "`func(func(start))`, and so on without end, and `toolz` has an "
+     "`iterate()` of the same shape.", True),
+    ("AND+REL",
+     "The third-party `more-itertools` package supplies one as "
+     "`iterate(func, start)`, which produces `start`, `func(start)`, "
+     "`func(func(start))`, and so on without end. `toolz` has an "
+     "`iterate()` of the same shape.", False),
     ("PAIR", "Both forms keep the result and the name.", False),
     ("PAIR", "A `break` at the match leaves both loops in one step and "
              "skips `else` along with them.", False),
@@ -355,14 +379,19 @@ def imperative_consequence(sentence: Sentence) -> bool:
     )
 
 
-def and_joins_subjects(sentence: Sentence) -> bool:
-    """A finite root and a finite "and" verb with different subjects."""
+def and_joined_clause(sentence: Sentence) -> Token | None:
+    """The finite "and" verb whose subject differs from the root's, or None.
+
+    The root is a finite verb with a plain subject; the verb coordinated
+    with it through "and" is finite, has a subject of its own that is
+    not a bare pronoun, and that subject's text differs from the first.
+    """
     root = root_of(sentence)
     if root is None or not finite(root, sentence):
-        return False
+        return None
     first = subject_of(root, sentence)
     if first is None or first.dep not in SUBJECT_DEPS:
-        return False
+        return None
     for conj in conj_verbs(root, sentence):
         second = subject_of(conj, sentence)
         if (second is None or not finite(conj, sentence)
@@ -370,6 +399,42 @@ def and_joins_subjects(sentence: Sentence) -> bool:
             continue
         said = phrase(second, sentence)
         if said not in BARE_PRONOUNS and said != phrase(first, sentence):
+            return conj
+    return None
+
+
+def and_joins_subjects(sentence: Sentence) -> bool:
+    """A finite root and a finite "and" verb with different subjects."""
+    return and_joined_clause(sentence) is not None
+
+
+def and_rides_on_relative(sentence: Sentence) -> bool:
+    """The `[AND]` shape where the first clause already carries a
+    relative clause or a parenthetical.
+
+    "CODE supplies one as CODE, which produces CODE, CODE, CODE, and
+    so on without end, and CODE has an CODE of the same shape": the
+    first clause holds a `relcl` (or an opening parenthesis) before the
+    "and" that introduces the second subject, so the second claim
+    rides on a sentence that was already full. The first claim takes a
+    period. The test is the clause's weight, not its subject, so a
+    short first clause with a relative clause still counts.
+    """
+    conj = and_joined_clause(sentence)
+    if conj is None:
+        return False
+    second = subject_of(conj, sentence)
+    assert second is not None
+    toks = sentence.tokens
+    end = min(second.i, conj.i)
+    for t in toks[:end]:
+        if t.punct and t.text == "(":
+            return True
+        if t.dep != "relcl":
+            continue
+        start = min(subtree(t, sentence))
+        if (start > 0 and toks[start].tag in WH_TAGS
+                and toks[start - 1].punct and toks[start - 1].text == ","):
             return True
     return False
 
@@ -543,7 +608,9 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
     for sentence in paragraph.sentences:
         if imperative_consequence(sentence):
             yield "IMP", sentence
-        if and_joins_subjects(sentence):
+        if and_rides_on_relative(sentence):
+            yield "AND+REL", sentence
+        elif and_joins_subjects(sentence):
             yield "AND", sentence
         if pair_gap(sentence):
             yield "PAIR", sentence

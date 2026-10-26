@@ -528,7 +528,9 @@ def sentence_shapes(v: Vars) -> None:
     "and", and [PAIR] a pair word ("between", "both", "either",
     "neither") whose conjunction arrives from the next clause and
     opens a noun phrase ("keeps state between values and the consumer
-    has a loop"). The survey rules, printed only under ARGS=--survey and never
+    has a loop"), and [AND+REL] an "and" that brings in a second
+    subject after a first clause that already carries a relative
+    clause or a parenthetical. The survey rules, printed only under ARGS=--survey and never
     baselined: [AND] an "and" joining two clauses with different
     subjects, and [COLON] a colon followed by an independent clause.
     Run `tip sentence-shapes CH=31 ARGS=--survey` at the start of a
@@ -536,7 +538,7 @@ def sentence_shapes(v: Vars) -> None:
     the subject-gap scan. CH= picks one chapter and its Solutions file.
     Hits judged keeps live in tools/data/sentence_shapes_baseline.txt,
     so the run prints only new ones; ARGS=--all lists every default
-    hit, and ARGS=--calibrate runs all five rules over
+    hit, and ARGS=--calibrate runs all six rules over
     tools/data/edit_pairs.json and the built-in examples.
     """
     py("tools.sentence_shapes", *prose_files(v), *v.words("ARGS"))

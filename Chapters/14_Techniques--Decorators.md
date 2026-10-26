@@ -1041,8 +1041,8 @@ because they give a `Callable` the attributes of a function object.
 and the name the trace prints must come from `func`.
 
 The return side is equally unconstrained.
-A decorator "returns a result, which Python binds to the original name,"
-and that result can be any object:
+A decorator "returns a result, which Python binds to the original name."
+That result can be any object:
 
 ```python
 # run_once.py

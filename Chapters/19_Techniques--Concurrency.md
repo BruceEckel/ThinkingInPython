@@ -19,8 +19,8 @@ then the OS stops it and switches to a different program for another time slice.
 Later came a finer-grained unit of scheduling that lives inside a program:
 the *thread of execution*.
 A modern OS schedules threads, not whole programs.
-Each task (unit of work) gets its own thread,
-and the OS performs *context switching* from one thread to the next.
+Each task (unit of work) gets its own thread.
+The OS performs *context switching* from one thread to the next.
 The OS controls everything: allocating threads,
 deciding how long a time slice is, switching contexts,
 and deciding which thread is ready to run next.
@@ -723,8 +723,8 @@ Keeping siblings alive past a failure means catching exceptions inside each task
 Every delay in this chapter so far has a set length or, in `network_io.py`,
 waits on a server in the same process, so every wait so far ends on its own.
 A call to a remote server can wait indefinitely.
-`asyncio.timeout()` (3.11) bounds how long a block of code may run,
-and a `TaskGroup` nested inside its `async with` block falls under the same deadline:
+`asyncio.timeout()` (3.11) bounds how long a block of code may run.
+A `TaskGroup` nested inside its `async with` block falls under the same deadline:
 
 ```python
 # async_timeout.py
