@@ -1031,7 +1031,7 @@ for value in fibonacci(7):
 ```
 
 The caller has an ordinary `for` loop,
-and `total` is a local of the code that uses it,
+and `total` is an ordinary variable beside the loop,
 but every value exists before the caller sees the first,
 so the sequence must be finite and fit in memory.
 
@@ -1043,7 +1043,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import override
 
-@dataclass(eq=False)
+@dataclass
 class Fibonacci(Iterator[int]):
     remaining: int
     _a: int = field(default=0, init=False)
@@ -1076,9 +1076,9 @@ but the rewrite moves the locals `a` and `b` into the attributes `_a` and `_b` a
 how far the loop has gone through `range(n)`,
 which the function form of `fibonacci()` keeps in its frame while it runs,
 becomes `remaining`, which `__next__()` decrements and tests on every call.
-`fibonacci()` must pause in the middle of its own loop, hand out a value,
-and resume where it stopped.
 
+What `fibonacci()` must do is pause in the middle of its own loop,
+hand out a value, and resume where it stopped.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
 and the useful part is the frame:
 a suspended generator keeps its frame alive and resumes it on the next call.
@@ -1088,10 +1088,11 @@ Icon's `suspend` statement produces a value and leaves the procedure ready to pr
 CLU and Sather use the word `yield` for the same step inside an iterator,
 which hands one element at a time to a loop.
 
-The restriction is the design.
-Each `yield` hands control back to whoever called `next()` or `send()`.
+The design is a restriction:
+each `yield` hands control back to whoever called `next()` or `send()`.
 Handing control anywhere else would mean carrying the C stack as well,
-the obstacle that kept Stackless Python's coroutines out of the core.
+which is why the PEP calls Stackless Python, whose coroutines do that,
+"a controversial rethinking of the Python core."
 That restriction is why a driver exists.
 Something must call `next()` and `send()`,
 and since a generator cannot name that something, you write it.
@@ -1110,7 +1111,8 @@ so you can compose a conversation from parts that never refer to their driver.
 An event loop is one such driver.
 `async`/`await` (PEP 492, Python 3.5, 2015)
 is the same machinery with a syntax that marks a function as one the event loop resumes.
-An Effect system builds on a generator rather than a coroutine for the reason the 2001 design chose the half it did.
+An Effect system builds on a generator rather than a full coroutine,
+for the reason the 2001 design chose the half it did.
 A generator hands each request to the code that resumed it.
 That code is the driver you write.
 
