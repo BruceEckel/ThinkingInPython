@@ -362,7 +362,12 @@ legal value** (PEP 661, Python 3.15+).
   comment to its own line or wrap the statement. The one sanctioned
   overflow is a trailing `# type: ignore` pragma. Output must fit
   too: shorten what the program prints rather than letting a `#:`
-  marker run past 60.
+  marker run past 60. A name is never the thing to shorten: a
+  parameter is named for its role (`callback`, not `use`), and a
+  signature the name pushes past 60 wraps across lines, the
+  parameters on their own indented line between `def f(` and
+  `) -> None:`, as chapter 11's test signatures and chapter 45's
+  `fibonacci_callback.py` do.
 
 - **Prose that walks a listing points with tags, not positions.** A
   line the prose refers to carries a trailing `# [1]`, `# [2]`, ...
@@ -508,6 +513,16 @@ revise:
   message echoed by a wrapper and again by the callee: drop the copy
   that carries less, and check that the first and last lines of the
   trace still identify themselves.
+
+- **When several listings vary one component, hold the rest
+  identical.** Chapter 45's `fibonacci_callback.py`,
+  `fibonacci_list.py`, and `fibonacci_class.py` show three shapes of
+  one producer, so each is driven by the same running-total consumer
+  over the same seven values, and the reader compares producers
+  alone. What each prints follows its subject: a listing whose
+  subject is a shape prints its result once (`total=20`), and a
+  listing whose subject is state across calls keeps the per-call
+  trace that shows the state surviving.
 
 ## Design patterns
 
