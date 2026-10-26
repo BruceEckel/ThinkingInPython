@@ -1020,15 +1020,19 @@ def fibonacci(n: int) -> list[int]:
 total = 0
 for value in fibonacci(7):
     total += value
-print(f"{total=}")
-#: total=20
+    print(f"{value=} {total=}")
+#: value=0 total=0
+#: value=1 total=1
+#: value=1 total=2
+#: value=2 total=4
+#: value=3 total=7
+#: value=5 total=12
+#: value=8 total=20
 ```
 
 The caller has an ordinary `for` loop,
 and `total` is a local of the code that uses it,
-so one `print()` after the loop shows the sum,
-where `consume()` prints on every call because it cannot know which call is its last.
-Every value exists before the caller sees the first, though,
+but every value exists before the caller sees the first,
 so the sequence must be finite and fit in memory.
 
 The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
@@ -1057,8 +1061,14 @@ class Fibonacci(Iterator[int]):
 total = 0
 for value in Fibonacci(7):
     total += value
-print(f"{total=}")
-#: total=20
+    print(f"{value=} {total=}")
+#: value=0 total=0
+#: value=1 total=1
+#: value=1 total=2
+#: value=2 total=4
+#: value=3 total=7
+#: value=5 total=12
+#: value=8 total=20
 ```
 
 The caller keeps its `for` loop and receives the values one at a time,

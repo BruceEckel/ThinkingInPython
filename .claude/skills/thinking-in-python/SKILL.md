@@ -518,11 +518,10 @@ revise:
   identical.** Chapter 45's `fibonacci_callback.py`,
   `fibonacci_list.py`, and `fibonacci_class.py` show three shapes of
   one producer, so each is driven by the same running-total consumer
-  over the same seven values, and the reader compares producers
-  alone. What each prints follows its subject: a listing whose
-  subject is a shape prints its result once (`total=20`), and a
-  listing whose subject is state across calls keeps the per-call
-  trace that shows the state surviving.
+  over the same seven values and prints the same seven lines, and
+  the reader compares producers alone. The consumer's print stays
+  per value in all three even where one could print once at the
+  end: a differing trace would read as a difference in the producers.
 
 ## Design patterns
 
