@@ -983,33 +983,35 @@ def summing() -> Callable[[int], None]:
         print(f"{value=} {total=}")
     return consume
 
-fibonacci(5, summing())
+fibonacci(7, summing())
 #: value=0 total=0
 #: value=1 total=1
 #: value=1 total=2
 #: value=2 total=4
 #: value=3 total=7
+#: value=5 total=12
+#: value=8 total=20
 ```
 
-The loop stays intact, but the consumer is now the callback,
-so it runs inside `fibonacci()`'s call and must keep its own state between calls:
+The loop in `fibonacci()` stays intact,
+but `consume()` runs inside `fibonacci()`'s call and must keep its own state between calls:
 every call to `consume()` starts with a fresh frame,
 so `total` lives in the closure that `summing()` returns.
-The producer also holds the control.
-It decides when the consumer runs and when the sequence ends.
-The consumer answers each call as it comes.
+`fibonacci()` also holds the control.
+It decides when `consume()` runs and when the sequence ends.
+`consume()` answers each call as it comes.
 
-Building the whole result list up front gives the consumer an ordinary `for` loop,
-but every value exists before the consumer sees the first,
+Having `fibonacci()` build the whole result list up front gives its caller an ordinary `for` loop,
+but every value exists before the caller sees the first,
 so the sequence must be finite and fit in memory.
-Rewriting the producer as an iterator class,
+Rewriting `fibonacci()` as an iterator class,
 with a `__next__()` that returns one value per call,
-moves its local variables into instance attributes and turns its control flow inside out:
+moves its locals `a` and `b` into instance attributes and turns its control flow inside out:
 the position in the loop, which the running function kept,
-becomes an attribute the programmer sets and tests on every call.
+becomes an attribute that `__next__()` sets and tests on every call.
 `fibonacci_iterator.py` in [Iterators](22_Patterns--Iterators.md#generators)
-shows `fibonacci()` in that form.
-The producer needed to pause in the middle of its own loop, hand out a value,
+shows `Fibonacci` in that form, with `remaining` as that attribute.
+`fibonacci()` needed to pause in the middle of its own loop, hand out a value,
 and resume where it stopped.
 
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism,

@@ -17,9 +17,11 @@ def summing() -> Callable[[int], None]:
         print(f"{value=} {total=}")
     return consume
 
-fibonacci(5, summing())
+fibonacci(7, summing())
 #: value=0 total=0
 #: value=1 total=1
 #: value=1 total=2
 #: value=2 total=4
 #: value=3 total=7
+#: value=5 total=12
+#: value=8 total=20
