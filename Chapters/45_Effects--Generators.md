@@ -840,8 +840,7 @@ task_runner(deque([download(), index()]))
 #: download: checksum
 ```
 
-`deque([download(), index()])` holds two generator objects.
-Calling `download()` and `index()` runs none of their bodies.
+`deque([download(), index()])` holds the two generator objects produced by calling `download()` and `index()`.
 `[1]` takes the job at the front of the queue,
 and `next()` runs it to its next `yield`.
 `[3]` puts that job at the back of the queue, behind the other job,
@@ -849,14 +848,8 @@ so the two jobs alternate.
 A finished job raises `StopIteration` at its `next()`,
 and the `continue` at `[2]` skips `[3]`, so the finished job leaves the queue.
 The loop ends when the queue is empty.
-Each `yield` suspends its job and returns control to `task_runner()`,
-which then runs the next job.
-The output interleaves the two jobs in a single thread,
-although neither names the other.
 
-`task_runner()` calls `next()` to give each job a turn.
-`drive()` calls `send()` to answer a generator's questions.
-When each job can make a request, one loop can do both:
+We can modify `task_runner()` to allow jobs to make requests:
 
 ```python
 # task_runner_send.py
@@ -877,6 +870,7 @@ def download() -> Generator[str, str]:
     yield "download: checksum"
 
 def index() -> Generator[str, str]:
+    # Each yield receives the runner's str and discards it
     yield "index: build"
     yield "index: merge"
 
