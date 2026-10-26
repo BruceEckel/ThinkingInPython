@@ -1077,8 +1077,9 @@ how far the loop has gone through `range(n)`,
 which the function form of `fibonacci()` keeps in its frame while it runs,
 becomes `remaining`, which `__next__()` decrements and tests on every call.
 
-What `fibonacci()` must do is pause in the middle of its own loop,
-hand out a value, and resume where it stopped.
+All three stand in for one ability:
+pausing `fibonacci()` in the middle of its own loop, handing out a value,
+and resuming where it stopped.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism,
 and the useful part is the frame:
 a suspended generator keeps its frame alive and resumes it on the next call.
