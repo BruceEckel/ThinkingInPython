@@ -1075,8 +1075,8 @@ which produces `start`, `func(start)`, `func(func(start))`,
 and so on without end, and `toolz` has an `iterate()` of the same shape.
 Each is a generator:
 a loop that yields the current value and then applies the step to it.
-The unfold is the first thing a generator gives the functional toolkit,
-and in 2001 Python had no way to write one.
+A generator is the direct way to write an unfold,
+and in 2001 Python had no generator.
 
 `fibonacci_list.py` is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
 which keeps `a` and `b` in its suspended execution frame and hands out one value per `next()`.
