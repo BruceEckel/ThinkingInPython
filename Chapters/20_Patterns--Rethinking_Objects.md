@@ -641,7 +641,7 @@ The type checker infers the concrete type behind `T` at each call site.
 With *ad-hoc polymorphism* (typically *function overloading*),
 a different implementation handles each type,
 and the argument's type selects which one runs.
-Python's form of function overloading is `@overload`.
+One Python form of function overloading is `@overload`.
 It gives one function name several typed signatures,
 all served by a single implementation that branches at runtime:
 
@@ -894,7 +894,7 @@ because each function annotates its parameter with a protocol that names the one
 
 #### What the Shape Does Not Say
 
-A protocol's structural check compares method names and signatures alone.
+A protocol's structural check compares member names and types alone.
 Two unrelated protocols can share a method name and signature by coincidence.
 The checker treats them as interchangeable:
 

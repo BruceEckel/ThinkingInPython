@@ -534,7 +534,8 @@ An `Outlet` request carries the hour so the handler can check which sources are 
 `Ask` carries a prompt for the same reason.
 
 `Source` carries no `@runtime_checkable`,
-because the listings use `Source` in annotations alone.
+because the listings name `Source` in annotations and in `Outlet`'s base,
+never in an `isinstance()` check.
 `supply()` needs that decorator,
 because it [matches an instance to a requested class](46_Effects--Stateless.md#supplying-an-interface)
 with `isinstance()`.
@@ -857,7 +858,8 @@ def research() -> Effect[
 ```
 
 The `research()` signature declares what the program needs and how it can fail.
-The signature is also the only place the three failures appear.
+Within `research()`,
+the signature is also the only place the three failures appear.
 The body requests each dependency by its type and leaves the network, the files,
 and the printing to the implementations you supply.
 Calling `research()` performs no work.

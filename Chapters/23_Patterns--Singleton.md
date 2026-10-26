@@ -506,7 +506,7 @@ adds the `__setattr__()` that forwards assignments.
 Python calls `__getattr__()` for every name it fails to find on the wrapper,
 an open set of names.
 The method's return type is whatever the inner object holds under each name,
-so `Any` is the one annotation that fits.
+so `Any` is the one annotation that fits every name and still lets the caller use the result.
 Delegation gives up static knowledge to forward every name,
 as it does throughout [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr).
 

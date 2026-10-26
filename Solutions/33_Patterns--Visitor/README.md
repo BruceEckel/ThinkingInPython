@@ -63,7 +63,7 @@ If you make `pollinate()` a `singledispatch` function too,
 the program prints the same four lines.
 `pollinate.registry` then holds one key, `object`, for the default,
 so every call runs the default body.
-The decorator's one effect is a registry lookup on each call.
+In this program the decorator's one effect is a registry lookup on each call.
 The solution keeps `pollinate()` an ordinary function and saves `@singledispatch` for `eat()`,
 the one operation whose answer depends on the flower type.
 
@@ -110,7 +110,7 @@ and with it the `Any` annotation the chapter explains.
 `Flower` also loses `pollinate()` and `eat()`,
 which become functions outside the hierarchy.
 `Chrysanthemum`'s `eat()` override becomes a registration.
-Two functions and one registration remain.
+Beside the four flower classes, two functions and one registration remain.
 
 The `Bug` classes hold no state.
 `Pollinator` and `Predator` each exist to name one operation.

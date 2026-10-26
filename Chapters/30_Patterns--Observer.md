@@ -922,7 +922,7 @@ the property intercepts every read and write of that attribute on an instance,
 routing a read through `read()` and a write through `write()`.
 The two function names are arbitrary.
 
-The `@property` form needs a method written in the class body for each attribute.
+The `@property` form needs a getter and a setter written in the class body for each attribute.
 `published()` writes the pair once, as nested functions,
 and builds the property for any field name.
 
@@ -1031,7 +1031,8 @@ so the checker synthesizes the same `__init__(self, celsius: float)` that `datac
 The checker accepts `Thermometer(100)` because `100` fits that parameter.
 `eq_default=False` makes the checker's claim match the runtime `eq=False`.
 
-`Broadcasting` has one type parameter, so a subclass publishes one value.
+`Broadcasting` has one type parameter,
+so a subclass publishes values of one type.
 A class that declares `celsius` and `humidity` sends both readings to the same responders with no name attached.
 A class with several published attributes uses `WeatherStation`'s name-and-value pair
 (exercise 12), or gives each attribute its own responders with the descriptor in exercise 10.
@@ -1478,7 +1479,7 @@ and calls `select()`.
 ## Document-View and MVC
 
 Document-View combines the controller with the view.
-We'll look at two approaches that differ only in where the input handling lives.
+We'll look at two approaches that differ in where the input handling lives.
 With Document-View, `View` has a `key()` method as a controller,
 while MVC gives `key()` to a `Controller` class.
 Both approaches share two models.
@@ -1682,7 +1683,8 @@ A new kind of key, say one that resets the count, is an edit to `Controller`.
 
 Adding a view leaves the controllers unchanged.
 A second view connects to a model and both views display (see exercise 13).
-A third model is a new view class and one more field in the controller,
+A third model is a new view class, one more field in the controller,
+and the `key()` code that writes to the new model,
 with `CountView` and `HistoryView` untouched.
 
 The decoupling also simplifies testing.

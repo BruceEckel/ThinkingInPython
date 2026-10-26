@@ -594,7 +594,7 @@ where a `list`'s `remove()` raises a `ValueError`.
 
 Repeated lookups run faster against a `set` than against a `list`.
 A `list` compares the item you look for against every element in turn.
-A `set` computes one hash and looks in one slot.
+A `set` computes one hash and usually looks in one slot.
 
 `timeit()` runs a callable `number` times and returns the total elapsed seconds.
 The [`lambda:`](05_Foundations--Functions.md#lambdas)

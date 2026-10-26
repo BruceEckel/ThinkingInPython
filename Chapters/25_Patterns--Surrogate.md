@@ -542,7 +542,8 @@ so the `query()` at `[1]` prints `result` alone.
 ### Protection Proxy
 
 A protection proxy decides whether a call reaches the implementation.
-Because `__getattr__()` receives the requested name, the check is one condition:
+Because `__getattr__()` receives the requested name,
+the check is one `if` statement:
 
 ```python
 # protection_proxy.py

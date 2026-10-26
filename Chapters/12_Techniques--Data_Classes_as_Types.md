@@ -483,7 +483,7 @@ so `s` stays on `D`, and every `D` object reads it from the class.
 
 `f: ClassVar[float]` appears in neither `show(D)` nor `vars(D())`.
 It has no initializer, so it is a bare annotation, like `x` and `s` in `A`.
-The declaration lives in `D.__annotations__` alone.
+The declaration lives in `D.__annotations__`.
 `expect()` shows that `D.f` raises an `AttributeError`,
 for the same reason `A().x` does.
 Assigning a value creates the attribute.
@@ -1237,7 +1237,8 @@ which the `# type: ignore` silences.
 Pyright accepts the `__new__()` without comment.
 
 A subclass of the `NamedTuple` may define `__new__()`.
-That avoids the prohibition, but one path still bypasses the check.
+That avoids the prohibition,
+but the inherited `_make()` and `_replace()` still bypass the check.
 `copy.replace()` calls the named tuple's `_replace()`,
 which rebuilds through `tuple.__new__()`, not through your `__new__()`,
 so `copy.replace()` on a validated instance quietly produces an unvalidated one.
@@ -1337,7 +1338,7 @@ print(c.host, c.name)
 #: localhost db
 ```
 
-A default in the base class is the one snag.
+One snag is a default in the base class.
 If `host` has a default, `name` follows it with none,
 and `@dataclass` refuses that order under its [field-ordering rule](#more-data-class-tools).
 The rule governs positional fields alone,
@@ -1525,7 +1526,7 @@ each can produce a `Stars` holding a number that no check saw.
 That is harmless while the copy comes from a legal original.
 It is dangerous when the state comes from a file that an older version of the class wrote.
 [*Memento*](36_Patterns--Memento.md) revisits that case.
-`copy.replace()` alone keeps the guarantee,
+`copy.replace()` keeps the guarantee,
 because rebuilding through the constructor is the only way to run the check again.
 
 ### Defining `__replace__()` {#defining-replace}

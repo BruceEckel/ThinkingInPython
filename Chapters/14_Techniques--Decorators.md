@@ -111,7 +111,7 @@ cheese()
 #: Wensleydale
 ```
 
-The body of `wrapper()` is the one part that runs at the call.
+The body of `wrapper()` is the one part of `announce` that runs at the call.
 
 `wrapper()` is a [*closure*](40_Functional--Foundations.md#closures).
 Defined inside its decorator, it refers to `func`,
@@ -337,7 +337,7 @@ Python binds `greet` to `decorate`.
 Calling `greet("Bob")` then runs `decorate("Bob")`,
 which wraps the string where it expects a function and returns the wrapper.
 The call runs silently.
-That silence is the only symptom.
+The caller gets a wrapper where it expected `"Bob"`.
 
 The annotations let the type checker report the mistake either way,
 at the decoration rather than at the call.

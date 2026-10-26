@@ -436,7 +436,7 @@ To bind one, `partial()` takes a [`Placeholder`](40_Functional--Foundations.md#l
 in each earlier position the caller fills.
 
 Save the strategy class for an algorithm that carries several related methods or mutable state.
-Configuration alone is a closure's job.
+Configuration alone is a job for a closure or a `partial` object.
 
 ## Chain of Responsibility: Choosing the Handler at Runtime
 

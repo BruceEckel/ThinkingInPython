@@ -514,6 +514,7 @@ The hand-written loop drops that value.
 The hand-written loop forwards neither.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 uses all three channels: the yielded values, the return value, and `send()`.
+The same section shows `yield from` relaying `throw()` and `close()` to the innermost generator.
 
 `test_flatten()` runs `flatten()` and `flatten_loop()` over the same inputs and expects the same flat list from each:
 

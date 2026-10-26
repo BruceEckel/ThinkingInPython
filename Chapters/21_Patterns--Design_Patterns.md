@@ -389,7 +389,7 @@ knowing each one through that interface.
 
 *Visitor* is the reverse of the others.
 The visitor specifies every concrete element.
-The pattern concentrates the heavy edges in one place on purpose.
+The pattern concentrates the heavy edges in the visitors on purpose.
 Adding an operation means writing one new visitor and leaving every other part as it was,
 while adding an element type means changing every visitor.
 That choice defines [*Visitor*](33_Patterns--Visitor.md).
@@ -414,7 +414,7 @@ Then you add a Markdown writer.
 The dashed box is the new class.
 The shaded parts are the existing ones whose source changes when you add `MdWriter`.
 Each heavy edge into the dashed box is a new place that specifies `MdWriter`.
-As in the gallery, the red box marks the part the change leaves alone.
+As in the gallery, the red box marks the part the design protects from the change.
 
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,

@@ -788,7 +788,7 @@ The `interact()` methods implement every rule of the game.
 
 `GameBuilder` assembles the maze in three stages: a room for every character,
 then the connections between rooms, then the teleport pairs.
-Each stage depends on the one before it,
+Stages 2 and 3 each need every room that Stage 1 builds,
 so each runs as its own labeled pass instead of all three interleaving in one loop.
 [Factory](26_Patterns--Factory.md#builder)
 counts `GameBuilder` among the cases where *Builder* remains useful in Python,
@@ -1119,11 +1119,12 @@ if __name__ == "__main__":
     show()
 ```
 
-Three ideas from earlier chapters make up the design.
+Four ideas from earlier chapters make up the design.
 [Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
 replaces a type switch,
 a [factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
-builds objects from data,
+builds objects from data, a [*Builder*](26_Patterns--Factory.md#builder)
+assembles them in ordered stages,
 and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object)
 removes the check for a missing door.
 None of them needs concurrency.

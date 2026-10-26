@@ -352,7 +352,7 @@ because the `for row in rows` clause runs inside `for x in row`.
 Everything to the right of `in` is an ordinary iterable expression,
 so anything that produces one works there.
 
-`zip()` walks two iterables together, taking one element from each:
+`zip()` walks several iterables together, taking one element from each:
 
 ```python
 # zip_pairs.py

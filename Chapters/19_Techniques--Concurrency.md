@@ -2275,7 +2275,7 @@ It does, but not for the reason threads were once the default choice.
 [I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
 divides concurrent work into two kinds, and neither kind needs threads.
 
-Threads remain for one job:
+Under the standard build, threads remain for one job:
 reaching code that doesn't cooperate with an event loop.
 Most database drivers, most GUI toolkits,
 and plenty of C extensions block the calling thread and expose no `async` entry point.

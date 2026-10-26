@@ -24,7 +24,7 @@ and `yield from`, which composes generators and produces the inner generator's r
 Every Effect in this chapter is such a generator.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
 
-An Effect's return type declares two things:
+Besides its result, an Effect's return type declares two things:
 the dependencies it needs and the ways it can fail.
 Both travel the yield channel every generator carries.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
@@ -764,7 +764,7 @@ If you forget the new argument at a call, `ty` reports a `missing-argument`.
 The difference is how many places you edit.
 A new parameter changes every call site along with every signature,
 and each function in between accepts the object and hands it onward.
-A new Ability changes the signatures alone.
+A new Ability changes the signatures and the edge's `supply()` call.
 `yield from greet_logged(name)` stays as it is.
 The instance appears once, at `supply()`.
 

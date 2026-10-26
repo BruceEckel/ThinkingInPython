@@ -836,7 +836,7 @@ so it yields no tuple.
 
 ### `permutations` and `combinations` {#permutations-and-combinations}
 
-Three tools draw `r` elements from an iterable, and two questions separate them:
+Four tools draw `r` elements from an iterable, and two questions separate them:
 does order matter, and may an element repeat?
 The same input and the same `r` make the answers comparable:
 

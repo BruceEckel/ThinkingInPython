@@ -188,7 +188,7 @@ the type checker reports `red.r = 9` before the script runs,
 and at runtime the assignment raises an `AttributeError`.
 
 Because the constructor sets every field once,
-`_replace()` builds an updated copy with one field replaced.
+`_replace()` builds an updated copy with new values for the fields you name.
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for a `NamedTuple`, a frozen data class,
 and any other type that defines `__replace__()`.
@@ -440,7 +440,7 @@ and a `NamedTuple` for typed fields set once.
 The hand-rolled `Messenger` is worth writing only to show that `SimpleNamespace` stores its keyword arguments in the instance `__dict__`.
 
 The frozen data class, which this book writes as `@record`,
-is the other immutable type with typed fields.
+is another immutable type with typed fields.
 Between it and a `NamedTuple`,
 the deciding question is whether tuple behavior is a feature.
 Choose `NamedTuple` when it is: unpacking, multiple return values,

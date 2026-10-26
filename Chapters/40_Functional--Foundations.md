@@ -38,7 +38,7 @@ then build a checked Effect system on that mechanism.
 
 ## Pure Functions
 
-A *pure function* computes its result from its arguments alone.
+A *pure function* computes its result from its arguments.
 It reads only values that stay the same,
 and it leaves everything outside itself as it was.
 Given the same arguments, it always produces the same outcome,
@@ -473,7 +473,7 @@ A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
 Once the enclosing function returns,
 the inner function's scope is the one place the captured variable has a name,
-so the inner function alone can read or rebind it.
+so the inner function alone can read or rebind it by name.
 That privacy gives you encapsulation without declaring a class:
 
 ```python
@@ -701,7 +701,8 @@ print(data[1])  # [1]
 
 Five of the chapter's ideas work at once: a record for the value,
 `Sequence` to state that `report()` leaves its input unchanged,
-two pure functions, `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
+three pure functions,
+`partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
 
 The `print()` at `[1]` shows that the pipeline leaves `data` as it was.
@@ -714,7 +715,7 @@ after the filter.
 
 `pipeline.py` is ordinary Python,
 written so that each piece depends on its arguments alone.
-The chapters ahead build on that single property.
+The chapters ahead build on that property.
 
 ## Exercises
 

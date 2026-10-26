@@ -1024,7 +1024,7 @@ class Pool[R]:
 
 `Pool` is generic over the pooled type,
 and it neither creates nor destroys anything.
-Its one job is holding the items between leases.
+Its job is holding the items between leases and lending them out.
 
 ```python
 # pool_demo.py

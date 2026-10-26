@@ -126,7 +126,7 @@ This part is for programmers coming to Python from another language.
 If you know Python, you can skim for topics new to you, or skip it altogether.
 If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md).
 Every chapter after Static Types annotates its examples,
-so Static Types is the chapter in Part I that the rest of the book assumes you have read.
+so Static Types is the chapter in Part I that every later chapter assumes you have read.
 [Class Attributes](09_Foundations--Class_Attributes.md)
 and [Cleanup](10_Foundations--Cleanup.md)
 are the two others that a reader who knows Python should still read,

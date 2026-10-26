@@ -163,8 +163,8 @@ marks an expression whose inferred type you want to see,
 and `ty check` prints that type as a diagnostic.
 
 The `# ty:` summary is for you, not for the tool.
-`ty` acts on two comment forms.
-`# type: ignore` silences every diagnostic on its line,
+`ty` acts on three comment forms.
+`# type: ignore` and a bare `# ty: ignore` silence every diagnostic on their line,
 and `# ty: ignore[invalid-argument-type]` silences the one rule it names.
 `# type: ignore` is the form every type checker honors.
 

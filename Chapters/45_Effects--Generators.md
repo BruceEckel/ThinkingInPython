@@ -1080,7 +1080,7 @@ and a recursive tree walk keeps a whole recursion in progress between one node a
 The consumer needs its own local variables and loops to track what it has seen,
 and it may stop early.
 
-Python had three ways to write such a producer.
+In a single thread, Python had three ways to write such a producer.
 Each comes with an undesirable compromise.
 
 The first way is for the function to invoke a callback on each computed value:

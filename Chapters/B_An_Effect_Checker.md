@@ -8,7 +8,8 @@ The checker here reads source text, resolves the calls it can,
 infers a row for every function, and reports each declared row the body exceeds.
 It is about 450 lines.
 Most of its pieces come from earlier chapters: a `match` over syntax-tree nodes,
-records for the data, a `Result` for the one operation that can fail,
+records for the data,
+a `Result` for the one operation in the core that can fail,
 and a pure core with its Effects at the edge.
 [The Checker Checks Itself](#the-checker-checks-itself)
 runs the checker on its own source to confirm that the core is pure.

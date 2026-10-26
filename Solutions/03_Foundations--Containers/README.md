@@ -366,7 +366,7 @@ while `defaultdict(int)` stores a `0` for `"dog"`,
 so their contents differ after the `counts["dog"]` line.
 
 **Rebuild the reporting.**
-The rest is what `Counter` supplies after the tally.
+The rest rebuilds two of the things `Counter` supplies after the tally.
 `most_common()` becomes a `sorted()` call with a key function and a slice,
 and the `Counter({...})` repr becomes a `dict()` conversion.
 

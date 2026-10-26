@@ -587,12 +587,12 @@ but you must tell the injector what every function needs,
 and tell it again when that changes.
 A mistake in the wiring appears only at runtime, when the program fails.
 
-Python has one mechanism that propagates on its own.
+Python has a mechanism that propagates on its own.
 A [`ContextVar`](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 holds a value for the current task,
 and any function the task calls reads the value without receiving it as an argument.
 The `ContextVar` supplies automatic propagation,
-but it removes the parameter along with the one benefit the parameter provided.
+but it removes the parameter along with the two benefits the parameter provided.
 `greet(ask, tell)` states its Effects in its signature.
 A `greet()` that reads two `ContextVar`s hides them.
 
@@ -1052,8 +1052,8 @@ A function can still call `print()`, next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
 In Python, neither Stateless nor the type checker reports it.
 A library checks the Effects you wrote down.
-Only a language with native Effects can find the ones you left out,
-because only its compiler reads every call in the body.
+A language with native Effects also finds the ones you left out,
+because its compiler reads every call in the body.
 
 Could Python itself gain Effect tracking,
 so that a tool infers every declaration instead of you writing it?

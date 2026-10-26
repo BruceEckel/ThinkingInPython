@@ -307,7 +307,7 @@ since the two sides of the failed assertion look alike.
 
 Hypothesis shrinks the failure to a one-character `s`,
 and printing the code points of both sides of the assertion shows they differ where they look alike.
-With `.hypothesis/` deleted between runs you see one of two characters,
+With `.hypothesis/` deleted between runs you nearly always see one of two characters,
 and your explanation covers both.
 
 <details>
@@ -340,8 +340,10 @@ E       )
 The two sides print almost identically,
 so you need their code points to tell them apart.
 
-Runs split between `'µ'` and `'ß'`,
+Nearly all runs split between `'µ'` and `'ß'`,
 since the shrinker sometimes stops at a failing character other than the smallest.
+An occasional run stops at a rarer character, such as the ligature `'ﬀ'`,
+whose uppercase is `"FF"`.
 Once a run fails, Hypothesis stores the counterexample in `.hypothesis/` and replays it first,
 so later runs report the same character until you delete that directory.
 
@@ -504,7 +506,7 @@ The crash is a real defect rather than an unstated precondition.
 `group_rounds()` keeps everyone in a group when a roster divides unevenly,
 folding the leftovers into existing groups.
 By that rule, the answer for a roster of two and a size of five is one group of two.
-Crashing is the one answer that contradicts what the function does everywhere else.
+Crashing contradicts what the function does everywhere else.
 The `group_rounds()` in [Functional Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size)
 includes the guard, so `test_group_rounds.py` passes with no `assume()`.
 
@@ -790,7 +792,7 @@ The `isinstance()` version drops the `match result:` line,
 and its final `return` (`[1]`) replaces a `case` line and its body.
 
 Reading, not length, separates the two versions.
-The `match` reads as one description of four shapes while the `isinstance()` version reads as four separate questions.
+The `match` reads as one description of four shapes while the `isinstance()` version reads as three separate questions and a fallthrough.
 The difference shows in what each version repeats.
 `result.error` appears three times in `describe_isinstance.py` and nowhere in the `match`,
 because each `case` pattern destructures the `Err` and matches the error inside it.

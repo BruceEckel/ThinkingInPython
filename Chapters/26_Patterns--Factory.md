@@ -190,8 +190,9 @@ The underscore discourages direct construction,
 but it is a convention rather than concealment.
 [*Singleton*](23_Patterns--Singleton.md#nothing-keeps-the-class-private)
 says the same of `_Settings`.
-Python honors its underscore in one place:
-`from module import *` leaves the class out.
+Python honors its underscore in two places:
+`from module import *` leaves the class out,
+and `help()` leaves it out of the module's listing.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.

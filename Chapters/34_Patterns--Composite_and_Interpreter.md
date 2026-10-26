@@ -166,7 +166,8 @@ Because `Directory` contains `Node`s,
 Each `match` needs one case per member of the union.
 
 `disk_usage()` still accepts a lone `File`, a subtree, or the whole tree.
-The one difference from `filesystem_classic.py` is where the operations live.
+Two things differ from `filesystem_classic.py`: where the operations live,
+and the closed union that replaces the base class.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes stay unchanged.
 A new node type now touches every function.
@@ -777,7 +778,7 @@ An interpolation's value can be a `Template`,
 built by nesting one `t`-string inside another.
 `+` instead concatenates `t`-strings into one flat `Template`,
 as `query` in `template_query.py` shows.
-Nesting is the one way to produce a `Template`-valued interpolation.
+Nesting, not `+`, produces a `Template`-valued interpolation.
 A walker that needs the pieces at every level must therefore also recurse into any value that is a `Template`.
 Everything else follows this chapter's walkers: one branch per node kind,
 and a recursive call where a node holds more nodes.

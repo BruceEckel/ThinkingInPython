@@ -28,7 +28,7 @@ Runtime dispatch resolves on the type of one object,
 the one receiving the method call.
 
 The solution is *Multiple Dispatching*.
-To dispatch on two unknown types, you need two method calls.
+To dispatch on two unknown types through methods, you need two method calls.
 The first resolves the first type, and the second resolves the second.
 Two unknown types means two dispatches, which is *double dispatching*.
 In `paper_scissors_rock.py`,
@@ -42,7 +42,8 @@ Python performs this second dispatch for you.
 If `a.__add__(b)` declines, `a + b` retries as `b.__radd__(a)`.
 That [retry](#operators-dispatch-twice)
 answers the opening `Number + Number` question.
-The rest of this chapter builds the general technique for any other interaction,
+Before that section,
+this chapter builds the general technique for any other interaction,
 where you write the second dispatch yourself.
 The working example is a game of paper, scissors, rock.
 
@@ -615,7 +616,8 @@ Python raises `TypeError`.
 
 Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately.
-Only a returned sentinel makes Python try the right operand's `__radd__()`.
+From inside `__add__()`,
+only a returned sentinel makes Python try the right operand's `__radd__()`.
 
 When both operands have the same type, Python tries `__add__()` alone,
 so `__add__()` resolves `Meters + Meters`.
@@ -649,7 +651,7 @@ using `__add__()` and `__radd__()` to let Python's own parser assemble the tree.
 
 ## Turning One Unknown Type Into a Second Dispatch
 
-Three techniques in this chapter answer the same question:
+Three of this chapter's techniques answer the same question:
 what do you do with a type the first dispatch could not resolve?
 The `eval_*()` family and `__add__()` with `__radd__()` answer it with a second dispatch,
 a second method call that resolves the type by running a method lookup.
@@ -660,7 +662,7 @@ is one dictionary lookup keyed on both types at once,
 not a second method resolution.
 
 The operators are the one case where the interpreter performs the second dispatch.
-Everywhere else you choose between writing a second dispatch in methods and replacing both dispatches with one lookup in data.
+Everywhere else you choose between writing a second dispatch in methods and replacing both dispatches with one lookup in data or one `match` statement.
 
 ## Exercises
 

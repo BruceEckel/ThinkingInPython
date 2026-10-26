@@ -660,7 +660,8 @@ error[invalid-argument-type]: Argument to bound method
   |                           ^^^^ Expected `Answer`, found `None`
 ```
 
-`next()` takes the generator alone.
+`next()` takes the generator and an optional default to return at exhaustion,
+and has no parameter for a value to send.
 It asks for the generator's next yielded value and ignores the `SendType`,
 so priming with it type-checks for any generator.
 

@@ -197,7 +197,8 @@ Use whichever name reads better in your own code.
 `unwrap()` and the `answer` field exist on `Ok` alone,
 so the type checker rejects `func_a(i).unwrap()`,
 as it rejects using the `Result` as if it were a number.
-The only way to the answer is narrowing to one of the two classes,
+Apart from `bind()`,
+the only way to the answer is narrowing to one of the two classes,
 with `isinstance()` as in `composing.py` below,
 or with `match` as in `safe_demo.py`.
 
@@ -610,7 +611,7 @@ That error type, `Exception`, is the base of the ordinary exception hierarchy.
 The signature therefore says that something can go wrong and not what,
 which is all an `except Exception` clause says.
 `@safe` catches `Exception` because it writes one `try`/`except` for every function it wraps,
-and the base class is the one type that covers every exception those functions raise.
+and the base class is the narrowest type that covers every ordinary exception those functions raise.
 A `try`/`except` written for one function can be narrower.
 `func_c()` in `steps.py` catches `ZeroDivisionError` alone,
 and a `parse()` that catches `ValueError` the same way can return `Result[int, ValueError]`.

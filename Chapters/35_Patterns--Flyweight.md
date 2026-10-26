@@ -411,7 +411,7 @@ populate the pool eagerly or guard the insert with a lock.
 
 ## A Pool That Does Not Leak
 
-Both pools so far hold their objects forever.
+Both pools built so far hold their objects forever.
 `@cache` keeps strong references to every argument and result,
 and `Color._pool` grows with every new color.
 A map has a handful of tile kinds and a program usually draws from a small palette,

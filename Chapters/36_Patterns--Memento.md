@@ -706,8 +706,9 @@ The loaded object carries the one field the old bytes held.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` raises `AttributeError` when anything reads it,
 often far from the line that called `pickle.loads()`.
-Pickle's convenience comes from leaving one job to you:
-matching the class on load to the class on save.
+Pickle's convenience comes from leaving two jobs to you:
+matching the class on load to the class on save,
+and rerunning the validation that the load skips.
 
 ### A Deleted Field Leaves a Ghost
 

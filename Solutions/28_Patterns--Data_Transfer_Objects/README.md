@@ -479,7 +479,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Which Should You Use?](../../Chapters/28_Patterns--Data_Transfer_Objects.md#which-should-you-use)
 lists what each type offers and when to choose it.
-For each scenario, find the one requirement that rules out the others:
+For each scenario, find the requirement that rules out most of the others:
 keys that first appear at runtime, a hashable value,
 or code that checks fields on construction.
 Consider also what `json.dumps()` does with each type.
@@ -652,7 +652,7 @@ The override makes a `Point` name its type the way a `NamedTuple` does.
 **What stays a tuple.**
 Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone,
 so `p[:1]` is the plain `(4.0,)`.
-A tuple on the left of `+` is the other gap:
+A tuple on the left of `+` is another gap:
 `(1.0, 1.0) + p` runs `tuple.__add__()`,
 which concatenates to a four-element tuple.
 Python calls `__radd__()` on the right operand first when that operand's class is a subclass of the left operand's class,

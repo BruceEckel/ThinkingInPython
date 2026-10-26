@@ -594,7 +594,7 @@ At runtime `choose_row()` stores a `Column` in `self.row`,
 and `_slot()` then uses that column's `value` as the row index.
 
 Adding a state or an input is now a local change:
-a rule in the list and a method or two.
+a `State` member or an input class, its rules in the list, and a method or two.
 Two language features do the work of a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
 The `dict` does the dispatch,
@@ -729,7 +729,8 @@ def test_no_transition_raises() -> None:
 The first design, [Each State Decides](#each-state-decides),
 suits a machine whose states have only a few transitions.
 Reading `trap_states.py`'s `LURING` and `luring()` tells you what that state does and which states can follow it.
-Adding a state is one row and one function.
+Adding a state is one row, one function,
+and a `case` in each existing function that leads to it.
 The design reads best when the transitions are obvious from the state's own name.
 
 A state's row holds its action, so the action appears once,
@@ -742,7 +743,8 @@ The second design, the [Table-Driven *State Machine*](#table-driven-state-machin
 suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
 Every transition is a rule in one table, in the same order as the diagram.
-Adding a state or an input is a rule in the list and a method or two.
+Adding a state or an input is a `State` member or an input class,
+its rules in the list, and a method or two.
 
 In the first design a member is also a `State` record with an `action` field.
 In the table-driven design a member is a bare name with no fields,

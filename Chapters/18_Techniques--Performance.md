@@ -144,7 +144,7 @@ and a full profiler times every function to answer a question about one.
 
 `sys.monitoring` ([PEP 669](https://peps.python.org/pep-0669/))
 is the interpreter's own instrumentation mechanism,
-the one profilers and debuggers now use.
+the one the tracing profiler and debuggers now use.
 You claim a tool identifier, register a callback for an event,
 and specify the code to which the event applies.
 
@@ -253,7 +253,7 @@ so the first report from a location answers it,
 and after the first hit the monitored code runs at full speed again.
 
 A profiler gives you a ranked table with no code to write.
-`sys.monitoring` gives you one number about one function.
+`sys.monitoring` gives you the counts you ask for, about the code you choose.
 It is the better tool when you already know which function to measure and the profiler's overhead changes the answer.
 
 ## Benchmark Alternatives with `timeit`

@@ -535,8 +535,8 @@ Python attaches the handled exception to the new one.
 | `raise X from None` | The report starts at `X` |
 
 All three raise the same exception.
-They differ in three attributes of that exception,
-and Python reads those attributes to build the report:
+They differ in two of the three attributes that record the chain,
+and Python reads all three to build the report:
 
 ```python
 # exception_chaining.py

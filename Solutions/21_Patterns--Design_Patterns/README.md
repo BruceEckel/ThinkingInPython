@@ -18,7 +18,7 @@ The last exercise has an answer you can check against the chapter's figure.
 <summary>Where to look</summary>
 
 [The Vector of Change](../../Chapters/21_Patterns--Design_Patterns.md#the-vector-of-change)
-describes the one axis along which a design keeps shifting.
+describes the main axis along which a design keeps shifting.
 Look at your history for the same function edited again and again,
 since that function marks the axis.
 Then ask which part absorbed each change and which parts you edited.
@@ -263,7 +263,7 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 #: 25.0 23.0
 ```
 
-Five constructs become one parameter.
+Five constructs become one parameter and a function per algorithm.
 The type checker still knows what the parameter accepts:
 `Callable[[float], float]` rejects a function taking the wrong arguments as surely as an interface rejects a class that does not implement it.
 

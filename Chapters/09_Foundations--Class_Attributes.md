@@ -98,7 +98,7 @@ The inspection helper `display_object()` that [Classes](07_Foundations--Classes.
 introduces reports attributes and methods separately,
 but the same class dictionary holds both.
 
-One kind of class attribute follows a different rule.
+Some class attributes follow a different rule.
 A [`@property`](07_Foundations--Classes.md#properties)
 stored on the class takes precedence over the instance dictionary for its name,
 so reading that name calls its getter and assigning to it calls its setter.
@@ -221,7 +221,7 @@ print(Tally.total)
 # a.total = 99  # ty: Cannot assign to ClassVar `total`
 ```
 
-`display_object(Tally)` shows that the class holds `total` alone.
+`display_object(Tally)` shows `total` on the class and no `label`.
 `label` first appears in `display_object(a)`, on the instance.
 An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` shows.
@@ -401,7 +401,7 @@ The `# type: ignore` suppresses that report so the listing can show what the lin
 Shared storage is right when you intend the sharing.
 The bug is not the class attribute.
 It is writing one where you meant a per-object default.
-Three kinds of value belong in class attributes:
+Three kinds of value commonly belong in class attributes:
 a count of every object created, a registry mapping names to classes,
 and a constant that all instances read but none change.
 Declare the sharing for each,

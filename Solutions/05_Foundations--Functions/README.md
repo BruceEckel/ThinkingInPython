@@ -362,7 +362,9 @@ print(apply_twice(lambda n: n * n, 3))
 ```
 
 A function that takes another function as an argument declares that parameter like any other.
-`func` has one requirement: it must be callable with one argument.
+`func` has two requirements: it must be callable with one argument,
+and it must accept the value it returns,
+since `apply_twice()` passes that value back in.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

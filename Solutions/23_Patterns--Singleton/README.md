@@ -441,8 +441,8 @@ a different design, a detail, or an equivalent alternative.
 
 [The First-Call Race](../../Chapters/23_Patterns--Singleton.md#the-first-call-race)
 shows several threads missing the cache before any of them stores a result.
-Compare the order of the two steps in a cached call, the lookup and the body,
-with where the lock sits.
+Compare the order of the three steps in a cached call, the lookup, the body,
+and the store, with where the lock sits.
 For the fix without a lock,
 see [Double-Checked Locking and Eager Creation](../../Chapters/23_Patterns--Singleton.md#double-checked-locking-and-eager-creation):
 call the cached function once before any thread starts.
@@ -529,8 +529,8 @@ print(len({id(s) for s in shared}))
 
 **Order only the body.**
 The count stays above one because the lock guards the wrong step.
-A call to `settings()` takes two steps: `@cache` looks for a stored result, and,
-on a miss, the body runs.
+A call to `settings()` takes three steps: `@cache` looks for a stored result,
+on a miss the body runs, and `@cache` stores what the body returns.
 The lock sits inside the body, so it orders only the second step.
 All eight threads reach the lookup before any of them has stored anything,
 so all eight miss.

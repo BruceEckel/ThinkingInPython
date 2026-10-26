@@ -178,7 +178,7 @@ for entry in caught:
 ```
 
 **Move the warning to the type.**
-Decorating the class moves the warning to the two operations that use the class as a type:
+Decorating the class moves the warning to the two operations that build something from the class:
 constructing an instance and subclassing.
 `render()` runs inside the recording block, yet `caught` holds two entries:
 one for the construction and one for the subclass.

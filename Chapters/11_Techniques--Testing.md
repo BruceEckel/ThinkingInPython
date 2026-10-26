@@ -418,7 +418,7 @@ resetting a global registry, or installing a `monkeypatch` every test needs,
 as `test_storage.py` does later in this chapter.
 
 Autouse runs the fixture.
-Only a parameter delivers the fixture's value.
+A parameter delivers the fixture's value.
 If you mark `funded` autouse and leave it out of the parameter list,
 the bare name `funded` refers to the fixture object the decorator returns,
 rather than the `Account` the function returns.

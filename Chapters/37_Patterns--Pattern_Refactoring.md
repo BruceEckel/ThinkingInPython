@@ -419,7 +419,7 @@ print(f"parsed {len(pieces)}, binned {binned}")
 ```
 
 The last two lines count the pieces for the comparison with `plastic_dropped.py`.
-Apart from those lines,
+Apart from those lines and the `pieces` and `bins` names they read,
 `recycle_dict_plastic.py` differs from `recycle_dict.py` in two places:
 the `Plastic` definition and the data file's name.
 Both plastic listings import their sorter,
@@ -641,8 +641,8 @@ draws the same distinction between a table keyed by class and dispatch that foll
 
 Design patterns separate the things that change from the things that stay the same.
 Overriding a method in each subclass is one way to do that.
-This chapter uses two others:
-a dictionary keyed by type and a `singledispatch` function.
+This chapter uses three others: a registry that each subclass fills,
+a dictionary keyed by type, and a `singledispatch` function.
 The deeper skill is spotting the [vector of change](21_Patterns--Design_Patterns.md#the-vector-of-change)
 and choosing the lightest construct that isolates it.
 

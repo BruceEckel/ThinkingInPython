@@ -175,7 +175,7 @@ so code holding a `WhatIUse` can safely receive a `WhatIUse2`.
 An override cannot narrow what it accepts.
 The commented-out signature in `adapter_variations.py`,
 `op(self, item: WhatIHave) -> None`, accepts a `WhatIHave` alone,
-which is all Approach 2 needs for its own callers.
+the case Approach 2 adds.
 If you use that signature in place of the union,
 a type checker rejects the override.
 A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts.
@@ -314,7 +314,7 @@ if __name__ == "__main__":
 ```
 
 Python calls `__getattr__()` as a fallback, after normal attribute lookup fails,
-so `f()` uses the adapter's own version while everything else falls through to the adaptee.
+so `f()` uses the adapter's own version while any name the adapter lacks falls through to the adaptee.
 `getattr_adapter.py` shows the idiomatic Python adapter: a thin wrapper,
 not a hierarchy.
 With no base class above it, `Adapter` is a record.

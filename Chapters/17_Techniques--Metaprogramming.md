@@ -2186,7 +2186,8 @@ The generated `__init__()`, `__eq__()`,
 and `__repr__()` give `Fraggle` a constructor, equality,
 and a `repr()` that you did not write.
 
-The rest is the bookkeeping every class carries.
+Beyond those three, the output holds `Fraggle`'s fields and methods,
+two annotation entries, and the bookkeeping every class carries.
 
 The output also shows the deferred evaluation of PEP 649 at work on a class.
 `__annotate_func__` is the code that computes the annotations,
