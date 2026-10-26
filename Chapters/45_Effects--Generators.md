@@ -1281,8 +1281,7 @@ which hands one element at a time to a loop.
 
 ### The Restriction Behind the Driver
 
-PEP 255's generator is a coroutine restricted in where control goes:
-each `yield` hands control back to whoever called `next()` or `send()`.
+PEP 255 kept the suspended frame and dropped a coroutine's ability to hand control to any other coroutine. each `yield` hands control back to whoever called `next()` or `send()`.
 Handing control anywhere else would mean carrying the C stack as well,
 which is why the PEP calls Stackless Python, whose coroutines do that,
 "a controversial rethinking of the Python core."
