@@ -950,10 +950,11 @@ asyncio.run(main())
 
 `asyncio.sleep(0)` models a wait for real I/O.
 
-On each pass, `async for` awaits the generator's `__anext__()`,
-so the `async for` loop must appear inside an `async def`.
-The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls,
-and it also requires an enclosing `async def`.
+`async for` is an `await` in loop form:
+on each pass it awaits the generator's `__anext__()`.
+Like any `await`, it belongs inside an `async def`,
+which is why the listing's two loops sit in `main()`.
+The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls.
 
 A class can supply that `__anext__()` directly,
 the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
