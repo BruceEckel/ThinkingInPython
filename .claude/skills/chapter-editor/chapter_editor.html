@@ -150,6 +150,7 @@ mark.flash { outline: 2px solid var(--accent); }
       <label><input type="checkbox" id="f-marked"> Marked</label>
     </div>
     <button class="quiet" id="next-change" title="Scroll to the next changed paragraph">Next change ↓</button>
+    <button class="quiet" id="next-mark" title="Scroll to the next marked paragraph">Next mark ↓</button>
     <span class="spacer"></span>
     <div class="status" id="status" role="status">Connecting…</div>
   </header>
@@ -354,6 +355,7 @@ function updateBlock(el, id, idx) {
   el.dataset.kind = b.kind;
   el.classList.toggle("changed", lastRound(b));
   el.classList.toggle("edited", b.edit != null);
+  el.classList.toggle("marked", marksOf(b).length > 0);
   el.querySelector(".ln").textContent = state.meta.lines?.[idx] ?? "";
   const view = el.querySelector(".view");
   const editing = state.editing.has(id) && !lk;
@@ -508,6 +510,7 @@ function renderBar() {
     m.round > 1 ? `<span class="pill chg">${t.chg} changed last round</span>` : "",
   ].join("");
   $("#next-change").hidden = !t.chg;
+  $("#next-mark").hidden = !(t.rw + t.del);
   const banner = $("#banner");
   if (m.status === "applying") {
     banner.hidden = false;
@@ -782,12 +785,15 @@ $("#f-marked").addEventListener("change", (ev) => {
   try { localStorage.setItem("ce-only-marked", state.onlyMarked ? "1" : "0"); } catch (e) {}
   render();
 });
-$("#next-change").addEventListener("click", () => {
+// Scroll to the next block with the class, wrapping to the first.
+function scrollToNext(cls) {
   const top = $("header.bar").getBoundingClientRect().bottom + 4;
-  const next = [...$("#doc").querySelectorAll(".blk.changed")].find((el) => el.getBoundingClientRect().top > top + 2);
-  const target = next || $("#doc").querySelector(".blk.changed");
+  const next = [...$("#doc").querySelectorAll(`.blk.${cls}`)].find((el) => el.getBoundingClientRect().top > top + 2);
+  const target = next || $("#doc").querySelector(`.blk.${cls}`);
   if (target) window.scrollBy({ top: target.getBoundingClientRect().top - top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-});
+}
+$("#next-change").addEventListener("click", () => scrollToNext("changed"));
+$("#next-mark").addEventListener("click", () => scrollToNext("marked"));
 
 // ---- Start.
 async function start() {
