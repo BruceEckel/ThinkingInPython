@@ -962,16 +962,16 @@ PEP 255 added generators to Python 2.2 in 2001 to solve one problem:
 writing a function that produces values one at a time,
 pausing after each value and resuming where it stopped when the caller asks for the next one.
 The problem appears whenever the producer keeps state between values and the consumer has a loop of its own.
-`fibonacci()` keeps two numbers and a count.
 The PEP's example, the standard library's `tokenize()`,
 keeps its place in the source text,
 and a recursive tree walk keeps a whole recursion in progress between one node and the next.
 The consumer needs its own local variables and loops to track what it has seen,
 and it may stop early.
+
 Python had three ways to write such a producer.
 Each comes with an undesirable compromise.
 
-The first way is for the function to invoke a callback with each value its loop computes:
+The first way is for the function to invoke a callback on each computed value:
 
 ```python
 # fibonacci_callback.py
@@ -1003,7 +1003,7 @@ fibonacci(7, summing())
 #: value=8 total=20
 ```
 
-`consume()` runs as a nested call while `fibonacci()` is partway through the loop.
+`consume()` runs as a nested call while `fibonacci()` moves through its loop.
 When `consume()` returns, the loop moves on to the next value.
 The running total needs a variable that survives from one call to the next.
 The returned `consume` captures `total` as a [closure](40_Functional--Foundations.md#closures)
@@ -1013,17 +1013,19 @@ The `nonlocal` statement lets `consume()` assign to the captured `total`.
 `fibonacci()` is in charge of how many times `consume()` runs and when the sequence ends.
 `consume()` receives one value per call and has no way to ask for the next one or to stop the loop early.
 
-The second way is for `fibonacci()` to compute every value into a list and return the list:
+The second way is for `fibonacci()` to return a list containing every computed value:
 
 ```python
 # fibonacci_list.py
+from itertools import accumulate, islice, repeat
+
 def fibonacci(n: int) -> list[int]:
-    result: list[int] = []
-    a, b = 0, 1
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
+    pairs = accumulate(
+        repeat(None),
+        lambda pair, _: (pair[1], pair[0] + pair[1]),
+        initial=(0, 1),
+    )
+    return [a for a, _ in islice(pairs, n)]
 
 total = 0
 for value in fibonacci(7):
@@ -1038,6 +1040,24 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
+This version threads the state between values through a chain of three `itertools` functions from [Toolkits](41_Functional--Toolkits.md#the-itertools-toolkit).
+[`accumulate()`](41_Functional--Toolkits.md#accumulate)
+is `reduce()` with every intermediate result kept.
+It starts from `initial=(0, 1)`,
+calls the lambda with the current pair and the next input element to get the next pair,
+and yields each pair in turn.
+The pair is the state `a, b` from the callback version,
+carried as a value from one call of the lambda to the next instead of held in an execution frame.
+[`repeat(None)`](41_Functional--Toolkits.md#repeat)
+supplies those input elements.
+`accumulate()` consumes one per step,
+and this computation has no input of its own,
+so each element is a placeholder that the lambda receives as `_`.
+`repeat()` with no count is endless, so the chain of pairs is endless too.
+[`islice()`](41_Functional--Toolkits.md#islice)
+takes the first `n` pairs and stops asking,
+and the comprehension keeps the first number of each pair.
+The comprehension's list is complete before `fibonacci()` returns.
 Every value exists before the caller sees the first,
 so the sequence must be finite and fit in memory.
 

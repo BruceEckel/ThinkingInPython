@@ -1,11 +1,13 @@
 # fibonacci_list.py
+from itertools import accumulate, islice, repeat
+
 def fibonacci(n: int) -> list[int]:
-    result: list[int] = []
-    a, b = 0, 1
-    for _ in range(n):
-        result.append(a)
-        a, b = b, a + b
-    return result
+    pairs = accumulate(
+        repeat(None),
+        lambda pair, _: (pair[1], pair[0] + pair[1]),
+        initial=(0, 1),
+    )
+    return [a for a, _ in islice(pairs, n)]
 
 total = 0
 for value in fibonacci(7):
