@@ -1026,7 +1026,9 @@ print(f"{total=}")
 
 The caller has an ordinary `for` loop,
 and `total` is a local of the code that uses it,
-but every value exists before the caller sees the first,
+so one `print()` after the loop shows the sum,
+where `consume()` prints on every call because it cannot know which call is its last.
+Every value exists before the caller sees the first, though,
 so the sequence must be finite and fit in memory.
 
 The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
