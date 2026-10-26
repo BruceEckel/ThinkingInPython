@@ -959,10 +959,11 @@ It describes a function by what it requests and writes those requests into its r
 ## Half a Coroutine by Design
 
 PEP 255 added generators to Python 2.2 in 2001 to solve one problem.
-Python had three ways to write a function that produces values one at a time and must remember where it is between one value and the next.
+Python had three ways to write a function producing values one at a time and remembering where it is between one value and the next.
 Each gave something up.
-Taking a callback and calling it with each value keeps the producer's loop intact,
-but the consumer then runs inside that call and must keep its own state between calls.
+The producer can take a callback as an argument and call it with each value its loop computes.
+The loop stays intact, but the consumer is now the callback,
+so it runs inside the producer's call and must keep its own state between calls.
 Building the whole result list up front gives the consumer an ordinary `for` loop,
 but every value exists before the consumer sees the first,
 so the sequence must be finite and fit in memory.
