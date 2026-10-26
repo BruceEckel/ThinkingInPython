@@ -1196,7 +1196,7 @@ a loop that yields the current value and then applies the step to it.
 A generator is the direct way to write an unfold,
 and before PEP 255 Python had no generator.
 
-The third way rewrites `fibonacci()` as an iterator class with a `__next__()` that returns one value per call:
+The third way is an iterator class with a `__next__()` that returns one value per call:
 
 ```python
 # fibonacci_class.py
@@ -1235,19 +1235,23 @@ for value in Fibonacci(7):
 The class moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out.
 In `fibonacci_callback.py`,
 the running function's stack frame holds the `for` loop's count of values.
-In the class, that count is the attribute `remaining`,
+In `Fibonacci`, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
 
-Each approach gives up one side's loop.
-The callback turns the consumer inside out:
-the body of its loop becomes `consume()`, a function the producer's loop calls.
-The list keeps both loops but runs the producer's loop to completion before the consumer's loop starts.
-The class turns the producer inside out:
-its loop becomes the bookkeeping in `__next__()`.
+Each approach gives up one side's loop:
+
+- The callback turns the consumer inside out:
+  the body of its loop becomes `consume()`,
+  a function the producer's loop calls.
+- The list keeps both loops but runs the producer's loop to completion before the consumer's loop starts.
+- The class turns the producer inside out:
+  its loop becomes the bookkeeping in `__next__()`.
+
 All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
 A generator lets the producer and the consumer each keep its own loop.
+
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
 alive and resumes it on the next call.
