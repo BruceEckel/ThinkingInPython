@@ -718,18 +718,19 @@ so every sequence this generator produces is legal by construction.
 
 **Where the state lives.**
 The machine's state is `previous`,
-a local variable in the generator's suspended frame.
-`yield` leaves the frame alive between one move and the next,
+a local variable in the generator's suspended [execution frame](../../Chapters/45_Effects--Generators.md#half-a-coroutine-by-design).
+`yield` leaves the execution frame alive between one move and the next,
 so the variable survives with it,
 and the loop over `range(count)` is the engine: each pass reads the state,
 picks a successor, and stores the pick back.
-`trap_states.py` keeps its state outside any frame.
+`trap_states.py` keeps its state outside any execution frame.
 The current state is a `TrapState` member held in the `StateMachine`'s `current_state` field,
 and `step()` replaces that field with the result of the member's transition function.
 The enum design makes the states visible and nameable:
 a caller can read `current_state`, print it,
 and compare it with `TrapState.HOLDING`.
-The generator keeps its state in the frame, where no caller can read it.
+The generator keeps its state in its execution frame,
+where no caller can read it.
 The whole machine reads as one loop.
 
 `trap_states.py` accepts any move in any state,

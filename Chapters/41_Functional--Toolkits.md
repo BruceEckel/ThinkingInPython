@@ -974,9 +974,10 @@ expect(RecursionError, factorial, 5000)
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-A `for` loop computes this same factorial in one frame at any `n`.
-Python pushes a frame for every recursive call, including one in tail position,
-where a language with *tail-call optimization* reuses the caller's frame.
+A `for` loop computes this same factorial in one stack frame at any `n`.
+Python pushes a stack frame for every recursive call,
+including one in tail position,
+where a language with *tail-call optimization* reuses the caller's stack frame.
 The stack has a cap, 1000 frames by default,
 so `factorial(5000)` raises a `RecursionError`.
 `sys.setrecursionlimit()` raises that limit when the depth is genuine.
@@ -1024,7 +1025,7 @@ To write `deep_sum()` as a loop,
 you build your own stack to track which sublists are still open,
 and you must get the push and pop right at every depth.
 In the recursive version the call stack does that bookkeeping.
-Each open sublist is a frame waiting for its `deep_sum()` call to return.
+Each open sublist is a stack frame waiting for its `deep_sum()` call to return.
 
 ## Case Study: Pairing Rounds
 
@@ -1215,7 +1216,7 @@ The circle method computes round `100` from its arithmetic alone.
 `deep_sum()` in [Recursion](#recursion) needs memory too.
 A counter cannot record which sublists are still open,
 so the recursive version keeps that state on the call stack,
-one frame per open sublist.
+one stack frame per open sublist.
 
 `group_rounds()` remains deterministic in the sense that matters for testing.
 The same `students`, `size`,

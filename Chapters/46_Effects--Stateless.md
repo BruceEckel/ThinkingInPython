@@ -1618,8 +1618,8 @@ returns that value as the result, and never resumes the inner generator.
 `supply()` returns a [`Handler`](#supplying-the-dependency),
 and that `Handler` breaks the condition that no handler sits between `run()` and the Effect.
 Its loop passes an error outward instead of throwing that error back into the Effect it wraps,
-so the driver's `throw()` raises that error in the `Handler`'s own frame,
-not `guarded()`'s frame.
+so the driver's `throw()` raises that error in the `Handler`'s own stack frame,
+not `guarded()`'s stack frame.
 The error propagates out of `run()`, and the inner `except` never runs:
 
 ```python

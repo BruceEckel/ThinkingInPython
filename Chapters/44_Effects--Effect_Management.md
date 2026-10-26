@@ -597,7 +597,8 @@ but it removes the parameter along with the one benefit the parameter provided.
 A `greet()` that reads two `ContextVar`s hides them.
 
 Setting the wrong `ContextVar`, or forgetting to set one,
-raises a `LookupError` at runtime, in the frame that reads the `ContextVar`.
+raises a `LookupError` at runtime,
+in the stack frame that reads the `ContextVar`.
 A `ContextVar` created with a default returns that default,
 so the read succeeds and the mistake appears later,
 as the incorrect result the default produces.

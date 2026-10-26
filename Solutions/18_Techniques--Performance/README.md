@@ -589,8 +589,8 @@ With `set_events()` in place of the local attachment,
 the new entry is `'square': 1`.
 It is the only addition,
 because the interpreter reports `PY_START` when a Python code object starts running,
-and the module's own frame starts before the tool attaches.
-CPython implements `print()` in C, so it starts no Python frame.
+and the module's own stack frame starts before the tool attaches.
+CPython implements `print()` in C, so it starts no Python stack frame.
 A program this small has no other candidates.
 
 The two local attachments above produce the same `Counter`.
@@ -669,7 +669,7 @@ Run `uv run python -m cProfile -s cumulative exercise_8.py`.
 The largest `cumtime` belongs to `exec`, then `<module>`, then `outer`.
 The largest `tottime` belongs to `{built-in method builtins.sum}`.
 The generator expression inside `inner()` comes second.
-It is the largest of the script's own Python frames,
+It is the largest of the script's own Python stack frames,
 because the arithmetic runs there.
 
 The two columns pick different functions because they measure different things.
@@ -678,15 +678,15 @@ including everything it called,
 so a caller's `cumtime` always covers the work beneath it.
 Every caller on the path accumulates the same time.
 `tottime` excludes the callees,
-so it attributes time to the frame that is executing.
+so it attributes time to the stack frame that is executing.
 
 A function high on `cumtime` and near zero on `tottime` is a pass-through.
 It is slow because of what it calls, so the gains are in its callees,
 and in how often it calls them.
 
 The two columns hold the same value only for a leaf function,
-one that does all of its work in its own frame.
-The top of the `cumtime` ranking is the outermost frame,
+one that does all of its work in its own stack frame.
+The top of the `cumtime` ranking is the outermost stack frame,
 which calls everything and does almost none of the work,
 so the two rankings usually open on different functions.
 

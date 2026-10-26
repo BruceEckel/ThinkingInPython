@@ -446,7 +446,7 @@ Its `deplete()` is empty, since a turbine burns no fuel.
 [Switching Implementations Mid-Run](../../Chapters/47_Effects--Stateless_in_Practice.md#switching-implementations-mid-run)
 shows `run_load()` asking for a `Source` and using the source the handler returns.
 Add a source class with the same two methods and place it in the tuple that `controller()` receives.
-For the blackout, trace which frames the handler's `Blackout` unwinds,
+For the blackout, trace which stack frames the handler's `Blackout` unwinds,
 and whether any `yield` lies between the handler's `raise` and `run()`.
 
 <details>
@@ -522,7 +522,7 @@ because `catch()` handles the failures an Effect yields on its error channel,
 and `choose()`, the handler, raises this one.
 A handler answers each request from inside the driver.
 No `yield` sits between the `raise` and `run()`'s own stack frame,
-so the exception unwinds the driver's frames in the ordinary Python way.
+so the exception unwinds the driver's stack frames in the ordinary Python way.
 The driver never throws it into the suspended Effect.
 
 If you wrap `run_load()` in `catch(Blackout)` to turn the blackout into a value,

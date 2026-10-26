@@ -94,8 +94,8 @@ Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` ru
 Chapters/45_Effects--Generators.md	The first call	The first call, which runs the body to its first `yield`, *primes* the generator.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes the body, which reaches `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	the `for` loop	A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`, and reaches the `for` loop at the bottom of the listing.
-Chapters/45_Effects--Generators.md	the next `next()`	A generator's frame leaves the call stack at `yield`, survives as the generator object's `gi_frame` with its locals and position intact, and returns to the call stack on the next `next()`.
-Chapters/45_Effects--Generators.md	the next call	The useful part is that a suspended generator keeps its frame alive and resumes it on the next call.
+Chapters/45_Effects--Generators.md	the next `next()`	A generator's execution frame leaves the call stack at `yield`, survives as the generator object's `gi_frame` with its locals and position intact, and returns to the call stack on the next `next()`.
+Chapters/45_Effects--Generators.md	the next call	The useful part is that a suspended generator keeps its execution frame alive and resumes it on the next call.
 Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
 Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop then calls `plug()` again for a replacement.
 Chapters/47_Effects--Stateless_in_Practice.md	The second call	The second call's answer comes from `db1`'s cache entry, because `memoize()` keys on `"Morty"` alone.

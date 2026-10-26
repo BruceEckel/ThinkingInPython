@@ -384,7 +384,7 @@ Called inside a function with no namespace argument,
 Since Python 3.13 (PEP 667), each `locals()` call in a function returns a new,
 independent snapshot,
 so a later `locals()` call misses a class that `exec()` defines there.
-A frame's `f_locals` attribute returns a write-through proxy,
+A stack frame's `f_locals` attribute returns a write-through proxy,
 the supported way for a debugger to change a function's variables.
 
 `EventMakers` stores each class it builds.

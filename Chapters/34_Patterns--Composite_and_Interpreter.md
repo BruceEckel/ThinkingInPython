@@ -716,7 +716,7 @@ Python expresses the pair with records, a union,
 operator methods that build nodes, and `match` functions that walk them.
 
 Every function here recurses once per level of tree.
-Python's default recursion limit of 1000 frames therefore caps how deep a tree these functions can walk.
+Python's default recursion limit of 1000 stack frames therefore caps how deep a tree these functions can walk.
 A hand-written expression nests a few levels deep.
 A machine-generated chain of thousands of nested nodes exceeds the limit.
 The alternative is an iterative walk with an explicit stack of pending nodes

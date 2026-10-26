@@ -1470,7 +1470,7 @@ print(evaluate(small, {"x": 3}),
 
 The `deep` expression is ordinary apart from its shape.
 Its tree is 2000 `Add` nodes deep.
-`evaluate()` needs one frame per level against a limit of 1000,
+`evaluate()` needs one stack frame per level against a limit of 1000,
 so it fails before reaching the bottom.
 
 **Defer the combine behind its children.**
@@ -1502,7 +1502,7 @@ so with the limit raised to `10**9`, `evaluate()` walks a million-level tree.
 Anything that recurses through C stops.
 `repr()` or `hash()` on that same tree raises a `RecursionError` that reports a stack overflow,
 whatever the limit says.
-Second, each pending level holds a frame, so memory grows with depth.
+Second, each pending level holds a stack frame, so memory grows with depth.
 Third, the limit is global,
 so a library that raises it changes the behavior of every other module in the process.
 The iterative walk keeps its pending work in one list and leaves every global setting as it was.

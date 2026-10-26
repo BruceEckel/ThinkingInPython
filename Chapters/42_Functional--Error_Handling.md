@@ -709,7 +709,7 @@ Python compiles that `case`, and the type checker accepts it.
 An exception's message says what went wrong but not where.
 `invalid literal for int() with base 10: 'no'` is accurate and leaves the reader asking:
 which setting, which field, which row of the file?
-The frame that has that answer is usually a caller of the frame that raised the exception.
+The stack frame that has that answer is usually a caller of the one that raised the exception.
 When a handler sits far enough up the stack to report the failure,
 the locals that explain it are out of reach.
 
@@ -757,8 +757,8 @@ which renders the message and the notes and leaves out the file paths a full tra
 
 Notes accumulate.
 As the exception propagates,
-each `except` clause that catches and re-raises it can add a line built from its own frame's locals.
-The frame that raised the exception cannot see those locals.
+each `except` clause that catches and re-raises it can add a line built from its own stack frame's locals.
+The stack frame that raised the exception cannot see those locals.
 In `add_note.py`, `read_setting()` builds its note from its own parameter `name`,
 which `parse_seconds()` never receives.
 
@@ -777,7 +777,7 @@ but the traceback of an `Err` stored in a list stays out of sight until your cod
 The `except` clause that caught the exception returns it as a value,
 so every caller above that clause receives an `Err`, an ordinary return value.
 No handler above that clause catches the exception,
-so none can add a note from its own frame.
+so none can add a note from its own stack frame.
 The exception must carry the context it needs before it becomes an `Err`:
 
 ```python
@@ -808,7 +808,7 @@ for result in results:
 ```
 
 `parse_field()` adds the note before it returns the exception as a value,
-in the one frame that has both the exception and the field name.
+in the one stack frame that has both the exception and the field name.
 The loop reads each `Result` after `parse_field()` has returned,
 and it never sees a field name.
 It still reports which field failed,

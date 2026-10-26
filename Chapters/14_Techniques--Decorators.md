@@ -517,8 +517,8 @@ Every layer has the original function's name and signature,
 so the layers compose to any depth.
 
 Each layer also adds two things that remain after `wraps` copies the metadata.
-A traceback through a decorated function shows a `wrapper` frame for each layer,
-on top of the frames for the caller and the original body.
+A traceback through a decorated function shows a `wrapper` stack frame for each layer,
+on top of the stack frames for the caller and the original body.
 Each call also makes an extra Python-level function call per layer,
 the call to that layer's wrapper, before the real body runs.
 For a function called occasionally, both are small.

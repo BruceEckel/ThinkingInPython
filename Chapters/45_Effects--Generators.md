@@ -1072,7 +1072,7 @@ for value in Fibonacci(7):
 
 This moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out.
 In the function version,
-the running frame holds the `for` loop's count of values.
+the running function's stack frame holds the `for` loop's count of values.
 In the class, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
 
@@ -1080,10 +1080,11 @@ All three approaches stand in for that one ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
-The useful part is that a suspended generator keeps its frame alive and resumes it on the next call.
-A frame holds a function's locals and its position in the code,
-and Python discards a function's frame when the function returns.
-A generator's frame leaves the call stack at `yield`,
+An *execution frame* is the object Python creates for each call to hold the function's locals and its position in the code.
+While the function runs, that object is its stack frame,
+an entry on the call stack, and Python discards it when the function returns.
+The useful part is that a suspended generator keeps its execution frame alive and resumes it on the next call.
+A generator's execution frame leaves the call stack at `yield`,
 survives as the generator object's `gi_frame` with its locals and position intact,
 and returns to the call stack on the next `next()`.
 The PEP names Ralph Griswold's Icon language, with CLU and Sather,

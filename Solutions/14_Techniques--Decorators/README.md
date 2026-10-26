@@ -790,8 +790,8 @@ expect(RuntimeError, always_fails)
 so `flaky.__name__` reports `flaky`, not `wrapper`.
 Without `@wraps`, a log line or a test report that reads `__name__` shows `wrapper` for every retried function.
 A traceback is the same either way.
-It names each frame from the code object, which `wraps` leaves alone,
-so the `wrapper` frame appears with or without `@wraps`.
+It names each stack frame from the code object, which `wraps` leaves alone,
+so the `wrapper` stack frame appears with or without `@wraps`.
 
 **Make the last attempt unguarded.**
 The final attempt meets two requirements at once.

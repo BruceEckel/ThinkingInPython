@@ -265,7 +265,7 @@ A narrowing on an attribute holds until a call rebinds the attribute,
 so recheck the attribute after any call that might change the object.
 Copying the attribute into a local variable before the test keeps the narrowing valid,
 because a function defined elsewhere cannot rebind its caller's local variable,
-short of frame introspection (see exercise 9).
+short of stack-frame introspection (see exercise 9).
 
 ## Constants with Final
 

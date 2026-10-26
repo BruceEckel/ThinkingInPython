@@ -559,7 +559,7 @@ so `tip jit_status` reports the first state:
 A python.org binary prints `JIT built in, switched off` until you set `PYTHON_JIT=1`.
 
 A third function, `sys._jit.is_active()`,
-reports whether the frame that called it is running compiled code.
+reports whether the stack frame that called it is running compiled code.
 The documentation warns against branching on its result,
 since a tracing compiler can give different answers to the same call.
 
