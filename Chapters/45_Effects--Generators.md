@@ -1045,23 +1045,23 @@ so the sequence must be finite and fit in memory.
 
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
 is a `reduce()` that keeps every intermediate result.
-The first argument to `accumulate()`, here `repeat(None)`,
-is the iterable whose elements it folds.
-Each step takes one element from that iterable,
-calls the lambda with the current pair and that element to get the next pair,
+Its first argument is the iterable whose elements it folds.
+Here that argument is [`repeat(None)`](41_Functional--Toolkits.md#repeat),
+an iterator that yields `None` every time something asks it for an element,
+and with no count argument it yields `None` forever.
+Each step of `accumulate()` takes one element from the iterable,
+so here each step takes a `None`,
+calls the lambda with the current pair and that `None` to get the next pair,
 and yields the new pair.
+The lambda names the `None` `_` because it ignores it.
 The pair is the state `a, b` from the callback version,
 carried as a value from one call of the lambda to the next instead of held in an execution frame.
 In `itertools_accumulate.py` from [Toolkits](41_Functional--Toolkits.md#accumulate),
 the iterable is `[1, 2, 3, 4]` and each step adds its element to the running total.
 `fibonacci()` has no list of elements to fold:
 each step needs the previous pair alone.
-The iterable's job here is to decide how many steps `accumulate()` takes.
-[`repeat(None)`](41_Functional--Toolkits.md#repeat)
-is an endless iterable whose every element is `None`,
-so `accumulate()` takes a step for each one,
-and the lambda names the element `_` because it ignores it.
-With no count, `repeat()` is endless, so the chain of pairs is endless too.
+The iterable's job here is to decide how many steps `accumulate()` takes,
+and `repeat(None)` is endless, so the chain of pairs is endless too.
 [`islice()`](41_Functional--Toolkits.md#islice)
 takes the first `n` pairs and stops asking,
 and the comprehension keeps the first number of each pair.
