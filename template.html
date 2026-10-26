@@ -137,6 +137,91 @@
       .toc-drop { display: none !important; }
     }
 
+    /* The current-section label, top left: the mirror of Contents.
+       It sits over the text on a narrow screen, so it keeps the
+       paper background. The script fills it and removes [hidden]. */
+    .section-menu {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 100;
+    }
+    .section-toggle {
+      max-width: 12rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: left;
+      background: var(--paper);
+      border: none;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      padding: 0 0 1px;
+    }
+    .section-toggle:hover { border-bottom-color: var(--accent); }
+    /* Anchored left, since the label sits at the left edge. */
+    .section-drop {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: auto;
+      padding-top: 0.6rem;
+    }
+    .section-menu:hover .section-drop,
+    .section-menu:focus-within .section-drop,
+    .section-menu[data-open] .section-drop { display: block; }
+    .section-drop ul {
+      position: relative;
+      list-style: none;
+      width: 22rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+      margin: 0;
+      padding: 0.5rem 0;
+      text-align: left;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      box-shadow: 0 6px 24px rgba(26, 22, 18, 0.12);
+    }
+    /* A nested list is part of the outer panel. */
+    .section-drop ul ul {
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      margin: 0;
+      padding: 0 0 0 1rem;
+      border: none;
+      box-shadow: none;
+    }
+    .section-drop li { margin: 0; }
+    .section-drop a {
+      display: block;
+      padding: 0.15rem 1rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      line-height: 1.35;
+      color: var(--ink);
+      border: none;
+      text-decoration: none;
+    }
+    .section-drop a:hover { color: var(--accent); }
+    .section-drop a[aria-current] { color: var(--accent); font-weight: 600; }
+    /* A touch screen has no hover: only a tap (data-open) opens the
+       list. This rule comes last so [data-open] wins the tie. */
+    @media (hover: none) {
+      .section-menu:hover .section-drop,
+      .section-menu:focus-within .section-drop { display: none; }
+      .section-menu[data-open] .section-drop { display: block; }
+    }
+    /* Search moves to the top left here, so this label takes a
+       second row under it. */
+    @media (max-width: 34rem) {
+      .section-menu { top: 3.2rem; }
+      .section-toggle { max-width: calc(100vw - 3rem); }
+      .section-drop ul { width: calc(100vw - 3rem); }
+    }
+
     /* Chapter header */
     .chapter-label {
       font-family: 'Cormorant SC', serif;
@@ -444,6 +529,12 @@
     <nav class="toc-drop" aria-label="Book contents">$toc-menu$</nav>
     $endif$
   </div>
+  $if(toc)$
+  <div class="section-menu" hidden>
+    <button class="toc-toggle section-toggle" type="button" aria-haspopup="true" aria-expanded="false"><span class="section-label">$title$</span></button>
+    <nav class="section-drop" aria-label="Chapter sections"></nav>
+  </div>
+  $endif$
   <div class="page">
     <nav class="chapter-nav chapter-nav-top">
       $if(prev-url)$<a href="$prev-url$">← $prev-title$</a>$else$<span></span>$endif$
@@ -483,6 +574,101 @@
       if (!here) return;
       menu.addEventListener("mouseenter", function () {
         list.scrollTop = here.parentNode.offsetTop - list.clientHeight / 2;
+      });
+    })();
+
+    // The floating section label: shows the section being read and
+    // drops down the chapter's own table of contents.
+    (function () {
+      var menu = document.querySelector(".section-menu");
+      var source = document.querySelector(".chapter-toc ul");
+      if (!menu || !source) return;
+      var button = menu.querySelector(".section-toggle");
+      var label = menu.querySelector(".section-label");
+      var drop = menu.querySelector(".section-drop");
+      if (!button || !label || !drop) return;
+      var list = source.cloneNode(true);
+      drop.appendChild(list);
+      menu.removeAttribute("hidden");
+
+      var chapterTitle = label.textContent;
+      var heads = [];
+      var lastH2 = "";
+      Array.prototype.forEach.call(list.querySelectorAll("a"), function (link) {
+        var href = link.getAttribute("href") || "";
+        if (href.charAt(0) !== "#") return;
+        var el = document.getElementById(decodeURIComponent(href.slice(1)));
+        if (!el) return;
+        var tag = el.tagName.toLowerCase();
+        var level = tag === "h2" ? 2 : tag === "h3" ? 3 : 0;
+        if (!level) return;
+        var text = link.textContent.trim();
+        if (level === 2) lastH2 = text;
+        heads.push({ el: el, link: link, level: level, text: text, parent: lastH2 });
+      });
+
+      var current = null;
+      function update() {
+        var line = 5 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+        var found = null;
+        for (var i = 0; i < heads.length; i++) {
+          if (heads[i].el.getBoundingClientRect().top <= line) found = heads[i];
+          else break;
+        }
+        if (found === current) return;
+        if (current) current.link.removeAttribute("aria-current");
+        current = found;
+        var text = chapterTitle;
+        if (found) {
+          text = found.level === 3 && found.parent
+            ? found.parent + " › " + found.text
+            : found.text;
+          found.link.setAttribute("aria-current", "true");
+        }
+        label.textContent = text;
+        button.title = text;
+      }
+
+      var queued = false;
+      function schedule() {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(function () { queued = false; update(); });
+      }
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule);
+      window.addEventListener("load", update);
+      update();
+
+      function centerCurrent() {
+        if (!current) return;
+        list.scrollTop = current.link.offsetTop - list.clientHeight / 2;
+      }
+      function close() {
+        menu.removeAttribute("data-open");
+        button.setAttribute("aria-expanded", "false");
+        button.blur();
+      }
+      menu.addEventListener("mouseenter", centerCurrent);
+      menu.addEventListener("focusin", centerCurrent);
+      button.addEventListener("click", function () {
+        var open = menu.hasAttribute("data-open");
+        if (open) {
+          close();
+        } else {
+          menu.setAttribute("data-open", "");
+          button.setAttribute("aria-expanded", "true");
+          centerCurrent();
+        }
+      });
+      drop.addEventListener("click", function (event) {
+        if (event.target.closest && event.target.closest("a")) close();
+      });
+      document.addEventListener("click", function (event) {
+        if (!menu.contains(event.target)) close();
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") close();
       });
     })();
   </script>

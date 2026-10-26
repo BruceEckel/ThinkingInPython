@@ -55,6 +55,7 @@ STATIC_FILES = ("search.css", "search.js",
 # sections). Flip this default, or override per-build with --chapter-toc /
 # --no-chapter-toc. CHAPTER_TOC_DEPTH controls how deep the list goes
 # (2 = top-level "##" sections only; 3 also includes "###" subsections).
+# The per-chapter TOC also feeds the floating section menu in template.html.
 CHAPTER_TOC = True
 CHAPTER_TOC_DEPTH = 3
 
