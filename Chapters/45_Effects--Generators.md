@@ -1250,7 +1250,7 @@ Each approach gives up one side's loop:
 All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its own loop, handing out a value,
 and resuming where it stopped.
-A generator lets the producer and the consumer each keep its own loop.
+A generator lets the producer and the consumer each keep their own loop.
 
 The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
