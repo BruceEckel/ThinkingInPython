@@ -442,7 +442,7 @@ while the values `emit()` yields still go to the driver.
 When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`.
 
-The result travels through as many levels as the delegation has.
+A result passes up through any number of `yield from` levels.
 In `yield_from_levels.py`, `inner()` returns `42`,
 `middle()` and `outer()` each return the value of their own `yield from` expression,
 and `report()` yields that value in one more line:
