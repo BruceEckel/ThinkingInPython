@@ -1,24 +1,39 @@
 # yield_from_levels.py
 from collections.abc import Generator
+from record import record
 
-def inner() -> Generator[str, None, int]:
-    yield "inner"
-    return 42
+@record
+class RMsg:
+    s: str
 
-def middle() -> Generator[str, None, int]:
-    yield "middle"
+@record
+class YMsg:
+    s: str
+
+def inner() -> Generator[YMsg, None, RMsg]:
+    yield YMsg("inner A")
+    yield YMsg("inner B")
+    return RMsg("Message from inner!")
+
+def middle() -> Generator[YMsg, None, RMsg]:
+    yield YMsg("middle A")
+    yield YMsg("middle B")
     return (yield from inner())
 
-def outer() -> Generator[str, None, int]:
-    yield "outer"
+def outer() -> Generator[YMsg, None, RMsg]:
+    yield YMsg("outer A")
+    yield YMsg("outer B")
     return (yield from middle())
 
-def report() -> Generator[str]:
+def report() -> Generator[YMsg | str]:
     yield f"{yield from outer() = }"
 
 for line in report():
     print(line)
-#: outer
-#: middle
-#: inner
-#: yield from outer() = 42
+#: YMsg(s='outer A')
+#: YMsg(s='outer B')
+#: YMsg(s='middle A')
+#: YMsg(s='middle B')
+#: YMsg(s='inner A')
+#: YMsg(s='inner B')
+#: yield from outer() = RMsg(s='Message from inner!')

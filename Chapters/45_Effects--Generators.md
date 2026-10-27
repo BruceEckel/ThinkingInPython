@@ -447,41 +447,62 @@ A result passes up through any number of `yield from` levels:
 ```python
 # yield_from_levels.py
 from collections.abc import Generator
+from record import record
 
-def inner() -> Generator[str, None, int]:
-    yield "inner"
-    return 42
+@record
+class RMsg:
+    s: str
 
-def middle() -> Generator[str, None, int]:
-    yield "middle"
+@record
+class YMsg:
+    s: str
+
+def inner() -> Generator[YMsg, None, RMsg]:
+    yield YMsg("inner A")
+    yield YMsg("inner B")
+    return RMsg("Message from inner!")
+
+def middle() -> Generator[YMsg, None, RMsg]:
+    yield YMsg("middle A")
+    yield YMsg("middle B")
     return (yield from inner())
 
-def outer() -> Generator[str, None, int]:
-    yield "outer"
+def outer() -> Generator[YMsg, None, RMsg]:
+    yield YMsg("outer A")
+    yield YMsg("outer B")
     return (yield from middle())
 
-def report() -> Generator[str]:
+def report() -> Generator[YMsg | str]:
     yield f"{yield from outer() = }"
 
 for line in report():
     print(line)
-#: outer
-#: middle
-#: inner
-#: yield from outer() = 42
+#: YMsg(s='outer A')
+#: YMsg(s='outer B')
+#: YMsg(s='middle A')
+#: YMsg(s='middle B')
+#: YMsg(s='inner A')
+#: YMsg(s='inner B')
+#: yield from outer() = RMsg(s='Message from inner!')
 ```
 
-Each level yields its own name before it delegates,
-so the output traces the descent, and the `42` comes back up the same path.
+The two record types keep the channels apart:
+a `YMsg` travels the yield channel and an `RMsg` the return channel.
+Each level yields two messages before it delegates,
+so the output traces the descent, and the `RMsg` comes back up the same path.
 A `return (yield from ...)` passes the result through unchanged.
+
 The parentheses are required.
 A bare `yield` expression may stand as a statement of its own or on the right side of an assignment.
 Everywhere else, including after `return`,
 the grammar requires parentheses around it.
+
 In `report()` the `yield from` sits inside an f-string's braces,
 where any expression may stand since Python 3.12 (PEP 701).
 The whole delegation therefore runs before Python builds the string,
 and the `=` after the expression prints its source text beside its value.
+`report()` yields every `YMsg` that the delegation passes through and then the string it builds,
+so its yield type is the union `YMsg | str`.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
