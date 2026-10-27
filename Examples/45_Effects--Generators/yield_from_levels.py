@@ -14,12 +14,11 @@ def outer() -> Generator[str, None, int]:
     return (yield from middle())
 
 def report() -> Generator[str]:
-    result = yield from outer()
-    yield f"outer returned {result}"
+    yield f"{yield from outer() = }"
 
 for line in report():
     print(line)
 #: outer
 #: middle
 #: inner
-#: outer returned 42
+#: yield from outer() = 42

@@ -445,7 +445,7 @@ When `emit()` finishes,
 The result travels through as many levels as the delegation has.
 In `yield_from_levels.py`, `inner()` returns `42`,
 `middle()` and `outer()` each return the value of their own `yield from` expression,
-and `report()` turns that value into one more yielded line:
+and `report()` yields that value in one more line:
 
 ```python
 # yield_from_levels.py
@@ -464,20 +464,23 @@ def outer() -> Generator[str, None, int]:
     return (yield from middle())
 
 def report() -> Generator[str]:
-    result = yield from outer()
-    yield f"outer returned {result}"
+    yield f"{yield from outer() = }"
 
 for line in report():
     print(line)
 #: outer
 #: middle
 #: inner
-#: outer returned 42
+#: yield from outer() = 42
 ```
 
 Each level yields its own name before it delegates,
 so the output traces the descent, and the `42` comes back up the same path.
 A `return (yield from ...)` passes the result through unchanged.
+In `report()` the `yield from` sits inside an f-string's braces,
+where any expression may stand since Python 3.12 (PEP 701),
+so the whole delegation runs before the string is built,
+and the `=` after the expression prints its source text beside its value.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
