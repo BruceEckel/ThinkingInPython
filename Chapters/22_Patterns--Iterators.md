@@ -287,7 +287,7 @@ Any validation at the top of a generator also waits for the first `next()`.
 A check meant to reject a bad argument raises its exception at the first `next()`,
 far from the call that passed the bad argument.
 
-In `eager_validation.py`, `lazy_squares()` shows the delay.
+`lazy_squares()` shows the delay.
 `squares()` removes the delay by being a plain function.
 
 ```python
@@ -590,7 +590,7 @@ The `if` clause runs forever.
 
 A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
-In `test_endless.py`, `counter()` stands in for `count(1)`.
+`counter()` stands in for `count(1)`.
 
 ```python
 # test_endless.py
