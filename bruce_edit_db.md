@@ -2611,6 +2611,44 @@ and each returns" -> ", and each driver returns"), Solutions 47
 
 **Home.** this file only | `tools/sentence_shapes.py` `[PAIR]`.
 
+### C48. Don't name the listing in the sentence that introduces it
+
+**Test.** A paragraph that ends directly above a listing names that
+listing's file in a code span ("`color_count.py` walks a nested
+dictionary of plants", "In `framework.py`, `run()` is the template
+method"), and the listing's own path line repeats the name one or two
+lines later. Drop the name and let the subject be the thing the
+sentence describes: the function ("`run()` is the template method"),
+"This example", "the solution", "one module". A rule of the R7 family:
+R7 cuts the sentence that only points, R31 points with "Here,", and
+this one cuts the name from a sentence that otherwise stays.
+
+**Keep when.** The name is the claim: the file does not exist yet
+("At this point `palindrome.py` does not exist"), the name is a
+convention ("A directory has at most one `conftest.py`"), the sentence
+names the chapter's file and the listing below is a changed copy
+("The chapter's `research.py` and the doubles ... appear here",
+"`registry_demo.py` imports `Shape` ... The unchanged demo therefore
+prints `[]`"), the name matches a harness entry (`norun.txt`), or the
+module name is what later listings import from ("`steps.py` gathers
+the three steps the rest of the chapter chains").
+
+**Sightings.** 1 marked by Bruce, `45_Effects--Generators` 2026-10-27
+(`1ce4fce1`), was Claude-written ("gives the name before the listing
+of the same name"):
+- "`color_count.py` walks a nested dictionary of plants, yields the
+  path to each plant, and returns a count of each color:" -> "This
+  example walks a nested dictionary of plants, ..." (Bruce's wording;
+  my first pass wrote "This one")
+
+The same-day sweep read the 19 paragraphs of that shape in both trees
+and changed 13 in ten files, keeping the six listed above: chapters
+07, 18, 19, 22 (two), 24 (three), 42, 44, Solutions 15, 18, and 38
+(two). The sweep's edits count as the detector's sightings, not
+Bruce's.
+
+**Home.** this file only.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
