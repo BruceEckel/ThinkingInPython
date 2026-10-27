@@ -651,7 +651,7 @@ You can also say why a caller that does little work of its own still ranks high 
 <summary>Solution</summary>
 
 Any script works.
-Here, `exercise_8.py` makes the two columns disagree on purpose:
+This example makes the two columns disagree on purpose:
 
 ```python
 # exercise_8.py
