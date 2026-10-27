@@ -492,6 +492,9 @@ The parentheses are required.
 A bare `yield` expression may stand as a statement of its own or on the right side of an assignment.
 Everywhere else, including after `return`,
 the grammar requires parentheses around it.
+The `yield (yield from outer())` in `report()` needs them for the same reason:
+the inner `yield from` is the operand of the outer `yield`,
+not a statement of its own.
 
 `report()` yields the value of its own `yield from`,
 so the `Returned` crosses from the return channel to the yield channel and reaches the `for` loop.
