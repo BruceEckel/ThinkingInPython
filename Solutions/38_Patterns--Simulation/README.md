@@ -656,8 +656,8 @@ a different design, a detail, or an equivalent alternative.
 ## 4 and 5: the robot world
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
-so `robot_world.py` holds that shared apparatus once,
-and each exercise imports the module.
+so one module holds that shared apparatus once.
+Each exercise imports it.
 
 ```python
 # robot_world.py
@@ -1131,7 +1131,8 @@ a different design, a detail, or an equivalent alternative.
 ## 6, 7, and 8: the Chladni plate
 
 The last three exercises all shake the same plate.
-Here, `chladni.py` combines the chapter's `standing_wave.py` and `chladni.py` into one file that all three import.
+One file combines the chapter's `standing_wave.py` and `chladni.py`.
+All three exercises import it.
 The file makes two changes:
 `Plate` takes the field function as a constructor argument instead of calling the module-level `amplitude()`,
 and the module adds `membrane()` beside `amplitude()`.
