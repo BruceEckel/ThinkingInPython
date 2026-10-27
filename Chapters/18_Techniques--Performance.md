@@ -54,7 +54,7 @@ You run `cProfile` on a script from the command line:
 ### Reading a `cProfile` Report
 
 `cProfile`'s report is a table, one row per function.
-This section's report profiles a small script, `prof_demo.py`.
+This section's report profiles a small script.
 The script has one obvious hot spot,
 and one generator expression that `cProfile` counts as a call per element:
 
