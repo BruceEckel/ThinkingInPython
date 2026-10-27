@@ -308,8 +308,7 @@ a version that catches the exception types you specify and lets the rest propaga
 
 Standard practice combines the first and third,
 the `Result` and the `NonZero` type.
-In `slope_edge.py`, `parse_run()` receives input as text,
-parses the text into a `NonZero`,
+`parse_run()` receives input as text, parses the text into a `NonZero`,
 and returns a `Result` instead of raising an exception.
 `slope()` takes the `NonZero` that `parse_run()` built and stays total:
 
