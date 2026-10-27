@@ -1,8 +1,3 @@
-I'd like to explore navigation within a chapter in the HTML version. Here's one possibility:
-- The current subsection name floats on the left, and changes as you scroll down.
-- If you hover over the current floating subsection name, it opens up the menu of all the subsections in the chapter, which you can select and thus navigate to.
-- I'm not sure what this should look like on the phone version
-
 Are there any unresolved claude artifacts
 
 Reading level
