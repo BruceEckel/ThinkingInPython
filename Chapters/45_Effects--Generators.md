@@ -491,7 +491,7 @@ The last output line is the one record that arrived through the return channel.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
-This one walks a nested dictionary of plants, yields the path to each plant,
+This example walks a nested dictionary of plants, yields the path to each plant,
 and returns a count of each color:
 
 ```python
