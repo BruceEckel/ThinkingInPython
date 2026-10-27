@@ -605,7 +605,7 @@ such as the number of names on a command line, zero included.
 The `sys.argv` rewrite stays out of the extracted listings.
 The book's output checker runs each listing with `exec()` inside the checker's own process,
 so a script reading `sys.argv` gets the checker's arguments instead.
-Here, `exercise_7.py` passes the names to `wrap()` as list literals,
+The solution passes the names to `wrap()` as list literals,
 so the checker can run both cases:
 
 ```python
