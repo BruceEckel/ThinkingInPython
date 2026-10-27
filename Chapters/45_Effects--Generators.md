@@ -472,8 +472,9 @@ def outer() -> Generator[YMsg, None, RMsg]:
     yield YMsg("outer B")
     return (yield from middle())
 
-def report() -> Generator[YMsg | str]:
-    yield f"{yield from outer() = }"
+def report() -> Generator[YMsg]:
+    result = yield from outer()
+    yield YMsg(str(result))
 
 for line in report():
     print(line)
@@ -483,7 +484,7 @@ for line in report():
 #: YMsg(s='middle B')
 #: YMsg(s='inner A')
 #: YMsg(s='inner B')
-#: yield from outer() = RMsg(s='Message from inner!')
+#: YMsg(s="RMsg(s='Message from inner!')")
 ```
 
 The two record types keep the channels apart:
@@ -497,12 +498,9 @@ A bare `yield` expression may stand as a statement of its own or on the right si
 Everywhere else, including after `return`,
 the grammar requires parentheses around it.
 
-In `report()` the `yield from` sits inside an f-string's braces,
-where any expression may stand since Python 3.12 (PEP 701).
-The whole delegation therefore runs before Python builds the string,
-and the `=` after the expression prints its source text beside its value.
-`report()` yields every `YMsg` that the delegation passes through and then the string it builds,
-so its yield type is the union `YMsg | str`.
+`report()` binds the result and wraps it in a `YMsg`,
+so every value it yields has the one type its annotation declares.
+The final output line shows the `RMsg` inside the `YMsg` that carries it.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.

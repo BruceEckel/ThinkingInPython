@@ -25,8 +25,9 @@ def outer() -> Generator[YMsg, None, RMsg]:
     yield YMsg("outer B")
     return (yield from middle())
 
-def report() -> Generator[YMsg | str]:
-    yield f"{yield from outer() = }"
+def report() -> Generator[YMsg]:
+    result = yield from outer()
+    yield YMsg(str(result))
 
 for line in report():
     print(line)
@@ -36,4 +37,4 @@ for line in report():
 #: YMsg(s='middle B')
 #: YMsg(s='inner A')
 #: YMsg(s='inner B')
-#: yield from outer() = RMsg(s='Message from inner!')
+#: YMsg(s="RMsg(s='Message from inner!')")
