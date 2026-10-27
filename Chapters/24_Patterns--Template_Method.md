@@ -26,7 +26,7 @@ Subclasses provide the individual steps.
 puts the `typing.final` decorator on a class.
 The decorator also works on a single method.
 On a method, it declares that no subclass may override that method.
-In `framework.py`, `run()` is the template method.
+`run()` is the template method.
 `@final` on `run()` makes the type checker reject any subclass that overrides it:
 
 ```python
@@ -136,7 +136,7 @@ If you leave `@override` off the misspelled method,
 the checker accepts it as a new method,
 because the typing rules let a subclass add any method.
 A runtime check can reject the misspelled method.
-In `near_miss.py`, `CheckedFramework` inherits from `ApplicationFramework` and adds that check.
+`CheckedFramework` inherits from `ApplicationFramework` and adds that check.
 Its `__init_subclass__()` runs at each subclass's `class` statement,
 and uses the standard library's `difflib` to find names that nearly match:
 
@@ -315,7 +315,7 @@ A subclass can break that requirement in three ways and still pass the type chec
 it raises an exception where the base does not,
 leaves a step empty when the anchored algorithm depends on it,
 or performs the step on one pass and skips the next.
-`faithless_step.py` shows the third failure:
+The listing shows the third failure:
 
 ```python
 # faithless_step.py
