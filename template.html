@@ -634,9 +634,13 @@
         if (found === current) return;
         if (current) current.link.removeAttribute("aria-current");
         current = found;
-        var text = chapterTitle;
+        // The label names the heading being read; the full path, with
+        // an h3's parent, goes in the tooltip, since a long h2 would
+        // push the h3 past the ellipsis.
+        var text = chapterTitle, path = chapterTitle;
         if (found) {
-          text = found.level === 3 && found.parent
+          text = found.text;
+          path = found.level === 3 && found.parent
             ? found.parent + " › " + found.text
             : found.text;
           found.link.setAttribute("aria-current", "true");
@@ -645,7 +649,7 @@
           topLink.setAttribute("aria-current", "true");
         }
         label.textContent = text;
-        button.title = text;
+        button.title = path;
       }
 
       var queued = false;
