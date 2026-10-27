@@ -480,32 +480,19 @@ for yielded in report():
 #: Returned(text='Message from inner!')
 ```
 
-The two record types keep the channels apart:
-a `Yielded` travels the yield channel and a `Returned` the return channel.
-They share one shape, so the type alone tells the channels apart.
-Each level yields its name before it delegates or returns,
-so the output traces the descent,
-and the `Returned` comes back up the same path.
-A `return (yield from ...)` passes the result through unchanged.
+A `Yielded` travels the yield channel and a `Returned` the return channel.
+The output traces the descent, and the `Returned` comes back up the same path.
+`return (yield from ...)` passes the result through unchanged.
 
-The parentheses are required.
-A bare `yield` expression may stand as a statement of its own or on the right side of an assignment.
-Everywhere else, including after `return`,
-the grammar requires parentheses around it.
-The `yield (yield from outer())` in `report()` needs them for the same reason:
-the inner `yield from` is the operand of the outer `yield`,
-not a statement of its own.
-
-`report()` yields the value of its own `yield from`,
-so the `Returned` crosses from the return channel to the yield channel and reaches the `for` loop.
+`report()` yields the value of its own `yield from`.
 Its annotation widens to `Iterator[Yielded | Returned]`,
-because the loop now receives both types.
+because the loop receives both types.
 The last output line is the one record that arrived through the return channel.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
-`color_count.py` walks a nested dictionary of plants,
-yields the path to each plant, and returns a count of each color:
+This one walks a nested dictionary of plants, yields the path to each plant,
+and returns a count of each color:
 
 ```python
 # color_count.py
