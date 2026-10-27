@@ -474,6 +474,10 @@ for line in report():
 Each level yields its own name before it delegates,
 so the output traces the descent, and the `42` comes back up the same path.
 A `return (yield from ...)` passes the result through unchanged.
+The parentheses are required.
+A bare `yield` expression may stand as a statement of its own or on the right side of an assignment.
+Everywhere else, including after `return`,
+the grammar requires parentheses around it.
 In `report()` the `yield from` sits inside an f-string's braces,
 where any expression may stand since Python 3.12 (PEP 701).
 The whole delegation therefore runs before Python builds the string,
