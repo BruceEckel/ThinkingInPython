@@ -359,7 +359,7 @@ which lets those threads share one generator by serializing their calls.
 
 ## `yield from` Composes Generators {#yield-from-composes-descriptions}
 
-An EMS needs a request made deep inside a program to reach the one driver at its edge.
+An EMS needs a request made deep inside a program to reach the driver at its edge.
 Generators provide that path because they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
@@ -441,6 +441,43 @@ while the values `emit()` yields still go to the driver.
 `report()` has no `try`, because `yield from` manages the result for you.
 When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`.
+
+The result travels through as many levels as the delegation has.
+In `yield_from_levels.py`, `inner()` returns `42`,
+`middle()` and `outer()` each return the value of their own `yield from` expression,
+and `report()` turns that value into one more yielded line:
+
+```python
+# yield_from_levels.py
+from collections.abc import Generator
+
+def inner() -> Generator[str, None, int]:
+    yield "inner"
+    return 42
+
+def middle() -> Generator[str, None, int]:
+    yield "middle"
+    return (yield from inner())
+
+def outer() -> Generator[str, None, int]:
+    yield "outer"
+    return (yield from middle())
+
+def report() -> Generator[str]:
+    result = yield from outer()
+    yield f"outer returned {result}"
+
+for line in report():
+    print(line)
+#: outer
+#: middle
+#: inner
+#: outer returned 42
+```
+
+Each level yields its own name before it delegates,
+so the output traces the descent, and the `42` comes back up the same path.
+A `return (yield from ...)` passes the result through unchanged.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
