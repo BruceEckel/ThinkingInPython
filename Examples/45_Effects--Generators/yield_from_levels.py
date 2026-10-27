@@ -22,13 +22,12 @@ def outer() -> Generator[Yielded, None, Returned]:
     yield Yielded("outer")
     return (yield from middle())
 
-def report() -> Iterator[Yielded]:
-    result: Returned = yield from outer()
-    yield Yielded(f"returned: {result.text}")
+def report() -> Iterator[Yielded | Returned]:
+    yield (yield from outer())
 
 for yielded in report():
     print(yielded)
 #: Yielded(text='outer')
 #: Yielded(text='middle')
 #: Yielded(text='inner')
-#: Yielded(text='returned: Message from inner!')
+#: Returned(text='Message from inner!')

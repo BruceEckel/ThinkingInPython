@@ -469,16 +469,15 @@ def outer() -> Generator[Yielded, None, Returned]:
     yield Yielded("outer")
     return (yield from middle())
 
-def report() -> Iterator[Yielded]:
-    result: Returned = yield from outer()
-    yield Yielded(f"returned: {result.text}")
+def report() -> Iterator[Yielded | Returned]:
+    yield (yield from outer())
 
 for yielded in report():
     print(yielded)
 #: Yielded(text='outer')
 #: Yielded(text='middle')
 #: Yielded(text='inner')
-#: Yielded(text='returned: Message from inner!')
+#: Returned(text='Message from inner!')
 ```
 
 The two record types keep the channels apart:
@@ -494,9 +493,11 @@ A bare `yield` expression may stand as a statement of its own or on the right si
 Everywhere else, including after `return`,
 the grammar requires parentheses around it.
 
-`report()` binds the result and yields its text inside a fresh `Yielded`,
-so every value it yields has the one type its annotation declares.
-The `returned:` prefix marks the one output line that arrives through the return channel.
+`report()` yields the value of its own `yield from`,
+so the `Returned` crosses from the return channel to the yield channel and reaches the `for` loop.
+Its annotation widens to `Iterator[Yielded | Returned]`,
+because the loop now receives both types.
+The last output line is the one record that arrived through the return channel.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
