@@ -1293,7 +1293,7 @@ Use `multiprocessing` when the job is a different shape:
 
 ### Measuring the Speedup
 
-`task_scaling.py` tests the claim that wall-clock time falls toward a single task's time as the work spreads across more cores.
+This section's listing tests the claim that wall-clock time falls toward a single task's time as the work spreads across more cores.
 It splits a set amount of work into a growing number of tasks,
 keeps the pool warm across every measurement,
 and shows how the time changes once task count passes the number of cores:
