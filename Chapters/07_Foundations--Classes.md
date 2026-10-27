@@ -186,7 +186,7 @@ The lookup starts at the class of the object,
 not at the class that defines the calling method,
 so base-class code reaches a method the subclass replaced.
 
-`f()` in `any_show.py` demonstrates dynamic typing.
+`f()` demonstrates dynamic typing.
 The class `Different` also has a method named `show()`,
 but does not derive from `Simple`:
 
