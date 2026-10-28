@@ -429,7 +429,9 @@ import exercise_1 as table
 import exercise_2 as methods
 from exercise_1 import Outcome
 
-EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
+type Name = str
+
+EXPECTED: Final[dict[tuple[Name, Name], Outcome]] = {
     ("Paper", "Rock"): Outcome.WIN,
     ("Paper", "Scissors"): Outcome.LOSE,
     ("Paper", "Paper"): Outcome.DRAW,
@@ -448,8 +450,8 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Lizard", "Lizard"): Outcome.DRAW,
 }
 
-def compete(module: ModuleType, player: str,
-            opponent: str) -> str:
+def compete(module: ModuleType, player: Name,
+            opponent: Name) -> str:
     ...
 ```
 
@@ -478,7 +480,9 @@ import exercise_1 as table
 import exercise_2 as methods
 from exercise_1 import Outcome
 
-EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
+type Name = str
+
+EXPECTED: Final[dict[tuple[Name, Name], Outcome]] = {
     ("Paper", "Rock"): Outcome.WIN,
     ("Paper", "Scissors"): Outcome.LOSE,
     ("Paper", "Paper"): Outcome.DRAW,
@@ -497,8 +501,8 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Lizard", "Lizard"): Outcome.DRAW,
 }
 
-def compete(module: ModuleType, player: str,
-            opponent: str) -> str:
+def compete(module: ModuleType, player: Name,
+            opponent: Name) -> str:
     result = getattr(module, player)().compete(
         getattr(module, opponent)())
     assert isinstance(result, module.Outcome)
