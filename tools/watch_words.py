@@ -17,7 +17,17 @@ stays), and a verb whose object is `nothing` (since 2026-10-24:
 "reports nothing", "changes nothing", "prints nothing", the verbs in
 `NOTHING_VERBS`; the positive form usually exists, "accepts", "leaves
 the list as it was", "prints an empty line", and a negation that is
-the claim stays), and the who-does-it family (since 2026-10-25, after
+the claim stays), the same verbs with `none`, `none of`, or `no X` as
+the object (since 2026-10-28, Bruce's "reversal of expectation":
+"runs none of the body", "raises no exception", "has no `__slots__`";
+the verb promises an action or a possession and the quantifier
+cancels it, so the reader builds the action and takes it back; say
+what happens instead, "the body runs later, when the driver calls
+`next()`", "Python continues", and keep the negation where it is the
+claim or has no positive term, "no `__slots__`" when the absence is
+what the sentence teaches; `NO_VERBS` adds the possession and
+provision verbs, `has`, `takes`, `provides`, `defines`, that the
+`nothing` rule had no need of), and the who-does-it family (since 2026-10-25, after
 the "by hand" sweep): `by hand`, `manually`, `explicit`, `explicitly`.
 Each says who writes something where the sentence could name what
 gets written: "checks each `Result` by hand" is "with `isinstance()`",
@@ -193,6 +203,34 @@ NOTHING_VERBS: Final = (
 )
 """A verb whose object is "nothing" (Tier 2, since 2026-10-24; the verb
 list grew on 2026-10-25 from the book sweep)."""
+NO_VERBS: Final = NOTHING_VERBS[:-1] + (
+    r"|has|have|had|having|takes?|took|taken|taking|contains?"
+    r"|contained|containing|mentions?|mentioned|mentioning|uses?|used"
+    r"|using|carr(?:y|ies|ied|ying)|offers?|offered|offering|allows?"
+    r"|allowed|allowing|involves?|involved|involving|provides?"
+    r"|provided|providing|suppl(?:y|ies|ied|ying)|defines?|defined"
+    r"|defining|specif(?:y|ies|ied|ying)|performs?|performed"
+    r"|performing|expects?|expected|expecting|exposes?|exposed"
+    r"|exposing|makes?|made|making|forwards?|forwarded|forwarding"
+    r"|introduces?|introduced|introducing|lists?|listed|listing"
+    r"|visits?|visited|visiting|starts?|started|starting|triggers?"
+    r"|triggered|triggering|affects?|affected|affecting|rejects?"
+    r"|rejected|rejecting|spends?|spent|spending|places?|placed"
+    r"|placing|acquires?|acquired|acquiring|installs?|installed"
+    r"|installing|deletes?|deleted|deleting|names?|named|naming"
+    r"|prevents?|prevented|preventing|wait(?:s|ed|ing)?|frees?|freed"
+    r"|freeing|caches?|cached|caching|registers?|notices?|noticed"
+    r"|noticing|handles?|handled|handling|serves?|served|serving"
+    r"|wants?|wanted|wanting|asks?|asked|asking|blocks?|blocked"
+    r"|blocking|ends?|ended|ending|closes?|closed|closing|loads?"
+    r"|loaded|loading|parses?|parsed|parsing|renames?|renamed"
+    r"|renaming|replaces?|replaced|replacing|surviv(?:e|es|ed|ing))"
+)
+"""The `nothing` verbs plus the possession and provision verbs, for
+`none`, `none of`, and `no X` as the object (Tier 2, since
+2026-10-28)."""
+NO_AFTER: Final = r"(?! longer\b| matter\b| doubt\b)"
+"""Idioms after "no" that are not a cancelled object."""
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
@@ -245,6 +283,8 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"earns?|earned|earning"),
         (2, r"bargains?"),
         (2, NOTHING_VERBS + r" nothing"),
+        (2, NO_VERBS + r" none(?: of)?"),
+        (2, NO_VERBS + r" no" + NO_AFTER),
         (2, r"by hand"),
         (2, r"manually"),
         (2, r"explicit(?:ly)?"),

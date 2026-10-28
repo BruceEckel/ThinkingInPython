@@ -26,6 +26,18 @@ def test_tier_2_hit() -> None:
         (1, 2, "already", "The value is already set")]
 
 
+def test_verb_with_no_or_none_object_is_tier_2() -> None:
+    assert [h[2] for h in hits("Python raises no exception. The call "
+                               "runs none of the body. It has no slots. "
+                               "The second supplies none.")] == [
+        "raises no", "runs none of", "has no", "supplies none"]
+
+
+def test_no_idioms_and_bare_no_are_not_hits() -> None:
+    assert hits("The call no longer runs. No matter what it does, "
+                "a value is no doubt present. No code runs.") == []
+
+
 def test_phrase_hit_is_case_insensitive() -> None:
     assert [h[2] for h in hits("Near-miss bugs. The Way Out.")] == [
         "near-miss", "the way out"]
