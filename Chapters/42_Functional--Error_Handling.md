@@ -269,8 +269,8 @@ with expected(RuntimeError):
 
 The type checker accepts both the discarded `Result` and `lies()`.
 Discarding a return value is legal Python.
-A function that always raises an exception satisfies any declared return type,
-since the checker finds no returned value to compare with that type.
+The checker compares a declared return type with the value of each `return` statement,
+so a function that always raises an exception satisfies any return type.
 
 ## Composing by Hand
 
@@ -381,7 +381,8 @@ if __name__ == "__main__":
 
 The two `composed()` functions succeed and fail on the same inputs.
 The exception version is shorter, but its signature says less.
-`-> int` specifies no failure, where `-> Result[int, str]` specifies one.
+`-> int` states the success type alone,
+where `-> Result[int, str]` states the failure type as well.
 In the exception version, Python also deletes `e` when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
@@ -391,7 +392,8 @@ whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 Look again at the two `bind()` methods in `result.py`.
 On an `Ok`, `bind()` passes the answer to the next function.
 On an `Err`, `bind()` skips the function and returns the `Err` unchanged.
-The two signatures differ because `Err` holds no answer to pass to the next step.
+The two signatures differ because the next step takes an answer,
+whereas an `Err` holds an error.
 `Err.bind()` therefore accepts a callable with any parameter list,
 and its return type is `Err[E]`, because it returns `self`.
 An `Err` anywhere in a chain skips the rest of the steps,
@@ -826,7 +828,7 @@ Typeshed declares `__notes__` on `Exception`'s base class, `BaseException`.
 `isinstance(result, Err)` narrows `result` to `Err[Exception]` too.
 
 Reading `error.__notes__` is safe here because `parse_field()` adds a note on every failure.
-An exception from someone else's code may carry no notes,
+An exception from someone else's code has a `__notes__` attribute only if something called `add_note()` on it,
 so read `__notes__` with `getattr(error, "__notes__", [])`.
 
 ## The returns Library
