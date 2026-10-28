@@ -59,10 +59,20 @@ file passes a strict type checker and linter.
   `NewType` only satisfies the checker; the dataclass also enforces
   the invariant at runtime.
 
-- `type X = ...` aliases are for compound shapes (tuples, dicts,
-  callables, unions), never a bare scalar rename like
-  `type Symbol = str`. The right side is lazily evaluated (PEP 695),
-  so it can name a class defined later in the file without quotes.
+- A `type X = ...` alias earns its line when its name tells the
+  reader something the signature cannot say otherwise. A compound
+  shape (a tuple, dict, callable, or union) is the usual case. A
+  scalar alias is right when a bare `str` or `int` hides the value's
+  role: `type Name = str` and `type Path = str` make
+  `dict[Name, Tree | Color]` and `at: Path` readable where
+  `dict[str, ...]` and `at: str` say nothing. Skip it when the
+  parameter's own name already carries the meaning (`symbol: str`),
+  and prefer a `Literal`, an `Enum`, or a validated record where the
+  value has a closed set or an invariant. Use a `type` alias, not a
+  `NewType`, for the scalar case: a `NewType` makes the checker
+  reject every bare literal. The right side is lazily evaluated
+  (PEP 695), so it can name a class defined later in the file
+  without quotes.
 
 - For a generator function whose yield type carries a guarantee you
   want verified, write the `Generator[...]` annotation out in full:
