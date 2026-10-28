@@ -189,7 +189,7 @@ print(shout(None))
 ```
 
 Inside the `if`, the type checker *narrows* `text` from `str | None` to `str`,
-so `.upper()` needs no cast.
+so the type checker accepts `.upper()` as written.
 After the `if`, `text` is `None`, since the branch returned for every `str`.
 If the branch falls through, `text` is the full `str | None` again.
 
@@ -222,7 +222,8 @@ print(describe(42))
 #: 42
 ```
 
-`repr()` accepts every object, so the `return` at `[1]` needs no test.
+`repr()` accepts every object,
+so the `return` at `[1]` handles any value that reaches it.
 If you annotate `value` as `Any` and uncomment the `return` above the `if`,
 the type checker accepts it,
 and `describe(42)` fails at runtime with an `AttributeError`.
@@ -461,14 +462,14 @@ A `type` statement creates a new name, not a new type.
 so the type checker accepts any pair of ints as a `Coord`.
 (For a type the type checker keeps separate from its base, use [`NewType`](#aliases-and-distinct-types).)
 
-Because an alias is the same type under another name, it adds no checking.
+Because an alias is the same type under another name,
+the type checker sees through it.
 Its job is to tell the reader what a value is.
 A compound shape is the usual case,
-but a scalar earns an alias when its name says what a bare `str` or `int` cannot:
+but a scalar gets an alias when its name says what a bare `str` or `int` cannot:
 `dict[Name, int]` says the keys are names,
 where `dict[str, int]` hides what they are.
-Skip the alias when the parameter's own name already says it,
-as `name: str` does.
+Skip the alias when the parameter's own name says it, as `name: str` does.
 `type UserId = int` reads like a distinct type in a signature,
 yet the type checker accepts any `int` as a `UserId`.
 When the checker must keep the two apart, `NewType` is the construct.
@@ -839,7 +840,7 @@ a hint repeats what the initializer says.
 `count: int = 0` says the same as `count = 0`, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
 A hint helps in proportion to the distance between a value's creation and its use.
-A value created and used within three lines needs no annotation.
+A value created and used within three lines can leave its type to inference.
 A value that arrives from another module, inside a container,
 needs a precise annotation.
 
@@ -1009,7 +1010,7 @@ Try each exercise before opening its [solution](../Solutions/08_Foundations--Sta
     Confirm that `ty check` accepts `.bump().bump().report()` on a `LoudTally` and that the call prints the message in capitals.
 5.  Run `ty check` on `type_defaults.py` and read what it reports for `reveal_type(words.top())`.
     Remove the `= str` default and run it again.
-    The type checker reports no error either way.
+    The type checker accepts the file either way.
     Say what that means for a bare `Stack` annotation.
 6.  In `type_aliases.py`,
     call `paint(grid, (2, 3), "purple")` and run `ty check`.
