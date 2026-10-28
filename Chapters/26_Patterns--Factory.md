@@ -410,7 +410,7 @@ produces the same failure even when the import statement is in the file.
 The module body, and with it the registration,
 runs at the first use of the imported name.
 An import written only to trigger registration never uses that name.
-Running with `-X lazy_imports=all` makes ordinary imports lazy too,
+Running with `-X lazy_imports=all` makes ordinary imports lazy along with the marked ones,
 so the same failure can appear in a program with no `lazy` keyword in it.
 Import a plugin module eagerly when the import exists for its side effect.
 
