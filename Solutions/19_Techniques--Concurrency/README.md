@@ -532,7 +532,7 @@ so each pair of increments adds one to `counter` instead of two.
 
 The semaphore accepts the stray call,
 because `release()` adds one to the count whether or not an `acquire()` came first.
-That missing error is the difference between a semaphore and a lock.
+That acceptance is the difference between a semaphore and a lock.
 `asyncio.Lock` checks for a matching acquire,
 so a release without one raises `RuntimeError: Lock is not acquired.` A semaphore's count can climb past its starting value,
 so the same mistake lifts the count to two and silently admits a second holder.
