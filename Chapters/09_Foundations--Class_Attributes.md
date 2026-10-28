@@ -560,7 +560,8 @@ Without the decorator,
 an annotated assignment such as `B`'s `x: int = 100` stays a shared class attribute,
 as `Cart` shows.
 The annotation marks a field.
-If you write `x = 100` with no `x: int`, `@dataclass` creates no field:
+If you write `x = 100` with no `x: int`,
+`@dataclass` leaves `x` out of `fields(B)`:
 
 ```python
 # dataclass_no_annotation.py
