@@ -106,8 +106,9 @@ Rebind only through the module.
 Sharing also depends on the module's name.
 `sys.modules` uses the module name as its key,
 and the file you launch runs under the name `__main__`.
-If that file is `config.py`, a later `import config` finds no cached entry,
-runs the body again, and builds a second module object with its own `settings`.
+If that file is `config.py`,
+a later `import config` looks under the key `config`, runs the body again,
+and builds a second module object with its own `settings`.
 Keep singleton state in a module you import, not in the script you run.
 
 ## When You Want a Class, Cache the Instance
@@ -564,7 +565,7 @@ A `__new__()` that returns some other object skips `__init__()` and fails `isins
 A singleton `__new__()` returns an instance of the class on every construction,
 so Python runs `__init__()` on the shared instance after every construction
 (see exercise 7).
-`SingletonClassVar` defines no `__init__()`,
+`SingletonClassVar` inherits `__init__()` from `object`,
 so `__new__()` both creates the shared list and appends each argument.
 
 ### Borg: Singleton by Inheritance
@@ -632,8 +633,8 @@ A subclass that needs storage of its own declares it:
 The lookup through `self` finds the subclass's dict first.
 Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
 
-*Borg* has no `cache_clear()`,
-so whatever one test leaves in `_shared_state` stays there for the next.
+The cached factory resets through `cache_clear()`,
+while *Borg*'s `_shared_state` carries whatever one test leaves there into the next.
 A pytest fixture that clears the dict before each test gives every test empty shared state:
 
 ```python
@@ -793,15 +794,16 @@ where the metaclass form discards it.
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
 the simpler methods that replace most metaclasses.
-A singleton needs none of this machinery,
-since a module or a cached factory gives you one instance and leaves construction alone.
+For a singleton, a module or a cached factory is enough,
+since either gives you one instance and leaves construction alone.
 
 ## Which Should You Use?
 
 Use the lightest tool that fits:
 
 - For almost everything, use a module with module-level state.
-  It is the default Python singleton and needs no class.
+  It is the default Python singleton,
+  which the import system builds and caches for you.
 - If you want a class, hide construction behind a cached factory (`@cache`),
   or override `__new__()` as `singleton_class_variable.py` does.
   Both create the instance on the first call,
@@ -809,7 +811,7 @@ Use the lightest tool that fits:
 - If you want many objects sharing one set of state, use *Borg*,
   but only when something needs those objects to be class instances:
   an existing class-based interface, an `isinstance()` check, or subclassing.
-  A module shares that state with every importer and needs no class,
+  A module shares that state with every importer,
   so shared data alone is no reason to use *Borg*.
 - The decorator and metaclass forms work,
   but they are more machinery than the problem usually justifies.
