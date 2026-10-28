@@ -105,7 +105,7 @@ and the type checker rejects a value on the wrong channel.
 The distinction exists for the type checker.
 At runtime, `Question("name")` returns the same `str` you passed in.
 
-Driving the generator with `next()` and `send()` sends one `Answer` at a time:
+Driving the generator with `next()` and `send()` produces one `Question` at a time:
 
 ```python
 # drive_by_hand.py
@@ -134,16 +134,11 @@ print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
-The `NewType` definitions let the type checker report a transposed annotation.
-If you mistakenly annotate the generator in `interview_generator.py` as `Generator[Answer, Question, Result]`,
-the type checker flags each `yield` in the body,
-because each one yields a `Question` where the annotation declares an `Answer`.
-It also flags each `next()` and `send()` in `drive_by_hand.py`.
+The `NewType` definitions let the type checker report any annotation mistakes.
 
-The last `send()` resumes the body,
-which reaches `return` instead of another `yield`,
+The last `send()` resumes `interview()`'s body,
+which encounters `return` instead of another `yield`,
 so the generator returns its `Result`.
-
 The caller sees that `return` as a `StopIteration`,
 and the `Result` arrives as the exception's `value`.
 A `for` loop loses that value,
