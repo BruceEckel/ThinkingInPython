@@ -1820,16 +1820,16 @@ so their lines sit between `__new__ Derived enter` and `__new__ Derived exit`,
 inside the metaclass's own construction step.
 The decorator is last, because it receives a finished class.
 
-- React to each new subclass: `__init_subclass__()`
-- Give a class attribute its own name: `__set_name__()`
-- Rewrite a finished class: a class decorator
+- React to each new subclass: `__init_subclass__()`.
+- Give a class attribute its own name: `__set_name__()`.
+- Rewrite a finished class: a class decorator.
 - Build a family of classes from data: `type()` with three arguments,
-  or an `exec()`ed class body when the definition is easier to read as source
+  or an `exec()`ed class body when the definition is easier to read as source.
 - Change the name, the bases, or the namespace before Python builds the class:
-  a metaclass `__new__()`
-- Control the namespace into which the body executes: `__prepare__()`
-- Decide whether an instance gets built: a metaclass `__call__()`
-- Read a class you did not write: `inspect`
+  a metaclass `__new__()`.
+- Control the namespace into which the body executes: `__prepare__()`.
+- Decide whether an instance gets built: a metaclass `__call__()`.
+- Read a class you did not write: `inspect`.
 
 None of these hooks is a separate facility added to the language.
 A class is an object that Python builds at run time by executing its body,
