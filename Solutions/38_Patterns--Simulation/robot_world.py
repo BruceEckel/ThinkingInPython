@@ -81,7 +81,7 @@ def item_factory(symbol: str) -> Item:
 
 type Coord = tuple[int, int]
 type RoomMap = dict[Coord, Room]
-type Route = str
+type Moves = str
 
 class Room:
     def __init__(self, occupant: Item) -> None:
@@ -143,6 +143,6 @@ class GameBuilder:
             t1.target_room = room2
             t2.target_room = room1
 
-    def run(self, moves: Route) -> None:
+    def run(self, moves: Moves) -> None:
         for char in moves:
             self.robot.move(Urge(char))

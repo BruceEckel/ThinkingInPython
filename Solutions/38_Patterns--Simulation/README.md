@@ -743,7 +743,7 @@ def item_factory(symbol: str) -> Item:
 
 type Coord = tuple[int, int]
 type RoomMap = dict[Coord, Room]
-type Route = str
+type Moves = str
 
 class Room:
     def __init__(self, occupant: Item) -> None:
@@ -805,7 +805,7 @@ class GameBuilder:
             t1.target_room = room2
             t2.target_room = room1
 
-    def run(self, moves: Route) -> None:
+    def run(self, moves: Moves) -> None:
         for char in moves:
             self.robot.move(Urge(char))
 ```
@@ -961,14 +961,14 @@ and walk each leg with `run()`.
 from collections import deque
 from collections.abc import Callable
 from typing import Final
-from robot_world import (EndGame, Food, GameBuilder, Room,
-                         Route, Teleport, Urge, Wall)
+from robot_world import (EndGame, Food, GameBuilder, Moves,
+                         Room, Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     ...
 
 def solve(game: GameBuilder,
-          arrived: Callable[[Room], bool]) -> Route | None:
+          arrived: Callable[[Room], bool]) -> Moves | None:
     ...
 
 def food(room: Room) -> bool:
@@ -1002,8 +1002,8 @@ Returning `None` makes an empty search the loop's ordinary exit.
 from collections import deque
 from collections.abc import Callable
 from typing import Final
-from robot_world import (EndGame, Food, GameBuilder, Room,
-                         Route, Teleport, Urge, Wall)
+from robot_world import (EndGame, Food, GameBuilder, Moves,
+                         Room, Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     beyond = room.doors.open(urge)
@@ -1014,9 +1014,9 @@ def landing(room: Room, urge: Urge) -> Room | None:
     return beyond
 
 def solve(game: GameBuilder,
-          arrived: Callable[[Room], bool]) -> Route | None:
+          arrived: Callable[[Room], bool]) -> Moves | None:
     start = game.robot.room
-    queue: deque[tuple[Room, Route]] = deque([(start, "")])
+    queue: deque[tuple[Room, Moves]] = deque([(start, "")])
     seen: set[Room] = {start}
     while queue:
         room, path = queue.popleft()

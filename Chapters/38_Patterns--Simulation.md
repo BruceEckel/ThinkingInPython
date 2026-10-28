@@ -800,7 +800,7 @@ from itertools import groupby
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room, RoomMap
 
-type Route = str
+type Moves = str
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
@@ -846,7 +846,7 @@ class GameBuilder:
                 rows[-1] += str(room.occupant)
         return "\n".join(rows)
 
-    def run(self, moves: Route) -> None:
+    def run(self, moves: Moves) -> None:
         for char in moves:
             self.robot.move(Urge(char))
 ```
@@ -936,7 +936,7 @@ That test reproduces what `Room.enter()` gets from `interact()`.
 ```python
 # robot_explorer/solver.py
 from collections import deque
-from game import GameBuilder, Route
+from game import GameBuilder, Moves
 from items import EndGame, Teleport, Urge, Wall
 from world import Room
 
@@ -949,9 +949,9 @@ def landing(room: Room, urge: Urge) -> Room | None:
         return beyond.occupant.target_room
     return beyond
 
-def solve(game: GameBuilder) -> Route:
+def solve(game: GameBuilder) -> Moves:
     start = game.robot.room
-    queue: deque[tuple[Room, Route]] = deque([(start, "")])
+    queue: deque[tuple[Room, Moves]] = deque([(start, "")])
     seen: set[Room] = {start}
     while queue:
         room, path = queue.popleft()

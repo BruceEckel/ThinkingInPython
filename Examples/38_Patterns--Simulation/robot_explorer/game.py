@@ -3,7 +3,7 @@ from itertools import groupby
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room, RoomMap
 
-type Route = str
+type Moves = str
 
 class GameBuilder:
     def __init__(self, maze: str) -> None:
@@ -49,6 +49,6 @@ class GameBuilder:
                 rows[-1] += str(room.occupant)
         return "\n".join(rows)
 
-    def run(self, moves: Route) -> None:
+    def run(self, moves: Moves) -> None:
         for char in moves:
             self.robot.move(Urge(char))

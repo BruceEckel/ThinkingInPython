@@ -1,6 +1,6 @@
 # robot_explorer/solver.py
 from collections import deque
-from game import GameBuilder, Route
+from game import GameBuilder, Moves
 from items import EndGame, Teleport, Urge, Wall
 from world import Room
 
@@ -13,9 +13,9 @@ def landing(room: Room, urge: Urge) -> Room | None:
         return beyond.occupant.target_room
     return beyond
 
-def solve(game: GameBuilder) -> Route:
+def solve(game: GameBuilder) -> Moves:
     start = game.robot.room
-    queue: deque[tuple[Room, Route]] = deque([(start, "")])
+    queue: deque[tuple[Room, Moves]] = deque([(start, "")])
     seen: set[Room] = {start}
     while queue:
         room, path = queue.popleft()

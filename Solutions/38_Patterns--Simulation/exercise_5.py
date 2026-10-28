@@ -2,8 +2,8 @@
 from collections import deque
 from collections.abc import Callable
 from typing import Final
-from robot_world import (EndGame, Food, GameBuilder, Room,
-                         Route, Teleport, Urge, Wall)
+from robot_world import (EndGame, Food, GameBuilder, Moves,
+                         Room, Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     beyond = room.doors.open(urge)
@@ -14,9 +14,9 @@ def landing(room: Room, urge: Urge) -> Room | None:
     return beyond
 
 def solve(game: GameBuilder,
-          arrived: Callable[[Room], bool]) -> Route | None:
+          arrived: Callable[[Room], bool]) -> Moves | None:
     start = game.robot.room
-    queue: deque[tuple[Room, Route]] = deque([(start, "")])
+    queue: deque[tuple[Room, Moves]] = deque([(start, "")])
     seen: set[Room] = {start}
     while queue:
         room, path = queue.popleft()
