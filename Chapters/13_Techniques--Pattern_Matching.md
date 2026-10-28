@@ -680,7 +680,7 @@ Python's `match` is a statement, not an expression,
 so a `match` that must produce a value goes inside a function that returns from each `case`.
 
 Python has no `sealed` keyword.
-`assert_never()` plus a type checker fills that role.
+`assert_never()` plus the type checker fills that role.
 
 An `if`/`isinstance()` chain that ends with `assert_never()` gives the same exhaustiveness check,
 but a `match` names the subject once and binds fields as it tests the type.
