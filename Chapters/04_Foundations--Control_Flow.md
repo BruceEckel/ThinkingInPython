@@ -471,7 +471,7 @@ Check the argument and raise your own exception first when the report should nam
 
 The optional `else` runs when the `try` block reaches its end.
 The loop `else` has the same shape.
-It runs when the loop hits no `break`.
+It runs when the loop exhausts its iterable.
 The `except` clauses catch exceptions raised in the `try` block alone.
 An exception from the follow-up work in the `else` propagates to the caller,
 past the handlers written for the `try` block's failure.
