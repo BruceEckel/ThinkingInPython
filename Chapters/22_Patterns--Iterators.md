@@ -750,7 +750,7 @@ so the type checker infers the element type from the `expected` argument.
 `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 `expected` must be a class such as `list`.
-The type checker also accepts a parameterized generic such as `list[int]`,
+The type checker accepts a parameterized generic such as `list[int]` as readily as `list`,
 but `isinstance()` raises a `TypeError` when it receives one,
 so either wrapper fails at the first item.
 
