@@ -145,7 +145,7 @@ then puts `total()` in the loop's place:
 
 The shaded region in each frame holds what the iterator hides from its caller.
 Inside `total()`, `sum()` makes the same `iter()` and `next()` calls as the written-out `for` loop,
-so a new source needs no change to `total()`.
+so `total()` stays the same for every new source.
 
 The third frame shows a limit of the protocol.
 A caller learns that the items have run out by asking for one more.
@@ -321,7 +321,8 @@ expect(ValueError, squares, -1)
 ```
 
 `lazy_squares()` contains a `yield`,
-so the call `lazy_squares(-1)` runs none of its body.
+so the call `lazy_squares(-1)` returns a generator object.
+The check at the top of its body waits for the first `next()`.
 `squares()` has no `yield`, so calling it runs the check immediately.
 Only `produce()` waits.
 
@@ -343,8 +344,8 @@ yet it supports repeated passes, because each pass gets a fresh iterator.
 One `range` object can drive loop after loop.
 The iterator runs out, not the iterable that made it.
 
-An `Iterable[T]` annotation gives no warning,
-because it describes a list and a half-spent generator equally well.
+The type checker accepts any generator for an `Iterable[T]` parameter,
+because the annotation describes a list and a half-spent generator equally well.
 A function that walks its argument twice therefore type-checks and then returns a wrong answer on the second pass:
 
 ```python
