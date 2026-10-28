@@ -642,7 +642,7 @@ from interview_generator import Answer, Question, Result
 def ask(
     question: Question
 ) -> Generator[Question, Answer, Answer]:
-    answer = yield question
+    answer: Answer = yield question
     print(f"  ask() received {answer}")
     return answer
 
