@@ -21,11 +21,14 @@ A generator therefore has three *channels*:
 - Values come in through `send()`
 - One value goes out through `return`
 
-This chapter covers the full three-channel annotation, the *driver*
-(the loop that runs such a conversation), and `yield from`,
-which composes generators that do not refer to their driver.
-[Stateless](46_Effects--Stateless.md) builds an Effect system on the annotation,
-the loop, and `yield from`, but generators are useful on their own.
+This chapter covers:
+
+- The full three-channel annotation
+- The *driver* (the loop that runs such a conversation)
+- `yield from`, which composes generators that do not refer to their driver
+
+[Stateless](46_Effects--Stateless.md) builds an Effect system on these,
+but generators are useful on their own.
 
 ## Annotating a Generator
 
@@ -35,7 +38,9 @@ and `Generator[str]` in [Context Managers](15_Techniques--Context_Managers.md#a-
 A short form fits a generator that yields values, receives `None`,
 and returns `None`.
 
-A generator that also receives values needs the full annotation:
+A generator that also receives values needs the full annotation,
+written here with the names the [`typing` documentation](https://docs.python.org/3/library/typing.html#annotating-generators-and-coroutines)
+uses:
 
     Generator[YieldType, SendType, ReturnType]
 
