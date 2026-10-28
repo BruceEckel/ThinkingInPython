@@ -705,7 +705,7 @@ installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
 the module stays unloaded for the rest of the run, so that work never happens.
 The failure is silent.
-Python continues, and the table ends up one row short.
+The run finishes, and the table ends up one row short.
 `all` defers ordinary `import` statements as well as the marked ones,
 including the ones that exist to run a module's body.
 The same silent failure therefore makes `all` an experiment to run rather than a setting to leave on.
