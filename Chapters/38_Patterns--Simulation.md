@@ -548,7 +548,7 @@ if __name__ == "__main__":
     show()
 ```
 
-In the rats model, concurrency organizes the code and adds no speed.
+In the rats model, concurrency organizes the code rather than speeding it up.
 Every rat awaits `asyncio.sleep(0)` at the same point,
 so the tasks take turns in round robin and the run stays deterministic.
 Because the tasks run one at a time,
@@ -711,7 +711,7 @@ so a new item must inherit directly from `Item`.
 If you derive a class from `Food` to inherit its behavior,
 that class is a grandchild of `Item`.
 `Item.__subclasses__()` leaves it out,
-so the loop finds no match and the function's last line builds a `Teleport`.
+so `item_factory()` falls through the loop to its last line and builds a `Teleport`.
 [Factory](26_Patterns--Factory.md#simple-factory-method)
 describes the recursion for deeper hierarchies,
 and that chapter's exercise 9 writes the recursion.
@@ -874,7 +874,7 @@ Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 Those tests are not the type switch that polymorphism removes.
 `GameBuilder` must tell the kinds of item apart, once.
-The movement code that runs afterward tests no types.
+The movement code that runs afterward calls `interact()` on whatever item a room holds.
 
 The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
@@ -1187,7 +1187,7 @@ A `Grain` is a position.
 `step()` contains all of the simulation's logic.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
-Each grain stores its own position and reads no other grain's position.
+Each grain stores its own position and moves independently of every other grain.
 
 ```python
 # chladni_plate/chladni.py
@@ -1440,7 +1440,7 @@ Try each exercise before opening its [solution](../Solutions/38_Patterns--Simula
     Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` records the coordinates it receives instead of starting a rat,
     run one rat with `asyncio.run(rat.run())`,
     and assert which cell the rat kept for itself and which cells it spawned.
-    You need no real `Blackboard`, `Maze`, or task scheduling.
+    The fake stands in for the real `Blackboard`, `Maze`, and task scheduling.
 2.  Report the cells no rat reaches.
     After `explore()` finishes,
     compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that no rat claimed.
