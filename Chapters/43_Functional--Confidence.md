@@ -119,7 +119,7 @@ from a cache to a database query planner.
 The more of your program is referentially transparent,
 the more of it a machine optimizes and a proof covers.
 
-Caching an impure function returns wrong values and raises no exception.
+Caching an impure function quietly returns wrong values.
 Because `withdraw()` reads and writes `balance`,
 decorating it with `lru_cache` leaves `balance` wrong:
 
