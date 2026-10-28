@@ -336,7 +336,8 @@ print("survived")
 #: survived
 ```
 
-A generator manager has no return value to set.
+In a generator manager,
+the `except` clause takes the place of `__exit__()`'s return value.
 `@contextmanager` raises the exception at the `yield`,
 so catching it there and suppressing it is the equivalent of `__exit__()` returning `True`.
 Re-raising it, or omitting the `except` clause,
@@ -402,7 +403,7 @@ so a `ZeroDivisionError` still matches `expected_one(ArithmeticError)`.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments,
 where `exc_type.__name__` gives the type alone.
-`__enter__()` returns `None` because this manager has no object for `as` to bind.
+`__enter__()` returns `None` because this manager watches the block for an exception instead of handing it an object.
 An `as` clause works and binds `None`.
 
 ### The `expected` Manager
@@ -494,7 +495,7 @@ so every exception the book demonstrates through `expected` or `expect()` has on
 
 `suppress` treats the no-argument call the opposite way.
 `suppress()` lets every exception propagate,
-because a raised exception has no listed type to match.
+because its tuple of types to match is empty.
 An `expected()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
 so name the types you expect unless you want the block to suppress every exception.
 
@@ -1115,8 +1116,8 @@ print("pool size after:", pool.available())
 The `time.sleep()` keeps each lease open long enough for other threads to call `lease()`,
 so both connections are out at once.
 A thread that calls `lease()` while the pool is empty blocks in `get()` until another thread returns a connection.
-With a pool that has no limit, all eight threads hold a lease together,
-so the demo prints a peak of eight.
+With a connection for each of the eight threads,
+all eight hold a lease together, so the demo prints a peak of eight.
 
 `available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate when more than one thread is borrowing,
@@ -1187,7 +1188,7 @@ with pool.lease() as second:
 The assignment to `stale` stands for any place a borrower stores the reference,
 such as an attribute or a list.
 With no assignment, `first` is the stale reference too.
-`with` creates no scope,
+The `as` target binds in the surrounding scope,
 so `first` still names the connection after its block ends.
 `test_lease_hands_out_same_object()` relies on that binding when it compares `second` with `first`.
 
@@ -1217,7 +1218,8 @@ which is the shortest form that can express setup, teardown,
 and a `try`/`finally` between them.
 Write a class with `__enter__()` and `__exit__()` when the manager needs state beyond one setup and teardown,
 methods beyond the two protocol ones, or reuse across several `with` statements.
-A generator provides none of those.
+A generator manager supplies one setup, one teardown,
+and one `with` statement per call.
 Add `ContextDecorator` only when the same bracket should also wrap whole functions.
 
 Whichever form you choose, the borrower's side contains two lines.
