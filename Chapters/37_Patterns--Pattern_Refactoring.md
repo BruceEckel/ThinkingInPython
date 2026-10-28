@@ -569,8 +569,8 @@ Each implementation above takes the [placeholder name `_`](33_Patterns--Visitor.
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
 `Paper` falls through to the base function.
 
-A forgotten material gets the default answer,
-with no exception at runtime and no report from the type checker.
+A forgotten material gets the default answer.
+The runtime and the type checker both accept it.
 `Paper` needs no special handling, so here the fallback answer is correct.
 When the default answer is wrong for an unregistered material,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
