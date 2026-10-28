@@ -5,7 +5,7 @@
 
 In C++ and Java a container is a library class you name and construct.
 Python builds its containers into the grammar.
-`[1, 2]`, `{"a": 1}`, and `{1, 2}` are literals that need no import.
+`[1, 2]`, `{"a": 1}`, and `{1, 2}` are literals, available in every module.
 `in` and `len()` work on all of them, and slicing works on the sequences.
 Lists, tuples, dictionaries, and sets are fundamental data types.
 
@@ -830,7 +830,7 @@ print(window)
 ```
 
 A `deque` with a `maxlen` is a sliding window.
-A `list` has no equivalent.
+A `list` keeps every item you append.
 
 ### `namedtuple`
 
