@@ -130,7 +130,7 @@ A dictionary mapping one program's shape names to its shape classes is a specifi
 stage two.
 The same dictionary becomes a standard design, stage three,
 when each subclass registers itself as its `class` statement runs.
-Adding a type then needs no edit to the dictionary.
+A new type then adds its own entry to the dictionary.
 [Factory](26_Patterns--Factory.md) builds both designs.
 [*Template Method*](24_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.
@@ -365,7 +365,7 @@ so adding an algorithm leaves every existing part as it was.
 *Observer* has one, and it points from the observer to the subject.
 An observer specifies its subject's class in `update()`,
 whose `subject` parameter receives the subject that changed.
-The subject knows no concrete observer:
+The subject knows each observer through the `Observer` interface:
 "All a subject knows is that it has a list of observers,
 each conforming to the simple interface of the abstract `Observer` class."
 The heavy edge points at the part that changes least,
@@ -382,7 +382,7 @@ The client specifies the target interface.
 The adapter alone knows the adaptee's real name,
 so a change to the adaptee reaches one file.
 
-*Decorator*, like *Strategy*, has no heavy edge.
+*Decorator*, like *Strategy*, points every edge at its interface.
 A topping satisfies the component interface and also holds a component,
 so it can wrap a pizza or another topping,
 knowing each one through that interface.
@@ -418,7 +418,8 @@ As in the gallery, the red box marks the part the design protects from the chang
 
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
-because the new writer satisfies the protocol and `Report` specifies no writer.
+because `Report` specifies the `Writer` protocol,
+which the new writer satisfies.
 `main` still changes, since something must construct the new class.
 A [registry factory](26_Patterns--Factory.md#self-registration)
 removes that last change,
