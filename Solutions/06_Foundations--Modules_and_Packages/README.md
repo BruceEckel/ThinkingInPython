@@ -376,7 +376,7 @@ shows `module4`'s relative import,
 and [`PYTHONPATH`](../../Chapters/06_Foundations--Modules_and_Packages.md#pythonpath)
 describes where Python searches for top-level names.
 A relative import needs the module's `__package__`.
-A file run as a script has none.
+A file run as a script has `__package__` set to `None`.
 An absolute import needs the project root on `sys.path`.
 The command you run decides the path's first entry.
 Compare what `python file.py` and `python -m package.module` put there.
@@ -404,8 +404,8 @@ ImportError: attempted relative import with no known parent package
 ```
 
 Python resolves a relative import against the module's `__package__`.
-A file run as a script has none, since it runs as `__main__`,
-which belongs to no package.
+In a file run as a script, `__package__` is `None`,
+since the file runs as `__main__`, a top-level module outside every package.
 The single dot has no parent to name.
 
 With the absolute import, the same command reports:
