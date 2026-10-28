@@ -568,8 +568,7 @@ a different design, a detail, or an equivalent alternative.
 Write `random_pairs()` as a generator,
 like the chapter's `all_pairs()` in `arena.py`,
 so its body runs only as you iterate over it.
-When the caller passes no `Counter`,
-create a fresh one so the body has a single path.
+When `counts` is `None`, create a fresh `Counter` so the body has a single path.
 Increment the count for each item inside the loop, before the `yield`,
 so the caller's own `Counter` fills as the loop consumes the pairs.
 
@@ -849,8 +848,8 @@ Python calls `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)
 so `self` is the right operand and `other` is the left one.
 The method must put them back in the order the source wrote them.
 Copying the body of `__sub__()`, `Meters(self.n - other)`, gives `Meters(-7)`.
-The copied `__rsub__()` looks correct and raises no exception,
-yet it returns the negative of every reflected subtraction.
+The copied `__rsub__()` looks correct and returns a `Meters` for every number,
+yet each result is the negative of the right answer.
 Addition commutes, so the same copied body in `__radd__()` gives the right answer every time.
 
 **Decline an unsupported operand.**
@@ -863,7 +862,8 @@ whose message names both types.
 Returning `NotImplemented`, rather than raising an exception,
 lets Python report both operand types.
 An exception raised inside `__rsub__()` carries the message `Meters` wrote,
-in place of Python's message naming the pair of types that has no defined subtraction.
+in place of Python's `unsupported operand type(s)` message,
+which names both types.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -887,7 +887,8 @@ a different design, a detail, or an equivalent alternative.
 
 [One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
 shows `exact_match.py`, where the key uses `type()`.
-A dictionary probe compares keys by equality, so a subclass finds no row.
+A dictionary probe compares keys by equality,
+so a subclass needs rows of its own.
 Every class has an `__mro__` tuple that lists it and then its bases in lookup order.
 Loop over one operand's `__mro__`,
 and inside that loop over the other operand's `__mro__`.
@@ -1867,7 +1868,7 @@ the demo prints the same five lines,
 because the lookup reaches each cell with a `Paper` in the position it reads.
 The type checker rejects the access.
 `ty` reports an `unresolved-attribute` in each cell,
-since a cell's parameters are `Item`s and `Item` has no `wet`.
+since a cell's parameters are `Item`s and `Paper` alone defines `wet`.
 The solution keeps the tests so that the type checker narrows the operand to `Paper` before the attribute access.
 
 Before you move on, name what separates your attempt from this one:
@@ -2120,7 +2121,7 @@ so the seeded meeting draws the same weapons and `Troll` wins again.
 finding them by name as exercise 3 does.
 
 If you drop `strict=True` and `Jargon`'s row of `GRID` comes up one cell short,
-the comprehension builds 35 entries and raises no exception.
+the comprehension quietly builds 35 entries.
 The check then prints `35 pairs agree with exercise 8: True`,
 since it plays only the pairs the table holds,
 and the seeded meeting raises a `KeyError` for the missing `(Jargon, Schedule)`.
