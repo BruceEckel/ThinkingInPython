@@ -423,7 +423,7 @@ This version moves the decision into a set that `A` owns.
 
 `A.__init_subclass__()` refuses the first subclass of a final class as Python creates that subclass,
 so the hierarchy below a final class stays empty.
-A check of the direct bases in `cls.__bases__` would therefore refuse every descendant too.
+A check of the direct bases in `cls.__bases__` would therefore refuse every descendant as well as the first subclass.
 The `__mro__` walk stays because it states the rule as written,
 "no final class anywhere above," in one line.
 
