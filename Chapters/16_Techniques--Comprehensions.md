@@ -366,7 +366,7 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 Pass `strict=True` to make a length mismatch raise a `ValueError` instead of silently truncating.
 `map()` called with several iterables passes one element from each to its function and stops at the shortest in the same way.
 Since Python 3.14, `map()` accepts `strict=True` too.
-Truncated output looks like complete output,
+A truncated result looks complete,
 so pass `strict=True` to either function whenever the inputs must have equal lengths.
 
 The `for` clause's target can unpack a nested tuple.
