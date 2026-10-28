@@ -98,7 +98,7 @@ The adapter's `pairs` field refers to the same list as before.
 **Show what `__getattr__()` cannot forward.**
 `len(adapter)` raises a `TypeError` although the list has a `__len__()`.
 Python looks up a special method on the class, not on the instance,
-so the lookup skips `__getattr__()` and finds no `__len__()` on `PairsAdapter`.
+so the lookup searches `PairsAdapter` for `__len__()` and skips `__getattr__()`.
 [Special Methods Bypass `__getattr__()`](../../Chapters/25_Patterns--Surrogate.md#special-methods-bypass-getattr)
 in *Surrogate* covers that lookup rule.
 `adapter[key]` works because the class defines `__getitem__()`.
@@ -312,7 +312,7 @@ print([name for name in vars(shop)
 **Hide the classes behind a function.**
 The caller uses one function.
 `shop._Engine` and `shop._FuelPump` still reach the classes,
-because Python enforces no privacy.
+because Python lets any caller read a module attribute, underscore or not.
 The underscore marks them as private, so `from shop import *` skips them.
 
 **List what a caller can see.**
@@ -391,17 +391,17 @@ The wrapped object offers `next_chunk()`.
 The wrapper exists to translate the caller's `read()` into a `next_chunk()` call.
 If you remove it, you lose that translation.
 The caller's `read()` then raises an `AttributeError`,
-because the wrapped object has no `read()`.
+because `next_chunk()` is the wrapped object's one method.
 
-An *Adapter* adds no behavior,
+An *Adapter* leaves each call's behavior as it was,
 which separates the *Adapter* from the *Decorator*.
 Both wrappers forward.
 Only the *Adapter* changes the name the caller uses.
 
 **The flag-checking wrapper is a *Proxy*.**
-Its interface is the wrapped object's interface,
-and it adds no behavior to a call that goes through.
-What it adds is a decision about whether the call proceeds.
+Its interface is the wrapped object's interface.
+A call that goes through behaves as it would on the wrapped object.
+What the proxy adds is a decision about whether the call proceeds.
 If you remove it, every call reaches the implementation,
 including the ones the proxy refuses.
 What you lose is control over when and whether a call proceeds.
