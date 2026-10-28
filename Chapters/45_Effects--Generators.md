@@ -414,15 +414,16 @@ A `yield from` expression evaluates to the inner generator's return value:
 ```python
 # yield_from_return.py
 from collections.abc import Generator, Iterator
+from typing import NewType
 
-type Size = int
+Size = NewType("Size", int)
 
 def emit(items: list[str]) -> Generator[str, None, Size]:
     total = 0
     for item in items:
         yield item
         total += len(item)
-    return total
+    return Size(total)
 
 def report(items: list[str]) -> Iterator[str]:
     size: Size = yield from emit(items)
@@ -433,7 +434,7 @@ print(list(report(["red", "green", "blue"])))
 ```
 
 The items `emit()` yields pass through `report()` to `list()`,
-but its `return total` goes to `report()` alone,
+but its `return Size(total)` goes to `report()` alone,
 as the value of the `yield from` expression.
 A `yield from` therefore works like a function call:
 `report()` calls `emit()` and gets its result back,

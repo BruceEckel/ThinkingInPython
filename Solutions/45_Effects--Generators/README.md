@@ -532,8 +532,9 @@ then yields it as a string of its own.
 ```python
 # The shape of exercise_5.py
 from collections.abc import Generator
+from typing import NewType
 
-type Size = int
+Size = NewType("Size", int)
 
 def emit(items: list[str]) -> Generator[str, None, Size]:
     ...
@@ -562,15 +563,16 @@ so the count reaches `summarize()` through a second return:
 ```python
 # exercise_5.py
 from collections.abc import Generator
+from typing import NewType
 
-type Size = int
+Size = NewType("Size", int)
 
 def emit(items: list[str]) -> Generator[str, None, Size]:
     total = 0
     for item in items:
         yield item
         total += len(item)
-    return total
+    return Size(total)
 
 def report(items: list[str]) -> Generator[str, None, Size]:
     size: Size = yield from emit(items)
