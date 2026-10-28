@@ -194,7 +194,10 @@ def interview() -> Generator[Question, Answer, Result]:
 def drive_from_dict(
         conversation: Generator[Question, Answer, Result],
         answers: dict[Question, Answer]) -> Result:
-    request = next(conversation)
+    try:
+        request = next(conversation)
+    except StopIteration as stop:
+        return stop.value
     while True:
         answer = answers[request]
         print(f"{request = }, {answer = }")

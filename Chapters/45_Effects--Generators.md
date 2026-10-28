@@ -265,7 +265,10 @@ ANSWERS: Final[dict[Question, Answer]] = {
 def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer],
           *, show_state: bool = False) -> Result:
-    request: Question = next(conversation)
+    try:
+        request: Question = next(conversation)
+    except StopIteration as stop:
+        return stop.value
     while True:
         answer = answers[request]
         line = f"{request = }, {answer = }"
@@ -287,12 +290,13 @@ The type checker verifies each `Question` the generator yields and each `Answer`
 `StopIteration.value` has type `Any`,
 so the type checker cannot ensure that `drive()` returns a `Result`.
 
-The `try` holds only the `send()` call,
-because a `StopIteration` inside it means the conversation finished.
-Another call that can raise `StopIteration` belongs outside the `try`.
+Each `try` holds one call on the conversation,
+because a `StopIteration` from `next()` or `send()` means the conversation finished.
+The `try` around the priming call catches a conversation that returns before it asks anything.
+Any other call that can raise `StopIteration` belongs outside both.
 A driver that reads its answers from an iterator, for example,
-gets `StopIteration` from `next()` when the answers run out.
-Inside the `try`, that exception would look like the end of the conversation.
+gets `StopIteration` from `next()` on the answers when they run out.
+Inside a `try`, that exception would look like the end of the conversation.
 The driver would then return `None` as the result.
 
 `drive()` runs the conversation.

@@ -13,7 +13,10 @@ ANSWERS: Final[dict[Question, Answer]] = {
 def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer],
           *, show_state: bool = False) -> Result:
-    request: Question = next(conversation)
+    try:
+        request: Question = next(conversation)
+    except StopIteration as stop:
+        return stop.value
     while True:
         answer = answers[request]
         line = f"{request = }, {answer = }"
