@@ -741,7 +741,9 @@ computes that order from a mapping of each node to its dependencies:
 from graphlib import CycleError, TopologicalSorter
 from exceptions import expected
 
-deps: dict[str, tuple[str, ...]] = {
+type Target = str
+
+deps: dict[Target, tuple[Target, ...]] = {
     "app": ("ui", "db"),
     "ui": ("core",),
     "db": ("core",),
