@@ -2,7 +2,7 @@
 from collections.abc import Generator
 
 def collect(name: str) -> Generator[str, int, int]:
-    first = yield f"{name} needs a value"
-    second = yield f"{name} needs another"
+    first: int = yield f"{name} needs a value"
+    second: int = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
     return first + second
