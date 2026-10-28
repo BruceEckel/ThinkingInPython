@@ -704,7 +704,7 @@ If nothing touches the lazily imported name,
 the module stays unloaded for the rest of the run, so that work never happens.
 The failure is silent.
 Python raises no exception, and the table ends up one row short.
-`all` defers ordinary `import` statements too,
+`all` defers ordinary `import` statements as well as the marked ones,
 including the ones that exist to run a module's body.
 The same silent failure therefore makes `all` an experiment to run rather than a setting to leave on.
 
