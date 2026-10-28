@@ -100,8 +100,8 @@ so the language settles the question.
 Python code from any two authors therefore lines up the same way.
 That sameness is one of the main reasons for Python's consistent readability.
 
-A statement ends with its line,
-where C++ and Java end each one with a semicolon.
+A statement ends with its line.
+C++ and Java end each one with a semicolon.
 A semicolon's one job is to separate two statements that share a line.
 An open parenthesis, bracket,
 or brace continues the statement across lines until it closes.
