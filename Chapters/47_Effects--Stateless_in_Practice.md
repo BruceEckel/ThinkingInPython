@@ -161,7 +161,8 @@ shows.
 Now compare these two listings to `ask_tell.py` in [Effect Management](44_Effects--Effect_Management.md#effects-by-hand).
 The by-hand version puts two objects in every signature.
 In the Stateless version, `greet()` has an empty parameter list.
-The two Abilities appear in the return type, where a type checker verifies them.
+The two Abilities appear in the return type,
+where the type checker verifies them.
 Python's signatures have no third part for Effects,
 so the return type carries them,
 the job that [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
