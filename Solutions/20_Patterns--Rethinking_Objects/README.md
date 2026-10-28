@@ -414,7 +414,7 @@ a different design, a detail, or an equivalent alternative.
 defines the `Coord` protocol and adapts `Pair`,
 a class that names its fields `a` and `b`.
 Write `TripleCoord` to hold a `Triple` and expose `x` and `y` as read-only properties that return the fields you choose.
-`distance()` needs no change, because it reads those two properties alone.
+`distance()` stays as it is, because it reads those two properties alone.
 
 <details>
 <summary>The shape</summary>
@@ -735,7 +735,7 @@ print(render("home"))
 
 The `cache` parameter of `render()` has the type `Cache`, not `Cache | None`.
 It defaults to the shared `NO_CACHE`, the way `total()` defaults to `SILENT`,
-so `render()` has no `is None` branch on the cache.
+so `render()` calls `cache.get()` on any cache it receives.
 The `None` that `get()` returns stays in its return type,
 because a miss is information on which the caller acts.
 
@@ -966,8 +966,7 @@ def fill(stack: Stack, count: int) -> int:
 <details>
 <summary>Done when</summary>
 
-`fill(BoundedStack(), 5)` returns `2` and raises no exception,
-`fill(Stack(), 5)` still returns `5`,
+`fill(BoundedStack(), 5)` returns `2`, `fill(Stack(), 5)` still returns `5`,
 a caller can ask your `BoundedStack` whether it is full,
 and `uv run ty check` passes.
 You can also name the guarantee you gave up and decide whether `BoundedStack` should stay a subclass of `Stack`.
