@@ -639,7 +639,7 @@ def describe(self: Any) -> str:
 <details>
 <summary>Done when</summary>
 
-your file contains no `class` statement,
+your file builds `Celsius` with a call to `type()`,
 `Celsius(21.5).describe()` returns `21.5 degrees C`,
 and `type(Celsius) is type` prints `True`.
 
