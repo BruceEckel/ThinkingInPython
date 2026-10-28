@@ -5,23 +5,26 @@ from collections.abc import Iterator
 from itertools import combinations, islice
 from hypothesis import given, strategies
 
-type Group = tuple[str, ...]
+type Student = str
+type Group = tuple[Student, ...]
 type Round = list[Group]
 
 def group_rounds(
-    students: list[str], size: int, seed: int = 0
+    students: list[Student], size: int, seed: int = 0
 ) -> Iterator[Round]:
-    history: Counter[frozenset[str]] = Counter()
+    history: Counter[frozenset[Student]] = Counter()
     rng = random.Random(seed)
 
-    def met(group: list[str], candidate: str) -> int:
+    def met(
+        group: list[Student], candidate: Student
+    ) -> int:
         return sum(history[frozenset((m, candidate))]
                    for m in group)
 
     while True:
         pool = list(students)
         rng.shuffle(pool)
-        groups: list[list[str]] = []
+        groups: list[list[Student]] = []
         while len(pool) >= size:
             leader = pool.pop()
             group = [leader]
