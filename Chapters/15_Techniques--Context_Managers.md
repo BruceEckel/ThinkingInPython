@@ -1195,7 +1195,7 @@ For a mutable pooled resource, a stale reference is the source of corruption.
 Two borrowers each use one connection as if they held it alone.
 
 Guarding against a stale reference takes a wrapper that invalidates the borrower's handle on exit.
-The `Pool` skeleton leaves out that refinement too.
+The `Pool` skeleton leaves out that refinement along with the others.
 
 Each refinement in this section is a change inside `lease()`.
 The code that creates, validates, and invalidates items runs there,
