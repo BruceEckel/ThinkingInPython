@@ -217,7 +217,7 @@ Chapters/46_Effects--Stateless.md	[PAST] provided: The driver throws a failure b
 Chapters/46_Effects--Stateless.md	[PAST] read: Both read CODE, and neither names the CODE it uses.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] got: Python got one Effect tracked into its type system with CODE.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] left: An CODE in a revealed type means CODE left the subtraction unfinished.
-Chapters/47_Effects--Stateless_in_Practice.md	[PAST] put: Add a wind turbine to CODE that is available only during a set windy stretch of the evening, put it between solar and the battery in the CODE order, and confirm CODE needs no change.
+Chapters/47_Effects--Stateless_in_Practice.md	[PAST] put: Add a wind turbine to CODE that is available only during a set windy stretch of the evening, put it between solar and the battery in the CODE order, and confirm CODE stays as written.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] raised: Add a fourth failure to CODE: a CODE raised when an article exceeds some length.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] spread: The pipeline is in there, spread across three CODE blocks.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] was: Each was a class with a method per product.

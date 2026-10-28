@@ -22,9 +22,10 @@ Chapters/36_Patterns--Memento.md	[IMP] Write tests proving existing mementos and
 Chapters/40_Functional--Foundations.md	[IMP] In CODE, add CODE beside CODE, and give CODE a second CODE stage built with CODE, so only readings between 20.0 and 30.0 Celsius reach the output.
 Chapters/44_Effects--Effect_Management.md	[COLON+AND] With it you know what a function does: whether it is safe to run in parallel with another, and what it does when you call it twice in a row.
 Chapters/44_Effects--Effect_Management.md	[COLON+AND] Write the production bindings for CODE: a CODE class whose CODE calls CODE and whose CODE calls CODE.
+Chapters/44_Effects--Effect_Management.md	[IMP] Effect information into the return type of every function, and the compiler's ordinary type checking tracks it from there.
 Chapters/46_Effects--Stateless.md	[IMP] Explain what each one catches, and why the checker catches assigning a dropped request but not discarding one.
 Chapters/47_Effects--Stateless_in_Practice.md	[IMP] Explain what the types claim, what the run does, and which line restores the guarantee.
-Solutions/04_Foundations--Control_Flow/README.md	[AND+REL] your four predictions match the run, where CODE returns CODE for both strings, while CODE returns CODE for both, and you can name the test CODE would need for each string and say why CODE needs none.
+Solutions/04_Foundations--Control_Flow/README.md	[AND+REL] your four predictions match the run, where CODE returns CODE for both strings, while CODE returns CODE for both, and you can name the test CODE would need for each string and say why CODE agrees with CODE on every string.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[IMP] Compare what CODE and CODE put there.
 Solutions/09_Foundations--Class_Attributes/README.md	[AND+REL] The second CODE raises an CODE (CODE), and CODE still prints CODE afterward.
 Solutions/17_Techniques--Metaprogramming/README.md	[COLON+AND] The prediction: CODE builds cleanly, and CODE holds CODE alone, so CODE stays out.
