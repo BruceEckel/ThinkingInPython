@@ -38,7 +38,10 @@ The solution compares the counts alone, the part a pure function guarantees.
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-def count_primes(limit: int) -> tuple[int, int]:
+type Count = int
+type ProcessId = int
+
+def count_primes(limit: int) -> tuple[Count, ProcessId]:
     count = 0
     for n in range(2, limit):
         if all(n % d for d in range(2, int(n ** 0.5) + 1)):
@@ -136,7 +139,10 @@ which keep the run short.
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-def count_primes(limit: int) -> tuple[int, int]:
+type Count = int
+type ProcessId = int
+
+def count_primes(limit: int) -> tuple[Count, ProcessId]:
     count = 0
     for n in range(2, limit):
         if all(n % d for d in range(2, int(n ** 0.5) + 1)):
