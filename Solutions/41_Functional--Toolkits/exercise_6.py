@@ -4,22 +4,25 @@ from collections import Counter
 from collections.abc import Iterator
 from itertools import combinations
 
-type Group = tuple[str, ...]
+type Student = str
+type Group = tuple[Student, ...]
 type Round = list[Group]
 
 def group_rounds(
-    students: list[str], size: int, rng: random.Random
+    students: list[Student], size: int, rng: random.Random
 ) -> Iterator[Round]:
-    history: Counter[frozenset[str]] = Counter()
+    history: Counter[frozenset[Student]] = Counter()
 
-    def met(group: list[str], candidate: str) -> int:
+    def met(
+        group: list[Student], candidate: Student
+    ) -> int:
         return sum(history[frozenset((m, candidate))]
                    for m in group)
 
     while True:
         pool = list(students)
         rng.shuffle(pool)
-        groups: list[list[str]] = []
+        groups: list[list[Student]] = []
         while len(pool) >= size:
             leader = pool.pop()
             group = [leader]
