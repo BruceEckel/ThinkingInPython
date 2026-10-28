@@ -58,13 +58,14 @@ Writing `def __init__(self, *, **kwargs)` is a syntax error,
 since a named parameter must follow a bare `*`.
 
 The listing needs the `m: Any` annotation to pass the type checker.
-The `Messenger` class declares no attributes.
+`Messenger` creates its attributes at runtime,
+from the keyword arguments a caller passes.
 If `m` keeps its inferred type, `Messenger`,
 the type checker rejects the write `m.more = 11` and every read,
 such as `m.info`.
 With `Any`, the type checker accepts every operation on `m`.
 
-An ad-hoc attribute bag declares none of your attribute names,
+An ad-hoc attribute bag's class is silent about your attribute names,
 so the type checker cannot verify them.
 The type checker accepts the typo `m.inof` because `m` is `Any`.
 At runtime the read raises an `AttributeError`.
@@ -78,7 +79,9 @@ The `__setattr__()` covers writes such as `m.more = 11`.
 The standard library's type declaration for `SimpleNamespace` has such a pair.
 In place of `__getattr__()`, its read half is `__getattribute__()`,
 which intercepts every attribute access.
-Because of that pair, the next listing needs no annotation.
+Because of that pair,
+the type checker accepts the next listing's `m` at its inferred type,
+`SimpleNamespace`.
 
 ## The Standard-Library Versions
 
