@@ -284,14 +284,14 @@ def drive(conversation: Generator[Question, Answer, Result],
 
 `show_state` adds the generator's state to each line of the trace.
 The default leaves it out,
-so an ordinary call shows the requests and the answers.
+so an ordinary call shows only the requests and the answers.
 
 The type checker verifies each `Question` the generator yields and each `Answer` that `drive()` sends.
 `StopIteration.value` has type `Any`,
 so the type checker cannot ensure that `drive()` returns a `Result`.
 
-Each `try` holds one call on the conversation,
-because a `StopIteration` from `next()` or `send()` means the conversation finished.
+Each `try` wraps one call that resumes the generator, `next()` or `send()`,
+because a `StopIteration` from either means the conversation finished.
 The `try` around the priming call catches a conversation that returns before it asks anything.
 Any other call that can raise `StopIteration` belongs outside both.
 A driver that reads its answers from an iterator, for example,
