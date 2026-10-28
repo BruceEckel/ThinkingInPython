@@ -261,10 +261,12 @@ A shared module defines `Meter` because [Semaphores](#semaphores) uses it too:
 # utils/meter.py
 from dataclasses import dataclass
 
+type Peak = int
+
 @dataclass
 class Meter:
     active: int = 0
-    peak: int = 0
+    peak: Peak = 0
 
     def __enter__(self) -> None:
         self.active += 1
@@ -281,14 +283,15 @@ Each price function runs on the same five orders, with a `Meter` of its own:
 # peak_concurrency.py
 import asyncio
 from collections.abc import Awaitable, Callable
-from meter import Meter
+from meter import Meter, Peak
+from pricing import Price
 
-async def io_price(order: int, meter: Meter) -> int:
+async def io_price(order: int, meter: Meter) -> Price:
     with meter:
         await asyncio.sleep(0.05)  # Off-processor work
     return order * 10
 
-async def cpu_price(order: int, meter: Meter) -> int:
+async def cpu_price(order: int, meter: Meter) -> Price:
     with meter:
         total = 0
         for _ in range(1_000_000):  # On-processor work
@@ -296,10 +299,11 @@ async def cpu_price(order: int, meter: Meter) -> int:
     return order * 10
 
 # The type of an async price function:
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
+type PriceTask = Callable[[int, Meter], Awaitable[Price]]
 
-async def run(price_task: PriceTask,
-              orders: list[int]) -> tuple[list[int], int]:
+async def run(
+    price_task: PriceTask, orders: list[int]
+) -> tuple[list[Price], Peak]:
     meter = Meter()
     coroutines = [price_task(o, meter) for o in orders]
     prices = await asyncio.gather(*coroutines)
@@ -1166,7 +1170,9 @@ as an ordinary function with no `Meter`:
 
 ```python
 # utils/pricing.py
-def cpu_price(order: int) -> int:
+type Price = int
+
+def cpu_price(order: int) -> Price:
     total = 0
     for _ in range(1_000_000):  # Processor work
         total += 1
@@ -1241,9 +1247,9 @@ since a process cannot return a value the way a function call does:
 ```python
 # multiprocessing_raw.py
 import multiprocessing as mp
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
-type Priced = tuple[int, int]  # (order, price)
+type Priced = tuple[int, Price]  # (order, price)
 
 def worker(order: int, results: mp.Queue[Priced]) -> None:
     results.put((order, cpu_price(order)))
@@ -1430,19 +1436,20 @@ import timeit
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from typing import NamedTuple
+from pricing import Price
 
 class Times(NamedTuple):
     sequential: float
     threaded: float
 
 def compare(
-    price: Callable[[int], int], orders: list[int],
+    price: Callable[[int], Price], orders: list[int],
     number: int
 ) -> Times:
-    def sequential() -> list[int]:
+    def sequential() -> list[Price]:
         return [price(o) for o in orders]
 
-    def threaded() -> list[int]:
+    def threaded() -> list[Price]:
         with ThreadPoolExecutor() as pool:
             return list(pool.map(price, orders))
 
@@ -1468,9 +1475,10 @@ and five threads overlap five of those waits despite the GIL:
 # io_threads.py
 import time
 from benchmark import report
+from pricing import Price
 from thread_compare import compare
 
-def io_price(order: int) -> int:
+def io_price(order: int) -> Price:
     time.sleep(0.05)  # Stand-in for I/O
     return order * 10
 
@@ -1729,9 +1737,9 @@ import os
 import timeit
 from concurrent.futures import InterpreterPoolExecutor
 from benchmark import report
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
-def sequential(orders: list[int]) -> list[int]:
+def sequential(orders: list[int]) -> list[Price]:
     return [cpu_price(o) for o in orders]
 
 orders = [1, 2, 3, 4, 5]
@@ -2146,11 +2154,11 @@ from concurrent.futures import (
     ProcessPoolExecutor,
     ThreadPoolExecutor,
 )
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
 def run_on(
     executor: Executor, orders: list[int]
-) -> list[int]:
+) -> list[Price]:
     with executor:
         return list(executor.map(cpu_price, orders))
 
@@ -2189,19 +2197,19 @@ and a `run_in_executor()` call all produce an awaitable.
 import asyncio
 import time
 from concurrent.futures import ProcessPoolExecutor
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
-async def io_price(order: int) -> int:
+async def io_price(order: int) -> Price:
     await asyncio.sleep(0.05)  # Native coroutine
     return order * 10
 
-def blocking_price(order: int) -> int:
+def blocking_price(order: int) -> Price:
     time.sleep(0.05)  # Blocking call, needs a thread
     return order * 10
 
 async def process_price(
     pool: ProcessPoolExecutor, order: int
-) -> int:
+) -> Price:
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(pool,
                                       cpu_price, order)

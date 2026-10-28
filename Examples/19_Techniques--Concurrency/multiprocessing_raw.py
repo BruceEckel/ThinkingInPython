@@ -1,8 +1,8 @@
 # multiprocessing_raw.py
 import multiprocessing as mp
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
-type Priced = tuple[int, int]  # (order, price)
+type Priced = tuple[int, Price]  # (order, price)
 
 def worker(order: int, results: mp.Queue[Priced]) -> None:
     results.put((order, cpu_price(order)))

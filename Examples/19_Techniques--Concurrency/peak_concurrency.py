@@ -1,14 +1,15 @@
 # peak_concurrency.py
 import asyncio
 from collections.abc import Awaitable, Callable
-from meter import Meter
+from meter import Meter, Peak
+from pricing import Price
 
-async def io_price(order: int, meter: Meter) -> int:
+async def io_price(order: int, meter: Meter) -> Price:
     with meter:
         await asyncio.sleep(0.05)  # Off-processor work
     return order * 10
 
-async def cpu_price(order: int, meter: Meter) -> int:
+async def cpu_price(order: int, meter: Meter) -> Price:
     with meter:
         total = 0
         for _ in range(1_000_000):  # On-processor work
@@ -16,10 +17,11 @@ async def cpu_price(order: int, meter: Meter) -> int:
     return order * 10
 
 # The type of an async price function:
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
+type PriceTask = Callable[[int, Meter], Awaitable[Price]]
 
-async def run(price_task: PriceTask,
-              orders: list[int]) -> tuple[list[int], int]:
+async def run(
+    price_task: PriceTask, orders: list[int]
+) -> tuple[list[Price], Peak]:
     meter = Meter()
     coroutines = [price_task(o, meter) for o in orders]
     prices = await asyncio.gather(*coroutines)

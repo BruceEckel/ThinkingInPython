@@ -3,9 +3,9 @@ import os
 import timeit
 from concurrent.futures import InterpreterPoolExecutor
 from benchmark import report
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
-def sequential(orders: list[int]) -> list[int]:
+def sequential(orders: list[int]) -> list[Price]:
     return [cpu_price(o) for o in orders]
 
 orders = [1, 2, 3, 4, 5]

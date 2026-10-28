@@ -1,5 +1,7 @@
 # utils/pricing.py
-def cpu_price(order: int) -> int:
+type Price = int
+
+def cpu_price(order: int) -> Price:
     total = 0
     for _ in range(1_000_000):  # Processor work
         total += 1

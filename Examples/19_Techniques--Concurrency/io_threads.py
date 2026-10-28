@@ -1,9 +1,10 @@
 # io_threads.py
 import time
 from benchmark import report
+from pricing import Price
 from thread_compare import compare
 
-def io_price(order: int) -> int:
+def io_price(order: int) -> Price:
     time.sleep(0.05)  # Stand-in for I/O
     return order * 10
 

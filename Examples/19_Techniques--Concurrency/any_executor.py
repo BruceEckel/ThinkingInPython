@@ -5,11 +5,11 @@ from concurrent.futures import (
     ProcessPoolExecutor,
     ThreadPoolExecutor,
 )
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
 def run_on(
     executor: Executor, orders: list[int]
-) -> list[int]:
+) -> list[Price]:
     with executor:
         return list(executor.map(cpu_price, orders))
 

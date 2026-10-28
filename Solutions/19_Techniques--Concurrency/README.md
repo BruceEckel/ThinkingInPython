@@ -217,15 +217,17 @@ and whether the other four tasks get a chance to start at that `await`.
 # The shape of exercise_3.py
 import asyncio
 from collections.abc import Awaitable, Callable
-from meter import Meter
+from meter import Meter, Peak
+from pricing import Price
 
-async def mixed_price(order: int, meter: Meter) -> int:
+async def mixed_price(order: int, meter: Meter) -> Price:
     ...
 
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
+type PriceTask = Callable[[int, Meter], Awaitable[Price]]
 
-async def run(price_task: PriceTask,
-              orders: list[int]) -> tuple[list[int], int]:
+async def run(
+    price_task: PriceTask, orders: list[int]
+) -> tuple[list[Price], Peak]:
     ...
 
 async def main() -> None:
@@ -247,9 +249,10 @@ still inside the `with meter:` block, leaves the peak at `5`.
 # exercise_3.py
 import asyncio
 from collections.abc import Awaitable, Callable
-from meter import Meter
+from meter import Meter, Peak
+from pricing import Price
 
-async def mixed_price(order: int, meter: Meter) -> int:
+async def mixed_price(order: int, meter: Meter) -> Price:
     with meter:
         # Waiting, off the processor
         await asyncio.sleep(0.05)
@@ -259,10 +262,11 @@ async def mixed_price(order: int, meter: Meter) -> int:
             total += 1
     return order * 10
 
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
+type PriceTask = Callable[[int, Meter], Awaitable[Price]]
 
-async def run(price_task: PriceTask,
-              orders: list[int]) -> tuple[list[int], int]:
+async def run(
+    price_task: PriceTask, orders: list[int]
+) -> tuple[list[Price], Peak]:
     meter = Meter()
     coroutines = [price_task(o, meter) for o in orders]
     prices = await asyncio.gather(*coroutines)
@@ -322,15 +326,17 @@ and what that does to the count of simultaneous tasks.
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from meter import Meter
+from meter import Meter, Peak
+from pricing import Price
 
-async def io_price(order: int, meter: Meter) -> int:
+async def io_price(order: int, meter: Meter) -> Price:
     ...
 
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
+type PriceTask = Callable[[int, Meter], Awaitable[Price]]
 
-async def run(price_task: PriceTask,
-              orders: list[int]) -> tuple[list[int], int]:
+async def run(
+    price_task: PriceTask, orders: list[int]
+) -> tuple[list[Price], Peak]:
     ...
 
 async def main() -> None:
@@ -353,17 +359,19 @@ You can say which thread `time.sleep()` holds and why the other tasks wait for i
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from meter import Meter
+from meter import Meter, Peak
+from pricing import Price
 
-async def io_price(order: int, meter: Meter) -> int:
+async def io_price(order: int, meter: Meter) -> Price:
     with meter:
         time.sleep(0.05)  # Blocking, and never awaited
     return order * 10
 
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
+type PriceTask = Callable[[int, Meter], Awaitable[Price]]
 
-async def run(price_task: PriceTask,
-              orders: list[int]) -> tuple[list[int], int]:
+async def run(
+    price_task: PriceTask, orders: list[int]
+) -> tuple[list[Price], Peak]:
     meter = Meter()
     coroutines = [price_task(o, meter) for o in orders]
     prices = await asyncio.gather(*coroutines)
@@ -1223,9 +1231,9 @@ import os
 import timeit
 from concurrent.futures import ThreadPoolExecutor
 from benchmark import report
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
-def sequential(orders: list[int]) -> list[int]:
+def sequential(orders: list[int]) -> list[Price]:
     ...
 ```
 
@@ -1246,9 +1254,9 @@ import os
 import timeit
 from concurrent.futures import ThreadPoolExecutor
 from benchmark import report
-from pricing import cpu_price
+from pricing import Price, cpu_price
 
-def sequential(orders: list[int]) -> list[int]:
+def sequential(orders: list[int]) -> list[Price]:
     return [cpu_price(o) for o in orders]
 
 orders = [1, 2, 3, 4, 5]
@@ -1582,13 +1590,13 @@ The changed function drops the bridge:
 ```python
 async def process_price(
     pool: ProcessPoolExecutor, order: int
-) -> int:
+) -> Price:
     return await pool.submit(cpu_price, order)
 ```
 
 `ty` rejects the line before anything runs:
 
-    error[invalid-await]: `Future[int]` is not awaitable
+    error[invalid-await]: `Future[Price]` is not awaitable
 
 At runtime the line raises a `TypeError` before any price comes back:
 

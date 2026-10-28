@@ -2,17 +2,19 @@
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from meter import Meter
+from meter import Meter, Peak
+from pricing import Price
 
-async def io_price(order: int, meter: Meter) -> int:
+async def io_price(order: int, meter: Meter) -> Price:
     with meter:
         time.sleep(0.05)  # Blocking, and never awaited
     return order * 10
 
-type PriceTask = Callable[[int, Meter], Awaitable[int]]
+type PriceTask = Callable[[int, Meter], Awaitable[Price]]
 
-async def run(price_task: PriceTask,
-              orders: list[int]) -> tuple[list[int], int]:
+async def run(
+    price_task: PriceTask, orders: list[int]
+) -> tuple[list[Price], Peak]:
     meter = Meter()
     coroutines = [price_task(o, meter) for o in orders]
     prices = await asyncio.gather(*coroutines)

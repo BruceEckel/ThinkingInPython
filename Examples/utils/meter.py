@@ -1,10 +1,12 @@
 # utils/meter.py
 from dataclasses import dataclass
 
+type Peak = int
+
 @dataclass
 class Meter:
     active: int = 0
-    peak: int = 0
+    peak: Peak = 0
 
     def __enter__(self) -> None:
         self.active += 1

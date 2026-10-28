@@ -3,19 +3,20 @@ import timeit
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from typing import NamedTuple
+from pricing import Price
 
 class Times(NamedTuple):
     sequential: float
     threaded: float
 
 def compare(
-    price: Callable[[int], int], orders: list[int],
+    price: Callable[[int], Price], orders: list[int],
     number: int
 ) -> Times:
-    def sequential() -> list[int]:
+    def sequential() -> list[Price]:
         return [price(o) for o in orders]
 
-    def threaded() -> list[int]:
+    def threaded() -> list[Price]:
         with ThreadPoolExecutor() as pool:
             return list(pool.map(price, orders))
 
