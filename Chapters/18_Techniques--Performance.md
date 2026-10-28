@@ -550,7 +550,7 @@ The `assert` checks that implication, which holds on every build.
 
 Most listings in this book print the same line on every machine.
 This listing's output changes with your interpreter,
-so its `print()` carries no `#:` line.
+so its output appears below the listing instead of in a `#:` line.
 The book's build has no JIT compiled in,
 so `tip jit_status` reports the first state:
 
@@ -674,8 +674,9 @@ print(f"hoisting did not halve the time: "
 
 Here the hoist at best ties the attribute lookup, and it can slow the loop.
 `out.append(i)` compiles to a method load that pushes the function and its `self` separately,
-building no bound method.
-`append = out.append` builds one, and every call then goes through it.
+so the call passes `self` straight to the function.
+`append = out.append` builds a bound method,
+and every call then goes through it.
 One machine measured the hoisted version five percent slower, another twenty.
 Measure it on your own machine before believing either direction.
 
@@ -894,7 +895,8 @@ wraps the same heap in a lock.
 ### Heap Versus Sort
 
 A heap answers a different question than a hash-based container.
-A `set` tells you whether a value is present in O(1), but it stores no order,
+A `set` tells you whether a value is present in O(1),
+but it arranges its items by hash,
 so finding the smallest values still means scanning or sorting every item.
 A heap keeps the smallest item at index 0 as you push and pop,
 so removing it takes O(log n) each time, however many times you repeat it.
@@ -1824,7 +1826,8 @@ The question is not the object count on its own but the work done per object cro
 The repository's `rust/README.md` explains how to build and run `fastcount` yourself.
 `uv run tip rust-all` compiles both functions, installs the module,
 and runs the comparison in `demo.py`, printing your machine's own numbers.
-The main book build skips this step and requires no Rust toolchain.
+The main book build skips this step,
+so you need a Rust toolchain for this step alone.
 
 ## Concurrency
 
