@@ -188,8 +188,8 @@ The new generator is suspended before its first statement,
 so no `yield` expression is waiting to receive a value.
 The first call, which runs the body to its first `yield`,
 *primes* the generator.
-The priming call must be `next()` or `send(None)`.
-`conversation.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
+The priming call must be `next()` or `send(None)`,
+otherwise you get `TypeError: can't send non-None value to a just-started generator`.
 
 `next(conversation)` is equivalent to `conversation.send(None)`:
 
@@ -206,7 +206,8 @@ print(f"{next(interview()) = }")
 Each `interview()` call creates a new generator,
 so both lines start from the beginning and produce the first question.
 
-The `# type: ignore` marks a real mismatch.
+The type checker is right to reject `interview().send(None)`.
+The `# type: ignore` silences that correct report so the listing can show the equivalence.
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
 The interpreter accepts `send(None)` as the priming call,
