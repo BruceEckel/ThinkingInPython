@@ -3,25 +3,28 @@ from collections import deque
 from collections.abc import Generator, Iterable
 from typing import Final
 
-REPLIES: Final[dict[str, str]] = {
+type Request = str
+type Reply = str
+
+REPLIES: Final[dict[Request, Reply]] = {
     "download: headers?": "200 OK, 512 bytes",
 }
 
-def answer(request: str) -> str:
+def answer(request: Request) -> Reply:
     return REPLIES.get(request, "ok")
 
-def download() -> Generator[str, str]:
+def download() -> Generator[Request, Reply]:
     reply = yield "download: headers?"
     print(f"download: {reply}")
     yield "download: checksum"
 
-def index() -> Generator[str, str]:
+def index() -> Generator[Request, Reply]:
     # Discard the send() argument:
     yield "index: build"
     yield "index: merge"
 
 def task_runner(
-    jobs: Iterable[Generator[str, str]]
+    jobs: Iterable[Generator[Request, Reply]]
 ) -> None:
     ready = deque((job, next(job)) for job in jobs)
     while ready:

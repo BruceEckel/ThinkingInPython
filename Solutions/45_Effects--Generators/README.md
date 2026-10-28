@@ -738,9 +738,10 @@ type Event = Coin | Digit
 type Report = Literal[
     "QUIESCENT", "COLLECTING", "SELECTING",
     "UNAVAILABLE", "NEED_MONEY", "DISPENSED"]
+type Code = str
 
-PRICES: Final[dict[str, int]] = {"11": 25, "12": 75}
-STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
+PRICES: Final[dict[Code, int]] = {"11": 25, "12": 75}
+STOCK: Final[dict[Code, int]] = {"11": 0, "12": 3}
 
 def machine() -> Generator[Report, Event]:
     ...
@@ -783,9 +784,10 @@ type Event = Coin | Digit
 type Report = Literal[
     "QUIESCENT", "COLLECTING", "SELECTING",
     "UNAVAILABLE", "NEED_MONEY", "DISPENSED"]
+type Code = str
 
-PRICES: Final[dict[str, int]] = {"11": 25, "12": 75}
-STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
+PRICES: Final[dict[Code, int]] = {"11": 25, "12": 75}
+STOCK: Final[dict[Code, int]] = {"11": 0, "12": 3}
 
 def machine() -> Generator[Report, Event]:
     stock = dict(STOCK)
