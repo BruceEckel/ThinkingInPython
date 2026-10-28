@@ -231,8 +231,11 @@ Calling `interview()` returns a generator object and runs none of the function b
 
 For managing Effects,
 a generator is more useful than a coroutine because you write the driver.
-Under `asyncio`, a coroutine's requests go to the event loop.
-A generator's requests go to whatever code calls `next()` and `send()`.
+A coroutine's requests go to an event loop,
+`asyncio`'s or one you write yourself.
+Each request must be an awaitable object built for that loop.
+A generator's requests go to whatever code calls `next()` and `send()`,
+and a request can be any value.
 The generator yields a request out, and the driver sends the answer back in.
 The driver chooses each answer,
 so the same generator runs unchanged under different drivers.
