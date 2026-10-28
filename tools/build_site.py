@@ -524,19 +524,21 @@ PATH_LINE = re.compile(r"^#\s+(\S+\.\w+)\s*$")
 
 
 def render_listing_menu(body: str) -> str:
-    """The section menu's second half: the page's listings, in order.
+    """The section menu's second half: the page's listings, alphabetical.
 
     One `li` per listing block, linking to the id `fence_ids()` gave
     it, so the body is the Markdown after `listing_links.site_rewrite()`,
     and the label is the path on the block's first line. A continued
     block carries no id and belongs to the file its first block names;
     a fence naming no file (a shape block, a fragment) has no id and is
-    left out. HTML on one line, like `render_toc_menu()`: it travels as
-    a pandoc variable, and template.html's script moves the items into
+    left out. The list is alphabetical by path, case aside, since a
+    reader looking for a file knows its name and not where the chapter
+    put it. HTML on one line, like `render_toc_menu()`: it travels as a
+    pandoc variable, and template.html's script moves the items into
     the drop-down under a "Listings" label. Empty when the page has
     none.
     """
-    items: list[str] = []
+    found: list[tuple[str, str]] = []
     lines = body.split("\n")
     for i, line in enumerate(lines[:-1]):
         m = ID_FENCE.match(line)
@@ -544,9 +546,11 @@ def render_listing_menu(body: str) -> str:
             continue
         p = PATH_LINE.match(lines[i + 1])
         label = p.group(1) if p else m.group(1).removeprefix("listing-")
-        items.append('<li class="section-listing">'
-                     f'<a href="#{m.group(1)}">{html.escape(label)}</a></li>')
-    return "".join(items)
+        found.append((label, m.group(1)))
+    found.sort(key=lambda pair: pair[0].casefold())
+    return "".join('<li class="section-listing">'
+                   f'<a href="#{anchor}">{html.escape(label)}</a></li>'
+                   for label, anchor in found)
 
 
 def render_chapter(body: str, ch: Chapter,
