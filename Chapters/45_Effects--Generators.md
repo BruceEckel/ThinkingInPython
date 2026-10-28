@@ -522,7 +522,7 @@ def visit(
     return counts
 
 def census(tree: Tree) -> Iterator[str]:
-    counts = yield from visit(tree)
+    counts: Counter = yield from visit(tree)
     for color, n in counts.items():
         yield f"{n} {color}"
 
@@ -550,11 +550,13 @@ for line in census(garden):
 
 A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`,
 and reaches the `for` loop at the bottom of the listing.
-Each [`Counter`](03_Foundations--Containers.md#counter) travels the other way.
-A `visit()` returns its subtree's count to the `visit()` that called it,
-and the count for the whole garden reaches `census()`.
+Note that [`Counter`](03_Foundations--Containers.md#counter)
+objects can be added together.
+A `visit()` returns its subtree's `Counter` to the `visit()` that called it,
+and the `Counter` for the whole garden reaches `census()`.
 
-Any iterable can follow `yield from`, including a list:
+`yield from` delegates to any iterable, not just a generator;
+here it takes a list:
 
 ```python
 # yield_from_list.py
