@@ -137,7 +137,7 @@ so the solution gives the list a `Protocol` that declares both operations.
 Written the way `command_pattern.py` writes it,
 the *GoF Design Patterns* shape is a base class with two `raise NotImplementedError` bodies.
 A base class makes sense when the commands share implementation.
-These commands share none.
+Each command here writes its own `__call__()` and `undo()`.
 
 **Remember what to reverse.**
 `Deposit` must also remember what it did, here the account and the amount,
@@ -167,7 +167,8 @@ a different design, a detail, or an equivalent alternative.
 
 [*Chain of Responsibility*: Choosing the Handler at Runtime](../../Chapters/27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 uses `None` to mean that a handler failed.
-`None` carries no reason, so give each handler a failure value that does,
+`None` says that a handler failed but not why,
+so give each handler a failure value that holds the reason,
 and return `Root | Failed`.
 In `first_root()`, tell a root from a failure with `match`, print each attempt,
 and read the handler's name from `__name__`.
@@ -331,7 +332,7 @@ first_root(g, 0.0, 2.0, [bisection])
 ```
 
 **Give failure a reason.**
-`None` signals that a handler failed and carries no reason,
+`None` signals that a handler failed but not why,
 so a handler that reports why it failed needs a failure value that holds the reason.
 
 **Report each way to fail.**
@@ -413,8 +414,8 @@ and Python compares tuples element by element.
 `key` is a *Strategy*.
 `sorted()` provides the algorithm (some comparison-based sort).
 The caller supplies the interchangeable policy that decides what "in order" means for this call.
-`sorted()` compares the values `key` returns, and its code mentions no tuples,
-scores, or names.
+`sorted()` compares the values `key` returns.
+Tuples, scores, and names appear in the key function, not in `sorted()`.
 Passing a different `key` swaps the ordering strategy the same way the chapter's classic *Strategy* form swaps the algorithm its Context holds.
 Here the Context holding the current strategy is the call to `sorted()`.
 
@@ -441,7 +442,8 @@ builds a configured *Strategy* from `bisection_within()` and again with `functoo
 Give `newton()` a `tolerance` parameter with a default so existing calls keep working.
 Then write a factory that returns an inner function calling `newton()` with the tolerance,
 and build a second finder with `partial()` and a keyword argument.
-Both finders match the `RootFinder` type, so `first_root()` needs no change.
+Both finders match the `RootFinder` type,
+so the existing `first_root()` runs them.
 
 <details>
 <summary>The shape</summary>
@@ -584,7 +586,7 @@ a different design, a detail, or an equivalent alternative.
 ## 5. An event bus that walks the MRO, and can unsubscribe
 
 > Because `EventBus.publish()` looks up `type(event)`,
-> a subclass of `Deposit` finds no handler.
+> a subclass of `Deposit` gets the empty default list.
 > Change `publish()` to walk `type(event).__mro__` and call every handler registered along it,
 > parents last.
 > Then add `unsubscribe()`.
