@@ -15,7 +15,7 @@ The design is the one [The Pythonic *Observer*](../../Chapters/30_Patterns--Obse
 describes: a list of callables, one method that appends to it,
 and one that calls each entry with the same argument.
 Any callable is a responder, a `lambda` included,
-so the demonstration needs no observer class.
+so the demonstration's responders are two `lambda`s.
 
 <details>
 <summary>The shape</summary>
@@ -75,7 +75,8 @@ print(calls)
 #: [('A', 42), ('B', 42)]
 ```
 
-Like `broadcaster.py`, this solution has no separate `Observer` class.
+Like `broadcaster.py`,
+this solution uses callables in place of an `Observer` class.
 Any callable, here two `lambda`s, is a responder.
 
 Before you move on, name what separates your attempt from this one:
@@ -833,7 +834,7 @@ def test_later_responder_runs_after_an_err() -> None:
 
 **Collect the failures as values.**
 Each responder reports a failure by returning an `Err`,
-so `announce()` needs no `try`.
+so `announce()` collects each `Err` with an `isinstance()` test.
 The caller receives the failures as an ordinary list and decides what to do with them,
 where exercise 3's caller must catch an `ExceptionGroup`.
 An empty list means every responder succeeded.
@@ -1040,7 +1041,8 @@ and after a set number of rounds whoever owns the larger patch wins.
 `FloodGame` can also inherit from `Broadcaster[Grid]`, as `GridModel` does,
 and call `self.announce(self.grid)` at the end of a successful `select()`.
 `grid_view.py`'s existing view then repaints after every move.
-The drawing code needs no change, but `show()`'s parameter annotation does.
+The drawing code stays as it is,
+but `show()`'s parameter annotation must change.
 That annotation specifies `GridModel`, which a `FloodGame` is not.
 Widening the annotation lets the same view draw either model.
 The wider type can be a Protocol that declares `connect()`, `size`, `grid`,
@@ -1061,7 +1063,7 @@ a different design, a detail, or an equivalent alternative.
 > Change the rule for a selection in `grid_observer.py`:
 > make `recolored()` advance every box in the selected box's row and column.
 > Run `grid_view.py` without editing it,
-> and explain why the view needed no change.
+> and explain why the view shows the new rule.
 
 <details>
 <summary>Where to look</summary>
@@ -1070,7 +1072,7 @@ In [The Model](../../Chapters/30_Patterns--Observer.md#the-model),
 `recolored()` alone decides which cells change.
 `GridModel.select()` calls it and announces the result.
 Build the new `Grid` from every cell that shares the selection's `x` or its `y`.
-For why the view needs no change,
+For why the view shows the new rule,
 see what `draw()` receives in [The View](../../Chapters/30_Patterns--Observer.md#the-view).
 
 <details>
