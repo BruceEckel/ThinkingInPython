@@ -743,6 +743,7 @@ def item_factory(symbol: str) -> Item:
 
 type Coord = tuple[int, int]
 type RoomMap = dict[Coord, Room]
+type Route = str
 
 class Room:
     def __init__(self, occupant: Item) -> None:
@@ -804,7 +805,7 @@ class GameBuilder:
             t1.target_room = room2
             t2.target_room = room1
 
-    def run(self, moves: str) -> None:
+    def run(self, moves: Route) -> None:
         for char in moves:
             self.robot.move(Urge(char))
 ```
@@ -961,13 +962,13 @@ from collections import deque
 from collections.abc import Callable
 from typing import Final
 from robot_world import (EndGame, Food, GameBuilder, Room,
-                         Teleport, Urge, Wall)
+                         Route, Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     ...
 
 def solve(game: GameBuilder,
-          arrived: Callable[[Room], bool]) -> str | None:
+          arrived: Callable[[Room], bool]) -> Route | None:
     ...
 
 def food(room: Room) -> bool:
@@ -1002,7 +1003,7 @@ from collections import deque
 from collections.abc import Callable
 from typing import Final
 from robot_world import (EndGame, Food, GameBuilder, Room,
-                         Teleport, Urge, Wall)
+                         Route, Teleport, Urge, Wall)
 
 def landing(room: Room, urge: Urge) -> Room | None:
     beyond = room.doors.open(urge)
@@ -1013,9 +1014,9 @@ def landing(room: Room, urge: Urge) -> Room | None:
     return beyond
 
 def solve(game: GameBuilder,
-          arrived: Callable[[Room], bool]) -> str | None:
+          arrived: Callable[[Room], bool]) -> Route | None:
     start = game.robot.room
-    queue: deque[tuple[Room, str]] = deque([(start, "")])
+    queue: deque[tuple[Room, Route]] = deque([(start, "")])
     seen: set[Room] = {start}
     while queue:
         room, path = queue.popleft()
