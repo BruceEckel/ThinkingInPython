@@ -829,7 +829,7 @@ and its exercise 4 show the same silence for a generator with no Effect in it.
 The declared `Need[Console]` in the return type still holds,
 since a declaration says what the function may request, not what it must.
 The chapter warns about this deletion.
-A bare `greet(name)` passes every check and silently drops the greeting.
+A bare `greet(name)` passes every check and discards the greeting.
 
 Removing the `yield from` in front of `need(Console)` in `greet()` draws two diagnostics:
 
