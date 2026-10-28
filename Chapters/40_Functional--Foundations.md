@@ -7,10 +7,10 @@ This chapter begins the book's exploration of functional programming.
 The ideas are useful before you learn their names.
 A pure function cannot corrupt state you overlooked.
 A bug in a pure function reproduces from the arguments alone.
-A pure function needs no mock or fixture to test.
+A test of a pure function is a call and a comparison.
 The standard library supplies and tests a cache in `functools` and a sliding window in `itertools`,
 so each one handles the edge case you would otherwise miss.
-A function that shares no state is safe to run in parallel.
+A function that keeps its state private is safe to run in parallel.
 And you can reason about code built from small,
 checkable pieces by substitution, the same way you check a line of algebra.
 
@@ -80,7 +80,7 @@ To understand one `withdraw()` call you must trace every call before it.
 A pure function is the most reliable code you can write,
 because its arguments alone determine what it returns or raises.
 You can call it from many threads at once,
-because it shares no state to corrupt.
+because each call keeps its state private.
 [Automatic Parallelism](43_Functional--Confidence.md#automatic-parallelism)
 uses that safety to spread the calls across cores.
 A cache can store the function's results,
@@ -167,7 +167,7 @@ as in `copy.replace(p, x=p.x + 10)`.
 
 When a value is immutable,
 two parts of a program can share one without coordinating,
-and concurrent code needs no lock to read it.
+and any number of threads can read it at once.
 That safety requires copying.
 Python's immutable types share no structure.
 `moved = Point(p.x + 10, p.y)` in `immutability.py` builds a new `Point`.
