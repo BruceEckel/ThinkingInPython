@@ -9,7 +9,7 @@ and then builds the carrier Python has today,
 the `Annotated` type from [PEP 593](https://peps.python.org/pep-0593/).
 The last part analyzes the tool that would check those annotations and shows how much of a type checker the tool would contain.
 [An Effect Checker](B_An_Effect_Checker.md)
-builds the part of that tool that needs no type inference.
+builds the part of that tool that works from names and written types.
 
 ## The Tracking Problem
 
@@ -23,7 +23,7 @@ A function's Effects come from two sources.
 The body performs some of them directly, as a call to `print()` does.
 The function inherits the rest from the functions it calls.
 Handling removes Effects.
-A function that runs `greet()` inside a handler for `Ask` passes no `Ask` to its own callers.
+A function that runs `greet()` inside a handler for `Ask` passes its own callers every Effect of `greet()` except `Ask`.
 The [Effect row](44_Effects--Effect_Management.md#native-effect-management)
 of a function `f` therefore follows one rule:
 
@@ -75,7 +75,7 @@ The open question is whether a tool can compute and check a row written in `Anno
 ## Why a Native System Tracks Best
 
 Native algebraic effect tracking has four properties.
-The `Annotated` design has none of them.
+A tool built on the `Annotated` design must supply each one.
 The first four problems in [What a Checker for the Row Must Do](#what-a-checker-for-the-row-must-do)
 take them in the same order.
 
@@ -177,8 +177,9 @@ The PEP directs every consumer to act on the objects it recognizes and ignore th
 
 A function has two places for annotations, its parameters and its return value.
 A row describes a call.
-A function with no parameters, such as `greet()`,
-has no parameter annotation to hold the row, but every function returns a value,
+A function with no parameters, such as `greet()`, has one place to hold the row:
+its return annotation.
+Every function returns a value,
 so `row()` reads the row from the return annotation.
 Stateless and ZIO put their rows in the return type too.
 A Stateless `Depend[A, R]` is a `Generator`,
@@ -280,8 +281,9 @@ or a caller holding the base type performs Effects the base row omits.
 Working all of that out is type inference,
 which the type checker performs on every run.
 The tool therefore belongs inside the checker.
-Of the three checkers this book names, mypy has a plugin interface.
-`ty` and Pyright have none at this writing.
+Of the three checkers this book names,
+mypy alone has a plugin interface at this writing.
+That rules out `ty` and Pyright as hosts for the tool.
 A tool that runs outside the checker has two choices.
 It can repeat the checker's inference,
 or it can check the calls it resolves and treat the others as unknown.
@@ -432,7 +434,8 @@ A function that handles `Ask` leaves `Ask` out of its own row.
 That function's `handling(Ask, Scripted())` block puts `Ask` back in the set,
 so the `greet()` call inside the block passes.
 
-The runtime check needs no call resolution, because running a call resolves it.
+The runtime check leaves call resolution to Python,
+which resolves each call by running it.
 Its limit is coverage.
 A runtime check covers the paths a run executes,
 so it verifies what your tests exercise and stays silent about the rest.
