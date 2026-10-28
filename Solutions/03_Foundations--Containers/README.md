@@ -297,7 +297,8 @@ print(xs[3:0:-1])  # The same three, in one slice
 #: [40, 30, 20]
 ```
 
-A negative `start` counts from the end, so `xs[-2:]` needs no length.
+A negative `start` counts from the end,
+so `xs[-2:]` stands in for `xs[len(xs) - 2:]`.
 The one-slice form is harder to read because the bounds swap roles.
 `3` is now the first index visited and `0` is the stop,
 which the slice excludes, so the slice ends at index `1`.
