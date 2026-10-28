@@ -150,7 +150,7 @@ as a data class does, but produces immutable instances.
 `typing.NamedTuple` is the class form of [`namedtuple()`](03_Foundations--Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names.
 The class form adds a type for each field,
-so a type checker infers `int` for a `Color`'s `r`.
+so the type checker infers `int` for a `Color`'s `r`.
 Because a `Color` is a tuple underneath,
 you can read each field by name or by position:
 
