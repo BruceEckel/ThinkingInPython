@@ -442,9 +442,9 @@ Then add the string to the one `type` statement that defines the alias and run t
 from typing import Literal
 
 type Coord = tuple[int, int]
-type Grid = dict[Coord, str]
 type Color = Literal[
     "red", "blue", "green", "yellow", "purple"]
+type Grid = dict[Coord, Color]
 
 def paint(grid: Grid, cell: Coord, color: Color) -> None:
     ...
@@ -467,9 +467,9 @@ the check passes and `print(grid)` shows `{(2, 3): 'purple'}`.
 from typing import Literal
 
 type Coord = tuple[int, int]
-type Grid = dict[Coord, str]
 type Color = Literal[
     "red", "blue", "green", "yellow", "purple"]
+type Grid = dict[Coord, Color]
 
 def paint(grid: Grid, cell: Coord, color: Color) -> None:
     grid[cell] = color
@@ -503,8 +503,9 @@ The alias also keeps the message short and puts the allowed set in one place to 
 
 **Widen the set at its definition.**
 Adding `"purple"` to the alias removes the error at every call.
-`grid[cell] = color` works as written,
-since `Grid`'s values are `str` and every `Color` is a `str`.
+`grid[cell] = color` works as written.
+`Grid`'s values are `Color`s,
+so the widened alias admits `"purple"` in the grid as well as in the parameter.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

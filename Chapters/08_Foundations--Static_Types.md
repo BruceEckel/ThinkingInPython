@@ -437,8 +437,8 @@ The *type statement* gives the annotation a name:
 from typing import Literal
 
 type Coord = tuple[int, int]
-type Grid = dict[Coord, str]
 type Color = Literal["red", "blue", "green", "yellow"]
+type Grid = dict[Coord, Color]
 
 def paint(grid: Grid, cell: Coord, color: Color) -> None:
     grid[cell] = color
@@ -461,10 +461,17 @@ A `type` statement creates a new name, not a new type.
 so the type checker accepts any pair of ints as a `Coord`.
 (For a type the type checker keeps separate from its base, use [`NewType`](#aliases-and-distinct-types).)
 
-Because an alias is the same type under another name,
-save it for a compound shape and let a built-in keep its own name.
-`type UserId = int` looks like a new type in a signature,
+Because an alias is the same type under another name, it adds no checking.
+Its job is to tell the reader what a value is.
+A compound shape is the usual case,
+but a scalar earns an alias when its name says what a bare `str` or `int` cannot:
+`dict[Name, int]` says the keys are names,
+where `dict[str, int]` hides what they are.
+Skip the alias when the parameter's own name already says it,
+as `name: str` does.
+`type UserId = int` reads like a distinct type in a signature,
 yet the type checker accepts any `int` as a `UserId`.
+When the checker must keep the two apart, `NewType` is the construct.
 
 `Color` specifies a union of literal values instead of a union of types.
 `Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings.
@@ -899,7 +906,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `type Name = ...` | A type alias for a longer type, e.g. `type Grid = dict[tuple[int, int], str]`, see [The `type` Statement](#the-type-statement) |
+| `type Name = ...` | A name for a type, compound or scalar, e.g. `type Coord = tuple[int, int]`, see [The `type` Statement](#the-type-statement) |
 | `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any class, not just a built-in |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 

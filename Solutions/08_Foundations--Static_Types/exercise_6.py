@@ -2,9 +2,9 @@
 from typing import Literal
 
 type Coord = tuple[int, int]
-type Grid = dict[Coord, str]
 type Color = Literal[
     "red", "blue", "green", "yellow", "purple"]
+type Grid = dict[Coord, Color]
 
 def paint(grid: Grid, cell: Coord, color: Color) -> None:
     grid[cell] = color
