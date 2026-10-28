@@ -142,7 +142,7 @@ as [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#abstra
 explains.
 `Search`, which stores its word list in a field, is such a record.
 
-The uppercase policy needs no data.
+The uppercase policy reads the text alone.
 The function form passes `str.upper`,
 which has the signature the framework expects:
 
