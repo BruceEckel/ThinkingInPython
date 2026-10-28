@@ -199,7 +199,8 @@ with expected(TypeError):
 ```
 
 `inherited` collects every non-dunder name the base classes define.
-For `MyApp` those bases are `CheckedFramework`, which adds no such name,
+For `MyApp` those bases are `CheckedFramework`, whose one method,
+`__init_subclass__()`, is a dunder the comprehension skips,
 and `ApplicationFramework`, which supplies `run` and the two steps.
 For each name the subclass defines,
 `getattr(super(cls, cls), name, None)` finds the attribute that the name replaces,
@@ -209,7 +210,7 @@ The `__final__` check exists because a subclass that replaces `run()` moves the 
 and `@final` stops that replacement only when the type checker runs.
 
 The `__final__` check reads a flag rather than a method name.
-A second `@final` instance method in `ApplicationFramework` therefore needs no change to `__init_subclass__()`.
+The same `__init_subclass__()` therefore protects a second `@final` instance method in `ApplicationFramework`.
 The `class` statement of a subclass that replaces that method raises the same `TypeError`.
 The check misses a `@final` on a `@property`,
 and a `@final` written above `@classmethod` or `@staticmethod`.
@@ -301,7 +302,7 @@ The next subclass author might restore the usual order out of habit.
 The reliable repair changes the framework.
 Separate construction from starting,
 and have the client call `run()` on a fully built object.
-So `ApplicationFramework` has no `__init__()`,
+So `ApplicationFramework` inherits its constructor from `object`,
 and the client calls `MyApp().run()`.
 
 ### Substitutability
@@ -405,13 +406,13 @@ Both the *Template Method* and the function version have an anchored algorithm a
 If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
-passing functions takes fewer lines and needs no class hierarchy.
+passing functions takes fewer lines and replaces the class hierarchy with one function.
 
 The subclass form also makes each step optional,
 since the base supplies the `...` default.
 The function form makes a step optional by giving its parameter a default.
-With `lambda: None` as the default,
-the loop calls both steps on every pass and needs no `None` test.
+With `lambda: None` as the default, the loop calls both steps on every pass.
+A `None` default would put a `None` test in the loop.
 `customize1` is a required parameter,
 so the type checker reports a call that omits it.
 
