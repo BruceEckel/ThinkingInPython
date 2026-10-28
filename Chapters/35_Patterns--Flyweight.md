@@ -462,7 +462,7 @@ and the weak reference's callback removes the pool entry.
 The pool guarantees sharing.
 Each object lives as long as a reference outside the pool holds it.
 `sys.intern()`'s pool works the same way.
-Its entries keep no interned string alive.
+An interned string lives as long as a reference outside the pool holds it.
 
 *Flyweight* cuts the number of objects,
 and [`slots=True`](18_Techniques--Performance.md#slots)
@@ -578,7 +578,8 @@ The enum version also brings iteration, exhaustive `match`,
 and a closed set of members.
 `Tile("?")` raises a `ValueError`, and `Tile.DOOR` raises an `AttributeError`.
 
-A `match` over `Tile` needs no `case _:` catch-all when every member has a case.
+When every member of `Tile` has a case,
+the type checker knows the `match` covers every value.
 If you leave a member out of a function that declares a return type,
 the type checker reports the missing case before the code runs:
 
