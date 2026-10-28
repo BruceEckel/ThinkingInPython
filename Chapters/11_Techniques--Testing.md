@@ -806,7 +806,7 @@ you widen every signature along the way,
 or introduce a context object to carry the parameter.
 [Concurrency](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 shows `ContextVar`, which carries such a value down the call chain and leaves every signature as it was.
-`monkeypatch` also leaves the signatures as they are.
+So does `monkeypatch`.
 It patches the name in place,
 and the patch applies process-wide until teardown restores the name.
 Choose injection when the parameter sits near the boundary.
@@ -946,7 +946,7 @@ so a test keeps passing after the real signature changes.
 builds a mock from the real function and checks each call against the real function's signature.
 
 This book patches with `monkeypatch` and prefers injection where you can change the code,
-because you test a function that takes its clock or its fetcher as an argument by calling it with a stand-in.
+because you can pass a stand-in to a function that takes its clock or its fetcher as an argument.
 
 ## Property-Based Testing
 
