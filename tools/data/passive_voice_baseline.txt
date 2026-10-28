@@ -29,6 +29,8 @@ Chapters/35_Patterns--Flyweight.md	[PASSIVE] is called: A pool of singletons key
 Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: That name is now bound to CODE.
 Chapters/40_Functional--Foundations.md	[PASSIVE] is associated: The runtime message names a local variable instead of the missing declaration: "cannot access local variable 'count' where it is not associated with a value."
 Chapters/44_Effects--Effect_Management.md	[PASSIVE] is delayed: The connection between the declaration and its supply is *delayed binding*.
+Chapters/45_Effects--Generators.md	[PASSIVE] be added: Note that CODE objects can be added together.
+Chapters/45_Effects--Generators.md	[PASSIVE] is suspended: The new generator is suspended before its first statement, so no CODE expression is waiting to receive a value.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
 Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
 Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] 's named: When CODE gains a fourth error, CODE's named CODE leaves it in the channel, so CODE's declared type no longer matches and the type checker reports an error at the CODE.

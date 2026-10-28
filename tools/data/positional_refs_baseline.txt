@@ -12,7 +12,7 @@ Chapters/04_Foundations--Control_Flow.md	The first `case`	The first `case` destr
 Chapters/04_Foundations--Control_Flow.md	the `for` clause	Every form has the same order: the expression that produces each item, the `for` clause that supplies the values, and an optional `if` that filters them.
 Chapters/04_Foundations--Control_Flow.md	the `try` block	An exception from the follow-up work in the `else` propagates to the caller, past the handlers written for the `try` block's failure.
 Chapters/04_Foundations--Control_Flow.md	the `try` block	The `except` clauses catch exceptions raised in the `try` block alone.
-Chapters/04_Foundations--Control_Flow.md	the `try` block	The optional `else` runs when the `try` block raises no exception.
+Chapters/04_Foundations--Control_Flow.md	the `try` block	The optional `else` runs when the `try` block reaches its end.
 Chapters/04_Foundations--Control_Flow.md	the first `case`	Python runs the first `case` that matches and then leaves the `match`.
 Chapters/04_Foundations--Control_Flow.md	the inner loop	Put `continue` in the inner loop's `else`, and a `break` after the inner loop, at the outer loop's level.
 Chapters/04_Foundations--Control_Flow.md	the inner loop	When the inner loop `break`s, Python skips its `else` and the outer `break` runs.
@@ -39,7 +39,7 @@ Chapters/15_Techniques--Context_Managers.md	the first `next()`	On 3.15 the wrapp
 Chapters/16_Techniques--Comprehensions.md	The `for` loop	The `for` loop runs after the context manager deletes the directory, and it reads the strings in `py_paths`, which outlive the directory.
 Chapters/16_Techniques--Comprehensions.md	The first clause	The first clause then iterates over that stale `row`.
 Chapters/16_Techniques--Comprehensions.md	The inner `for col`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
-Chapters/16_Techniques--Comprehensions.md	the next statement	It evaluates its output expression for every element before the next statement runs.
+Chapters/16_Techniques--Comprehensions.md	the next statement	A list comprehension evaluates its output expression for every element before the next statement runs, so it reads `factor` at creation.
 Chapters/16_Techniques--Comprehensions.md	the outer `e`	The `e` inside the brackets is a different name from the `e` outside them, so the outer `e` keeps its value.
 Chapters/16_Techniques--Comprehensions.md	the outer `for row`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
 Chapters/17_Techniques--Metaprogramming.md	The last call	The last call drops that row, for the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes) passes `exclude=("__hash__",)`.
@@ -54,6 +54,7 @@ Chapters/19_Techniques--Concurrency.md	the `try` block	A bare `ValueError` raise
 Chapters/19_Techniques--Concurrency.md	the outer `except ExceptionGroup`	The members no clause matches propagate as a new group that keeps the original message, so the outer `except ExceptionGroup` catches the `KeyError` alone.
 Chapters/20_Patterns--Rethinking_Objects.md	The final `def`	The final `def` is the function that runs.
 Chapters/22_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
+Chapters/22_Patterns--Iterators.md	the first `next()`	The check at the top of its body waits for the first `next()`.
 Chapters/23_Patterns--Singleton.md	the first assignment	If you drop the inner test, every thread that passed the outer test before the first assignment builds its own object, one after another.
 Chapters/23_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list, where the metaclass form discards it.
 Chapters/23_Patterns--Singleton.md	the first call	That override skips `__new__()` and `__init__()` on every later construction, so only the first call's arguments reach the constructor.
@@ -92,7 +93,7 @@ Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdr
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 Chapters/45_Effects--Generators.md	The first call	The first call, which runs the body to its first `yield`, *primes* the generator.
-Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes the body, which reaches `return` instead of another `yield`, so the generator returns its `Result`.
+Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes `interview()`'s body, which encounters `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	The next `next()`	The next `next()` links that frame back into the call stack.
 Chapters/45_Effects--Generators.md	the `for` loop	A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`, and reaches the `for` loop at the bottom of the listing.
 Chapters/45_Effects--Generators.md	the first `n`	[`islice()`](41_Functional--Toolkits.md#islice) takes the first `n` pairs, and the comprehension keeps the first number of each pair.
@@ -109,7 +110,8 @@ Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except
 Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs, since `finally` runs whether or not an exception is propagating.
 Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` shifts down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
 Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in automatically.
-Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the `TypeError` bypasses the `else` clause too.
+Solutions/04_Foundations--Control_Flow/README.md	the `except` clause	The `else` clause runs only when the `try` block finishes without an exception, so the `TypeError` bypasses the `else` clause as well as the `except` clause.
+Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the `TypeError` bypasses the `else` clause as well as the `except` clause.
 Solutions/05_Foundations--Functions/README.md	the first call	A tuple has no `append()`, so the first call that omits `target` raises an `AttributeError`.
 Solutions/05_Foundations--Functions/README.md	the line that	You can name the line that makes `count` local in each function.
 Solutions/05_Foundations--Functions/README.md	the third `bad_append(3)`	the third `bad_append(3)` prints `[1, 2, 3]`, matching the prediction you wrote down first.
@@ -176,9 +178,10 @@ Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` gr
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` fills the third slot and the second `square(1)` becomes a hit.
 Solutions/45_Effects--Generators/README.md	The third `send()`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
-Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
+Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator waits before the first line of its body rather than at a `yield`, so Python discards the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first `send()`	So at runtime the first `send()` accepts `None` alone, a value the `SendType` excludes.
 Solutions/45_Effects--Generators/README.md	the first call	An annotation cannot express "`None` for the first call, `Answer` afterward," because a single `SendType` covers every call.
+Solutions/45_Effects--Generators/README.md	the first line	A just-started generator waits before the first line of its body rather than at a `yield`, so Python discards the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first line	The call `interview()` returns a generator object, suspended before the first line of its body.
 Solutions/45_Effects--Generators/README.md	the last `send()`	If you read the total as the result of the last `send()`, writing `total: Total = t.send(Amount(12))` with no `try`, the script prints the three prompts and then stops with `StopIteration: 42`.
 Solutions/45_Effects--Generators/README.md	the last `yield`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
