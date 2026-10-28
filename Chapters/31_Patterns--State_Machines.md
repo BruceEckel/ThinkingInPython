@@ -300,7 +300,7 @@ The rules are a list, which the engine groups into a `dict`.
 The action on a rule takes the input,
 so what the machine does depends on the state and the input together.
 That is a *Mealy machine*, the other classical state machine.
-The first design's `action` acts per state and sees no input,
+The first design's `action` acts per state and runs the same way whichever input led into that state,
 while a rule's `action` acts per transition and reads the input that fired it.
 
 The mousetrap's inputs are `Mouse` members, each naming one event.
@@ -313,7 +313,7 @@ The table looks up a rule by the input's class, not by its value.
 
 For the current state and the type of the incoming input,
 the engine tries the candidate rules in order.
-It takes the first rule whose condition passes (or has no condition),
+It takes the first rule whose condition passes (or is `None`),
 runs that rule's action, and moves to the next state:
 
 ```python
@@ -412,7 +412,7 @@ A `Row` moves it to `SELECTING`.
 A `Column` moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
-The vending machine's states carry no data,
+The vending machine's states are bare `auto()` members,
 so the demo prints a state by its `name`:
 
 ```python
@@ -754,7 +754,7 @@ it is the `action` of every rule whose `next_state` is that state.
 `refund()` runs on every transition into `QUIESCENT`,
 so one comprehension writes it into all four `Quit` rules.
 That is the Mealy shape: the action belongs to the transition.
-A state's `action` takes no arguments,
+A state's `action` depends on the state alone,
 while a rule's action reads the input that caused the transition:
 `add_money()` reads the coin's `value`.
 
