@@ -281,8 +281,8 @@ print(w, "|", str(p).split(" at ")[0])
 
 `p.__len__()` and `len(p)` look interchangeable but take different lookup paths.
 `p.__len__()` is ordinary attribute access.
-That lookup searches the instance and `Proxy`, comes up empty,
-and falls through to `__getattr__()`, which delegates.
+That lookup searches the instance and `Proxy`,
+then falls through to `__getattr__()`, which delegates.
 `len(p)` looks up `__len__()` on `type(p)` and skips both the instance and `__getattr__()`,
 so it reports that `Proxy` has no `len()`.
 
