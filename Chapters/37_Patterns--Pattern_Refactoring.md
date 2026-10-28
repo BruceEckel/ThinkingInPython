@@ -88,7 +88,8 @@ A `type` statement's right side evaluates lazily,
 so the alias can name `Trash` several lines before the `class` statement that defines it.
 
 Python implicitly makes [`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
-a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.
+a classmethod, so the `@classmethod` decorator is optional.
+The method's first parameter is the new subclass.
 `__init_subclass__()` runs once per subclass,
 immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
@@ -173,7 +174,7 @@ Cardboard:12
 ```
 
 The parser looks up each material by name in the registry,
-so a new material needs no edit to `parse()`:
+so `parse()` stays as written when you add a material:
 
 ```python
 # parse_trash.py
@@ -512,7 +513,8 @@ In the real program those edits go in `trash.py`.
 A method belongs in the body of its own class by design.
 You can assign a function onto a class from outside,
 but a reader of the class must then search every module for the behavior assigned onto it.
-A plant whose material classes come from a supplier has no class body to edit.
+When a plant's material classes come from a supplier,
+the supplier owns their class bodies.
 
 The method form is a real option, not an example built to fail.
 This hierarchy is small and the book owns every subclass,
@@ -667,7 +669,7 @@ Try each exercise before opening its [solution](../Solutions/37_Patterns--Patter
 
 1.  Add a `Plastic` material to `trash.py`,
     then point `recycle_dict.py` at `plastic.dat` and run it.
-    Confirm that `sort_by_type()` and `parse_trash.py` need no changes,
+    Confirm that `sort_by_type()` and `parse_trash.py` handle `Plastic` as written,
     then account for every pound of plastic that `plastic_dropped.py` loses.
     Which test in `test_trash.py` fails, and why is that failure correct?
 2.  Write a `price()` operation as a function over a list of `Trash`,
