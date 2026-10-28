@@ -171,7 +171,7 @@ every time it changes the value.
 *Design by Contract* (DbC)
 is the practice of checking arguments on entry and results on exit,
 with a class invariant that must hold between calls.
-`f1()` takes no argument, so only the postcondition appears here.
+`f1()` takes `self` alone, so only the postcondition appears here.
 A method that accepts a second rating needs a precondition for it as well as the postcondition.
 
 DbC spreads the contract across every method that touches the value.
@@ -350,8 +350,7 @@ expect(AttributeError, getattr, A(), "x")
 ```
 
 `A` inherits `__init__()`, `__repr__()`, `__eq__()`,
-and `__hash__()` from `object`,
-so `show(A())` reports none of them as redefined.
+and `__hash__()` from `object`, so `show(A())` reports `None` under `[Methods]`.
 
 `x` and `s` in `A` are *bare annotations*: declared, but not assigned a value.
 A [bare annotation](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
@@ -757,7 +756,7 @@ class Person:
     email: EmailAddress
 ```
 
-`Person` declares no checks of its own.
+`Person` leaves its checks to its field types.
 Its annotations require a `FullName` and an `EmailAddress`,
 which the type checker enforces.
 Every `FullName` and `EmailAddress` is legal from construction.
@@ -870,11 +869,11 @@ class BirthDate:
 ```
 
 The `Enum` creates the constrained set of `Month`s.
-No thirteenth month can exist, because `Month` defines no such value.
+`Month` defines twelve members, so no thirteenth month can exist.
 
 Each member's value is its month number, so `Month(7)` looks up `JULY` by value.
 `Month(13)` raises a `ValueError`, because no member holds 13.
-The `Enum`'s lookup performs the range check, so `Month` writes none.
+The `Enum`'s lookup performs the range check on `Month`'s behalf.
 
 A day count cannot serve as the member's value,
 because `Enum` treats members with equal values as aliases of one another.
@@ -1093,7 +1092,7 @@ print(Month("Smarch", 7, 30))
 
 `Month("Smarch", 7, 30)` passes every `check()`,
 so the data class accepts an invented month and a second July.
-The `Enum` defines no such value.
+The `Enum` admits its twelve members and rejects every other value.
 `Months.of()` also writes out the range check that the `Enum`'s lookup performs for `Month(7)`.
 
 `Months` carries a list of its twelve `Month`s,
@@ -1317,7 +1316,8 @@ calling it from `__post_init__()` discards the fields the data class just assign
 The [*Borg* singleton](23_Patterns--Singleton.md#borg-singleton-by-inheritance)
 is that case.
 
-When the base class is also a data class, you need no `__post_init__()`.
+When the base class is also a data class,
+the generated `__init__()` takes over the job of `__post_init__()`.
 The subclass generates one `__init__()` covering the inherited fields and the new ones,
 in order:
 
@@ -1575,7 +1575,8 @@ For a mutable type, the caller assigns to the attribute.
 
 ## Serializing to JSON
 
-A data class has no built-in JSON support.
+The `json` module converts dicts, lists, tuples, strings, numbers, booleans,
+and `None`.
 Handed a data class instance,
 `json.dumps()` raises `TypeError: Object of type Person is not JSON serializable`.
 
