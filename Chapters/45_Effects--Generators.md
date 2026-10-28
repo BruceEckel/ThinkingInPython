@@ -161,18 +161,20 @@ Resuming runs the body from that position, with every local variable intact.
 In `drive_by_hand.py`,
 `inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
 The position and the locals together are the generator's state.
+
 A [closure](40_Functional--Foundations.md#closures)
 keeps its captured variables between calls,
 but each call runs its body from the top.
-The generator keeps its place as well,
+The generator keeps its locals and its place in the body,
 so a loop or a branch in progress survives the suspension.
 The generator is an ordinary object,
 so that state lasts as long as something holds a reference to the generator.
 
 The suspended generator is what [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 calls a continuation: the rest of the computation from the `yield` forward.
-A native handler can do three things with a continuation: resume it once,
-discard it, or resume it several times for a retry or a backtracking search.
+A handler[[link to handler definition]] can do three things with a continuation:
+resume it once, discard it,
+or resume it several times for a retry or a backtracking search.
 A generator's driver can do the first two.
 It resumes the continuation once with `send()`,
 and discards it by dropping the last reference to the generator.
