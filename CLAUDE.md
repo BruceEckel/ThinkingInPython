@@ -250,6 +250,19 @@ of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
 ending on a preposition whose object moved) and `tip watch-words`
 (`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
+Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
+object, `no X`, `none`, or `none of` ("runs none of the body", "raises
+no exception", "has no `__slots__`"), Bruce's "reversal of
+expectation": the verb promises an action or a possession and the
+quantifier takes it back. The 2026-10-28 sweep (48 Opus agents, one
+per chapter with its Solutions file, brief in
+`build/reversal-2026-10-28/`) read all 593 hits, rewrote about 350 to
+say what happens instead, and the 251 keeps are in the baseline: an
+absence that is the claim, half of a contrast, a quoted diagnostic's
+wording, an exercise statement. The scan reads a fixed verb list, so
+"hits no `break`" and "with no exception" slipped past it and were
+fixed by hand; `NO_VERBS` in `tools/watch_words.py` is where a missed
+verb goes.
 `tip possessives` (`tools/stranded_possessives.py`, 2026-10-14) lists a
 possessive whose head noun is elided ("not the base's"), the possessive
 cousin of the stranded preposition; the sweeps that day fixed 83 and the

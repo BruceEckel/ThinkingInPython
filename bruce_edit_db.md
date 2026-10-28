@@ -2013,6 +2013,67 @@ rule `[ADD]`):
 `[ADD]` is a survey rule there, since 161 of the 178 hits were keeps);
 this file. Promoted on Bruce's ruling, the way R46 to R48 were.
 
+### R50. A verb cancelled by its object says what happens instead
+
+**Test.** A verb that promises an action or a possession, followed by an
+object that cancels it: `no X`, `none`, `none of`, `nothing` ("runs none
+of the function body", "raises no exception", "has no `__slots__`",
+"needs no lock", "prints nothing"). Bruce's name for the fault is a
+*reversal of expectation*: "'runs' makes the reader think something will
+happen and 'none of' reverses that expectation." Say what does happen,
+plainly, in the sentence's own terms: when the body runs, what Python
+does instead, who supplies the thing, what stays as it was. The rewrite
+must read as the natural way to say it. Two forms Bruce rejected the same
+day are the trap on the other side, "with its body still to run" and
+"leaves its body for the driver": they avoid the word and give the reader
+nothing to picture. If the only positive form is a contortion, keep the
+negative.
+
+**Keep when.** The absence is the claim and has no positive term ("a
+class with no `__slots__`" where the missing declaration is the lesson,
+"Python has no labeled `break`", "`object` defines no `__len__()`" as
+the reason a check fails); half of a real contrast ("`Strategy` has
+none. ... `Observer` has one"); a quoted diagnostic's wording ("has no
+attribute 'add'"); an exercise statement or a Done-when criterion that
+tests an absence; a hint whose clue is the missing thing.
+
+**Sightings.** 1 round, 48 files, 2026-10-28, from Bruce's note on
+chapter 45 and the book sweep that followed ("That's the general pattern
+(reversal of expectation) we want to fix throughout the book"); 593
+hits read, about 350 rewritten, 251 kept (the `tip watch-words`
+baseline holds them):
+- `45_Effects--Generators` (`125a2f2c`): "Calling `interview()` returns a
+  generator object and runs none of the function body." -> "Calling
+  `interview()` returns that object. `next()` and `send()` run the body,
+  one `yield` at a time."
+- `06_Foundations--Modules_and_Packages` (`e90231b6`): "Python raises no
+  exception, and the table ends up one row short." -> "Python
+  continues, and the table ends up one row short."
+- `22_Patterns--Iterators` (`8a4ed56d`): "so a new source needs no change
+  to `total()`" -> "so `total()` stays the same for every new source"
+- `19_Techniques--Concurrency` (`8ba96052`): "finds no idle worker" ->
+  "finds every worker busy"; "shares no state" -> "keeps its state
+  private"
+- `30_Patterns--Observer` (`89811688`): "`Thermometer` declares its
+  fields and writes no method" -> "consists of its field declarations"
+- `44_Effects--Effect_Management` (`f95b3aee`): "The function's
+  signature answers none of these questions" -> "leaves all four
+  questions open"
+- `04_Foundations--Control_Flow` (session follow-up): "It runs when the
+  loop hits no `break`." -> "It runs when the loop exhausts its
+  iterable."
+- the rejected contortions, same day: "runs none of its body" -> "with
+  its body still to run" and "leaves its body for the driver", both
+  replaced by "The body runs later, one `yield` at a time, when the
+  driver calls `next()` or `send()`."
+
+**Home.** CLAUDE.md (global, the `<verb> nothing` paragraph of the watch
+list, widened to `no X` and `none of`); `tip watch-words` (`NO_VERBS`
+in `tools/watch_words.py`, Tier 2); this file. Promoted on Bruce's
+ruling, the way R46 to R49 were. The `positive` skill's test is the
+general case; this rule is its sharpest shape, where the verb itself
+raises the expectation that the object cancels.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different

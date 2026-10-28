@@ -174,6 +174,17 @@ flourishes, nothing that obscures the point.
   sentence-shapes CH=NN ARGS=--survey` lists the candidates as
   `[ADD]`; rule R49 in `bruce_edit_db.md` has the pairs (Bruce,
   2026-10-28).
+- **Reversal of expectation:** a verb that promises an action or a
+  possession, then an object that cancels it: "runs none of the
+  body", "raises no exception", "has no `__slots__`", "prints
+  nothing". The reader builds the action and takes it back. Say what
+  happens instead ("the body runs later, when the driver calls
+  `next()`", "Python continues"), and keep the negative where the
+  absence is the claim, half of a contrast, or a diagnostic's wording.
+  A rewrite that avoids the word and gives the reader nothing to
+  picture ("with its body still to run") is worse than the negative.
+  `tip watch-words CH=NN` lists the candidates; rule R50 in
+  `bruce_edit_db.md` has the pairs (Bruce, 2026-10-28).
 
 The style rules and watch list in the global `~/.claude/CLAUDE.md` are
 the standard for this pass. `banned_phrases.py` gates a handful of them;
