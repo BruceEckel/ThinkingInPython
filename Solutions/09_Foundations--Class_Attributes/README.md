@@ -507,7 +507,7 @@ so both instances report `2`.
 Reading `c.total` falls back to that shared value.
 
 Writing the fix as `type(self).total += 1` also prints `2 2 2` here,
-because `Counting` has no subclass.
+because `type(self)` is `Counting` for both `c` and `d`.
 With a subclass, the subclass's first construction forks the counter the way `classvar_fork.py` forks it for `Sub`.
 Constructing an empty subclass twice after `c` and `d` leaves `Counting.total` at `2` and gives the subclass its own `total` of `4`.
 Naming the class sends every write to one dictionary.
@@ -641,7 +641,8 @@ a different design, a detail, or an equivalent alternative.
 
 [A Bare Annotation Declares, It Does Not Create](../../Chapters/09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
 explains the difference between declaring `seat` and creating it.
-The annotation informs the type checker and creates no attribute,
+The annotation informs the type checker.
+An assignment creates the attribute,
 so `vars()` on the instance shows what exists.
 Read the attribute inside `expected(AttributeError)`, assign it from outside,
 and print `vars()` again.
