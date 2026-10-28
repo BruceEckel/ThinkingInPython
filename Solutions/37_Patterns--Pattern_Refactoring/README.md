@@ -4,7 +4,7 @@
 
 > Add a `Plastic` material to `trash.py`,
 > then point `recycle_dict.py` at `plastic.dat` and run it.
-> Confirm that `sort_by_type()` and `parse_trash.py` need no changes,
+> Confirm that `sort_by_type()` and `parse_trash.py` handle `Plastic` as written,
 > then account for every pound of plastic that `plastic_dropped.py` loses.
 > Which test in `test_trash.py` fails, and why is that failure correct?
 
@@ -117,19 +117,20 @@ The `Plastic` class is the only new Python code.
 so `Trash.create("Plastic", weight)` finds the class with no further code.
 
 **Bin each piece by its class.**
-`sort_by_type()` needs no change because its loop,
+`sort_by_type()` handles `Plastic` as written, because its loop,
 `bins[type(piece)].append(piece)`, keys on the class of each piece.
 `Plastic` is a new key for the dictionary,
 so `defaultdict` creates its bin the way it creates every other.
 
 The one edit to `recycle_dict.py` is the filename,
 since the script hardcodes `parse("trash.dat")`.
-`parse_trash.py` needs no change because it calls `Trash.create(name, weight)` with a name read from the file and specifies no material.
+`parse_trash.py` handles `Plastic` as written,
+because it passes `Trash.create(name, weight)` the name it reads from the file and leaves the choice of class to the registry.
 If `Plastic` needs special handling,
 an optional `@recycling_note.register` function provides it.
 
 `plastic_dropped.py` parses four pieces and bins two.
-The `match` in `sort_by_match()` has no `case` for `Plastic` and no `case _`.
+The `match` in `sort_by_match()` holds four cases, one per original material.
 The twenty-pound and forty-pound pieces fall through it,
 and the loop moves on to the next piece.
 Sixty pounds at 0.15 a pound is the `Plastic: 9.00` that `recycle_dict_plastic.py` prints and `plastic_dropped.py` omits.
@@ -519,7 +520,7 @@ def _(t: Aluminum) -> str:
 and you can name the lookup behind each.
 After your change, the `CrushedAluminum:` line is gone,
 its weight adds to the `Aluminum` total, every other material keeps its own bin,
-and the sorting loop specifies no material.
+and the sorting loop takes each bin's key from the piece.
 
 <details>
 <summary>Solution</summary>
@@ -611,7 +612,8 @@ so every material keeps a bin of its own.
 The type checker treats that restatement as optional.
 
 **Sort by the declared key.**
-The sorting loop still specifies no material.
+The sorting loop, `shared[t.bin].append(t)`, takes each key from the piece,
+as the exact-class loop does.
 
 `type(t)` is a convenient key, not an inevitable one.
 A design that declares its own key can group classes that `type(t)` keeps apart,
@@ -763,7 +765,7 @@ including a harmless one like `Paper`, whose answer is `"none"`.
 **Fall back to a default answer.**
 `hazard()` returns `"none"` for the plastic, whose hazard is toxic fumes.
 That wrong answer looks like every correct `"none"` beside it.
-The forgotten registration produces no exception and no report from the type checker.
+The forgotten registration gets past both the run and the type checker.
 
 **Refuse an unregistered type.**
 `strict_hazard()` raises a `NotImplementedError` that names the material at the first call.
