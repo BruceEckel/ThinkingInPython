@@ -663,7 +663,7 @@ The program still completes normally.
 `pending` grows on every pass.
 The flaw stays hidden until the program runs out of memory or the code that reads `pending` reports stale data.
 
-`Exploder` and `HalfDone` need different things from a type checker.
+`Exploder` and `HalfDone` need different things from the type checker.
 Only one of those things exists.
 
 A declaration in the base class can expose `HalfDone`'s omission.
@@ -678,7 +678,7 @@ Then constructing `HalfDone` raises a `TypeError`.
 The type checker reports the construction before the program runs.
 
 Exposing `Exploder`'s exception would take a declaration that Python lacks.
-For a type checker to catch `Exploder`,
+For the type checker to catch `Exploder`,
 the base class must state which exceptions a step may raise,
 and the checker must compare every override with that list.
 Java's `throws` clause provides that mechanism for checked exceptions.
