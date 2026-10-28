@@ -191,7 +191,7 @@ but `append()` leaves `toast.steps` bound to the same list.
 **Hash the `Recipe`.**
 Hashing a tuple hashes each element,
 so a `Recipe` is hashable only when every field is.
-The `list` has no hash, so the `Recipe` has none either.
+Hashing the `Recipe` hashes the `steps` list, which raises the `TypeError`.
 
 The silent `append()` and the `TypeError` have one cause.
 A `NamedTuple` freezes which object each field references,
@@ -512,7 +512,7 @@ A frozen `@dataclass` also hashes by value (with the default `eq=True`).
 A mutable `@dataclass` sets `__hash__` to `None`,
 so using one as a key raises a `TypeError`.
 `SimpleNamespace` and a `TypedDict` raise the same `TypeError`.
-`SimpleNamespace` compares by contents and defines no hash.
+`SimpleNamespace` compares by contents and sets `__hash__` to `None`.
 A `TypedDict` is a `dict` at runtime.
 
 Between a frozen data class and a `NamedTuple` here,
