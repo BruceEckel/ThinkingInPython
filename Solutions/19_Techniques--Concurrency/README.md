@@ -530,11 +530,11 @@ Two tasks now sit inside the critical section together,
 both reading `counter` before either writes,
 so each pair of increments adds one to `counter` instead of two.
 
-The semaphore reports no error,
+The semaphore accepts the stray call,
 because `release()` adds one to the count whether or not an `acquire()` came first.
 That missing error is the difference between a semaphore and a lock.
 `asyncio.Lock` checks for a matching acquire,
-so a release without one raises `RuntimeError: Lock is not acquired.` A semaphore's count has no upper limit,
+so a release without one raises `RuntimeError: Lock is not acquired.` A semaphore's count can climb past its starting value,
 so the same mistake lifts the count to two and silently admits a second holder.
 That second holder reintroduces the race the lock is there to prevent.
 `asyncio.BoundedSemaphore(1)` checks the count against its initial value,
@@ -1426,7 +1426,7 @@ read the same `next_number`, and return the same ticket,
 as they do without the lock.
 
 **See what the lock does cover.**
-It covers `out.append(item)`, which needs no lock.
+It covers `out.append(item)`, which is safe outside the lock.
 `out` is a local list, one per worker,
 so the worker's own thread alone touches it.
 
