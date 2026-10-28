@@ -371,7 +371,7 @@ That is the pair of dispatches the `eval_*()` family writes out.
 `singledispatchmethod` matches on the MRO, like `singledispatch`,
 rather than exactly.
 
-Declaring the `@singledispatchmethod` on a shared base is a mistake that raises no exception.
+Declaring the `@singledispatchmethod` on a shared base is a mistake that runs and returns a wrong answer.
 The base then holds one dispatcher that every subclass inherits.
 Because resolving `self` finds that same dispatcher for every subclass,
 each class needs its own `@singledispatchmethod`.
@@ -479,9 +479,8 @@ Every other combination comes from `Paper`,
 through `super().compete(opponent)` and the inherited `eval_*()` methods.
 
 The table version has no comparable override.
-The lookup matches classes exactly,
-so `DampPaper` inherits none of `Paper`'s rows.
-It needs seven rows of its own, five of them copies of `Paper`'s rows.
+The lookup matches classes exactly, so `Paper`'s rows apply to `Paper` alone.
+`DampPaper` needs seven rows of its own, five of them copies of `Paper`'s rows.
 Editing `Paper`'s rows changes the game for every `Paper`.
 
 ## Testing Both Versions
