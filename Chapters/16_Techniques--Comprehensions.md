@@ -96,7 +96,7 @@ A `lambda` predicate leaves the element type of `filter()`'s result at `int | st
 so `ty` rejects `e ** 2`.
 Pyright infers the mixed list literal as `list[Unknown]` and accepts any operation on its elements.
 The comprehension's `if isinstance(e, int)` narrows the element type to `int`,
-so `list_comprehension.py` needs no `# type: ignore` comment.
+so `ty` accepts `e ** 2` in `list_comprehension.py`.
 `filter()` narrows when its predicate is a named function annotated to return [`TypeIs[int]` or `TypeGuard[int]`](08_Foundations--Static_Types.md#type-narrowing)
 rather than `bool`:
 
@@ -366,7 +366,7 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 Pass `strict=True` to make a length mismatch raise a `ValueError` instead of silently truncating.
 `map()` called with several iterables passes one element from each to its function and stops at the shortest in the same way.
 Since Python 3.14, `map()` accepts `strict=True` too.
-A dropped element leaves no trace in the output,
+Truncated output looks like complete output,
 so pass `strict=True` to either function whenever the inputs must have equal lengths.
 
 The `for` clause's target can unpack a nested tuple.
@@ -692,8 +692,8 @@ print(list(gen))
 Because the output expression runs later,
 it reads `factor` when `list()` pulls the values rather than when Python creates the generator.
 `list(gen)` returns `[10, 20, 30]` instead of `[2, 4, 6]`.
-A list comprehension has no such gap.
-It evaluates its output expression for every element before the next statement runs.
+A list comprehension evaluates its output expression for every element before the next statement runs,
+so it reads `factor` at creation.
 
 The gap between creation and consumption is also why `path_walk_comprehension.py` uses brackets.
 With parentheses, Python still evaluates the outermost iterable, `root.walk()`,
