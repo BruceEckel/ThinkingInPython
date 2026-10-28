@@ -202,7 +202,7 @@ The rest of this chapter uses names you can tell apart at a glance:
 | `notify()` | `announce()` |
 | `update()` | calling the responder |
 
-The last row has no method name on the right.
+In the last row, a call takes the place of a method name.
 A responder is a callable, so the receiving end is the call.
 Broadcasting a change takes one method name, `announce()`, where GoF uses two.
 
@@ -260,7 +260,7 @@ An announcement carries one argument.
 When a change has two parts to report,
 such as an attribute's name and its new value,
 the broadcaster packs them in a tuple and each responder unpacks it.
-A responder that needs no data ignores the argument it receives.
+A responder that cares only that a change occurred ignores the argument it receives.
 
 A responder returns `None`, as the `Responder` `type` alias declares.
 At runtime, `announce()` discards a responder's return value,
@@ -474,7 +474,7 @@ The tests connect a list's `append` to the broadcaster,
 so the list records every announced value.
 
 `disconnect()` matches by equality, and a lambda equals only itself.
-A second lambda with the same text matches no connection,
+A second lambda with the same text is a different object,
 so `disconnect()` raises a `ValueError`.
 To disconnect a lambda,
 bind it to a name and pass that name to both `connect()` and `disconnect()`.
@@ -730,11 +730,11 @@ Its list of responders can change at any moment,
 including in the middle of an `announce()`.
 Three earlier sections each handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
-a lambda written inline in `connect()` has no name to pass to `disconnect()`,
+a lambda must be bound to a name to reach both `connect()` and `disconnect()`,
 and a lapsed listener is a connection that outlives the program's use of its responder.
 
 Decoupling and dynamism are separate properties.
-A decoupled broadcaster holds its responders as callables and names none of them.
+A decoupled broadcaster knows its responders only as callables.
 A dynamic broadcaster lets the set of responders change after the broadcaster exists.
 A broadcaster that receives its responders at construction is decoupled but not dynamic:
 
@@ -767,7 +767,7 @@ print(log)
 The `@record` freezes the field,
 and a tuple keeps the items it holds at creation,
 so the set of responders stays the same.
-`announce()` needs no `list()` copy of the tuple,
+`announce()` loops over the tuple directly,
 since the tuple holds the same responders for the whole loop.
 The broadcaster still holds strong references to its responders,
 so each responder stays alive as long as the broadcaster does.
@@ -897,7 +897,7 @@ so as a decorator it binds the function's name to `None` (see exercise 11).
 
 The two listings that follow build the `__init__()`, the announcing properties,
 and the list of responders that every subclass shares,
-so a subclass such as `Thermometer` declares its fields and writes no method.
+so a subclass such as `Thermometer` consists of its field declarations.
 The first piece builds the property that publishes a field:
 
 ```python
@@ -1160,7 +1160,7 @@ because `set_celsius()` returns when `gather()` has waited for both responders.
 
 ### Disconnecting During an Async Notification
 
-The async `announce()` needs no `list()` copy.
+The async `announce()` loops over `self._responders` where the synchronous one loops over a `list()` copy.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
 so a `disconnect()` call during the fan-out leaves that tuple as it was:
 
@@ -1263,7 +1263,7 @@ A 3x3 grid reaches all three colors (see exercise 9).
 
 ### The Model
 
-The model's code names no part of the view that displays it:
+The model reaches the view that displays it only through `announce()`:
 
 ```python
 # grid_observer.py
@@ -1331,7 +1331,7 @@ so some of the coordinates in its `cross` lie outside the grid.
 Because a `Grid`'s keys are coordinates,
 `cell in grid` is `True` only for a coordinate inside the grid.
 The comprehension's `if` clause applies that test and skips any outside coordinates,
-so `recolored()` needs no grid size.
+so `recolored()` gets the grid's bounds from its keys.
 The [dictionary merge](03_Foundations--Containers.md#dictionaries)
 builds the new grid.
 Every key on the right is also in `grid`,
@@ -1716,7 +1716,7 @@ Three designs in this chapter separate the notification code from the measuring 
 - `Broadcaster` and `AsyncBroadcaster` hold the responder list and the notification loop,
   and `Thermometer` inherits them.
   `BoundBroadcaster` holds a tuple of responders and the same loop.
-- `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
+- `weather_station.py` holds its own responder list and calls its responders from `__setattr__()`,
   so one method covers every attribute.
 - `broadcasting.py` holds the list and the loop like `Broadcaster`,
   and its generated properties call `announce()` as well,
@@ -1869,7 +1869,7 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
 7.  Change the rule for a selection in `grid_observer.py`:
     make `recolored()` advance every box in the selected box's row and column.
     Run `grid_view.py` without editing it,
-    and explain why the view needed no change.
+    and explain why the view shows the new rule.
 8.  Add a second view to `grid_observer.py`'s `GridModel`.
     Write one view that prints a letter per cell and another that prints how many cells each color holds,
     connect both to the same model,
