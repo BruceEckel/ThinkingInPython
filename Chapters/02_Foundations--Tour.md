@@ -149,7 +149,7 @@ Reserve `is` for `None` and other singletons.
 `a[:]` is a *shallow* copy.
 It duplicates the outer list.
 The copy shares the outer list's inner objects.
-The standard library's `copy.deepcopy()` duplicates the inner objects as well.
+The standard library's `copy.deepcopy()` duplicates the inner objects as well as the outer list.
 
 Numbers, strings, and tuples are *immutable*.
 Operations on them produce new objects and leave the original as it was.
