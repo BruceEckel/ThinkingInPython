@@ -29,7 +29,7 @@ def machine() -> Generator[Report, Event]:
             amount += event.cents
             event = yield "COLLECTING"
         row = event.value  # Not a Coin, so a first Digit
-        second = yield "SELECTING"
+        second: Event = yield "SELECTING"
         # A coin instead of a digit
         if isinstance(second, Coin):
             amount += second.cents

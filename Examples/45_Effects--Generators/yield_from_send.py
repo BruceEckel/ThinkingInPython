@@ -3,8 +3,8 @@ from collections.abc import Generator
 from collect import collect
 
 def both() -> Generator[str, int]:
-    alpha = yield from collect("alpha")  # [1]
-    beta = yield from collect("beta")  # [2]
+    alpha: int = yield from collect("alpha")  # [1]
+    beta: int = yield from collect("beta")  # [2]
     yield f"total {alpha + beta}"  # [3]
 
 g = both()

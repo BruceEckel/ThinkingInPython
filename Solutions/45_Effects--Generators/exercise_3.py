@@ -2,15 +2,15 @@
 from collections.abc import Generator
 
 def collect(name: str) -> Generator[str, int, int]:
-    first = yield f"{name} needs a value"
-    second = yield f"{name} needs another"
+    first: int = yield f"{name} needs a value"
+    second: int = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
     return first + second
 
 def both() -> Generator[str, int]:
-    alpha = yield from collect("alpha")
-    beta = yield from collect("beta")
-    gamma = yield from collect("gamma")
+    alpha: int = yield from collect("alpha")
+    beta: int = yield from collect("beta")
+    gamma: int = yield from collect("gamma")
     yield f"total {alpha + beta + gamma}"
 
 g = both()

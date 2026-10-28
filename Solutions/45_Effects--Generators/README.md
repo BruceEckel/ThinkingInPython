@@ -65,7 +65,7 @@ Total = NewType("Total", int)
 def tally() -> Generator[Prompt, Amount, Total]:
     total = 0
     for n in (1, 2, 3):
-        amount = yield Prompt(f"amount {n} of 3")
+        amount: Amount = yield Prompt(f"amount {n} of 3")
         total += amount
     return Total(total)
 
@@ -186,9 +186,9 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield Question("name")
-    town = yield Question("town")
-    friend = yield Question("friend")
+    name: Answer = yield Question("name")
+    town: Answer = yield Question("town")
+    friend: Answer = yield Question("friend")
     return Result(f"{name} of {town}, friend {friend}")
 
 def drive_from_dict(
@@ -352,15 +352,15 @@ including which sends print two lines and what `send(6)` prints.
 from collections.abc import Generator
 
 def collect(name: str) -> Generator[str, int, int]:
-    first = yield f"{name} needs a value"
-    second = yield f"{name} needs another"
+    first: int = yield f"{name} needs a value"
+    second: int = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
     return first + second
 
 def both() -> Generator[str, int]:
-    alpha = yield from collect("alpha")
-    beta = yield from collect("beta")
-    gamma = yield from collect("gamma")
+    alpha: int = yield from collect("alpha")
+    beta: int = yield from collect("beta")
+    gamma: int = yield from collect("gamma")
     yield f"total {alpha + beta + gamma}"
 
 g = both()
@@ -798,7 +798,7 @@ def machine() -> Generator[Report, Event]:
             amount += event.cents
             event = yield "COLLECTING"
         row = event.value  # Not a Coin, so a first Digit
-        second = yield "SELECTING"
+        second: Event = yield "SELECTING"
         # A coin instead of a digit
         if isinstance(second, Coin):
             amount += second.cents

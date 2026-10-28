@@ -9,7 +9,7 @@ Total = NewType("Total", int)
 def tally() -> Generator[Prompt, Amount, Total]:
     total = 0
     for n in (1, 2, 3):
-        amount = yield Prompt(f"amount {n} of 3")
+        amount: Amount = yield Prompt(f"amount {n} of 3")
         total += amount
     return Total(total)
 

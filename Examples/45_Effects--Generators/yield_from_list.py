@@ -2,7 +2,7 @@
 from collections.abc import Iterator
 
 def relay() -> Iterator[int | None]:
-    v = yield from [1, 2, 3]
+    v: None = yield from [1, 2, 3]
     yield v
 
 print(list(relay()))

@@ -7,9 +7,9 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield Question("name")
-    town = yield Question("town")
-    friend = yield Question("friend")
+    name: Answer = yield Question("name")
+    town: Answer = yield Question("town")
+    friend: Answer = yield Question("friend")
     return Result(f"{name} of {town}, friend {friend}")
 
 def drive_from_dict(

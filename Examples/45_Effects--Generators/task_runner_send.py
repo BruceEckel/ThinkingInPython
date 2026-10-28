@@ -14,7 +14,7 @@ def answer(request: Request) -> Reply:
     return REPLIES.get(request, "ok")
 
 def download() -> Generator[Request, Reply]:
-    reply = yield "download: headers?"
+    reply: Reply = yield "download: headers?"
     print(f"download: {reply}")
     yield "download: checksum"
 

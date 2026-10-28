@@ -83,9 +83,9 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield Question("name")
-    town = yield Question("town")
-    friend = yield Question("friend")
+    name: Answer = yield Question("name")
+    town: Answer = yield Question("town")
+    friend: Answer = yield Question("friend")
     return Result(f"{name} of {town}, friend {friend}")
 ```
 
@@ -563,7 +563,7 @@ here it takes a list:
 from collections.abc import Iterator
 
 def relay() -> Iterator[int | None]:
-    v = yield from [1, 2, 3]
+    v: None = yield from [1, 2, 3]
     yield v
 
 print(list(relay()))
@@ -599,8 +599,8 @@ from collections.abc import Generator
 from collect import collect
 
 def both() -> Generator[str, int]:
-    alpha = yield from collect("alpha")  # [1]
-    beta = yield from collect("beta")  # [2]
+    alpha: int = yield from collect("alpha")  # [1]
+    beta: int = yield from collect("beta")  # [2]
     yield f"total {alpha + beta}"  # [3]
 
 g = both()
@@ -750,7 +750,7 @@ def proxy(
             answer = known[request]  # [1]
             print(f"  proxy answers {request}")
         else:
-            answer = yield request  # [2]
+            answer: Answer = yield request  # [2]
         try:
             request = inner.send(answer)
         except StopIteration as stop:
@@ -974,7 +974,7 @@ def answer(request: Request) -> Reply:
     return REPLIES.get(request, "ok")
 
 def download() -> Generator[Request, Reply]:
-    reply = yield "download: headers?"
+    reply: Reply = yield "download: headers?"
     print(f"download: {reply}")
     yield "download: checksum"
 
