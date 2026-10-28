@@ -34,7 +34,7 @@ They sit in three groups by what they share: language and implementation idioms
 (most of them tied to C++ or Java's limits), functional idioms,
 and dependency supply (patterns that supply a collaborator from outside).
 Everything else sits in [Other Patterns and Idioms](#other-patterns-and-idioms),
-whose rows share no trait.
+a catch-all section.
 The source and group tables list their rows alphabetically.
 GoF lists the classic patterns in the same order.
 
