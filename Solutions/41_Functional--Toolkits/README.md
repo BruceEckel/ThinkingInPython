@@ -60,7 +60,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 The loop version runs two lines longer than the recursive one,
 a difference too small to decide between them.
 The rewrite changes how much of the bookkeeping is yours.
-The recursive version names no stack.
+The recursive version lets Python keep the stack.
 The call stack holds the sublists still to walk, and `return` pops one.
 In the loop version you allocate the stack, seed it with a copy of `items`,
 choose `pop()` over `pop(0)`, and choose `extend()` over `append()`.
@@ -322,7 +322,8 @@ If you wrap `groupby()` in a dictionary comprehension,
 the demo prints `{'B': ['b'], 'A': ['a']}`.
 The second `"b"` group replaces the first under the same key,
 so the result holds one of the two `"b"` items.
-Python raises no exception, and the type checker accepts the function.
+Python runs the comprehension to the end,
+and the type checker accepts the function.
 In the solution's `defaultdict`,
 a key that appears again adds its item to the existing group instead of replacing it.
 
