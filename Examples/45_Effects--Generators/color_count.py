@@ -25,7 +25,7 @@ def visit(
     return counts
 
 def census(tree: Tree) -> Iterator[str]:
-    counts = yield from visit(tree)
+    counts: Counter = yield from visit(tree)
     for color, n in counts.items():
         yield f"{n} {color}"
 
