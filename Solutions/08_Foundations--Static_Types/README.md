@@ -339,7 +339,7 @@ a different design, a detail, or an equivalent alternative.
 
 > Run `ty check` on `type_defaults.py` and read what it reports for `reveal_type(words.top())`.
 > Remove the `= str` default and run it again.
-> The type checker reports no error either way.
+> The type checker accepts the file either way.
 > Say what that means for a bare `Stack` annotation.
 
 <details>
@@ -402,7 +402,7 @@ print(words.top().upper())
 #: BETA
 ```
 
-Without the default, `ty` reports `Unknown` and finds no errors in the file.
+Without the default, `ty` reports `Unknown` and accepts the file.
 An unsolved type parameter becomes `Unknown`.
 The checker accepts any operation on an `Unknown` value,
 so every expression built on that value passes.
