@@ -471,7 +471,7 @@ and neither checks which methods the proxy supplies:
 -   A `__class__` property returning the implementation's class makes `isinstance()` test that class in place of `Proxy`.
 
 Both workarounds satisfy the runtime check.
-Neither satisfies a type checker.
+Neither satisfies the type checker.
 Inheritance satisfies both checks.
 `proxy_interface.py`'s `Proxy` inherits `Service`,
 so `isinstance(p, Service)` returns `True`,
