@@ -858,7 +858,7 @@ class Subscripted:
 the `= {}` version fails at the class definition with `mutable default <class 'dict'> for field index is not allowed: use default_factory`,
 and both fixed versions build an empty index.
 Changing the subscripted factory to `dict[int, int]` makes `uv run ty check` report `invalid-assignment`;
-swapping the bare `dict` for `list` draws no report.
+swapping the bare `dict` for `list` passes the check.
 
 <details>
 <summary>Solution</summary>
