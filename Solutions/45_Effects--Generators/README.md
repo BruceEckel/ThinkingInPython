@@ -531,10 +531,12 @@ then yields it as a string of its own.
 # The shape of exercise_5.py
 from collections.abc import Generator
 
-def emit(items: list[str]) -> Generator[str, None, int]:
+type Size = int
+
+def emit(items: list[str]) -> Generator[str, None, Size]:
     ...
 
-def report(items: list[str]) -> Generator[str, None, int]:
+def report(items: list[str]) -> Generator[str, None, Size]:
     ...
 
 def summarize(items: list[str]) -> Generator[str]:
@@ -559,20 +561,22 @@ so the count reaches `summarize()` through a second return:
 # exercise_5.py
 from collections.abc import Generator
 
-def emit(items: list[str]) -> Generator[str, None, int]:
+type Size = int
+
+def emit(items: list[str]) -> Generator[str, None, Size]:
     total = 0
     for item in items:
         yield item
         total += len(item)
     return total
 
-def report(items: list[str]) -> Generator[str, None, int]:
-    size: int = yield from emit(items)
+def report(items: list[str]) -> Generator[str, None, Size]:
+    size: Size = yield from emit(items)
     yield f"({size} characters)"
     return size
 
 def summarize(items: list[str]) -> Generator[str]:
-    counted: int = yield from report(items)
+    counted: Size = yield from report(items)
     yield f"total: {counted}"
 
 print(list(summarize(["red", "green", "blue"])))
@@ -580,18 +584,18 @@ print(list(summarize(["red", "green", "blue"])))
 ```
 
 **Declare the return channel.**
-`report()`'s annotation changes from `Iterator[str]` to `Generator[str, None, int]`,
+`report()`'s annotation changes from `Iterator[str]` to `Generator[str, None, Size]`,
 because a generator that returns something needs the long form.
 Under `Iterator[str]` a generator must return `None`,
 so `ty` rejects `report()`'s `return size` with an `invalid-return-type`:
-expected `None`, found `int`.
+expected `None`, found `Size`.
 
 If you change `report()`'s annotation but leave out `return size`,
 the script still runs, and the printed list ends with `'total: None'`.
 `report()` returns `None`,
 and the `yield from` in `summarize()` delivers that `None` into `counted`.
 `ty` reports an `invalid-return-type` on the annotation,
-because `report()` declares an `int` and, with no `return` statement,
+because `report()` declares a `Size` and, with no `return` statement,
 returns `None`.
 
 **Keep the strings and the count apart.**
