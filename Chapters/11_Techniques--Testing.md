@@ -715,7 +715,7 @@ Because of that restoration, a later test calls the real `randint()`.
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
 Better still, have the code accept a `random.Random` instance,
-so a test passes a seeded `random.Random(0)` and needs no patching:
+so a test passes a seeded `random.Random(0)` instead of patching `randint()`:
 
 ```python
 # dice_rng.py
@@ -797,7 +797,7 @@ def test_elapsed() -> None:
 ```
 
 Both tests check the same arithmetic.
-`test_stopwatch_clock.py` needs no `monkeypatch`,
+`test_stopwatch_clock.py` passes a lambda where `test_stopwatch.py` patches `time.monotonic()`,
 because the `elapsed()` it tests takes its source of time as a parameter.
 
 The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
@@ -806,7 +806,7 @@ you widen every signature along the way,
 or introduce a context object to carry the parameter.
 [Concurrency](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 shows `ContextVar`, which carries such a value down the call chain and leaves every signature as it was.
-`monkeypatch` adds no parameters.
+`monkeypatch` also leaves the signatures as they are.
 It patches the name in place,
 and the patch applies process-wide until teardown restores the name.
 Choose injection when the parameter sits near the boundary.
@@ -946,7 +946,7 @@ so a test keeps passing after the real signature changes.
 builds a mock from the real function and checks each call against the real function's signature.
 
 This book patches with `monkeypatch` and prefers injection where you can change the code,
-because a function that takes its clock or its fetcher as an argument needs no patching library.
+because you test a function that takes its clock or its fetcher as an argument by calling it with a stand-in.
 
 ## Property-Based Testing
 
