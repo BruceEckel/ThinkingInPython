@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated, Final
 from effect_names import Console, FileSystem
 from effect_rows import performs
-from row_check import Report, check, lines
+from row_check import ModuleName, Report, check, lines
 
 def read(
     path: Path,
@@ -12,7 +12,7 @@ def read(
 
 def load(
     paths: list[Path],
-) -> Annotated[dict[str, str], performs(FileSystem)]:
+) -> Annotated[dict[ModuleName, str], performs(FileSystem)]:
     return {path.stem: read(path) for path in paths}
 
 def show(

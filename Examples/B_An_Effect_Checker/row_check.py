@@ -5,6 +5,8 @@ from infer_rows import Rows, body_row, infer
 from record import record
 from result import Err, Ok
 
+type ModuleName = str
+
 @record
 class Undeclared:
     where: str
@@ -34,7 +36,7 @@ def undeclared(
     ]
 
 def check(
-    sources: dict[str, str], table: Table = STDLIB
+    sources: dict[ModuleName, str], table: Table = STDLIB
 ) -> Report:
     known: dict[str, Facts] = {}
     findings: list[Finding] = []

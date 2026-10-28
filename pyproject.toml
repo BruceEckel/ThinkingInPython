@@ -189,6 +189,7 @@ lines-after-imports = 1
 "**/two_games.py" = ["I001"]
 "**/vending_demo.py" = ["I001"]
 "**/function_facts.py" = ["I001"]
+"**/local_types.py" = ["I001"]
 
 # Examples run with cwd set to their chapter dir; adding the tree's utils/
 # directory to the import path lets test files import shared helpers

@@ -1,16 +1,17 @@
 # local_types.py
 import ast
 from typing import TypeIs
-from call_names import UNRESOLVED, Scope, imports_of
+from call_names import (FullName, UNRESOLVED, Scope,
+                        imports_of)
 
 type Def = ast.FunctionDef | ast.AsyncFunctionDef
 
 def assigned(
     body: list[ast.stmt], scope: Scope
-) -> dict[str, str]:
-    types: dict[str, str] = {}
-    written: dict[str, str] = {}
-    values: dict[ast.AST, str] = {}
+) -> dict[str, FullName]:
+    types: dict[str, FullName] = {}
+    written: dict[str, FullName] = {}
+    values: dict[ast.AST, FullName] = {}
     nodes = (n for stmt in body for n in ast.walk(stmt))
     for node in nodes:
         match node:
@@ -34,7 +35,7 @@ def assigned(
 
 def parameters(
     func: Def, scope: Scope, owner: str
-) -> dict[str, str]:
+) -> dict[str, FullName]:
     args = func.args
     positional = args.posonlyargs + args.args
     every = positional + args.kwonlyargs

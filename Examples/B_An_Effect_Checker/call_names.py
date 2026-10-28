@@ -4,8 +4,10 @@ import builtins
 from typing import Final
 from record import record
 
-UNRESOLVED: Final[str] = "?"
-LITERALS: Final[dict[type[ast.expr], str]] = {
+type FullName = str
+
+UNRESOLVED: Final[FullName] = "?"
+LITERALS: Final[dict[type[ast.expr], FullName]] = {
     ast.List: "builtins.list",
     ast.ListComp: "builtins.list",
     ast.Dict: "builtins.dict",
@@ -19,8 +21,8 @@ LITERALS: Final[dict[type[ast.expr], str]] = {
 def top_of(name: str) -> str:
     return name.split(".")[0]
 
-def imports_of(tree: ast.Module) -> dict[str, str]:
-    found: dict[str, str] = {}
+def imports_of(tree: ast.Module) -> dict[str, FullName]:
+    found: dict[str, FullName] = {}
     for node in ast.walk(tree):
         match node:
             case ast.Import(names=aliases):
@@ -50,11 +52,11 @@ def dotted(node: ast.expr) -> list[str]:
 @record
 class Scope:
     module: str
-    names: dict[str, str]
+    names: dict[str, FullName]
     defined: frozenset[str]
-    types: dict[str, str]
+    types: dict[str, FullName]
 
-    def name(self, name: str) -> str:
+    def name(self, name: str) -> FullName:
         if name in self.types:
             return UNRESOLVED
         if name in self.names:
@@ -65,7 +67,7 @@ class Scope:
             return f"builtins.{name}"
         return UNRESOLVED
 
-    def annotation(self, node: ast.expr) -> str:
+    def annotation(self, node: ast.expr) -> FullName:
         match node:
             case ast.Subscript(value=value, slice=inner):
                 outer = self.annotation(value)
@@ -78,7 +80,7 @@ class Scope:
             case _:
                 return UNRESOLVED
 
-    def type_of(self, node: ast.expr) -> str:
+    def type_of(self, node: ast.expr) -> FullName:
         match node:
             case ast.Constant(value=str()):
                 return "builtins.str"
@@ -91,7 +93,7 @@ class Scope:
             case _:
                 return LITERALS.get(type(node), UNRESOLVED)
 
-    def callee(self, func: ast.expr) -> str:
+    def callee(self, func: ast.expr) -> FullName:
         match func:
             case ast.Name(id=name):
                 return self.name(name)

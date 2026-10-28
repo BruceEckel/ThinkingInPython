@@ -201,8 +201,10 @@ import builtins
 from typing import Final
 from record import record
 
-UNRESOLVED: Final[str] = "?"
-LITERALS: Final[dict[type[ast.expr], str]] = {
+type FullName = str
+
+UNRESOLVED: Final[FullName] = "?"
+LITERALS: Final[dict[type[ast.expr], FullName]] = {
     ast.List: "builtins.list",
     ast.ListComp: "builtins.list",
     ast.Dict: "builtins.dict",
@@ -216,8 +218,8 @@ LITERALS: Final[dict[type[ast.expr], str]] = {
 def top_of(name: str) -> str:
     return name.split(".")[0]
 
-def imports_of(tree: ast.Module) -> dict[str, str]:
-    found: dict[str, str] = {}
+def imports_of(tree: ast.Module) -> dict[str, FullName]:
+    found: dict[str, FullName] = {}
     for node in ast.walk(tree):
         match node:
             case ast.Import(names=aliases):
@@ -266,11 +268,11 @@ It is recursive, as the tree is.
 @record
 class Scope:
     module: str
-    names: dict[str, str]
+    names: dict[str, FullName]
     defined: frozenset[str]
-    types: dict[str, str]
+    types: dict[str, FullName]
 
-    def name(self, name: str) -> str:
+    def name(self, name: str) -> FullName:
         if name in self.types:
             return UNRESOLVED
         if name in self.names:
@@ -281,7 +283,7 @@ class Scope:
             return f"builtins.{name}"
         return UNRESOLVED
 
-    def annotation(self, node: ast.expr) -> str:
+    def annotation(self, node: ast.expr) -> FullName:
         match node:
             case ast.Subscript(value=value, slice=inner):
                 outer = self.annotation(value)
@@ -294,7 +296,7 @@ class Scope:
             case _:
                 return UNRESOLVED
 
-    def type_of(self, node: ast.expr) -> str:
+    def type_of(self, node: ast.expr) -> FullName:
         match node:
             case ast.Constant(value=str()):
                 return "builtins.str"
@@ -307,7 +309,7 @@ class Scope:
             case _:
                 return LITERALS.get(type(node), UNRESOLVED)
 
-    def callee(self, func: ast.expr) -> str:
+    def callee(self, func: ast.expr) -> FullName:
         match func:
             case ast.Name(id=name):
                 return self.name(name)
@@ -575,16 +577,17 @@ The local-type helpers that `function_facts.py` imports fill a `Scope` from a fu
 # local_types.py
 import ast
 from typing import TypeIs
-from call_names import UNRESOLVED, Scope, imports_of
+from call_names import (FullName, UNRESOLVED, Scope,
+                        imports_of)
 
 type Def = ast.FunctionDef | ast.AsyncFunctionDef
 
 def assigned(
     body: list[ast.stmt], scope: Scope
-) -> dict[str, str]:
-    types: dict[str, str] = {}
-    written: dict[str, str] = {}
-    values: dict[ast.AST, str] = {}
+) -> dict[str, FullName]:
+    types: dict[str, FullName] = {}
+    written: dict[str, FullName] = {}
+    values: dict[ast.AST, FullName] = {}
     nodes = (n for stmt in body for n in ast.walk(stmt))
     for node in nodes:
         match node:
@@ -608,7 +611,7 @@ def assigned(
 
 def parameters(
     func: Def, scope: Scope, owner: str
-) -> dict[str, str]:
+) -> dict[str, FullName]:
     args = func.args
     positional = args.posonlyargs + args.args
     every = positional + args.kwonlyargs
@@ -932,6 +935,8 @@ from infer_rows import Rows, body_row, infer
 from record import record
 from result import Err, Ok
 
+type ModuleName = str
+
 @record
 class Undeclared:
     where: str
@@ -961,7 +966,7 @@ def undeclared(
     ]
 
 def check(
-    sources: dict[str, str], table: Table = STDLIB
+    sources: dict[ModuleName, str], table: Table = STDLIB
 ) -> Report:
     known: dict[str, Facts] = {}
     findings: list[Finding] = []
@@ -1193,7 +1198,7 @@ from pathlib import Path
 from typing import Annotated, Final
 from effect_names import Console, FileSystem
 from effect_rows import performs
-from row_check import Report, check, lines
+from row_check import ModuleName, Report, check, lines
 
 def read(
     path: Path,
@@ -1202,7 +1207,7 @@ def read(
 
 def load(
     paths: list[Path],
-) -> Annotated[dict[str, str], performs(FileSystem)]:
+) -> Annotated[dict[ModuleName, str], performs(FileSystem)]:
     return {path.stem: read(path) for path in paths}
 
 def show(
