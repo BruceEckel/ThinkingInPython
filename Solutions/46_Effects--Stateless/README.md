@@ -502,7 +502,7 @@ a different design, a detail, or an equivalent alternative.
 
 > Add a `Metal` material to `test_nailer.py` with a strength that survives the robotic nailer,
 > and add its two rows to the table.
-> Then explain why the test function body needs no change.
+> Then explain why the test function body stays the same.
 
 <details>
 <summary>Where to look</summary>
@@ -581,13 +581,13 @@ print(run(supply(METAL, ROBOTIC)(holds)()))
 so both its rows read `True`.
 
 **Build each environment from a row.**
-The test function body needs no change because every material and nailer arrives as an argument.
+The test function body stays the same because every material and nailer arrives as an argument.
 The `parametrize` table decides which material and nailer the body receives,
 so adding a row adds a case and leaves the function body that runs it as it is.
 
 That split between the table and the body is the chapter's split between an Effect and its environment,
 applied to a test.
-`holds()` declares two requirements and names no instance,
+`holds()` declares two requirements and leaves the instances to `supply()`,
 so every combination of instances is a valid environment for it.
 The parametrize table is a list of environments,
 and the test body is the driver that runs the Effect in each one.
@@ -829,7 +829,7 @@ and its exercise 4 show the same silence for a generator with no Effect in it.
 The declared `Need[Console]` in the return type still holds,
 since a declaration says what the function may request, not what it must.
 The chapter warns about this deletion.
-A bare `greet(name)` passes every check and prints no greeting.
+A bare `greet(name)` passes every check and silently drops the greeting.
 
 Removing the `yield from` in front of `need(Console)` in `greet()` draws two diagnostics:
 
@@ -864,7 +864,7 @@ a `Generator` rather than a `Console`.
 
 The difference between the two cases is whether anything later uses the dropped value.
 The discarded `greet(name)` ends at its statement,
-so the type checker has no later use to compare with its type, and accepts it.
+so the type checker evaluates that statement alone and accepts it.
 Assigning `need(Console)` binds a generator to `console`,
 and the next line calls `print()` on it as if it were a `Console`.
 The type checker evaluates that call and rejects it.
