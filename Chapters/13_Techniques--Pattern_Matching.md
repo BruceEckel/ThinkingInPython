@@ -489,17 +489,72 @@ print(handle({"button": 1}))
 #: Unrecognized event: {'button': 1}
 ```
 
-Binding through a mapping pattern loses type information a class pattern keeps.
-`handle()`'s parameter is `event: dict[str, object]`,
-so `x` and `y` come out typed `object`,
-the same as every other value the dictionary could hold.
-The shape test is precise,
-but each binding takes the dictionary's one declared value type.
+A `TypedDict` declares a value type for each key.
+Here `handle()` takes a union of two `TypedDict` classes,
+each with a `Literal` value for its `"type"` key:
+
+```python
+# typed_events.py
+from typing import Literal, TypedDict
+
+class Click(TypedDict):
+    type: Literal["click"]
+    x: int
+    y: int
+
+class Key(TypedDict):
+    type: Literal["key"]
+    key: str
+
+type Event = Click | Key
+
+def handle(event: Event) -> str:
+    match event:
+        case {"type": "click", "x": x, "y": y}:
+            return f"Click at ({x}, {y}), sum {x + y}"
+        case {"type": "key", "key": key}:
+            return f"Key {key.upper()}"
+        case _:
+            return "Unrecognized event"
+
+print(handle({"type": "click", "x": 10, "y": 20}))
+#: Click at (10, 20), sum 30
+print(handle({"type": "key", "key": "Enter"}))
+#: Key ENTER
+```
+
+`mapping_patterns.py` loses type information through its annotation,
+not its patterns.
+Its parameter is `event: dict[str, object]`,
+so each binding takes the dictionary's one declared value type and comes out typed `object`.
+If you add `{x + y}` to its first `case`, `ty` reports `unsupported-operator`,
+because `object` defines no `+`.
+
+In `typed_events.py` the `Literal` value of `"type"` does the narrowing.
+The pattern `{"type": "click", ...}` matches that key against `"click"`,
+a value `Click` alone can hold,
+so the type checker narrows `Event` to `Click` and binds `x` and `y` as `int`.
+The pattern `{"type": "key", ...}` narrows to `Key` the same way,
+which makes `key` a `str` with an `upper()` method.
+
+At runtime a `TypedDict` instance is a `dict`, so the event stays a dictionary.
+That suits an event that arrives as JSON,
+since `json.loads()` returns a `dict` that `handle()` matches directly.
+The type checker enforces the declared keys and types;
+at runtime `handle()` accepts any `dict`.
+[Typing `**kwargs` with a `TypedDict`](08_Foundations--Static_Types.md#typed-kwargs)
+introduces the construct.
+
+[Which Should You Use?](28_Patterns--Data_Transfer_Objects.md#which-should-you-use)
+describes when a `TypedDict` fits better than a data class.
+For pattern matching,
+the choice depends on what the program does with the data next.
 `class_patterns.py`'s `Point(x, y)` binds `x` and `y` as `int`,
 because `Point` declares its fields that way.
-When the data has a known shape, parse it into a data class first,
-then match on the data class.
+When the program must validate the data or goes on to compute with it,
+parse it into a data class first, then match on the data class.
 You keep the shape test and gain the field types.
+When the data must stay a dict, a `TypedDict` gives the bindings their types.
 
 ## Patterns Nest
 
