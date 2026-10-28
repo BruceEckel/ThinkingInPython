@@ -428,7 +428,7 @@ and the class gets `__module__` set to `"builtins"`.
 `pickle.dumps()` on an instance then raises a `PicklingError`,
 because pickle looks the class up as `builtins.Start` and does not find it.
 `inspect.getsource()` raises a `TypeError`,
-because `inspect` takes the class for a built-in, compiled into the interpreter.
+because `inspect` treats the class as a built-in, compiled into the interpreter.
 
 `type()`-built classes fail differently.
 `type()` sets `LightOn`'s `__module__` to `events`,
