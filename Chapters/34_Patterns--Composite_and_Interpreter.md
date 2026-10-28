@@ -196,7 +196,8 @@ including the `assert_never()` in each `case _`.
 `walk()` is a generator, so traversing a composite is lazy.
 The [`yield from`](22_Patterns--Iterators.md#delegating-with-yield-from)
 flattens the recursion into a single stream of paths.
-A consumer of that stream receives path strings and needs no case for `File` or `Directory`.
+A consumer of that stream receives path strings.
+The `match` on `File` and `Directory` stays inside `walk()`.
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
 A record freezes the binding of the field, not the object bound to it.
@@ -258,8 +259,8 @@ which makes `pathlib` look like a *Composite*.
 `iterdir()` lists one directory and `rglob()` walks the whole tree.
 Both yield a `Path` for each entry, whatever its kind.
 `pathlib` lacks the structure.
-A `Path` is an immutable value that names a location and holds no entries.
-The tree lives in the operating system's filesystem.
+A `Path` is an immutable value that names a location.
+The entries and the tree they form live in the operating system's filesystem.
 `iterdir()` asks the OS for the children each time you call it.
 The caller must add up any result over that tree, as `disk_usage()` does.
 On a directory, `stat().st_size` reports the size of the directory itself rather than the size of its contents,
@@ -567,7 +568,7 @@ Each walker supplies the meaning, so a new operation is one more walker.
 [*Visitor*](33_Patterns--Visitor.md)
 exists to add new operations to an existing hierarchy from outside it.
 `to_infix()` is one such operation, and every node class stays unchanged.
-The `match` version needs no `accept()` method and no visitor classes.
+The `match` version replaces the `accept()` methods and the visitor classes with one function.
 Unlike `singledispatch`, it binds the nodes' fields in the patterns.
 
 ## Simplification Rewrites the Tree
