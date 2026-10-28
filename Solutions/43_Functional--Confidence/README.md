@@ -97,7 +97,8 @@ not how many processes the pool started.
 
 The number depends on the core count, the task sizes, and scheduling,
 so it is reproducible on your machine and nowhere else.
-Because of that dependence, the listing has no `#:` marker for it.
+Because of that dependence,
+the count appears here in prose rather than in a `#:` marker.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -374,7 +375,7 @@ def test_upper_leaves_the_micro_sign_in_the_greek_block(
 **Trace the round trip.**
 `µ` is U+00B5 MICRO SIGN,
 a character Latin-1 kept separate from the Greek letter it resembles.
-It has no uppercase form of its own,
+It shares its uppercase form with that Greek letter,
 so `.upper()` maps it to U+039C GREEK CAPITAL LETTER MU.
 The round trip ends in a different Unicode block from the one where it started.
 
@@ -519,7 +520,7 @@ Crashing contradicts what the function does everywhere else.
 The `group_rounds()` in [Functional Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size)
 includes the guard, so `test_group_rounds.py` passes with no `assume()`.
 
-Finding the defect takes no cleverness and no thought about edge cases.
+Finding the defect is a mechanical search.
 Hypothesis prefers small examples,
 so it soon generates a roster of `2` against a size of `3`.
 The property states what holds for every roster.
