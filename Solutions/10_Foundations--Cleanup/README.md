@@ -418,7 +418,8 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [The `self.close` Trap](../../Chapters/10_Foundations--Cleanup.md#the-self-close-trap)
-shows why a callback must hold no reference to the object whose collection triggers it.
+shows why a callback must carry what it needs, such as a name,
+rather than the object whose collection triggers it.
 `self.close` is a bound method, so ask what a bound method stores.
 Then ask what holds the callback,
 and what that means for the reference count when you `del b`.
@@ -755,7 +756,8 @@ An `__enter__()` that fails has not returned, so `__exit__()` does not run.
 in the method that acquired it.
 
 Acquiring in `__enter__()` still helps.
-A `Guarded` whose `__init__()` fails for some other reason holds no resource at that point.
+If `Guarded.__init__()` fails for some other reason,
+the failure comes before `__enter__()` acquires the resource.
 Moving the acquisition leaves the guard just as necessary, though.
 Whichever method acquires a resource,
 a step that can fail after the acquisition must release the resource before the exception propagates.
