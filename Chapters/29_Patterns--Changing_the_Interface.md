@@ -177,7 +177,7 @@ The commented-out signature in `adapter_variations.py`,
 `op(self, item: WhatIHave) -> None`, accepts a `WhatIHave` alone,
 the case Approach 2 adds.
 If you use that signature in place of the union,
-a type checker rejects the override.
+the type checker rejects the override.
 A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts.
 That refusal breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
 `ty` reports the rejection as `invalid-method-override`:
@@ -569,7 +569,7 @@ which keeps it working and tells each caller to move.
 `warnings.deprecated()` marks a function, method,
 or class as scheduled for removal
 (Python 3.13 and later; `typing_extensions.deprecated` before that).
-Both a type checker and the runtime act on the mark:
+Both the type checker and the runtime act on the mark:
 
 ```python
 # deprecating.py
@@ -617,7 +617,7 @@ A warning goes to standard error, but a `#:` marker captures standard output.
 Much existing code marks a deprecation with a `warnings.warn()` call inside the function body,
 with `DeprecationWarning` as the category.
 That call supplies the runtime half alone,
-since a type checker reads it as an ordinary function call.
+since the type checker reads it as an ordinary function call.
 
 `warnings.deprecated()` requires the message.
 That message should say what to use instead.
