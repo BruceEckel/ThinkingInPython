@@ -1921,7 +1921,7 @@ not merely an equal one.
 
 `dunder`'s type is `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
 naming each sentinel value rather than the generic `sentinel` class,
-so a type checker narrows `dunder` to `Sequence[str]` once it rules out both sentinels.
+so the type checker narrows `dunder` to `Sequence[str]` once it rules out both sentinels.
 `name in dunder` then needs no further guard.
 
 `display_object()` reports differently under `INTERESTING_DUNDERS` and `REDEFINED_DUNDERS`,
