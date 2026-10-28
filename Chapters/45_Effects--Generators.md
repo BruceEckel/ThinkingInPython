@@ -141,8 +141,7 @@ which encounters `return` instead of another `yield`,
 so the generator returns its `Result`.
 The caller sees that `return` as a `StopIteration`,
 and the `Result` arrives as the exception's `value`.
-A `for` loop loses that value,
-because it catches the `StopIteration` and discards the exception.
+A `for` loop treats `StopIteration` as a normal end-of-loop so it discards the exception and loses the return value.
 To read the `ReturnType`, catch the exception yourself,
 as `drive_by_hand.py` does.
 
@@ -162,6 +161,11 @@ Resuming runs the body from that position, with every local variable intact.
 In `drive_by_hand.py`,
 `inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
 The position and the locals together are the generator's state.
+A [closure](40_Functional--Foundations.md#closures)
+keeps its captured variables between calls,
+but each call runs its body from the top.
+The generator keeps its place as well,
+so a loop or a branch in progress survives the suspension.
 The generator is an ordinary object,
 so that state lasts as long as something holds a reference to the generator.
 
