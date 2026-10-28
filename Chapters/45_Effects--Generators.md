@@ -264,7 +264,7 @@ ANSWERS: Final[dict[Question, Answer]] = {
 def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer],
           *, show_state: bool = False) -> Result:
-    request = next(conversation)
+    request: Question = next(conversation)
     while True:
         answer = answers[request]
         line = f"{request = }, {answer = }"
