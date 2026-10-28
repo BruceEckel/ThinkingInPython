@@ -60,9 +60,11 @@ reading and writing the module-level `balance`:
 
 ```python
 # not_transparent.py
-balance = 100
+type Balance = int
 
-def withdraw(amount: int) -> int:
+balance: Balance = 100
+
+def withdraw(amount: int) -> Balance:
     global balance
     balance -= amount
     return balance
@@ -125,10 +127,12 @@ decorating it with `lru_cache` leaves `balance` wrong:
 # cached_withdraw.py
 from functools import lru_cache
 
-balance = 100
+type Balance = int
+
+balance: Balance = 100
 
 @lru_cache
-def withdraw(amount: int) -> int:
+def withdraw(amount: int) -> Balance:
     global balance
     balance -= amount
     return balance

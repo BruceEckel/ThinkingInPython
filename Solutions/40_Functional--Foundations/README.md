@@ -20,7 +20,9 @@ Call it twice with the same argument and compare the two results.
 
 ```python
 # The shape of exercise_1.py
-def deposit(amount: int) -> int:
+type Balance = int
+
+def deposit(amount: int) -> Balance:
     ...
 ```
 
@@ -37,9 +39,11 @@ and say what you must know to predict a call's result.
 
 ```python
 # exercise_1.py
-balance = 100
+type Balance = int
 
-def deposit(amount: int) -> int:
+balance: Balance = 100
+
+def deposit(amount: int) -> Balance:
     global balance
     balance += amount
     return balance

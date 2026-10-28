@@ -1,11 +1,13 @@
 # pure_functions.py
+type Balance = int
+
 # Pure: the result depends only on the arguments:
 def double(x: int) -> int:
     return x * 2
 
 # Impure: it depends on and mutates outside state:
-balance = 100
-def withdraw(amount: int) -> int:
+balance: Balance = 100
+def withdraw(amount: int) -> Balance:
     global balance
     balance -= amount
     return balance

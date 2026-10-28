@@ -1,7 +1,9 @@
 # not_transparent.py
-balance = 100
+type Balance = int
 
-def withdraw(amount: int) -> int:
+balance: Balance = 100
+
+def withdraw(amount: int) -> Balance:
     global balance
     balance -= amount
     return balance

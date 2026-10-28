@@ -1,7 +1,9 @@
 # exercise_1.py
-balance = 100
+type Balance = int
 
-def deposit(amount: int) -> int:
+balance: Balance = 100
+
+def deposit(amount: int) -> Balance:
     global balance
     balance += amount
     return balance
