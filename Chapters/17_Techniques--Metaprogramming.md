@@ -44,7 +44,7 @@ The instance stays as it was.
 
 What creates these "class" objects?
 Other special objects, called *metaclasses*.
-The default metaclass is `type`, and almost every class needs no other.
+The default metaclass is `type`, and it serves almost every class.
 You can customize how Python produces classes by running extra code or injecting members as it builds each class.
 That is metaclass programming.
 
@@ -428,13 +428,12 @@ and the class gets `__module__` set to `"builtins"`.
 `pickle.dumps()` on an instance then raises a `PicklingError`,
 because pickle looks the class up as `builtins.Start` and does not find it.
 `inspect.getsource()` raises a `TypeError`,
-because a built-in class carries no source.
+because `inspect` takes the class for a built-in, compiled into the interpreter.
 
 `type()`-built classes fail differently.
 `type()` sets `LightOn`'s `__module__` to `events`,
 the module where `make()` calls `type()`.
-But the `makers` dict holds the class,
-and `events` has no attribute named `LightOn`.
+But the class lives in the `makers` dict, not as an attribute of `events`.
 Pickle therefore looks for `events.LightOn` and does not find that either.
 `inspect.getsource()` raises an `OSError` instead of a `TypeError`.
 For both generators' classes, then,
@@ -870,8 +869,8 @@ and `frozen_default=True` tells the checker that classes built by `model()` reje
 a decorator that builds a class's methods from its field declarations.
 The checker cannot represent a class built any other way,
 because it neither imports nor executes your code.
-The checker emulates the constructs it recognizes, accepts what you declare,
-and has no other source of information about a class.
+The checker learns about a class from two sources alone:
+the constructs it recognizes and emulates, and what you declare.
 That is why `commander.py` uses a `cast()` to state the real signature.
 Its class exists only as [text in a string](#generating-classes-with-exec).
 
@@ -1177,7 +1176,7 @@ The difference is timing.
 `__new__()` runs before the class object exists, so it can change the name,
 bases, and namespace that Python uses to build it.
 `__init__()` runs after the class exists,
-so changing those arguments has no effect,
+so changing those arguments leaves the class as it was,
 though you can still modify the finished class object:
 
 ```python
@@ -1653,7 +1652,7 @@ and raises a `TypeError` for a class that is not a `Protocol`.
 `display_object()` walks every member that `inspect.getmembers_static()` returns.
 The static variant reads members from the `__dict__` of the object and of each of its classes,
 without invoking descriptors, properties, or `__getattr__()`.
-Inspecting an object therefore runs none of its properties or descriptors,
+Inspecting an object therefore reads what those dictionaries hold,
 which makes the tool safe to point at something unfamiliar.
 
 The tool sorts each member into one of two lists.
@@ -1912,8 +1911,7 @@ because a class inherits `object`'s version of any it leaves out,
 and the report lists an inherited dunder the same way as one the class wrote.
 `REDEFINED_DUNDERS` filters harder.
 Among those same four,
-it keeps only the ones whose value differs from `object`'s version,
-so a class that overrides none of them shows no dunders.
+it keeps only the ones whose value differs from `object`'s version.
 
 The comparison uses `is`, not `==`,
 since a dunder inherited unchanged from `object` is the same function object,
@@ -1922,7 +1920,7 @@ not merely an equal one.
 `dunder`'s type is `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
 naming each sentinel value rather than the generic `sentinel` class,
 so the type checker narrows `dunder` to `Sequence[str]` once it rules out both sentinels.
-`name in dunder` then needs no further guard.
+The type checker then accepts `name in dunder` as written.
 
 `display_object()` reports differently under `INTERESTING_DUNDERS` and `REDEFINED_DUNDERS`,
 on an empty class and on one that redefines almost everything:
@@ -1974,7 +1972,7 @@ display_object(Point, REDEFINED_DUNDERS,
 #:   • __repr__(self)
 ```
 
-`Plain` writes none of the four,
+`Plain` inherits all four from `object`,
 so `INTERESTING_DUNDERS` shows `object`'s versions and `REDEFINED_DUNDERS` shows `None` under both headings.
 `@dataclass` writes three of them and sets `__hash__` to `None`,
 so `Point` reports a `__hash__` attribute rather than a method.
