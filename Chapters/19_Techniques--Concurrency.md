@@ -216,7 +216,7 @@ At the `await` each task suspends.
 It stops executing, saves its position in the function,
 and hands control back to the event loop.
 
-A suspended task runs no bytecode and uses no processor time.
+A suspended task sits idle and leaves the processor to the other tasks.
 Local variables keep their values until the task resumes.
 The event loop starts the next task,
 so all three are in flight during the first wait.
@@ -580,8 +580,7 @@ so all six are in flight together.
 The `tasks` dict holds the task objects so the loop after the block can read each outcome.
 The `TaskGroup` holds its own strong references until the block exits.
 Those references matter because the event loop keeps only weak references to its tasks.
-A task that loses its last strong reference can disappear mid-execution,
-printing nothing and raising no exception.
+A task that loses its last strong reference can silently disappear mid-execution.
 Outside a `TaskGroup`,
 keep the returned task in a variable or a set that outlives the task.
 
@@ -712,14 +711,15 @@ asyncio.run(main())
 
 `gather()` leaves its siblings unsupervised, where `TaskGroup` cancels them,
 so `e` and `f` keep sleeping and eventually print their `fetched` line.
-The `gather()` call returns normally, so the call site needs no `try`/`except*`.
+The `gather()` call returns normally,
+so the call site reads each failure from `results`.
 
 That behavior is `gather()`'s alternative to `TaskGroup`'s all-or-cancel contract.
 For a batch where partial failure is data to examine rather than a reason to stop,
 `return_exceptions=True` collects failures as values instead of cancelling the tasks still in flight.
 A health check across ten services needs all the answers, including the errors,
 not a cancelled remainder of the batch.
-`TaskGroup` has no such mode.
+`TaskGroup` cancels the rest of the batch on any failure.
 Keeping siblings alive past a failure means catching exceptions inside each task yourself.
 
 ### Bounding a Wait with `asyncio.timeout()` {#bounding-a-wait-with-asynciotimeout}
@@ -775,7 +775,7 @@ instead of one call.
 ## A Single Thread Still Races
 
 `asyncio` runs one task at a time,
-and that fact tempts you to conclude that shared state needs no locking.
+and that fact tempts you to conclude that shared state is safe from races.
 But "one at a time" protects the instructions between two `await`s,
 not a value read before an `await` and written after it.
 Two coroutines that read a shared value, `await`,
@@ -853,7 +853,8 @@ One task at a time runs its read-modify-write,
 however often the event loop switches to another task in between.
 A `threading.Lock` repairs the threaded version of this race the same way.
 
-An `asyncio.Lock` orders tasks on one event loop and gives no protection across threads.
+An `asyncio.Lock` orders tasks on one event loop.
+Its protection stops at that loop's thread.
 A worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
 
 ### Semaphores
@@ -1020,7 +1021,7 @@ asyncio.run(main())
 #: resolved: False
 ```
 
-Two equally polite tasks make no progress,
+Two equally polite tasks stay where they started,
 although the event loop keeps both tasks busy the whole time.
 Each round, both tasks find the other still wanting the resource,
 so both give and neither clears its entry in `wants`.
@@ -1804,7 +1805,7 @@ interp.close()
 The `Queue` from `create_queue()` carries values from one interpreter to another.
 
 Each interpreter is as isolated as a process pool's worker.
-It imports its own copy of every module and shares no objects with the other interpreters,
+It imports its own copy of every module and keeps its objects to itself,
 so data crosses by copying or through a `Queue`.
 All the interpreters live in one operating-system process, though,
 so starting an interpreter takes a fraction of the time that starting a process takes.
@@ -1886,7 +1887,7 @@ tuple comparison falls through to the second field, the description string.
 Collecting the producer futures and calling `result()` [turns a producer's exception into one you can see](#what-a-process-pool-requires).
 
 `consume()` calls `get()` in a loop, the way a live consumer should.
-Blocked there, it uses no processor time while it waits,
+Blocked there, it leaves the processor to other threads while it waits,
 and it wakes the instant `put()` adds an item, with no polling in between.
 This listing's queue holds every job by the time `consume()` starts,
 so its first `get()` returns immediately.
@@ -2252,7 +2253,7 @@ That conversion is why `process_price()` calls `loop.run_in_executor()` instead 
 `main(pool: ProcessPoolExecutor)` receives its pool as a parameter,
 and `with ProcessPoolExecutor() as pool:` creates the pool outside `main`.
 Creating a `ProcessPoolExecutor` sets up its queues and pipes,
-each `submit()` that finds no idle worker spawns another worker process,
+each `submit()` that finds every worker busy spawns another worker process,
 and `__exit__()` joins the workers through `shutdown(wait=True)`.
 That join is an ordinary blocking call.
 Running it on the thread driving the event loop freezes every task on that loop,
@@ -2552,7 +2553,7 @@ is a small corner of the territory.
   are two different disciplines built on this same idea.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
   an isolated object that reacts only to messages sent to its own mailbox,
-  shares no state, and can spawn more actors.
+  keeps its state private, and can spawn more actors.
   The most established production examples include Erlang,
   built at Ericsson for telephone switches.
   Elixir is newer and built on Erlang's BEAM virtual machine.
