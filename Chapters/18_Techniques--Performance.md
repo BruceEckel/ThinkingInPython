@@ -492,7 +492,7 @@ which collapsed the old interpreter's 332 dispatch jumps into 3,
 so the comparison was against a compiler regression rather than a fast interpreter.
 With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
 The advice under [Numbers on Your Machine](#numbers-on-your-machine)
-applies to CPython's own developers too.]
+applies to CPython's own developers as well as to you.]
 
 The JIT in the next section adds its speedup to the tail-calling interpreter's speedup.
 The JIT compiles the hot paths,
