@@ -1730,7 +1730,7 @@ Try each exercise before opening its [solution](../Solutions/12_Techniques--Data
     and read the error `@dataclass` reports.
     Then fix it two ways,
     with `default_factory=dict` and with `default_factory=dict[str, Month]`,
-    and say which one a type checker can verify.
+    and say which one the type checker can verify.
 8.  `stars_float.py` builds a `Stars` holding `5.5`.
     Add a type test to the check in `__post_init__()` so that `Stars(5.5)` raises `TypeFailure`.
     `Stars(True)` also passes the range check.

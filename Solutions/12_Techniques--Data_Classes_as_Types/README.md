@@ -813,7 +813,7 @@ a different design, a detail, or an equivalent alternative.
 > and read the error `@dataclass` reports.
 > Then fix it two ways,
 > with `default_factory=dict` and with `default_factory=dict[str, Month]`,
-> and say which one a type checker can verify.
+> and say which one the type checker can verify.
 
 <details>
 <summary>Where to look</summary>
@@ -822,7 +822,7 @@ a different design, a detail, or an equivalent alternative.
 shows `@dataclass` rejecting a mutable default and `field(default_factory=...)` as the fix.
 Wrap the class definition that has the `= {}` default in `expected(ValueError)` to capture the message.
 Then write the two fixed classes,
-and ask what return type a type checker can read from `dict` and from `dict[str, Month]`.
+and ask what return type the type checker can read from `dict` and from `dict[str, Month]`.
 
 <details>
 <summary>The shape</summary>
