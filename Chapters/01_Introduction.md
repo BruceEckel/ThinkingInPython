@@ -234,7 +234,7 @@ The code you read is the code that runs,
 and the output you see is the output it produces.
 
 A few early listings make a type error on purpose and carry a `# type: ignore` comment on that line.
-The comment tells a type checker to suppress the error it would report there.
+The comment tells the type checker to suppress the error it would report there.
 [Static Types](08_Foundations--Static_Types.md) covers type checking in full,
 along with the `# ty:` comments that appear from that chapter on.
 
