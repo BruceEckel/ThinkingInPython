@@ -2344,7 +2344,7 @@ Asynchrony is `async def` and `await`.
 A resource's lifetime is a `with` block.
 Each is reasonable alone.
 None composes with another.
-Some pairs allow no conversion.
+Converting one into another gives something up.
 An `Awaitable` cannot become a `Result` without blocking and giving up the asynchrony.
 A `with` block's guarantee is lexical,
 so you cannot hand it to a caller as a value the way you can a `Result`.
