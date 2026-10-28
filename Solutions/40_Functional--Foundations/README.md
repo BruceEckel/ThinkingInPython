@@ -587,7 +587,7 @@ The listing prints the type's name, since the address changes from run to run.
 
 **Exhaust the iterator.**
 The second `list(raw)`, at `[2]`, is the more dangerous half.
-It returns `[]` and raises no error.
+It returns `[]` instead of raising an exception.
 The first `list(raw)`, at `[1]`, consumed the iterator, which stays exhausted,
 so every later pass gets an empty result.
 A comprehension, by contrast, returns a complete list,
