@@ -233,7 +233,7 @@ and defensive copies, all to stop other code from changing your data.
 These copies plug the outbound leak but leave the inbound one open.
 The constructor stores the caller's own list,
 so the caller can mutate the internals through that reference.
-A fully defensive class must copy on the way in as well.
+A fully defensive class must copy on the way in as well as on the way out.
 
 A `@dataclass` version of `Plugged` trims the constructor,
 but its generated `__repr__()` prints `_numbers` and `_bob`,
