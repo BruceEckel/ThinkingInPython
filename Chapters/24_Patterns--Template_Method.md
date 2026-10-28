@@ -302,7 +302,7 @@ The next subclass author might restore the usual order out of habit.
 The reliable repair changes the framework.
 Separate construction from starting,
 and have the client call `run()` on a fully built object.
-So `ApplicationFramework` inherits its constructor from `object`,
+So `ApplicationFramework` drops its `__init__()`,
 and the client calls `MyApp().run()`.
 
 ### Substitutability
