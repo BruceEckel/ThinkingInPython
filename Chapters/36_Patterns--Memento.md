@@ -246,7 +246,7 @@ Both `save()` and `restore()` must copy.
 ## Immutability
 
 All that copying exists because `Sketch` mutates its list.
-An immutable state can be shared instead of copied.
+Holders can share an immutable state instead of copying it.
 When the state is a record, every state is a memento:
 
 ```python
