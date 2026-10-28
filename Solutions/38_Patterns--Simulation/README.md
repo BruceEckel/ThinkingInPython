@@ -8,7 +8,7 @@
 > Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` records the coordinates it receives instead of starting a rat,
 > run one rat with `asyncio.run(rat.run())`,
 > and assert which cell the rat kept for itself and which cells it spawned.
-> You need no real `Blackboard`, `Maze`, or task scheduling.
+> The fake stands in for the real `Blackboard`, `Maze`, and task scheduling.
 
 <details>
 <summary>Where to look</summary>
