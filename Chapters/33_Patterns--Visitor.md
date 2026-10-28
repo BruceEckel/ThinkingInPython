@@ -172,7 +172,7 @@ In [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-
 the `Any` in `paper_scissors_rock.py` lets a class that omits an `eval_*()` method pass the checker and raise an `AttributeError` at runtime.
 The `Any` in `accept()` is a choice,
 unlike the one in [Data Transfer Objects](28_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger),
-where a bag of attributes named at runtime leaves no precise type to write.
+where a bag of attributes named at runtime makes `Any` the most precise type you can write.
 
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
 so `accept()` is the one method the pattern adds to the primary hierarchy.
@@ -291,7 +291,7 @@ the one stored under `object`.
 
 A new `Flower` subclass gets the default answer until someone registers it.
 Both the runtime and the checker accept the `nectar()` call on that subclass,
-so a forgotten registration returns the default's `no nectar` string and raises no exception.
+so a forgotten registration quietly returns the default's `no nectar` string.
 
 The default also accepts arguments outside `Flower`.
 Because the default sits under `object`,
