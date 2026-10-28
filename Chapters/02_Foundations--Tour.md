@@ -100,7 +100,8 @@ so the language settles the question.
 Python code from any two authors therefore lines up the same way.
 That sameness is one of the main reasons for Python's consistent readability.
 
-A statement ends with its line, so it needs no terminating semicolon.
+A statement ends with its line,
+where C++ and Java end each one with a semicolon.
 A semicolon's one job is to separate two statements that share a line.
 An open parenthesis, bracket,
 or brace continues the statement across lines until it closes.
@@ -157,7 +158,7 @@ Lists, dictionaries, and sets are *mutable*.
 Mutability decides whether a change made through one name is visible through another,
 as the `4` appended through `b` is visible through `a` in `references.py`.
 
-You can assign several names at once, so a swap needs no temporary:
+You can assign several names at once, so a swap takes one line:
 
 ```python
 # multiple_assignment.py
@@ -445,7 +446,8 @@ The `r` right before a string means "raw."
 Python takes each backslash in a raw string literally, as a single character.
 Without the `r`, the `\u` in the last literal of `strings.py` starts a Unicode escape,
 which requires four hex digits.
-The `tils` after it supplies none, so the literal is a syntax error.
+The `t` after it falls outside the hex digits `0`-`9` and `a`-`f`,
+so the literal is a syntax error.
 A raw string has one limit: it cannot end with a single backslash,
 because a backslash in a raw string still makes the quote after it part of the string's text.
 
