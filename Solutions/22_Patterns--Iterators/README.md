@@ -11,7 +11,7 @@
 [Generators](../../Chapters/22_Patterns--Iterators.md#generators)
 shows how a function containing `yield` returns an iterator.
 Write `evens()` the same way, then pass its result to `total()`.
-Any iterable works there, so `total()` needs no change.
+Any iterable works there, so `total()` works as written.
 
 <details>
 <summary>The shape</summary>
@@ -116,7 +116,8 @@ If `__len__()` returns `self.start` alone,
 since `len()` rejects a negative length.
 So does `list(Countdown(-1))`,
 because `list()` calls `__len__()` to size its result.
-A `for` loop over the same object runs zero times and raises no exception.
+A `for` loop over the same object calls `__iter__()` alone,
+so it runs zero times and ends normally.
 The solution returns `max(self.start, 0)`,
 so a negative `start` gives a length of 0, matching the empty iteration.
 
@@ -178,7 +179,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [What Laziness Hides](../../Chapters/22_Patterns--Iterators.md#what-laziness-hides)
-explains that creating a generator runs none of its body.
+explains that a generator's body waits for the first `next()`.
 Wrap the generator in `itertools.islice()` with a stop of 10.
 `islice()` stops pulling once it has the number you request,
 so the generator's loop runs that many iterations.
@@ -702,14 +703,15 @@ print(len(endless.seen))
 ```
 
 **Match by methods, not by base.**
-`traverse()` needs no change,
+`traverse()` works as written,
 because its parameter's type is the `GoFIterator` protocol rather than a class.
 `OverSequence` and `OverStream` share no base class,
 and neither names the protocol.
 Defining the protocol's four methods satisfies it.
 
 **Index a stored sequence.**
-`OverSequence` needs no `seen` list because its `items` sequence holds every value.
+`OverSequence` rewinds by setting `index` back to 0,
+because its `items` sequence holds every value.
 A caller can index that sequence repeatedly, in any order,
 and every value stays in place.
 The GoF interface assumes every collection allows that kind of access,
