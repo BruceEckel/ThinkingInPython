@@ -495,7 +495,7 @@ for a, b in ((0.0, 2.0), (1.0, 1.3)):
 The `[1.0, 1.3]` line shows the fall-through.
 Both ends of that interval lie below the root, so bisection returns `None`.
 The loop in `first_root()` then calls `secant()`,
-which needs no bracket and finds the root.
+which reads the two ends as starting points and finds the root.
 Adding, removing, or reordering the finders means editing the `chain` list.
 
 The test in `first_root()` is `root is not None`, not `if root`.
@@ -602,7 +602,8 @@ Calling every handler is the second difference from the chain,
 which stops at the first handler that succeeds.
 
 The events are values, written as records.
-The handlers are ordinary functions, so they need no base class.
+The handlers are ordinary functions,
+so any function with the right signature is a handler.
 Registering one is a single `subscribe()` call.
 Here, `Handler` names their signature, not an interface:
 
@@ -699,8 +700,8 @@ The test file confirms that:
 
 - Publishing calls every handler registered for a type.
 - A handler receives only its own event type.
-- Publishing an event with no handler raises no exception.
-- Publishing an unhandled event leaves no stray entry behind.
+- Publishing an event with no handler returns normally.
+- Publishing an unhandled event leaves `_handlers` as it was.
 
 ```python
 # test_event_bus.py
@@ -973,7 +974,7 @@ both use `singledispatch`.
 
 Stop at the first form that supports what you need:
 
-1.  A plain function, when the behavior needs no state of its own
+1.  A plain function, when the behavior depends on its arguments alone
     (`command.py`, `strategy.py`).
 2.  A bound method, when the state belongs to an existing object.
     `account.deposit` is a command with its instance attached
@@ -1017,7 +1018,7 @@ Try each exercise before opening its [solution](../Solutions/27_Patterns--Functi
     Confirm that `chain.py`'s `first_root()` runs a chain holding either one,
     with no change to `first_root()`.
 5.  Because `EventBus.publish()` looks up `type(event)`,
-    a subclass of `Deposit` finds no handler.
+    a subclass of `Deposit` gets the empty default list.
     Change `publish()` to walk `type(event).__mro__` and call every handler registered along it,
     parents last.
     Then add `unsubscribe()`.
