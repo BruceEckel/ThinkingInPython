@@ -572,7 +572,7 @@ Derived().show()
 `Derived` defines `show()` itself,
 so `Derived().show()` finds it there and the lookup stops before reaching `Base`.
 The rename turns the override into an unrelated new method.
-Python accepts any method name in a subclass and keeps no record of which ones you meant as overrides.
+Python accepts any method name in a subclass and treats a method you meant as an override like any other new method.
 
 **Declare the intended override.**
 With `from typing import override` added and the decorator uncommented,
@@ -586,7 +586,7 @@ error[invalid-explicit-override]: Method `show` is decorated with
 info: No `show` definitions were found on any superclasses of `Derived`
 ```
 
-If you remove the decorator, the type checker reports no error,
+If you remove the decorator, the type checker accepts the program,
 since the code no longer states an intention for it to verify.
 The feature has three parts: `@override` states an intention,
 the type checker verifies it, and the running program ignores it.
@@ -595,7 +595,7 @@ In a real codebase the base class and its overrides often sit in different files
 so a rename slips past a reader.
 With `@override` on every overriding method,
 the type checker reports each method whose name the rename removed from the base class.
-A decorator that changes no behavior at run time is worth writing when a tool reads it.
+A decorator that returns the method it receives at run time is worth writing when a tool reads it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
