@@ -1,15 +1,18 @@
 # exercise_2.py
 from collections.abc import Callable
 
-def flat(weight: float) -> float:
+type Weight = float
+type Cost = float
+
+def flat(weight: Weight) -> Cost:
     return 5.0
 
-def by_weight(weight: float) -> float:
+def by_weight(weight: Weight) -> Cost:
     return 0.5 * weight
 
 def checkout(
-    weight: float, shipping: Callable[[float], float]
-) -> float:
+    weight: Weight, shipping: Callable[[Weight], Cost]
+) -> Cost:
     return 20.0 + shipping(weight)
 
 print(checkout(6.0, flat), checkout(6.0, by_weight))

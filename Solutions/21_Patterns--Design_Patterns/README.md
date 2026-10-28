@@ -196,15 +196,18 @@ and state what remains in one sentence.
 # The shape of exercise_2.py
 from collections.abc import Callable
 
-def flat(weight: float) -> float:
+type Weight = float
+type Cost = float
+
+def flat(weight: Weight) -> Cost:
     ...
 
-def by_weight(weight: float) -> float:
+def by_weight(weight: Weight) -> Cost:
     ...
 
 def checkout(
-    weight: float, shipping: Callable[[float], float]
-) -> float:
+    weight: Weight, shipping: Callable[[Weight], Cost]
+) -> Cost:
     ...
 ```
 
@@ -234,7 +237,7 @@ Now cross out what Python supplies:
 
 - The interface goes.
   A function is a value with a call signature,
-  and `Callable[[float], float]` states that signature without declaring an interface.
+  and `Callable[[Weight], Cost]` states that signature without declaring an interface.
 - The concrete classes go.
   Each holds one method and no state, so each becomes one function.
 - The context class goes, along with its field and its setter.
@@ -248,15 +251,18 @@ One sentence remains: make the varying step a parameter.
 # exercise_2.py
 from collections.abc import Callable
 
-def flat(weight: float) -> float:
+type Weight = float
+type Cost = float
+
+def flat(weight: Weight) -> Cost:
     return 5.0
 
-def by_weight(weight: float) -> float:
+def by_weight(weight: Weight) -> Cost:
     return 0.5 * weight
 
 def checkout(
-    weight: float, shipping: Callable[[float], float]
-) -> float:
+    weight: Weight, shipping: Callable[[Weight], Cost]
+) -> Cost:
     return 20.0 + shipping(weight)
 
 print(checkout(6.0, flat), checkout(6.0, by_weight))
@@ -265,7 +271,7 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 
 Five constructs become one parameter and a function per algorithm.
 The type checker still knows what the parameter accepts:
-`Callable[[float], float]` rejects a function taking the wrong arguments as surely as an interface rejects a class that does not implement it.
+`Callable[[Weight], Cost]` rejects a function taking the wrong arguments as surely as an interface rejects a class that does not implement it.
 
 The sentence that remains is the pattern.
 The subtraction keeps the pattern's intent and removes the supporting code.
@@ -309,21 +315,24 @@ If something breaks, you have found the part that expresses the design's intent.
 from abc import ABC, abstractmethod
 from typing import override
 
+type Weight = float
+type Cost = float
+
 class Shipping(ABC):
     @abstractmethod
-    def cost(self, weight: float) -> float: ...
+    def cost(self, weight: Weight) -> Cost: ...
 
 class Flat(Shipping):
     @override
-    def cost(self, weight: float) -> float:
+    def cost(self, weight: Weight) -> Cost:
         ...
 
 class ByWeight(Shipping):
     @override
-    def cost(self, weight: float) -> float:
+    def cost(self, weight: Weight) -> Cost:
         ...
 
-def checkout(weight: float, shipping: Shipping) -> float:
+def checkout(weight: Weight, shipping: Shipping) -> Cost:
     ...
 ```
 
@@ -347,21 +356,24 @@ an abstract base and two subclasses.
 from abc import ABC, abstractmethod
 from typing import override
 
+type Weight = float
+type Cost = float
+
 class Shipping(ABC):
     @abstractmethod
-    def cost(self, weight: float) -> float: ...
+    def cost(self, weight: Weight) -> Cost: ...
 
 class Flat(Shipping):
     @override
-    def cost(self, weight: float) -> float:
+    def cost(self, weight: Weight) -> Cost:
         return 5.0
 
 class ByWeight(Shipping):
     @override
-    def cost(self, weight: float) -> float:
+    def cost(self, weight: Weight) -> Cost:
         return 0.5 * weight
 
-def checkout(weight: float, shipping: Shipping) -> float:
+def checkout(weight: Weight, shipping: Shipping) -> Cost:
     return 20.0 + shipping.cost(weight)
 
 print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
