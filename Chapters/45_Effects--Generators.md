@@ -215,8 +215,9 @@ and `None` is not an `Answer`.
 The interpreter accepts `send(None)` as the priming call,
 but the type checker rejects it,
 because the annotation applies one `SendType` to every call, the first included.
-A driver therefore primes with `next()`, which takes any iterator,
-so the call passes the check.
+A driver therefore primes with `next()`.
+The check applies to `send()`'s argument,
+and `next()` takes the generator alone.
 
 ## A Generator Waits for Its Driver {#a-generator-is-a-description}
 
@@ -233,7 +234,7 @@ Calling `interview()` returns that object.
 For managing Effects,
 a generator is more useful than a coroutine because you write the driver.
 A coroutine's requests go to an event loop,
-`asyncio`'s or one you write yourself.
+whether `asyncio`'s loop or one you write yourself.
 Each request must be an awaitable object built for that loop.
 A generator's requests go to whatever code calls `next()` and `send()`,
 and a request can be any value.
