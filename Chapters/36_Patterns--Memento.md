@@ -246,7 +246,7 @@ Both `save()` and `restore()` must copy.
 ## Immutability
 
 All that copying exists because `Sketch` mutates its list.
-An immutable state needs no copy.
+An immutable state can be shared instead of copied.
 When the state is a record, every state is a memento:
 
 ```python
@@ -298,7 +298,8 @@ and the copying.
 
 Frames 1 to 3 trace `sketch_demo.py`,
 with a copy in each call to `save()` and `restore()`.
-Frame 4 traces `frozen_demo.py` and has no copy.
+Frame 4 traces `frozen_demo.py`,
+where saving keeps a reference instead of a copy.
 The caretaker keeps `before`.
 `draw()` returns `after` as a new object beside it.
 
@@ -712,7 +713,7 @@ and rerunning the validation that the load skips.
 
 ### A Deleted Field Leaves a Ghost
 
-Deleting a field raises no exception.
+Deleting a field passes silently.
 The old bytes load, and every later read succeeds.
 `pickle.loads()` writes the dropped name into the object's `__dict__` as a ghost attribute.
 The ghost sits outside the class's declared fields,
@@ -773,7 +774,7 @@ instead of the delayed `AttributeError` from `pickle_drift.py`.
 Protocol Buffers goes further.
 A schema shared across languages gives every field a number written in the schema.
 Old and new versions can then read each other's messages by design.
-All three read the bytes as data and run no code from them,
+All three treat the bytes as data rather than as instructions,
 which removes pickle's security risk.
 
 ## Snapshots in the Wild
