@@ -730,7 +730,7 @@ Its list of responders can change at any moment,
 including in the middle of an `announce()`.
 Three earlier sections each handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
-a lambda must be bound to a name to reach both `connect()` and `disconnect()`,
+a lambda needs a name to reach both `connect()` and `disconnect()`,
 and a lapsed listener is a connection that outlives the program's use of its responder.
 
 Decoupling and dynamism are separate properties.
