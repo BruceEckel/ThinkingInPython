@@ -830,7 +830,7 @@ The rename to `"Goose"` survives the restore because `copy.replace()` copies eve
 
 **Narrow the history's state type.**
 `copy.replace()` requires a `__replace__()` method.
-A bare type variable `S` declares none,
+A bare type variable `S` guarantees the methods of `object` alone,
 so `restore_field()` takes a `History[Drawing]`,
 whose `Drawing` states carry the `__replace__()` method that `dataclass()` generates.
 A generic version would need a `Protocol` declaring `__replace__()` as the type variable's bound.
@@ -977,7 +977,7 @@ A dataclass field with a simple default stores that default as a class attribute
 so `restored.layer` finds `DrawingV2.layer` by ordinary attribute lookup while `restored.__dict__` has no `layer`.
 With the field written `layer: list[str] = field(default_factory=list)`,
 the default disappears.
-A `default_factory` leaves no class attribute,
+A `default_factory` runs inside `__init__()`, which pickle skips,
 so the loaded object raises an `AttributeError` the first time anything reads `layer`.
 
 **Skip the constructor on load.**
