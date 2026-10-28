@@ -185,12 +185,12 @@ which then changes it in place with no other code reading it between changes.
 
 ### Immutability in Annotations
 
-Type annotations can state immutability so a type checker enforces it.
+Type annotations can state immutability so the type checker enforces it.
 `typing.Final` marks a name bound once, at its declaration.
 The read-only collection types in `collections.abc`,
 such as `Sequence` and `Mapping`, expose the operations that read a collection.
 They have no `append()` or item assignment,
-so a type checker rejects any attempt to mutate through them:
+so the type checker rejects any attempt to mutate through them:
 
 ```python
 # immutable_types.py
