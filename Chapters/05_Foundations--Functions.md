@@ -585,7 +585,7 @@ so the call raises a `TypeError`.
 Among the built-ins, `max()` and `min()` take a keyword-only `default`,
 which they return for an empty iterable in place of raising a `ValueError`.
 With `max(scores, default=0)`, the call returns `0` for an empty `scores`,
-so the code needs no `try`/`except` around it.
+so one expression covers the empty case that would otherwise take a `try`/`except`.
 
 ## Lambdas
 
