@@ -616,7 +616,7 @@ so `__init__()` calls `update_wrapper(self, func)`.
 
 The `__name__: str` declaration tells the type checker about the attribute `update_wrapper()` sets,
 so `__call__()` can print `self.__name__`.
-`tracer.py` needs no declaration,
+In `tracer.py` the type checker reads `__name__` from `wrapper`'s type,
 because `wrapper` is a function and a function's type includes `__name__`.
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
@@ -986,7 +986,7 @@ A decorator line must sit directly above a `def`, an `async def`, a `class`,
 or another decorator line.
 `@decorator` above a bare assignment, or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
-Past that, `@` places no requirement on the callable it passes to the decorator.
+Past that, the decorator decides what it accepts.
 The callable you decorate can come from somewhere other than a `def`:
 
 ```python
@@ -1067,7 +1067,7 @@ so `greeting()` raises a `TypeError`, because a `str` is not callable.
 
 `run_once` suits a value that needs one-time setup logic but stays constant afterward.
 For a value that a single expression computes,
-an assignment to a module-level constant needs no function and no decorator.
+assign the expression to a module-level constant.
 
 A class decorator can also return an object that is not a class.
 [*Singleton*](23_Patterns--Singleton.md#singleton-by-class-decorator)
