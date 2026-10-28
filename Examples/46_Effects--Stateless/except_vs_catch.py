@@ -5,7 +5,7 @@ from stateless import Success, Try, catch, run
 
 def guarded(name: str) -> Try[KeyError, str]:
     try:
-        value = yield from score(name)
+        value: int = yield from score(name)
     except KeyError:
         return f"{name}: unknown"
     return f"{name}: {value}"
