@@ -361,6 +361,9 @@ As [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-functio
 shows, a function looks up a module-level name when its body runs.
 `next()` runs the body after `watched = watch()` has bound the name.
 
+The annotation is `Generator[str]` rather than `Iterator[str]`,
+because `inspect.getgeneratorstate()` takes a `Generator` and the type checker rejects an `Iterator` argument.
+
 Every answer `interview()` receives comes from its driver.
 Swapping `drive()`'s dictionary for a database, or for `input()`,
 changes `drive()` and leaves `interview()` as it is.
