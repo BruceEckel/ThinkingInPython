@@ -428,8 +428,8 @@ with expected(RecursionError):
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-Python finds no `f` on the instance or on `BrokenProxy`,
-so it calls `__getattr__("f")`.
+`f` is missing from both the instance and `BrokenProxy`,
+so Python calls `__getattr__("f")`.
 That call starts by reading `self._imp`, another missing name,
 so Python calls `__getattr__("_imp")`, which starts by reading `self._imp`.
 Each call to `__getattr__()` starts another missing-attribute lookup,
