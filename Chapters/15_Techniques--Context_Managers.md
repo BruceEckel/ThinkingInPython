@@ -1218,8 +1218,7 @@ which is the shortest form that can express setup, teardown,
 and a `try`/`finally` between them.
 Write a class with `__enter__()` and `__exit__()` when the manager needs state beyond one setup and teardown,
 methods beyond the two protocol ones, or reuse across several `with` statements.
-A generator manager supplies one setup, one teardown,
-and one `with` statement per call.
+A generator manager is one setup and one teardown, entered once.
 Add `ContextDecorator` only when the same bracket should also wrap whole functions.
 
 Whichever form you choose, the borrower's side contains two lines.
