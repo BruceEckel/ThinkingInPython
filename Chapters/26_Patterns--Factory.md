@@ -167,7 +167,7 @@ and a `match` where the overrides go.
 
 `shape_name()` is a [*generator*](22_Patterns--Iterators.md#generators).
 A factory takes information that tells it what to build.
-A generator object needs no argument to produce its next value,
+A generator object produces its next value from its own state,
 because it holds the algorithm that decides what comes next.
 
 Normally the data passed to `factory()` comes from outside the system rather than from a random number generator.
@@ -344,7 +344,7 @@ A base class whose `draw()` raises a `NotImplementedError` reports the omission 
 at the first `draw()` call.
 
 The type checker reports a line that constructs such a class by name,
-but `make()` contains no such line.
+but `make()` constructs the class it looks up in the registry.
 `Shape.registry[name]()` calls a `type[Shape]`.
 Any `type[Shape]` may be a concrete subclass, so the checker accepts the call.
 [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
@@ -691,7 +691,7 @@ and it makes `create_shape()` worse.
 `create_shape()` then compiles and runs any string it receives,
 so a configuration file, a request,
 or a command line can hand it arbitrary code instead of a shape name.
-The dictionary lookup runs no code from the string.
+The dictionary lookup treats the string as a key.
 You get either a factory or a `KeyError`.
 The factory has the type `ShapeMaker` that `FACTORIES` declares,
 where `eval()` returns `Any`.
@@ -952,7 +952,7 @@ the line that passes the factory to `GameEnvironment`.
 
 The two versions differ more at runtime.
 Constructing the incomplete subclass of the abstract base class raises a `TypeError`,
-while the Protocol has no runtime guard.
+while a `BrokenFactory` constructs at runtime like any other class.
 If you run the program despite the report,
 it fails with an `AttributeError` when `GameEnvironment.__init__()` calls `make_obstacle()`.
 
@@ -1127,7 +1127,7 @@ and the converter decides whether the result is ASCII text or TeX.
 The builder most programmers meet is narrower,
 the one Joshua Bloch's *Effective Java* recommends.
 In Java and C++, a class with many optional settings needs a constructor for every useful combination,
-because those languages have no keyword arguments.
+because those languages pass every argument by position.
 That pile of constructors is the *telescoping constructor*.
 Translated into Python, this builder is the workaround:
 a companion class that collects settings one method call at a time.
