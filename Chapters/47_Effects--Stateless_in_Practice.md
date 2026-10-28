@@ -113,7 +113,7 @@ the `yield from` then evaluates to that generator's return value,
 which here is the value the handler sent back.
 `prompt` is payload on the request, there for the handler to read,
 so the answer to an `Ask` is the value `scripted()` returns.
-A `Tell` needs no answer,
+A `Tell` is a one-way message,
 which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
 
 `ask()` and `tell()` are accessors,
@@ -300,7 +300,7 @@ def batch_due(last_run: datetime) -> Depend[Now, bool]:
     return moment - last_run >= timedelta(hours=24)
 ```
 
-Like `Flip`, `Now` carries no data.
+Like `Flip`, `Now` is an empty class.
 Its answer type is its whole content.
 The handlers decide which moment `stamp()` and `batch_due()` receive:
 
@@ -331,7 +331,7 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 so `stamp()` produces a known string a test can compare.
 `tomorrow` reports a moment a day later,
 so `batch_due()` returns `True` at once.
-`batch_due()` holds no `datetime.now()` call,
+`batch_due()` gets its moment from whichever handler answers `Now`,
 so a test supplies the moment outright.
 A production handler that returns `datetime.now()` runs the same function.
 
@@ -688,7 +688,7 @@ which checks each source's `available()` at each request.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 swaps an implementation between runs.
 `microgrid.py` swaps one during a run.
-The consumer names no source, so its code stays the same.
+The handler chooses the source, so the consumer's code stays the same.
 
 ## State as an Ability
 
@@ -758,7 +758,7 @@ def ledger(cell: Cell) -> tuple[
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
 `Put` has `Tell`'s shape: payload out, `None` back.
 `purchase()`'s comparison sits between the two requests,
-in code that mentions no cell.
+in code that sees only the integer `get()` returned.
 
 `purchase()`'s signature declares the shared state.
 `Depend[Get | Put, bool]` tells a caller this function reads or writes something that outlives it.
@@ -869,7 +869,8 @@ Within `research()`,
 the signature is also the only place the three failures appear.
 The body requests each dependency by its type and leaves the network, the files,
 and the printing to the implementations you supply.
-Calling `research()` performs no work.
+Calling `research()` returns a generator object.
+Its body runs when `run()` drives that generator.
 
 The three `@throws` functions are the pattern for bringing ordinary code in.
 `fetch()` and `look_up()` call ordinary methods rather than Effects,
@@ -1030,7 +1031,7 @@ as `as_type()` would, without a cast.
 
 ## The Success Path
 
-`research()` handles no errors.
+`research()` hands every failure to the error channel.
 Its body is a straight run of six lines, each calling the next step,
 and no line tests whether the previous one worked.
 The error channel makes that straight run possible.
@@ -1083,7 +1084,7 @@ The difference is who writes the branch that short-circuits.
 At this size the by-hand version is respectable, and a reader may prefer it.
 Two differences hold at any size.
 The by-hand signature, `(Feed, Encyclopedia) -> str`,
-mentions none of the three failures,
+is silent about all three failures,
 so adding a fourth failure leaves the signature as it is.
 And the handling interleaves with the logic.
 `research_and_report()` decides both what to do about a failure and what to say about it.
@@ -1199,7 +1200,7 @@ print(type(missing).__name__)
 `outcome()` is the boundary function `scenarios.py` uses,
 with the same upcasting annotations.
 Its result type is the union `report()` builds by listing all three errors.
-This listing specifies none of them at the catch.
+Here `catch_all()` takes all three from the channel's declaration.
 The two calls repeat the `NotInteresting` and `NoArticle` runs of `scenarios.py`.
 Where `report()` turns those failures into messages,
 `catch_all()` returns them as values.
@@ -1492,7 +1493,7 @@ print(script.lines)
 
 `Script` records what arrives,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching.
-The engine holds no printing to intercept.
+The engine sends every line to the `Narrator` its caller supplies.
 `test_greeter.py` in [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 makes the same swap with one Ability rather than three.
 
@@ -1514,7 +1515,7 @@ The guarantee moves from a class hierarchy into a two-line function.
 
 One `supply()` call can type-check at most nine actors.
 `supply()`'s declaration carries overloads for one through nine values,
-so a tenth argument matches none of them:
+so the type checker rejects a tenth argument:
 
 ```text
 error[no-matching-overload]: No overload of function `supply`
@@ -1667,7 +1668,7 @@ If you leave the `Time()` out, the type checker rejects the `run()` call.
 
 The added `Need[Time]` is the thesis of both chapters applied to a cross-cutting concern.
 In a system with untracked Effects,
-adding retry to a hundred call sites changes no signature.
+adding retry to a hundred call sites leaves every signature as it was.
 Here adding retry changes a type.
 Every caller that runs the retried function without a `Time` fails the check.
 
@@ -1742,7 +1743,7 @@ which is the same fact that makes `retry()` decorate the function.
 
 Because the cache is an `lru_cache`, every argument must be hashable.
 An unhashable one, such as a `list`, raises a `TypeError` at the call.
-The cache also has no size limit by default,
+The cache's `maxsize` also defaults to `None`,
 so it keeps every result as long as the memoized function exists.
 `memoize(maxsize=128)` bounds it.
 
@@ -1826,7 +1827,7 @@ each `wait()` blocks on the task the same iteration just created,
 so the sleeps run one after another and take about five times as long.
 
 The pool is a supplied dependency, not a global,
-so `squares()` declares `Need[Executor]` and specifies no pool.
+so `squares()` declares `Need[Executor]` and works with whichever pool the edge supplies.
 Supplying a `ProcessPoolExecutor` moves the same work into processes.
 `squares()` stays as written.
 `as_type(Executor)` appears for the reason it always does.
@@ -1975,7 +1976,8 @@ print(f"run() at least 20x slower: "
 and by the listing's own measure that makes it at least twenty times slower than `run_async()`.
 Running the listing with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
 prints both per-call costs.
-Synchronous code has no loop to reuse, so each of its `run()` calls builds one.
+Synchronous code runs outside any event loop,
+so each of its `run()` calls builds one.
 From inside a running loop,
 `run_async()` is both the one that works and the one that is fast.
 
@@ -2164,7 +2166,7 @@ The `# type: ignore` silences that diagnostic,
 since the listing provokes the matching runtime failure on purpose.
 The `MissingAbilityError` the listing prints names the `Log` nobody supplied.
 Nesting the `supply()` inside the `run()` call draws the same diagnostic,
-so the checker needs no named intermediate to catch the missing `Log`.
+so the checker catches the missing `Log` in either form.
 
 `catch()` handles part of a channel the way `supply()` does.
 If you catch one of two declared errors, the other stays in the error channel.
@@ -2203,7 +2205,7 @@ Python cannot copy a suspended generator, so each `yield` resumes once.
 
 Two pieces of the library show that limit.
 `Effect[A, E, R]` carries a separate `E` that `@throws` fills and `catch()` empties.
-Koka needs no such type parameter,
+Koka tracks failure in its Effect row,
 because an exception there is an ordinary Ability whose handler declines to resume.
 The extra type parameter exists because a Stateless handler always resumes the Effect,
 so a failure cannot be an Ability.
@@ -2405,7 +2407,7 @@ Try each exercise before opening its [solution](../Solutions/47_Effects--Statele
     and which line restores the guarantee.
 3.  Add a wind turbine to `power.py` that is available only during a set windy stretch of the evening,
     put it between solar and the battery in the `sun_first` order,
-    and confirm `run_load()` needs no change.
+    and confirm `run_load()` stays as written.
     Then shorten every source until some hour has no source,
     run `run_load()` again,
     and say where the `Blackout` propagates and why `catch(Blackout)` around `run_load()` does not intercept it.
