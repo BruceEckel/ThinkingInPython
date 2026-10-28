@@ -121,7 +121,7 @@ It also lets the type checker verify the `Proxy`'s `f()` and `g()` against the b
 
 A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 is the structural alternative.
-The implementation needs no base class.
+An implementation conforms by defining the methods the Protocol lists.
 The type checker verifies the shape statically,
 and `@runtime_checkable` lets `isinstance()` check the shape at runtime:
 
@@ -149,7 +149,8 @@ print(isinstance(Partial(), Service))
 
 With inheritance, the abstract base class rejects an incomplete implementation at construction.
 A `Protocol` reports the mismatch statically,
-at a parameter annotated `Service`, and needs no common base.
+at a parameter annotated `Service`,
+and accepts any class that defines `f()` and `g()`.
 
 One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks that the methods exist,
 not that their signatures match.
@@ -280,10 +281,10 @@ print(w, "|", str(p).split(" at ")[0])
 
 `p.__len__()` and `len(p)` look interchangeable but take different lookup paths.
 `p.__len__()` is ordinary attribute access.
-That lookup searches the instance and `Proxy`, finds no `__len__()`,
+That lookup searches the instance and `Proxy`, comes up empty,
 and falls through to `__getattr__()`, which delegates.
-`len(p)` looks up `__len__()` on `type(p)`, skips the instance, finds none,
-and reports that `Proxy` has no `len()`.
+`len(p)` looks up `__len__()` on `type(p)` and skips both the instance and `__getattr__()`,
+so it reports that `Proxy` has no `len()`.
 
 `ty` and Pyright reject `len(p)` statically for the same reason,
 so the listing needs the `# type: ignore` to show the runtime failure.
@@ -359,7 +360,7 @@ print(p.level, settings.level)
 ```
 
 `object.__setattr__()` stores `_implementation` on the proxy without going through `__setattr__()`.
-`WriteProxy` needs no `# type: ignore`,
+In `proxy_setattr.py`, `p.level = "high"` passes the type checker as written,
 because a declared `__setattr__()` makes the type checker accept assignment to any attribute name.
 
 `WriteProxy` names its attribute `_implementation`, with one underscore.
@@ -776,7 +777,7 @@ for the races an unsynchronized swap allows.
 
 `run()` takes `surrogate: Any` because a `Behavior` annotation fails at the call.
 If `run()` declares `surrogate: Behavior`, the checker rejects `run(surrogate)`,
-because `Surrogate` defines no `f()` of its own.
+because `Surrogate` supplies `f()` through `__getattr__()`.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
 
 The test passes the *State* surrogate two small implementations,
