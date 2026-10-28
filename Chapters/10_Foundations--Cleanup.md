@@ -271,7 +271,8 @@ as a file object's `close()` does.
 `Socket.__init__()` prints "opened" before `__enter__()` runs.
 That ordering matters when `__init__()` fails.
 If `__init__()` raises an exception after acquiring the resource,
-the `with` statement receives no context manager.
+the exception propagates out of the constructor call,
+before the `with` statement has an object to enter.
 Neither `__enter__()` nor `__exit__()` runs.
 The resource leaks silently:
 
@@ -299,7 +300,7 @@ except RuntimeError as e:
 #: caught boom
 ```
 
-`C opened` has no matching `closed`.
+The output goes from `C opened` straight to `caught boom`.
 The resource that `__init__()` opened before it failed stays open.
 
 One fix keeps `__init__()` free of resources and acquires them in `__enter__()`,
@@ -352,7 +353,7 @@ which keeps its object alive.
 which lets Python destroy the object.
 
 The callback receives `name`, not the `Connection`,
-so the registered cleanup adds no strong reference to the `Connection`.
+so the finalizer refers to the `Connection` through its weak reference alone.
 `finalize(self, self.close)` looks tidier, but it gives the callback the object.
 The bound method holds a strong reference to the object,
 so the object survives until the program ends.
@@ -372,7 +373,7 @@ ahead of the teardown that makes `__del__()` unreliable.
 
 ### The `self.close` Trap {#the-self-close-trap}
 
-Passing `self.close` to `finalize()` produces no error,
+`finalize()` accepts `self.close` as readily as any other callback,
 but the object stays alive until the program exits:
 
 ```python
@@ -542,7 +543,8 @@ so the counts fall later.
 so that count is correct only if `__del__()` runs and succeeds.
 [Why `__del__()` Is Not Cleanup](#why-del-is-not-cleanup)
 lists the ways `__del__()` can fail.
-The weak registry runs none of your code when Python destroys an object.
+The weak registry hands that bookkeeping to `WeakValueDictionary`,
+whose callback removes each entry when Python destroys the object.
 
 ## The Rule
 
