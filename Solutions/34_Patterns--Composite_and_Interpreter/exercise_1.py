@@ -14,9 +14,10 @@ class Directory:
     entries: tuple[Node, ...]
 
 type Node = File | Directory
+type Location = str
 
 def find(entry: Node, name: str,
-         prefix: str = "") -> Iterator[str]:
+         prefix: Location = "") -> Iterator[Location]:
     match entry:
         case File(n, _):
             if n == name:

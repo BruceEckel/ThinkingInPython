@@ -38,6 +38,8 @@ from collections.abc import Iterator
 from typing import override
 from record import record
 
+type Location = str
+
 class Node(ABC):
     __slots__ = ()
     name: str
@@ -46,7 +48,9 @@ class Node(ABC):
     def disk_usage(self) -> int: ...
 
     @abstractmethod
-    def walk(self, prefix: str = "") -> Iterator[str]: ...
+    def walk(
+        self, prefix: Location = ""
+    ) -> Iterator[Location]: ...
 
 @record
 class File(Node):
@@ -58,7 +62,9 @@ class File(Node):
         return self.size
 
     @override
-    def walk(self, prefix: str = "") -> Iterator[str]:
+    def walk(
+        self, prefix: Location = ""
+    ) -> Iterator[Location]:
         yield prefix + self.name
 
 @record
@@ -72,7 +78,9 @@ class Directory(Node):
                    for entry in self.entries)
 
     @override
-    def walk(self, prefix: str = "") -> Iterator[str]:
+    def walk(
+        self, prefix: Location = ""
+    ) -> Iterator[Location]:
         for entry in self.entries:
             yield from entry.walk(f"{prefix}{self.name}/")
 
@@ -126,6 +134,7 @@ class Directory:
     entries: tuple[Node, ...]
 
 type Node = File | Directory
+type Location = str
 
 def disk_usage(entry: Node) -> int:
     match entry:
@@ -137,7 +146,9 @@ def disk_usage(entry: Node) -> int:
         case _:
             assert_never(entry)
 
-def walk(entry: Node, prefix: str = "") -> Iterator[str]:
+def walk(
+    entry: Node, prefix: Location = ""
+) -> Iterator[Location]:
     match entry:
         case File(name, _):
             yield prefix + name

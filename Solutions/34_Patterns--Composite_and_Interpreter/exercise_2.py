@@ -19,6 +19,7 @@ class Symlink:
     target: str
 
 type Node = File | Directory | Symlink
+type Location = str
 
 def disk_usage(entry: Node) -> int:
     match entry:
@@ -33,7 +34,9 @@ def disk_usage(entry: Node) -> int:
         case _:
             assert_never(entry)
 
-def walk(entry: Node, prefix: str = "") -> Iterator[str]:
+def walk(
+    entry: Node, prefix: Location = ""
+) -> Iterator[Location]:
     match entry:
         case File(name, _):
             yield prefix + name
