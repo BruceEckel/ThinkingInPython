@@ -326,7 +326,7 @@ Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
 because whenever `drive()`'s code runs, the generator waits at a `yield`.
 After the `return`, the generator is `GEN_CLOSED`,
 so sending it another answer raises `StopIteration` at once.
-That `StopIteration` is empty,
+That `StopIteration` carries `None` as its value,
 so `expect()` prints the exception's class name alone.
 
 The generator and `drive()` take turns.
@@ -1278,9 +1278,9 @@ and so on without end.
 Each is a generator:
 a loop that yields the current value and then applies the step to it.
 A generator is the direct way to write an unfold.
-Python has had generators since PEP 255.
 
-The third way is an iterator class with a `__next__()` that returns one value per call:
+The third way, older than PEP 255's generators,
+is an iterator class with a `__next__()` that returns one value per call:
 
 ```python
 # fibonacci_class.py
