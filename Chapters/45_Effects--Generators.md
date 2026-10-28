@@ -505,10 +505,12 @@ class Color(StrEnum):
     GREEN = "green"
     BLUE = "blue"
 
-type Tree = dict[str, Tree | Color]
+type Name = str
+type Path = str
+type Tree = dict[Name, Tree | Color]
 
 def visit(
-    tree: Tree, at: str = ""
+    tree: Tree, at: Path = ""
 ) -> Generator[str, None, Counter[Color]]:
     counts = Counter[Color]()
     for name, node in tree.items():
