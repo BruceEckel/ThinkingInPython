@@ -15,6 +15,8 @@ so a generator can receive a value as well as hand one out,
 and it can return a final result when it finishes.
 Used that way, a generator is not a sequence but a conversation.
 It yields a request, suspends, and continues when a caller sends the answer.
+A generator therefore has three *channels*: values go out through `yield`,
+come in through `send()`, and one value goes out through `return`.
 
 This chapter covers the full three-channel annotation, the *driver*
 (the loop that runs such a conversation), and `yield from`,
@@ -603,9 +605,7 @@ def collect(name: str) -> Generator[Prompt, Value, Total]:
 as `Question` and `Result` are in `interview_generator.py`,
 so the type checker tells a prompt from a total.
 `Value` is a `type` alias,
-so the driver's `g.send(value)` passes a bare `int` and still matches the `SendType`.
-
-`both()` delegates to `collect()` twice:
+so the driver's `g.send(value)` passes a bare `int` and still matches the send type.
 
 ```python
 # yield_from_send.py
@@ -630,7 +630,8 @@ for value in [1, 2, 3, 4]:
 #: send(4) -> total 10
 ```
 
-`both()` declares the same yield and send types as `collect()`,
+`both()` declares the same yield (`Prompt`) and send (`Value`)
+types as `collect()`,
 because `yield from` passes both channels through to the driver.
 Its return type stays at the default, since `both()` returns `None`.
 
