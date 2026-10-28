@@ -439,7 +439,7 @@ Its `deplete()` is empty, since a turbine burns no fuel.
 
 > Add a wind turbine to `power.py` that is available only during a set windy stretch of the evening,
 > put it between solar and the battery in the `sun_first` order,
-> and confirm `run_load()` needs no change.
+> and confirm `run_load()` stays as written.
 > Then shorten every source until some hour has no source,
 > run `run_load()` again,
 > and say where the `Blackout` propagates and why `catch(Blackout)` around `run_load()` does not intercept it.
@@ -510,7 +510,7 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 The turbine takes 19:00 through 21:00,
 the hours the battery and the grid cover in the chapter's `sun_first` run.
 
-`run_load()` needs no change.
+`run_load()` stays as written.
 It asks for a `Source` at an hour and uses the source the handler returns.
 The handler decides which sources exist, the order in which it prefers them,
 and whether one of them is new.
@@ -2294,11 +2294,11 @@ play(Loud(), Kitty(), Weapon())
 **Name the factory's shape.**
 The shared signature recovers the *Abstract Factory*'s interface.
 `run_season()` accepts any function that stages a scene,
-and its body names no family of actors.
+and its body gives each cast a narrator and lets the cast choose its actors.
 Independence from the family is the property the pattern exists to provide.
 Python provides that property,
 because a function is already an object with a type.
-Saying so takes no abstract factory class.
+A one-line `Cast` alias says so, in place of an abstract factory class.
 
 **Show the mismatch getting through.**
 The shared signature does not recover the guarantee that makes the pattern worth naming.
@@ -2315,7 +2315,7 @@ Nothing checks it.
 
 So the shared signature prevents some mismatches and permits others.
 A caller that takes a `Cast` can no longer assemble a mismatched set by accident,
-because it receives a whole cast and names no actor.
+because it receives a whole cast, with the actors chosen inside it.
 `play()` is still there and still accepts any three actors.
 
 Adding a fourth actor to the chapter's three-actor version shows which files need the edits.
