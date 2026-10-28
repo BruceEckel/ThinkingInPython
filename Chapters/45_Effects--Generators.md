@@ -293,7 +293,7 @@ so the type checker cannot ensure that `drive()` returns a `Result`.
 Each `try` wraps one call that resumes the generator, `next()` or `send()`,
 because a `StopIteration` from either means the conversation finished.
 The `try` around the priming call catches a conversation that returns before it asks anything.
-Any other call that can raise `StopIteration` belongs outside both.
+Any other call that can raise `StopIteration` belongs outside both `try` blocks.
 A driver that reads its answers from an iterator, for example,
 gets `StopIteration` from `next()` on the answers when they run out.
 Inside a `try`, that exception would look like the end of the conversation.
