@@ -5,7 +5,7 @@
 > Write the production bindings for `ask_tell.py`:
 > a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`.
 > Then run `greet(Console(), Console())` interactively.
-> Confirm `greet()` requires no change.
+> Confirm `greet()` runs unchanged.
 > Serving a new context without edits is what delayed binding provides.
 
 <details>
@@ -101,15 +101,15 @@ You can also replace either parameter with a double,
 and the other parameter keeps its binding.
 
 **Declare what the function needs.**
-`greet()` requires no change, and could not have required one.
-Its body names none of `Console`, `input()`, `print()`, or `Scripted`,
+`greet()` runs unchanged, as it must.
+Its body names only its parameters, `ask` and `tell`,
 so changing the binding leaves that body as it is.
 Delayed binding moves the choice of implementation to the call site,
 where a test can choose differently from production.
 
 **Satisfy the protocols structurally.**
 After the choice moves, the type checker still enforces the protocols.
-`Console` inherits from `object` alone and declares no relationship to `Ask` or `Tell`,
+`Console` inherits from `object` rather than from `Ask` or `Tell`,
 but it has the two methods with the right signatures,
 so it satisfies both protocols structurally.
 If you give `Console` a `tell()` that returns a `str`,
@@ -668,7 +668,7 @@ where one `asyncio.run()` call runs the coroutine.
 `async` satisfies neither of the other two.
 
 `async` does not **separate the interface from the implementation**.
-`await price_of_async(item)` specifies no interface.
+`await price_of_async(item)` names an implementation, not an interface.
 It says "run this particular coroutine."
 The coroutine's body defines what awaiting it does.
 Compare `Ask` in `ask_tell.py`,
