@@ -150,6 +150,15 @@ flourishes, nothing that obscures the point.
   an annotation is what it is, what a driver must do. Rule R47 in
   `bruce_edit_db.md` has the test and the chapter 45 pairs (Bruce,
   2026-10-25). A cut must not orphan a `[n]` tag.
+- **List punctuation:** every bullet item starts with a capital. An
+  item that is a sentence ends with a period; one that is a fragment
+  ends with nothing, the test being whether the items could be
+  separated from one another with commas. An imperative clause is a
+  sentence ("React to each new subclass: `__init_subclass__()`."), a
+  list where one item carries a second, full sentence keeps its
+  periods throughout, and an item that is a clause and comma-separable
+  both takes no period. Numbered exercise lists are sentences. Rule
+  R48 in `bruce_edit_db.md` has the pairs (Bruce, 2026-10-28).
 
 The style rules and watch list in the global `~/.claude/CLAUDE.md` are
 the standard for this pass. `banned_phrases.py` gates a handful of them;
