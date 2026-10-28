@@ -183,7 +183,7 @@ Python cannot copy a generator.
 `copy.copy()` on a suspended generator raises `TypeError`.
 A generator is therefore a *one-shot continuation*.
 
-Calling a generator function creates the generator and runs none of its body.
+Calling a generator function creates the generator and leaves its body for the driver to run.
 The new generator is suspended before its first statement,
 so no `yield` expression is waiting to receive a value.
 The first call, which runs the body to its first `yield`,
@@ -223,10 +223,9 @@ shows that calling an `async def` function leaves its body waiting to run.
 The call returns a coroutine object that holds the body.
 That chapter calls the object a description of work,
 since building it and running it are separate steps.
-A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
-the same three-part shape as a `Generator`.
+A `Coroutine[YieldType, SendType, ReturnType]` has the same three-part shape as a `Generator`.
 The shapes match because `async def` and generator functions both return an object that holds a body for a driver to run.
-Calling `interview()` returns a generator object and runs none of the function body.
+Calling `interview()` returns that object with its body still to run.
 `next()` and `send()` run the body, one `yield` at a time.
 
 For managing Effects,
@@ -318,7 +317,7 @@ expect(StopIteration, conversation.send, Answer("Bob"))
 #: [StopIteration]
 ```
 
-`GEN_CREATED` shows that calling `interview()` created the generator and ran none of its body.
+`GEN_CREATED` shows that calling `interview()` created the generator with its body still to run.
 Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
 because whenever `drive()`'s code runs, the generator waits at a `yield`.
 After the `return`, the generator is `GEN_CLOSED`,
@@ -930,7 +929,7 @@ A generator written for others to drive must therefore let `GeneratorExit` end i
 
 This chapter rests on three ideas:
 
-- Calling a generator function runs none of its body.
+- Calling a generator function leaves its body for the driver.
   The call returns a generator object that holds the body and its state,
   and a driver runs that body one `yield` at a time with `next()` and `send()`.
 - `yield` carries a request out of the body and `send()` carries the answer back in,
