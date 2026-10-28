@@ -279,8 +279,7 @@ In your own code, first check what the library declares.
 
 ## Nothing Runs Yet
 
-Calling `greet()` performs no work.
-It returns a `Generator`:
+Calling `greet()` returns a `Generator` before any line of its body runs:
 
 ```python
 # describe_only.py
@@ -479,7 +478,7 @@ Calling `bound("Bob")` builds a fresh description, and that one runs.
 A second `bound("Alice")` builds a fresh one too.
 
 An Effect from `success()` can run more than once,
-because `success()` builds no generator.
+because `success()` returns a `SuccessEffect` instead of a generator.
 A `SuccessEffect`'s `send()` reports the value every time,
 so a constant Effect replays.
 
@@ -542,8 +541,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 In Stateless, an unsupplied dependency is a type error,
 not a production incident.
-The type checker finds the omission,
-so you need no test that exercises the path and no reviewer who happens to notice it.
+The type checker finds the omission before any test exercises the path or any reviewer happens to notice it.
 
 The expected type in that message names `Async` and `Exception`:
 
@@ -968,7 +966,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
 
 A full EMS does [three things](44_Effects--Effect_Management.md#tracking-and-management),
 and the second is to separate each Effect's interface from its implementation.
-`Console` as a `Protocol` holds no implementation.
+`Console` as a `Protocol` is the interface.
 `Terminal` is one implementation and `Recorder` is another.
 `greet()` refers to neither.
 `Recorder` qualifies as a `Console` without inheriting from `Console`,
@@ -1192,7 +1190,7 @@ Having no container has three consequences:
    `supply()` binds for one execution of one Effect,
    so two bindings for the same type can be live at once,
    as the screen and memory `Console`s are in [When Two Implementations Match](#when-two-implementations-match).
-   Test cases need no reset between them.
+   Each test case supplies its own bindings and starts clean.
    A typical DI container has one flat registry and no equivalent to [handler layering](#layering-handlers).
 
 3. Stateless Abilities live in the function type.
@@ -1269,7 +1267,7 @@ neither `report()` nor anything that calls it needs `async`.
 ### `sleep()` Carries Two Abilities
 
 You need `wait()` at the point where an Effect requests a coroutine's result.
-A function that already returns an Effect needs no `wait()`,
+For a function that already returns an Effect, `yield from` is enough,
 because `yield from` composes the returned Effect into the caller's Effect.
 `stateless.time.sleep()` is such a function,
 and it pairs an `Async` request with a `Need[Time]` Ability.
@@ -1327,7 +1325,7 @@ not the standard library's `time` module,
 so `time.sleep(seconds)` is the coroutine that `Time.sleep()` returns.
 `Time.sleep()` is the only `async def` here.
 `wait()` hands its coroutine to the driver, which awaits it,
-so `delayed_sum()` needs no `async` and no `await` of its own.
+so `delayed_sum()` stays an ordinary generator function.
 
 `Time` has no special status in Stateless.
 It is an ordinary class whose one method is `async def sleep()`.
@@ -1828,7 +1826,7 @@ two of which take a vocabulary of their own:
    and `supply()` answers it with an instance.
 2. A failure is an exception.
    `@throws` lifts it into the type, and `catch()` takes it back out as a value.
-3. An Ability that the driver answers on its own needs no vocabulary.
+3. The driver answers some Abilities on its own.
    `Async` sits in the same channel as a `Need`,
    and `run()` answers it by awaiting the request's awaitable in the event loop it starts.
 
@@ -1884,7 +1882,7 @@ Try each exercise before opening its [solution](../Solutions/46_Effects--Statele
     then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
 5.  Add a `Metal` material to `test_nailer.py` with a strength that survives the robotic nailer,
     and add its two rows to the table.
-    Then explain why the test function body needs no change.
+    Then explain why the test function body stays the same.
 6.  This one looks ahead to `handle()`,
     which [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
     covers.
