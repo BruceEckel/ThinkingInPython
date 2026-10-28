@@ -60,7 +60,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 The loop version runs two lines longer than the recursive one,
 a difference too small to decide between them.
 The rewrite changes how much of the bookkeeping is yours.
-The recursive version lets Python keep the stack.
+The recursive version leaves the stack to Python.
 The call stack holds the sublists still to walk, and `return` pops one.
 In the loop version you allocate the stack, seed it with a copy of `items`,
 choose `pop()` over `pop(0)`, and choose `extend()` over `append()`.
