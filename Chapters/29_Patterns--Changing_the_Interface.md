@@ -240,7 +240,7 @@ use(ObjectAdapter(WhatIHave()))
 `ObjectAdapter` qualifies as a `WhatIWant` because it has an `f()` with the signature the `Protocol` declares.
 The adaptee does not qualify.
 If you call `use(WhatIHave())`, the type checker rejects the argument,
-because `WhatIHave` defines no `f()`.
+because `WhatIHave` defines `g()` and `h()`, not `f()`.
 `ObjectAdapter` keeps the check that inheritance provides in `adapter.py` and drops the base class.
 
 The standard library declares a target interface of this kind for file paths
