@@ -59,7 +59,8 @@ class StateMachine:
 shows a surrogate that forwards a call to whichever state object it currently holds.
 Define a `Mood` protocol with one `hello()` method,
 and give `UnpredictablePerson` a `change_to()` that swaps the held object.
-A new mood is another class with the same method, so the person needs no change.
+A new mood is another class with the same method,
+so `UnpredictablePerson` stays as it is.
 
 <details>
 <summary>The shape</summary>
@@ -99,7 +100,7 @@ class UnpredictablePerson:
 
 one `UnpredictablePerson` in your `exercise_1.py` gives three different `hello()` replies in a row,
 the last from `Prozac`.
-Adding `Prozac` changes no line of `UnpredictablePerson`.
+Adding `Prozac` leaves every line of `UnpredictablePerson` as it was.
 
 <details>
 <summary>Solution</summary>
@@ -144,7 +145,7 @@ print(person.hello())
 #: Everything is wonderful. Just wonderful.
 ```
 
-`UnpredictablePerson` names no specific mood,
+`UnpredictablePerson` refers to its mood through the `Mood` protocol,
 so adding a third mood changes which `Mood` object `change_to()` installs and leaves every line of `UnpredictablePerson` as it was.
 `UnpredictablePerson` is the [*State* surrogate](../../Chapters/25_Patterns--Surrogate.md#state),
 applied to a new domain.
@@ -932,7 +933,7 @@ The rest of the cycle is a straight line, one input type per state,
 and the machine is still the chapter's `table_machine.py` engine unchanged.
 
 **Record what later conditions need.**
-A `RinseDone` input carries no data of its own,
+A `RinseDone` input is a bare signal that the rinse finished,
 so the condition reads `load_kg` off the machine,
 where `begin()` recorded it when the cycle started.
 
@@ -1036,7 +1037,8 @@ If you leave out the unconditional rule to `ElevatorState.DOORS_OPEN` under `(ID
 a call for the floor the car is on fails both `above()` and `below()`,
 and `handle()` raises `NoTransition`:
 `no rule from ElevatorState.IDLE on CallButton`.
-The demo makes no such call, so its output does not change.
+The demo's one call, `CallButton(3)` from floor 0, passes `above()`,
+so its output stays the same.
 The solution keeps that rule last, as the group's `else`.
 
 ```python
@@ -1296,7 +1298,7 @@ a different design, a detail, or an equivalent alternative.
 
 [A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
 explains that the engine looks up `type(input_)` as the key,
-so a subclass of an input type has no rule of its own.
+so an instance of a subclass of an input type finds the rules filed under the subclass and passes over the base class's rules.
 Read the `NoTransition` message to see which class it reports,
 then fix it once by adding keys and once by choosing what the input is.
 Compare how many rules each fix needs as denominations and states multiply.
@@ -1407,7 +1409,7 @@ print(m2.amount)
 
 **Reproduce the failure.**
 The exception is `NoTransition`, not a `TypeError` or a silent no-op,
-and its message names the input class that found no rule: `Nickel`.
+and its message names the input's class: `Nickel`.
 `handle()` looks up `(self.state, type(input_))`,
 and `type(Nickel("nickel", 5))` is `Nickel`.
 A dictionary probe compares keys by equality,
