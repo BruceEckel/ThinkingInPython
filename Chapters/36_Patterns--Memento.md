@@ -205,7 +205,7 @@ so it installs the stray tuple as the sketch's state with no complaint.
 The type checker reports the plain tuple before the program runs.
 At runtime, `restore()` raises an `AttributeError` when it reads `memento.strokes`.
 The `strokes` tuple is immutable on its own.
-The record makes the attribute that holds it read-only too.
+The record adds a second guard by making the attribute that holds it read-only.
 
 ### Testing the Sketch
 
