@@ -27,10 +27,11 @@ def test_tier_2_hit() -> None:
 
 
 def test_verb_with_no_or_none_object_is_tier_2() -> None:
-    assert [h[2] for h in hits("Python raises no exception. The call "
-                               "runs none of the body. It has no slots. "
-                               "The second supplies none.")] == [
-        "raises no", "runs none of", "has no", "supplies none"]
+    found = hits("Python raises no exception. The call runs none of "
+                 "the body. It has no slots. The second supplies none.")
+    assert sorted(h[2] for h in found) == [
+        "has no", "raises no", "runs none of", "supplies none"]
+    assert {h[1] for h in found} == {2}
 
 
 def test_no_idioms_and_bare_no_are_not_hits() -> None:
