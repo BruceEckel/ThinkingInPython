@@ -215,8 +215,8 @@ and `None` is not an `Answer`.
 The interpreter accepts `send(None)` as the priming call,
 but the type checker rejects it,
 because the annotation applies one `SendType` to every call, the first included.
-A driver therefore primes with `next()`,
-which sends no value and passes the check.
+A driver therefore primes with `next()`, which takes any iterator,
+so the call passes the check.
 
 ## A Generator Waits for Its Driver {#a-generator-is-a-description}
 
@@ -246,7 +246,7 @@ That separation of a request from its fulfillment is the core of an [Effect Mana
 A driver function runs the generator from start to finish.
 It starts the body with `next()`, sends each answer back with `send()`,
 and returns the generator's result when the body ends.
-`drive()` looks up each answer in a table:
+Here, it looks up each answer in a table:
 
 ```python
 # drive.py
@@ -325,8 +325,8 @@ Each line of `drive()`'s trace shows `GEN_SUSPENDED`,
 because whenever `drive()`'s code runs, the generator waits at a `yield`.
 After the `return`, the generator is `GEN_CLOSED`,
 so sending it another answer raises `StopIteration` at once.
-That `StopIteration` carries no value,
-so `expect()` prints the exception's class name with no message.
+That `StopIteration` is empty,
+so `expect()` prints the exception's class name alone.
 
 The generator and `drive()` take turns.
 While the body runs, `drive()` waits inside `send()`,
@@ -457,7 +457,8 @@ A `yield from` therefore works like a function call:
 while the values `emit()` yields still go to the driver.
 
 `drive_by_hand.py` and `drive()` read a generator's result by catching `StopIteration` and taking its `value`.
-`report()` has no `try`, because `yield from` manages the result for you.
+`report()` writes an assignment instead of a `try`,
+because `yield from` manages the result for you.
 When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`.
 
@@ -747,7 +748,7 @@ However deeply the delegations nest, the program has one driver.
 The generator yields a `Question`, `drive()` looks it up,
 and the request stops there.
 `yield from` relays the request upward and passes the answer back down intact,
-so `survey()` contains no code that reads a `Question`.
+so reading a `Question` stays `drive()`'s job.
 
 `drive()` and `yield from` also differ in what they do at `StopIteration`.
 Both catch it and both take `stop.value`,
@@ -804,7 +805,7 @@ print(drive(
 and relays a request with a `yield` of its own at `[2]` instead of a `yield from`,
 because `yield from` would relay every request.
 In the second run, `drive()` sees two requests instead of three.
-The proxy answers `town` at `[1]`, so the driver sees no request for it,
+The proxy answers `town` at `[1]`, so that request stops at the proxy,
 and the result changes while `interview()` and `drive()` stay the same.
 `proxy()` is a [*Proxy*](25_Patterns--Surrogate.md#proxy):
 the same interface as the object it wraps, with a forwarding loop of its own.
@@ -854,7 +855,7 @@ An exception that escapes the generator's body ends the generator and propagates
 
 `g.close()` raises `GeneratorExit` at the `yield` on which the generator now waits,
 `yield "recovered"`.
-`worker()` has no matching `except`, so `GeneratorExit` propagates,
+`worker()` catches `ValueError` alone, so `GeneratorExit` propagates,
 the `finally` block runs, and the generator ends.
 `close()` catches the `GeneratorExit` and returns `None` once the generator finishes,
 so no traceback appears.
@@ -924,8 +925,8 @@ When a driver stops using a live generator before the generator finishes,
 the driver shuts it down with `close()`.
 Python also calls `close()` on a live generator when it reclaims the generator's memory.
 When Python reclaims a generator like `stubborn()`,
-the `RuntimeError` has no caller to reach,
-so Python prints it as an "Exception ignored" message and continues.
+the `close()` call comes from Python's cleanup rather than from your code,
+so Python prints the `RuntimeError` as an "Exception ignored" message and continues.
 A generator written for others to drive must therefore let `GeneratorExit` end it.
 
 ## The Driver You Already Use
@@ -1139,7 +1140,7 @@ ending when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
 The asynchronous generator `countdown()` writes the same loop as a body with `yield` and leaves the two methods to Python.
 
-An asynchronous generator has no return channel,
+An asynchronous generator drops the return channel,
 so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
 Writing `return` with a value in one is a `SyntaxError`, as is `yield from`.
 The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
@@ -1258,8 +1259,8 @@ so the state travels as a value instead of living in a stack frame.
 
 In `itertools_accumulate.py` from [Toolkits](41_Functional--Toolkits.md#accumulate),
 the iterable is `[1, 2, 3, 4]` and each step adds its element to the running total.
-`fibonacci()` folds `repeat(None)`, whose elements carry no information:
-each step needs the previous pair alone.
+`fibonacci()` folds `repeat(None)`, whose elements are placeholders.
+Each step needs the previous pair alone.
 The iterable's one job here is to decide how many steps `accumulate()` takes,
 and `repeat(None)` is endless, so the chain of pairs is endless too.
 [`islice()`](41_Functional--Toolkits.md#islice) takes the first `n` pairs,
@@ -1268,15 +1269,15 @@ and the comprehension keeps the first number of each pair.
 Needing `repeat(None)` as a placeholder shows that `itertools` lacks the right operation.
 A fold like `accumulate()` consumes an input.
 A sequence built from a start value and a step needs the opposite operation,
-an *unfold*, and `itertools` has no function for it.
+an *unfold*.
 The third-party `more-itertools` package supplies one as `iterate(func, start)`,
 which produces `start`, `func(start)`, `func(func(start))`,
 and so on without end.
 `toolz` has an `iterate()` of the same shape.
 Each is a generator:
 a loop that yields the current value and then applies the step to it.
-A generator is the direct way to write an unfold,
-and before PEP 255 Python had no generator.
+A generator is the direct way to write an unfold.
+Python has had generators since PEP 255.
 
 The third way is an iterator class with a `__next__()` that returns one value per call:
 
