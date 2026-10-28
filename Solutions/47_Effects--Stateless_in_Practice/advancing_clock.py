@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from typing import Final
 from stateless import Ability, Depend, handle, run
 
+type FileName = str
+
 class Now(Ability[datetime]):
     pass
 
@@ -24,7 +26,7 @@ def ticking(
 
 def archive_twice(
     entry: str
-) -> Depend[Now, tuple[str, str]]:
+) -> Depend[Now, tuple[FileName, str]]:
     opened = yield from now()
     path = f"log-{opened:%Y-%m-%d}.txt"
     stamped = yield from now()
@@ -32,7 +34,7 @@ def archive_twice(
 
 def archive_once(
     entry: str
-) -> Depend[Now, tuple[str, str]]:
+) -> Depend[Now, tuple[FileName, str]]:
     moment = yield from now()
     path = f"log-{moment:%Y-%m-%d}.txt"
     return path, f"[{moment:%Y-%m-%d}] {entry}"

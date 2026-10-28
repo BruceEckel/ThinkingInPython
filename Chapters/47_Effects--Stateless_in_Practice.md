@@ -389,7 +389,11 @@ from typing import Final
 from stateless import Depend, handle, run
 from timekeeping import Now, now
 
-def archive(entry: str) -> Depend[Now, tuple[str, str]]:
+type FileName = str
+
+def archive(
+    entry: str
+) -> Depend[Now, tuple[FileName, str]]:
     opened = yield from now()
     path = f"log-{opened:%Y-%m-%d}.txt"
     stamped = yield from now()
