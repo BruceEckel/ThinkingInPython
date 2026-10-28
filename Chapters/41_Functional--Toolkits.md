@@ -383,7 +383,8 @@ Each synthesized comparison is slower than a hand-written one,
 because it calls your methods.
 The `__le__()` that `total_ordering` supplies for `Weight` calls your `__lt__()`,
 then calls `__eq__()` too when `__lt__()` returns `False`.
-The `__le__()` that `@dataclass(order=True)` generates returns `(self.kg,) <= (other.kg,)` and calls no other method.
+The `__le__()` that `@dataclass(order=True)` generates compares the fields directly,
+as `(self.kg,) <= (other.kg,)`.
 
 ### `singledispatch`
 
@@ -498,7 +499,7 @@ print(next(it))
 `islice()` differs from a list slice in two ways.
 It rejects negative indices with a `ValueError`,
 since a negative index counts back from the end,
-and an iterator may have no end.
+and an iterator may be infinite.
 And it consumes every element it passes.
 An iterator you pass to `islice()` resumes where the slice stopped,
 so `next(it)` returns `8`.
@@ -682,7 +683,8 @@ print(list(filterfalse(lambda n: n % 2 == 0, range(6))))
 ```
 
 Since Python 3.14 the `operator` module names the `None` tests,
-`is_none()` and `is_not_none()`, so a `None` filter needs no lambda.
+`is_none()` and `is_not_none()`,
+so a `None` filter passes one of them in place of a lambda.
 `filterfalse(is_none, data)` drops each `None` and keeps a `0` or an empty string,
 which `filter(None, data)` discards along with the `None`.
 
@@ -733,8 +735,8 @@ expect(ValueError, list,  # [2]
 
 Python offers three ways to zip inputs of different lengths,
 and the one you choose records what a mismatch means.
-Plain `zip()` (`[1]`) stops at the shortest, drops the `3`,
-and raises no exception, the right choice when the extra elements are surplus.
+Plain `zip()` (`[1]`) stops at the shortest and drops the `3` silently,
+the right choice when the extra elements are surplus.
 `zip(a, b, strict=True)` (`[2]`) raises a `ValueError`.
 `strict=True` is the right choice when equal lengths are an invariant you want checked.
 `zip_longest()` pads,
@@ -937,7 +939,7 @@ An eager function prints every `computing square` line before the first `got`.
 
 `list(squares())[:3]` looks equivalent and is a different program.
 It builds the whole list before slicing, so it asks `squares()` for every value.
-Because `squares()` has no last value, `list()` keeps asking for more,
+Because `squares()` yields forever, `list()` keeps asking for more,
 printing `computing square` lines and growing its list until memory runs out.
 The slice never runs, because `list()` never returns.
 Slicing lazily lets the source be infinite.
@@ -984,7 +986,7 @@ so `factorial(5000)` raises a `RecursionError`.
 
 A long flat sequence calls for a loop or one of the `itertools` tools.
 For a countdown like this one, the loop is as short as the recursion and faster,
-since it makes no calls.
+since it stays in one stack frame.
 Recursion is a better choice if the problem branches rather than repeats,
 as `nested_sum.py` shows.
 
