@@ -585,17 +585,24 @@ delivering it to the `yield` that waits inside the inner generator.
 ```python
 # collect.py
 from collections.abc import Generator
+from typing import NewType
 
-type Prompt = str
+Prompt = NewType("Prompt", str)
 type Value = int
-type Total = int
+Total = NewType("Total", int)
 
 def collect(name: str) -> Generator[Prompt, Value, Total]:
-    first: Value = yield f"{name} needs a value"
-    second: Value = yield f"{name} needs another"
+    first: Value = yield Prompt(f"{name} needs a value")
+    second: Value = yield Prompt(f"{name} needs another")
     print(f"{name} got {first} and {second}")
-    return first + second
+    return Total(first + second)
 ```
+
+`Prompt` and `Total` are `NewType`s,
+as `Question` and `Result` are in `interview_generator.py`,
+so the type checker tells a prompt from a total.
+`Value` is a `type` alias,
+so the driver's `g.send(value)` passes a bare `int` and still matches the `SendType`.
 
 `both()` delegates to `collect()` twice:
 
@@ -607,7 +614,7 @@ from collect import Prompt, Total, Value, collect
 def both() -> Generator[Prompt, Value]:
     alpha: Total = yield from collect("alpha")  # [1]
     beta: Total = yield from collect("beta")  # [2]
-    yield f"total {alpha + beta}"  # [3]
+    yield Prompt(f"total {alpha + beta}")  # [3]
 
 g = both()
 print(next(g))

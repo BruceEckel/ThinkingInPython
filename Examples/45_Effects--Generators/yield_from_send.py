@@ -5,7 +5,7 @@ from collect import Prompt, Total, Value, collect
 def both() -> Generator[Prompt, Value]:
     alpha: Total = yield from collect("alpha")  # [1]
     beta: Total = yield from collect("beta")  # [2]
-    yield f"total {alpha + beta}"  # [3]
+    yield Prompt(f"total {alpha + beta}")  # [3]
 
 g = both()
 print(next(g))
