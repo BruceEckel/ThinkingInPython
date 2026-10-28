@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from record import record
 from stateless import Ability, Depend
 
+type Count = int
+
 class Get(Ability[int]):
     pass
 
@@ -26,7 +28,7 @@ def purchase(price: int) -> Depend[Get | Put, bool]:
     return True
 
 def spree(prices: tuple[int, ...]) -> Depend[
-    Get | Put, int
+    Get | Put, Count
 ]:
     bought = 0
     for price in prices:

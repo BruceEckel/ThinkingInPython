@@ -1378,6 +1378,8 @@ from collections.abc import Callable, Iterator
 from record import record
 from stateless import Ability, Depend, handle, run
 
+type Count = int
+
 class Get(Ability[int]):
     pass
 
@@ -1401,7 +1403,7 @@ def purchase(price: int) -> Depend[Get | Put, bool]:
 
 def spree(
     prices: tuple[int, ...]
-) -> Depend[Get | Put, int]:
+) -> Depend[Get | Put, Count]:
     bought = 0
     for price in prices:
         if (yield from purchase(price)):
