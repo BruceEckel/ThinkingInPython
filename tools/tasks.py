@@ -553,13 +553,17 @@ def sentence_shapes(v: Vars) -> None:
     subject after a first clause that already carries a relative
     clause or a parenthetical. The survey rules, printed only under ARGS=--survey and never
     baselined: [AND] an "and" joining two clauses with different
-    subjects, and [COLON] a colon followed by an independent clause.
+    subjects, [COLON] a colon followed by an independent clause, and
+    [ADD] an additive adverb ("also", "too", "as well") in a sentence
+    whose subject differs from the previous sentence's, where the
+    reader attaches the adverb to the new subject ("the generator
+    keeps its place as well" read as the closure keeping its place).
     Run `tip sentence-shapes CH=31 ARGS=--survey` at the start of a
     chapter pass. It reports and never gates; `tip prose` runs it after
     the subject-gap scan. CH= picks one chapter and its Solutions file.
     Hits judged keeps live in tools/data/sentence_shapes_baseline.txt,
     so the run prints only new ones; ARGS=--all lists every default
-    hit, and ARGS=--calibrate runs all six rules over
+    hit, and ARGS=--calibrate runs all seven rules over
     tools/data/edit_pairs.json and the built-in examples.
     """
     py("tools.sentence_shapes", *prose_files(v), *v.words("ARGS"))

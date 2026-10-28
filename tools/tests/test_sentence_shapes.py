@@ -103,6 +103,11 @@ def rules(source: str) -> list[str]:
      "`func(func(start))`, and so on without end. `toolz` has an "
      "`iterate()` of the same shape.", []),
     ("Intro paragraph.", []),
+    ("A closure keeps its captured variables between calls, but each call runs its body from the top. The generator keeps its place as well, so a loop in progress survives.", ["ADD"]),
+    ("A closure keeps its captured variables between calls, but each call runs its body from the top. The generator keeps its locals and its place in the body, so a loop in progress survives.", []),
+    ("It checks the declaration's type and ignores which code runs first. Pyright accepts the read too.", ["ADD"]),
+    ("Programmers have been bad at keeping objects inside that set. Constructing an object in an illegal state is too easy.", []),
+    ("The copy shares the inner objects. It duplicates the outer list as well.", []),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
     assert rules(source) == expected
@@ -138,7 +143,7 @@ def test_the_reported_line_is_the_sentences_first_character() -> None:
 def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL"}
-    assert set(SURVEY_RULES) == {"AND", "COLON"}
+    assert set(SURVEY_RULES) == {"AND", "COLON", "ADD"}
 
 
 def test_main_reports_without_failing_and_accepts(

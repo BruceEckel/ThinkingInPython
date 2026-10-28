@@ -1956,6 +1956,63 @@ periods, 29 fragment items without), so a new list is the place to
 apply it, and `scratchpad/bullets_scan.py` from that session is the
 shape of a checker if the rule ever needs one.
 
+### R49. An additive adverb after a change of subject names what it adds
+
+**Test.** "also", "too", "as well", and "likewise" say that something
+joins a set the previous sentence set up, and the reader must decide
+which constituent is the new member. When the sentence's subject differs
+from the previous sentence's subject, the subject is the reader's first
+candidate ("the generator, too, keeps its place"), so a sentence that
+meant to add to its predicate is misread. Read each such sentence twice,
+once with the adverb on the subject and once on the object or
+complement. If the subject reading is false or beside the point, name
+the thing added ("as well as X", "along with X", "X and Y") or let
+another word carry the addition ("that last change", "a second guard").
+A pronoun subject ("It also ...") carries the previous subject on and
+is quiet, and so is a sentence where the subject reading is the one
+meant ("Pyright accepts the read too").
+
+**Keep when.** The subject reading is the claim: "Tuples and
+dictionaries can carry them too", "A slice of CODE holds the export open
+too", "Python also calls CODE on a live generator when it reclaims the
+generator's memory" (the driver calls it, and Python does as well).
+Where both readings are true, the sentence stands.
+
+**Sightings.** 17 in 15 files, 2026-10-28, from Bruce's note on a
+sentence the session had just written in `45_Effects--Generators`
+("'as well' could read as 'the same way a closure does'. Analyze the
+problem grammatically and apply that analysis across the book"); the
+book-wide read had 178 candidates (`tip sentence-shapes ARGS=--survey`,
+rule `[ADD]`):
+- `45_Effects--Generators` (`7143c244`): "A closure keeps its captured
+  variables between calls, but each call runs its body from the top.
+  The generator keeps its place as well," -> "The generator keeps its
+  locals and its place in the body,"
+- `02_Foundations--Tour` (`4e378773`): "The copy shares the outer list's
+  inner objects. The standard library's `copy.deepcopy()` duplicates the
+  inner objects as well." -> "duplicates the inner objects as well as
+  the outer list."
+- `20_Patterns--Rethinking_Objects` (`23260e24`): "A fully defensive
+  class must copy on the way in as well." -> "must copy on the way in as
+  well as on the way out."
+- `44_Effects--Effect_Management` (`32e4070b`): "A library checks the
+  Effects you wrote down. A language with native Effects also finds the
+  ones you left out," -> "A language with native Effects checks those
+  and finds the ones you left out,"
+- `21_Patterns--Design_Patterns` (`1aadacc7`): "A registry factory
+  removes that last change too," -> "removes that last change," ("last"
+  carries the addition)
+- `36_Patterns--Memento` (`fecb80d5`): "The `strokes` tuple is immutable
+  on its own. The record makes the attribute that holds it read-only
+  too." -> "The record adds a second guard by making the attribute that
+  holds it read-only."
+- the rest in chapters 06, 12 (two), 15, 18, 22, 26, 47 and Solutions
+  04, 17, 21, each the same shape and repair.
+
+**Home.** CLAUDE.md (project, the `tip sentence-shapes` paragraph:
+`[ADD]` is a survey rule there, since 161 of the 178 hits were keeps);
+this file. Promoted on Bruce's ruling, the way R46 to R48 were.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different

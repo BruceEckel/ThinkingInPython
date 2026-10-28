@@ -88,6 +88,11 @@ SOURCES: Final[tuple[str, ...]] = (
     "`func(func(start))`, and so on without end. `toolz` has an "
     "`iterate()` of the same shape.",
     "Intro paragraph.",
+    "A closure keeps its captured variables between calls, but each call runs its body from the top. The generator keeps its place as well, so a loop in progress survives.",
+    "A closure keeps its captured variables between calls, but each call runs its body from the top. The generator keeps its locals and its place in the body, so a loop in progress survives.",
+    "It checks the declaration's type and ignores which code runs first. Pyright accepts the read too.",
+    "Programmers have been bad at keeping objects inside that set. Constructing an object in an illegal state is too easy.",
+    "The copy shares the inner objects. It duplicates the outer list as well.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 

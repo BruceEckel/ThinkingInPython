@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""Report sentences with an imperative-plus-consequence, a split-worthy "and", a colon-led clause, or a pair word's stray conjunction.
+"""Report sentences with an imperative-plus-consequence, a split-worthy "and", a colon-led clause, a pair word's stray conjunction, or an additive adverb with an open focus.
 
-Four sentence shapes from the author's style rules, found with the
+Five sentence shapes from the author's style rules, found with the
 dependency parse that `tools/parsed_prose.py` caches under
 `build/parses/` (spaCy, run in a throwaway Python 3.12 environment; see
 that module). Each hit carries its rule label at the start of the
@@ -87,9 +87,35 @@ this shape, 5 were split, and the 6 keeps are Done-when criteria,
 which list several conditions in one sentence by design. A sentence
 earns `[AND+REL]` or `[AND]`, never both.
 
+`[ADD]` (2026-10-28, from a sentence the author marked in chapter 45)
+is an additive adverb whose focus the sentence leaves open. "also",
+"too", "as well", and "likewise" (`ADDITIVE_WORDS`) say that
+something joins a set the previous sentence established, and the
+reader has to decide which constituent is the new member. When the
+sentence's subject differs from the previous sentence's, the subject
+is the first candidate ("the generator, too, keeps its place"), and
+a writer who meant the predicate ("its place, as well as its
+variables") is misread: "A closure keeps its captured variables
+between calls. The generator keeps its place as well" said that the
+closure keeps its place. Both readings are open whenever the subject
+is new, so the rule fires on a root-clause additive adverb in a
+sentence whose root subject's lemma differs from the previous
+sentence's root subject (same paragraph), the subject not a bare
+pronoun (`BARE_PRONOUNS`, plus "we", "you", "I", "one"), since a
+pronoun carries the previous subject on. The degree "too" ("too
+easy": "too" followed by anything but punctuation), the pair "not
+only ... but also", and "as well as" (a conjunction, not the tag)
+are not additive here and are skipped, and so is an adverb in a
+subordinate clause. The repair names the thing added ("keeps its
+locals and its place", "copies on the way in as well as on the way
+out") or lets another word carry it ("removes that last change").
+The book-wide read that day had 178 hits and 17 real ones, so the
+rule is a survey rule: most additive adverbs with a new subject do
+mean the subject ("Pyright accepts the read too"), and the reader
+cannot tell which from the parse.
 Four rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-and `[AND+REL]`, judged against a baseline. Two are survey rules, `SURVEY_RULES`: `[AND]` and
-plain `[COLON]`. The calibration shows why. `[AND]` fired on 7 before
+and `[AND+REL]`, judged against a baseline. Three are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, and `[ADD]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -131,7 +157,7 @@ the stale entries. A run given paths compares against those files' entries alone
 with paths adds and drops entries for those files and keeps
 every other file's entries.
 
-`--calibrate` checks all six rules against `tools/data/edit_pairs.json`
+`--calibrate` checks all seven rules against `tools/data/edit_pairs.json`
 (the sentences the author rewrote, 72 records of `before`, `after`, and
 `fault`): each before and after text is parsed as a one-paragraph
 document, and each rule reports the pairs where it fires on the before
@@ -159,7 +185,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes           # new hits
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
-    uv run python -m tools.sentence_shapes --survey  # + AND, COLON
+    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
@@ -227,6 +253,7 @@ RULES: Final = {
 SURVEY_RULES: Final = {
     "AND": "an and joining clauses with different subjects",
     "COLON": "colon, then an independent clause",
+    "ADD": "an additive adverb after a change of subject",
 }
 """Printed only under `--survey`; never baselined."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
@@ -246,6 +273,10 @@ PAIR_BREAKS: Final = frozenset(",;:.()?!")
 PAIR_NOUN_START: Final = frozenset(
     {"DET", "NOUN", "PROPN", "PRON", "ADJ", "NUM"})
 """Parts of speech that open a noun phrase after the stray conjunction."""
+ADDITIVE_WORDS: Final = frozenset({"also", "too", "likewise"})
+"""Adverbs that add a member to a set the previous sentence set up."""
+CARRIED_SUBJECTS: Final = BARE_PRONOUNS | frozenset({"we", "you", "i", "one"})
+"""A subject that carries the previous sentence's subject on."""
 
 CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     # (rule, text, should it fire)
@@ -286,6 +317,18 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
      "`func(func(start))`, and so on without end. `toolz` has an "
      "`iterate()` of the same shape.", False),
     ("PAIR", "Both forms keep the result and the name.", False),
+    ("ADD", "A closure keeps its captured variables between calls, but "
+            "each call runs its body from the top. The generator keeps "
+            "its place as well, so a loop in progress survives.", True),
+    ("ADD", "A closure keeps its captured variables between calls, but "
+            "each call runs its body from the top. The generator keeps "
+            "its locals and its place in the body, so a loop in progress "
+            "survives.", False),
+    ("ADD", "It checks the declaration's type and ignores which code "
+            "runs first. Pyright accepts the read too.", True),
+    ("ADD", "Programmers have been bad at keeping objects inside that "
+            "set. Constructing an object in an illegal state is too "
+            "easy.", False),
     ("PAIR", "A `break` at the match leaves both loops in one step and "
              "skips `else` along with them.", False),
 )
@@ -601,11 +644,79 @@ def colon_clause(sentence: Sentence) -> str | None:
     return found
 
 
+def additive_word(sentence: Sentence) -> Token | None:
+    """The sentence's additive adverb, or None.
+
+    "also", "too", "likewise", or the "well" of "as well". Skipped:
+    the "also" of "but also", the degree "too" (followed by a word,
+    not punctuation), and "as well as", which is a conjunction.
+    """
+    toks = sentence.tokens
+    for k, tok in enumerate(toks):
+        low = tok.text.lower()
+        before = toks[k - 1].text.lower() if k else ""
+        after = toks[k + 1] if k + 1 < len(toks) else None
+        if low in ADDITIVE_WORDS and tok.pos in ("ADV", "PART"):
+            if low == "also" and before == "but":
+                return None
+            if low == "too" and after is not None and not after.punct:
+                continue
+            return tok
+        if low == "well" and before == "as":
+            if after is not None and after.text.lower() == "as":
+                continue
+            return tok
+    return None
+
+
+def governing_verb(tok: Token, sentence: Sentence) -> Token:
+    """The verb an adverb modifies, through any adverb or aux chain."""
+    cur = tok
+    while cur.head != cur.i:
+        head = sentence.tokens[cur.head]
+        if head.pos in ("VERB", "AUX"):
+            return head
+        cur = head
+    return cur
+
+
+def additive_after_new_subject(sentence: Sentence,
+                               previous: Sentence) -> bool:
+    """Does an additive adverb follow a change of root subject?
+
+    The adverb must sit in the root clause, both sentences must have
+    a root subject, this sentence's subject must not be a pronoun
+    that carries the previous subject on, and the two subjects'
+    lemmas must differ.
+    """
+    adverb = additive_word(sentence)
+    root = root_of(sentence)
+    if adverb is None or root is None:
+        return False
+    if governing_verb(adverb, sentence).i != root.i:
+        return False
+    subject = subject_of(root, sentence)
+    previous_root = root_of(previous)
+    if subject is None or previous_root is None:
+        return False
+    previous_subject = subject_of(previous_root, previous)
+    if previous_subject is None:
+        return False
+    if subject.text.lower() in CARRIED_SUBJECTS:
+        return False
+    return subject.lemma.lower() != previous_subject.lemma.lower()
+
+
 def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph."""
     if skipped(paragraph):
         return
+    previous: Sentence | None = None
     for sentence in paragraph.sentences:
+        if previous is not None and additive_after_new_subject(
+                sentence, previous):
+            yield "ADD", sentence
+        previous = sentence
         if imperative_consequence(sentence):
             yield "IMP", sentence
         if and_rides_on_relative(sentence):

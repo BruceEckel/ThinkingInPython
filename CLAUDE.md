@@ -317,11 +317,22 @@ were split, and the keeps are Done-when criteria. A
 colon after a count or a demonstrative ("three parts:", "this
 shape:") is skipped. The survey rules print only under `ARGS=--survey`
 and never enter the baseline: `[AND]`, an "and" that joins two clauses
-with different subjects, and `[COLON]`, a colon followed by an
-independent clause. The author's own rewrites fire `[AND]` six times in
+with different subjects, `[COLON]`, a colon followed by an
+independent clause, and `[ADD]` (2026-10-28), an additive adverb
+("also", "too", "as well", "likewise") in the root clause of a
+sentence whose subject differs from the previous sentence's. The
+adverb says something joins a set the previous sentence set up, and
+a new subject is the reader's first candidate, so a writer who meant
+the predicate is misread: "A closure keeps its captured variables
+between calls. The generator keeps its place as well" said the
+closure keeps its place; the repair names the thing added ("keeps
+its locals and its place"). The book-wide read that day had 178
+hits and 17 rewrites, since most such adverbs do mean the subject
+("Pyright accepts the read too"), which is why it is a survey rule.
+The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
-pass. `ARGS=--calibrate` runs all five rules over
+pass. `ARGS=--calibrate` runs all seven rules over
 `tools/data/edit_pairs.json` and the style rules' own examples.
 `tip passive` (`tools/passive_voice.py`, 2026-10-19) reads the same
 parse for passive clauses: a verb with a passive auxiliary and a passive
