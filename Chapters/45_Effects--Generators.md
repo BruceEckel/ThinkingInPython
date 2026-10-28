@@ -183,8 +183,9 @@ Python cannot copy a generator.
 `copy.copy()` on a suspended generator raises `TypeError`.
 A generator is therefore a *one-shot continuation*.
 
-A newly created generator pauses at the top of the function body,
-before any code runs, so no `yield` expression is waiting to receive a value.
+Calling a generator function creates the generator and runs none of its body.
+The new generator is suspended before its first statement,
+so no `yield` expression is waiting to receive a value.
 The first call, which runs the body to its first `yield`,
 *primes* the generator.
 That call must be `next()` or `send(None)`.
