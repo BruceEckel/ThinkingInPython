@@ -371,7 +371,7 @@ That is the pair of dispatches the `eval_*()` family writes out.
 `singledispatchmethod` matches on the MRO, like `singledispatch`,
 rather than exactly.
 
-Declaring the `@singledispatchmethod` on a shared base is a mistake that runs and returns a wrong answer.
+Declaring the `@singledispatchmethod` on a shared base is a mistake that runs and gives wrong answers.
 The base then holds one dispatcher that every subclass inherits.
 Because resolving `self` finds that same dispatcher for every subclass,
 each class needs its own `@singledispatchmethod`.
