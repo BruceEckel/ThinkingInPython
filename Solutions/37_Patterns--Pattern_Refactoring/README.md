@@ -765,7 +765,7 @@ including a harmless one like `Paper`, whose answer is `"none"`.
 **Fall back to a default answer.**
 `hazard()` returns `"none"` for the plastic, whose hazard is toxic fumes.
 That wrong answer looks like every correct `"none"` beside it.
-The forgotten registration gets past both the run and the type checker.
+The forgotten registration passes both the run and the type checker.
 
 **Refuse an unregistered type.**
 `strict_hazard()` raises a `NotImplementedError` that names the material at the first call.
