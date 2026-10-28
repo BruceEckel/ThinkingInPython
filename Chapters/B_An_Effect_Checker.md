@@ -138,7 +138,7 @@ because a dictionary keeps insertion order.
 The `"os.*"` below it is `FileSystem`.
 Whole modules take one line each, which keeps the table short.
 
-A name that matches no pattern gets `UNKNOWN`.
+A name that falls through every pattern gets `UNKNOWN`.
 Because the table lists pure modules by name,
 leaving a module out can add an `Unknown` and cannot hide an Effect.
 
@@ -156,7 +156,7 @@ because the checker reads the code as text instead of importing it.
 In source text, `performs(Ask)` is the name `Ask`.
 
 The test file confirms that the first matching pattern wins,
-that a name no pattern matches is `Unknown`,
+that a name outside the table is `Unknown`,
 and that `names()` reads class names:
 
 ```python
@@ -861,13 +861,13 @@ def infer(known: dict[str, Facts], table: Table) -> Rows:
     return rows
 ```
 
-An unresolved call has the name `"?"`, which matches no pattern,
+An unresolved call has the name `"?"`, which falls through every pattern,
 so `lookup()` answers `UNKNOWN`.
 
 `step()` is a pure function from one set of rows to the next.
 A declared row stays as written,
 so a caller's row includes the declaration instead of what the callee's body performs.
-A function that declares no row gets the union of what its calls perform.
+Every other function gets the union of what its calls perform.
 
 `infer()` is the loop.
 The [walrus operator](04_Foundations--Control_Flow.md#the-walrus-operator)
@@ -1075,7 +1075,7 @@ The test file confirms that:
 - An Effect the body performs and the declared row omits is a finding.
 - An Effect the row declares is no finding.
 - `hides()` removes an Effect from the body's row.
-- A function with no declared row gets an inferred one and draws no finding.
+- A function with no declared row gets an inferred one and passes the check.
 - An unresolved call adds `Unknown`.
 - A module that fails to parse becomes a finding under its module name.
 
@@ -1179,7 +1179,7 @@ so `fetch()` draws a finding.
 With the stub, `requests.get` is a declared function like any other,
 and the second run prints its row, `['Network']`.
 `fetch()`'s body row takes the stub's declared `Network`.
-`fetch()` declares `Network` too, so the second run reports no finding.
+`fetch()` declares `Network` too, so the second run accepts `fetch()`.
 The stub's body is the constant `...`,
 so its body row is empty and stays within its declaration.
 Type checkers solve the same problem the same way,
@@ -1236,8 +1236,9 @@ show(check(load([Path(name) for name in FILES])))
 
 The demo runs the checker on seven of its own source files and on `utils/result.py`,
 and prints every nonempty row.
-The output names no function from `effect_table.py`, `call_names.py`,
-`function_facts.py`, `local_types.py`, `infer_rows.py`, or `row_check.py`,
+Every function in `effect_table.py`, `call_names.py`, `function_facts.py`,
+`local_types.py`, `infer_rows.py`,
+and `row_check.py` has an empty row and stays out of the output,
 so the checker confirms that its core is pure.
 `FileSystem` and `Console` appear in three functions at the edge and in the module that calls them.
 [Effect Management](44_Effects--Effect_Management.md#a-program-can-never-be-pure)
@@ -1335,7 +1336,7 @@ If it kept the first assignment's type,
 The `builtins.*` pattern calls both pure, so both rows would be empty.
 
 The limits in this second list are silent.
-They produce no `Unknown`.
+Each one produces a row that looks complete.
 A production tool must remove each one:
 
 - A function passed as an argument.
