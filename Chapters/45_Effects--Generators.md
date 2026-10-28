@@ -584,9 +584,13 @@ delivering it to the `yield` that waits inside the inner generator.
 # collect.py
 from collections.abc import Generator
 
-def collect(name: str) -> Generator[str, int, int]:
-    first: int = yield f"{name} needs a value"
-    second: int = yield f"{name} needs another"
+type Prompt = str
+type Value = int
+type Total = int
+
+def collect(name: str) -> Generator[Prompt, Value, Total]:
+    first: Value = yield f"{name} needs a value"
+    second: Value = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
     return first + second
 ```
@@ -596,11 +600,11 @@ def collect(name: str) -> Generator[str, int, int]:
 ```python
 # yield_from_send.py
 from collections.abc import Generator
-from collect import collect
+from collect import Prompt, Total, Value, collect
 
-def both() -> Generator[str, int]:
-    alpha: int = yield from collect("alpha")  # [1]
-    beta: int = yield from collect("beta")  # [2]
+def both() -> Generator[Prompt, Value]:
+    alpha: Total = yield from collect("alpha")  # [1]
+    beta: Total = yield from collect("beta")  # [2]
     yield f"total {alpha + beta}"  # [3]
 
 g = both()

@@ -1,16 +1,20 @@
 # exercise_3.py
 from collections.abc import Generator
 
-def collect(name: str) -> Generator[str, int, int]:
-    first: int = yield f"{name} needs a value"
-    second: int = yield f"{name} needs another"
+type Prompt = str
+type Value = int
+type Total = int
+
+def collect(name: str) -> Generator[Prompt, Value, Total]:
+    first: Value = yield f"{name} needs a value"
+    second: Value = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
     return first + second
 
-def both() -> Generator[str, int]:
-    alpha: int = yield from collect("alpha")
-    beta: int = yield from collect("beta")
-    gamma: int = yield from collect("gamma")
+def both() -> Generator[Prompt, Value]:
+    alpha: Total = yield from collect("alpha")
+    beta: Total = yield from collect("beta")
+    gamma: Total = yield from collect("gamma")
     yield f"total {alpha + beta + gamma}"
 
 g = both()

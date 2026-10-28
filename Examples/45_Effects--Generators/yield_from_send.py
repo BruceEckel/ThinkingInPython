@@ -1,10 +1,10 @@
 # yield_from_send.py
 from collections.abc import Generator
-from collect import collect
+from collect import Prompt, Total, Value, collect
 
-def both() -> Generator[str, int]:
-    alpha: int = yield from collect("alpha")  # [1]
-    beta: int = yield from collect("beta")  # [2]
+def both() -> Generator[Prompt, Value]:
+    alpha: Total = yield from collect("alpha")  # [1]
+    beta: Total = yield from collect("beta")  # [2]
     yield f"total {alpha + beta}"  # [3]
 
 g = both()
