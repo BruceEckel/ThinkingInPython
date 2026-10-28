@@ -387,13 +387,15 @@ from collections.abc import Callable
 from enum import Enum
 from record import record
 
-type Next = Callable[[str], Turnstile]
+type StateName = str
+type Word = str
+type Next = Callable[[Word], Turnstile]
 
 @record
 class WordRow:
     next: Next
 
-def table(transitions: dict[str, str]) -> Next:
+def table(transitions: dict[Word, StateName]) -> Next:
     ...
 
 class Turnstile(WordRow, Enum):
@@ -427,14 +429,16 @@ from collections.abc import Callable
 from enum import Enum
 from record import record
 
-type Next = Callable[[str], Turnstile]
+type StateName = str
+type Word = str
+type Next = Callable[[Word], Turnstile]
 
 @record
 class WordRow:
     next: Next
 
-def table(transitions: dict[str, str]) -> Next:
-    def next_state(word: str) -> Turnstile:
+def table(transitions: dict[Word, StateName]) -> Next:
+    def next_state(word: Word) -> Turnstile:
         name = transitions.get(word, transitions["*"])
         return Turnstile[name]
     return next_state
@@ -501,7 +505,9 @@ The controller then holds the table and does one lookup per word.
 
 ```python
 # The shape of exercise_4.py
-type Transitions = dict[tuple[str, str], str]
+type StateName = str
+type Word = str
+type Transitions = dict[tuple[StateName, Word], StateName]
 
 TRANSITIONS: Transitions = {
     ("locked", "coin"): "unlocked",
@@ -511,11 +517,11 @@ TRANSITIONS: Transitions = {
 }
 
 class TableController:
-    def __init__(self, initial: str,
+    def __init__(self, initial: StateName,
                  table: Transitions) -> None:
         ...
 
-    def process(self, word: str) -> None:
+    def process(self, word: Word) -> None:
         ...
 ```
 
@@ -541,7 +547,9 @@ A single table keyed by `(state, word)` collects both dictionaries and makes the
 
 ```python
 # exercise_4.py
-type Transitions = dict[tuple[str, str], str]
+type StateName = str
+type Word = str
+type Transitions = dict[tuple[StateName, Word], StateName]
 
 TRANSITIONS: Transitions = {
     ("locked", "coin"): "unlocked",
@@ -551,12 +559,12 @@ TRANSITIONS: Transitions = {
 }
 
 class TableController:
-    def __init__(self, initial: str,
+    def __init__(self, initial: StateName,
                  table: Transitions) -> None:
         self.current = initial
         self.table = table
 
-    def process(self, word: str) -> None:
+    def process(self, word: Word) -> None:
         self.current = self.table[self.current, word]
 
 words = ["push", "coin", "push", "coin", "coin", "push"]

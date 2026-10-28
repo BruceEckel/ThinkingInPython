@@ -3,14 +3,16 @@ from collections.abc import Callable
 from enum import Enum
 from record import record
 
-type Next = Callable[[str], Turnstile]
+type StateName = str
+type Word = str
+type Next = Callable[[Word], Turnstile]
 
 @record
 class WordRow:
     next: Next
 
-def table(transitions: dict[str, str]) -> Next:
-    def next_state(word: str) -> Turnstile:
+def table(transitions: dict[Word, StateName]) -> Next:
+    def next_state(word: Word) -> Turnstile:
         name = transitions.get(word, transitions["*"])
         return Turnstile[name]
     return next_state

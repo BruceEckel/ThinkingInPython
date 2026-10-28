@@ -1,5 +1,7 @@
 # exercise_4.py
-type Transitions = dict[tuple[str, str], str]
+type StateName = str
+type Word = str
+type Transitions = dict[tuple[StateName, Word], StateName]
 
 TRANSITIONS: Transitions = {
     ("locked", "coin"): "unlocked",
@@ -9,12 +11,12 @@ TRANSITIONS: Transitions = {
 }
 
 class TableController:
-    def __init__(self, initial: str,
+    def __init__(self, initial: StateName,
                  table: Transitions) -> None:
         self.current = initial
         self.table = table
 
-    def process(self, word: str) -> None:
+    def process(self, word: Word) -> None:
         self.current = self.table[self.current, word]
 
 words = ["push", "coin", "push", "coin", "coin", "push"]
