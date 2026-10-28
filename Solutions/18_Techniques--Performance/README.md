@@ -1010,7 +1010,8 @@ import sys
 print(sys._jit.is_available(), sys._jit.is_enabled())
 ```
 
-The listing carries no `#:` line, because its output depends on the interpreter.
+The listing's output depends on the interpreter,
+so it appears here instead of in a `#:` line.
 The book's build prints `False False`.
 
 The two flags identify the state.
@@ -1024,7 +1025,7 @@ and `PYTHON_JIT=0` switches it back off.
 
 On a `True False` build,
 the comparison is two runs of the same file that differ in `PYTHON_JIT` alone.
-`tip` and `uv run` use the project's own interpreter, which has no JIT.
+`tip` and `uv run` use the project's own interpreter, the `False False` build.
 Run the file with the `True False` build's `python` instead,
 from the chapter directory with `utils/` on the import path
 (`tip membership` prints those commands in your shell's syntax):
