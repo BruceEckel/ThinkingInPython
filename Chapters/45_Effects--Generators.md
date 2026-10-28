@@ -32,13 +32,12 @@ but generators are useful on their own.
 
 ## Annotating a Generator
 
-Earlier chapters annotate their generators with a short form:
-`Iterator[int]` in [Iterators](22_Patterns--Iterators.md#generators),
+Earlier chapters annotate their generators using the short form `Iterator[int]` in [Iterators](22_Patterns--Iterators.md#generators),
 and `Generator[str]` in [Context Managers](15_Techniques--Context_Managers.md#a-basic-context-manager).
-A short form fits a generator that yields values, receives `None`,
+The short form fits a generator that yields values, receives `None`,
 and returns `None`.
 
-A generator that also receives values needs the full annotation,
+A generator that receives and/or returns values needs the full annotation,
 written here with the names the [`typing` documentation](https://docs.python.org/3/library/typing.html#annotating-generators-and-coroutines)
 uses:
 
@@ -76,7 +75,7 @@ print(list(countdown(6)), list(squares(6)))
 `Generator[int]` means `Generator[int, None, None]`.
 `Iterator[int]` describes the same one-way generator without relying on the defaults.
 It describes the yield channel alone,
-so a type checker rejects `send()` on anything annotated `Iterator`.
+so the type checker rejects `send()` on anything annotated `Iterator`.
 The long form is necessary when the send and return channels carry a value other than `None`,
 as they do in this chapter.
 
@@ -99,11 +98,10 @@ def interview() -> Generator[Question, Answer, Result]:
     return Result(f"{name} of {town}, friend {friend}")
 ```
 
-Although `Generator[str, str, str]` describes `interview()` accurately,
-it gives all three channels the same `str`.
-`NewType` gives each channel a distinct type,
-so the annotation says which kind of value each channel carries,
-and a type checker rejects a value on the wrong channel.
+Although `Generator[str, str, str]` works,
+`NewType` gives each channel a distinct type which makes the logic easer to follow.
+The annotation says which kind of value each channel carries,
+and the type checker rejects a value on the wrong channel.
 The distinction exists for the type checker.
 At runtime, `Question("name")` returns the same `str` you passed in.
 
