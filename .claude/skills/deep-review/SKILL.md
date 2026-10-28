@@ -159,6 +159,21 @@ flourishes, nothing that obscures the point.
   periods throughout, and an item that is a clause and comma-separable
   both takes no period. Numbered exercise lists are sentences. Rule
   R48 in `bruce_edit_db.md` has the pairs (Bruce, 2026-10-28).
+- **Additive adverb after a change of subject:** "also", "too",
+  "as well", or "likewise" in a sentence whose subject differs from
+  the previous sentence's. The adverb adds a member to a set the
+  previous sentence set up, and a new subject is the reader's first
+  candidate, so a sentence that meant to add to its predicate is
+  misread: "A closure keeps its captured variables between calls.
+  The generator keeps its place as well" said the closure keeps its
+  place. Read the sentence both ways; if the subject reading is
+  false, name the thing added ("keeps its locals and its place",
+  "copies on the way in as well as on the way out") or let another
+  word carry it ("removes that last change"). A subject reading that
+  is the claim stays ("Pyright accepts the read too"). `tip
+  sentence-shapes CH=NN ARGS=--survey` lists the candidates as
+  `[ADD]`; rule R49 in `bruce_edit_db.md` has the pairs (Bruce,
+  2026-10-28).
 
 The style rules and watch list in the global `~/.claude/CLAUDE.md` are
 the standard for this pass. `banned_phrases.py` gates a handful of them;
