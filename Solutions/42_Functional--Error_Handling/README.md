@@ -52,7 +52,7 @@ The other inputs give the same results as `composing_with_bind.py`.
 <summary>Solution</summary>
 
 If you append `func_d()` at the end of the chain,
-an `Err` from it has no later step to skip.
+an `Err` from it comes after every other step has run.
 Input `4` prints `func_c(4) runs` and then `Err(error='func_d(4)')`,
 so the run cannot show that a failure from the new step stops the chain.
 The solution puts `func_d()` before `func_c()`,
@@ -406,7 +406,7 @@ If you build the error list first and return early when it holds anything,
 the type checker rejects a later `a.answer`.
 It cannot infer that an empty error list means all three succeeded.
 The tuple pattern states that condition in the `case`,
-so the listing needs no `assert` to restate it.
+where the type checker reads it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -630,7 +630,6 @@ report(load_setting("timeout", "30").bind(
 ```
 
 **Note only the failing path.**
-The successful call carries no note.
 A successful `load_setting()` returns its `Ok` from inside the `try` block and never reaches `add_note()`,
 which sits in the `except` clause.
 An `Ok` holds an answer, while notes attach to exceptions.
