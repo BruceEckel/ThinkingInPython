@@ -46,8 +46,8 @@ find_factor(97)
 #: 97 is prime
 ```
 
-The loop tries every `d` from 2 up to 96, finds no factor,
-and so runs to the end of its `range()` without reaching `break`.
+Every `d` from 2 up to 96 leaves a remainder when it divides 97,
+so the loop runs to the end of its `range()` without reaching `break`.
 A `for` loop's `else` clause runs when the loop ends that way,
 so the `else` clause prints `97 is prime`.
 
@@ -197,7 +197,7 @@ a different design, a detail, or an equivalent alternative.
 [Errors and Exceptions](../../Chapters/04_Foundations--Control_Flow.md#errors-and-exceptions)
 shows how `except` selects which exception types it catches,
 and when `finally` and `else` run.
-Trace which clauses run when the exception type matches none of the `except` clauses.
+Trace which clauses run when the `except ValueError` clause meets a `TypeError`.
 To show the exception reaching the caller in a listing,
 wrap the call in a `try` that specifies the exception type.
 
@@ -681,7 +681,7 @@ def look_first(text):
 your four predictions match the run,
 where `look_first()` returns `None` for both strings,
 while `int()` returns `42` for both,
-and you can name the test `look_first()` would need for each string and say why `parse_int()` needs none.
+and you can name the test `look_first()` would need for each string and say why `parse_int()` agrees with `int()` on every string.
 
 <details>
 <summary>Solution</summary>
