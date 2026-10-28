@@ -257,7 +257,7 @@ so the `TypeError` propagates past it.
 The `finally` block still runs,
 since `finally` runs whether or not an exception is propagating.
 The `else` clause runs only when the `try` block finishes without an exception,
-so the `TypeError` bypasses the `else` clause too.
+so the `TypeError` bypasses the `else` clause as well as the `except` clause.
 
 **Catch the exception at the caller.**
 Because the `TypeError` propagates up past `divide_and_report()`,
