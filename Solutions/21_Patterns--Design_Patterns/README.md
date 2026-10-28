@@ -641,7 +641,7 @@ the part whose job is to assemble the pieces.
 The `match` in `main()` names every writer class,
 so `main()`'s heavy edges are the ones that remain.
 A [registry](../../Chapters/26_Patterns--Factory.md#self-registration)
-moves them out of `main()` as well.
+removes those remaining edges from `main()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

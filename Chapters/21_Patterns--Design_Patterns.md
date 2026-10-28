@@ -421,7 +421,7 @@ On the right, `Report` keeps its source,
 because the new writer satisfies the protocol and `Report` specifies no writer.
 `main` still changes, since something must construct the new class.
 A [registry factory](26_Patterns--Factory.md#self-registration)
-removes that last change too,
+removes that last change,
 by letting the new class register itself as its `class` statement runs.
 
 A change to a part can force an edit in every part with a heavy edge pointing at it.
