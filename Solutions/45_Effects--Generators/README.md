@@ -291,7 +291,7 @@ and `None` is not a `Result` in any case.
 
 The type checker accepts `return stop.value` as a declared `Result`,
 because `StopIteration.value` has type `Any`.
-The runtime raises no exception either.
+The runtime accepts it too.
 The program first fails later,
 when code that expects a string receives that `None`,
 far from the driver that returned it.
@@ -476,7 +476,7 @@ Calling a generator function produces a description rather than a conversation.
 The call `interview()` returns a generator object,
 suspended before the first line of its body.
 The generator stays suspended for the rest of the run,
-so it asks none of its three questions.
+so `color` is the one request `drive()` receives.
 The `return` statement in `survey()` interpolates the object's repr into the sentence where the interview's `Result` belonged.
 
 The type checker told you more.
@@ -676,15 +676,14 @@ error[invalid-argument-type]: Argument to bound method
   |                           ^^^^ Expected `Answer`, found `None`
 ```
 
-`next()` takes the generator and an optional default to return at exhaustion,
-and has no parameter for a value to send.
+`next()` takes the generator and an optional default to return at exhaustion.
 It asks for the generator's next yielded value and ignores the `SendType`,
 so priming with it type-checks for any generator.
 
 The mismatch is real rather than a type checker limitation.
 A generator's `SendType` describes what a suspended `yield` expression can receive.
-A just-started generator has no suspended `yield`,
-so nothing receives the value handed to the first `send()`.
+A just-started generator waits before the first line of its body rather than at a `yield`,
+so Python discards the value handed to the first `send()`.
 The runtime enforces the same rule.
 Sending a non-`None` value to a fresh generator raises `TypeError: can't send non-None value to a just-started generator`.
 So at runtime the first `send()` accepts `None` alone,
@@ -858,7 +857,7 @@ The `yield` in `machine()` runs the opposite direction from the one in `intervie
 Neither signature says so.
 Both yield strings, but `interview()` yields a request the driver must satisfy,
 while `machine()` yields a report the driver may ignore.
-`send(Coin(25))` delivers an event and answers no question.
+`send(Coin(25))` delivers an event rather than an answer.
 The `COLLECTING` it returns reports the state that event produced.
 A generator's type declares what each channel carries and leaves open whether a yielded value is a request or a report.
 
