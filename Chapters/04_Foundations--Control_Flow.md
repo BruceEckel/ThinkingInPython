@@ -232,7 +232,8 @@ where a `return` is a syntax error.
 ### `range()`, `enumerate()`, and `zip()`
 
 `for` walks the items of any iterable.
-A list, a set, a dictionary, or a string needs no index.
+A loop over a list, a set, a dictionary,
+or a string hands you each element directly.
 Use `range()` for counting and `enumerate()` when you also need the index:
 
 ```python
@@ -468,7 +469,7 @@ divide_and_report(1, 1)
 `checked_divide()` raises a `ValueError` before the division can raise Python's own `ZeroDivisionError`.
 Check the argument and raise your own exception first when the report should name the bad argument rather than the failed arithmetic.
 
-The optional `else` runs when the `try` block raises no exception.
+The optional `else` runs when the `try` block reaches its end.
 The loop `else` has the same shape.
 It runs when the loop hits no `break`.
 The `except` clauses catch exceptions raised in the `try` block alone.
