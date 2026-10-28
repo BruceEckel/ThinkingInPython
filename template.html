@@ -704,7 +704,13 @@
         button.blur();
       }
       menu.addEventListener("mouseenter", centerCurrent);
-      menu.addEventListener("focusin", centerCurrent);
+      menu.addEventListener("focusin", function (event) {
+        // Only the button taking focus (opening by keyboard) centers
+        // the list. A click on a link inside focuses it too, and
+        // scrolling the list under the pointer between mousedown
+        // and mouseup would lose that click.
+        if (event.target === button) centerCurrent();
+      });
       button.addEventListener("click", function () {
         var open = menu.hasAttribute("data-open");
         if (open) {
