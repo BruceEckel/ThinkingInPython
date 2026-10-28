@@ -4,12 +4,14 @@ from functools import partial
 from typing import Final
 
 type Fn = Callable[[float], float]
-type RootFinder = Callable[[Fn, float, float], float | None]
+type Hint = float
+type Root = float
+type RootFinder = Callable[[Fn, Hint, Hint], Root | None]
 
 MAX_ITER: Final[int] = 200
 
-def newton(f: Fn, a: float, b: float,
-           tolerance: float = 1e-12) -> float | None:
+def newton(f: Fn, a: Hint, b: Hint,
+           tolerance: float = 1e-12) -> Root | None:
     x = (a + b) / 2
     h = 1e-7
     for _ in range(MAX_ITER):
@@ -23,12 +25,12 @@ def newton(f: Fn, a: float, b: float,
     return None
 
 def newton_within(tolerance: float) -> RootFinder:
-    def finder(f: Fn, a: float, b: float) -> float | None:
+    def finder(f: Fn, a: Hint, b: Hint) -> Root | None:
         return newton(f, a, b, tolerance)
     return finder
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[RootFinder]) -> Root | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:

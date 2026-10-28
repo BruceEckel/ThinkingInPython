@@ -275,13 +275,15 @@ from collections.abc import Callable
 from typing import Final
 
 type Fn = Callable[[float], float]
-type RootFinder = Callable[[Fn, float, float], float | None]
+type Hint = float
+type Root = float
+type RootFinder = Callable[[Fn, Hint, Hint], Root | None]
 
 TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
 
-def bisection_tol(f: Fn, a: float, b: float,
-                  tolerance: float) -> float | None:
+def bisection_tol(f: Fn, a: Hint, b: Hint,
+                  tolerance: float) -> Root | None:
     if f(a) * f(b) > 0:  # Endpoints must bracket a root
         return None
     while abs(b - a) > tolerance:
@@ -292,10 +294,10 @@ def bisection_tol(f: Fn, a: float, b: float,
             a = mid
     return (a + b) / 2
 
-def bisection(f: Fn, a: float, b: float) -> float | None:
+def bisection(f: Fn, a: Hint, b: Hint) -> Root | None:
     return bisection_tol(f, a, b, TOLERANCE)
 
-def secant(f: Fn, a: float, b: float) -> float | None:
+def secant(f: Fn, a: Hint, b: Hint) -> Root | None:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
         f0, f1 = f(x0), f(x1)
@@ -307,7 +309,7 @@ def secant(f: Fn, a: float, b: float) -> float | None:
         x0, x1 = x1, x2
     return None
 
-def newton(f: Fn, a: float, b: float) -> float | None:
+def newton(f: Fn, a: Hint, b: Hint) -> Root | None:
     x = (a + b) / 2  # Start between the hints
     h = 1e-7
     for _ in range(MAX_ITER):
@@ -321,8 +323,8 @@ def newton(f: Fn, a: float, b: float) -> float | None:
             return x
     return None
 
-def solve(f: Fn, a: float, b: float,
-          finder: RootFinder) -> float:
+def solve(f: Fn, a: Hint, b: Hint,
+          finder: RootFinder) -> Root:
     root = finder(f, a, b)
     if root is None:
         raise ValueError(f"no root in [{a}, {b}]")
@@ -384,10 +386,11 @@ and returns a three-parameter finder:
 
 ```python
 # configured_strategy.py
-from algorithms import Fn, RootFinder, bisection_tol, solve
+from algorithms import (Fn, Hint, Root, RootFinder,
+                        bisection_tol, solve)
 
 def bisection_within(tolerance: float) -> RootFinder:
-    def finder(f: Fn, a: float, b: float) -> float | None:
+    def finder(f: Fn, a: Hint, b: Hint) -> Root | None:
         return bisection_tol(f, a, b, tolerance)
     return finder
 
@@ -448,10 +451,10 @@ In Python that chain is a list of functions.
 
 ```python
 # chain.py
-from algorithms import Fn, RootFinder
+from algorithms import Fn, Hint, Root, RootFinder
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[RootFinder]) -> Root | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
@@ -470,13 +473,14 @@ Running bisection alone and then the chain on two intervals shows the difference
 
 ```python
 # chain_demo.py
-from algorithms import RootFinder, bisection, newton, secant
+from algorithms import (Root, RootFinder, bisection,
+                        newton, secant)
 from chain import first_root
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
 
-def show(root: float | None) -> str:
+def show(root: Root | None) -> str:
     return "None" if root is None else f"{root:.6f}"
 
 chain: list[RootFinder] = [bisection, secant, newton]
@@ -524,8 +528,8 @@ The test file confirms that:
 
 ```python
 # test_chain.py
-from algorithms import (Fn, RootFinder, bisection,
-                        newton, secant)
+from algorithms import (Fn, Hint, Root, RootFinder,
+                        bisection, newton, secant)
 from chain import first_root
 
 def f(x: float) -> float:
@@ -533,8 +537,8 @@ def f(x: float) -> float:
 
 def watched(finder: RootFinder,
             tried: list[str]) -> RootFinder:
-    def recording(f: Fn, a: float,
-                  b: float) -> float | None:
+    def recording(f: Fn, a: Hint,
+                  b: Hint) -> Root | None:
         tried.append(finder.__name__)  # type: ignore
         return finder(f, a, b)
     return recording

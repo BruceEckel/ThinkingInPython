@@ -168,7 +168,7 @@ a different design, a detail, or an equivalent alternative.
 [*Chain of Responsibility*: Choosing the Handler at Runtime](../../Chapters/27_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 uses `None` to mean that a handler failed.
 `None` carries no reason, so give each handler a failure value that does,
-and return `float | Failed`.
+and return `Root | Failed`.
 In `first_root()`, tell a root from a failure with `match`, print each attempt,
 and read the handler's name from `__name__`.
 Because `Callable` declares no `__name__`,
@@ -184,6 +184,8 @@ from typing import Final, Protocol
 from record import record
 
 type Fn = Callable[[float], float]
+type Hint = float
+type Root = float
 
 @record
 class Failed:
@@ -191,29 +193,29 @@ class Failed:
 
 class Finder(Protocol):
     __name__: str
-    def __call__(self, f: Fn, a: float,
-                 b: float) -> float | Failed: ...
+    def __call__(self, f: Fn, a: Hint,
+                 b: Hint) -> Root | Failed: ...
 
 TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
 NO_CONVERGENCE: Final[Failed] = Failed(
     f"no convergence in {MAX_ITER} steps")
 
-def bisection_tol(f: Fn, a: float, b: float,
-                  tolerance: float) -> float | Failed:
+def bisection_tol(f: Fn, a: Hint, b: Hint,
+                  tolerance: float) -> Root | Failed:
     ...
 
-def bisection(f: Fn, a: float, b: float) -> float | Failed:
+def bisection(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     ...
 
-def secant(f: Fn, a: float, b: float) -> float | Failed:
+def secant(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     ...
 
-def newton(f: Fn, a: float, b: float) -> float | Failed:
+def newton(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     ...
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[Finder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[Finder]) -> Root | None:
     ...
 
 def f(x: float) -> float:
@@ -244,6 +246,8 @@ from typing import Final, Protocol
 from record import record
 
 type Fn = Callable[[float], float]
+type Hint = float
+type Root = float
 
 @record
 class Failed:
@@ -251,16 +255,16 @@ class Failed:
 
 class Finder(Protocol):
     __name__: str
-    def __call__(self, f: Fn, a: float,
-                 b: float) -> float | Failed: ...
+    def __call__(self, f: Fn, a: Hint,
+                 b: Hint) -> Root | Failed: ...
 
 TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
 NO_CONVERGENCE: Final[Failed] = Failed(
     f"no convergence in {MAX_ITER} steps")
 
-def bisection_tol(f: Fn, a: float, b: float,
-                  tolerance: float) -> float | Failed:
+def bisection_tol(f: Fn, a: Hint, b: Hint,
+                  tolerance: float) -> Root | Failed:
     if f(a) * f(b) > 0:
         return Failed(f"no root bracketed by [{a}, {b}]")
     while abs(b - a) > tolerance:
@@ -271,10 +275,10 @@ def bisection_tol(f: Fn, a: float, b: float,
             a = mid
     return (a + b) / 2
 
-def bisection(f: Fn, a: float, b: float) -> float | Failed:
+def bisection(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     return bisection_tol(f, a, b, TOLERANCE)
 
-def secant(f: Fn, a: float, b: float) -> float | Failed:
+def secant(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
         f0, f1 = f(x0), f(x1)
@@ -286,7 +290,7 @@ def secant(f: Fn, a: float, b: float) -> float | Failed:
         x0, x1 = x1, x2
     return NO_CONVERGENCE
 
-def newton(f: Fn, a: float, b: float) -> float | Failed:
+def newton(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     x = (a + b) / 2
     h = 1e-7
     for _ in range(MAX_ITER):
@@ -299,8 +303,8 @@ def newton(f: Fn, a: float, b: float) -> float | Failed:
             return x
     return NO_CONVERGENCE
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[Finder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[Finder]) -> Root | None:
     for finder in chain:
         match finder(f, a, b):
             case Failed(reason):
@@ -339,7 +343,7 @@ it returns a `Failed` at once when `f` has the same sign at both ends of the int
 **Tell a root from a failure.**
 The chapter's advice about the failure value still holds:
 `first_root()` checks the result's type, not its truthiness.
-A `Failed` is never a root, so `float | Failed` says which result is which.
+A `Failed` is never a root, so `Root | Failed` says which result is which.
 
 **Name each attempt.**
 Python stores each function's name in its `__name__` attribute,
@@ -449,19 +453,21 @@ from functools import partial
 from typing import Final
 
 type Fn = Callable[[float], float]
-type RootFinder = Callable[[Fn, float, float], float | None]
+type Hint = float
+type Root = float
+type RootFinder = Callable[[Fn, Hint, Hint], Root | None]
 
 MAX_ITER: Final[int] = 200
 
-def newton(f: Fn, a: float, b: float,
-           tolerance: float = 1e-12) -> float | None:
+def newton(f: Fn, a: Hint, b: Hint,
+           tolerance: float = 1e-12) -> Root | None:
     ...
 
 def newton_within(tolerance: float) -> RootFinder:
     ...
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[RootFinder]) -> Root | None:
     ...
 
 def f(x: float) -> float:
@@ -494,12 +500,14 @@ from functools import partial
 from typing import Final
 
 type Fn = Callable[[float], float]
-type RootFinder = Callable[[Fn, float, float], float | None]
+type Hint = float
+type Root = float
+type RootFinder = Callable[[Fn, Hint, Hint], Root | None]
 
 MAX_ITER: Final[int] = 200
 
-def newton(f: Fn, a: float, b: float,
-           tolerance: float = 1e-12) -> float | None:
+def newton(f: Fn, a: Hint, b: Hint,
+           tolerance: float = 1e-12) -> Root | None:
     x = (a + b) / 2
     h = 1e-7
     for _ in range(MAX_ITER):
@@ -513,12 +521,12 @@ def newton(f: Fn, a: float, b: float,
     return None
 
 def newton_within(tolerance: float) -> RootFinder:
-    def finder(f: Fn, a: float, b: float) -> float | None:
+    def finder(f: Fn, a: Hint, b: Hint) -> Root | None:
         return newton(f, a, b, tolerance)
     return finder
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[RootFinder]) -> Root | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:

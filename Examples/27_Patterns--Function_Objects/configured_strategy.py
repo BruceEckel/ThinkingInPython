@@ -1,8 +1,9 @@
 # configured_strategy.py
-from algorithms import Fn, RootFinder, bisection_tol, solve
+from algorithms import (Fn, Hint, Root, RootFinder,
+                        bisection_tol, solve)
 
 def bisection_within(tolerance: float) -> RootFinder:
-    def finder(f: Fn, a: float, b: float) -> float | None:
+    def finder(f: Fn, a: Hint, b: Hint) -> Root | None:
         return bisection_tol(f, a, b, tolerance)
     return finder
 

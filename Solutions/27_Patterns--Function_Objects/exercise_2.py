@@ -4,6 +4,8 @@ from typing import Final, Protocol
 from record import record
 
 type Fn = Callable[[float], float]
+type Hint = float
+type Root = float
 
 @record
 class Failed:
@@ -11,16 +13,16 @@ class Failed:
 
 class Finder(Protocol):
     __name__: str
-    def __call__(self, f: Fn, a: float,
-                 b: float) -> float | Failed: ...
+    def __call__(self, f: Fn, a: Hint,
+                 b: Hint) -> Root | Failed: ...
 
 TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
 NO_CONVERGENCE: Final[Failed] = Failed(
     f"no convergence in {MAX_ITER} steps")
 
-def bisection_tol(f: Fn, a: float, b: float,
-                  tolerance: float) -> float | Failed:
+def bisection_tol(f: Fn, a: Hint, b: Hint,
+                  tolerance: float) -> Root | Failed:
     if f(a) * f(b) > 0:
         return Failed(f"no root bracketed by [{a}, {b}]")
     while abs(b - a) > tolerance:
@@ -31,10 +33,10 @@ def bisection_tol(f: Fn, a: float, b: float,
             a = mid
     return (a + b) / 2
 
-def bisection(f: Fn, a: float, b: float) -> float | Failed:
+def bisection(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     return bisection_tol(f, a, b, TOLERANCE)
 
-def secant(f: Fn, a: float, b: float) -> float | Failed:
+def secant(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
         f0, f1 = f(x0), f(x1)
@@ -46,7 +48,7 @@ def secant(f: Fn, a: float, b: float) -> float | Failed:
         x0, x1 = x1, x2
     return NO_CONVERGENCE
 
-def newton(f: Fn, a: float, b: float) -> float | Failed:
+def newton(f: Fn, a: Hint, b: Hint) -> Root | Failed:
     x = (a + b) / 2
     h = 1e-7
     for _ in range(MAX_ITER):
@@ -59,8 +61,8 @@ def newton(f: Fn, a: float, b: float) -> float | Failed:
             return x
     return NO_CONVERGENCE
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[Finder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[Finder]) -> Root | None:
     for finder in chain:
         match finder(f, a, b):
             case Failed(reason):

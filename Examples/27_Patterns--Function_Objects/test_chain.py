@@ -1,6 +1,6 @@
 # test_chain.py
-from algorithms import (Fn, RootFinder, bisection,
-                        newton, secant)
+from algorithms import (Fn, Hint, Root, RootFinder,
+                        bisection, newton, secant)
 from chain import first_root
 
 def f(x: float) -> float:
@@ -8,8 +8,8 @@ def f(x: float) -> float:
 
 def watched(finder: RootFinder,
             tried: list[str]) -> RootFinder:
-    def recording(f: Fn, a: float,
-                  b: float) -> float | None:
+    def recording(f: Fn, a: Hint,
+                  b: Hint) -> Root | None:
         tried.append(finder.__name__)  # type: ignore
         return finder(f, a, b)
     return recording

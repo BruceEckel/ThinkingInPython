@@ -1,11 +1,12 @@
 # chain_demo.py
-from algorithms import RootFinder, bisection, newton, secant
+from algorithms import (Root, RootFinder, bisection,
+                        newton, secant)
 from chain import first_root
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
 
-def show(root: float | None) -> str:
+def show(root: Root | None) -> str:
     return "None" if root is None else f"{root:.6f}"
 
 chain: list[RootFinder] = [bisection, secant, newton]

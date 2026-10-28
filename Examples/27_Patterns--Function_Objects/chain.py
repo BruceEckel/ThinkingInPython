@@ -1,8 +1,8 @@
 # chain.py
-from algorithms import Fn, RootFinder
+from algorithms import Fn, Hint, Root, RootFinder
 
-def first_root(f: Fn, a: float, b: float,
-               chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: Hint, b: Hint,
+               chain: list[RootFinder]) -> Root | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
