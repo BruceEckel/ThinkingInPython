@@ -54,7 +54,7 @@ The log write, the clock read,
 and the exception become your function's Effects too,
 and no signature on the path mentions any of them.
 
-A behavior confined to one function needs no system to manage it,
+A behavior confined to one function is easy to manage,
 because one read of that function tells you what's happening.
 But an Effect passes from callee to caller, one call at a time.
 Every signature on the path hides it.
@@ -437,7 +437,7 @@ A reader who sees only the signature must ask:
 - Does it behave differently in a different environment?
 - Can it fail, and does it fail silently or loudly?
 
-The function's signature answers none of these questions.
+The function's signature leaves all four questions open.
 You must read the implementation, trusting that you find everything it needs,
 everything it changes, and everything that might go wrong.
 In a small codebase you can hold that knowledge in your head.
@@ -761,7 +761,7 @@ so the `Ask` handler supplies an empty name in that case.
 the Effect its handler bodies perform,
 the counterpart of Koka's `<console,exn>`.
 Flix installs the `Console` handler when the program starts,
-so `main()` writes none.
+so `main()` installs handlers for `Ask` and `Tell` alone.
 
 Languages in this family include Koka, Flix, Eff, Effekt, and Unison.
 OCaml 5 has the handler mechanism,
@@ -772,7 +772,7 @@ though it does not yet track Effects in function types.
 Changing languages is rarely an option.
 A team committed to Scala or TypeScript cannot use native Effects,
 so designers build *library* Effect systems on top of existing type systems.
-The compiler has no built-in notion of an Effect,
+The compiler checks types, not Effects,
 so the library encodes Effect information into the return type of every function,
 and the compiler's ordinary type checking tracks it from there.
 That encoding changes the mechanism.
@@ -918,7 +918,7 @@ The library therefore supplies its own copy of every effectful standard-library 
 each returning a description that carries the Effect signature.
 `print`, `printLine`,
 and `readLine` in the ZIO listing are the wrapped versions of Scala's own console calls.
-The TypeScript listing uses no wrapper from the library and does the wrapping itself:
+The TypeScript listing does its own wrapping:
 `console.log` goes in `Effect.sync` and Node's `readline` in `Effect.promise`.
 Console, file, clock, random, and network calls each get a wrapped version,
 and you must wrap a third-party library to make it conform.
@@ -931,7 +931,8 @@ rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
-A library has no such help from the language.
+A library works with the language's ordinary calls,
+which run as soon as you make them.
 It can delay the binding of `ask` to an implementation only by delaying the call itself,
 so it builds a description now and runs it later.
 
@@ -980,7 +981,7 @@ the second and third properties of a full EMS.
 
 ## Effect Management for Python
 
-The Python language has no Effect Management System, but it has a start.
+The Python language has the start of an Effect Management System.
 Python tracks one Effect in function signatures: `async`.
 An `async def` builds a description instead of running its body:
 
@@ -1133,7 +1134,8 @@ and wrap every effectful call.
 Effect tracking will look obvious in hindsight.
 Future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
-Python offers no native Effect tracking beyond `async`, and will not soon.
+Python's native Effect tracking stops at `async`,
+and it will stay there for some time.
 [Generators](45_Effects--Generators.md) shows the mechanism a library needs:
 a generator suspends and resumes with a value.
 [Stateless](46_Effects--Stateless.md) builds a library EMS on that mechanism,
@@ -1147,7 +1149,7 @@ Try each exercise before opening its [solution](../Solutions/44_Effects--Effect_
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`.
     Then run `greet(Console(), Console())` interactively.
-    Confirm `greet()` requires no change.
+    Confirm `greet()` runs unchanged.
     Serving a new context without edits is what delayed binding provides.
 2.  Do the bookkeeping the chapter describes.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect
