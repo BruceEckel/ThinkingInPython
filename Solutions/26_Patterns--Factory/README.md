@@ -935,7 +935,8 @@ The `noqa` comment is the one mark in the file that says the import is deliberat
 The import must stay an ordinary import.
 A `lazy import` defers the module body, and with it the two `class` statements,
 until the first use of `extra_shapes`.
-The demo makes no such use, so the classes stay unregistered.
+The import is the demo's one mention of `extra_shapes`,
+so the classes stay unregistered.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1315,7 +1316,7 @@ If you call `all_subclasses(sub)` without `yield from`,
 the call builds a generator and discards it, so its body never runs.
 `names(all_subclasses(Shape))` then prints `['Circle', 'Square']`,
 the same list as `Shape.__subclasses__()`.
-The demo draws no `Oval`.
+Every shape the demo draws is a `Circle` or a `Square`.
 Neither the type checker nor ruff reports the dropped keyword.
 The solution's `yield from` runs each inner generator and yields every class that generator yields.
 
