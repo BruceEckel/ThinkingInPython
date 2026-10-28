@@ -260,11 +260,11 @@ Stateless also provides three dependencies of its own:
 
 - `Console` in `stateless.console`,
   whose `print_line()` and `read_line()` *accessors* call its `print()` and `input()` methods
-  (an accessor is a small function that wraps one request and declares its answer type),
-- `Files` in `stateless.files` that reads a whole file,
+  (an accessor is a small function that wraps one request and declares its answer type)
+- `Files` in `stateless.files` that reads a whole file
 - `Time` in `stateless.time`,
   which [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
-  supplies to `retry()`.
+  supplies to `retry()`
 
 All three are concrete classes rather than interfaces.
 Being concrete means [a test double for one of them must inherit from it](#supplying-an-interface).

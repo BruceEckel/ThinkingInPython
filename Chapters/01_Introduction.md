@@ -104,8 +104,8 @@ which removes two constraints that introductory books follow:
 
 You should be comfortable with:
 
-- Functions, classes, objects, and inheritance.
-- Containers: lists, dictionaries, tuples, and sets.
+- Functions, classes, objects, and inheritance
+- Containers: lists, dictionaries, tuples, and sets
 
 If a language feature is new to you, look it up as you go.
 

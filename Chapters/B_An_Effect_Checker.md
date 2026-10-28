@@ -1270,34 +1270,34 @@ with types where the tool needs them.
 Here, in one place, is what the checker resolves:
 
 - A bare name, through the module's imports, then its own definitions,
-  then `builtins`.
-- A dotted name whose head is an import, such as `time.sleep` or `requests.get`.
+  then `builtins`
+- A dotted name whose head is an import, such as `time.sleep` or `requests.get`
 - A method on a receiver whose type the source writes out:
   an annotated parameter, an annotated assignment,
   the first parameter of a method, a module-level constant
   (through `Final[...]`),
-  or a parameter or variable annotated with a `type` alias defined in the same module.
+  or a parameter or variable annotated with a `type` alias defined in the same module
 - A method on a receiver whose type is evident: a string, an f-string, a list,
   dictionary, set, or tuple literal, a list, dictionary, or set comprehension,
-  or a local assigned from a call, which takes the callee's name as its type.
-- A method called on a class, such as `dict.fromkeys()`.
-- A class call, which performs what the class's `__init__()` performs when it defines one.
+  or a local assigned from a call, which takes the callee's name as its type
+- A method called on a class, such as `dict.fromkeys()`
+- A class call, which performs what the class's `__init__()` performs when it defines one
 
 Every limit below produces `Unknown`, so each one appears in a row:
 
-- A call of a parameter, or of a local that holds a function.
-- A call of a call's result, as in `dataclass(frozen=True)(cls)`.
+- A call of a parameter, or of a local that holds a function
+- A call of a call's result, as in `dataclass(frozen=True)(cls)`
 - A method on an attribute, such as a record's field,
   or on a name bound in one of these places: a loop, a `with`, an `except`,
   a walrus, a tuple target, a pattern, a `*args` or `**kwargs` parameter,
-  or the parameters of a nested function or a `lambda`.
-- A method on a local that two assignments give different types.
+  or the parameters of a nested function or a `lambda`
+- A method on a local that two assignments give different types
 - A receiver annotated with an `X | Y` union,
-  or with a `type` alias imported from another module.
+  or with a `type` alias imported from another module
 - A method on a `staticmethod`'s first parameter,
-  because the first parameter of every method gets the class as its type.
+  because the first parameter of every method gets the class as its type
 - An inherited method,
-  because the checker looks up a method under the receiver's own class name.
+  because the checker looks up a method under the receiver's own class name
 
 A name bound in one of those ways is a variable of no known type,
 including a name that matches a built-in.

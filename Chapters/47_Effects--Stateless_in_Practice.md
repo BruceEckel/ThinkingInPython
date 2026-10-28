@@ -2320,10 +2320,10 @@ a row written in `typing.Annotated`, and what a tool would need to check it.
 
 Consider the signatures once more:
 
-- `Success[int]`: pure.
+- `Success[int]`: pure
 - `Depend[Need[Console], None]`: prints, somehow,
-  through something supplied later.
-- `Effect[Need[Console], KeyError, None]`: prints, might not find the name.
+  through something supplied later
+- `Effect[Need[Console], KeyError, None]`: prints, might not find the name
 
 Each one describes what a function needs, what it can produce,
 and how it can fail, before you read a single line of the body.

@@ -621,8 +621,8 @@ the compiler infers the Effects made by the function.
 The same small program, written four times,
 shows how different Effect Management Systems work:
 
-- Two languages with native Effects: Koka and Flix.
-- Two library Effect systems: ZIO for Scala and Effect for TypeScript.
+- Two languages with native Effects: Koka and Flix
+- Two library Effect systems: ZIO for Scala and Effect for TypeScript
 
 [Koka](https://koka-lang.github.io/) is a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
@@ -1024,10 +1024,10 @@ Third-party libraries supply other parts of an EMS.
 The [returns](https://github.com/dry-python/returns)
 library provides four containers:
 
-- `Result`, like the one in [Error Handling](42_Functional--Error_Handling.md).
-- `Maybe`, for a value that might be absent.
-- `IO`, which marks a value as having come from input/output.
-- `RequiresContext`, for delayed binding of dependencies.
+- `Result`, like the one in [Error Handling](42_Functional--Error_Handling.md)
+- `Maybe`, for a value that might be absent
+- `IO`, which marks a value as having come from input/output
+- `RequiresContext`, for delayed binding of dependencies
 
 The [effect](https://pypi.org/project/effect/)
 library ports the description/execution split to Python.

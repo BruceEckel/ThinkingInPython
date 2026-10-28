@@ -226,12 +226,12 @@ The pattern is [*Strategy*](../../Chapters/27_Patterns--Function_Objects.md#stra
 in the shape it takes in Java.
 Its usual form requires:
 
-- an interface, `ShippingStrategy`, declaring one method, `cost()`
-- a concrete class per algorithm, `FlatRate` and `ByWeight`,
+- An interface, `ShippingStrategy`, declaring one method, `cost()`
+- A concrete class per algorithm, `FlatRate` and `ByWeight`,
   each implementing that interface
-- a context class, `Checkout`, holding a `ShippingStrategy` field
-- a constructor argument or setter on the context to install a `ShippingStrategy`
-- at the call site, a `new FlatRate()` to pass in
+- A context class, `Checkout`, holding a `ShippingStrategy` field
+- A constructor argument or setter on the context to install a `ShippingStrategy`
+- At the call site, a `new FlatRate()` to pass in
 
 Now cross out what Python supplies:
 

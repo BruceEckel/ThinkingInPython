@@ -20,10 +20,10 @@ One line replaces several lines of loop bookkeeping.
 
 A list comprehension consists of:
 
--   An input iterable.
--   A variable representing members of the input iterable.
--   An optional filter expression.
--   An output expression that builds one element of the output list from each member that passes the filter.
+-   An input iterable
+-   A variable representing members of the input iterable
+-   An optional filter expression
+-   An output expression that builds one element of the output list from each member that passes the filter
 
 The first examples take their input from a list that mixes integers and strings:
 
