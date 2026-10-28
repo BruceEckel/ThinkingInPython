@@ -188,7 +188,7 @@ The new generator is suspended before its first statement,
 so no `yield` expression is waiting to receive a value.
 The first call, which runs the body to its first `yield`,
 *primes* the generator.
-That call must be `next()` or `send(None)`.
+The priming call must be `next()` or `send(None)`.
 `conversation.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 `next(conversation)` is equivalent to `conversation.send(None)`:
