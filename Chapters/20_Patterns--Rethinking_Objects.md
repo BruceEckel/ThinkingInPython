@@ -68,7 +68,7 @@ says that an object of a subtype must work anywhere code expects an object of it
 A subclass may add behavior, but it must honor the base class contract.
 An override may accept more than the base does but never less.
 The override returns a result that works wherever the caller expects the base's result,
-and any exception it raises is one the caller expects from the base.
+and its exceptions are ones the caller expects from the base.
 When subclasses obey the principle,
 code you write against the base class works unchanged on any of them.
 That obedience makes polymorphism safe,
