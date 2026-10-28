@@ -389,7 +389,8 @@ You can say which function reports division by `Num(0)`, and why there.
 If you write `__truediv__()`, the one division method the exercise names,
 `x / 2` builds a `Div`, but `1 / x` raises a `TypeError`.
 `int.__truediv__()` returns `NotImplemented` for a `Var`.
-Python then finds no reflected method to try.
+Python then looks for the reflected method, `x.__rtruediv__()`,
+which is missing.
 The chapter's `Operators` pairs `__add__()` with `__radd__()` and `__mul__()` with `__rmul__()` for that reason,
 so the solution adds `__rtruediv__()` as well.
 
@@ -559,7 +560,7 @@ so an unchanged subtree stays shared.
 **Leave division for evaluation.**
 A `Num` holds an `int`, and a quotient of two `int`s is usually a fraction,
 which no `Num` can hold.
-Division by `Num(0)` produces no value to fold.
+Division by `Num(0)` is undefined.
 
 `simplify()` should leave the `ZeroDivisionError` to `evaluate()`.
 `simplify()` rewrites a tree.
@@ -1505,7 +1506,7 @@ The type checker then rejects the `assert_never()` call.
 `sys.setrecursionlimit()` avoids the error for `evaluate()`,
 but it has three drawbacks.
 First, it lifts the limit for Python calls alone.
-A call from one Python function to another uses no C stack,
+A call from one Python function to another leaves the C stack at the same depth,
 so with the limit raised to `10**9`, `evaluate()` walks a million-level tree.
 Anything that recurses through C stops.
 `repr()` or `hash()` on that same tree raises a `RecursionError` that reports a stack overflow,
