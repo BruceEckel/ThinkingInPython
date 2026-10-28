@@ -384,7 +384,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Network Calls](../../Chapters/11_Techniques--Testing.md#network-calls)
-replaces `urlopen()` with `monkeypatch.setattr()` so the test opens no network connection.
+replaces `urlopen()` with `monkeypatch.setattr()` so the test reads bytes from memory in place of a network response.
 For the second function, accept a `Callable` that opens the URL,
 and pass a plain function returning an `io.BytesIO`.
 Both tests can share that one stub.
