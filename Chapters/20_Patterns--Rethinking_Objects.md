@@ -68,7 +68,7 @@ says that an object of a subtype must work anywhere code expects an object of it
 A subclass may add behavior, but it must honor the base class contract.
 An override may accept more than the base does but never less.
 The override returns a result that works wherever the caller expects the base's result,
-and raises no surprising exceptions.
+and any exception it raises is one the caller expects from the base.
 When subclasses obey the principle,
 code you write against the base class works unchanged on any of them.
 That obedience makes polymorphism safe,
@@ -78,8 +78,8 @@ Code written against the base class calls a method and depends on every subclass
 A statically typed compiler can ensure that an override's signature stays compatible.
 It cannot ensure that the override behaves the way the base class declares.
 
-Python has no such compiler,
-but its type checker stops at the same place that compiler does.
+In Python a separate type checker does that compiler's job,
+and it stops at the same place that compiler does.
 A type checker reads an override's signature and reports one that no longer fits,
 especially when [`@override`](07_Foundations--Classes.md#marking-overrides-with-override)
 marks the intent.
@@ -887,8 +887,7 @@ print(audit(invoice))
 #: Invoice for Ada
 ```
 
-`Invoice` inherits from `object` alone and lists none of `Priced`,
-`Serializable`, or `Describable`, yet `charge()`, `persist()`,
+`Invoice` inherits from `object` alone, yet `charge()`, `persist()`,
 and `audit()` each accept it,
 because each function annotates its parameter with a protocol that names the one method the function calls.
 
@@ -957,7 +956,6 @@ the two protocols declare different return types,
 so the type checker can tell `Priced` from `Weighted`.
 
 `NewType` is only an aid during type checking.
-It builds no wrapper object.
 At runtime, calling `UserId` returns its argument,
 so `UserId(42)` equals `42` and is an `int`:
 
@@ -970,7 +968,7 @@ def test_newtype_has_no_runtime_effect() -> None:
     assert type(UserId(42)) is int
 ```
 
-Passing a raw `int` where a signature says `UserId` raises no exception either.
+Python also accepts a raw `int` where a signature says `UserId`.
 At runtime, `lookup(42)` prints `user-42`, the same as `lookup(UserId(42))`.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
@@ -1136,7 +1134,7 @@ and it is safe as a default argument value.
 The standard library includes this idea as `logging.NullHandler`.
 The maze in [Simulation](38_Patterns--Simulation.md)
 points every doorless direction at one shared `EDGE` room,
-so movement code needs no `None` check.
+so movement code enters `EDGE` as it enters any other room.
 
 Null objects stand in for "nothing to do," not `None`'s "nothing there."
 Sometimes a caller must notice absence,
