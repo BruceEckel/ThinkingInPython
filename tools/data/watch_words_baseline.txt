@@ -18,14 +18,22 @@ Chapters/01_Introduction.md	only: Instead of a class that exists only to hold on
 Chapters/01_Introduction.md	only: My only hope is that this book will be engaging to read
 Chapters/01_Introduction.md	only: and adds the complexity only when the answer is no
 Chapters/01_Introduction.md	only: because a pattern shows its value only in a program you build yourself
+Chapters/02_Foundations--Tour.md	defines no: CODE defines no CODE
 Chapters/02_Foundations--Tour.md	even: CODE breaks a tie to the nearest even value
+Chapters/02_Foundations--Tour.md	has no: CODE has no set number of bits to flip
+Chapters/02_Foundations--Tour.md	has no: Python has no CODE or CODE
 Chapters/02_Foundations--Tour.md	only: Python binds a name only when the assignment runs
 Chapters/02_Foundations--Tour.md	only: Use a t-string only when a consumer must inspect
 Chapters/03_Foundations--Containers.md	already: CODE returns the list already stored under CODE
+Chapters/03_Foundations--Containers.md	has no: A CODE also has no CODE method
 Chapters/03_Foundations--Containers.md	only: Go past those four only when a measurement or a specific job calls for it
 Chapters/04_Foundations--Control_Flow.md	does nothing: The CODE statement does nothing
+Chapters/04_Foundations--Control_Flow.md	has no: Python has no CODE/CODE statement
+Chapters/04_Foundations--Control_Flow.md	has no: Python has no labeled CODE
 Chapters/04_Foundations--Control_Flow.md	only: they are keywords only in this statement
+Chapters/05_Foundations--Functions.md	has no: The read half of CODE then looks up a local that has no value yet
 Chapters/05_Foundations--Functions.md	itself: A call that names its arguments documents itself
+Chapters/05_Foundations--Functions.md	needs no: so CODE needs no declaration
 Chapters/05_Foundations--Functions.md	never: CODE never reads the signature of the function it calls
 Chapters/05_Foundations--Functions.md	only: A CODE begins the *keyword-only* parameters
 Chapters/05_Foundations--Functions.md	only: A CODE ends the *positional-only* parameters
@@ -39,6 +47,7 @@ Chapters/06_Foundations--Modules_and_Packages.md	even: even inside a standard-li
 Chapters/06_Foundations--Modules_and_Packages.md	even: even on a filesystem that treats the two names as one
 Chapters/06_Foundations--Modules_and_Packages.md	ever: not names your program ever deferred
 Chapters/06_Foundations--Modules_and_Packages.md	explicit: This book uses an explicit CODE by default
+Chapters/06_Foundations--Modules_and_Packages.md	has no: because Python has no CODE keyword
 Chapters/06_Foundations--Modules_and_Packages.md	never: Callers then never write the name of the submodule that defines CODE
 Chapters/06_Foundations--Modules_and_Packages.md	never: so that work never happens
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
@@ -47,10 +56,16 @@ Chapters/06_Foundations--Modules_and_Packages.md	only: a keyword only inside an 
 Chapters/06_Foundations--Modules_and_Packages.md	only: defers only the imports you marked CODE
 Chapters/06_Foundations--Modules_and_Packages.md	only: only flags the directory as a package.^[The name CODE often confuses people
 Chapters/06_Foundations--Modules_and_Packages.md	only: the way CODE is a keyword only inside a CODE statement
+Chapters/07_Foundations--Classes.md	defines no: If a derived class defines no constructor
+Chapters/07_Foundations--Classes.md	has no: A method defined without CODE has no parameter to receive the reference
+Chapters/07_Foundations--Classes.md	has no: Reading one raises an CODE reporting that the property has no getter
+Chapters/07_Foundations--Classes.md	has no: The assignment in the constructor then raises an CODE reporting that the property CODE has no setter
+Chapters/07_Foundations--Classes.md	have no: its instances have no CODE to hold the cached value
 Chapters/07_Foundations--Classes.md	only: and add CODE only when users see the output
 Chapters/07_Foundations--Classes.md	want: When you override a method but still want the base-class version
 Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
 Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
+Chapters/08_Foundations--Static_Types.md	has no: because CODE has no such method
 Chapters/08_Foundations--Static_Types.md	names the rule: A diagnostic names the rule in brackets
 Chapters/08_Foundations--Static_Types.md	never: The Python runtime never acts on a type hint
 Chapters/08_Foundations--Static_Types.md	only: It is a keyword only at the start of this statement
@@ -59,16 +74,21 @@ Chapters/08_Foundations--Static_Types.md	only: but that is only a hint to human 
 Chapters/08_Foundations--Static_Types.md	only: that rejection is the only enforcement
 Chapters/08_Foundations--Static_Types.md	want: If you want static type checking like you get from a compiler in a typed language
 Chapters/08_Foundations--Static_Types.md	want: marks an expression whose inferred type you want to see
+Chapters/09_Foundations--Class_Attributes.md	carries no: carries no CODE
+Chapters/09_Foundations--Class_Attributes.md	has no: CODE has no CODE
+Chapters/09_Foundations--Class_Attributes.md	has no: because the instance has no dictionary to hold the new attribute
 Chapters/09_Foundations--Class_Attributes.md	never: It never checks whether some method sets the attribute
 Chapters/09_Foundations--Class_Attributes.md	only: The shadowing rule confines a change to one object only while the shared value is immutable
 Chapters/09_Foundations--Class_Attributes.md	only: This exercise needs only the one expression given here
 Chapters/09_Foundations--Class_Attributes.md	want: Decide which you want
+Chapters/10_Foundations--Cleanup.md	has no: so a CODE instance has no slot in which to list its weak references
 Chapters/10_Foundations--Cleanup.md	never: Never release a resource in CODE
 Chapters/10_Foundations--Cleanup.md	only: That list holds the only remaining references
 Chapters/10_Foundations--Cleanup.md	only: The only referrer is CODE
 Chapters/10_Foundations--Cleanup.md	only: so that count is correct only if CODE runs and succeeds
 Chapters/11_Techniques--Testing.md	exactly: CODE is exactly CODE on any IEEE double
 Chapters/11_Techniques--Testing.md	exactly: that CODE ran exactly once
+Chapters/11_Techniques--Testing.md	has no: Python has no access control
 Chapters/11_Techniques--Testing.md	is what: The CODE in CODE is what CODE produces first
 Chapters/11_Techniques--Testing.md	names the case: A failure names the case that failed
 Chapters/11_Techniques--Testing.md	only: A *black-box* test treats the code as an opaque box and exercises only its public interface
@@ -79,6 +99,11 @@ Chapters/11_Techniques--Testing.md	only: Only the code changes to satisfy it
 Chapters/11_Techniques--Testing.md	only: The test passes only if the block raises the expected exception
 Chapters/11_Techniques--Testing.md	only: so that only implementation remains
 Chapters/11_Techniques--Testing.md	sends nothing: a balance of zero or more sends nothing
+Chapters/12_Techniques--Data_Classes_as_Types.md	has no: CODE has no CODE
+Chapters/12_Techniques--Data_Classes_as_Types.md	has no: CODE has no CODE to assign them
+Chapters/12_Techniques--Data_Classes_as_Types.md	has no: CODE has no CODE to copy them onto each instance
+Chapters/12_Techniques--Data_Classes_as_Types.md	has no: Feed CODE a JSON string whose email has no CODE
+Chapters/12_Techniques--Data_Classes_as_Types.md	has no: It has no initializer
 Chapters/12_Techniques--Data_Classes_as_Types.md	is what: one field different" is what you do with any immutable value
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: A read-only CODE keeps users from assigning to CODE
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: Because fields after CODE are keyword-only
@@ -86,8 +111,12 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	only: CODE works only on data c
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: Passing CODE to CODE makes every field keyword-only
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: and those members are the only values the type has
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: so only the postcondition appears here
+Chapters/12_Techniques--Data_Classes_as_Types.md	takes no: so it accepts any callable that takes no arguments
 Chapters/12_Techniques--Data_Classes_as_Types.md	want: Subscript the factory when you want that agreement checked
 Chapters/13_Techniques--Pattern_Matching.md	cost: Every channel also has a rough cost to send a message
+Chapters/13_Techniques--Pattern_Matching.md	defines no: because CODE defines no CODE
+Chapters/13_Techniques--Pattern_Matching.md	has no: Python has no CODE keyword
+Chapters/13_Techniques--Pattern_Matching.md	has no: and CODE has no CODE to forget
 Chapters/13_Techniques--Pattern_Matching.md	only: The case matches only when the pattern fits and the guard is true
 Chapters/13_Techniques--Pattern_Matching.md	only: Use a captured name only in the CODE that captured it
 Chapters/13_Techniques--Pattern_Matching.md	only: Use it as a type-only check or a final catch-all
@@ -98,6 +127,9 @@ Chapters/14_Techniques--Decorators.md	cost: A plain pizza stores its own cost an
 Chapters/14_Techniques--Decorators.md	cost: The tests check the cost and description of a stacked order
 Chapters/14_Techniques--Decorators.md	cost: adds to the cost
 Chapters/14_Techniques--Decorators.md	cost: then print its cost and description
+Chapters/14_Techniques--Decorators.md	has no: A CODE instance has no CODE
+Chapters/14_Techniques--Decorators.md	has no: CODE has no CODE
+Chapters/14_Techniques--Decorators.md	has no: The lambda's parameter has no annotation
 Chapters/14_Techniques--Decorators.md	leaves nothing: so CODE fills CODE's own CODE parameter and leaves nothing for CODE
 Chapters/14_Techniques--Decorators.md	never: The original body of CODE never runs
 Chapters/14_Techniques--Decorators.md	only: A read-only CODE in a CODE requires that reading the name produce the property's return type
@@ -119,6 +151,9 @@ Chapters/15_Techniques--Context_Managers.md	want: Write a manager when you want 
 Chapters/15_Techniques--Context_Managers.md	want: once you decide you want one
 Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect unless you want the block to suppress every exception
 Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE are a better choice when the function they apply already has a name
+Chapters/16_Techniques--Comprehensions.md	builds no: The CODE loop prints the same values and builds no list
+Chapters/16_Techniques--Comprehensions.md	has no: Python has no tuple comprehension
+Chapters/16_Techniques--Comprehensions.md	having no: The CODE depends on the enclosing scope having no CODE
 Chapters/16_Techniques--Comprehensions.md	only: especially if you consume the result only once
 Chapters/16_Techniques--Comprehensions.md	only: write a list comprehension that finds the string elements made only of digits (CODE)
 Chapters/16_Techniques--Comprehensions.md	paying: paying attention to which value wins for the key CODE
@@ -128,6 +163,11 @@ Chapters/16_Techniques--Comprehensions.md	want: and a CODE loop when you want th
 Chapters/16_Techniques--Comprehensions.md	want: and append the ones you want
 Chapters/17_Techniques--Metaprogramming.md	already: so CODE receives the CODE at CODE under a key the mapping already holds
 Chapters/17_Techniques--Metaprogramming.md	evaluates nothing: CODE evaluates nothing
+Chapters/17_Techniques--Metaprogramming.md	has no: CODE has no simpler substitute either
+Chapters/17_Techniques--Metaprogramming.md	has no: CODE's private CODE has no CODE key
+Chapters/17_Techniques--Metaprogramming.md	has no: The loop then has no CODE class for CODE to test
+Chapters/17_Techniques--Metaprogramming.md	has no: or CODE when a built-in has no inspectable signature
+Chapters/17_Techniques--Metaprogramming.md	has no: so it has no such cell and names CODE instead
 Chapters/17_Techniques--Metaprogramming.md	hook: Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction
 Chapters/17_Techniques--Metaprogramming.md	hook: No other hook can detect the CODE at CODE
 Chapters/17_Techniques--Metaprogramming.md	hook: The one hook missing from its trace is CODE
@@ -146,9 +186,12 @@ Chapters/17_Techniques--Metaprogramming.md	only: Only three known names reach th
 Chapters/17_Techniques--Metaprogramming.md	only: The comment suppresses the diagnostic only because provoking that crash is educational
 Chapters/17_Techniques--Metaprogramming.md	only: Use a metaclass only when these cannot do the job
 Chapters/17_Techniques--Metaprogramming.md	only: while a metamethod works only through the class
+Chapters/17_Techniques--Metaprogramming.md	shares no: Enforcing an invariant across a family of classes that shares no base class
 Chapters/17_Techniques--Metaprogramming.md	spelling: You might expect to parameterize[^parameterize-spelling] the class
+Chapters/17_Techniques--Metaprogramming.md	takes no: which takes no arguments
 Chapters/17_Techniques--Metaprogramming.md	want: and you configure them to produce the objects you want
 Chapters/18_Techniques--Performance.md	already: It is the better tool when you already know which function to measure and the profiler's overhead changes the answer
+Chapters/18_Techniques--Performance.md	carry no: and its instances carry no CODE
 Chapters/18_Techniques--Performance.md	cost: Each timing includes the cost of calling the lambda
 Chapters/18_Techniques--Performance.md	cost: How much does a hardware upgrade cost compared to paying programmers to solve the performance problem
 Chapters/18_Techniques--Performance.md	cost: The size comparison shows the cost of boxing
@@ -157,7 +200,15 @@ Chapters/18_Techniques--Performance.md	cost: so the same 100 extractions cost ro
 Chapters/18_Techniques--Performance.md	costing: costing O(n log n) however few items you then take
 Chapters/18_Techniques--Performance.md	costs: Re-sorting after every insertion costs far more than one incremental CODE/CODE pair
 Chapters/18_Techniques--Performance.md	costs: because costs grow at different rates
+Chapters/18_Techniques--Performance.md	declare no: A class can inherit from one slotted base as long as its other bases declare no slots of their own
+Chapters/18_Techniques--Performance.md	declares no: A class whose base declares no CODE writes CODE
+Chapters/18_Techniques--Performance.md	declares no: A subclass that declares no CODE of its own silently gets a CODE back
+Chapters/18_Techniques--Performance.md	declares no: add CODE that declares no CODE of its own
 Chapters/18_Techniques--Performance.md	even: halve an even value or triple-and-increment an odd one
+Chapters/18_Techniques--Performance.md	has no: A generator has no CODE
+Chapters/18_Techniques--Performance.md	has no: A slotted instance has no CODE
+Chapters/18_Techniques--Performance.md	has no: CODE has no parameter that describes slots
+Chapters/18_Techniques--Performance.md	has no: The book's build has no JIT compiled in
 Chapters/18_Techniques--Performance.md	only: CODE applies only to numeric functions
 Chapters/18_Techniques--Performance.md	only: Caching is correct only when the function is pure
 Chapters/18_Techniques--Performance.md	only: Explain why caching suits only pure functions
@@ -166,18 +217,28 @@ Chapters/18_Techniques--Performance.md	only: but only to print the slice
 Chapters/18_Techniques--Performance.md	paying: How much does a hardware upgrade cost compared to paying programmers to solve the performance problem
 Chapters/19_Techniques--Concurrency.md	already: Threads already distributed computing resources
 Chapters/19_Techniques--Concurrency.md	already: Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort
+Chapters/19_Techniques--Concurrency.md	contain no: The CPU tasks contain no CODE
 Chapters/19_Techniques--Concurrency.md	cost: A million tiny results can cost more to pickle than the parallelism saves
 Chapters/19_Techniques--Concurrency.md	even: Even when you understand the problems produced by shared mutable state
 Chapters/19_Techniques--Concurrency.md	even: even a program written as CODE from top to bottom keeps a thread pool underneath
 Chapters/19_Techniques--Concurrency.md	even: since finer chunks even out the load across workers
+Chapters/19_Techniques--Concurrency.md	expose no: and plenty of C extensions block the calling thread and expose no CODE entry point
 Chapters/19_Techniques--Concurrency.md	given nothing: Given nothing else to do
+Chapters/19_Techniques--Concurrency.md	has no: A real deadlock has no CODE
+Chapters/19_Techniques--Concurrency.md	has no: has no wait to interrupt
+Chapters/19_Techniques--Concurrency.md	have no: cancellable batches have no thread equivalent
+Chapters/19_Techniques--Concurrency.md	holds no: A coroutine holds no worker
 Chapters/19_Techniques--Concurrency.md	is what: and that is what you want
 Chapters/19_Techniques--Concurrency.md	itself: Loading an extension that has not declared itself thread-safe re-enables the GIL for the whole process and emits a warning
 Chapters/19_Techniques--Concurrency.md	itself: not just itself
 Chapters/19_Techniques--Concurrency.md	itself: suspends itself and yields control
+Chapters/19_Techniques--Concurrency.md	needs no: CODE needs no locks
+Chapters/19_Techniques--Concurrency.md	needs no: CODE suspends a task and needs no locking
+Chapters/19_Techniques--Concurrency.md	needs no: so the task keeps control through them and needs no lock
 Chapters/19_Techniques--Concurrency.md	never: **Never call a blocking function inside a coroutine
 Chapters/19_Techniques--Concurrency.md	never: and the clauses below it never run
 Chapters/19_Techniques--Concurrency.md	never: its body never runs
+Chapters/19_Techniques--Concurrency.md	offers no: Python still offers no safe way to cancel a running thread
 Chapters/19_Techniques--Concurrency.md	only: "concurrency is not parallelism" (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def] As this chapter shows
 Chapters/19_Techniques--Concurrency.md	only: **More cores speed up only the parallel fraction of the work
 Chapters/19_Techniques--Concurrency.md	only: A CPU-bound task cannot overlap if only a single core is available
@@ -205,10 +266,12 @@ Chapters/19_Techniques--Concurrency.md	price: CODE runs a price function sequent
 Chapters/19_Techniques--Concurrency.md	price: Each price function runs on the same five orders
 Chapters/19_Techniques--Concurrency.md	price: writing the same price lookup twice
 Chapters/19_Techniques--Concurrency.md	prices: the same prices CODE prints
-Chapters/19_Techniques--Concurrency.md	printing nothing: printing nothing and raising no exception
 Chapters/19_Techniques--Concurrency.md	want: and that is what you want
+Chapters/20_Patterns--Rethinking_Objects.md	declares no: When a base comes from a library and declares no CODE
 Chapters/20_Patterns--Rethinking_Objects.md	does nothing: The CODE branch does nothing
 Chapters/20_Patterns--Rethinking_Objects.md	doing nothing: Doing nothing is behavior
+Chapters/20_Patterns--Rethinking_Objects.md	has no: CODE fails the type checker because CODE has no CODE method
+Chapters/20_Patterns--Rethinking_Objects.md	has no: Swift and Kotlin encourage immutability through CODE and CODE (Go has no general immutability)
 Chapters/20_Patterns--Rethinking_Objects.md	never: An override may accept more than the base does but never less
 Chapters/20_Patterns--Rethinking_Objects.md	only: But a method is only a function whose first argument is the object
 Chapters/20_Patterns--Rethinking_Objects.md	only: CODE is only an aid during type checking
@@ -222,9 +285,13 @@ Chapters/20_Patterns--Rethinking_Objects.md	promise: The fourth OOP promise is p
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The second OOP promise is behavior inside the object
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The third OOP promise is reuse through inheritance
 Chapters/20_Patterns--Rethinking_Objects.md	promises: OOP made four promises
+Chapters/20_Patterns--Rethinking_Objects.md	share no: CODE and CODE share no base class
+Chapters/20_Patterns--Rethinking_Objects.md	the way out: A fully defensive class must copy on the way in as well as on the way out
 Chapters/20_Patterns--Rethinking_Objects.md	want: I want to question how much of that machinery you need
 Chapters/21_Patterns--Design_Patterns.md	already: but [*Singleton* shows that a Python module already is one.]
 Chapters/21_Patterns--Design_Patterns.md	does it: and where does it put it
+Chapters/21_Patterns--Design_Patterns.md	has no: the interface has no name and no file of its own
+Chapters/21_Patterns--Design_Patterns.md	has none: *Strategy* has none
 Chapters/21_Patterns--Design_Patterns.md	itself: A CODE renders itself through a writer
 Chapters/21_Patterns--Design_Patterns.md	itself: by letting the new class register itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	names the patterns: GoF's first chapter lists eight "common causes of redesign" and names the patterns that address each one
@@ -232,11 +299,17 @@ Chapters/21_Patterns--Design_Patterns.md	only: *Once and once only*
 Chapters/21_Patterns--Design_Patterns.md	only: This listing shows only the shape
 Chapters/21_Patterns--Design_Patterns.md	only: This usually appears only after you apply a standard design several times
 Chapters/22_Patterns--Iterators.md	cost: What has CODE cost you on an infinite source
+Chapters/22_Patterns--Iterators.md	defines no: A generator defines no CODE
+Chapters/22_Patterns--Iterators.md	has no: CODE has no CODE
+Chapters/22_Patterns--Iterators.md	has no: CODE has no protocol for "iterable more than once
+Chapters/22_Patterns--Iterators.md	has no: and a list has no CODE
 Chapters/22_Patterns--Iterators.md	itself: Its CODE returns itself
+Chapters/22_Patterns--Iterators.md	needs no: and explain why it needs no CODE list
 Chapters/22_Patterns--Iterators.md	only: CODE shows only the stream version
 Chapters/22_Patterns--Iterators.md	only: It asks only for the next item
 Chapters/22_Patterns--Iterators.md	only: Only CODE waits
 Chapters/22_Patterns--Iterators.md	want: then say which of the two you would want wrapping a parsed log file
+Chapters/23_Patterns--Singleton.md	adds no: A second underscore adds no protection
 Chapters/23_Patterns--Singleton.md	only: Declare only what you rebind
 Chapters/23_Patterns--Singleton.md	only: Python calls it only when ordinary attribute lookup fails
 Chapters/23_Patterns--Singleton.md	only: Rebind only through the module
@@ -245,20 +318,25 @@ Chapters/23_Patterns--Singleton.md	only: because an annotation evaluates only wh
 Chapters/23_Patterns--Singleton.md	want: Alex Martelli observes that what you usually want is not one object but one shared set of state
 Chapters/23_Patterns--Singleton.md	want: If you want a class
 Chapters/23_Patterns--Singleton.md	want: If you want many objects sharing one set of state
+Chapters/24_Patterns--Template_Method.md	declares no: A function's type declares no CODE
 Chapters/24_Patterns--Template_Method.md	hook: This kind of optional step is a *hook*
 Chapters/24_Patterns--Template_Method.md	hook: whether the subclass overrides CODE or misspells a hook
 Chapters/24_Patterns--Template_Method.md	hooks: The CODE and CODE in the opening example are hooks
 Chapters/24_Patterns--Template_Method.md	hooks: The box beneath them changes from empty hooks to CODE to two lambdas
 Chapters/24_Patterns--Template_Method.md	hooks: starting from the base class with its empty hooks
+Chapters/24_Patterns--Template_Method.md	needs no: The function version also needs no CODE
 Chapters/24_Patterns--Template_Method.md	only: Change the check so it compares a new method only against the names CODE defines
 Chapters/24_Patterns--Template_Method.md	only: Only the type checker enforces CODE
 Chapters/24_Patterns--Template_Method.md	only: The *Template Method* works only when every subclass is a faithful substitute for its base
 Chapters/24_Patterns--Template_Method.md	only: so a subclass overrides only the steps that matter to it
 Chapters/24_Patterns--Template_Method.md	overrides nothing: The type checker then rejects a method that overrides nothing
 Chapters/24_Patterns--Template_Method.md	want: If you want an override to fail at runtime
+Chapters/25_Patterns--Surrogate.md	declares no: The type checker rejects the assignment because CODE declares no CODE and no CODE that accepts one
+Chapters/25_Patterns--Surrogate.md	defines no: CODE reports the missing method because CODE defines no CODE
 Chapters/25_Patterns--Surrogate.md	even: even when the implementation defines a CODE of its own
 Chapters/25_Patterns--Surrogate.md	expensive: Provides "lazy initialization" to create expensive objects on demand
 Chapters/25_Patterns--Surrogate.md	explicit: With explicit forwarding
+Chapters/25_Patterns--Surrogate.md	has no: so it reports that CODE has no CODE
 Chapters/25_Patterns--Surrogate.md	itself: CODE calls itself when the name it reads is also missing
 Chapters/25_Patterns--Surrogate.md	itself: so a CODE that reads CODE calls itself forever
 Chapters/25_Patterns--Surrogate.md	names the cause: not the CODE that names the cause
@@ -266,12 +344,16 @@ Chapters/25_Patterns--Surrogate.md	never: so the client never specifies one
 Chapters/25_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a set number of connections at a time
 Chapters/25_Patterns--Surrogate.md	only: Only the surrogate's current implementation changes
 Chapters/25_Patterns--Surrogate.md	only: Python calls it only after normal lookup fails
+Chapters/26_Patterns--Factory.md	carries no: Add a CODE to CODE that satisfies CODE but carries no CODE
 Chapters/26_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
 Chapters/26_Patterns--Factory.md	even: even momentarily
 Chapters/26_Patterns--Factory.md	explicit: Explicit Registration with a Protocol makes the checker report a class that lacks CODE at the line that registers it
 Chapters/26_Patterns--Factory.md	explicit: Explicit registration fails the opposite way
 Chapters/26_Patterns--Factory.md	explicit: If registration is explicit instead
 Chapters/26_Patterns--Factory.md	explicit: as Explicit Registration with a Protocol does for a class that lacks CODE
+Chapters/26_Patterns--Factory.md	has no: An if-chain like CODE has no wildcard
+Chapters/26_Patterns--Factory.md	has no: The message names pickling because CODE falls back on the pickle protocol for a type that has no copy rule of its own
+Chapters/26_Patterns--Factory.md	have no: the concrete classes have no base class
 Chapters/26_Patterns--Factory.md	itself: CODE lets each subclass register itself
 Chapters/26_Patterns--Factory.md	itself: a new CODE subclass can register itself with no edit to existing code
 Chapters/26_Patterns--Factory.md	never: An import written only to trigger registration never uses that name
@@ -283,10 +365,14 @@ Chapters/26_Patterns--Factory.md	only: CODE is the only code that changes when y
 Chapters/26_Patterns--Factory.md	only: When the variant differs only in field values
 Chapters/26_Patterns--Factory.md	only: and a factory class only when that work has state of its own
 Chapters/26_Patterns--Factory.md	only: and the only method CODE and CODE override
+Chapters/27_Patterns--Function_Objects.md	carried none: A function pointer carried none
+Chapters/27_Patterns--Function_Objects.md	declares no: and a CODE declares no CODE
 Chapters/27_Patterns--Function_Objects.md	exactly: When each type needs exactly one
+Chapters/27_Patterns--Function_Objects.md	has no: and it has no CODE
 Chapters/27_Patterns--Function_Objects.md	never: The type checker reads the source and never runs it
 Chapters/27_Patterns--Function_Objects.md	only: and the type checker rejects CODE as an assignment to a read-only property
 Chapters/27_Patterns--Function_Objects.md	want: or do you now want an object
+Chapters/28_Patterns--Data_Transfer_Objects.md	declares no: A subclass that declares no CODE gives each instance a CODE
 Chapters/28_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
 Chapters/29_Patterns--Changing_the_Interface.md	itself: so CODE calls itself until Python raises a CODE
 Chapters/29_Patterns--Changing_the_Interface.md	names that place: The first line of each trace names that place
@@ -295,11 +381,18 @@ Chapters/29_Patterns--Changing_the_Interface.md	only: The CODE in CODE makes its
 Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from a second file
 Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
+Chapters/30_Patterns--Observer.md	has no: A CODE CODE has no list of responders
+Chapters/30_Patterns--Observer.md	has no: CODE has no CODE
+Chapters/30_Patterns--Observer.md	has no: a CODE has no CODE attribute
+Chapters/30_Patterns--Observer.md	holds no: and the controller holds no view
+Chapters/30_Patterns--Observer.md	matching no: A CODE matching no connection raises a CODE
 Chapters/30_Patterns--Observer.md	reaches nothing: and one smaller size reaches nothing
+Chapters/30_Patterns--Observer.md	takes no: and its CODE records that CODE takes no type parameter
 Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs more than the money inserted
 Chapters/31_Patterns--State_Machines.md	even: even when a later rule
 Chapters/31_Patterns--State_Machines.md	expensive: CODE for too expensive and CODE for sold out
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
+Chapters/31_Patterns--State_Machines.md	has no: an input for which that state has no rule
 Chapters/31_Patterns--State_Machines.md	paid: CODE refunds from every paid state
 Chapters/31_Patterns--State_Machines.md	paid: and a CODE selects from every paid state but CODE
 Chapters/31_Patterns--State_Machines.md	price: A CODE holds one item's price and quantity
@@ -310,10 +403,15 @@ Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior f
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table (see exercise 9)
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: It matches classes exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: The lookup matches classes exactly
+Chapters/32_Patterns--Multiple_Dispatching.md	has no: Because CODE has no CODE method to receive the dispatch
+Chapters/32_Patterns--Multiple_Dispatching.md	has no: The table version has no comparable override
+Chapters/32_Patterns--Multiple_Dispatching.md	has no: since the sentinel branch has no CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	only: CODE needs only the CODE and CODE cases
 Chapters/32_Patterns--Multiple_Dispatching.md	only: The counter fills only as you consume the generator
 Chapters/32_Patterns--Multiple_Dispatching.md	only: and CODE and battles the groups against each other until only members of one group remain
 Chapters/32_Patterns--Multiple_Dispatching.md	want: You want to say CODE
+Chapters/33_Patterns--Visitor.md	declares no: CODE types its visitor as CODE because the CODE base class declares no CODE method
+Chapters/33_Patterns--Visitor.md	has no: Python has no method overloading
 Chapters/33_Patterns--Visitor.md	itself: *Multiple Dispatching* is the end in itself
 Chapters/33_Patterns--Visitor.md	only: CODE is the conventional placeholder for a name that exists only to satisfy CODE
 Chapters/33_Patterns--Visitor.md	only: Only mypy rejects it
@@ -322,8 +420,10 @@ Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a neste
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
 Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: The alternative is an iterative walk with an explicit stack of pending nodes (see exercise 8)
 Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: which walks the same tree with an explicit stack and no recursion
+Chapters/34_Patterns--Composite_and_Interpreter.md	have no: and CODE have no special methods of their own
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
+Chapters/34_Patterns--Composite_and_Interpreter.md	yields no: An empty directory has size 0 and yields no paths
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
 Chapters/35_Patterns--Flyweight.md	only: Only identity proves sharing
 Chapters/35_Patterns--Flyweight.md	only: but only a handful of tile kinds
@@ -336,11 +436,14 @@ Chapters/36_Patterns--Memento.md	itself: an opaque snapshot of itself
 Chapters/36_Patterns--Memento.md	only: A parameter typed CODE accepts only a CODE
 Chapters/36_Patterns--Memento.md	only: CODE exists only for the type checker
 Chapters/36_Patterns--Memento.md	only: Only unpickle data you trust
-Chapters/36_Patterns--Memento.md	only: The record makes the attribute that holds it read-only too
 Chapters/36_Patterns--Memento.md	only: so a history of CODE states stores each stroke once and duplicates only the pointers
+Chapters/36_Patterns--Memento.md	reads no: The caretaker reads no field of the states it holds
+Chapters/37_Patterns--Pattern_Refactoring.md	has no: The loop has no list of materials to maintain and no case to forget
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: so each one can register itself in CODE automatically
 Chapters/37_Patterns--Pattern_Refactoring.md	names the shape: CODE names the shape the sorting sections use
+Chapters/37_Patterns--Pattern_Refactoring.md	needs no: CODE needs no special handling
 Chapters/37_Patterns--Pattern_Refactoring.md	wants: Now the safety officer wants a disposal hazard printed beside the instruction
+Chapters/38_Patterns--Simulation.md	accept no: so a new item's CODE must accept no arguments
 Chapters/38_Patterns--Simulation.md	exactly: Every target letter marks exactly two rooms
 Chapters/38_Patterns--Simulation.md	happens: What happens to the two rats that both claimed one cell
 Chapters/38_Patterns--Simulation.md	itself: CODE replaces itself
@@ -349,6 +452,8 @@ Chapters/38_Patterns--Simulation.md	itself: it keeps the first for itself and sp
 Chapters/38_Patterns--Simulation.md	itself: not to itself
 Chapters/38_Patterns--Simulation.md	itself: so a new kind of item registers itself
 Chapters/38_Patterns--Simulation.md	names concepts: CODE nests inside CODE because it names concepts that CODE alone uses
+Chapters/38_Patterns--Simulation.md	need no: need no lock
+Chapters/38_Patterns--Simulation.md	needs no: so the blackboard needs no lock
 Chapters/38_Patterns--Simulation.md	never: because a maze character is one character long and never equals CODE's empty CODE
 Chapters/38_Patterns--Simulation.md	only: Because CODE depends only on the CODE CODE
 Chapters/38_Patterns--Simulation.md	only: CODE is CODE only for a type checker reading the file and CODE at runtime
@@ -361,7 +466,13 @@ Chapters/38_Patterns--Simulation.md	say nothing: global order arising from local
 Chapters/39_Patterns--Pattern_Catalog.md	only: and several exist only to work around limits of a particular language
 Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the preset ones
 Chapters/40_Functional--Foundations.md	exactly: a closure is one way to let exactly one function change it
+Chapters/40_Functional--Foundations.md	finds none: finds none
+Chapters/40_Functional--Foundations.md	has no: CODE's CODE has no comprehension equivalent
+Chapters/40_Functional--Foundations.md	has none: A pure function has none
+Chapters/40_Functional--Foundations.md	has none: Python's standard library has none
+Chapters/40_Functional--Foundations.md	have no: They have no CODE or item assignment
 Chapters/40_Functional--Foundations.md	is what: which is what *first-class* means
+Chapters/40_Functional--Foundations.md	needs no: needs no declaration
 Chapters/40_Functional--Foundations.md	only: Each freezes only its own top level
 Chapters/40_Functional--Foundations.md	only: For a function whose parameters are positional-only
 Chapters/40_Functional--Foundations.md	only: Freezing only the binding is the shallow-freezing lesson again
@@ -369,11 +480,15 @@ Chapters/40_Functional--Foundations.md	only: The read-only collection types in C
 Chapters/40_Functional--Foundations.md	only: and only the binding
 Chapters/40_Functional--Foundations.md	only: position is the only way to bind an argument
 Chapters/40_Functional--Foundations.md	only: so only readings between 20.0 and 30.0 Celsius reach the output
+Chapters/40_Functional--Foundations.md	share no: Python's immutable types share no structure
+Chapters/40_Functional--Foundations.md	takes no: It also types the resulting callable as one that takes no arguments
 Chapters/40_Functional--Foundations.md	want: A closure fits when you want to configure behavior once
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
 Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to schedule so that every pair meets exactly once
 Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pair into rounds in which each player appears exactly once
 Chapters/41_Functional--Toolkits.md	explicit: using a list as an explicit stack
+Chapters/41_Functional--Toolkits.md	have no: A given CODE and CODE may have no exact answer
+Chapters/41_Functional--Toolkits.md	have none: so seven students have none
 Chapters/41_Functional--Toolkits.md	itself: *Recursion* expresses a repeated computation as a function that calls itself
 Chapters/41_Functional--Toolkits.md	itself: CODE states what to do with one element and delegates the nesting to itself
 Chapters/41_Functional--Toolkits.md	names the role: so the call names the role of the CODE
@@ -388,9 +503,14 @@ Chapters/41_Functional--Toolkits.md	only: built only from CODE pieces and a gene
 Chapters/41_Functional--Toolkits.md	only: pure functions only
 Chapters/41_Functional--Toolkits.md	only: since CODE groups only adjacent elements
 Chapters/41_Functional--Toolkits.md	only: you can describe an infinite sequence and take only the part you use
+Chapters/41_Functional--Toolkits.md	takes no: CODE takes no lock
 Chapters/41_Functional--Toolkits.md	want: CODE is the right choice when equal lengths are an invariant you want checked
 Chapters/41_Functional--Toolkits.md	want: CODE to take as many of them as you want
 Chapters/41_Functional--Toolkits.md	want: Keeping one is right when you want each pair of distinct elements once
+Chapters/41_Functional--Toolkits.md	yields no: so it yields no tuple
+Chapters/42_Functional--Error_Handling.md	carries no: Python's union carries no tag
+Chapters/42_Functional--Error_Handling.md	has no: reporting that CODE in the union has no CODE
+Chapters/42_Functional--Error_Handling.md	have no: Here the type parameters have no bounds or constraints
 Chapters/42_Functional--Error_Handling.md	names a structure: but the word names a structure that many types share
 Chapters/42_Functional--Error_Handling.md	never: and it never sees a field name
 Chapters/42_Functional--Error_Handling.md	never: which CODE never receives
@@ -398,6 +518,8 @@ Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type
 Chapters/42_Functional--Error_Handling.md	wants: A caller who wants the original must read it from the new exception's CODE
 Chapters/43_Functional--Confidence.md	even: and perhaps some should even be mathematically provable
 Chapters/43_Functional--Confidence.md	exactly: every student appears in exactly one group per round
+Chapters/43_Functional--Confidence.md	has no: The language has no way to mark CODE as pure
+Chapters/43_Functional--Confidence.md	has no: because it has no intermediate state
 Chapters/43_Functional--Confidence.md	never: and never checks whether the wrapped function is referentially transparent
 Chapters/43_Functional--Confidence.md	only: CODE prints the two times only when you run the listing with CODE
 Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the counts
@@ -405,6 +527,7 @@ Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result
 Chapters/44_Effects--Effect_Management.md	by hand: Something the programmer tracks by hand works in small programs
 Chapters/44_Effects--Effect_Management.md	by hand: and which technique from Effects by Hand applies to the rest
 Chapters/44_Effects--Effect_Management.md	by hand: nobody can imagine doing it by hand
+Chapters/44_Effects--Effect_Management.md	carry no: almost all of which carry no Effect annotations
 Chapters/44_Effects--Effect_Management.md	does it: Does it behave differently in a different environment
 Chapters/44_Effects--Effect_Management.md	does it: and does it fail silently or loudly
 Chapters/44_Effects--Effect_Management.md	does it: what does it change
@@ -413,22 +536,35 @@ Chapters/44_Effects--Effect_Management.md	even: Even CODE grows
 Chapters/44_Effects--Effect_Management.md	is what: CODE is what it produces on success
 Chapters/44_Effects--Effect_Management.md	is what: Serving a new context without edits is what delayed binding provides
 Chapters/44_Effects--Effect_Management.md	itself: Could Python itself gain Effect tracking
+Chapters/44_Effects--Effect_Management.md	needs no: An Effect Checker builds the part of that tool that needs no type inference
 Chapters/44_Effects--Effect_Management.md	never: the exception never propagates to the caller
 Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
+Chapters/45_Effects--Generators.md	has no: CODE receives one value per call and has no way to ask for the next value or to stop the loop early
+Chapters/45_Effects--Generators.md	holds no: A generator holds no items
 Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
-Chapters/46_Effects--Stateless.md	already: A function that already returns an Effect needs no CODE
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
+Chapters/46_Effects--Stateless.md	already: For a function that already returns an Effect
 Chapters/46_Effects--Stateless.md	already: It carries CODE on a function that already returns an Effect
 Chapters/46_Effects--Stateless.md	already: which raises a CODE because a loop is already running
 Chapters/46_Effects--Stateless.md	captures nothing: The test captures nothing from stdout and mocks nothing
+Chapters/46_Effects--Stateless.md	contains no: CODE contains no CODE
+Chapters/46_Effects--Stateless.md	contains no: CODE is not an CODE and contains no CODE
 Chapters/46_Effects--Stateless.md	cost: That is the cost behind "a synchronous program calls it once
+Chapters/46_Effects--Stateless.md	declares none: The record drops its slots because CODE declares none
 Chapters/46_Effects--Stateless.md	do nothing: When an Effect appears to do nothing
 Chapters/46_Effects--Stateless.md	even: CODE must declare the CODE even though no CODE appears in its body
 Chapters/46_Effects--Stateless.md	even: even for an Effect with no CODE in it
 Chapters/46_Effects--Stateless.md	exactly: A dictionary matches the key exactly
-Chapters/46_Effects--Stateless.md	happens: so you need no test that exercises the path and no reviewer who happens to notice it
+Chapters/46_Effects--Stateless.md	has no: An interface has no implementation to inherit by accident
+Chapters/46_Effects--Stateless.md	has no: An unbound dependency has no answer anywhere in the program
+Chapters/46_Effects--Stateless.md	has no: CODE has no special status in Stateless
+Chapters/46_Effects--Stateless.md	has no: Stateless has no container
+Chapters/46_Effects--Stateless.md	has no: Stateless has no such registration
+Chapters/46_Effects--Stateless.md	has no: it has no values and is a subtype of every other type
+Chapters/46_Effects--Stateless.md	has no: so its Effect type has no dependency to declare
+Chapters/46_Effects--Stateless.md	having no: Having no container has three consequences
 Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs
 Chapters/46_Effects--Stateless.md	mocks nothing: The test captures nothing from stdout and mocks nothing
@@ -450,15 +586,31 @@ Chapters/46_Effects--Stateless.md	only: You can catch both errors or only one
 Chapters/46_Effects--Stateless.md	only: but an interface reaches CODE only through an implementation
 Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
+Chapters/46_Effects--Stateless.md	provided no: provided no handler sits between CODE and that Effect
+Chapters/46_Effects--Stateless.md	share no: CODE and CODE share no base class
+Chapters/46_Effects--Stateless.md	takes no: and CODE takes no default argument
 Chapters/47_Effects--Stateless_in_Practice.md	already: CODE and CODE already share a signature
 Chapters/47_Effects--Stateless_in_Practice.md	already: On a function that already returns an Effect
+Chapters/47_Effects--Stateless_in_Practice.md	carries no: CODE carries no CODE
 Chapters/47_Effects--Stateless_in_Practice.md	costs: CODE reuses the running loop and costs little beyond the Effect
 Chapters/47_Effects--Stateless_in_Practice.md	costs: Running the listing with CODE prints both per-call costs
+Chapters/47_Effects--Stateless_in_Practice.md	declares no: CODE declares no CODE
+Chapters/47_Effects--Stateless_in_Practice.md	declares no: so it declares no Ability
 Chapters/47_Effects--Stateless_in_Practice.md	even: CODE type-checks even though its CODE claim is false
 Chapters/47_Effects--Stateless_in_Practice.md	even: then say why it differs from CODE's trace even though both fail the same way
+Chapters/47_Effects--Stateless_in_Practice.md	has no: A library checks the Effects you wrote down and has no record of any others
+Chapters/47_Effects--Stateless_in_Practice.md	has no: Because Stateless has no scoping mechanism
+Chapters/47_Effects--Stateless_in_Practice.md	has no: Stateless has no defect channel
+Chapters/47_Effects--Stateless_in_Practice.md	has no: Stateless has no equivalent
+Chapters/47_Effects--Stateless_in_Practice.md	has no: Stateless has no scoping mechanism of its own
+Chapters/47_Effects--Stateless_in_Practice.md	has no: Stateless has no such thing
+Chapters/47_Effects--Stateless_in_Practice.md	has no: Then shorten every source until some hour has no source
+Chapters/47_Effects--Stateless_in_Practice.md	have no: Python's signatures have no third part for Effects
+Chapters/47_Effects--Stateless_in_Practice.md	holds no: holds no factory
 Chapters/47_Effects--Stateless_in_Practice.md	inherit nothing: The cast is a set of ordinary classes that inherit nothing
 Chapters/47_Effects--Stateless_in_Practice.md	is what: Here is what ZIO does that Stateless cannot
 Chapters/47_Effects--Stateless_in_Practice.md	is what: The difference between the two ways in is what the type checker verifies
+Chapters/47_Effects--Stateless_in_Practice.md	names no: A CODE headline names no known topic
 Chapters/47_Effects--Stateless_in_Practice.md	names what: CODE names what it takes
 Chapters/47_Effects--Stateless_in_Practice.md	never: This one never propagates
 Chapters/47_Effects--Stateless_in_Practice.md	never: and the driver never resumes the generator
@@ -473,33 +625,57 @@ Chapters/47_Effects--Stateless_in_Practice.md	only: and only the function can bu
 Chapters/47_Effects--Stateless_in_Practice.md	only: and whose body is only the success path
 Chapters/47_Effects--Stateless_in_Practice.md	only: so the only evidence is a bug report saying the log file is occasionally short by a few lines
 Chapters/47_Effects--Stateless_in_Practice.md	price: Assert that CODE attempts every price and writes once per purchase
+Chapters/47_Effects--Stateless_in_Practice.md	provides no: Stateless provides no timeout
+Chapters/47_Effects--Stateless_in_Practice.md	provides no: Stateless provides no way to acquire a resource in one Effect and release it after a later Effect finishes
 Chapters/A_Effect_Tracking.md	by hand: Effects by Hand counts five signatures to edit when a helper four calls below CODE needs a CODE Effect
 Chapters/A_Effect_Tracking.md	by hand: such as the CODE in Effects by Hand
+Chapters/A_Effect_Tracking.md	carry no: and nearly every function on PyPI carry no row
+Chapters/A_Effect_Tracking.md	declares no: CODE declares no exception
 Chapters/A_Effect_Tracking.md	declares nothing: so an empty list can mean either a function declared pure or one that declares nothing
+Chapters/A_Effect_Tracking.md	has no: which has no annotations
+Chapters/A_Effect_Tracking.md	have no: since they have no Python body to analyze
 Chapters/A_Effect_Tracking.md	names an effect: The row names an Effect
 Chapters/A_Effect_Tracking.md	never: or never
+Chapters/A_Effect_Tracking.md	records no: OCaml 5 has handlers and records no row in a function's type
 Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
+Chapters/B_An_Effect_Checker.md	declares no: For a function that declares no row
+Chapters/B_An_Effect_Checker.md	has no: A built-in has no CODE and no CODE in which to store one
+Chapters/B_An_Effect_Checker.md	has no: which has no written type
 Chapters/B_An_Effect_Checker.md	is what: is what the checker resolves
 Chapters/B_An_Effect_Checker.md	itself: CODE declares itself pure and calls CODE
 Chapters/B_An_Effect_Checker.md	names the effects: A second piece of metadata names the Effects the function performs and leaves out of its declared row
+Chapters/B_An_Effect_Checker.md	needs no: Much of tracking needs no type inference
+Chapters/B_An_Effect_Checker.md	needs no: This appendix builds the part that needs no type inference
+Chapters/B_An_Effect_Checker.md	recorded no: If CODE recorded no binding for the loop variable
 Solutions/02_Foundations--Tour/README.md	only: A post-processor has only the characters
 Solutions/03_Foundations--Containers/README.md	cost: CODE compares the cost of operations at the left end of a CODE and of a CODE
 Solutions/03_Foundations--Containers/README.md	costs: so the CODE loop costs O(n)
 Solutions/03_Foundations--Containers/README.md	costs: so the whole loop costs O(n²)
+Solutions/04_Foundations--Control_Flow/README.md	has no: or when you read a stream that has no end
 Solutions/04_Foundations--Control_Flow/README.md	only: A list pattern matches only a sequence of its own length
 Solutions/04_Foundations--Control_Flow/README.md	only: Order matters only between patterns that could both match the same value
 Solutions/04_Foundations--Control_Flow/README.md	only: and increment it only in the branch that handles an odd CODE
 Solutions/04_Foundations--Control_Flow/README.md	only: so CODE matches only a list of two items
+Solutions/05_Foundations--Functions/README.md	has no: A tuple has no CODE
+Solutions/05_Foundations--Functions/README.md	has no: CODE raises an CODE when CODE has no CODE
 Solutions/05_Foundations--Functions/README.md	never: and CODE never prints
 Solutions/05_Foundations--Functions/README.md	only: Any parameter that follows CODE is keyword-only
 Solutions/05_Foundations--Functions/README.md	only: CODE is positional-only
 Solutions/05_Foundations--Functions/README.md	only: Positional-Only and Keyword-Only Parameters explains the CODE and CODE markers
 Solutions/05_Foundations--Functions/README.md	only: Positional-Only and Keyword-Only Parameters explains the CODE marker
 Solutions/05_Foundations--Functions/README.md	only: and Positional-Only and Keyword-Only Parameters shows how a parameter becomes keyword-only
+Solutions/06_Foundations--Modules_and_Packages/README.md	has no: The single dot has no parent to name
 Solutions/07_Foundations--Classes/README.md	never: The program never calls CODE
 Solutions/07_Foundations--Classes/README.md	only: so the trace shows only the CODE chain
 Solutions/07_Foundations--Classes/README.md	want: the form you want in a traceback or a debugger
 Solutions/07_Foundations--Classes/README.md	want: the form you want in output a user reads
+Solutions/08_Foundations--Static_Types/README.md	has no: A tuple has no CODE
+Solutions/08_Foundations--Static_Types/README.md	has no: It says the type you declared has no such operation
+Solutions/08_Foundations--Static_Types/README.md	has no: and the tuple type has no method that changes its contents
+Solutions/08_Foundations--Static_Types/README.md	has no: since a tuple has no CODE
+Solutions/08_Foundations--Static_Types/README.md	has no: so it has no CODE
+Solutions/09_Foundations--Class_Attributes/README.md	has no: CODE has no CODE
+Solutions/09_Foundations--Class_Attributes/README.md	has no: CODE's CODE has no decorator to inspect its defaults
 Solutions/09_Foundations--Class_Attributes/README.md	never: The checker accepts the declaration CODE and never checks that a method assigns CODE
 Solutions/10_Foundations--Cleanup/README.md	explicit: An Explicit CODE and a CODE Block describes when CODE calls CODE
 Solutions/10_Foundations--Cleanup/README.md	explicit: because the explicit CODE runs before the program has allocated enough objects to start an automatic pass
@@ -517,26 +693,41 @@ Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: If you keep only 
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	want: Subscript the factory when you want the checker to confirm the agreement
 Solutions/14_Techniques--Decorators/README.md	cost: Wrapping the two extras in the other order changes the description and leaves the cost alone
 Solutions/14_Techniques--Decorators/README.md	cost: and a cost equal to the espresso's price plus both extras' prices
+Solutions/14_Techniques--Decorators/README.md	has no: That instance has no CODE
+Solutions/14_Techniques--Decorators/README.md	has no: since CODE has no CODE
 Solutions/14_Techniques--Decorators/README.md	only: Give CODE a CODE parameter that defaults to CODE and a keyword-only CODE
 Solutions/14_Techniques--Decorators/README.md	price: Each extra adds its own price and name to what the inner drink reports
 Solutions/14_Techniques--Decorators/README.md	price: and a cost equal to the espresso's price plus both extras' prices
 Solutions/14_Techniques--Decorators/README.md	prices: and a cost equal to the espresso's price plus both extras' prices
+Solutions/16_Techniques--Comprehensions/README.md	has no: since the integer CODE has no CODE method
 Solutions/16_Techniques--Comprehensions/README.md	only: Two entries collide only if their normalized strings are equal
 Solutions/16_Techniques--Comprehensions/README.md	want: The right shape depends on whether you want the list
 Solutions/16_Techniques--Comprehensions/README.md	want: and a loop when you want the side effect alone
 Solutions/16_Techniques--Comprehensions/README.md	want: use a comprehension when you want the collection it produces
+Solutions/17_Techniques--Metaprogramming/README.md	has no: That is why the chapter says CODE has no simpler substitute
+Solutions/17_Techniques--Metaprogramming/README.md	holds no: The registry holds no CODE
 Solutions/18_Techniques--Performance/README.md	already: CODE means the JIT is already running
+Solutions/18_Techniques--Performance/README.md	declares no: A subclass that declares no CODE of its own gets the default CODE
 Solutions/18_Techniques--Performance/README.md	even: The comprehension must build and hold the whole list of half a million even squares before CODE discards nearly all of them
 Solutions/18_Techniques--Performance/README.md	even: so it computes nine squares and stores the five even ones it returns
+Solutions/18_Techniques--Performance/README.md	has no: A program this small has no other candidates
+Solutions/18_Techniques--Performance/README.md	has no: CODE means the build has no JIT compiled in
 Solutions/18_Techniques--Performance/README.md	only: Skipping the body is the reason to cache only pure functions
 Solutions/18_Techniques--Performance/README.md	only: since callers read only the front element
+Solutions/18_Techniques--Performance/README.md	starts no: so it starts no Python stack frame
 Solutions/19_Techniques--Concurrency/README.md	already: and inside CODE that context already carries CODE
+Solutions/19_Techniques--Concurrency/README.md	defines no: That future holds no reference to an event loop and defines no CODE
+Solutions/19_Techniques--Concurrency/README.md	has no: A free-threaded interpreter has no GIL
+Solutions/19_Techniques--Concurrency/README.md	has no: CODE's CODE has no CODE
+Solutions/19_Techniques--Concurrency/README.md	has no: it has no CODE to reach
+Solutions/19_Techniques--Concurrency/README.md	holds no: That future holds no reference to an event loop and defines no CODE
 Solutions/19_Techniques--Concurrency/README.md	never: "Later" never loops back to "earlier
 Solutions/19_Techniques--Concurrency/README.md	only: the interpreter considers switching threads only at a function call or at the jump that closes a loop iteration
 Solutions/19_Techniques--Concurrency/README.md	price: At runtime the line raises a CODE before any price comes back
 Solutions/19_Techniques--Concurrency/README.md	prices: with prices CODE
 Solutions/19_Techniques--Concurrency/README.md	prices: with the prices unchanged
 Solutions/20_Patterns--Rethinking_Objects/README.md	names no shape: and it names no shape
+Solutions/20_Patterns--Rethinking_Objects/README.md	names no: and it names no shape
 Solutions/20_Patterns--Rethinking_Objects/README.md	names the missing case: The inferred type names the missing case
 Solutions/20_Patterns--Rethinking_Objects/README.md	never: so the CODE that CODE generated for CODE never runs
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE exists only for the type checker
@@ -545,15 +736,24 @@ Solutions/20_Patterns--Rethinking_Objects/README.md	only: The composed version h
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: Write CODE to hold a CODE and expose CODE and CODE as read-only properties that return the fields you choose
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes only the copy
 Solutions/20_Patterns--Rethinking_Objects/README.md	price: so the type checker now rejects a weight where CODE declares a price
+Solutions/21_Patterns--Design_Patterns/README.md	names none of: and the remainder fits in one sentence that states the pattern's intent and names none of its classes
 Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the same shipping calculation
+Solutions/22_Patterns--Iterators/README.md	defines no: because a generator defines no CODE
+Solutions/22_Patterns--Iterators/README.md	has no: Python's iterator protocol has no CODE
+Solutions/22_Patterns--Iterators/README.md	has no: The recursion has no base case
+Solutions/22_Patterns--Iterators/README.md	has no: so the recursion has no base case to stop it
 Solutions/22_Patterns--Iterators/README.md	have to: and what CODE would have to do to learn a count
+Solutions/22_Patterns--Iterators/README.md	holds no: The generator holds no CODE field to inspect
 Solutions/22_Patterns--Iterators/README.md	only: A log is an append-only record that many processes write
 Solutions/22_Patterns--Iterators/README.md	only: CODE stops only when CODE reports the end
 Solutions/22_Patterns--Iterators/README.md	only: CODE works only if every value stays reachable
 Solutions/22_Patterns--Iterators/README.md	only: since CODE and CODE differ only in how they re-yield
+Solutions/22_Patterns--Iterators/README.md	share no: CODE and CODE share no base class
 Solutions/23_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* distinguishes mutating a shared object from rebinding a name
 Solutions/23_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* explains that Python caches a module in CODE and runs its body once
 Solutions/23_Patterns--Singleton/README.md	already: as A Module Is Already a *Singleton* argues at the top of the chapter
+Solutions/23_Patterns--Singleton/README.md	defines no: and your module defines no class
+Solutions/23_Patterns--Singleton/README.md	has no: because CODE has no CODE attribute
 Solutions/23_Patterns--Singleton/README.md	only: **Order only the body
 Solutions/23_Patterns--Singleton/README.md	only: **Rebind only the local name
 Solutions/23_Patterns--Singleton/README.md	only: one-and-only-one CODE list to which any part of the program can append
@@ -561,6 +761,7 @@ Solutions/23_Patterns--Singleton/README.md	only: rebind only through the module
 Solutions/23_Patterns--Singleton/README.md	only: so it orders only the second step
 Solutions/23_Patterns--Singleton/README.md	only: weigh the code each form needs against what only a class can offer
 Solutions/23_Patterns--Singleton/README.md	want: When You Want a Class
+Solutions/24_Patterns--Template_Method/README.md	has no: Python has no such declaration
 Solutions/24_Patterns--Template_Method/README.md	hooks: Hooks and the Misspelled Override builds the set of known names inside CODE from the classes in CODE
 Solutions/24_Patterns--Template_Method/README.md	never: and CODE on the second returns normally while printing evidence that CODE never did its share
 Solutions/24_Patterns--Template_Method/README.md	only: Only discipline
@@ -571,6 +772,7 @@ Solutions/25_Patterns--Surrogate/README.md	only: CODE runs only when normal look
 Solutions/25_Patterns--Surrogate/README.md	only: Let only a CODE class create the CODE objects
 Solutions/25_Patterns--Surrogate/README.md	only: The Recursion Trap and Forwarding with CODE describe a method that Python calls only after normal lookup fails
 Solutions/25_Patterns--Surrogate/README.md	only: which runs only when normal lookup fails
+Solutions/26_Patterns--Factory/README.md	declares no: In the CODE version the concrete factory declares no base class
 Solutions/26_Patterns--Factory/README.md	explicit: Explicit Registration with a Protocol registers classes with CODE
 Solutions/26_Patterns--Factory/README.md	itself: Each class registers itself
 Solutions/26_Patterns--Factory/README.md	never: The demo never uses the name CODE
@@ -579,81 +781,125 @@ Solutions/26_Patterns--Factory/README.md	never: so its body never runs
 Solutions/26_Patterns--Factory/README.md	only: That test works on a CODE only when it is CODE
 Solutions/26_Patterns--Factory/README.md	only: and only when something mutates them in place
 Solutions/26_Patterns--Factory/README.md	only: the table is the only acceptable version of the two
+Solutions/27_Patterns--Function_Objects/README.md	declares no: A CODE describes a call and declares no CODE
+Solutions/27_Patterns--Function_Objects/README.md	declares no: Because CODE declares no CODE
+Solutions/27_Patterns--Function_Objects/README.md	has no: A silent CODE matches what CODE does with an event that has no handler
+Solutions/27_Patterns--Function_Objects/README.md	has no: You need a closure when the function has no parameter for the setting
+Solutions/27_Patterns--Function_Objects/README.md	has no: because an object of type CODE has no attribute CODE
 Solutions/27_Patterns--Function_Objects/README.md	never: A CODE is never a root
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	defines no: but CODE defines no CODE
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	has no: A bare tuple has no CODE attribute
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	has no: A tuple has no CODE
 Solutions/29_Patterns--Changing_the_Interface/README.md	already: A module is already a namespace
+Solutions/29_Patterns--Changing_the_Interface/README.md	defines no: The adapter defines no CODE
 Solutions/29_Patterns--Changing_the_Interface/README.md	even: even through an instance
 Solutions/29_Patterns--Changing_the_Interface/README.md	never: and you can say why CODE never sees that call
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: CODE reports CODE because the parameter is positional-only
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: import only that function elsewhere
 Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE
+Solutions/30_Patterns--Observer/README.md	has no: The registry has no CODE
+Solutions/30_Patterns--Observer/README.md	has no: since CODE has no CODE
+Solutions/30_Patterns--Observer/README.md	has no: so a second view either duplicates CODE or has no input of its own
+Solutions/30_Patterns--Observer/README.md	has no: so it types the class access as CODE and reports that CODE has no CODE
+Solutions/30_Patterns--Observer/README.md	holds no: The controller holds no reference to either view
+Solutions/30_Patterns--Observer/README.md	means no: A zero row with a nonzero right-hand side means no solution
+Solutions/30_Patterns--Observer/README.md	means no: so a nonzero last column means no count of selections reaches that color
+Solutions/30_Patterns--Observer/README.md	needs no: so every one lies inside it and the comprehension needs no CODE test
 Solutions/30_Patterns--Observer/README.md	never: Class access is the part a validating descriptor never needs
 Solutions/30_Patterns--Observer/README.md	reaches nothing: CODE reaches nothing
+Solutions/31_Patterns--State_Machines/README.md	has no: A dictionary keyed on CODE has no wildcard
+Solutions/31_Patterns--State_Machines/README.md	make no: and each CODE returns the current state on the moves that make no sense there
 Solutions/31_Patterns--State_Machines/README.md	never: Across repeated runs you never see CODE before an CODE
 Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a quarter only in a number the existing action reads
 Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate rule and not when you want a separate value
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count leaves each weapon an opposite that draws
 Solutions/32_Patterns--Multiple_Dispatching/README.md	exactly: That is what the chapter's "matches classes exactly" means
+Solutions/32_Patterns--Multiple_Dispatching/README.md	finds no: CODE finds no CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	is what: That is what the chapter's "matches classes exactly" means
 Solutions/32_Patterns--Multiple_Dispatching/README.md	only: CODE needs only the numeric case
 Solutions/32_Patterns--Multiple_Dispatching/README.md	only: Only the cells that need code look like code
 Solutions/32_Patterns--Multiple_Dispatching/README.md	only: since it plays only the pairs the table holds
 Solutions/32_Patterns--Multiple_Dispatching/README.md	want: Which behavior you want depends on whether a subclass is a new competitor or a variation on an existing one
+Solutions/33_Patterns--Visitor/README.md	declares no: because the empty CODE base declares no CODE
+Solutions/33_Patterns--Visitor/README.md	hold no: The CODE classes hold no state
+Solutions/33_Patterns--Visitor/README.md	inherits none: because CODE requires a CODE method and CODE inherits none
 Solutions/33_Patterns--Visitor/README.md	only: Only that one needs CODE and CODE
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	is what: The left operand is what the caller wrote first
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A child gets parentheses only when its own operator binds more loosely than what the parent needs
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: where CODE yields only file paths
+Solutions/35_Patterns--Flyweight/README.md	has no: so the class still has no CODE
 Solutions/35_Patterns--Flyweight/README.md	only: but only after CODE has pooled the instance
 Solutions/35_Patterns--Flyweight/README.md	only: whose CODE turns CODE only when the cells share one CODE
+Solutions/35_Patterns--Flyweight/README.md	takes no: Each lookup is one CODE index and takes no lock
+Solutions/36_Patterns--Memento/README.md	has no: so CODE finds CODE by ordinary attribute lookup while CODE has no CODE
 Solutions/36_Patterns--Memento/README.md	only: and pass it to CODE as the only change
+Solutions/37_Patterns--Pattern_Refactoring/README.md	defines no: because a record defines no ordering for CODE to use
 Solutions/37_Patterns--Pattern_Refactoring/README.md	itself: A subclass of CODE registers itself when its CODE statement runs
 Solutions/37_Patterns--Pattern_Refactoring/README.md	only: The CODE class is the only new Python code
 Solutions/37_Patterns--Pattern_Refactoring/README.md	only: When a calculation has the same form for every type and varies only in the numbers each type carries
 Solutions/38_Patterns--Simulation/README.md	exactly: so the difference is exactly CODE at every point on the plate
+Solutions/38_Patterns--Simulation/README.md	has no: The original CODE needs no lock because it has no CODE between the test and the add
 Solutions/38_Patterns--Simulation/README.md	itself: To see why the factory finds CODE by itself
+Solutions/38_Patterns--Simulation/README.md	needs no: The original CODE needs no lock because it has no CODE between the test and the add
 Solutions/38_Patterns--Simulation/README.md	never: so the summary statistic cannot tell "finished" from "never started
 Solutions/38_Patterns--Simulation/README.md	only: A coroutine gives up control only at an CODE
 Solutions/38_Patterns--Simulation/README.md	only: A coroutine yields control only at an CODE
 Solutions/38_Patterns--Simulation/README.md	only: Only the field changes
 Solutions/38_Patterns--Simulation/README.md	only: The Rat and the Blackboard shows CODE calling only the methods of the CODE CODE
 Solutions/38_Patterns--Simulation/README.md	wants: more than anyone wants to watch
+Solutions/40_Functional--Foundations/README.md	needs no: CODE needs no CODE
 Solutions/40_Functional--Foundations/README.md	only: CODE is positional-only
 Solutions/40_Functional--Foundations/README.md	only: Immutability in Annotations contrasts CODE with a read-only type such as CODE
 Solutions/40_Functional--Foundations/README.md	only: then consider how a caller can supply a positional-only parameter
 Solutions/41_Functional--Toolkits/README.md	exactly: so CODE yields exactly fifteen integers in all
+Solutions/41_Functional--Toolkits/README.md	has no: A CODE has no CODE
 Solutions/41_Functional--Toolkits/README.md	only: Lazy Evaluation explains why CODE over an infinite CODE pulls only what it needs
 Solutions/41_Functional--Toolkits/README.md	only: The CODE version accepts only an integer
 Solutions/41_Functional--Toolkits/README.md	only: The chapter's CODE entry states that "CODE works correctly only for pure functions
 Solutions/42_Functional--Error_Handling/README.md	by hand: and Composing by Hand has the chain to adapt
+Solutions/42_Functional--Error_Handling/README.md	has no: because the CODE member of the union has no such method
+Solutions/42_Functional--Error_Handling/README.md	holds no: CODE is one value and holds no reason
 Solutions/42_Functional--Error_Handling/README.md	never: A successful CODE returns its CODE from inside the CODE block and never reaches CODE
 Solutions/42_Functional--Error_Handling/README.md	never: so it never propagates to the top-level handler that prints a traceback
 Solutions/42_Functional--Error_Handling/README.md	only: **Catch only the named types
 Solutions/42_Functional--Error_Handling/README.md	only: **Note only the failing path
+Solutions/43_Functional--Confidence/README.md	bind no: The CODE patterns bind no name there
 Solutions/43_Functional--Confidence/README.md	by hand: and it is the one Effects by Hand describes
 Solutions/43_Functional--Confidence/README.md	even: The exercise's comparison therefore comes out even at either precision
+Solutions/43_Functional--Confidence/README.md	has no: A fenced block executed in place has no file for a worker to import
+Solutions/43_Functional--Confidence/README.md	has no: CODE has no inverse either
 Solutions/43_Functional--Confidence/README.md	never: A hand-written loop over CODE never tests CODE
 Solutions/44_Effects--Effect_Management/README.md	by hand: Each remaining Effect points to the technique from Effects by Hand
 Solutions/44_Effects--Effect_Management/README.md	by hand: Effects by Hand shows CODE taking its CODE and CODE Effects as parameters
 Solutions/44_Effects--Effect_Management/README.md	by hand: Effects by Hand shows the bookkeeping that each new Effect adds to every signature on the path
 Solutions/44_Effects--Effect_Management/README.md	by hand: and Effects by Hand covers the rest
 Solutions/44_Effects--Effect_Management/README.md	by hand: the technique from Effects by Hand applies instead
+Solutions/44_Effects--Effect_Management/README.md	has no: CODE has no equivalent of writing a function against "something awaitable that yields a price" and choosing the implementation later
 Solutions/44_Effects--Effect_Management/README.md	never: with a CODE that CODE was never awaited
 Solutions/44_Effects--Effect_Management/README.md	only: Only an CODE may contain CODE
 Solutions/44_Effects--Effect_Management/README.md	only: so CODE needs only methods with matching signatures
 Solutions/44_Effects--Effect_Management/README.md	price: CODE has no equivalent of writing a function against "something awaitable that yields a price" and choosing the implementation later
 Solutions/44_Effects--Effect_Management/README.md	prices: CODE receives a list of coroutines rather than prices
 Solutions/44_Effects--Effect_Management/README.md	prices: so a test that needs fake prices must inject CODE through every signature
+Solutions/45_Effects--Generators/README.md	holds no: The machine holds no CODE attribute and consults no table
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
 Solutions/45_Effects--Generators/README.md	want: So annotate a local whenever you want the checker to verify the type of the call that produces its value
 Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
+Solutions/46_Effects--Stateless/README.md	has no: a call to CODE has no terminal from which to read
+Solutions/46_Effects--Stateless/README.md	has none: CODE has none
 Solutions/46_Effects--Stateless/README.md	names the role: Each wrapper names the role this instance fills
 Solutions/46_Effects--Stateless/README.md	never: so the body never yields its CODE request
 Solutions/46_Effects--Stateless/README.md	only: and only the annotation
 Solutions/46_Effects--Stateless/README.md	only: read both diagnostics and ask what the function has become once it loses its only CODE
+Solutions/46_Effects--Stateless/README.md	yield no: CODE in the yield channel means the function may yield no value of any type
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: CODE is for a value you already have
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: The two factories in CODE already have the same signature
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: because a function is already an object with a type
+Solutions/47_Effects--Stateless_in_Practice/README.md	contains no: or CODE that contains no CODE and whose body is more than a single CODE statement
+Solutions/47_Effects--Stateless_in_Practice/README.md	has no: hour 20 has no supplier
+Solutions/47_Effects--Stateless_in_Practice/README.md	has no: the request has no field to carry the range
 Solutions/47_Effects--Stateless_in_Practice/README.md	itself: whether the battery reports itself unavailable once exhausted
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: CODE cannot catch what never entered the channel
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: The driver never throws it into the suspended Effect
