@@ -295,7 +295,7 @@ Renaming or removing the base method later orphans the subclass method.
 Python accepts the orphaned method too.
 Either bug is easy to miss.
 
-To let a type checker report either bug,
+To let the type checker report either bug,
 the `typing` module provides the `@override` decorator.
 A line starting with `@` above a definition applies a [*decorator*](14_Techniques--Decorators.md)
 to it.
