@@ -1826,8 +1826,8 @@ The question is not the object count on its own but the work done per object cro
 The repository's `rust/README.md` explains how to build and run `fastcount` yourself.
 `uv run tip rust-all` compiles both functions, installs the module,
 and runs the comparison in `demo.py`, printing your machine's own numbers.
-The main book build skips this step,
-so you need a Rust toolchain for this step alone.
+The main book build skips this step.
+Only `tip rust-all` needs the Rust toolchain.
 
 ## Concurrency
 
