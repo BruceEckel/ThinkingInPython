@@ -402,7 +402,9 @@ Use it when the import crosses a package boundary,
 since it spells out the full path from the top-level package.
 Keep relative imports for a package's own submodules.
 
-A relative import needs a package context, and a file run as a script has none.
+A relative import needs a package context.
+A file run as a script becomes the top-level module `__main__`,
+outside every package.
 Running `python a_package/module4.py` raises `ImportError: attempted relative import with no known parent package`.
 From the directory that holds `a_package`,
 run it as `python -m a_package.module4` instead.
@@ -494,7 +496,7 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 ```
 
 `undeclared` stays in `exporting` with `_internal`,
-although its name has no underscore.
+although its name looks public.
 
 The `# noqa: F403` silences the linter's warning about the star import.
 A star import hides the source of each name from a reader and from the tools.
@@ -703,7 +705,7 @@ installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
 the module stays unloaded for the rest of the run, so that work never happens.
 The failure is silent.
-Python raises no exception, and the table ends up one row short.
+Python continues, and the table ends up one row short.
 `all` defers ordinary `import` statements as well as the marked ones,
 including the ones that exist to run a module's body.
 The same silent failure therefore makes `all` an experiment to run rather than a setting to leave on.
