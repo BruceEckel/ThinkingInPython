@@ -390,7 +390,7 @@ Swapping the `match` for the dictionary is a redesign, not a rename.
 
 The `defaultdict(list)` creates a material's bin the first time the loop reads a piece of that material.
 `Bins` is an alias for a plain `dict`,
-so a type checker accepts `bins: Bins = {}` too.
+so the type checker accepts `bins: Bins = {}` too.
 That version raises a `KeyError` on the first piece of trash.
 
 `plastic_dropped.py` drops the plastic in `plastic.dat`.
