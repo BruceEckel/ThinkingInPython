@@ -71,7 +71,7 @@ a [dictionary is often shorter](#when-not-to-match).
 
 `|` joins several patterns in one `case`.
 The case matches when any one of them fits.
-A pattern has no `or`.
+Inside a pattern, `|` takes the place of `or`.
 Writing `case "up" or "u":`, as you would in an `if` condition,
 fails with a bare `SyntaxError: invalid syntax`.
 
@@ -155,7 +155,7 @@ Python refuses to compile the `match` and reports `SyntaxError: name capture 'DE
 When the capture is the last `case`, as here,
 Python compiles the `match` silently, and the type checker accepts it.
 The checker treats the capture as matching every value,
-so `broken()` needs no `return` after its `match`.
+so it sees every path through `broken()` ending at the `return`.
 `ruff` flags the line only when you enable its pep8-naming rules.
 Then N806 reports `DEFAULT` as an uppercase variable inside a function.
 That message is about naming style rather than the capture,
@@ -294,8 +294,8 @@ For an ordinary class `R` that lacks `__match_args__`,
 ### Keyword Patterns
 
 A keyword pattern such as `Point(x=0, y=y)` matches by attribute name.
-It reads each named attribute,
-so it needs no `__match_args__` and works with any class.
+It reads each named attribute, so it works with any class,
+whether or not the class defines `__match_args__`.
 It also lets you match a subset of attributes while ignoring the rest:
 
 ```python
@@ -379,7 +379,7 @@ refusing to compile the `match` when another `case` follows:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
 Matching on `isinstance()` differs from the exact-type dispatch of a `dict` keyed on `type(value)`,
-where a subclass finds no entry.
+where a subclass needs an entry of its own.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
 relies on that exact-type dispatch.
 
@@ -666,8 +666,8 @@ so the type checker accepts a missing `case` there.
 It also reports the error inside the `match`, at the `assert_never()` call,
 instead of at the function's return type.
 
-A `switch` in C, JavaScript, or traditional Java has no such check,
-and it silently skips any value outside its cases.
+A `switch` in C, JavaScript,
+or traditional Java silently skips any value outside its cases.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala.
