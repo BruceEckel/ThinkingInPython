@@ -1901,6 +1901,61 @@ restores a sentence or the name joins that baseline. Four cuts took a
 reason along (chapters 04, 19, 30, 34, commit `73b3a3e9`), the shape
 to reread for: a narration whose last clause was the mechanism.
 
+### R48. A bullet item starts with a capital and ends with a period only when it is a sentence
+
+**Test.** Read each item of a list on its own. It starts with a capital
+letter whatever it is. If it is a sentence, it ends with a period. If it
+is a fragment, it ends with nothing; the test for a fragment is whether
+the items could be separated from one another with commas ("Functions,
+classes, objects, and inheritance", "`Maybe`, for a value that might be
+absent"). An imperative clause is a sentence ("React to each new
+subclass: `__init_subclass__()`."). A list where one item carries a
+second, full sentence keeps its periods throughout (chapter 21's
+principles, chapter 19's bold rules). An item that passes both tests, a
+clause that could also ride in a comma list, takes the comma reading
+and no period. Numbered exercise lists are sentences and always take
+periods.
+
+**Keep when.** A bold or italic label that R5 governs ends with a
+period, and its explanation is sentences. A `Hint:` or `Done when:`
+paragraph is prose, not a list item.
+
+**Sightings.** 3 rounds, 9 files, 2026-10-28, all on Bruce's rulings:
+- `45_Effects--Generators` (`8bd2f662`), "capitalize each, remove the
+  punctuation at the end of each", on a list he had just asked for:
+  "- values go out through `yield`," / "- values come in through
+  `send()`," / "- one value goes out through `return`." -> "- Values go
+  out through `yield`" / "- Values come in through `send()`" / "- One
+  value goes out through `return`"
+- the book survey that followed ("check bullet points throughout the
+  book"; 147 lists, 783 items, 44 changed in `fc5aa9a2`): `01_Introduction`
+  "Functions, classes, objects, and inheritance." -> "Functions, classes,
+  objects, and inheritance"; `46_Effects--Stateless`, three built-in
+  dependencies written as one sentence over bullets, "`Files` in
+  `stateless.files` that reads a whole file," -> "`Files` in
+  `stateless.files` that reads a whole file" and the last item's period
+  gone; Solutions `21_Patterns--Design_Patterns` "an interface,
+  `ShippingStrategy`, declaring one method, `cost()`" -> "An interface,
+  `ShippingStrategy`, declaring one method, `cost()`"; the same in
+  chapters 16, 44, 47 and appendix B
+- `17_Techniques--Metaprogramming` (`33f2daf3`), after Bruce stated the
+  rule in words ("If a bullet point is an actual sentence, it should end
+  with a period"): "React to each new subclass: `__init_subclass__()`" ->
+  "React to each new subclass: `__init_subclass__()`." (the sweep had
+  read the need-and-tool pairs as fragments; an imperative clause is a
+  sentence)
+- the tie-breaker, same day, on the chapter 45 list whose items are
+  clauses and comma-separable both: "Leave them off. I see the
+  conundrum, because they could either be separated by commas or stand
+  alone as sentences."
+
+**Home.** CLAUDE.md (global, the "Bullet items" bullet); this file.
+Promoted on Bruce's ruling, the way R46 and R47 were. The survey found
+the book nearly uniform before the sweep (about 670 sentence items with
+periods, 29 fragment items without), so a new list is the place to
+apply it, and `scratchpad/bullets_scan.py` from that session is the
+shape of a checker if the rule ever needs one.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
