@@ -17,9 +17,9 @@ Used that way, a generator is not a sequence but a conversation.
 It yields a request, suspends, and continues when a caller sends the answer.
 A generator therefore has three *channels*:
 
-- values go out through `yield`,
-- values come in through `send()`,
-- one value goes out through `return`.
+- Values go out through `yield`
+- Values come in through `send()`
+- One value goes out through `return`
 
 This chapter covers the full three-channel annotation, the *driver*
 (the loop that runs such a conversation), and `yield from`,
