@@ -15,7 +15,7 @@ adds an operation to an existing hierarchy from outside it.
 Decide which of `pollinate()` and `eat()` answers differently by flower type.
 Only that one needs `@singledispatch` and `register`.
 Then list what the *Visitor* machinery in [The Classic *Visitor*](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor)
-exists to do, and what in it has no job left.
+exists to do, and what takes over each job when the operations become functions.
 
 <details>
 <summary>The shape</summary>
@@ -54,7 +54,7 @@ your file prints the `flower_visitors.py` lines for each flower you run,
 with `Chrysanthemum is toxic to Worm` coming from a registered implementation of `eat()`,
 and `uv run ty check` passes on it.
 You can also list every class and method of `flower_visitors.py` that your file no longer has,
-and say why each one has no job left.
+and say what takes over each one's job.
 
 <details>
 <summary>Solution</summary>
