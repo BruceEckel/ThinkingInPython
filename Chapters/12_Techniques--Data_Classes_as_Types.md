@@ -172,7 +172,7 @@ every time it changes the value.
 is the practice of checking arguments on entry and results on exit,
 with a class invariant that must hold between calls.
 `f1()` takes no argument, so only the postcondition appears here.
-A method that accepts a second rating needs a precondition for it as well.
+A method that accepts a second rating needs a precondition for it as well as the postcondition.
 
 DbC spreads the contract across every method that touches the value.
 The invariant is the part this chapter replaces.
@@ -622,7 +622,7 @@ Because the type checker rejects a `float` argument in annotated code before the
 A value from outside the program is different.
 Parsed JSON arrives as `Any`,
 which the type checker accepts for every parameter.
-A type built at that boundary therefore tests the field's type in the check as well:
+A type built at that boundary therefore tests the field's type as well as its range:
 `check(isinstance(self.number, int) and 1 <= self.number <= 10, ...)`.
 
 ### Normalizing a Frozen Field
