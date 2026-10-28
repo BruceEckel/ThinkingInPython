@@ -6,7 +6,10 @@ on a warm "paper" background, a small fixed "Contents" link to the index, a
 chapter label and title rule, and previous/next navigation. There is no
 persistent sidebar. The index page is the table of contents; hovering over
 the Contents link drops down the same list of chapters (`render_toc_menu()`),
-so a reader can go from one chapter to any other in one click.
+so a reader can go from one chapter to any other in one click. The
+section label at the top left drops down the chapter's own sections,
+and under them the chapter's listings (`render_listing_menu()`), each
+a link to its block.
 
 This adapts the OOPology build to this book: the chapter title comes from the
 first `#` heading (not YAML front matter), images referenced as `_images/<name>`
@@ -513,6 +516,39 @@ def render_toc_menu(chapters: list[Chapter], current: Chapter | None) -> str:
     return f'<ul>{"".join(items)}</ul>'
 
 
+# A fence `listing_links.fence_ids()` has given an id, and the path line
+# under it. Document's FENCE regex takes a bare language name only, so
+# the rewritten body is read here, not through Document.
+ID_FENCE = re.compile(r"^\s*```\s*\{#(listing-[^\s}]+)")
+PATH_LINE = re.compile(r"^#\s+(\S+\.\w+)\s*$")
+
+
+def render_listing_menu(body: str) -> str:
+    """The section menu's second half: the page's listings, in order.
+
+    One `li` per listing block, linking to the id `fence_ids()` gave
+    it, so the body is the Markdown after `listing_links.site_rewrite()`,
+    and the label is the path on the block's first line. A continued
+    block carries no id and belongs to the file its first block names;
+    a fence naming no file (a shape block, a fragment) has no id and is
+    left out. HTML on one line, like `render_toc_menu()`: it travels as
+    a pandoc variable, and template.html's script moves the items into
+    the drop-down under a "Listings" label. Empty when the page has
+    none.
+    """
+    items: list[str] = []
+    lines = body.split("\n")
+    for i, line in enumerate(lines[:-1]):
+        m = ID_FENCE.match(line)
+        if m is None:
+            continue
+        p = PATH_LINE.match(lines[i + 1])
+        label = p.group(1) if p else m.group(1).removeprefix("listing-")
+        items.append('<li class="section-listing">'
+                     f'<a href="#{m.group(1)}">{html.escape(label)}</a></li>')
+    return "".join(items)
+
+
 def render_chapter(body: str, ch: Chapter,
                    prev: Chapter | None, nxt: Chapter | None,
                    chapter_toc: bool = False, toc_menu: str = "",
@@ -553,6 +589,8 @@ def render_chapter(body: str, ch: Chapter,
                       f"--variable=next-title:{nxt.title}"]
     if toc_menu:
         variables.append(f"--variable=toc-menu:{toc_menu}")
+    if chapter_toc and (listing_menu := render_listing_menu(body)):
+        variables.append(f"--variable=listing-menu:{listing_menu}")
     toc_opts = ["--toc", f"--toc-depth={CHAPTER_TOC_DEPTH}"] if chapter_toc else []
     proc = subprocess.run(
         ["pandoc", "--template", str(TEMPLATE), "--from", "markdown+smart",

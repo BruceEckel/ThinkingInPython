@@ -214,6 +214,23 @@
       padding-bottom: 0.35rem;
     }
     .section-drop a[aria-current] { color: var(--accent); font-weight: 600; }
+    /* The chapter's listings follow its sections, under a label
+       styled like a Part heading in the Contents drop-down. */
+    .section-drop .section-listings {
+      margin-top: 0.4rem;
+      padding: 0.5rem 1rem 0.1rem;
+      border-top: 1px solid var(--rule);
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+    .section-drop .section-listing a {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 0.78rem;
+      padding-top: 0.1rem;
+      padding-bottom: 0.1rem;
+    }
     /* A touch screen has no hover: only a tap (data-open) opens the
        list. This rule comes last so [data-open] wins the tie. */
     @media (hover: none) {
@@ -540,6 +557,9 @@
   <div class="section-menu" hidden>
     <button class="toc-toggle section-toggle" type="button" aria-haspopup="true" aria-expanded="false"><span class="section-label">$title$</span></button>
     <nav class="section-drop" aria-label="Chapter sections"></nav>
+    $if(listing-menu)$
+    <ul class="listing-menu" hidden>$listing-menu$</ul>
+    $endif$
   </div>
   $endif$
   <div class="page">
@@ -596,6 +616,17 @@
       if (!button || !label || !drop) return;
       var list = source.cloneNode(true);
       drop.appendChild(list);
+      // The page's listings, rendered by build_site.render_listing_menu(),
+      // join the same list under a label, so one panel scrolls.
+      var listings = menu.querySelector(".listing-menu");
+      if (listings) {
+        var head = document.createElement("li");
+        head.className = "section-listings";
+        head.textContent = "Listings";
+        list.appendChild(head);
+        while (listings.firstChild) list.appendChild(listings.firstChild);
+        listings.parentNode.removeChild(listings);
+      }
       menu.removeAttribute("hidden");
 
       var chapterTitle = label.textContent;
@@ -685,7 +716,18 @@
         }
       });
       drop.addEventListener("click", function (event) {
-        if (event.target.closest && event.target.closest("a")) close();
+        var link = event.target.closest && event.target.closest("a");
+        if (!link) return;
+        // A listing folded inside a Solutions step ladder: open every
+        // <details> around it, or the browser has nothing to scroll to.
+        var href = link.getAttribute("href") || "";
+        if (href.charAt(0) === "#") {
+          var target = document.getElementById(decodeURIComponent(href.slice(1)));
+          for (var d = target && target.parentElement; d; d = d.parentElement) {
+            if (d.tagName === "DETAILS") d.open = true;
+          }
+        }
+        close();
       });
       document.addEventListener("click", function (event) {
         if (!menu.contains(event.target)) close();
