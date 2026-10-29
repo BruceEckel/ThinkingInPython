@@ -925,7 +925,7 @@ Python delivers that name automatically.
 When a `class` body finishes executing,
 Python calls `__set_name__(owner, name)` on every class attribute that defines it,
 descriptor or otherwise,
-passing the freshly created class and the name that holds the attribute.
+passing the freshly created class as `owner` and the attribute's name as `name`.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
 the descriptor protocol, and uses the delivered name to build its storage key.
 A `print()` at the top of each method traces the descriptor's whole life,
