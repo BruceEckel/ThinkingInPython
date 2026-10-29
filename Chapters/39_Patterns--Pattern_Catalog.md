@@ -161,7 +161,7 @@ built on the operating system's I/O completion ports.
 | [*Model-View-Controller* (MVC)](30_Patterns--Observer.md#document-view-and-mvc) | Separate data, presentation, and input handling. |
 | [*Pipes and Filters*](22_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |
 | *Presentation-Abstraction-Control* (PAC) | Build interactive systems from cooperating agents, each split three ways. |
-| [*Reflection*](17_Techniques--Metaprogramming.md) | Let a program inspect and adjust its own structure at runtime. |
+| [*Reflection*](17_Techniques--Metaprogramming.md) | Let a program inspect and adjust its structure at runtime. |
 
 ## Enterprise Application (Fowler)
 
