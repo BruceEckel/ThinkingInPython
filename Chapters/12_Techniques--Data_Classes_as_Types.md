@@ -589,7 +589,7 @@ You know it without checking.
 
 That guarantee changes how you write the functions.
 `f1()` and `f2()` both declare `(s: Stars) -> Stars`,
-and their bodies hold the arithmetic alone.
+and their bodies hold the arithmetic and a `Stars()` call.
 Every `Stars` argument is legal,
 and building the returned `Stars` runs the check on the result.
 

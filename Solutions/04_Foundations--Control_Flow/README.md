@@ -508,7 +508,7 @@ so the context stays in its attribute and out of the report.
 `__context__` answers "what was the `except` block handling when `raise` ran,"
 and Python fills that attribute in automatically.
 `__cause__` answers "what do you, the author, say explains this,"
-and `from` alone fills that one in.
+and the `from` clause fills that one in.
 `from None` leaves `__cause__` as `None` and sets `__suppress_context__`,
 so the traceback omits the `__context__` exception.
 

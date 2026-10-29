@@ -211,7 +211,7 @@ that has a command for running one example.
 runs the file from its chapter folder with `Examples/utils/` on the import path,
 and prints the equivalent by-hand commands first.
 
-The short form, `tip <name>`, takes the listing's name alone.
+The short form, `tip <name>`, leaves out `run-one`.
 `tip membership` runs `membership.py`.
 Words after the name go to the program,
 so `tip membership --numbers` passes the `--numbers` flag to `membership.py`.

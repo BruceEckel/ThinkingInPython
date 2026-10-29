@@ -404,9 +404,9 @@ and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
 
-`distance()` has one advantage.
+`distance()` has an advantage.
 It lives outside `Point`, so it can serve any type that has an `x` and a `y`.
-The method keeps one advantage of its own.
+The method keeps an advantage of its own.
 Dot-completion on `p1.` lists every operation `Point` supports,
 so the method is discoverable.
 

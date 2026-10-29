@@ -765,7 +765,7 @@ both intact.
 `drive()` and `yield from` also differ in what they do at `StopIteration`.
 Both catch it and both take `stop.value`,
 but they hand that value to different places.
-`drive()` returns the `Result` to its own caller, ending the conversation.
+`drive()` returns the `Result` to its caller, ending the conversation.
 `yield from` makes the `Result` the value of the expression in the enclosing generator,
 after which that generator keeps running.
 

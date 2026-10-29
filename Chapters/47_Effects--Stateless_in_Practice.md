@@ -2359,7 +2359,7 @@ and `yield from` is one operator for joining two Effects.
 `research()` joins five steps of two kinds with that one operator,
 once `@throws` has brought the ordinary functions in at the boundary.
 `Async` is one more Ability in the same channel rather than a second viral annotation.
-Resource lifetime is the one concern left outside the Effect type.
+Resource lifetime stays outside the Effect type.
 Because Stateless has no scoping mechanism, `with` blocks stay where they are.
 `ExitStack` flattens them,
 and they remain a separate mechanism from the Effect type.

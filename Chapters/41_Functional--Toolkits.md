@@ -1056,7 +1056,7 @@ Whoever draws the phantom sits out that round.
 The circle method is pairs-only.
 It is a closed-form answer to one narrow question:
 how do you split every possible pair into rounds in which each player appears exactly once?
-Pairs are the only group size where that question has a tidy rotation-based answer.
+The rotation-based answer belongs to pairs.
 Groups of three are far harder to schedule so that every pair meets exactly once.
 The best-known case is *Kirkman's schoolgirl problem*,
 fifteen students walking in threes on seven days.

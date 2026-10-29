@@ -144,7 +144,7 @@ and a full profiler times every function to answer a question about one.
 
 `sys.monitoring` ([PEP 669](https://peps.python.org/pep-0669/))
 is the interpreter's own instrumentation mechanism,
-the one the tracing profiler and debuggers now use.
+on which profilers and debuggers now build.
 You claim a tool identifier, register a callback for an event,
 and specify the code to which the event applies.
 
@@ -273,7 +273,7 @@ A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
 comparing each element until it finds a match or reaches the end.
 A `set` tests membership through hashing.
-`target in as_set` computes a hash of `target` and checks the one bucket that hash selects.
+`target in as_set` computes a hash of `target` and checks the bucket that hash selects.
 Scanning gets slower as the list grows.
 Hashing stays fast however many elements the set holds:
 
@@ -760,7 +760,7 @@ consider a [heap](#heap) instead.
 
 You now have three ways to answer the same membership question: scan a `list`,
 binary-search a sorted `list` with `bisect`,
-or hash the value and check one bucket of a `set`.
+or hash the value and check its bucket in a `set`.
 
 ```python
 # search_comparison.py

@@ -413,7 +413,7 @@ Ruff reads the assignment as redefining a name the module just imported,
 and flags it as an unused import followed by a shadowing binding.
 That rule exists because rebinding an imported name is far more often a mistake than an intention.
 Here the rebinding is deliberate, so the solution silences the warning.
-In ordinary code that warning is the one automatic signal that code has rebound a shared name.
+In ordinary code that warning is an automatic signal that code has rebound a shared name.
 
 To replace the shared dict, assign through the module.
 `config.settings = {...}` rebinds the attribute on the one module object rather than a name in your own namespace,
