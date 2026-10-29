@@ -789,7 +789,7 @@ The `interact()` methods implement every rule of the game.
 `GameBuilder` assembles the maze in three stages: a room for every character,
 then the connections between rooms, then the teleport pairs.
 Stages 2 and 3 each need every room that Stage 1 builds,
-so each runs as its own labeled pass instead of all three interleaving in one loop.
+so the three stages run as three separate passes, each labeled by a comment.
 [Factory](26_Patterns--Factory.md#builder)
 counts `GameBuilder` among the cases where *Builder* remains useful in Python,
 because construction here takes three ordered stages rather than a single call.
