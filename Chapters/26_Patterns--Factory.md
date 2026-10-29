@@ -393,7 +393,7 @@ In the second frame the arrows run the other way:
 each class points at the registry.
 From then on a caller points at `make()` alone,
 and `make()` points at the class it finds.
-`Triangle` adds one arrow, from its own `class` statement.
+`Triangle` adds one arrow, from its `class` statement.
 
 ### Hazards of Self Registration
 
@@ -682,8 +682,8 @@ Python does not need a `Factory` class nested in every shape.
 `registry.py` stores each class itself in the dictionary,
 with no nested classes.
 
-A separate factory object is worth writing when it holds state of its own,
-such as a pool, a cache, or loaded configuration,
+A separate factory object is worth writing when it holds state, such as a pool,
+a cache, or loaded configuration,
 or when the caller keeps the factory to construct objects later.
 
 You could eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
@@ -1302,7 +1302,7 @@ Match the machinery to what varies:
   a `@classmethod` that ends with `return cls(...)`.
 - When construction does more than call a constructor
   (pooling, caching, consulting configuration), write a factory function,
-  and a factory class only when that work has state of its own.
+  and a factory class only when that work has state.
   The cached factory in [*Singleton*](23_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)
   is one such function.
 - When a class does work that needs a product and each subclass picks the product,
