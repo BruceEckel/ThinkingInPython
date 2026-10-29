@@ -754,6 +754,21 @@ The outermost generator still needs code that calls `next()` and `send()`,
 so the listing ends with a `drive()` call.
 However deeply the delegations nest, the program has one driver.
 
+`drive()` and `yield from` differ in how they respond to a request.
+`drive()` answers it.
+The generator yields a `Question`, `drive()` looks it up,
+and the request stops there.
+`yield from` relays the request upward and passes the answer back down,
+both intact.
+`drive()` does the lookup for a `Question` yielded at any depth.
+
+`drive()` and `yield from` also differ in what they do at `StopIteration`.
+Both catch it and both take `stop.value`,
+but they hand that value to different places.
+`drive()` returns the `Result` to its own caller, ending the conversation.
+`yield from` makes the `Result` the value of the expression in the enclosing generator,
+after which that generator keeps running.
+
 `survey()` names the generators it delegates to in its own body.
 A generator can receive them as arguments instead,
 so the caller decides what the conversation holds:
@@ -801,21 +816,7 @@ and each `yield from` expression collects what its step returns.
 A `yield from` target is an ordinary value: it can arrive as a parameter,
 sit in a list, or be built at the point of delegation.
 
-`drive()` and `yield from` differ in how they respond to a request.
-`drive()` answers it.
-The generator yields a `Question`, `drive()` looks it up,
-and the request stops there.
-`yield from` relays the request upward and passes the answer back down intact,
-so reading a `Question` stays `drive()`'s job.
-
-`drive()` and `yield from` also differ in what they do at `StopIteration`.
-Both catch it and both take `stop.value`,
-but they hand that value to different places.
-`drive()` returns the `Result` to its own caller, ending the conversation.
-`yield from` makes the `Result` the value of the expression in the enclosing generator,
-after which that generator keeps running.
-
-A generator between the two can do both:
+A generator that sits between `drive()` and `interview()` can do both:
 answer the requests it knows and relay the rest.
 `proxy()` has the same annotation as `interview()`, so `drive()` accepts either,
 and `survey()` could delegate to either with `yield from`:
@@ -1476,16 +1477,24 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     Run `ty check` and the script, and explain both results.
     Which one told you more,
     and what does the type checker say once you remove `profile`'s annotation?
-5.  `report()` in `yield_from_return.py` yields its lines and returns `None`.
+5.  Rewrite `sequence()` in `yield_from_arguments.py` as a generic function,
+    `sequence[R](*steps: Generator[Question, Answer, R])`,
+    returning `Generator[Question, Answer, list[R]]`.
+    Run `ty check` and the script,
+    and explain why `drive()` rejects the call while the script runs.
+    Then write a wrapper that joins the list into a `Result`,
+    so `drive()` stays unchanged,
+    and say what the type checker infers for `R` at each call.
+6.  `report()` in `yield_from_return.py` yields its lines and returns `None`.
     Rewrite it to return the character count as well,
     and give it the full annotation.
     Then write a caller that delegates to it with `yield from` and yields that count in a line of its own,
     and say which type parameter carries each of the two values.
-6.  Explain why a driver must prime with `next()` rather than `send(None)`,
+7.  Explain why a driver must prime with `next()` rather than `send(None)`,
     given that the two are equivalent at runtime.
     `send_none_is_next.py` has the answer.
     State it in terms of the `SendType`.
-7.  [A Vending Machine](31_Patterns--State_Machines.md#a-vending-machine)
+8.  [A Vending Machine](31_Patterns--State_Machines.md#a-vending-machine)
     keeps its current state in an attribute and looks up each transition in a table.
     Write a simplified version as a single generator instead.
     It collects money, takes two digits, then dispenses or refuses.

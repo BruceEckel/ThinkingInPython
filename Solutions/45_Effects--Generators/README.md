@@ -511,7 +511,212 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 
-## 5. `report()` with a return value
+## 5. A generic `sequence()`
+
+> Rewrite `sequence()` in `yield_from_arguments.py` as a generic function,
+> `sequence[R](*steps: Generator[Question, Answer, R])`,
+> returning `Generator[Question, Answer, list[R]]`.
+> Run `ty check` and the script,
+> and explain why `drive()` rejects the call while the script runs.
+> Then write a wrapper that joins the list into a `Result`,
+> so `drive()` stays unchanged,
+> and say what the type checker infers for `R` at each call.
+
+<details>
+<summary>Where to look</summary>
+
+[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
+shows `sequence()` collecting each step's return value into a `list[str]` and joining the list.
+A type parameter in the `ReturnType` position lets each step return a type of its own,
+and `yield from` evaluates to that type.
+Compare what `drive()` declares for its `conversation` parameter with the type of the generic call.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from collections.abc import Generator
+from typing import NewType
+
+Question = NewType("Question", str)
+Answer = NewType("Answer", str)
+Result = NewType("Result", str)
+
+def ask(
+    question: Question
+) -> Generator[Question, Answer, Answer]:
+    ...
+
+def interview() -> Generator[Question, Answer, Result]:
+    ...
+
+def drive(conversation: Generator[Question, Answer, Result],
+          answers: dict[Question, Answer]) -> Result:
+    ...
+
+def sequence[R](
+    *steps: Generator[Question, Answer, R]
+) -> Generator[Question, Answer, list[R]]:
+    ...
+
+def joined(
+    *steps: Generator[Question, Answer, str]
+) -> Generator[Question, Answer, Result]:
+    ...
+```
+
+<details>
+<summary>Done when</summary>
+
+`ty` reports an `invalid-argument-type` on the `drive()` call and names `list[Result | Answer]` as the return type it found,
+the script still runs and prints a list,
+and your wrapper checks clean under `ty` and prints a joined `Result`.
+
+<details>
+<summary>Solution</summary>
+
+The generic version keeps the loop and returns the list:
+
+```python
+def sequence[R](
+    *steps: Generator[Question, Answer, R]
+) -> Generator[Question, Answer, list[R]]:
+    results: list[R] = []
+    for step in steps:
+        result = yield from step
+        results.append(result)
+    return results
+```
+
+`ty` rejects the `drive()` call:
+
+```text
+error[invalid-argument-type]: Argument to function `drive`
+is incorrect
+  --> yield_from_arguments.py:17:5
+   |
+17 |     sequence(interview(), ask(Question("color"))),
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Expected `Generator[Question, Answer, Result]`, found
+`Generator[Question, Answer, list[Result | Answer]]`
+```
+
+The checker solves `R` from both arguments at once.
+`interview()` returns `Result` and `ask()` returns `Answer`,
+so `R` is their union, `Result | Answer`,
+and the call's type carries `list[Result | Answer]` in the return position.
+`drive()` declares `Generator[Question, Answer, Result]` for its `conversation`,
+and it ends by returning `stop.value` as its own `Result`.
+A list is not a `Result`,
+so the argument fails where `drive()` would hand the list to its caller.
+Python ignores the annotations,
+so the script runs to the end and `print()` shows the list:
+
+```text
+request = 'name', answer = 'Alice'
+  ask() received Alice
+request = 'town', answer = 'Wonderland'
+  ask() received Wonderland
+request = 'friend', answer = 'Rabbit'
+  ask() received Rabbit
+request = 'color', answer = 'blue'
+  ask() received blue
+['Alice of Wonderland, friend Rabbit', 'blue']
+```
+
+The wrapper delegates to the generic `sequence()` and joins what comes back,
+so `drive()` sees the `Result` it declares.
+This file carries its own `ask()`, `interview()`, and `drive()`,
+since a solution cannot import the chapter's listings:
+
+```python
+# exercise_5.py
+from collections.abc import Generator
+from typing import NewType
+
+Question = NewType("Question", str)
+Answer = NewType("Answer", str)
+Result = NewType("Result", str)
+
+def ask(
+    question: Question
+) -> Generator[Question, Answer, Answer]:
+    answer: Answer = yield question
+    return answer
+
+def interview() -> Generator[Question, Answer, Result]:
+    name: Answer = yield from ask(Question("name"))
+    town: Answer = yield from ask(Question("town"))
+    return Result(f"{name} of {town}")
+
+def drive(conversation: Generator[Question, Answer, Result],
+          answers: dict[Question, Answer]) -> Result:
+    try:
+        request: Question = next(conversation)
+    except StopIteration as stop:
+        return stop.value
+    while True:
+        answer = answers[request]
+        print(f"{request = }, {answer = }")
+        try:
+            request = conversation.send(answer)
+        except StopIteration as stop:
+            return stop.value
+
+def sequence[R](
+    *steps: Generator[Question, Answer, R]
+) -> Generator[Question, Answer, list[R]]:
+    results: list[R] = []
+    for step in steps:
+        result = yield from step
+        results.append(result)
+    return results
+
+def joined(
+    *steps: Generator[Question, Answer, str]
+) -> Generator[Question, Answer, Result]:
+    results = yield from sequence(*steps)
+    return Result(", ".join(results))
+
+answers = {
+    Question("name"): Answer("Alice"),
+    Question("town"): Answer("Wonderland"),
+    Question("color"): Answer("blue"),
+}
+print(drive(
+    joined(interview(), ask(Question("color"))), answers
+))
+#: request = 'name', answer = 'Alice'
+#: request = 'town', answer = 'Wonderland'
+#: request = 'color', answer = 'blue'
+#: Alice of Wonderland, blue
+```
+
+The checker solves `R` at each call from the argument types.
+Inside `joined()`, the call `sequence(*steps)` sees `steps` through its annotation,
+`Generator[Question, Answer, str]`,
+so `R` is `str` there and `results` is a `list[str]`,
+which `", ".join()` accepts.
+At the call `joined(interview(), ask(Question("color")))`,
+the checker matches `interview()`'s `Generator[Question, Answer, Result]` against `Generator[Question, Answer, str]`.
+`Generator` is covariant in its return type and `Result` is a `str`,
+so the match succeeds, and `ask()`'s `Answer` passes the same way.
+The two annotations do different jobs.
+`sequence()`'s type parameter lets it collect any return type,
+so one definition serves steps of every return type.
+`joined()`'s `str` annotation makes the join type-check,
+and it turns `Result | Answer` into `str` before `sequence()` sees the steps.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
+</details>
+</details>
+</details>
+</details>
+
+## 6. `report()` with a return value
 
 > `report()` in `yield_from_return.py` yields its lines and returns `None`.
 > Rewrite it to return the character count as well,
@@ -533,7 +738,7 @@ then yields it as a string of its own.
 <summary>The shape</summary>
 
 ```python
-# The shape of exercise_5.py
+# The shape of exercise_6.py
 from collections.abc import Generator
 from typing import NewType
 
@@ -564,7 +769,7 @@ The solution returns the count from `report()`,
 so the count reaches `summarize()` through a second return:
 
 ```python
-# exercise_5.py
+# exercise_6.py
 from collections.abc import Generator
 from typing import NewType
 
@@ -633,7 +838,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 
-## 6. Why a driver primes with `next()`
+## 7. Why a driver primes with `next()`
 
 > Explain why a driver must prime with `next()` rather than `send(None)`,
 > given that the two are equivalent at runtime.
@@ -713,7 +918,7 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 
-## 7. A vending machine as a single generator
+## 8. A vending machine as a single generator
 
 > [A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
 > keeps its current state in an attribute and looks up each transition in a table.
@@ -740,7 +945,7 @@ the driver's `send()` delivers events rather than answers.
 <summary>The shape</summary>
 
 ```python
-# The shape of exercise_7.py
+# The shape of exercise_8.py
 from collections.abc import Generator
 from typing import Final, Literal
 from record import record
@@ -786,7 +991,7 @@ so the type checker passes the shared version.
 The solution copies `STOCK` into a local, so each generator holds its own stock.
 
 ```python
-# exercise_7.py
+# exercise_8.py
 from collections.abc import Generator
 from typing import Final, Literal
 from record import record

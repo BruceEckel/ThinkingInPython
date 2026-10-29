@@ -1,4 +1,4 @@
-# exercise_7.py
+# exercise_8.py
 from collections.abc import Generator
 from typing import Final, Literal
 from record import record
