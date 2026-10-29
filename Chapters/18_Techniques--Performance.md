@@ -208,7 +208,7 @@ Claiming one that another tool holds raises a `ValueError`,
 so a second tool gets an exception instead of silently replacing the first tool's callbacks.
 
 For an answer you need once rather than continuously,
-the callback can turn its own event off:
+the callback can turn its event off:
 
 ```python
 # monitoring_coverage.py
@@ -342,7 +342,7 @@ When you write your own timing code, use that clock and repeat the run.
 
     uv run python -m timeit -s "s = set(range(100_000))" "99_999 in s"
 
-The command-line form chooses its own `number`, trying 1, 2, 5, 10, 20, 50,
+The command-line form chooses `number`, trying 1, 2, 5, 10, 20, 50,
 and so on until one batch takes at least 0.2 seconds.
 Since 3.15, `--target-time` (`-t`) sets that threshold,
 so `-t 1` picks a `number` large enough for each batch to run about a second.
@@ -414,7 +414,7 @@ adds the measurements above that line:
     set at least 100x faster: True
 
 The names are the keyword arguments at the call site,
-so each listing labels its own measurements.
+so each listing labels its measurements.
 Your ratio differs from the one above.
 
 `traced()` measures memory instead of time.
