@@ -80,7 +80,7 @@ and returns silently.
 `export_svg()` has a wildcard case that raises an exception,
 so it reports the gap at runtime, the first time someone asks it for a triangle.
 
-No tool reports the missing case at edit time.
+At edit time, the type checker accepts both functions.
 `kind: str` gives the type checker no list of the strings `export_svg()` should handle.
 An `Enum` for `kind` and an `assert_never()` wildcard [move that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 An if-chain like `render()` has no wildcard, so it still gets no report.
@@ -561,7 +561,8 @@ not `type[Shape]`.
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 The table belongs to `make` rather than to a class in the hierarchy,
 so no `cls.registry` lookup walks the MRO.
-No shape class carries a `make()` that a call like `Circle.make("Square")` could misuse.
+`make` is a `ShapeFactory` outside the shape classes,
+so a call like `Circle.make("Square")` raises an `AttributeError` instead of building a `Square`.
 
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,
