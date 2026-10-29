@@ -615,7 +615,7 @@ and refuses to assign that callable to the declared `Callable[[int], int]`.
 Both reports fall on the assignment line, so one comment covers them.
 At runtime `percent()` clamps each argument, as the `#:` line shows.
 
-The declaration on its own line states the type of the function that `partial()` builds.
+The declaration on its own line states the type of `percent`.
 `ty` takes the type of `percent` from that declaration and checks the three calls against it.
 A call to `percent()` with no argument draws a `missing-argument` report,
 so `ty` catches the `TypeError` case before the program runs.
