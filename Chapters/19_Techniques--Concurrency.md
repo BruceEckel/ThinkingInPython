@@ -662,7 +662,7 @@ so the `ValueError` clause receives `ValueError(1)` and `ValueError(3)` together
 The clauses claim members in order.
 If an `except* Exception` comes first, it claims all four,
 and the clauses below it never run.
-The members no clause matches propagate as a new group that keeps the original message,
+The remaining members propagate as a new group that keeps the original message,
 so the outer `except ExceptionGroup` catches the `KeyError` alone.
 
 `except*` also wraps a lone exception.
