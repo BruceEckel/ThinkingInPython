@@ -551,7 +551,7 @@ def test_can_undo_and_can_redo() -> None:
 ```
 
 The alternative design stores commands instead of states.
-Each undoable action carries its own inverse,
+Each undoable action carries its inverse,
 the [*Command* variation](27_Patterns--Function_Objects.md#a-callable-object-as-a-command).
 *Command*-based undo saves memory when a snapshot is large,
 but needs an inverse written and tested for every action.
