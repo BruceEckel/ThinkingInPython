@@ -17,8 +17,8 @@ runs the checker on its own source to confirm that the core is pure.
 ## The Restriction
 
 The checker resolves a call by its name and by the written type of its receiver.
-A call it cannot resolve contributes an Effect named `Unknown` to the caller's row.
-The checker treats no unresolved call as pure.
+A call it cannot resolve contributes an Effect named `Unknown` to the caller's row,
+instead of counting as pure.
 With that rule the tool stays small, and every unresolved call shows in a row.
 A row that reads `Unknown` says the checker [could not resolve a call](#what-the-checker-resolves-and-what-it-cannot-see),
 and where.
