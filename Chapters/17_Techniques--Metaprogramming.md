@@ -63,7 +63,7 @@ but simpler hooks cover almost every case a metaclass handled before those hooks
 
 - `__init_subclass__()` runs at subclass creation.
   It replaces most "do something at each class definition" metaclasses.
-- `__set_name__()` gives a class attribute its own name, at class-creation time.
+- `__set_name__()` gives a class attribute its name, at class-creation time.
 - [*Class decorators*](14_Techniques--Decorators.md#decorating-classes)
   transform a class after Python builds it.
 
@@ -454,9 +454,8 @@ because the class comes from a `type()` call rather than a `class` statement in 
 Often a base class needs to keep track of its subclasses.
 Tracking subclasses is the textbook justification for a metaclass.
 Python calls `__init_subclass__()` automatically for every new subclass,
-so a base class can register its own subclasses in a few lines.
-Here, each base class tracks its "leaf" subclasses
-(those with no subclasses of their own),
+so a base class can register its subclasses in a few lines.
+Here, each base class tracks its "leaf" subclasses (those with no subclasses),
 using `__init_subclass__()` instead of a metaclass:
 
 ```python
@@ -514,12 +513,11 @@ None of this needs a metaclass.
 `__init_subclass__()` is implicitly a class method.
 Its first argument is the new subclass.
 `__init_subclass__()` runs for classes derived from the class whose body defines it,
-and not for that class,
-so neither `Color` nor `Shape` appears in its own registry.
+and not for that class, so neither `Color` nor `Shape` appears in its registry.
 
 The keyword arguments come from the subclass header.
 Writing `class Blue(Color, shade="cool"):` delivers `shade="cool"` to `__init_subclass__()`,
-so a subclass can configure its own registration.
+so a subclass can configure its registration.
 The base that declares the keyword takes it as a parameter,
 `def __init_subclass__(cls, shade: str = "", **kwargs: object)`,
 so the keyword binds to `shade` and `kwargs` collects the rest.
@@ -639,7 +637,7 @@ print(Button.press.__dict__)
 ```
 
 `mark()` returns the same `F` it receives,
-so `press()` keeps its own signature through the decoration.
+so `press()` keeps its signature through the decoration.
 
 When the `class Button` statement finishes,
 `__init_subclass__()` walks `vars(cls)`, the new class's own namespace,
@@ -919,7 +917,7 @@ Method binding is the descriptor protocol at work.
 
 ### A Descriptor That Learns Its Name
 
-Telling a class attribute its own name is another job that once needed a metaclass.
+Telling a class attribute its name is another job that once needed a metaclass.
 In `x = Field()` below, `Field()` runs before the assignment,
 so `Field`'s constructor finishes before Python binds the name `x`,
 too early to learn it.
@@ -1675,7 +1673,7 @@ When `obj` is a class, every attribute lives on a class,
 so all of them carry the tag.
 In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
 `show(D)` in `classvar_dataclass.py` tags both `D.x` and `D.s`.
-`D` declares them in its own body, but `show(D)` inspects the class,
+`D` declares them in its body, but `show(D)` inspects the class,
 where both live.
 
 For an instance, the tag says whether the value lives on the class or on the object,
@@ -1820,7 +1818,7 @@ inside the metaclass's own construction step.
 The decorator is last, because it receives a finished class.
 
 - React to each new subclass: `__init_subclass__()`.
-- Give a class attribute its own name: `__set_name__()`.
+- Give a class attribute its name: `__set_name__()`.
 - Rewrite a finished class: a class decorator.
 - Build a family of classes from data: `type()` with three arguments,
   or an `exec()`ed class body when the definition is easier to read as source.
