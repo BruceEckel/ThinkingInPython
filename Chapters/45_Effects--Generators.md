@@ -584,8 +584,8 @@ objects can be added together.
 A `visit()` returns its subtree's `Counter` to the `visit()` that called it,
 and the `Counter` for the whole garden reaches `census()`.
 
-`yield from` delegates to any iterable, not just a generator;
-here it takes a list:
+`yield from` delegates to any iterable, not just a generator.
+Here, it takes a list:
 
 ```python
 # yield_from_list.py
@@ -599,9 +599,9 @@ print(list(relay()))
 #: [1, 2, 3, None]
 ```
 
-A list's iterator ends with a bare `StopIteration`,
-whose `value` defaults to `None`,
-so a `yield from` over a list evaluates to `None`.
+A generator's `return` statement supplies the `value` that its `StopIteration` carries.
+A list's iterator raises a bare `StopIteration`,
+so its `value` is `None` and a `yield from` over a list evaluates to `None`.
 
 ### The Send Channel
 
