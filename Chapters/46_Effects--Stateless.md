@@ -213,7 +213,7 @@ Everything else is an Ability request.
 The two bounds overlap.
 A class that subclasses both satisfies each at once,
 and at runtime it counts as a failure.
-No listing here builds one.
+The listings here keep requests and failures in separate classes.
 
 The second type parameter is `Any`,
 which [Generators](45_Effects--Generators.md#annotating-a-generator)
@@ -1422,7 +1422,8 @@ A synchronous program calls `run()` once at its outermost edge.
 An asynchronous program such as a web service or a bot awaits `run_async()` at the edge of each request.
 
 Calling `run()` inside a coroutine is a runtime error rather than a type error,
-because no type records whether an event loop is running.
+because whether an event loop is running is a fact about the moment of the call,
+not about any type.
 The opposite mistake, calling `run_async()` without `await` in synchronous code,
 draws `ty`'s `unused-awaitable` warning.
 
