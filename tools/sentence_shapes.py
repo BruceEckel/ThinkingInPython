@@ -113,9 +113,32 @@ The book-wide read that day had 178 hits and 17 real ones, so the
 rule is a survey rule: most additive adverbs with a new subject do
 mean the subject ("Pyright accepts the read too"), and the reader
 cannot tell which from the parse.
+`[TWO]` (2026-10-28, from a sentence the author marked in chapter 45
+as "hard to follow") is a comparison whose two terms each carry a
+modifier of their own, so the reader holds two unfinished pictures
+and the relation between them in one clause: "`drive()` answers a
+request yielded two generators deep the same way it answers one from
+`interview()`'s own body." The comparator is "the same way", "the
+same X as", "as X as", "like", "unlike", "rather than", "instead
+of", "compared with", or "differs from" (`comparator()`). The first
+term runs from the root verb to the comparator, the second from the
+comparator to the end, and a term is heavy (`heavy_side()`) when it
+holds four or more content words and among them a verb ("a request
+yielded two generators deep", "it answers one from `interview()`'s
+own body"), the mark of a stretch the reader builds rather than
+reads. The rule fires when both terms are heavy.
+The repair introduces each picture in its own sentence and then
+states the relation ("The requests now come from `ask()`, one
+generator below `interview()`, and `yield from` passes each one up
+to the driver, so `drive()` sees the same `Question`s it saw in
+`interview_generator.py`"), or drops a modifier the context already
+supplies. "Use a `set` rather than a `list`" is quiet, because both
+terms are light. It is a survey rule because weight is a judgment:
+two heavy terms the reader already knows can ride in one clause.
+
 Four rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-and `[AND+REL]`, judged against a baseline. Three are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, and `[ADD]`. The calibration shows why. `[AND]` fired on 7 before
+and `[AND+REL]`, judged against a baseline. Four are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, and `[TWO]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -254,6 +277,7 @@ SURVEY_RULES: Final = {
     "AND": "an and joining clauses with different subjects",
     "COLON": "colon, then an independent clause",
     "ADD": "an additive adverb after a change of subject",
+    "TWO": "two modified terms held across one comparison",
 }
 """Printed only under `--survey`; never baselined."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
@@ -277,9 +301,25 @@ ADDITIVE_WORDS: Final = frozenset({"also", "too", "likewise"})
 """Adverbs that add a member to a set the previous sentence set up."""
 CARRIED_SUBJECTS: Final = BARE_PRONOUNS | frozenset({"we", "you", "i", "one"})
 """A subject that carries the previous sentence's subject on."""
+COMPARATOR_PAIRS: Final = frozenset({
+    ("rather", "than"), ("instead", "of"), ("compared", "with"),
+    ("compared", "to"), ("differs", "from"), ("differ", "from"),
+    ("same", "way")})
+"""Two-word comparators, by (previous word, word)."""
+HEAVY_CONTENT: Final = 4
+"""Content words a side of a comparison needs before it is heavy."""
+LIGHT_POS: Final = frozenset({"DET", "PUNCT", "PART", "CCONJ", "SPACE"})
+"""Tokens that add no weight to a side."""
+NESTING_POS: Final = frozenset({"VERB"})
+"""A side with a verb of its own (a participle, a relative clause, a
+clause) is a picture the reader builds rather than a name."""
 
 CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     # (rule, text, should it fire)
+    ("TWO", "`drive()`, imported unchanged, answers a request yielded two generators deep the same way it answers one from `interview()`'s own body.", True),
+    ("TWO", "`drive()` is imported unchanged. The requests now come from `ask()`, one generator below `interview()`, and `yield from` passes each one up to the driver, so `drive()` sees the same `Question`s it saw in `interview_generator.py`.", False),
+    ("TWO", "Use a `set` rather than a `list` for membership tests.", False),
+    ("TWO", "A delegating generator passes requests up the same way a function call passes a return value down.", False),
     ("IMP", "Remove `frozen=True` and the pattern fails.", True),
     ("IMP", "If you remove `frozen=True`, the pattern fails.", False),
     ("IMP", "Forget the new argument at a call and `ty` reports "
@@ -707,6 +747,66 @@ def additive_after_new_subject(sentence: Sentence,
     return subject.lemma.lower() != previous_subject.lemma.lower()
 
 
+def comparator(sentence: Sentence) -> Token | None:
+    """The token that relates two terms, or None.
+
+    "like" and "unlike" as prepositions, the second word of a
+    `COMPARATOR_PAIRS` pair ("rather than", "the same way"), the
+    second "as" of "as X as", and an "as" within eight words of a
+    "same".
+    """
+    toks = sentence.tokens
+    lows = [t.text.lower() for t in toks]
+    for k, low in enumerate(lows):
+        before = lows[k - 1] if k else ""
+        if low in ("like", "unlike") and toks[k].pos in ("ADP", "SCONJ"):
+            return toks[k]
+        if (before, low) in COMPARATOR_PAIRS:
+            return toks[k]
+        if low == "as" and k >= 2 and lows[k - 2] == "as":
+            return toks[k]
+        if low == "as" and "same" in lows[max(0, k - 8):k]:
+            return toks[k]
+    return None
+
+
+def heavy_side(tokens: list[Token]) -> bool:
+    """Is this stretch of a sentence a picture of its own?
+
+    `HEAVY_CONTENT` content words (not `LIGHT_POS`), and among them
+    a verb (`NESTING_POS`): a participle, a relative clause, or a
+    clause, which makes the reader build the stretch rather than
+    read a name.
+    """
+    content = [t for t in tokens if t.pos not in LIGHT_POS]
+    if len(content) < HEAVY_CONTENT:
+        return False
+    return any(t.pos in NESTING_POS for t in content)
+
+
+def two_terms(sentence: Sentence) -> bool:
+    """Does a comparison in the predicate hold a heavy term on each side?
+
+    The first term runs from the root verb to the comparator, the
+    second from the comparator to the end of the sentence.
+    """
+    comp = comparator(sentence)
+    root = root_of(sentence)
+    if comp is None or root is None or root.i >= comp.i:
+        return False
+    toks = sentence.tokens
+    first = comp.i
+    lows = [t.text.lower() for t in toks]
+    if lows[first - 1] in ("rather", "instead", "compared", "differs",
+                           "differ", "same", "as"):
+        first -= 1
+        if lows[first - 1] == "the" and lows[first] == "same":
+            first -= 1
+    before = list(toks[root.i + 1:first])
+    after = list(toks[comp.i + 1:])
+    return heavy_side(before) and heavy_side(after)
+
+
 def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph."""
     if skipped(paragraph):
@@ -725,6 +825,8 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
             yield "AND", sentence
         if pair_gap(sentence):
             yield "PAIR", sentence
+        if two_terms(sentence):
+            yield "TWO", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:

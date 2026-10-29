@@ -24,6 +24,9 @@ from tools.stranded_prepositions import joined, paragraphs
 DATA: Final = Path(__file__).with_name("data") / "sentence_shapes_parses.json"
 
 SOURCES: Final[tuple[str, ...]] = (
+    "`drive()`, imported unchanged, answers a request yielded two generators deep the same way it answers one from `interview()`'s own body.",
+    "`drive()` is imported unchanged. The requests now come from `ask()`, one generator below `interview()`, and `yield from` passes each one up to the driver, so `drive()` sees the same `Question`s it saw in `interview_generator.py`.",
+    "Use a `set` rather than a `list` for membership tests.",
     "Remove `frozen=True` and the pattern fails.",
     "If you remove `frozen=True`, the pattern fails.",
     "Forget the new argument at a call and `ty` reports "
