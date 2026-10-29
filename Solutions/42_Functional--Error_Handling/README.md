@@ -286,8 +286,8 @@ from `E` to `F`.
 
 **Prefix errors at the boundary.**
 To prefix every error in a chain, you call `result.map_error(prefix)` once,
-at the boundary where you report the error,
-instead of adding the prefix inside every function that might produce an error.
+at the boundary where you report the error.
+The functions that might produce an error leave the prefix to that one call.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
