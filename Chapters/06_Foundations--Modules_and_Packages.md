@@ -186,7 +186,7 @@ though it collects them in a dictionary instead of in the module's namespace.
 As your programs get larger, you further organize your code into *packages*.
 A package is a directory that contains multiple modules,
 each one a *submodule* of the package.
-It forms its own namespace, named after the directory.
+It forms a namespace, named after the directory.
 
 To make a directory a package, you put a special file named `__init__.py` in it.
 `__init__.py` runs once,
