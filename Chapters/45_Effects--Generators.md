@@ -1337,41 +1337,15 @@ the sequence must be finite and fit in memory.
 
 This is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators).
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
-is a `reduce()` that keeps every intermediate result.
-[`repeat(None)`](41_Functional--Toolkits.md#repeat)
-is an iterator that produces `None` every time something asks it for an element.
-With no count argument it produces `None` forever.
-Each step of `accumulate()` takes one element from the first argument,
-so here each step takes a `None`.
-It calls the lambda,
-passing the current pair together with `None` to get the next pair.
-It hands out the new pair as the `yield` value from the `pairs` iterator.
-The lambda's second parameter always receives that `None`,
-so the lambda ignores it with the parameter `_`.
-The pair holds the same state as `a` and `b` in `fibonacci_callback.py`.
-There, the stack frame of the running `fibonacci()` keeps `a` and `b` between calls of `consume()`.
-Here, `accumulate()` passes the pair into each lambda call and takes the new pair out,
-so the state travels as a value instead of living in a stack frame.
-
-In `itertools_accumulate.py` from [Toolkits](41_Functional--Toolkits.md#accumulate),
-the iterable is `[1, 2, 3, 4]` and each step adds its element to the running total.
-`fibonacci()` folds `repeat(None)`, whose elements are placeholders.
-Each step needs the previous pair alone.
-The iterable's one job here is to decide how many steps `accumulate()` takes,
-and `repeat(None)` is endless, so the chain of pairs is endless too.
-[`islice()`](41_Functional--Toolkits.md#islice) takes the first `n` pairs,
-and the comprehension keeps the first number of each pair.
-
-Needing `repeat(None)` as a placeholder shows that `itertools` lacks the right operation.
-A fold like `accumulate()` consumes an input.
-A sequence built from a start value and a step needs the opposite operation,
+is a `reduce()` that keeps every intermediate result,
+a fold that consumes an input.
+Here the input is [`repeat(None)`](41_Functional--Toolkits.md#repeat),
+an endless supply of placeholders that counts the steps,
+so [`islice()`](41_Functional--Toolkits.md#islice)
+cuts the chain of pairs at `n`.
+The placeholder is the sign that a fold is the wrong operation here,
+since a sequence built from a start value and a step needs the opposite operation,
 an *unfold*.
-The third-party `more-itertools` package supplies one as `iterate(func, start)`,
-which produces `start`, `func(start)`, `func(func(start))`,
-and so on without end.
-`toolz` has an `iterate()` of the same shape.
-Each is a generator:
-a loop that yields the current value and then applies the step to it.
 A generator is the direct way to write an unfold.
 
 The third way, older than PEP 255's generators,

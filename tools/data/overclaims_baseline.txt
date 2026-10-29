@@ -729,7 +729,6 @@ Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
 Chapters/45_Effects--Generators.md	[BOUND] Each CODE wraps one call that resumes the generator, CODE or CODE, because a CODE from either means the conversation finished
-Chapters/45_Effects--Generators.md	[BOUND] Each step needs the previous pair alone
 Chapters/45_Effects--Generators.md	[BOUND] In a single thread, Python had three ways to write such a producer
 Chapters/45_Effects--Generators.md	[BOUND] It describes the yield channel alone, so the type checker rejects CODE on anything annotated CODE
 Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
@@ -740,7 +739,6 @@ Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three ch
 Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as a body with CODE and leaves the two methods to Python
 Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
 Chapters/45_Effects--Generators.md	[BOUND] The check applies to CODE's argument, and CODE takes the generator alone
-Chapters/45_Effects--Generators.md	[BOUND] The iterable's one job here is to decide how many steps CODE takes, and CODE is endless, so the chain of pairs is endless too
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
 Chapters/45_Effects--Generators.md	[BOUND] Through a CODE, the same two calls reach the innermost generator
 Chapters/45_Effects--Generators.md	[BOUND] Two loops passing values in both directions resembles a queue like the ones in Coordinating Threads with Queues, with three differences
