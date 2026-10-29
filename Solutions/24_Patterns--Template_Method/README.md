@@ -669,7 +669,7 @@ Only one of those things exists.
 A declaration in the base class can expose `HalfDone`'s omission.
 Through the `...` body,
 the base class declares that a subclass may skip this step.
-With that body, no checker can catch the omission,
+With that body, the omission looks to a checker like a deliberate choice,
 because "deliberately empty" and "forgotten" are the same code.
 Only the base class can record that difference.
 The base class can declare that a subclass must supply the step,
@@ -693,8 +693,7 @@ because both are properties of the class structure that a base class can declare
 What a step does once called is behavior,
 and [Liskov substitution](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution)
 is a rule about behavior.
-No tool checks substitution,
-so the chapter leaves that check to your discipline.
+The chapter therefore leaves substitution to your discipline.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
