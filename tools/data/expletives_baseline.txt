@@ -16,3 +16,4 @@ Chapters/44_Effects--Effect_Management.md	[IT-IS] it is safe: With it you know w
 Chapters/46_Effects--Stateless.md	[THERE] there produces: CODE there produces a CODE where the signature expects an CODE, so the type checker rejects it.
 Solutions/05_Foundations--Functions/README.md	[IT-IS] it must be callable: CODE has two requirements: it must be callable with one argument, and it must accept the value it returns, since CODE passes that value back in.
 Solutions/07_Foundations--Classes/README.md	[IT-IS] it is worth: It is worth writing when a tool reads it.
+Solutions/38_Patterns--Simulation/README.md	[THERE] there equal: On the line CODE the swap leaves the point where it was, so the subtraction there must equal its negation.

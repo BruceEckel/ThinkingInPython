@@ -41,7 +41,7 @@ Chapters/21_Patterns--Design_Patterns.md	[REPEAT] *Subtraction* :: Apply *Subtra
 Chapters/22_Patterns--Iterators.md	[EARLIER] *iterable* :: An *iterable* has CODE, which returns an *iterator*
 Chapters/25_Patterns--Surrogate.md	[EARLIER] *Protection proxy* :: *Protection proxy*
 Chapters/26_Patterns--Factory.md	[REPEAT] *Factory* :: Thus, *Factory* might be the most common design pattern
-Chapters/38_Patterns--Simulation.md	[EARLIER] *maze* :: A *maze* holds its own layout
+Chapters/38_Patterns--Simulation.md	[EARLIER] *maze* :: A *maze* holds its layout
 Chapters/38_Patterns--Simulation.md	[EARLIER] *rat* :: A *rat* explores
 Chapters/39_Patterns--Pattern_Catalog.md	[EARLIER] *Dispatcher* :: The original description of *Reactor* lists *Dispatcher* as another name for the pattern
 Chapters/39_Patterns--Pattern_Catalog.md	[REPEAT] *Behavioral* :: One of those groupings is GoF's *Creational*/*Structural*/*Behavioral* split, which the Design Patterns chapter accepts for *Creational* and questions for *Structural* and *Behavioral*

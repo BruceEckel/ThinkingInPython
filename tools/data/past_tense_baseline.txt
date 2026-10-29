@@ -237,7 +237,7 @@ Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST-HEADING] imported
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] included: Changing the import back to CODE while the file is still CODE raises CODE on every platform, Windows and macOS included.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] read: When a module may rebind a name to a new list or dict, import the module and read the name through it each time, as in CODE.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] updated: your script outside CODE prints CODE after four loading messages, the same script runs again with the directory renamed to CODE and the import updated, and you can cite the convention in File Names that the capital letter breaks.
-Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote a prediction before each run, the CODE version prints CODE, and you have the result of the CODE run against CODE on your own machine.
+Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote a prediction before each run, the CODE version prints CODE, and you have the result of the CODE run against CODE on your machine.
 Solutions/06_Foundations--Modules_and_Packages/README.md	[PAST] wrote: you wrote your prediction before running, CODE without the line prints a list that matches it and differs from CODE by two names, and after you restore the line it prints CODE again.
 Solutions/07_Foundations--Classes/README.md	[PAST] removed: With the decorator removed, CODE prints CODE.
 Solutions/08_Foundations--Static_Types/README.md	[PAST] found: before the widening, CODE reports CODE on the CODE call with CODEExpected CODE, found CODE CODE.

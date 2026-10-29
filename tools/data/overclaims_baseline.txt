@@ -1276,7 +1276,7 @@ Solutions/38_Patterns--Simulation/README.md	[BOUND] Taking the single near piece
 Solutions/38_Patterns--Simulation/README.md	[BOUND] The file makes two changes
 Solutions/38_Patterns--Simulation/README.md	[BOUND] The greedy tour does guarantee that every leg is a shortest path, which is all breadth-first search guarantees
 Solutions/38_Patterns--Simulation/README.md	[BOUND] The nodal lines are straight because the new field is a product of one function of CODE and one function of CODE
-Solutions/38_Patterns--Simulation/README.md	[BOUND] The one number equal to its own negation is zero
+Solutions/38_Patterns--Simulation/README.md	[BOUND] The one number equal to its negation is zero
 Solutions/38_Patterns--Simulation/README.md	[BOUND] The one requested change forces three more edits, because a caller must CODE an CODE to get its result
 Solutions/38_Patterns--Simulation/README.md	[BOUND] The robot walks the stretch between the start and the single piece three times
 Solutions/38_Patterns--Simulation/README.md	[BOUND] Two pieces of food can sit close together down one dead-end corridor while a third sits one step nearer in the opposite direction, with the rest of the food far beyond it
