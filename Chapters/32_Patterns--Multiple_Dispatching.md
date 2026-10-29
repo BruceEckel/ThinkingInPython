@@ -184,7 +184,7 @@ the type named in the method's own name.
 If you read that convention the other way,
 every `eval_*()` result appears reversed.
 
-The `caller` argument of each `eval_*()` method is the same object `compete()` held as `self` before passing it along.
+`compete()` passes `self` to the `eval_*()` method as the `caller` argument.
 A game whose outcome depends on the caller's state reads that state through `caller`.
 This game ignores the argument,
 since the outcome depends on the two types alone.
