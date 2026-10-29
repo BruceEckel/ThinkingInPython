@@ -1286,8 +1286,8 @@ The main diagonal in every figure follows from the same two terms.
 Swapping `x` and `y` turns the first term into the second and the second into the first,
 so the swap reverses the subtraction inside `amplitude()`'s `abs()`.
 On the line `x == y` the swap leaves the point where it was,
-so the subtraction there must equal its own negation.
-The one number equal to its own negation is zero.
+so the subtraction there must equal its negation.
+The one number equal to its negation is zero.
 Every mode in which this plate can ring therefore has a nodal line straight down the main diagonal,
 so the figures all share that one feature whichever `(m, n)` produced them.
 
