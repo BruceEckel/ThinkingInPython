@@ -612,7 +612,7 @@ Stateless provides no way to acquire a resource in one Effect and release it aft
 [Running Effects in Parallel](#running-effects-in-parallel) revisits that limit.
 
 One thing stays outside the types.
-`choose()` raises a `Blackout` when no source can supply the hour,
+`choose()` raises a `Blackout` when `available()` returns `False` for every source in `order`,
 and that is ordinary code raising an ordinary exception.
 No `@throws` lifts it,
 so it propagates out of `run()` and no signature mentions it.
@@ -792,7 +792,8 @@ When one function owns a number, a local variable is the right tool,
 and `count_heads()` keeps its count in one.
 The pair of Abilities serves separate functions that share the cell,
 such as `purchase()` and any other spender.
-No parameter carries the cell through the signatures between them.
+The cell reaches them through the handlers,
+so the signatures between them declare `Get | Put` in place of a `Cell` parameter.
 
 Treatments of algebraic effects open with this pattern and name it the *State effect*,
 with `get` and `put` as its two operations.
@@ -1147,7 +1148,7 @@ print(type(edge(Wire(""))).__name__)
 `Empty` originates here, in the generator,
 where the headline is available to inspect.
 The generator yields that failure as a value rather than raising it,
-so no decorator takes part.
+so it reaches the error channel directly rather than through a decorator.
 `throw(Empty())` yields the failure the way `Ask(prompt)` yields a request,
 and the driver receives it.
 Execution stops there.
