@@ -118,7 +118,7 @@ A pattern develops in stages, each more general than the last:
     the solution that arose to solve this particular problem.
     This might be a clever design, but it stays specific to that problem.
 3.  **Standard Design**: a specific design made general through reuse,
-    so it solves this kind of problem wherever it appears in your own programs.
+    so it solves this kind of problem wherever it appears in your programs.
 4.  **Design Pattern**: the shape several standard designs share,
     stated apart from any one program or language.
     This usually appears only after you apply a standard design several times,
@@ -130,7 +130,7 @@ A dictionary mapping one program's shape names to its shape classes is a specifi
 stage two.
 The same dictionary becomes a standard design, stage three,
 when each subclass registers itself as its `class` statement runs.
-A new type then adds its own entry to the dictionary.
+A new type then adds its entry to the dictionary.
 [Factory](26_Patterns--Factory.md) builds both designs.
 [*Template Method*](24_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.
@@ -317,7 +317,7 @@ That reach is why *GoF Design Patterns* repeats the saying that "inheritance bre
 A caller that writes `Circle(2)` knows a name and a constructor signature.
 A caller that writes `isinstance(s, Circle)` knows the name and tests an object's type against it.
 A caller written against an abstract base class knows a set of method names and signatures,
-and every class that implements them says so in its own `class` line.
+and every class that implements them says so in its `class` line.
 A caller written against a `Protocol` knows the same set of names,
 but no class declares that it implements them.
 The type checker compares each class's method names and signatures with those of the protocol.
