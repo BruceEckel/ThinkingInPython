@@ -15,7 +15,7 @@ show `walk()` recursing through a `Directory`,
 the classic version through overridden methods and the data-class version through `match`.
 Write `find()` in the same shape,
 with one case per `Node` type and `yield from` for the recursion.
-A `Directory` case checks its own name before it descends,
+A `Directory` case checks its name before it descends,
 and it carries the path prefix down.
 
 <details>
@@ -61,7 +61,7 @@ If you copy `walk()` and add a name test to the `File` case alone,
 The copied `Directory` case descends straight into its children,
 so every path it yields lies beneath the directory.
 The exercise says a directory can match,
-so the solution's `Directory` case tests its own name before it descends.
+so the solution's `Directory` case tests its name before it descends.
 
 ```python
 # exercise_1.py
@@ -184,7 +184,7 @@ def walk(
 `uv run ty check` passes on your file,
 and deleting the `Symlink` case from either `disk_usage()` or `walk()` brings back a `type-assertion-failure` at that function's `assert_never()`.
 Both functions also return normally on a tree holding `Symlink("up", "/root")`,
-a link to its own root.
+a link to its root.
 
 <details>
 <summary>Solution</summary>
@@ -272,7 +272,7 @@ since the target file's own entry counts its bytes.
 Adding the target's size again double-counts those bytes.
 
 **Stop at the link.**
-If `walk()` follows a link back to one of its own ancestors,
+If `walk()` follows a link back to one of its ancestors,
 it re-enters that ancestor until Python raises a `RecursionError`.
 
 Before you move on, name what separates your attempt from this one:
@@ -1488,7 +1488,7 @@ A stack version must arrange that moment in its own loop.
 A loop that pushes children and pops them gives a pre-order walk.
 That walk reaches each `Add` before its children,
 but an `Add` combines its children's values after the children have produced them.
-The solution stacks the pending operation behind its own children.
+The solution stacks the pending operation behind its children.
 `work += [Op.ADD, right, left]` puts `Op.ADD` deepest, so it comes off last,
 by which point the two values it needs are on `values`.
 
