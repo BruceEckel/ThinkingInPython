@@ -271,7 +271,8 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 
 Five constructs become one parameter and a function per algorithm.
 The type checker still knows what the parameter accepts:
-`Callable[[Weight], Cost]` rejects a function taking the wrong arguments as surely as an interface rejects a class that does not implement it.
+`Callable[[Weight], Cost]` rejects a function that takes the wrong arguments.
+In Java, the `ShippingStrategy` interface makes the same check on a class.
 
 The sentence that remains is the pattern.
 The subtraction keeps the pattern's intent and removes the supporting code.
