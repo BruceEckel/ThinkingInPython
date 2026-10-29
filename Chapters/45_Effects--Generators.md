@@ -626,10 +626,10 @@ def collect(name: str) -> Generator[Prompt, Value, Total]:
 ```
 
 `Prompt` and `Total` are `NewType`s,
-as `Question` and `Result` are in `interview_generator.py`,
-so the type checker tells a prompt from a total.
+like `Question` and `Result` in `interview_generator.py`,
+so the type checker distinguishes a prompt from a total.
 `Value` is a `type` alias,
-so the driver's `g.send(value)` passes a bare `int` and still matches the send type.
+so the driver's `g.send(value)` passes a bare `int` and still matches the send type:
 
 ```python
 # yield_from_send.py
@@ -645,23 +645,23 @@ g = both()
 print(next(g))
 #: alpha needs a value
 for value in [1, 2, 3, 4]:
-    print(f"send({value}) -> {g.send(value)}")
-#: send(1) -> alpha needs another
+    print(f"g.send({value}) -> {g.send(value)}")
+#: g.send(1) -> alpha needs another
 #: alpha got 1 and 2
-#: send(2) -> beta needs a value
-#: send(3) -> beta needs another
+#: g.send(2) -> beta needs a value
+#: g.send(3) -> beta needs another
 #: beta got 3 and 4
-#: send(4) -> total 10
+#: g.send(4) -> total 10
 ```
 
-`both()` declares the same yield (`Prompt`) and send (`Value`)
-types as `collect()`,
-because `yield from` passes both channels through to the driver.
-Its return type stays at the default, since `both()` returns `None`.
+`both()` declares the same yield type (`Prompt`) and send type (`Value`)
+as `collect()`, because `yield from` passes both channels through to the driver.
+Its return type is the `None` default, since `both()` returns `None`.
 
 `g.send(2)` supplies `second`,
 so `collect("alpha")` finishes and the `yield from` at `[1]` completes.
-`both()` starts the `yield from` at `[2]` in the same call.
+Before that `send(2)` returns,
+`both()` continues to `[2]` and `collect("beta")` runs to its first prompt.
 One `send()` therefore ends one inner generator and produces the first prompt of the next,
 which is why `alpha got 1 and 2` and `beta needs a value` sit on adjacent output lines.
 The `yield` at `[3]` gives `send(4)` a value to return.
