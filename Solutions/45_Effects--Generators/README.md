@@ -470,7 +470,6 @@ The script still runs, and produces:
 
 ```text
 request = 'color', answer = 'blue'
-  ask() received blue
 <generator object interview at 0x000001C5FB3FDE40>, color blue
 ```
 
@@ -615,13 +614,9 @@ so the script runs to the end and `print()` shows the list:
 
 ```text
 request = 'name', answer = 'Alice'
-  ask() received Alice
 request = 'town', answer = 'Wonderland'
-  ask() received Wonderland
 request = 'friend', answer = 'Rabbit'
-  ask() received Rabbit
 request = 'color', answer = 'blue'
-  ask() received blue
 ['Alice of Wonderland, friend Rabbit', 'blue']
 ```
 

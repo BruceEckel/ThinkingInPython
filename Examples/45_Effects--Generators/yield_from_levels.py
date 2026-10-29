@@ -23,7 +23,8 @@ def outer() -> Generator[Yielded, None, Returned]:
     return (yield from middle())
 
 def report() -> Iterator[Yielded | Returned]:
-    yield (yield from outer())
+    result = yield from outer()
+    yield result
 
 for yielded in report():
     print(yielded)

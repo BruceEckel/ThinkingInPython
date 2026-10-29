@@ -7,7 +7,6 @@ def ask(
     question: Question
 ) -> Generator[Question, Answer, Answer]:
     answer: Answer = yield question
-    print(f"  ask() received {answer}")
     return answer
 
 def interview() -> Generator[Question, Answer, Result]:
@@ -19,9 +18,6 @@ def interview() -> Generator[Question, Answer, Result]:
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
 #: request = 'name', answer = 'Alice'
-#:   ask() received Alice
 #: request = 'town', answer = 'Wonderland'
-#:   ask() received Wonderland
 #: request = 'friend', answer = 'Rabbit'
-#:   ask() received Rabbit
 #: Alice of Wonderland, friend Rabbit

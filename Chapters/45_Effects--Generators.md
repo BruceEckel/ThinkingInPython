@@ -499,7 +499,8 @@ def outer() -> Generator[Yielded, None, Returned]:
     return (yield from middle())
 
 def report() -> Iterator[Yielded | Returned]:
-    yield (yield from outer())
+    result = yield from outer()
+    yield result
 
 for yielded in report():
     print(yielded)
@@ -551,7 +552,7 @@ def visit(
     return counts
 
 def census(tree: Tree) -> Iterator[str]:
-    counts: Counter = yield from visit(tree)
+    counts: Counter[Color] = yield from visit(tree)
     for color, n in counts.items():
         yield f"{n} {color}"
 
@@ -682,7 +683,6 @@ def ask(
     question: Question
 ) -> Generator[Question, Answer, Answer]:
     answer: Answer = yield question
-    print(f"  ask() received {answer}")
     return answer
 
 def interview() -> Generator[Question, Answer, Result]:
@@ -694,11 +694,8 @@ def interview() -> Generator[Question, Answer, Result]:
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
 #: request = 'name', answer = 'Alice'
-#:   ask() received Alice
 #: request = 'town', answer = 'Wonderland'
-#:   ask() received Wonderland
 #: request = 'friend', answer = 'Rabbit'
-#:   ask() received Rabbit
 #: Alice of Wonderland, friend Rabbit
 ```
 
@@ -710,7 +707,7 @@ which binds it to `name`, `town`, or `friend`.
 This listing imports `drive()` unchanged.
 The requests now come from `ask()`, one generator below `interview()`,
 and `yield from` passes each one up to the driver,
-so `drive()` sees the same `Question`s it saw in `interview_generator.py`.
+so `drive()` sees the same `Question`s it saw in `interview_generator.py` and prints the same trace.
 `ask()` yields a `Question` and receives an `Answer`,
 so the same `ask()` runs under any driver that answers `Question`s.
 A single loop at the edge of the program interprets requests yielded at any depth.
@@ -737,13 +734,9 @@ def survey() -> Generator[Question, Answer, Result]:
 print(drive(survey(),
             ANSWERS | {Question("color"): Answer("blue")}))
 #: request = 'name', answer = 'Alice'
-#:   ask() received Alice
 #: request = 'town', answer = 'Wonderland'
-#:   ask() received Wonderland
 #: request = 'friend', answer = 'Rabbit'
-#:   ask() received Rabbit
 #: request = 'color', answer = 'blue'
-#:   ask() received blue
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
@@ -769,8 +762,9 @@ but they hand that value to different places.
 `yield from` hands the `Result` to the enclosing generator,
 which continues the conversation.
 
-`survey()` delegates to `interview()` and `ask(...)`.
-A generator can receive its targets as arguments instead,
+A `yield from` target is an ordinary value: it can arrive as a parameter,
+sit in a list, or be built at the point of delegation.
+A generator can receive its targets as arguments,
 so the caller decides what the conversation holds:
 
 ```python
@@ -794,13 +788,9 @@ print(drive(
     ANSWERS | {Question("color"): Answer("blue")},
 ))
 #: request = 'name', answer = 'Alice'
-#:   ask() received Alice
 #: request = 'town', answer = 'Wonderland'
-#:   ask() received Wonderland
 #: request = 'friend', answer = 'Rabbit'
-#:   ask() received Rabbit
 #: request = 'color', answer = 'blue'
-#:   ask() received blue
 #: Alice of Wonderland, friend Rabbit, blue
 ```
 
@@ -810,11 +800,6 @@ and returns a `str`.
 so `interview()` and `ask()` both qualify as steps.
 The loop delegates to each step in turn,
 and each `yield from` expression collects what its step returns.
-`drive()` sees the same four requests it saw from `survey()`.
-`survey()`'s body sets the shape of the conversation.
-`sequence()` receives that shape as an argument list.
-A `yield from` target is an ordinary value: it can arrive as a parameter,
-sit in a list, or be built at the point of delegation.
 
 A generator that sits between `drive()` and `interview()` can do both:
 answer the requests it knows and relay the rest.
@@ -825,9 +810,8 @@ and `survey()` could delegate to either with `yield from`:
 # answering_proxy.py
 from collections.abc import Generator
 from drive import ANSWERS, drive
-from interview_generator import (
-    Answer, Question, Result, interview
-)
+from interview_generator import Answer, Question, Result
+from yield_from_delegates import interview
 
 def proxy(
     inner: Generator[Question, Answer, Result],
@@ -1067,7 +1051,6 @@ def download() -> Generator[Request, Reply]:
     yield "download: checksum"
 
 def index() -> Generator[Request, Reply]:
-    # Discard the send() argument:
     yield "index: build"
     yield "index: merge"
 

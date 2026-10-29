@@ -19,7 +19,6 @@ def download() -> Generator[Request, Reply]:
     yield "download: checksum"
 
 def index() -> Generator[Request, Reply]:
-    # Discard the send() argument:
     yield "index: build"
     yield "index: merge"
 

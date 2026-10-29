@@ -1,9 +1,8 @@
 # answering_proxy.py
 from collections.abc import Generator
 from drive import ANSWERS, drive
-from interview_generator import (
-    Answer, Question, Result, interview
-)
+from interview_generator import Answer, Question, Result
+from yield_from_delegates import interview
 
 def proxy(
     inner: Generator[Question, Answer, Result],
