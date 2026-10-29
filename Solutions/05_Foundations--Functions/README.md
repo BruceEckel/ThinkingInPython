@@ -102,7 +102,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Sentinel Values](../../Chapters/05_Foundations--Functions.md#sentinel-values)
-builds a default that no caller can pass as data.
+builds a unique default, distinct from any value a caller passes as data.
 Test the parameter with `is` against that object,
 and use a bare `raise` inside the `except` block.
 Consider what `get(prefs, "theme", None)` would look like to the function if `None` were the sentinel.
