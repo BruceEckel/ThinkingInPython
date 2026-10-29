@@ -510,7 +510,7 @@ so the `Connection` survives.
 the backstop the chapter describes.
 Here it runs the callback for an object that `del b` should have destroyed.
 
-The chapter's `finalize(self, print, name, "closed")` avoids the trap by passing the pieces the callback needs rather than the object that has them.
+The chapter's `finalize(self, print, name, "closed")` avoids the trap by passing the pieces the callback needs rather than the `Connection`.
 `name` is a `str` the `Connection` also holds.
 The finalizer's reference to `name` keeps a string alive, not a connection.
 The rule holds for any finalizer:
