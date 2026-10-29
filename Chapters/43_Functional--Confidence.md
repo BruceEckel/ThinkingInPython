@@ -221,7 +221,7 @@ Purity guarantees that the parallel run returns the serial run's answers.
 Whether parallel runs faster at a given size is a separate question,
 and the timing answers it.
 
-Sending the calls to a worker adds requirements of its own.
+Sending the calls to a worker adds requirements.
 Each argument and each result pickles to cross the process boundary.
 The function pickles as its qualified name,
 so `count_primes()` must sit at the top level of a module a worker can import.
@@ -452,7 +452,7 @@ The simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 
 Avoid a law that restates the implementation.
-Asserting `encode(text) == text.encode().hex()` compares `encode()` with a copy of its own body,
+Asserting `encode(text) == text.encode().hex()` compares `encode()` with a copy of its body,
 so the test and the code share any bug.
 A good law, like the roundtrip law,
 constrains what the function computes and leaves the body to decide how.
