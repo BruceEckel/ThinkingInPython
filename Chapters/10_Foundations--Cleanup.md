@@ -185,9 +185,10 @@ When an object in a real program stays alive and you don't know why,
 as it shows the cycle in this listing.
 
 The cyclic garbage collector frees the node.
-The collector is a separate mechanism that runs on allocation counts rather than when the object becomes unreachable,
+The collector is a separate mechanism, triggered by allocation counts.
+An unreachable cycle stays in memory until the collector's next run,
 so in a real program the allocation counts, rather than your code,
-decide when the collector runs.
+decide when the cycle goes away.
 `gc.disable()` above turns off that collector's automatic runs,
 and `gc.collect()` then forces a run,
 so the `a finalized` line marks the moment of destruction.
