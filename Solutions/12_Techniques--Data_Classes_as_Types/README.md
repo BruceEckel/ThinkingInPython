@@ -10,7 +10,7 @@
 <summary>Where to look</summary>
 
 [Enums Are Types Too](../../Chapters/12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-shows `Month` checking a day against its own cap.
+shows `Month` checking a day against its cap.
 The cap now depends on a second value,
 so `check_day()` needs the `Year` as well,
 and `Year` needs a method that applies the leap rule.
