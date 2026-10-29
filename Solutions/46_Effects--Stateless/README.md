@@ -745,7 +745,7 @@ and leaves `Need[Clock]` in place.
 `handle()` and the type checker are each right about what they describe.
 `isinstance()` cannot test a type argument.
 `Need[Clock]` and `Need[Console]` are the same runtime class,
-so no runtime check tells the two apart.
+so at runtime the two look alike.
 The distinction lives in the annotation, where the type checker reads it.
 `handle()` matches on the annotation's origin, which erases the distinction.
 A handler like `default()` handles more than its type says.
@@ -811,7 +811,7 @@ The script runs to completion and prints:
 ['greeted Alice', 'greeted Bob']
 ```
 
-No greeting prints.
+The log entries are the whole output.
 `greet()` is a generator function,
 so calling `greet(name)` builds an Effect and returns it.
 The statement then discards that Effect before its body starts,
@@ -1388,7 +1388,7 @@ Three implementations have six orderings, and one rule predicts them all.
 so whichever implementation comes first answers it.
 Two of the six orderings put `Terminal` first and send the greeting to the screen.
 The remaining four split evenly between `Capture` and the third implementation.
-No ordering produces an error or a warning.
+All six orderings run cleanly.
 
 The fix splits the one structural check that all three objects match:
 
