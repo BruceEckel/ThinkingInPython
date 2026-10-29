@@ -313,7 +313,7 @@ The count is eight when every thread misses the cache,
 and the sleep makes that result likely.
 
 The fix puts the check inside a lock.
-`@cache` runs its check inside its own wrapper,
+`@cache` runs its check inside its wrapper,
 where your code cannot put a lock around it.
 So the locked version drops `@cache` and puts its own check inside the lock:
 
@@ -425,7 +425,7 @@ The import system runs a module body once,
 so the object exists before any thread can ask for it.
 The race needs laziness, and this listing gives it up on purpose.
 
-If you need the class to hand back one instance from its own constructor,
+If you need the class to hand back one instance from its constructor,
 override `__new__()`, as `singleton_class_variable.py` does.
 
 Modules and cached factories should cover your singleton needs.
@@ -520,7 +520,7 @@ The class then builds the object whether or not anything uses it
 (see exercise 1).
 (The bare `__OnlyOne()` works because the nested class exists at that point in the body.
 The qualified `OnlyOne.__OnlyOne()` fails,
-since the name `OnlyOne` stays unbound until its own class body finishes running.)
+since the name `OnlyOne` stays unbound until its class body finishes running.)
 
 Either way, `OnlyOne` takes a nested class, a class variable,
 and a `__getattr__()` to share one object,
