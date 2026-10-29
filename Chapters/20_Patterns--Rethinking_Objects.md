@@ -512,7 +512,7 @@ It inherits an implementation and now depends on that implementation's details.
 The dependence sits in `list`'s implementation,
 below the signatures the type checker reads.
 That dependence is the *fragile base class* problem:
-a base class cannot change its own internals without risking every subclass that came to depend on them.
+a base class cannot change its internals without risking every subclass that came to depend on them.
 
 Composition answers that problem by delegation.
 Hold a list instead of being one, and expose only what you meant to expose:
