@@ -209,7 +209,10 @@ def drive_from_dict(
 def drive_naive(
         conversation: Generator[Question, Answer, Result],
         answers: Iterator[Answer]) -> Result:
-    request = next(conversation)
+    try:
+        request = next(conversation)
+    except StopIteration as stop:
+        return stop.value
     while True:
         try:  # next() and send() share one except clause
             reply = next(answers)
@@ -221,7 +224,10 @@ def drive_naive(
 def drive_in_order(
         conversation: Generator[Question, Answer, Result],
         answers: Iterator[Answer]) -> Result:
-    request = next(conversation)
+    try:
+        request = next(conversation)
+    except StopIteration as stop:
+        return stop.value
     while True:
         # Fetched outside the try on purpose
         reply = next(answers)

@@ -854,7 +854,10 @@ def proxy(
     inner: Generator[Question, Answer, Result],
     known: dict[Question, Answer],
 ) -> Generator[Question, Answer, Result]:
-    request = next(inner)
+    try:
+        request = next(inner)
+    except StopIteration as stop:
+        return stop.value
     while True:
         if request in known:
             answer = known[request]  # [1]
@@ -882,6 +885,9 @@ print(drive(
 ```
 
 `proxy()` drives `inner` the way `drive()` does, with `next()` and `send()`.
+Its priming call sits in a `try`, as `drive()`'s priming call does,
+and here the guard matters more: `proxy()` is a generator,
+so a `StopIteration` that escaped its body would become a `RuntimeError`.
 `proxy()` relays a request with a `yield` at `[2]` instead of a `yield from`,
 because `yield from` would relay every request.
 In the second run, `drive()` sees two requests instead of three.
@@ -1074,6 +1080,7 @@ from typing import Final
 
 type Request = str
 type Reply = str
+type Job = Generator[Request, Reply]
 
 REPLIES: Final[dict[Request, Reply]] = {
     "download: headers?": "200 OK, 512 bytes",
@@ -1082,19 +1089,22 @@ REPLIES: Final[dict[Request, Reply]] = {
 def answer(request: Request) -> Reply:
     return REPLIES.get(request, "ok")
 
-def download() -> Generator[Request, Reply]:
+def download() -> Job:
     reply: Reply = yield "download: headers?"
     print(f"download: {reply}")
     yield "download: checksum"
 
-def index() -> Generator[Request, Reply]:
+def index() -> Job:
     yield "index: build"
     yield "index: merge"
 
-def task_runner(
-    jobs: Iterable[Generator[Request, Reply]]
-) -> None:
-    ready = deque((job, next(job)) for job in jobs)
+def task_runner(jobs: Iterable[Job]) -> None:
+    ready: deque[tuple[Job, Request]] = deque()
+    for job in jobs:
+        try:
+            ready.append((job, next(job)))
+        except StopIteration:
+            pass
     while ready:
         job, request = ready.popleft()
         print(request)
@@ -1112,8 +1122,9 @@ task_runner([download(), index()])
 #: index: merge
 ```
 
-`ready` uses a generator expression to pair every `job` with `next(job)`,
-that job's next request.
+The `for` loop primes each `job` and pairs it with its first request.
+The `except` drops a job that finishes before its first `yield`,
+and keeps that `StopIteration` out of the runner's own flow.
 When sending the last request for that `job` fails,
 the `while` loop continues without appending the `job` to `ready`,
 de-scheduling that `job`.

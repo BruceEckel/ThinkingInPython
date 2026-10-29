@@ -8,7 +8,10 @@ def proxy(
     inner: Generator[Question, Answer, Result],
     known: dict[Question, Answer],
 ) -> Generator[Question, Answer, Result]:
-    request = next(inner)
+    try:
+        request = next(inner)
+    except StopIteration as stop:
+        return stop.value
     while True:
         if request in known:
             answer = known[request]  # [1]
