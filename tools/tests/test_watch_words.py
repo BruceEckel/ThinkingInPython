@@ -34,9 +34,19 @@ def test_verb_with_no_or_none_object_is_tier_2() -> None:
     assert {h[1] for h in found} == {2}
 
 
+def test_negated_subject_is_an_advisory_tier_1_hit() -> None:
+    found = hits("No tool checks the step. A call with no argument "
+                 "raises a TypeError. It has no lock protecting it. "
+                 "Here no annotation expresses it.")
+    assert [(h[1], h[2]) for h in found if h[2].startswith("no ")] == [
+        (1, "no tool checks"), (1, "no annotation expresses")]
+    assert [h[2] for h in found if h[1] == 2] == ["has no"]
+
+
 def test_no_idioms_and_bare_no_are_not_hits() -> None:
-    assert hits("The call no longer runs. No matter what it does, "
-                "a value is no doubt present. No code runs.") == []
+    found = hits("The call no longer runs. No matter what it does, "
+                 "a value is no doubt present. No code runs.")
+    assert [h for h in found if h[1] != 1] == []
 
 
 def test_phrase_hit_is_case_insensitive() -> None:

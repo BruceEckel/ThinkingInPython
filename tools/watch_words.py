@@ -79,6 +79,18 @@ alone, and either adds a `c T1` count to the summary. `--accept`
 leaves them out of the baseline; `--accept --tier 1` baselines only
 the Tier 1 hits.
 
+One Tier 1 rule is a survey rather than a watch word (since 2026-10-28):
+a negated subject, `no <noun> <verb>` with a verb from `NO_VERBS` ("no
+annotation expresses it", "No tool checks the step", "no greeting
+prints"). It is the cancelled-object shape turned around: the
+quantifier arrives first, so the reader knows up front, but the
+sentence still says what fails to happen where it could say what does
+("the mistake surfaces at run time", "the log gains both entries").
+Many such sentences are the absence as the claim, which is why the
+rule is advisory and never counts as new. A `no` after a preposition
+("with no `await` returns") or after a `NO_VERBS` verb ("has no
+`__slots__` gives", already the object rule's hit) is skipped.
+
 Every hit a human judges a keep lives in
 `tools/data/watch_words_baseline.txt`, so a run prints only what is
 new. An entry is `path<TAB>word: clause`, whitespace normalized and no
@@ -232,6 +244,20 @@ NO_VERBS: Final = NOTHING_VERBS[:-1] + (
 2026-10-28)."""
 NO_AFTER: Final = r"(?! longer\b| matter\b| doubt\b)"
 """Idioms after "no" that are not a cancelled object."""
+NO_SUBJECT: Final = (
+    r"no (?!longer\b|matter\b|doubt\b)(?:\w+ )?\w+ " + NO_VERBS
+)
+"""A negated subject: `no`, a noun of one or two words, then a `NO_VERBS`
+verb (Tier 1, a survey, since 2026-10-28)."""
+NO_SUBJECT_BEFORE: Final = re.compile(r"(\w+)\W*$")
+"""The word before a match, for the negated-subject skip."""
+NO_SUBJECT_PREPOSITIONS: Final = frozenset((
+    "with", "of", "to", "at", "from", "for", "in", "on", "by", "into",
+    "under", "over", "about", "through", "as", "than", "and", "or",
+    "but", "is", "are", "was", "were", "be", "being", "been"))
+"""Words before `no` that make it an object or a complement, not a
+subject (and the conjunctions, which hide the governing verb)."""
+NO_VERB_WORD: Final = re.compile(NO_VERBS, re.IGNORECASE)
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
@@ -286,6 +312,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, NOTHING_VERBS + r" nothing"),
         (2, NO_VERBS + r" none(?: of)?"),
         (2, NO_VERBS + r" no" + NO_AFTER),
+        (1, NO_SUBJECT),
         (2, r"by hand"),
         (2, r"manually"),
         (2, r"explicit(?:ly)?"),
@@ -318,8 +345,20 @@ def literal_hook(text: str, m: re.Match[str]) -> bool:
     return any(term in near for term in HOOK_NEAR)
 
 
+def literal_no_subject(text: str, m: re.Match[str]) -> bool:
+    """Is this `no` an object or a complement rather than a subject?"""
+    before = NO_SUBJECT_BEFORE.search(text[:m.start()])
+    if before is None:
+        return False
+    word = before.group(1).lower()
+    return (word in NO_SUBJECT_PREPOSITIONS
+            or NO_VERB_WORD.fullmatch(word) is not None)
+
+
 def literal(word: str, text: str, m: re.Match[str]) -> bool:
     """Does this match carry a sense the style guide does not flag?"""
+    if word.startswith("no "):
+        return literal_no_subject(text, m)
     if word == "even":
         return literal_even(text, m)
     if word in ("hook", "hooks"):
