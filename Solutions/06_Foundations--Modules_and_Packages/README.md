@@ -316,7 +316,7 @@ so setting it tests your explanation.
 
 you wrote a prediction before each run,
 the `import Module` version prints `I'm being useful!`,
-and you have the result of the `import module` run against `Module.py` on your own machine.
+and you have the result of the `import module` run against `Module.py` on your machine.
 You can also say why the effect of setting `PYTHONCASEOK` shows which program compares the two names.
 
 <details>
