@@ -453,7 +453,7 @@ when that tuple behavior must come with your own construction or methods.
 Choose a [record](12_Techniques--Data_Classes_as_Types.md#immutability)
 when the value should be a distinct type that equals instances of its own class alone.
 Choose the record too when inherited ordering and array-shaped JSON are wrong rather than convenient,
-or when the type must check its own values.
+or when the type must check its values.
 A record runs [`__post_init__()`](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 on every construction, so its values are legal as well as typed.
 By contrast, [a `NamedTuple` cannot validate itself](12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate).
