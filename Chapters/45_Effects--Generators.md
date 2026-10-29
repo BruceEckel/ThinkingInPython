@@ -466,10 +466,10 @@ A `yield from` therefore works like a function call:
 while the values `emit()` yields still go to the driver.
 
 `drive_by_hand.py` and `drive()` read a generator's result by catching `StopIteration` and taking its `value`.
-`report()` writes an assignment instead of a `try`,
-because `yield from` manages the result for you.
+In `report()`, `yield from` does that work.
 When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`.
+The one assignment `size: Size = yield from emit(items)` replaces the `try` and the `except`.
 
 A result passes up through any number of `yield from` levels:
 
