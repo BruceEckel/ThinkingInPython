@@ -769,7 +769,8 @@ but they hand that value to different places.
 `yield from` hands the `Result` to the enclosing generator,
 which continues the conversation.
 
-`survey()` names the generators it delegates to in its body.
+`survey()` writes its two `yield from` targets, `interview()` and `ask(...)`,
+into its body.
 A generator can receive them as arguments instead,
 so the caller decides what the conversation holds:
 
