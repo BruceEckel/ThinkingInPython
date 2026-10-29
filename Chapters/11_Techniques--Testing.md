@@ -99,8 +99,8 @@ Most Python projects use `pytest`, and so does this book.
 `pytest` uses two ideas that keep tests short.
 A test is a function whose name starts with `test_`.
 A check is Python's built-in `assert` statement.
-No base class needs inheriting,
-and no special assertion methods need memorizing.
+Those two ideas replace `unittest`'s `TestCase` base class and its assertion methods,
+such as `assertEqual()`.
 `pytest` rewrites `assert` so that a failure shows you both sides of the comparison.
 
 Most of this chapter's tests check the following `Account` class,
