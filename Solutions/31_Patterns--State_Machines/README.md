@@ -377,7 +377,7 @@ Here a factory builds that function around the state's own table,
 a `dict` from word to the name of the next state,
 with a wildcard entry for words the state ignores.
 The enum turns the name into the member,
-so no controller holds a `dict` of name to state object.
+so the enum doubles as the map from name to state object.
 
 <details>
 <summary>The shape</summary>
