@@ -33,7 +33,7 @@ explains the filename comment on a listing's first line and the `#:` output mark
 ## Indentation and Blocks
 
 Python is clean to write.
-Your own code stays easy to read long after you've written it.
+Your code stays easy to read long after you've written it.
 Part of that readability comes from indentation,
 which determines how statements group into blocks.
 Here, the script runs with `python if.py`:
@@ -552,7 +552,7 @@ It prints the expression's text, the `=` with any spaces you put around it,
 and then the value.
 By default the value appears as its `repr()`,
 so the output shows `'Alice'` in quotes.
-Use `=` to label values in your own exploring and debugging code.
+Use `=` to label values in your exploring and debugging code.
 
 Since Python 3.12 ([PEP 701](https://peps.python.org/pep-0701/)),
 the expression inside the braces can reuse the string's own quote character,
