@@ -446,7 +446,7 @@ It stands to the static tool as `isinstance()` assertions stand to the type chec
 If the static tool existed, complete and correct,
 it would fill all three roles and give you algebraic effect tracking.
 `ask()` would still call `input()`.
-No test could replace that call.
+Every test of `ask()` would run that call.
 The row names an Effect,
 but `ask()` holds both the Effect's interface and its implementation,
 bound together when you write `ask()`.
