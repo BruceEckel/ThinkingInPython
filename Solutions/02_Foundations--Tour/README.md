@@ -115,7 +115,7 @@ a different design, a detail, or an equivalent alternative.
 [f-Strings](../../Chapters/02_Foundations--Tour.md#f-strings)
 covers the format spec after the colon in a replacement field.
 Change the digit after the `.` in `.0f` to set the precision.
-A trailing `=` inside the braces makes the field print its own source text before the value.
+A trailing `=` inside the braces makes the field print its source text before the value.
 
 <details>
 <summary>Done when</summary>
