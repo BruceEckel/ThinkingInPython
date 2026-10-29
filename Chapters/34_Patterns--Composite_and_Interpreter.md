@@ -161,7 +161,7 @@ def walk(
 
 `Node` is a recursive union.
 `Directory` holds a `tuple[Node, ...]`,
-so the alias names itself through one of its own members.
+so the alias names itself through one of its members.
 That self-reference lets a `Directory` hold other directories to any depth.
 
 `Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement)
