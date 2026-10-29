@@ -1213,8 +1213,8 @@ A function that reads mutable state is impure, however simple its body looks.
 
 The general version needs memory, where the circle method needs a round number.
 In the circle method, which pair sits where in round `r` follows from `r` alone.
-`group_rounds()` needs the `history` `Counter`,
-because no formula takes a round number and returns the grouping of arbitrary size that keeps every pair's meeting count lowest.
+`group_rounds()` needs the `history` `Counter`, because it builds each group,
+whatever the size, from the students who have met its members least often in the earlier rounds.
 To reach round `100`,
 `group_rounds()` therefore generates rounds `0` through `99` first.
 The circle method computes round `100` from its arithmetic alone.
