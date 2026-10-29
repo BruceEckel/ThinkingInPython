@@ -674,7 +674,7 @@ print(c + 0.5, isinstance(c, float))
 
 **Define the method as a function.**
 `describe()` is a module-level function,
-defined before `type()` creates the class that carries `unit`.
+defined before `type()` creates `Celsius`.
 With no class to name as the type of `self`, the annotation uses `Any`,
 which lets the type checker accept `self.unit`.
 
