@@ -206,6 +206,7 @@ list grew on 2026-10-25 from the book sweep)."""
 NO_VERBS: Final = NOTHING_VERBS[:-1] + (
     r"|has|have|had|having|takes?|took|taken|taking|contains?"
     r"|contained|containing|mentions?|mentioned|mentioning|uses?|used"
+    r"|expresses?|expressed|expressing|states?|stated|stating"
     r"|using|carr(?:y|ies|ied|ying)|offers?|offered|offering|allows?"
     r"|allowed|allowing|involves?|involved|involving|provides?"
     r"|provided|providing|suppl(?:y|ies|ied|ying)|defines?|defined"
