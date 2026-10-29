@@ -385,8 +385,8 @@ a different design, a detail, or an equivalent alternative.
 > Put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
 > Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,
 > using a maze that contains a loop.
-> `amaze.txt` is a perfect maze,
-> so no two rats reach one unclaimed cell and the counts always agree.
+> `amaze.txt` is a perfect maze, so a single rat reaches each unclaimed cell.
+> In that maze the counts always agree.
 > `test_rats_and_mazes.py` still passes, because `visited` is a set.
 > The guarantee that broke is "one rat per cell", not "every cell visited".
 > What happens to the two rats that both claimed one cell,
@@ -932,7 +932,7 @@ a different design, a detail, or an equivalent alternative.
 > Replace that `isinstance()` test with a `Callable[[Room], bool]` parameter,
 > so the caller says what counts as arriving,
 > and leave the rest of the search as it is,
-> beyond letting `solve()` return `None` when no room matches.
+> beyond letting `solve()` return `None` when the search runs out of rooms.
 > Then use the new parameter to feed the robot:
 > search for the nearest room holding a `Food`, walk there,
 > and repeat until no `Food` remains,
@@ -1274,7 +1274,7 @@ not approximately zero.
 A zero field means a zero kick.
 `step()` scales each grain's random displacement by the amplitude under that grain,
 so `uniform(-kick, kick) * 0.0` comes to zero and leaves each grain where it is.
-The view shows neither chaos nor a figure because no grain moves.
+The view shows neither chaos nor a figure because every grain stays where it started.
 It shows the initial random scatter, frozen.
 
 Agitation reads `0.000` from the start,
