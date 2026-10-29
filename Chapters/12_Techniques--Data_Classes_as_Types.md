@@ -55,7 +55,7 @@ Python strips every `assert` when you run with `-O` or `-OO`.
 so the optimizer may remove it.
 Under those flags, validation written with `assert` disappears silently and lets in the illegal values this chapter exists to keep out.
 A value that arrives from outside the program needs a check that stays.
-No flag removes a `raise`.
+A `raise` statement runs under every flag.
 
 `eq=False` turns off the generated `__eq__()`, for two reasons.
 A mutable data class that defines `__eq__()` [sets `__hash__` to `None`](#data-classes).
@@ -1307,7 +1307,7 @@ print(c.url, c.name)
 #: tcp://localhost:5432 db
 ```
 
-No field declaration produces `url`.
+`url` comes from `Connection.__init__()`, which `__post_init__()` calls.
 If you delete `__post_init__()`,
 `print(c.url, c.name)` raises an `AttributeError`.
 
