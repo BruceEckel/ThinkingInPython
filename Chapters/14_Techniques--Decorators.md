@@ -115,7 +115,7 @@ The body of `wrapper()` is the one part of `announce` that runs at the call.
 
 `wrapper()` is a [*closure*](40_Functional--Foundations.md#closures).
 Defined inside its decorator, it refers to `func`,
-a variable from the enclosing scope, not one of its own parameters.
+a variable from the enclosing scope, not one of its parameters.
 Python keeps `func` alive as long as `wrapper()` exists,
 so `func` outlives the decorator call that received it.
 A call to `cheese()`, long after decoration finished,
