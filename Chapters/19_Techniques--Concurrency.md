@@ -892,7 +892,7 @@ Here, `__enter__()` finishes both updates before the task reaches its `await`,
 so the task keeps control through them and needs no lock.
 
 A semaphore initialized to one behaves like a lock, with one difference.
-Releasing a `Lock` that no task holds raises `RuntimeError: Lock is not acquired.` An over-released `Semaphore` quietly increases its own limit,
+Releasing a `Lock` that no task holds raises `RuntimeError: Lock is not acquired.` An over-released `Semaphore` quietly increases its limit,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
 `asyncio.BoundedSemaphore` checks for that mistake.
 A `release()` beyond its starting count raises a `ValueError`.
@@ -1383,7 +1383,7 @@ Wall time drops sharply up to the core count, then flattens or reverses past it,
 as doubling from 32 to 64 tasks did here.
 
 `TOTAL` and `CORE_MULTIPLIER` are the two constants to adjust.
-Increase `TOTAL` for a slower, more dramatic slope on your own machine,
+Increase `TOTAL` for a slower, more dramatic slope on your machine,
 or lower `CORE_MULTIPLIER` to stop the sweep at the core count instead of past it.
 
 ### Why Speedup Isn't Linear
@@ -1406,7 +1406,7 @@ on 16 cores or 1,600.
 Splitting into more, smaller tasks yields gains up to a point,
 since finer chunks even out the load across workers.
 Past that point, though,
-each additional task adds its own slice of the same serial overhead:
+each additional task adds its slice of the same serial overhead:
 one more chunk to pickle, one more result to collect.
 Once that added overhead outweighs the benefit of the smaller pieces,
 the curve flattens.
@@ -2444,7 +2444,7 @@ On one well-provisioned machine,
 60,000 threads started in about four seconds with room to spare,
 each blocked on a `threading.Event` that nothing sets.
 A laptop with far less memory can fail at a fraction of that.
-To find your own machine's number,
+To find your machine's number,
 start threads that block on a `threading.Event` that nothing sets and increase the count until `start()` raises an exception.
 A task's limit is heap memory alone,
 because a task uses neither of the per-thread OS resources that limit threads:
@@ -2551,7 +2551,7 @@ is a small corner of the territory.
   Actor languages and CSP, below,
   are two different disciplines built on this same idea.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
-  an isolated object that reacts only to messages sent to its own mailbox,
+  an isolated object that reacts only to messages sent to its mailbox,
   keeps its state private, and can spawn more actors.
   The most established production examples include Erlang,
   built at Ericsson for telephone switches.
