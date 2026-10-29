@@ -703,9 +703,9 @@ if __name__ == "__main__":
 ```
 
 `Answer` fills two of `ask()`'s three positions, in two roles.
-As the `SendType` it is the value of the `yield` inside `ask()`,
-sent by the driver.
-As the `ReturnType` it is the value of the whole `yield from` expression in `interview()`.
+As the `SendType` it goes from the driver to the `yield` inside `ask()`.
+As the `ReturnType` it goes from `ask()` up to `interview()`,
+which binds it to `name`, `town`, or `friend`.
 
 This listing imports `drive()` unchanged.
 The requests now come from `ask()`, one generator below `interview()`,
