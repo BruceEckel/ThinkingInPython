@@ -43,7 +43,8 @@ Solutions/29_Patterns--Changing_the_Interface/README.md	1	exercise_5.py	strip-ig
 Solutions/40_Functional--Foundations/README.md	1	exercise_6.py	strip-ignore
 Solutions/40_Functional--Foundations/README.md	2	exercise_6_tuple.py	append: CONFIG.append(3)
 Solutions/45_Effects--Generators/README.md	1	yield_from_nested.py	replace: yield from interview() => interview()
-Solutions/45_Effects--Generators/README.md	2	send_none_is_next.py	strip-ignore
+Solutions/45_Effects--Generators/README.md	2	yield_from_arguments.py	replace: def sequence( => def sequence[R](	replace: *steps: Generator[Question, Answer, str] => *steps: Generator[Question, Answer, R]	replace: ) -> Generator[Question, Answer, Result]: => ) -> Generator[Question, Answer, list[R]]:	replace: results: list[str] = [] => results: list[R] = []	replace: return Result(", ".join(results)) => return results
+Solutions/45_Effects--Generators/README.md	3	send_none_is_next.py	strip-ignore
 Solutions/46_Effects--Stateless/README.md	1	undeclared_need.py	strip-ignore
 Solutions/46_Effects--Stateless/README.md	2	exercise_3.py	none
 Solutions/46_Effects--Stateless/README.md	3	greeter.py	replace: console = yield from need(Console) => console = need(Console)
