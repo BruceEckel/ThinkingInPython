@@ -2185,7 +2185,12 @@ criterion that must stay abstract so as not to give the answer away.
 
 **Sightings.** 2, both Bruce's flags on chapter 45 on 2026-10-29
 (`ca045294`, `4a5d14ea`), promoted on his request to apply it across
-the book. Candidates for a scan: "the value of the", "the X of the Y
+the book. The sweep the same day (brief `build/role-2026-10-29/`,
+21 Opus agents over 422 regex candidates in 49 chapters) rewrote 13
+sentences and kept the rest: the shape is rare outside chapter 45,
+and the keeps were short relative clauses that are the claim, a role
+that is the only handle before the listing names the thing, a
+general rule a name would narrow, and exercise or Done-when wording. Candidates for a scan: "the value of the", "the X of the Y
 in the Z", a relative clause ending on a preposition ("the generators
 it delegates to"), "after which", "at which point"; a parse rule would
 flag an object noun phrase with two or more nested prepositional
