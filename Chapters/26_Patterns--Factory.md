@@ -629,9 +629,9 @@ The pattern remains, but no longer needs a class hierarchy to express it.
 
 Because the static `factory()` method in `shape_factory_method.py` collects all the creation operations in one place,
 that method is the only existing code you change when you add a shape.
+`factory()` chooses what to build with a `match` statement on its string argument.
 A *factory object* defines a single `create()` method,
-so choosing what to build becomes choosing which factory object to call,
-rather than passing a string to a `match` statement.
+so choosing what to build becomes choosing which factory object to call.
 Here, we create one factory object per `Shape` subtype:
 
 ```python
