@@ -361,7 +361,7 @@ class Sub(Open):
 
 `class B(A, final=True):` builds,
 a subclass of `B` fails with `[TypeError] B is final; you cannot subclass it`,
-and a sibling of `B` written with no keyword in its header accepts a subclass of its own,
+and a sibling of `B` written with no keyword in its header accepts a subclass,
 for which `issubclass()` against `A` prints `True`.
 
 <details>
