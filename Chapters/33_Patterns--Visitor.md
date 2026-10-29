@@ -366,7 +366,7 @@ def test_dispatch_follows_inheritance() -> None:
 ## Where Visitor Still Fits
 
 *Visitor* still has a place:
-when an object must loop over its own elements inside `accept()`,
+when an object must loop over its elements inside `accept()`,
 or when someone else's framework calls that method.
 Both cases are rare in Python.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)
