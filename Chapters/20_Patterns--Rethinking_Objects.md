@@ -509,7 +509,8 @@ print(f"{len(counted)=}, {counted.appends=}")
 so the count is wrong the moment anyone adds items through another of the base class's methods.
 The subclass is correct line by line.
 It inherits an implementation and now depends on that implementation's details.
-No signature records that dependence, and no type checker reports it.
+The dependence sits in `list`'s implementation,
+below the signatures the type checker reads.
 That dependence is the *fragile base class* problem:
 a base class cannot change its own internals without risking every subclass that came to depend on them.
 
