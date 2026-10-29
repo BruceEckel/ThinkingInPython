@@ -711,8 +711,8 @@ This listing imports `drive()` unchanged.
 The requests now come from `ask()`, one generator below `interview()`,
 and `yield from` passes each one up to the driver,
 so `drive()` sees the same `Question`s it saw in `interview_generator.py`.
-`ask()` works with a `Question` and an `Answer` alone,
-so the same `ask()` runs under any driver.
+`ask()` yields a `Question` and receives an `Answer`,
+so the same `ask()` runs under any driver that answers `Question`s.
 A single loop at the edge of the program interprets requests yielded at any depth.
 
 ### Composing Is Not Interpreting

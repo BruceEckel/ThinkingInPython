@@ -248,6 +248,7 @@ Chapters/19_Techniques--Concurrency.md	[BOUND] The listing prints one line per p
 Chapters/19_Techniques--Concurrency.md	[BOUND] The listing puts the global and the CODE side by side, so each printed line shows both values as one task reads them
 Chapters/19_Techniques--Concurrency.md	[BOUND] The one compatibility check mirrors the free-threading check
 Chapters/19_Techniques--Concurrency.md	[BOUND] The only difference between one run and another is how finely the listing splits the total work
+Chapters/19_Techniques--Concurrency.md	[BOUND] The remaining members propagate as a new group that keeps the original message, so the outer CODE catches the CODE alone
 Chapters/19_Techniques--Concurrency.md	[BOUND] This listing raises a group of four exceptions into two CODE clauses
 Chapters/19_Techniques--Concurrency.md	[BOUND] Those two differences make it the first thing to try for CPU-bound work, before a process pool or a free-threaded interpreter
 Chapters/19_Techniques--Concurrency.md	[BOUND] Threads that share mutable state need a lock, or a queue like the one in Coordinating Threads with Queues
@@ -604,6 +605,7 @@ Chapters/42_Functional--Error_Handling.md	[BOUND] a value that is one thing or a
 Chapters/43_Functional--Confidence.md	[BOUND] A CODE statement is one way to break substitution
 Chapters/43_Functional--Confidence.md	[BOUND] An implementation may therefore cache the call, run the two calls in either order, or skip the second
 Chapters/43_Functional--Confidence.md	[BOUND] CODE runs the four calls one at a time, on one core
+Chapters/43_Functional--Confidence.md	[BOUND] Each call's answer comes from its arguments alone, so the calls are independent
 Chapters/43_Functional--Confidence.md	[BOUND] Functional programming answers with a spectrum, not a single guarantee
 Chapters/43_Functional--Confidence.md	[BOUND] Hypothesis can rerun and shrink freely because each call depends on its arguments alone
 Chapters/43_Functional--Confidence.md	[BOUND] That rules out two shapes these chapters use often
@@ -639,21 +641,28 @@ Chapters/44_Effects--Effect_Management.md	[BOUND] The function reads its argumen
 Chapters/44_Effects--Effect_Management.md	[BOUND] The read leaves the environment as it was, yet the result of your function differs from one call to the next
 Chapters/44_Effects--Effect_Management.md	[BOUND] Three calls down, a helper that formats currency reads a configuration service and writes to an audit log
 Chapters/44_Effects--Effect_Management.md	[BOUND] Three things pass from callee to caller
+Chapters/45_Effects--Generators.md	[BOUND] A delegating generator passes all three channels through to the innermost generator, so you can compose a conversation from parts that never refer to their driver
+Chapters/45_Effects--Generators.md	[BOUND] A handler can do three things with a continuation
+Chapters/45_Effects--Generators.md	[BOUND] A suspended generator preserves two things
 Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator drops the return channel, so CODE takes two parameters where CODE takes three
 Chapters/45_Effects--Generators.md	[BOUND] CODE catches CODE alone, so CODE propagates, the CODE block runs, and the generator ends
 Chapters/45_Effects--Generators.md	[BOUND] CODE makes the first two calls itself, and the CODE makes the rest, ending when CODE raises CODE, the asynchronous counterpart of CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
+Chapters/45_Effects--Generators.md	[BOUND] Each CODE wraps one call that resumes the generator, CODE or CODE, because a CODE from either means the conversation finished
 Chapters/45_Effects--Generators.md	[BOUND] Each step needs the previous pair alone
 Chapters/45_Effects--Generators.md	[BOUND] In a single thread, Python had three ways to write such a producer
+Chapters/45_Effects--Generators.md	[BOUND] It describes the yield channel alone, so the type checker rejects CODE on anything annotated CODE
 Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
 Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver at the edge of the program
+Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
 Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as a body with CODE and leaves the two methods to Python
 Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
 Chapters/45_Effects--Generators.md	[BOUND] The check applies to CODE's argument, and CODE takes the generator alone
 Chapters/45_Effects--Generators.md	[BOUND] The iterable's one job here is to decide how many steps CODE takes, and CODE is endless, so the chain of pairs is endless too
+Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
 Chapters/45_Effects--Generators.md	[BOUND] Through a CODE, the same two calls reach the innermost generator
 Chapters/45_Effects--Generators.md	[BOUND] Two loops passing values in both directions resembles a queue like the ones in Coordinating Threads with Queues, with three differences
 Chapters/46_Effects--Stateless.md	[BOUND] A caller now has two options
@@ -984,6 +993,7 @@ Solutions/26_Patterns--Factory/README.md	[BOUND] CODE accepts any object with th
 Solutions/26_Patterns--Factory/README.md	[BOUND] CODE appends to the one list both spawns share, so CODE becomes CODE and the assertion that it equals CODE fails
 Solutions/26_Patterns--Factory/README.md	[BOUND] CODE lists two classes while CODE lists three, CODE among them
 Solutions/26_Patterns--Factory/README.md	[BOUND] If you leave out CODE, the table still fills and the demo prints the same three lines
+Solutions/26_Patterns--Factory/README.md	[BOUND] In CODE each factory matches the protocol by its methods alone, so constructing the factory is legal
 Solutions/26_Patterns--Factory/README.md	[BOUND] The CODE comment is the one mark in the file that says the import is deliberate
 Solutions/26_Patterns--Factory/README.md	[BOUND] The demo mentions CODE in the import alone, so the two classes stay out of the registry
 Solutions/26_Patterns--Factory/README.md	[BOUND] The listing below shows the new shape alone
@@ -1179,6 +1189,7 @@ Solutions/42_Functional--Error_Handling/README.md	[BOUND] CODE passes a success 
 Solutions/42_Functional--Error_Handling/README.md	[BOUND] CODE returns an CODE listing all three failures in step order, CODE an CODE holding CODE alone, and CODE the same CODE that CODE prints
 Solutions/42_Functional--Error_Handling/README.md	[BOUND] If you give CODE to CODE alone, CODE raises an CODE
 Solutions/42_Functional--Error_Handling/README.md	[BOUND] The CODE-chained version stops at the first failure, while this version calls all three functions every time
+Solutions/42_Functional--Error_Handling/README.md	[BOUND] The functions that might produce an error leave the prefix to that one call
 Solutions/42_Functional--Error_Handling/README.md	[BOUND] The three calls take independent inputs, so CODE can make all three
 Solutions/42_Functional--Error_Handling/README.md	[BOUND] The three steps return CODE, an CODE or one error string, while CODE returns CODE, a finished CODE or a list of error strings
 Solutions/42_Functional--Error_Handling/README.md	[BOUND] Use a CODE when the caller may need to act on which failure occurred, or when a person reading a bug report needs to know which of three steps went wrong
@@ -1257,9 +1268,3 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Then compare that 
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Under the guard, the driver runs in the main process alone, so a worker loads CODE without running the driver
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Write the first signature with the new appliance alone and read which line the type checker reports
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Your review rule flags the CODE line in CODE and accepts a body that holds the CODE alone
-Chapters/19_Techniques--Concurrency.md	[BOUND] The remaining members propagate as a new group that keeps the original message, so the outer CODE catches the CODE alone
-Chapters/43_Functional--Confidence.md	[BOUND] Each call's answer comes from its arguments alone, so the calls are independent
-Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
-Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
-Solutions/26_Patterns--Factory/README.md	[BOUND] In CODE each factory matches the protocol by its methods alone, so constructing the factory is legal
-Solutions/42_Functional--Error_Handling/README.md	[BOUND] The functions that might produce an error leave the prefix to that one call

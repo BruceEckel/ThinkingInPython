@@ -1081,8 +1081,7 @@ Suppose you add a state reachable from several others,
 the way the table handles `Quit` from every state but `QUIESCENT`.
 No position in the body corresponds to that state.
 The new state becomes a flag, or a check repeated at several `yield`s.
-Either one breaks the correspondence between position and state,
-the one thing that makes this version readable.
+Either one breaks the correspondence between position and state that makes this version readable.
 
 With the table, adding any state means one new `Enum` member and a few new rules.
 Those rules sit next to the existing ones,
