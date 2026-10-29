@@ -99,7 +99,8 @@ def interview() -> Generator[Question, Answer, Result]:
 ```
 
 Although `Generator[str, str, str]` works,
-`NewType` gives each channel a distinct type which makes the logic easer to follow.
+`NewType` gives each channel a distinct type,
+which makes the logic easier to follow.
 The annotation says which kind of value each channel carries,
 and the type checker rejects a value on the wrong channel.
 The distinction exists for the type checker.
@@ -133,8 +134,6 @@ except StopIteration as stop:
 print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
-
-The `NewType` definitions let the type checker report any annotation mistakes.
 
 The last `send()` resumes `interview()`'s body,
 which encounters `return` instead of another `yield`,
@@ -617,8 +616,8 @@ for line in census(garden):
 
 A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`,
 and reaches the `for` loop at the bottom of the listing.
-Note that [`Counter`](03_Foundations--Containers.md#counter)
-objects can be added together.
+[`Counter`](03_Foundations--Containers.md#counter) objects support `+`,
+so `counts += yield from visit(...)` merges a subtree's counts into the parent's counts.
 A `visit()` returns its subtree's `Counter` to the `visit()` that called it,
 and the `Counter` for the whole garden reaches `census()`.
 
@@ -891,7 +890,7 @@ so a `StopIteration` that escaped its body would become a `RuntimeError`.
 which can be any distance away.
 `interview()` reaches one on its first line.
 A generator that opens with a `yield from` runs its whole delegate first,
-and `sequence()` with no steps returns before it yields at all.
+and `sequence()` with no steps returns before its first `yield`.
 The `except` turns that early return into `proxy()`'s own result.
 `proxy()` relays a request with a `yield` at `[2]` instead of a `yield from`,
 because `yield from` would relay every request.
@@ -948,8 +947,10 @@ An exception that escapes the generator's body ends the generator and propagates
 `yield "recovered"`.
 `worker()` catches `ValueError` alone, so `GeneratorExit` propagates,
 the `finally` block runs, and the generator ends.
-`close()` catches the `GeneratorExit` and returns `None` once the generator finishes,
+`close()` catches the `GeneratorExit` and returns when the generator finishes,
 so no traceback appears.
+Its return value is whatever the generator returned while handling `GeneratorExit`,
+and `None` here, since `worker()` lets the exception propagate.
 
 Through a `yield from`, the same two calls reach the innermost generator:
 
@@ -1251,7 +1252,7 @@ PEP 255 added generators to Python 2.2 in 2001 so that a function can produce va
 The function pauses after each value.
 When the caller asks for the next value,
 it resumes from the point where it paused.
-The problem appears whenever the producer keeps state from one value to the next while the consumer has a loop of its own.
+The need for that pause appears whenever the producer keeps state from one value to the next while the consumer has a loop of its own.
 The PEP's example, the standard library's `tokenize()`,
 keeps its place in the source text,
 and a recursive tree walk keeps a whole recursion in progress between one node and the next.
@@ -1334,7 +1335,7 @@ for value in fibonacci(7):
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
 
-This is a functional version of the generator `fibonacci()` in `iterators.py`.
+This is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators).
 [`accumulate()`](41_Functional--Toolkits.md#accumulate)
 is a `reduce()` that keeps every intermediate result.
 [`repeat(None)`](41_Functional--Toolkits.md#repeat)
@@ -1473,7 +1474,8 @@ and since a generator cannot name that something, you write it.
 
 In May 1999, two years before the PEP,
 Tim Peters called generators "half a coroutine" on python-dev.
-The other half came in 2005, when PEP 342 added the send channel to Python 2.5.
+The other half came with PEP 342, written in 2005,
+which added the send channel to Python 2.5 in 2006.
 Simulations, games, and asynchronous I/O need to pass a value or an exception into a generator at its suspension point,
 so `send()`, `throw()`, and `close()` arrived together,
 and the PEP describes a scheduler that runs many generators as a "trampoline,"
@@ -1540,3 +1542,6 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     Here `yield` reports the state the machine reached instead of requesting something the machine needs.
     Say which of the two versions you would rather extend with another state,
     and why.
+9.  Replace `proxy()`'s loop in `answering_proxy.py` with the single line `return (yield from inner)` and run `drive()` over the same `known` table.
+    Explain from the output why this `proxy()` cannot answer `town`,
+    and say what a generator must do to answer one request and relay the rest.

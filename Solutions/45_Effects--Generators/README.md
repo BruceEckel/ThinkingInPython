@@ -1099,3 +1099,135 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+
+## 9. A proxy that relays everything
+
+> Replace `proxy()`'s loop in `answering_proxy.py` with the single line `return (yield from inner)` and run `drive()` over the same `known` table.
+> Explain from the output why this `proxy()` cannot answer `town`,
+> and say what a generator must do to answer one request and relay the rest.
+
+<details>
+<summary>Where to look</summary>
+
+[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
+contrasts `drive()`, which answers a request, with `yield from`,
+which relays it.
+`proxy()` answers from `known` in one branch and yields the request in the other,
+because its own loop sees each request before deciding.
+Ask where `proxy()`'s body waits while `inner` runs under a `yield from`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+from collections.abc import Generator
+from typing import NewType
+
+Question = NewType("Question", str)
+Answer = NewType("Answer", str)
+Result = NewType("Result", str)
+
+def interview() -> Generator[Question, Answer, Result]:
+    ...
+
+def drive(conversation: Generator[Question, Answer, Result],
+          answers: dict[Question, Answer]) -> Result:
+    ...
+
+def proxy(
+    inner: Generator[Question, Answer, Result],
+    known: dict[Question, Answer],
+) -> Generator[Question, Answer, Result]:
+    ...
+```
+
+<details>
+<summary>Done when</summary>
+
+`drive()` prints three request lines,
+with `town` answered `Wonderland` rather than `Oz`,
+the `Result` is `Alice of Wonderland, friend Rabbit`,
+and your explanation says that `proxy()`'s body waits inside the `yield from` until `inner` finishes.
+
+<details>
+<summary>Solution</summary>
+
+The relaying `proxy()` is short,
+and this file carries its own `interview()` and `drive()`:
+
+```python
+# exercise_9.py
+from collections.abc import Generator
+from typing import NewType
+
+Question = NewType("Question", str)
+Answer = NewType("Answer", str)
+Result = NewType("Result", str)
+
+def interview() -> Generator[Question, Answer, Result]:
+    name: Answer = yield Question("name")
+    town: Answer = yield Question("town")
+    friend: Answer = yield Question("friend")
+    return Result(f"{name} of {town}, friend {friend}")
+
+def drive(conversation: Generator[Question, Answer, Result],
+          answers: dict[Question, Answer]) -> Result:
+    try:
+        request: Question = next(conversation)
+    except StopIteration as stop:
+        return stop.value
+    while True:
+        answer = answers[request]
+        print(f"{request = }, {answer = }")
+        try:
+            request = conversation.send(answer)
+        except StopIteration as stop:
+            return stop.value
+
+def proxy(
+    inner: Generator[Question, Answer, Result],
+    known: dict[Question, Answer],
+) -> Generator[Question, Answer, Result]:
+    return (yield from inner)
+
+answers = {
+    Question("name"): Answer("Alice"),
+    Question("town"): Answer("Wonderland"),
+    Question("friend"): Answer("Rabbit"),
+}
+print(drive(
+    proxy(interview(), {Question("town"): Answer("Oz")}),
+    answers,
+))
+#: request = 'name', answer = 'Alice'
+#: request = 'town', answer = 'Wonderland'
+#: request = 'friend', answer = 'Rabbit'
+#: Alice of Wonderland, friend Rabbit
+```
+
+`proxy()` ignores `known`.
+`yield from inner` relays every request `inner` yields up to `drive()` and passes every answer back down,
+and while that happens `proxy()`'s body waits inside the `yield from` expression.
+The body resumes when `inner` finishes,
+with `inner`'s `Result` as the expression's value,
+and by then `drive()` has answered every request.
+`town` reaches `drive()`, which answers `Wonderland`,
+so the `Result` is the chapter's unproxied one.
+`yield from` composes; it does not interpret.
+
+To answer one request and relay the rest,
+a generator must see each request before it goes up.
+That means driving `inner` with `next()` and `send()` in a loop of its own,
+answering from `known` when it can and yielding the request otherwise,
+which is the chapter's `proxy()`.
+The chapter's relaying `yield` hands one request to the driver and receives one answer;
+a `yield from` would hand over the whole conversation.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
+</details>
+</details>
+</details>
+</details>
