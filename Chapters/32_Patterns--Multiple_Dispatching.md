@@ -242,7 +242,7 @@ OUTCOME: Final[Table] = {
 }
 ```
 
-The table version keeps the checking and repeats no method names.
+The table version keeps the checking and drops the repetition.
 Its `Item` declares the one method the dispatch needs,
 so `compete()` takes its opponent as an `Item`.
 Its answers are rows in one dictionary,
