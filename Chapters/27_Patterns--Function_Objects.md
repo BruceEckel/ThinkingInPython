@@ -699,7 +699,7 @@ An event then runs the handlers registered for its own type and for every ancest
 The test file confirms that:
 
 - Publishing calls every handler registered for a type.
-- A handler receives only its own event type.
+- A handler receives only its event type.
 - Publishing an event with no handler returns normally.
 - Publishing an unhandled event leaves `_handlers` as it was.
 
