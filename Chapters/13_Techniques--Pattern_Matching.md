@@ -734,7 +734,7 @@ while a `match` stays as written.
 
 When the set of types is *open* (anyone can add a new one),
 inheritance and dynamic binding work better than `match`.
-Each type defines its own methods, so adding a type touches only the new class.
+Each type defines its methods, so adding a type touches only the new class.
 Use `match` for a closed set of cases you want to handle in one place,
 especially when the cases test the value's attributes or elements.
 
