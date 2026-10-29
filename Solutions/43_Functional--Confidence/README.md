@@ -684,7 +684,7 @@ Substituting `30` for `timeout()` is correct until someone sets `TIMEOUT`,
 and then the substituted version and the original disagree while both still look right.
 Tests show the problem first.
 One test that sets the variable changes the answer for every test after it.
-No argument list records the dependency.
+The signature `timeout() -> int` hides the dependency.
 
 **Make the hidden input a parameter.**
 The repair is the same for `stale()` and `timeout()`,
