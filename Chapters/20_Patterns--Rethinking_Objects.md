@@ -1032,8 +1032,9 @@ for shape in shapes:
 ```
 
 Adding a new shape is easier in the OOP version,
-where the shape is one class that carries its own `area()`,
-rather than a record plus a new `case` in every function that matches on shapes.
+where the new shape is one class that carries its own `area()`.
+In the functional version,
+a new shape is a record plus a new `case` in every function that matches on shapes.
 Adding a new operation over all shapes is easier in the pattern matching
 (functional) version,
 where the operation is one new function rather than a new method on every class.
