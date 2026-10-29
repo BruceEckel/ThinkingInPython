@@ -21,7 +21,7 @@ a shared coordination object, and structural typing in one small program.
 
 ## Rats & Mazes
 
-A *maze* holds its own layout.
+A *maze* holds its layout.
 Given a coordinate, it reports whether that cell is a wall or an opening,
 and it hands out an entry point.
 The maze answers questions and leaves every decision to the rats.
@@ -1410,7 +1410,7 @@ the same endless counter that numbered the rats.
 A simulation is a set of objects that act on their own and interact through shared state.
 The grains are the limiting case of that definition.
 The shared state is the plate,
-and a grain's whole interaction with it is one read of the field at its own position.
+and a grain's whole interaction with it is one read of the field at its position.
 Yet the aggregate shows structure that no agent encodes.
 This is *emergence*:
 global order arising from local rules that say nothing about it.
