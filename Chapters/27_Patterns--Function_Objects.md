@@ -818,8 +818,7 @@ Registering `cls` puts the original class in `EVENTS`.
 Every event is an instance of `built`.
 `publish()` then refuses every event.
 `@handler` refuses every handler class,
-because the annotation it reads names the class that `dataclass()` returned
-(see exercise 7).
+because the annotation it reads evaluates to `built` (see exercise 7).
 
 A bank account's events and handlers are classes under the two decorators:
 
