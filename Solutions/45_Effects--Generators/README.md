@@ -618,7 +618,8 @@ the runtime equivalent of `send(None)`.
 The count `12` therefore reaches `summarize()` through two returns.
 `'(12 characters)'` takes the other route: `report()` yields it,
 the `yield from` in `summarize()` relays it, and the driver receives it.
-No generator binds it to a name.
+The count ends up in `size` and then in `counted`;
+the string ends up in the list that `list()` builds.
 A generator can yield a number or return it.
 The choice decides which code receives the number:
 a yielded value goes to the driver,
