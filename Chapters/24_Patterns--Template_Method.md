@@ -256,7 +256,7 @@ after any earlier steps have run.
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
 The client starts the engine, not `ApplicationFramework`.
-A framework can call `run()` from its own constructor,
+A framework can call `run()` from its constructor,
 but that constrains any subclass with its own `__init__()`.
 Because `run()` calls methods the subclass supplies,
 the subclass must finish its own setup before it calls `super().__init__()`.
@@ -399,7 +399,7 @@ In the first two frames each arrow is a call through `self`,
 and in frame 2 those calls reach the subclass's methods.
 In frame 3 the arrow labels read `customize1()` and `customize2()`,
 with no `self`.
-`run_framework()` calls its own parameters.
+`run_framework()` calls its parameters.
 The output column shows that the lambdas print the same four lines as `MyApp`.
 
 Both the *Template Method* and the function version have an anchored algorithm and varying steps.
