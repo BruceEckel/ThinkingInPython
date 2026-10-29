@@ -798,7 +798,7 @@ def test_elapsed() -> None:
 
 Both tests check the same arithmetic.
 `test_stopwatch_clock.py` passes a lambda where `test_stopwatch.py` patches `time.monotonic()`,
-because the `elapsed()` it tests takes its source of time as a parameter.
+because `stopwatch_clock.elapsed()` takes its source of time as a parameter.
 
 The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
 When that code sits several calls deep in a real codebase,
