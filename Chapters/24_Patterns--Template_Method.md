@@ -101,9 +101,9 @@ def test_template_method_runs_steps_in_order() -> None:
 The base class calls code written later, sometimes years later.
 Framework authors call this the *Hollywood Principle*: "don't call us,
 we'll call you."
-The general name for this reversal is *Inversion of Control*:
-the framework defines the flow of control and calls your code,
-rather than your code calling into a library.
+The general name for this reversal is *Inversion of Control*.
+Your code calls into a library,
+but a framework defines the flow of control and calls your code.
 
 Only the type checker enforces `@final`.
 At runtime the decorator sets `__final__ = True` on the function.
