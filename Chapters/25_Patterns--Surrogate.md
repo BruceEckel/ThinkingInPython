@@ -211,7 +211,7 @@ Python calls it only after normal lookup fails.
 Normal lookup finds `self.__implementation`,
 so reading that name inside `__getattr__()` returns the attribute.
 `__getattribute__()` intercepts every attribute access,
-including each `self.` access in its own body,
+including each `self.` access in its body,
 so a `__getattribute__()` that reads `self.__implementation` calls itself forever.
 To avoid that recursion,
 `__getattribute__()` must call `object.__getattribute__()` for every internal access.
