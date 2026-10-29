@@ -375,7 +375,7 @@ which is where a heavy edge belongs.
 Something must specify a class to construct it.
 The pattern moves that choice out of the client and into a creator.
 Naming the concrete product is the creator's whole job.
-No other part names the concrete creator.
+The client knows the creator and the product through their interfaces.
 
 *Adapter* moves the heavy edge inside the adapter.
 The client specifies the target interface.
