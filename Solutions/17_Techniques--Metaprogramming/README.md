@@ -595,7 +595,7 @@ before anything runs, and marks both bases to show which pair conflicts.
 
 The runtime message tells you something collided.
 The static diagnostic tells you which two bases collided and why,
-at the moment you type the header rather than the moment Python first imports the module.
+at the moment you type the header, before Python first imports the module.
 
 The chapter's `metaclass_layout_conflict.py` still carries the `# type: ignore`,
 because that listing exists to show the `TypeError`.
