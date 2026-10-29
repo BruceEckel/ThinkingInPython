@@ -227,7 +227,7 @@ The type checker then verifies that the implementation you pass has the necessar
 A `Protocol` on that parameter guards the implementation side structurally.
 `proxy_protocol.py`'s `isinstance()` is the runtime half of that check.
 
-Calls on the proxy get no such check.
+Calls on the proxy lose that check.
 Because `__getattr__()` resolves `p.f()` and returns `Any`,
 the checker accepts any call on `p`.
 A misspelled `p.ff()` passes the checker the same way,
