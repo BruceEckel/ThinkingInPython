@@ -288,7 +288,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Pattern Matching](../../Chapters/04_Foundations--Control_Flow.md#pattern-matching)
 shows sequence patterns matching a split command.
-A list pattern matches only a sequence of its own length,
+A list pattern matches only a sequence of its length,
 so count the items in `"go north 3"` against each existing `case`.
 Put the three-item pattern where Python tries it before any `case` that also matches a three-item list,
 and bind `direction` and `distance` by name.
