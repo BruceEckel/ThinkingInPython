@@ -2044,7 +2044,7 @@ so the protection appears to be there.
 The channel carries only what you put into it.
 
 ZIO does not catch an undeclared failure at compile time either.
-Its own documentation uses the same example.
+Its documentation uses the same example.
 `def divide(a: Int, b: Int): ZIO[Any, Nothing, Int] = ZIO.succeed(a / b)` declares an error type of `Nothing`,
 and a zero denominator still throws.
 The difference is at runtime.
