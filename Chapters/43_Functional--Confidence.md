@@ -155,7 +155,7 @@ and never checks whether the wrapped function is referentially transparent.
 ## Automatic Parallelism
 
 A pure function is automatically parallelizable.
-Each call's answer comes from its arguments alone, so no call affects another.
+Each call's answer comes from its arguments alone, so the calls are independent.
 The calls can run in any order, on any schedule, on any number of cores,
 and still return the same answers.
 
