@@ -1164,7 +1164,7 @@ validate an item before lending it out, or give `get()` a timeout,
 so a borrower facing an empty pool gets a `queue.Empty` exception instead of waiting forever.
 
 Those refinements all guard the pool's side.
-The borrower's side has a mistake of its own.
+The borrower's side has a mistake.
 `Pool` lets a borrower keep a reference after the `with` block ends,
 then use it after the pool has lent the object to another borrower.
 The pool hands out the same object again, not a copy,
