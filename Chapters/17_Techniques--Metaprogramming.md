@@ -447,7 +447,7 @@ If `make()` also binds each class as an attribute of its module,
 `globals()[name] = new_cls`, the pair `events.LightOn` leads to `LightOn`,
 and the round trip works.
 `inspect.getsource()` still raises an `OSError`,
-because no source file holds the class.
+because the class comes from a `type()` call rather than a `class` statement in a source file.
 
 ## Self-Registration of Subclasses
 
