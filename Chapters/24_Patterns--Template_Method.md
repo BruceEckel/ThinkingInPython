@@ -449,7 +449,7 @@ Each of this chapter's four anchors guards against a different way of breaking t
 - Discipline, via the Liskov Substitution Principle.
   The principle governs whether each step is a faithful substitute.
   `@abstractmethod` ensures that a required step exists.
-  No tool checks what the step does.
+  What the step does is yours to check.
 
 Ask how the algorithm might break, and choose the mechanism that protects it.
 
