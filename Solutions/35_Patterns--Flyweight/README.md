@@ -1107,8 +1107,7 @@ def locked_tile(symbol: Symbol) -> Tile:
 four threads calling the slow `tile()` on a cold symbol print `4 4`
 (four results, four distinct objects),
 and each fixed version leaves the four threads holding 1 distinct object.
-Give each fix a symbol no earlier call has used,
-since a warm cache entry hides the race.
+Give each fix a fresh symbol, since a warm cache entry hides the race.
 
 <details>
 <summary>Solution</summary>
