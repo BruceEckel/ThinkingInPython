@@ -2090,6 +2090,58 @@ ruling, the way R46 to R49 were. The `positive` skill's test is the
 general case; this rule is its sharpest shape, where the verb itself
 raises the expectation that the object cancels.
 
+### R51. One picture per clause
+
+**Test.** A clause relates two terms through a comparator ("the same
+way", "the same X as", "as X as", "like", "unlike", "rather than",
+"instead of", "compared with", "differs from"), and each term is a
+picture the reader has to build before the relation can land: a noun
+with a participle, a relative clause, or a clause under it. Bruce's
+name for the fault is "asking the reader to hold two things at once"
+(chapter 45, 2026-10-28): "`drive()`, imported unchanged, answers a
+request yielded two generators deep the same way it answers one from
+`interview()`'s own body." The reader builds the deep request, holds
+it, builds the request from the body, then applies "the same way",
+while the verb between them carries content of its own. Repair: give
+each picture its own sentence, in the order the reader needs them,
+the new thing first, then the mechanism, then the relation, so the
+relation sentence compares two things already on the page. Or make
+the second term a name the reader already has (a listing, a term the
+paragraph introduced), or drop a modifier the context already
+supplies. The test for the rewrite is one read at speed: the relation
+lands on the first pass, and no added sentence repeats a term without
+adding anything.
+
+**Keep when.** Both terms are already on the page (the comparison
+names two listings or classes the section just showed); the terms
+are short enough to read as names even with a verb in them; "rather
+than" or "instead of" joins two bare verb phrases ("return a
+description rather than raise an exception", two actions, not two
+pictures); an exercise statement, a Done-when criterion, or a hint;
+an idiom the scan cannot tell from a comparison ("as soon as", "as
+long as", "like any other", "looks like").
+
+**Sightings.** 1 round, 2026-10-28, from Bruce's note on chapter 45
+and the book sweep that followed (`[TWO]` in `tip sentence-shapes
+ARGS=--survey`, 102 hits in 38 chapters, 21 Opus agents, 18
+rewrites, 84 keeps, 17 commits):
+- `45_Effects--Generators` (`ac20c972`): the sentence above ->
+  "`drive()` is imported unchanged. The requests now come from `ask()`,
+  one generator below `interview()`, and `yield from` passes each one
+  up to the driver, so `drive()` sees the same `Question`s it saw in
+  `interview_generator.py`."
+- the sweep's keeps were the majority, because most comparators in the
+  book join two short terms or two bare verb phrases, and the scan
+  weighs words, not familiarity.
+
+**Home.** CLAUDE.md (global, "One picture per clause"); `tip
+sentence-shapes` (`[TWO]`, `SURVEY_RULES` in `tools/sentence_shapes.py`,
+`comparator()`, `heavy_side()`, `two_terms()`); the deep-review skill's
+prose pass; this file. Promoted on Bruce's ruling, the way R46 to R50
+were. It is a cousin of the `straighten` skill's "subject held open":
+there the reader holds a subject across a long modifier, here two
+modified terms across a comparator.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different

@@ -351,6 +351,18 @@ closure keeps its place; the repair names the thing added ("keeps
 its locals and its place"). The book-wide read that day had 178
 hits and 17 rewrites, since most such adverbs do mean the subject
 ("Pyright accepts the read too"), which is why it is a survey rule.
+The fourth survey rule is `[TWO]` (2026-10-28), a comparison whose
+two terms each carry a verb of their own ("answers a request
+yielded two generators deep the same way it answers one from
+`interview()`'s own body"), Bruce's "asking the reader to hold two
+things at once"; the first term runs from the root verb to the
+comparator, the second from the comparator to the end, and each
+must hold four content words and a verb. The repair gives each
+picture its own sentence and then states the relation. The
+book-wide read that day had 102 hits, 18 rewrites, and 84
+keeps (idioms the scan cannot tell from comparisons, "as soon
+as" and "like any other"; two bare verb phrases around "rather
+than"; exercise statements), so it stays a survey rule.
 The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter

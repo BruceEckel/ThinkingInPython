@@ -174,6 +174,18 @@ flourishes, nothing that obscures the point.
   sentence-shapes CH=NN ARGS=--survey` lists the candidates as
   `[ADD]`; rule R49 in `bruce_edit_db.md` has the pairs (Bruce,
   2026-10-28).
+- **One picture per clause:** a comparison ("the same way", "as X
+  as", "like", "rather than", "instead of") whose two terms each
+  carry a participle, a relative clause, or a clause, so the reader
+  builds two pictures and then compares them inside one clause
+  ("answers a request yielded two generators deep the same way it
+  answers one from `interview()`'s own body"). Give each picture
+  its own sentence, the new thing first, then the mechanism, then
+  the relation, or make the second term a name the reader already
+  has. Keep two bare verb phrases around "rather than", terms
+  short enough to read as names, and idioms ("as soon as").
+  `tip sentence-shapes CH=NN ARGS=--survey` lists them as `[TWO]`;
+  rule R51 in `bruce_edit_db.md` (Bruce, 2026-10-28).
 - **Reversal of expectation:** a verb that promises an action or a
   possession, then an object that cancels it: "runs none of the
   body", "raises no exception", "has no `__slots__`", "prints
