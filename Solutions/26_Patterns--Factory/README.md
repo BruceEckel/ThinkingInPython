@@ -432,7 +432,7 @@ so it accepts the definition of a factory that omits `make_obstacle()`.
 The type checker reports the line that constructs that factory.
 If you run the program without fixing it,
 Python raises a `TypeError` at that construction, before the game runs.
-In `abstract_factory_protocol.py` no class declares that it satisfies the protocol,
+In `abstract_factory_protocol.py` each factory matches the protocol by its methods alone,
 so constructing the factory is legal.
 The type checker reports the call that needs the protocol.
 At runtime that version fails later, inside the game.
