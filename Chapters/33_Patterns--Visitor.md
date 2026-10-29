@@ -144,7 +144,7 @@ for flower in (Chrysanthemum(), Gladiolus()):
 ```
 
 The first dispatch resolves to `Predator.visit` rather than `Worm.visit`,
-because `Worm` inherits the operation from the class that defines it.
+because `Worm` inherits `visit()` from `Predator`.
 
 ## Two Departures from the Classic Shape
 
