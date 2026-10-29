@@ -246,7 +246,6 @@ Chapters/19_Techniques--Concurrency.md	[BOUND] The fix mirrors the one in CODE
 Chapters/19_Techniques--Concurrency.md	[BOUND] The last two lines show which task the deadline stopped
 Chapters/19_Techniques--Concurrency.md	[BOUND] The listing prints one line per pool, each naming its executor beside CODE
 Chapters/19_Techniques--Concurrency.md	[BOUND] The listing puts the global and the CODE side by side, so each printed line shows both values as one task reads them
-Chapters/19_Techniques--Concurrency.md	[BOUND] The members no clause matches propagate as a new group that keeps the original message, so the outer CODE catches the CODE alone
 Chapters/19_Techniques--Concurrency.md	[BOUND] The one compatibility check mirrors the free-threading check
 Chapters/19_Techniques--Concurrency.md	[BOUND] The only difference between one run and another is how finely the listing splits the total work
 Chapters/19_Techniques--Concurrency.md	[BOUND] This listing raises a group of four exceptions into two CODE clauses
@@ -605,7 +604,6 @@ Chapters/42_Functional--Error_Handling.md	[BOUND] a value that is one thing or a
 Chapters/43_Functional--Confidence.md	[BOUND] A CODE statement is one way to break substitution
 Chapters/43_Functional--Confidence.md	[BOUND] An implementation may therefore cache the call, run the two calls in either order, or skip the second
 Chapters/43_Functional--Confidence.md	[BOUND] CODE runs the four calls one at a time, on one core
-Chapters/43_Functional--Confidence.md	[BOUND] Each call's answer comes from its arguments alone, so no call affects another
 Chapters/43_Functional--Confidence.md	[BOUND] Functional programming answers with a spectrum, not a single guarantee
 Chapters/43_Functional--Confidence.md	[BOUND] Hypothesis can rerun and shrink freely because each call depends on its arguments alone
 Chapters/43_Functional--Confidence.md	[BOUND] That rules out two shapes these chapters use often
@@ -655,7 +653,6 @@ Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver 
 Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as a body with CODE and leaves the two methods to Python
 Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
 Chapters/45_Effects--Generators.md	[BOUND] The check applies to CODE's argument, and CODE takes the generator alone
-Chapters/45_Effects--Generators.md	[BOUND] The items CODE yields pass through CODE to CODE, but its CODE goes to CODE alone, as the value of the CODE expression
 Chapters/45_Effects--Generators.md	[BOUND] The iterable's one job here is to decide how many steps CODE takes, and CODE is endless, so the chain of pairs is endless too
 Chapters/45_Effects--Generators.md	[BOUND] Through a CODE, the same two calls reach the innermost generator
 Chapters/45_Effects--Generators.md	[BOUND] Two loops passing values in both directions resembles a queue like the ones in Coordinating Threads with Queues, with three differences
@@ -1265,3 +1262,4 @@ Chapters/43_Functional--Confidence.md	[BOUND] Each call's answer comes from its 
 Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
 Solutions/26_Patterns--Factory/README.md	[BOUND] In CODE each factory matches the protocol by its methods alone, so constructing the factory is legal
+Solutions/42_Functional--Error_Handling/README.md	[BOUND] The functions that might produce an error leave the prefix to that one call
