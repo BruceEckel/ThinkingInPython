@@ -182,7 +182,7 @@ Both `java.util.Observable` and the reactive libraries call the subject an `Obse
 so in every listing you must work out which role each name denotes.
 
 GoF's method names are a second obstacle.
-When the subject changes, it calls its own `notify()`,
+When the subject changes, it calls its `notify()`,
 and `notify()` calls `update()` on each observer.
 Those two names describe one change from its two ends.
 `notify()` is the subject sending a change,
