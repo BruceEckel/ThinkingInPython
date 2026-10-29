@@ -1112,7 +1112,7 @@ For a parsed log file, take the skipping version.
 A log is an append-only record that many processes write,
 so a malformed line is a routine event rather than a broken contract.
 One truncated line should leave the rest of the file readable.
-With the version that raises a `TypeError`, the exception ends the generator,
+With `typed()`, the exception ends the generator,
 so the caller resumes by parsing the file again and somehow starting past the line that failed.
 
 Skipping hides what it drops.
