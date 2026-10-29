@@ -407,8 +407,8 @@ The `klass` string is the danger in this approach.
 `exec()` runs its argument with the full power of the language,
 and `klass` splices `class_name` into source text as-is.
 A name could hold a newline followed by a second statement.
-Without validation, that statement breaks out of the `class` block and runs anything,
-the same way an unescaped value breaks out of a hand-built SQL query.
+Without validation, that statement breaks out of the `class` block and runs anything.
+An unescaped value in a hand-built SQL query breaks out the same way.
 The `KNOWN_COMMANDS` check prevents that injection.
 Only three known names reach the template.
 `make()` in `events.py` is safe from injection,
