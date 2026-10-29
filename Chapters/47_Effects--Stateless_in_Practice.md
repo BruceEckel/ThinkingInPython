@@ -1738,7 +1738,9 @@ print(f"attempts: {db.attempts}")
 ```
 
 `memoize()` caches by argument through `functools.lru_cache`.
-It wraps the Effect in an object that records the result and replays it rather than driving the spent generator again.
+It wraps the Effect in an object that records the result.
+A repeat call with the same argument gets that object back from the cache.
+The object replays the recorded result instead of driving its spent generator.
 That wrapper exists because a generator runs once,
 which is the same fact that makes `retry()` decorate the function.
 
