@@ -125,7 +125,7 @@ asks whether raising an exception breaks the purity of `slope()`.
 
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and records are immutable.
-Each freezes only its own top level.
+Each freezes only its top level.
 The tuple `([1], 2)` always holds that same list.
 Anyone can still append to the list.
 A tuple of strings, immutable all the way down, stays what you last read,
