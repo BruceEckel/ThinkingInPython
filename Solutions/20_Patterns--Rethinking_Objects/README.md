@@ -199,7 +199,7 @@ so look at what it must hash when one value is mutable.
 printing `immutable` after the assignment shows `bob=Bob(name='Ralph')`,
 and `hash(immutable)` raises a `TypeError` whose message is `unhashable type: 'Bob'`.
 You can also name who must make immutability go all the way down,
-and why no tool does it.
+and how many levels `frozen=True` freezes.
 
 <details>
 <summary>Solution</summary>
