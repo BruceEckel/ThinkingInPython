@@ -740,7 +740,7 @@ The solution reads with `.get(cls, [])`,
 which returns an empty list and leaves `_handlers` as it was.
 
 Adding `unsubscribe()` cannot break an existing caller,
-since no existing caller calls it.
+since only new code calls it.
 The MRO walk can.
 A handler subscribed to `Deposit` starts receiving events of every subclass of `Deposit`,
 including subclasses written after the handler.
