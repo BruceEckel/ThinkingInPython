@@ -389,7 +389,7 @@ Generators provide that path because they nest.
 passing every yielded request out to the outer driver and every sent answer back down.
 
 In the simplest case,
-each generator yields values and leaves its send and return channels at `None`,
+each generator only yields values and leaves its send and return channels at `None`,
 so its annotation can be `Iterator[str]` instead of `Generator[str, None, None]`.
 The driver is `list()`,
 which calls `next()` until the outermost generator finishes:
@@ -457,8 +457,9 @@ print(list(report(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)']
 ```
 
-The items `emit()` yields pass through `report()` to `list()`,
-but its `return Size(total)` goes to `report()` alone,
+The yield channel and the return channel end in different places.
+Each item `emit()` yields passes through `report()` to `list()`.
+The `Size` that `emit()` returns stops one level up, in `report()`,
 as the value of the `yield from` expression.
 A `yield from` therefore works like a function call:
 `report()` calls `emit()` and gets its result back,
