@@ -37,7 +37,7 @@ and `Generator[str]` in [Context Managers](15_Techniques--Context_Managers.md#a-
 The short form fits a generator that yields values, receives `None`,
 and returns `None`.
 
-A generator that receives and/or returns values needs the full annotation,
+A generator that receives or returns values needs the full annotation,
 written here with the names the [`typing` documentation](https://docs.python.org/3/library/typing.html#annotating-generators-and-coroutines)
 uses:
 
@@ -189,8 +189,8 @@ The new generator is suspended before its first statement,
 so no `yield` expression is waiting to receive a value.
 The first call, which runs the body to its first `yield`,
 *primes* the generator.
-The priming call must be `next()` or `send(None)`,
-otherwise you get `TypeError: can't send non-None value to a just-started generator`.
+The priming call must be `next()` or `send(None)`.
+Any other argument raises `TypeError: can't send non-None value to a just-started generator`.
 
 `next(conversation)` is equivalent to `conversation.send(None)`:
 
@@ -215,8 +215,8 @@ The interpreter accepts `send(None)` as the priming call,
 but the type checker rejects it,
 because the annotation applies one `SendType` to every call, the first included.
 A driver therefore primes with `next()`.
-The check applies to `send()`'s argument,
-and `next()` takes the generator alone.
+The check applies to `send()`'s argument.
+`next()` takes the generator alone.
 
 ## A Generator Waits for Its Driver {#a-generator-is-a-description}
 
@@ -425,7 +425,7 @@ Generators provide that path because they nest.
 passing every yielded request out to the outer driver and every sent answer back down.
 
 In the simplest case,
-each generator only yields values and leaves its send and return channels at `None`,
+each generator yields values and leaves its send and return channels at `None`,
 so its annotation can be `Iterator[str]` instead of `Generator[str, None, None]`.
 The driver is `list()`,
 which calls `next()` until the outermost generator finishes:
@@ -459,8 +459,8 @@ print(list(top()))
 #: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
 ```
 
-"To exhaustion" means each `yield from` runs its target until that generator finishes,
-and exhaustion is transitive.
+"To exhaustion" means each `yield from` runs its target until that generator finishes.
+Exhaustion is transitive.
 `list(top())` receives one flat sequence,
 and `top()`'s single `yield from` finishes when the last generator beneath it finishes.
 
@@ -1131,9 +1131,8 @@ task_runner([download(), index()])
 The `for` loop primes each `job` and pairs it with its first request.
 The `except` drops a job that finishes before its first `yield`,
 and keeps that `StopIteration` out of the runner's own flow.
-When sending the last request for that `job` fails,
-the `while` loop continues without appending the `job` to `ready`,
-de-scheduling that `job`.
+When a `job` finishes, its `send()` raises `StopIteration`.
+The `continue` then skips the `append`, so that `job` leaves `ready`.
 
 `index()` discards what it receives; it yields only to take turns.
 
@@ -1260,7 +1259,7 @@ The consumer needs its own local variables and loops to track what it has seen,
 and it may stop early.
 
 In a single thread, Python had three ways to write such a producer.
-Each comes with an undesirable compromise.
+Each comes with a compromise.
 
 The first way is for the function to invoke a callback on each computed value:
 
