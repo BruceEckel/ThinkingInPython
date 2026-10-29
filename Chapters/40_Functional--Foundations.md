@@ -12,7 +12,7 @@ The standard library supplies and tests a cache in `functools` and a sliding win
 so each one handles the edge case you would otherwise miss.
 A function that keeps its state private is safe to run in parallel.
 And you can reason about code built from small,
-checkable pieces by substitution, the same way you check a line of algebra.
+checkable pieces the way you check a line of algebra, by substitution.
 
 The functional style lets you keep loops, classes, and mutation.
 It asks you to notice when a piece of code can depend on its arguments alone,
