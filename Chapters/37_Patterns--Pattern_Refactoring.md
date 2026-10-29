@@ -510,7 +510,7 @@ along with each material whose answer to it differs.
 
 Each operation's edits sit in the class bodies, as `note_methods.py` shows.
 In the real program those edits go in `trash.py`.
-A method belongs in the body of its own class by design.
+A method belongs in the body of its class by design.
 You can assign a function onto a class from outside,
 but a reader of the class must then search every module for the behavior assigned onto it.
 When a plant's material classes come from a supplier,
@@ -520,7 +520,7 @@ The method form is a real option, not an example built to fail.
 This hierarchy is small and the book owns every subclass,
 so `note()` on each material is a fair choice here.
 The method is a better choice while you own the hierarchy and the operations stay few.
-Each subclass defines its own answer, so a new class brings its answers with it.
+Each subclass defines its answer, so a new class brings its answers with it.
 The method is a worse choice when the hierarchy belongs to someone else,
 or when operations start to outnumber materials.
 
