@@ -73,7 +73,7 @@ asyncio.run(main())
 
 The trace splits into two halves that list the tasks in opposite orders.
 `gather()` starts its tasks in argument order, so `d` starts last.
-Each task then suspends at its own `await`.
+Each task then suspends at its `await`.
 The event loop resumes the tasks in the order their timers fire,
 so the shortest delay wakes first and `d` resumes before the other three.
 
@@ -611,7 +611,7 @@ whose workers import the module again.
 
 The recursion is the failure.
 The `RuntimeError` comes from a safety check against it.
-Python detects that a child process is spawning children during its own bootstrap and raises the error instead of starting them.
+Python detects that a child process is spawning children during its bootstrap and raises the error instead of starting them.
 The recursion therefore ends with the first generation of workers.
 
 The `if __name__ == "__main__"` line prevents that recursion.
