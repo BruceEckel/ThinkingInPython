@@ -1260,3 +1260,8 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Then compare that 
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Under the guard, the driver runs in the main process alone, so a worker loads CODE without running the driver
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Write the first signature with the new appliance alone and read which line the type checker reports
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Your review rule flags the CODE line in CODE and accepts a body that holds the CODE alone
+Chapters/19_Techniques--Concurrency.md	[BOUND] The remaining members propagate as a new group that keeps the original message, so the outer CODE catches the CODE alone
+Chapters/43_Functional--Confidence.md	[BOUND] Each call's answer comes from its arguments alone, so the calls are independent
+Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
+Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
+Solutions/26_Patterns--Factory/README.md	[BOUND] In CODE each factory matches the protocol by its methods alone, so constructing the factory is legal

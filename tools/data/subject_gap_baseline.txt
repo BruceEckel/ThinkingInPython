@@ -19,7 +19,6 @@ Chapters/08_Foundations--Static_Types.md	[cc,ccomp,conj,punct] rejects .. accept
 Chapters/08_Foundations--Static_Types.md	[cc,conj,relcl] CODE .. gives: A CODE that returns an CODE, or that requires an argument, gives its class a different shape.
 Chapters/08_Foundations--Static_Types.md	[cc,conj] CODE .. silences: CODE and a bare CODE silence every diagnostic on their line, and CODE silences the one rule it names.
 Chapters/08_Foundations--Static_Types.md	[relcl] function .. takes: A function that validates or converts data against an arbitrary annotation takes a type expression as its argument.
-Chapters/11_Techniques--Testing.md	[relcl] function .. needs: This book patches with CODE and prefers injection where you can change the code, because a function that takes its clock or its fetcher as an argument needs no patching library.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[acl,cc,conj] CODE .. is: A CODE made of a legal CODE and a legal CODE is legal by construction:
 Chapters/12_Techniques--Data_Classes_as_Types.md	[prep,relcl] type .. is: A type you define, like a rating from one to ten, is a smaller set: the allowed values.
 Chapters/14_Techniques--Decorators.md	[prep] CODE .. is: CODE above a bare assignment, or above a CODE alias, is a syntax error rather than a decorator applied to something unusual.

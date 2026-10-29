@@ -51,7 +51,7 @@ Chapters/18_Techniques--Performance.md	The first call	The first call stops to co
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
 Chapters/19_Techniques--Concurrency.md	The last line	The last line shows what `main()` reads after its tasks finish.
 Chapters/19_Techniques--Concurrency.md	the `try` block	A bare `ValueError` raised into an `except* ValueError` clause arrives as a group of one, so an `except*` handler always reads its exceptions from `.exceptions`, whether the `try` block raised a group or a single exception.
-Chapters/19_Techniques--Concurrency.md	the outer `except ExceptionGroup`	The members no clause matches propagate as a new group that keeps the original message, so the outer `except ExceptionGroup` catches the `KeyError` alone.
+Chapters/19_Techniques--Concurrency.md	the outer `except ExceptionGroup`	The remaining members propagate as a new group that keeps the original message, so the outer `except ExceptionGroup` catches the `KeyError` alone.
 Chapters/20_Patterns--Rethinking_Objects.md	The final `def`	The final `def` is the function that runs.
 Chapters/22_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 Chapters/22_Patterns--Iterators.md	the first `next()`	The check at the top of its body waits for the first `next()`.

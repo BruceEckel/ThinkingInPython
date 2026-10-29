@@ -27,7 +27,6 @@ Chapters/19_Techniques--Concurrency.md	one call in
 Chapters/20_Patterns--Rethinking_Objects.md	and show that the counts are now correct for every route in
 Chapters/23_Patterns--Singleton.md	People can create as many objects as they like
 Chapters/27_Patterns--Function_Objects.md	Each handler holds a reference to the next and decides whether to pass the request along
-Chapters/27_Patterns--Function_Objects.md	Publishing an unhandled event leaves no stray entry behind
 Chapters/28_Patterns--Data_Transfer_Objects.md	The *Messenger* passes a package of information around
 Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
 Chapters/30_Patterns--Observer.md	decides which changes it acts on
@@ -49,7 +48,6 @@ Solutions/18_Techniques--Performance/README.md	one machine measured CODE about 2
 Solutions/21_Patterns--Design_Patterns/README.md	a CODE to pass in
 Solutions/27_Patterns--Function_Objects/README.md	now receives more events than before
 Solutions/27_Patterns--Function_Objects/README.md	so iterating over it in order calls the most specific handlers first and the inherited ones after
-Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds no behavior to a call that goes through
 Solutions/30_Patterns--Observer/README.md	CODE gives the single-player scoring the exercise asks for
 Solutions/30_Patterns--Observer/README.md	CODE reuses CODE from CODE unchanged and adds the CODE the exercise asks for
 Solutions/30_Patterns--Observer/README.md	so the demo's CODE and the first test still see the group the exercise asks for

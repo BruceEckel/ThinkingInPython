@@ -172,7 +172,6 @@ Chapters/35_Patterns--Flyweight.md	[PAST] split: First, split each object's stat
 Chapters/36_Patterns--Memento.md	[PAST] bound: For a field that grows with every edit, bound the history's depth (see exercise 2), coalesce edits before CODE stores them, use a persistent structure that shares more than a flat tuple, or switch to *Command*-based undo, which stores an edit instead of a state.
 Chapters/36_Patterns--Memento.md	[PAST] had: CODE builds a bare CODE with CODE, skipping CODE, and copies in the fields the old bytes had.
 Chapters/36_Patterns--Memento.md	[PAST] let: The checker and the frozen field both let code holding a CODE read CODE, unpack that tuple, or build a CODE of its own.
-Chapters/36_Patterns--Memento.md	[PAST] read: All three read the bytes as data and run no code from them, which removes pickle's security risk.
 Chapters/36_Patterns--Memento.md	[PAST] scoped: Databases provide savepoints, mementos scoped to a transaction.
 Chapters/38_Patterns--Simulation.md	[PAST] adapted: This second example, adapted from my *Atomic Kotlin* book, walks a single robot through a maze.
 Chapters/38_Patterns--Simulation.md	[PAST] claimed: CODE is a set, so a cell claimed twice still counts once.
@@ -186,7 +185,6 @@ Chapters/41_Functional--Toolkits.md	[PAST] discarded: CODE consumed the CODE on 
 Chapters/41_Functional--Toolkits.md	[PAST] found: CODE's first parameter is CODE, so CODE draws CODE: expected CODE, found CODE.
 Chapters/41_Functional--Toolkits.md	[PAST] kept: CODE is CODE with the intermediate results kept.
 Chapters/41_Functional--Toolkits.md	[PAST] was: CODE was the first value computed, so the fourth miss, at CODE, proves the cache evicted it.
-Chapters/42_Functional--Error_Handling.md	[PAST] read: An exception from someone else's code may carry no notes, so read CODE with CODE.
 Chapters/42_Functional--Error_Handling.md	[PAST] read: The CODE branch reads CODE, and that read type-checks.
 Chapters/43_Functional--Confidence.md	[PAST] bound: Each test checks a single input against a single answer, so the examples you invent bound what you learn.
 Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place leaves CODE as it was.
