@@ -884,10 +884,15 @@ print(drive(
 #: Alice of Oz, friend Rabbit
 ```
 
-`proxy()` drives `inner` the way `drive()` does, with `next()` and `send()`.
-Its priming call sits in a `try`, as `drive()`'s priming call does,
-and here the guard matters more: `proxy()` is a generator,
+The priming call to `next()` sits in a `try`,
+which is essential because `proxy()` is a generator,
 so a `StopIteration` that escaped its body would become a `RuntimeError`.
+`next(inner)` runs `inner`'s body up to its first `yield`,
+which can be any distance away.
+`interview()` reaches one on its first line.
+A generator that opens with a `yield from` runs its whole delegate first,
+and `sequence()` with no steps returns before it yields at all.
+The `except` turns that early return into `proxy()`'s own result.
 `proxy()` relays a request with a `yield` at `[2]` instead of a `yield from`,
 because `yield from` would relay every request.
 In the second run, `drive()` sees two requests instead of three.
