@@ -2066,10 +2066,26 @@ baseline holds them):
   its body still to run" and "leaves its body for the driver", both
   replaced by "The body runs later, one `yield` at a time, when the
   driver calls `next()` or `send()`."
+- the shape turned around, a negated subject, same day: `45` (`05d56eea`)
+  "The runtime enforces that pairing, though no annotation expresses
+  it." -> "The annotation describes the three channels; the runtime
+  enforces the pairing."; then a second sweep of 90 `no <noun> <verb>`
+  sites, 45 rewritten and 45 kept: `26` "No tool reports the missing
+  case at edit time" -> "At edit time, the type checker accepts both
+  functions"; Solutions `46` "No greeting prints" -> "The log entries
+  are the whole output"; `43` "so no call affects another" -> "so the
+  calls are independent"; `20` "No signature records that dependence,
+  and no type checker reports it" -> "The dependence sits in `list`'s
+  implementation, below the signatures the type checker reads". The
+  keeps were half the hits: "No lock protects the cell", "No type
+  reports the race", "No tool reads the behavior behind the
+  signature", where the absence is the lesson.
 
 **Home.** CLAUDE.md (global, the `<verb> nothing` paragraph of the watch
-list, widened to `no X` and `none of`); `tip watch-words` (`NO_VERBS`
-in `tools/watch_words.py`, Tier 2); this file. Promoted on Bruce's
+list, widened to `no X` and `none of`, and to the negated subject);
+`tip watch-words` (`NO_VERBS` in `tools/watch_words.py`, Tier 2, and
+`NO_SUBJECT`, a Tier 1 survey, since the subject shape keeps as often
+as it rewrites); this file. Promoted on Bruce's
 ruling, the way R46 to R49 were. The `positive` skill's test is the
 general case; this rule is its sharpest shape, where the verb itself
 raises the expectation that the object cancels.

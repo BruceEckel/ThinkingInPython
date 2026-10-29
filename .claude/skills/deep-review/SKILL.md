@@ -183,6 +183,10 @@ flourishes, nothing that obscures the point.
   absence is the claim, half of a contrast, or a diagnostic's wording.
   A rewrite that avoids the word and gives the reader nothing to
   picture ("with its body still to run") is worse than the negative.
+  The shape turned around, a negated subject ("no annotation
+  expresses it", "No tool checks the step"), gets the same test;
+  `tip watch-words CH=NN ARGS=--tier 1` lists it as advisory, and
+  about half such sentences are the absence as the lesson.
   `tip watch-words CH=NN` lists the candidates; rule R50 in
   `bruce_edit_db.md` has the pairs (Bruce, 2026-10-28).
 

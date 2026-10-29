@@ -263,6 +263,15 @@ wording, an exercise statement. The scan reads a fixed verb list, so
 "hits no `break`" and "with no exception" slipped past it and were
 fixed by hand; `NO_VERBS` in `tools/watch_words.py` is where a missed
 verb goes.
+The same day a Tier 1 survey rule joined it for the shape turned
+around, a negated subject (`NO_SUBJECT`: "no annotation expresses
+it", "No tool checks the step"), printed only under `--all` or
+`--tier 1` and never counted as new, since most such sentences are
+the absence as the claim; a `no` after a preposition or after a
+`NO_VERBS` verb is skipped. The second sweep that day (36 Opus
+agents, brief in `build/nosubject-2026-10-28/`) read its 90 hits,
+rewrote 45, and kept 45, so a chapter pass reads the Tier 1 list
+for this shape by hand rather than through a baseline.
 `tip possessives` (`tools/stranded_possessives.py`, 2026-10-14) lists a
 possessive whose head noun is elided ("not the base's"), the possessive
 cousin of the stranded preposition; the sweeps that day fixed 83 and the
