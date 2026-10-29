@@ -170,7 +170,7 @@ A caller must capture stdout to redirect the output or to test the function.
 
 `Depend[Need[Console], None]` states the dependency.
 A caller now has two options: supply a `Console`,
-or declare the same need in its own signature and pass the Ability to its own caller.
+or declare the same need in its own signature and pass the Ability to its caller.
 A caller that does neither fails the type check.
 
 Two details in `greeter.py` matter:
