@@ -607,7 +607,7 @@ The checker solves `R` from both arguments at once.
 so `R` is their union, `Result | Answer`,
 and the call's type carries `list[Result | Answer]` in the return position.
 `drive()` declares `Generator[Question, Answer, Result]` for its `conversation`,
-and it ends by returning `stop.value` as its own `Result`.
+and it ends by returning `stop.value` as its `Result`.
 A list is not a `Result`,
 so the argument fails where `drive()` would hand the list to its caller.
 Python ignores the annotations,
