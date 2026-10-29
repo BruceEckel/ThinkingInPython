@@ -516,7 +516,7 @@ The output traces the descent, and the `Returned` comes back up the same path.
 `report()` yields the value of its own `yield from`.
 Its annotation widens to `Iterator[Yielded | Returned]`,
 because the loop receives both types.
-The last output line is the one record that arrived through the return channel.
+The last output line arrived through the return channel.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
