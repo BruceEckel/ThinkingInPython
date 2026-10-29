@@ -769,9 +769,8 @@ but they hand that value to different places.
 `yield from` hands the `Result` to the enclosing generator,
 which continues the conversation.
 
-`survey()` writes its two `yield from` targets, `interview()` and `ask(...)`,
-into its body.
-A generator can receive them as arguments instead,
+`survey()` delegates to `interview()` and `ask(...)`, both named in its body.
+A generator can receive its targets as arguments instead,
 so the caller decides what the conversation holds:
 
 ```python
@@ -812,7 +811,7 @@ so `interview()` and `ask()` both qualify as steps.
 The loop delegates to each step in turn,
 and each `yield from` expression collects what its step returns.
 `drive()` sees the same four requests it saw from `survey()`.
-`survey()` writes the shape of the conversation into its body.
+`survey()`'s body sets the shape of the conversation.
 `sequence()` receives that shape as an argument list.
 A `yield from` target is an ordinary value: it can arrive as a parameter,
 sit in a list, or be built at the point of delegation.
