@@ -265,7 +265,7 @@ Idempotence adds a different kind of check,
 one about the operation rather than the output.
 It catches a sort that drops the last element.
 That sort's output is always ordered, so the invariant passes.
-But running the sort on its own output drops another element,
+But running the sort on its output drops another element,
 so twice and once disagree on every list of two or more.
 
 **Compare against an independent version.**
