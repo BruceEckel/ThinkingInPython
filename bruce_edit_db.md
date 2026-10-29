@@ -2170,10 +2170,11 @@ stated ("the value of the expression" two paragraphs up).
   continues the conversation." (beside "`drive()` returns the `Result`
   to its caller, ending the conversation")
 - "`survey()` names the generators it delegates to in its body." ->
-  "`survey()` delegates to `interview()` and `ask(...)`, both named
-  in its body." (a first rewrite, "writes its two `yield from`
-  targets ... into its body", read as editing source: a transfer
-  verb must fit the mechanism, not just the sentence)
+  "`survey()` delegates to `interview()` and `ask(...)`." (two
+  earlier rewrites failed: "writes its two `yield from` targets ...
+  into its body" read as editing source, and "both named in its
+  body" restated what the listing shows; once the names are in the
+  sentence, the role phrase goes entirely)
 
 **Keep when.** The role is the only handle the page has (no name
 exists yet, or the sentence is the definition that introduces the
