@@ -560,7 +560,7 @@ not `type[Shape]`.
 
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 The table belongs to `make` rather than to a class in the hierarchy,
-so no `cls.registry` lookup walks the MRO.
+so a lookup reads the factory's one table rather than walking a class's MRO.
 `make` is a `ShapeFactory` outside the shape classes,
 so a call like `Circle.make("Square")` raises an `AttributeError` instead of building a `Square`.
 
