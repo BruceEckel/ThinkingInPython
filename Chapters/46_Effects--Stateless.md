@@ -1693,8 +1693,9 @@ A returned `KeyError` is data.
 
 `catch_score.py` has the same shape as `handler_blocks_except.py`.
 `supply()` wraps a function `run()` drives.
-The `catch()` here still works,
-because it matches the yielded value rather than relying on the driver to throw it back in.
+The `catch()` here still works, because it matches the yielded value.
+The `except` clause in `guarded()` relies on the driver to throw the error back in.
+The `Handler` that `supply()` puts between them passes the error outward instead.
 
 Moving the error into the result forces every caller to match on it.
 If you drop the `match` and use `value` as a number,
