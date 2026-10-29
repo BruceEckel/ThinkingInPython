@@ -892,8 +892,7 @@ Here, `__enter__()` finishes both updates before the task reaches its `await`,
 so the task keeps control through them and needs no lock.
 
 A semaphore initialized to one behaves like a lock, with one difference.
-Releasing a `Lock` that no task holds raises `RuntimeError: Lock is not acquired`.
-An over-released `Semaphore` quietly increases its own limit,
+Releasing a `Lock` that no task holds raises `RuntimeError: Lock is not acquired.` An over-released `Semaphore` quietly increases its own limit,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
 `asyncio.BoundedSemaphore` checks for that mistake.
 A `release()` beyond its starting count raises a `ValueError`.
