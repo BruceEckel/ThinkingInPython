@@ -2142,6 +2142,58 @@ were. It is a cousin of the `straighten` skill's "subject held open":
 there the reader holds a subject across a long modifier, here two
 modified terms across a comparator.
 
+### R52. Name the thing, not its role
+
+**Test.** A noun phrase identifies something by its place in the
+machinery, through a chain of two or more "of"/"in" phrases or a
+relative clause with a verb of its own, when the page already gives
+that thing a name: an identifier in a code span, a term the section
+introduced, a listing. Bruce's word for the fault is "convoluted"
+(chapter 45, 2026-10-29). "`yield from` makes the `Result` the value
+of the expression in the enclosing generator, after which that
+generator keeps running" makes the reader climb `Result` -> value ->
+expression -> generator and then attach a tail clause to the last
+rung. "`survey()` names the generators it delegates to in its body"
+describes `interview()` and `ask()` by their role when both names are
+on the page three lines up. A second tell is the tail: "after which",
+"at which point", or a trailing "in its body" that could attach to
+more than one thing in front of it. Repair: write the name; make the
+verb the action between the two named parties (hands X to Y, writes X
+into Z, passes X up to W); let the tail say what the recipient does
+next, in the paragraph's own terms, so a contrast sentence beside it
+keeps the same shape. Delete a role phrase the paragraph already
+stated ("the value of the expression" two paragraphs up).
+
+- "`yield from` makes the `Result` the value of the expression in the
+  enclosing generator, after which that generator keeps running." ->
+  "`yield from` hands the `Result` to the enclosing generator, which
+  continues the conversation." (beside "`drive()` returns the `Result`
+  to its caller, ending the conversation")
+- "`survey()` names the generators it delegates to in its body." ->
+  "`survey()` writes its two `yield from` targets, `interview()` and
+  `ask(...)`, into its body."
+
+**Keep when.** The role is the only handle the page has (no name
+exists yet, or the sentence is the definition that introduces the
+name); the chain is a type or a path the reader must see as written
+("the `ReturnType` position of `Generator`", "the `__dict__` of the
+instance"); a quoted diagnostic; an exercise statement or a Done-when
+criterion that must stay abstract so as not to give the answer away.
+
+**Sightings.** 2, both Bruce's flags on chapter 45 on 2026-10-29
+(`ca045294`, `4a5d14ea`), promoted on his request to apply it across
+the book. Candidates for a scan: "the value of the", "the X of the Y
+in the Z", a relative clause ending on a preposition ("the generators
+it delegates to"), "after which", "at which point"; a parse rule would
+flag an object noun phrase with two or more nested prepositional
+phrases or a relative clause when the paragraph holds a code span the
+phrase could stand for.
+
+**Home.** This file; the deep-review skill's prose pass (vague
+descriptions, since 2026-10-22, is the neighbor: there a verdict or an
+abstract noun stands where the mechanism should be, here a description
+of the mechanism stands where its name should be).
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
