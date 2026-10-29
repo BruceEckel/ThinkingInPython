@@ -829,7 +829,7 @@ The three type parameters of `ZIO[Ask & Tell, Nothing, Unit]` carry the Effect i
 an intersection type that lists both Effects.
 `Nothing` is the error type, meaning `greet` cannot fail.
 Each console layer turns the `IOException` a read or write can raise into a defect with `orDie`,
-so no error reaches the signature.
+so the signature's error type stays `Nothing`.
 `Unit` is what it produces on success.
 The signature does the same job as Koka's Effect row.
 It tells you what `greet` needs, what can go wrong, and what comes back.
