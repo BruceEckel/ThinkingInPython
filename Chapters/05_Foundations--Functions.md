@@ -496,7 +496,7 @@ expect(TypeError, trace, report, *nums, **opts)
 The same `func(*args, **kwargs)` call passes the items of `nums` positionally,
 so `report()`'s first parameter, `label`, also receives `1`.
 Each parameter takes one value.
-`trace()` never reads the signature of the function it calls,
+`trace()` never reads `func`'s signature,
 so the clash first appears when `trace()` calls `report()`.
 Because Python raises `TypeError` there, `calling report` prints first.
 
