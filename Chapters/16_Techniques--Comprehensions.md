@@ -690,7 +690,7 @@ print(list(gen))
 ```
 
 Because the output expression runs later,
-it reads `factor` when `list()` pulls the values rather than when Python creates the generator.
+it reads `factor` when `list()` pulls the values rather than at creation.
 `list(gen)` returns `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension evaluates its output expression for every element before the next statement runs,
 so it reads `factor` at creation.
