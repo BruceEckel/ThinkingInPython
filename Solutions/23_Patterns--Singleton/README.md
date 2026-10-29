@@ -107,7 +107,8 @@ whether or not anything constructs an `OnlyOne`.
 Removing the deferral also removes the first-call race from [Tests, Threads, and Locks](../../Chapters/23_Patterns--Singleton.md#tests-threads-and-locks).
 In the chapter's version,
 two threads racing the first construction could each see the `None` sentinel and each build an inner object.
-The class body runs once, during the import, so no first call remains to race.
+The class body runs once, during the import,
+so the inner object exists before any thread calls `OnlyOne()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
