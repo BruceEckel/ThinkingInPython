@@ -52,7 +52,7 @@ print(deposit(30), deposit(30))
 #: 130 160
 ```
 
-`deposit()` reads and mutates `balance`, a name outside its own scope.
+`deposit()` reads and mutates `balance`, a name outside its scope.
 A pure function reads only values that stay the same and leaves everything outside itself as it was,
 so `deposit()` breaks both halves of that definition.
 What `deposit(30)` returns depends on how many times `deposit()`
