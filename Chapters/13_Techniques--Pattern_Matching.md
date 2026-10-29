@@ -428,7 +428,7 @@ When a guard is false, `match` tries the next `case`, but the names stay bound.
 Once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
 In `leaky()`, the `x` that `case _:` returns holds `3`,
-left over from the failed guard in the case above it.
+left over from the failed guard `x > 100`.
 Any name a later case leaves alone keeps the value an earlier,
 failed case bound.
 
