@@ -152,7 +152,7 @@ Solutions/19_Techniques--Concurrency/README.md	the next `next()`	The `with lock:
 Solutions/19_Techniques--Concurrency/README.md	the third `pool.submit(enqueue, ...)`	**Add a third producer.** The one change is the third `pool.submit(enqueue, ...)`.
 Solutions/20_Patterns--Rethinking_Objects/README.md	the last line	Without the `# type: ignore` on the last line, `ty` rejects the call:
 Solutions/22_Patterns--Iterators/README.md	The following `next(it)`	The following `next(it)` returns `4`.
-Solutions/22_Patterns--Iterators/README.md	the line that	With the version that raises a `TypeError`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
+Solutions/22_Patterns--Iterators/README.md	the line that	With `typed()`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
 Solutions/22_Patterns--Iterators/README.md	the next `next()`	over `(x * 2 for x in [1, 2, 3])`, three calls to `peek()` print `2 2 2`, the next `next()` still returns `2`, `list()` of the rest gives `[4, 6]`, and `peek()` then reports the end.
 Solutions/22_Patterns--Iterators/README.md	the next `yield`	Each time something asks a generator for a value, its body runs to the next `yield` and pauses there.
 Solutions/22_Patterns--Iterators/README.md	the next call	A generator pauses inside its `for` loop at each `yield` and resumes there on the next call, so the loop that skips is the loop that yields.

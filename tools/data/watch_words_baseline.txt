@@ -34,7 +34,7 @@ Chapters/04_Foundations--Control_Flow.md	only: they are keywords only in this st
 Chapters/05_Foundations--Functions.md	has no: The read half of CODE then looks up a local that has no value yet
 Chapters/05_Foundations--Functions.md	itself: A call that names its arguments documents itself
 Chapters/05_Foundations--Functions.md	needs no: so CODE needs no declaration
-Chapters/05_Foundations--Functions.md	never: CODE never reads the signature of the function it calls
+Chapters/05_Foundations--Functions.md	never: CODE never reads CODE's signature
 Chapters/05_Foundations--Functions.md	only: A CODE begins the *keyword-only* parameters
 Chapters/05_Foundations--Functions.md	only: A CODE ends the *positional-only* parameters
 Chapters/05_Foundations--Functions.md	only: Keyword-only parameters are exempt
@@ -363,7 +363,6 @@ Chapters/26_Patterns--Factory.md	never: The classic failure is a plugin that "ne
 Chapters/26_Patterns--Factory.md	only: An import written only to trigger registration never uses that name
 Chapters/26_Patterns--Factory.md	only: CODE is the only code that changes when you add a new type of CODE
 Chapters/26_Patterns--Factory.md	only: When the variant differs only in field values
-Chapters/26_Patterns--Factory.md	only: and a factory class only when that work has state of its own
 Chapters/26_Patterns--Factory.md	only: and the only method CODE and CODE override
 Chapters/27_Patterns--Function_Objects.md	carried none: A function pointer carried none
 Chapters/27_Patterns--Function_Objects.md	declares no: and a CODE declares no CODE
@@ -473,7 +472,6 @@ Chapters/40_Functional--Foundations.md	has none: Python's standard library has n
 Chapters/40_Functional--Foundations.md	have no: They have no CODE or item assignment
 Chapters/40_Functional--Foundations.md	is what: which is what *first-class* means
 Chapters/40_Functional--Foundations.md	needs no: needs no declaration
-Chapters/40_Functional--Foundations.md	only: Each freezes only its own top level
 Chapters/40_Functional--Foundations.md	only: For a function whose parameters are positional-only
 Chapters/40_Functional--Foundations.md	only: Freezing only the binding is the shallow-freezing lesson again
 Chapters/40_Functional--Foundations.md	only: The read-only collection types in CODE

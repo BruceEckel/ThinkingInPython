@@ -1365,7 +1365,6 @@ Solutions/46_Effects--Stateless/README.md	[BOUND] CODE reads the Ability from th
 Solutions/46_Effects--Stateless/README.md	[BOUND] Following the type checker until the program builds means one edit
 Solutions/46_Effects--Stateless/README.md	[BOUND] Now every caller has two options, the same two CODE's callers have
 Solutions/46_Effects--Stateless/README.md	[BOUND] One Effect, Many Environments shows CODE running CODE against a table of materials and nailers
-Solutions/46_Effects--Stateless/README.md	[BOUND] One more line at the end of the listing could hand CODE the object that prints instead of the one that records
 Solutions/46_Effects--Stateless/README.md	[BOUND] Pass both instances to CODE in one call, run the Effect, and assert on each recorder's list
 Solutions/46_Effects--Stateless/README.md	[BOUND] The difference between the two cases is whether anything later uses the dropped value
 Solutions/46_Effects--Stateless/README.md	[BOUND] The discarded CODE ends at its statement, so the type checker evaluates that statement alone and accepts it
