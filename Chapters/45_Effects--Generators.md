@@ -372,6 +372,43 @@ changes `drive()` and leaves `interview()` as it is.
 The generator declares requests.
 The driver interprets them.
 
+`interview()` asks the same three questions whatever answers it hears.
+A generator can build its next request from the answer it received:
+
+```python
+# follow_up.py
+from collections.abc import Generator
+from drive import ANSWERS, drive
+from interview_generator import Answer, Question, Result
+
+def follow_up() -> Generator[Question, Answer, Result]:
+    name: Answer = yield Question("name")
+    pet: Answer = yield Question(f"pet of {name}")
+    return Result(f"{name} keeps a {pet}")
+
+print(drive(follow_up(), ANSWERS | {
+    Question("pet of Alice"): Answer("cat"),
+}))
+#: request = 'name', answer = 'Alice'
+#: request = 'pet of Alice', answer = 'cat'
+#: Alice keeps a cat
+print(drive(follow_up(), {
+    Question("name"): Answer("Bob"),
+    Question("pet of Bob"): Answer("dog"),
+}))
+#: request = 'name', answer = 'Bob'
+#: request = 'pet of Bob', answer = 'dog'
+#: Bob keeps a dog
+```
+
+`Question(f"pet of {name}")` carries the `Answer` to `name`,
+so the driver's table needs an entry it could not have written before that answer arrived.
+Under the second table the generator asks `pet of Bob`,
+because the answer to `name` changed.
+The driver still chooses every answer.
+The generator chooses what to ask next from what it has heard,
+and that choice is the conversation.
+
 Each generator has one driver at a time.
 The annotation describes the three channels; the runtime enforces the pairing.
 If a second thread resumes a generator while another thread is running its body,
