@@ -105,7 +105,7 @@ print(left == right)
 The two grass cells differ in `col` alone,
 and that difference makes them different values.
 No factory can hand one object to both cells,
-because no single object holds both positions.
+because each `Cell` holds one position.
 Every cell in the grid is a distinct value,
 so the map needs one object per cell.
 
