@@ -766,8 +766,8 @@ both intact.
 Both catch it and both take `stop.value`,
 but they hand that value to different places.
 `drive()` returns the `Result` to its caller, ending the conversation.
-`yield from` makes the `Result` the value of the expression in the enclosing generator,
-after which that generator keeps running.
+`yield from` hands the `Result` to the enclosing generator,
+which continues the conversation.
 
 `survey()` names the generators it delegates to in its own body.
 A generator can receive them as arguments instead,
