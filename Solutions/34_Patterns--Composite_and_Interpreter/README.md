@@ -558,8 +558,8 @@ The `Neg` case keeps the chapter's `is` test,
 so an unchanged subtree stays shared.
 
 **Leave division for evaluation.**
-A `Num` holds an `int`, and a quotient of two `int`s is usually a fraction,
-which no `Num` can hold.
+A `Num` holds an `int`, while a quotient of two `int`s is usually a fraction,
+so the `Div` stays in the tree with its operands simplified.
 Division by `Num(0)` is undefined.
 
 `simplify()` should leave the `ZeroDivisionError` to `evaluate()`.
