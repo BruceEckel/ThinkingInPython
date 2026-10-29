@@ -747,14 +747,59 @@ print(drive(survey(),
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
-[[Can we create an example where the target(s) of 'yield from' are passed as arguments to the generator function?]]
-
 Here `interview()`'s `Result` arrives as the value of `yield from interview()` instead of as `stop.value` in the driver.
 `interview()`'s questions reach `drive()` through three generators rather than two.
 
 The outermost generator still needs code that calls `next()` and `send()`,
 so the listing ends with a `drive()` call.
 However deeply the delegations nest, the program has one driver.
+
+`survey()` names the generators it delegates to in its own body.
+A generator can receive them as arguments instead,
+so the caller decides what the conversation holds:
+
+```python
+# yield_from_arguments.py
+from collections.abc import Generator
+from drive import ANSWERS, drive
+from interview_generator import Answer, Question, Result
+from yield_from_delegates import ask, interview
+
+def sequence(
+    *steps: Generator[Question, Answer, str]
+) -> Generator[Question, Answer, Result]:
+    results: list[str] = []
+    for step in steps:
+        result = yield from step
+        results.append(result)
+    return Result(", ".join(results))
+
+print(drive(
+    sequence(interview(), ask(Question("color"))),
+    ANSWERS | {Question("color"): Answer("blue")},
+))
+#: request = 'name', answer = 'Alice'
+#:   ask() received Alice
+#: request = 'town', answer = 'Wonderland'
+#:   ask() received Wonderland
+#: request = 'friend', answer = 'Rabbit'
+#:   ask() received Rabbit
+#: request = 'color', answer = 'blue'
+#:   ask() received blue
+#: Alice of Wonderland, friend Rabbit, blue
+```
+
+A step is any generator that yields `Question`s, receives `Answer`s,
+and returns a `str`.
+`Result` and `Answer` are both `str`s,
+so `interview()` and `ask()` both qualify as steps.
+The loop delegates to each step in turn,
+and each `yield from` expression collects what its step returns.
+`drive()` sees the same four requests it saw from `survey()`.
+`survey()` writes the shape of the conversation into its body.
+`sequence()` receives that shape as an argument list.
+A `yield from` target is an ordinary value: it can arrive as a parameter,
+sit in a list, or be built at the point of delegation.
 
 `drive()` and `yield from` differ in how they respond to a request.
 `drive()` answers it.
