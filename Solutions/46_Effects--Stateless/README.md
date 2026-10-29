@@ -224,7 +224,7 @@ so a caller could hand it to `run()` with no environment:
 Now every caller has two options, the same two `greet()`'s callers have.
 A caller can supply a `Console`, which ends the requirement,
 or declare `Need[Console]` in its own return type,
-which puts the same choice to its own callers.
+which puts the same choice to its callers.
 Those two are the only options, so the dependency stays visible.
 The requirement appears in the signature of every function between the one that uses the `Console` and the one that supplies it.
 The type checker reports an error at any of those functions that leaves the requirement out.
