@@ -747,6 +747,8 @@ print(drive(survey(),
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
+[[Can we create an example where the target(s) of 'yield from' are passed as arguments to the generator function?]]
+
 Here `interview()`'s `Result` arrives as the value of `yield from interview()` instead of as `stop.value` in the driver.
 `interview()`'s questions reach `drive()` through three generators rather than two.
 
@@ -812,8 +814,8 @@ print(drive(
 #: Alice of Oz, friend Rabbit
 ```
 
-`proxy()` drives `inner` the way `drive()` does, with `next()` and `send()`,
-and relays a request with a `yield` of its own at `[2]` instead of a `yield from`,
+`proxy()` drives `inner` the way `drive()` does, with `next()` and `send()`.
+`proxy()` relays a request with a `yield` of its own at `[2]` instead of a `yield from`,
 because `yield from` would relay every request.
 In the second run, `drive()` sees two requests instead of three.
 The proxy answers `town` at `[1]`, so that request stops at the proxy,
@@ -860,7 +862,7 @@ g.close()
 ```
 
 `g.throw(ValueError("bad input"))` raises that exception at the suspended `yield "ready"`,
-inside `worker()`'s body, the same way the `with` block's exception does.
+inside `worker()`'s body.
 Like `send()`, `throw()` returns the next value the generator yields.
 An exception that escapes the generator's body ends the generator and propagates out of `throw()` into the driver.
 
