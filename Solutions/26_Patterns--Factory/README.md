@@ -434,7 +434,8 @@ If you run the program without fixing it,
 Python raises a `TypeError` at that construction, before the game runs.
 In `abstract_factory_protocol.py` each factory matches the protocol by its methods alone,
 so constructing the factory is legal.
-The type checker reports the call that needs the protocol.
+The type checker reports the `GameEnvironment(...)` call,
+which passes the factory as a `GameElementFactory`.
 At runtime that version fails later, inside the game.
 `GameEnvironment.__init__()` raises an `AttributeError` when it calls `make_obstacle()`.
 
