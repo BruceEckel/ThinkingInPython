@@ -707,7 +707,7 @@ As the `SendType` it is the value of the `yield` inside `ask()`,
 sent by the driver.
 As the `ReturnType` it is the value of the whole `yield from` expression in `interview()`.
 
-`drive()` is imported unchanged.
+This listing imports `drive()` unchanged.
 The requests now come from `ask()`, one generator below `interview()`,
 and `yield from` passes each one up to the driver,
 so `drive()` sees the same `Question`s it saw in `interview_generator.py`.
