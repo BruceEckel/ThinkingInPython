@@ -23,6 +23,7 @@ Chapters/40_Functional--Foundations.md	[IMP] In CODE, add CODE beside CODE, and 
 Chapters/44_Effects--Effect_Management.md	[COLON+AND] With it you know what a function does: whether it is safe to run in parallel with another, and what it does when you call it twice in a row.
 Chapters/44_Effects--Effect_Management.md	[COLON+AND] Write the production bindings for CODE: a CODE class whose CODE calls CODE and whose CODE calls CODE.
 Chapters/44_Effects--Effect_Management.md	[IMP] Effect information into the return type of every function, and the compiler's ordinary type checking tracks it from there.
+Chapters/45_Effects--Generators.md	[PAIR] A generator that sits between CODE and CODE can do both: answer the requests it knows and relay the rest.
 Chapters/46_Effects--Stateless.md	[IMP] Explain what each one catches, and why the checker catches assigning a dropped request but not discarding one.
 Chapters/47_Effects--Stateless_in_Practice.md	[IMP] Explain what the types claim, what the run does, and which line restores the guarantee.
 Solutions/04_Foundations--Control_Flow/README.md	[AND+REL] your four predictions match the run, where CODE returns CODE for both strings, while CODE returns CODE for both, and you can name the test CODE would need for each string and say why CODE agrees with CODE on every string.
