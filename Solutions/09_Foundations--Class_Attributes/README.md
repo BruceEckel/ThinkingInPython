@@ -598,7 +598,7 @@ not three equal lists.
 
 This listing combines the shared mutable value of `shared_mutable.py` with the inheritance lookup of `class_var_inheritance.py`.
 Each one alone keeps a change where you can see it.
-In a single class, a mutable `ClassVar` declares its sharing in the body of the class that uses it,
+In a single class, a mutable `ClassVar` declares its sharing in the class body,
 so the sharing stays visible.
 A subclass changes an inherited immutable `ClassVar` by assignment,
 which creates the subclass's own entry.
