@@ -579,7 +579,7 @@ which tells Python where to look for modules and packages.
 `PYTHONPATH` takes multiple paths,
 which Python adds to `sys.path` in the order given.
 Python searches `sys.path` from the front and uses the first directory that holds your module or package.
-It raises a `ModuleNotFoundError` when no directory does.
+If the search exhausts `sys.path`, Python raises a `ModuleNotFoundError`.
 
 `PYTHONPATH` works, but today you install your package into the environment you use.
 The install puts the package on the search path with no environment variable.
