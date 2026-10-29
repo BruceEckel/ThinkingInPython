@@ -826,7 +826,7 @@ class GameBuilder:
 <summary>Where to look</summary>
 
 [Rooms, Robots, and the Item Factory](../../Chapters/38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
-shows how `Food.interact()` replaces its own occupant and how `item_factory()` finds an `Item` class from its `symbol`.
+shows how `Food.interact()` replaces the room's occupant with an `Empty()` and how `item_factory()` finds an `Item` class from its `symbol`.
 Give `Coin` the `$` symbol, an `interact()` that does the same replacement,
 and a count on `Robot`.
 To see why the factory finds `Coin` by itself,
