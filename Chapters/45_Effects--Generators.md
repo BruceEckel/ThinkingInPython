@@ -336,7 +336,7 @@ so `expect()` prints the exception's class name alone.
 The generator and `drive()` take turns.
 While the body runs, `drive()` waits inside `send()`,
 so only code inside the body can see `GEN_RUNNING`.
-That code needs a reference to its own generator,
+That code needs a reference to its generator,
 which a module-level name supplies:
 
 ```python
@@ -513,7 +513,7 @@ A `Yielded` travels the yield channel and a `Returned` the return channel.
 The output traces the descent, and the `Returned` comes back up the same path.
 `return (yield from ...)` passes the result through unchanged.
 
-`report()` yields the value of its own `yield from`.
+`report()` yields the value of its `yield from`.
 Its annotation widens to `Iterator[Yielded | Returned]`,
 because the loop receives both types.
 The last output line arrives through the return channel.
@@ -769,7 +769,7 @@ but they hand that value to different places.
 `yield from` hands the `Result` to the enclosing generator,
 which continues the conversation.
 
-`survey()` names the generators it delegates to in its own body.
+`survey()` names the generators it delegates to in its body.
 A generator can receive them as arguments instead,
 so the caller decides what the conversation holds:
 
@@ -861,7 +861,7 @@ print(drive(
 ```
 
 `proxy()` drives `inner` the way `drive()` does, with `next()` and `send()`.
-`proxy()` relays a request with a `yield` of its own at `[2]` instead of a `yield from`,
+`proxy()` relays a request with a `yield` at `[2]` instead of a `yield from`,
 because `yield from` would relay every request.
 In the second run, `drive()` sees two requests instead of three.
 The proxy answers `town` at `[1]`, so that request stops at the proxy,
@@ -1390,7 +1390,7 @@ Each approach gives up one side's loop:
   its loop becomes the bookkeeping in `__next__()`.
 
 All three approaches work around the same missing ability:
-pausing `fibonacci()` in the middle of its own loop, handing out a value,
+pausing `fibonacci()` in the middle of its loop, handing out a value,
 and resuming where it stopped.
 A generator lets the producer and the consumer each keep their own loop.
 
