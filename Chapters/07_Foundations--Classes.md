@@ -584,7 +584,7 @@ print([p])
 `print()` and `str()` use `__str__()` when it exists and otherwise fall back to `__repr__()`.
 The fallback runs in one direction.
 `repr()` calls `__repr__()` in every case.
-A container builds its own display from the `__repr__()` of its elements,
+A container builds its display from the `__repr__()` of its elements,
 so the list prints `Point(3, 4)` rather than `(3, 4)`.
 In an f-string, `{p!r}` selects `__repr__()` and `{p!s}` selects `__str__()`.
 A bare `{p}` also selects `__str__()` for a class that inherits `__format__()` from `object`.
