@@ -78,7 +78,8 @@ When you call a method for an object, as in `x.show()`,
 Python passes the object reference automatically.
 A method defined without `self` has no parameter to receive the reference.
 The "1" in the error message counts that reference.
-A type checker reports the mistake before anything runs,
+
+A type checker reports `Oops().show()` before anything runs,
 so the call carries a `# type: ignore` to say the mistake is deliberate.
 
 In C++ or Java you declare object-level fields inside the class body but outside the methods.
