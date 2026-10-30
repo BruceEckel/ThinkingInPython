@@ -288,15 +288,15 @@ print([*rest, first])  # Collect, then spread
 
 Unlike a starred target, any number of operands can carry a star,
 and they mix freely with ordinary elements.
+`+` joins two lists as well, but both operands must be lists,
+so `[0, 2] + (1, 3)` raises a `TypeError`.
+[Functions](05_Foundations--Functions.md#unpacking-arguments)
+uses the same star to spread an iterable into a call's arguments.
 
 `first, *rest = evens` and the display after it use both directions.
 `*rest` collects on the left of the assignment and spreads inside the display,
 so the pair builds a new list holding `evens` rotated by one place.
 `evens` stays as it was.
-`+` joins two lists as well, but both operands must be lists,
-so `[0, 2] + (1, 3)` raises a `TypeError`.
-[Functions](05_Foundations--Functions.md#unpacking-arguments)
-uses the same star to spread an iterable into a call's arguments.
 
 Tuples are often heterogeneous, with each position a different type:
 
@@ -442,11 +442,11 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 #: {'a': 1, 'b': 2, 'c': 3}
 ```
 
-`|=` updates the left `dict` in place, as `update()` does.
 For sets, `|` means union, so the operands can come in either order.
 For dictionaries the order matters.
 When both dictionaries hold the same key,
 the merged `dict` keeps the right operand's value, so `"y"` comes out as `20`.
+`|=` updates the left `dict` in place, as `update()` does.
 
 `**` spreads each dictionary's entries the way `*` spreads a list's elements.
 A later entry replaces an earlier one with the same key.
@@ -678,7 +678,8 @@ print(Counter("aaab") ^ Counter("abbc"))  # Symmetric diff
 ```
 
 A missing key counts as zero rather than raising a `KeyError`.
-`-`, `&`, and `|` also work between two counters.
+
+`-`, `&`, and `|` work between two counters.
 They are the operators from [Sets](#sets), here meaning multiset difference,
 minimum, and maximum.
 Python 3.15 adds `^`, the multiset symmetric difference,
@@ -810,6 +811,7 @@ print(deque_time * 20 < list_time)  # Not close
 Use a `deque` for a queue.
 Indexing its middle is O(n), though,
 so keep a `list` wherever you index by position.
+
 When one thread must wait for another to supply the next item,
 use [`queue.Queue`](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
 whose `get()` blocks until an item arrives.
@@ -855,7 +857,9 @@ print(height)
 
 A `namedtuple` is a fixed-length record like the tuple in `heterogeneous.py`,
 but each field has a name, so `alice.age` says which value it reads.
-`typing.NamedTuple` builds the same kind of tuple subclass from a `class` statement.
+
+`typing.NamedTuple` builds the same kind of tuple subclass as `namedtuple`,
+but from a `class` statement.
 You write `class Person(NamedTuple):` and annotate each field in the body,
 as in `name: str`, instead of listing bare names.
 A type checker then verifies each field against its annotation.
