@@ -1031,7 +1031,8 @@ A livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
 A deadlock looks idle, with tasks suspended and waiting.
 In both cases, progress stops.
-The usual fix is to break the symmetry,
+
+The usual fix for a livelock is to break the symmetry,
 for example letting the task with the lower ID give way while the other proceeds.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
@@ -1052,7 +1053,8 @@ and it fails as soon as two tasks overlap.
 `async_race.py` shows why.
 The last write replaces every earlier one.
 Each reader resumes to find another task's value.
-A `ContextVar` is the same convenience without that failure.
+
+A `ContextVar` has the convenience of a global.
 It holds a value per *context*.
 Every task starts with a copy of the context current when `create_task()` runs,
 so one task's `set()` changes its own copy,
@@ -1402,6 +1404,8 @@ the best any number of cores can do is:
 As *n* → ∞, that ceiling approaches 1 / *s*.
 A job that spends 10 percent of its time in serial overhead speeds up at most tenfold,
 on 16 cores or 1,600.
+The ceiling applies to any system that divides work across independent workers,
+in Python or anywhere else, so adding cores alone is not a scaling strategy.
 
 Splitting into more, smaller tasks yields gains up to a point,
 since finer chunks even out the load across workers.
@@ -1410,8 +1414,6 @@ each additional task adds its slice of the same serial overhead:
 one more chunk to pickle, one more result to collect.
 Once that added overhead outweighs the benefit of the smaller pieces,
 the curve flattens.
-The ceiling applies to any system that divides work across independent workers,
-in Python or anywhere else, so adding cores alone is not a scaling strategy.
 
 ## The GIL and Free Threading
 
@@ -1763,6 +1765,7 @@ print(f"subinterpreters run in parallel: "
 Subinterpreters overlap computing, where a thread pool takes turns.
 Because each worker interpreter holds its own GIL,
 several of them run on separate cores at once.
+
 The interpreters share the process's memory,
 but each keeps its own isolated objects.
 Arguments and results cross that boundary by copying.
