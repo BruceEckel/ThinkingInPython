@@ -209,4 +209,12 @@ and it becomes part of every future pass.
   and the steps of one walkthrough.
   A pronoun or "This" that opens the new paragraph gets its noun,
   since its antecedent now sits in the paragraph before.
-  `bruce_edit_db.md` R29 has the record and the 2026-10-05 sweep.
+  The break is often not the whole fix
+  (Bruce, 2026-10-30: "sometimes this requires rewriting both paragraphs"):
+  a half that leaned on the other through an opening "though" or "also",
+  a pointer, or a lead-in sentence at the end of the first half
+  is reworded so that each paragraph opens on its own claim
+  and closes on its own point,
+  and a sentence that tangles the two concepts at the seam is split with them.
+  `bruce_edit_db.md` R29 has the record, the chapter 45 before/after,
+  and the 2026-10-05 and 2026-10-30 sweeps.

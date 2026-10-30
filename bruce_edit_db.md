@@ -1180,7 +1180,16 @@ explained, not for who the subject is. Usual seams: a design reason
 beside a mechanism, a construct's explanation beside a walkthrough of
 the listing's run, what the code does beside when to use it, one
 listing's discussion beside the next listing's. A pronoun or "This"
-that opens the new paragraph gets its noun.
+that opens the new paragraph gets its noun. The break is often not
+the whole fix (Bruce, 2026-10-30: "sometimes this requires rewriting
+both paragraphs"): a half that leaned on the other, through an
+opening "though", "also", or "the same way", a pointer, or a last
+sentence that was a lead-in to the other half, is reworded so that
+each paragraph opens on its own claim with its noun written out and
+closes on its own point. A tangled sentence at the seam, one that
+joins the two concepts with "so ... where ...", is split with the
+paragraph. Run the test on every paragraph you touch in any pass,
+not only in a paragraph sweep.
 
 **Keep when.** The halves need each other: a claim and its reason, the
 two halves of a contrast, the steps of one walkthrough, a rule and the
@@ -1236,6 +1245,31 @@ multiple primary concepts, and this makes it confusing."
   broke the tuple-as-cache-key explanation from "Purity is a second,
   separate requirement."
 
+- `45_Effects--Generators` 2026-10-30, Claude-written, during the
+  structural pass: "Chapter 31's `Enum` makes the states a closed set.
+  Here the set is open: any function that returns a `Machine` is a
+  state, so a test reaches a state by driving the machine to it, where
+  `test_trap_states.py` iterates over `TrapState` and checks every
+  state against every move. A machine designed as a diagram still
+  belongs in chapter 31's table." One paragraph held the open set, the
+  two test designs, and a verdict, with the middle two tangled in one
+  sentence. The rewrite: "Here the set is open: any function that
+  returns a `Machine` is a state. `test_trap_states.py` iterates over
+  `TrapState` and checks every state against every move; a test of the
+  generator design reaches a state by driving the machine to it. A
+  machine whose states a test must enumerate belongs in chapter 31's
+  table." followed by a new paragraph for the copying limit ("The
+  generator design has a second limit. `copy.deepcopy()` and `pickle`
+  both refuse a suspended generator, ..."). A blank line alone would
+  have left the tangled sentence and the unexplained verdict. Bruce,
+  the same day: "I have regularly noticed paragraphs in the book that
+  confusingly combine more than one topic and should be split
+  (sometimes this requires rewriting both paragraphs)."
+- Book sweep 2026-10-30, every chapter, appendix, and Solutions file:
+  one Opus agent per chapter with its Solutions file, reading every
+  paragraph with the rewrite clause in force (see the sweep log in
+  project memory `paragraph-sweep-2026-10-30`).
+
 **Sweep notes.** A seam whose next sentence carries "though", "also",
 "the same way", or a mid-sentence "it"/"one" still leans on the
 paragraph before; the agents' rule covered the opening word alone, so
@@ -1243,7 +1277,8 @@ read the whole first sentence of each new paragraph. The agents' "close
 calls left whole" lists (about 300 across the book) are the cases this
 rule keeps: a claim with its reason, a contrast, a one-sentence half.
 
-**Home.** cohesion (Accrued patterns).
+**Home.** CLAUDE.md (global, "One primary concept per paragraph"),
+cohesion (Accrued patterns), deep-review (prose pass, "Overloaded").
 
 ### R30. "Iterate" takes "over"
 

@@ -124,6 +124,18 @@ flourishes, nothing that obscures the point.
   surrounding chapters. Newly drafted prose is the usual source, showing
   up as inflated diction, a throat-clearing opener, or five clipped
   sentences in a row.
+- **Overloaded:** a paragraph that explains two things. Say in one
+  sentence what the paragraph explains; if that sentence needs "and"
+  to join two explanations, break the paragraph at the seam, then
+  reread both halves and rewrite what leaned across the break (an
+  opening "though" or "also", a pointer, a lead-in sentence, a
+  sentence that tangles both concepts) so each paragraph opens on its
+  own claim and closes on its own point. Bruce, 2026-10-30: "sometimes
+  this requires rewriting both paragraphs." Keep together a claim
+  and its reason, a contrast's two halves, and one walkthrough's
+  steps. Run this on every paragraph the review touches; it is rule
+  R29 in `bruce_edit_db.md`, with chapter 45's trap paragraph as the
+  before/after.
 - **Obscuring:** prose that sounds explanatory but leaves out the reason
   or the consequence. Cutting words is right only when the meaning
   survives the cut, so restore the missing half instead of trimming
