@@ -131,7 +131,7 @@ The type checker accepts `BoundedStack` as a `Stack`.
 The subclass matches the signature and breaks the contract behind it.
 Substitutability is the part of polymorphism that no tool can ensure.
 
-A test can catch the broken contract.
+A test catches the broken contract.
 If a test written against `Stack`'s contract also runs against `BoundedStack`,
 the test catches `fill()` failing on the third item.
 Two later tests use the same pattern to check other runtime guarantees:

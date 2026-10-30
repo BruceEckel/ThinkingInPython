@@ -72,7 +72,7 @@ When the block finishes,
 `trace()` produces values alone,
 the shape that [Iterators](22_Patterns--Iterators.md#generators)
 annotates `Iterator[T]`.
-Every `@contextmanager` generator in this book is annotated `Generator` instead,
+Every `@contextmanager` generator in this book carries `Generator` instead,
 because the decorator calls the generator's `throw()` method,
 a method of `Generator` and not of `Iterator`,
 and `ty` reports the `Iterator[str]` form as deprecated.
