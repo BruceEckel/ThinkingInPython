@@ -35,6 +35,7 @@ If you drop the `% 400` clause from `is_leap()`,
 every century year counts as common.
 `check_day()` then raises a `TypeFailure` for `Day(29)` in 2000,
 and `test_feb_29_allowed_in_2000` fails.
+
 An `is_leap()` that tests divisibility by 4 alone passes all four tests,
 because 2000 is the one century year `Year` accepts.
 The solution still writes the full rule,
