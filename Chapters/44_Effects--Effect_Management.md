@@ -775,7 +775,8 @@ so designers build *library* Effect systems on top of existing type systems.
 The compiler checks types, not Effects,
 so the library encodes Effect information into the return type of every function,
 and the compiler's ordinary type checking tracks it from there.
-That encoding changes the mechanism.
+
+Encoding Effects into return types changes the mechanism.
 Instead of writing a computation and letting the compiler infer its Effects,
 you build a *description* of a computation, and execute the description later.
 [ZIO](https://zio.dev/) is such a library, for Scala.
@@ -843,7 +844,8 @@ Koka declares each Effect in two lines and handles it in one `with` clause.
 Even `greet()` grows: it cannot call `ask` and then `tell`,
 because each call produces a description, not a value,
 so a `for` comprehension chains the two descriptions into one.
-The machinery exists because the language cannot intercept an Effect at the point where it runs,
+
+The machinery exists because Scala cannot intercept an Effect at the point where it runs,
 the way a native handler does.
 A library works with values alone, so every Effect must become a value.
 `greet` is a data structure describing a program.
@@ -945,6 +947,7 @@ not when the runtime executes it.
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 Polysemy and Effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
+
 Stateless builds on generators, as TypeScript Effect's `function*` does.
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes with a value.
@@ -1007,7 +1010,8 @@ a description of work.
 The body has not started, so `ran` is still `[]`.
 The body runs only when something drives the description: an `await`, a task,
 or `asyncio.run()`.
-That description/execution split is the library Effect system model.
+
+A coroutine's description/execution split is the library Effect system model.
 Descriptions compose inside `async def` functions.
 `asyncio.run()` is the edge where description becomes action.
 
