@@ -7,8 +7,9 @@ This appendix builds the part that needs no type inference.
 The checker here reads source text, resolves the calls it can,
 infers a row for every function, and reports each declared row the body exceeds.
 It is about 450 lines.
-Most of its pieces come from earlier chapters: a `match` over syntax-tree nodes,
-records for the data,
+
+Most of the checker's pieces come from earlier chapters:
+a `match` over syntax-tree nodes, records for the data,
 a `Result` for the one operation in the core that can fail,
 and a pure core with its Effects at the edge.
 [The Checker Checks Itself](#the-checker-checks-itself)
@@ -1241,6 +1242,7 @@ Every function in `effect_table.py`, `call_names.py`, `function_facts.py`,
 and `row_check.py` has an empty row and stays out of the output,
 so the checker confirms that its core is pure.
 `FileSystem` and `Console` appear in three functions at the edge and in the module that calls them.
+
 [Effect Management](44_Effects--Effect_Management.md#a-program-can-never-be-pure)
 describes pushing the Effects to the edges:
 isolating them in a few functions so the rest of the program stays pure.
