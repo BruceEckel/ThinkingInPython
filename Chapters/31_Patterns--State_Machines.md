@@ -398,7 +398,7 @@ When every condition in a group returns `False`,
 
 ### A Vending Machine
 
-A single table can now define the machine.
+A single table now defines the machine.
 The conditions and actions are ordinary methods, stored in the table.
 The machine collects money, takes a selection as a row and then a column,
 then either dispenses the item, reports it sold out,
