@@ -397,6 +397,7 @@ the way `use_module.py` looks for `module`.
 
 Two dots refer to the parent package,
 so `a_package/b_package/module3.py` can import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
+
 The absolute form `from a_package.module1 import function1` works from inside the package too.
 Use it when the import crosses a package boundary,
 since it spells out the full path from the top-level package.
@@ -706,9 +707,12 @@ If nothing touches the lazily imported name,
 the module stays unloaded for the rest of the run, so that work never happens.
 The failure is silent.
 The run finishes, and the table ends up one row short.
+
 `all` defers ordinary `import` statements as well as the marked ones,
 including the ones that exist to run a module's body.
-The same silent failure therefore makes `all` an experiment to run rather than a setting to leave on.
+Under `all`, a module imported for what its body does can stay unloaded for the whole run,
+while the run finishes normally.
+That silent failure makes `all` an experiment to run rather than a setting to leave on.
 
 ## Exercises
 
