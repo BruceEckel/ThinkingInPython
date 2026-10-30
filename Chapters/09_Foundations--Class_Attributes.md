@@ -238,6 +238,7 @@ which creates a real `label` attribute on `a`, not on `Tally`.
 Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrates in `class_attribute_confusion.py`.
 The `total` that `a` reports is `Tally.total`.
+
 The `[CV]` tag marks an attribute the class stores.
 It stands for "class variable," another name for a class attribute.
 `label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,
@@ -455,6 +456,7 @@ the way `a` reads through to `Stars` until `a.rating = 1`.
 `ClassVar` leaves that lookup alone.
 It tells the type checker that `shared` belongs to the class.
 Attribute lookup alone decides whether subclasses share storage.
+
 `Right` writes `shared = 100` and leaves the annotation to `Base`.
 The override is still a `ClassVar`.
 The type checker applies the base's declaration to it,
@@ -509,6 +511,7 @@ whenever a `ClassVar` must count across every subclass rather than fork one coun
 A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
 that writes `cls.total += 1` forks the same way,
 because `cls` is the class that received the call.
+
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry avoids the fork by mutating one dictionary in place.
 `Trash.registry[cls.__name__] = cls` assigns into the dictionary,
 not to an attribute of `cls`, so every subclass shares the one registry.
