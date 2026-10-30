@@ -682,7 +682,7 @@ path.unlink()  # Delete the file
 
 The `RuntimeError` propagates, but `with` closes the file first.
 Because a `with` block shares the enclosing scope,
-`f` stays bound after the block exits, so the listing can print `f.closed`.
+`f` stays bound after the block exits, so the listing prints `f.closed`.
 
 [Cleanup](10_Foundations--Cleanup.md)
 contrasts the close that `with` guarantees with leaving the close to Python's garbage collector.
