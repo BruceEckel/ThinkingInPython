@@ -423,6 +423,7 @@ The last two lines count the pieces for the comparison with `plastic_dropped.py`
 Apart from those lines and the `pieces` and `bins` names they read,
 `recycle_dict_plastic.py` differs from `recycle_dict.py` in two places:
 the `Plastic` definition and the data file's name.
+
 Both plastic listings import their sorter,
 so `sort_by_type()` and `sort_by_match()` run on `plastic.dat` as written.
 The sorting line, `bins[type(piece)].append(piece)`, bins the new material,
@@ -660,6 +661,7 @@ None of the three is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
 Keep a pattern where it does more than a language feature does.
+
 This chapter follows [simplicity before generality](21_Patterns--Design_Patterns.md#design-principles).
 Each construct answers a requirement the plant stated and anticipates none that the plant left unstated.
 
