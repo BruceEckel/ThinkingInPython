@@ -91,7 +91,7 @@ def rules(source: str) -> list[str]:
     ("A `break` at the match leaves both loops in one step and skips "
      "`else` along with them.", []),
     ("A call between the check and the use can reset that attribute.",
-     []),
+     ["CAN"]),
     ("`Temperature` has no `__dict__` to assign them, so neither the "
      "class nor the instance holds an `celsius`.", []),
     ("The third-party `more-itertools` package supplies one as "
@@ -146,7 +146,7 @@ def test_the_reported_line_is_the_sentences_first_character() -> None:
 def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL"}
-    assert set(SURVEY_RULES) == {"AND", "COLON", "ADD", "TWO"}
+    assert set(SURVEY_RULES) == {"AND", "COLON", "ADD", "TWO", "CAN"}
 
 
 def test_main_reports_without_failing_and_accepts(
