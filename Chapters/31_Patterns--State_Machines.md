@@ -363,9 +363,9 @@ A `Rule` reads as a sentence: from `state`, on an input of `input_type`,
 go to `next_state`, running `action` if the rule has one,
 provided `condition` passes if the rule has one.
 A state is an `Enum` member, so a misspelled state is a type error.
+
 `Rule` is generic in `I`, the input class, and `input_type` is `type[I]`,
 so a rule's `action` and `condition` must accept the class its `input_type` names.
-
 The input class appears twice,
 as the `input_type` field and as the type argument `I`,
 because the two do different jobs.
@@ -484,11 +484,13 @@ The lookup is by class identity.
 An instance of a subclass of `Money` has a different `type()`,
 so it finds the rules filed under that subclass, if any,
 and passes over the rules filed under `Money` (see exercise 9).
+
+Other chapters key a dictionary by class.
 The [event bus](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-stores its handlers under the event class the same way,
+stores its handlers under the event class,
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting)
-reuse the lookup.
+reuse this engine's lookup.
 
 `VendingMachine` holds the table, its conditions, and its actions:
 
@@ -567,6 +569,7 @@ The rules go in `__init__()` rather than in the class body,
 because each rule holds a bound method.
 `self.add_money` holds a reference to this machine,
 so each `VendingMachine`'s rules call methods that read and write its own `amount` and `slots`.
+
 `Quit` refunds from every paid state,
 and a `Row` selects from every paid state but `SELECTING`,
 which is waiting for a `Column`.
@@ -762,7 +765,8 @@ In both designs the states are `Enum` members because a state machine works with
 Iterating over the enum reaches every member of that set.
 `test_trap_states.py` checks each state against each move,
 and `VendingMachine` builds its `Quit` and `Row` rules from a comprehension over `State`.
-A member is one object that every machine using it shares,
+
+An `Enum` member is one object that every machine using it shares,
 so every machine sees a value stored on a member (see exercise 2).
 Data that belongs to one machine lives on the machine,
 as `VendingMachine`'s `amount` and `row` do.
