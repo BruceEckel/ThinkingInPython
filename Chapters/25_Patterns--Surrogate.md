@@ -114,7 +114,7 @@ with expected(TypeError):
 ```
 
 The type checker reports the `Partial()` construction before the program runs,
-so the line has a `# type: ignore` and the listing can show the runtime refusal.
+so the line has a `# type: ignore` and the listing shows the runtime refusal.
 
 The inheritance makes a `Proxy` acceptable wherever code expects a `Service`.
 It also lets the type checker verify the `Proxy`'s `f()` and `g()` against the base.
