@@ -262,7 +262,8 @@ so the `TypeError` bypasses the `else` clause as well as the `except` clause.
 **Catch the exception at the caller.**
 Because the `TypeError` propagates up past `divide_and_report()`,
 this listing wraps the call in its own `try`/`except TypeError` to show the exception reaching the caller.
-If you call `divide_and_report(1, "x")` at the top level instead,
+
+If you call `divide_and_report(1, "x")` at the top level, outside any `try`,
 `finally always runs` prints first, and then the traceback appears,
 ending in `TypeError: unsupported operand type(s) for /: 'int' and 'str'`.
 Above that last line,
