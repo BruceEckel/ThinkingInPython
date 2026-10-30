@@ -530,6 +530,7 @@ as the listing does by going through `setattr()`.
 You can still mutate a field's `list` in place.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates that leak.
+
 A frozen instance is hashable only when every field it holds is.
 The types this chapter validates hold `int`s and `str`s,
 so every field of theirs keeps its constructed value,
@@ -981,7 +982,8 @@ Mix in a type when the member is one of that type.
 `Month` stays a bare `Enum`,
 because a month carries an `int` rather than being one.
 `max_days` reads that number through `.value`.
-A class of your own can be the mix-in too.
+
+Besides a built-in like `tuple` or `str`, the mix-in can be a class of your own.
 `Enum` passes the assigned value to the mix-in's `__init__()`,
 unpacking a tuple into separate arguments,
 so `Enum` builds each member the way a constructor call builds an ordinary instance.
