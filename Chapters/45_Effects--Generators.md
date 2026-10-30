@@ -928,11 +928,49 @@ A generator object has two more methods,
 and each resumes the generator with an exception in place of a value.
 `throw(exc)` raises `exc` at that `yield`.
 `close()` raises `GeneratorExit` there,
-the signal that the generator will not be resumed again and should finish.
+the driver's signal that it will not resume the generator again,
+so the generator should finish.
+`pause()` yields once and lets every exception through,
+so each call shows one thing:
+
+```python
+# throw_close_basics.py
+from collections.abc import Generator
+from exceptions import expect
+
+def pause() -> Generator[str]:
+    print("started")
+    yield "paused"
+    print("resumed")
+
+g = pause()
+print(next(g))
+#: started
+#: paused
+expect(ValueError, g.throw, ValueError("stop"))
+#: [ValueError] stop
+
+g = pause()
+next(g)
+#: started
+g.close()
+print("closed")
+#: closed
+```
+
+`g.throw(ValueError("stop"))` resumes `pause()` at its `yield` and raises the `ValueError` there.
+The body lets it through,
+so the exception leaves the generator and comes back out of the `throw()` call,
+where `expect()` reports it.
+`g.close()` raises `GeneratorExit` at the same `yield`;
+the body lets that propagate too, and `close()` catches it,
+so the driver sees an ordinary return.
+In both runs an exception arrives at the `yield` in place of a value,
+the body ends there, and `print("resumed")` stays unreached.
 
 A `raise` statement in the driver cannot do what `throw()` does.
 `raise` raises its exception in the frame that executes it.
-While the driver runs, the generator's frame is suspended.
+While the driver runs, the generator's frame waits at its `yield`.
 An exception propagates through the frames on the call stack,
 and a suspended frame is off that stack,
 so the generator's `except` clauses are out of the path of any `raise` the driver executes.
@@ -948,7 +986,7 @@ In the three-channel picture,
 and the generator that asked decides what to do about it:
 handle the exception and yield again, or let it propagate,
 which ends the generator.
-`asyncio` answers a coroutine this way when an awaited operation fails or the task is cancelled.
+`asyncio` answers a coroutine this way when an awaited operation fails or a cancellation arrives.
 In [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager),
 `@contextmanager`'s `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
@@ -995,7 +1033,8 @@ A generator that answers `GeneratorExit` with another `yield` has refused to fin
 and `close()` raises a `RuntimeError`.
 
 A suspended generator holds whatever its body has open,
-a file or a lock inside a `with` statement, until it is resumed or collected.
+a file or a lock inside a `with` statement,
+until the driver resumes it or the garbage collector reclaims it.
 Python calls `close()` on a suspended generator when it is garbage-collected,
 so the `finally` block would run eventually;
 a driver that calls `close()` chooses the moment.
@@ -1035,11 +1074,11 @@ g.close()
 The driver calls `throw()` on the generator `outer()` returned,
 but `inner()` prints the `caught` line.
 `yield from` passes the exception down to the `yield` where `inner()` waits,
-because that `yield` is the one that is suspended;
+because `inner()`'s `yield` is the point of suspension;
 `outer()` waits at its `yield from` expression.
 Had `inner()` let the exception escape,
 it would have come back up as if `outer()`'s `yield from` had raised it,
-and `outer()`'s `try` would see it on the way out.
+and `outer()`'s `try` would see it as it propagated.
 `g.close()` raises `GeneratorExit` in `inner()` first,
 so the cleanup lines print from the inside out.
 A driver that holds the outermost generator can stop and clean up every generator beneath it.
