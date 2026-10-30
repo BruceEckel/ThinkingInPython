@@ -403,7 +403,8 @@ so a `ZeroDivisionError` still matches `expected_one(ArithmeticError)`.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments,
 where `exc_type.__name__` gives the type alone.
-`__enter__()` returns `None` because this manager watches the block for an exception instead of handing it an object.
+
+`__enter__()` returns `None` because `expected_one` watches the block for an exception instead of handing it an object.
 An `as` clause works and binds `None`.
 
 ### The `expected` Manager
@@ -971,6 +972,9 @@ and suppression through a truthy return work the same way in the async form.
 The Concurrency chapter uses `async with` throughout, for `asyncio.TaskGroup`,
 locks, and semaphores.
 Each of those is an object with the two `a`-prefixed methods.
+
+The `contextlib` tools for combining, closing,
+and decorating managers each have an async counterpart.
 `AsyncExitStack` is the `ExitStack` equivalent for holding several async managers.
 `aclosing(obj)` awaits `obj.aclose()` on exit,
 the async counterpart of `closing()`.
