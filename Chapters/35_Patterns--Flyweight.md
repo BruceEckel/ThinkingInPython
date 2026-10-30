@@ -187,6 +187,7 @@ print(field[3][5].label(3, 5))
 The twenty-four cells share three `Tile` objects.
 Because `@cache` returns the same `Tile` for the same symbol every time,
 the object count stays at the number of tile kinds however large the grid grows.
+The listing shows the object count, not the memory behind it (see exercise 2).
 
 `[*row for row in field]` uses [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
 to flatten the grid into one list of cells.
@@ -195,7 +196,6 @@ The listing counts `id(t)` rather than `len(set(cells))` on purpose.
 Because `Tile` is a record, its generated `__eq__()` compares field values.
 A set of cells therefore collapses to three with or without sharing.
 Only identity proves sharing.
-The listing shows the object count, not the memory behind it (see exercise 2).
 
 The two `label()` calls in `tile_map_demo.py` go to one object,
 the shared water tile, and get two answers,
@@ -310,9 +310,10 @@ A factory function like `tile()` has a visibly different name and call syntax,
 so a caller can see that construction goes through the factory rather than the class.
 If you want callers to construct objects with an ordinary class call such as `Color(...)`,
 hide the pool inside `__new__()` instead.
+
 [*Singleton*](23_Patterns--Singleton.md#the-classic-implementations)
-builds and returns its one instance in `__new__()` the same way.
-Here the pool stores each instance under its constructor arguments instead of a single constant key.
+builds and returns its one instance in `__new__()`.
+An interning `__new__()` stores each instance in a pool under its constructor arguments instead of a single constant key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
 A *Multiton*'s objects can be mutable.
 A flyweight must be immutable, so `Color` is a record:
@@ -386,7 +387,9 @@ A direct `Tile("~", "water", False)` bypasses `tile()`,
 building a second object equal to the pooled water tile.
 Every `Color(...)` call looks in the pool first,
 so two `Color`s with the same components are the same object and `is` returns the same result as `==`.
-The bookkeeping exists for that guarantee, or for the constructor syntax.
+
+Write the `__new__()` bookkeeping when `is` must agree with `==` for every `Color`,
+or when callers must keep writing `Color(...)`.
 When you need neither,
 a `@cache` factory like `tile_map.py`'s `tile()` shares one object per value with no `__new__()`.
 
