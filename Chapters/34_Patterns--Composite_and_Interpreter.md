@@ -11,8 +11,9 @@ In *Interpreter*, the tree is a sentence in a small language,
 and evaluating the sentence walks the tree.
 *GoF Design Patterns* presents them as separate patterns,
 but *Interpreter* is *Composite* with meaning attached.
-In Python both reduce to one technique: a union of records for the nodes,
-and recursive functions that `match` on them.
+
+In Python the two patterns reduce to one technique:
+a union of records for the nodes, and recursive functions that `match` on them.
 Each of those `match` statements is [exhaustive](13_Techniques--Pattern_Matching.md#exhaustive-matching),
 so the type checker reports a node kind that no case handles.
 
@@ -262,7 +263,8 @@ Both yield a `Path` for each entry, whatever its kind.
 A `Path` is an immutable value that names a location.
 The entries and the tree they form live in the operating system's filesystem.
 `iterdir()` asks the OS for the children each time you call it.
-The caller must add up any result over that tree, as `disk_usage()` does.
+
+The caller must add up any result over a directory tree, as `disk_usage()` does.
 On a directory, `stat().st_size` reports the size of the directory itself rather than the size of its contents,
 so you add up the sizes yourself:
 
@@ -407,8 +409,9 @@ def test_operators_build_the_tree() -> None:
 
 The reflected methods depend on the operator dispatch from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice).
 `2 * x` works because `int.__mul__()` returns `NotImplemented` and Python calls `x.__rmul__(2)`.
-Unlike that chapter's `Meters`, though,
-these reflected methods accept any operand.
+
+Unlike `Meters` in *Multiple Dispatching*,
+the reflected methods in `expr.py` accept any operand.
 `ty` reports `"a" + x` as `unsupported-operator` in source it checks,
 but at runtime `Var.__radd__()` runs before `str` tries to concatenate.
 The result is `Add(Num("a"), x)`,
@@ -448,6 +451,7 @@ Python tests the operand's truth value.
 Then `and` and `or` return one of their two operands,
 and `not` returns a `bool`.
 `x and y` evaluates to `y` and quietly drops `x` from the expression.
+
 An expression language that needs boolean operators overloads `&` and `|`,
 so a Pandas filter reads `(a > 1) & (b > 2)`.
 The parentheses change the parse.
@@ -788,6 +792,7 @@ the literal `str` pieces the author typed and the `Interpolation` objects holdin
 Iterating over a `Template` is flat.
 `for piece in template` yields one level of `str` and `Interpolation` objects,
 so the walk is a loop rather than a recursion.
+
 An interpolation's value can be a `Template`,
 built by nesting one `t`-string inside another.
 `+` instead concatenates `t`-strings into one flat `Template`,
