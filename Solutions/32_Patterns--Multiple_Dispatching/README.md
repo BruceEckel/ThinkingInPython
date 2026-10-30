@@ -1830,7 +1830,7 @@ so the seven combinations with a constant answer stay one line each and still re
 Only the cells that need code look like code.
 
 **Read the state in both orders.**
-The `(Paper, Rock)` cell receives both items, so it can consult `player.wet`.
+The `(Paper, Rock)` cell receives both items, so it consults `player.wet`.
 One duel has two orders, and each order has its own cell,
 so the `(Rock, Paper)` cell needs the same test.
 In that cell the paper is the opponent, so the cell reads `opponent.wet`.
