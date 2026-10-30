@@ -523,8 +523,9 @@ Without a declaration,
 reads that local before anything has assigned it,
 and fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
+
 [`global`](05_Foundations--Functions.md#names-inside-a-function)
-does the same for a module-level name.
+redirects an assignment to a module-level name.
 Each statement targets its own scope.
 With `global count` in place of `nonlocal count`,
 `increment()` looks for a module-level `count`, finds none,
