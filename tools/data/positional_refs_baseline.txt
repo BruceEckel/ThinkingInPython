@@ -92,11 +92,10 @@ Chapters/42_Functional--Error_Handling.md	the first call	`add_note()` appends ea
 Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdraw(30)` evaluates to `70`, so substituting `70` for it ought to leave the result at `110`.
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
-Chapters/45_Effects--Generators.md	The first call	The first call, which runs the body to its first `yield`, *primes* the generator.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes `interview()`'s body, which encounters `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	The next `next()`	The next `next()` links that frame back into the call stack.
 Chapters/45_Effects--Generators.md	the `for` loop	A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`, and reaches the `for` loop at the bottom of the listing.
-Chapters/45_Effects--Generators.md	the first `yield`	Code before the first `yield` is the state's entry action, the Moore shape.
+Chapters/45_Effects--Generators.md	the first `yield`	Code before the first `yield` is the state's entry action, the Moore shape, where the action belongs to the state.
 Chapters/45_Effects--Generators.md	the innermost `yield`	Every transition nests one generator deeper, each `next()` passes through every level on its way to the innermost `yield`, and after about a thousand transitions the chain is deeper than Python's recursion limit.
 Chapters/45_Effects--Generators.md	the innermost `yield`	The driver reports the card's failure with `throw()`, which raises `Failed` at the innermost `yield`, in the card step.
 Chapters/45_Effects--Generators.md	the next call	The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function) alive and resumes it on the next call.

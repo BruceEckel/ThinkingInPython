@@ -144,6 +144,13 @@ A `for` loop treats `StopIteration` as a normal end-of-loop so it discards the e
 To read the `ReturnType`, catch the exception yourself,
 as `drive_by_hand.py` does.
 
+![Each channel carries one type, in one direction.](_images/generator_channels)
+
+The three arrows are the annotation's three positions: `YieldType` on the first,
+`SendType` on the second, `ReturnType` on the third.
+A `Question` or a `Result` leaves the generator by its own route,
+and the driver tells them apart by how each arrives.
+
 When the body finishes with `return`,
 Python raises `StopIteration` on the generator's behalf.
 If a `StopIteration` propagates out of the body instead,
@@ -152,6 +159,8 @@ Python converts it into a `RuntimeError`
 As [Asking Consumes an Item](22_Patterns--Iterators.md#asking-consumes-an-item)
 shows, calling `next()` on an exhausted iterator raises `StopIteration`,
 so a `next()` call inside the body can trigger that conversion.
+
+## What a Suspended Generator Holds
 
 A suspended generator preserves two things:
 its position in the body and every local variable.
@@ -229,19 +238,6 @@ A `Coroutine[YieldType, SendType, ReturnType]` has the same three-part shape as 
 The shapes match because `async def` and generator functions both return an object that holds a body for a driver to run.
 Calling `interview()` returns that object.
 `next()` and `send()` run the body, one `yield` at a time.
-
-For managing Effects,
-a generator is more useful than a coroutine because you write the driver.
-A coroutine's requests go to an event loop,
-whether `asyncio`'s loop or one you write yourself.
-Each request must be an awaitable object built for that loop.
-A generator's requests go to whatever code calls `next()` and `send()`,
-and a request can be any value.
-The generator yields a request out, and the driver sends the answer back in.
-The driver chooses each answer,
-so the same generator runs unchanged under different drivers.
-That separation of a request from its fulfillment is the core of an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
-(EMS).
 
 A driver function runs the generator from start to finish.
 It starts the body with `next()`, sends each answer back with `send()`,
@@ -366,6 +362,19 @@ because `inspect.getgeneratorstate()` takes a `Generator` and the type checker r
 Every answer `interview()` receives comes from its driver.
 Swapping `drive()`'s dictionary for a database, or for `input()`,
 changes `drive()` and leaves `interview()` as it is.
+
+For managing Effects,
+a generator is more useful than a coroutine because you write the driver.
+A coroutine's requests go to an event loop,
+whether `asyncio`'s loop or one you write yourself.
+Each request must be an awaitable object built for that loop.
+A generator's requests go to whatever code calls `next()` and `send()`,
+and a request can be any value.
+The generator yields a request out, and the driver sends the answer back in.
+The driver chooses each answer,
+so the same generator runs unchanged under different drivers.
+That separation of a request from its fulfillment is the core of an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
+(EMS).
 
 `interview()` and `drive()` form an EMS in miniature.
 The generator declares requests.
@@ -779,6 +788,13 @@ print(drive(survey(),
 Here `interview()`'s `Result` arrives as the value of `yield from interview()` instead of as `stop.value` in the driver.
 `interview()`'s questions reach `drive()` through three generators rather than two.
 
+![Requests reach the one driver; results stop one level up.](_images/yield_from_relay)
+
+Each `yield from` passes the `Question` up and the `Answer` down unchanged,
+so the trace repeats the three request lines of `yield_from_delegates.py` before the new one.
+The `Result` goes one level up and stops,
+as the value of `survey()`'s `yield from`.
+
 The outermost generator still needs code that calls `next()` and `send()`,
 so the listing ends with a `drive()` call.
 However deeply the delegations nest, the program has one driver.
@@ -797,6 +813,8 @@ but they hand that value to different places.
 `drive()` returns the `Result` to its caller, ending the conversation.
 `yield from` hands the `Result` to the enclosing generator,
 which continues the conversation.
+
+### A Generator in the Middle
 
 A `yield from` target is an ordinary value: it can arrive as a parameter,
 sit in a list, or be built at the point of delegation.
@@ -1073,230 +1091,6 @@ the `close()` call comes from Python's cleanup rather than from your code,
 so Python prints the `RuntimeError` as an "Exception ignored" message and continues.
 A generator written for others to drive must therefore let `GeneratorExit` end it.
 
-## The Driver You Already Use
-
-This chapter rests on three ideas:
-
-- Calling a generator function returns a generator object that holds the body and its state.
-  A driver runs that body one `yield` at a time with `next()` and `send()`.
-- `yield` carries a request out of the body and `send()` carries the answer back in,
-  so the body can ask for something and receive the answer.
-- `yield from` composes those conversations.
-  Each generator in the chain yields to whatever code resumed it,
-  so one chain serves every driver.
-
-The first two ideas are enough to build a task runner.
-A queue holds the live generators.
-The runner gives each one a turn:
-
-```python
-# task_runner.py
-from collections import deque
-from collections.abc import Iterator
-
-def download() -> Iterator[str]:
-    for part in ("headers", "body", "checksum"):
-        yield f"download: {part}"
-
-def index() -> Iterator[str]:
-    yield "index: build"
-    yield "index: merge"
-
-def task_runner(jobs: deque[Iterator[str]]) -> None:
-    while jobs:
-        job = jobs.popleft()  # [1]
-        try:
-            print(next(job))
-        except StopIteration:
-            continue  # [2]
-        jobs.append(job)  # [3]
-
-task_runner(deque([download(), index()]))
-#: download: headers
-#: index: build
-#: download: body
-#: index: merge
-#: download: checksum
-```
-
-`deque([download(), index()])` holds the two generator objects produced by calling `download()` and `index()`.
-`[1]` takes the job at the front of the queue,
-and `next()` runs it to its next `yield`.
-`[3]` puts that job at the back of the queue, behind the other job,
-so the two jobs alternate.
-A finished job raises `StopIteration` at its `next()`,
-and the `continue` at `[2]` skips `[3]`, so the finished job leaves the queue.
-The loop ends when the queue is empty.
-
-We can modify `task_runner()` to allow jobs to make requests:
-
-```python
-# task_runner_send.py
-from collections import deque
-from collections.abc import Generator, Iterable
-from typing import Final
-
-type Request = str
-type Reply = str
-type Job = Generator[Request, Reply]
-
-REPLIES: Final[dict[Request, Reply]] = {
-    "download: headers?": "200 OK, 512 bytes",
-}
-
-def answer(request: Request) -> Reply:
-    return REPLIES.get(request, "ok")
-
-def download() -> Job:
-    reply: Reply = yield "download: headers?"
-    print(f"download: {reply}")
-    yield "download: checksum"
-
-def index() -> Job:
-    yield "index: build"
-    yield "index: merge"
-
-def task_runner(jobs: Iterable[Job]) -> None:
-    ready: deque[tuple[Job, Request]] = deque()
-    for job in jobs:
-        try:
-            ready.append((job, next(job)))
-        except StopIteration:
-            pass
-    while ready:
-        job, request = ready.popleft()
-        print(request)
-        try:
-            request = job.send(answer(request))
-        except StopIteration:
-            continue
-        ready.append((job, request))
-
-task_runner([download(), index()])
-#: download: headers?
-#: download: 200 OK, 512 bytes
-#: index: build
-#: download: checksum
-#: index: merge
-```
-
-The `for` loop primes each `job` and pairs it with its first request.
-The `except` drops a job that finishes before its first `yield`,
-and keeps that `StopIteration` out of the runner's own flow.
-When a `job` finishes, its `send()` raises `StopIteration`.
-The `continue` then skips the `append`, so that `job` leaves `ready`.
-
-`index()` discards what it receives; it yields only to take turns.
-
-`asyncio.run()` starts an event loop,
-a driver like the one in `task_runner_send.py`.
-[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-describes `await` as suspending a task until the event loop resumes it.
-The event loop gives each task a turn and answers the request each task yields.
-Like a generator, a coroutine object offers `send()`, `throw()`, and `close()`.
-`await` suspends the coroutine and yields a request, a `Future`,
-to the task that drives it.
-When the `Future` has a result, the loop resumes the coroutine,
-and the `await` expression evaluates to that result.
-
-That event loop is the single driver at the edge of the program.
-Each request passes through every awaiting caller on its way to that loop,
-so an `await` in a function makes every caller `async` in turn.
-
-An `async def` function can also contain `yield`.
-The result is an *asynchronous generator*, which has two drivers at once.
-Each `await` sends a request up to the event loop,
-while each `yield` hands a value to the `async for` loop that consumes it:
-
-```python
-# async_generator.py
-import asyncio
-from collections.abc import AsyncGenerator
-
-async def countdown(n: int) -> AsyncGenerator[int]:
-    while n > 0:
-        await asyncio.sleep(0)
-        yield n
-        n -= 1
-
-async def main() -> None:
-    async for n in countdown(5):
-        print(f"{n = }")
-    print([n * n async for n in countdown(5)])
-
-asyncio.run(main())
-#: n = 5
-#: n = 4
-#: n = 3
-#: n = 2
-#: n = 1
-#: [25, 16, 9, 4, 1]
-```
-
-`asyncio.sleep(0)` models a wait for real I/O.
-
-`async for` is an `await` in loop form:
-on each pass it awaits the generator's `__anext__()`.
-Like any `await`, it belongs inside an `async def`,
-which is why the listing's two loops sit in `main()`.
-The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls.
-
-A class can supply that `__anext__()` directly,
-the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
-supplies `__next__()`:
-
-```python
-# async_iterator_class.py
-import asyncio
-from collections.abc import AsyncIterator
-from dataclasses import dataclass
-from typing import override
-
-@dataclass
-class Countdown(AsyncIterator[int]):
-    n: int
-
-    @override
-    async def __anext__(self) -> int:
-        if self.n == 0:
-            raise StopAsyncIteration
-        await asyncio.sleep(0)
-        value = self.n
-        self.n -= 1
-        return value
-
-async def main() -> None:
-    it = Countdown(3)
-    print(await it.__anext__())
-    print(await it.__anext__())
-    async for n in it:
-        print(f"{n = }")
-
-asyncio.run(main())
-#: 3
-#: 2
-#: n = 1
-```
-
-`AsyncIterator` supplies an `__aiter__()` that returns `self`,
-so the class writes `__anext__()` alone.
-`__anext__()` is a coroutine function,
-which is why `async for` must await what it returns.
-`main()` makes the first two calls itself, and the `async for` makes the rest,
-ending when `__anext__()` raises `StopAsyncIteration`,
-the asynchronous counterpart of `StopIteration`.
-The asynchronous generator `countdown()` writes the same loop as a body with `yield` and leaves the two methods to Python.
-
-An asynchronous generator drops the return channel,
-so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
-Writing `return` with a value in one is a `SyntaxError`, as is `yield from`.
-The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
-Each of the three returns an awaitable for the caller to `await`.
-
-[Stateless](46_Effects--Stateless.md)
-builds on all three of this chapter's ideas.
-It describes a function by what it requests and writes those requests into its return type.
-
 ## One Generator per State
 
 [State Machines](31_Patterns--State_Machines.md)
@@ -1431,7 +1225,9 @@ print(trap.send(Mouse.ESCAPES))
 #: Waiting
 ```
 
-The engine is the loop at `[1]`.
+`trampoline()` is the engine, the loop at `[1]`.
+PEP 342 calls such a driver a *trampoline*: each state returns to the loop,
+which bounces into the next state.
 `yield from` runs the current state,
 relaying each of its `yield`s up to `run_all()` and each `send()` back down,
 and when the state returns,
@@ -1455,8 +1251,10 @@ so `send()` returns `"Waiting"` and the entry message prints once.
 [Which Design Should You Use?](31_Patterns--State_Machines.md#which-design-should-you-use)
 asks whether an action belongs to the state or to the transition.
 Here the question has two places to put code rather than two designs.
-Code before the first `yield` is the state's entry action, the Moore shape.
-Code before a `return` runs on that transition alone, the Mealy shape:
+Code before the first `yield` is the state's entry action, the Moore shape,
+where the action belongs to the state.
+Code before a `return` runs on that transition alone, the Mealy shape,
+where the action belongs to the transition:
 a `print("Door latched")` above `return holding()` in `trapping()` would run when the mouse is trapped and at no other time.
 Both fit one function with no `action` field.
 
@@ -1465,6 +1263,7 @@ A state's local variables are its data.
 A generator state keeps such a value in a local and passes it to the next state as an argument,
 `return selecting(amount)`,
 so each state receives the data it needs and the machine object disappears.
+
 Exercise 8 writes the vending machine as one generator,
 with each state a loop inside a single body,
 which suits a machine that is mostly a sequence.
@@ -1472,15 +1271,15 @@ One generator per state suits a machine like the trap,
 whose transitions form a graph.
 
 Chapter 31's `Enum` makes the states a closed set.
-Here the set is open: any function that returns a `Machine` is a state,
-so a test reaches a state by driving the machine to it,
-where `test_trap_states.py` iterates over `TrapState` and checks every state against every move.
-A machine designed as a diagram still belongs in chapter 31's table.
-A suspended frame also resists copying:
-`copy.deepcopy()` and `pickle` both refuse a generator object.
-A [*Memento*](36_Patterns--Memento.md#the-classic-memento)
-therefore belongs to the enum designs,
-which keep the state in a value a record can hold.
+Here the set is open: any function that returns a `Machine` is a state.
+`test_trap_states.py` iterates over `TrapState` and checks every state against every move;
+a test of the generator design reaches a state by driving the machine to it.
+A machine whose states a test must enumerate belongs in chapter 31's table.
+
+The generator design has a second limit.
+`copy.deepcopy()` and `pickle` both refuse a suspended generator,
+so a [*Memento*](36_Patterns--Memento.md#the-classic-memento)
+belongs to the enum designs, which keep the state in a value a record can hold.
 
 One shape looks like a transition and is a delegation:
 
@@ -1516,11 +1315,232 @@ and after about a thousand transitions the chain is deeper than Python's recursi
 The trampoline keeps the chain one level deep.
 `yield from state` finishes when the state returns,
 and the loop takes up the next state at the same depth.
-PEP 342 calls such a driver a trampoline,
-and [The Restriction Behind the Driver](#the-restriction-behind-the-driver)
-says why one exists.
+[The Restriction Behind the Driver](#the-restriction-behind-the-driver)
+says why a driver exists.
 Exercise 9 meets the same `return (yield from inner)` in `proxy()`,
 where it relays every request instead of answering one.
+
+## Many Generators, One Driver
+
+This chapter rests on three ideas:
+
+- Calling a generator function returns a generator object that holds the body and its state.
+  A driver runs that body one `yield` at a time with `next()` and `send()`.
+- `yield` carries a request out of the body and `send()` carries the answer back in,
+  so the body can ask for something and receive the answer.
+- `yield from` composes those conversations.
+  Each generator in the chain yields to whatever code resumed it,
+  so one chain serves every driver.
+
+The first two ideas are enough to build a task runner.
+A queue holds the live generators.
+The runner gives each one a turn:
+
+```python
+# task_runner.py
+from collections import deque
+from collections.abc import Iterator
+
+def download() -> Iterator[str]:
+    for part in ("headers", "body", "checksum"):
+        yield f"download: {part}"
+
+def index() -> Iterator[str]:
+    yield "index: build"
+    yield "index: merge"
+
+def task_runner(jobs: deque[Iterator[str]]) -> None:
+    while jobs:
+        job = jobs.popleft()  # [1]
+        try:
+            print(next(job))
+        except StopIteration:
+            continue  # [2]
+        jobs.append(job)  # [3]
+
+task_runner(deque([download(), index()]))
+#: download: headers
+#: index: build
+#: download: body
+#: index: merge
+#: download: checksum
+```
+
+`deque([download(), index()])` holds the two generator objects produced by calling `download()` and `index()`.
+`[1]` takes the job at the front of the queue,
+and `next()` runs it to its next `yield`.
+`[3]` puts that job at the back of the queue, behind the other job,
+so the two jobs alternate.
+A finished job raises `StopIteration` at its `next()`,
+and the `continue` at `[2]` skips `[3]`, so the finished job leaves the queue.
+The loop ends when the queue is empty.
+
+We can modify `task_runner()` to allow jobs to make requests:
+
+```python
+# task_runner_send.py
+from collections import deque
+from collections.abc import Generator, Iterable
+from typing import Final
+
+type Request = str
+type Reply = str
+type Job = Generator[Request, Reply]
+
+REPLIES: Final[dict[Request, Reply]] = {
+    "download: headers?": "200 OK, 512 bytes",
+}
+
+def answer(request: Request) -> Reply:
+    return REPLIES.get(request, "ok")
+
+def download() -> Job:
+    reply: Reply = yield "download: headers?"
+    print(f"download: {reply}")
+    yield "download: checksum"
+
+def index() -> Job:
+    yield "index: build"
+    yield "index: merge"
+
+def task_runner(jobs: Iterable[Job]) -> None:
+    ready: deque[tuple[Job, Request]] = deque()
+    for job in jobs:
+        try:
+            ready.append((job, next(job)))
+        except StopIteration:
+            pass
+    while ready:
+        job, request = ready.popleft()
+        print(request)
+        try:
+            request = job.send(answer(request))
+        except StopIteration:
+            continue
+        ready.append((job, request))
+
+task_runner([download(), index()])
+#: download: headers?
+#: download: 200 OK, 512 bytes
+#: index: build
+#: download: checksum
+#: index: merge
+```
+
+The `for` loop primes each `job` and pairs it with its first request.
+The `except` drops a job that finishes before its first `yield`,
+and keeps that `StopIteration` out of the runner's own flow.
+When a `job` finishes, its `send()` raises `StopIteration`.
+The `continue` then skips the `append`, so that `job` leaves `ready`.
+
+`index()` discards what it receives; it yields only to take turns.
+
+## The Driver You Already Use
+
+`asyncio.run()` starts an event loop,
+a driver like the one in `task_runner_send.py`.
+[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
+describes `await` as suspending a task until the event loop resumes it.
+The event loop gives each task a turn and answers the request each task yields.
+Like a generator, a coroutine object offers `send()`, `throw()`, and `close()`.
+`await` suspends the coroutine and yields a request, a `Future`,
+to the task that drives it.
+When the `Future` has a result, the loop resumes the coroutine,
+and the `await` expression evaluates to that result.
+
+That event loop is the single driver at the edge of the program.
+Each request passes through every awaiting caller on its way to that loop,
+so an `await` in a function makes every caller `async` in turn.
+
+An `async def` function can also contain `yield`.
+The result is an *asynchronous generator*, which has two drivers at once.
+Each `await` sends a request up to the event loop,
+while each `yield` hands a value to the `async for` loop that consumes it:
+
+```python
+# async_generator.py
+import asyncio
+from collections.abc import AsyncGenerator
+
+async def countdown(n: int) -> AsyncGenerator[int]:
+    while n > 0:
+        await asyncio.sleep(0)
+        yield n
+        n -= 1
+
+async def main() -> None:
+    async for n in countdown(5):
+        print(f"{n = }")
+    print([n * n async for n in countdown(5)])
+
+asyncio.run(main())
+#: n = 5
+#: n = 4
+#: n = 3
+#: n = 2
+#: n = 1
+#: [25, 16, 9, 4, 1]
+```
+
+`asyncio.sleep(0)` models a wait for real I/O.
+
+`async for` is an `await` in loop form:
+on each pass it awaits the generator's `__anext__()`.
+Like any `await`, it belongs inside an `async def`,
+which is why the listing's two loops sit in `main()`.
+The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls.
+
+A class can supply that `__anext__()` directly,
+the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
+supplies `__next__()`:
+
+```python
+# async_iterator_class.py
+import asyncio
+from collections.abc import AsyncIterator
+from dataclasses import dataclass
+from typing import override
+
+@dataclass
+class Countdown(AsyncIterator[int]):
+    n: int
+
+    @override
+    async def __anext__(self) -> int:
+        if self.n == 0:
+            raise StopAsyncIteration
+        await asyncio.sleep(0)
+        value = self.n
+        self.n -= 1
+        return value
+
+async def main() -> None:
+    it = Countdown(3)
+    print(await it.__anext__())
+    print(await it.__anext__())
+    async for n in it:
+        print(f"{n = }")
+
+asyncio.run(main())
+#: 3
+#: 2
+#: n = 1
+```
+
+`AsyncIterator` supplies an `__aiter__()` that returns `self`,
+so the class writes `__anext__()` alone.
+`__anext__()` is a coroutine function,
+which is why `async for` must await what it returns.
+`main()` makes the first two calls itself, and the `async for` makes the rest,
+ending when `__anext__()` raises `StopAsyncIteration`,
+the asynchronous counterpart of `StopIteration`.
+The asynchronous generator `countdown()` writes the same loop as a body with `yield` and leaves the two methods to Python.
+
+An asynchronous generator drops the return channel,
+so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
+Writing `return` with a value in one is a `SyntaxError`, as is `yield from`.
+The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
+Each of the three returns an awaitable for the caller to `await`.
 
 ## Half a Coroutine by Design
 
@@ -1584,16 +1604,13 @@ The second way is for `fibonacci()` to return a list containing every computed v
 
 ```python
 # fibonacci_list.py
-from collections.abc import Iterator
-from itertools import accumulate, islice, repeat
-
 def fibonacci(n: int) -> list[int]:
-    pairs: Iterator[tuple[int, int]] = accumulate(
-        repeat(None),
-        lambda pair, _: (pair[1], pair[0] + pair[1]),
-        initial=(0, 1),
-    )
-    return [a for a, _ in islice(pairs, n)]
+    values: list[int] = []
+    a, b = 0, 1
+    for _ in range(n):
+        values.append(a)
+        a, b = b, a + b
+    return values
 
 total = 0
 for value in fibonacci(7):
@@ -1608,21 +1625,10 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
+This `fibonacci()` is the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators)
+with `values.append(a)` in place of `yield a`.
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
-
-This is a functional version of the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators).
-[`accumulate()`](41_Functional--Toolkits.md#accumulate)
-is a `reduce()` that keeps every intermediate result,
-a fold that consumes an input.
-Here the input is [`repeat(None)`](41_Functional--Toolkits.md#repeat),
-an endless supply of placeholders that counts the steps,
-so [`islice()`](41_Functional--Toolkits.md#islice)
-cuts the chain of pairs at `n`.
-The placeholder is the sign that a fold is the wrong operation here,
-since a sequence built from a start value and a step needs the opposite operation,
-an *unfold*.
-A generator is the direct way to write an unfold.
 
 The third way, older than PEP 255's generators,
 is an iterator class with a `__next__()` that returns one value per call:
@@ -1715,7 +1721,7 @@ Each `yield` hands control back to whoever called `next()` or `send()`.
 Handing control anywhere else would mean carrying the C stack as well,
 which is why the PEP calls Stackless Python, whose coroutines do that,
 "a controversial rethinking of the Python core."
-The suspended generator is the one-shot continuation that [Annotating a Generator](#annotating-a-generator)
+The suspended generator is the one-shot continuation that [What a Suspended Generator Holds](#what-a-suspended-generator-holds)
 describes, and the restriction says who resumes it:
 the code that called `next()` or `send()`.
 That restriction is why a driver exists.
@@ -1741,6 +1747,10 @@ An Effect system builds on a generator rather than a full coroutine,
 for the reason the 2001 design chose the half it did.
 A generator hands each request to the code that resumed it.
 That code is the driver you write.
+
+[Stateless](46_Effects--Stateless.md)
+builds on all three of this chapter's ideas.
+It describes a function by what it requests and writes those requests into its return type.
 
 ## Exercises
 

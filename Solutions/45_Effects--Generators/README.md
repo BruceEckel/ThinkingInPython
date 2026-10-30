@@ -530,7 +530,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
+[A Generator in the Middle](../../Chapters/45_Effects--Generators.md#a-generator-in-the-middle)
 shows `sequence()` collecting each step's return value into a `list[str]` and joining the list.
 A type parameter in the `ReturnType` position lets each step return a type of its own,
 and `yield from` evaluates to that type.

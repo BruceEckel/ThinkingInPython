@@ -731,7 +731,7 @@ Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
 Chapters/45_Effects--Generators.md	[BOUND] CODE takes the generator alone
-Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape
+Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape, where the action belongs to the transition
 Chapters/45_Effects--Generators.md	[BOUND] Each CODE wraps one call that resumes the generator, CODE or CODE, because a CODE from either means the conversation finished
 Chapters/45_Effects--Generators.md	[BOUND] Here the question has two places to put code rather than two designs
 Chapters/45_Effects--Generators.md	[BOUND] In a single thread, Python had three ways to write such a producer

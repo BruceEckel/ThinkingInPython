@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>A Question yielded by ask() climbs through interview() and survey() to drive(), the Answer comes back down the same path, and interview()'s Result stops in survey()</title>
+  <defs>
+    <marker id="ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ink_open" viewBox="0 0 18 12" refX="17" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L17,6 L1.5,10.5" fill="none" stroke="#1a1612" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="200" y="20" width="200" height="56" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="300" y="44" font-size="15" fill="#1a1612" font-weight="bold" text-anchor="middle">drive()</text>
+  <text x="300" y="64" font-size="11" fill="#7a6e62" text-anchor="middle">the one driver</text>
+  <rect x="200" y="106" width="200" height="56" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="300" y="130" font-size="15" fill="#1a1612" font-weight="bold" text-anchor="middle">survey()</text>
+  <text x="300" y="150" font-size="11" fill="#7a6e62" text-anchor="middle">yield from interview()</text>
+  <rect x="200" y="192" width="200" height="56" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="300" y="216" font-size="15" fill="#1a1612" font-weight="bold" text-anchor="middle">interview()</text>
+  <text x="300" y="236" font-size="11" fill="#7a6e62" text-anchor="middle">yield from ask(...)</text>
+  <rect x="200" y="278" width="200" height="56" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="300" y="302" font-size="15" fill="#1a1612" font-weight="bold" text-anchor="middle">ask()</text>
+  <text x="300" y="322" font-size="11" fill="#7a6e62" text-anchor="middle">yield Question("name")</text>
+  <line x1="300" y1="76" x2="300" y2="106" stroke="#c8bfb0" stroke-width="1.3"/>
+  <text x="308" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">next() / send()</text>
+  <line x1="300" y1="162" x2="300" y2="192" stroke="#c8bfb0" stroke-width="1.3"/>
+  <text x="308" y="182" font-size="10.5" fill="#7a6e62" text-anchor="start">yield from</text>
+  <line x1="300" y1="248" x2="300" y2="278" stroke="#c8bfb0" stroke-width="1.3"/>
+  <text x="308" y="268" font-size="10.5" fill="#7a6e62" text-anchor="start">yield from</text>
+  <path d="M200,306 L130,306 L130,48 L183.6,48" fill="none" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ink)"/>
+  <text x="118" y="154" font-size="12" fill="#1a1612" text-anchor="end">Question</text>
+  <text x="118" y="170" font-size="10.5" fill="#7a6e62" text-anchor="end">climbs every level</text>
+  <path d="M400,234 L440,234 L440,148 L404,148" fill="none" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ink_open)"/>
+  <text x="450" y="172" font-size="12" fill="#1a1612" text-anchor="start">Result</text>
+  <text x="450" y="188" font-size="10.5" fill="#7a6e62" text-anchor="start">stops one level up</text>
+  <path d="M400,48 L590,48 L590,306 L416.4,306" fill="none" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ink)"/>
+  <text x="602" y="154" font-size="12" fill="#1a1612" text-anchor="start">Answer</text>
+  <text x="602" y="170" font-size="10.5" fill="#7a6e62" text-anchor="start">comes back down</text>
+</svg>
