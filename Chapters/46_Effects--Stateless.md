@@ -112,9 +112,9 @@ whatever the return annotation says and whatever object the body returns.
 `double()` calls `success()` and returns the Effect that `success()` builds,
 the way an ordinary function returns a list.
 The annotation describes that returned object rather than how the body reads.
-The Effect implements the generator protocol,
-and `run()` drives any object that implements that protocol.
 
+The Effect that `double()` returns implements the generator protocol,
+and `run()` drives any object that implements that protocol.
 `success()` returns a `SuccessEffect`,
 a small class that implements that protocol with its own `send()` and `throw()` methods.
 Its `send()` raises `StopIteration` carrying the value,
@@ -1118,14 +1118,15 @@ greet("Alice")  # [2]
 #: Hello, Alice!
 ```
 
-The type is the registration key,
-so `register(Console, Recorder())` binds an implementation to the type the caller requests.
+The type is the registration key.
 A dictionary matches the key exactly,
 so `get(Console)` never returns a subclass registered under its own name.
 `supply()` takes bare instances and matches a request with `isinstance()`,
 so two instances that satisfy one `Need` are [ambiguous](#when-two-implementations-match).
 
-The DI registration key also sets the type an instance answers for,
+Besides matching lookups,
+the DI registration key sets the type for which an instance answers.
+`register(Console, Recorder())` binds an implementation to the type the caller requests,
 as `as_type(Console)` does for `supply()`.
 `supply()` [reads each Ability from its argument's static type](#supplying-an-interface),
 so `supply(recorder)` is a `Handler[Need[Recorder]]`,
@@ -1839,10 +1840,10 @@ and the channel reads `Never` once a handler answers the last Ability.
 `catch()` removes an error and moves it into the result,
 where a `match` must account for it.
 An Effect with both channels emptied is a `Success`.
-`run()` accepts more than that.
+
+`run()` accepts more than a `Success`.
 Its parameter is `Effect[Async, Exception, R]`,
 so an `Async` request or a declared failure can still remain in its type when you call it.
-
 The channels resolve differently:
 
 - `unsupplied.py` shows the type checker rejecting a `run()` call whose Effect still declares an Ability,
