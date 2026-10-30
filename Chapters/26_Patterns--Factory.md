@@ -186,6 +186,7 @@ The concrete shapes carry a leading underscore because callers get them through 
 and `_Circle` stays a name inside the module.
 `shape_name()` strips the underscore,
 so the name a caller passes to `factory()` is `"Circle"`, not `_Circle`.
+
 The underscore discourages direct construction,
 but it is a convention rather than concealment.
 [*Singleton*](23_Patterns--Singleton.md#nothing-keeps-the-class-private)
@@ -216,6 +217,7 @@ The usual alternative constructor is a `@classmethod` like `from_fahrenheit()`,
 which computes the constructor's arguments and ends with `return cls(...)`.
 That form is the most common factory.
 The standard library's `dict.fromkeys()` and `datetime.fromisoformat()` are two examples.
+
 The `@classmethod` form chooses arguments rather than a class.
 `cls` is whichever class receives the call,
 so a subclass that calls the inherited method gets an instance of the subclass.
@@ -334,8 +336,8 @@ The two `class` statements fill `Shape.registry` on their own.
 `__init_subclass__()` runs for each class that inherits from `Shape`,
 so a class that satisfies a Protocol by structure alone stays out of the registry.
 Inheritance is the mechanism.
-`ABC` adds one guard on top of that.
 
+`ABC` adds one guard on top of inheritance.
 A subclass registers as its `class` statement executes,
 so a subclass that lacks `draw()` still registers.
 The guard acts when `make()` constructs that class.
@@ -354,9 +356,11 @@ Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
 uses this same self-registration.
+
 `Shape.__subclasses__()` can build the registry,
-but it stops at direct subclasses,
-while `__init_subclass__()` runs for every class anywhere below `Shape`.
+but it stops at direct subclasses.
+`__init_subclass__()` runs for every class anywhere below `Shape`,
+so a class that inherits from `Circle` registers as well.
 
 Importing `registry` runs its two `class` statements.
 The key list shows the names they registered:
