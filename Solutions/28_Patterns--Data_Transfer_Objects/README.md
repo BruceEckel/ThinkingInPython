@@ -638,6 +638,8 @@ print(p[:1], (1.0, 1.0) + p)
 `tuple.__add__()` concatenates and returns a `tuple`,
 so the override replaces it with a sum of the coordinates and constructs the result with `type(self)(...)`.
 Using `type(self)` rather than `Point` means a subclass of `Point` gets an instance of its own class back.
+
+**Annotate `other` as any tuple.**
 The parameter carries `tuple[float, ...]` rather than `tuple[float, float]` because an override must accept everything the base method accepts.
 `tuple.__add__()` takes a tuple of any length,
 so `ty` reports `invalid-method-override` for the two-element annotation,
@@ -657,6 +659,7 @@ A tuple on the left of `+` is another gap:
 which concatenates to a four-element tuple.
 Python calls `__radd__()` on the right operand first when that operand's class is a subclass of the left operand's class,
 but `Point` defines no `__radd__()`.
+
 Each tuple operation a `Point` must survive is one more override.
 So a `NamedTuple` is a better choice when positional tuple behavior is a feature,
 and a record is a better choice when that behavior is a liability.
