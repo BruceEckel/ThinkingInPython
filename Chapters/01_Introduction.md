@@ -124,6 +124,7 @@ control flow, functions, modules, classes, static typing, class attributes,
 and object cleanup.
 This part is for programmers coming to Python from another language.
 If you know Python, you can skim for topics new to you, or skip it altogether.
+
 If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md).
 Every chapter after Static Types annotates its examples,
 so Static Types is the chapter in Part I that every later chapter assumes you have read.
@@ -277,6 +278,7 @@ an attribute, or a keyword argument.
 Each chapter's Exercises section links to that chapter's solutions.
 On the website they are a page beside the chapter.
 The EPUB and PDF link to the `Solutions/` directory of the source repository.
+
 Each solution opens in steps, so you can take as little help as you need:
 a hint first, then a check that tells you when your attempt is finished,
 then the full answer.
