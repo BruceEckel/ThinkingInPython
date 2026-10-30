@@ -688,7 +688,8 @@ So `async` is an Effect-tracking system rather than a full EMS,
 in the same sense as most of the AI languages in [Custom AI Languages with Effects](../../Chapters/44_Effects--Effect_Management.md#custom-ai-languages-with-effects).
 It tracks one Effect, chosen by the language,
 with the implementation set at the call site.
-Setting the implementation there also explains why the propagation feels like a nuisance rather than a benefit.
+
+Binding the implementation at the call site explains why the propagation of `async` feels like a nuisance rather than a benefit.
 You do the bookkeeping of Effect tracking,
 an `await` and an `async def` in every caller,
 without the delayed binding that makes that bookkeeping useful.
