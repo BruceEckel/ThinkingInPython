@@ -598,6 +598,7 @@ print(caught[0].message)
 `to_string()` keeps working,
 so existing callers get a warning in place of the `AttributeError` that deleting the method would raise.
 The mark works in two halves.
+
 The static half is a `ty` diagnostic on the deprecated call,
 which the caller sees before running anything.
 The `# type: ignore` silences that diagnostic here,
@@ -626,6 +627,7 @@ That message should say what to use instead.
 
 The decorator also applies to a class,
 where it warns on construction and on subclassing.
+
 Applied to a single `@overload`,
 the mark deprecates one call signature while the rest stay current.
 When a function now takes a `Path` in place of a string,
