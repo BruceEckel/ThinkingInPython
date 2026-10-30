@@ -47,6 +47,7 @@ except StopIteration:
 
 The `is` at `[1]` shows that calling `iter()` on a list creates a new iterator each time.
 The `is` at `[2]` shows that calling `iter()` on an iterator returns that iterator.
+
 The tempting call is `next(nums)`, and it fails.
 `next()` requires an iterator, and a list has no `__next__()`,
 so `next(nums)` raises a `TypeError` at runtime.
@@ -229,8 +230,11 @@ because the fields are the one place the position can live between calls.
 The generator keeps the loop.
 `yield a` suspends it with `a`, `b`, and the position in the `for` loop intact,
 and `next()` resumes it after the `yield`.
-`eq=False` keeps `object`'s identity comparison,
-for the reason [A Type-Checking Iterator](#a-type-checking-iterator) gives.
+
+The `@dataclass` decoration on `Fibonacci` carries `eq=False`,
+so the iterator keeps `object`'s identity comparison and its hash.
+[A Type-Checking Iterator](#a-type-checking-iterator)
+explains why an iterator needs both.
 
 Generators are lazy.
 `fibonacci(1_000_000)` starts computing when you iterate over it,
@@ -435,13 +439,14 @@ print(f"lockstep buffered far less: "
 
 Both branches see all five squares,
 so `tee()` delivers the second pass the generator cannot.
+`tee()` buffers every item the leading branch consumes until the trailing branch catches up.
+
 Each `with traced()` block measures the memory its body allocates,
 using the helper from [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine).
 `current` is what the block leaves allocated,
 and `peak` is the most it held at once.
-`tee()` buffers every item the leading branch consumes until the trailing branch catches up.
 When `first` drains while `second` waits,
-the buffer therefore holds the whole stream.
+the `tee()` buffer holds the whole stream.
 That buffer uses as much memory as a list,
 and the `buffered.current > listed.current * 0.9` comparison confirms it
 (one machine measured 4,096,384 bytes buffered against 4,000,672 for the list).
@@ -735,10 +740,10 @@ Use the class when the wrapper needs its own state or extra methods,
 such as `accepted` in `typed_iterator.py`, and use the generator otherwise.
 `typed_demo.py` reads `accepted` mid-stream,
 while a generator's local variables stay hidden from its caller.
-Either way, the wrapper works with every function that takes an iterator,
+
+Either wrapper works with every function that takes an iterator,
 because every such function calls `iter()` and `next()`,
 and both wrappers support those calls.
-
 The two wrappers' inputs differ, though.
 `typed()` takes an `Iterable[object]`, so a list is fine.
 `TypedIterator` calls `next()` on what it stores,
