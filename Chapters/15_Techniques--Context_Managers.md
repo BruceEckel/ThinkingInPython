@@ -69,6 +69,14 @@ if __name__ == "__main__":
 When the block finishes,
 `trace()` resumes just after the `yield` and prints `exit A`.
 
+`trace()` produces values alone,
+the shape that [Iterators](22_Patterns--Iterators.md#generators)
+annotates `Iterator[T]`.
+Every `@contextmanager` generator in this book is annotated `Generator` instead,
+because the decorator calls the generator's `throw()` method,
+a method of `Generator` and not of `Iterator`,
+and `ty` reports the `Iterator[str]` form as deprecated.
+
 The manager object `trace()` returns is single-use.
 Its generator runs once,
 so the `with manager:` at `[1]` raises an `AttributeError`.
