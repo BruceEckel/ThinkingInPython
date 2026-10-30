@@ -383,7 +383,10 @@ The two `composed()` functions succeed and fail on the same inputs.
 The exception version is shorter, but its signature says less.
 `-> int` states the success type alone,
 where `-> Result[int, str]` states the failure type as well.
-In the exception version, Python also deletes `e` when the `except` clause ends,
+
+In the exception version, the caller receives the error through `e`,
+the name the `except` clause binds.
+Python deletes `e` when that clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
 ## Composing With bind
@@ -392,10 +395,12 @@ whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 Look again at the two `bind()` methods in `result.py`.
 On an `Ok`, `bind()` passes the answer to the next function.
 On an `Err`, `bind()` skips the function and returns the `Err` unchanged.
-The two signatures differ because the next step takes an answer,
+
+The two `bind()` signatures differ because the next step takes an answer,
 whereas an `Err` holds an error.
 `Err.bind()` therefore accepts a callable with any parameter list,
 and its return type is `Err[E]`, because it returns `self`.
+
 An `Err` anywhere in a chain skips the rest of the steps,
 because each later `bind()` returns that same `Err`:
 
