@@ -477,11 +477,12 @@ print(built)
 #: [2, 4, 6]
 ```
 
-**Compute the products eagerly.**
 The lines print in the same order as in `genexp_timing.py`,
 because the generator expression there also calls `source()` on the line where it appears.
 `exercise_8.py` renames the second message to `list created`.
-The last line changes from `[10, 20, 30]` to `[2, 4, 6]`,
+
+**Compute the products eagerly.**
+The printed list changes from `[10, 20, 30]` to `[2, 4, 6]`,
 because a list comprehension does all its work on the line where it appears.
 The later `factor = 10` leaves `built` as it was,
 because `built` holds computed numbers rather than code that reads `factor`.
