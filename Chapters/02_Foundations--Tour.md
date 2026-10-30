@@ -57,10 +57,11 @@ Python makes them optional.
 
 The conditional clause ends with a colon.
 A group of indented statements follows: the "then" part of the `if` statement.
-The `print()` function sends its arguments to standard output,
-separated by spaces and followed by a newline.
 The statement at `[2]` starts at the left margin again,
 and that change in indentation ends the `if`.
+
+The `print()` function sends its arguments to standard output,
+separated by spaces and followed by a newline.
 
 An indented block groups statements inside the enclosing scope,
 so the `val` assigned at `[1]` stays visible after the `if`.
@@ -488,8 +489,8 @@ print("notes.txt".removesuffix(".txt"))
 String methods return new values and leave the original string intact.
 After three calls on `s`, `repr(s)` still shows its surrounding spaces,
 and the quotes that `repr()` adds make those spaces visible.
-An optional third argument to `replace()` limits how many occurrences it replaces.
 
+An optional third argument to `replace()` limits how many occurrences it replaces.
 `strip()` and its one-sided forms `lstrip()` and `rstrip()` take an optional argument,
 but that argument is a set of characters, not a prefix or suffix.
 `"test_setup".lstrip("test_")` removes every leading `t`, `e`, `s`, and `_`,
@@ -545,6 +546,7 @@ A comma or an underscore in the spec groups the digits by thousands,
 so `f"{1234567:,}"` produces `1,234,567`.
 Since Python 3.14, a separator after the precision groups the fractional digits as well,
 so `f"{3.14159265:.6_f}"` produces `3.141_593`.
+
 A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
 An `=` after the expression, as in `{name = }`, is the *debug specifier*.
