@@ -577,7 +577,7 @@ Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs
 Chapters/46_Effects--Stateless.md	mocks nothing: The test captures nothing from stdout and mocks nothing
 Chapters/46_Effects--Stateless.md	names each place: The type checker names each place that needs changing
-Chapters/46_Effects--Stateless.md	never: A test can then supply a clock that never waits
+Chapters/46_Effects--Stateless.md	never: A test then supplies a clock that never waits
 Chapters/46_Effects--Stateless.md	never: and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
 Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name

@@ -3064,6 +3064,28 @@ no "also"/"still"/"even"/"always", and no condition or option word in
 the sentence. The book has about 800 prose lines with "can"; the rule
 is a survey because the parse cannot tell a capability stated as a fact
 from a hedged event.
+- Book sweep 2026-10-30, the same day: 23 Opus agents read the 298
+  `[CAN]` hits (one to three chapters each, with their Solutions files)
+  and rewrote 21, keeping 277. The rewrites all had the chapter 20
+  shape, a generic or definite subject followed by the listing that
+  shows the event: "A test can check the model with no window" ->
+  "checks" (38, `test_robot.py` below it), "A decorator can capture
+  that pattern" -> "captures" (42, `@safe` follows), "a test can bind
+  to `Recorder`" -> "binds" (46, `test_greeter.py` follows), "`yield
+  from` can take over that job:" -> "takes over" (45, lead-in to
+  `yield_from_nested.py`), "so the listing can print `f.closed`" ->
+  "prints" (04). The keeps, by the agents' labels: a hazard or race
+  ("can fail", "can each run the constructor"), what a construct
+  permits in general ("a comprehension can use `:=`"), one option
+  among several ("A `__getattr__()` proxy can annotate it `Service`"),
+  a contrast with an inability ("can build the registry, but it stops
+  at direct subclasses"), a purpose clause ("so the listing can show
+  the runtime failure"), and an exercise or hint. The agents'
+  closest calls were sentences true of the listing but phrased as the
+  reason the design works ("Because the machine is deterministic, a
+  test can drive it"); they kept those, and Bruce's chapter reads
+  decide them (`build/can-2026-10-30/LEFTOVERS.md`). Yield 7%, so the
+  shape is rare in this book; the rule stays a survey for new drafts.
 
 **Home.** CLAUDE.md (global, the "can"/"could" bullet); this file.
 
