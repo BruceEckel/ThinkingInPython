@@ -257,6 +257,7 @@ A call to `spawn()` before then raises an `AttributeError`.
 The declaration gives the type checker the attribute's type,
 `asyncio.TaskGroup` rather than `asyncio.TaskGroup | None`,
 so `spawn()` skips the `None` check and calls `self.group.create_task()`.
+
 In a data class, a bare annotation adds a parameter to the generated `__init__()`,
 so `group` needs `field(init=False)`.
 The robot example later in this chapter also declares `Robot.room` to give the type checker its type.
@@ -479,12 +480,12 @@ The canvas shows the walls in gray, then each claimed cell turns green in turn,
 so you watch the pack move through the maze from the entry outward.
 The view records the order by subclassing `Blackboard` and overriding `claim()`,
 so `blackboard.py` stays as written.
+The harness skips `rats_view.py`, like every windowed view in this book.
 
 Each of this chapter's three views is a separate file holding all the display code,
 the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example).
 The subscription half of *Observer* is absent,
 because each view drives or replays its model itself.
-The harness skips `rats_view.py`, like every windowed view in this book.
 
 ```python
 # rats_and_mazes/rats_view.py
@@ -1423,6 +1424,9 @@ A grain moves roughly five orders of magnitude less per step at 20,000 steps tha
 The nodal lines keep thinning as long as `step()` keeps running,
 so in any one run the step count, not the plate, sets their width.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
+
+`standing_wave.py` holds the physics.
+`chladni.py` holds the rule that moves the grains.
 Exercise 7 asks you to tell the physics from the rule that models it.
 If you swap `amplitude()`'s formula for a membrane's formula,
 every figure changes while `chladni.py` and the view stay as they are.
