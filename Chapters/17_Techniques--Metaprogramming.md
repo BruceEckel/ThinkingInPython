@@ -376,11 +376,6 @@ not the module's namespace,
 and seeds it with `{"Command": Command}` so the generated class can find its base.
 `exec()` also adds a `__builtins__` entry, the dictionary of built-in names,
 to any globals mapping that lacks one, so `namespace` holds more than classes.
-The type checker skips the code inside the string,
-so `namespace` carries the annotation `dict[str, object]`,
-and `namespace[class_name]` is an `object`.
-Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
-`cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
 The `namespace` argument also lets `make_class()` read the generated class back as `namespace[class_name]`.
 Called inside a function with no namespace argument,
@@ -390,6 +385,12 @@ independent snapshot,
 so a later `locals()` call misses a class that `exec()` defines there.
 A stack frame's `f_locals` attribute returns a write-through proxy,
 the supported way for a debugger to change a function's variables.
+
+The type checker skips the code inside the string,
+so `namespace` carries the annotation `dict[str, object]`,
+and `namespace[class_name]` is an `object`.
+Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
+`cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
 `EventMakers` stores each class it builds.
 `make_class()` builds a fresh class on every call.
@@ -409,7 +410,8 @@ and `klass` splices `class_name` into source text as-is.
 A name can hold a newline followed by a second statement.
 Without validation, that statement breaks out of the `class` block and runs anything.
 An unescaped value in a hand-built SQL query breaks out the same way.
-The `KNOWN_COMMANDS` check prevents that injection.
+
+`make_class()` checks `class_name` against `KNOWN_COMMANDS` before it builds `klass`.
 Only three known names reach the template.
 `make()` in `events.py` is safe from injection,
 because `type(name, (Event,), ...)` treats `name` as a string value,
@@ -727,10 +729,10 @@ Python builds `B` normally.
 A class's own `__init_subclass__()` does not run for that class.
 At `B`'s creation, Python runs the version `B` inherits from `A`,
 which is `object`'s default and accepts every subclass.
-Use the runtime version in the rare case where the interpreter must refuse the subclass too.
 
 A decorator like `@final` is a *marker*.
 It sets an attribute and leaves enforcement to the type checker.
+Use the runtime version in the rare case where the interpreter must refuse the subclass too.
 
 The test file confirms that:
 
@@ -1556,7 +1558,8 @@ A class decorator receives the finished class, so it can add, replace,
 or inspect members.
 It runs after `type.__new__()` has used the name, the bases, and the namespace,
 so changing those means building a replacement class.
-A class decorator also cannot give the class object behavior of its own.
+
+A class decorator cannot give the class object behavior of its own.
 Setting `__call__` from a decorator makes instances callable.
 Only a metaclass makes the class callable in a new way.
 The case for a metaclass rests on that limit.
