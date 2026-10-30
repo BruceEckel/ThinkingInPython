@@ -1279,6 +1279,7 @@ In both cases each `yield from` relays the error value as is,
 through `announce()` and the `supply()` handler, to the driver.
 `run()` is the first code to act on the error,
 and it raises the error as an ordinary exception.
+
 Declaring a failure is not handling it.
 The declaration says the failure can occur.
 `catch()` turns it into a value the program handles.
