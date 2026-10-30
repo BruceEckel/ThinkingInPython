@@ -96,6 +96,9 @@ Chapters/45_Effects--Generators.md	The first call	The first call, which runs the
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes `interview()`'s body, which encounters `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	The next `next()`	The next `next()` links that frame back into the call stack.
 Chapters/45_Effects--Generators.md	the `for` loop	A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`, and reaches the `for` loop at the bottom of the listing.
+Chapters/45_Effects--Generators.md	the first `yield`	Code before the first `yield` is the state's entry action, the Moore shape.
+Chapters/45_Effects--Generators.md	the innermost `yield`	Every transition nests one generator deeper, each `next()` passes through every level on its way to the innermost `yield`, and after about a thousand transitions the chain is deeper than Python's recursion limit.
+Chapters/45_Effects--Generators.md	the innermost `yield`	The driver reports the card's failure with `throw()`, which raises `Failed` at the innermost `yield`, in the card step.
 Chapters/45_Effects--Generators.md	the next call	The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function) alive and resumes it on the next call.
 Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
 Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop then calls `plug()` again for a replacement.

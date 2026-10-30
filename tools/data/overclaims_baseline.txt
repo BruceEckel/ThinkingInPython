@@ -723,18 +723,24 @@ Chapters/45_Effects--Generators.md	[BOUND] A delegating generator passes all thr
 Chapters/45_Effects--Generators.md	[BOUND] A handler can do three things with a continuation
 Chapters/45_Effects--Generators.md	[BOUND] A suspended generator preserves two things
 Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator drops the return channel, so CODE takes two parameters where CODE takes three
+Chapters/45_Effects--Generators.md	[BOUND] Both fit one function with no CODE field
 Chapters/45_Effects--Generators.md	[BOUND] CODE catches CODE alone, so CODE propagates, the CODE block runs, and the generator ends
 Chapters/45_Effects--Generators.md	[BOUND] CODE makes the first two calls itself, and the CODE makes the rest, ending when CODE raises CODE, the asynchronous counterpart of CODE
+Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE returns CODE and the entry message prints once
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
 Chapters/45_Effects--Generators.md	[BOUND] CODE takes the generator alone
+Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape
 Chapters/45_Effects--Generators.md	[BOUND] Each CODE wraps one call that resumes the generator, CODE or CODE, because a CODE from either means the conversation finished
+Chapters/45_Effects--Generators.md	[BOUND] Here the question has two places to put code rather than two designs
 Chapters/45_Effects--Generators.md	[BOUND] In a single thread, Python had three ways to write such a producer
 Chapters/45_Effects--Generators.md	[BOUND] It describes the yield channel alone, so the type checker rejects CODE on anything annotated CODE
 Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
+Chapters/45_Effects--Generators.md	[BOUND] One shape looks like a transition and is a delegation
 Chapters/45_Effects--Generators.md	[BOUND] Replace CODE's loop in CODE with the single line CODE and run CODE over the same CODE table
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
+Chapters/45_Effects--Generators.md	[BOUND] That CODE sits before the step's CODE, so the exception passes straight out of the card step, whose own action is the one that failed
 Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver at the edge of the program
 Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
 Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as a body with CODE and leaves the two methods to Python
@@ -742,6 +748,7 @@ Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that su
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
 Chapters/45_Effects--Generators.md	[BOUND] Through a CODE, the same two calls reach the innermost generator
 Chapters/45_Effects--Generators.md	[BOUND] Two loops passing values in both directions resembles a queue like the ones in Coordinating Threads with Queues, with three differences
+Chapters/45_Effects--Generators.md	[BOUND] a CODE above CODE in CODE would run when the mouse is trapped and at no other time
 Chapters/46_Effects--Stateless.md	[BOUND] A caller now has two options
 Chapters/46_Effects--Stateless.md	[BOUND] A channel empties in one of three ways, two of which take a vocabulary of their own
 Chapters/46_Effects--Stateless.md	[BOUND] A failure leaves the error channel in one of two ways

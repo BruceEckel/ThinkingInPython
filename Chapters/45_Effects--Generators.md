@@ -887,7 +887,7 @@ The priming call to `next()` sits in a `try`,
 which is essential because `proxy()` is a generator,
 so a `StopIteration` that escaped its body would become a `RuntimeError`.
 `next(inner)` runs `inner`'s body up to its first `yield`,
-which can be any distance away.
+and how much of the body runs before that point depends on the generator.
 `interview()` reaches one on its first line.
 A generator that opens with a `yield from` runs its whole delegate first,
 and `sequence()` with no steps returns before its first `yield`.
@@ -990,6 +990,60 @@ but `inner()` prints the `caught` line.
 `g.close()` raises `GeneratorExit` in `inner()` first,
 so the cleanup lines print from the inside out.
 A driver that holds the outermost generator can stop and clean up every generator beneath it.
+
+That inside-out order is the order a [*Saga*](39_Patterns--Pattern_Catalog.md#distributed-and-cloud)
+needs.
+The pattern runs a long transaction as a series of steps,
+and when a later step fails, each earlier step compensates for what it did,
+latest step first.
+With one generator per step,
+a step's compensation is an `except` clause around its `yield from`:
+
+```python
+# saga.py
+from collections.abc import Generator
+from exceptions import expect
+
+class Failed(Exception):
+    pass
+
+def step(
+    name: str, rest: Generator[str] | None = None
+) -> Generator[str]:
+    yield f"do {name}"
+    if rest is None:
+        return
+    try:
+        yield from rest
+    except Failed:
+        print(f"undo {name}")
+        raise
+
+booking = step("flight", step("hotel", step("card")))
+print(next(booking))
+#: do flight
+print(next(booking))
+#: do hotel
+print(next(booking))
+#: do card
+expect(Failed, booking.throw, Failed("card declined"))
+#: undo hotel
+#: undo flight
+#: [Failed] card declined
+```
+
+Each step yields its command,
+then delegates to the steps after it inside a `try`.
+The driver reports the card's failure with `throw()`,
+which raises `Failed` at the innermost `yield`, in the card step.
+That `yield` sits before the step's `try`,
+so the exception passes straight out of the card step,
+whose own action is the one that failed.
+It then climbs through the two `yield from` expressions,
+and each `except` prints its compensation and raises `Failed` again,
+hotel before flight.
+The nesting of the `try` blocks is the undo stack.
+When all three commands succeed, the booking runs to its end.
 
 A generator can catch `GeneratorExit` and yield again instead of ending.
 Doing so makes `close()` raise a `RuntimeError`:
@@ -1244,6 +1298,231 @@ Each of the three returns an awaitable for the caller to `await`.
 [Stateless](46_Effects--Stateless.md)
 builds on all three of this chapter's ideas.
 It describes a function by what it requests and writes those requests into its return type.
+
+## One Generator per State
+
+[State Machines](31_Patterns--State_Machines.md)
+builds its mousetrap from an `Enum` of rows,
+each holding a state's entry message and a transition function,
+and an engine that calls the current state's function on every input.
+A generator offers a third design.
+Each state is a generator function.
+Its entry action is the code before its first `yield`,
+each `yield` reports the state's name and receives the next input,
+and a transition is a `return` whose value is the next state:
+
+```python
+# trap_generators.py
+from collections.abc import Generator
+from enum import StrEnum
+
+class Mouse(StrEnum):
+    APPEARS = "mouse appears"
+    RUNS_AWAY = "mouse runs away"
+    ENTERS = "mouse enters trap"
+    ESCAPES = "mouse escapes"
+    TRAPPED = "mouse trapped"
+    REMOVED = "mouse removed"
+
+type Machine = Generator[str, Mouse, Machine | None]
+
+def waiting() -> Machine:
+    print("Broadcasting cheese smell")
+    while True:
+        match (yield "Waiting"):
+            case Mouse.APPEARS:
+                return luring()
+
+def luring() -> Machine:
+    print("Presenting Cheese, door open")
+    while True:
+        match (yield "Luring"):
+            case Mouse.RUNS_AWAY:
+                return waiting()
+            case Mouse.ENTERS:
+                return trapping()
+
+def trapping() -> Machine:
+    print("Closing door")
+    while True:
+        match (yield "Trapping"):
+            case Mouse.ESCAPES:
+                return waiting()
+            case Mouse.TRAPPED:
+                return holding()
+
+def holding() -> Machine:
+    print("Mouse caught")
+    print("*ding*")
+    while True:
+        match (yield "Holding"):
+            case Mouse.REMOVED:
+                return waiting()
+```
+
+`Mouse` is the input enum from [Mousetrap States](31_Patterns--State_Machines.md#mousetrap-states).
+`Machine` is a recursive alias: a state yields its name, receives a `Mouse`,
+and returns the next state, or `None` to halt.
+The `type` statement evaluates its right side lazily,
+so the alias can name itself.
+
+An input with no `case` leaves the state's `while` loop running,
+so the state stays and its entry action stays done.
+`trap_states.py`'s `waiting()` returns `TrapState.WAITING` from its `case _`,
+and `state_machine.py` re-enters the state and prints its message again.
+`HOLDING`'s `chime` is a third field in its row;
+here `holding()`'s entry code prints it after the message.
+
+`return luring()` creates `luring()`'s generator object and hands it out as `waiting()`'s result.
+The body runs when a driver delegates to it:
+
+```python
+# trap_generators_demo.py
+from collections.abc import Generator, Iterable
+from typing import Final
+from trap_generators import Machine, Mouse, waiting
+
+def trampoline(
+    state: Machine | None
+) -> Generator[str, Mouse]:
+    while state is not None:
+        state = yield from state  # [1]
+
+def run_all(
+    start: Machine, inputs: Iterable[Mouse]
+) -> None:
+    machine = trampoline(start)
+    state = next(machine)  # [2]
+    for input_ in inputs:
+        new_state = machine.send(input_)  # [3]
+        print(state, input_, "->", new_state)
+        state = new_state
+
+MOVES: Final[list[Mouse]] = [
+    Mouse.APPEARS, Mouse.RUNS_AWAY, Mouse.APPEARS,
+    Mouse.ENTERS, Mouse.ESCAPES, Mouse.APPEARS,
+    Mouse.ENTERS, Mouse.TRAPPED, Mouse.REMOVED,
+]
+run_all(waiting(), MOVES)
+#: Broadcasting cheese smell
+#: Presenting Cheese, door open
+#: Waiting mouse appears -> Luring
+#: Broadcasting cheese smell
+#: Luring mouse runs away -> Waiting
+#: Presenting Cheese, door open
+#: Waiting mouse appears -> Luring
+#: Closing door
+#: Luring mouse enters trap -> Trapping
+#: Broadcasting cheese smell
+#: Trapping mouse escapes -> Waiting
+#: Presenting Cheese, door open
+#: Waiting mouse appears -> Luring
+#: Closing door
+#: Luring mouse enters trap -> Trapping
+#: Mouse caught
+#: *ding*
+#: Trapping mouse trapped -> Holding
+#: Broadcasting cheese smell
+#: Holding mouse removed -> Waiting
+
+trap = trampoline(waiting())
+print(next(trap))
+#: Broadcasting cheese smell
+#: Waiting
+print(trap.send(Mouse.ESCAPES))
+#: Waiting
+```
+
+The engine is the loop at `[1]`.
+`yield from` runs the current state,
+relaying each of its `yield`s up to `run_all()` and each `send()` back down,
+and when the state returns,
+the loop takes the returned generator as the next state.
+Apart from its return type, `trampoline()` has a state's annotation,
+so `run_all()` drives it as it drives any generator.
+`[2]` primes the machine,
+which runs `waiting()`'s entry action and stops at its first `yield`.
+Each `send()` at `[3]` delivers one input and returns the name of the state the machine then occupies.
+
+This trace and the trace in `trap_states_demo.py` have the same lines in a different order.
+Each entry message prints before the transition line that leads to it.
+The entry action runs inside `send()`, in the new state's body,
+and `run_all()` prints its line after `send()` returns.
+In `state_machine.py` the engine owns both prints and orders them;
+here each state owns its entry action.
+The second run shows a state that stays.
+`waiting()` matches `Mouse.APPEARS` alone,
+so `send()` returns `"Waiting"` and the entry message prints once.
+
+[Which Design Should You Use?](31_Patterns--State_Machines.md#which-design-should-you-use)
+asks whether an action belongs to the state or to the transition.
+Here the question has two places to put code rather than two designs.
+Code before the first `yield` is the state's entry action, the Moore shape.
+Code before a `return` runs on that transition alone, the Mealy shape:
+a `print("Door latched")` above `return holding()` in `trapping()` would run when the mouse is trapped and at no other time.
+Both fit one function with no `action` field.
+
+A state's local variables are its data.
+`VendingMachine` keeps `amount` on the machine object because every machine shares the enum members.
+A generator state keeps such a value in a local and passes it to the next state as an argument,
+`return selecting(amount)`,
+so each state receives the data it needs and the machine object disappears.
+Exercise 8 writes the vending machine as one generator,
+with each state a loop inside a single body,
+which suits a machine that is mostly a sequence.
+One generator per state suits a machine like the trap,
+whose transitions form a graph.
+
+The design gives up what the `Enum` gave.
+The states form an open set: any function that returns a `Machine` is a state,
+so a test reaches a state by driving the machine to it,
+where `test_trap_states.py` iterates over `TrapState` and checks every state against every move.
+A machine designed as a diagram still belongs in chapter 31's table.
+A suspended frame also resists copying:
+`copy.deepcopy()` and `pickle` both refuse a generator object.
+A [*Memento*](36_Patterns--Memento.md#the-classic-memento)
+therefore belongs to the enum designs,
+which keep the state in a value a record can hold.
+
+One shape looks like a transition and is a delegation:
+
+```python
+# tail_delegation.py
+from collections.abc import Generator
+from exceptions import expect
+
+def tick() -> Generator[str]:
+    yield "tick"
+    return (yield from tock())  # [1]
+
+def tock() -> Generator[str]:
+    yield "tock"
+    return (yield from tick())
+
+def run(steps: int) -> None:
+    clock = tick()
+    for _ in range(steps):
+        next(clock)
+
+run(500)
+expect(RecursionError, run, 2000)
+#: [RecursionError] maximum recursion depth exceeded
+```
+
+`[1]` hands control to `tock()`,
+but `tick()` stays suspended at its `yield from` until `tock()` returns,
+and `tock()` delegates to a new `tick()` in turn instead of returning.
+Every transition nests one generator deeper,
+each `next()` passes through every level on its way to the innermost `yield`,
+and after about a thousand transitions the chain is deeper than Python's recursion limit.
+The trampoline keeps the chain one level deep.
+`yield from state` finishes when the state returns,
+and the loop takes up the next state at the same depth.
+PEP 342 calls such a driver a trampoline,
+and [The Restriction Behind the Driver](#the-restriction-behind-the-driver)
+says why one exists.
+Exercise 9 meets the same `return (yield from inner)` in `proxy()`,
+where it relays every request instead of answering one.
 
 ## Half a Coroutine by Design
 

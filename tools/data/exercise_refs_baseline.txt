@@ -25,6 +25,8 @@ Chapters/Function_Objects	Function_Objects	1	Undo, added to `command.py`
 Chapters/Function_Objects	Function_Objects	3	`sorted()` with a compound key, and why `key` is *Strategy*
 Chapters/Function_Objects	Function_Objects	5	An event bus that walks the MRO, and can unsubscribe
 Chapters/Function_Objects	Function_Objects	7	`event()` registering `cls`
+Chapters/Generators	Generators	8	A vending machine as a single generator
+Chapters/Generators	Generators	9	A proxy that relays everything
 Chapters/Iterators	Iterators	8	A peekable iterator
 Chapters/Memento	Memento	2	A bounded `History`
 Chapters/Memento	Memento	3	Serializing a `Drawing` to JSON
