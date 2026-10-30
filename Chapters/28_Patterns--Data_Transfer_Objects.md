@@ -446,7 +446,7 @@ The hand-rolled `Messenger` is worth writing only to show that `SimpleNamespace`
 The frozen data class, which this book writes as `@record`,
 is another immutable type with typed fields.
 Between it and a `NamedTuple`,
-the deciding question is whether tuple behavior is a feature.
+the first question is whether tuple behavior is a feature.
 Choose `NamedTuple` when it is: unpacking, multiple return values,
 compatibility with code that expects a tuple.
 Subclass `tuple` yourself, as `point_tuple.py` does,

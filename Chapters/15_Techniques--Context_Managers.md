@@ -1128,8 +1128,8 @@ print("pool size after:", pool.available())
 The `time.sleep()` keeps each lease open long enough for other threads to call `lease()`,
 so both connections are out at once.
 A thread that calls `lease()` while the pool is empty blocks in `get()` until another thread returns a connection.
-With a connection for each of the eight threads,
-all eight hold a lease together, so the demo prints a peak of eight.
+If the pool held a connection for each of the eight threads,
+all eight would hold a lease together and the peak would be eight.
 
 `available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate when more than one thread is borrowing,

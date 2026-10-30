@@ -784,8 +784,9 @@ positional_trace(report, "point", func="f")
 `report` fills `func` by position,
 and the keyword `func="f"` names the same parameter, so `func` gets two values.
 
-The listing calls `trace()` through `expect()` and marks the call with `# type: ignore`,
-since the type checker reports the clash before the code runs.
+The listing calls `trace()` through `expect()`,
+which catches the runtime `TypeError`, and marks the call with `# type: ignore`,
+because the type checker reports the clash before the code runs.
 
 **Make `func` positional-only.**
 The listing names this version `positional_trace()` so that both versions run in one file.

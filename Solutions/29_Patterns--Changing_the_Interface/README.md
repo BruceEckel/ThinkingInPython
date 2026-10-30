@@ -393,10 +393,10 @@ If you remove it, you lose that translation.
 The caller's `read()` then raises an `AttributeError`,
 because `next_chunk()` is the wrapped object's one method.
 
-An *Adapter* passes each call through as it is,
-which separates the *Adapter* from the *Decorator*.
+An *Adapter* changes the name the caller uses and leaves the call's behavior as it is.
+A *Decorator* keeps the name and adds behavior.
 Both wrappers forward.
-Only the *Adapter* changes the name the caller uses.
+The interface tells them apart.
 
 **The flag-checking wrapper is a *Proxy*.**
 Its interface is the wrapped object's interface.

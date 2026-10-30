@@ -1545,7 +1545,7 @@ No other hook can detect the `on_open` at `[2]`.
 and a class decorator all run after the body has finished,
 by which time `[2]` has overwritten `[1]`.
 The static half of the check is ruff's report of the same mistake.
-The `# noqa: F811` suppresses that report so the listing can run.
+The `# noqa: F811` suppresses that report so the listing passes `ruff`.
 `__prepare__()` detects the mistake at run time,
 including on names the body computes.
 

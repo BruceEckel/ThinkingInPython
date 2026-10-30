@@ -721,7 +721,7 @@ a dictionary from "the action just produced" to "the legal actions that can foll
 including the special `None` key for "no action yet,"
 whose one successor is `APPEARS`.
 
-**Remember the last move.**
+**Pick from the legal successors.**
 `NEXT_ACTIONS` constrains every choice,
 so every sequence this generator produces is legal by construction.
 
