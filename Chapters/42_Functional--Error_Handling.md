@@ -563,7 +563,7 @@ def test_combined_returns_answer_or_first_failure(
 ## Turning Exceptions into Results
 
 In `steps.py`, `func_c()` wraps a division in a `try`/`except` and returns an `Err` from the `except` clause when the division raises a `ZeroDivisionError`.
-A decorator can capture that pattern.
+A decorator captures that pattern.
 `@safe` takes a function that can raise an exception and produces one that returns a `Result`,
 with the exception as the error the `Err` wraps.
 Like `result.py`, it lives in `utils/` and any chapter can import it:
