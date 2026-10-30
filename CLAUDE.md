@@ -363,6 +363,14 @@ book-wide read that day had 102 hits, 18 rewrites, and 84
 keeps (idioms the scan cannot tell from comparisons, "as soon
 as" and "like any other"; two bare verb phrases around "rather
 than"; exercise statements), so it stays a survey rule.
+The fifth survey rule is `[CAN]` (2026-10-30), a modal "can" on a
+main-clause verb with a thing as its subject, no negation, and no
+condition or option word in the sentence ("A test can catch the
+broken contract", Bruce: "this could be 'catches'"); the repair is
+the plain present when the sentence reports what the thing on the
+page does, and the keep is a real capability ("a `set` can hold
+any hashable object"), which the parse cannot tell apart, so it
+is a survey rule.
 The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter

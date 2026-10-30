@@ -3032,6 +3032,41 @@ Bruce's.
 
 **Home.** this file only.
 
+---
+
+### C49. "Can" where the sentence reports what happens is the plain present
+
+**Test.** A modal "can" on a verb whose subject is a thing, in a
+sentence that reports what that thing does in the case on the page:
+the test the next sentence shows catching the failure, the handler the
+run shows reaching the state. The reader takes "can" as possibility, so
+the modal hedges a fact. Write the plain present: "A test can catch the
+broken contract" is "A test catches the broken contract". Ask: is the
+sentence about whether the thing is able to, or about what it does
+here? The style guide's "can" bullet keeps "can" for a standing
+capability, and this candidate is its other half.
+
+**Keep when.** The capability is the claim ("a `set` can hold any
+hashable object", "`survey()` can delegate to either"); the subject is
+a person and the "can" is a choice or a permission ("you can skim");
+a condition sits on the page ("if you remove the guard, a subclass can
+take the slots back"); the modal is negated ("cannot").
+
+**Sightings.** 1, Bruce 2026-10-30 on `20_Patterns--Rethinking_Objects`:
+"A test can catch the broken contract." (my rewrite of "No tool catches
+the broken contract, but a test can.") -> "A test catches the broken
+contract." Bruce: "note that this could be 'catches' rather than 'can
+catch'. What kind of rule can you create to discover and fix things like
+this." `[CAN]` in `tip sentence-shapes ARGS=--survey` lists the
+candidates since that day (`can_event()` in `tools/sentence_shapes.py`):
+a main-clause "can" on a lexical verb, a thing as subject, no negation,
+no "also"/"still"/"even"/"always", and no condition or option word in
+the sentence. The book has about 800 prose lines with "can"; the rule
+is a survey because the parse cannot tell a capability stated as a fact
+from a hedged event.
+
+**Home.** CLAUDE.md (global, the "can"/"could" bullet); this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

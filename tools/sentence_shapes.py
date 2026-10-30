@@ -136,9 +136,32 @@ supplies. "Use a `set` rather than a `list`" is quiet, because both
 terms are light. It is a survey rule because weight is a judgment:
 two heavy terms the reader already knows can ride in one clause.
 
+`[CAN]` (2026-10-30, from a sentence the author marked in chapter 20)
+is a modal "can" standing where the sentence reports what happens:
+"A test can catch the broken contract", said of the test the next
+sentence describes, is "A test catches the broken contract". The
+style rule keeps "can" for a standing capability, and the reader
+takes "can" as possibility, so a "can" on an event that does occur
+hedges a fact. The rule (`can_event()`) fires on an `aux` token
+with lemma "can" whose head is a lexical verb (so "can be" is
+quiet) in the root clause or a verb coordinated with the root,
+with no negation ("cannot" is a claim about ability) and no
+"also", "still", "even", or "always" on the verb, whose subject is
+a thing rather than a person (`PERSON_SUBJECTS`: "you", "we", "I",
+"one", "reader", "programmer"), in a sentence with none of
+`OPTION_WORDS` ("if", "when", "whenever", "unless", "whether",
+"while", "until", "once", "either", "or", "any", "anything"), which
+mark a condition or a choice and so a real capability. The repair
+is the plain present ("catches", "reaches", "reports"). It is a
+survey rule because the parse cannot tell a capability stated as
+a fact ("a `set` can hold any hashable object", "`survey()` can
+delegate to either") from an event hedged with "can"; the reader
+of the list asks whether the sentence describes what the thing on
+the page does, and writes the present if so.
+
 Four rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-and `[AND+REL]`, judged against a baseline. Four are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, `[ADD]`, and `[TWO]`. The calibration shows why. `[AND]` fired on 7 before
+and `[AND+REL]`, judged against a baseline. Five are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, `[TWO]`, and `[CAN]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -208,7 +231,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes           # new hits
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
-    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD
+    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
@@ -278,6 +301,7 @@ SURVEY_RULES: Final = {
     "COLON": "colon, then an independent clause",
     "ADD": "an additive adverb after a change of subject",
     "TWO": "two modified terms held across one comparison",
+    "CAN": "a modal can where the sentence reports what happens",
 }
 """Printed only under `--survey`; never baselined."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
@@ -299,6 +323,15 @@ PAIR_NOUN_START: Final = frozenset(
 """Parts of speech that open a noun phrase after the stray conjunction."""
 ADDITIVE_WORDS: Final = frozenset({"also", "too", "likewise"})
 """Adverbs that add a member to a set the previous sentence set up."""
+PERSON_SUBJECTS: Final = frozenset(
+    "you we i one reader programmer author people someone".split())
+"""A subject whose \"can\" is a choice or a permission, not a hedge."""
+OPTION_WORDS: Final = frozenset(
+    "if when whenever unless whether while until once either or any "
+    "anything anyone sometimes".split())
+"""Words that mark a condition or a choice, so the \"can\" is real."""
+ABILITY_ADVERBS: Final = frozenset({"also", "still", "even", "always"})
+"""Adverbs on the verb that make the \"can\" a capability claim."""
 CARRIED_SUBJECTS: Final = BARE_PRONOUNS | frozenset({"we", "you", "i", "one"})
 """A subject that carries the previous sentence's subject on."""
 COMPARATOR_PAIRS: Final = frozenset({
@@ -371,6 +404,13 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
             "easy.", False),
     ("PAIR", "A `break` at the match leaves both loops in one step and "
              "skips `else` along with them.", False),
+    ("CAN", "A test can catch the broken contract.", True),
+    ("CAN", "A test catches the broken contract.", False),
+    ("CAN", "If you remove the guard, a subclass can take the slots "
+            "back.", False),
+    ("CAN", "You can skim for topics new to you.", False),
+    ("CAN", "A `set` can hold any hashable object.", False),
+    ("CAN", "The type checker cannot see the string.", False),
 )
 """The style rules' own examples: (rule, text, should it fire)."""
 
@@ -807,6 +847,44 @@ def two_terms(sentence: Sentence) -> bool:
     return heavy_side(before) and heavy_side(after)
 
 
+def can_event(sentence: Sentence) -> bool:
+    """Is a modal "can" hedging an event the sentence reports?
+
+    An `aux` with lemma "can" on a lexical verb in the root clause
+    (or coordinated with the root), with no negation and none of
+    `ABILITY_ADVERBS` on the verb, a subject that is not one of
+    `PERSON_SUBJECTS`, and none of `OPTION_WORDS` in the sentence.
+    """
+    root = root_of(sentence)
+    if root is None:
+        return False
+    lows = {t.text.lower() for t in sentence.tokens}
+    if lows & OPTION_WORDS:
+        return False
+    for tok in sentence.tokens:
+        if tok.lemma.lower() != "can" or tok.dep != "aux":
+            continue
+        verb = sentence.tokens[tok.head]
+        if verb.pos != "VERB":
+            continue
+        main = verb.i == root.i or (
+            verb.dep == "conj" and verb.head == root.i)
+        if not main:
+            continue
+        kids = children(verb, sentence)
+        if any(k.dep == "neg" for k in kids):
+            continue
+        if any(k.text.lower() in ABILITY_ADVERBS for k in kids):
+            continue
+        subject = subject_of(verb, sentence)
+        if subject is None and verb.dep == "conj":
+            subject = subject_of(root, sentence)
+        if subject is None or subject.text.lower() in PERSON_SUBJECTS:
+            continue
+        return True
+    return False
+
+
 def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph."""
     if skipped(paragraph):
@@ -827,6 +905,8 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
             yield "PAIR", sentence
         if two_terms(sentence):
             yield "TWO", sentence
+        if can_event(sentence):
+            yield "CAN", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:
