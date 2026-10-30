@@ -813,6 +813,7 @@ Every caller who constructs it resets its state.
 The chapter's listing inherits `object.__init__()` and does all its work in `__new__()`.
 There the first construction passes the `None` test and creates `val`.
 Every construction, the first included, appends its argument to `val`.
+
 A singleton that keeps an `__init__()` must make it safe to run repeatedly,
 for example by returning at once when `hasattr(self, "val")` is true.
 
