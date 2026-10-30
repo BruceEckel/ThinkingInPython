@@ -405,7 +405,10 @@ because the engine starts in `run()`,
 and the client calls `run()` on a finished object.
 Each call site gains a line, `greeter.run()`.
 That line moves the decision about when the algorithm starts from the base class to the client.
-The same reasoning favors eager creation in [*Singleton*](../../Chapters/23_Patterns--Singleton.md#double-checked-locking-and-eager-creation).
+
+[*Singleton*](../../Chapters/23_Patterns--Singleton.md#double-checked-locking-and-eager-creation)
+applies the same rule in its eager creation:
+construction finishes before any code uses the object.
 Eager creation builds the object at import time,
 before any thread can read a half-built one.
 
