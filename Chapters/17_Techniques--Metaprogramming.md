@@ -406,7 +406,7 @@ so it has no such cell and names `Event.__init__()` instead.
 The `klass` string is the danger in this approach.
 `exec()` runs its argument with the full power of the language,
 and `klass` splices `class_name` into source text as-is.
-A name could hold a newline followed by a second statement.
+A name can hold a newline followed by a second statement.
 Without validation, that statement breaks out of the `class` block and runs anything.
 An unescaped value in a hand-built SQL query breaks out the same way.
 The `KNOWN_COMMANDS` check prevents that injection.
@@ -2238,7 +2238,7 @@ Try each exercise before opening its [solution](../Solutions/17_Techniques--Meta
     it keeps the first definition of a duplicated name and discards the later one.
     Give the two `on_open` bodies different `print()` calls so you can tell them apart,
     then confirm that `Handlers().on_open()` runs the first one.
-    Explain why no class decorator could achieve the same thing.
+    Explain why no class decorator can achieve the same thing.
 
 [^crtp]: C++ templates can do this via the *Curiously Recurring Template Pattern*
 (CRTP):

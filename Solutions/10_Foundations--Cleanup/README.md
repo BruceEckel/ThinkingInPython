@@ -613,7 +613,7 @@ The cycle collector reclaims both together when it runs.
 Removing the `gc.disable()`/`gc.enable()` pair takes away the guarantee about when the finalizers run.
 The collector then also runs on its own schedule,
 triggered by allocation counts,
-so an automatic pass could in principle reclaim the cycle at any allocation after `self_link()` returns.
+so an automatic pass can in principle reclaim the cycle at any allocation after `self_link()` returns.
 This small program still prints the same transcript every run,
 because the explicit `gc.collect()` runs before the program has allocated enough objects to start an automatic pass,
 so that call sets the moment of collection.

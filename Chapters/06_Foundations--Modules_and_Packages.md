@@ -396,7 +396,7 @@ the way `use_module.py` looks for `module`.
 `use_module4.py` stops with `ModuleNotFoundError: No module named 'module1'`.
 
 Two dots refer to the parent package,
-so `a_package/b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
+so `a_package/b_package/module3.py` can import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
 The absolute form `from a_package.module1 import function1` works from inside the package too.
 Use it when the import crosses a package boundary,
 since it spells out the full path from the top-level package.

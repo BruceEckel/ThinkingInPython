@@ -169,7 +169,7 @@ The last two build on the chapters before them.
 
 Two appendices follow.
 [Effect Tracking](A_Effect_Tracking.md)
-asks how much Effect tracking Python's `Annotated` type could express without a library,
+asks how much Effect tracking Python's `Annotated` type can express without a library,
 and [An Effect Checker](B_An_Effect_Checker.md)
 builds a checker for those annotations.
 The checker works without type inference,

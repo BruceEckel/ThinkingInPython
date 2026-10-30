@@ -112,7 +112,7 @@ The code works with any object that produces an iterator.
 A pattern develops in stages, each more general than the last:
 
 1.  **Idiom**: how you write code in a particular language to do this particular type of thing.
-    This could be as common as the way you step through an array in C
+    This can be as common as the way you step through an array in C
     (stopping at its last element).
 2.  **Specific Design**:
     the solution that arose to solve this particular problem.
@@ -133,7 +133,7 @@ when each subclass registers itself as its `class` statement runs.
 A new type then adds its entry to the dictionary.
 [Factory](26_Patterns--Factory.md) builds both designs.
 [*Template Method*](24_Patterns--Template_Method.md) is a design pattern,
-stage four: a shape of solution you could build in any language with polymorphism.
+stage four: a shape of solution you can build in any language with polymorphism.
 
 The stages are a history, not a ranking.
 Patterns are subtle and appear over time,

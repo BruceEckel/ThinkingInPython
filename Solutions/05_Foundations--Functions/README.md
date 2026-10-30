@@ -96,7 +96,7 @@ a different design, a detail, or an equivalent alternative.
 > In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
 > so a missing key with no default re-raises `KeyError`.
 > Confirm that `get(prefs, "theme")` raises a `KeyError` and that `get(prefs, "theme", None)` returns `None`.
-> Explain why `default=None` could not serve as the sentinel in this function.
+> Explain why `default=None` cannot serve as the sentinel in this function.
 
 <details>
 <summary>Where to look</summary>

@@ -145,7 +145,7 @@ not in the handler.
 
 **Make the two strings agree.**
 `archive_once()` reads the clock one time and derives both strings from that value.
-The mismatch needs two readings that could differ.
+The mismatch needs two readings that can differ.
 With one reading, the two strings must agree.
 A handler still chooses the moment, and it can choose 23:59:59,
 but both strings then carry that moment.

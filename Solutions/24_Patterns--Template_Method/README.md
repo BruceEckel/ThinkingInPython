@@ -560,7 +560,7 @@ shows a subclass that type-checks yet breaks the algorithm the base class anchor
 Write one subclass whose `customize1()` raises an exception,
 and one that keeps the `...` default for a step on which the flow depends.
 The base class can declare a step mandatory with `ABC` and `@abstractmethod`.
-Consider which of the two failures any declaration available in Python could expose.
+Consider which of the two failures any declaration available in Python can expose.
 
 <details>
 <summary>The shape</summary>

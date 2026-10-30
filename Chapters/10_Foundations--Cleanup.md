@@ -67,7 +67,7 @@ There, Python finalizes the same three objects in the opposite order.
 The order in which the three `__del__()` methods run is an implementation detail.
 It depends on how the interpreter tears down the `counters` list at shutdown,
 and it can differ from one CPython build to the next.
-Another implementation could destroy the objects in a different order,
+Another implementation can destroy the objects in a different order,
 or skip the `__del__()` methods at exit.
 PyPy, with a tracing garbage collector, is one such implementation.
 

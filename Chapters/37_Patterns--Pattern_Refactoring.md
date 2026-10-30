@@ -281,7 +281,7 @@ it cannot point to a missing `case`.
 [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
 warns against this shape: a `match` over an open set.
 
-A `case _:` wildcard could catch a new material.
+A `case _:` wildcard can catch a new material.
 `case _: raise ValueError(f"unsorted {type(piece).__name__}")` turns the silent drop into a `ValueError`.
 The wildcard helps, but the flaw remains.
 Every new material means editing this `match`.

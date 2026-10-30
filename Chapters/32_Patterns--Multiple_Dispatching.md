@@ -653,7 +653,7 @@ using `__add__()` and `__radd__()` to let Python's own parser assemble the tree.
 ## Turning One Unknown Type Into a Second Dispatch
 
 Three of this chapter's techniques answer the same question:
-what do you do with a type the first dispatch could not resolve?
+what do you do with a type the first dispatch cannot resolve?
 The `eval_*()` family and `__add__()` with `__radd__()` answer it with a second dispatch,
 a second method call that resolves the type by running a method lookup.
 The `OUTCOME` table answers it differently.

@@ -434,7 +434,7 @@ print(f"lockstep buffered far less: "
 ```
 
 Both branches see all five squares,
-so `tee()` delivers the second pass the generator could not.
+so `tee()` delivers the second pass the generator cannot.
 Each `with traced()` block measures the memory its body allocates,
 using the helper from [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine).
 `current` is what the block leaves allocated,
@@ -911,7 +911,7 @@ That is why a peekable iterator must buffer,
 and why `tee()` buffers the whole stream in `tee.py` when one branch drains first.
 
 `DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values),
-because the default must differ from every value the source could yield.
+because the default must differ from every value the source can yield.
 With `None` as the default,
 an exhausted source and a source that yields `None` produce the same return value.
 The built-in `iter()` uses a sentinel the same way in its two-argument form.

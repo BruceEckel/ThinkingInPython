@@ -566,7 +566,7 @@ Division by `Num(0)` is undefined.
 `simplify()` rewrites a tree.
 `evaluate()` computes the tree's value.
 A caller can simplify an expression and then discard it,
-so an exception raised in `simplify()` could report an error in a division the program throws away.
+so an exception raised in `simplify()` can report an error in a division the program throws away.
 Leaving `Div(lhs, Num(0))` in the tree lets `evaluate()` raise `ZeroDivisionError` at the moment the division runs.
 Python treats `1 / 0` in source the same way.
 The compiler accepts it.

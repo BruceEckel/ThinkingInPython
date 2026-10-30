@@ -1041,7 +1041,7 @@ For a table consulted once per duel, that time is negligible.
 In an inner loop, it matters.
 
 Order now decides the answer.
-`(TolerantPaper, TolerantRock)` and `(TolerantOrigami, TolerantItem)` could both match.
+`(TolerantPaper, TolerantRock)` and `(TolerantOrigami, TolerantItem)` can both match.
 The order in which the loops walk picks the one that wins.
 That rule lives in `compete()` instead of in the table.
 The exact version settles the question with one probe.

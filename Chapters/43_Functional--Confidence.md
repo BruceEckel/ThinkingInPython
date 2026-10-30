@@ -160,7 +160,7 @@ The calls can run in any order, on any schedule, on any number of cores,
 and still return the same answers.
 
 Shared state makes the answers depend on the schedule.
-Two parallel `withdraw()` calls could both read `balance` before either writes it back.
+Two parallel `withdraw()` calls can both read `balance` before either writes it back.
 The second write then overwrites the first, so `balance` records one withdrawal.
 A lock makes each call finish its read and write before the other call reads `balance`,
 but the lock serializes the work you wanted to overlap.

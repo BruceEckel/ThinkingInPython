@@ -162,7 +162,7 @@ After the caller catches the `TypeFailure`,
 the object still holds that illegal value.
 
 The order is a choice, not something mutation forces.
-`f1()` could check the sum before assigning it,
+`f1()` can check the sum before assigning it,
 and then `damaged` stays `Stars(8)` instead of holding a corrupted `13`.
 With mutation, every method must check before it assigns,
 every time it changes the value.

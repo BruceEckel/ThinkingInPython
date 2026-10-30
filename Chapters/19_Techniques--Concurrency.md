@@ -887,7 +887,7 @@ asyncio.run(main())
 `meter` is the `Meter` from [Overlapping the Waits](#overlapping-the-waits),
 which reports a peak of 5 for the unbounded I/O tasks there and 2 here.
 A threaded equivalent of this worker needs a lock around the two updates in `Meter.__enter__()`,
-since a preemptive switch could occur between them.
+since a preemptive switch can occur between them.
 Here, `__enter__()` finishes both updates before the task reaches its `await`,
 so the task keeps control through them and needs no lock.
 
@@ -971,7 +971,7 @@ Once both hold their first lock,
 each task's `async with second:` suspends on a lock the other task keeps holding.
 A real deadlock has no `timeout`.
 Both tasks wait forever, the event loop included,
-since the one task that could wake each of them is waiting too.
+since the one task that can wake each of them is waiting too.
 Here, `asyncio.wait_for()` bounds the wait.
 When its deadline passes, it cancels the `gather()` and raises a `TimeoutError`,
 so the example reports the deadlock instead of hanging.
@@ -2329,7 +2329,7 @@ The platform sets its size.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint,
 since a task consists of ordinary Python objects.
-Dividing the stack size by a task's footprint gives the number of tasks one thread's stack could hold:
+Dividing the stack size by a task's footprint gives the number of tasks one thread's stack can hold:
 
 ```python
 # task_vs_thread_memory.py
@@ -2379,7 +2379,7 @@ print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 `STACK_SIZE` stipulates the stack figure as a common one-mebibyte default instead of measuring a thread that ran.
 
 Before a thread runs one line of its target function,
-its stack reservation could hold hundreds of suspended tasks.
+its stack reservation can hold hundreds of suspended tasks.
 The stack figure is address space set aside whether the thread touches every byte or not.
 The task figure is heap measured by `tracemalloc`.
 The comparison favors tasks over threads by hundreds to one,

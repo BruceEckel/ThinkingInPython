@@ -346,7 +346,7 @@ so `["go", direction]` matches only a list of two items.
 The three-item split matches neither list pattern and reaches `case _`.
 
 **Arrange the patterns.**
-Order matters only between patterns that could both match the same value.
+Order matters only between patterns that can both match the same value.
 The two `go` patterns match lists of different lengths,
 so either arrangement works here.
 

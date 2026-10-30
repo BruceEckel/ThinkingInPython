@@ -882,6 +882,6 @@ Try each exercise before opening its [solution](../Solutions/25_Patterns--Surrog
 6.  `len(p)` raises a `TypeError` on the `Proxy` that `dunder_bypass.py` imports from `proxy_getattr.py`.
     Give that `Proxy` a `__len__()` that forwards to the implementation,
     and confirm `len(p)` returns 2.
-    Then explain why `__getattr__()` could not have supplied it.
+    Then explain why `__getattr__()` cannot supply it.
 7.  Extend `Surrogate` in `state_surrogate.py` so `change_to()` rejects an implementation missing a method the current one has,
-    and explain why the type checker could not have reported that swap.
+    and explain why the type checker cannot report that swap.

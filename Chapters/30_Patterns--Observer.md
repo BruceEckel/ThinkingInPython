@@ -335,7 +335,7 @@ gets a generated `__init__()` and the list another way.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `connect()` and `announce()`,
 not because the pattern requires a base class.
-A `Thermometer` could use composition, holding a `Broadcaster` as an attribute
+A `Thermometer` can use composition, holding a `Broadcaster` as an attribute
 (`self.temperature_changed = Broadcaster[float]()`).
 Code then connects a responder through that attribute
 (`t.temperature_changed.connect(display)`).
@@ -610,7 +610,7 @@ broadcaster.announce(30.0)
 
 A `Broadcaster` holds a strong reference to every object you `connect()`,
 so `weak_responder.py` puts the weak reference inside the responder.
-A different broadcaster could store weak references for every responder.
+A different broadcaster can store weak references for every responder.
 With `Broadcaster`, a responder that needs a weak reference creates and holds that reference.
 
 An ordinary `weakref.ref(plot.redraw)` is dead from the moment you make it.

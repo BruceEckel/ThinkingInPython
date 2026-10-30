@@ -654,7 +654,7 @@ a different design, a detail, or an equivalent alternative.
 > `len(p)` raises a `TypeError` on the `Proxy` that `dunder_bypass.py` imports from `proxy_getattr.py`.
 > Give that `Proxy` a `__len__()` that forwards to the implementation,
 > and confirm `len(p)` returns 2.
-> Then explain why `__getattr__()` could not have supplied it.
+> Then explain why `__getattr__()` cannot supply it.
 
 <details>
 <summary>Where to look</summary>
@@ -732,7 +732,7 @@ print(len(p))
 #: 2
 ```
 
-`__getattr__()` could not have supplied `__len__()`,
+`__getattr__()` cannot supply `__len__()`,
 because `len()` looks up `__len__()` on `type(p)` and calls what it finds there.
 That lookup bypasses the instance, and with it `__getattr__()`,
 which Python calls after a failed lookup on the instance.
@@ -758,7 +758,7 @@ a different design, a detail, or an equivalent alternative.
 ## 7. A `change_to()` that refuses a narrower implementation
 
 > Extend `Surrogate` in `state_surrogate.py` so `change_to()` rejects an implementation missing a method the current one has,
-> and explain why the type checker could not have reported that swap.
+> and explain why the type checker cannot report that swap.
 
 <details>
 <summary>Where to look</summary>

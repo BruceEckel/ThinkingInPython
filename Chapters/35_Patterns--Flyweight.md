@@ -616,7 +616,7 @@ the member the `match` leaves out.
 Adding that case clears the diagnostic.
 
 The enum version cannot load its tile kinds at runtime.
-`tile()` reads `SPECS`, a dict that a program could fill from a file at runtime,
+`tile()` reads `SPECS`, a dict that a program can fill from a file at runtime,
 while each `Tile` member is an assignment in the `class` statement.
 
 Both designs in [State Machines](31_Patterns--State_Machines.md#which-design-should-you-use)

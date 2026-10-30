@@ -1039,7 +1039,7 @@ from the chapter directory with `utils/` on the import path
 The measured work runs in C, not in bytecode.
 `target in as_list` and `target in as_set` both do their work in the interpreter's C code.
 The JIT compiles only the bytecode the interpreter runs,
-so it could speed up almost none of the time the listing reports.
+so it can speed up almost none of the time the listing reports.
 Moving work into C is also why the advice in [Write Idiomatic Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python)
 speeds a program up.
 

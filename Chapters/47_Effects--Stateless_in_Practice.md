@@ -1446,7 +1446,7 @@ the job `as_type()` does elsewhere.
 Its body is the one place in the program that binds an implementation to an Ability.
 
 Each requested type needs a shape of its own.
-You could rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
+You can rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
 `Hero` stays distinct, since it also declares `approach()`.
 But every hero then satisfies `Obstacle` as well as `Hero`.
 `play()` supplies the hero first,

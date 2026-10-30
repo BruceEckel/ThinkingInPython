@@ -412,7 +412,7 @@ because a *Façade* narrows many objects to a few names,
 while each of these wraps one object.
 
 Purpose, not code, decides the classification.
-All three could be the same `__getattr__()` forwarder.
+All three can be the same `__getattr__()` forwarder.
 What separates them is the answer to "what breaks if I delete this."
 A name chosen from that answer tells the next reader why the wrapper is there.
 

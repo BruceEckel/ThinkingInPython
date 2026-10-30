@@ -883,24 +883,22 @@ print(drive(
 #: Alice of Oz, friend Rabbit
 ```
 
+`proxy()` is a [*Proxy*](25_Patterns--Surrogate.md#proxy):
+the same interface as the object it wraps, with a forwarding loop of its own.
+It is also the shape of [layering handlers](46_Effects--Stateless.md#layering-handlers)
+in Stateless, where a handler answers the requests `supply()` gave it and re-yields the rest to the handler outside it.
+
 The priming call to `next()` sits in a `try`,
 which is essential because `proxy()` is a generator,
 so a `StopIteration` that escaped its body would become a `RuntimeError`.
 `next(inner)` runs `inner`'s body up to its first `yield`,
 and how much of the body runs before that point depends on the generator.
-`interview()` reaches one on its first line.
 A generator that opens with a `yield from` runs its whole delegate first,
 and `sequence()` with no steps returns before its first `yield`.
-The `except` turns that early return into `proxy()`'s own result.
-`proxy()` relays a request with a `yield` at `[2]` instead of a `yield from`,
-because `yield from` would relay every request.
+
 In the second run, `drive()` sees two requests instead of three.
 The proxy answers `town` at `[1]`, so that request stops at the proxy,
 and the result changes while `interview()` and `drive()` stay the same.
-`proxy()` is a [*Proxy*](25_Patterns--Surrogate.md#proxy):
-the same interface as the object it wraps, with a forwarding loop of its own.
-It is also the shape of [layering handlers](46_Effects--Stateless.md#layering-handlers)
-in Stateless, where a handler answers the requests `supply()` gave it and re-yields the rest to the handler outside it.
 
 ### `throw()` and `close()` Reach the Innermost Generator
 

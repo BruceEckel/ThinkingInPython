@@ -455,7 +455,7 @@ With `func is None`, the same call raises a `TypeError` at decoration.
 `decorate("TAG")` wraps the string,
 and when Python applies that wrapper to the function,
 the wrapper calls `"TAG"` as if the string were the decorated function.
-With either test, a decorator whose own argument could be callable,
+With either test, a decorator whose own argument can be callable,
 such as a `key` function, mistakes that argument, passed positionally,
 for the function it decorates.
 For that reason `label` makes its arguments keyword-only,
@@ -707,7 +707,7 @@ def test_counts_are_independent_per_function() -> None:
 
 The function form can keep a count too,
 in a variable of the decorator's body that `wrapper()` updates through [`nonlocal`](40_Functional--Foundations.md#closures).
-The wrapper's own `__dict__` could hold the count as well,
+The wrapper's own `__dict__` can hold the count as well,
 but the type checker reports every dotted access to an attribute stored there.
 Call state therefore goes in a closure or an instance.
 [Attributes on a Function](17_Techniques--Metaprogramming.md#attributes-on-a-function)

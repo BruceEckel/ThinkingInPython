@@ -309,7 +309,7 @@ A post-processor has only the characters,
 so it must guess which spans to quote by matching them against the values.
 The guess fails as soon as a literal matches a value.
 With `name = "scored"`, the finished string reads `scored scored 92%`,
-and either of the two words could be the value.
+and either of the two words can be the value.
 
 `Template` removes that guess,
 because it keeps each value apart from the literal text.

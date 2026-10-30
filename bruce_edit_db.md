@@ -2202,6 +2202,52 @@ descriptions, since 2026-10-22, is the neighbor: there a verdict or an
 abstract noun stands where the mechanism should be, here a description
 of the mechanism stands where its name should be).
 
+### R53. "Can" for a standing capability, "could" for a condition or a past
+
+**Test.** A "could" or "could not" in prose about what code, a type, a
+construct, or the reader is able to do. Put the sentence in the present
+with no condition attached: if it stays true, the modal is "can"
+("cannot"). "Could" is the past of "can" and the modal of a
+counterfactual, so a reader looks for the condition or the past event
+it depends on, and a sentence with neither makes a standing capability
+read as hypothetical. Bruce's flag (chapter 45, 2026-10-30): "`drive()`
+accepts either, and `survey()` could delegate to either with `yield
+from`" states what the shared annotation permits, so "can". The perfect
+form is the same fault: "explain why `__getattr__()` could not have
+supplied it" gives a standing reason, so "cannot supply it".
+
+- `45_Generators` 2026-10-30, was Claude-written: "`survey()` could
+  delegate to either with `yield from`" -> "can delegate to either"
+- `25_Surrogate` 2026-10-30: "Then explain why `__getattr__()` could
+  not have supplied it." -> "cannot supply it."
+- `14_Decorators` 2026-10-30: "The wrapper's own `__dict__` could hold
+  the count as well," -> "can hold the count as well,"
+- `19_Concurrency` 2026-10-30: "since a preemptive switch could occur
+  between them." -> "can occur between them."
+- `A_Effect_Tracking` 2026-10-30: "The tool could run in three
+  places." -> "The tool can run in three places."
+
+**Keep when.** A narrated past ("I decided to see what the Claude AI
+could do with it"; "Before Python 3.15 ... the manager closed any
+resource it opened before the body could use it"); a counterfactual
+whose condition is on the page ("If Python had always supported
+coroutines, you could expect every library to conform"; "If one
+`Signal` member lacked a `case`, `act()` could reach its end"); a
+speculation about the future ("asks what Python could adopt", "A
+future CPython could add another"); "could have" ("any one of them
+could have caused the bug"); the idiom "could not be more different";
+a report of one run's outcome ("a row that reads `Unknown` says the
+checker could not resolve a call").
+
+**Sightings.** 1 flag, promoted on Bruce's request to a book sweep the
+same day (2026-10-30): 69 sites in `Chapters/` and `Solutions/`, 48
+rewritten plus 4 generated exercise quotes that followed their
+chapters, 17 kept. Candidate for a scan: `could` as a Tier 1 entry in
+`tools/watch_words.py`, with the 17 keeps as its baseline.
+
+**Home.** CLAUDE.md writing style (the "can"/"could" bullet beside
+"Present tense for standing behavior") | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different

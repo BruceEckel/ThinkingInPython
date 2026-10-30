@@ -638,7 +638,7 @@ Try each exercise before opening its [solution](../Solutions/05_Foundations--Fun
 2.  In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
     so a missing key with no default re-raises `KeyError`.
     Confirm that `get(prefs, "theme")` raises a `KeyError` and that `get(prefs, "theme", None)` returns `None`.
-    Explain why `default=None` could not serve as the sentinel in this function.
+    Explain why `default=None` cannot serve as the sentinel in this function.
 3.  In `param_markers.py`, add a parameter `label="result"` to `divide()`,
     keyword-only, so `print(divide(10, 2, label="half"))` shows `half: 5.0`.
     Confirm that `divide(10, 2, "half")`, passing `label` positionally,

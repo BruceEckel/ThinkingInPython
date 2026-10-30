@@ -151,7 +151,7 @@ if __name__ == "__main__":
 #: Square.draw
 ```
 
-Here the `factory()` argument is a string, but it could be any sort of data.
+Here the `factory()` argument is a string, but it can be any sort of data.
 Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
 
@@ -228,7 +228,7 @@ so `Month(7)` returns the existing member `JULY` rather than building a new obje
 as `factory()` raises one for a name it does not recognize.
 Where `factory()` has a `match` that lists each class,
 the `Enum` looks the value up in a table of its members,
-because the class holds every member the call could return.
+because the class holds every member the call can return.
 A factory over a closed set of products reduces to a lookup.
 
 ## The Pythonic Factory: a Dictionary
@@ -686,7 +686,7 @@ A separate factory object is worth writing when it holds state, such as a pool,
 a cache, or loaded configuration,
 or when the caller keeps the factory to construct objects later.
 
-You could eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
+You can eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
 Dispatching through `eval()` is unnecessary,
 and it makes `create_shape()` worse.
 `create_shape()` then compiles and runs any string it receives,

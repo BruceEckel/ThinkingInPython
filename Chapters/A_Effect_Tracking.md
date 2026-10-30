@@ -2,7 +2,7 @@
 
 [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
 asks whether Python could gain Effect tracking.
-It answers that the annotation syntax could carry the information and that propagation is the hard part.
+It answers that the annotation syntax can carry the information and that propagation is the hard part.
 This appendix states the tracking problem apart from any one language,
 says why a language that tracks Effects natively solves the problem best,
 and then builds the carrier Python has today,
@@ -225,7 +225,7 @@ The type checker follows the PEP's rule.
 `reveal_type(ask)` reports `def ask(prompt: str) -> str`,
 and `name: str = ask(...)` checks against that `str`.
 Existing callers stay as they are,
-so a codebase could adopt rows one function at a time.
+so a codebase can adopt rows one function at a time.
 
 That same rule is the design's weakness.
 `shout()` calls `tell()` under a bare `None` return annotation.
@@ -409,7 +409,7 @@ Every row that includes `Unknown` would be incomplete.
 
 ### Find a Place to Run
 
-The tool could run in three places.
+The tool can run in three places.
 The first is inside the type checker,
 a place [Resolve Every Call](#resolve-every-call) rules out for `ty`.
 
@@ -463,7 +463,7 @@ No check confirms that the row a static tool verified matches the dependencies F
 
 [The Tracking Problem](#the-tracking-problem)
 divides algebraic effects into a row half and a handler half.
-`Annotated` can carry the row, so PEP 593 could give Python the row half,
+`Annotated` can carry the row, so PEP 593 can give Python the row half,
 algebraic effect tracking.
 No metadata can supply the handler half.
 A native handler receives the continuation and can resume it once,

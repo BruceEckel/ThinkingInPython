@@ -102,7 +102,7 @@ Chapters/11_Techniques--Testing.md	[BOUND] CODE passes for one reason
 Chapters/11_Techniques--Testing.md	[BOUND] If you swap the two functions' order in the file, CODE fails, since CODE is still empty
 Chapters/11_Techniques--Testing.md	[BOUND] Keep the CODE block down to the single call that should fail
 Chapters/11_Techniques--Testing.md	[BOUND] One rule covers both CODE and CODE
-Chapters/11_Techniques--Testing.md	[BOUND] The work is mostly in the first two steps, since a function that is hard to test usually fetches a dependency that a caller could pass in
+Chapters/11_Techniques--Testing.md	[BOUND] The work is mostly in the first two steps, since a function that is hard to test usually fetches a dependency that a caller can pass in
 Chapters/11_Techniques--Testing.md	[BOUND] To the language, the single leading underscore in CODE is one more character in the attribute's name
 Chapters/11_Techniques--Testing.md	[BOUND] a failed withdrawal must leave the balance alone
 Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] A data class generates an CODE with one parameter per field, and its body assigns each one (CODE)
@@ -256,8 +256,8 @@ Chapters/19_Techniques--Concurrency.md	[BOUND] A plain CODE around the CODE bloc
 Chapters/19_Techniques--Concurrency.md	[BOUND] A semaphore initialized to one behaves like a lock, with one difference
 Chapters/19_Techniques--Concurrency.md	[BOUND] A task's limit is heap memory alone, because a task uses neither of the per-thread OS resources that limit threads
 Chapters/19_Techniques--Concurrency.md	[BOUND] As it exits, it re-raises both failures wrapped in an exception group, since more than one task can fail at once
-Chapters/19_Techniques--Concurrency.md	[BOUND] Before a thread runs one line of its target function, its stack reservation could hold hundreds of suspended tasks
-Chapters/19_Techniques--Concurrency.md	[BOUND] Both tasks wait forever, the event loop included, since the one task that could wake each of them is waiting too
+Chapters/19_Techniques--Concurrency.md	[BOUND] Before a thread runs one line of its target function, its stack reservation can hold hundreds of suspended tasks
+Chapters/19_Techniques--Concurrency.md	[BOUND] Both tasks wait forever, the event loop included, since the one task that can wake each of them is waiting too
 Chapters/19_Techniques--Concurrency.md	[BOUND] CODE connects the two kinds of CODE
 Chapters/19_Techniques--Concurrency.md	[BOUND] CODE is the newer, composable form, scoping the deadline over an entire block, CODE included, instead of one call
 Chapters/19_Techniques--Concurrency.md	[BOUND] CODE needs no locks, since the event loop lets one task at a time touch it
@@ -856,13 +856,13 @@ Chapters/A_Effect_Tracking.md	[BOUND] CODE carries two pieces of metadata, a str
 Chapters/A_Effect_Tracking.md	[BOUND] CODE is a label here, an empty class, so CODE stays the one implementation CODE can run
 Chapters/A_Effect_Tracking.md	[BOUND] CODE reads each declaration alone, so it returns the empty row CODE declares
 Chapters/A_Effect_Tracking.md	[BOUND] Effects by Hand counts five signatures to edit when a helper four calls below CODE needs a CODE Effect
-Chapters/A_Effect_Tracking.md	[BOUND] Existing callers stay as they are, so a codebase could adopt rows one function at a time
+Chapters/A_Effect_Tracking.md	[BOUND] Existing callers stay as they are, so a codebase can adopt rows one function at a time
 Chapters/A_Effect_Tracking.md	[BOUND] Of the three checkers this book names, mypy alone has a plugin interface at this writing
 Chapters/A_Effect_Tracking.md	[BOUND] The Effect row of a function CODE therefore follows one rule
 Chapters/A_Effect_Tracking.md	[BOUND] The PEP gives tools one rule
 Chapters/A_Effect_Tracking.md	[BOUND] The first four problems in What a Checker for the Row Must Do take them in the same order
 Chapters/A_Effect_Tracking.md	[BOUND] The four problems before this section apply in full to a separate tool
-Chapters/A_Effect_Tracking.md	[BOUND] The tool could run in three places
+Chapters/A_Effect_Tracking.md	[BOUND] The tool can run in three places
 Chapters/A_Effect_Tracking.md	[BOUND] Tracking Is Not Management explains why a row alone cannot manage it
 Chapters/B_An_Effect_Checker.md	[BOUND] A CODE holds the names the checker has collected at one point in a file
 Chapters/B_An_Effect_Checker.md	[BOUND] CODE and CODE appear in three functions at the edge and in the module that calls them

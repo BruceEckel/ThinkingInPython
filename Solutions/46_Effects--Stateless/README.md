@@ -1443,7 +1443,7 @@ so each implementation satisfies one of them,
 and each Effect requests the `Protocol` it needs.
 
 That change turns the silent choice into a diagnostic.
-One more line at the end of the listing could hand `to_log()` a `Terminal` instead of a `Capture`.
+One more line at the end of the listing can hand `to_log()` a `Terminal` instead of a `Capture`.
 `ty` rejects that line before the program runs:
 
 ```text

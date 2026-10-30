@@ -950,7 +950,7 @@ a different design, a detail, or an equivalent alternative.
 > it keeps the first definition of a duplicated name and discards the later one.
 > Give the two `on_open` bodies different `print()` calls so you can tell them apart,
 > then confirm that `Handlers().on_open()` runs the first one.
-> Explain why no class decorator could achieve the same thing.
+> Explain why no class decorator can achieve the same thing.
 
 <details>
 <summary>Where to look</summary>

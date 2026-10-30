@@ -85,6 +85,7 @@ Chapters/19_Techniques--Concurrency.md	[PAST] distributed: Threads already distr
 Chapters/19_Techniques--Concurrency.md	[PAST] emerged: Another benefit of threads emerged when more CPUs became available on a single machine.
 Chapters/19_Techniques--Concurrency.md	[PAST] gave: Reference counting gave Python deterministic cleanup with no collector pauses.
 Chapters/19_Techniques--Concurrency.md	[PAST] had: Early machines had a single CPU, and early operating systems (OS) were little more than program loaders.
+Chapters/19_Techniques--Concurrency.md	[PAST] included: Both tasks wait forever, the event loop included, since the one task that can wake each of them is waiting too.
 Chapters/19_Techniques--Concurrency.md	[PAST] included: CODE is the newer, composable form, scoping the deadline over an entire block, CODE included, instead of one call.
 Chapters/19_Techniques--Concurrency.md	[PAST] kept: Single-threaded code kept nearly all its speed.
 Chapters/19_Techniques--Concurrency.md	[PAST] learned: Engineers learned tricks to make programs run faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
