@@ -201,6 +201,7 @@ the binding that [Variables and References](02_Foundations--Tour.md#variables-an
 describes.
 Every `bad_append()` call that uses the default binds `target` to the one list Python builds at the `def`,
 so each call mutates the list the next call uses.
+
 A caller that passes a mutable object sees the changes the function makes:
 
 ```python
