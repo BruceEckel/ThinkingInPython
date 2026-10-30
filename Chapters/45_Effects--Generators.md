@@ -969,12 +969,11 @@ In both runs an exception arrives at the `yield` in place of a value,
 the body ends there, and `print("resumed")` stays unreached.
 
 A `raise` statement in the driver cannot do what `throw()` does.
-`raise` raises its exception in the frame that executes it.
-While the driver runs, the generator's frame waits at its `yield`.
-An exception propagates through the frames on the call stack,
-and a suspended frame is off that stack,
-so the generator's `except` clauses are out of the path of any `raise` the driver executes.
-`throw()` resumes the generator's frame first and then raises the exception at the `yield`,
+`raise` raises its exception in the function that executes it,
+and the exception propagates up through that function's callers.
+While the driver runs, the generator is suspended at its `yield`,
+off the call stack, so the generator's `except` clauses are out of the path of any `raise` the driver executes.
+`throw()` resumes the generator first and then raises the exception at the `yield`,
 where the generator's own `try` statement sees it.
 Inside the body, `raise` is still the statement to use;
 `throw()` is a method for the driver, the holder of the generator object.
@@ -1032,7 +1031,7 @@ and `None` here, since `worker()` lets the exception propagate.
 A generator that answers `GeneratorExit` with another `yield` has refused to finish,
 and `close()` raises a `RuntimeError`.
 
-A suspended generator holds whatever its body has open,
+A suspended generator keeps open whatever its body has opened,
 a file or a lock inside a `with` statement,
 until the driver resumes it or the garbage collector reclaims it.
 Python calls `close()` on a suspended generator when it is garbage-collected,
