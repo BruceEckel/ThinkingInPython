@@ -370,7 +370,8 @@ whether `asyncio`'s loop or one you write yourself.
 Each request must be an awaitable object built for that loop.
 A generator's requests go to whatever code calls `next()` and `send()`,
 and a request can be any value.
-The generator yields a request out, and the driver sends the answer back in.
+
+A generator yields a request out, and the driver sends the answer back in.
 The driver chooses each answer,
 so the same generator runs unchanged under different drivers.
 That separation of a request from its fulfillment is the core of an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
@@ -1280,7 +1281,8 @@ The entry action runs inside `send()`, in the new state's body,
 and `run_all()` prints its line after `send()` returns.
 In `state_machine.py` the engine owns both prints and orders them;
 here each state owns its entry action.
-The second run shows a state that stays.
+
+The listing's second run shows a state that stays.
 `waiting()` matches `Mouse.APPEARS` alone,
 so `send()` returns `"Waiting"` and the entry message prints once.
 
