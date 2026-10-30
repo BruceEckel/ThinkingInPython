@@ -460,6 +460,8 @@ so the listing's `type(grid)` call returns `dict` as it always has.
 A `type` statement creates a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the type checker accepts any pair of ints as a `Coord`.
+`type UserId = int` reads like a distinct type in a signature,
+yet the type checker accepts any `int` as a `UserId`.
 (For a type the type checker keeps separate from its base, use [`NewType`](#aliases-and-distinct-types).)
 
 Because an alias is the same type under another name,
@@ -470,9 +472,6 @@ but a scalar gets an alias when its name says what a bare `str` or `int` cannot:
 `dict[Name, int]` says the keys are names,
 where `dict[str, int]` hides what they are.
 Skip the alias when the parameter's own name says it, as `name: str` does.
-`type UserId = int` reads like a distinct type in a signature,
-yet the type checker accepts any `int` as a `UserId`.
-When the checker must keep the two apart, `NewType` is the construct.
 
 `Color` specifies a union of literal values instead of a union of types.
 `Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings.
@@ -736,7 +735,8 @@ print(t.bump().bump().report())
 and the result has `report()`.
 If `bump()` declares `-> Tally`, the type checker rejects `report()`,
 because `Tally` has no such method.
-Alternative constructors benefit the same way.
+
+Alternative constructors need `Self` for the same reason `bump()` does.
 A `@classmethod` that ends with `return cls(...)` declares `-> Self`,
 so a call on a subclass has the subclass's type, not the base's type.
 
@@ -839,6 +839,7 @@ For a local variable whose type is obvious from its initializer,
 a hint repeats what the initializer says.
 `count: int = 0` says the same as `count = 0`, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
+
 A hint helps in proportion to the distance between a value's creation and its use.
 A value created and used within three lines can leave its type to inference.
 A value that arrives from another module, inside a container,
