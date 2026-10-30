@@ -195,9 +195,9 @@ Because the constructor sets every field once,
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for a `NamedTuple`, a frozen data class,
 and any other type that defines `__replace__()`.
-Immutability also makes a `NamedTuple` hashable,
-so a `Color` can be a `dict` key or a `set` element.
 
+Immutability makes a `NamedTuple` hashable,
+so a `Color` can be a `dict` key or a `set` element.
 Immutability applies to the fields, not to the objects they name.
 A `NamedTuple` holding a list lets that list change,
 the same leak [`frozen=True` has](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
@@ -431,6 +431,7 @@ the same structural equality that `still_a_tuple.py` shows.
 
 Tuple operations return plain tuples.
 A subclass whose `+` and slicing must return its own type overrides `__add__()` and `__getitem__()`.
+
 The empty `__slots__ = ()` keeps a `Point` as small as a tuple.
 A subclass that declares no `__slots__` gives each instance a `__dict__`,
 and with it the ability to grow attributes beyond the ones the class declares.
@@ -452,8 +453,9 @@ Subclass `tuple` yourself, as `point_tuple.py` does,
 when that tuple behavior must come with your own construction or methods.
 Choose a [record](12_Techniques--Data_Classes_as_Types.md#immutability)
 when the value should be a distinct type that equals instances of its own class alone.
-Choose the record too when inherited ordering and array-shaped JSON are wrong rather than convenient,
-or when the type must check its values.
+Choose the record too when inherited ordering and array-shaped JSON are wrong rather than convenient.
+
+Choose the record when the type must check its values.
 A record runs [`__post_init__()`](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 on every construction, so its values are legal as well as typed.
 By contrast, [a `NamedTuple` cannot validate itself](12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate).
