@@ -410,9 +410,11 @@ with expected(AttributeError):
 
 Without the guard, the misspelled `self._imp` produces a `RecursionError` that hides the typo.
 With the guard, the second call to `__getattr__()` reports the typo by name.
-The guard also makes the proxy work with `copy` and `pickle`,
-which look up `__setstate__()` on an instance whose `__init__()` has not run.
-Both get an `AttributeError`, treat it as a missing `__setstate__()`,
+
+The guard lets `copy` and `pickle` rebuild a proxy.
+Both look up `__setstate__()` on an instance whose `__init__()` has not run.
+Both get an `AttributeError` from the guard,
+treat it as a missing `__setstate__()`,
 and copy the saved state into the new instance's `__dict__` instead of recursing.
 
 The guard raises an `AttributeError` for every name that starts with an underscore,
@@ -807,6 +809,7 @@ Every annotation in `state_surrogate.py` that carries the implementation is `Any
 which the book's typing guidance treats as a last resort.
 `__getattr__()` returns `Any` because it returns the attribute for any name the caller reads,
 whatever that attribute's type.
+
 The `Any` on the parameters of `__init__()` and `change_to()` is a choice.
 `state_demo.py` still type-checks if both parameters carry `Behavior`.
 The checker then verifies every implementation that reaches either method.
