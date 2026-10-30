@@ -17,7 +17,7 @@ def proxy(
             answer = known[request]  # [1]
             print(f"  proxy answers {request}")
         else:
-            answer: Answer = yield request  # [2]
+            answer: Answer = yield request
         try:
             request = inner.send(answer)
         except StopIteration as stop:

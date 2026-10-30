@@ -862,7 +862,7 @@ def proxy(
             answer = known[request]  # [1]
             print(f"  proxy answers {request}")
         else:
-            answer: Answer = yield request  # [2]
+            answer: Answer = yield request
         try:
             request = inner.send(answer)
         except StopIteration as stop:
@@ -989,8 +989,8 @@ but `inner()` prints the `caught` line.
 so the cleanup lines print from the inside out.
 A driver that holds the outermost generator can stop and clean up every generator beneath it.
 
-That inside-out order is the order a [*Saga*](39_Patterns--Pattern_Catalog.md#distributed-and-cloud)
-needs.
+A [*Saga*](39_Patterns--Pattern_Catalog.md#distributed-and-cloud)
+relies on that inside-out cleanup.
 The pattern runs a long transaction as a series of steps,
 and when a later step fails, each earlier step compensates for what it did,
 latest step first.
