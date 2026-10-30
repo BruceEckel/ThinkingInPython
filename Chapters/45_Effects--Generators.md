@@ -763,7 +763,7 @@ A single loop at the edge of the program interprets requests yielded at any dept
 `drive()` and `yield from` both run a generator's body one `yield` at a time and both finish at `StopIteration`,
 so they are easy to confuse.
 In `yield_from_delegates.py`, `drive()` receives `interview()`'s `Result`.
-`yield from` can take over that job:
+`yield from` takes over that job:
 
 ```python
 # yield_from_nested.py
