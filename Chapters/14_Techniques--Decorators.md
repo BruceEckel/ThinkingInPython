@@ -455,9 +455,11 @@ With `func is None`, the same call raises a `TypeError` at decoration.
 `decorate("TAG")` wraps the string,
 and when Python applies that wrapper to the function,
 the wrapper calls `"TAG"` as if the string were the decorated function.
-With either test, a decorator whose own argument can be callable,
-such as a `key` function, mistakes that argument, passed positionally,
-for the function it decorates.
+
+Both `callable(func)` and `func is None` fail for a decorator whose own argument can be callable,
+such as a `key` function.
+Passed positionally, that argument arrives in `func`,
+so both tests mistake it for the function the decorator wraps.
 For that reason `label` makes its arguments keyword-only,
 so a caller must name them.
 
@@ -864,9 +866,11 @@ print(ex.method(5))
 and the `__repr__()` the class defines prints it as `Ex()`.
 The method decoration that failed with `logged` works here,
 through the descriptor every function carries.
-For the same reason, `repeat_class.repeat` works on methods.
+
+`repeat_class.repeat` is a class-form decorator that works on methods.
 Its `__call__()` returns `wrapper`, an ordinary function,
-so a method decorated with `@repeat(times=3)` is still a function.
+so a method decorated with `@repeat(times=3)` is still a function,
+and that function's `__get__()` binds the instance.
 
 If `method_decoration.py` decorates `Ex.method` with a fully typed class-form decorator,
 such as `trace_class.trace`, instead of `logged`,
