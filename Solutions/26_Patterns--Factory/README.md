@@ -189,7 +189,8 @@ Beyond that, `shape_factory_method.py` edits one function, `Shape.factory()`,
 where the new `case` sits inside logic you must re-read.
 `shape_factory_objects.py` leaves its dispatcher, `create_shape()`, as it was,
 and adds a nested `Factory` to `_Triangle` and one data line to `FACTORIES`.
-Every shape in that version carries a nested `Factory` and an entry in the table.
+
+Every shape in `shape_factory_objects.py` carries a nested `Factory` and an entry in `FACTORIES`.
 The chapter's `registry.py` drops both the nested class and the entry.
 Each class registers itself, so adding a shape means writing its class.
 
