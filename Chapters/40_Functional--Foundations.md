@@ -272,7 +272,7 @@ Python therefore sets their `__hash__` to `None`.
 
 Freezing a dataclass lets it keep contents-based equality and a hash at the same time.
 [`@record`](18_Techniques--Performance.md#record) freezes `Point`,
-so `Point(3, 4)` can key `distances`.
+so `Point(3, 4)` keys `distances`.
 Python computes that hash from the fields, so every field must be hashable too.
 Hashing a frozen record that holds a `list` still raises a `TypeError`.
 `frozen_leaky.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
