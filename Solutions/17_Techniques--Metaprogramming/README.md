@@ -785,6 +785,7 @@ since `type.__init__()` checks its arguments and then ignores them.
 `new_vs_init.py` shows the same limit for the namespace.
 Its `__init__()` writes an `added_in_init` key into `namespace`.
 `hasattr()` then reports `False` for that attribute on the class.
+
 `__new__()` must make every decision that goes through the arguments: the name,
 the bases, and the namespace from which `type` builds the class.
 `__init__()` receives the completed class object and can change it in place,
