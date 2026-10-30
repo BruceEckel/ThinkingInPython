@@ -1482,7 +1482,8 @@ Document-View combines the controller with the view.
 We'll look at two approaches that differ in where the input handling lives.
 With Document-View, `View` has a `key()` method as a controller,
 while MVC gives `key()` to a `Controller` class.
-Both approaches share two models.
+
+Document-View and MVC share two models.
 The first is a counter:
 
 ```python
@@ -1744,7 +1745,8 @@ With pull, a broadcast sends the thermometer.
 Each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
 Pull leaves the decision of which changes to announce with the thermometer.
 A responder's choice covers what it reads and which announcements prompt it to act.
-`weather_station.py` pushes a pair and lets each responder choose the changes it handles.
+
+`weather_station.py` pushes a name-and-value pair for every assignment and lets each responder choose the changes it handles.
 `celsius` and `humidity` share one channel,
 so every responder receives both kinds of change, along with the attribute name.
 
