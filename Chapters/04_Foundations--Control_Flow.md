@@ -517,6 +517,7 @@ Since Python 3.14 you can leave out the parentheses,
 as in `except ValueError, TypeError:`,
 so you will see both forms in existing code.
 A clause with `as` still requires them.
+
 Python tries the `except` clauses in order and runs the first whose type matches,
 so a broad clause above a narrow one takes every exception the narrow one exists to catch.
 Order them most specific first.
