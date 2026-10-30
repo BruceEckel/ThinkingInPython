@@ -2134,7 +2134,8 @@ where exercise 8 needs a method in every existing class and an eight-method clas
 [Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
 reaches the same conclusion: for a ruleset that is a known set of answers,
 the table is shorter and easier to maintain.
-Exercise 8's version keeps the chapter's two advantages.
+
+Exercise 8's version keeps the two advantages the chapter gives the method version.
 Its `eval_*()` methods receive the competing objects,
 so a weapon whose result depends on its state fits there,
 while this grid needs exercise 9's callable cells.
