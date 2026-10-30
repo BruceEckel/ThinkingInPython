@@ -16,6 +16,7 @@ and use *design patterns* for the concept.
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 Many of those examples inspired the ones in this part of the book.
+
 This chapter introduces the concepts.
 Its one listing shows a pattern shrinking to a function.
 The chapters that follow supply the rest of the code.
@@ -337,6 +338,7 @@ In Python, an implementer meets the `Protocol` and `Callable` rungs through its 
 An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and no implementer inherits.
 A `Callable` annotation is not a class.
+
 The `Protocol` and `Callable` rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
 In a language where every implementer must specify its interface,
 a pattern exists to build a declared interface.
