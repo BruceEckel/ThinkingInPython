@@ -425,7 +425,7 @@ which runs only for the files that pass.
 
 A `with` block, unlike a function body, runs in the enclosing scope.
 `py_paths` stays bound after the block ends,
-so the `for path in sorted(py_paths):` line below the block can read it.
+so the `for path in sorted(py_paths):` line below the block reads it.
 
 The comprehension finishes building `py_paths`, as strings,
 while the directory still exists.
@@ -641,7 +641,7 @@ and `sum((n * n for n in nums), 0)` is the fix.
 
 ### A Generator Expression Runs Once
 
-`genexp_consumers.py` can iterate over `nums` three times because a `range` is re-iterable.
+`genexp_consumers.py` iterates over `nums` three times because a `range` is re-iterable.
 Each `for` over it starts again at zero.
 A generator expression is not re-iterable:
 
