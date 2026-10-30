@@ -1000,7 +1000,7 @@ Every borrower must return the object on every path out of their code,
 including the exception path.
 Each missed return removes an object from the pool for good.
 Enough missed returns empty the pool, so the next borrower waits forever.
-A context manager can return every borrowed object to the pool.
+A context manager returns every borrowed object to the pool.
 In Python, a pool is a queue plus a `@contextmanager` method:
 
 ```python
