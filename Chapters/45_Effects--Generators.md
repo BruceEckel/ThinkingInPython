@@ -920,15 +920,38 @@ and the result changes while `interview()` and `drive()` stay the same.
 
 ### `throw()` and `close()` Reach the Innermost Generator
 
-A driver can `throw()` an exception into a generator or `close()` it.
-`yield from` relays both calls.
-`throw()` raises its exception inside the innermost generator rather than in the delegating one.
-`close()` ends every generator in the chain.
+So far a driver has resumed a generator in two ways:
+`next()` runs it to its first `yield`,
+and `send()` resumes it with a value that becomes the result of the `yield` expression on which it waits.
+A generator object has two more methods,
+and each resumes the generator with an exception in place of a value.
+`throw(exc)` raises `exc` at that `yield`.
+`close()` raises `GeneratorExit` there,
+the signal that the generator will not be resumed again and should finish.
 
+A `raise` statement in the driver cannot do what `throw()` does.
+`raise` raises its exception in the frame that executes it.
+While the driver runs, the generator's frame is suspended.
+An exception propagates through the frames on the call stack,
+and a suspended frame is off that stack,
+so the generator's `except` clauses are out of the path of any `raise` the driver executes.
+`throw()` resumes the generator's frame first and then raises the exception at the `yield`,
+where the generator's own `try` statement sees it.
+Inside the body, `raise` is still the statement to use;
+`throw()` is a method for the driver, the holder of the generator object.
+
+In the three-channel picture,
+`throw()` gives the driver a second way to answer a request.
+`send()` delivers the answer when the request succeeded.
+`throw()` delivers the failure when it did not,
+and the generator that asked decides what to do about it:
+handle the exception and yield again, or let it propagate,
+which ends the generator.
+`asyncio` answers a coroutine this way when an awaited operation fails or the task is cancelled.
 In [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager),
 `@contextmanager`'s `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
-A driver can make the same call from its own code:
+A driver you write makes the same call:
 
 ```python
 # throw_and_close.py
@@ -967,6 +990,14 @@ the `finally` block runs, and the generator ends.
 so no traceback appears.
 Its return value is whatever the generator returned while handling `GeneratorExit`,
 and `None` here, since `worker()` lets the exception propagate.
+A generator that answers `GeneratorExit` with another `yield` has refused to finish,
+and `close()` raises a `RuntimeError`.
+
+A suspended generator holds whatever its body has open,
+a file or a lock inside a `with` statement, until it is resumed or collected.
+Python calls `close()` on a suspended generator when it is garbage-collected,
+so the `finally` block would run eventually;
+a driver that calls `close()` chooses the moment.
 
 Through a `yield from`, the same two calls reach the innermost generator:
 
@@ -1002,7 +1033,12 @@ g.close()
 
 The driver calls `throw()` on the generator `outer()` returned,
 but `inner()` prints the `caught` line.
-`yield from` passes the exception down to the `yield` where `inner()` waits.
+`yield from` passes the exception down to the `yield` where `inner()` waits,
+because that `yield` is the one that is suspended;
+`outer()` waits at its `yield from` expression.
+Had `inner()` let the exception escape,
+it would have come back up as if `outer()`'s `yield from` had raised it,
+and `outer()`'s `try` would see it on the way out.
 `g.close()` raises `GeneratorExit` in `inner()` first,
 so the cleanup lines print from the inside out.
 A driver that holds the outermost generator can stop and clean up every generator beneath it.
