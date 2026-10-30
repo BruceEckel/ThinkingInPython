@@ -1325,6 +1325,7 @@ The forked work runs in a worker,
 outside the driver and the handler stack that answers requests.
 So you must remove the requirement before the fork.
 Supply it first and fork the bound function.
+
 The type system enforces a rule about where a handler can answer a request.
 That rule is the guarantee on which [Stateless](../../Chapters/46_Effects--Stateless.md)
 and [Stateless in Practice](../../Chapters/47_Effects--Stateless_in_Practice.md)
@@ -1763,15 +1764,17 @@ and the checker's job is to confirm that the Effect agrees.
 Once you delete the annotation,
 the type checker has one description instead of two,
 so it can no longer report a disagreement.
-Callers lose their check too.
+
+`outcome()`'s callers lose their check when you delete the annotation.
 Under `ty` the result is `Unknown`,
 so a caller that treats it as a `str` type-checks.
 Under Pyright, each unannotated caller's inferred type gains the new member,
 up to the first caller with an annotation.
-Exercise 4 of [Generators](../../Chapters/45_Effects--Generators.md)
-needs a declared type to catch a missing `yield from` for the same reason.
+
 A type checker verifies claims.
 An inferred type is not a claim.
+Exercise 4 of [Generators](../../Chapters/45_Effects--Generators.md)
+needs a declared type to catch a missing `yield from` for the same reason.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
