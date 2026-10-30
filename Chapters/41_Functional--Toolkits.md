@@ -43,6 +43,7 @@ print(reduce(or_, [{"a": 1}, {"b": 2}, {"a": 3}], {}))
 `operator.or_()` is `|` as a function.
 On two dictionaries `|` is a union that keeps the right operand's value for a key both hold,
 so the later `"a": 3` replaces `"a": 1`.
+
 The `operator` module supplies a named function for each operator,
 ready to pass to a fold in place of `lambda a, b: a | b`.
 A function call has one too.
@@ -97,13 +98,13 @@ That is fifty-nine calls in all, against 2,692,537 for the undecorated version,
 where every branch recomputes the whole subtree beneath it.
 [Caching](18_Techniques--Performance.md#caching)
 runs both versions side by side.
-[Recursion](#recursion) explains why `fib()` keeps its recursive form.
 
 An iterative Fibonacci, `a, b = b, a + b` in a loop,
 needs neither recursion nor a cache.
 The recursive one stays the running example here because its body is one line and its calls repeat the same arguments,
 so the cache's effect shows in the hit count.
 The branching and the repeated subproblem matter, not the arithmetic.
+[Recursion](#recursion) explains why `fib()` keeps its recursive form.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever.
@@ -203,11 +204,11 @@ so writing `zero_pad = partial(pad, fill="0")` here works.
 the order a method expects.
 `partial` passes the bound arguments first and the instance after them,
 so `partial(pad, 5)` calls `pad(5, instance)` and fails with `AttributeError: 'int' object has no attribute 'value'`.
-The type checker reports the mistake before the run.
-`pad()`'s first parameter is `self`,
-so `partial(pad, 5)` draws `invalid-argument-type`: expected `Text`,
-found `Literal[5]`.
 Use `partialmethod` inside a class body and `partial` everywhere else.
+
+The type checker rejects `partial(pad, 5)` before the run.
+`pad()`'s first parameter is `self`, so the call draws `invalid-argument-type`:
+expected `Text`, found `Literal[5]`.
 
 ### `cached_property`
 
@@ -337,6 +338,7 @@ The rule compares two strings at a time,
 so where `"3"` belongs depends on the string beside it.
 A per-element key for this order is hard to find.
 The comparator states the rule.
+
 When a key function exists, use it,
 as in `sorted(words, key=len, reverse=True)`, which orders words by length.
 `sorted()` calls a key function once per element and a comparator once per comparison.
@@ -869,7 +871,8 @@ Order matters and elements repeat, so it yields all four pairs.
 `math.perm(n, r)` and `math.comb(n, r)` compute how many tuples `permutations()` and `combinations()` yield from `n` elements,
 so you can size a draw before you run it.
 `math.comb(20, 3)` is `1140`, the number of three-element draws from twenty.
-Python 3.15 also groups both under `math.integer`,
+
+Python 3.15 adds `math.integer`,
 a namespace that holds the integer-only functions: `gcd()`, `lcm()`, `isqrt()`,
 `factorial()`, `perm()`, and `comb()`.
 `math.integer.comb is math.comb` is `True`, so either name works.
@@ -1218,7 +1221,8 @@ whatever the size, from the students who have met its members least often in the
 To reach round `100`,
 `group_rounds()` therefore generates rounds `0` through `99` first.
 The circle method computes round `100` from its arithmetic alone.
-`deep_sum()` in [Recursion](#recursion) needs memory too.
+
+`deep_sum()` in [Recursion](#recursion) needs memory of a different kind.
 A counter cannot record which sublists are still open,
 so the recursive version keeps that state on the call stack,
 one stack frame per open sublist.
