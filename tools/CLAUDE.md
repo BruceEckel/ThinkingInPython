@@ -45,7 +45,10 @@ executes only listings without `#:` markers, with a full run of
 every listing once a day, and `tip output` refreshes only chapters
 whose Markdown or `utils/` changed since their markers last passed,
 or all of them when the checker changed (the `tools` modules it
-loads, `norun.txt`, `timing.txt`, `uv.lock`, `.python-version`). `tip gate RUN=full`, `tip ci`, and `tip release` turn the
+loads, `norun.txt`, `timing.txt`, `uv.lock`, `.python-version`, and
+since 2026-10-30 the interpreter's `sys.version`, because a Python
+patch upgrade changes none of those files and the 3.15.2 upgrade's
+verify refreshed no markers until `TIP_FULL=1` forced it). `tip gate RUN=full`, `tip ci`, and `tip release` turn the
 shortcuts off (`TIP_FULL=1`), and `tip everything` does too, then
 adds spell, prose (Vale), site, EPUB, and PDF, keeping going past a
 failure (`tools/everything.py`). A new tools test that reads a

@@ -30,9 +30,12 @@ that records the last time the work passed:
   (every listing can import them), the checker (the source of every
   ``tools`` module loaded in the process, found at runtime, so a new
   import joins the digest without a list to update), ``timing.txt`` and
-  ``norun.txt``, ``uv.lock``, and ``.python-version``. An edit to a tool
-  the checker does not load, such as ``verify.py``, leaves every stamp
-  valid. Nothing else can change a listing's output: the
+  ``norun.txt``, ``uv.lock``, ``.python-version``, and the running
+  interpreter's ``sys.version`` (since 2026-10-30: the 3.15.1 to 3.15.2
+  patch upgrade changed neither file, so ``tip python-upgrade``'s verify
+  refreshed no chapter's markers, and a full run had to follow by hand).
+  An edit to a tool the checker does not load, such as ``verify.py``,
+  leaves every stamp valid. Nothing else can change a listing's output: the
   build trees come from the Markdown alone, and no listing reads another
   chapter's directory. An edit to one chapter then refreshes that
   chapter. A marker the refresh rewrites changes the file, so the next
@@ -152,6 +155,7 @@ def marker_context(tree: Path, utils: Path) -> str:
         h.update(path.name.encode() + b"\0")
         if path.is_file():
             h.update(path.read_bytes())
+    h.update(sys.version.encode() + b"\0")
     h.update(_tree_key(tree).encode())
     if utils.is_dir():
         for path in sorted(utils.rglob("*.py")):
