@@ -491,8 +491,11 @@ and that method calls `__repr__()`.
 Adding `__str__()` makes `print(t)` and the printed list differ.
 The list keeps showing `Temperature(21.0)` for each element,
 because a container formats its elements with `repr()`, not `str()`.
-`{t!r}` calls `repr()`,
-producing the same `Temperature(21.0)` form inside an f-string.
+
+**Pick a form inside an f-string.**
+A bare `{t}` calls `str()`,
+through the `__format__()` that `Temperature` inherits from `object`.
+`{t!r}` calls `repr()`, so one f-string can show both forms side by side.
 
 The two forms serve different readers.
 `Temperature(21.0)` is the expression that rebuilds this object,
