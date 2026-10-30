@@ -10,6 +10,8 @@
 Chapters/01_Introduction.md	already: and does the language already do the pattern's job
 Chapters/01_Introduction.md	already: if they don't already
 Chapters/01_Introduction.md	already: this book asks whether the language already solves the problem
+Chapters/01_Introduction.md	could: I decided to see what the Claude AI could do with it
+Chapters/01_Introduction.md	could: and asks what Python could adopt
 Chapters/01_Introduction.md	even: Eventually I even wrote a message confirming I would not complete it
 Chapters/01_Introduction.md	is what: This book is what I've always wanted to create
 Chapters/01_Introduction.md	never: Claude allowed me to create tooling for the book that I had imagined but never fully realized
@@ -86,6 +88,7 @@ Chapters/10_Foundations--Cleanup.md	never: Never release a resource in CODE
 Chapters/10_Foundations--Cleanup.md	only: That list holds the only remaining references
 Chapters/10_Foundations--Cleanup.md	only: The only referrer is CODE
 Chapters/10_Foundations--Cleanup.md	only: so that count is correct only if CODE runs and succeeds
+Chapters/11_Techniques--Testing.md	could: any one of them could have caused the bug
 Chapters/11_Techniques--Testing.md	exactly: CODE is exactly CODE on any IEEE double
 Chapters/11_Techniques--Testing.md	exactly: that CODE ran exactly once
 Chapters/11_Techniques--Testing.md	has no: Python has no access control
@@ -114,6 +117,7 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	only: so only the postcondition
 Chapters/12_Techniques--Data_Classes_as_Types.md	takes no: so it accepts any callable that takes no arguments
 Chapters/12_Techniques--Data_Classes_as_Types.md	want: Subscript the factory when you want that agreement checked
 Chapters/13_Techniques--Pattern_Matching.md	cost: Every channel also has a rough cost to send a message
+Chapters/13_Techniques--Pattern_Matching.md	could: CODE could reach its end and return CODE
 Chapters/13_Techniques--Pattern_Matching.md	defines no: because CODE defines no CODE
 Chapters/13_Techniques--Pattern_Matching.md	has no: Python has no CODE keyword
 Chapters/13_Techniques--Pattern_Matching.md	has no: and CODE has no CODE to forget
@@ -140,6 +144,7 @@ Chapters/14_Techniques--Decorators.md	price: Changing the price of a topping mea
 Chapters/14_Techniques--Decorators.md	price: where a price change means editing every class that includes that topping
 Chapters/14_Techniques--Decorators.md	want: If you want the run-once idiom
 Chapters/14_Techniques--Decorators.md	want: Sometimes you want to choose later
+Chapters/15_Techniques--Context_Managers.md	could: The manager closed any resource it opened before the body could use it
 Chapters/15_Techniques--Context_Managers.md	never: CODE never propagates to the CODE
 Chapters/15_Techniques--Context_Managers.md	never: never runs
 Chapters/15_Techniques--Context_Managers.md	only: A class manager that stores per-CODE state stays reusable only if CODE resets that state
@@ -219,6 +224,11 @@ Chapters/19_Techniques--Concurrency.md	already: Threads already distributed comp
 Chapters/19_Techniques--Concurrency.md	already: Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort
 Chapters/19_Techniques--Concurrency.md	contain no: The CPU tasks contain no CODE
 Chapters/19_Techniques--Concurrency.md	cost: A million tiny results can cost more to pickle than the parallelism saves
+Chapters/19_Techniques--Concurrency.md	could: Multiple CPUs could run multiple parts of a program simultaneously
+Chapters/19_Techniques--Concurrency.md	could: Now two threads could update the same count at once and lose one of the updates
+Chapters/19_Techniques--Concurrency.md	could: the OS could switch contexts faster
+Chapters/19_Techniques--Concurrency.md	could: whose workers could not be more different
+Chapters/19_Techniques--Concurrency.md	could: you could expect every library to conform
 Chapters/19_Techniques--Concurrency.md	even: Even when you understand the problems produced by shared mutable state
 Chapters/19_Techniques--Concurrency.md	even: even a program written as CODE from top to bottom keeps a thread pool underneath
 Chapters/19_Techniques--Concurrency.md	even: since finer chunks even out the load across workers
@@ -256,7 +266,6 @@ Chapters/19_Techniques--Concurrency.md	only: The only difference between one run
 Chapters/19_Techniques--Concurrency.md	only: This chapter makes concurrency look (somewhat) easy because it has touched only the surface of shared mutable state problems
 Chapters/19_Techniques--Concurrency.md	only: Typically a thread runs only a few milliseconds at a time
 Chapters/19_Techniques--Concurrency.md	only: Usually only one thread touches an object
-Chapters/19_Techniques--Concurrency.md	only: an isolated object that reacts only to messages sent to its own mailbox
 Chapters/19_Techniques--Concurrency.md	only: and a free-threaded build only once you know every extension you use supports it
 Chapters/19_Techniques--Concurrency.md	only: but only in the way a crash is better than corruption
 Chapters/19_Techniques--Concurrency.md	only: only the type of object the call built
@@ -365,6 +374,7 @@ Chapters/26_Patterns--Factory.md	only: CODE is the only code that changes when y
 Chapters/26_Patterns--Factory.md	only: When the variant differs only in field values
 Chapters/26_Patterns--Factory.md	only: and the only method CODE and CODE override
 Chapters/27_Patterns--Function_Objects.md	carried none: A function pointer carried none
+Chapters/27_Patterns--Function_Objects.md	could: a class was the lightest form that could carry state
 Chapters/27_Patterns--Function_Objects.md	declares no: and a CODE declares no CODE
 Chapters/27_Patterns--Function_Objects.md	exactly: When each type needs exactly one
 Chapters/27_Patterns--Function_Objects.md	has no: and it has no CODE
@@ -420,7 +430,6 @@ Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checkin
 Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: The alternative is an iterative walk with an explicit stack of pending nodes (see exercise 8)
 Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: which walks the same tree with an explicit stack and no recursion
 Chapters/34_Patterns--Composite_and_Interpreter.md	have no: and CODE have no special methods of their own
-Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
 Chapters/34_Patterns--Composite_and_Interpreter.md	yields no: An empty directory has size 0 and yields no paths
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
@@ -495,7 +504,6 @@ Chapters/41_Functional--Toolkits.md	never: because CODE never returns
 Chapters/41_Functional--Toolkits.md	only: *Lazy evaluation* computes a value only when something needs it
 Chapters/41_Functional--Toolkits.md	only: A perfect trio schedule exists only when the roster size leaves a remainder of 3 when divided by 6
 Chapters/41_Functional--Toolkits.md	only: CODE works correctly only for pure functions
-Chapters/41_Functional--Toolkits.md	only: Pairs are the only group size where that question has a tidy rotation-based answer
 Chapters/41_Functional--Toolkits.md	only: and it holds only the few items in flight
 Chapters/41_Functional--Toolkits.md	only: built only from CODE pieces and a generator expression
 Chapters/41_Functional--Toolkits.md	only: pure functions only
@@ -526,6 +534,7 @@ Chapters/44_Effects--Effect_Management.md	by hand: Something the programmer trac
 Chapters/44_Effects--Effect_Management.md	by hand: and which technique from Effects by Hand applies to the rest
 Chapters/44_Effects--Effect_Management.md	by hand: nobody can imagine doing it by hand
 Chapters/44_Effects--Effect_Management.md	carry no: almost all of which carry no Effect annotations
+Chapters/44_Effects--Effect_Management.md	could: Could Python itself gain Effect tracking
 Chapters/44_Effects--Effect_Management.md	does it: Does it behave differently in a different environment
 Chapters/44_Effects--Effect_Management.md	does it: and does it fail silently or loudly
 Chapters/44_Effects--Effect_Management.md	does it: what does it change
@@ -539,6 +548,7 @@ Chapters/44_Effects--Effect_Management.md	never: the exception never propagates 
 Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
+Chapters/45_Effects--Generators.md	could: so the driver's table needs an entry it could not have written before that answer arrived
 Chapters/45_Effects--Generators.md	has no: CODE receives one value per call and has no way to ask for the next value or to stop the loop early
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
 Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
@@ -628,6 +638,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	provides no: Stateless provides no
 Chapters/A_Effect_Tracking.md	by hand: Effects by Hand counts five signatures to edit when a helper four calls below CODE needs a CODE Effect
 Chapters/A_Effect_Tracking.md	by hand: such as the CODE in Effects by Hand
 Chapters/A_Effect_Tracking.md	carry no: and nearly every function on PyPI carry no row
+Chapters/A_Effect_Tracking.md	could: Effect Management asks whether Python could gain Effect tracking
 Chapters/A_Effect_Tracking.md	declares no: CODE declares no exception
 Chapters/A_Effect_Tracking.md	declares nothing: so an empty list can mean either a function declared pure or one that declares nothing
 Chapters/A_Effect_Tracking.md	has no: which has no annotations
@@ -636,6 +647,7 @@ Chapters/A_Effect_Tracking.md	names an effect: The row names an Effect
 Chapters/A_Effect_Tracking.md	never: or never
 Chapters/A_Effect_Tracking.md	records no: OCaml 5 has handlers and records no row in a function's type
 Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
+Chapters/B_An_Effect_Checker.md	could: A row that reads CODE says the checker could not resolve a call
 Chapters/B_An_Effect_Checker.md	declares no: For a function that declares no row
 Chapters/B_An_Effect_Checker.md	has no: A built-in has no CODE and no CODE in which to store one
 Chapters/B_An_Effect_Checker.md	has no: which has no written type
@@ -650,8 +662,6 @@ Solutions/03_Foundations--Containers/README.md	cost: CODE compares the cost of o
 Solutions/03_Foundations--Containers/README.md	costs: so the CODE loop costs O(n)
 Solutions/03_Foundations--Containers/README.md	costs: so the whole loop costs O(n²)
 Solutions/04_Foundations--Control_Flow/README.md	has no: or when you read a stream that has no end
-Solutions/04_Foundations--Control_Flow/README.md	only: A list pattern matches only a sequence of its own length
-Solutions/04_Foundations--Control_Flow/README.md	only: Order matters only between patterns that could both match the same value
 Solutions/04_Foundations--Control_Flow/README.md	only: and increment it only in the branch that handles an odd CODE
 Solutions/04_Foundations--Control_Flow/README.md	only: so CODE matches only a list of two items
 Solutions/05_Foundations--Functions/README.md	has no: A tuple has no CODE
@@ -724,6 +734,7 @@ Solutions/19_Techniques--Concurrency/README.md	only: the interpreter considers s
 Solutions/19_Techniques--Concurrency/README.md	price: At runtime the line raises a CODE before any price comes back
 Solutions/19_Techniques--Concurrency/README.md	prices: with prices CODE
 Solutions/19_Techniques--Concurrency/README.md	prices: with the prices unchanged
+Solutions/20_Patterns--Rethinking_Objects/README.md	could: A future CPython could add another
 Solutions/20_Patterns--Rethinking_Objects/README.md	names no shape: and it names no shape
 Solutions/20_Patterns--Rethinking_Objects/README.md	names no: and it names no shape
 Solutions/20_Patterns--Rethinking_Objects/README.md	names the missing case: The inferred type names the missing case
@@ -885,6 +896,7 @@ Solutions/45_Effects--Generators/README.md	only: A generator's return value arri
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
 Solutions/45_Effects--Generators/README.md	want: So annotate a local whenever you want the checker to verify the type of the call that produces its value
 Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
+Solutions/46_Effects--Stateless/README.md	could: so a caller could hand it to CODE with no environment
 Solutions/46_Effects--Stateless/README.md	has no: a call to CODE has no terminal from which to read
 Solutions/46_Effects--Stateless/README.md	has none: CODE has none
 Solutions/46_Effects--Stateless/README.md	names the role: Each wrapper names the role this instance fills

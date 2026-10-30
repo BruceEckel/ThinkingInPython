@@ -2242,8 +2242,9 @@ checker could not resolve a call").
 **Sightings.** 1 flag, promoted on Bruce's request to a book sweep the
 same day (2026-10-30): 69 sites in `Chapters/` and `Solutions/`, 48
 rewritten plus 4 generated exercise quotes that followed their
-chapters, 17 kept. Candidate for a scan: `could` as a Tier 1 entry in
-`tools/watch_words.py`, with the 17 keeps as its baseline.
+chapters, 17 kept. Scan: `could` is a Tier 2 entry in `tools/watch_words.py`
+since the same day, with the 17 keeps in its baseline (Tier 1 has
+no per-word baseline, so the keeps could not be recorded there).
 
 **Home.** CLAUDE.md writing style (the "can"/"could" bullet beside
 "Present tense for standing behavior") | this file.

@@ -35,7 +35,11 @@ gets written: "checks each `Result` by hand" is "with `isinstance()`",
 "passed explicitly" is "passed as an argument". A hit stays where the
 contrast with an implicit or generated form is the claim ("explicit
 is better than implicit", the explicit `self` parameter, an explicit
-`{#id}` on a heading against the auto-slug). Tier 1 ("Consider rewriting") is a word with
+`{#id}` on a heading against the auto-slug). `could` joined Tier 2 on
+2026-10-30 (rule R53): a sentence that states a standing capability
+takes "can" ("`survey()` can delegate to either"); a narrated past, a
+counterfactual whose condition is on the page, a speculation about
+the future, and "could have" stay. Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -294,6 +298,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (3, r"wants?"),
         (3, r"spellings?"),
         (2, r"already"),
+        (2, r"could"),
         (2, r"even"),
         (2, r"honest(?:ly)?"),
         (2, r"buys?|bought"),
