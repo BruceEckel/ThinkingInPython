@@ -14,7 +14,7 @@ Chapters/01_Introduction.md	along with the CODE comments that appear from that c
 Chapters/03_Foundations--Containers.md	write one slice expression for each of
 Chapters/04_Foundations--Control_Flow.md	and the outer CODE (CODE) runs right after
 Chapters/04_Foundations--Control_Flow.md	which CODE lets through)
-Chapters/06_Foundations--Modules_and_Packages.md	The same silent failure therefore makes CODE an experiment to run rather than a setting to leave on
+Chapters/06_Foundations--Modules_and_Packages.md	That silent failure makes CODE an experiment to run rather than a setting to leave on
 Chapters/09_Foundations--Class_Attributes.md	The annotated field in CODE also leaves a class attribute behind
 Chapters/10_Foundations--Cleanup.md	With CODE left on
 Chapters/11_Techniques--Testing.md	CODE ran first and left its entry behind
@@ -34,7 +34,7 @@ Chapters/30_Patterns--Observer.md	set before CODE and cleared after
 Chapters/38_Patterns--Simulation.md	The teleports are not shortcuts but the only way through
 Chapters/38_Patterns--Simulation.md	a single robot walks a maze where each object it meets decides which room the robot ends up in
 Chapters/41_Functional--Toolkits.md	CODE saves each element the first time through
-Chapters/46_Effects--Stateless.md	The DI registration key also sets the type an instance answers for
+Chapters/45_Effects--Generators.md	CODE yields once and lets every exception through
 Chapters/47_Effects--Stateless_in_Practice.md	building a fresh event loop for the call and tearing it down after
 Chapters/a.md	Name the field they sit on
 Solutions/02_Foundations--Tour/README.md	CODE changes the literal text and passes each value through

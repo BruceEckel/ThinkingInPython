@@ -45,7 +45,7 @@ Chapters/28_Patterns--Data_Transfer_Objects.md	[prep] CODE .. produce: When the 
 Chapters/29_Patterns--Changing_the_Interface.md	[appos] parameter .. raises: If an override renames a keyword-capable parameter, a call that passes the old name by keyword raises a CODE.
 Chapters/29_Patterns--Changing_the_Interface.md	[cc,conj] CODE .. look: CODE and CODE build the new instance without running CODE, then look up CODE on it.
 Chapters/30_Patterns--Observer.md	[cc,nummod,prep] exercise .. raised: Redo exercise 3 with each failure returned as a value instead of raised as an exception.
-Chapters/31_Patterns--State_Machines.md	[cc,dobj,npadvmod,prep] stores .. reuse: The event bus stores its handlers under the event class the same way, and *Multiple Dispatching* and Pattern Refactoring reuse the lookup.
+Chapters/31_Patterns--State_Machines.md	[cc,dobj,prep] stores .. reuse: The event bus stores its handlers under the event class, and *Multiple Dispatching* and Pattern Refactoring reuse this engine's lookup.
 Chapters/34_Patterns--Composite_and_Interpreter.md	[relcl] build .. alternates: A build that runs targets in parallel calls CODE once, then alternates CODE and CODE in place of CODE.
 Chapters/40_Functional--Foundations.md	[appos,relcl] functions .. requires: Five of the chapter's ideas work at once: a record for the value, CODE to state that CODE leaves its input unchanged, three pure functions, CODE to turn a two-argument predicate into the one-argument callable CODE requires, and CODE and CODE for the traversal.
 Chapters/40_Functional--Foundations.md	[conj] key .. is: Contents-based equality together with a stable hash is why a dictionary key, a cache entry, or a value shared across threads is normally a tuple or a record.

@@ -168,6 +168,7 @@ Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE collects the three argu
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE covers the common case of one call
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE lets a single CODE block serve all three cases
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE prints the exception's CODE, which includes both its type and its arguments, where CODE gives the type alone
+Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE produces values alone, the shape that Iterators annotates CODE
 Chapters/15_Techniques--Context_Managers.md	[BOUND] It calls the same two methods on every manager, whether CODE built it from a generator or a class defined it
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Ordering, the three exception arguments, and suppression through a truthy return work the same way in the async form
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Rewrite CODE to take its names from CODE, run it with no arguments and with three, and confirm that with three names the close order reverses the open order, and that with none the program prints CODE alone
@@ -535,7 +536,6 @@ Chapters/33_Patterns--Visitor.md	[BOUND] CODE resolves one argument's type
 Chapters/33_Patterns--Visitor.md	[BOUND] Count the lines each change adds, and say which of the two changes CODE makes shorter
 Chapters/33_Patterns--Visitor.md	[BOUND] If you delete the override, every flower resolves to the same CODE, so the visitor's type alone decides which method runs
 Chapters/33_Patterns--Visitor.md	[BOUND] Nothing registers CODE, so CODE resolves to the same implementation CODE does, the one stored under CODE
-Chapters/33_Patterns--Visitor.md	[BOUND] The CODE in CODE is a choice, unlike the one in Data Transfer Objects, where a bag of attributes named at runtime makes CODE the most precise type you can write
 Chapters/33_Patterns--Visitor.md	[BOUND] The classic pattern overloads CODE once per flower type and keeps each operation's body in the visitor, so CODE is the one method the pattern adds to the primary hierarchy
 Chapters/33_Patterns--Visitor.md	[BOUND] The flower's type is the one thing left for runtime to resolve
 Chapters/33_Patterns--Visitor.md	[BOUND] The two operations, CODE and CODE, are new, each added independently of the other
@@ -731,6 +731,7 @@ Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
 Chapters/45_Effects--Generators.md	[BOUND] CODE takes the generator alone
+Chapters/45_Effects--Generators.md	[BOUND] CODE yields once and lets every exception through, so each call shows one thing
 Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape, where the action belongs to the transition
 Chapters/45_Effects--Generators.md	[BOUND] Each CODE wraps one call that resumes the generator, CODE or CODE, because a CODE from either means the conversation finished
 Chapters/45_Effects--Generators.md	[BOUND] Here the question has two places to put code rather than two designs
@@ -739,6 +740,7 @@ Chapters/45_Effects--Generators.md	[BOUND] It describes the yield channel alone,
 Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
 Chapters/45_Effects--Generators.md	[BOUND] One shape looks like a transition and is a delegation
 Chapters/45_Effects--Generators.md	[BOUND] Replace CODE's loop in CODE with the single line CODE and run CODE over the same CODE table
+Chapters/45_Effects--Generators.md	[BOUND] So far a driver has resumed a generator in two ways
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
 Chapters/45_Effects--Generators.md	[BOUND] That CODE sits before the step's CODE, so the exception passes straight out of the card step, whose own action is the one that failed
 Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver at the edge of the program
@@ -1202,7 +1204,7 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] CODE reads as it d
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] CODE reports an CODE in each cell, since a cell's parameters are CODEs and CODE alone defines CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] CODE resolves on CODE's type alone
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Exercise 10 collects the same 36 answers in one place
-Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Exercise 8's version keeps the chapter's two advantages
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Exercise 8's version keeps the two advantages the chapter gives the method version
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] If you leave CODE out of CODE, the program prints the same two lines, since every weapon class defines its own
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] It returns a closure that ignores both operands and returns one CODE, so the seven combinations with a constant answer stay one line each and still read as a table of answers
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] That change has three consequences
@@ -1353,10 +1355,10 @@ Solutions/44_Effects--Effect_Management/README.md	[BOUND] Your CODE body is the 
 Solutions/45_Effects--Generators/README.md	[BOUND] **Keep the three channels apart
 Solutions/45_Effects--Generators/README.md	[BOUND] A send that supplies a collector's first value produces one line
 Solutions/45_Effects--Generators/README.md	[BOUND] Annotating a Generator describes the three parameters of CODE
+Solutions/45_Effects--Generators/README.md	[BOUND] CODE's annotation alone gives the checker a declared type to compare with the call's type
 Solutions/45_Effects--Generators/README.md	[BOUND] So at runtime the first CODE accepts CODE alone, a value the CODE excludes
 Solutions/45_Effects--Generators/README.md	[BOUND] The CODE in CODE runs the opposite direction from the one in CODE
 Solutions/45_Effects--Generators/README.md	[BOUND] The CODE meant for the conversation catches the one from the exhausted answers and treats it as a finished interview
-Solutions/45_Effects--Generators/README.md	[BOUND] The annotation alone gives the checker a declared type to compare with the call's type
 Solutions/45_Effects--Generators/README.md	[BOUND] The f-string then accepts any object, since formatting one calls CODE on it
 Solutions/45_Effects--Generators/README.md	[BOUND] The generator stays suspended for the rest of the run, so CODE is the one request CODE receives
 Solutions/45_Effects--Generators/README.md	[BOUND] The one call that cannot carry a value comes from the one function that cannot pass one

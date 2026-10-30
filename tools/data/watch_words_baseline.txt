@@ -877,7 +877,7 @@ Solutions/43_Functional--Confidence/README.md	bind no: The CODE patterns bind no
 Solutions/43_Functional--Confidence/README.md	by hand: and it is the one Effects by Hand describes
 Solutions/43_Functional--Confidence/README.md	even: The exercise's comparison therefore comes out even at either precision
 Solutions/43_Functional--Confidence/README.md	has no: A fenced block executed in place has no file for a worker to import
-Solutions/43_Functional--Confidence/README.md	has no: CODE has no inverse either
+Solutions/43_Functional--Confidence/README.md	has no: CODE has no inverse
 Solutions/43_Functional--Confidence/README.md	never: A hand-written loop over CODE never tests CODE
 Solutions/44_Effects--Effect_Management/README.md	by hand: Each remaining Effect points to the technique from Effects by Hand
 Solutions/44_Effects--Effect_Management/README.md	by hand: Effects by Hand shows CODE taking its CODE and CODE Effects as parameters

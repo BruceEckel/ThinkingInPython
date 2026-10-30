@@ -18,8 +18,7 @@ Chapters/09_Foundations--Class_Attributes.md	[R32] A CODE with no value stays a 
 Chapters/09_Foundations--Class_Attributes.md	[R32] The assignment creates CODE on CODE alone, the same shadowing CODE demonstrates in CODE
 Chapters/09_Foundations--Class_Attributes.md	[R32] Writing the same increment through CODE forks the counter when the base class has subclasses, the same way CODE forks CODE
 Chapters/13_Techniques--Pattern_Matching.md	[R35] Rethinking Objects works through the same tradeoff with shapes, and *Multiple Dispatching* and *Visitor* explore it further
-Chapters/13_Techniques--Pattern_Matching.md	[R35] The tradeoff has a name
-Chapters/13_Techniques--Pattern_Matching.md	[R35] When Not to Match weighs an open set of types against a closed one, and the two notification versions show that tradeoff in code
+Chapters/13_Techniques--Pattern_Matching.md	[R35] The tradeoff between the two notification versions has a name
 Chapters/14_Techniques--Decorators.md	[R32] With CODE, the same call raises a CODE at decoration
 Chapters/14_Techniques--Decorators.md	[R35] Changing the price of a topping means changing one number, in one place
 Chapters/15_Techniques--Context_Managers.md	[R32] CODE builds such a manager from an async generator, the same way CODE builds the synchronous form

@@ -183,7 +183,7 @@ Chapters/38_Patterns--Simulation.md	[PAST] sprinkled: In 1787 Ernst Chladni spri
 Chapters/38_Patterns--Simulation.md	[PAST] wrote: Jeremy Meyer wrote the original Java version of this example.
 Chapters/41_Functional--Toolkits.md	[PAST] consumed: CODE consumed the CODE on its way to the stop index and discarded it.
 Chapters/41_Functional--Toolkits.md	[PAST] discarded: CODE consumed the CODE on its way to the stop index and discarded it.
-Chapters/41_Functional--Toolkits.md	[PAST] found: CODE's first parameter is CODE, so CODE draws CODE: expected CODE, found CODE.
+Chapters/41_Functional--Toolkits.md	[PAST] found: CODE's first parameter is CODE, so the call draws CODE: expected CODE, found CODE.
 Chapters/41_Functional--Toolkits.md	[PAST] kept: CODE is CODE with the intermediate results kept.
 Chapters/41_Functional--Toolkits.md	[PAST] was: CODE was the first value computed, so the fourth miss, at CODE, proves the cache evicted it.
 Chapters/42_Functional--Error_Handling.md	[PAST] read: The CODE branch reads CODE, and that read type-checks.
