@@ -245,11 +245,12 @@ which holds 2 by the time anything calls them.
 The argument to [`functools.partial()`](40_Functional--Foundations.md#partial-application)
 is an ordinary expression that Python evaluates where you write it,
 so each command stores the finished string built from its own iteration's `n`.
-The older remedy binds the value through a default argument,
-`lambda n=n: print(f"step {n}")`.
-Python evaluates a default once, when it creates the lambda.
+
 When commands built in a loop all behave like the last one,
 the shared loop variable is the cause.
+The remedy older than `partial()` binds the value through a default argument,
+`lambda n=n: print(f"step {n}")`.
+Python evaluates a default once, when it creates the lambda.
 
 ## Strategy: Choosing the Algorithm at Runtime
 
@@ -649,8 +650,8 @@ The type checker must therefore find one `E` that satisfies the event type and t
 No such `E` exists for a `Deposit` paired with a handler that takes a `Withdraw`,
 so the type checker reports a type error.
 The check runs once, at registration.
-The stored `defaultdict`, though,
-mixes handlers for every event type in one structure.
+
+The stored `defaultdict` mixes handlers for every event type in one structure.
 One annotation covers every list.
 No single event class fits all of them, so the element type is `Handler[Any]`.
 
