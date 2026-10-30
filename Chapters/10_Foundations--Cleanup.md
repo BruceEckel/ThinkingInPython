@@ -50,6 +50,7 @@ when it tears down the global `counters` list.
 That list holds the only remaining references,
 so destroying the list drops each `Counter`'s reference count to zero,
 and Python destroys each `Counter` in turn.
+
 The listing's markers end at `End of delete loop`,
 which the program's last statement prints.
 Each `__del__()` prints afterward.
@@ -366,10 +367,11 @@ Its `alive` attribute reports whether it can still run.
 
 `b` holds the only strong reference to its `Connection`,
 so `del b` destroys the object here, where the `del c` in `cleanup.py` does not.
-Nobody calls `close()`, but the callback still runs,
-and it runs before interpreter shutdown rather than during it.
-For an object still alive when the program ends,
-`finalize()` runs the callback from the `atexit` module's exit handlers,
+Nobody calls `close()`, but the callback still runs, at `del b`,
+before interpreter shutdown rather than during it.
+
+An object still alive when the program ends gets its callback too.
+`finalize()` runs that callback from the `atexit` module's exit handlers,
 ahead of the teardown that makes `__del__()` unreliable.
 
 ### The `self.close` Trap {#the-self-close-trap}
