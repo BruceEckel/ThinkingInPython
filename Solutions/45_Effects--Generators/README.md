@@ -493,7 +493,8 @@ That assignment is the defect.
 The runtime output shows a consequence two lines later,
 in the `return` statement, where the f-string formats the object.
 A reader must work backward from a `<generator object ...>` in a report to the missing `yield from`.
-Worse, the failure is quiet: no exception, an exit code of zero,
+
+The runtime failure is quiet: no exception, an exit code of zero,
 and output that a log scraper accepts.
 A coroutine that nothing awaits draws a `RuntimeWarning` when Python reclaims it,
 as [Concurrency](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics)
@@ -506,7 +507,8 @@ For `profile = interview()` it infers the expression's own type,
 and no declared type contradicts that inference.
 The f-string then accepts any object, since formatting one calls `str()` on it.
 A generator object's `str()` is its repr, so the output shows the repr.
-The annotation alone gives the checker a declared type to compare with the call's type.
+
+`profile`'s annotation alone gives the checker a declared type to compare with the call's type.
 So annotate a local whenever you want the checker to verify the type of the call that produces its value.
 
 Before you move on, name what separates your attempt from this one:
@@ -615,6 +617,7 @@ and the call's type carries `list[Result | Answer]` in the return position.
 and it ends by returning `stop.value` as its `Result`.
 A list is not a `Result`,
 so the argument fails where `drive()` would hand the list to its caller.
+
 Python ignores the annotations,
 so the script runs to the end and `print()` shows the list:
 
@@ -703,7 +706,8 @@ At the call `joined(interview(), ask(Question("color")))`,
 the checker matches `interview()`'s `Generator[Question, Answer, Result]` against `Generator[Question, Answer, str]`.
 `Generator` is covariant in its return type and `Result` is a `str`,
 so the match succeeds, and `ask()`'s `Answer` passes the same way.
-The two annotations do different jobs.
+
+The annotations on `sequence()` and `joined()` do different jobs.
 `sequence()`'s type parameter lets it collect any return type,
 so one definition serves steps of every return type.
 `joined()`'s `str` annotation makes the join type-check,
