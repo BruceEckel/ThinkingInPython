@@ -273,8 +273,10 @@ A method call is the ordinary case, and it is hard.
 For `console.print(message)` the tool needs the type of `console`.
 That type may come from a parameter annotation, an assignment,
 a narrowing `isinstance()`, a generic, or an overload.
-A subclass may also override the method.
-An override needs its own rule.
+
+The tool reads the row of `print()` from `console`'s declared type,
+but the call may run a subclass's override.
+An override therefore needs its own rule.
 The overriding method's row must fit inside the row of the method it replaces,
 or a caller holding the base type performs Effects the base row omits.
 
@@ -366,6 +368,7 @@ with handling(Ask, Scripted()):
 `Scripted`, the test stand-in from `ask_tell.py`,
 answers every prompt with the same name.
 Inside that block the tool would remove `Ask` from the row.
+
 The subtraction is sound if the handler intercepts the Effect.
 Interception requires `ask()` to consult the installed handler instead of calling `input()`.
 Consulting an installed handler takes a runtime mechanism,
