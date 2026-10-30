@@ -3083,9 +3083,12 @@ from a hedged event.
   the runtime failure"), and an exercise or hint. The agents'
   closest calls were sentences true of the listing but phrased as the
   reason the design works ("Because the machine is deterministic, a
-  test can drive it"); they kept those, and Bruce's chapter reads
-  decide them (`build/can-2026-10-30/LEFTOVERS.md`). Yield 7%, so the
-  shape is rare in this book; the rule stays a survey for new drafts.
+  test can drive it"); they kept those. Bruce read every close call
+  in `build/can-2026-10-30/LEFTOVERS.md` the same day and kept them
+  all, so a "can" that gives the reason a design works, with the
+  listing as its evidence, is a keep, as is a "can" paired with a
+  "cannot" or set against a sibling option. Yield 7%, so the shape
+  is rare in this book; the rule stays a survey for new drafts.
 
 **Home.** CLAUDE.md (global, the "can"/"could" bullet); this file.
 
