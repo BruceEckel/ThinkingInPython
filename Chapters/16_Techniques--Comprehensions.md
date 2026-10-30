@@ -752,6 +752,9 @@ so the nested `[2, 3]` above stays a single element of the result.
 
 `**` does the same for dictionaries, merging each mapping into the result,
 where a later key's value replaces an earlier one.
+In `{**d for d in dicts}`,
+the third mapping's `"a": 3` replaces the first mapping's `"a": 1`.
+
 With braces, `*` builds a set and `**` builds a dict.
 In an ordinary brace comprehension, the colon decides between the two.
 Neither unpacking comprehension has a colon, so the operator decides.
