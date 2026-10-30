@@ -971,8 +971,8 @@ the body ends there, and `print("resumed")` stays unreached.
 A `raise` statement in the driver cannot do what `throw()` does.
 `raise` raises its exception in the function that executes it,
 and the exception propagates up through that function's callers.
-While the driver runs, the generator is suspended at its `yield`,
-off the call stack, so the generator's `except` clauses are out of the path of any `raise` the driver executes.
+While the driver runs, the generator waits at its `yield`, off the call stack,
+so the generator's `except` clauses are out of the path of any `raise` the driver executes.
 `throw()` resumes the generator first and then raises the exception at the `yield`,
 where the generator's own `try` statement sees it.
 Inside the body, `raise` is still the statement to use;
