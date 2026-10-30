@@ -387,8 +387,12 @@ are lowercase without being the lowercase of anything.
 `ß` breaks the same law by changing a string's length.
 `"ß".upper()` is `"SS"`, two characters.
 Lowering `"SS"` gives `"ss"`, which differs from `"ß"`.
+
 For case-insensitive comparison Python provides `str.casefold()` rather than `str.lower()`.
-`casefold()` has no inverse either.
+`casefold()` maps `µ` to the Greek `μ` and `ß` to `"ss"`,
+the results of their round trips,
+so `s.upper().casefold() == s.casefold()` holds for both characters.
+Like `upper()` and `lower()`, `casefold()` has no inverse.
 
 A hand-written loop over `"abcde"` never tests `µ`.
 The generated strings include characters nobody thinks to type.
