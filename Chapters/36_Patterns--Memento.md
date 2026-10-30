@@ -356,11 +356,11 @@ or switch to *Command*-based undo, which stores an edit instead of a state.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 argues that encapsulation exists mainly because of mutation,
 so freezing removes most of the reason for it.
-That section's reasoning also makes `strokes` a tuple rather than a list.
-Freezing blocks assignment to the field,
+Freezing blocks assignment to a field,
 not changes to the object the field holds.
 A record holding a list therefore lets that list change,
 as `frozen_leaky.py` in that chapter shows.
+For that reason, `strokes` in `Drawing` is a tuple rather than a list.
 
 [*Flyweight*](35_Patterns--Flyweight.md)
 shares immutable values among objects that exist at once.
@@ -695,13 +695,13 @@ No practical annotation declares that `SketchV1` can become a different class.
 That name is now bound to `SketchV2`.
 `pickle.loads()` builds a bare `SketchV2` with `__new__()`,
 skipping `__init__()`, and copies in the fields the old bytes had.
+Skipping `__init__()` also skips `__post_init__()`,
+so a memento saved before you add validation to a field loads with that field unchecked.
 
 Pickle writes the fields into the object's `__dict__`,
 bypassing the frozen check.
 A record's generated `__setattr__()` raises `FrozenInstanceError`.
 Pickle updates `__dict__` without calling `__setattr__()`.
-Skipping `__init__()` also skips `__post_init__()`,
-so a memento saved before you add validation to a field loads with that field unchecked.
 
 The loaded object carries the one field the old bytes held.
 `restored.strokes` works because both versions agree on that field.
