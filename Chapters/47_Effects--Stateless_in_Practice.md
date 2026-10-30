@@ -231,8 +231,6 @@ print(4_000 < heads < 6_000)
 #: True
 ```
 
-The body of `count_heads()` does not call `random`,
-and no parameter carries a seed or a source.
 `Ask` and `Tell` each carry a payload the request delivers,
 whereas `Flip`'s whole content is its type and the `bool` it produces.
 
@@ -245,6 +243,8 @@ so `if yield from flip():` is a syntax error.
 Two handlers feed the same function.
 `count_heads()` runs the same code under both,
 because either answer arrives through the same `send()` channel.
+The body of `count_heads()` does not call `random`,
+and no parameter carries a seed or a source.
 
 The scripted handler holds state.
 `next(script)` produces a different value at each request,
@@ -681,14 +681,15 @@ The load's declared dependency stays the same.
 and that type appears once.
 The object answering the need changes:
 four objects in turn during the first run.
-A dependency bound before the program starts gives one answer for the whole run.
-Here the source that can supply the load changes with the hour.
 In `microgrid.py` the binding is a call to `choose()`,
 which checks each source's `available()` at each request.
+The handler chooses the source, so the consumer's code stays the same.
+
+A dependency bound before the program starts gives one answer for the whole run.
+Here the source that can supply the load changes with the hour.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 swaps an implementation between runs.
 `microgrid.py` swaps one during a run.
-The handler chooses the source, so the consumer's code stays the same.
 
 ## State as an Ability
 
@@ -870,6 +871,7 @@ Within `research()`,
 the signature is also the only place the three failures appear.
 The body requests each dependency by its type and leaves the network, the files,
 and the printing to the implementations you supply.
+
 Calling `research()` returns a generator object.
 Its body runs when `run()` drives that generator.
 
@@ -1979,6 +1981,7 @@ print(f"run() at least 20x slower: "
 and by the listing's own measure that makes it at least twenty times slower than `run_async()`.
 Running the listing with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
 prints both per-call costs.
+
 Synchronous code runs outside any event loop,
 so each of its `run()` calls builds one.
 From inside a running loop,
@@ -2251,12 +2254,14 @@ with no exponential backoff and no jitter.
 with no way to specify the one worth retrying.
 Stateless provides no timeout, `race`, fallback combinator, or finalizer.
 The missing `race` rules out the hedging strategy that races a delayed second request.
+
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.
 Two forked Effects that share the `Cell` of [State as an Ability](#state-as-an-ability)
 race on it.
 No type reports the race.
 The library leaves state shared across forked Effects to you and to Python.
-Above that sit the resilience patterns a production system eventually needs
+
+Above the operators and the concurrency primitives sit the resilience patterns a production system eventually needs
 (rate limiting, bulkheads, and circuit breakers), none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
 not a platform for building distributed systems.
