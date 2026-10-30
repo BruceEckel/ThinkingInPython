@@ -563,8 +563,10 @@ Python 3.5 added the operator for array libraries such as NumPy.
 No built-in type implements either method, so `2 @ 3` raises a `TypeError`.
 The in-place forms, `__iadd__()` and its siblings, are a separate family.
 They serve `+=`, not `a + b`.
-`Meters.__add__()` and `Meters.__radd__()` each print a line when they run,
-so the output traces each dispatch:
+
+In `radd_dispatch.py`,
+a `Meters` record implements `__add__()` and `__radd__()`.
+Each method prints a line when it runs, so the output traces each dispatch:
 
 ```python
 # radd_dispatch.py
@@ -639,6 +641,7 @@ makes `ty` reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
 Pyright and mypy accept the access,
 because that inheritance from `Any` makes any attribute access on the sentinel branch type-check.
+
 The sentinel is a signal to the interpreter.
 A direct call such as `Meters(3).__add__("four")` does return it.
 But the type checker also uses the annotation as the type of the `+` expression that calls `__add__()`,
