@@ -191,6 +191,7 @@ print(counts)
 `fib()` and `square()` stay untouched.
 `on_start()` does the counting outside them,
 and the interpreter calls it each time a monitored Python function begins.
+
 `set_local_events()` is the narrow instrument.
 It attaches the event to one code object,
 so `square()` is absent from the count although it ran.
@@ -299,14 +300,14 @@ print(f"set at least 100x faster: {t_set * 100 < t_list}")
 
 `timeit.timeit()` calls its first argument repeatedly and returns the total elapsed time in seconds for every call combined,
 not the time for one call.
-That first argument is a `lambda` here rather than a string of code,
-since a `lambda` can close over `target`, `as_list`, and `as_set`,
-while a string needs a `setup` argument or `globals` to reach them.
 `number` sets how many times `timeit` calls the lambda, 100 in this case.
 `number` defaults to a million calls.
 A million suits a microsecond snippet and is a long wait for anything slower,
 so always set `number` for a function you are timing for the first time.
 
+`membership.py` passes `timeit.timeit()` a `lambda` rather than a string of code,
+since a `lambda` can close over `target`, `as_list`, and `as_set`,
+while a string needs a `setup` argument or `globals` to reach them.
 Each timing includes the cost of calling the lambda.
 A set lookup takes nanoseconds, so that call is a sizable share of `t_set`,
 and the ratio understates how much faster the set is.
@@ -1357,6 +1358,7 @@ The same is true of weak references,
 as [Cleanup](10_Foundations--Cleanup.md#slotted-class-needs-weakref) shows.
 Add `"__weakref__"` to `__slots__` if some other object needs to hold one
 (`weakref_slot=True` adds it to a data class).
+
 Since 3.15, `"__dict__"` and `"__weakref__"` work in the `__slots__` of any class,
 including subclasses of `int`, `bytes`, and `tuple`,
 which raised a `TypeError` for every non-empty `__slots__` through 3.14.
@@ -1369,6 +1371,7 @@ When two unrelated classes both declare non-empty `__slots__`,
 each claims its own layout, the two layouts conflict,
 and a class cannot inherit from both.
 A class can inherit from one slotted base as long as its other bases declare no slots of their own.
+
 A subclass that declares no `__slots__` of its own silently gets a `__dict__` back,
 undoing the saving for every instance of that subclass (see exercise 6).
 
