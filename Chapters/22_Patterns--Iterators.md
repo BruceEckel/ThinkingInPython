@@ -594,7 +594,7 @@ skipping and stopping give the same result.
 On infinite data of that kind, `takewhile()` finishes.
 The `if` clause runs forever.
 
-A test can demonstrate that difference, but not by writing `list(count(1))`.
+A test demonstrates that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
 `counter()` stands in for `count(1)`.
 
