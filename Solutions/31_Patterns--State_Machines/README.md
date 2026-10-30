@@ -735,6 +735,7 @@ picks a successor, and stores the pick back.
 `trap_states.py` keeps its state outside any execution frame.
 The current state is a `TrapState` member held in the `StateMachine`'s `current_state` field,
 and `step()` replaces that field with the result of the member's transition function.
+
 The enum design makes the states visible and nameable:
 a caller can read `current_state`, print it,
 and compare it with `TrapState.HOLDING`.
