@@ -129,6 +129,7 @@ so the signatures match.
 The type checker accepts `BoundedStack` as a `Stack`.
 `fill()` takes a `Stack` and relies on its `push()` always succeeding.
 The subclass matches the signature and breaks the contract behind it.
+Substitutability is the part of polymorphism that no tool can ensure.
 
 No tool catches the broken contract, but a test can.
 If a test written against `Stack`'s contract also runs against `BoundedStack`,
@@ -137,7 +138,6 @@ Two later tests use the same pattern to check other runtime guarantees:
 `test_plugged.py` confirms that a getter's copy holds,
 and `test_immutable.py` confirms that a frozen field refuses assignment.
 
-Substitutability is the part of polymorphism that no tool can ensure.
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.
@@ -1035,12 +1035,12 @@ Adding a new shape is easier in the OOP version,
 where the new shape is one class that carries its own `area()`.
 In the functional version,
 a new shape is a record plus a new `case` in every function that matches on shapes.
+There, the exhaustiveness check covers adding a shape.
+Adding a member to the `Shape` union leaves every existing `match` incomplete,
+and `assert_never()` turns each one into a type checker error naming the shape you missed.
 Adding a new operation over all shapes is easier in the pattern matching
 (functional) version,
 where the operation is one new function rather than a new method on every class.
-In the functional version, the exhaustiveness check covers adding a shape.
-Adding a member to the `Shape` union leaves every existing `match` incomplete,
-and `assert_never()` turns each one into a type checker error naming the shape you missed.
 
 The OOP approach assumes you add types more often than operations.
 That assumption often fails.
