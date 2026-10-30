@@ -398,7 +398,7 @@ Calling `make_class("Start")` twice produces two distinct classes.
 
 The `__init__()` in `klass` sits textually inside a `class` block,
 and the compiler treats a block compiled from a string the same as one read from a file.
-So this `__init__()` gets a `__class__` cell and can call zero-argument `super()`.
+So this `__init__()` gets a `__class__` cell and calls zero-argument `super()`.
 `init()` in `events.py` is a nested function rather than a method in a class body,
 so it has no such cell and names `Event.__init__()` instead.
 
