@@ -559,7 +559,7 @@ which is all that remains once you supply every other Ability.
 
 `Need` creates a delayed binding,
 so different runs can bind different implementations.
-For example, a test can bind to a `Console` that records instead of printing:
+For example, a test binds to a `Console` that records instead of printing:
 
 ```python
 # recorder.py
@@ -1336,7 +1336,7 @@ It is an ordinary class whose one method is `async def sleep()`.
 
 Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect).
 `Need[Time]` moves that side cause into the Ability channel.
-A test can then supply a clock that never waits:
+A test then supplies a clock that never waits:
 
 ```python
 # test_instant_clock.py
