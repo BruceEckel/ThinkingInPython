@@ -156,6 +156,7 @@ When the capture is the last `case`, as here,
 Python compiles the `match` silently, and the type checker accepts it.
 The checker treats the capture as matching every value,
 so it sees every path through `broken()` ending at the `return`.
+
 `ruff` flags the line only when you enable its pep8-naming rules.
 Then N806 reports `DEFAULT` as an uppercase variable inside a function.
 That message is about naming style rather than the capture,
@@ -929,10 +930,11 @@ Inheritance confines a new type to one new subclass.
 Pattern matching confines a new operation to one new function.
 A new operation touches every existing subclass,
 and a new type touches every existing `match`.
+
+The tradeoff between the two notification versions has a name:
+the *expression problem*.
 [When Not to Match](#when-not-to-match)
-weighs an open set of types against a closed one,
-and the two notification versions show that tradeoff in code.
-The tradeoff has a name: the *expression problem*.
+weighs it as the choice between an open set of types and a closed one.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works through the same tradeoff with shapes,
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
