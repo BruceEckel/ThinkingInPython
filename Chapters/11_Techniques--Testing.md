@@ -21,13 +21,14 @@ Tests also expose problems in the design.
 A function that is hard to test usually reads the clock, the filesystem,
 or the network instead of receiving them as arguments.
 
-When you find a bug that no test caught, the patch is half the job.
-Start by writing a test that reproduces the bug, and watch it fail.
+When you find a bug that no test caught,
+start by writing a test that reproduces the bug, and watch it fail.
 The fix then turns that test green.
 If the bug returns, that test reports it.
-The other half of the job is asking what allowed the bug:
-a case the tests missed, a claim the annotations left out,
-an interface that makes misuse easy.
+
+The patch is half the job.
+The other half is asking what allowed the bug: a case the tests missed,
+a claim the annotations left out, an interface that makes misuse easy.
 Fix the bug, and also fix its cause.
 A team that stops at the patch fixes the same kind of bug forever.
 
@@ -270,6 +271,8 @@ anchors a pattern at the start of the string,
 so it rejects `less than 250` for this message, which starts with `balance`.
 Its old name, `re.match()`, is now soft-deprecated,
 since that name hides the anchoring and reads like the `match` statement.
+
+Text you copy from a message into `match=` becomes a regular expression.
 If the message holds `.`, `(`, or another regular-expression metacharacter,
 pass the copied text through `re.escape()` so the pattern matches it literally.
 
@@ -806,9 +809,10 @@ you widen every signature along the way,
 or introduce a context object to carry the parameter.
 [Concurrency](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 shows `ContextVar`, which carries such a value down the call chain and leaves every signature as it was.
-So does `monkeypatch`.
-It patches the name in place,
-and the patch applies process-wide until teardown restores the name.
+
+`monkeypatch` patches the name in place,
+so every signature along the call chain stays as it was.
+The patch applies process-wide until teardown restores the name.
 Choose injection when the parameter sits near the boundary.
 Choose `monkeypatch` when passing the parameter down changes more code than the test is worth.
 
