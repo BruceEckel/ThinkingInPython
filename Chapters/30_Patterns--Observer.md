@@ -1312,7 +1312,7 @@ class GridModel(Broadcaster[Grid]):
 an [`Enum`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 whose members are also strings.
 `Color.KHAKI` compares equal to `"khaki"` and works anywhere a `str` does,
-so the view can pass a `Color` to `tkinter` as a color name.
+so the view passes a `Color` to `tkinter` as a color name.
 
 `list(Color)` is the cycle of colors,
 because iterating over an enum produces its members in definition order.
