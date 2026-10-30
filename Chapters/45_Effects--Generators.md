@@ -1473,8 +1473,8 @@ which suits a machine that is mostly a sequence.
 One generator per state suits a machine like the trap,
 whose transitions form a graph.
 
-The design gives up what the `Enum` gave.
-The states form an open set: any function that returns a `Machine` is a state,
+Chapter 31's `Enum` makes the states a closed set.
+Here the set is open: any function that returns a `Machine` is a state,
 so a test reaches a state by driving the machine to it,
 where `test_trap_states.py` iterates over `TrapState` and checks every state against every move.
 A machine designed as a diagram still belongs in chapter 31's table.
