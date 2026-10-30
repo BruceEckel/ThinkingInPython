@@ -1055,6 +1055,9 @@ The `# type: ignore` silences that report so the listing can show what the const
 
 The type checker accepts `Stars(True)`,
 because a `bool` is an `int` to the checker for the same subclass reason.
+In the loop the three values reach the checker as one union,
+so its report names `True` beside the two values it rejects;
+a direct `Stars(True)` passes.
 The runtime test is therefore the one check that rejects `True`.
 
 Before you move on, name what separates your attempt from this one:

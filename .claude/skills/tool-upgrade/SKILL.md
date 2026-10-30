@@ -194,7 +194,31 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   version-pins ARGS=--write` bumped the ten pins. winget's pandoc
   uninstall failed with 1603 for the third time, so pandoc stays at
   3.12.1 with 3.13 available; vale moved to 3.25.1. The small-int
-  cache still reaches 1024 on 3.15.2.
+  cache still reaches 1024 on 3.15.2. Then, on Bruce's "check to see
+  if there are any things we can improve with the new ty", a second
+  pass the earlier upgrades never made: `uv run ty check build/examples
+  --warn unused-ignore-comment` (and `build/solutions`; the printed
+  rule name is `unused-type-ignore-comment`, so grep for that) found
+  none of the 90 `# type: ignore` lines unused; `redundant-cast` is on
+  by default and was silent, and the three `typing.cast()` calls each
+  convert an `object` or a `Callable` the next line needs. The four
+  changelogs (0.0.92 to 0.0.95) add no rule and change no default:
+  narrowing fixes for `match` captures, enum comparisons, and
+  `LiteralString`, ParamSpec and TypeVarTuple inference, Django
+  support, a preview `baseline` setting, SARIF output. Four
+  report-only Opus agents (about 125k tokens and three and a half
+  minutes each) then read the 107 unpinned prose lines that say what
+  `ty` cannot do, misses, or accepts (`grep -rn -i '`ty` \(does
+  not\|cannot\|misses\|accepts\|has no\|reports nothing\|still\)\|the
+  type checker \(does not\|cannot\|...\)' Chapters Solutions`), probed
+  each under both versions, and found every one still true, and the
+  prose beside each of the 70 ignores in those chapters still names
+  the diagnostic it suppresses. One imprecision surfaced that no
+  version caused: Solutions 12 exercise 8 passes three values through
+  one loop, so the suppressed report names `True` beside the two
+  values the checker rejects; a sentence now says so. That pass is
+  the shape to repeat when a `ty` release adds a rule or a narrowing
+  change, since the gate cannot see a "cannot see" sentence turn false.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
