@@ -1033,7 +1033,7 @@ because every route to the `!` passes through a teleport.
 
 ### Testing the Walk
 
-A test can check the model without opening a window.
+A test checks the model without opening a window.
 
 ```python
 # robot_explorer/test_robot.py
@@ -1251,7 +1251,7 @@ Grains scattered at random sample the field's average, so agitation starts high.
 A grain resting on a nodal line contributes zero.
 One number says how settled the sand is.
 `render()` draws grain density as characters, as `Blackboard.render()` does,
-so the model can show its state without a window.
+so the model shows its state without a window.
 
 ```python
 # chladni_plate/chladni_demo.py
