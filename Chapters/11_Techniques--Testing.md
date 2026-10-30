@@ -247,7 +247,7 @@ Any statement inside it that raises the expected type passes the test,
 including one that fails for an unrelated reason.
 
 `match=` takes a regular expression that `pytest` checks against the exception's message,
-so the test can confirm which failure occurred as well as its type:
+so the test confirms which failure occurred as well as its type:
 
 ```python
 # test_overdraft_message.py
@@ -672,7 +672,7 @@ so `@pytest.fixture(autouse=True)` applies the fixture to both tests in `test_st
 whose parameter lists stay empty.
 
 `data_dir()` reads `APP_DATA` on every call,
-so the fixture's `monkeypatch.setenv()` can change the directory `data_dir()` returns.
+so the fixture's `monkeypatch.setenv()` changes the directory `data_dir()` returns.
 A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` reads the variable once,
 at import time, before any fixture runs,
 so the constant keeps that first value after the fixture patches the environment.
