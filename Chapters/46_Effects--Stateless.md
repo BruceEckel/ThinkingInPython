@@ -779,7 +779,7 @@ The type records which Abilities each layer leaves open.
 
 The repeated union is the shape a `type` alias normally shortens.
 Elsewhere the book writes one.
-Under `ty` 0.0.91 the alias checks the same as the written-out signature.
+Under `ty` 0.0.95 the alias checks the same as the written-out signature.
 An undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
 This book still writes Effect signatures out in full,
 because the union is the information.

@@ -170,6 +170,31 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   probes and the 7 pinned sentences HOLD, each byte-identical under
   0.0.90 and 0.0.91 (one report-only Opus agent, about 90k tokens, under
   two minutes).
+  The 0.0.91 to 0.0.95 upgrade (2026-10-30, with Python 3.15.1 to
+  3.15.2, uv 0.13.5 to 0.13.6, ruff 0.17.2 to 0.17.3, pytest 9.1.1 to
+  9.2.0, hypothesis 6.170.8 to 6.170.14, time-machine 3.5.1 to 3.6.0,
+  numba 0.68.0 to 0.68.1; pyright, Stateless, and numpy unchanged) was
+  quiet across four `ty` releases. In order: `uv self update` (the old
+  uv could not see 3.15.2), `tip python-upgrade`, then a second verify
+  under `TIP_FULL=1`, because the first one refreshed no markers: the
+  stamp digest covered `uv.lock` and `.python-version` and a patch
+  upgrade changes neither, so `skip_stamps.marker_context()` hashes
+  `sys.version` since that day. Then `tip tools-upgrade` with `tip
+  sweep` green on both trees, `tip check output-check` clean, the
+  pyright delta one renamed message (chapter 17's `events.py` now says
+  `Hour` where it said `int`, from the alias added 2026-10-28, not
+  from pyright, which did not move; accepted), `tip
+  quoted-diagnostics-probe` 43 of 43 MATCH, no `ty` warnings in either
+  tree, and all 13 probes HOLD, byte-identical under 0.0.91 and 0.0.95
+  (one report-only Opus agent, about 105k tokens, two and a half
+  minutes; its brief is the shape to reuse, in
+  `build/upgrade-2026-10-30/PROBES.md` while that directory lasts: one
+  numbered probe per pinned claim, both versions through `uv tool run
+  --from ty==OLD`, scratch files deleted by listed path). Then `tip
+  version-pins ARGS=--write` bumped the ten pins. winget's pandoc
+  uninstall failed with 1603 for the third time, so pandoc stays at
+  3.12.1 with 3.13 available; vale moved to 3.25.1. The small-int
+  cache still reaches 1024 on 3.15.2.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,

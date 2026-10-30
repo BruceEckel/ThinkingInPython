@@ -344,7 +344,7 @@ A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 declares its attributes in the same form as `Shape`, a bare annotation,
 since it describes what a class must have and leaves the value to the class.
 
-`ty` 0.0.91 enforces what the declaration states about the value.
+`ty` 0.0.95 enforces what the declaration states about the value.
 A subclass that writes `sides = "four"` draws `invalid-assignment` on that line,
 since the checker compares the value with the declared `ClassVar[int]`.
 A subclass that redeclares the attribute as `sides: ClassVar[str] = "four"` draws `invalid-attribute-override`.
