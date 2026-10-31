@@ -949,29 +949,30 @@ def pause() -> Generator[None]:
 g = pause()
 next(g)
 #: started
-expect(ValueError, g.throw, ValueError("stop"))
+expect(ValueError, g.throw, ValueError("stop"))  # [1]
 #: [ValueError] stop
 
 g = pause()
 next(g)
 #: started
-g.close()
+g.close()  # [2]
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 ```
 
-The first run calls `throw()`.
-`pause()` resumes at its `yield`, and Python raises the `ValueError` there,
-inside the body.
+At `[1]`, `pause()` resumes at its `yield`,
+and Python raises the `ValueError` there, inside the body.
 The body lets the exception through,
 so it travels out of the generator and arrives back in the driver as the result of the `throw()` call,
 where `expect()` reports it.
-The second run calls `close()`.
-`pause()` resumes at the same `yield`, and Python raises `GeneratorExit` there.
+
+At `[2]`, `pause()` resumes at the same `yield`,
+and Python raises `GeneratorExit` there.
 The body lets that through as well,
 but this time the driver sees an ordinary return,
 because `close()` catches the `GeneratorExit` on its way out.
 Afterward the generator is `GEN_CLOSED`, as it would be after a `return`.
+
 In both runs the body ends at the `yield`, before it reaches `print("resumed")`.
 An exception arrived where a value was expected,
 and an exception the body lets through ends the body.

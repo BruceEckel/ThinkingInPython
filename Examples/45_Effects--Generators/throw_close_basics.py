@@ -11,12 +11,12 @@ def pause() -> Generator[None]:
 g = pause()
 next(g)
 #: started
-expect(ValueError, g.throw, ValueError("stop"))
+expect(ValueError, g.throw, ValueError("stop"))  # [1]
 #: [ValueError] stop
 
 g = pause()
 next(g)
 #: started
-g.close()
+g.close()  # [2]
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
