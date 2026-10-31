@@ -17,6 +17,8 @@ next(g)
 expect(ValueError, g.throw, ValueError("stop"))  # [1]
 #: finished
 #: [ValueError] stop
+print(inspect.getgeneratorstate(g))
+#: GEN_CLOSED
 
 g = pause()
 next(g)
