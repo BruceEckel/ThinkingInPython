@@ -20,7 +20,10 @@
 // edit to the script is tested without a site rebuild. What it fails on:
 //
 //   - a link into the book (a heading, a chapter, a listing, a footnote)
-//     that gets no panel, or a navigation or external link that gets one;
+//     that gets no panel, or a navigation or external link that gets one
+//     (navigation is the Contents drop-down, the section menu with its
+//     listing list, the chapter's own contents, previous/next, and a
+//     footnote's back-link);
 //   - a panel that is empty, keeps an id or a footnote back-link, or holds
 //     a "#place" link taken from another page and still naming this one;
 //   - a link inside a panel opening a second panel, or Escape not closing;
@@ -78,6 +81,7 @@ function kindOf(a) {
   if (a.closest(".chapter-toc")) return "chapter contents";
   if (a.classList.contains("toc-toggle")) return "Contents";
   if (a.closest(".toc-drop")) return "Contents list";
+  if (a.closest(".section-menu")) return "section menu";
   if (a.classList.contains("footnote-back")) return "footnote back-link";
   if (a.getAttribute("aria-hidden") === "true") return "code line";
   if (a.classList.contains("footnote-ref")) return "footnote";
