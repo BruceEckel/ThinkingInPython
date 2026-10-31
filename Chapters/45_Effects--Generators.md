@@ -928,7 +928,7 @@ and that value becomes the result of the `yield` expression where the generator 
 Two more methods resume the body,
 and each delivers an exception instead of a value.
 `throw(exc)` resumes the generator and raises `exc` at the `yield` where it stopped.
-`close()` does the same with a `GeneratorExit` exception.
+`close()` resumes the generator and raises `GeneratorExit` at that `yield`.
 `GeneratorExit` is the driver's signal that this resumption is the last one,
 so the generator should finish.
 `pause()` yields once and lets every exception through,
