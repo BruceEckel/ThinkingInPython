@@ -3,9 +3,9 @@ import inspect
 from collections.abc import Generator
 from exceptions import expect
 
-def pause() -> Generator[str]:
+def pause() -> Generator[None]:
     print("started")
-    yield "paused"
+    yield
     print("resumed")
 
 g = pause()
