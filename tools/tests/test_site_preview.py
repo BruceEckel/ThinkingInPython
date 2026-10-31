@@ -9,6 +9,10 @@ ran the checker between releases. This test renders chapter 11 and its
 Solutions page with the real site builder into a temp directory and runs
 the checker over them, so a template or build change that adds links the
 checker misclassifies fails in the tools tests.
+The test runs when `tools/` changed, like the rest of the suite,
+and carries no `book` mark. The links it guards come from
+`template.html` and `tools/build_site.py`, so a chapter edit alone
+leaves it unaffected.
 """
 import os
 import re
@@ -38,7 +42,6 @@ def linked_pages(page: Path) -> set[str]:
     return set(HREF.findall(html))
 
 
-@pytest.mark.book
 @pytest.mark.skipif(
     shutil.which("pandoc") is None
     or shutil.which("node") is None

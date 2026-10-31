@@ -8,7 +8,7 @@
 //
 // PREVIEW_SITE=<dir> names another directory of built pages, which
 // tools/tests/test_site_preview.py uses to check one chapter rendered into
-// a temp directory on every gate.
+// a temp directory when tools/ changed.
 //
 // `tip preview-check` builds the site first and then runs this, and
 // `tip release` and `tip everything` run that task. CI does not, since
