@@ -960,6 +960,11 @@ print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 ```
 
+In both `[1]` and `[2]`, the body ends at the `yield`,
+before it reaches `print("resumed")`.
+The exception arrives in place of a value and travels out through the body.
+Leaving the body ends the generator, as a `return` would.
+
 At `[1]`, `pause()` resumes at its `yield`,
 and Python raises the `ValueError` there, inside the body.
 The body lets the exception through,
@@ -972,10 +977,6 @@ The body lets that through as well,
 but this time the driver sees an ordinary return,
 because `close()` catches the `GeneratorExit` on its way out.
 Afterward the generator is `GEN_CLOSED`, as it would be after a `return`.
-
-In both runs the body ends at the `yield`, before it reaches `print("resumed")`.
-An exception arrived where a value was expected,
-and an exception the body lets through ends the body.
 
 Why does the driver need a method for this, when Python already has `raise`?
 Because `raise` raises its exception in the function that executes it,
