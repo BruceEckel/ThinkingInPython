@@ -1200,7 +1200,16 @@ A generator written for others to drive therefore lets `GeneratorExit` end it.
 builds its mousetrap from an `Enum` of rows,
 each holding a state's entry message and a transition function,
 and an engine that calls the current state's function on every input.
-A generator offers a third design.
+
+Every resumption of a generator is a decision point.
+The body reads the value that `send()` delivered and chooses what to do next:
+yield again, or return and finish.
+`answering_proxy.py` makes that choice with an `if`,
+between yielding a request to the driver and answering it from its table.
+A `match` on the received input makes the same choice with one `case` per input.
+A generator that returns from a `case` has moved to a new state.
+
+A generator therefore offers a third design.
 Each state is a generator function.
 Its entry action is the code before its first `yield`,
 each `yield` reports the state's name and receives the next input,
