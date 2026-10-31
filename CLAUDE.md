@@ -979,7 +979,9 @@ and how it was measured.
   every `Chapters/` one behind them. Use `tip sweep` (runs every check
   over both trees, reports all failures, exits nonzero if any failed)
   whenever the first failure is unlikely to be the only one. A tool
-  upgrade is the standard case, and `tools-upgrade` now ends with it.
+  upgrade is the standard case, and `tools-upgrade` runs it after the
+  pins list, then `tip unused-ignores` (a `# type: ignore` the new
+  `ty` no longer needs; report-only, in no gate).
 - **A green `tip sweep` does not mean the committed trees are current,
   and does not mean the `#:` markers are right.** `sweep` runs checks,
   coupling-panels, solutions-numbering, ty, lint, run, and test, each

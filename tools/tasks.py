@@ -1143,6 +1143,26 @@ def quoted_diagnostics_probe(v: Vars) -> None:
     py("tools.quoted_diagnostics_probe", *v.words("ARGS"))
 
 
+@task("Report a `# type: ignore` the installed ty no longer needs "
+      "(advisory; run after a ty upgrade)",
+      deps=("extract",))
+def unused_ignores(v: Vars) -> None:
+    """Report-only, in no gate. One `ty check` over both trees with the
+    `unused-ignore-comment` rule promoted to an error, so an ignore
+    that `ty` no longer needs fails the run; the rule is off by
+    default, which is why the gate's `ty` step never sees one. A hit
+    means a `ty` release learned the construct, and the fix is to
+    delete the comment and reread the prose beside it, which usually
+    says why the checker needed help (the printed rule name is
+    `unused-type-ignore-comment`). `tools-upgrade` ends with this task.
+    The listings' `reveal_type()` calls print their `info` lines here as
+    they do under `tip ty`; `revealed-type` is not a rule, so they
+    cannot be turned off.
+    """
+    tool("ty", "check", "build/examples", "build/solutions",
+         "--error", "unused-ignore-comment")
+
+
 section("Book builds (site, EPUB, PDF)")
 
 
@@ -2071,13 +2091,18 @@ def tools_upgrade(v: Vars) -> None:
     and the book needs fixing, not that the upgrade failed; the stamp is
     written first for that reason. The task then prints the prose pins
     that name an older `ty` version; once the probes in the tool-upgrade
-    skill pass, `tip version-pins ARGS=--write` bumps them.
+    skill pass, `tip version-pins ARGS=--write` bumps them. Last comes
+    `unused-ignores`, after the sweep, since its `ty` run is readable
+    only on trees the sweep found clean: a `# type: ignore` the new
+    `ty` no longer needs fails it, and that comment comes out along
+    with a reread of the prose beside it.
     """
     py("tools.upgrade_tools")
     invoke("tools-check-full", v)
     py("tools.tool_stamp", "--write")
     py("tools.version_pins")
     invoke("sweep", v)
+    invoke("unused-ignores", v)
 
 
 @task("Upgrade the dev Python (latest patch; TO=3.15 to repin a minor),"

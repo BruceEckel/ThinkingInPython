@@ -29,6 +29,17 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   before assuming the first failure is the only one: `tip verify` stops
   at the first failing gate, and `solutions-gate` runs first, as `gate`'s
   prerequisite.
+  The other direction has its own report since 2026-10-30:
+  `tip unused-ignores` runs `ty check` over both trees with
+  `--error unused-ignore-comment`, a rule that is off by default, so
+  the gate's `ty` step never sees an ignore that a new release made
+  unnecessary. It exits nonzero on any hit and `tip tools-upgrade`
+  ends with it, after the sweep. A hit is a `# type: ignore` to delete
+  and a paragraph to reread, since the prose beside an ignore names
+  the diagnostic it suppresses, and the release that retired the
+  ignore made that sentence false. The upgrades before that day never
+  ran the check; the first run, on 0.0.95, found none of the 90
+  ignores unused.
   The 0.0.75 to 0.0.77 upgrade (2026-09-02, alongside Python 3.15.0b3 to
   3.15.0rc2) was the first with **no fallout at all**: `tip sweep` green
   on both trees, no marker or reflow drift, and all four version-pinned
@@ -198,7 +209,9 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   if there are any things we can improve with the new ty", a second
   pass the earlier upgrades never made: `uv run ty check build/examples
   --warn unused-ignore-comment` (and `build/solutions`; the printed
-  rule name is `unused-type-ignore-comment`, so grep for that) found
+  rule name is `unused-type-ignore-comment`, so grep for that; the
+  run is `tip unused-ignores` and the last step of `tools-upgrade`
+  since that evening) found
   none of the 90 `# type: ignore` lines unused; `redundant-cast` is on
   by default and was silent, and the three `typing.cast()` calls each
   convert an `object` or a `Callable` the next line needs. The four

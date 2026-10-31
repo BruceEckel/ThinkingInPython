@@ -2605,6 +2605,16 @@ entry names a quote that is gone. `ARGS=--list` prints the spec,
 Run it after `tip tools-upgrade`. It joins no gate, on the same terms
 as `tip pyright-review`.
 
+`tip unused-ignores` (a task in `tasks.py`, no module of its own,
+2026-10-30) is the third advisory check an upgrade runs, and the one
+`tools-upgrade` itself ends with, after the sweep. It is one
+`ty check` over both build trees with `--error unused-ignore-comment`,
+so a `# type: ignore` that the new `ty` no longer needs fails the run.
+The rule is off by default, which is why the gate's `ty` step never
+reports one. A hit is a comment to delete and a paragraph to reread:
+the prose beside an ignore names the diagnostic it suppresses, and
+the release that retired the ignore made that sentence false.
+
 ## exercise_refs.py
 
 The book names its exercises by number in prose: "Exercise 8 works
