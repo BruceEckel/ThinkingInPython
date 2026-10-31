@@ -6,6 +6,10 @@
 //   node tools/site_preview_check.js            # every page in build/site
 //   node tools/site_preview_check.js 29 index   # pages whose names start so
 //
+// PREVIEW_SITE=<dir> names another directory of built pages, which
+// tools/tests/test_site_preview.py uses to check one chapter rendered into
+// a temp directory on every gate.
+//
 // `tip preview-check` builds the site first and then runs this, and
 // `tip release` and `tip everything` run that task. CI does not, since
 // 2026-10-24: .github/workflows/ci.yml pins pandoc to the local version,
@@ -43,7 +47,7 @@ const path = require("path");
 const { execSync } = require("child_process");
 
 const ROOT = path.resolve(__dirname, "..");
-const SITE = path.join(ROOT, "build", "site");
+const SITE = process.env.PREVIEW_SITE || path.join(ROOT, "build", "site");
 const SCRIPT = path.join(ROOT, "resources", "static", "link-preview.js");
 const NODE_DIR = path.join(ROOT, "build", "node");
 const JSDOM_VERSION = "27";

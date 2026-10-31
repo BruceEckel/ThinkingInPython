@@ -1212,6 +1212,10 @@ def preview_check(v: Vars) -> None:
     and its first run installs jsdom under build/node/ from the network.
     `tip release` and `tip everything` run it; CI stopped on 2026-10-24,
     once ci.yml pinned pandoc to the local version.
+    `tools/tests/test_site_preview.py` runs the checker over chapter 11's
+    page and its Solutions page, rendered into a temp directory, in every
+    gate's tools tests, so a template or build change that adds links the
+    checker cannot classify fails before a release.
     After an edit to resources/static/link-preview.js alone, `node
     tools/site_preview_check.js` reruns it against the site already built.
     """
