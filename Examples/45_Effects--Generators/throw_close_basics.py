@@ -1,4 +1,5 @@
 # throw_close_basics.py
+import inspect
 from collections.abc import Generator
 from exceptions import expect
 
@@ -18,5 +19,5 @@ g = pause()
 next(g)
 #: started
 g.close()
-print("closed")
-#: closed
+print(inspect.getgeneratorstate(g))
+#: GEN_CLOSED

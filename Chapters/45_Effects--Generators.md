@@ -933,11 +933,11 @@ and each delivers an exception instead of a value:
 
 `GeneratorExit` is the driver's signal that this resumption is the last one,
 so the generator should finish.
-`pause()` yields once and lets every exception through,
-so each call below shows one thing:
+This demonstrates the basics of `throw()` and `close()`:
 
 ```python
 # throw_close_basics.py
+import inspect
 from collections.abc import Generator
 from exceptions import expect
 
@@ -957,8 +957,8 @@ g = pause()
 next(g)
 #: started
 g.close()
-print("closed")
-#: closed
+print(inspect.getgeneratorstate(g))
+#: GEN_CLOSED
 ```
 
 The first run calls `throw()`.
@@ -970,9 +970,9 @@ where `expect()` reports it.
 The second run calls `close()`.
 `pause()` resumes at the same `yield`, and Python raises `GeneratorExit` there.
 The body lets that through as well,
-but this time the driver sees an ordinary return:
-`close()` catches the `GeneratorExit` and returns,
-and the program goes on to print `closed`.
+but this time the driver sees an ordinary return,
+because `close()` catches the `GeneratorExit` on its way out.
+Afterward the generator is `GEN_CLOSED`, as it would be after a `return`.
 In both runs the body ends at the `yield`, before it reaches `print("resumed")`.
 An exception arrived where a value was expected,
 and an exception the body lets through ends the body.
