@@ -151,7 +151,7 @@ The three arrows are the annotation's three positions: `YieldType` on the first,
 A `Question` or a `Result` leaves the generator by its own route,
 and the driver tells them apart by how each arrives.
 
-When the body finishes with `return`,
+When the generator body finishes with `return`,
 Python raises `StopIteration` on the generator's behalf.
 If a `StopIteration` propagates out of the body instead,
 Python converts it into a `RuntimeError`
@@ -192,7 +192,7 @@ Python cannot copy a generator.
 A generator is therefore a *one-shot continuation*.
 
 Calling a generator function creates the generator.
-The body runs later, one `yield` at a time,
+The generator body runs later, one `yield` at a time,
 when the driver calls `next()` or `send()`.
 The new generator is suspended before its first statement,
 so no `yield` expression is waiting to receive a value.
@@ -240,7 +240,8 @@ Calling `interview()` returns that object.
 `next()` and `send()` run the body, one `yield` at a time.
 
 A driver function runs the generator from start to finish.
-It starts the body with `next()`, sends each answer back with `send()`,
+It starts the generator body with `next()`,
+sends each answer back with `send()`,
 and returns the generator's result when the body ends.
 Here, it looks up each answer in a table:
 
@@ -329,7 +330,7 @@ That `StopIteration` carries `None` as its value,
 so `expect()` prints the exception's class name alone.
 
 The generator and `drive()` take turns.
-While the body runs, `drive()` waits inside `send()`,
+While the generator body runs, `drive()` waits inside `send()`,
 so only code inside the body can see `GEN_RUNNING`.
 That code needs a reference to its generator,
 which a module-level name supplies:
@@ -354,7 +355,7 @@ print(inspect.getgeneratorstate(watched))
 `watch()` names `watched` before the module binds it.
 As [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
 shows, a function looks up a module-level name when its body runs.
-`next()` runs the body after `watched = watch()` has bound the name.
+`next()` runs `watch()`'s body after `watched = watch()` has bound the name.
 
 The annotation is `Generator[str]` rather than `Iterator[str]`,
 because `inspect.getgeneratorstate()` takes a `Generator` and the type checker rejects an `Iterator` argument.
@@ -921,7 +922,7 @@ and the result changes while `interview()` and `drive()` stay the same.
 
 ### `throw()` and `close()` Reach the Innermost Generator
 
-Two generator methods have resumed a body in this chapter.
+Two of a generator object's methods have resumed its body in this chapter.
 `next()` runs the body to its next `yield`, where the generator suspends.
 `send()` resumes the body with a value,
 and that value becomes the result of the `yield` expression where the generator stopped.
@@ -960,7 +961,7 @@ print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 ```
 
-In both `[1]` and `[2]`, the body ends at the `yield`,
+In both `[1]` and `[2]`, the generator body ends at the `yield`,
 before it reaches `print("resumed")`.
 The exception arrives in place of a value and travels out through the body.
 Leaving the body ends the generator, as a `return` would.
@@ -1037,7 +1038,7 @@ The `except ValueError` clause catches it, prints `caught`,
 and yields `"recovered"`.
 Like `send()`, `throw()` returns the next value the generator yields,
 so the driver prints `recovered`.
-An exception the body lets through ends the generator and comes back out of `throw()` into the driver,
+An exception the generator body lets through ends the generator and comes back out of `throw()` into the driver,
 as in `throw_close_basics.py`.
 
 `g.close()` then raises `GeneratorExit` at `yield "recovered"`,
@@ -1095,7 +1096,7 @@ The driver holds the generator `outer()` returned and calls `throw()` on it,
 but `inner()` prints the `caught` line.
 `outer()` is paused at its `yield from` expression,
 and `inner()` is paused at its `yield`.
-The exception belongs at the point where the body stopped,
+The exception belongs at the point where the innermost body stopped,
 and `inner()`'s `yield` is that point,
 so `yield from` hands the exception down to `inner()`.
 `inner()`'s `except` clause handles it and yields `"inner recovered"`,
@@ -1268,7 +1269,7 @@ and `state_machine.py` re-enters the state and prints its message again.
 here `holding()`'s entry code prints it after the message.
 
 `return luring()` creates `luring()`'s generator object and hands it out as `waiting()`'s result.
-The body runs when a driver delegates to it:
+`luring()`'s body runs when a driver delegates to it:
 
 ```python
 # trap_generators_demo.py
@@ -1368,7 +1369,7 @@ A generator state keeps such a value in a local and passes it to the next state 
 so each state receives the data it needs and the machine object disappears.
 
 Exercise 8 writes the vending machine as one generator,
-with each state a loop inside a single body,
+with each state a loop inside a single generator body,
 which suits a machine that is mostly a sequence.
 One generator per state suits a machine like the trap,
 whose transitions form a graph.
@@ -1637,7 +1638,8 @@ which is why `async for` must await what it returns.
 `main()` makes the first two calls itself, and the `async for` makes the rest,
 ending when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
-The asynchronous generator `countdown()` writes the same loop as a body with `yield` and leaves the two methods to Python.
+The asynchronous generator `countdown()` writes the same loop as its body,
+with a `yield`, and leaves the two methods to Python.
 
 An asynchronous generator drops the return channel,
 so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
