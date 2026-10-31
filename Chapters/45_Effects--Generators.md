@@ -921,8 +921,8 @@ and the result changes while `interview()` and `drive()` stay the same.
 
 ### `throw()` and `close()` Reach the Innermost Generator
 
-A driver has so far resumed a generator in two ways.
-`next()` runs the body to its first `yield`.
+Two generator methods have resumed a body in this chapter.
+`next()` runs the body to its next `yield`, where the generator suspends.
 `send()` resumes the body with a value,
 and that value becomes the result of the `yield` expression where the generator stopped.
 A generator object has two more methods,
