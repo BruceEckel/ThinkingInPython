@@ -948,26 +948,32 @@ from exceptions import expect
 
 def pause() -> Generator[None]:
     print("started")
-    yield
-    print("resumed")
+    try:
+        yield
+        print("resumed")
+    finally:
+        print("finished")
 
 g = pause()
 next(g)
 #: started
 expect(ValueError, g.throw, ValueError("stop"))  # [1]
+#: finished
 #: [ValueError] stop
 
 g = pause()
 next(g)
 #: started
 g.close()  # [2]
+#: finished
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 ```
 
 In both `[1]` and `[2]`, the generator body ends at the `yield`,
 before it reaches `print("resumed")`.
-The exception arrives in place of a value and travels out through the body.
+The exception arrives in place of a value and travels out through the body,
+running the `finally` block on its way, which prints `finished`.
 Leaving the body ends the generator, as a `return` would.
 
 At `[1]`, `pause()` resumes,
@@ -977,7 +983,7 @@ so it travels out of the generator and arrives back in the driver as the result 
 where `expect()` reports it.
 
 At `[2]`, the same `yield` raises `GeneratorExit`.
-The body lets that through as well,
+The body lets that through as well, and the `finally` block runs again,
 but this time the driver sees an ordinary return,
 because `close()` catches the `GeneratorExit` on its way out.
 Afterward the generator is `GEN_CLOSED`, as it would be after a `return`.

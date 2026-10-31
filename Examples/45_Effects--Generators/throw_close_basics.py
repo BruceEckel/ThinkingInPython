@@ -5,18 +5,23 @@ from exceptions import expect
 
 def pause() -> Generator[None]:
     print("started")
-    yield
-    print("resumed")
+    try:
+        yield
+        print("resumed")
+    finally:
+        print("finished")
 
 g = pause()
 next(g)
 #: started
 expect(ValueError, g.throw, ValueError("stop"))  # [1]
+#: finished
 #: [ValueError] stop
 
 g = pause()
 next(g)
 #: started
 g.close()  # [2]
+#: finished
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
