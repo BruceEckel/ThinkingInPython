@@ -922,16 +922,20 @@ and the result changes while `interview()` and `drive()` stay the same.
 
 ### `throw()` and `close()` Reach the Innermost Generator
 
-Two of a generator object's methods have resumed its body in this chapter.
+A driver controls a generator through the methods of the generator object,
+and two of those methods have resumed the body in this chapter.
 `next()` runs the body to its next `yield`, where the generator suspends.
 `send()` resumes the body with a value,
 and that value becomes the result of the `yield` expression where the generator stopped.
-Two more methods resume the body,
-and each delivers an exception instead of a value:
+Two more methods resume the body at that same `yield`,
+and this time the `yield` expression raises an exception instead of returning a value:
 
-- `throw(exc)` resumes the generator and raises `exc` at the `yield` where it stopped.
-- `close()` resumes the generator and raises `GeneratorExit` at that `yield`.
+- `throw(exc)` makes the `yield` raise `exc`.
+- `close()` makes the `yield` raise `GeneratorExit`.
 
+Both methods belong to the driver, the code that holds the generator object.
+The body sees their effect alone:
+an exception comes out of its `yield` where a value was due.
 `GeneratorExit` is the driver's signal that this resumption is the last one,
 so the generator should finish.
 This demonstrates the basics of `throw()` and `close()`:
@@ -966,14 +970,13 @@ before it reaches `print("resumed")`.
 The exception arrives in place of a value and travels out through the body.
 Leaving the body ends the generator, as a `return` would.
 
-At `[1]`, `pause()` resumes at its `yield`,
-and Python raises the `ValueError` there, inside the body.
+At `[1]`, `pause()` resumes,
+and its `yield` raises the `ValueError` instead of returning a value.
 The body lets the exception through,
 so it travels out of the generator and arrives back in the driver as the result of the `throw()` call,
 where `expect()` reports it.
 
-At `[2]`, `pause()` resumes at the same `yield`,
-and Python raises `GeneratorExit` there.
+At `[2]`, the same `yield` raises `GeneratorExit`.
 The body lets that through as well,
 but this time the driver sees an ordinary return,
 because `close()` catches the `GeneratorExit` on its way out.
@@ -1050,11 +1053,47 @@ so the driver sees an ordinary return.
 Its return value is whatever the generator returned while handling `GeneratorExit`,
 and `None` here, since `worker()` ends through its `finally` block with no `return` value.
 
-There are two reasons to call `close()`.
+`close()` is the driver's tool for a generator it is finished with.
 A paused generator keeps open whatever its body opened:
 a file or a lock inside a `with` statement, a connection, a transaction.
-A driver that is done with a generator before the generator is done closes it,
-so that the cleanup runs now.
+The common case is a driver that has the answer it needs before the generator has run out:
+
+```python
+# close_when_done.py
+import inspect
+from collections.abc import Generator
+
+def readings() -> Generator[int]:
+    print("sensor on")
+    try:
+        yield from [3, 7, 12, 9, 4]
+    finally:
+        print("sensor off")
+
+def first_above(
+    source: Generator[int], limit: int
+) -> int | None:
+    for reading in source:
+        if reading > limit:
+            return reading  # [1]
+    return None
+
+sensor = readings()
+print(first_above(sensor, 10))
+#: sensor on
+#: 12
+print(inspect.getgeneratorstate(sensor))
+#: GEN_SUSPENDED
+sensor.close()  # [2]
+#: sensor off
+```
+
+`first_above()` returns at `[1]` with the reading it was looking for.
+`readings()` stays paused at its `yield`,
+with the sensor on and two readings still to produce, and the caller,
+which holds the generator, sees `GEN_SUSPENDED`.
+`close()` at `[2]` ends the generator,
+and its `finally` block turns the sensor off.
 If the driver leaves the generator paused,
 Python calls `close()` when the garbage collector reclaims it,
 so the `finally` block runs eventually.
