@@ -9,9 +9,8 @@ def pause() -> Generator[str]:
     print("resumed")
 
 g = pause()
-print(next(g))
+next(g)
 #: started
-#: paused
 expect(ValueError, g.throw, ValueError("stop"))
 #: [ValueError] stop
 
