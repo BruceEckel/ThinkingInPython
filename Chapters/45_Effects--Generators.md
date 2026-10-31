@@ -925,8 +925,8 @@ Two generator methods have resumed a body in this chapter.
 `next()` runs the body to its next `yield`, where the generator suspends.
 `send()` resumes the body with a value,
 and that value becomes the result of the `yield` expression where the generator stopped.
-A generator object has two more methods,
-and each resumes the body with an exception instead of a value.
+Two more methods resume the body,
+and each delivers an exception instead of a value.
 `throw(exc)` resumes the generator and raises `exc` at the `yield` where it stopped.
 `close()` does the same with a `GeneratorExit` exception.
 `GeneratorExit` is the driver's signal that this resumption is the last one,
