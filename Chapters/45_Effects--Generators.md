@@ -432,8 +432,12 @@ which lets those threads share one generator by serializing their calls.
 
 An EMS needs a request made deep inside a program to reach the driver at its edge.
 Generators provide that path because they nest.
-`yield from` runs an inner generator to exhaustion,
-passing every yielded request out to the outer driver and every sent answer back down.
+`yield from` delegates to an inner generator until that generator finishes.
+While it does, the outer generator sits suspended at the `yield from` expression,
+and the driver's calls on the outer generator reach the inner one.
+Every request the inner generator yields passes out to the driver,
+and every answer the driver sends passes back down to the `yield` that is waiting.
+The driver still supplies each step; `yield from` is the path between them.
 
 In the simplest case,
 each generator yields values and leaves its send and return channels at `None`,
@@ -470,7 +474,8 @@ print(list(top()))
 #: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
 ```
 
-"To exhaustion" means each `yield from` runs its target until that generator finishes.
+"To exhaustion" means each `yield from` stays with its target until that generator finishes,
+however many `next()` calls that takes.
 Exhaustion is transitive.
 `list(top())` receives one flat sequence,
 and `top()`'s single `yield from` finishes when the last generator beneath it finishes.
@@ -920,7 +925,7 @@ In the second run, `drive()` sees two requests instead of three.
 The proxy answers `town` at `[1]`, so that request stops at the proxy,
 and the result changes while `interview()` and `drive()` stay the same.
 
-### `throw()` and `close()` Reach the Innermost Generator
+## `throw()` and `close()`: The Driver's Exception Channel {#the-drivers-exception-channel}
 
 A driver controls a generator through the methods of the generator object,
 and two of those methods have resumed the body in this chapter.
@@ -938,6 +943,8 @@ The body sees their effect alone:
 an exception comes out of its `yield` where a value was due.
 `GeneratorExit` is the driver's signal that this resumption is the last one,
 so the generator should finish.
+### An Exception at the `yield`
+
 This demonstrates the basics of `throw()` and `close()`:
 
 ```python
@@ -1016,6 +1023,9 @@ which ends the generator.
 `@contextmanager` does it in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
 its `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
+
+### Handle, Clean Up, or Stop Early
+
 A driver you write makes the same call,
 and a generator written for such a driver puts a `try` around its `yield`:
 
@@ -1106,6 +1116,8 @@ If the driver leaves the generator paused,
 Python calls `close()` when the garbage collector reclaims it,
 so the `finally` block runs eventually.
 Calling `close()` yourself chooses the moment.
+
+### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
 A `yield from` passes both calls on, down to the generator that is waiting:
 
@@ -1212,7 +1224,8 @@ hotel before flight.
 The nesting of the `try` blocks is the undo stack.
 When all three commands succeed, the booking runs to its end.
 
-`close()` requires the generator to finish.
+### `close()` Requires the Generator to Finish
+
 A generator that catches `GeneratorExit` and yields again has refused to finish,
 and `close()` raises a `RuntimeError`:
 
