@@ -1135,8 +1135,12 @@ from collections.abc import Generator
 
 def readings() -> Generator[int]:
     print("sensor on")
+    pending = [3, 7, 12, 9, 4]
     try:
-        yield from [3, 7, 12, 9, 4]
+        while pending:
+            yield pending.pop(0)
+    except GeneratorExit:
+        print(f"stopped with {len(pending)} unread")
     finally:
         print("sensor off")
 
@@ -1155,16 +1159,24 @@ print(first_above(sensor, 10))
 print(inspect.getgeneratorstate(sensor))
 #: GEN_SUSPENDED
 sensor.close()  # [2]
+#: stopped with 2 unread
 #: sensor off
 ```
 
 `first_above()` returns at `[1]` with the first reading over the limit.
 `readings()` stays paused at its `yield`,
-with the sensor on and two readings still to produce.
+with the sensor on and two readings still in `pending`.
 The caller still holds the generator,
 which `inspect.getgeneratorstate()` reports as `GEN_SUSPENDED`.
-`close()` at `[2]` ends the generator,
-and its `finally` block turns the sensor off.
+`close()` at `[2]` raises `GeneratorExit` at that `yield`.
+The two clauses around the `yield` do different jobs.
+The `except GeneratorExit` clause runs when the driver stops early,
+and reports what the stop left unread.
+The `finally` clause runs on every ending and turns the sensor off.
+A generator may catch `GeneratorExit` as long as it then finishes,
+as `readings()` does by reaching the end of its body;
+[`close()` Requires the Generator to Finish](#close-requires-the-generator-to-finish)
+shows the generator that yields instead.
 If the driver leaves the generator paused,
 Python calls `close()` when the garbage collector reclaims the generator,
 so the `finally` block runs eventually.
