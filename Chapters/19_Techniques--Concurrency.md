@@ -143,7 +143,7 @@ Instead of using threads for I/O-bound problems,
 asynchrony lets you create coroutines.
 Each coroutine, upon encountering I/O,
 suspends itself and yields control ... but not to the OS.
-Instead, control goes to the *event loop*,
+Control goes to the *event loop*,
 which picks the next task that is ready to run.
 
 1. `async def` defines a *coroutine function*.
@@ -1563,7 +1563,7 @@ A tracing garbage collector breaks every extension.
 In rejecting that 1996 patch,
 Guido van Rossum set the requirement that held for three decades:
 remove the GIL without slowing single-threaded code.
-Attempts kept failing to meet it, so workarounds appeared instead.
+Attempts kept failing to meet it, so workarounds appeared.
 `multiprocessing` arrived in 2008, `asyncio` in 2014,
 and the per-interpreter GIL of [Subinterpreters](#subinterpreters) in 2023.
 
@@ -2508,7 +2508,7 @@ a stack reservation and a scheduler entry.
   Catching `asyncio.CancelledError` and swallowing it leaves the `TaskGroup` waiting on a task it cancelled.
 - **Several locks avoid deadlock when every task acquires them in one agreed order.**
   Acquire shared locks in the same sequence everywhere.
-  When two tasks keep yielding to each other instead,
+  When two tasks keep yielding to each other,
   break the symmetry so one of them gives way and the other goes ahead.
 
 ## Concurrency Is Not Easy

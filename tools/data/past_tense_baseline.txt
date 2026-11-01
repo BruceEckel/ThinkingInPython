@@ -78,7 +78,7 @@ Chapters/18_Techniques--Performance.md	[PAST] tuned: An optimization tuned to to
 Chapters/18_Techniques--Performance.md	[PAST] was: LLVM 19 had capped its tail-duplication pass, which collapsed the old interpreter's 332 dispatch jumps into 3, so the comparison was against a compiler regression rather than a fast interpreter.
 Chapters/18_Techniques--Performance.md	[PAST] was: With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
 Chapters/19_Techniques--Concurrency.md	[PAST] adopted: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency.
-Chapters/19_Techniques--Concurrency.md	[PAST] appeared: Attempts kept failing to meet it, so workarounds appeared instead.
+Chapters/19_Techniques--Concurrency.md	[PAST] appeared: Attempts kept failing to meet it, so workarounds appeared.
 Chapters/19_Techniques--Concurrency.md	[PAST] came: Later came a finer-grained unit of scheduling that lives inside a program: the *thread of execution*.
 Chapters/19_Techniques--Concurrency.md	[PAST] changed: The second changed who schedules parallel work.
 Chapters/19_Techniques--Concurrency.md	[PAST] distributed: Threads already distributed computing resources, so more CPUs simply meant more resources to distribute (of course, it wasn't quite that easy).

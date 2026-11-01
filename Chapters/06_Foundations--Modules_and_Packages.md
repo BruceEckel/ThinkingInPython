@@ -408,7 +408,7 @@ A file run as a script becomes the top-level module `__main__`,
 outside every package.
 Running `python a_package/module4.py` raises `ImportError: attempted relative import with no known parent package`.
 From the directory that holds `a_package`,
-run it as `python -m a_package.module4` instead.
+run it as `python -m a_package.module4`.
 
 ### Circular Imports
 
@@ -543,8 +543,7 @@ This book uses `test_*.py`, e.g. `test_result.py`.
 Give your modules names that no standard library module uses.
 A file named `random.py`, `string.py`,
 or `weakref.py` can shadow the stdlib module,
-so `import random` loads your file instead,
-even inside a standard-library module,
+so `import random` loads your file, even inside a standard-library module,
 because Python [searches the script's directory before the standard library](#pythonpath).
 
 Give a shared module a distinctive name.

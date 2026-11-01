@@ -755,7 +755,7 @@ instead of the O(n) scan a `list` needs.
 The speed is in the search alone.
 `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic, when the smallest item is all you read,
-consider a [heap](#heap) instead.
+consider a [heap](#heap).
 
 ### Scan, Bisect, or Hash
 
@@ -1849,7 +1849,7 @@ It also tells you whether the program spends its time computing or waiting,
 and which strategy fits depends on that answer.
 A program mostly waiting on a database, a socket, or a subprocess is I/O-bound.
 Steps 2 through 9 below help it little.
-Skip to step 10 and restructure around `asyncio` instead.
+Skip to step 10 and restructure around `asyncio`.
 A program mostly consuming CPU is compute-bound.
 The list below targets that case, simplest change first.
 

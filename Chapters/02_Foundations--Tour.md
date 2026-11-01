@@ -390,7 +390,7 @@ so the same expression on a nonempty list yields `items[0]`.
 `x or default` is a common way to supply a fallback,
 but it replaces every falsy `x`.
 A legitimate `0` or `""` gets the fallback the same as a missing value does.
-When zero or an empty string is a legal value, test for `None` instead:
+When zero or an empty string is a legal value, test for `None`:
 `default if x is None else x`.
 That is a [conditional expression](04_Foundations--Control_Flow.md#conditionals).
 

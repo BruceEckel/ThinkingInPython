@@ -1898,7 +1898,7 @@ def _show_dunder(
 `display_object()` hides standard dunder members by default.
 Pass their names in `dunder` to keep specific ones.
 `dunder=["__init__"]` shows `__init__` and hides the other dunders.
-Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member,
+Pass the `ALL_DUNDERS` sentinel to keep every dunder member,
 including the interpreter's own machinery.
 `ALL_DUNDERS` is useful for exploring an unfamiliar object,
 but it lists a class's own choices among everything `object` and the interpreter add,

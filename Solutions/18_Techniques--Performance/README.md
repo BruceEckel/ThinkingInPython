@@ -920,7 +920,7 @@ You can say which index reads the first `5` and which one inserts after the last
 <summary>Solution</summary>
 
 `bisect_search.py` calls `bisect()` to find an insertion point.
-If you call `bisect()` to find the first `5` instead, `left` comes back as `5`,
+If you call `bisect()` to find the first `5`, `left` comes back as `5`,
 `xs[left]` prints `7`, and `xs[left:right]` prints `[]`.
 `bisect()` returns the position after the last equal element,
 the right place to insert a duplicate and the wrong place to read one.
@@ -1026,7 +1026,7 @@ and `PYTHON_JIT=0` switches it back off.
 On a `True False` build,
 the comparison is two runs of the same file that differ in `PYTHON_JIT` alone.
 `tip` and `uv run` use the project's own interpreter, the `False False` build.
-Run the file with the `True False` build's `python` instead,
+Run the file with the `True False` build's `python`,
 from the chapter directory with `utils/` on the import path
 (`tip membership` prints those commands in your shell's syntax):
 

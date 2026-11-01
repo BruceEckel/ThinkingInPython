@@ -1360,7 +1360,7 @@ def distribute(source: Iterator[int]) -> None:
 your edited `shared_iterator.py`, with the lock around the loop body,
 still reports `200 distinct, duplicates True`.
 You can name the call the `for` header makes outside the lock,
-and say what the lock covers instead.
+and say what the lock covers.
 
 <details>
 <summary>Solution</summary>

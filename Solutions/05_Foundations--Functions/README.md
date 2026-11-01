@@ -212,8 +212,7 @@ def divide(a, b, /, *, label="result"):
 `print(divide(10, 2, label="half"))` prints `half: 5.0`,
 and `divide(10, 2, "half")` raises a `TypeError`:
 `divide() takes 2 positional arguments but 3 were given`.
-If that second call returns `half: 5.0` instead,
-`label` is still positional-or-keyword.
+If that second call returns `half: 5.0`, `label` is still positional-or-keyword.
 
 <details>
 <summary>Solution</summary>

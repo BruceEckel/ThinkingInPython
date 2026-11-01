@@ -192,7 +192,7 @@ Each `remove()` shifts the following elements one place to the left,
 and the loop then advances its index,
 so it steps over the element that moved into the vacated slot.
 The loop runs to its end as if it had visited every item.
-Build a new list instead, with a comprehension that keeps the items you need,
+Build a new list, with a comprehension that keeps the items you need,
 or iterate over a copy with `for x in xs[:]`.
 
 ## Tuples and Unpacking

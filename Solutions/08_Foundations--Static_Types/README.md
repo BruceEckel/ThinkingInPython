@@ -815,7 +815,7 @@ so consider when a tuple receives its contents.
 with `HISTORY` empty,
 `ty check` reports `unresolved-attribute` for the `append()` call,
 and your final `final_constants.py` passes the check and prints `3 hello ('first',)`.
-Adding `"first"` later with `HISTORY = HISTORY + ("first",)` instead draws `invalid-assignment`.
+Adding `"first"` later with `HISTORY = HISTORY + ("first",)` draws `invalid-assignment`.
 
 <details>
 <summary>Solution</summary>

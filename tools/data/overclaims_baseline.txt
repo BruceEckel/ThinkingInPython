@@ -26,7 +26,7 @@ Chapters/03_Foundations--Containers.md	[BOUND] By default a measured listing pri
 Chapters/03_Foundations--Containers.md	[BOUND] CODE alone yields CODE pairs
 Chapters/03_Foundations--Containers.md	[BOUND] CODE collects on the left of the assignment and spreads inside the display, so the pair builds a new list holding CODE rotated by one place
 Chapters/03_Foundations--Containers.md	[BOUND] Each CODE shifts the following elements one place to the left, and the loop then advances its index, so it steps over the element that moved into the vacated slot
-Chapters/03_Foundations--Containers.md	[BOUND] The container then keeps the same elements, whichever code holds it, so you can share a container of immutable elements, where a mutable one calls for a defensive copy
+Chapters/03_Foundations--Containers.md	[BOUND] The container then keeps the same elements no matter which code holds it, so you can share a container of immutable elements, where a mutable one calls for a defensive copy
 Chapters/03_Foundations--Containers.md	[BOUND] a single expression that produces a new list, in place of a loop with CODE
 Chapters/04_Foundations--Control_Flow.md	[BOUND] A CODE at the match leaves both loops in one step and skips CODE along with them
 Chapters/04_Foundations--Control_Flow.md	[BOUND] A comprehension builds a list, dictionary, or set from an iterable in one expression, replacing a loop that builds up a result
@@ -169,6 +169,7 @@ Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE covers the common case 
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE lets a single CODE block serve all three cases
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE prints the exception's CODE, which includes both its type and its arguments, where CODE gives the type alone
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE produces values alone, the shape that Iterators annotates CODE
+Chapters/15_Techniques--Context_Managers.md	[BOUND] In all four forms, the borrower's side contains two lines
 Chapters/15_Techniques--Context_Managers.md	[BOUND] It calls the same two methods on every manager, whether CODE built it from a generator or a class defined it
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Ordering, the three exception arguments, and suppression through a truthy return work the same way in the async form
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Rewrite CODE to take its names from CODE, run it with no arguments and with three, and confirm that with three names the close order reverses the open order, and that with none the program prints CODE alone
@@ -178,7 +179,6 @@ Chapters/15_Techniques--Context_Managers.md	[BOUND] The message from CODE is too
 Chapters/15_Techniques--Context_Managers.md	[BOUND] The three parameters of CODE describe the exception that ended the block
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Two borrowers each use one connection as if they held it alone
 Chapters/15_Techniques--Context_Managers.md	[BOUND] When the managers are too long for one line, parentheses group them, and the managers still enter left to right and exit in reverse
-Chapters/15_Techniques--Context_Managers.md	[BOUND] Whichever form you choose, the borrower's side contains two lines
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Write a context manager CODE whose CODE suppresses CODE and lets everything else through, without using CODE
 Chapters/16_Techniques--Comprehensions.md	[BOUND] *Comprehensions* build one collection from another in a single expression
 Chapters/16_Techniques--Comprehensions.md	[BOUND] A set comprehension has the same four parts as a list comprehension, inside CODE instead of CODE
@@ -297,7 +297,7 @@ Chapters/19_Techniques--Concurrency.md	[BOUND] Usually only one thread touches a
 Chapters/19_Techniques--Concurrency.md	[BOUND] Wall time drops sharply as the split grows toward one task per core
 Chapters/19_Techniques--Concurrency.md	[BOUND] When the others should keep running after one task fails, CODE returns each failure as a value instead of raising it
 Chapters/19_Techniques--Concurrency.md	[BOUND] When two jobs share a priority, tuple comparison falls through to the second field, the description string
-Chapters/19_Techniques--Concurrency.md	[BOUND] When two tasks keep yielding to each other instead, break the symmetry so one of them gives way and the other goes ahead
+Chapters/19_Techniques--Concurrency.md	[BOUND] When two tasks keep yielding to each other, break the symmetry so one of them gives way and the other goes ahead
 Chapters/19_Techniques--Concurrency.md	[BOUND] Where a lock admits one task, CODE admits up to CODE at once and suspends the rest
 Chapters/19_Techniques--Concurrency.md	[BOUND] While one task waits, the thread runs another
 Chapters/19_Techniques--Concurrency.md	[BOUND] With enough cores the wall-clock time falls toward the time of a single task
