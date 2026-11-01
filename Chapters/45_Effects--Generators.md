@@ -1010,11 +1010,11 @@ off the call stack.
 
 A `raise` in the driver therefore goes up to the driver's callers.
 The generator's `except` and `finally` clauses are nowhere on that path.
-`throw()` and `close()` reverse the order.
-Each resumes the generator first, so the generator is running again,
-and then raises an exception at the `yield`,
-where the generator's own `except` clauses catch it and its `finally` clauses run.
-`throw()` raises the exception the driver passed;
+`throw()` and `close()` put the generator back on the call stack first.
+Each resumes the generator at its `yield`, then raises an exception there.
+The generator's `except` clauses catch it and its `finally` clauses run.
+
+`throw()` raises the exception the driver passed.
 `close()` raises `GeneratorExit`.
 Both are methods for the driver, the code that holds the generator object.
 Inside the generator's body, `raise` works as it does anywhere.
