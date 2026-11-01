@@ -1042,9 +1042,10 @@ Then the generator ends.
 shows a driver closing a sensor generator when it has the reading it needs.
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
-An exception can propagate in the opposite direction too,
-from the generator into the driver.
-A `raise` in the generator body leaves the generator through the call that resumed it:
+An exception can also propagate from the generator into the driver.
+When the generator body raises an exception,
+the exception comes out of the `next()`, `send()`,
+or `throw()` call that resumed the generator:
 
 ```python
 # body_raises.py
