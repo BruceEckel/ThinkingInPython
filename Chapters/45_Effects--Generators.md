@@ -925,7 +925,7 @@ In the second run, `drive()` sees two requests instead of three.
 The proxy answers `town` at `[1]`, so that request stops at the proxy,
 and the result changes while `interview()` and `drive()` stay the same.
 
-## `throw()` and `close()`: The Driver's Exception Channel {#the-drivers-exception-channel}
+## The Driver's Exception Channel {#the-drivers-exception-channel}
 
 A driver controls a generator through the methods of the generator object:
 
