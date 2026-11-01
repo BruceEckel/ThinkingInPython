@@ -159,9 +159,31 @@ delegate to either") from an event hedged with "can"; the reader
 of the list asks whether the sentence describes what the thing on
 the page does, and writes the present if so.
 
+`[SAME]` (2026-11-01, from a sentence the author marked in chapter 45)
+is a "same" with nothing to compare against: "At CODE, the same CODE
+raises CODE", said of a generator with one `yield`. "Same" has one
+job, saying that two things the reader could take as different are
+one thing or alike. When the noun has one referent on the page and
+nothing is compared, "same" only means the one just mentioned, which
+"the", "that", or "its" already says, and the sentence is a pointer
+dressed as a comparison. The repair is the pointer ("its CODE", "That
+directory reaches pytest", "uses this self-registration"). The rule
+(`same_pointer()`) fires on a "same" whose previous token is a
+determiner or possessive (`SAME_DETERMINERS`), in a sentence with none
+of `COMPARISON_WORDS` ("as", "than", "both", "each", "and", a count)
+and none of the "no matter" and "for any" sequences, and not in an
+idiom (`same_idiom()`: "same way", "same time", "same place",
+"same reason", "of the same", "the same with", "stays the same",
+"reads the same", a subject pronoun opening a relative clause right
+after it, or "same" before sentence punctuation as a predicate). It is a survey rule because the
+parse cannot tell an implied second term ("for the same reason
+`bump()` does", "The same approach isolates a database") from none.
+The book-wide read that day covered 194 candidates and rewrote 6, so
+the keeps dominate and a baseline would be the whole list.
+
 Four rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-and `[AND+REL]`, judged against a baseline. Five are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, `[ADD]`, `[TWO]`, and `[CAN]`. The calibration shows why. `[AND]` fired on 7 before
+and `[AND+REL]`, judged against a baseline. Six are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, and `[SAME]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -231,7 +253,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes           # new hits
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
-    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN
+    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
@@ -302,6 +324,7 @@ SURVEY_RULES: Final = {
     "ADD": "an additive adverb after a change of subject",
     "TWO": "two modified terms held across one comparison",
     "CAN": "a modal can where the sentence reports what happens",
+    "SAME": "a same with nothing to compare against",
 }
 """Printed only under `--survey`; never baselined."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
@@ -346,6 +369,28 @@ LIGHT_POS: Final = frozenset({"DET", "PUNCT", "PART", "CCONJ", "SPACE"})
 NESTING_POS: Final = frozenset({"VERB"})
 """A side with a verb of its own (a participle, a relative clause, a
 clause) is a picture the reader builds rather than a name."""
+SAME_DETERMINERS: Final = frozenset(
+    "the this that its their his her your our".split())
+"""Words before \"same\" that make it a pointer candidate."""
+COMPARISON_WORDS: Final = frozenset(
+    "as than that which whether both each every all across twice "
+    "again regardless either two three four several everywhere "
+    "throughout identical one and".split())
+"""Words that mark a comparison or a count, so \"same\" is real."""
+SAME_PHRASES: Final = (("no", "matter"), ("for", "any"))
+"""Two-word sequences that make a \"same\" sentence quiet."""
+SAME_AFTER: Final = frozenset({"way", "time", "place", "reason"})
+"""Words after \"same\" that make an idiom."""
+SAME_PREDICATE: Final = frozenset(
+    "stays stay stayed remains remain is are was were look looks "
+    "read reads".split())
+"""Verbs before \"the same\" that make it a predicate; \"of the same\"
+(\"a package of the same name\") relates two things and is quiet too."""
+SAME_SUBJECTS: Final = frozenset("it they he she we you i".split())
+"""A subject pronoun right after \"same X\" opens a relative clause
+(\"the same cls it received\"), which is the second term."""
+SAME_PUNCT: Final = frozenset(".,:;)")
+"""Punctuation after \"same\" that makes it a predicate."""
 
 CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     # (rule, text, should it fire)
@@ -411,6 +456,12 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("CAN", "You can skim for topics new to you.", False),
     ("CAN", "A `set` can hold any hashable object.", False),
     ("CAN", "The type checker cannot see the string.", False),
+    ("SAME", "At `[2]`, the same `yield` raises `GeneratorExit`.", True),
+    ("SAME", "At `[2]`, its `yield` raises `GeneratorExit`.", False),
+    ("SAME", "The same directory reaches pytest through `pythonpath` in `pyproject.toml`.", True),
+    ("SAME", "Alternative constructors need `Self` for the same reason `bump()` does.", False),
+    ("SAME", "`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.", False),
+    ("SAME", "The code runs the same with or without them.", False),
 )
 """The style rules' own examples: (rule, text, should it fire)."""
 
@@ -885,6 +936,47 @@ def can_event(sentence: Sentence) -> bool:
     return False
 
 
+def same_idiom(toks: list[Token], k: int) -> bool:
+    """Is the \"same\" at index k an idiom or a predicate?"""
+    after = toks[k + 1] if k + 1 < len(toks) else None
+    if after is None or after.text in SAME_PUNCT:
+        return True
+    if after.text.lower() in SAME_AFTER:
+        return True
+    if any(t.text.lower() in SAME_SUBJECTS and t.dep.startswith("nsubj")
+           for t in toks[k + 1:k + 4]):
+        return True
+    before = toks[k - 2].text.lower() if k >= 2 else ""
+    if before in SAME_PREDICATE or before == "of":
+        return True
+    return toks[k - 1].text.lower() == "the" and (
+        after.text.lower() == "with")
+
+
+def same_pointer(sentence: Sentence) -> bool:
+    """Does a \"same\" stand where a pointer would do?
+
+    A token with lemma \"same\" after a `SAME_DETERMINERS` word, in a
+    sentence with none of `COMPARISON_WORDS` or `SAME_PHRASES`, and
+    not an idiom (`same_idiom()`).
+    """
+    toks = list(sentence.tokens)
+    lows = [t.text.lower() for t in toks]
+    if set(lows) & COMPARISON_WORDS:
+        return False
+    if any(pair in SAME_PHRASES for pair in zip(lows, lows[1:])):
+        return False
+    for k, tok in enumerate(toks):
+        if tok.lemma.lower() != "same" or k == 0:
+            continue
+        if lows[k - 1] not in SAME_DETERMINERS:
+            continue
+        if same_idiom(toks, k):
+            continue
+        return True
+    return False
+
+
 def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph."""
     if skipped(paragraph):
@@ -907,6 +999,8 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
             yield "TWO", sentence
         if can_event(sentence):
             yield "CAN", sentence
+        if same_pointer(sentence):
+            yield "SAME", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:

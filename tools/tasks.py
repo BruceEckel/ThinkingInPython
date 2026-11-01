@@ -558,6 +558,10 @@ def sentence_shapes(v: Vars) -> None:
     whose subject differs from the previous sentence's, where the
     reader attaches the adverb to the new subject ("the generator
     keeps its place as well" read as the closure keeping its place).
+    Two more survey rules follow: [CAN] a modal "can" that hedges an
+    event the sentence reports, and [SAME] a "same" with nothing to
+    compare against ("the same `yield`" where the listing has one
+    `yield`, which "its `yield`" says).
     Run `tip sentence-shapes CH=31 ARGS=--survey` at the start of a
     chapter pass. It reports and never gates; `tip prose` runs it after
     the subject-gap scan. CH= picks one chapter and its Solutions file.

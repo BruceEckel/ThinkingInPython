@@ -96,6 +96,11 @@ SOURCES: Final[tuple[str, ...]] = (
     "It checks the declaration's type and ignores which code runs first. Pyright accepts the read too.",
     "Programmers have been bad at keeping objects inside that set. Constructing an object in an illegal state is too easy.",
     "The copy shares the inner objects. It duplicates the outer list as well.",
+    "At `[2]`, the same `yield` raises `GeneratorExit`.",
+    "The same directory reaches pytest through `pythonpath` in `pyproject.toml`.",
+    "Alternative constructors need `Self` for the same reason `bump()` does.",
+    "`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.",
+    "The code runs the same with or without them.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 

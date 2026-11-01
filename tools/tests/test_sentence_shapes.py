@@ -111,6 +111,11 @@ def rules(source: str) -> list[str]:
     ("`drive()`, imported unchanged, answers a request yielded two generators deep the same way it answers one from `interview()`'s own body.", ["TWO"]),
     ("`drive()` is imported unchanged. The requests now come from `ask()`, one generator below `interview()`, and `yield from` passes each one up to the driver, so `drive()` sees the same `Question`s it saw in `interview_generator.py`.", []),
     ("Use a `set` rather than a `list` for membership tests.", []),
+    ("At `[2]`, the same `yield` raises `GeneratorExit`.", ["SAME"]),
+    ("The same directory reaches pytest through `pythonpath` in `pyproject.toml`.", ["SAME"]),
+    ("Alternative constructors need `Self` for the same reason `bump()` does.", []),
+    ("`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.", []),
+    ("The code runs the same with or without them.", []),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
     assert rules(source) == expected
@@ -146,7 +151,8 @@ def test_the_reported_line_is_the_sentences_first_character() -> None:
 def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL"}
-    assert set(SURVEY_RULES) == {"AND", "COLON", "ADD", "TWO", "CAN"}
+    assert set(SURVEY_RULES) == {
+        "AND", "COLON", "ADD", "TWO", "CAN", "SAME"}
 
 
 def test_main_reports_without_failing_and_accepts(

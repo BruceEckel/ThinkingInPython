@@ -371,6 +371,16 @@ the plain present when the sentence reports what the thing on the
 page does, and the keep is a real capability ("a `set` can hold
 any hashable object"), which the parse cannot tell apart, so it
 is a survey rule.
+The sixth survey rule is `[SAME]` (2026-11-01), a "same" after a
+determiner or possessive in a sentence with no comparison or count
+word and no idiom ("At `[2]`, the same `yield` raises
+`GeneratorExit`", Bruce: `pause()` has one `yield`, so "same"
+compared the thing with itself). "Same" says two things are one or
+alike; with one referent and nothing compared it is a pointer, and
+the repair is "its `yield`" or "that directory". The parse cannot
+tell an implied second term ("for the same reason `bump()` does")
+from none, so it is a survey rule: the book-wide read had 194
+candidates and 6 rewrites.
 The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
@@ -484,6 +494,14 @@ lists every hit.
 Solutions file and leaves every other file's entries alone, so one
 chapter's accept never takes in another chapter's unread hits.
 `tip internal-names-accept` reads code, not prose, and takes no `CH=`.
+A baseline entry is keyed by the sentence, so an edit to a line that
+holds an accepted keep re-keys it: the check then prints the sentence
+as `NEW` and the old wording as `stale`, with the flagged word itself
+unchanged. After a sweep, read each such pair, confirm the flagged
+word is untouched, and run the scoped `-accept`; a parallel agent
+cannot do this, since every accept rewrites the shared baseline file,
+so briefs tell agents to list the pair and the session accepts it
+before the commit (2026-11-01).
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
 accepted, 610 watch words fixed and 220 accepted (a `want` with a
 human subject, an arithmetic `even`, a `never` that is the claim, a
