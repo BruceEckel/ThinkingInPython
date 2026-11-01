@@ -1002,18 +1002,21 @@ It tells the generator to finish.
 
 Why does the driver need methods to raise an exception inside the generator,
 when Python already has `raise`?
-Because `raise` raises its exception in the function that executes it,
+`raise` produces its exception in the function that executes it,
 and the exception then travels up through that function's callers.
 While the driver runs, the generator sits paused at its `yield`,
 off the call stack.
+
 A `raise` in the driver therefore goes up to the driver's callers,
 and the generator's `except` clauses are nowhere on that path.
-`throw()` reverses the order.
-It resumes the generator first, so the generator is running again,
-and then raises the exception at the `yield`,
-where the generator's own `try` statement sees it.
+`throw()` and `close()` reverse the order.
+Each resumes the generator first, so the generator is running again,
+and then raises an exception at the `yield`,
+where the generator's own `try` statement sees it:
+`throw()` raises the exception the driver passed,
+and `close()` raises `GeneratorExit`.
 Inside the generator's body, `raise` works as it does anywhere.
-`throw()` is a method for the driver, the code that holds the generator object.
+Both are methods for the driver, the code that holds the generator object.
 
 In the three-channel picture,
 `throw()` is the driver's second way to answer a request.
@@ -1023,6 +1026,8 @@ When the driver has a failure instead, it calls `throw()` with the exception,
 and the generator that asked decides what to do about it:
 handle the exception and yield again, or let it propagate,
 which ends the generator.
+When the driver is done with the conversation, it calls `close()`,
+and the generator runs its cleanup and ends.
 `asyncio` answers a coroutine this way when an awaited operation fails or a cancellation arrives.
 `@contextmanager` does it in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
 its `__exit__()` calls the generator's `throw()` method,
