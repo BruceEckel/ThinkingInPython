@@ -34,7 +34,7 @@ Chapters/30_Patterns--Observer.md	set before CODE and cleared after
 Chapters/38_Patterns--Simulation.md	The teleports are not shortcuts but the only way through
 Chapters/38_Patterns--Simulation.md	a single robot walks a maze where each object it meets decides which room the robot ends up in
 Chapters/41_Functional--Toolkits.md	CODE saves each element the first time through
-Chapters/45_Effects--Generators.md	CODE yields once and lets every exception through
+Chapters/45_Effects--Generators.md	A CODE passes both calls on
 Chapters/47_Effects--Stateless_in_Practice.md	building a fresh event loop for the call and tearing it down after
 Chapters/a.md	Name the field they sit on
 Solutions/02_Foundations--Tour/README.md	CODE changes the literal text and passes each value through
