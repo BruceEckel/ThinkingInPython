@@ -1668,9 +1668,8 @@ Each model announces to the responders it holds.
 That one-way flow is the benefit.
 Because each view receives announcements from its model alone,
 replacing the controller leaves the views working as before.
-The views built earlier go on displaying,
-since the announcements they receive come from the models,
-whichever controller sent the request.
+The views built earlier go on displaying with any controller,
+since the announcements they receive come from the models.
 `vim`'s first key displays `++-xk`,
 because the keys live in the `History` model,
 not in the controller that recorded them.

@@ -1060,7 +1060,7 @@ print(capture.messages)
 
 `Terminal` and `Capture` share no base class, and neither names the other.
 Both satisfy `Console` structurally, so `isinstance()` accepts either.
-`supply()` hands over whichever it examines first.
+`supply()` hands over the instance it examines first.
 `greet()` runs the same body in both runs.
 The type checker accepts both runs alike,
 because both bindings have the same type.
@@ -1071,7 +1071,7 @@ Here Stateless lacks a check ZIO performs.
 ZIO reports two implementations of one requirement as a compile-time error naming both candidates,
 because its `provide` resolves the dependency graph during compilation.
 `supply()` resolves at runtime by scanning its arguments,
-so the same mistake produces a program that runs and hands each request to whichever instance comes first in the argument list.
+so the same mistake produces a program that runs and hands each request to the instance that comes first in the argument list.
 Give Abilities distinct method names when that ambiguity is possible,
 and supply one implementation per Ability.
 

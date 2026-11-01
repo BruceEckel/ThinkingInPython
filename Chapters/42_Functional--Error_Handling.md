@@ -192,7 +192,7 @@ if __name__ == "__main__":
 To get the answer, the caller must unpack the `Result`.
 `unwrap()`, a name borrowed from Rust, returns the answer an `Ok` holds.
 Reading the `answer` field returns the same value.
-Use whichever name reads better in your own code.
+Use the name that reads better in your own code.
 
 `unwrap()` and the `answer` field exist on `Ok` alone,
 so the type checker rejects `func_a(i).unwrap()`,
@@ -889,7 +889,7 @@ Try each exercise before opening its [solution](../Solutions/42_Functional--Erro
     Show that a `TypeError` raised inside the wrapped function now propagates,
     where the original `@safe` returned it as an `Err`.
 5.  Write `load_setting(name, text)` that returns `Result[int, Exception]` and attaches a note naming the setting.
-    Chain two of them with `bind()` and print the notes from whichever one failed.
+    Chain two of them with `bind()` and print the notes from the call that failed.
     Does the successful call carry a note?
     Why or why not?
 6.  Rewrite `func_a()`, `func_b()`,

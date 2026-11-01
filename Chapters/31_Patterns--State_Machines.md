@@ -300,7 +300,7 @@ The rules are a list, which the engine groups into a `dict`.
 The action on a rule takes the input,
 so what the machine does depends on the state and the input together.
 That is a *Mealy machine*, the other classical state machine.
-The first design's `action` acts per state and runs the same way whichever input led into that state,
+The first design's `action` acts per state and runs the same way for every input that leads into that state,
 while a rule's `action` acts per transition and reads the input that fired it.
 
 The mousetrap's inputs are `Mouse` members, each naming one event.

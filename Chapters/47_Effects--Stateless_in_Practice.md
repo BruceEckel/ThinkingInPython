@@ -180,7 +180,7 @@ Every tool in the library packages those two calls.
 `handle()` is `drive()` with a type lookup in place of the dictionary,
 `run()` is that loop applied after the last handler,
 and `supply()` is `handle()` prepackaged for `Need`:
-a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
+a handler whose answer to `Need[T]` is the supplied instance that is a `T`.
 
 ## Scripting an Unpredictable Source
 
@@ -331,7 +331,7 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 so `stamp()` produces a known string a test can compare.
 `tomorrow` reports a moment a day later,
 so `batch_due()` returns `True` at once.
-`batch_due()` gets its moment from whichever handler answers `Now`,
+`batch_due()` gets its moment from the handler that answers `Now`,
 so a test supplies the moment outright.
 A production handler that returns `datetime.now()` runs the same function.
 
@@ -668,7 +668,7 @@ run(handle(battery_first)(run_load)(17, 4))
 #: Grid offline
 ```
 
-`run_load()` draws from whichever source `plug()` hands it,
+`run_load()` draws from the source `plug()` hands it,
 so the second run prints a different trace from the same code.
 Apart from their lengths,
 the two runs differ only in the order of the tuple passed to `controller()`.
@@ -1754,7 +1754,7 @@ so it keeps every result as long as the memoized function exists.
 
 That cache key is the argument, not the scenario.
 `memoize()` wraps `save_user()` before `supply()` runs,
-so the memoized call returns the same cache entry whichever `Database` you supply:
+so the memoized call returns the same cache entry for any `Database` you supply:
 
 ```python
 # memoize_environment.py
@@ -1832,7 +1832,7 @@ each `wait()` blocks on the task the same iteration just created,
 so the sleeps run one after another and take about five times as long.
 
 The pool is a supplied dependency, not a global,
-so `squares()` declares `Need[Executor]` and works with whichever pool the edge supplies.
+so `squares()` declares `Need[Executor]` and works with any pool the edge supplies.
 Supplying a `ProcessPoolExecutor` moves the same work into processes.
 `squares()` stays as written.
 `as_type(Executor)` appears for the reason it always does.

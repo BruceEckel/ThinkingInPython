@@ -205,9 +205,9 @@ if __name__ == "__main__":
 `pool.map()` sends the same calls to worker processes,
 which the operating system places on separate cores.
 The `assert` passes on every run,
-because a pure call returns the same answer whichever process runs it and whenever it runs.
+because a pure call returns the same answer in any process, at any time.
 Like `map()`, `pool.map()` returns the answers in the order of `limits`,
-whichever call finishes first, so the two lists match position by position.
+not in the order the calls finish, so the two lists match position by position.
 
 The limits in `parallel_pure.py` are large enough for the parallel run to finish sooner.
 [`report()`](18_Techniques--Performance.md#numbers-on-your-machine)
@@ -375,7 +375,7 @@ because Hypothesis generates boundary values and unusual characters instead of s
 When a law fails, Hypothesis reports the failing input,
 which `property_check.py`'s bare `assert` leaves out.
 Hypothesis also shrinks that input to the smallest example that still fails,
-so the report shows the simplest failing case rather than whichever random one failed first.
+so the report shows the simplest failing case rather than the first random case that failed.
 The framework automates falsification.
 
 ### Shrinking a Failure

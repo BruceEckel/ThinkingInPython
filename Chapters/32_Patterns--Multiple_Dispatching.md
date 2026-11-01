@@ -531,7 +531,7 @@ def test_versions_match_expected(module: ModuleType,
 ```
 
 `test_paper_scissors.py` imports the two modules, not their classes.
-`getattr(module, player)` looks the class up on whichever module `pytest` passed to `test_versions_match_expected()`,
+`getattr(module, player)` looks the class up on the module `pytest` passed to `test_versions_match_expected()`,
 so one dictionary of nine expected answers, `EXPECTED`,
 drives two independent sets of `Paper`, `Scissors`, and `Rock` classes.
 Iterating over `EXPECTED` yields its keys,
@@ -736,7 +736,7 @@ Try each exercise before opening its [solution](../Solutions/32_Patterns--Multip
     so the seven unchanged cells stay one line each.
     Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.
     Dry paper wraps the rock and wins, wet paper is too soggy and draws,
-    whichever of the two calls `compete()`.
+    whether `Paper` or `Rock` calls `compete()`.
     The chapter gives two reasons for preferring the method version.
     Say which one this change answers, and which one survives it.
 10. Modify exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.
