@@ -1020,8 +1020,7 @@ where the generator's own `except` clauses can catch it.
 Both are methods for the driver, the code that holds the generator object.
 Inside the generator's body, `raise` works as it does anywhere.
 
-In the three-channel picture,
-`throw()` is the driver's second way to answer a request.
+`send()` and `throw()` both answer a yielded request.
 A generator yields a request and waits.
 When the driver has the answer, it calls `send()` with the answer.
 When the driver has a failure instead, it calls `throw()` with the exception,
