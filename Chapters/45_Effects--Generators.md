@@ -1033,8 +1033,10 @@ and the generator runs its cleanup and ends.
 its `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
 
-The exception channel runs the other way as well.
-A `raise` in the generator body leaves the generator through whichever call resumed it:
+`throw()` and `close()` deliver an exception from the driver into the generator.
+An exception can travel the opposite direction too,
+from the generator into the driver:
+a `raise` in the generator body leaves the generator through whichever call resumed it.
 
 ```python
 # body_raises.py
