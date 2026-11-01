@@ -1,6 +1,6 @@
 """Tests for tools/prose_lint.py, mostly the quoted-literal exception.
 
-The other four checks are single regexes; QUOTE-PUNCT is the one that has
+The other checks are single regexes; QUOTE-PUNCT is the one that has
 to tell quoted prose from a quoted literal, so it carries the cases.
 """
 
@@ -198,3 +198,46 @@ def test_bare_raise_column_points_at_the_verb() -> None:
 
 def test_bare_raise_in_a_fenced_block_is_skipped() -> None:
     assert codes("```python\n# This raises instead.\n```\n") == []
+
+
+# ── RAISE-THE: no "the" before an exception class (R46) ───────────────────────
+
+RAISE_THE = [
+    "Its `yield` raises the `ValueError` instead of returning a value.",
+    '`g.throw(ValueError("bad input"))` raises the `ValueError` at '
+    '`yield "ready"`.',
+    "the last attempt raises the `TypeError` to the caller.",
+    "Hashing the `Recipe` hashes the `steps` list, which raises the "
+    "`TypeError`.",
+    "Raise the `KeyError` yourself.",
+    "The driver then re-raises the `Failed`.",
+    "A later call raised the `StopIteration` again.",
+]
+
+RAISE_THE_CLEAN = [
+    "It raises a `TypeError`.",
+    "Python raises `StopIteration` on the generator's behalf.",
+    "`run()` raises the same `KeyError` a missing key raises.",
+    "The constructor raises the exception it was given.",
+    'It raises the `Failed("card declined")` instance.',
+    "The `raise` statement rethrows it.",
+    "the `TypeError` the earlier run raised",
+    "Catch the `TypeError` that assigning raises.",
+]
+
+@pytest.mark.parametrize("text", RAISE_THE)
+def test_raise_the_class_is_reported(text: str) -> None:
+    assert codes(text).count("RAISE-THE") == 1
+
+@pytest.mark.parametrize("text", RAISE_THE_CLEAN)
+def test_raise_without_the_before_a_class_is_clean(text: str) -> None:
+    assert "RAISE-THE" not in codes(text)
+
+def test_raise_the_column_points_at_the_verb() -> None:
+    [(_, col, code, _)] = lint_text("- It raises the `TypeError`.")
+    assert code == "RAISE-THE"
+    assert col == len("- It ") + 1
+
+def test_raise_the_in_a_fenced_block_is_skipped() -> None:
+    text = "```python\n# This raises the `TypeError`.\n```\n"
+    assert codes(text) == []

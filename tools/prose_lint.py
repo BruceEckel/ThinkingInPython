@@ -10,6 +10,7 @@ Checks the prose in `Chapters/*.md` for:
   TRAILING-WS    trailing whitespace (a two-space hard break is allowed)
   SET-FIX        "fix" meaning "set" or "determine", which reads as "repair"
   BARE-RAISE     "raises" with no object ("raises instead", "returns or raises")
+  RAISE-THE      "raises the `X`" with an exception class: write "raises `X`"
 
 QUOTE-PUNCT applies to quoted prose, where the book puts the mark inside the
 quote ("easier to ask forgiveness than permission,"). A quoted *literal* is the
@@ -53,6 +54,20 @@ hand-wrapped and its object may open the next line; in `Chapters/`
 reflow never ends a line on a verb. A code span counts as one token.
 A causative ("makes `parse()` raise at the first byte") has the
 contact-relative shape and is missed; the book has none.
+
+RAISE-THE enforces rule R46: when the object of "raise" is an exception
+class in a code span, no "the" comes before it. Write "Python raises
+`StopIteration`" and "its `yield` raises `ValueError`", never "raises the
+`StopIteration`" (Bruce, 2026-10-23, reaffirmed 2026-11-01 after commit
+70c89ad0 fixed four sites: two in chapter 45 and one each in Solutions 14
+and 28). The verb is any form of raise (raises, raised, raising,
+re-raise, reraises, and so on, in any case), followed by "the" and then a
+code span whose whole content is a bare capitalized identifier. Three
+shapes stay legal. The indefinite article ("raises a `TypeError`") is
+correct. A word between "the" and the span ("raises the same `KeyError`
+a missing key raises") makes the object a particular instance. A span
+that is not a bare class name ("raises the `Failed("card declined")`
+instance", "the `raise` statement") names something else.
 
 Code is skipped through the shared classifier in `tools.prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
@@ -133,6 +148,14 @@ _PRONOUNS = frozenset("""
 """.split())
 _BARE_RAISE_MESSAGE = ('"raises" takes an object: "raises a `TypeError`", '
                        '"raises an exception"')
+# "raise the " up to a code span; the span itself is checked in raise_the().
+_RAISE_THE = re.compile(
+    r"\b(?:re-?)?(?:raises|raise|raised|raising)\s+the\s+(?=`)",
+    re.IGNORECASE)
+_CLASS_NAME = re.compile(r"[A-Z][A-Za-z0-9_]*")
+_RAISE_THE_MESSAGE = ('write the class alone after "raises": '
+                      '"raises `TypeError`", not "raises the `TypeError`" '
+                      "(rule R46)")
 _WORD = re.compile(r"[A-Za-z][A-Za-z'’-]*")
 _CLAUSE_START = re.compile(r"[.,;:?!]")
 _SPAN_FILL = "\x00"
@@ -191,6 +214,23 @@ def bare_raises(body: str, spans: list[tuple[int, int]]) -> Iterator[int]:
         if _has_fronted_object(before):
             continue
         yield m.start()
+
+
+def raise_the(body: str, spans: list[tuple[int, int]]) -> Iterator[int]:
+    """Column offsets of each "raises the `X`" with a bare class name.
+
+    A span's offsets include its backticks, so the content is
+    `body[start + 1:end - 1]`. A verb inside a span is never a hit.
+    """
+    for m in _RAISE_THE.finditer(body):
+        if _in_span(m.start(), spans):
+            continue
+        for start, end in spans:
+            if start == m.end() and body[start:start + 2] != "``":
+                if _CLASS_NAME.fullmatch(body[start + 1:end - 1]):
+                    yield m.start()
+                break
+
 
 Issue = tuple[int, int, str, str]  # line, column, code, message
 
@@ -358,6 +398,10 @@ def lint_text(text: str) -> list[Issue]:
         for col in bare_raises(body, spans):
             findings.append((lineno, offset + col + 1, "BARE-RAISE",
                              _BARE_RAISE_MESSAGE))
+
+        for col in raise_the(body, spans):
+            findings.append((lineno, offset + col + 1, "RAISE-THE",
+                             _RAISE_THE_MESSAGE))
 
     findings.sort()
     return findings
