@@ -759,7 +759,7 @@ Acquiring in `__enter__()` still helps.
 If `Guarded.__init__()` fails for some other reason,
 the failure comes before `__enter__()` acquires the resource.
 Moving the acquisition leaves the guard just as necessary, though.
-Whichever method acquires a resource,
+Whether `__init__()` or `__enter__()` acquires the resource,
 a step that can fail after the acquisition must release the resource before the exception propagates.
 
 Before you move on, name what separates your attempt from this one:

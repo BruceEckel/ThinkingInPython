@@ -543,7 +543,7 @@ Without it the eight constructors overlap,
 so the whole run takes about 50 milliseconds.
 With it they queue, so the run takes about 400.
 Each thread still builds its own `Settings` and still returns the one it built.
-`@cache` keeps whichever finished last,
+`@cache` keeps the `Settings` built last,
 so seven callers hold objects the cache has overwritten.
 The lock makes the program slower and leaves the race in place.
 

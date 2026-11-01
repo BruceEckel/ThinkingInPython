@@ -414,7 +414,7 @@ a different design, a detail, or an equivalent alternative.
 keeps one `EXPECTED` mapping and checks both implementations against it.
 Add the seven `Lizard` rows to that mapping,
 keyed on the player's and opponent's class names.
-A helper looks each class up by name with `getattr()` on whichever module it receives,
+A helper looks each class up by name with `getattr()` on the module it receives,
 so one mapping checks both versions.
 The test reports any disagreement as a failure.
 
@@ -519,7 +519,7 @@ for module in (table, methods):
 
 **Check both versions against one mapping.**
 The test's helper, `compete()`,
-looks each class up by name on whichever module it receives,
+looks each class up by name on the module it receives,
 so one `EXPECTED` checks both sets of classes.
 
 **Compare across separate enumerations.**
@@ -1656,7 +1656,7 @@ a different design, a detail, or an equivalent alternative.
 > so the seven unchanged cells stay one line each.
 > Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.
 > Dry paper wraps the rock and wins, wet paper is too soggy and draws,
-> whichever of the two calls `compete()`.
+> whether `Paper` or `Rock` calls `compete()`.
 > The chapter gives two reasons for preferring the method version.
 > Say which one this change answers, and which one survives it.
 
@@ -1670,7 +1670,7 @@ shows the lookup.
 Store a callable in every cell and call what the lookup returns with both items.
 To wrap each constant `Outcome`,
 a helper returns a closure that ignores its arguments.
-The `(Paper, Rock)` and `(Rock, Paper)` cells each read `wet` from whichever item is the `Paper`.
+The `(Paper, Rock)` and `(Rock, Paper)` cells each read `wet` from the item that is the `Paper`.
 
 <details>
 <summary>The shape</summary>
@@ -1732,7 +1732,7 @@ OUTCOME: Final[
 <summary>Done when</summary>
 
 a dry `Paper` beats `Rock`,
-a wet `Paper` draws with `Rock` whichever of the two calls `compete()`,
+a wet `Paper` draws with `Rock` whether `Paper` or `Rock` calls `compete()`,
 the other seven pairs return the chapter's answers,
 and `uv run ty check` passes on your file.
 You can also name the chapter's reason the callable cells answer,

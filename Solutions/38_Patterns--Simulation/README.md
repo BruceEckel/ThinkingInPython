@@ -1289,7 +1289,7 @@ On the line `x == y` the swap leaves the point where it was,
 so the subtraction there must equal its negation.
 The one number equal to its negation is zero.
 Every mode in which this plate can ring therefore has a nodal line straight down the main diagonal,
-so the figures all share that one feature whichever `(m, n)` produced them.
+so the figures for every `(m, n)` share that one feature.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

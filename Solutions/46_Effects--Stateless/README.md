@@ -1386,7 +1386,7 @@ and you can name the case that two `Protocol`s still leave to argument order.
 
 Three implementations have six orderings, and one rule predicts them all.
 `supply()` scans its arguments and takes the first that satisfies the request,
-so whichever implementation comes first answers it.
+so the implementation that comes first answers the request.
 Two of the six orderings put `Terminal` first and send the greeting to the screen.
 The remaining four split evenly between `Capture` and the third implementation.
 All six orderings run cleanly.

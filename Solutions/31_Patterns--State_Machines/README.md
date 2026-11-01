@@ -56,7 +56,7 @@ class StateMachine:
 <summary>Where to look</summary>
 
 [*State*](../../Chapters/25_Patterns--Surrogate.md#state)
-shows a surrogate that forwards a call to whichever state object it currently holds.
+shows a surrogate that forwards a call to the state object it currently holds.
 Define a `Mood` protocol with one `hello()` method,
 and give `UnpredictablePerson` a `change_to()` that swaps the held object.
 A new mood is another class with the same method,

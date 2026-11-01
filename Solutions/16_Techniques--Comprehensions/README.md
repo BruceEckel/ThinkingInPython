@@ -160,7 +160,7 @@ Two names that upper-case to the same string collide.
 The comprehension builds a `dict`,
 so the later value replaces the earlier one under the shared key.
 Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry, not two.
-Its value comes from whichever of the two names appears later in the list.
+Its value comes from the name that appears later in the list.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

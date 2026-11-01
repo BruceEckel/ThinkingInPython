@@ -819,7 +819,7 @@ but `PriorityQueue` orders its items by comparing the tuples.
 The drain order is always priority first, `1` before `2` before `3`,
 then alphabetically by the description within a priority
 (the tuple's second field).
-The final order is the same whichever thread submits a job first,
+The final order is the same no matter which thread submits a job first,
 because `consume()` starts after all three producers finish.
 
 Before you move on, name what separates your attempt from this one:
@@ -1217,8 +1217,7 @@ a different design, a detail, or an equivalent alternative.
 [The GIL and Free Threading](../../Chapters/19_Techniques--Concurrency.md#the-gil-and-free-threading)
 and [Subinterpreters](../../Chapters/19_Techniques--Concurrency.md#subinterpreters)
 describe where the GIL lives.
-The assertion compares results,
-which are the same whichever executor ran the work.
+The assertion compares results, which are the same under either executor.
 The boolean compares times,
 so ask how many GILs a pool of threads shares and how many a pool of subinterpreters has.
 

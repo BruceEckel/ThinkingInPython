@@ -138,7 +138,7 @@ a different design, a detail, or an equivalent alternative.
 defines `Ok` and `Err` with a `bind()` on each.
 `map_error()` is the mirror image of those two `bind()` methods.
 `Err` applies the function to its error and wraps the return value in a new `Err`.
-`Ok` returns `self`, so a chain can call `map_error()` whichever side it holds.
+`Ok` returns `self`, so a chain can call `map_error()` on an `Ok` or an `Err`.
 
 <details>
 <summary>The shape</summary>
@@ -207,7 +207,7 @@ On a value typed `Result[int, str]`,
 including one on a value that holds an `Err`,
 because the `Ok` member of the union has no such method.
 The solution gives `Ok` a `map_error()` that returns `self`,
-so a chain can call the method whichever side it holds.
+so a chain can call the method on an `Ok` or an `Err`.
 
 ```python
 # exercise_2.py
@@ -556,7 +556,7 @@ a different design, a detail, or an equivalent alternative.
 ## 5. Notes that survive as data
 
 > Write `load_setting(name, text)` that returns `Result[int, Exception]` and attaches a note naming the setting.
-> Chain two of them with `bind()` and print the notes from whichever one failed.
+> Chain two of them with `bind()` and print the notes from the call that failed.
 > Does the successful call carry a note?
 > Why or why not?
 
