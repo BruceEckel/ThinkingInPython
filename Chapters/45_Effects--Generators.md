@@ -1069,14 +1069,16 @@ print(inspect.getgeneratorstate(g))
 
 `send(-3)` at `[2]` resumes the body with `received` bound to `-3`.
 The body rejects the value and raises `ValueError` at `[1]`.
-The exception leaves the generator through the `send()` call that resumed it,
-and `expect()` reports it in the driver.
-The generator is then `GEN_CLOSED`, as it is after `throw()`.
+The `ValueError` propagates out of the generator body.
+The `send()` call at `[2]` then raises that `ValueError` in the driver,
+where `expect()` reports it.
+`GEN_CLOSED` shows that the exception shut the generator down,
+as `throw()` does.
 
-The driver's method call is the exception's path in both directions.
 `throw()` carries an exception from the driver down to the `yield`.
-A `raise` in the body carries an exception from the generator up through the resuming call,
-whether that was `next()`, `send()`, or `throw()`.
+A `raise` in the body carries an exception from the generator up to the `next()`,
+`send()`, or `throw()` call that resumed the generator.
+In both directions, the exception passes through a method call that the driver made on the generator object.
 
 ### Handle, Clean Up, or Stop Early
 

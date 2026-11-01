@@ -549,7 +549,6 @@ Chapters/44_Effects--Effect_Management.md	price: The function it calls computes 
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
 Chapters/45_Effects--Generators.md	could: so the driver's table needs an entry it could not have written before that answer arrived
-Chapters/45_Effects--Generators.md	has no: CODE receives one value per call and has no way to ask for the next value or to stop the loop early
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
 Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
