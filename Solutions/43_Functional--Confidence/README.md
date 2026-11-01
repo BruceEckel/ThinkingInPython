@@ -260,7 +260,7 @@ and so does one that returns the first element alone.
 
 **Check that running twice matches running once.**
 Idempotence on its own catches little more.
-The same `[]`-returning function passes it too.
+The `[]`-returning function passes it too.
 Idempotence adds a different kind of check,
 one about the operation rather than the output.
 It catches a sort that drops the last element.
