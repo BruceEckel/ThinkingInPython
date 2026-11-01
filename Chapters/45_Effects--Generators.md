@@ -1035,8 +1035,8 @@ its `__exit__()` calls the generator's `throw()` method,
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
 An exception can travel the opposite direction too,
-from the generator into the driver:
-a `raise` in the generator body leaves the generator through whichever call resumed it.
+from the generator into the driver.
+A `raise` in the generator body leaves the generator through whichever call resumed it:
 
 ```python
 # body_raises.py
