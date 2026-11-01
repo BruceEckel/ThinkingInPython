@@ -1034,7 +1034,12 @@ its `__exit__()` calls the generator's `throw()` method,
 
 Most conversations end when the generator returns.
 When the driver finishes first, with the generator still waiting at a `yield`,
-it calls `close()`, and the generator runs its cleanup and ends.
+it calls `close()`, and `GeneratorExit` arrives at that `yield`.
+The cleanup that runs is the generator's own code,
+a `finally` clause or an `except GeneratorExit` around the `yield`.
+Then the generator ends.
+`close_when_done.py` in [Handle, Clean Up, or Stop Early](#handle-clean-up-or-stop-early)
+shows a driver closing a sensor generator when it has the reading it needs.
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
 An exception can propagate in the opposite direction too,
