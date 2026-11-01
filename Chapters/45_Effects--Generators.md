@@ -993,7 +993,7 @@ so Python runs the `finally` block on its way out of the `try` statement.
 The `ValueError` then propagates out of the generator and comes out of the driver's `throw()` call,
 where `expect()` reports it.
 
-At `[2]`, the same `yield` raises `GeneratorExit`.
+At `[2]`, its `yield` raises `GeneratorExit`.
 `GeneratorExit` takes the same path out of `pause()`,
 running the `finally` block.
 This time the driver sees an ordinary return,
