@@ -46,9 +46,6 @@ run_all(waiting(), MOVES)
 #: Broadcasting cheese smell
 #: Holding mouse removed -> Waiting
 
-trap = trampoline(waiting())
-print(next(trap))
+run_all(waiting(), [Mouse.ESCAPES])
 #: Broadcasting cheese smell
-#: Waiting
-print(trap.send(Mouse.ESCAPES))
-#: Waiting
+#: Waiting mouse escapes -> Waiting

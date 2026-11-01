@@ -958,7 +958,6 @@ from collections.abc import Generator
 from exceptions import expect
 
 def pause() -> Generator[None]:
-    print("started")
     try:
         yield
         print("resumed")
@@ -967,7 +966,6 @@ def pause() -> Generator[None]:
 
 g = pause()
 next(g)
-#: started
 expect(ValueError, g.throw, ValueError("stop"))  # [1]
 #: finished
 #: [ValueError] stop
@@ -976,7 +974,6 @@ print(inspect.getgeneratorstate(g))
 
 g = pause()
 next(g)
-#: started
 g.close()  # [2]
 #: finished
 print(inspect.getgeneratorstate(g))
@@ -1084,7 +1081,6 @@ from collections.abc import Generator
 def worker() -> Generator[str]:
     try:
         yield "ready"
-        yield "still going"
     except ValueError as e:
         print(f"caught: {e}")
         yield "recovered"
@@ -1440,12 +1436,9 @@ run_all(waiting(), MOVES)
 #: Broadcasting cheese smell
 #: Holding mouse removed -> Waiting
 
-trap = trampoline(waiting())
-print(next(trap))
+run_all(waiting(), [Mouse.ESCAPES])
 #: Broadcasting cheese smell
-#: Waiting
-print(trap.send(Mouse.ESCAPES))
-#: Waiting
+#: Waiting mouse escapes -> Waiting
 ```
 
 `trampoline()` is the engine, the loop at `[1]`.
@@ -1469,7 +1462,8 @@ here each state's body runs its entry action.
 
 The listing's second run shows a state that stays.
 `waiting()` matches `Mouse.APPEARS` alone,
-so `send()` returns `"Waiting"` and the entry message prints once.
+so `Mouse.ESCAPES` leaves the machine in `Waiting`,
+and the entry message prints once.
 
 [Which Design Should You Use?](31_Patterns--State_Machines.md#which-design-should-you-use)
 asks whether an action belongs to the state or to the transition.

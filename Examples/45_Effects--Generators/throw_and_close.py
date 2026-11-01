@@ -4,7 +4,6 @@ from collections.abc import Generator
 def worker() -> Generator[str]:
     try:
         yield "ready"
-        yield "still going"
     except ValueError as e:
         print(f"caught: {e}")
         yield "recovered"

@@ -4,7 +4,6 @@ from collections.abc import Generator
 from exceptions import expect
 
 def pause() -> Generator[None]:
-    print("started")
     try:
         yield
         print("resumed")
@@ -13,7 +12,6 @@ def pause() -> Generator[None]:
 
 g = pause()
 next(g)
-#: started
 expect(ValueError, g.throw, ValueError("stop"))  # [1]
 #: finished
 #: [ValueError] stop
@@ -22,7 +20,6 @@ print(inspect.getgeneratorstate(g))
 
 g = pause()
 next(g)
-#: started
 g.close()  # [2]
 #: finished
 print(inspect.getgeneratorstate(g))

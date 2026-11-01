@@ -728,7 +728,7 @@ Chapters/45_Effects--Generators.md	[BOUND] A suspended generator preserves two t
 Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator drops the return channel, so CODE takes two parameters where CODE takes three
 Chapters/45_Effects--Generators.md	[BOUND] CODE handles one exception and cleans up after any
 Chapters/45_Effects--Generators.md	[BOUND] CODE makes the first two calls itself, and the CODE makes the rest
-Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE returns CODE and the entry message prints once
+Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE leaves the machine in CODE, and the entry message prints once
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
