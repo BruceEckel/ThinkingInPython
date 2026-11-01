@@ -155,7 +155,7 @@ so the driver tells them apart by how each arrives.
 
 When the generator body finishes with `return`,
 Python raises `StopIteration` on the generator's behalf.
-If a `StopIteration` propagates out of the body instead,
+If the body raises a `StopIteration` of its own,
 Python converts it into a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)).
 As [Asking Consumes an Item](22_Patterns--Iterators.md#asking-consumes-an-item)
@@ -772,8 +772,7 @@ A single loop at the edge of the program interprets requests yielded at any dept
 `drive()` and `yield from` both run a generator's body one `yield` at a time and both finish at `StopIteration`,
 so they are easy to confuse.
 In `yield_from_delegates.py`, `drive()` receives `interview()`'s `Result`.
-In `yield_from_nested.py`,
-a `yield from` in `survey()` receives that `Result` instead:
+In `yield_from_nested.py`, a `yield from` in `survey()` receives that `Result`:
 
 ```python
 # yield_from_nested.py
@@ -1023,10 +1022,10 @@ Inside the generator's body, `raise` works as it does anywhere.
 `send()` and `throw()` both answer a yielded request.
 A generator yields a request and waits.
 When the driver has the answer, it calls `send()` with the answer.
-When the driver has a failure instead, it calls `throw()` with the exception,
-and the generator that asked decides what to do about it:
-handle the exception and yield again, or let it propagate,
-which ends the generator.
+When the driver has a failure, it calls `throw()` with the exception.
+The generator either handles the exception and yields again,
+or lets it propagate.
+An exception that propagates out of the generator ends it.
 When the driver has finished the conversation, it calls `close()`,
 and the generator runs its cleanup and ends.
 `asyncio` answers a coroutine this way when an awaited operation fails or a cancellation arrives.
