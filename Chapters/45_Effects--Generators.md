@@ -933,8 +933,8 @@ A driver controls a generator through the methods of the generator object:
 - `send()` resumes the body with a value,
   and that value becomes the result of the `yield` expression where the generator stopped.
 
-Two more methods resume the body at that same `yield`,
-and this time the `yield` expression raises an exception instead of returning a value:
+Two more methods resume the body at a `yield`.
+With these, the `yield` expression raises an exception instead of returning a value:
 
 - `throw(exc)` makes the `yield` raise `exc`.
 - `close()` makes the `yield` raise `GeneratorExit`.
@@ -994,13 +994,13 @@ where `expect()` reports it.
 
 At `[2]`, the same `yield` raises `GeneratorExit`.
 `GeneratorExit` takes the same path out of `pause()`,
-and the `finally` block runs again.
+running the `finally` block.
 This time the driver sees an ordinary return,
 because `close()` catches the `GeneratorExit` on its way out.
 `GeneratorExit` is the driver's signal that this resumption is the last one.
 It tells the generator to finish.
 
-Why does the driver need methods to raise an exception inside the generator,
+Why does the driver need methods to raise exceptions inside the generator,
 when Python already has `raise`?
 `raise` produces its exception in the function that executes it,
 and the exception then travels up through that function's callers.
@@ -1032,6 +1032,38 @@ and the generator runs its cleanup and ends.
 `@contextmanager` does it in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
 its `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
+
+The exception channel runs the other way as well.
+A `raise` in the generator body leaves the generator through whichever call resumed it:
+
+```python
+# body_raises.py
+import inspect
+from collections.abc import Generator
+from exceptions import expect
+
+def strict() -> Generator[str, int]:
+    received = yield "a positive number"
+    if received <= 0:
+        raise ValueError("not positive")  # [1]
+
+g = strict()
+print(next(g))
+#: a positive number
+expect(ValueError, g.send, -3)  # [2]
+#: [ValueError] not positive
+print(inspect.getgeneratorstate(g))
+#: GEN_CLOSED
+```
+
+The `ValueError` at `[1]` is the body's own.
+It comes out of the driver's `send()` call at `[2]`,
+where `expect()` reports it, and the generator is `GEN_CLOSED` afterward,
+as it is after `throw()`.
+The driver's method call is the meeting point in both directions.
+`throw()` carries the driver's failure down to the `yield`,
+and a `raise` in the body carries the generator's failure up through `next()`,
+`send()`, or `throw()`, whichever the driver called.
 
 ### Handle, Clean Up, or Stop Early
 
