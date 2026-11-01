@@ -927,25 +927,24 @@ and the result changes while `interview()` and `drive()` stay the same.
 
 ## `throw()` and `close()`: The Driver's Exception Channel {#the-drivers-exception-channel}
 
-A driver controls a generator through the methods of the generator object,
-and two of those methods have resumed the body in this chapter.
-`next()` runs the body to its next `yield`, where the generator suspends.
-`send()` resumes the body with a value,
-and that value becomes the result of the `yield` expression where the generator stopped.
+A driver controls a generator through the methods of the generator object:
+
+- `next()` runs the body to its next `yield`, where the generator suspends.
+- `send()` resumes the body with a value,
+  and that value becomes the result of the `yield` expression where the generator stopped.
+
 Two more methods resume the body at that same `yield`,
 and this time the `yield` expression raises an exception instead of returning a value:
 
 - `throw(exc)` makes the `yield` raise `exc`.
 - `close()` makes the `yield` raise `GeneratorExit`.
 
-Both methods belong to the driver, the code that holds the generator object.
-The body sees their effect alone:
-an exception comes out of its `yield` where a value was due.
-`GeneratorExit` is the driver's signal that this resumption is the last one,
-so the generator should finish.
+Both methods are called by the driver holding the generator object.
+In both cases, an exception comes out of a `yield` that was expecting a value.
+
 ### An Exception at the `yield`
 
-This demonstrates the basics of `throw()` and `close()`:
+Here are the basics of `throw()` and `close()`:
 
 ```python
 # throw_close_basics.py
@@ -988,14 +987,19 @@ and both runs leave it `GEN_CLOSED`.
 
 At `[1]`, `pause()` resumes,
 and its `yield` raises the `ValueError` instead of returning a value.
-The body lets the exception through,
-so it travels out of the generator and arrives back in the driver as the result of the `throw()` call,
+`pause()`'s `try` has a `finally` clause and no `except`,
+so the `ValueError` runs the `finally` block and propagates out of the generator.
+It arrives back in the driver as the result of the `throw()` call,
 where `expect()` reports it.
 
 At `[2]`, the same `yield` raises `GeneratorExit`.
-The body lets that through as well, and the `finally` block runs again,
-but this time the driver sees an ordinary return,
+`GeneratorExit` takes the same path out of `pause()`,
+and the `finally` block runs again.
+This time the driver sees an ordinary return,
 because `close()` catches the `GeneratorExit` on its way out.
+`GeneratorExit` is the driver's signal that this resumption is the last one,
+so the generator should finish.
+
 
 Why does the driver need a method for this, when Python already has `raise`?
 Because `raise` raises its exception in the function that executes it,
