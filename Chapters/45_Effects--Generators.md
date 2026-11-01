@@ -988,7 +988,7 @@ and both runs leave it `GEN_CLOSED`.
 At `[1]`, `pause()` resumes,
 and its `yield` raises the `ValueError` instead of returning a value.
 `pause()`'s `try` has a `finally` clause and no `except`,
-so the `ValueError` runs the `finally` block and propagates out of the generator.
+so Python runs the `finally` block on its way out of the `try` statement and the `ValueError` propagates out of the generator.
 It arrives back in the driver as the result of the `throw()` call,
 where `expect()` reports it.
 
