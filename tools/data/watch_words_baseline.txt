@@ -883,7 +883,7 @@ Solutions/44_Effects--Effect_Management/README.md	by hand: Each remaining Effect
 Solutions/44_Effects--Effect_Management/README.md	by hand: Effects by Hand shows CODE taking its CODE and CODE Effects as parameters
 Solutions/44_Effects--Effect_Management/README.md	by hand: Effects by Hand shows the bookkeeping that each new Effect adds to every signature on the path
 Solutions/44_Effects--Effect_Management/README.md	by hand: and Effects by Hand covers the rest
-Solutions/44_Effects--Effect_Management/README.md	by hand: the technique from Effects by Hand applies instead
+Solutions/44_Effects--Effect_Management/README.md	by hand: the technique from Effects by Hand applies
 Solutions/44_Effects--Effect_Management/README.md	has no: CODE has no equivalent of writing a function against "something awaitable that yields a price" and choosing the implementation later
 Solutions/44_Effects--Effect_Management/README.md	never: with a CODE that CODE was never awaited
 Solutions/44_Effects--Effect_Management/README.md	only: Only an CODE may contain CODE

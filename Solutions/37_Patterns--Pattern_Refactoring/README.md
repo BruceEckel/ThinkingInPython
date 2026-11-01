@@ -593,7 +593,7 @@ so the assignment overwrites the `bin = Aluminum` that `CrushedAluminum` declare
 so `CrushedAluminum` is a new key and gets a bin of its own.
 
 **Resolve the note through the MRO.**
-`singledispatch` resolves through the MRO instead.
+`singledispatch` resolves through the MRO.
 It walks from `CrushedAluminum` to `Aluminum` and uses `Aluminum`'s registration.
 
 Both behaviors are deliberate, and neither is a fallback.

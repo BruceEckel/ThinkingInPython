@@ -387,7 +387,7 @@ All three conversions in [Converting Effectful to Pure](../../Chapters/44_Effect
 manage the exception Effect.
 For a side cause and a side effect,
 the technique from [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
-applies instead: pass in what the function would otherwise read or write.
+applies: pass in what the function would otherwise read or write.
 For `withdraw()`, that means taking the balance as a parameter and returning the new one.
 The same inputs then give the same answer.
 The caller holds the state.

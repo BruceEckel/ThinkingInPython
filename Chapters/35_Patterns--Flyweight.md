@@ -309,7 +309,7 @@ whereas a cache that evicts an entry runs slower and returns equal results.
 A factory function like `tile()` has a visibly different name and call syntax,
 so a caller can see that construction goes through the factory rather than the class.
 If you want callers to construct objects with an ordinary class call such as `Color(...)`,
-hide the pool inside `__new__()` instead.
+hide the pool inside `__new__()`.
 
 [*Singleton*](23_Patterns--Singleton.md#the-classic-implementations)
 builds and returns its one instance in `__new__()`.
