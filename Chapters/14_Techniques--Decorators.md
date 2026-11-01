@@ -1263,7 +1263,7 @@ so its instances are descriptors.
 Python calls that `__get__()` when code reads the attribute,
 so `@property` runs its getter, `@staticmethod` returns the plain function,
 and `@classmethod` binds the function to the class.
-The same `__get__()` makes them work on methods, where `logged` fails.
+That `__get__()` makes them work on methods, where `logged` fails.
 [`@dataclass`](12_Techniques--Data_Classes_as_Types.md#data-classes)
 is a class decorator like `register`, except it mutates the class,
 adding a generated `__init__()`, `__repr__()`,

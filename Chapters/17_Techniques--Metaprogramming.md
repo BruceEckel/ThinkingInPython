@@ -2072,7 +2072,7 @@ def display_object(
 Importing into any example works because the example tooling puts `utils/` on the import path,
 not because Python searches other directories automatically.
 `tools/run_examples.py` sets `PYTHONPATH` to the tree's `utils/` directory before running each script.
-The same directory reaches pytest through `pythonpath` in `pyproject.toml`.
+That directory reaches pytest through `pythonpath` in `pyproject.toml`.
 Without either, `from display import display_object` fails with `ModuleNotFoundError`.
 
 ### The Tool in Use
