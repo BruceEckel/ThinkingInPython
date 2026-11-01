@@ -103,7 +103,7 @@ print(step("jump"))
 The alternatives in `step()` are literals,
 which compare the subject with a value.
 When alternatives do capture, each one must bind the same set of names,
-so the body can use those names whichever alternative matched.
+so the body can use those names after any alternative matches.
 
 ## A Bare Name Captures, a Dotted Name Compares
 

@@ -255,7 +255,7 @@ built outside the cache.
    A `threading.Lock` around the constructor function's body leaves the race in place,
    because every thread misses the cache before reaching the lock.
    The threads serialize, but each still builds an object.
-   The cache keeps whichever finished last.
+   The cache keeps the object from the thread that finished last.
    The check must run inside the lock, as `singleton_locked_settings.py` shows.
 
 ### The First-Call Race

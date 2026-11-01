@@ -309,7 +309,7 @@ One fix keeps `__init__()` free of resources and acquires them in `__enter__()`,
 so a failed construction ends before the first acquisition.
 A failure in `__enter__()` leaks the same way, though,
 because `__exit__()` runs only after `__enter__()` returns (see exercise 7).
-Whichever method acquires the resource,
+Whether `__init__()` or `__enter__()` acquires the resource,
 a step that can fail after the acquisition needs its own `try`/`except`,
 which releases the resource before re-raising the exception.
 

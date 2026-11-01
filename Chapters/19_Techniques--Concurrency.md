@@ -615,7 +615,7 @@ Keeping the task objects lets you inspect each outcome after a partial failure.
 so `task.exception()` returns the `ValueError` instead of raising it.
 
 Cancelling a task raises `asyncio.CancelledError` inside it,
-at whichever `await` currently suspends it.
+at the `await` that currently suspends it.
 That exception derives from `BaseException` rather than `Exception` so that a handler for ordinary errors lets it pass.
 Inside a task, a `try`/`except Exception` that logs and continues lets cancellation propagate,
 so the task still stops the way the group intended.

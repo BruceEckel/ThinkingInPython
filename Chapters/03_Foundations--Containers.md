@@ -909,7 +909,7 @@ so each such line carries a `# type: ignore` comment.
 That comment silences the type checker for its line.
 
 Use the immutable form whenever a container should stay the same after you build it.
-The container then keeps the same elements, whichever code holds it,
+The container then keeps the same elements no matter which code holds it,
 so you can share a container of immutable elements,
 where a mutable one calls for a defensive copy.
 An immutable container is safe as a default argument,
@@ -1012,7 +1012,7 @@ A fixed-length record whose positions mean different things is a `tuple` or a `n
 Lookup by key is a `dict`.
 Uniqueness and membership are a `set`.
 Go past those four only when a measurement or a specific job calls for it,
-and freeze whichever you pick as soon as it stops changing.
+and freeze the container you pick as soon as it stops changing.
 
 ## Exercises
 

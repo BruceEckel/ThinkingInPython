@@ -268,7 +268,7 @@ The secant and Newton methods are *open*: they need somewhere to start,
 not a bracket.
 
 All three share one signature, so they are interchangeable,
-and `solve()` runs whichever one the caller passes:
+and `solve()` runs the algorithm the caller passes:
 
 ```python
 # algorithms.py
@@ -505,7 +505,7 @@ Because `0.0` is falsy,
 a [truthiness](02_Foundations--Tour.md#booleans-none-and-truthiness)
 test discards that correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
-Whichever value marks failure, compare the result against it with `is`.
+For any failure value, compare the result against it with `is`.
 
 `None` is the right failure value here because a root is always a `float`,
 so a `None` result means the search failed.

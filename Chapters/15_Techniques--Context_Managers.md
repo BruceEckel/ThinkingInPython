@@ -1233,7 +1233,7 @@ methods beyond the two protocol ones, or reuse across several `with` statements.
 A generator manager handles one setup, one teardown, and one entry.
 Add `ContextDecorator` only when the same bracket should also wrap whole functions.
 
-Whichever form you choose, the borrower's side contains two lines.
+In all four forms, the borrower's side contains two lines.
 Every change you make later goes inside the manager.
 
 ## Exercises

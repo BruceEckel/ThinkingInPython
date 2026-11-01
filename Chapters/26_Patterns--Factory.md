@@ -219,7 +219,7 @@ That form is the most common factory.
 The standard library's `dict.fromkeys()` and `datetime.fromisoformat()` are two examples.
 
 The `@classmethod` form chooses arguments rather than a class.
-`cls` is whichever class receives the call,
+`cls` is the class that receives the call,
 so a subclass that calls the inherited method gets an instance of the subclass.
 
 An `Enum` makes its constructor a factory over a closed set.
