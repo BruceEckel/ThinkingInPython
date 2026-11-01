@@ -25,7 +25,7 @@ This chapter covers:
 
 - The full three-channel annotation
 - The *driver* (the loop that runs such a conversation)
-- `yield from`, which composes generators that do not refer to their driver
+- `yield from`, which composes generators that run under any driver
 
 [Stateless](46_Effects--Stateless.md) builds an Effect system on these,
 but generators are useful on their own.
@@ -73,10 +73,10 @@ print(list(countdown(6)), list(squares(6)))
 ```
 
 `Generator[int]` means `Generator[int, None, None]`.
-`Iterator[int]` describes the same one-way generator without relying on the defaults.
-It describes the yield channel alone,
+`Iterator[int]` describes the same one-way generator.
+Its type has the yield channel alone,
 so the type checker rejects `send()` on anything annotated `Iterator`.
-The long form is necessary when the send and return channels carry a value other than `None`,
+The long form is necessary when the send channel or the return channel carries a value other than `None`,
 as they do in this chapter.
 
 Here, the `interview()` generator yields a question, receives an answer,
@@ -100,7 +100,7 @@ def interview() -> Generator[Question, Answer, Result]:
 
 Although `Generator[str, str, str]` works,
 `NewType` gives each channel a distinct type,
-which makes the logic easier to follow.
+so a reader tells a question from an answer or a result by its type.
 The annotation says which kind of value each channel carries,
 and the type checker rejects a value on the wrong channel.
 The distinction exists for the type checker.
@@ -138,9 +138,10 @@ print(f"{result = }")
 The last `send()` resumes `interview()`'s body,
 which encounters `return` instead of another `yield`,
 so the generator returns its `Result`.
-The caller sees that `return` as a `StopIteration`,
+The caller receives that `return` as a `StopIteration`,
 and the `Result` arrives as the exception's `value`.
-A `for` loop treats `StopIteration` as a normal end-of-loop so it discards the exception and loses the return value.
+A `for` loop treats `StopIteration` as the normal end of the loop,
+so it discards the exception and loses the return value.
 To read the `ReturnType`, catch the exception yourself,
 as `drive_by_hand.py` does.
 
@@ -148,8 +149,9 @@ as `drive_by_hand.py` does.
 
 The three arrows are the annotation's three positions: `YieldType` on the first,
 `SendType` on the second, `ReturnType` on the third.
-A `Question` or a `Result` leaves the generator by its own route,
-and the driver tells them apart by how each arrives.
+A `Question` comes back as the value of `next()` or `send()`,
+and a `Result` arrives as the `value` of a `StopIteration`,
+so the driver tells them apart by how each arrives.
 
 When the generator body finishes with `return`,
 Python raises `StopIteration` on the generator's behalf.
@@ -217,9 +219,9 @@ Each `interview()` call creates a new generator,
 so both lines start from the beginning and produce the first question.
 
 The type checker is right to reject `interview().send(None)`.
-The `# type: ignore` silences that correct report so the listing can show the equivalence.
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
+The `# type: ignore` silences that correct report so the listing can show the equivalence.
 The interpreter accepts `send(None)` as the priming call,
 but the type checker rejects it,
 because the annotation applies one `SendType` to every call, the first included.
@@ -243,7 +245,7 @@ A driver function runs the generator from start to finish.
 It starts the generator body with `next()`,
 sends each answer back with `send()`,
 and returns the generator's result when the body ends.
-Here, it looks up each answer in a table:
+Here, `drive()` looks up each answer in a table:
 
 ```python
 # drive.py
@@ -280,7 +282,7 @@ def drive(conversation: Generator[Question, Answer, Result],
 
 `show_state` adds the generator's state to each line of the trace.
 The default leaves it out,
-so an ordinary call shows only the requests and the answers.
+so an ordinary call shows the requests and the answers.
 
 The type checker verifies each `Question` the generator yields and each `Answer` that `drive()` sends.
 `StopIteration.value` has type `Any`,
@@ -292,11 +294,10 @@ The `try` around the priming call catches a conversation that returns before it 
 Any other call that can raise `StopIteration` belongs outside both `try` blocks.
 A driver that reads its answers from an iterator, for example,
 gets `StopIteration` from `next()` on the answers when they run out.
-Inside a `try`, that exception would look like the end of the conversation.
-The driver would then return `None` as the result.
+Inside a `try`, the `except StopIteration` clause catches that exception as the end of the conversation.
+The driver then returns `None` as the result.
 
-`drive()` runs the conversation.
-`show_state=True` puts the generator's state on each line of the trace:
+Here, `drive()` runs the conversation with `show_state=True`:
 
 ```python
 # two_way_generator.py
@@ -331,7 +332,7 @@ so `expect()` prints the exception's class name alone.
 
 The generator and `drive()` take turns.
 While the generator body runs, `drive()` waits inside `send()`,
-so only code inside the body can see `GEN_RUNNING`.
+so `inspect.getgeneratorstate()` returns `GEN_RUNNING` only when code inside the body calls it.
 That code needs a reference to its generator,
 which a module-level name supplies:
 
@@ -382,7 +383,7 @@ That separation of a request from its fulfillment is the core of an [Effect Mana
 The generator declares requests.
 The driver interprets them.
 
-`interview()` asks the same three questions whatever answers it hears.
+`interview()` asks the same three questions whatever answers it receives.
 A generator can build its next request from the answer it received:
 
 ```python
@@ -416,8 +417,8 @@ so the driver's table needs an entry it could not have written before that answe
 Under the second table the generator asks `pet of Bob`,
 because the answer to `name` changed.
 The driver still chooses every answer.
-The generator chooses what to ask next from what it has heard,
-and that choice is the conversation.
+The generator chooses what to ask next from the answers it has received.
+That choice is the conversation.
 
 Each generator has one driver at a time.
 The annotation describes the three channels; the runtime enforces the pairing.
@@ -437,7 +438,7 @@ While it does, the outer generator sits suspended at the `yield from` expression
 and the driver's calls on the outer generator reach the inner one.
 Every request the inner generator yields passes out to the driver,
 and every answer the driver sends passes back down to the `yield` that is waiting.
-The driver still supplies each step; `yield from` is the path between them.
+The driver still supplies each answer; `yield from` relays it.
 
 In the simplest case,
 each generator yields values and leaves its send and return channels at `None`,
@@ -477,8 +478,8 @@ print(list(top()))
 "To exhaustion" means each `yield from` stays with its target until that generator finishes,
 however many `next()` calls that takes.
 Exhaustion is transitive.
-`list(top())` receives one flat sequence,
-and `top()`'s single `yield from` finishes when the last generator beneath it finishes.
+`top()`'s single `yield from` finishes when the last generator beneath it finishes,
+so `list(top())` receives one flat sequence.
 
 Without `from`, a bare `yield one()` yields the generator object as a single value,
 so `list(outer())` shows `<generator object one at ...>` in place of `'only'`.
@@ -518,7 +519,7 @@ A `yield from` therefore works like a function call:
 while the values `emit()` yields still go to the driver.
 
 `drive_by_hand.py` and `drive()` read a generator's result by catching `StopIteration` and taking its `value`.
-In `report()`, `yield from` does that work.
+In `report()`, `yield from` takes both steps.
 When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`.
 The one assignment `size: Size = yield from emit(items)` replaces the `try` and the `except`.
@@ -562,19 +563,20 @@ for yielded in report():
 #: Returned(text='Message from inner!')
 ```
 
-A `Yielded` travels the yield channel and a `Returned` the return channel.
-The output traces the descent, and the `Returned` comes back up the same path.
+A `Yielded` goes out on the yield channel and a `Returned` on the return channel.
+The `Yielded` lines print outermost first, in the order the generators start.
+The `Returned` passes back up through `middle()` and `outer()` to `report()`.
 `return (yield from ...)` passes the result through unchanged.
 
-`report()` yields the value of its `yield from`.
+`report()` yields the value of its `yield from`,
+so the last output line arrives through the return channel.
 Its annotation widens to `Iterator[Yielded | Returned]`,
 because the loop receives both types.
-The last output line arrives through the return channel.
 
 Because each `yield from` hands a result back to its caller,
 a recursive generator can combine results on the way back up a tree.
-This example walks a nested dictionary of plants, yields the path to each plant,
-and returns a count of each color:
+Here, `visit()` walks a nested dictionary of plants,
+yields the path to each plant, and returns a count of each color:
 
 ```python
 # color_count.py
@@ -632,10 +634,11 @@ for line in census(garden):
 
 A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`,
 and reaches the `for` loop at the bottom of the listing.
-[`Counter`](03_Foundations--Containers.md#counter) objects support `+`,
+Each `visit()` returns its subtree's [`Counter`](03_Foundations--Containers.md#counter)
+to the `visit()` that called it.
+`Counter` objects support `+`,
 so `counts += yield from visit(...)` merges a subtree's counts into the parent's counts.
-A `visit()` returns its subtree's `Counter` to the `visit()` that called it,
-and the `Counter` for the whole garden reaches `census()`.
+The outermost `visit()` returns the `Counter` for the whole garden to `census()`.
 
 `yield from` delegates to any iterable, not just a generator.
 Here, it takes a list:
@@ -654,7 +657,7 @@ print(list(relay()))
 
 A generator's `return` statement supplies the `value` that its `StopIteration` carries.
 A list's iterator raises a bare `StopIteration`,
-so its `value` is `None` and a `yield from` over a list evaluates to `None`.
+so the exception's `value` is `None` and a `yield from` over a list evaluates to `None`.
 
 ### The Send Channel
 
@@ -709,7 +712,7 @@ for value in [1, 2, 3, 4]:
 
 `both()` declares the same yield type (`Prompt`) and send type (`Value`)
 as `collect()`, because `yield from` passes both channels through to the driver.
-Its return type is the `None` default, since `both()` returns `None`.
+`both()` returns `None`, so its return type is the `None` default.
 
 `g.send(2)` supplies `second`,
 so `collect("alpha")` finishes and the `yield from` at `[1]` completes.
@@ -718,12 +721,12 @@ Before that `send(2)` returns,
 One `send()` therefore ends one inner generator and produces the first prompt of the next,
 which is why `alpha got 1 and 2` and `beta needs a value` sit on adjacent output lines.
 The `yield` at `[3]` gives `send(4)` a value to return.
-Without it, `send(4)` would finish `both()` and raise `StopIteration` in the loop.
+Without it, `send(4)` finishes `both()` and raises `StopIteration` in the loop.
 
 ### All Three Channels
 
-This version of `interview()` makes each request through a helper, `ask()`,
-and delegates to it with `yield from`:
+Here, a new version of `interview()` makes each request through a helper,
+`ask()`, and delegates to it with `yield from`:
 
 ```python
 # yield_from_delegates.py
@@ -769,7 +772,8 @@ A single loop at the edge of the program interprets requests yielded at any dept
 `drive()` and `yield from` both run a generator's body one `yield` at a time and both finish at `StopIteration`,
 so they are easy to confuse.
 In `yield_from_delegates.py`, `drive()` receives `interview()`'s `Result`.
-`yield from` takes over that job:
+In `yield_from_nested.py`,
+a `yield from` in `survey()` receives that `Result` instead:
 
 ```python
 # yield_from_nested.py
@@ -823,8 +827,9 @@ which continues the conversation.
 
 ### A Generator in the Middle
 
-A `yield from` target is an ordinary value: it can arrive as a parameter,
-sit in a list, or be built at the point of delegation.
+A `yield from` target is an ordinary value.
+It can arrive as a parameter, sit in a list,
+or be built at the point of delegation.
 A generator can receive its targets as arguments,
 so the caller decides what the conversation holds:
 
@@ -913,13 +918,13 @@ the same interface as the object it wraps, with a forwarding loop of its own.
 It is also the shape of [layering handlers](46_Effects--Stateless.md#layering-handlers)
 in Stateless, where a handler answers the requests `supply()` gave it and re-yields the rest to the handler outside it.
 
-The priming call to `next()` sits in a `try`,
-which is essential because `proxy()` is a generator,
-so a `StopIteration` that escaped its body would become a `RuntimeError`.
-`next(inner)` runs `inner`'s body up to its first `yield`,
-and how much of the body runs before that point depends on the generator.
-A generator that opens with a `yield from` runs its whole delegate first,
-and `sequence()` with no steps returns before its first `yield`.
+The priming call to `next()` sits in a `try` because `proxy()` is a generator,
+and a `StopIteration` that propagates out of a generator's body becomes a `RuntimeError`.
+`next(inner)` runs `inner`'s body up to its first `yield`.
+How much code runs before that point depends on the generator.
+A generator that opens with a `yield from` runs into its delegate and stops at the delegate's first `yield`.
+`sequence()` with no steps returns before it yields anything,
+so `next(inner)` raises `StopIteration`.
 
 In the second run, `drive()` sees two requests instead of three.
 The proxy answers `town` at `[1]`, so that request stops at the proxy,
@@ -940,7 +945,7 @@ With these, the `yield` expression raises an exception instead of returning a va
 - `close()` makes the `yield` raise `GeneratorExit`.
 
 The driver that holds the generator object calls both methods.
-In both cases, an exception comes out of a `yield` that was expecting a value.
+In both cases, an exception comes out of the `yield` in place of the value `send()` would deliver.
 
 ### An Exception at the `yield`
 
@@ -980,16 +985,16 @@ print(inspect.getgeneratorstate(g))
 
 In both `[1]` and `[2]`, the generator body ends at the `yield`,
 before it reaches `print("resumed")`.
-The exception arrives in place of a value and travels out through the body,
+The exception arrives in place of a value and propagates out through the body,
 running the `finally` block on its way, which prints `finished`.
 Leaving the body ends the generator, as a `return` would,
-and both runs leave it `GEN_CLOSED`.
+and both runs leave the generator `GEN_CLOSED`.
 
 At `[1]`, `pause()` resumes,
 and its `yield` raises `ValueError` instead of returning a value.
 `pause()`'s `try` has a `finally` clause and no `except`,
-so Python runs the `finally` block on its way out of the `try` statement and the `ValueError` propagates out of the generator.
-It arrives back in the driver as the result of the `throw()` call,
+so Python runs the `finally` block on its way out of the `try` statement.
+The `ValueError` then propagates out of the generator and comes out of the driver's `throw()` call,
 where `expect()` reports it.
 
 At `[2]`, the same `yield` raises `GeneratorExit`.
@@ -1003,20 +1008,20 @@ It tells the generator to finish.
 Why does the driver need methods to raise exceptions inside the generator,
 when Python has a `raise` statement?
 `raise` produces its exception in the function that executes it,
-and the exception then travels up through that function's callers.
+and the exception then propagates up through that function's callers.
 While the driver runs, the generator sits paused at its `yield`,
 off the call stack.
 
-A `raise` in the driver therefore goes up to the driver's callers,
-and the generator's `except` clauses are nowhere on that path.
+A `raise` in the driver therefore goes up to the driver's callers.
+The generator's `except` clauses are nowhere on that path.
 `throw()` and `close()` reverse the order.
 Each resumes the generator first, so the generator is running again,
 and then raises an exception at the `yield`,
-where the generator's own `try` statement sees it.
+where the generator's own `except` clauses can catch it.
 `throw()` raises the exception the driver passed;
 `close()` raises `GeneratorExit`.
-Inside the generator's body, `raise` works as it does anywhere.
 Both are methods for the driver, the code that holds the generator object.
+Inside the generator's body, `raise` works as it does anywhere.
 
 In the three-channel picture,
 `throw()` is the driver's second way to answer a request.
@@ -1029,12 +1034,12 @@ which ends the generator.
 When the driver has finished the conversation, it calls `close()`,
 and the generator runs its cleanup and ends.
 `asyncio` answers a coroutine this way when an awaited operation fails or a cancellation arrives.
-`@contextmanager` does it in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
+`@contextmanager` answers its generator the same way in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
 its `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
-An exception can travel the opposite direction too,
+An exception can propagate in the opposite direction too,
 from the generator into the driver.
 A `raise` in the generator body leaves the generator through the call that resumed it:
 
@@ -1062,15 +1067,15 @@ The `ValueError` at `[1]` is the body's own.
 It comes out of the driver's `send()` call at `[2]`,
 where `expect()` reports it.
 Afterward the generator is `GEN_CLOSED`, as it is after `throw()`.
-The driver's method call is the meeting point in both directions.
+In both directions, the exception passes through the driver's method call.
 `throw()` carries the driver's failure down to the `yield`,
 and a `raise` in the body carries the generator's failure up through the driver's call,
 whether that was `next()`, `send()`, or `throw()`.
 
 ### Handle, Clean Up, or Stop Early
 
-A driver you write makes the same call,
-and a generator written for such a driver puts a `try` around its `yield`:
+A driver you write calls the same `throw()` and `close()` methods.
+A generator written for such a driver puts a `try` around its `yield`:
 
 ```python
 # throw_and_close.py
@@ -1102,17 +1107,19 @@ The `except ValueError` clause catches it, prints `caught`,
 and yields `"recovered"`.
 Like `send()`, `throw()` returns the next value the generator yields,
 so the driver prints `recovered`.
-An exception the generator body lets through ends the generator and comes back out of `throw()` into the driver,
+An exception that propagates out of the generator body ends the generator and comes back out of `throw()` into the driver,
 as in `throw_close_basics.py`.
 
 `g.close()` then raises `GeneratorExit` at `yield "recovered"`,
 where the generator now waits.
-The `except` clause names `ValueError` alone, so `GeneratorExit` passes it,
-the `finally` block prints `cleanup`, and the generator ends.
+The `except` clause names `ValueError` alone,
+so `GeneratorExit` propagates past it, the `finally` block prints `cleanup`,
+and the generator ends.
 `close()` catches the `GeneratorExit` on its way out and returns,
 so the driver sees an ordinary return.
-Its return value is whatever the generator returned while handling `GeneratorExit`,
-and `None` here, since `worker()` ends through its `finally` block with no `return` value.
+`close()` returns whatever the generator returned while handling `GeneratorExit`.
+Here the return value is `None`,
+since `worker()` ends through its `finally` block with no `return` statement.
 
 `close()` is the driver's tool for ending a generator early.
 A paused generator keeps open whatever its body opened:
@@ -1151,14 +1158,15 @@ sensor.close()  # [2]
 
 `first_above()` returns at `[1]` with the first reading over the limit.
 `readings()` stays paused at its `yield`,
-with the sensor on and two readings still to produce, and the caller,
-which holds the generator, sees `GEN_SUSPENDED`.
+with the sensor on and two readings still to produce.
+The caller still holds the generator,
+which `inspect.getgeneratorstate()` reports as `GEN_SUSPENDED`.
 `close()` at `[2]` ends the generator,
 and its `finally` block turns the sensor off.
 If the driver leaves the generator paused,
-Python calls `close()` when the garbage collector reclaims it,
+Python calls `close()` when the garbage collector reclaims the generator,
 so the `finally` block runs eventually.
-Calling `close()` yourself chooses the moment.
+Calling `close()` yourself runs the `finally` block at a point you choose.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
@@ -1199,15 +1207,14 @@ but `inner()` prints the `caught` line.
 `outer()` is paused at its `yield from` expression,
 and `inner()` is paused at its `yield`.
 The exception belongs at the point where the innermost body stopped,
-and `inner()`'s `yield` is that point,
+which is `inner()`'s `yield`,
 so `yield from` hands the exception down to `inner()`.
-`inner()`'s `except` clause handles it and yields `"inner recovered"`,
-and that value comes back up through `yield from` to the driver,
+`inner()`'s `except` clause handles it and yields `"inner recovered"`.
+That value comes back up through `yield from` to the driver,
 as every yielded value does.
-If the exception had propagated out of `inner()`,
-it would have come back up into `outer()`,
-as if `outer()`'s `yield from` expression had raised it,
-and `outer()`'s `try` would have seen it next.
+If the exception propagates out of `inner()`, it comes back up into `outer()`,
+as if `outer()`'s `yield from` expression had raised it.
+`outer()`'s `finally` block then runs on the exception's way out.
 `g.close()` follows the same path.
 Python raises `GeneratorExit` in `inner()` first, then in `outer()`,
 so the two cleanup lines print from the inside out.
@@ -1256,12 +1263,12 @@ expect(Failed, booking.throw, Failed("card declined"))
 
 Each step yields its command,
 then delegates to the steps after it inside a `try`.
-The driver reports the card's failure by calling `throw()`,
-and Python raises `Failed` at the innermost `yield`, in the card step.
+The driver reports the card's failure by calling `throw()`.
+Python raises `Failed` at the innermost `yield`, in the card step.
 That `yield` sits before the card step's `try`,
 so the exception passes straight out of the card step,
 whose own action is the one that failed.
-It then climbs through the two `yield from` expressions.
+The exception then propagates up through the two `yield from` expressions.
 Each `except` prints its compensation and raises `Failed` again,
 hotel before flight.
 The nesting of the `try` blocks is the undo stack.
@@ -1269,8 +1276,8 @@ When all three commands succeed, the booking runs to its end.
 
 ### `close()` Requires the Generator to Finish
 
-A generator that catches `GeneratorExit` and yields again has refused to finish,
-and `close()` raises a `RuntimeError`:
+If a generator catches `GeneratorExit` and yields again instead of finishing,
+`close()` raises a `RuntimeError`:
 
 ```python
 # throw_and_close_gotcha.py
@@ -1374,7 +1381,8 @@ The `type` statement evaluates its right side lazily,
 so the alias can name itself.
 
 An input with no `case` leaves the state's `while` loop running,
-so the state stays and its entry action stays done.
+so the machine stays in that state.
+The entry action sits above the loop, so it runs once, on entry.
 `trap_states.py`'s `waiting()` returns `TrapState.WAITING` from its `case _`,
 and `state_machine.py` re-enters the state and prints its message again.
 `HOLDING`'s `chime` is a third field in its row;
@@ -1444,9 +1452,8 @@ print(trap.send(Mouse.ESCAPES))
 PEP 342 calls such a driver a *trampoline*: each state returns to the loop,
 which bounces into the next state.
 `yield from` runs the current state,
-relaying each of its `yield`s up to `run_all()` and each `send()` back down,
-and when the state returns,
-the loop takes the returned generator as the next state.
+relaying each of its `yield`s up to `run_all()` and each `send()` back down.
+When the state returns, the loop takes the returned generator as the next state.
 Apart from its return type, `trampoline()` has a state's annotation,
 so `run_all()` drives it as it drives any generator.
 `[2]` primes the machine,
@@ -1457,8 +1464,8 @@ This trace and the trace in `trap_states_demo.py` have the same lines in a diffe
 Each entry message prints before the transition line that leads to it.
 The entry action runs inside `send()`, in the new state's body,
 and `run_all()` prints its line after `send()` returns.
-In `state_machine.py` the engine owns both prints and orders them;
-here each state owns its entry action.
+In `state_machine.py` the engine makes both `print()` calls and chooses their order;
+here each state's body runs its entry action.
 
 The listing's second run shows a state that stays.
 `waiting()` matches `Mouse.APPEARS` alone,
@@ -1470,9 +1477,9 @@ Here the question has two places to put code rather than two designs.
 Code before the first `yield` is the state's entry action, the Moore shape,
 where the action belongs to the state.
 Code before a `return` runs on that transition alone, the Mealy shape,
-where the action belongs to the transition:
-a `print("Door latched")` above `return holding()` in `trapping()` would run when the mouse is trapped and at no other time.
-Both fit one function with no `action` field.
+where the action belongs to the transition.
+A `print("Door latched")` above `return holding()` in `trapping()` runs when the mouse is trapped and at no other time.
+The Moore shape and the Mealy shape both fit one function with no `action` field.
 
 A state's local variables are its data.
 `VendingMachine` keeps `amount` on the machine object because every machine shares the enum members.
@@ -1493,7 +1500,7 @@ a test of the generator design reaches a state by driving the machine to it.
 A machine whose states a test must enumerate belongs in chapter 31's table.
 
 The generator design has a second limit.
-`copy.deepcopy()` and `pickle` both refuse a suspended generator,
+`copy.deepcopy()` and `pickle` both raise a `TypeError` on a suspended generator,
 so a [*Memento*](36_Patterns--Memento.md#the-classic-memento)
 belongs to the enum designs, which keep the state in a value a record can hold.
 
@@ -1523,11 +1530,11 @@ expect(RecursionError, run, 2000)
 ```
 
 `[1]` hands control to `tock()`,
-but `tick()` stays suspended at its `yield from` until `tock()` returns,
-and `tock()` delegates to a new `tick()` in turn instead of returning.
+but `tick()` stays suspended at its `yield from` until `tock()` returns.
+`tock()` delegates to a new `tick()` in turn instead of returning.
 Every transition nests one generator deeper,
-each `next()` passes through every level on its way to the innermost `yield`,
-and after about a thousand transitions the chain is deeper than Python's recursion limit.
+and each `next()` passes through every level on its way to the innermost `yield`.
+After about a thousand transitions the chain is deeper than Python's recursion limit.
 The trampoline keeps the chain one level deep.
 `yield from state` finishes when the state returns,
 and the loop takes up the next state at the same depth.
@@ -1546,7 +1553,7 @@ This chapter rests on three ideas:
   so the body can ask for something and receive the answer.
 - `yield from` composes those conversations.
   Each generator in the chain yields to whatever code resumed it,
-  so one chain serves every driver.
+  so one chain runs under any driver.
 
 The first two ideas are enough to build a task runner.
 A queue holds the live generators.
@@ -1589,7 +1596,6 @@ and `next()` runs it to its next `yield`.
 so the two jobs alternate.
 A finished job raises `StopIteration` at its `next()`,
 and the `continue` at `[2]` skips `[3]`, so the finished job leaves the queue.
-The loop ends when the queue is empty.
 
 We can modify `task_runner()` to allow jobs to make requests:
 
@@ -1644,21 +1650,22 @@ task_runner([download(), index()])
 ```
 
 The `for` loop primes each `job` and pairs it with its first request.
-The `except` drops a job that finishes before its first `yield`,
-and keeps that `StopIteration` out of the runner's own flow.
+The `except` catches the `StopIteration` from a job that finishes before its first `yield`,
+and drops that job.
 When a `job` finishes, its `send()` raises `StopIteration`.
 The `continue` then skips the `append`, so that `job` leaves `ready`.
 
-`index()` discards what it receives; it yields only to take turns.
+`index()` discards what it receives.
+It yields only to take turns.
 
 ## The Driver You Already Use
 
 `asyncio.run()` starts an event loop,
 a driver like the one in `task_runner_send.py`.
-[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-describes `await` as suspending a task until the event loop resumes it.
 The event loop gives each task a turn and answers the request each task yields.
 Like a generator, a coroutine object offers `send()`, `throw()`, and `close()`.
+[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
+describes `await` as suspending a task until the event loop resumes it.
 `await` suspends the coroutine and yields a request, a `Future`,
 to the task that drives it.
 When the `Future` has a result, the loop resumes the coroutine,
@@ -1706,7 +1713,7 @@ Like any `await`, it belongs inside an `async def`,
 which is why the listing's two loops sit in `main()`.
 The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls.
 
-A class can supply that `__anext__()` directly,
+A class can supply that `__anext__()`,
 the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
 supplies `__next__()`:
 
@@ -1747,15 +1754,16 @@ asyncio.run(main())
 so the class writes `__anext__()` alone.
 `__anext__()` is a coroutine function,
 which is why `async for` must await what it returns.
-`main()` makes the first two calls itself, and the `async for` makes the rest,
-ending when `__anext__()` raises `StopAsyncIteration`,
+`main()` makes the first two calls itself, and the `async for` makes the rest.
+The loop ends when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
 The asynchronous generator `countdown()` writes the same loop as its body,
 with a `yield`, and leaves the two methods to Python.
 
 An asynchronous generator drops the return channel,
 so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
-Writing `return` with a value in one is a `SyntaxError`, as is `yield from`.
+Writing `return` with a value in an asynchronous generator is a `SyntaxError`,
+as is `yield from`.
 The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
 Each of the three returns an awaitable for the caller to `await`.
 
@@ -1764,11 +1772,11 @@ Each of the three returns an awaitable for the caller to `await`.
 PEP 255 added generators to Python 2.2 in 2001 so that a function can produce values one at a time.
 The function pauses after each value.
 When the caller asks for the next value,
-it resumes from the point where it paused.
+the function resumes from the point where it paused.
 The need for that pause appears whenever the producer keeps state from one value to the next while the consumer has a loop of its own.
 The PEP's example, the standard library's `tokenize()`,
-keeps its place in the source text,
-and a recursive tree walk keeps a whole recursion in progress between one node and the next.
+keeps its place in the source text.
+A recursive tree walk keeps a whole recursion in progress between one node and the next.
 The consumer needs its own local variables and loops to track what it has seen,
 and it may stop early.
 
@@ -1814,8 +1822,8 @@ which captures `total` as a [closure](40_Functional--Foundations.md#closures)
 variable, so `total` outlives `summing()`'s call.
 The `nonlocal` statement lets `consume()` assign to the captured `total`.
 
-`fibonacci()` is in charge of how many times `consume()` runs and when the sequence ends.
-`consume()` receives one value per call and has no way to ask for the next value or to stop the loop early.
+`fibonacci()` controls how many times `consume()` runs and when the sequence ends.
+`consume()` receives one value per call and cannot ask for the next value or stop the loop early.
 
 The second way is for `fibonacci()` to return a list containing every computed value:
 
@@ -1904,12 +1912,12 @@ pausing `fibonacci()` in the middle of its loop, handing out a value,
 and resuming where it stopped.
 A generator lets the producer and the consumer each keep their own loop.
 
-Two loops passing values in both directions resembles a queue like the ones in [Coordinating Threads with Queues](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
+A pair of loops passing values in both directions resembles a queue like the ones in [Coordinating Threads with Queues](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
 with three differences:
 
-1. A generator holds no items: a value goes out,
-   the generator stays suspended until the driver sends a value,
-   and only then does the next value go out.
+1. A generator holds no items.
+   A value goes out, the generator stays suspended until the driver sends a value,
+   and then the next value goes out.
 2. Control moves with the value,
    so at any moment either the driver or the generator body is running.
 3. The generator cannot start an exchange.
@@ -1920,7 +1928,7 @@ The useful part is that a suspended generator keeps its [execution frame](05_Fou
 alive and resumes it on the next call.
 Python discards a function's stack frame when the function returns.
 At `yield`, Python unlinks the generator's execution frame from the call stack,
-so it stops being a stack frame.
+so the frame stops being a stack frame.
 The execution frame lives on the heap inside the generator object,
 which exposes it as `gi_frame`, with its locals and position intact.
 The next `next()` links that frame back into the call stack.
@@ -1935,12 +1943,12 @@ which hands one element at a time to a loop.
 
 PEP 255 kept the suspended frame and dropped a coroutine's ability to hand control to any other coroutine.
 Each `yield` hands control back to whoever called `next()` or `send()`.
-Handing control anywhere else would mean carrying the C stack as well,
-which is why the PEP calls Stackless Python, whose coroutines do that,
-"a controversial rethinking of the Python core."
+Handing control anywhere else means saving and restoring the C stack as well.
+Stackless Python's coroutines do that,
+and the PEP calls Stackless "a controversial rethinking of the Python core."
 The suspended generator is the one-shot continuation that [What a Suspended Generator Holds](#what-a-suspended-generator-holds)
-describes, and the restriction says who resumes it:
-the code that called `next()` or `send()`.
+describes.
+The restriction says who resumes it: the code that called `next()` or `send()`.
 That restriction is why a driver exists.
 Something must call `next()` and `send()`,
 and since a generator cannot name that something, you write it.
@@ -1950,8 +1958,8 @@ Tim Peters called generators "half a coroutine" on python-dev.
 The other half came with PEP 342, written in 2005,
 which added the send channel to Python 2.5 in 2006.
 Simulations, games, and asynchronous I/O need to pass a value or an exception into a generator at its suspension point,
-so `send()`, `throw()`, and `close()` arrived together,
-and the PEP describes a scheduler that runs many generators as a "trampoline,"
+so `send()`, `throw()`, and `close()` arrived together.
+The PEP describes a scheduler that runs many generators as a "trampoline,"
 the shape of `task_runner_send.py`.
 `yield from` (PEP 380, Python 3.3, 2012) completes the set.
 A delegating generator passes all three channels through to the innermost generator,
@@ -2015,7 +2023,7 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     It collects money, takes two digits, then dispenses or refuses.
     It yields its current state and receives each event with `send()`,
     so the position in the generator's body carries the state.
-    This generator's `yield` runs the opposite direction from `interview()`'s `yield`.
+    This generator's `yield` runs in the opposite direction from `interview()`'s `yield`.
     Here `yield` reports the state the machine reached instead of requesting something the machine needs.
     Say which of the two versions you would rather extend with another state,
     and why.

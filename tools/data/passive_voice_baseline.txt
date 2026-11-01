@@ -31,6 +31,7 @@ Chapters/40_Functional--Foundations.md	[PASSIVE] is associated: The runtime mess
 Chapters/44_Effects--Effect_Management.md	[PASSIVE] is delayed: The connection between the declaration and its supply is *delayed binding*.
 Chapters/45_Effects--Generators.md	[PASSIVE] is paused: CODE is paused at its CODE expression, and CODE is paused at its CODE.
 Chapters/45_Effects--Generators.md	[PASSIVE] is suspended: The new generator is suspended before its first statement, so no CODE expression is waiting to receive a value.
+Chapters/45_Effects--Generators.md	[PASSIVE] is trapped: A CODE above CODE in CODE runs when the mouse is trapped and at no other time.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
 Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
 Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] 's named: When CODE gains a fourth error, CODE's named CODE leaves it in the channel, so CODE's declared type no longer matches and the type checker reports an error at the CODE.
@@ -54,6 +55,5 @@ Solutions/40_Functional--Foundations/README.md	[PASSIVE] is associated: Running 
 Solutions/43_Functional--Confidence/README.md	[PASSIVE] is SIGN: ** CODE is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the Greek letter it resembles.
 Solutions/43_Functional--Confidence/README.md	[PASSIVE] is ordered: That sort's output is always ordered, so the invariant passes.
 Solutions/44_Effects--Effect_Management/README.md	[PASSIVE] was awaited: The CODE call raises a CODE for adding an CODE and a CODE, with a CODE that CODE was never awaited.
-Solutions/45_Effects--Generators/README.md	[PASSIVE] is suspended: CODE relays in both directions on its own: prompts up to the driver, numbers down to whichever CODE is suspended inside the current CODE.
 Solutions/45_Effects--Generators/README.md	[PASSIVE] sits suspended: Without CODE, the call to CODE builds a generator object, and that object sits suspended before its first line.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[PASSIVE] is required: The guard is now required, because a process pool starts workers by re-importing the module.

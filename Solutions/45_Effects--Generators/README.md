@@ -412,7 +412,7 @@ A send that supplies a collector's second value produces two:
 the completed collector's `print()`, then the next prompt.
 
 `yield from` relays in both directions on its own: prompts up to the driver,
-numbers down to whichever `yield` is suspended inside the current `collect()`.
+numbers down to the suspended `yield` inside the current `collect()`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -931,7 +931,7 @@ a different design, a detail, or an equivalent alternative.
 > It collects money, takes two digits, then dispenses or refuses.
 > It yields its current state and receives each event with `send()`,
 > so the position in the generator's body carries the state.
-> This generator's `yield` runs the opposite direction from `interview()`'s `yield`.
+> This generator's `yield` runs in the opposite direction from `interview()`'s `yield`.
 > Here `yield` reports the state the machine reached instead of requesting something the machine needs.
 > Say which of the two versions you would rather extend with another state,
 > and why.
