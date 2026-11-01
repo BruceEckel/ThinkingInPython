@@ -805,7 +805,7 @@ Catching every `Exception` is a deliberate shortcut here.
 A real `retry` should take the exception types to retry as an argument,
 because some failures repeat on every attempt.
 A `TypeError` from a bad call signature fails the same way each time,
-so retrying it repeats the failure until the last attempt raises the `TypeError` to the caller.
+so retrying it repeats the failure until the last attempt raises `TypeError` to the caller.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

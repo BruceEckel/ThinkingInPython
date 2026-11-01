@@ -191,7 +191,7 @@ but `append()` leaves `toast.steps` bound to the same list.
 **Hash the `Recipe`.**
 Hashing a tuple hashes each element,
 so a `Recipe` is hashable only when every field is.
-Hashing the `Recipe` hashes the `steps` list, which raises the `TypeError`.
+Hashing the `Recipe` hashes the `steps` list, which raises `TypeError`.
 
 The silent `append()` and the `TypeError` have one cause.
 A `NamedTuple` freezes which object each field references,

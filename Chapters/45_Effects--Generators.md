@@ -986,7 +986,7 @@ Leaving the body ends the generator, as a `return` would,
 and both runs leave it `GEN_CLOSED`.
 
 At `[1]`, `pause()` resumes,
-and its `yield` raises the `ValueError` instead of returning a value.
+and its `yield` raises `ValueError` instead of returning a value.
 `pause()`'s `try` has a `finally` clause and no `except`,
 so Python runs the `finally` block on its way out of the `try` statement and the `ValueError` propagates out of the generator.
 It arrives back in the driver as the result of the `throw()` call,
@@ -1057,7 +1057,7 @@ g.close()
 ```
 
 `worker()` handles one exception and cleans up after any.
-`g.throw(ValueError("bad input"))` raises the `ValueError` at `yield "ready"`.
+`g.throw(ValueError("bad input"))` raises `ValueError` at `yield "ready"`.
 The `except ValueError` clause catches it, prints `caught`,
 and yields `"recovered"`.
 Like `send()`, `throw()` returns the next value the generator yields,
