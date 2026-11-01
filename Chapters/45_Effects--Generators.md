@@ -1066,8 +1066,9 @@ print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 ```
 
-The `ValueError` at `[1]` is the body's own.
-It comes out of the driver's `send()` call at `[2]`,
+At `[1]` the generator body raises `ValueError` on its own,
+in response to the value `send()` delivered.
+The exception comes out of the driver's `send()` call at `[2]`,
 where `expect()` reports it.
 Afterward the generator is `GEN_CLOSED`, as it is after `throw()`.
 In both directions, the exception passes through the driver's method call.
