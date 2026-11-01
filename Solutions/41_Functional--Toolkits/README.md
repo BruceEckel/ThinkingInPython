@@ -322,8 +322,7 @@ If you wrap `groupby()` in a dictionary comprehension,
 the demo prints `{'B': ['b'], 'A': ['a']}`.
 The second `"b"` group replaces the first under the same key,
 so the result holds one of the two `"b"` items.
-Python runs the comprehension to the end,
-and the type checker accepts the function.
+The comprehension runs to the end, and the type checker accepts the function.
 In the solution's `defaultdict`,
 a key that appears again adds its item to the existing group instead of replacing it.
 

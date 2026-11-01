@@ -9,11 +9,11 @@
 # before accepting.
 # See tools/positional_refs.py.
 Chapters/04_Foundations--Control_Flow.md	The first `case`	The first `case` destructures the split command.
+Chapters/04_Foundations--Control_Flow.md	The first `case`	The first `case` that matches runs, and then the `match` ends.
 Chapters/04_Foundations--Control_Flow.md	the `for` clause	Every form has the same order: the expression that produces each item, the `for` clause that supplies the values, and an optional `if` that filters them.
 Chapters/04_Foundations--Control_Flow.md	the `try` block	An exception from the follow-up work in the `else` propagates to the caller, past the handlers written for the `try` block's failure.
 Chapters/04_Foundations--Control_Flow.md	the `try` block	The `except` clauses catch exceptions raised in the `try` block alone.
 Chapters/04_Foundations--Control_Flow.md	the `try` block	The optional `else` runs when the `try` block reaches its end.
-Chapters/04_Foundations--Control_Flow.md	the first `case`	Python runs the first `case` that matches and then leaves the `match`.
 Chapters/04_Foundations--Control_Flow.md	the inner loop	Put `continue` in the inner loop's `else`, and a `break` after the inner loop, at the outer loop's level.
 Chapters/04_Foundations--Control_Flow.md	the inner loop	When the inner loop `break`s, Python skips its `else` and the outer `break` runs.
 Chapters/04_Foundations--Control_Flow.md	the inner loop	When the inner loop runs to the end, the `continue` starts the outer loop's next iteration:

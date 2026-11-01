@@ -403,7 +403,7 @@ print(run("dance"))
 #: unknown command
 ```
 
-Python runs the first `case` that matches and then leaves the `match`.
+The first `case` that matches runs, and then the `match` ends.
 A C `switch` falls through from one `case` into the next until a `break` stops it.
 A Python `case` ends on its own.
 
