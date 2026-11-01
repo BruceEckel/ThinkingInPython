@@ -1076,14 +1076,17 @@ where `expect()` reports it.
 as `throw()` does.
 
 `throw()` carries an exception from the driver down to the `yield`.
-A `raise` in the body carries an exception from the generator up to the `next()`,
+A `raise` in the generator body carries an exception from the generator up to the `next()`,
 `send()`, or `throw()` call that resumed the generator.
 In both directions, the exception passes through a method call that the driver made on the generator object.
 
 ### Handle, Clean Up, or Stop Early
 
-A driver you write calls the same `throw()` and `close()` methods.
-A generator written for such a driver puts a `try` around its `yield`:
+In `throw_close_basics.py`,
+`pause()` lets both exceptions propagate and cleans up in a `finally` clause.
+A generator body chooses what to do with an exception that arrives at its `yield`:
+handle it and yield again, clean up, or let the exception end the generator.
+`worker()` does all three with a `try` around its `yield`:
 
 ```python
 # throw_and_close.py
