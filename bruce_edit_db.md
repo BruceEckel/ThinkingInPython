@@ -2367,7 +2367,15 @@ becomes the object or the reason.
 **Keep when.** The mechanism really is the actor. A function that returns
 or raises does so itself, and "`__getattr__()` returns a value" needs no
 rewriting. An exception "propagates" and "arrives": those are its own
-verbs.
+verbs, and so is "runs" for a block or a statement. The actor to name is
+the construct with its own verb before it is "Python": "the `finally`
+block runs on the way out of the `try`", not "Python runs the `finally`
+block" (Bruce, 2026-11-01: "as we know in this book we are using
+Python"). Name Python where Python does something the construct does
+not do on its own: "Python raises `StopIteration` on the generator's
+behalf", "Python converts it into a `RuntimeError`", and where the
+contrast is with another tool ("Python runs the program either way",
+against the type checker).
 
 **Sightings.** 4, two chapters (promoted 2026-11-01).
 - "`__getattr__()` fires for any name the proxy and its class lack" ->
@@ -2384,6 +2392,12 @@ verbs.
   propagates out of the generator" -> "so Python runs the `finally`
   block on its way out of the `try` statement and the `ValueError`
   propagates out of the generator"
+
+- `45_Effects--Generators` 2026-11-01, was Claude-written (same day,
+  the over-correction of the sighting above), Bruce: 'This could be
+  "the finally block runs"': "so Python runs the `finally` block on
+  its way out of the `try` statement" -> "so the `finally` block runs
+  on the way out of the `try` statement"
 
 **Home.** activate (Accrued patterns) | this file.
 
