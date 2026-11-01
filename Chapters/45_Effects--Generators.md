@@ -1000,7 +1000,6 @@ because `close()` catches the `GeneratorExit` on its way out.
 `GeneratorExit` is the driver's signal that this resumption is the last one,
 so the generator should finish.
 
-
 Why does the driver need a method for this, when Python already has `raise`?
 Because `raise` raises its exception in the function that executes it,
 and the exception then travels up through that function's callers.
