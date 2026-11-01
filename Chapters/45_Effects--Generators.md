@@ -1016,19 +1016,21 @@ The generator's `except` clauses catch it and its `finally` clauses run.
 
 `throw()` raises the exception the driver passed.
 `close()` raises `GeneratorExit`.
-Both are methods for the driver, the code that holds the generator object.
+The driver, the code that holds the generator object, calls both methods.
 Inside the generator's body, `raise` works as it does anywhere.
 
 A generator yields a request and waits.
-When the driver has the answer, it calls `send()` with the answer.
-When the driver has a failure, it calls `throw()` with the exception.
+When the driver has an answer, it calls `send()` with that answer.
+When the driver has a failure, it calls `throw()` with an exception.
 Either call replies to the request the generator yielded,
 `send()` with a value and `throw()` with an exception.
 The generator either handles the exception and yields again,
 or lets it propagate.
-An exception that propagates out of the generator ends it.
-When the driver has finished the conversation, it calls `close()`,
-and the generator runs its cleanup and ends.
+An exception that propagates out of a generator ends that generator.
+
+Most conversations end when the generator returns.
+When the driver finishes first, with the generator still waiting at a `yield`,
+it calls `close()`, and the generator runs its cleanup and ends.
 `asyncio` answers a coroutine this way when an awaited operation fails or a cancellation arrives.
 `@contextmanager` answers its generator the same way in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
 its `__exit__()` calls the generator's `throw()` method,
