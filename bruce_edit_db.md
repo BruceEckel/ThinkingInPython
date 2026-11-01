@@ -481,6 +481,18 @@ already stated nearby, as in a summary sentence that closes a section.
   "Vague descriptions" section and the deep-review prose pass's
   "Vague" lens.
 
+- `45_Effects--Generators` 2026-11-01, three sites, Bruce: "vague",
+  "sounds like it does the same involving a GeneratorExit", "'lets the
+  exception through' is vague": "The exception channel runs the other
+  way as well." -> "`throw()` and `close()` deliver an exception from
+  the driver into the generator. An exception can travel the opposite
+  direction too, from the generator into the driver."; "`close()` does
+  the same with a `GeneratorExit` exception." -> "`close()` resumes the
+  generator and raises `GeneratorExit` at that `yield`."; "The body lets
+  the exception through" -> "`pause()`'s `try` has a `finally` clause
+  and no `except`, so Python runs the `finally` block ... and the
+  `ValueError` propagates out of the generator."
+
 **Home.** literal (Accrued patterns and the "Vague descriptions"
 section), the pass that owns figures; deep-review (prose pass, "Vague").
 Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
@@ -573,6 +585,11 @@ reads the others as "prefer the noun" will overshoot.
   `async def` already declares one" -> "declares `async`"; "you find
   them by inspection" -> "find Effects"; "A system that does so is" ->
   "That type system is"
+
+- `45_Effects--Generators` 2026-11-01, Bruce: "this?": "Why does the
+  driver need a method for this, when Python already has `raise`?" ->
+  "Why does the driver need methods to raise exceptions inside the
+  generator, when Python has a `raise` statement?"
 
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
@@ -1836,6 +1853,10 @@ notifies the responders" stayed inline.
   `returns` library's four containers -> "provides four containers:"
   and one bullet each
 
+- `45_Effects--Generators` 2026-11-01, Bruce: "make bullets": two
+  sentences describing `throw(exc)` and `close()` in parallel -> a
+  two-item list under a colon.
+
 **Home.** this file; the deep-review skill (structural).
 
 ### R46. "raises `X`", not "raises the `X`"
@@ -1861,6 +1882,12 @@ raising an exception. just say 'raises StopIteration'"):
   `ValueError` from `gather()`"; Solutions `33` "raises the
   `AttributeError` above" -> "raises `AttributeError`, as the `#:` line
   shows"
+
+- `45_Effects--Generators` 2026-11-01, was Claude-written (same day,
+  twice; Bruce: no "the"): "its `yield` raises the `ValueError`" -> "its
+  `yield` raises `ValueError`"; "raises the `ValueError` at `yield
+  \"ready\"`" -> "raises `ValueError` at ...". `RAISE-THE` in
+  `tools/prose_lint.py` gates the shape since that day.
 
 **Home.** CLAUDE.md watch list (global, the "Raise" bullet), beside R1.
 
@@ -1921,6 +1948,11 @@ the rest of the chapter for similar issues"; 15 passages cut in
 - Kept on the test: "`GEN_CREATED` shows that calling `interview()`
   created the generator and ran none of its body." (what the marker
   means); "`watch()` names `watched` before the module binds it."
+
+- `45_Effects--Generators` 2026-11-01, Bruce: "Instead of restating the
+  code, put [1] and [2] markers in the code and refer to those": "The
+  first run calls `throw()`." / "The second run calls `close()`." ->
+  tags on the two lines and "At `[1]`, ..." / "At `[2]`, ...".
 
 **Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
 deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the
@@ -2284,6 +2316,77 @@ no per-word baseline, so the keeps could not be recorded there).
 **Home.** CLAUDE.md writing style (the "can"/"could" bullet beside
 "Present tense for standing behavior") | this file.
 
+### R54. "whichever" is "the X that", or the independence stated plainly
+
+**Test.** The sentence has "whichever". If it picks out one thing by a
+property ("whichever call resumed it", "whichever class receives the
+call", "keeps whichever finished last"), write the definite noun phrase:
+"the call that resumed it", "the class that receives the call", "keeps
+the result that finished last", supplying the noun when "whichever"
+stood alone. If the sentence's claim is that the outcome is the same
+across a choice ("the same elements, whichever code holds it",
+"Whichever form you choose, the borrower's side has two lines"), state
+the independence in plain words: "no matter which code holds it", "In
+all four forms", "for every input", "under either executor", or name
+the two options ("Whether `__init__()` or `__enter__()` acquires the
+resource"). A choice offered to the reader ("Use whichever name reads
+better") is "the name that reads better".
+
+**Keep when.** None seen yet. The 2026-11-01 sweep read all 45 sites in
+`Chapters/` and `Solutions/` and kept none; the two generated exercise
+quotes in `Solutions/` followed their chapters.
+
+**Sightings.** 1 flag, promoted on Bruce's request to a book sweep the
+same day (2026-11-01, "kind of a vague word. Here it seems like it could
+be 'the'"): 45 sites, 44 rewritten by three Opus agents plus the
+session, one in `Solutions/45` left for the session to finish.
+- `45_Effects--Generators` 2026-11-01, was Claude-written (same day):
+  "leaves the generator through whichever call resumed it" -> "leaves
+  the generator through the call that resumed it"
+- `45_Effects--Generators`: "up through `next()`, `send()`, or
+  `throw()`, whichever the driver called" -> "up through the driver's
+  call, whether that was `next()`, `send()`, or `throw()`"
+- `26_Patterns--Factory`: "`cls` is whichever class receives the call"
+  -> "`cls` is the class that receives the call"
+- `03_Foundations--Containers`: "keeps the same elements, whichever code
+  holds it" -> "keeps the same elements no matter which code holds it"
+- `10_Foundations--Cleanup`: "Whichever method acquires the resource,"
+  -> "Whether `__init__()` or `__enter__()` acquires the resource,"
+
+**Home.** CLAUDE.md watch list (Tier 2, "whichever") | this file.
+
+### R55. Name the actor for a language mechanism
+
+**Test.** A language feature or an exception sits in subject position
+under a verb it cannot perform on its own: a hook "fires", a lookup
+"sees", a call "asks", a checker "wants", an exception "runs" a block.
+Name the actor that performs it (Python, the type checker, the caller)
+and use the verb that actor performs; the feature or the exception
+becomes the object or the reason.
+
+**Keep when.** The mechanism really is the actor. A function that returns
+or raises does so itself, and "`__getattr__()` returns a value" needs no
+rewriting. An exception "propagates" and "arrives": those are its own
+verbs.
+
+**Sightings.** 4, two chapters (promoted 2026-11-01).
+- "`__getattr__()` fires for any name the proxy and its class lack" ->
+  "Python calls `__getattr__()` for any name the proxy and its class
+  lack"
+- "`__getattr__()` never sees a special method, never sees an assignment"
+  -> "Python never calls `__getattr__()` for a special-method lookup or
+  for an assignment"
+- "`len(p)` asks `type(p)` for `__len__()` without consulting the
+  instance" -> "`len(p)` looks up `__len__()` on `type(p)`, skips the
+  instance"
+- `45_Effects--Generators` 2026-11-01, was Claude-written, Bruce: "is
+  that how it works?": "so the `ValueError` runs the `finally` block and
+  propagates out of the generator" -> "so Python runs the `finally`
+  block on its way out of the `try` statement and the `ValueError`
+  propagates out of the generator"
+
+**Home.** activate (Accrued patterns) | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -2305,29 +2408,6 @@ Claude-written (same chapter, so not yet independent):
   a subclass must work in its place"
 - "trusting that whatever a subclass supplies still fits" -> "trusting
   that what the subclass supplies fits"
-
-### C2. Name the actor for a language mechanism
-
-**Test.** A language feature sits in subject position under a verb it
-cannot perform on its own: a hook "fires", a lookup "sees", a call
-"asks", a checker "wants". Name the actor that performs it (Python, the
-type checker, the caller) and use the verb that actor performs.
-
-**Keep when.** The mechanism really is the actor. A function that returns
-or raises does so itself, and "`__getattr__()` returns a value" needs no
-rewriting.
-
-**Sightings.** 3, all `25_Patterns--Surrogate` 2026-08-31, was
-Claude-written (same chapter, so not yet independent):
-- "`__getattr__()` fires for any name the proxy and its class lack" ->
-  "Python calls `__getattr__()` for any name the proxy and its class
-  lack"
-- "`__getattr__()` never sees a special method, never sees an assignment"
-  -> "Python never calls `__getattr__()` for a special-method lookup or
-  for an assignment"
-- "`len(p)` asks `type(p)` for `__len__()` without consulting the
-  instance" -> "`len(p)` looks up `__len__()` on `type(p)`, skips the
-  instance"
 
 ### C7. Give a bare comparative its noun
 
@@ -3091,6 +3171,99 @@ from a hedged event.
   is rare in this book; the rule stays a survey for new drafts.
 
 **Home.** CLAUDE.md (global, the "can"/"could" bullet); this file.
+
+### C50. A part noun names its owner when a second owner is on the page
+
+**Test.** "the body", "the loop", "the call", "the result" stands for a
+part of one thing while a second thing with the same kind of part is in
+the paragraph: a driver function beside a generator, an ordinary
+function beside a generator function, two generators. Name the owner:
+"the generator body", "`watch()`'s body", "`luring()`'s body", "the
+innermost body". The pointer cousin is R12.
+
+**Keep when.** The previous sentence names the owner and nothing else
+with a body is on the page; "its body" with one candidate; "the body of
+its loop".
+
+**Sightings.** 1 (eight sites in one chapter), `45_Effects--Generators`
+2026-11-01, Bruce: "which body?" and "look through the chapter to find
+places where 'generator body' would be more illuminating":
+- "In both `[1]` and `[2]`, the body ends at the `yield`" -> "the
+  generator body ends at the `yield`"
+- "It starts the body with `next()`" (a paragraph opening "A driver
+  function runs the generator") -> "It starts the generator body with
+  `next()`"
+- "`next()` runs the body after `watched = watch()` has bound the name"
+  (after a sentence about functions in general) -> "`next()` runs
+  `watch()`'s body after ..."
+- "The exception belongs at the point where the body stopped" (two
+  generators paused) -> "where the innermost body stopped"
+
+**Home.** antecedents | this file.
+
+### C51. A statement whose output shows only that execution continued is replaced by one that shows the effect (listing)
+
+**Test.** A listing ends a demonstration with a `print()` of a constant
+("closed", "done", "after") whose only information is that the program
+reached that line. Replace it with a read of the state the operation
+changed (`inspect.getgeneratorstate(g)`), a `finally` that prints when
+it runs, or the operation's return value, so the output shows what the
+operation did.
+
+**Keep when.** Reaching the line is the claim: a listing showing that a
+call returns at all, or that an exception was caught before this point,
+and the prose says so.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-01, Bruce: "this seems
+meaningless. Is there some better way to demonstrate close()?":
+- `g.close()` / `print("closed")` / `#: closed` -> `g.close()` /
+  `print(inspect.getgeneratorstate(g))` / `#: GEN_CLOSED`, and a
+  `finally: print("finished")` in the generator so both runs show the
+  exception passing through the body.
+
+**Home.** listing-design (a seventh question) | this file.
+
+### C52. Parallel runs in one listing start with the same statements (listing)
+
+**Test.** A listing shows two or more runs that differ in one operation,
+and the statements before that operation differ in a second way
+(`print(next(g))` in one run, bare `next(g)` in the other), so the
+output differs for a reason the listing is not about. Write the shared
+part identically, dropping the output the point does not need.
+
+**Keep when.** The difference in the setup is part of the point and the
+prose names it.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-01, Bruce: "why does
+this output two lines ... And the same thing later only one":
+- run 1 `print(next(g))` with `#: started` `#: paused`, run 2 `next(g)`
+  with `#: started` -> both runs `next(g)` with `#: started`; the
+  yielded string then went unused and became a bare `yield` with
+  `Generator[None]`.
+
+**Home.** listing-design | this file.
+
+### C53. The colon that introduces a listing sits on the sentence that says what the listing shows
+
+**Test.** Two sentences lead into a listing, and the colon is on the
+first, which states a claim, while the second describes the mechanism
+the listing demonstrates. Give the claim a period and end the mechanism
+sentence with the colon, so the colon points at what follows it. A
+cousin of R21 (a colon joining a claim to its explanation) and R31
+(pointing at the adjacent listing).
+
+**Keep when.** One sentence leads in.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-01, Bruce: "This should
+be two sentences, with the colon at the end of the last one":
+- "An exception can travel the opposite direction too, from the
+  generator into the driver: a `raise` in the generator body leaves the
+  generator through whichever call resumed it." -> "An exception can
+  travel the opposite direction too, from the generator into the
+  driver. A `raise` in the generator body leaves the generator through
+  the call that resumed it:"
+
+**Home.** this file only.
 
 ## Retired
 
