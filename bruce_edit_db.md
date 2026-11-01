@@ -3265,6 +3265,98 @@ be two sentences, with the colon at the end of the last one":
 
 **Home.** this file only.
 
+### C54. A trailing "instead" goes where the sentence already names the alternative
+
+**Test.** The sentence ends on "instead" (not "instead of"). Delete the
+word and reread with the sentence before it. If the reader still knows
+this option replaces the earlier one, the word was repeating what the
+structure says. The usual carriers: a condition parallel to the previous
+sentence's ("When the driver has the answer, it calls `send()`. When the
+driver has a failure, it calls `throw()`"), an "In `a.py` ... In `b.py`"
+pair, a "not" or "rather than" in reach, a listing after the colon that
+shows the replacement, a verb that means replacement ("skip", "shadow",
+"discards" against "raises").
+
+**Keep when.** "instead" is the only word saying a substitution
+happened, so that without it the new thing reads as an addition:
+"`@dataclass` sets `__hash__` to `None` instead" (a reader would
+otherwise think it also inherits the default), "so a named constant in a
+`case` silently captures instead". A sentence-opening "Instead," that
+joins two paragraphs whose contrast is otherwise unmarked. An exercise
+statement. When deletion leaves the sentence ambiguous, name the
+contrast: "If a `StopIteration` propagates out of the body instead" ->
+"If the body raises a `StopIteration` of its own".
+
+**Sightings.** 1 flag, then a book sweep the same day (2026-11-01,
+Bruce: "is this necessary? Sweep the book for similar usages"): 104
+bare "instead" sites read, 39 deleted, 1 rewritten, about 35 kept, 28
+exercise statements left. Keeps were the majority outside the
+parallel-condition shape.
+- `45_Effects--Generators` 2026-11-01, was Claude-written (same day):
+  "When the driver has a failure instead, it calls `throw()` with the
+  exception" -> "When the driver has a failure, it calls `throw()` with
+  the exception"
+- `45_Effects--Generators`: "In `yield_from_nested.py`, a `yield from`
+  in `survey()` receives that `Result` instead:" -> "... receives that
+  `Result`:"
+- `22_Patterns--Iterators`: "so the list habit `odd_squares[:5]` raises
+  a `TypeError` instead." -> "raises a `TypeError`." ("defines no
+  `__getitem__()`" carries the contrast)
+- `19_Techniques--Concurrency`: "but not to the OS. Instead, control
+  goes to the *event loop*" -> "Control goes to the *event loop*"
+
+**Home.** CLAUDE.md (a bullet before "Prefer the positive statement",
+2026-11-01) | this file. Not a watch word: a bare scan would list 400
+"instead of"s, and the shape is a per-sentence judgment.
+
+### C55. "same" with nothing to compare against is a pointer; write the pointer
+
+**Test.** The sentence has "the same X" (or "this same X"). Ask what
+second thing "same" compares X with. If there is none, because X has one
+referent on the page and the sentence makes no identity claim, "same"
+is standing in for "the", "that", or "its" and saying "the one I just
+mentioned". Write that pointer, or the noun's owner: "At `[2]`, the
+same `yield` raises `GeneratorExit`" -> "its `yield`" (one `yield` in
+`pause()`); "The same directory reaches pytest" -> "That directory";
+"uses this same self-registration" -> "uses this self-registration".
+
+**Keep when.** "same" carries a claim, which is most of the time:
+identity against a possible copy or second instance ("returns the same
+`cls` it received", "reads the same list"), a comparison whose second
+term is implied but real ("for the same reason `bump()` does", "the
+same figure the CPU-bound version produces", "The same approach isolates
+a database"), an unchanged input against a changed output ("the same
+command reports:", "The same call works from outside the class"), a
+relation between two things in the sentence ("a package of the same
+name", "in the same file"), the idioms ("the same way", "stays the
+same", "at the same time"), a quotation, an exercise statement.
+
+**Sightings.** 1 flag, then a book sweep the same day (2026-11-01,
+Bruce: "I think 'same' is redundant here. I'm pointing this out because
+I'd like you to learn from it and apply that learning throughout the
+book."). Of about 1339 "same" lines, 194 had no comparison word or
+idiom in the sentence; four Opus agents and the session read those 194
+and changed 6, keeping 183 and leaving 5 exercise or quote sites. The
+fault is rare and specific; the sweep's filter (no "as", "that",
+"than", "both", "each", "two", "and" in the sentence) is in the
+session's `same_survey2.py` and is the shape a survey rule would use.
+- `45_Effects--Generators` 2026-11-01, was Claude-written (same day):
+  "At `[2]`, the same `yield` raises `GeneratorExit`." -> "At `[2]`,
+  its `yield` raises `GeneratorExit`."
+- `26_Patterns--Factory`: "[Pattern Refactoring] uses this same
+  self-registration." -> "uses this self-registration."
+- `14_Techniques--Decorators`: "The same `__get__()` makes them work on
+  methods" -> "That `__get__()` makes them work on methods"
+- `17_Techniques--Metaprogramming`: "The same directory reaches pytest
+  through `pythonpath`" -> "That directory reaches pytest ..."
+- `Solutions/43_Functional--Confidence`: "The same `[]`-returning
+  function passes it too." -> "The `[]`-returning function passes it
+  too." ("too" compares)
+
+**Home.** CLAUDE.md (a bullet before "Prefer the positive statement",
+2026-11-01) | `[SAME]` survey rule in `tools/sentence_shapes.py` (same
+day) | antecedents (a pointer word in disguise) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
