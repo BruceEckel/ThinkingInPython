@@ -464,10 +464,17 @@ def expand_specs(specs: list[str]) -> list[str]:
 def resolve_chapters(specs: list[str]) -> list[Path]:
     """Each spec (number, stem prefix, name part, path, a numeric range
     like `30-40`, or a comma-separated run of them) must match exactly
-    one chapter; a range must match one chapter per number."""
+    one chapter; a range must match one chapter per number.
+
+    `_resolve` pairs a chapter selector with the chapter's Solutions
+    file, as the gate's reflow does (since 9526c189), so a selector
+    keeps the chapter alone here: a Solutions file runs by its path.
+    """
     chapters: list[Path] = []
     for spec in expand_specs(specs):
         matched = _resolve(spec)
+        if not Path(spec).is_file():
+            matched = [p for p in matched if "Solutions" not in p.parts]
         if len(matched) != 1:
             found = ", ".join(p.name for p in matched) or "nothing"
             raise SystemExit(
