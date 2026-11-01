@@ -245,8 +245,7 @@ built outside the cache.
    The cache keeps one of those objects.
    With a constructor slow enough to widen that race,
    eight threads calling `settings()` at once usually run the constructor eight times and return eight different objects.
-   When threads can arrive before the singleton exists,
-   create it *eagerly* instead.
+   When threads can arrive before the singleton exists, create it *eagerly*.
    Call `settings()` once at import time, or use the module form,
    which the import system builds once.
 
@@ -512,7 +511,7 @@ Delegation gives up static knowledge to forward every name,
 as it does throughout [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr).
 
 When the inner object is ready to build before the first call,
-you can create it eagerly in the class body instead,
+you can create it eagerly in the class body,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Eager creation removes the sentinel, the guard,
 and the first-call race that every lazy singleton has under threads.
@@ -709,7 +708,7 @@ For an ordinary class `C`, `type(C)` is `type`,
 so the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
 After decoration, `type(Registry)` is `singleton`,
-so the same parentheses run `singleton.__call__()` instead.
+so the same parentheses run `singleton.__call__()`.
 The wrapped class's constructor runs only when that method calls it.
 
 ```python

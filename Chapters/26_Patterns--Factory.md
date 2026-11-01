@@ -282,7 +282,7 @@ make("Square").draw()
 
 The `dict` values have the type `type[Shape]` because they are classes,
 and calling one constructs an instance.
-If the table holds instances instead, as in `{"Circle": Circle()}`,
+If the table holds instances, as in `{"Circle": Circle()}`,
 `make()` returns the stored object, so every caller shares one `Circle`.
 [*Prototype*](#prototype)
 keeps a table of instances on purpose and copies one for each caller.
@@ -480,7 +480,7 @@ because the `Triangle` that `test_new_subclass_registers_itself()` defined is st
 ### Explicit Registration with a Protocol
 
 `registry.py` needs a base class because Python calls the base class's `__init_subclass__()` for each new subclass.
-If registration is explicit instead, `Shape` can be a Protocol,
+If registration is explicit, `Shape` can be a Protocol,
 with a class decorator doing the registering.
 The table then moves out of the base class and into the factory that reads it.
 Python lets you [set an attribute on a function](17_Techniques--Metaprogramming.md#attributes-on-a-function),
@@ -1038,7 +1038,7 @@ a socket, or a lock.
 A prototype holding one makes `deepcopy()` raise a `TypeError`.
 For a lock the message is `cannot pickle '_thread.lock' object`.
 The message names pickling because `deepcopy()` falls back on the pickle protocol for a type that has no copy rule of its own.
-Give such a class a `__deepcopy__()` that says what the copy holds instead:
+Give such a class a `__deepcopy__()` that says what the copy holds:
 a fresh connection, or an empty slot the clone fills when it first needs one.
 
 You can combine *Prototype* with a registry.

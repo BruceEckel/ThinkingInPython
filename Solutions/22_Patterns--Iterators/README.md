@@ -201,7 +201,7 @@ def fibonacci(n: int) -> Iterator[int]:
 
 your file prints `[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]` at once,
 and `uv run ty check` passes on it.
-Slicing the generator with `[:10]` instead makes the type checker report `not-subscriptable`.
+Slicing the generator with `[:10]` makes the type checker report `not-subscriptable`.
 
 <details>
 <summary>Solution</summary>

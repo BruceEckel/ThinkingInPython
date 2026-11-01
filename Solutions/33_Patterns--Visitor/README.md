@@ -119,7 +119,7 @@ Once the operation is a function, the call site names it.
 `pollinate(flower, "Bee")` says what `flower.accept(bee)` says with a class and a method.
 
 You lose the visitor as an object that a variable can hold and a caller can pass to another function.
-When that matters, pass the function instead, since a function is a value too.
+When that matters, pass the function, since a function is a value too.
 `op = eat` works.
 A `dict[str, Callable[[Flower, str], str]]` keyed by operation name lets a program choose an operation at runtime,
 as a `Visitor` hierarchy does, without the classes.

@@ -151,7 +151,7 @@ because `Worm` inherits `visit()` from `Predator`.
 One annotation in `flower_visitors.py` looks like a shortcut,
 but the empty base class requires it.
 `accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method.
-If you declare that parameter as `Visitor` instead,
+If you declare that parameter as `Visitor`,
 the type checker reports `visitor.visit` as an unresolved attribute.
 The classic pattern declares `visit()` abstract on the visitor base,
 so `visitor.visit` resolves.
@@ -316,8 +316,7 @@ Adding a new flower is a class,
 plus one registration for each operation whose default answer is wrong for it.
 
 When the operation should be a method of a class,
-use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
-instead.
+use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod).
 `singledispatchmethod` dispatches on the first argument after `self`.
 
 ### Testing the Operations

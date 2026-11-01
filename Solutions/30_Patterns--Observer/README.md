@@ -389,8 +389,7 @@ your test passes against your `Broadcaster`:
 the first responder raises an exception,
 `announce()` raises an `ExceptionGroup` holding it,
 and the second responder has recorded the value.
-If `announce()` discards each exception instead,
-the test fails with `DID NOT RAISE`.
+If `announce()` discards each exception, the test fails with `DID NOT RAISE`.
 
 <details>
 <summary>Solution</summary>

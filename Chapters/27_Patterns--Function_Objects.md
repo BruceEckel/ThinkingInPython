@@ -990,7 +990,7 @@ Stop at the first form that supports what you need:
 A function that carries data in its `__dict__` sits between entries 1 and 3.
 The list leaves it out.
 The type checker reports each [dotted access to such an attribute](17_Techniques--Metaprogramming.md#attributes-on-a-function),
-so configuration goes in a closure or a callable object instead.
+so configuration goes in a closure or a callable object.
 
 The *GoF Design Patterns* forms of *Command*, *Strategy*,
 and *Chain of Responsibility* all start at number 5.

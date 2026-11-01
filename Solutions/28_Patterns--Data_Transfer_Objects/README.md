@@ -290,7 +290,7 @@ a different design, a detail, or an equivalent alternative.
 [Returning Multiple Values](../../Chapters/28_Patterns--Data_Transfer_Objects.md#returning-multiple-values)
 compares a bare tuple with a `NamedTuple` as a return type.
 The broken line reads the fields by name.
-A tuple has no `mean`, and its `count` is a method, so index the tuple instead.
+A tuple has no `mean`, and its `count` is a method, so index the tuple.
 To see what the type checker still catches,
 try unpacking into the wrong number of names,
 then swap two names that have different types or the same type.

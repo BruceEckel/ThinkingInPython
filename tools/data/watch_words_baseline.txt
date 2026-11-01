@@ -358,7 +358,7 @@ Chapters/26_Patterns--Factory.md	even: A lazy import produces the same failure e
 Chapters/26_Patterns--Factory.md	even: even momentarily
 Chapters/26_Patterns--Factory.md	explicit: Explicit Registration with a Protocol makes the checker report a class that lacks CODE at the line that registers it
 Chapters/26_Patterns--Factory.md	explicit: Explicit registration fails the opposite way
-Chapters/26_Patterns--Factory.md	explicit: If registration is explicit instead
+Chapters/26_Patterns--Factory.md	explicit: If registration is explicit
 Chapters/26_Patterns--Factory.md	explicit: as Explicit Registration with a Protocol does for a class that lacks CODE
 Chapters/26_Patterns--Factory.md	has no: An if-chain like CODE has no wildcard
 Chapters/26_Patterns--Factory.md	has no: The message names pickling because CODE falls back on the pickle protocol for a type that has no copy rule of its own

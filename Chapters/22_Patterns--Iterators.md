@@ -509,7 +509,7 @@ print(list(flatten_loop(data)) == list(flatten(data)))
 
 `flatten_loop()` carries a `# noqa` because of ruff's `UP028` rule.
 That rule reports a `for` loop whose body is a lone `yield` of the loop variable,
-and tells you to write `yield from` instead.
+and tells you to write `yield from`.
 
 The two forms agree for a generator that yields values and returns `None`,
 as `flatten()` does.
@@ -577,7 +577,7 @@ so the infinite `count(1)` produces as many values as they pull.
 
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
-so the list habit `odd_squares[:5]` raises a `TypeError` instead.
+so the list habit `odd_squares[:5]` raises a `TypeError`.
 
 [Functional Toolkits](41_Functional--Toolkits.md#the-itertools-toolkit)
 covers `chain()` and `groupby()` in full,
