@@ -39,7 +39,12 @@ is better than implicit", the explicit `self` parameter, an explicit
 2026-10-30 (rule R53): a sentence that states a standing capability
 takes "can" ("`survey()` can delegate to either"); a narrated past, a
 counterfactual whose condition is on the page, a speculation about
-the future, and "could have" stay. Tier 1 ("Consider rewriting") is a word with
+the future, and "could have" stay. `whichever` joined Tier 2 on
+2026-11-01 (rule R54): it is "the X that" when the sentence picks one
+thing out by a property, and the independence stated plainly ("no
+matter which", "in all four forms", the two options named) when the
+claim is that the outcome is the same across a choice; the book sweep
+that day rewrote all 45 sites. Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -299,6 +304,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (3, r"spellings?"),
         (2, r"already"),
         (2, r"could"),
+        (2, r"whichever"),
         (2, r"even"),
         (2, r"honest(?:ly)?"),
         (2, r"buys?|bought"),
