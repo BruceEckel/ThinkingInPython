@@ -1027,14 +1027,14 @@ Either call replies to the request the generator yielded,
 The generator either handles the exception and yields again,
 or lets it propagate.
 An exception that propagates out of a generator ends that generator.
+`asyncio` calls `throw()` on a coroutine when an awaited operation fails or a cancellation arrives.
+`@contextmanager` does the same in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
+its `__exit__()` calls the generator's `throw()` method,
+"which resumes the generator by raising the block's exception at the `yield`."
 
 Most conversations end when the generator returns.
 When the driver finishes first, with the generator still waiting at a `yield`,
 it calls `close()`, and the generator runs its cleanup and ends.
-`asyncio` answers a coroutine this way when an awaited operation fails or a cancellation arrives.
-`@contextmanager` answers its generator the same way in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
-its `__exit__()` calls the generator's `throw()` method,
-"which resumes the generator by raising the block's exception at the `yield`."
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
 An exception can propagate in the opposite direction too,
