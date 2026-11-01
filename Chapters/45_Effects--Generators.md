@@ -997,10 +997,11 @@ At `[2]`, the same `yield` raises `GeneratorExit`.
 and the `finally` block runs again.
 This time the driver sees an ordinary return,
 because `close()` catches the `GeneratorExit` on its way out.
-`GeneratorExit` is the driver's signal that this resumption is the last one,
-so the generator should finish.
+`GeneratorExit` is the driver's signal that this resumption is the last one.
+It tells the generator to finish.
 
-Why does the driver need a method for this, when Python already has `raise`?
+Why does the driver need a method to raise an exception inside the generator,
+when Python already has `raise`?
 Because `raise` raises its exception in the function that executes it,
 and the exception then travels up through that function's callers.
 While the driver runs, the generator sits paused at its `yield`,
