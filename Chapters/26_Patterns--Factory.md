@@ -355,7 +355,7 @@ makes the checker report a class that lacks `draw()` at the line that registers 
 Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
-uses this same self-registration.
+uses this self-registration.
 
 `Shape.__subclasses__()` can build the registry,
 but it stops at direct subclasses.
