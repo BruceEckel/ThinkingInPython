@@ -941,10 +941,15 @@ Two more methods resume the body at a `yield`.
 With these, the `yield` expression raises an exception instead of returning a value:
 
 - `throw(exc)` makes the `yield` raise `exc`.
-- `close()` makes the `yield` raise `GeneratorExit`.
+- `close()` is `throw(GeneratorExit)` plus a rule: the generator must end.
 
 The driver that holds the generator object calls both methods.
 In both cases, an exception comes out of the `yield` in place of the value `send()` would deliver.
+`throw()` is the primitive.
+PEP 342, which added both methods,
+defines `close()` as a `throw()` of `GeneratorExit` at the `yield`,
+after which the generator returns or lets `GeneratorExit` propagate,
+and `close()` returns.
 
 ### An Exception at the `yield`
 
@@ -1032,10 +1037,10 @@ An exception that propagates out of a generator ends that generator.
 its `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
 
-`close()` sends one message: finish.
-The exception it raises, `GeneratorExit`,
-says the same thing whatever the driver's reason,
-and a generator that catches it must end.
+`close()` is the `throw()` whose exception Python chooses,
+so it sends one message: finish.
+`GeneratorExit` says the same thing whatever the driver's reason,
+and a generator that catches it must still end.
 If the generator yields again, `close()` raises a `RuntimeError`,
 as [`close()` Requires the Generator to Finish](#close-requires-the-generator-to-finish)
 shows.
