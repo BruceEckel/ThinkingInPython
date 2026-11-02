@@ -1032,6 +1032,20 @@ An exception that propagates out of a generator ends that generator.
 its `__exit__()` calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
 
+`close()` sends one message: finish.
+The exception it raises, `GeneratorExit`,
+says the same thing whatever the driver's reason,
+and a generator that catches it must end.
+If the generator yields again, `close()` raises a `RuntimeError`,
+as [`close()` Requires the Generator to Finish](#close-requires-the-generator-to-finish)
+shows.
+`throw()` leaves the decision with the generator.
+The exception's class says which failure occurred,
+so the body's `except` clauses choose among failures,
+and a clause that handles one yields the next request.
+`worker()` in [Handle, Clean Up, or Stop Early](#handle-clean-up-or-stop-early)
+catches a `ValueError` this way and yields `"recovered"`.
+
 Most conversations end when the generator returns.
 When the driver finishes first, with the generator still waiting at a `yield`,
 it calls `close()`, and `GeneratorExit` arrives at that `yield`.
