@@ -948,8 +948,9 @@ In both cases, an exception comes out of the `yield` in place of the value `send
 `throw()` is the primitive.
 PEP 342, which added both methods, defines `close()` as a call to `throw()`.
 `close()` throws `GeneratorExit` at the `yield`.
-When the generator then returns or lets `GeneratorExit` propagate,
-`close()` returns.
+The generator ends in one of two ways: it returns,
+or it lets `GeneratorExit` propagate out of its body.
+Once it has ended either way, `close()` returns.
 
 ### An Exception at the `yield`
 
