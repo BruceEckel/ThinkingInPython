@@ -948,8 +948,7 @@ After `close()`, the generator ends in one of two ways: it returns,
 or it lets `GeneratorExit` propagate out of its body.
 Either way, the generator has finished,
 and `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
-The driver's `close()` call then completes,
-and the driver continues from the line after it.
+`close()` then returns to the driver, and the driver's next statement runs.
 
 ### An Exception at the `yield`
 
