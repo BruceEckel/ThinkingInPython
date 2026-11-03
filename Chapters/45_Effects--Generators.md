@@ -941,10 +941,13 @@ Two more methods resume the body at a `yield`.
 With these, the `yield` expression raises an exception instead of returning a value:
 
 - `throw(exc)` makes the `yield` raise `exc`.
-- `close()` is `throw(GeneratorExit)` plus a check on what the body does with that exception.
-  A body that lets it propagate finishes on its own, and `close()` returns.
+- `close()` is `throw(GeneratorExit)` followed by a runtime test,
+  inside `close()`, of how the body responded.
+  A body that lets the exception propagate finishes on its own,
+  and `close()` returns.
   A body that catches it must then return instead of yielding again,
   or `close()` raises a `RuntimeError` in the driver.
+  No static check sees the difference.
 
 Both methods are called by the driver that holds the generator object.
 After `close()`, the generator returns,
