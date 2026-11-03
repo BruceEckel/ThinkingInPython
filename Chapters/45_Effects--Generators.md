@@ -941,7 +941,8 @@ Two more methods resume the body at a `yield`.
 With these, the `yield` expression raises an exception instead of returning a value:
 
 - `throw(exc)` makes the `yield` raise `exc`.
-- `close()` is `throw(GeneratorExit)` plus a rule: the generator must end.
+- `close()` is `throw(GeneratorExit)` plus a check `close()` makes afterward:
+  the generator must have finished, or `close()` raises a `RuntimeError`.
 
 Both methods are called by the driver that holds the generator object.
 After `close()`, the generator returns,
