@@ -950,7 +950,7 @@ PEP 342, which added both methods, defines `close()` as a call to `throw()`.
 `close()` throws `GeneratorExit` at the `yield`.
 The generator ends in one of two ways: it returns,
 or it lets `GeneratorExit` propagate out of its body.
-Once it has ended either way, `close()` returns.
+Either way, `close()` then returns.
 
 ### An Exception at the `yield`
 
