@@ -947,7 +947,6 @@ With these, the `yield` expression raises an exception instead of returning a va
   and `close()` returns.
   A body that catches it must then return instead of yielding again,
   or `close()` raises a `RuntimeError` in the driver.
-  No static check sees the difference.
 
 Both methods are called by the driver that holds the generator object.
 After `close()`, the generator returns,
