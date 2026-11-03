@@ -978,15 +978,19 @@ import inspect
 from collections.abc import Generator
 from exceptions import expect
 
-def worker() -> Generator[str]:
+def worker() -> Generator[str, None, str]:
     try:
-        yield "ready"
-        print("resumed")
-    except ValueError as e:
-        print(f"caught: {e}")
-        yield "recovered"
-    finally:
-        print("cleanup")
+        try:
+            yield "ready"
+            print("resumed")
+        except ValueError as e:
+            print(f"caught: {e}")
+            yield "recovered"
+        finally:
+            print("cleanup")
+    except GeneratorExit:
+        return "closed"
+    return "done"
 
 g = worker()
 print(next(g))
@@ -994,8 +998,9 @@ print(next(g))
 print(g.throw(ValueError("bad input")))  # [1]
 #: caught: bad input
 #: recovered
-g.close()  # [2]
+print(g.close())  # [2]
 #: cleanup
+#: closed
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 
@@ -1016,20 +1021,18 @@ skipping `print("resumed")`.
 At `[1]`, `g.throw(ValueError("bad input"))` resumes `worker()`,
 and `yield "ready"` raises `ValueError` instead of returning a value.
 The `except ValueError` clause catches it and yields `"recovered"`.
-Like `send()`, `throw()` returns the next value the generator yields,
-so the driver prints `recovered`.
 The generator waits again, now at `yield "recovered"`.
 
 At `[2]`, `g.close()` raises `GeneratorExit` at `yield "recovered"`.
-The `except` clause names `ValueError` alone,
-so `GeneratorExit` propagates past it.
-The `finally` block prints `cleanup` as the exception leaves,
-and the generator ends.
-`close()` catches the `GeneratorExit` as it leaves the generator,
-and the driver's call returns the way an ordinary method call does.
-`close()` returns whatever the generator returned while handling `GeneratorExit`.
-Here the return value is `None`,
-since `worker()` ends through its `finally` block with no `return` statement.
+That `yield` sits inside the `except ValueError` handler,
+and an exception raised inside a handler skips the sibling `except` clauses of its own `try`,
+so the clause for `GeneratorExit` wraps the whole statement.
+The exception leaves the inner `try` through its `finally` block,
+which prints `cleanup`,
+and the outer `except GeneratorExit` clause catches it and returns `"closed"`.
+`close()` returns whatever the generator returned while handling `GeneratorExit`,
+so the driver prints `closed`,
+and the call returns the way an ordinary method call does.
 
 At `[3]`, a fresh `worker()` waits at `yield "ready"`,
 and `g.throw(TypeError("stop"))` raises `TypeError` there.

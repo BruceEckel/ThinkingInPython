@@ -3,15 +3,19 @@ import inspect
 from collections.abc import Generator
 from exceptions import expect
 
-def worker() -> Generator[str]:
+def worker() -> Generator[str, None, str]:
     try:
-        yield "ready"
-        print("resumed")
-    except ValueError as e:
-        print(f"caught: {e}")
-        yield "recovered"
-    finally:
-        print("cleanup")
+        try:
+            yield "ready"
+            print("resumed")
+        except ValueError as e:
+            print(f"caught: {e}")
+            yield "recovered"
+        finally:
+            print("cleanup")
+    except GeneratorExit:
+        return "closed"
+    return "done"
 
 g = worker()
 print(next(g))
@@ -19,8 +23,9 @@ print(next(g))
 print(g.throw(ValueError("bad input")))  # [1]
 #: caught: bad input
 #: recovered
-g.close()  # [2]
+print(g.close())  # [2]
 #: cleanup
+#: closed
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 
