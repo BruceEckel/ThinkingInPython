@@ -1012,9 +1012,19 @@ expect(TypeError, g.throw, TypeError("stop"))  # [3]
 #: [TypeError] stop
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
+
+g = worker()
+print(next(g))
+#: ready
+expect(StopIteration, next, g)  # [4]
+#: resumed
+#: cleanup
+#: [StopIteration] done
+print(inspect.getgeneratorstate(g))
+#: GEN_CLOSED
 ```
 
-In every run the exception arrives in place of a value,
+In the first three runs the exception arrives in place of a value,
 so the body goes from the `yield` straight to an `except` or `finally` clause,
 skipping `print("resumed")`.
 
@@ -1042,7 +1052,14 @@ which prints `cleanup`.
 Leaving the body ends the generator, as a `return` would.
 The `TypeError` then comes out of the driver's `throw()` call,
 where `expect()` reports it.
-Both runs leave the generator `GEN_CLOSED`.
+
+At `[4]`, the driver sends no exception,
+so `next(g)` resumes after `yield "ready"`, prints `resumed`,
+and leaves the `try` statement through the `finally` block.
+The body then reaches `return "done"`,
+and that value arrives in the driver as `StopIteration.value`,
+which `expect()` prints.
+Every run leaves the generator `GEN_CLOSED`.
 
 A generator yields a request and waits while the driver carries the request out.
 When the attempt succeeds, the driver calls `send()` with the answer.

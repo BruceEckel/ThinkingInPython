@@ -37,3 +37,13 @@ expect(TypeError, g.throw, TypeError("stop"))  # [3]
 #: [TypeError] stop
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
+
+g = worker()
+print(next(g))
+#: ready
+expect(StopIteration, next, g)  # [4]
+#: resumed
+#: cleanup
+#: [StopIteration] done
+print(inspect.getgeneratorstate(g))
+#: GEN_CLOSED
