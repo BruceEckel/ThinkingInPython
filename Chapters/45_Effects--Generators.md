@@ -943,8 +943,7 @@ With these, the `yield` expression raises an exception instead of returning a va
 - `throw(exc)` makes the `yield` raise `exc`.
 - `close()` is `throw(GeneratorExit)` plus a rule: the generator must end.
 
-The driver that holds the generator object calls both methods.
-`throw()` is the primitive.
+Both methods are called by the driver that holds the generator object.
 After `close()`, the generator ends in one of two ways: it returns,
 or it lets `GeneratorExit` propagate out of its body.
 Either way, `close()` then returns.
