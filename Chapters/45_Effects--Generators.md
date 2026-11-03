@@ -959,8 +959,8 @@ Why does the driver need methods to raise exceptions inside the generator,
 when Python has a `raise` statement?
 `raise` produces its exception in the function that executes it,
 and the exception then propagates up through that function's callers.
-While the driver runs, the generator waits at its `yield`, off the call stack.
 
+While the driver runs, the generator waits at its `yield`, off the call stack.
 A `raise` in the driver therefore propagates to the driver's callers and never reaches the generator's `except` and `finally` clauses.
 `throw()` and `close()` resume the generator at its `yield`,
 then raise an exception there.
@@ -968,10 +968,8 @@ The generator's `except` clauses catch it and its `finally` clauses run.
 
 ### An Exception at the `yield`
 
-A generator body chooses what to do with an exception that arrives at its `yield`:
-handle it and yield again, clean up, or let the exception end the generator.
-`worker()` does all three with a `try` around its `yield`,
-and the three tagged calls take one path each:
+A generator body chooses what to do with an exception that arrives at its `yield`.
+It can handle the exception and yield again, clean up, or let the exception end the generator:
 
 ```python
 # throw_close_basics.py
