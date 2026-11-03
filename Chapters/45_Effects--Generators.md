@@ -946,7 +946,10 @@ With these, the `yield` expression raises an exception instead of returning a va
 Both methods are called by the driver that holds the generator object.
 After `close()`, the generator ends in one of two ways: it returns,
 or it lets `GeneratorExit` propagate out of its body.
-Either way, `close()` then returns.
+Either way, the generator has finished,
+and `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
+The driver's `close()` call then completes,
+and the driver continues from the line after it.
 
 ### An Exception at the `yield`
 
