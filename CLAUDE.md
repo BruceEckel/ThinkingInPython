@@ -92,9 +92,9 @@ deep-review prose pass also look for and fix vague descriptions: an
 abstract noun, a pointer phrase, or a verdict standing where the
 sentence could say what the machinery does ("states the
 arrangement", "do that work", "the same shape of trace").
-`/passes NN` (`.claude/skills/passes/SKILL.md`, 2026-11-02) runs all
+`/super-prose NN` (`.claude/skills/super-prose/SKILL.md`, 2026-11-02) runs all
 eight prose passes in the session, including `/activate`, over a
-chapter or one section (`/passes 45 section "<heading>"`), and
+chapter or one section (`/super-prose 45 section "<heading>"`), and
 commits; it is the in-session form of `tip rewrite`.
 `tip rewrite CH=NN` runs these five plus `elements-of-style` and `bruce-edit-apply` by
 default; `tip rewrite ARGS=--list` shows the set and the model each

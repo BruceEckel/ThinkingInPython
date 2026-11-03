@@ -1,11 +1,11 @@
 ---
-name: passes
-description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The eight passes are literal, positive, straighten, cohesion, antecedents, activate, bruce-edit-apply, and elements-of-style, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/passes" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
+name: super-prose
+description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The eight passes are literal, positive, straighten, cohesion, antecedents, activate, bruce-edit-apply, and elements-of-style, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/super-prose" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
 ---
 
-# Passes: the eight prose passes as one request
+# Super-prose: the eight prose passes as one request
 
-`/passes 45` or `/passes 45 section "The Driver's Exception Channel"`
+`/super-prose 45` or `/super-prose 45 section "The Driver's Exception Channel"`
 means: apply every prose pass the project defines, over that scope,
 in the order below, in one session, and commit.
 It is the in-session form of `tip rewrite CH=NN`, which runs the
