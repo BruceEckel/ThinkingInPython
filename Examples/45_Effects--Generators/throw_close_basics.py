@@ -3,24 +3,31 @@ import inspect
 from collections.abc import Generator
 from exceptions import expect
 
-def pause() -> Generator[None]:
+def worker() -> Generator[str]:
     try:
-        yield
+        yield "ready"
         print("resumed")
+    except ValueError as e:
+        print(f"caught: {e}")
+        yield "recovered"
     finally:
-        print("finished")
+        print("cleanup")
 
-g = pause()
-next(g)
-expect(ValueError, g.throw, ValueError("stop"))  # [1]
-#: finished
-#: [ValueError] stop
+g = worker()
+print(next(g))
+#: ready
+print(g.throw(ValueError("bad input")))  # [1]
+#: caught: bad input
+#: recovered
+g.close()  # [2]
+#: cleanup
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 
-g = pause()
+g = worker()
 next(g)
-g.close()  # [2]
-#: finished
+expect(TypeError, g.throw, TypeError("stop"))  # [3]
+#: cleanup
+#: [TypeError] stop
 print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
