@@ -946,10 +946,10 @@ With these, the `yield` expression raises an exception instead of returning a va
 The driver that holds the generator object calls both methods.
 In both cases, an exception comes out of the `yield` in place of the value `send()` would deliver.
 `throw()` is the primitive.
-PEP 342, which added both methods,
-defines `close()` as a `throw()` of `GeneratorExit` at the `yield`,
-after which the generator returns or lets `GeneratorExit` propagate,
-and `close()` returns.
+PEP 342, which added both methods, defines `close()` through it.
+`close()` throws `GeneratorExit` at the `yield`.
+When the generator then returns or lets `GeneratorExit` propagate,
+`close()` returns.
 
 ### An Exception at the `yield`
 
