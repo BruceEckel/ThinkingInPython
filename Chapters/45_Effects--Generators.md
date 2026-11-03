@@ -950,9 +950,25 @@ Either way, the generator has finished,
 and `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
 `close()` then returns to the driver, and the driver's next statement runs.
 
+Why does the driver need methods to raise exceptions inside the generator,
+when Python has a `raise` statement?
+`raise` produces its exception in the function that executes it,
+and the exception then propagates up through that function's callers.
+While the driver runs, the generator sits paused at its `yield`,
+off the call stack.
+
+A `raise` in the driver therefore goes up to the driver's callers.
+The generator's `except` and `finally` clauses are nowhere on that path.
+`throw()` and `close()` resume the generator at its `yield`,
+then raise an exception there.
+The generator's `except` clauses catch it and its `finally` clauses run.
+
 ### An Exception at the `yield`
 
-Here are the basics of `throw()` and `close()`:
+A generator body chooses what to do with an exception that arrives at its `yield`:
+handle it and yield again, clean up, or let the exception end the generator.
+`worker()` does all three with a `try` around its `yield`,
+and the three tagged calls take one path each:
 
 ```python
 # throw_close_basics.py
@@ -990,10 +1006,6 @@ print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 ```
 
-A generator body chooses what to do with an exception that arrives at its `yield`:
-handle it and yield again, clean up, or let the exception end the generator.
-`worker()` does all three with a `try` around its `yield`,
-and the three tagged calls take one path each.
 In every run the exception arrives in place of a value,
 and the body goes from the `yield` straight to an `except` or `finally` clause,
 skipping `print("resumed")`.
@@ -1015,8 +1027,6 @@ so the driver sees an ordinary return.
 `close()` returns whatever the generator returned while handling `GeneratorExit`.
 Here the return value is `None`,
 since `worker()` ends through its `finally` block with no `return` statement.
-`GeneratorExit` is the driver's signal that this resumption is the last one.
-It tells the generator to finish.
 
 At `[3]`, a fresh `worker()` waits at `yield "ready"`,
 and `g.throw(TypeError("stop"))` raises `TypeError` there.
@@ -1027,24 +1037,6 @@ Leaving the body ends the generator, as a `return` would.
 The `TypeError` then comes out of the driver's `throw()` call,
 where `expect()` reports it.
 Both runs leave the generator `GEN_CLOSED`.
-
-Why does the driver need methods to raise exceptions inside the generator,
-when Python has a `raise` statement?
-`raise` produces its exception in the function that executes it,
-and the exception then propagates up through that function's callers.
-While the driver runs, the generator sits paused at its `yield`,
-off the call stack.
-
-A `raise` in the driver therefore goes up to the driver's callers.
-The generator's `except` and `finally` clauses are nowhere on that path.
-`throw()` and `close()` resume the generator at its `yield`,
-then raise an exception there.
-The generator's `except` clauses catch it and its `finally` clauses run.
-
-`throw()` raises the exception the driver passed.
-`close()` raises `GeneratorExit`.
-The driver, the code that holds the generator object, calls both methods.
-Inside the generator's body, `raise` works as it does anywhere.
 
 A generator yields a request and waits.
 When the driver has an answer, it calls `send()` with that answer.
@@ -1113,7 +1105,7 @@ The `ValueError` propagates out of the generator body.
 The `send()` call at `[2]` then raises that `ValueError` in the driver,
 where `expect()` reports it.
 `GEN_CLOSED` shows that the exception shut the generator down,
-as `throw()` does.
+as the `TypeError` thrown into `worker()` in `throw_close_basics.py` did.
 
 `throw()` carries an exception from the driver down to the `yield`.
 A `raise` in the generator body carries an exception from the generator up to the `next()`,
@@ -1180,6 +1172,42 @@ If the driver leaves the generator paused,
 Python calls `close()` when the garbage collector reclaims the generator,
 so the `finally` block runs eventually.
 Calling `close()` yourself runs the `finally` block at a point you choose.
+A generator still at `GEN_CREATED`, before its first `next()`,
+has entered no `try` statement.
+`close()` on it marks it `GEN_CLOSED` and leaves the body unrun,
+so closing `readings()` before its first `next()` leaves the sensor as it was.
+
+### `close()` Requires the Generator to Finish
+
+If a generator catches `GeneratorExit` and yields again instead of finishing,
+`close()` raises a `RuntimeError`:
+
+```python
+# throw_and_close_gotcha.py
+from collections.abc import Generator
+from exceptions import expect
+
+def stubborn() -> Generator[str]:
+    try:
+        yield "go"
+    except GeneratorExit:
+        yield "not done"
+
+s = stubborn()
+print(next(s))
+#: go
+expect(RuntimeError, s.close)
+#: [RuntimeError] generator ignored GeneratorExit
+```
+
+A `yield` inside a `finally` clause draws the same `RuntimeError`,
+since `GeneratorExit` runs that clause on its way out.
+When the driver calls `close()`, the `RuntimeError` arrives in the driver,
+as above.
+When the garbage collector makes the `close()` call,
+the call comes from the collector rather than from code that can catch the exception,
+so Python prints the error as an "Exception ignored" message and continues.
+A generator written for others to drive therefore lets `GeneratorExit` end it.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
@@ -1286,36 +1314,6 @@ Each `except` prints its compensation and raises `Failed` again,
 hotel before flight.
 The nesting of the `try` blocks is the undo stack.
 When all three commands succeed, the booking runs to its end.
-
-### `close()` Requires the Generator to Finish
-
-If a generator catches `GeneratorExit` and yields again instead of finishing,
-`close()` raises a `RuntimeError`:
-
-```python
-# throw_and_close_gotcha.py
-from collections.abc import Generator
-from exceptions import expect
-
-def stubborn() -> Generator[str]:
-    try:
-        yield "go"
-    except GeneratorExit:
-        yield "not done"
-
-s = stubborn()
-print(next(s))
-#: go
-expect(RuntimeError, s.close)
-#: [RuntimeError] generator ignored GeneratorExit
-```
-
-When the driver calls `close()`, the `RuntimeError` arrives in the driver,
-as above.
-When the garbage collector makes the `close()` call,
-the call comes from the collector rather than from code that can catch the exception,
-so Python prints the error as an "Exception ignored" message and continues.
-A generator written for others to drive therefore lets `GeneratorExit` end it.
 
 ## One Generator per State
 
