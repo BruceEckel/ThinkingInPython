@@ -954,11 +954,9 @@ Why does the driver need methods to raise exceptions inside the generator,
 when Python has a `raise` statement?
 `raise` produces its exception in the function that executes it,
 and the exception then propagates up through that function's callers.
-While the driver runs, the generator sits paused at its `yield`,
-off the call stack.
+While the driver runs, the generator waits at its `yield`, off the call stack.
 
-A `raise` in the driver therefore goes up to the driver's callers.
-The generator's `except` and `finally` clauses are nowhere on that path.
+A `raise` in the driver therefore propagates to the driver's callers and never reaches the generator's `except` and `finally` clauses.
 `throw()` and `close()` resume the generator at its `yield`,
 then raise an exception there.
 The generator's `except` clauses catch it and its `finally` clauses run.
@@ -1007,23 +1005,23 @@ print(inspect.getgeneratorstate(g))
 ```
 
 In every run the exception arrives in place of a value,
-and the body goes from the `yield` straight to an `except` or `finally` clause,
+so the body goes from the `yield` straight to an `except` or `finally` clause,
 skipping `print("resumed")`.
 
 At `[1]`, `g.throw(ValueError("bad input"))` resumes `worker()`,
 and `yield "ready"` raises `ValueError` instead of returning a value.
-The `except ValueError` clause catches it, prints `caught`,
-and yields `"recovered"`.
+The `except ValueError` clause catches it and yields `"recovered"`.
 Like `send()`, `throw()` returns the next value the generator yields,
 so the driver prints `recovered`.
 The generator waits again, now at `yield "recovered"`.
 
 At `[2]`, `g.close()` raises `GeneratorExit` at `yield "recovered"`.
 The `except` clause names `ValueError` alone,
-so `GeneratorExit` propagates past it, the `finally` block prints `cleanup`,
+so `GeneratorExit` propagates past it.
+The `finally` block prints `cleanup` as the exception leaves,
 and the generator ends.
-`close()` catches the `GeneratorExit` on its way out and returns,
-so the driver sees an ordinary return.
+`close()` catches the `GeneratorExit` as it leaves the generator,
+and the driver's call returns the way an ordinary method call does.
 `close()` returns whatever the generator returned while handling `GeneratorExit`.
 Here the return value is `None`,
 since `worker()` ends through its `finally` block with no `return` statement.
@@ -1031,8 +1029,8 @@ since `worker()` ends through its `finally` block with no `return` statement.
 At `[3]`, a fresh `worker()` waits at `yield "ready"`,
 and `g.throw(TypeError("stop"))` raises `TypeError` there.
 No `except` clause names `TypeError`,
-so the exception propagates out of the `try` statement,
-running the `finally` block on its way, which prints `cleanup`.
+so the exception leaves the `try` statement through the `finally` block,
+which prints `cleanup`.
 Leaving the body ends the generator, as a `return` would.
 The `TypeError` then comes out of the driver's `throw()` call,
 where `expect()` reports it.
@@ -1041,25 +1039,24 @@ Both runs leave the generator `GEN_CLOSED`.
 A generator yields a request and waits.
 When the driver has an answer, it calls `send()` with that answer.
 When the driver has a failure, it calls `throw()` with an exception.
-Either call replies to the request the generator yielded,
-`send()` with a value and `throw()` with an exception.
 The generator either handles the exception and yields again,
 or lets it propagate.
 An exception that propagates out of a generator ends that generator.
 `asyncio` calls `throw()` on a coroutine when an awaited operation fails or a cancellation arrives.
-`@contextmanager` does the same in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager):
-its `__exit__()` calls the generator's `throw()` method,
+`@contextmanager`'s `__exit__()`,
+in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager),
+calls the generator's `throw()` method,
 "which resumes the generator by raising the block's exception at the `yield`."
 
 `close()` is the `throw()` whose exception Python chooses,
 so it sends one message: finish.
-`GeneratorExit` says the same thing whatever the driver's reason,
+`GeneratorExit` is the same exception whatever the driver's reason,
 and a generator that catches it must still end.
 If the generator yields again, `close()` raises a `RuntimeError`,
 as [`close()` Requires the Generator to Finish](#close-requires-the-generator-to-finish)
 shows.
 `throw()` leaves the decision with the generator.
-The exception's class says which failure occurred,
+The exception's class identifies the failure,
 so the body's `except` clauses choose among failures,
 and a clause that handles one yields the next request.
 `worker()` in `throw_close_basics.py` catches a `ValueError` this way and yields `"recovered"`.
@@ -1074,7 +1071,7 @@ Then the generator ends.
 shows a driver closing a sensor generator when it has the reading it needs.
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
-An exception can also propagate from the generator into the driver.
+The channel carries exceptions the other way as well.
 When the generator body raises an exception,
 the exception comes out of the `next()`, `send()`,
 or `throw()` call that resumed the generator:
@@ -1117,7 +1114,7 @@ In both directions, the exception passes through a method call that the driver m
 `close()` is the driver's tool for ending a generator early.
 A paused generator keeps open whatever its body opened:
 a file or a lock inside a `with` statement, a connection, a transaction.
-The common case is a driver that has the answer it needs before the generator has run out:
+The common case is a driver that has the answer it needs before the generator has yielded its last value:
 
 ```python
 # close_when_done.py
@@ -1157,24 +1154,25 @@ sensor.close()  # [2]
 `first_above()` returns at `[1]` with the first reading over the limit.
 `readings()` stays paused at its `yield`,
 with the sensor on and two readings still in `pending`.
-The caller still holds the generator,
+The driver still holds the generator,
 which `inspect.getgeneratorstate()` reports as `GEN_SUSPENDED`.
 `close()` at `[2]` raises `GeneratorExit` at that `yield`.
-The two clauses around the `yield` do different jobs.
 The `except GeneratorExit` clause runs when the driver stops early,
 and reports what the stop left unread.
 The `finally` clause runs on every ending and turns the sensor off.
+
 A generator may catch `GeneratorExit` as long as it then finishes,
-as `readings()` does by reaching the end of its body;
+as `readings()` does by reaching the end of its body.
 [`close()` Requires the Generator to Finish](#close-requires-the-generator-to-finish)
 shows the generator that yields instead.
+
 If the driver leaves the generator paused,
 Python calls `close()` when the garbage collector reclaims the generator,
 so the `finally` block runs eventually.
 Calling `close()` yourself runs the `finally` block at a point you choose.
 A generator still at `GEN_CREATED`, before its first `next()`,
 has entered no `try` statement.
-`close()` on it marks it `GEN_CLOSED` and leaves the body unrun,
+`close()` on it marks it `GEN_CLOSED` and skips the body,
 so closing `readings()` before its first `next()` leaves the sensor as it was.
 
 ### `close()` Requires the Generator to Finish
@@ -1201,7 +1199,7 @@ expect(RuntimeError, s.close)
 ```
 
 A `yield` inside a `finally` clause draws the same `RuntimeError`,
-since `GeneratorExit` runs that clause on its way out.
+since `GeneratorExit` runs that clause as it propagates out.
 When the driver calls `close()`, the `RuntimeError` arrives in the driver,
 as above.
 When the garbage collector makes the `close()` call,
@@ -1211,7 +1209,7 @@ A generator written for others to drive therefore lets `GeneratorExit` end it.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
-A `yield from` passes both calls on, down to the generator that is waiting:
+A `yield from` forwards both calls to the generator that is waiting:
 
 ```python
 # throw_through.py
@@ -1247,16 +1245,14 @@ The driver holds the generator `outer()` returned and calls `throw()` on it,
 but `inner()` prints the `caught` line.
 `outer()` is paused at its `yield from` expression,
 and `inner()` is paused at its `yield`.
-The exception belongs at the point where the innermost body stopped,
-which is `inner()`'s `yield`,
-so `yield from` hands the exception down to `inner()`.
+The innermost body stopped at `inner()`'s `yield`,
+so `yield from` forwards the exception to that `yield`.
 `inner()`'s `except` clause handles it and yields `"inner recovered"`.
-That value comes back up through `yield from` to the driver,
-as every yielded value does.
-If the exception propagates out of `inner()`, it comes back up into `outer()`,
+`yield from` relays that value to the driver, as it relays every yielded value.
+If the exception propagates out of `inner()`, it propagates into `outer()`,
 as if `outer()`'s `yield from` expression had raised it.
-`outer()`'s `finally` block then runs on the exception's way out.
-`g.close()` follows the same path.
+`outer()`'s `finally` block then runs as the exception leaves.
+`g.close()` takes the same path as `throw()`.
 Python raises `GeneratorExit` in `inner()` first, then in `outer()`,
 so the two cleanup lines print from the inside out.
 A driver that holds the outermost generator stops and cleans up every generator beneath it with one call.
@@ -1306,8 +1302,8 @@ Each step yields its command,
 then delegates to the steps after it inside a `try`.
 The driver reports the card's failure by calling `throw()`.
 Python raises `Failed` at the innermost `yield`, in the card step.
-That `yield` sits before the card step's `try`,
-so the exception passes straight out of the card step,
+That `yield` comes before the card step's `try`,
+so the exception propagates out of the card step,
 whose own action is the one that failed.
 The exception then propagates up through the two `yield from` expressions.
 Each `except` prints its compensation and raises `Failed` again,

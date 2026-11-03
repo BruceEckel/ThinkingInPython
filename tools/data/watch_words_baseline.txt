@@ -550,6 +550,7 @@ Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
 Chapters/45_Effects--Generators.md	could: so the driver's table needs an entry it could not have written before that answer arrived
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
+Chapters/45_Effects--Generators.md	never: A CODE in the driver therefore propagates to the driver's callers and never reaches the generator's CODE and CODE clauses
 Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
 Chapters/46_Effects--Stateless.md	already: For a function that already returns an Effect
