@@ -1036,9 +1036,11 @@ The `TypeError` then comes out of the driver's `throw()` call,
 where `expect()` reports it.
 Both runs leave the generator `GEN_CLOSED`.
 
-A generator yields a request and waits.
-When the driver has an answer, it calls `send()` with that answer.
-When the driver has a failure, it calls `throw()` with an exception.
+A generator yields a request and waits while the driver carries the request out.
+When the attempt succeeds, the driver calls `send()` with the answer.
+When the attempt fails, say the file the generator asked for is missing,
+the driver calls `throw()` with the exception the attempt raised,
+so the generator learns which failure occurred and chooses what to do about it.
 The generator either handles the exception and yields again,
 or lets it propagate.
 An exception that propagates out of a generator ends that generator.
