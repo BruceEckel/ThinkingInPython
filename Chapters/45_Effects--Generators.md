@@ -969,7 +969,8 @@ The generator's `except` clauses catch it and its `finally` clauses run.
 ### An Exception at the `yield`
 
 A generator body chooses what to do with an exception that arrives at its `yield`.
-It can handle the exception and yield again, clean up, or let the exception end the generator:
+It can handle the exception and yield again, clean up,
+or let the exception end the generator:
 
 ```python
 # throw_close_basics.py
@@ -999,7 +1000,8 @@ print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 
 g = worker()
-next(g)
+print(next(g))
+#: ready
 expect(TypeError, g.throw, TypeError("stop"))  # [3]
 #: cleanup
 #: [TypeError] stop

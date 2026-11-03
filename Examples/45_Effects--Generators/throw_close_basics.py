@@ -25,7 +25,8 @@ print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 
 g = worker()
-next(g)
+print(next(g))
+#: ready
 expect(TypeError, g.throw, TypeError("stop"))  # [3]
 #: cleanup
 #: [TypeError] stop
