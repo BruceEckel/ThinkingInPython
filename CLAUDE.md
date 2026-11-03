@@ -784,6 +784,14 @@ and how it was measured.
   (`sys._jit.is_available()` is `True`), while `uv run` uses uv's
   managed build, where it is `False`. `sys.version` tells the builds
   apart: "tags/v3.15..." is python.org, "main, ..." is managed.
+  From 2026-10-22 to 2026-11-03 bare `python` was a `.cmd` shim in
+  `~/.local/bin` that ran `py`, which PowerShell and cmd resolve
+  through PATHEXT and Git Bash does not, so the Bash tool reported
+  "python: command not found". Since 2026-11-03 the install manager's
+  alias folder, `AppData/Local/Python/bin` (`python.exe`,
+  `python3-64.exe`, `pip.exe`), is on the user PATH and the shim is
+  gone, so every shell resolves the same `python`. There is still no
+  bare `python3`; `py` and `python3-64` are the other spellings.
   Before that date the python.org build lived at `C:/Python/python.exe`
   and there was no `python3` on PATH. The install manager replaced
   that build, and every environment created on it broke. A `uv tool`
