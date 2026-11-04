@@ -18,7 +18,7 @@ and under that count "the first three runs" meant all three, including the one t
 The section's last sentence, "Every run leaves the generator `GEN_CLOSED`",
 was true under the generator count alone.
 The fixes cited the tags ("At `[1]`, `[2]`, and `[3]` the exception arrives in place of a value")
-and named the unit ("All three generators end `GEN_CLOSED`").
+and named the unit ("All three generators end in `GEN_CLOSED`").
 
 The other prose passes each own one species of this fault.
 `antecedents` owns pronouns and stand-in nouns.
@@ -69,6 +69,9 @@ A listing offers several things to count:
 its top-level driver calls, its tagged lines, its generators or objects, its printed lines, the repetitions inside one call.
 Test: count the unit each way the listing allows; if the counts differ, the sentence is ambiguous.
 Fix: name the unit ("all three generators", "the second `run()` call", "three repetitions of `save_user()`"), or cite the tags.
+An ordinal has the same fault when the listing offers two orders:
+"finishes when the last generator beneath it finishes" (the last to finish, or the lowest in the chain?)
+became "finishes when every generator beneath it has finished".
 Chapter 47 said "The same schedule that governed three attempts now governs three runs"
 after pages where "run" counted `run()` calls, over a listing with one `run()`;
 the repair names the repeated function.
@@ -91,7 +94,7 @@ Test: attach the modifier to each head and read each result.
 Fix: move the modifier next to its head, or split the sentence so each head keeps its own.
 
 **A coordination with open scope.**
-"old tests and docs", "leaves its send and return channels at `None`", "a handler or a driver and a generator".
+"old tests and docs", "a handler or a driver and a generator".
 Test: bracket the "and" or "or" each way.
 Fix: repeat the shared word ("old tests and old docs"), move the shared word to the end, or split.
 

@@ -726,7 +726,6 @@ Chapters/45_Effects--Generators.md	[BOUND] A handler can do three things with a 
 Chapters/45_Effects--Generators.md	[BOUND] A pair of loops passing values in both directions resembles a queue like the ones in Coordinating Threads with Queues, with three differences
 Chapters/45_Effects--Generators.md	[BOUND] A suspended generator preserves two things
 Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator drops the return channel, so CODE takes two parameters where CODE takes three
-Chapters/45_Effects--Generators.md	[BOUND] CODE makes the first two calls itself, and the CODE makes the rest
 Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE leaves the machine in CODE, and the entry message prints once
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE

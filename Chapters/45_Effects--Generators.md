@@ -478,7 +478,7 @@ print(list(top()))
 "To exhaustion" means each `yield from` stays with its target until that generator finishes,
 however many `next()` calls that takes.
 Exhaustion is transitive.
-`top()`'s single `yield from` finishes when the last generator beneath it finishes,
+`top()`'s single `yield from` finishes when every generator beneath it has finished,
 so `list(top())` receives one flat sequence.
 
 Without `from`, a bare `yield one()` yields the generator object as a single value,
@@ -1522,8 +1522,8 @@ A generator state keeps such a value in a local and passes it to the next state 
 so each state receives the data it needs and the machine object disappears.
 
 Exercise 8 writes the vending machine as one generator,
-with each state a loop inside a single generator body,
-which suits a machine that is mostly a sequence.
+with each state a loop inside a single generator body.
+That design suits a machine that is mostly a sequence.
 One generator per state suits a machine like the trap,
 whose transitions form a graph.
 
@@ -1684,7 +1684,7 @@ task_runner([download(), index()])
 ```
 
 The `for` loop primes each `job` and pairs it with its first request.
-The `except` catches the `StopIteration` from a job that finishes before its first `yield`,
+The `for` loop's `except` catches the `StopIteration` from a job that finishes before its first `yield`,
 and drops that job.
 When a `job` finishes, its `send()` raises `StopIteration`.
 The `continue` then skips the `append`, so that `job` leaves `ready`.
@@ -1745,7 +1745,7 @@ asyncio.run(main())
 on each pass it awaits the generator's `__anext__()`.
 Like any `await`, it belongs inside an `async def`,
 which is why both `async for` loops sit in `main()`.
-The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls.
+The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects its values through its own `__anext__()` calls.
 
 A class can supply that `__anext__()`,
 the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
@@ -1788,7 +1788,8 @@ asyncio.run(main())
 so the class writes `__anext__()` alone.
 `__anext__()` is a coroutine function,
 which is why `async for` must await what it returns.
-`main()` makes the first two calls itself, and the `async for` makes the rest.
+`main()` makes the first two `__anext__()` calls itself,
+and the `async for` makes the rest.
 The loop ends when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
 The asynchronous generator `countdown()` writes the same loop as its body,
