@@ -945,13 +945,14 @@ With these, the `yield` expression raises an exception instead of returning a va
   inside `close()`, of how the body responded.
   A body that lets the exception propagate finishes on its own,
   and `close()` returns.
-  A body that catches it must then return instead of yielding again,
+  A body that catches the exception must then return instead of yielding again,
   or `close()` raises a `RuntimeError` in the driver.
 
 Both methods are called by the driver that holds the generator object.
+
 After `close()`, the generator returns,
 or it lets `GeneratorExit` propagate out of its body.
-Either way, the generator has finished,
+Either way, the generator finishes,
 and `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
 `close()` then returns to the driver, and the driver's next statement runs.
 
