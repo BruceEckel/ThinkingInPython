@@ -1125,11 +1125,8 @@ print(inspect.getgeneratorstate(g))
 
 `send(-3)` at `[2]` resumes the body with `received` bound to `-3`.
 The body rejects the value and raises `ValueError` at `[1]`.
-The `ValueError` propagates out of the generator body.
-The `send()` call at `[2]` then raises that `ValueError` in the driver,
-where `expect()` reports it.
-`GEN_CLOSED` shows that the exception shut down the generator,
-as the `TypeError` thrown into `worker()` in `throw_close_basics.py` did.
+The `send()` call at `[2]` then raises that `ValueError` in the driver.
+`GEN_CLOSED` shows that the exception shut down the generator.
 
 `throw()` carries an exception from the driver down to the `yield`.
 A `raise` in the generator body carries an exception from the generator up to the `next()`,
@@ -1139,7 +1136,7 @@ In both directions, the exception passes through a method call that the driver m
 ### Stopping Early with `close()` {#stopping-early-with-close}
 
 `close()` is the driver's tool for ending a generator early.
-A paused generator keeps open every resource its body opened:
+A generator paused at a `yield` still holds the resources it acquired before the pause:
 a file or a lock inside a `with` statement, a connection, a transaction.
 The common case is a driver that has the answer it needs before the generator has yielded its last value:
 
