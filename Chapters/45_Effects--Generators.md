@@ -1095,7 +1095,7 @@ The cleanup that runs is the generator's own code,
 a `finally` clause or an `except GeneratorExit` around the `yield`.
 Then the generator ends.
 
-### An Exception Raised in the Body
+### An Exception Raised in the Generator
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
 The channel carries exceptions the other way as well.
