@@ -1094,8 +1094,8 @@ it calls `close()`, and `GeneratorExit` arrives at that `yield`.
 The cleanup that runs is the generator's own code,
 a `finally` clause or an `except GeneratorExit` around the `yield`.
 Then the generator ends.
-`close_when_done.py` in [Stopping Early with `close()`](#stopping-early-with-close)
-shows a driver closing a sensor generator when it has the reading it needs.
+
+### An Exception Raised in the Body
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
 The channel carries exceptions the other way as well.
