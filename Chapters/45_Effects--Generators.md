@@ -370,7 +370,7 @@ a generator is more useful than a coroutine because you write the driver.
 A coroutine's requests go to an event loop,
 whether `asyncio`'s loop or one you write yourself.
 Each request must be an awaitable object built for that loop.
-A generator's requests go to whatever code calls `next()` and `send()`,
+A generator's requests go to the code that calls `next()` and `send()`,
 and a request can be any value.
 
 A generator yields a request out, and the driver sends the answer back in.
@@ -383,7 +383,7 @@ That separation of a request from its fulfillment is the core of an [Effect Mana
 The generator declares requests.
 The driver interprets them.
 
-`interview()` asks the same three questions whatever answers it receives.
+`interview()` asks the same three questions no matter what answers it receives.
 A generator can build its next request from the answer it received:
 
 ```python
@@ -1045,7 +1045,7 @@ so the clause for `GeneratorExit` wraps the whole statement.
 The exception leaves the inner `try` through its `finally` block,
 which prints `cleanup`.
 The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
-`close()` returns whatever the generator returned while handling `GeneratorExit`,
+`close()` returns the value the generator returned while handling `GeneratorExit`,
 so the driver prints `closed`,
 and the call returns the way an ordinary method call does.
 
@@ -1067,7 +1067,7 @@ and that value arrives in the driver as `StopIteration.value`,
 which `expect()` prints.
 All three generators end in `GEN_CLOSED`.
 
-A generator yields a request and waits while the driver carries the request out.
+A generator yields a request and waits while the driver carries out the request.
 When the attempt succeeds, the driver calls `send()` with the answer.
 When the attempt fails, say the file the generator asked for is missing,
 the driver calls `throw()` with the exception the attempt raised,
@@ -1075,24 +1075,18 @@ so the generator learns which failure occurred and chooses what to do about it.
 The generator either handles the exception and yields again,
 or lets it propagate.
 An exception that propagates out of a generator ends that generator.
-`asyncio` calls `throw()` on a coroutine when an awaited operation fails or a cancellation arrives.
-`@contextmanager`'s `__exit__()`,
-in [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager),
-calls the generator's `throw()` method,
-"which resumes the generator by raising the block's exception at the `yield`."
 
-`close()` is the `throw()` whose exception Python chooses,
-so it sends one message: finish.
-`GeneratorExit` is the same exception whatever the driver's reason,
-and a generator that catches it must still end.
-If the generator yields again, `close()` raises a `RuntimeError`,
-as [`close()` Requires the Generator to Finish](#close-requires-the-generator-to-finish)
-shows.
-`throw()` leaves the decision with the generator.
-The exception's class identifies the failure,
-so the body's `except` clauses choose among failures,
-and a clause that handles one yields the next request.
-`worker()` in `throw_close_basics.py` catches a `ValueError` this way and yields `"recovered"`.
+`throw()` and `close()` differ in who chooses the exception.
+With `throw()`, the driver chooses it,
+and the exception's class tells the generator which failure occurred.
+The body's `except` clauses pick the failures the generator handles,
+and a clause that handles one yields the next request,
+as `worker()` in `throw_close_basics.py` does at `[1]`,
+where it catches a `ValueError` and yields `"recovered"`.
+`close()` always produces `GeneratorExit`, so the exception carries one meaning,
+which is to finish the generator.
+A generator that catches `GeneratorExit` runs its cleanup and must then end.
+If it yields again, `close()` raises a `RuntimeError`.
 
 Most conversations end when the generator returns.
 When the driver finishes first, with the generator still waiting at a `yield`,
@@ -1134,7 +1128,7 @@ The body rejects the value and raises `ValueError` at `[1]`.
 The `ValueError` propagates out of the generator body.
 The `send()` call at `[2]` then raises that `ValueError` in the driver,
 where `expect()` reports it.
-`GEN_CLOSED` shows that the exception shut the generator down,
+`GEN_CLOSED` shows that the exception shut down the generator,
 as the `TypeError` thrown into `worker()` in `throw_close_basics.py` did.
 
 `throw()` carries an exception from the driver down to the `yield`.
@@ -1145,7 +1139,7 @@ In both directions, the exception passes through a method call that the driver m
 ### Stopping Early with `close()` {#stopping-early-with-close}
 
 `close()` is the driver's tool for ending a generator early.
-A paused generator keeps open whatever its body opened:
+A paused generator keeps open every resource its body opened:
 a file or a lock inside a `with` statement, a connection, a transaction.
 The common case is a driver that has the answer it needs before the generator has yielded its last value:
 
@@ -1192,7 +1186,7 @@ which `inspect.getgeneratorstate()` reports as `GEN_SUSPENDED`.
 `close()` at `[2]` raises `GeneratorExit` at that `yield`.
 The `except GeneratorExit` clause runs when the driver stops early,
 and reports what the stop left unread.
-The `finally` clause runs on every ending and turns the sensor off.
+The `finally` clause runs on every ending and turns off the sensor.
 
 A generator may catch `GeneratorExit` as long as it then finishes,
 as `readings()` does by reaching the end of its body.
@@ -1596,7 +1590,7 @@ This chapter rests on three ideas:
 - `yield` carries a request out of the body and `send()` carries the answer back in,
   so the body can ask for something and receive the answer.
 - `yield from` composes those conversations.
-  Each generator in the chain yields to whatever code resumed it,
+  Each generator in the chain yields to the code that resumed it,
   so one chain runs under any driver.
 
 The first two ideas are enough to build a task runner.

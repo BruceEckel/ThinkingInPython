@@ -48,7 +48,9 @@ scope's line range:
 - `tip positional CH=NN ARGS=--survey` (for `ambiguity`: `count+unit`,
   the survey hits on `call` and `time`, `construct xN`, `ordinal+span`)
 - `tip sentence-shapes CH=NN ARGS=--survey` (for `straighten` and
-  `cohesion`: `[AND]`, `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`;
+  `cohesion`: `[AND]`, `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`,
+  and the default `[PRT]`, a phrasal verb split around a noun phrase,
+  "carries the request out" -> "carries out the request", R56;
   `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too)
 - `tip watch-words CH=NN ARGS="--tier 1"` (negated subjects)
 

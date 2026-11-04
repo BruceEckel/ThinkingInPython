@@ -2401,6 +2401,41 @@ against the type checker).
 
 **Home.** activate (Accrued patterns) | this file.
 
+### R56. Keep a phrasal verb's particle beside its verb
+
+**Test.** A two-word verb whose particle sits after a noun-phrase
+object: "carries the request out", "looks the name up", "turns the
+sensor off", "shuts the generator down". The particle holds the verb's
+meaning ("carry" is transport, "carry out" is perform), so the reader
+finishes "carries the request" and then revises it when "out" arrives.
+Move the particle next to the verb: "carries out the request", "looks
+up the name", "turns off the sensor", "shuts down the generator". In a
+heading, the same shape takes one verb instead ("Telling the Wrappers
+Apart" -> "Distinguishing the Wrappers"). `tip sentence-shapes` lists
+the prose shape as `[PRT]` (`tools/sentence_shapes.py`, 2026-11-04).
+
+**Keep when.** The object is a pronoun or a one-word code span, which
+English puts before the particle ("carries it out", "looks `name` up").
+The particle opens a path or a measure and is not the verb's meaning
+("leaves the amount up to you", "sends a request up to the event loop",
+"stops one level up", "passes the `Question` up and the answer down").
+The joined form has another meaning ("pass the error up", since "pass
+up" declines; "pass the tuple on"; "start the work over") or no joined
+form ("lets zero through", "leaves one student over").
+
+**Sightings.** 2, two chapters (promoted 2026-11-04; the heading
+sighting was C26).
+- `29_Patterns--Changing_the_Interface` 2026-09-17 (`cacb544f`), was
+  Claude-written, Bruce's own edit:
+  "## Telling the Wrappers Apart" -> "## Distinguishing the Wrappers"
+- `45_Effects--Generators` 2026-11-04, was Claude-written, Bruce:
+  'general style: carries out the request':
+  "waits while the driver carries the request out" -> "waits while
+  the driver carries out the request"
+
+**Home.** straighten (Accrued patterns) | CLAUDE.md watch list |
+`tools/sentence_shapes.py` `[PRT]` | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -2640,19 +2675,6 @@ takes "you" off a sentence about how the design behaves.
 **Sightings.** 1, `27_Patterns--Function_Objects` 2026-09-16, was Claude-written:
 - "Adding, removing, or reordering handlers means editing a list." ->
   "To add, remove, or reorder the handlers you edit the `chain` list."
-
-### C26. In a heading, one verb rather than a split phrasal verb
-
-**Test.** A heading whose verb's particle sits after the object
-("Telling X Apart", "Setting X Off") where one verb says the same
-("Distinguishing X", "Offsetting X").
-
-**Keep when.** Prose sentences: the global CLAUDE.md allows a phrasal
-verb with its object present ("pass it around"). Headings only.
-
-**Sightings.** 1, `29_Patterns--Changing_the_Interface` 2026-09-17
-(`cacb544f`), was Claude-written, Bruce's own edit:
-- "## Telling the Wrappers Apart" -> "## Distinguishing the Wrappers"
 
 ### C27. Call an operation by the name its mechanism uses
 
@@ -3370,6 +3392,37 @@ session's `same_survey2.py` and is the shape a survey rule would use.
 **Home.** CLAUDE.md (a bullet before "Prefer the positive statement",
 2026-11-01) | `[SAME]` survey rule in `tools/sentence_shapes.py` (same
 day) | antecedents (a pointer word in disguise) | this file.
+
+### C56. Read every "whatever" with suspicion
+
+**Test.** The sentence has "whatever". Two shapes. The concessive
+("whatever the driver's reason", "whatever its base classes") claims
+the outcome holds across every case of something, which is either a
+universal the sentence has not earned (the overclaim shape, test it as
+`tip overclaims` would) or a set the sentence need not mention at all,
+in which case cut the phrase. The free relative ("whatever the caller
+supplies", "whatever holds `self.close`") is R54's shape with a thing
+instead of a choice: write the definite noun phrase ("the value the
+caller supplies", "the object that holds `self.close`"), or name the
+set when the independence is the claim ("any object with that shape").
+`tip watch-words` lists the word as Tier 2 (2026-11-04).
+
+**Keep when.** None seen yet. The chapter 45 pass the same day read
+its seven sites and rewrote all seven: the free relatives became "the
+code that calls `next()`", "the value the generator returned", "the
+code that resumed it", "every resource its body opened" (a list of
+them follows); the concessives became "no matter what answers it
+receives", "from either driver" (the two options named), "when the
+questions arrive in any order". The other 59 sites stay NEW for their
+chapters' passes.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-04, was
+Claude-written (same day), Bruce's own edit, "the use of 'whatever'
+should be considered circumspect in general":
+- "so the exception carries one meaning, finish, whatever the driver's
+  reason." -> "so the exception carries one meaning, finish."
+
+**Home.** CLAUDE.md watch list (Tier 2, "whatever") | this file.
 
 ## Retired
 

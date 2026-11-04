@@ -266,6 +266,12 @@ of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
 ending on a preposition whose object moved) and `tip watch-words`
 (`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
+Since 2026-11-04 "whatever" is a Tier 2 watch word (candidate C56 in
+`bruce_edit_db.md`, Bruce: "should be considered circumspect in
+general"): a concessive "whatever the driver's reason" is a universal
+to test or a phrase to cut, and a free relative "whatever the caller
+supplies" is "the value the caller supplies"; its 66 sites stay NEW
+for the chapter passes.
 Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
 object, `no X`, `none`, or `none of` ("runs none of the body", "raises
 no exception", "has no `__slots__`"), Bruce's "reversal of
@@ -397,6 +403,17 @@ the repair is "its `yield`" or "that directory". The parse cannot
 tell an implied second term ("for the same reason `bump()` does")
 from none, so it is a survey rule: the book-wide read had 194
 candidates and 6 rewrites.
+The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
+around a noun-phrase object ("the driver carries the request out",
+Bruce: "general style: carries out the request"); the particle holds
+the verb's meaning, so the reader finishes "carries the request" and
+revises it when "out" arrives. The repair moves the particle beside
+its verb, and R56 in `bruce_edit_db.md` has the rule. A pronoun or
+one-word code-span object ("carries it out", "looks `name` up"), a
+measure ("one level up"), a path ("up to you"), and "through" or
+"over" are quiet by design; the baseline holds the keeps: a joined
+form with another meaning ("pass the error up"), a directional pair,
+a parser misread ("up front").
 The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter

@@ -350,3 +350,20 @@ before/after pair, and it becomes part of every future pass.
   on the class. A function stored there is a descriptor, and reading it
   through an instance binds that instance."
   The same rule is in the global `CLAUDE.md` under Writing style.
+- **A phrasal verb split around a noun phrase** (2026-11-04, Bruce:
+  "general style: carries out the request").
+  "waits while the driver carries the request out" is the verb held
+  open: the particle carries the verb's meaning ("carry" is transport,
+  "carry out" is perform), and the reader finishes "carries the
+  request" before "out" arrives and revises it.
+  Put the particle beside its verb whenever the object is a noun
+  phrase: "carries out the request", "looks up the name", "turns off
+  the sensor", "shuts down the generator".
+  A pronoun or a one-word code span stays before the particle
+  ("carries it out", "looks `name` up"), since English puts it there.
+  Leave a particle that opens a path or a measure ("leaves the amount
+  up to you", "stops one level up"), and a verb whose joined form has
+  another meaning or none ("pass the error up", "lets zero through").
+  `tip sentence-shapes` lists the shape as `[PRT]`, a default rule
+  with a baseline of judged keeps; R56 in `bruce_edit_db.md` has the
+  sightings, and a heading with the shape takes one verb instead.

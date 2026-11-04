@@ -269,16 +269,15 @@ print(repr(drive_naive(interview(),
 
 **Reuse the generator unchanged.**
 `interview()` stays as it was,
-because it yields a `Question` and receives an `Answer`,
-whatever the answer's source.
+because it yields a `Question` and receives an `Answer`, from either driver.
 The generator describes the conversation.
 The driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
 **Find the answer for each request.**
 The two drivers differ in the property on which they rely.
-The dictionary driver looks each answer up by the request,
-so it answers correctly in whatever order the questions arrive,
+The dictionary driver looks up each answer by the request,
+so it answers correctly when the questions arrive in any order,
 and it answers a repeated question the same way twice.
 The iterator driver goes by position,
 so it depends on the generator asking its questions in the order the driver holds the replies.
