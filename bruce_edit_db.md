@@ -3429,6 +3429,38 @@ should be considered circumspect in general":
 
 **Home.** CLAUDE.md watch list (Tier 2, "whatever") | this file.
 
+### C57. A present perfect in a time clause is the simple present
+
+**Test.** "has" or "have" plus a participle inside a clause opened by
+"before", "after", "when", "once", "until", or "whenever": "before the
+generator has yielded its last value", "when every generator beneath it
+has finished", "after `watched = watch()` has bound the name". The
+subordinator already orders the two events, and present narration keeps
+one tense, so write "yields", "finishes", "binds". `tip past-tense
+ARGS=--survey` lists the shape as `[PERFECT]` (`tools/past_tense.py`,
+2026-11-04); the book had 41 sites that day. The activate skill's tense
+category has the pattern.
+
+**Keep when.** The perfect carries a completed state the present loses
+("reads `counter` after the previous lock holder has written it", where
+the completed write is the point). A perfect outside a time clause ("the
+answers it has received", "has entered no `try` statement") is judged by
+the standing-behavior test instead.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-04, was
+Claude-written, Bruce: "'has yielded' can just be 'yields'. I thought we
+had captured this kind of thing somewhere in super-prose":
+- "before the generator has yielded its last value" -> "before the
+  generator yields its last value"
+- same pass: "when every generator beneath it has finished" -> "when
+  every generator beneath it finishes"; "after `watched = watch()` has
+  bound the name" -> "after `watched = watch()` binds the name"; and
+  outside a time clause, "A generator that returns from a `case` has
+  moved to a new state" -> "moves to a new state"
+
+**Home.** activate (Accrued patterns) | `tools/past_tense.py`
+`[PERFECT]` | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

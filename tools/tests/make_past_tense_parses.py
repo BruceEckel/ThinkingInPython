@@ -44,6 +44,10 @@ SOURCES: Final[tuple[str, ...]] = (
     "If the list were empty, it stops.",
     "One design served three jobs.",
     "Some prose.",
+    "The driver has the answer it needs before the generator has yielded its last value.",
+    "The driver has the answer it needs before the generator yields its last value.",
+    "The generator chooses what to ask next from the answers it has received.",
+    "The handler runs when every generator beneath it has finished.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 

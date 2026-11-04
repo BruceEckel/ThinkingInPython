@@ -53,6 +53,9 @@ scope's line range:
   "carries the request out" -> "carries out the request", R56;
   `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too)
 - `tip watch-words CH=NN ARGS="--tier 1"` (negated subjects)
+- `tip past-tense CH=NN ARGS=--survey` (for `activate`: `[PAST-SUB]`,
+  and `[PERFECT]`, a present perfect in a time clause, "before the
+  generator has yielded" -> "before the generator yields", C57)
 
 Read `deep_review_db.md` and the chapter's most recent
 `deep_review/~NN...` file for standing exemptions, and the Rules

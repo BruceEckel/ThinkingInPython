@@ -43,6 +43,24 @@ function the caller passed", "the case that failed"): an anterior
 reference inside present narration, not the drift the rule describes.
 The drift is a main-clause past ("One design served three jobs in this
 chapter"). `tip past-tense CH=NN ARGS=--survey` feeds an activate pass.
+
+`[PERFECT]` (2026-11-04, from a sentence the author marked in chapter
+45) is the second survey rule: a present perfect heading a time clause,
+"before the generator has yielded its last value", "when every
+generator beneath it has finished", "after the pool has lent the object
+to another borrower". The author: "'has yielded' can just be 'yields'".
+Present narration keeps one tense, and the subordinator already says
+that the clause's event comes first, so the perfect's completed-before-
+now is said twice. The rule (`perfect_verbs()`) fires on a `VBN` with
+an `aux` "has" or "have" (tag `VBZ` or `VBP`) whose clause is an `advcl`
+(or a `conj` under one) with a `mark` in `TIME_MARKS` ("before",
+"after", "when", "once", "until", "whenever", "while"). It is a survey
+rule because a perfect in a time clause sometimes carries a state the
+present loses ("reads `counter` after the previous lock holder has
+written it" stresses the completed write), and the reader of the list
+decides; the repair is the simple present. A present perfect in a main
+clause or a relative clause ("the answers it has received", "has
+entered no `try` statement") is outside the rule.
 A hit prints as `path:line: [PAST] <verb>: <sentence>`, the line holding
 the sentence's first character or the heading's line. A verb in form
 (b) is named with its auxiliary.
@@ -161,9 +179,16 @@ LABELS: Final = {
     "PAST": "past-tense verb of a main clause",
     "PAST-HEADING": "past-tense verb in a heading",
     "PAST-SUB": "past-tense verb of a subordinate clause (survey)",
+    "PERFECT": "present perfect in a time clause (survey)",
 }
-SURVEY_LABELS: Final = frozenset({"PAST-SUB"})
+SURVEY_LABELS: Final = frozenset({"PAST-SUB", "PERFECT"})
 """Printed only under `--survey`; never baselined."""
+TIME_MARKS: Final = frozenset(
+    "before after when once until whenever while".split())
+"""Subordinators that open a time clause, where a present perfect
+("before the generator has yielded") is the simple present ("before
+the generator yields")."""
+PRESENT_AUX_TAGS: Final = frozenset({"VBZ", "VBP"})
 FIRST_PERSON: Final = frozenset({"i", "we"})
 OPENERS: Final = frozenset({"if", "when"})
 AUX_DEPS: Final = frozenset({"aux", "auxpass"})
@@ -210,6 +235,46 @@ def past_verbs(sentence: Sentence) -> Iterator[tuple[Token, str]]:
                     if c.dep in AUX_DEPS and c.tag == "VBD"]
             if past:
                 yield tok, f"{past[0].text} {tok.text}"
+
+
+def time_clause(verb: Token, sentence: Sentence) -> bool:
+    """Does this verb head a clause opened by one of `TIME_MARKS`?
+
+    The verb's dep is `advcl`, or `conj` under one, and a child of that
+    clause's verb is a time subordinator: a `mark` ("before", "after",
+    "once", "until"), or a wh-adverb (`advmod` tagged `WRB`), which is
+    how the parser attaches "when" and "whenever".
+    """
+    seen: set[int] = set()
+    while verb.dep == "conj" and verb.i not in seen:
+        seen.add(verb.i)
+        verb = sentence.tokens[verb.head]
+    if verb.dep != "advcl":
+        return False
+    return any(
+        (c.dep == "mark" or (c.dep == "advmod" and c.tag == "WRB"))
+        and c.text.lower() in TIME_MARKS
+        for c in children(verb, sentence))
+
+
+def perfect_verbs(sentence: Sentence) -> Iterator[tuple[Token, str]]:
+    """(verb, shown) for each present perfect in a time clause.
+
+    A `VBN` with an `aux` child "has" or "have" (tag `VBZ` or `VBP`),
+    heading a clause that `time_clause()` accepts: "before the generator
+    has yielded its last value", "when every generator beneath it has
+    finished". Present narration says "yields" and "finishes"; the
+    perfect adds a completed-before-now that the subordinator already
+    states.
+    """
+    for tok in sentence.tokens:
+        if tok.tag != "VBN":
+            continue
+        have = [c for c in children(tok, sentence)
+                if c.dep in AUX_DEPS and c.lemma.lower() == "have"
+                and c.tag in PRESENT_AUX_TAGS]
+        if have and time_clause(tok, sentence):
+            yield tok, f"{have[0].text} {tok.text}"
 
 
 def is_main(verb: Token, sentence: Sentence) -> bool:
@@ -267,6 +332,10 @@ def hits(paragraph: Paragraph, label: str | None = None) -> Iterator[Hit]:
                 continue
             kind = label or ("PAST" if main else "PAST-SUB")
             yield Hit(kind, verb, shown, sentence)
+        if label is None:
+            for verb, shown in perfect_verbs(sentence):
+                if not quoted(sentence, text, verb):
+                    yield Hit("PERFECT", verb, shown, sentence)
 
 
 def message(paragraph: Paragraph, hit: Hit) -> str:

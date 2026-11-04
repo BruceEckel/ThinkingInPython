@@ -440,3 +440,19 @@ and it becomes part of every future pass.
   Keep the sentence's subject:
   when Bruce flags a sentence as passive, change its verbs first,
   and restructure around a new subject only if the verbs cannot carry it.
+- "before the generator has yielded its last value" becomes
+  "before the generator yields its last value" (2026-11-04, Bruce:
+  "'has yielded' can just be 'yields'").
+  A present perfect in a time clause ("before", "after", "when", "once",
+  "until") says completed-before-now twice: the subordinator already
+  orders the two events, and present narration keeps one tense.
+  Write the simple present: "when every generator beneath it finishes",
+  "after `watched = watch()` binds the name".
+  `tip past-tense CH=NN ARGS=--survey` lists the shape as `[PERFECT]`,
+  a survey rule, since the perfect sometimes carries a completed state
+  the present loses ("reads `counter` after the previous lock holder
+  has written it"), and the pass decides per sentence.
+  A perfect in a main clause or a relative clause ("the answers it has
+  received") is a different question: ask whether the sentence reports
+  standing behavior, and if so write the present ("moves to a new
+  state", not "has moved").

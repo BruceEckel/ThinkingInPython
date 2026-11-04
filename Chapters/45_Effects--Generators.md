@@ -356,7 +356,7 @@ print(inspect.getgeneratorstate(watched))
 `watch()` names `watched` before the module binds it.
 As [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
 shows, a function looks up a module-level name when its body runs.
-`next()` runs `watch()`'s body after `watched = watch()` has bound the name.
+`next()` runs `watch()`'s body after `watched = watch()` binds the name.
 
 The annotation is `Generator[str]` rather than `Iterator[str]`,
 because `inspect.getgeneratorstate()` takes a `Generator` and the type checker rejects an `Iterator` argument.
@@ -478,7 +478,7 @@ print(list(top()))
 "To exhaustion" means each `yield from` stays with its target until that generator finishes,
 however many `next()` calls that takes.
 Exhaustion is transitive.
-`top()`'s single `yield from` finishes when every generator beneath it has finished,
+`top()`'s single `yield from` finishes when every generator beneath it finishes,
 so `list(top())` receives one flat sequence.
 
 Without `from`, a bare `yield one()` yields the generator object as a single value,
@@ -1138,7 +1138,7 @@ In both directions, the exception passes through a method call that the driver m
 `close()` is the driver's tool for ending a generator early.
 A generator paused at a `yield` still holds the resources it acquired before the pause:
 a file or a lock inside a `with` statement, a connection, a transaction.
-The common case is a driver that has the answer it needs before the generator has yielded its last value:
+The common case is a driver that has the answer it needs before the generator yields its last value:
 
 ```python
 # close_when_done.py
@@ -1348,7 +1348,7 @@ yield again, or return and finish.
 `answering_proxy.py` makes that choice with an `if`,
 between yielding a request to the driver and answering it from its table.
 A `match` on the received input makes the same choice with one `case` per input.
-A generator that returns from a `case` has moved to a new state.
+A generator that returns from a `case` moves to a new state.
 
 A generator therefore offers a third design.
 Each state is a generator function.

@@ -443,7 +443,14 @@ Stayed Constant"), which the check reads from the document's own heading
 lines. The first run found 1283 hits, nearly all in subordinate clauses
 ("the function the caller passed"), which refer back inside present
 narration and are not the drift. `[PAST-SUB]` therefore prints only under
-`ARGS=--survey`, for the activate pass, and is never baselined. Skips
+`ARGS=--survey`, for the activate pass, and is never baselined. The
+second survey rule is `[PERFECT]` (2026-11-04, Bruce: "'has yielded'
+can just be 'yields'"), a present perfect heading a time clause
+("before the generator has yielded its last value", "when every
+generator beneath it has finished"): the subordinator already orders
+the events, so the repair is the simple present, and the keep is a
+completed state the present loses ("after the previous lock holder
+has written it"); 41 sites that day, C57 in `bruce_edit_db.md`. Skips
 print nothing: a sentence with a year, a version number, or a PEP number
 (a dated event), a sentence with a modal (would, could, might, should), a
 verb inside double quotes, a `Hint:` or `Done when:` paragraph, a
