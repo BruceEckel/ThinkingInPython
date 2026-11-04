@@ -1039,8 +1039,8 @@ That `yield` sits inside the `except ValueError` handler,
 and an exception raised inside a handler skips the sibling `except` clauses of its own `try`,
 so the clause for `GeneratorExit` wraps the whole statement.
 The exception leaves the inner `try` through its `finally` block,
-which prints `cleanup`,
-and the outer `except GeneratorExit` clause catches it and returns `"closed"`.
+which prints `cleanup`.
+The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
 `close()` returns whatever the generator returned while handling `GeneratorExit`,
 so the driver prints `closed`,
 and the call returns the way an ordinary method call does.
@@ -1048,19 +1048,20 @@ and the call returns the way an ordinary method call does.
 At `[3]`, a fresh `worker()` waits at `yield "ready"`,
 and `g.throw(TypeError("stop"))` raises `TypeError` there.
 No `except` clause names `TypeError`,
-so the exception leaves the `try` statement through the `finally` block,
-which prints `cleanup`.
+so the exception leaves the inner `try` through its `finally` block,
+which prints `cleanup`,
+and passes the outer `except GeneratorExit` clause unmatched.
 Leaving the body ends the generator, as a `return` would.
 The `TypeError` then comes out of the driver's `throw()` call,
 where `expect()` reports it.
 
-At `[4]`, the driver sends no exception,
-so `next(g)` resumes after `yield "ready"`, prints `resumed`,
-and leaves the `try` statement through the `finally` block.
+At `[4]`, the driver calls `next(g)` instead of `throw()`,
+so the body resumes after `yield "ready"`, prints `resumed`,
+and leaves the inner `try` through its `finally` block.
 The body then reaches `return "done"`,
 and that value arrives in the driver as `StopIteration.value`,
 which `expect()` prints.
-Every run leaves the generator `GEN_CLOSED`.
+All three generators end in `GEN_CLOSED`.
 
 A generator yields a request and waits while the driver carries the request out.
 When the attempt succeeds, the driver calls `send()` with the answer.
@@ -1743,7 +1744,7 @@ asyncio.run(main())
 `async for` is an `await` in loop form:
 on each pass it awaits the generator's `__anext__()`.
 Like any `await`, it belongs inside an `async def`,
-which is why the listing's two loops sit in `main()`.
+which is why both `async for` loops sit in `main()`.
 The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects the values through the same `__anext__()` calls.
 
 A class can supply that `__anext__()`,

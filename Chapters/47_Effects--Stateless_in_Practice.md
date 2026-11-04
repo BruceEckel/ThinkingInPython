@@ -1715,11 +1715,11 @@ print(run(env(repeated)("Morty")))
 #: ('Morty saved', 'Morty saved', 'Morty saved')
 ```
 
-The same schedule that governed three attempts now governs three runs,
+The same schedule that governed three attempts now governs three repetitions of `save_user()`,
 and the tuple holds every result in order.
 Where `retry()` stops at the first success,
 `repeat()` continues until the schedule runs out.
-A failure on any run propagates unchanged rather than becoming a `RetryError`.
+A failure on any repetition propagates unchanged rather than becoming a `RetryError`.
 
 `memoize()` solves the spent-generator problem:
 

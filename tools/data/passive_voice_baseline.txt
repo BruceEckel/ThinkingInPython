@@ -30,13 +30,14 @@ Chapters/36_Patterns--Memento.md	[PASSIVE] is bound: That name is now bound to C
 Chapters/40_Functional--Foundations.md	[PASSIVE] is associated: The runtime message names a local variable instead of the missing declaration: "cannot access local variable 'count' where it is not associated with a value."
 Chapters/44_Effects--Effect_Management.md	[PASSIVE] is delayed: The connection between the declaration and its supply is *delayed binding*.
 Chapters/45_Effects--Generators.md	[PASSIVE+BY] are called: Both methods are called by the driver that holds the generator object.
+Chapters/45_Effects--Generators.md	[PASSIVE+BY] is followed: CODE is CODE followed by a runtime test, inside CODE, of how the body responded.
 Chapters/45_Effects--Generators.md	[PASSIVE] is paused: CODE is paused at its CODE expression, and CODE is paused at its CODE.
 Chapters/45_Effects--Generators.md	[PASSIVE] is suspended: The new generator is suspended before its first statement, so no CODE expression is waiting to receive a value.
 Chapters/45_Effects--Generators.md	[PASSIVE] is trapped: A CODE above CODE in CODE runs when the mouse is trapped and at no other time.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
 Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
 Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] 's named: When CODE gains a fourth error, CODE's named CODE leaves it in the channel, so CODE's declared type no longer matches and the type checker reports an error at the CODE.
-Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] is prepackaged: CODE is CODE with a type lookup in place of the dictionary, CODE is that loop applied after the last handler, and CODE is CODE prepackaged for CODE: a handler whose answer to CODE is whichever supplied instance is a CODE.
+Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] is prepackaged: CODE is CODE with a type lookup in place of the dictionary, CODE is that loop applied after the last handler, and CODE is CODE prepackaged for CODE: a handler whose answer to CODE is the supplied instance that is a CODE.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the run prints CODE, and you can say which slot the surviving CODE occupies and why the loop skipped it.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the swapped CODE prints CODE, and you can say what a single value of CODE would have to do for the order of the two CODE blocks to change the output.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the traceback shows CODE above CODE, and printing the classes of CODE and CODE names two different exceptions: the one you constructed and CODE.
