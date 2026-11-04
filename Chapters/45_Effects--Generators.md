@@ -427,7 +427,7 @@ the second thread gets `ValueError: generator already executing`.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 reproduces the `ValueError` with several threads.
 It also shows `threading.synchronized_iterator()`,
-which lets those threads share one generator by serializing their calls.
+which wraps the generator function so that each generator it creates serializes the threads' calls.
 
 ## `yield from` Composes Generators {#yield-from-composes-descriptions}
 
@@ -955,6 +955,8 @@ or it lets `GeneratorExit` propagate out of its body.
 Either way, the generator finishes,
 and `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
 `close()` then returns to the driver, and the driver's next statement runs.
+If the cleanup raises a different exception, the generator still closes,
+and that exception comes out of `close()` instead.
 
 Why does the driver need methods to raise exceptions inside the generator,
 when Python has a `raise` statement?
@@ -1033,6 +1035,8 @@ At `[1]`, `g.throw(ValueError("bad input"))` resumes `worker()`,
 and `yield "ready"` raises `ValueError` instead of returning a value.
 The `except ValueError` clause catches it and yields `"recovered"`.
 The generator waits again, now at `yield "recovered"`.
+`throw()` returns that yielded value to the driver, as `next()` and `send()` do,
+which is why `print()` shows `recovered`.
 
 At `[2]`, `g.close()` raises `GeneratorExit` at `yield "recovered"`.
 That `yield` sits inside the `except ValueError` handler,
@@ -1445,7 +1449,10 @@ def run_all(
     machine = trampoline(start)
     state = next(machine)  # [2]
     for input_ in inputs:
-        new_state = machine.send(input_)  # [3]
+        try:
+            new_state = machine.send(input_)  # [3]
+        except StopIteration:
+            return  # [4]
         print(state, input_, "->", new_state)
         state = new_state
 
@@ -1492,8 +1499,10 @@ so `run_all()` drives it as it drives any generator.
 `[2]` primes the machine,
 which runs `waiting()`'s entry action and stops at its first `yield`.
 Each `send()` at `[3]` delivers one input and returns the name of the state the machine then occupies.
+A state that returns `None` ends `trampoline()`'s loop,
+so that `send()` raises `StopIteration` and `run_all()` returns at `[4]`.
 
-This trace and the trace in `trap_states_demo.py` have the same lines in a different order.
+For `MOVES`, this trace and the trace in `trap_states_demo.py` have the same lines in a different order.
 Each entry message prints before the transition line that leads to it.
 The entry action runs inside `send()`, in the new state's body,
 and `run_all()` prints its line after `send()` returns.
@@ -1516,7 +1525,8 @@ A `print("Door latched")` above `return holding()` in `trapping()` runs when the
 The Moore shape and the Mealy shape both fit one function with no `action` field.
 
 A state's local variables are its data.
-`VendingMachine` keeps `amount` on the machine object because every machine shares the enum members.
+[`VendingMachine`](31_Patterns--State_Machines.md#a-vending-machine)
+keeps `amount` on the machine object because every machine shares the enum members.
 A generator state keeps such a value in a local and passes it to the next state as an argument,
 `return selecting(amount)`,
 so each state receives the data it needs and the machine object disappears.
@@ -1758,7 +1768,7 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import override
 
-@dataclass
+@dataclass(eq=False)
 class Countdown(AsyncIterator[int]):
     n: int
 
@@ -1899,7 +1909,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import override
 
-@dataclass
+@dataclass(eq=False)
 class Fibonacci(Iterator[int]):
     remaining: int
     _a: int = field(default=0, init=False)
@@ -1994,8 +2004,9 @@ The other half came with PEP 342, written in 2005,
 which added the send channel to Python 2.5 in 2006.
 Simulations, games, and asynchronous I/O need to pass a value or an exception into a generator at its suspension point,
 so `send()`, `throw()`, and `close()` arrived together.
-The PEP describes a scheduler that runs many generators as a "trampoline,"
-the shape of `task_runner_send.py`.
+The PEP's trampoline, the loop in `trap_generators_demo.py`,
+also describes a scheduler like `task_runner_send.py`,
+which runs many generators from one driver.
 `yield from` (PEP 380, Python 3.3, 2012) completes the set.
 A delegating generator passes all three channels through to the innermost generator,
 so you can compose a conversation from parts that never refer to their driver.

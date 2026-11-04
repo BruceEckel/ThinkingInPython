@@ -323,3 +323,66 @@ The 9 exercises (`lines 2014–2065` and `Solutions/45_Effects--Generators/READM
    - Explicitly state in `throw_close_basics.py` (line 1035) that `g.throw()` returns the next yielded value when the generator catches the exception and yields (Section 3.1).
    - Trim lines 295–298 so they don't spoil Exercise 2 (Section 3.2).
    - Link `VendingMachine` on first mention at line 1518 (Section 3.3) and reconcile the duplicate introduction of PEP 342's *trampoline* at line 1995 (Section 1.1 / Section 4).
+
+## Verdicts
+
+Tested 2026-11-04 against the chapter and runs under `uv run`
+(Python 3.15.1, `ty` on the pinned version). Applied items are in
+commit "ch45: apply the Antigravity r3 review" and its parent.
+
+- 1.1 Structure (fibonacci listings repeat chapter 22; gi_frame and
+  the semi-coroutine restriction sit at the end): **left for Bruce.**
+  The facts hold: chapter 22's `fibonacci_iterator.py` is the same
+  class, and chapters 05 and 22 both link
+  `#half-a-coroutine-by-design` for the frame explanation, so moving
+  that paragraph means retargeting both links. A restructuring is the
+  author's call.
+- 1.1 Duplicate introduction of PEP 342's trampoline: **applied.** The
+  second mention now refers back to `trap_generators_demo.py`.
+- 1.2 Async detour: **left for Bruce.** The section already states
+  that `AsyncGenerator` drops the return channel and `yield from`;
+  whether the two listings stay is structural.
+- 2.1 `close()` typed `None` by typeshed: **rejected.** `ty` reveals
+  `str | None` for `g.close()` on `Generator[str, None, str]`, and
+  `result: str = g.close()` fails for the `None` member, not for a
+  bare `None` return type. The chapter's claim is correct as written.
+- 2.1 Third outcome (cleanup raises another exception): **applied.**
+  Confirmed by a probe: the generator reaches `GEN_CLOSED` and the
+  exception comes out of `close()`.
+- 2.2a `run_all()` and a state that returns `None`: **applied.** The
+  review quoted a different version of the listing, but the fault is
+  real: `trampoline()` returns on `None` and `run_all()` did not
+  catch the `StopIteration`. `run_all()` now returns at `[4]`, and the
+  prose says so.
+- 2.2b Trace comparison holds for `MOVES` only: **applied.** Chapter
+  31's second run prints the entry message again; this chapter's does
+  not. The sentence now says "For `MOVES`".
+- 2.3 `synchronized_iterator()` vs `serialize_iterator()`:
+  **applied.** Chapter 19 says `synchronized_iterator()` takes the
+  generator function; the sentence here now says what it wraps.
+- 2.4 `@dataclass(eq=False)` on the two iterator classes: **applied.**
+  Chapter 22 states the rule at its `Fibonacci`.
+- 3.1 `throw()`'s return value unexplained: **applied**, one sentence
+  after the `[1]` walk.
+- 3.2 Lines 294-298 spoil exercise 2: **left for Bruce.** The
+  passage does describe the exercise's driver and its `None` result.
+  Dropping the last sentence ("The driver then returns `None` as the
+  result.") would keep the hazard and withhold the answer.
+- 3.3 Link `VendingMachine` on first mention: **applied.**
+- 3.4 Bridge from `Iterator[T]` to the three-parameter form:
+  **rejected.** The "Annotating a Generator" section opens with that
+  bridge.
+- 4.1, 4.2, 4.3: **rejected.** The quoted sentences ("That requires a
+  call to `next(g)`", "The reason is in the state diagram",
+  `yield_from_both.py`) are not in the chapter.
+- 4.4, 4.5, 4.8: same as 2.1, 2.2b, and 1.1 above.
+- 4.7 "We can modify `task_runner()`": **rejected.** Bruce's "we"
+  stays.
+- Section 5 exercise table: **rejected.** It describes nine exercises
+  (`countdown`, `accumulator`, `transact`, `temp_workspace`,
+  `round_robin`, ...) that are not this chapter's. The review's
+  executive summary also names listings the chapter does not have
+  (`return_value.py`, `two_way.py`, `running_average.py`,
+  `yield_from_both.py`, `close_ignores.py`). Every line number and
+  quotation was therefore checked against the file before anything
+  changed.
