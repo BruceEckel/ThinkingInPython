@@ -3215,15 +3215,20 @@ part of one thing while a second thing with the same kind of part is in
 the paragraph: a driver function beside a generator, an ordinary
 function beside a generator function, two generators. Name the owner:
 "the generator body", "`watch()`'s body", "`luring()`'s body", "the
-innermost body". The pointer cousin is R12.
+innermost body". The pointer cousin is R12. A heading has no previous
+sentence to supply the owner, so there the owner itself stands in for
+the part: "An Exception Raised in the Generator", not "in the Body".
 
 **Keep when.** The previous sentence names the owner and nothing else
 with a body is on the page; "its body" with one candidate; "the body of
 its loop".
 
-**Sightings.** 1 (eight sites in one chapter), `45_Effects--Generators`
-2026-11-01, Bruce: "which body?" and "look through the chapter to find
-places where 'generator body' would be more illuminating":
+**Sightings.** 1 (nine sites in one chapter), `45_Effects--Generators`
+2026-11-01 and 2026-11-04, Bruce: "which body?", "look through the
+chapter to find places where 'generator body' would be more
+illuminating", and on a heading, "'Body' is vague":
+- heading (2026-11-04, `f55d274f`): "### An Exception Raised in the
+  Body" -> "### An Exception Raised in the Generator"
 - "In both `[1]` and `[2]`, the body ends at the `yield`" -> "the
   generator body ends at the `yield`"
 - "It starts the body with `next()`" (a paragraph opening "A driver
