@@ -86,17 +86,29 @@ pass: it clears `tip prose`'s passive-voice and there-is warnings and
 cuts metadiscourse, empty frames, and expletive constructions; new
 passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
 section.
-`/literal`, `/positive`, `/straighten`, `/cohesion`, and `/antecedents`
-are the other prose passes. Since 2026-10-22 `/literal` and the
+`/literal`, `/positive`, `/straighten`, `/cohesion`, `/antecedents`,
+and `/ambiguity` are the other prose passes. Since 2026-10-22 `/literal` and the
 deep-review prose pass also look for and fix vague descriptions: an
 abstract noun, a pointer phrase, or a verdict standing where the
 sentence could say what the machinery does ("states the
 arrangement", "do that work", "the same shape of trace").
+`/ambiguity` (`.claude/skills/ambiguity/SKILL.md`, 2026-11-04) tests
+every sentence that counts, compares, coordinates, modifies, or limits
+for a second reading and rewrites it so only the reading the listing
+supports survives: a count with two units ("the first three runs" over
+three generators and four tags, the chapter 45 sentence that started
+it), a word with two senses in one passage, a modifier with two heads,
+an open "and" or "only" scope, a definite noun the listing has several
+of, a comparison missing its term, a connective with two senses. Its
+mechanical candidates come from `tip positional CH=NN ARGS=--survey`
+(the `count+unit` rule, added the same day) and the sentence-shape
+survey; shapes Bruce flags that its catalog lacks accrue in its
+"Accrued shapes" section.
 `/super-prose NN` (`.claude/skills/super-prose/SKILL.md`, 2026-11-02) runs all
-eight prose passes in the session, including `/activate`, over a
+nine prose passes in the session, including `/activate`, over a
 chapter or one section (`/super-prose 45 section "<heading>"`), and
 commits; it is the in-session form of `tip rewrite`.
-`tip rewrite CH=NN` runs these five plus `elements-of-style` and `bruce-edit-apply` by
+`tip rewrite CH=NN` runs these six plus `elements-of-style` and `bruce-edit-apply` by
 default; `tip rewrite ARGS=--list` shows the set and the model each
 pass runs on. Each pass can name its own model in `tools/rewrite.py`'s
 `PASSES`; `MODEL_NOTES` there records which model each

@@ -746,6 +746,11 @@ def positional(v: Vars) -> None:
     the watch-word scan. CH= picks one chapter and its Solutions file.
     Hits judged keeps live in tools/data/positional_refs_baseline.txt,
     so the run prints only new ones; ARGS=--all lists every hit.
+    Since 2026-11-04 the `count+unit` rule also lists a count on an
+    execution noun ("the first three runs", "both attempts"), where
+    the fault is a listing that offers two ways to count the unit; the
+    same shape on `call` and `time` prints under ARGS=--survey only and
+    is never baselined. The `ambiguity` skill reads both per chapter.
     """
     py("tools.positional_refs", *prose_files(v), *v.words("ARGS"))
 

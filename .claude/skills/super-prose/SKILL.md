@@ -1,9 +1,9 @@
 ---
 name: super-prose
-description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The eight passes are literal, positive, straighten, cohesion, antecedents, activate, bruce-edit-apply, and elements-of-style, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/super-prose" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
+description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The nine passes are literal, positive, straighten, cohesion, antecedents, ambiguity, activate, bruce-edit-apply, and elements-of-style, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/super-prose" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
 ---
 
-# Super-prose: the eight prose passes as one request
+# Super-prose: the nine prose passes as one request
 
 `/super-prose 45` or `/super-prose 45 section "The Driver's Exception Channel"`
 means: apply every prose pass the project defines, over that scope,
@@ -16,7 +16,7 @@ which `tip rewrite` cannot.
 
 ## The order
 
-Load all eight skills with the `Skill` tool before touching the
+Load all nine skills with the `Skill` tool before touching the
 prose, then read the scope once and apply them together.
 The order is the order the skills' own boundary notes give:
 each pass hands the next one less to do.
@@ -28,10 +28,14 @@ each pass hands the next one less to do.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
    one primary concept per paragraph.
 5. `antecedents`: every pointer with two candidates gets its noun.
-6. `activate`: passives with a natural actor, nominalizations,
+6. `ambiguity`: every sentence that counts, compares, coordinates,
+   modifies, or limits keeps one reading: a count with two units, a
+   word with two senses, a modifier with two heads, an open scope, a
+   definite noun the listing has several of, a missing comparand.
+7. `activate`: passives with a natural actor, nominalizations,
    metadiscourse, empty frames, tense drift.
-7. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
-8. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
+8. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
+9. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
    mostly needless words and emphatic words at the end.
 
 ## Before the read
@@ -41,8 +45,11 @@ scope's line range:
 
 - `tip negatives CH=NN` (for `positive`)
 - `tip pointers CH=NN` (for `antecedents`)
+- `tip positional CH=NN ARGS=--survey` (for `ambiguity`: `count+unit`,
+  the survey hits on `call` and `time`, `construct xN`, `ordinal+span`)
 - `tip sentence-shapes CH=NN ARGS=--survey` (for `straighten` and
-  `cohesion`: `[AND]`, `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`)
+  `cohesion`: `[AND]`, `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`;
+  `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too)
 - `tip watch-words CH=NN ARGS="--tier 1"` (negated subjects)
 
 Read `deep_review_db.md` and the chapter's most recent
