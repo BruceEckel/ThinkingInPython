@@ -1025,7 +1025,7 @@ print(inspect.getgeneratorstate(g))
 #: GEN_CLOSED
 ```
 
-In the first three runs the exception arrives in place of a value,
+At `[1]`, `[2]`, and `[3]` the exception arrives in place of a value,
 so the body goes from the `yield` straight to an `except` or `finally` clause,
 skipping `print("resumed")`.
 
