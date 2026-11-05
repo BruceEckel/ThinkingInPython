@@ -2007,9 +2007,10 @@ which hands one element at a time to a loop.
 
 PEP 255 kept the suspended frame and dropped a coroutine's ability to hand control to any other coroutine.
 Each `yield` hands control back to whoever called `next()` or `send()`.
-Handing control anywhere else means saving and restoring the C stack as well.
-Stackless Python's coroutines do that,
-and the PEP calls Stackless "a controversial rethinking of the Python core."
+In 2001, handing control anywhere else meant preserving part of the C stack along with the frame,
+because CPython ran each Python call inside a nested call of its interpreter.
+Stackless Python allows such a transfer by keeping Python's state off the C stack.
+The PEP calls Stackless "a controversial rethinking of the Python core."
 The suspended generator is the one-shot continuation that [What a Suspended Generator Holds](#what-a-suspended-generator-holds)
 describes.
 The restriction says who resumes it: the code that called `next()` or `send()`.
