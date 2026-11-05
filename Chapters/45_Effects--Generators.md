@@ -1808,13 +1808,38 @@ Each of the three returns an awaitable for the caller to `await`.
 
 ## Half a Coroutine by Design
 
-PEP 255 added generators to Python 2.2 in 2001 so that a function can produce values one at a time.
-The function pauses after each value.
-When the caller asks for the next value,
-the function resumes from the point where it paused.
-The need for that pause appears whenever the producer keeps state from one value to the next while the consumer has a loop of its own.
-The PEP's example, the standard library's `tokenize()`,
-keeps its place in the source text.
+A running function's position in its body is state, as its local variables are.
+Halfway through a loop, a function has done part of its work.
+Its position determines what it does next.
+
+A call preserves the caller's position and locals.
+The caller waits in the middle of its body and continues from that point when the call returns.
+The called function starts at its first line and loses its position and its locals when it returns.
+
+That difference matters when a producer computes a series of values,
+a consumer uses them one at a time,
+and each is simplest to write as a loop of its own.
+One of the two must call the other.
+The called function starts from its first line every time,
+so you rewrite its loop as a state machine:
+variables that hold the loop's locals and its position,
+and code that reads them on every call to find where to continue.
+
+Melvin Conway described that rewrite in 1963,
+in [a paper](https://www.melconway.com/Home/pdf/compiler.pdf)
+on the design of a one-pass COBOL compiler.
+His example is a subroutine that delivers one character per call.
+That subroutine needs "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call."
+A harder task, Conway notes,
+"would necessitate an absurd arrangement of switches."
+His alternative is the coroutine:
+a routine that passes control to another routine and later continues "at the point where it left off."
+Coroutines, he writes, are "subroutines all at the same level,
+each acting as if it were the master program when in fact there is no master program."
+
+PEP 255 added generators to Python 2.2 in 2001 so that a called function can hand a value to its caller and keep its position and its locals.
+The PEP's motivating example is the standard library's `tokenize()`,
+which keeps its place in the source text from one token to the next.
 A recursive tree walk keeps a whole recursion in progress between one node and the next.
 The consumer needs its own local variables and loops to track what it has seen,
 and it may stop early.
@@ -1972,9 +1997,9 @@ The execution frame lives on the heap inside the generator object,
 which exposes it as `gi_frame`, with its locals and position intact.
 The next `next()` links that frame back into the call stack.
 
-The PEP names Ralph Griswold's Icon language, with CLU and Sather,
-as the models.
-Icon's `suspend` statement produces a value and leaves the procedure ready to produce another.
+The PEP cites the "pleasant solutions" of three earlier languages:
+iterators in CLU and Sather, and generators in Ralph Griswold's Icon.
+Icon's `suspend` produces a value and leaves the procedure ready to produce another.
 CLU and Sather use the word `yield` for the same step inside an iterator,
 which hands one element at a time to a loop.
 
@@ -1994,10 +2019,17 @@ and since a generator cannot name that something, you write it.
 
 In May 1999, two years before the PEP,
 Tim Peters called generators "half a coroutine" on python-dev.
-The other half came with PEP 342, written in 2005,
-which added the send channel to Python 2.5 in 2006.
-Simulations, games, and asynchronous I/O need to pass a value or an exception into a generator at its suspension point,
-so `send()`, `throw()`, and `close()` arrived together.
+Coroutines, he wrote, are "equal partners," each free to resume any other,
+while a generator returns control to its caller.
+
+PEP 342, written in 2005, kept that restriction and added the send channel,
+which reached Python 2.5 in 2006.
+The PEP calls coroutines "a natural way of expressing" simulations, games,
+and asynchronous I/O.
+Such programs need to pass a value or an exception into a generator at its suspension point,
+which `send()` and `throw()` do.
+The PEP also permits `yield` inside `try`/`finally` and adds `close()`,
+so that an abandoned generator runs its cleanup code.
 The PEP describes a scheduler that runs many generators as a "trampoline,"
 the shape of `task_runner_send.py`.
 `yield from` (PEP 380, Python 3.3, 2012) completes the set.
