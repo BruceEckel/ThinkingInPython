@@ -626,6 +626,7 @@ Stackless keeps Python's state off the C stack, per Tismer's 2000 paper and PEP 
 Peters's "half" is the asymmetry, which PEP 342 kept (line 1997),
 and `close()` has its own reason (line 1999).
 The four Conway quotations in the new opening were compared with the page images of the 1963 paper, pages 396 and 397, and match.
+The IPL-V passage was compared the same way with page 209 of the April 1960 article and matches; the mark lost in extraction is a dash after "must coexist in the computer", before "that of the generator and that of the superprocess and subprocess".
 Three items stand as they were: the PEP 492 sentence (line 2008), the two "one-shot continuation" sentences, which match chapter 44's definition of a continuation, and the stackless half of "half a coroutine".
 
 ### PEP 255 and the 1999 debate (verdicts from `python_pep_255_decision.md`)
