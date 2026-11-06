@@ -640,6 +640,14 @@ An independent read of the new passages that day confirmed the six quotations an
 "A delegating generator passes all three channels through to the innermost generator" was wrong: `yield from` relays the yield and send channels to the driver, and the helper's return value stops at the delegating generator, as the value of the `yield from` expression.
 "The third way, older than PEP 255's generators" was imprecise: PEP 255 requires PEP 234 and names the iterator as "another alternative", so the chapter no longer dates the iterator class before generators.
 
+Three follow-ups went in later that day.
+The chapter opens with the reason a generator exists, and "Half a Coroutine by Design" begins by recalling that opening (`f4669e3e`).
+The second restriction is tied to `async` through PEP 492's statement that `await` "uses the `yield from` implementation" (`d6c22177`).
+Exercise 10 asks for PEP 255's tree walk as an iterator class, and its solution prints the class's stack beside the generator's `gi_yieldfrom` chain (`861f8516`).
+A second independent read found nothing wrong and five statements imprecise, corrected in `861f8516` and `c58392df`.
+A generator keeps its state across each `next()` or `send()`, where the new opening had said "between calls".
+An `await` suspends the `async` function that contains it, and each awaiting caller suspends at an `await` of its own, where the text had said "one frame" and "every caller".
+
 ### PEP 255 and the 1999 debate (verdicts from `python_pep_255_decision.md`)
 
 | Line | Chapter's wording | Verdict | Evidence |
