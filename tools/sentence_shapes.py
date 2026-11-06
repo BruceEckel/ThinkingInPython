@@ -181,8 +181,36 @@ parse cannot tell an implied second term ("for the same reason
 The book-wide read that day covered 194 candidates and rewrote 6, so
 the keeps dominate and a baseline would be the whole list.
 
-Four rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-and `[AND+REL]`, judged against a baseline. Six are survey rules, `SURVEY_RULES`: `[AND]`,
+`[PRT]` (2026-11-04, from a sentence the author marked in chapter 45)
+is a phrasal verb split around a noun-phrase object: "the driver
+carries the request out". The reader takes "carries the request" as a
+finished verb phrase, transport, and revises it when "out" arrives
+and turns the verb into "performs"; the particle holds the verb's
+meaning and lands last. The author's style puts the particle beside
+its verb whenever the object is a noun phrase, "carries out the
+request", "looks up the name", "turns off the sensor", "shuts down the
+generator". The rule (`split_particle()`) fires on a token with dep
+`prt` whose head verb precedes it, with a `dobj` of that verb between
+the two. Quiet by design: an object that is one of `LIGHT_OBJECTS`, a
+pronoun or the CODE placeholder, which English puts before the
+particle ("carries it out", "looks `name` up"); an object holding a
+number, which makes the particle a measure ("stops one level up",
+"three levels down"); a `QUIET_PARTICLES` particle, "through" or
+"over", whose verb has no joined form in the book's senses ("lets zero
+through", "starts the work over"); and a particle followed by one of
+`PATH_PREPOSITIONS`, which makes it the start of a path ("leaves the
+amount up to you", "sends a request up to the event loop"). It is a
+default rule because the repair is one word's move and the keeps are
+few: a joined form with another meaning ("pass the error up", since
+"pass up" declines; "pass the tuple on"), a directional pair ("passes
+the CODE up and the CODE down"), and a parser misread ("up front",
+"Putting the Pieces Together"). The book-wide read that day had 78
+candidates. A heading with the shape ("Telling the Wrappers Apart")
+takes one verb instead ("Distinguishing the Wrappers"), but headings
+are outside the paragraph reader, so the rule never sees one.
+
+Five rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
+`[AND+REL]`, and `[PRT]`, judged against a baseline. Six are survey rules, `SURVEY_RULES`: `[AND]`,
 plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, and `[SAME]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
@@ -316,6 +344,7 @@ RULES: Final = {
     "COLON+AND": "colon, then a clause with an and-joined clause",
     "PAIR": "a pair word whose and or or arrives from the next clause",
     "AND+REL": "an and-joined second subject after a relative clause",
+    "PRT": "a phrasal verb's particle after a noun-phrase object",
 }
 """The default rules: judged against the baseline."""
 SURVEY_RULES: Final = {
@@ -391,6 +420,23 @@ SAME_SUBJECTS: Final = frozenset("it they he she we you i".split())
 (\"the same cls it received\"), which is the second term."""
 SAME_PUNCT: Final = frozenset(".,:;)")
 """Punctuation after \"same\" that makes it a predicate."""
+LIGHT_OBJECTS: Final = frozenset(
+    "it them this that one you me us each both all some something "
+    "anything nothing everything code".split())
+"""An object English puts before the particle: a pronoun ("carries it
+out", "gives something up"), or the CODE placeholder a code span
+becomes ("looks `name` up"), one word the reader does not hold the
+verb open across."""
+QUIET_PARTICLES: Final = frozenset({"through", "over"})
+"""Particles whose verb has no joined form in the book's senses: "lets
+zero through", "passes the string through", "starts the work over",
+"leaves one student over"."""
+PATH_PREPOSITIONS: Final = frozenset(
+    "to of into onto from toward towards".split())
+"""A preposition right after the particle makes it the start of a path
+("leaves the amount up to you", "sends a request up to the event loop",
+"follow the traceback down to the call"), where the object stays
+before it."""
 
 CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     # (rule, text, should it fire)
@@ -462,6 +508,13 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("SAME", "Alternative constructors need `Self` for the same reason `bump()` does.", False),
     ("SAME", "`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.", False),
     ("SAME", "The code runs the same with or without them.", False),
+    ("PRT", "A generator yields a request and waits while the driver carries the request out.", True),
+    ("PRT", "A generator yields a request and waits while the driver carries out the request.", False),
+    ("PRT", "The driver carries it out.", False),
+    ("PRT", "`pickle` looks the class up as `shapes.Circle` and does not find it.", True),
+    ("PRT", "Gradual typing leaves the amount up to you.", False),
+    ("PRT", "The `Result` that `ask()` returns stops one level up.", False),
+    ("PRT", "`check()` rejects negatives but lets zero through.", False),
 )
 """The style rules' own examples: (rule, text, should it fire)."""
 
@@ -977,12 +1030,53 @@ def same_pointer(sentence: Sentence) -> bool:
     return False
 
 
+def split_particle(sentence: Sentence) -> bool:
+    """Does a phrasal verb's particle follow a noun-phrase object?
+
+    A token with dep `prt` whose head is a verb before it, with a
+    `dobj` of that verb between the two whose subtree is more than one
+    of `LIGHT_OBJECTS`: "carries the request out", "looks the name
+    up". The reader takes "carries the request" as a finished verb
+    phrase and then revises it when "out" arrives; the repair puts the
+    particle beside its verb, "carries out the request". A pronoun
+    object stays between them because English puts it there. Quiet:
+    a `QUIET_PARTICLES` particle, and a particle that opens a path
+    (`PATH_PREPOSITIONS` right after it: "leaves the amount up to you").
+    """
+    toks = sentence.tokens
+    for tok in toks:
+        if tok.dep != "prt" or tok.lemma.lower() in QUIET_PARTICLES:
+            continue
+        after = toks[tok.i + 1] if tok.i + 1 < len(toks) else None
+        if after is not None and after.text.lower() in PATH_PREPOSITIONS:
+            continue
+        verb = toks[tok.head]
+        if verb.pos not in ("VERB", "AUX") or verb.i >= tok.i:
+            continue
+        for child in children(verb, sentence):
+            if child.dep not in ("dobj", "obj"):
+                continue
+            if not verb.i < child.i < tok.i:
+                continue
+            words = [toks[i] for i in sorted(subtree(child, sentence))
+                     if not toks[i].punct]
+            if (len(words) == 1
+                    and words[0].text.lower() in LIGHT_OBJECTS):
+                continue
+            if any(w.pos == "NUM" for w in words):
+                continue  # a measure: "stops one level up"
+            return True
+    return False
+
+
 def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph."""
     if skipped(paragraph):
         return
     previous: Sentence | None = None
     for sentence in paragraph.sentences:
+        if split_particle(sentence):
+            yield "PRT", sentence
         if previous is not None and additive_after_new_subject(
                 sentence, previous):
             yield "ADD", sentence

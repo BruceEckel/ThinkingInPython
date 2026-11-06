@@ -28,7 +28,9 @@ Chapters/07_Foundations--Classes.md	The first read	The first read of a `cached_p
 Chapters/07_Foundations--Classes.md	the first read	`total` is *lazily initialized*, created on first use, so the method runs at the first read rather than when the constructor runs.
 Chapters/08_Foundations--Static_Types.md	the line that	The wrong value causes a failure later, often far from the line that produced it.
 Chapters/09_Foundations--Class_Attributes.md	the first read	No attribute exists until something assigns one, so the first read raises an `AttributeError`.
+Chapters/10_Foundations--Cleanup.md	next run	An unreachable cycle stays in memory until the collector's next run, so in a real program the allocation counts, rather than your code, decide when the cycle goes away.
 Chapters/10_Foundations--Cleanup.md	the `with` block	`__exit__()` calls `close()`, so `close()` runs at the end of the `with` block, at a line you can identify.
+Chapters/12_Techniques--Data_Classes_as_Types.md	three runs	Because none of the three runs `__init__()` or `__post_init__()`, each can produce a `Stars` holding a number that no check saw.
 Chapters/13_Techniques--Pattern_Matching.md	the last `case`	When the capture is the last `case`, as here, Python compiles the `match` silently, and the type checker accepts it.
 Chapters/13_Techniques--Pattern_Matching.md	the next `case`	When a guard is false, `match` tries the next `case`, but the names stay bound.
 Chapters/13_Techniques--Pattern_Matching.md	the next `case`	`case [a, b]` matches a two-element `range`, but for a generator or a `set`, `match` moves on to the next `case`.
@@ -42,23 +44,38 @@ Chapters/16_Techniques--Comprehensions.md	The inner `for col`	The inner `for col
 Chapters/16_Techniques--Comprehensions.md	the next statement	A list comprehension evaluates its output expression for every element before the next statement runs, so it reads `factor` at creation.
 Chapters/16_Techniques--Comprehensions.md	the outer `e`	The `e` inside the brackets is a different name from the `e` outside them, so the outer `e` keeps its value.
 Chapters/16_Techniques--Comprehensions.md	the outer `for row`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
+Chapters/16_Techniques--Comprehensions.md	two passes	It needs two passes, one to size the result and one to fill it, so it converts its argument to a list first.
 Chapters/17_Techniques--Metaprogramming.md	The last call	The last call drops that row, for the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes) passes `exclude=("__hash__",)`.
 Chapters/17_Techniques--Metaprogramming.md	The next lookup	The next lookup of that name finds the stored class, so `__missing__()` builds each class once.
 Chapters/17_Techniques--Metaprogramming.md	the first call	`__new__()` and `__init__()` run once per class, on the first call.
 Chapters/17_Techniques--Metaprogramming.md	the first lookup	On the first lookup of an event type, `EventMakers` builds the class and registers it under its name, so `LightOn` gets one `Creating` line though `SCHEDULE` names it twice.
 Chapters/17_Techniques--Metaprogramming.md	the lines that	The type checker never runs the metaclass, so it reports the lines that use those changes as errors.
 Chapters/18_Techniques--Performance.md	The first call	The first call stops to compile.
+Chapters/18_Techniques--Performance.md	each pass	`timeit` compiles the string into the body of its timing loop, so each pass runs the snippet inline.
+Chapters/18_Techniques--Performance.md	second pass	Fitting the whole data set in memory gives you more than a second pass.
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
+Chapters/19_Techniques--Concurrency.md	Both runs	Both runs use the same `asyncio.gather()`, yet the peaks differ.
+Chapters/19_Techniques--Concurrency.md	Each round	Each round, both tasks find the other still wanting the resource, so both give and neither clears its entry in `wants`.
 Chapters/19_Techniques--Concurrency.md	The last line	The last line shows what `main()` reads after its tasks finish.
+Chapters/19_Techniques--Concurrency.md	each round	(The `sleep(0)` is a stand-in for a database query or an HTTP call.) In each round all eight tasks read the same value before any of them writes, so their eight writes store the same result.
 Chapters/19_Techniques--Concurrency.md	the `try` block	A bare `ValueError` raised into an `except* ValueError` clause arrives as a group of one, so an `except*` handler always reads its exceptions from `.exceptions`, whether the `try` block raised a group or a single exception.
 Chapters/19_Techniques--Concurrency.md	the outer `except ExceptionGroup`	The remaining members propagate as a new group that keeps the original message, so the outer `except ExceptionGroup` catches the `KeyError` alone.
+Chapters/19_Techniques--Concurrency.md	three rounds	`range(3)` stops the listing after three rounds so it can report `resolved: False`.
 Chapters/20_Patterns--Rethinking_Objects.md	The final `def`	The final `def` is the function that runs.
 Chapters/22_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
+Chapters/22_Patterns--Iterators.md	every pass	`Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass, so you can iterate over it repeatedly.
+Chapters/22_Patterns--Iterators.md	second pass	A `Countdown` produces the same values on a second pass.
+Chapters/22_Patterns--Iterators.md	second pass	Both branches see all five squares, so `tee()` delivers the second pass the generator cannot.
 Chapters/22_Patterns--Iterators.md	the first `next()`	The check at the top of its body waits for the first `next()`.
 Chapters/23_Patterns--Singleton.md	the first assignment	If you drop the inner test, every thread that passed the outer test before the first assignment builds its own object, one after another.
 Chapters/23_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list, where the metaclass form discards it.
 Chapters/23_Patterns--Singleton.md	the first call	That override skips `__new__()` and `__init__()` on every later construction, so only the first call's arguments reach the constructor.
 Chapters/23_Patterns--Singleton.md	the first call	When the inner object is ready to build before the first call, you can create it eagerly in the class body, `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
+Chapters/23_Patterns--Singleton.md	three passes	Calling `singleton` with those three passes four positional arguments to `singleton.__init__()`, which takes two.
+Chapters/24_Patterns--Template_Method.md	Each pass	Each pass calls the step, so each pass must perform it.
+Chapters/24_Patterns--Template_Method.md	each pass	Each pass calls the step, so each pass must perform it.
+Chapters/24_Patterns--Template_Method.md	every pass	An unexpected exception, an empty step the flow needs, and a skipped pass each stop `run()` from performing every step on every pass.
+Chapters/24_Patterns--Template_Method.md	every pass	With `lambda: None` as the default, the loop calls both steps on every pass.
 Chapters/25_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup finds the proxy's `level`, so Python skips `__getattr__()`.
 Chapters/25_Patterns--Surrogate.md	the second call	With the guard, the second call to `__getattr__()` reports the typo by name.
 Chapters/26_Patterns--Factory.md	the first `build()`	Every `.topping()` call after the first `build()` adds to that same list, so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
@@ -66,10 +83,12 @@ Chapters/26_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` 
 Chapters/26_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/26_Patterns--Factory.md	the line that	[Explicit Registration with a Protocol](#explicit-registration-with-a-protocol) makes the checker report a class that lacks `draw()` at the line that registers it.
 Chapters/29_Patterns--Changing_the_Interface.md	The first line	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
+Chapters/29_Patterns--Changing_the_Interface.md	each trace	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, and Python evaluates an annotation lazily, so by the first call the whole module has loaded and `TrapState` exists.
 Chapters/32_Patterns--Multiple_Dispatching.md	The last case	The last case shows why the sentinel exists.
 Chapters/33_Patterns--Visitor.md	the last line	In the last line of `bug_visits.py`'s output, both dispatches change the result, because `Chrysanthemum` overrides `eat()` (chrysanthemums really do produce a natural insecticide).
 Chapters/33_Patterns--Visitor.md	the next `def _`	`@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name, so every implementation stays in the table.
+Chapters/35_Patterns--Flyweight.md	each run	Its C implementation runs the lookup, the call to your function, and the store as three separate steps, so threads that all miss on the same key each run the function and each keep their own result.
 Chapters/35_Patterns--Flyweight.md	the first call	`@cache` stores each result under its argument, so every call with the same symbol returns the object the first call built.
 Chapters/36_Patterns--Memento.md	The final `Drawing`	The final `Drawing` alone costs two thousand.
 Chapters/36_Patterns--Memento.md	the line that	`restored.title` raises `AttributeError` when anything reads it, often far from the line that called `pickle.loads()`.
@@ -77,9 +96,12 @@ Chapters/37_Patterns--Pattern_Refactoring.md	The earlier `sum_value()`	The earli
 Chapters/37_Patterns--Pattern_Refactoring.md	several lines before	A `type` statement's right side evaluates lazily, so the alias can name `Trash` several lines before the `class` statement that defines it.
 Chapters/37_Patterns--Pattern_Refactoring.md	the first `Plastic:`	Without that `class` statement, `create()` raises a `KeyError` at the first `Plastic:` line, loudly, at parse time.
 Chapters/37_Patterns--Pattern_Refactoring.md	the first call	When the default answer is wrong for an unregistered material, the *Visitor* chapter advises making the base function raise `NotImplementedError`, so a forgotten registration fails at the first call (see exercise 5).
+Chapters/38_Patterns--Simulation.md	each run	`groupby()`, with the same key, then walks the sorted list in one pass, yielding each run of matching letters, and `pair = list(group)` collects each run.
+Chapters/40_Functional--Foundations.md	second pass	Once a `list()` call or a `for` loop has consumed the iterator, a second pass over the same object finds it silently empty.
 Chapters/40_Functional--Foundations.md	the first call	`total` is still 5 from the first call, so the second call returns 10.
 Chapters/40_Functional--Foundations.md	the next call	`withdraw()` returns a different answer each time, because each call changes `balance` and the next call reads the new value.
 Chapters/40_Functional--Foundations.md	the second call	`total` is still 5 from the first call, so the second call returns 10.
+Chapters/41_Functional--Toolkits.md	Each round	Each round is a shuffle, then a greedy choice repeated until the pool is empty, in place of the circle method's rotation around a stationary player.
 Chapters/41_Functional--Toolkits.md	The last case	The last case asks for groups of five from a roster of two:
 Chapters/41_Functional--Toolkits.md	the final `1`	`dropwhile()` stops testing once the predicate fails, so it yields the final `1`.
 Chapters/41_Functional--Toolkits.md	the first `got`	An eager function prints every `computing square` line before the first `got`.
@@ -91,22 +113,50 @@ Chapters/42_Functional--Error_Handling.md	the first `Err`	In `combining.py`, the
 Chapters/42_Functional--Error_Handling.md	the first call	`add_note()` appends each note to a list, `__notes__`, which the first call creates.
 Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdraw(30)` evaluates to `70`, so substituting `70` for it ought to leave the result at `110`.
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.
+Chapters/43_Functional--Confidence.md	every run	The `assert` passes on every run, because a pure call returns the same answer in any process, at any time.
+Chapters/43_Functional--Confidence.md	every run	`database=None` turns off the example database, so every run searches from scratch.
+Chapters/43_Functional--Confidence.md	every run	`derandomize=True` seeds the search from a hash of the test function, so this book gets the same answer on every run.
+Chapters/43_Functional--Confidence.md	every run	`random.seed(42)` makes the hand-written loop draw the same strings on every run.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes `interview()`'s body, which encounters `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	The next `next()`	The next `next()` links that frame back into the call stack.
+Chapters/45_Effects--Generators.md	The outer `except GeneratorExit`	The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
 Chapters/45_Effects--Generators.md	The outermost `visit()`	The outermost `visit()` returns the `Counter` for the whole garden to `census()`.
+Chapters/45_Effects--Generators.md	each pass	`async for` is an `await` in loop form: on each pass it awaits the generator's `__anext__()`.
+Chapters/45_Effects--Generators.md	second run	In the second run, `drive()` sees two requests instead of three.
+Chapters/45_Effects--Generators.md	second run	The listing's second run shows a state that stays.
 Chapters/45_Effects--Generators.md	the `for` loop	A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`, and reaches the `for` loop at the bottom of the listing.
 Chapters/45_Effects--Generators.md	the first `yield`	Code before the first `yield` is the state's entry action, the Moore shape, where the action belongs to the state.
+Chapters/45_Effects--Generators.md	the inner `try`	No `except` clause names `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
+Chapters/45_Effects--Generators.md	the inner `try`	The exception leaves the inner `try` through its `finally` block, which prints `cleanup`.
 Chapters/45_Effects--Generators.md	the innermost `yield`	Every transition nests one generator deeper, and each `next()` passes through every level on its way to the innermost `yield`.
 Chapters/45_Effects--Generators.md	the innermost `yield`	Python raises `Failed` at the innermost `yield`, in the card step.
 Chapters/45_Effects--Generators.md	the last call	Conway calls that test "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call." A harder task, he notes, "would necessitate an absurd arrangement of switches."
 Chapters/45_Effects--Generators.md	the next call	The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function) alive and resumes it on the next call.
+Chapters/45_Effects--Generators.md	the outer `except GeneratorExit`	No `except` clause names `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
+Chapters/46_Effects--Stateless.md	both runs	The type checker accepts both runs alike, because both bindings have the same type.
+Chapters/46_Effects--Stateless.md	both runs	`greet()` runs the same body in both runs.
+Chapters/46_Effects--Stateless.md	second run	Storing one in a registry to run later, handing the same one to two consumers, or keeping one around to retry after a failure---each of these returns `None` on the second run instead of raising an exception.
+Chapters/46_Effects--Stateless.md	second run	The second run wraps `greet()` in its own `supply()` first, and that inner `supply()` empties the Ability channel before any request reaches `fallback`.
 Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
+Chapters/47_Effects--Stateless_in_Practice.md	Each run	Each run's last line is the outcome that `report()` returns.
 Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop then calls `plug()` again for a replacement.
 Chapters/47_Effects--Stateless_in_Practice.md	The second call	The second call's answer comes from `db1`'s cache entry, because `memoize()` keys on `"Morty"` alone.
+Chapters/47_Effects--Stateless_in_Practice.md	each run	Those lines therefore record where each run stopped.
+Chapters/47_Effects--Stateless_in_Practice.md	first run	The first run is the baseline: one attempt, no retry, and it fails.
+Chapters/47_Effects--Stateless_in_Practice.md	first run	The object answering the need changes: four objects in turn during the first run.
+Chapters/47_Effects--Stateless_in_Practice.md	four runs	The four runs of one program differ only in what you supply.
+Chapters/47_Effects--Stateless_in_Practice.md	second run	`run_load()` draws from the source `plug()` hands it, so the second run prints a different trace from the same code.
 Chapters/47_Effects--Stateless_in_Practice.md	the inner loop	`draw()` returns `None` on success, so anything else in `failure` is the `Drained` that ends the inner loop.
-Chapters/47_Effects--Stateless_in_Practice.md	the last handler	`handle()` is `drive()` with a type lookup in place of the dictionary, `run()` is that loop applied after the last handler, and `supply()` is `handle()` prepackaged for `Need`: a handler whose answer to `Need[T]` is whichever supplied instance is a `T`.
+Chapters/47_Effects--Stateless_in_Practice.md	the last handler	`handle()` is `drive()` with a type lookup in place of the dictionary, `run()` is that loop applied after the last handler, and `supply()` is `handle()` prepackaged for `Need`: a handler whose answer to `Need[T]` is the supplied instance that is a `T`.
 Chapters/47_Effects--Stateless_in_Practice.md	the next line	The stop comes before the `need(Encyclopedia)` on the next line, and so before any call to `Library.article()`.
+Chapters/47_Effects--Stateless_in_Practice.md	third run	The error becomes `RetryError[Crashed]`, which is why the third run catches `RetryError` rather than `Crashed`.
+Chapters/47_Effects--Stateless_in_Practice.md	third run	The third run counts them there, after the `match` narrows `outcome` from `str | RetryError` to the error.
+Chapters/47_Effects--Stateless_in_Practice.md	three attempts	The same schedule that governed three attempts now governs three repetitions of `save_user()`, and the tuple holds every result in order.
+Chapters/47_Effects--Stateless_in_Practice.md	three runs	Those three runs are claims about testability, so each one becomes a test.
+Chapters/47_Effects--Stateless_in_Practice.md	two runs	Apart from their lengths, the two runs differ only in the order of the tuple passed to `controller()`.
+Chapters/B_An_Effect_Checker.md	second run	With the stub, `requests.get` is a declared function like any other, and the second run prints its row, `['Network']`.
+Chapters/B_An_Effect_Checker.md	second run	`fetch()` declares `Network` too, so the second run accepts `fetch()`.
 Chapters/B_An_Effect_Checker.md	the first assignment	If it kept the first assignment's type, `path.read_text()` would resolve to `builtins.str.read_text`.
 Chapters/B_An_Effect_Checker.md	the third line	`hides()` is the third line of Appendix A's rule, "the Effects f handles," in the weakest form you can write without handlers.
 Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except` clause specifies `ValueError`, so the `TypeError` propagates past it.
@@ -122,13 +172,22 @@ Solutions/08_Foundations--Static_Types/README.md	the second line	**Narrow a name
 Solutions/09_Foundations--Class_Attributes/README.md	the first `Sub()`	`vars(Sub).get("total")` prints `None` before the first `Sub()`, then `2` and `3` after each call, while `Base.total` stays at `1`.
 Solutions/09_Foundations--Class_Attributes/README.md	the first `vars()`	`uv run ty check` passes on your file, the first `vars()` shows `holder` alone, and the read inside `expected(AttributeError)` reports `'Ticket' object has no attribute 'seat'`.
 Solutions/10_Foundations--Cleanup/README.md	The `with` statement	The `with` statement calls `__exit__()` only for a block it has entered, and it enters the block only after `__enter__()` returns.
+Solutions/10_Foundations--Cleanup/README.md	every run	This small program still prints the same transcript every run, because the explicit `gc.collect()` runs before the program has allocated enough objects to start an automatic pass, so that call sets the moment of collection.
 Solutions/10_Foundations--Cleanup/README.md	the last `Counter`	**Abandon the old list.** `counters.clear()` empties the existing list in place, dropping its reference to the last `Counter` object.
 Solutions/10_Foundations--Cleanup/README.md	the last `Counter`	With two references, rebinding leaves the last `Counter` object alive, and `live_count()` still returns `1`.
+Solutions/11_Techniques--Testing/README.md	each run	**Run one body per rate.** `parametrize` runs this one test body four times, once per rate, and `pytest` reports each run as `test_add_interest_rates[0.0]`, `test_add_interest_rates[0.05]`, and so on.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	the first `@`	`partition()` splits at the first `@`, and the domain half, `"@x.com"`, holds text.
 Solutions/13_Techniques--Pattern_Matching/README.md	at line 43	The second is the same diagnostic at line 43, in `cost()`.
 Solutions/13_Techniques--Pattern_Matching/README.md	the final `case _`	If you delete the final `case _` from the second version, the script prints the same two lines, but `ty` reports `invalid-return-type`.
 Solutions/13_Techniques--Pattern_Matching/README.md	the last case	Python accepts `case FALLBACK:` because it is the last case, and rejects any case after it with a `SyntaxError`.
 Solutions/14_Techniques--Decorators/README.md	The outermost decorator	The outermost decorator prints first and last, and each inner layer's output appears nested in between.
+Solutions/14_Techniques--Decorators/README.md	every attempt	A real `retry` should take the exception types to retry as an argument, because some failures repeat on every attempt.
+Solutions/14_Techniques--Decorators/README.md	every run	The listing prints a deterministic check, because the raw number changes every run while the `#:` marker stays constant.
+Solutions/14_Techniques--Decorators/README.md	final attempt	**Make the last attempt unguarded.** The final attempt meets two requirements at once.
+Solutions/14_Techniques--Decorators/README.md	final attempt	The solution makes the final attempt outside the `try`.
+Solutions/14_Techniques--Decorators/README.md	last attempt	**Make the last attempt unguarded.** The final attempt meets two requirements at once.
+Solutions/14_Techniques--Decorators/README.md	last attempt	A `TypeError` from a bad call signature fails the same way each time, so retrying it repeats the failure until the last attempt raises `TypeError` to the caller.
+Solutions/14_Techniques--Decorators/README.md	last attempt	If you re-raise the exception from inside the loop with a bare `raise` on the last attempt, `retry` works at runtime.
 Solutions/14_Techniques--Decorators/README.md	the final `print()`	Both `decorating` lines still print, but the final `print()` raises an `AttributeError`, since `None` has no `__name__`.
 Solutions/14_Techniques--Decorators/README.md	the first call	A repeated call returns its cached result silently, a third distinct call evicts the first so repeating the first call prints again, a call with a keyword argument works, and both functions keep their `__name__`.
 Solutions/14_Techniques--Decorators/README.md	the first call	If you key the cache on `(args, kwargs)`, the first call, `square(4)`, raises a `TypeError`.
@@ -144,8 +203,13 @@ Solutions/17_Techniques--Metaprogramming/README.md	the final lookup	with the che
 Solutions/17_Techniques--Metaprogramming/README.md	the first definition	No class decorator can keep the first definition, and neither can `__init_subclass__()` or `__set_name__()`.
 Solutions/17_Techniques--Metaprogramming/README.md	the second `on_open`	Python still builds the second `on_open` function and passes it to `__setitem__()`, where the early return discards it.
 Solutions/17_Techniques--Metaprogramming/README.md	the second call	your edited `singleton.py` prints `True` for `c1 is c2` and `False` for `c1 is a`, and its trace shows `building CSingleton` once, followed by `reusing CSingleton` on the second call.
+Solutions/17_Techniques--Metaprogramming/README.md	three runs	That assignment drops the last reference to the first function, so Python frees the first function before any of the three runs.
 Solutions/18_Techniques--Performance/README.md	The last line	**Expose the inherited `__slots__`.** The last line shows why the subclass's `__dict__` is easy to miss.
 Solutions/18_Techniques--Performance/README.md	the first call	The cache lets that side effect run on the first call with a given argument and silently skips it on every repeat.
+Solutions/18_Techniques--Performance/README.md	two runs	On a `True False` build, the comparison is two runs of the same file that differ in `PYTHON_JIT` alone.
+Solutions/18_Techniques--Performance/README.md	two runs	On a python.org 3.15 build, the `--numbers` lines from the two runs differ by about as much as two runs under the same setting.
+Solutions/19_Techniques--Concurrency/README.md	every run	your edited `priority_queue.py` prints six tuples in the same order on every run, opening with `(1, 'alert')`, `(1, 'page oncall')`, `(1, 'zzz')` and closing with `(3, 'aaa')`, `(3, 'backup')`.
+Solutions/19_Techniques--Concurrency/README.md	several runs	your edited `gil_race.py` prints `lost updates: False` on each of several runs on the standard build, and you can name the kind of statement that, placed between the read and the write, makes it print `lost updates: True` again.
 Solutions/19_Techniques--Concurrency/README.md	the `for` statement	**Take each item unguarded.** `for item in source:` is the `for` statement calling `source.__next__()`, and that call runs before control reaches the indented block.
 Solutions/19_Techniques--Concurrency/README.md	the first `resumed`	your edited `async_mechanics.py` prints `d: started` as the fourth `started` line and `d: resumed` as the first `resumed` line, and the final list reads `['A', 'B', 'C', 'D']`, in argument order.
 Solutions/19_Techniques--Concurrency/README.md	the fourth `started`	your edited `async_mechanics.py` prints `d: started` as the fourth `started` line and `d: resumed` as the first `resumed` line, and the final list reads `['A', 'B', 'C', 'D']`, in argument order.
@@ -153,11 +217,17 @@ Solutions/19_Techniques--Concurrency/README.md	the line before	`ty` rejects the 
 Solutions/19_Techniques--Concurrency/README.md	the next `next()`	The `with lock:` inside the body therefore starts after `next()` has returned a number, and ends before the next `next()` begins.
 Solutions/19_Techniques--Concurrency/README.md	the third `pool.submit(enqueue, ...)`	**Add a third producer.** The one change is the third `pool.submit(enqueue, ...)`.
 Solutions/20_Patterns--Rethinking_Objects/README.md	the last line	Without the `# type: ignore` on the last line, `ty` rejects the call:
+Solutions/22_Patterns--Iterators/README.md	Each pass	Each pass recomputes the values from scratch.
 Solutions/22_Patterns--Iterators/README.md	The following `next(it)`	The following `next(it)` returns `4`.
+Solutions/22_Patterns--Iterators/README.md	second pass	This `squares()` leaves out the chapter's trace line, since the exercise is about the second pass.
 Solutions/22_Patterns--Iterators/README.md	the line that	With `typed()`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
 Solutions/22_Patterns--Iterators/README.md	the next `next()`	over `(x * 2 for x in [1, 2, 3])`, three calls to `peek()` print `2 2 2`, the next `next()` still returns `2`, `list()` of the rest gives `[4, 6]`, and `peek()` then reports the end.
 Solutions/22_Patterns--Iterators/README.md	the next `yield`	Each time something asks a generator for a value, its body runs to the next `yield` and pauses there.
 Solutions/22_Patterns--Iterators/README.md	the next call	A generator pauses inside its `for` loop at each `yield` and resumes there on the next call, so the loop that skips is the loop that yields.
+Solutions/22_Patterns--Iterators/README.md	two passes	each fix prints `[0, 1, 4, 9, 16]` on two passes in a row, where `generator_lifecycle.py` printed an empty list the second time.
+Solutions/23_Patterns--Singleton/README.md	Each run	**Reset the state on every construction.** Each run of `__init__()` rebinds `val` to a new one-item list, discarding the list before it.
+Solutions/24_Patterns--Template_Method/README.md	every pass	`pending` grows on every pass.
+Solutions/24_Patterns--Template_Method/README.md	first pass	**Raise an unexpected exception.** `Exploder` breaks the algorithm on the first step of the first pass.
 Solutions/25_Patterns--Surrogate/README.md	The first `query()`	The first `query()` then reports `0 answered before build`.
 Solutions/25_Patterns--Surrogate/README.md	the first `query()`	The proxy serves three requests from a string it holds from the start and defers the slow construction until the first `query()`.
 Solutions/25_Patterns--Surrogate/README.md	the first `query()`	your `exercise_1.py` prints the `description` three times before any build message appears, and the first `query()` then prints `3 answered before build` ahead of `Expensive built`.
@@ -165,21 +235,35 @@ Solutions/26_Patterns--Factory/README.md	the fifth `.topping()`	That builder che
 Solutions/26_Patterns--Factory/README.md	the line that	The type checker reports the line that constructs that factory.
 Solutions/26_Patterns--Factory/README.md	the line that	You can name the line that registers `Circle` and when it runs.
 Solutions/27_Patterns--Function_Objects/README.md	a few lines earlier	`EVENTS` holds the original class, so `handler()` raises `TypeError: Announce: not an @event`, although `Deposit` went through `@event` a few lines earlier.
+Solutions/27_Patterns--Function_Objects/README.md	each attempt	**Name each attempt.** Python stores each function's name in its `__name__` attribute, so the report reads `finder.__name__` to name the handler that ran, with no extra bookkeeping.
+Solutions/27_Patterns--Function_Objects/README.md	every attempt	The solution gives each finder a failure value that holds a reason and has `first_root()` report every attempt:
 Solutions/27_Patterns--Function_Objects/README.md	the first `@handler`	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 Solutions/27_Patterns--Function_Objects/README.md	the first handler	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 Solutions/27_Patterns--Function_Objects/README.md	the line that	running your macro and then undoing it returns the state your commands changed to its starting value, with the commands reversed last to first, and `uv run ty check` passes on your file, including the line that calls each command's `undo()`.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	The line that	The line that reads `result.mean` and `result.count` breaks.
+Solutions/31_Patterns--State_Machines/README.md	each pass	`yield` leaves the execution frame alive between one move and the next, so the variable survives with it, and the loop over `range(count)` is the engine: each pass reads the state, picks a successor, and stores the pick back.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	each round	Across two hundred seeds, each of the three kinds wins `meeting(5)` at least once, so the outcome depends on the random draws each round, as it does in a real rock-paper-scissors tournament.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	the first `next()`	Calling a generator function returns a generator object, and the body starts at the first `next()`.
 Solutions/35_Patterns--Flyweight/README.md	the first `make_color()`	If you keep `@record` on `Color`, the first `make_color()` call raises a `TypeError` at `_pool[key] = found`, because the `WeakValueDictionary` cannot create a weak reference to a slotted `Color` with no `__weakref__` slot.
 Solutions/37_Patterns--Pattern_Refactoring/README.md	the first call	**Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the material at the first call.
 Solutions/38_Patterns--Simulation/README.md	The fifth `claim()`	The fifth `claim()` finds the script empty, so `next()` raises a `StopIteration` inside the coroutine, and Python turns it into a `RuntimeError` ("coroutine raised StopIteration") that fails the test.
+Solutions/38_Patterns--Simulation/README.md	every run	If you test the broken `claim()` on `amaze.txt`, the count of `True` returns equals `len(visited)` on every run, and the inserted `await` looks harmless.
 Solutions/38_Patterns--Simulation/README.md	the last `Food`	on the chapter's `MAZE`, your tour prints `16 meals, 282 moves`, `game.robot.finished` is `True` at the end, and the search for food returns `None` once the last `Food` is eaten, so the script reaches the walk to the `!`.
 Solutions/40_Functional--Foundations/README.md	the first `tally()`	Running the program raises an `UnboundLocalError` at the first `tally()` call: "cannot access local variable 'count' where it is not associated with a value." The type checker points at the assignment that went wrong.
 Solutions/40_Functional--Foundations/README.md	the first call	With `nonlocal` deleted, `ty` reports `unresolved-reference` on `count += step`, and the first call raises an `UnboundLocalError`.
 Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` group replaces the first under the same key, so the result holds one of the two `"b"` items.
+Solutions/41_Functional--Toolkits/README.md	every run	The `rng` version also lets a caller pass `random.Random()`, which seeds itself from the operating system, and get schedules that differ on every run.
+Solutions/41_Functional--Toolkits/README.md	first round	The first round is the same one `pair_rounds.py` prints, because the default `seed: int = 0` builds `random.Random(0)` internally.
+Solutions/41_Functional--Toolkits/README.md	first round	with the chapter's eight students in groups of two, two calls given separate `random.Random(0)` objects produce the same first round, `Gia-Eve Hal-Bo Di-Fi Ana-Cy`, the first round `pair_rounds.py` prints.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` fills the third slot and the second `square(1)` becomes a hit.
+Solutions/43_Functional--Confidence/README.md	all runs	Nearly all runs split between `'µ'` and `'ß'`, since the shrinker sometimes stops at a failing character other than the smallest.
+Solutions/43_Functional--Confidence/README.md	each run	When each run starts with an empty `.hypothesis/` directory, the reported names vary from run to run.
+Solutions/43_Functional--Confidence/README.md	first run	The first run after the fix replays the case once more, finds that it passes, and deletes it from the database.
+Solutions/43_Functional--Confidence/README.md	second run	A second run reports the identical counterexample, and reports it noticeably faster.
+Solutions/43_Functional--Confidence/README.md	three runs	With limits twenty times smaller, `[10_000, 20_000, 30_000, 40_000]`, the same machine reported `3` on each of three runs.
 Solutions/45_Effects--Generators/README.md	The third `send()`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
+Solutions/45_Effects--Generators/README.md	last two runs	**Test a short answer source.** The last two runs show that hazard.
 Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator waits before the first line of its body rather than at a `yield`, so Python discards the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first `send()`	So at runtime the first `send()` accepts `None` alone, a value the `SendType` excludes.
 Solutions/45_Effects--Generators/README.md	the first call	An annotation cannot express "`None` for the first call, `Answer` afterward," because a single `SendType` covers every call.
@@ -191,11 +275,20 @@ Solutions/45_Effects--Generators/README.md	the next `"12"`	After three `"12"` sa
 Solutions/45_Effects--Generators/README.md	the outermost `visit()`	`prefixes()` follows `gi_yieldfrom` from the outermost `visit()` to the innermost and reads the same three prefixes.
 Solutions/45_Effects--Generators/README.md	the second `yield from`	The count travels through the `ReturnType`: `emit()` returns it, `yield from` delivers it into `report()`'s `size`, `report()` returns it again, and the second `yield from` delivers it into `summarize()`'s `counted`.
 Solutions/45_Effects--Generators/README.md	two lines later	The runtime output shows a consequence two lines later, in the `return` statement, where the f-string formats the object.
+Solutions/46_Effects--Stateless/README.md	both passes	your four passes print `Hello, Alice!` and `Hello, Bob!` three times: the first pass over the stored Effects prints them, the second runs silently, and both passes over the functions print them.
+Solutions/46_Effects--Stateless/README.md	first attempt	By the time the first attempt fails, that attempt has run the generator to its end, and a finished generator stays finished.
+Solutions/46_Effects--Stateless/README.md	first pass	your four passes print `Hello, Alice!` and `Hello, Bob!` three times: the first pass over the stored Effects prints them, the second runs silently, and both passes over the functions print them.
+Solutions/46_Effects--Stateless/README.md	four passes	your four passes print `Hello, Alice!` and `Hello, Bob!` three times: the first pass over the stored Effects prints them, the second runs silently, and both passes over the functions print them.
 Solutions/46_Effects--Stateless/README.md	on line 29	The error appears on line 29, the `yield from` that introduces the undeclared failure, not on the signature and not at the call site.
+Solutions/46_Effects--Stateless/README.md	second pass	**Run each stored Effect twice.** The second pass over `built` runs silently, and `run()` returns `None` for each entry.
+Solutions/46_Effects--Stateless/README.md	six runs	your six predictions match six runs with the third implementation added.
 Solutions/46_Effects--Stateless/README.md	the next line	Assigning `need(Console)` binds a generator to `console`, and the next line calls `print()` on it as if it were a `Console`.
 Solutions/46_Effects--Stateless/README.md	the second `info`	In the second `info` line, the type checker names the missing method rather than the missing type.
 Solutions/46_Effects--Stateless/README.md	the second `run()`	The type checker removes `Need[Console]` from the requirements and leaves `Need[Clock]` open, so the second `run()` needs a `# type: ignore`.
 Solutions/47_Effects--Stateless_in_Practice/README.md	The line that	**Lift the failure into the channel.** The line that restores the guarantee is `@throws(KeyError)`.
+Solutions/47_Effects--Stateless_in_Practice/README.md	both runs	Each call to `ticking()` builds a fresh handler with its own stored moment, so both runs in the listing start at 23:59:59.
+Solutions/47_Effects--Stateless_in_Practice/README.md	every attempt	`WEATHER`'s headline is the same on every attempt, and `TOPICS` holds the same two topics, so `topic_of()` returns the same answer however many times it runs.
+Solutions/47_Effects--Stateless_in_Practice/README.md	first attempt	It ends with the answer the first attempt produced.
 Solutions/47_Effects--Stateless_in_Practice/README.md	the inner loop	Each time a draw fails, `run_load()` breaks out of the inner loop, leaves the `connected` block, and asks for another source.
 Solutions/47_Effects--Stateless_in_Practice/README.md	the last `Put`	The `Cell` version has one piece of state, so the next `Get` returns the value the last `Put` wrote.
 Solutions/47_Effects--Stateless_in_Practice/README.md	the next `Get`	The `Cell` version has one piece of state, so the next `Get` returns the value the last `Put` wrote.

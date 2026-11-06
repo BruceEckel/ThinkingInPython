@@ -1692,11 +1692,16 @@ tip subject-gap-accept CH=31     # baseline the judged keeps
 
 ## sentence_shapes.py
 
-Finds four sentence shapes from the style rules. Two are default rules,
+Finds sentence shapes from the style rules. The default rules are
 held to `tools/data/sentence_shapes_baseline.txt`: `[IMP]`, a command
-plus its consequence ("Remove `frozen=True` and the pattern fails"), and
+plus its consequence ("Remove `frozen=True` and the pattern fails"),
 `[COLON+AND]`, a colon followed by a clause whose verb joins a second
-clause with its own subject through "and". Two are survey rules: `[AND]`,
+clause with its own subject through "and", `[PAIR]`, `[AND+REL]`, and
+`[PRT]` (2026-11-04), a phrasal verb's particle after a noun-phrase
+object ("carries the request out"), which the style writes with the
+particle beside its verb ("carries out the request"); a pronoun object
+("carries it out"), a measure ("one level up"), a path ("up to you"),
+and "through" or "over" are quiet. The survey rules include `[AND]`,
 an "and" that joins two clauses with different subjects, and `[COLON]`,
 a colon followed by an independent clause. A colon after a count or a
 demonstrative ("three parts:", "this shape:") is skipped. Two imperatives

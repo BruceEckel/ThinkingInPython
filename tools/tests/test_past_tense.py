@@ -45,6 +45,14 @@ def shown(source: str) -> list[str]:
      ["ran", "rewrote"]),
     ("Hint: the loop ran first.", []),
     ("The loop runs first. The gate rewrote the marker.", ["rewrote"]),
+    ("The driver has the answer it needs before the generator has "
+     "yielded its last value.", ["has yielded"]),
+    ("The driver has the answer it needs before the generator yields "
+     "its last value.", []),
+    ("The generator chooses what to ask next from the answers it has "
+     "received.", []),
+    ("The handler runs when every generator beneath it has finished.",
+     ["has finished"]),
 ])
 def test_hits(source: str, expected: list[str]) -> None:
     assert shown(source) == expected

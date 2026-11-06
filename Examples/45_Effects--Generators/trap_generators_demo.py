@@ -15,7 +15,10 @@ def run_all(
     machine = trampoline(start)
     state = next(machine)  # [2]
     for input_ in inputs:
-        new_state = machine.send(input_)  # [3]
+        try:
+            new_state = machine.send(input_)  # [3]
+        except StopIteration:
+            return  # [4]
         print(state, input_, "->", new_state)
         state = new_state
 

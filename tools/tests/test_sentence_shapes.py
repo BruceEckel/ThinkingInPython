@@ -116,6 +116,15 @@ def rules(source: str) -> list[str]:
     ("Alternative constructors need `Self` for the same reason `bump()` does.", []),
     ("`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.", []),
     ("The code runs the same with or without them.", []),
+    ("A generator yields a request and waits while the driver carries the request out.", ["PRT"]),
+    ("A generator yields a request and waits while the driver carries out the request.", []),
+    ("The driver carries it out.", []),
+    ("`pickle` looks the class up as `shapes.Circle` and does not find it.", ["PRT"]),
+    ("`pickle` looks `name` up in the module.", []),
+    ("Gradual typing leaves the amount up to you.", []),
+    ("The `Result` that `ask()` returns stops one level up.", []),
+    ("`check()` rejects negatives but lets zero through.", []),
+    ("The `finally` clause runs on every ending and turns the sensor off.", ["PRT"]),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
     assert rules(source) == expected
@@ -150,7 +159,7 @@ def test_the_reported_line_is_the_sentences_first_character() -> None:
 
 def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
-    assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL"}
+    assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
         "AND", "COLON", "ADD", "TWO", "CAN", "SAME"}
 

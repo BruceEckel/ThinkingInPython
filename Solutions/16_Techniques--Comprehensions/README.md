@@ -527,7 +527,7 @@ def cube_if_even(n: int) -> int | None:
 
 both comprehensions print `[0, 8, 64]`,
 and the recorded arguments match the call count you predicted for each one.
-You can also name the arguments that appear twice in the second run and say why the rest appear once.
+You can also name the arguments the second comprehension passes twice and say why it passes the rest once.
 
 <details>
 <summary>Solution</summary>

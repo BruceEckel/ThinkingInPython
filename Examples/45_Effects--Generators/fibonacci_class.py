@@ -3,7 +3,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import override
 
-@dataclass
+@dataclass(eq=False)
 class Fibonacci(Iterator[int]):
     remaining: int
     _a: int = field(default=0, init=False)

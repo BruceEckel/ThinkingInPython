@@ -726,8 +726,6 @@ Chapters/45_Effects--Generators.md	[BOUND] A pair of loops passing values in bot
 Chapters/45_Effects--Generators.md	[BOUND] A suspended generator preserves two things
 Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator drops the return channel, so CODE takes two parameters where CODE takes three
 Chapters/45_Effects--Generators.md	[BOUND] An ordinary call keeps that state for the caller alone
-Chapters/45_Effects--Generators.md	[BOUND] CODE handles one exception and cleans up after any
-Chapters/45_Effects--Generators.md	[BOUND] CODE makes the first two calls itself, and the CODE makes the rest
 Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE leaves the machine in CODE, and the entry message prints once
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
@@ -743,9 +741,8 @@ Chapters/45_Effects--Generators.md	[BOUND] Its type has the yield channel alone,
 Chapters/45_Effects--Generators.md	[BOUND] One shape looks like a transition and is a delegation
 Chapters/45_Effects--Generators.md	[BOUND] Replace CODE's loop in CODE with the single line CODE and run CODE over the same CODE table
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
-Chapters/45_Effects--Generators.md	[BOUND] That CODE sits before the card step's CODE, so the exception passes straight out of the card step, whose own action is the one that failed
+Chapters/45_Effects--Generators.md	[BOUND] That CODE comes before the card step's CODE, so the exception propagates out of the card step, whose own action is the one that failed
 Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver at the edge of the program
-Chapters/45_Effects--Generators.md	[BOUND] The CODE clause names CODE alone, so CODE propagates past it, the CODE block prints CODE, and the generator ends
 Chapters/45_Effects--Generators.md	[BOUND] The Moore shape and the Mealy shape both fit one function with no CODE field
 Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
 Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as its body, with a CODE, and leaves the two methods to Python

@@ -537,9 +537,9 @@ def subject_gap_accept(v: Vars) -> None:
 
 
 @task("Report new imperative-plus-consequence sentences, split-worthy "
-      "\"and\"s, colon-led clauses, and pair words with a stray "
-      "conjunction (report-only; accept with "
-      "`tip sentence-shapes-accept`)")
+      "\"and\"s, colon-led clauses, pair words with a stray "
+      "conjunction, and phrasal verbs split around a noun phrase "
+      "(report-only; accept with `tip sentence-shapes-accept`)")
 def sentence_shapes(v: Vars) -> None:
     """Report sentence shapes from the style rules, found with the
     cached spaCy parse (tools/parsed_prose.py). The default rules,
@@ -549,9 +549,12 @@ def sentence_shapes(v: Vars) -> None:
     "and", and [PAIR] a pair word ("between", "both", "either",
     "neither") whose conjunction arrives from the next clause and
     opens a noun phrase ("keeps state between values and the consumer
-    has a loop"), and [AND+REL] an "and" that brings in a second
+    has a loop"), [AND+REL] an "and" that brings in a second
     subject after a first clause that already carries a relative
-    clause or a parenthetical. The survey rules, printed only under ARGS=--survey and never
+    clause or a parenthetical, and [PRT] a phrasal verb's particle
+    after a noun-phrase object ("carries the request out", which the
+    style writes "carries out the request"; a pronoun object stays
+    before the particle). The survey rules, printed only under ARGS=--survey and never
     baselined: [AND] an "and" joining two clauses with different
     subjects, [COLON] a colon followed by an independent clause, and
     [ADD] an additive adverb ("also", "too", "as well") in a sentence
@@ -746,6 +749,11 @@ def positional(v: Vars) -> None:
     the watch-word scan. CH= picks one chapter and its Solutions file.
     Hits judged keeps live in tools/data/positional_refs_baseline.txt,
     so the run prints only new ones; ARGS=--all lists every hit.
+    Since 2026-11-04 the `count+unit` rule also lists a count on an
+    execution noun ("the first three runs", "both attempts"), where
+    the fault is a listing that offers two ways to count the unit; the
+    same shape on `call` and `time` prints under ARGS=--survey only and
+    is never baselined. The `ambiguity` skill reads both per chapter.
     """
     py("tools.positional_refs", *prose_files(v), *v.words("ARGS"))
 

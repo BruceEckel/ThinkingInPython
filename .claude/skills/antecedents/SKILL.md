@@ -34,6 +34,10 @@ or "it" or "they" with two or more same-number nouns in the sentence before,
 named on the line.
 A listed sentence is not a fault by itself.
 The test below decides.
+A count word is a pointer too ("the second run", "the first three runs"),
+and it has two candidates when the listing offers two ways to count its unit;
+the `ambiguity` pass owns that shape and the other double readings,
+with `tip positional CH=NN ARGS=--survey` as its candidate list.
 
 ## The test
 

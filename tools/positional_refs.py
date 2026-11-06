@@ -40,6 +40,24 @@ statement-like word (line, call, loop, print, return, ...):
    per line with the part after the first `#` removed (a crude
    comment strip: a `#` inside a string also cuts the line). The kind
    label carries the count, as in `construct x3`.
+7. `count+unit` (2026-11-04): a count applied to an execution noun,
+   "the first three runs", "both attempts", "every pass", "the second
+   round". The unit counts executions rather than lines, so no tag
+   names it, and the fault is a listing that offers more than one way
+   to count it: chapter 45's `throw_close_basics.py` has three
+   generators and four tagged resumptions, and "the first three runs"
+   was right under one count and false under the other. The test is
+   whether the listing offers a second way to count the unit; if it
+   does, name the unit concretely ("all three generators") or cite the
+   tags. The number of the noun follows the count word (each/every
+   and an ordinal take the singular, a cardinal or both/all the
+   plural), so a quantifier before a verb ("both run", "each runs")
+   never matches. A match that overlaps another pattern's match ("the
+   first call", already `ordinal+noun`) is dropped. The same shape on
+   `call` and `time` ("the first call", "each time") is a survey
+   rule, `survey count+unit`: too common and too often right for a
+   baseline, it prints under `--survey` only, marked `survey`, and is
+   never counted as new. The `ambiguity` skill reads it per chapter.
 
 Deliberately not matched, so a human never reads them as hits: "the
 first argument" or "the first parameter" (a position in a call or
@@ -72,6 +90,7 @@ every other file's entries.
 
     uv run python -m tools.positional_refs          # new hits
     uv run python -m tools.positional_refs --all    # every hit
+    uv run python -m tools.positional_refs --survey # + call, time
     uv run python -m tools.positional_refs --accept # judged keeps
     uv run python -m tools.positional_refs Chapters/30_*.md
     uv run tip positional CH=30
@@ -139,6 +158,38 @@ PATTERNS: Final[tuple[tuple[str, re.Pattern[str]], ...]] = (
 CONSTRUCT: Final = re.compile(
     rf"\bthe `?({'|'.join(KEYWORDS)})`? {CONSTRUCT_NOUN}\b",
     re.IGNORECASE)
+
+# `count+unit`: a count applied to an execution noun, a unit the
+# listing may offer more than one way to count ("the first three
+# runs" of a listing with three generators and four tagged calls).
+# The noun's number follows the count word, so a quantifier before a
+# verb ("both run", "each runs") never matches: each/every and an
+# ordinal take the singular, a cardinal or both/all takes the plural.
+COUNT_ORD: Final = (
+    r"(?:first|second|third|fourth|fifth|sixth|seventh|last|final"
+    r"|next|previous|other)")
+COUNT_CARD: Final = r"(?:two|three|four|five|six|several|both|all)"
+UNIT_SING: Final = (
+    r"(?:run|round|attempt|pass|resumption|trace|exchange)")
+UNIT_PLUR: Final = (
+    r"(?:runs|rounds|attempts|passes|resumptions|traces|exchanges)")
+SURVEY_SING: Final = r"(?:call|time)"
+SURVEY_PLUR: Final = r"(?:calls|times)"
+
+
+def count_unit(singular: str, plural: str) -> re.Pattern[str]:
+    """The `count+unit` pattern for one pair of unit-noun forms."""
+    return re.compile(
+        rf"\b(?:(?:each|every|{COUNT_ORD}) {singular}"
+        rf"|(?:{COUNT_ORD} )?{COUNT_CARD} {plural})\b",
+        re.IGNORECASE)
+
+
+COUNT_UNIT: Final = count_unit(UNIT_SING, UNIT_PLUR)
+# "call" and "time" are too common and too often right ("the first
+# call", "each time") for a baseline; they print under --survey only.
+SURVEY_UNIT: Final = count_unit(SURVEY_SING, SURVEY_PLUR)
+SURVEY_KIND: Final = "survey count+unit"
 BASELINE: Final = DATA_DIR / "positional_refs_baseline.txt"
 HEADER: Final = (
     "# Prose that points at a listing line by position or by a\n"
@@ -275,14 +326,29 @@ def keyword_counts(block: Block) -> dict[str, int]:
 def sentence_hits(
     sentence: str, counts: dict[str, int],
 ) -> Iterator[tuple[int, str, str]]:
-    """(offset, kind, phrase) for each pattern match in a sentence."""
+    """(offset, kind, phrase) for each pattern match in a sentence.
+
+    A `count+unit` match that overlaps another pattern's match ("the
+    first call" is already an `ordinal+noun` hit) is dropped, so a
+    phrase is reported once.
+    """
+    spans: list[tuple[int, int]] = []
     for kind, pattern in PATTERNS:
         for m in pattern.finditer(sentence):
+            spans.append(m.span())
             yield m.start(), kind, m.group()
     for m in CONSTRUCT.finditer(sentence):
         n = counts.get(m.group(1).lower(), 0)
         if n >= 2:
+            spans.append(m.span())
             yield m.start(), f"construct x{n}", m.group()
+    for kind, pattern in (("count+unit", COUNT_UNIT),
+                          (SURVEY_KIND, SURVEY_UNIT)):
+        for m in pattern.finditer(sentence):
+            start, end = m.span()
+            if any(s < end and start < e for s, e in spans):
+                continue
+            yield start, kind, m.group()
 
 
 def find(doc: Document) -> Iterator[Hit]:
@@ -323,13 +389,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--accept", action="store_true",
                     help="add the NEW hits to the baseline and drop "
                          "stale entries")
+    ap.add_argument("--survey", action="store_true",
+                    help="also print the survey hits (a count on "
+                         "`call` or `time`), which are never baselined")
     args = ap.parse_args(argv)
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
-    found = sorted(
+    every = sorted(
         ((display(p), h) for p in paths for h in find(Document.parse(p))),
         key=lambda item: (item[0], item[1].line, item[1].phrase),
     )
+    survey = [item for item in every if item[1].kind == SURVEY_KIND]
+    found = [item for item in every if item[1].kind != SURVEY_KIND]
     baseline = load_baseline(BASELINE)
     scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
     keys = [key(s, h.phrase, h.sentence) for s, h in found]
@@ -351,8 +422,13 @@ def main(argv: list[str] | None = None) -> int:
     for entry in stale:
         shown, phrase, sentence = entry.split("\t", 2)
         print(f"stale    {shown}: '{phrase}' :: {sentence}")
+    if args.survey:
+        for shown, hit in survey:
+            print(f"survey   {shown}:{hit.line}: [{hit.kind}] "
+                  f"'{hit.phrase}' :: {hit.sentence}")
     print(f"{len(new)} new, {len(found) - len(new)} accepted"
-          + (f", {len(stale)} stale" if stale else ""))
+          + (f", {len(stale)} stale" if stale else "")
+          + (f", {len(survey)} survey" if args.survey else ""))
     return 1 if args.fail and new else 0
 
 

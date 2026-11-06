@@ -553,6 +553,7 @@ Chapters/45_Effects--Generators.md	by hand: "to cast that into an iterator frame
 Chapters/45_Effects--Generators.md	could: so the driver's table needs an entry it could not have written before that answer arrived
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
 Chapters/45_Effects--Generators.md	manually: "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand
+Chapters/45_Effects--Generators.md	never: A CODE in the driver therefore propagates to the driver's callers and never reaches the generator's CODE and CODE clauses
 Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
 Chapters/46_Effects--Stateless.md	already: For a function that already returns an Effect

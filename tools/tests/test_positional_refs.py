@@ -143,3 +143,49 @@ def test_accept_with_paths_touches_only_their_entries(
     capsys.readouterr()
     assert main(["--fail"]) == 1
     assert "1 new, 1 accepted" in capsys.readouterr().out
+
+
+THREE = ("```python\ng = f()\nnext(g)  # [1]\ng = f()\nnext(g)  # [2]\n"
+         "g = f()\nnext(g)  # [3]\n```\n")
+
+
+def test_count_unit_hits() -> None:
+    text = THREE + ("\nIn the first three runs the value arrives.\n"
+                    "Every run ends closed. Both attempts fail.\n")
+    assert [(k, p) for _, k, p in hits(text)] == [
+        ("count+unit", "first three runs"),
+        ("count+unit", "Every run"),
+        ("count+unit", "Both attempts"),
+    ]
+
+
+def test_quantifier_before_a_verb_is_not_a_hit() -> None:
+    text = THREE + "\nThey both run the body, and each runs it once.\n"
+    assert hits(text) == []
+
+
+def test_count_unit_defers_to_ordinal_noun() -> None:
+    text = THREE + "\nThe first call primes it.\n"
+    assert [(k, p) for _, k, p in hits(text)] == [
+        ("ordinal+noun", "The first call")]
+
+
+def test_survey_units_are_marked() -> None:
+    text = THREE + "\nEach time the body runs, two calls arrive.\n"
+    assert [(k, p) for _, k, p in hits(text)] == [
+        ("survey count+unit", "Each time"),
+        ("survey count+unit", "two calls"),
+    ]
+
+
+def test_survey_hits_print_only_under_survey(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text(THREE + "\nEach time it prints.\n", encoding="utf-8")
+    assert main(["--fail"]) == 0
+    out = capsys.readouterr().out
+    assert "survey" not in out and "0 new, 0 accepted" in out
+    assert main(["--survey"]) == 0
+    out = capsys.readouterr().out
+    assert "survey   " in out and "'Each time'" in out
+    assert out.strip().endswith("0 new, 0 accepted, 1 survey")

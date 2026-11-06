@@ -86,13 +86,29 @@ pass: it clears `tip prose`'s passive-voice and there-is warnings and
 cuts metadiscourse, empty frames, and expletive constructions; new
 passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
 section.
-`/literal`, `/positive`, `/straighten`, `/cohesion`, and `/antecedents`
-are the other prose passes. Since 2026-10-22 `/literal` and the
+`/literal`, `/positive`, `/straighten`, `/cohesion`, `/antecedents`,
+and `/ambiguity` are the other prose passes. Since 2026-10-22 `/literal` and the
 deep-review prose pass also look for and fix vague descriptions: an
 abstract noun, a pointer phrase, or a verdict standing where the
 sentence could say what the machinery does ("states the
 arrangement", "do that work", "the same shape of trace").
-`tip rewrite CH=NN` runs these five plus `elements-of-style` and `bruce-edit-apply` by
+`/ambiguity` (`.claude/skills/ambiguity/SKILL.md`, 2026-11-04) tests
+every sentence that counts, compares, coordinates, modifies, or limits
+for a second reading and rewrites it so only the reading the listing
+supports survives: a count with two units ("the first three runs" over
+three generators and four tags, the chapter 45 sentence that started
+it), a word with two senses in one passage, a modifier with two heads,
+an open "and" or "only" scope, a definite noun the listing has several
+of, a comparison missing its term, a connective with two senses. Its
+mechanical candidates come from `tip positional CH=NN ARGS=--survey`
+(the `count+unit` rule, added the same day) and the sentence-shape
+survey; shapes Bruce flags that its catalog lacks accrue in its
+"Accrued shapes" section.
+`/super-prose NN` (`.claude/skills/super-prose/SKILL.md`, 2026-11-02) runs all
+nine prose passes in the session, including `/activate`, over a
+chapter or one section (`/super-prose 45 section "<heading>"`), and
+commits; it is the in-session form of `tip rewrite`.
+`tip rewrite CH=NN` runs these six plus `elements-of-style` and `bruce-edit-apply` by
 default; `tip rewrite ARGS=--list` shows the set and the model each
 pass runs on. Each pass can name its own model in `tools/rewrite.py`'s
 `PASSES`; `MODEL_NOTES` there records which model each
@@ -250,6 +266,12 @@ of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
 ending on a preposition whose object moved) and `tip watch-words`
 (`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
+Since 2026-11-04 "whatever" is a Tier 2 watch word (candidate C56 in
+`bruce_edit_db.md`, Bruce: "should be considered circumspect in
+general"): a concessive "whatever the driver's reason" is a universal
+to test or a phrase to cut, and a free relative "whatever the caller
+supplies" is "the value the caller supplies"; its 66 sites stay NEW
+for the chapter passes.
 Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
 object, `no X`, `none`, or `none of` ("runs none of the body", "raises
 no exception", "has no `__slots__`"), Bruce's "reversal of
@@ -381,6 +403,17 @@ the repair is "its `yield`" or "that directory". The parse cannot
 tell an implied second term ("for the same reason `bump()` does")
 from none, so it is a survey rule: the book-wide read had 194
 candidates and 6 rewrites.
+The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
+around a noun-phrase object ("the driver carries the request out",
+Bruce: "general style: carries out the request"); the particle holds
+the verb's meaning, so the reader finishes "carries the request" and
+revises it when "out" arrives. The repair moves the particle beside
+its verb, and R56 in `bruce_edit_db.md` has the rule. A pronoun or
+one-word code-span object ("carries it out", "looks `name` up"), a
+measure ("one level up"), a path ("up to you"), and "through" or
+"over" are quiet by design; the baseline holds the keeps: a joined
+form with another meaning ("pass the error up"), a directional pair,
+a parser misread ("up front").
 The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
@@ -410,7 +443,14 @@ Stayed Constant"), which the check reads from the document's own heading
 lines. The first run found 1283 hits, nearly all in subordinate clauses
 ("the function the caller passed"), which refer back inside present
 narration and are not the drift. `[PAST-SUB]` therefore prints only under
-`ARGS=--survey`, for the activate pass, and is never baselined. Skips
+`ARGS=--survey`, for the activate pass, and is never baselined. The
+second survey rule is `[PERFECT]` (2026-11-04, Bruce: "'has yielded'
+can just be 'yields'"), a present perfect heading a time clause
+("before the generator has yielded its last value", "when every
+generator beneath it has finished"): the subordinator already orders
+the events, so the repair is the simple present, and the keep is a
+completed state the present loses ("after the previous lock holder
+has written it"); 41 sites that day, C57 in `bruce_edit_db.md`. Skips
 print nothing: a sentence with a year, a version number, or a PEP number
 (a dated event), a sentence with a modal (would, could, might, should), a
 verb inside double quotes, a `Hint:` or `Done when:` paragraph, a
@@ -780,6 +820,14 @@ and how it was measured.
   (`sys._jit.is_available()` is `True`), while `uv run` uses uv's
   managed build, where it is `False`. `sys.version` tells the builds
   apart: "tags/v3.15..." is python.org, "main, ..." is managed.
+  From 2026-10-22 to 2026-11-03 bare `python` was a `.cmd` shim in
+  `~/.local/bin` that ran `py`, which PowerShell and cmd resolve
+  through PATHEXT and Git Bash does not, so the Bash tool reported
+  "python: command not found". Since 2026-11-03 the install manager's
+  alias folder, `AppData/Local/Python/bin` (`python.exe`,
+  `python3-64.exe`, `pip.exe`), is on the user PATH and the shim is
+  gone, so every shell resolves the same `python`. There is still no
+  bare `python3`; `py` and `python3-64` are the other spellings.
   Before that date the python.org build lived at `C:/Python/python.exe`
   and there was no `python3` on PATH. The install manager replaced
   that build, and every environment created on it broke. A `uv tool`

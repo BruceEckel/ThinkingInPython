@@ -101,6 +101,15 @@ SOURCES: Final[tuple[str, ...]] = (
     "Alternative constructors need `Self` for the same reason `bump()` does.",
     "`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.",
     "The code runs the same with or without them.",
+    "A generator yields a request and waits while the driver carries the request out.",
+    "A generator yields a request and waits while the driver carries out the request.",
+    "The driver carries it out.",
+    "`pickle` looks the class up as `shapes.Circle` and does not find it.",
+    "`pickle` looks `name` up in the module.",
+    "Gradual typing leaves the amount up to you.",
+    "The `Result` that `ask()` returns stops one level up.",
+    "`check()` rejects negatives but lets zero through.",
+    "The `finally` clause runs on every ending and turns the sensor off.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 

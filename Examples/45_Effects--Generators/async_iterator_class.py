@@ -4,7 +4,7 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import override
 
-@dataclass
+@dataclass(eq=False)
 class Countdown(AsyncIterator[int]):
     n: int
 

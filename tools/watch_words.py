@@ -44,7 +44,13 @@ the future, and "could have" stay. `whichever` joined Tier 2 on
 thing out by a property, and the independence stated plainly ("no
 matter which", "in all four forms", the two options named) when the
 claim is that the outcome is the same across a choice; the book sweep
-that day rewrote all 45 sites. Tier 1 ("Consider rewriting") is a word with
+that day rewrote all 45 sites. `whatever` joined Tier 2 on 2026-11-04
+(candidate C56, Bruce: "should be considered circumspect in general"):
+a concessive "whatever the driver's reason" claims the outcome across
+every case, a universal to test or a phrase to cut, and a free relative
+"whatever the caller supplies" is R54's shape with a thing, "the value
+the caller supplies". Its 66 sites are read by the chapter passes, so
+they stay NEW until each is judged. Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -305,6 +311,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"already"),
         (2, r"could"),
         (2, r"whichever"),
+        (2, r"whatever"),
         (2, r"even"),
         (2, r"honest(?:ly)?"),
         (2, r"buys?|bought"),

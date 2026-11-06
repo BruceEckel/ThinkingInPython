@@ -103,7 +103,10 @@ class Pass:
 # and straighten fixes what is left. cohesion and antecedents come last
 # because they clean up after a split sentence, and cohesion precedes
 # antecedents because moving a sentence can change what a pronoun points
-# at.
+# at. ambiguity follows antecedents: it tests every sentence that
+# counts, compares, coordinates, modifies, or limits for a second
+# reading, and it goes after the pointer pass because a pronoun just
+# replaced by its noun can be the noun the listing has two of.
 PASSES: tuple[Pass, ...] = (
     Pass(
         "elements-of-style",
@@ -147,6 +150,12 @@ PASSES: tuple[Pass, ...] = (
         "antecedents",
         "antecedents",
         "name what each this/it/one/thing points at when two nouns could",
+        default=True,
+    ),
+    Pass(
+        "ambiguity",
+        "ambiguity",
+        "one reading per sentence: a count with two units, a word with two senses, a modifier with two heads",
         default=True,
     ),
     Pass(
