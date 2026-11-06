@@ -8,7 +8,7 @@ A function's position in its body is state.
 An ordinary call keeps that state for the caller alone.
 The called function starts at its first line every time,
 so a function that hands out one result per call must record its progress in variables and find its place again on each call.
-A generator keeps its position and its local variables between calls,
+A generator hands a value to its caller and keeps its position and its local variables,
 which lets it stop in the middle of a loop, or of a conversation,
 and continue from that point.
 
@@ -1720,7 +1720,7 @@ and the `await` expression evaluates to that result.
 
 That event loop is the single driver at the edge of the program.
 Each request passes through every awaiting caller on its way to that loop,
-so an `await` in a function makes every caller `async` in turn.
+so an `await` in a function makes each of those callers `async` in turn.
 
 An `async def` function can also contain `yield`.
 The result is an *asynchronous generator*, which has two drivers at once.
@@ -2146,9 +2146,10 @@ An event loop is one such driver.
 is the same machinery with a syntax that marks a function as one the event loop resumes.
 `await` uses the implementation of `yield from`,
 so the second restriction holds for it.
-An `await` suspends one frame,
-which is why an `await` in a function makes every caller `async`,
-as [The Driver You Already Use](#the-driver-you-already-use) describes.
+An `await` suspends the `async` function that contains it,
+so a caller that awaits that function suspends at its own `await` and must be `async` too.
+[The Driver You Already Use](#the-driver-you-already-use) states the result:
+every awaiting caller is `async` in turn.
 
 An Effect system builds on a generator rather than a full coroutine,
 for the reason the 2001 design chose the half it did.

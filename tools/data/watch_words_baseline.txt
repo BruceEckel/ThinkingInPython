@@ -548,7 +548,7 @@ Chapters/44_Effects--Effect_Management.md	never: the exception never propagates 
 Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
-Chapters/45_Effects--Generators.md	already: as The Driver You Already Use describes
+Chapters/45_Effects--Generators.md	already: The Driver You Already Use states the result
 Chapters/45_Effects--Generators.md	by hand: "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand
 Chapters/45_Effects--Generators.md	could: so the driver's table needs an entry it could not have written before that answer arrived
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
