@@ -549,8 +549,10 @@ Chapters/44_Effects--Effect_Management.md	price: The function it calls computes 
 Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
 Chapters/45_Effects--Generators.md	already: as The Driver You Already Use describes
+Chapters/45_Effects--Generators.md	by hand: "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand
 Chapters/45_Effects--Generators.md	could: so the driver's table needs an entry it could not have written before that answer arrived
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
+Chapters/45_Effects--Generators.md	manually: "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand
 Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
 Chapters/46_Effects--Stateless.md	already: For a function that already returns an Effect
@@ -891,6 +893,7 @@ Solutions/44_Effects--Effect_Management/README.md	only: so CODE needs only metho
 Solutions/44_Effects--Effect_Management/README.md	price: CODE has no equivalent of writing a function against "something awaitable that yields a price" and choosing the implementation later
 Solutions/44_Effects--Effect_Management/README.md	prices: CODE receives a list of coroutines rather than prices
 Solutions/44_Effects--Effect_Management/README.md	prices: so a test that needs fake prices must inject CODE through every signature
+Solutions/45_Effects--Generators/README.md	contains no: CODE contains no CODE
 Solutions/45_Effects--Generators/README.md	holds no: The machine holds no CODE attribute and consults no table
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret

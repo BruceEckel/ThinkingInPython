@@ -1235,3 +1235,206 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+
+## 10. A tree walk as an iterator class
+
+> PEP 255 asks its reader to picture a recursive tree walk as an iterator:
+> "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand."
+> Write that iterator for `visit()` in `color_count.py`.
+> `Paths` is an iterator class, with no `yield` in it,
+> that produces the path lines `visit()` yields, in the same order,
+> and leaves out the counts.
+> Keep the walk's position in a list that serves as a stack.
+> Then say what `Paths` stores that `visit()` leaves to Python.
+
+<details>
+<summary>Where to look</summary>
+
+[Half a Coroutine by Design](../../Chapters/45_Effects--Generators.md#half-a-coroutine-by-design)
+shows `Squasher` storing its position in a field,
+because `__next__()` starts at its first line on every call.
+A walk in progress inside `visit()` is several calls deep.
+Each of those calls has a path prefix and a place in its dictionary's items,
+so give each call in progress one entry on the stack.
+`iter(tree.items())` returns an iterator that keeps its place between `next()` calls.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+import inspect
+from collections.abc import Generator, Iterator
+from enum import StrEnum
+from types import GeneratorType
+from typing import override
+
+class Color(StrEnum):
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+
+type Name = str
+type Path = str
+type Tree = dict[Name, Tree | Color]
+type Item = tuple[Name, Tree | Color]
+type Level = tuple[Path, Iterator[Item]]
+
+def visit(tree: Tree, at: Path = "") -> Generator[str]:
+    ...
+
+def level(tree: Tree, at: Path = "") -> Level:
+    ...
+
+class Paths(Iterator[str]):
+    def __init__(self, tree: Tree) -> None:
+        ...
+
+    @override
+    def __next__(self) -> str:
+        ...
+
+def prefixes(walk: Iterator[str] | None) -> list[Path]:
+    ...
+```
+
+<details>
+<summary>Done when</summary>
+
+`list(Paths(garden))` equals the six path lines that `color_count.py` prints,
+a tree with an empty subtree produces the lines of its other entries,
+`Paths` contains no `yield`,
+and your answer names the two things each stack entry holds and says where `visit()` keeps them.
+
+<details>
+<summary>Solution</summary>
+
+This file carries `visit()` without its counts, to compare with `Paths`:
+
+```python
+# exercise_10.py
+import inspect
+from collections.abc import Generator, Iterator
+from enum import StrEnum
+from types import GeneratorType
+from typing import override
+
+class Color(StrEnum):
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+
+type Name = str
+type Path = str
+type Tree = dict[Name, Tree | Color]
+type Item = tuple[Name, Tree | Color]
+type Level = tuple[Path, Iterator[Item]]
+
+def visit(tree: Tree, at: Path = "") -> Generator[str]:
+    for name, node in tree.items():
+        if isinstance(node, dict):
+            yield from visit(node, f"{at}{name}/")
+        else:
+            yield f"{at}{name}: {node}"
+
+def level(tree: Tree, at: Path = "") -> Level:
+    return at, iter(tree.items())
+
+class Paths(Iterator[str]):
+    def __init__(self, tree: Tree) -> None:
+        self.stack: list[Level] = [level(tree)]
+
+    @override
+    def __next__(self) -> str:
+        while self.stack:
+            at, items = self.stack[-1]
+            match next(items, None):
+                case None:
+                    self.stack.pop()  # [1]
+                case name, dict() as subtree:
+                    self.stack.append(  # [2]
+                        level(subtree, f"{at}{name}/"))
+                case name, color:
+                    return f"{at}{name}: {color}"  # [3]
+        raise StopIteration
+
+def prefixes(walk: Iterator[str] | None) -> list[Path]:
+    found: list[Path] = []
+    while isinstance(walk, GeneratorType):
+        found.append(inspect.getgeneratorlocals(walk)["at"])
+        walk = walk.gi_yieldfrom
+    return found
+
+garden: Tree = {
+    "rose": Color.RED,
+    "beds": {
+        "fern": Color.GREEN,
+        "tulip": Color.RED,
+        "pond": {"iris": Color.BLUE, "reed": Color.GREEN},
+    },
+    "ivy": Color.GREEN,
+}
+print(list(Paths(garden)) == list(visit(garden)))
+#: True
+print(list(Paths({"bed": {}, "ivy": Color.GREEN})))
+#: ['ivy: green']
+paths = Paths(garden)
+print([next(paths) for _ in range(4)][-1])
+#: beds/pond/iris: blue
+print([at for at, _ in paths.stack])
+#: ['', 'beds/', 'beds/pond/']
+walk = visit(garden)
+print([next(walk) for _ in range(4)][-1])
+#: beds/pond/iris: blue
+print(prefixes(walk))
+#: ['', 'beds/', 'beds/pond/']
+```
+
+**A stack entry is a call in progress.**
+A `Level` holds the two things one `visit()` call needs in order to continue:
+the prefix `at`, and an iterator that keeps the call's place in its dictionary's items.
+`level()` takes the two arguments that `visit()` takes,
+so `[2]` pushes a level where `visit()` calls itself.
+`[1]` pops a level where a `visit()` call finishes its loop and returns,
+and `[3]` returns a line where `visit()` yields one.
+For `{"bed": {}, "ivy": Color.GREEN}`, `[2]` pushes a level for `bed`.
+The next pass finds that level empty and pops it at `[1]`.
+
+**`__next__()` finds its place on every call.**
+`visit()` continues after its `yield` when the consumer asks for another line.
+`__next__()` starts at its first line,
+so its `while` loop reads the top of the stack to find the level where the walk stopped.
+That level's iterator supplies the place within the level.
+
+**`Paths` stores the chain of calls.**
+After four lines, with the walk at `beds/pond/iris`,
+`paths.stack` holds three levels: the garden, `beds/`, and `beds/pond/`.
+The generator holds the same three levels,
+as three suspended `visit()` generators.
+Each one waits at its place in the loop over `tree.items()`,
+with `at` among its locals: the outer two at a `yield from`,
+the innermost at its `yield`.
+A delegating generator's `gi_yieldfrom` attribute refers to the generator to which it delegates.
+`prefixes()` follows `gi_yieldfrom` from the outermost `visit()` to the innermost and reads the same three prefixes.
+
+Python adds a generator to the chain at each `yield from` and discards that generator when it returns.
+In `Paths` you write the chain as a list,
+with an `append()` for each call and a `pop()` for each return.
+That list is the PEP's "state of the traversal."
+
+*GoF Design Patterns* makes the same observation about an iterator that the client advances over a recursive structure such as a [*Composite*](../../Chapters/34_Patterns--Composite_and_Interpreter.md):
+the iterator "has to store a path" through the structure "to keep track of the current object."
+`paths.stack` is that path.
+
+A chain of generators stops at Python's recursion limit,
+as the chapter's `tail_delegation.py` shows.
+On a tree 1,500 levels deep, `visit()` raises `RecursionError`.
+`Paths` walks that tree, because its stack is a list.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
+</details>
+</details>
+</details>
+</details>

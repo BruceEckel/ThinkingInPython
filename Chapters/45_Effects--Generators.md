@@ -2212,3 +2212,11 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
 9.  Replace `proxy()`'s loop in `answering_proxy.py` with the single line `return (yield from inner)` and run `drive()` over the same `known` table.
     Explain from the output why this `proxy()` cannot answer `town`,
     and say what a generator must do to answer one request and relay the rest.
+10. PEP 255 asks its reader to picture a recursive tree walk as an iterator:
+    "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand."
+    Write that iterator for `visit()` in `color_count.py`.
+    `Paths` is an iterator class, with no `yield` in it,
+    that produces the path lines `visit()` yields, in the same order,
+    and leaves out the counts.
+    Keep the walk's position in a list that serves as a stack.
+    Then say what `Paths` stores that `visit()` leaves to Python.

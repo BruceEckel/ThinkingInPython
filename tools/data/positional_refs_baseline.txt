@@ -188,6 +188,7 @@ Solutions/45_Effects--Generators/README.md	the first line	The call `interview()`
 Solutions/45_Effects--Generators/README.md	the last `send()`	If you read the total as the result of the last `send()`, writing `total: Total = t.send(Amount(12))` with no `try`, the script prints the three prompts and then stops with `StopIteration: 42`.
 Solutions/45_Effects--Generators/README.md	the last `yield`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	the next `"12"`	After three `"12"` sales, by any mix of machines, a fresh `machine()` answers the next `"12"` order with `UNAVAILABLE`.
+Solutions/45_Effects--Generators/README.md	the outermost `visit()`	`prefixes()` follows `gi_yieldfrom` from the outermost `visit()` to the innermost and reads the same three prefixes.
 Solutions/45_Effects--Generators/README.md	the second `yield from`	The count travels through the `ReturnType`: `emit()` returns it, `yield from` delivers it into `report()`'s `size`, `report()` returns it again, and the second `yield from` delivers it into `summarize()`'s `counted`.
 Solutions/45_Effects--Generators/README.md	two lines later	The runtime output shows a consequence two lines later, in the `return` statement, where the f-string formats the object.
 Solutions/46_Effects--Stateless/README.md	on line 29	The error appears on line 29, the `yield from` that introduces the undeclared failure, not on the signature and not at the call site.
