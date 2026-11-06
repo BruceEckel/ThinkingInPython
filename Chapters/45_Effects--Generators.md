@@ -1828,14 +1828,99 @@ and code that reads them on every call to find where to continue.
 Melvin Conway described that rewrite in 1963,
 in [a paper](https://www.melconway.com/Home/pdf/compiler.pdf)
 on the design of a one-pass COBOL compiler.
-His example is a subroutine that delivers one character per call.
-That subroutine needs "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call."
-A harder task, Conway notes,
-"would necessitate an absurd arrangement of switches."
-His alternative is the coroutine:
+His example is a subroutine, the "asterisk squasher,"
+that reads punched cards and delivers their characters one per call.
+The squasher replaces each pair of adjacent asterisks,
+the exponentiation operator of FORTRAN and COBOL,
+with a single up-arrow character.
+Asterisks pair off from the left,
+so three in a row become an arrow and an asterisk.
+`squasher_switch.py` is that subroutine as an iterator class,
+with `^` standing for the arrow:
+
+```python
+# squasher_switch.py
+from collections.abc import Iterator
+from dataclasses import dataclass, field
+from typing import override
+
+@dataclass
+class Squasher(Iterator[str]):
+    chars: Iterator[str]
+    _held: str = field(default="", init=False)
+
+    @override
+    def __next__(self) -> str:
+        if self._held:  # [1]
+            held, self._held = self._held, ""
+            return held
+        char = next(self.chars)
+        if char != "*":
+            return char
+        match next(self.chars, ""):
+            case "*":
+                return "^"
+            case "":
+                return "*"
+            case following:
+                self._held = following  # [2]
+                return "*"
+
+print(list(Squasher(iter("a**b*c***"))))
+#: ['a', '^', 'b', '*', 'c', '^', '*']
+```
+
+In Conway's flowchart the cards keep coming.
+A Python iterator ends,
+so the `next()` call in the `match` statement takes a default of `""`.
+When the input ends on a single asterisk,
+`case "":` matches that default and delivers the asterisk.
+
+`__next__()` must read the character after an asterisk to tell a single asterisk from a pair.
+At `[2]` the call holds a single asterisk and the character after it,
+two characters to deliver with one return value.
+The call returns the asterisk and stores the second character in `_held`.
+The test at `[1]` begins every call and chooses between returning a stored character and reading a new one.
+Conway calls that test "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call."
+A harder task, he notes, "would necessitate an absurd arrangement of switches."
+
+Conway's alternative is the coroutine:
 a routine that passes control to another routine and later continues "at the point where it left off."
 Coroutines, he writes, are "subroutines all at the same level,
 each acting as if it were the master program when in fact there is no master program."
+
+Written as a generator,
+the squasher delivers a single asterisk and the character after it with two statements in a row:
+
+```python
+# squasher_generator.py
+from collections.abc import Iterator
+
+def squash(chars: Iterator[str]) -> Iterator[str]:
+    for char in chars:
+        if char != "*":
+            yield char
+            continue
+        match next(chars, ""):
+            case "*":
+                yield "^"
+            case "":
+                yield "*"
+            case following:
+                yield "*"  # [1]
+                yield following  # [2]
+
+print(list(squash(iter("a**b*c***"))))
+#: ['a', '^', 'b', '*', 'c', '^', '*']
+```
+
+The generator suspends at `[1]` with the asterisk delivered and the second character in the local variable `following`.
+When the consumer asks for another character,
+the body continues from that point and delivers `following` at `[2]`.
+A generator suspended at `[1]` has a character waiting,
+so its position does the work of the switch.
+Conway's flowchart of the coroutine version has those two steps in a row:
+a write of the asterisk, then a write of the character after it.
 
 PEP 255 added generators to Python 2.2 in 2001 so that a called function can hand a value to its caller and keep its position and its locals.
 The PEP's motivating example is the standard library's `tokenize()`,
@@ -1919,8 +2004,8 @@ with `values.append(a)` in place of `yield a`.
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
 
-The third way, older than PEP 255's generators,
-is an iterator class with a `__next__()` that returns one value per call:
+The third way is an iterator class like `Squasher`,
+whose `__next__()` returns one value per call:
 
 ```python
 # fibonacci_class.py
@@ -2033,8 +2118,19 @@ The PEP also permits `yield` inside `try`/`finally` and adds `close()`,
 so that an abandoned generator runs its cleanup code.
 The PEP describes a scheduler that runs many generators as a "trampoline,"
 the shape of `task_runner_send.py`.
-`yield from` (PEP 380, Python 3.3, 2012) completes the set.
-A delegating generator passes all three channels through to the innermost generator,
+
+A generator has a second restriction.
+A `yield` suspends one frame,
+the frame of the function that contains the `yield`.
+A function that the generator calls runs in a frame of its own and cannot suspend the generator's frame,
+so a helper that makes a request must be a generator too.
+PEP 380 describes the consequence:
+"a piece of code containing a `yield` cannot be factored out and put into a separate function in the same way as other code."
+The PEP's answer is `yield from`, which reached Python 3.3 in 2012.
+The helper is still a generator,
+and the generator that calls it delegates to it.
+`yield from` relays each request out to the driver and each answer back in,
+and it evaluates to the helper's return value,
 so you can compose a conversation from parts that never refer to their driver.
 
 An event loop is one such driver.
