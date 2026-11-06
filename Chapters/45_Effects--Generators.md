@@ -4,6 +4,14 @@
 > and continue when the answer arrives.
 > An Effect system runs on that conversation.
 
+A function's position in its body is state.
+An ordinary call keeps that state for the caller alone.
+The called function starts at its first line every time,
+so a function that hands out one result per call must record its progress in variables and find its place again on each call.
+A generator keeps its position and its local variables between calls,
+which lets it stop in the middle of a loop, or of a conversation,
+and continue from that point.
+
 [Iterators](22_Patterns--Iterators.md#generators)
 presents generators as a way to produce values lazily:
 a function containing `yield`,
@@ -1808,7 +1816,7 @@ Each of the three returns an awaitable for the caller to `await`.
 
 ## Half a Coroutine by Design
 
-A running function's position in its body is state, as its local variables are.
+The chapter's opening treats a function's position in its body as state.
 Halfway through a loop, a function has done part of its work.
 Its position determines what it does next.
 
