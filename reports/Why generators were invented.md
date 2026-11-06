@@ -627,7 +627,18 @@ Peters's "half" is the asymmetry, which PEP 342 kept (line 1997),
 and `close()` has its own reason (line 1999).
 The four Conway quotations in the new opening were compared with the page images of the 1963 paper, pages 396 and 397, and match.
 The IPL-V passage was compared the same way with page 209 of the April 1960 article and matches; the mark lost in extraction is a dash after "must coexist in the computer", before "that of the generator and that of the superprocess and subprocess".
-Three items stand as they were: the PEP 492 sentence (line 2008), the two "one-shot continuation" sentences, which match chapter 44's definition of a continuation, and the stackless half of "half a coroutine".
+Three items stood as they were after those commits: the PEP 492 sentence (line 2008), the two "one-shot continuation" sentences, which match chapter 44's definition of a continuation, and the stackless half of "half a coroutine".
+
+On 2026-11-06 the chapter closed the third item and gained Conway's example.
+"Half a Coroutine by Design" now shows the asterisk squasher as two listings, `squasher_switch.py` (an iterator class whose `__next__()` tests a stored character on every call, the switch of Conway's Figure 1) and `squasher_generator.py` (the same logic with two `yield`s in a row, the two writes of his Figure 2).
+Both listings were compared with the flowcharts on page 397 of the paper.
+Their `case ""` is an addition: Conway's flowcharts read cards without end, and a Python iterator ends.
+"The Restriction Behind the Driver" now has a paragraph on the second restriction: a `yield` suspends one frame, so a helper that makes a request must be a generator too, with the sentence from PEP 380's Motivation quoted from the PEP's source text.
+The PEP 492 sentence and the "one-shot continuation" sentences stand as they were.
+
+An independent read of the new passages that day confirmed the six quotations and both listings, and it corrected two older sentences that the 13 claims below do not cover.
+"A delegating generator passes all three channels through to the innermost generator" was wrong: `yield from` relays the yield and send channels to the driver, and the helper's return value stops at the delegating generator, as the value of the `yield from` expression.
+"The third way, older than PEP 255's generators" was imprecise: PEP 255 requires PEP 234 and names the iterator as "another alternative", so the chapter no longer dates the iterator class before generators.
 
 ### PEP 255 and the 1999 debate (verdicts from `python_pep_255_decision.md`)
 
