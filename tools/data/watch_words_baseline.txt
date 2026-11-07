@@ -84,7 +84,6 @@ Chapters/09_Foundations--Class_Attributes.md	never: It never checks whether some
 Chapters/09_Foundations--Class_Attributes.md	only: The shadowing rule confines a change to one object only while the shared value is immutable
 Chapters/09_Foundations--Class_Attributes.md	only: This exercise needs only the one expression given here
 Chapters/09_Foundations--Class_Attributes.md	want: Decide which you want
-Chapters/10_Foundations--Cleanup.md	has no: so a CODE instance has no slot in which to list its weak references
 Chapters/10_Foundations--Cleanup.md	never: Never release a resource in CODE
 Chapters/10_Foundations--Cleanup.md	only: That list holds the only remaining references
 Chapters/10_Foundations--Cleanup.md	only: The only referrer is CODE

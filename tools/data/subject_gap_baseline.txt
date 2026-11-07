@@ -9,7 +9,7 @@
 # before accepting.
 # See tools/subject_gap.py.
 Chapters/02_Foundations--Tour.md	[cc,conj] CODE .. explain: Print CODE and CODE and confirm that CODE changed and CODE still holds CODE, then explain why CODE earlier changed the list bound to CODE, but appending to CODE does not.
-Chapters/05_Foundations--Functions.md	[cc,relcl] function .. does: A function that finishes without a CODE returns CODE, and so does a bare CODE.
+Chapters/05_Foundations--Functions.md	[cc,relcl] function .. does: A function that reaches the end of its body returns CODE, and so does a bare CODE.
 Chapters/06_Foundations--Modules_and_Packages.md	[appos,cc,conj,prep] Windows .. name: Windows and macOS default to case-insensitive filesystems, so CODE and CODE name the same file there.
 Chapters/06_Foundations--Modules_and_Packages.md	[prep] CODE .. finds: Every later CODE of that name, from any file in the program, finds the module there and binds the same object.
 Chapters/06_Foundations--Modules_and_Packages.md	[relcl] identifier .. is: Any identifier that begins and ends with double underscores (a dunder) is one that Python itself sets, calls, or reads.

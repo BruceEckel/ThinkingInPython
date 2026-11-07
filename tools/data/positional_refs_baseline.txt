@@ -213,14 +213,12 @@ Solutions/19_Techniques--Concurrency/README.md	the `for` statement	**Take each i
 Solutions/19_Techniques--Concurrency/README.md	the first `resumed`	your edited `async_mechanics.py` prints `d: started` as the fourth `started` line and `d: resumed` as the first `resumed` line, and the final list reads `['A', 'B', 'C', 'D']`, in argument order.
 Solutions/19_Techniques--Concurrency/README.md	the fourth `started`	your edited `async_mechanics.py` prints `d: started` as the fourth `started` line and `d: resumed` as the first `resumed` line, and the final list reads `['A', 'B', 'C', 'D']`, in argument order.
 Solutions/19_Techniques--Concurrency/README.md	the line before	`ty` rejects the line before anything runs:
-Solutions/19_Techniques--Concurrency/README.md	the next `next()`	The `with lock:` inside the body therefore starts after `next()` has returned a number, and ends before the next `next()` begins.
 Solutions/19_Techniques--Concurrency/README.md	the third `pool.submit(enqueue, ...)`	**Add a third producer.** The one change is the third `pool.submit(enqueue, ...)`.
 Solutions/20_Patterns--Rethinking_Objects/README.md	the last line	Without the `# type: ignore` on the last line, `ty` rejects the call:
 Solutions/22_Patterns--Iterators/README.md	Each pass	Each pass recomputes the values from scratch.
 Solutions/22_Patterns--Iterators/README.md	The following `next(it)`	The following `next(it)` returns `4`.
 Solutions/22_Patterns--Iterators/README.md	second pass	This `squares()` leaves out the chapter's trace line, since the exercise is about the second pass.
 Solutions/22_Patterns--Iterators/README.md	the line that	With `typed()`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
-Solutions/22_Patterns--Iterators/README.md	the next `next()`	over `(x * 2 for x in [1, 2, 3])`, three calls to `peek()` print `2 2 2`, the next `next()` still returns `2`, `list()` of the rest gives `[4, 6]`, and `peek()` then reports the end.
 Solutions/22_Patterns--Iterators/README.md	the next `yield`	Each time something asks a generator for a value, its body runs to the next `yield` and pauses there.
 Solutions/22_Patterns--Iterators/README.md	the next call	A generator pauses inside its `for` loop at each `yield` and resumes there on the next call, so the loop that skips is the loop that yields.
 Solutions/22_Patterns--Iterators/README.md	two passes	each fix prints `[0, 1, 4, 9, 16]` on two passes in a row, where `generator_lifecycle.py` printed an empty list the second time.
@@ -234,7 +232,7 @@ Solutions/26_Patterns--Factory/README.md	the fifth `.topping()`	That builder che
 Solutions/26_Patterns--Factory/README.md	the line that	The type checker reports the line that constructs that factory.
 Solutions/26_Patterns--Factory/README.md	the line that	You can name the line that registers `Circle` and when it runs.
 Solutions/27_Patterns--Function_Objects/README.md	a few lines earlier	`EVENTS` holds the original class, so `handler()` raises `TypeError: Announce: not an @event`, although `Deposit` went through `@event` a few lines earlier.
-Solutions/27_Patterns--Function_Objects/README.md	each attempt	**Name each attempt.** Python stores each function's name in its `__name__` attribute, so the report reads `finder.__name__` to name the handler that ran, with no extra bookkeeping.
+Solutions/27_Patterns--Function_Objects/README.md	each attempt	**Name each attempt.** Python stores each function's name in its `__name__` attribute, so the report reads `finder.__name__` to say which handler ran, with no extra bookkeeping.
 Solutions/27_Patterns--Function_Objects/README.md	every attempt	The solution gives each finder a failure value that holds a reason and has `first_root()` report every attempt:
 Solutions/27_Patterns--Function_Objects/README.md	the first `@handler`	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 Solutions/27_Patterns--Function_Objects/README.md	the first handler	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.

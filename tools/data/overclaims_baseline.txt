@@ -593,7 +593,6 @@ Chapters/37_Patterns--Pattern_Refactoring.md	[BOUND] and reshape the design so t
 Chapters/38_Patterns--Simulation.md	[BOUND] A maze with a loop holds two paths between some pairs of cells, so two different rats can reach the same open cell from opposite directions
 Chapters/38_Patterns--Simulation.md	[BOUND] Atomicity adds the other guarantee, one rat per cell, which only a count like the one in exercise 3 can detect
 Chapters/38_Patterns--Simulation.md	[BOUND] CODE holds its two pieces of state in different ways
-Chapters/38_Patterns--Simulation.md	[BOUND] CODE is CODE only for a type checker reading the file and CODE at runtime, so the runtime skips that import and the cycle exists for the checker alone
 Chapters/38_Patterns--Simulation.md	[BOUND] CODE nests inside CODE because it names concepts that CODE alone uses
 Chapters/38_Patterns--Simulation.md	[BOUND] CODE states what it needs from a blackboard in the CODE CODE, so CODE imports from the standard library alone
 Chapters/38_Patterns--Simulation.md	[BOUND] CODE stops at whatever room holds an CODE, the one goal it can express
@@ -605,6 +604,7 @@ Chapters/38_Patterns--Simulation.md	[BOUND] Factory counts CODE among the cases 
 Chapters/38_Patterns--Simulation.md	[BOUND] It tests and marks a cell in one step with no CODE in between, so each cell goes to one rat, however many reach it
 Chapters/38_Patterns--Simulation.md	[BOUND] One move is one chain
 Chapters/38_Patterns--Simulation.md	[BOUND] Random kicks alone carry them there
+Chapters/38_Patterns--Simulation.md	[BOUND] The cycle exists for the checker alone
 Chapters/38_Patterns--Simulation.md	[BOUND] The design adds an event loop, a component whose one job here is to resume each waiting rat in turn
 Chapters/38_Patterns--Simulation.md	[BOUND] The imports point one way, from CODE into the model's modules
 Chapters/38_Patterns--Simulation.md	[BOUND] The rest is the maze
@@ -951,7 +951,7 @@ Solutions/11_Techniques--Testing/README.md	[BOUND] It is usually one function at
 Solutions/11_Techniques--Testing/README.md	[BOUND] The order of those two calls decides whether the other account keeps its balance when a transfer fails
 Solutions/11_Techniques--Testing/README.md	[BOUND] Those two expressions can round differently, so the test compares them with CODE
 Solutions/11_Techniques--Testing/README.md	[BOUND] Use both to test CODE, then write a second function that takes the directory as a parameter and test it with CODE alone
-Solutions/12_Techniques--Data_Classes_as_Types/README.md	[BOUND] An CODE that tests divisibility by 4 alone passes all four tests, because 2000 is the one century year CODE accepts
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	[BOUND] An CODE that tests divisibility by 4 alone passes all four tests, because the range CODE accepts holds one century year, 2000
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[BOUND] CODE reads the annotation, sees CODE, and leaves CODE alone as an ordinary class attribute, so CODE stays out of CODE
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[BOUND] Counting the CODE characters rejects CODE, so the solution makes two calls to CODE
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[BOUND] Strengthen it there with two calls to CODE
@@ -975,7 +975,7 @@ Solutions/14_Techniques--Decorators/README.md	[BOUND] Two things decide which ki
 Solutions/14_Techniques--Decorators/README.md	[BOUND] Wrapping the two extras in the other order changes the description and leaves the cost alone, and CODE passes
 Solutions/14_Techniques--Decorators/README.md	[BOUND] after two calls to one decorated function and one call to another, the two per-function counts read CODE and CODE, the class-level total reads CODE, and every call prints its CODE and CODE trace lines
 Solutions/14_Techniques--Decorators/README.md	[BOUND] each of your two classes prints its name once, as its CODE statement finishes and before any later line runs, and printing each class's CODE afterward gives the names back
-Solutions/14_Techniques--Decorators/README.md	[BOUND] one call to the CODE-decorated method through an instance runs its body CODE times with that instance as CODE, and your printout shows a CODE under one name and a CODE instance under the other
+Solutions/14_Techniques--Decorators/README.md	[BOUND] one call to the CODE-decorated method through an instance runs its body as many times as CODE holds, with that instance as CODE, and your printout shows a CODE under one name and a CODE instance under the other
 Solutions/14_Techniques--Decorators/README.md	[BOUND] under CODE, a function that raises an exception on its first two calls returns its result on the third
 Solutions/14_Techniques--Decorators/README.md	[BOUND] with CODE above CODE, one call prints CODE's CODE line, then your timing line, then CODE's CODE line showing the real return value rather than CODE
 Solutions/15_Techniques--Context_Managers/README.md	[BOUND] **Suppress one exception type
@@ -1074,7 +1074,7 @@ Solutions/22_Patterns--Iterators/README.md	[BOUND] The container keeps the value
 Solutions/22_Patterns--Iterators/README.md	[BOUND] The test should resemble CODE, because CODE and the generator expression's CODE clause are the same operation written two ways
 Solutions/22_Patterns--Iterators/README.md	[BOUND] To add the test to CODE, copy the test function alone
 Solutions/22_Patterns--Iterators/README.md	[BOUND] You can name the one piece of state your CODE adds
-Solutions/22_Patterns--Iterators/README.md	[BOUND] over CODE, three calls to CODE print CODE, the next CODE still returns CODE, CODE of the rest gives CODE, and CODE then reports the end
+Solutions/22_Patterns--Iterators/README.md	[BOUND] over CODE, three calls to CODE print CODE, the CODE that follows still returns CODE, CODE of the rest gives CODE, and CODE then reports the end
 Solutions/23_Patterns--Singleton/README.md	[BOUND] **Return the one instance
 Solutions/23_Patterns--Singleton/README.md	[BOUND] A call to CODE takes three steps
 Solutions/23_Patterns--Singleton/README.md	[BOUND] Any subclass that leaves CODE alone writes into CODE's dict, beside every other such subclass
@@ -1221,7 +1221,7 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] your CODE prints o
 Solutions/33_Patterns--Visitor/README.md	[BOUND] A new operation requires one function plus a registration for each flower that differs
 Solutions/33_Patterns--Visitor/README.md	[BOUND] Beside the four flower classes, two functions and one registration remain
 Solutions/33_Patterns--Visitor/README.md	[BOUND] CODE and CODE each exist to name one operation
-Solutions/33_Patterns--Visitor/README.md	[BOUND] CODE specifies the one method CODE calls, so the parameter declares what CODE needs instead of accepting anything
+Solutions/33_Patterns--Visitor/README.md	[BOUND] CODE specifies the one method CODE calls, so the parameter declares what CODE needs instead of admitting anything
 Solutions/33_Patterns--Visitor/README.md	[BOUND] Functions over a hierarchy keep a new operation in one place
 Solutions/33_Patterns--Visitor/README.md	[BOUND] If you make CODE a CODE function too, the program prints the same four lines
 Solutions/33_Patterns--Visitor/README.md	[BOUND] In this program the decorator's one effect is a registry lookup on each call
