@@ -163,7 +163,7 @@ Chapters/B_An_Effect_Checker.md	the third line	`hides()` is the third line of Ap
 Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except` clause specifies `ValueError`, so the `TypeError` propagates past it.
 Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs, since `finally` runs whether or not an exception is propagating.
 Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` shifts down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
-Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in automatically.
+Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills in that attribute automatically.
 Solutions/04_Foundations--Control_Flow/README.md	the `except` clause	The `else` clause runs only when the `try` block finishes without an exception, so the `TypeError` bypasses the `else` clause as well as the `except` clause.
 Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the `TypeError` bypasses the `else` clause as well as the `except` clause.
 Solutions/05_Foundations--Functions/README.md	the first call	A tuple has no `append()`, so the first call that omits `target` raises an `AttributeError`.
@@ -282,7 +282,7 @@ Solutions/46_Effects--Stateless/README.md	first pass	your four passes print `Hel
 Solutions/46_Effects--Stateless/README.md	four passes	your four passes print `Hello, Alice!` and `Hello, Bob!` three times: the first pass over the stored Effects prints them, the second runs silently, and both passes over the functions print them.
 Solutions/46_Effects--Stateless/README.md	on line 29	The error appears on line 29, the `yield from` that introduces the undeclared failure, not on the signature and not at the call site.
 Solutions/46_Effects--Stateless/README.md	second pass	**Run each stored Effect twice.** The second pass over `built` runs silently, and `run()` returns `None` for each entry.
-Solutions/46_Effects--Stateless/README.md	six runs	your six predictions match six runs with the third implementation added.
+Solutions/46_Effects--Stateless/README.md	six runs	your six predictions for `ambiguous_supply.py` with a third implementation match your six runs.
 Solutions/46_Effects--Stateless/README.md	the next line	Assigning `need(Console)` binds a generator to `console`, and the next line calls `print()` on it as if it were a `Console`.
 Solutions/46_Effects--Stateless/README.md	the second `info`	In the second `info` line, the type checker names the missing method rather than the missing type.
 Solutions/46_Effects--Stateless/README.md	the second `run()`	The type checker removes `Need[Console]` from the requirements and leaves `Need[Clock]` open, so the second `run()` needs a `# type: ignore`.

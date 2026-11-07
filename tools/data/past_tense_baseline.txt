@@ -325,7 +325,6 @@ Solutions/45_Effects--Generators/README.md	[PAST] stopped: The interview stopped
 Solutions/45_Effects--Generators/README.md	[PAST] told: The type checker told you more.
 Solutions/45_Effects--Generators/README.md	[PAST] wrote: you wrote the full sequence of lines before running the modified CODE, and it matches the run line for line, including which sends print two lines and what CODE prints.
 Solutions/46_Effects--Stateless/README.md	[PAST-HEADING] declared: 2. An undeclared need, declared
-Solutions/46_Effects--Stateless/README.md	[PAST] added: your six predictions match six runs with the third implementation added.
 Solutions/46_Effects--Stateless/README.md	[PAST] answered: At runtime the handler answered three requests across the two calls, two for CODE and one for CODE, although CODE annotates its parameter CODE.
 Solutions/46_Effects--Stateless/README.md	[PAST] applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.
 Solutions/46_Effects--Stateless/README.md	[PAST] described: Its signature described a different function.

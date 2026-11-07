@@ -528,7 +528,7 @@ Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] When both operands have th
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] When two objects of unknown type interact, a method call resolves its receiver's type alone
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] With the CODE override alone, the inherited CODE reports that the rock loses, so the two orders of one duel disagree
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Write a helper that wraps a constant CODE in a callable, so the seven unchanged cells stay one line each
-Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Writing the table out as data puts all nine answers in one place
+Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Writing out the table as data puts all nine answers in one place
 Chapters/33_Patterns--Visitor.md	[BOUND] *Visitor*, the final pattern in *GoF Design Patterns*, requires one method on the primary class hierarchy, typically called CODE, which takes an object from a secondary hierarchy called CODE
 Chapters/33_Patterns--Visitor.md	[BOUND] CODE resolves one argument's type
 Chapters/33_Patterns--Visitor.md	[BOUND] Count the lines each change adds, and say which of the two changes CODE makes shorter
@@ -777,7 +777,7 @@ Chapters/46_Effects--Stateless.md	[BOUND] So far CODE has appeared in one place
 Chapters/46_Effects--Stateless.md	[BOUND] So the two channels guarantee different things
 Chapters/46_Effects--Stateless.md	[BOUND] That CODE is the only CODE in CODE, so deleting it turns CODE into an ordinary function
 Chapters/46_Effects--Stateless.md	[BOUND] The failure the signature declares is the one the caller sees
-Chapters/46_Effects--Stateless.md	[BOUND] The output above shows standard output alone, so it leaves the warning out
+Chapters/46_Effects--Stateless.md	[BOUND] The output above shows standard output alone, so it leaves out the warning
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter version then adds two parameters to every function on the path
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter-passed version adds a CODE argument to both, although CODE, one level further down, is the one function that uses it
 Chapters/46_Effects--Stateless.md	[BOUND] The two calls are identical, and registration sits outside the types, so the type checker accepts both
@@ -1382,8 +1382,8 @@ Solutions/46_Effects--Stateless/README.md	[BOUND] The fix splits the one structu
 Solutions/46_Effects--Stateless/README.md	[BOUND] The requirement appears in the signature of every function between the one that uses the CODE and the one that supplies it
 Solutions/46_Effects--Stateless/README.md	[BOUND] Then check whether the type checker can tell two classes apart when they share one method name
 Solutions/46_Effects--Stateless/README.md	[BOUND] Those two are the only options, so the dependency stays visible
-Solutions/46_Effects--Stateless/README.md	[BOUND] Three implementations have six orderings, and one rule predicts them all
 Solutions/46_Effects--Stateless/README.md	[BOUND] Two CODEs that share one method name describe one shape under two names
+Solutions/46_Effects--Stateless/README.md	[BOUND] With a third implementation added to CODE, the three implementations have six orderings, and one rule predicts them all
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] **Leave the Effect alone
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Add a source class with the same two methods and place it in the tuple that CODE receives
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE asks for an instance of CODE, so its request consists of the type alone
@@ -1391,7 +1391,6 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE gains a CODE,
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE holds its hours in its code, CODE in CODE, so the solution shortens the other four sources
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE is the only addition
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE needs two edits
-Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE takes four edits, one of which the type checker names
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE's body names CODE and CODE alone
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Dependencies That Need Dependencies shows CODE unions growing as one Effect delegates to another with CODE
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Every draw succeeds, so CODE asks for one source, and the test passes without exercising the re-request it exists to check
@@ -1399,6 +1398,7 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Here is the chapte
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] If you script working sources alone, such as CODE, the run prints CODE, both hours, and CODE, all from a single request
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Starting with edit 4, the type checker reports each line the change requires, one edit at a time
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] The CODE version has one piece of state, so the next CODE returns the value the last CODE wrote
+Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] The Effect version takes four edits, one of which the type checker names
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] The accessor is the only place where the type checker verifies a caller's arguments, since once the accessor builds the request, the arguments are fields that the handler alone reads
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] The prediction is two lines
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] The rule that catches CODE is a reading rule about one line

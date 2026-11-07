@@ -682,6 +682,7 @@ Solutions/07_Foundations--Classes/README.md	only: so the trace shows only the CO
 Solutions/07_Foundations--Classes/README.md	want: the form you want in a traceback or a debugger
 Solutions/07_Foundations--Classes/README.md	want: the form you want in output a user reads
 Solutions/08_Foundations--Static_Types/README.md	has no: A tuple has no CODE
+Solutions/08_Foundations--Static_Types/README.md	has no: CODEObject of type CODE has no attribute CODE CODE
 Solutions/08_Foundations--Static_Types/README.md	has no: It says the type you declared has no such operation
 Solutions/08_Foundations--Static_Types/README.md	has no: and the tuple type has no method that changes its contents
 Solutions/08_Foundations--Static_Types/README.md	has no: since a tuple has no CODE
