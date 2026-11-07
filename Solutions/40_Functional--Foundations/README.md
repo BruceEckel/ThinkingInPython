@@ -536,7 +536,7 @@ then consume it twice with `list()` and compare the two results.
 your comprehensions print `[1, 4, 9, 16, 25]` and `[2, 4]`,
 and the last-letter sort prints `['banana', 'pie', 'kiwi', 'watermelon']`.
 You can say why that is the input order.
-The bare `map()` result prints as `<map object at 0x...>`,
+The bare `map()` result's type name, `type(...).__name__`, prints as `map`,
 and a second `list()` over it gives `[]`.
 
 <details>
