@@ -644,8 +644,9 @@ The parameter carries `tuple[float, ...]` rather than `tuple[float, float]` beca
 `tuple.__add__()` takes a tuple of any length,
 so `ty` reports `invalid-method-override` for the two-element annotation,
 citing the Liskov Substitution Principle.
-The wider annotation lets `p + (1.0, 1.0)` type-check as well as `Point + Point`.
-At runtime, the unpacking `x, y = other` raises a `ValueError` for a tuple of any other length.
+The wider annotation also lets `p + (1.0,)` type-check,
+so a tuple of the wrong length gets past the type checker.
+At runtime the unpacking `x, y = other` raises a `ValueError` for it.
 
 **Reuse the properties in `__repr__()`.**
 `tuple.__repr__()` prints `(4.0, 6.0)`.
