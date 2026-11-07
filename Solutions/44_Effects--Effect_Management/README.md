@@ -102,7 +102,7 @@ and the other parameter keeps its binding.
 
 **Declare what the function needs.**
 `greet()` runs unchanged, as it must.
-Its body names only its parameters, `ask` and `tell`,
+Its body names its parameters, `ask` and `tell`, and no implementation,
 so changing the binding leaves that body as it is.
 Delayed binding moves the choice of implementation to the call site,
 where a test can choose differently from production.
