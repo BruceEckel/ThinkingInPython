@@ -168,8 +168,8 @@ so run `ruff check` on the camelCase file inside the book's repository and see w
 <details>
 <summary>Done when</summary>
 
-all three versions print `5 0b1010`,
-`ruff check` in the book's repository reports `N816` on the camelCase file and passes the uppercase one,
+each renamed `augmented.py` and `bitwise.py` prints the same output as the original,
+`ruff check` in the book's repository reports `N816` on the camelCase names and accepts the uppercase ones,
 and you can say what each form tells a reader about whether the value changes.
 
 <details>

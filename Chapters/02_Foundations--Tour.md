@@ -248,7 +248,8 @@ print(alias, items)
 #: [1, 2, 3] [1, 2, 3, 4]
 ```
 
-Augmented assignment on a mutable object changes it in place,
+On a mutable built-in, such as a list,
+augmented assignment changes the object in place,
 so every other name bound to that object refers to the changed object.
 For a list, `+=` does what `extend()` does.
 For an `int`, both forms rebind the name,
@@ -558,8 +559,10 @@ Use `=` to label values in your exploring and debugging code.
 
 Since Python 3.12 ([PEP 701](https://peps.python.org/pep-0701/)),
 the expression inside the braces can reuse the string's own quote character,
-as in `f"{d["key"]}"`, hold a backslash, and span several lines.
+as in `f"{d["key"]}"`, hold a backslash,
+and span several lines inside a single-quoted string.
 Older code avoids all three because earlier versions rejected them.
+Before 3.12, an expression spanned several lines only inside a triple-quoted f-string.
 
 Existing code also uses two older styles: the `%` operator,
 as in `"val: %d" % val`, and the `str.format()` method,
