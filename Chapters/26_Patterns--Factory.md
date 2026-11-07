@@ -192,7 +192,7 @@ but it is a convention rather than concealment.
 [*Singleton*](23_Patterns--Singleton.md#nothing-keeps-the-class-private)
 says the same of `_Settings`.
 Python honors its underscore in two places:
-`from module import *` leaves the class out,
+`from module import *` leaves out the class,
 and `help()` leaves it out of the module's listing.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
@@ -229,7 +229,7 @@ so `Month(7)` returns the existing member `JULY` rather than building a new obje
 `Month(13)` raises a `ValueError`,
 as `factory()` raises one for a name it does not recognize.
 Where `factory()` has a `match` that lists each class,
-the `Enum` looks the value up in a table of its members,
+the `Enum` looks up the value in a table of its members,
 because the class holds every member the call can return.
 A factory over a closed set of products reduces to a lookup.
 
@@ -1298,7 +1298,7 @@ Match the machinery to what varies:
 
 - When a name maps to a class, use a dictionary.
   When the set of classes is closed,
-  write the table out and key it by a `Literal`, as in `shape_table.py`,
+  write out the table and key it by a `Literal`, as in `shape_table.py`,
   so a bad name fails at the check.
   When the set is open-ended or spread across modules,
   let the classes fill the table:
