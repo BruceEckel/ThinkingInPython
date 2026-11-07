@@ -777,7 +777,7 @@ if __name__ == "__main__":
 #: [AttributeError] 'int' object has no attribute 'display'
 ```
 
-`Any` switches the type checker off for `t`, so any type passes.
+`Any` switches off the type checker for `t`, so any type passes.
 Each `Any` parameter is dynamically typed.
 `Any` is a different thing from `object`.
 If you use `t: object` (the safe top type),
