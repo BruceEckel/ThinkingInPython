@@ -138,7 +138,7 @@ though a frozen memento raises a `FrozenInstanceError` on an accidental edit.
 
 You can replace the class with `type Memento = tuple[str, ...]`.
 Every call to `save()` and `restore()` still type-checks,
-once `restore()` copies the tuple it receives in place of `memento.strokes`.
+once `save()` returns `tuple(self.strokes)` and `restore()` copies the tuple it receives in place of `memento.strokes`.
 But an alias is a second name for an existing type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks on its own.
@@ -358,7 +358,7 @@ argues that encapsulation exists mainly because of mutation,
 so freezing removes most of the reason for it.
 Freezing blocks assignment to a field,
 not changes to the object the field holds.
-A record holding a list therefore lets that list change,
+A frozen data class holding a list therefore lets that list change,
 as `frozen_leaky.py` in that chapter shows.
 For that reason, `strokes` in `Drawing` is a tuple rather than a list.
 
