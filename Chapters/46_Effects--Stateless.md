@@ -782,7 +782,7 @@ The repeated union is the shape a `type` alias normally shortens.
 Elsewhere the book writes one.
 Under `ty` 0.0.95 the alias checks the same as the written-out signature.
 An undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
-This book still writes Effect signatures out in full,
+This book still writes out Effect signatures in full,
 because the union is the information.
 Every channel a function uses stays visible at the point of use.
 Before you shorten one with an alias,
@@ -1086,7 +1086,7 @@ a terminal in production, and a scripted one in a demo.
 
 Conventional DI meets that goal with a container.
 The container maps each type to the instance that satisfies it,
-and hands those instances out during execution:
+and hands out those instances during execution:
 
 ```python
 # dependency_injection.py
@@ -1416,7 +1416,7 @@ asyncio.run(main())
 which raises a `RuntimeError` because a loop is already running.
 Nothing awaits the coroutine,
 so the run also prints a `RuntimeWarning` to standard error.
-The output above shows standard output alone, so it leaves the warning out.
+The output above shows standard output alone, so it leaves out the warning.
 The warning is harmless, and a reliable sign of this mistake.
 It appears whenever asynchronous code calls `run()`.
 
