@@ -634,6 +634,8 @@ add(5, 6)  # A third entry, so add(1, 2) is evicted
 add(5, 6)  # Still cached, so nothing prints
 add(1, 2)  # Gone from the cache, so it runs again
 #: computing add(1, 2)
+add(a=1, b=2)  # Keyword arguments make a new key
+#: computing add(1, 2)
 print(square.__name__, add.__name__)
 #: square add
 ```
