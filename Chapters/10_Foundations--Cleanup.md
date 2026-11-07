@@ -461,7 +461,7 @@ finalize(WeakSlot("y"), print, "y", "closed")
 
 `__slots__` removes the instance `__dict__` and, by default,
 the `__weakref__` slot along with it,
-so a `Slot` instance has no slot in which to list its weak references.
+so a `Slot` instance has nowhere to list its weak references.
 `ref()`, `weakref.proxy()`,
 and `WeakValueDictionary` raise the same `TypeError` on a `Slot`,
 since a slotted class keeps the list of an instance's weak references in its `__weakref__` slot.
@@ -577,7 +577,7 @@ The file's `__del__()` closes it and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
 On CPython `del f` is that moment.
 On an implementation that reclaims the file only when its collector runs,
-the `gc.collect()` call runs that collector before the `print()`.
+the `gc.collect()` call makes that collector run before the `print()`.
 
 The diagnostic backstop exists to report a file left open,
 not to replace `close()`.
