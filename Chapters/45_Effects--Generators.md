@@ -1,7 +1,7 @@
 # Generators
 
 > A generator is a *resumable function*: it can pause partway, hand out a value,
-> and continue with its state intact when its caller sends one back.
+> and continue with its state intact when its driver sends back a value.
 > An Effect system runs on that conversation.
 
 A function's position in its body is state.
@@ -36,14 +36,14 @@ This chapter covers:
 - `yield from`, which composes generators that run under any driver
 - `throw()` and `close()`,
   which raise an exception at a suspended generator's `yield`
-- Drivers with more to do: a state machine with one generator per state,
+- Expanded drivers: a state machine with one generator per state,
   a scheduler that runs many generators, and the event loop behind `await`
 - Why a Python generator is half a coroutine,
   and why the other half is the driver you write
 
 [Stateless](46_Effects--Stateless.md)
 builds an Effect system on the three channels, the driver, `yield from`,
-and `throw()`, but generators are useful on their own.
+and `throw()`.
 
 ## Annotating a Generator
 

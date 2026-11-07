@@ -737,7 +737,7 @@ Chapters/45_Effects--Generators.md	[BOUND] Here the choice is between two places
 Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
 Chapters/45_Effects--Generators.md	[BOUND] One shape looks like a transition and is a delegation
 Chapters/45_Effects--Generators.md	[BOUND] Replace CODE's loop in CODE with the single line CODE and run CODE over the same CODE table
-Chapters/45_Effects--Generators.md	[BOUND] Stateless builds an Effect system on the three channels, the driver, CODE, and CODE, but generators are useful on their own
+Chapters/45_Effects--Generators.md	[BOUND] Stateless builds an Effect system on the three channels, the driver, CODE, and CODE
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
 Chapters/45_Effects--Generators.md	[BOUND] That CODE comes before the card step's CODE, so the exception propagates out of the card step, whose own action is the one that failed
 Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver at the edge of the program
