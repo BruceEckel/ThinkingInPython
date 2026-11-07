@@ -521,6 +521,16 @@ the judged keeps: a count followed by a list of that length, an idiom
 the claim, and a bound the next sentence qualifies. The 141 hits left
 NEW are the agents' "unsure" items, kept out of the baseline for
 Bruce's read.
+Since 2026-11-07 `tip overclaims ARGS=--survey` adds `[LEAD]`, a
+survey rule that is never baselined: a list lead-in whose last
+sentence bounds every item with a universal ("Each approach gives
+up one side's loop:") above an item holding an exemption word
+("The list keeps both loops", "still", "except", "unchanged"), the
+chapter 45 contradiction the 2026-11-06 super-prose pass found by
+hand and no tool had flagged. Under an exercise's own lead-in only
+its nested items count. The scan sees the shape and the reader
+judges the contradiction; the first run over `Chapters/` had eight
+hits and no contradiction, so a chapter pass reads its lines once.
 `tip stranded-accept`, `tip possessives-accept`, `tip watch-words-accept`,
 `tip internal-names-accept`, `tip positional-accept`,
 `tip trailing-accept`, `tip subject-gap-accept`,

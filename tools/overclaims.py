@@ -10,12 +10,30 @@ applies: can you point at the second member? If so, the bound is
 false and the sentence needs rewording. If not, the count is true and
 the hit is a keep.
 
-`[BOUND]` is the one rule. A clause earns it from any pattern in
+`[BOUND]` is the default rule. A clause earns it from any pattern in
 `PATTERNS`: "the one/only/sole/single X", a count word ("one", "a
 single", "two", "three", "four") before a noun from `NOUNS`, "one and
 only", "nothing else", "no other", "all it does", "that is all", "the
 rest is", "everything else", and "alone". `RULES` maps a label to its
-regular expression, so a second rule can join later.
+regular expression.
+
+`[LEAD]`, a list lead-in that bounds every item while one item
+exempts itself: a paragraph whose last sentence ends in a colon and
+holds a universal from `LEAD_UNIVERSAL` ("each", "every", "all",
+"only"), followed directly by list items, one of which holds an
+exemption word from `LEAD_EXEMPT` ("keeps", "still", "both",
+"except"). When the lead-in is itself a list item (an exercise with
+sub-steps), only the items nested under it count, so a sibling
+exercise never reads as one of its items. The case that found it was
+chapter 45's "Each approach gives up one side's loop:" above an item
+that said "The list keeps both loops". It is a survey rule because
+the contradiction is a judgment: the scan sees only the shape, so
+the hits are a reading list (the first run over `Chapters/`, on
+2026-11-07, had eight hits and no contradiction). A `[LEAD]` hit
+prints only under `--survey`, marked `survey` instead of NEW or
+accepted, after the `[BOUND]` lines. It never enters the baseline,
+never counts toward `N new`, and is counted on a `K survey` line of
+its own.
 
 The check reads each paragraph's prose, joins its lines, and splits
 the text into clauses at `.`, `;`, `:`, `?`, and `!`, the way
@@ -36,6 +54,7 @@ entries, for the given files alone when paths are given.
 
     uv run python -m tools.overclaims          # new hits
     uv run python -m tools.overclaims --all    # every hit
+    uv run python -m tools.overclaims --survey Chapters  # + LEAD
     uv run tip overclaims CH=45
     uv run tip overclaims-accept CH=45
 """
@@ -47,6 +66,7 @@ from pathlib import Path
 from typing import Final
 from tools.config import DATA_DIR, ROOT
 from tools.markdown import Document
+from tools.prose import LIST_ITEM
 from tools.repo import add_paths_arg, md_files
 from tools.report import Finding
 from tools.stranded_prepositions import (
@@ -88,6 +108,14 @@ RULES: Final[dict[str, re.Pattern[str]]] = {
                         re.IGNORECASE),
 }
 """Rule label to its pattern."""
+LEAD_UNIVERSAL: Final = re.compile(
+    r"\b(?:each|every|all|both|none|neither|always|never|the same|"
+    r"the only|only)\b", re.IGNORECASE)
+"""A universal in a list lead-in, bounding every item below it."""
+LEAD_EXEMPT: Final = re.compile(
+    r"\b(?:keeps?|kept|retains?|stays?|remains?|still|both|all|"
+    r"neither|except|unlike|unchanged|intact)\b", re.IGNORECASE)
+"""A word in a list item that can exempt it from the lead-in."""
 BASELINE: Final = DATA_DIR / "overclaims_baseline.txt"
 HEADER: Final = (
     "# Overclaim candidates a human read and judged keeps: the count\n"
@@ -102,6 +130,8 @@ HEADER: Final = (
 )
 
 SENTENCE_END = re.compile(r"[.;:?!]+[\"')\]*_”’]*(?=\s|$)")
+LEAD_END = re.compile(r"[^.;?!]*:[\"')\]*_”’]*$")
+"""A lead-in's last sentence, the one that ends on the colon."""
 
 
 def rules(clause: str) -> list[str]:
@@ -129,6 +159,41 @@ def find(doc: Document) -> Iterator[Finding]:
             for rule in rules(clause):
                 yield Finding(doc.path, lines[max(last, 0)],
                               f"[{rule}] {shown}")
+
+
+def indent(doc: Document, paragraph: list[tuple[int, str]]) -> int:
+    """The list indent of the paragraph's first line, or -1."""
+    m = LIST_ITEM.match(doc.lines[paragraph[0][0] - 1])
+    return len(m.group(1)) if m else -1
+
+
+def is_item(doc: Document, paragraph: list[tuple[int, str]],
+            after: int, deeper_than: int) -> bool:
+    """A list item indented past `deeper_than`, with only blank
+    lines between it and line `after`."""
+    gap = doc.lines[after:paragraph[0][0] - 1]
+    return (indent(doc, paragraph) > deeper_than
+            and all(not line.strip() for line in gap))
+
+
+def find_leads(doc: Document) -> Iterator[Finding]:
+    """A `[LEAD]` hit per exempting item under a universal lead-in."""
+    found = list(paragraphs(doc))
+    for index, paragraph in enumerate(found):
+        lead = " ".join(joined(paragraph)[0].split())
+        last = LEAD_END.search(lead)
+        if last is None or not LEAD_UNIVERSAL.search(last.group()):
+            continue
+        depth = indent(doc, paragraph)
+        after = paragraph[-1][0]
+        for item in found[index + 1:]:
+            if not is_item(doc, item, after, depth):
+                break
+            after = item[-1][0]
+            text = " ".join(joined(item)[0].split())
+            if LEAD_EXEMPT.search(text):
+                yield Finding(doc.path, item[0][0],
+                              f"[LEAD] {lead} -> {text}")
 
 
 def key(shown: str, clause: str) -> str:
@@ -166,6 +231,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--accept", action="store_true",
                     help="add the NEW hits to the baseline and drop "
                          "stale entries")
+    ap.add_argument("--survey", action="store_true",
+                    help="also print the [LEAD] survey rule, "
+                         "never baselined")
     args = ap.parse_args(argv)
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
@@ -193,8 +261,16 @@ def main(argv: list[str] | None = None) -> int:
     for entry in stale:
         shown, clause = entry.split("\t", 1)
         print(f"stale    {shown}: {clause}")
+    survey = sorted(
+        {(display(f.path), f.line, f.message)
+         for p in paths for f in find_leads(Document.parse(p))}
+    ) if args.survey else []
+    for shown, line, message in survey:
+        print(f"{'survey':8} {shown}:{line}: {message}")
     print(f"{len(new)} new, {len(found) - len(new)} accepted"
           + (f", {len(stale)} stale" if stale else ""))
+    if args.survey:
+        print(f"{len(survey)} survey")
     return 1 if args.fail and new else 0
 
 

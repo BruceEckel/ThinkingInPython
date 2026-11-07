@@ -56,6 +56,10 @@ scope's line range:
 - `tip past-tense CH=NN ARGS=--survey` (for `activate`: `[PAST-SUB]`,
   and `[PERFECT]`, a present perfect in a time clause, "before the
   generator has yielded" -> "before the generator yields", C57)
+- `tip overclaims CH=NN ARGS=--survey` (for the claim check every
+  pass makes: `[LEAD]`, a list lead-in that bounds every item above
+  an item that exempts itself, "Each approach gives up one side's
+  loop:" over "The list keeps both loops", 2026-11-07)
 
 Read `deep_review_db.md` and the chapter's most recent
 `deep_review/~NN...` file for standing exemptions, and the Rules
