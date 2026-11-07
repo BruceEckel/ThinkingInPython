@@ -442,7 +442,7 @@ which makes randomness repeatable a different way, by taking a `seed` parameter.
 A `seed` parameter works,
 but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
 Here the return type names the source.
-No signature between `handle()` and the request mentions it.
+No parameter list between `handle()` and the request mentions the source.
 
 `Flip` and `Now` are both side causes,
 in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect):
@@ -759,7 +759,7 @@ def ledger(cell: Cell) -> tuple[
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
 `Put` has `Tell`'s shape: payload out, `None` back.
 `purchase()`'s comparison sits between the two requests,
-in code that sees only the integer `get()` returned.
+in code that compares the integer `get()` returned with `price` and never sees the cell.
 
 `purchase()`'s signature declares the shared state.
 `Depend[Get | Put, bool]` tells a caller this function reads or writes something that outlives it.
@@ -1870,7 +1870,7 @@ which covers part of what the missing scope mechanism would do.
 
 Here is every tool from both chapters that acts on a description.
 Each one builds a description, rewrites a description's type, or executes one.
-Three sit outside the tables.
+Six sit outside the tables, in three groups.
 `as_type()` relabels a value for the type checker and hands the value back unchanged at runtime.
 `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
 `print_line()`, `read_line()`, and `read_file()`,
@@ -2375,7 +2375,7 @@ For most Python code that demand is larger than the benefit.
 [Converting Effectful to Pure](44_Effects--Effect_Management.md#converting-effectful-to-pure)
 gives three techniques: returning a `Result`, catching the exception you expect,
 and restricting a type so bad values cannot exist.
-They make most of a function's failures visible in its signature,
+They remove a function's failures or make them visible in its signature,
 with no generator discipline and no description/execution split.
 Use Stateless when a system is large enough that hidden Effects have caused a production incident,
 and when the team will declare every Effect at every boundary.
@@ -2389,7 +2389,7 @@ and none of them needs an Effect type to work.
 
 But watch the direction.
 Python got one Effect tracked into its type system with `async`.
-The languages listed under [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
+The languages in the Koka family under [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 track all of them.
 Stateless demonstrates that Python's type system is expressive enough to do it,
 given a library willing to encode everything into return types.

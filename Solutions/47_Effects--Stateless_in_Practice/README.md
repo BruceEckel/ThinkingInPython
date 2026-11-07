@@ -457,7 +457,7 @@ and whether any `yield` lies between the handler's `raise` and `run()`.
 <summary>Done when</summary>
 
 `run_load()` is unchanged and your `sun_first` trace shows the turbine's hours between `Solar offline` and `Battery online`.
-With every source shortened,
+With the other four sources shortened,
 `run()` raises a `Blackout` for the first uncovered hour,
 with or without `catch(Blackout)` around `run_load()`,
 and you can say which function raises it and why that function sits outside the Effect.
@@ -518,6 +518,8 @@ Choosing the source in the handler is the same substitution `Console` and `Feed`
 applied to a choice made fresh at every request rather than once at the start.
 
 **Leave an hour with no supplier.**
+`Solar` holds its hours in its code, `6 <= hour < 19` in `available()`,
+so the solution shortens the other four sources.
 With the turbine, the battery, the grid, and the backup shortened,
 hour 20 has no supplier.
 The `Blackout` propagates out of `run()` instead of arriving on the Effect's error channel.
