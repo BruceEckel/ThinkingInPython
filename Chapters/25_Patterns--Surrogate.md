@@ -424,7 +424,7 @@ A narrower guard, `if name == "_implementation"`,
 keeps forwarding those names and still works with `copy` and `pickle`,
 but a typo like `self._imp` recurses again.
 
-This chapter's other `__getattr__()` proxies leave the guard out,
+This chapter's other `__getattr__()` proxies leave out the guard,
 so each listing shows one idea.
 
 ### A Surrogate Is Not Its Implementation
@@ -835,7 +835,7 @@ so the checker rejects `change_to(StateB())`.
 With that surrogate, `state_demo.py` fails the same way.
 `ty` narrows `first` to `Implementation1` despite its `Behavior` declaration,
 and rejects `surrogate.change_to(second)`.
-Every caller then writes the parameter out, as in `Surrogate[StateA | StateB]`,
+Every caller then writes out the parameter, as in `Surrogate[StateA | StateB]`,
 so `state_surrogate.py` keeps `Any`.
 
 ## One Surrogate, Two Intents
