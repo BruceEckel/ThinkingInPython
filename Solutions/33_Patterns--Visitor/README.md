@@ -307,7 +307,9 @@ each beside the operation it extends.
 That difference is the [expression problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem).
 Methods on a class keep a new type in one place.
 Functions over a hierarchy keep a new operation in one place.
-No arrangement does both at once.
+Because `register` works from any module,
+`singledispatch` can also keep a new type's registrations beside its class,
+and each operation's cases then sit in several modules.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
