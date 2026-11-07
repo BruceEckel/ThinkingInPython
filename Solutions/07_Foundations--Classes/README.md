@@ -213,8 +213,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Inheritance](../../Chapters/07_Foundations--Classes.md#inheritance)
-shows `Derived.show()` printing a message and then calling `super().show(msg)`.
+In [Inheritance](../../Chapters/07_Foundations--Classes.md#inheritance),
+`Derived.show()` prints a message and then calls `super().show(msg)`.
 Give `MoreDerived` a `show()` with the same shape and its own message.
 `MoreDerived` inherits `show_twice()`, which calls `self.show()`,
 so the lookup starts at the class of `self`.
