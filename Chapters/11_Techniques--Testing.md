@@ -816,7 +816,7 @@ The patch applies process-wide until teardown restores the name.
 Choose injection when the parameter sits near the boundary.
 Choose `monkeypatch` when passing the parameter down changes more code than the test is worth.
 
-`monkeypatch` cannot patch `datetime.now()`.
+`monkeypatch` cannot set `now` on the `datetime` class.
 `monkeypatch.setattr(datetime, "now", ...)` raises a `TypeError`,
 because `datetime` is an immutable C type that rejects attribute assignment.
 That rejection justifies the effort of injection for code that calls `datetime.now()`.
