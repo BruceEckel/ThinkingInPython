@@ -586,7 +586,7 @@ If you pair `Column` with `choose_row()`, written for a `Row`,
 `ty` reports `invalid-argument-type` on that rule.
 `refund()` accepts `object`, so it pairs with any input type.
 
-The listing binds the list to `rules`, with no annotation, before the call,
+`__init__()` binds the list to `rules`, with no annotation, before the call,
 and that binding leaves each `Rule(...)` to infer its `I` from its own arguments.
 If you write the list inline as the argument,
 the parameter's `Sequence[Rule[Any]]` becomes its expected type.
