@@ -431,8 +431,8 @@ and the object's type decides which methods you can call.
 To make the append an error,
 annotate with an immutable type such as `tuple[int, ...]` and assign a tuple.
 A `Sequence` annotation is not enough.
-For a `Final` name, the checker keeps the assigned list's own type,
-so the append still passes.
+In the scope that assigns the list,
+the checker narrows the name to the list's own type, so the append still passes.
 
 <details>
 <summary>Done when</summary>

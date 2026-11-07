@@ -10,7 +10,7 @@ A bug in a pure function reproduces from the arguments alone.
 A test of a pure function is a call and a comparison.
 The standard library supplies and tests a cache in `functools` and a sliding window in `itertools`,
 so each one handles the edge case you would otherwise miss.
-A function that keeps its state private is safe to run in parallel.
+A function that shares no mutable state is safe to run in parallel.
 And you can reason about code built from small,
 checkable pieces the way you check a line of algebra, by substitution.
 
@@ -344,14 +344,15 @@ Supporting a new operator means adding a row to the table,
 whether the literal holds that row or a later line adds it,
 as the `operations["%"]` line does here.
 The dispatch code stays the same.
-The same table of functions underlies [the dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
+The same table, holding classes instead of functions,
+underlies [the dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let you add features to a program from outside its core.
 
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 replaces the same kind of `if`/`elif` chain with `match`.
 `match` and the table differ in one way that decides between them.
 A `match` is code, so adding an operator means editing the function,
-and the type checker verifies every case.
+and the type checker checks each case's body.
 The table is data, so adding an operator means adding a row,
 which another module does at import time and a test does at runtime.
 Choose `match` when you know the whole set of cases as you write the function,
