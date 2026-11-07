@@ -48,7 +48,8 @@ class OnlyOne:
 <details>
 <summary>Done when</summary>
 
-your file prints the same accumulated `val` list and `False True` that the chapter's `singleton_pattern.py` prints,
+your file prints the accumulated `val` list and `False True`,
+as the chapter's `singleton_pattern.py` does,
 and `uv run ty check` passes on it with the sentinel and the guard gone.
 You can also name what the change gives up and the failure that no longer occurs.
 
