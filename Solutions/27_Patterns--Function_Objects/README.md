@@ -349,7 +349,7 @@ A `Failed` is never a root, so `Root | Failed` says which result is which.
 
 **Name each attempt.**
 Python stores each function's name in its `__name__` attribute,
-so the report reads `finder.__name__` to name the handler that ran,
+so the report reads `finder.__name__` to say which handler ran,
 with no extra bookkeeping.
 
 Reading `finder.__name__` is why `chain` needs a `Protocol` here instead of an alias like the chapter's `RootFinder`.
@@ -362,7 +362,7 @@ Pyright allows the reads, inferring the attributes of a function object.
 and a function satisfies both.
 
 The listing copies the finders from `algorithms.py` rather than importing them,
-because each failing `return` now returns a `Failed`.
+because each failing `return` now hands back a `Failed`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
