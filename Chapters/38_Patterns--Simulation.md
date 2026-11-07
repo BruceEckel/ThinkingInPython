@@ -476,7 +476,8 @@ The same `Blackboard` and `Rat` classes drive a GUI demonstration.
 `rats_view.py` lets the rats finish exploring,
 records the order in which they claimed cells,
 and replays that order on a `tkinter` canvas.
-The canvas shows the walls in gray, then each claimed cell turns green in turn,
+The canvas shows the walls in gray,
+then each claimed cell turns green in that order,
 so you watch the pack move through the maze from the entry outward.
 The view records the order by subclassing `Blackboard` and overriding `claim()`,
 so `blackboard.py` stays as written.
@@ -619,7 +620,7 @@ class Robot(Item):
 `world.py` imports `Item`, `Robot`, `Urge`, and `Wall` from `items.py`,
 so `from world import Room` here is circular.
 `TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
-so the runtime skips that import and the cycle exists for the checker alone.
+so Python skips that import and the cycle exists for the checker alone.
 Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`).
 Python evaluates an annotation only when something reads it,
 so no line of `items.py` looks `Room` up at runtime.
