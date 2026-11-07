@@ -280,7 +280,7 @@ class LoudTally(NamedTally):
 
 with `t = LoudTally("clicks")`,
 `print(t.bump().bump().report())` prints `CLICKS: 2` and `uv run ty check` passes.
-Changing `bump()`'s return annotation from `Self` to `Tally` makes the check report `unresolved-attribute` for `report` on the chained call.
+Changing `bump()`'s return annotation from `Self` to `Tally` makes `ty` flag `unresolved-attribute` on the chained `report()` call.
 
 <details>
 <summary>Solution</summary>
