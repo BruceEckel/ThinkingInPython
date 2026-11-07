@@ -1094,6 +1094,12 @@ The first checks that the prototype survived,
 but a user of the registry depends on the next spawn being correct.
 The second assertion tests that spawn, the one `copy.copy()` corrupts.
 
+`test_prototype_parts.py` carries its own `Monster`, `PROTOTYPES`,
+and `spawn()`, because a solution runs in its own folder and cannot import the chapter's `prototype_registry.py`.
+Its test fails when that local `spawn()` switches to `copy.copy()`.
+In the chapter's folder,
+the two tests in `test_prototype.py` catch the `copy.copy()` bug the exercise introduces into `prototype_registry.py`.
+
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
@@ -1114,7 +1120,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Factory Objects](../../Chapters/26_Patterns--Factory.md#factory-objects)
-describes the `eval()` dispatcher and the `FACTORIES` table that replaces it.
+describes the `FACTORIES` table and the `eval()` dispatcher that can replace it.
 `eval()` compiles and runs the string it receives,
 so `kind` can be an expression with a side effect,
 such as a conditional whose test calls `print()`.

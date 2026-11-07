@@ -283,7 +283,8 @@ make("Square").draw()
 The `dict` values have the type `type[Shape]` because they are classes,
 and calling one constructs an instance.
 If the table holds instances, as in `{"Circle": Circle()}`,
-`make()` returns the stored object, so every caller shares one `Circle`.
+and `make()` returns `SHAPES[kind]` without calling it,
+every caller shares one `Circle`.
 [*Prototype*](#prototype)
 keeps a table of instances on purpose and copies one for each caller.
 
@@ -775,12 +776,12 @@ each overridden in a concrete factory.
 Each factory method creates a different kind of object.
 Creating the factory object chooses the concrete version of every object that factory creates.
 
-The example in *GoF Design Patterns* makes one program work across several graphical user interfaces
-(GUIs).
-You create a factory object for the GUI you use.
-From then on, when you ask that factory for a menu, button, or slider,
-it creates the version of that item suited to that GUI.
-Switching from one GUI to another then changes one place in the code,
+The example in *GoF Design Patterns* makes one user interface toolkit work across several look-and-feel standards,
+such as Motif and Presentation Manager.
+You create a factory object for the look and feel you use.
+From then on, when you ask that factory for a scroll bar, window, or button,
+it creates the version of that widget suited to that look and feel.
+Switching from one look and feel to another then changes one place in the code,
 most likely via startup configuration.
 
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
@@ -1126,13 +1127,15 @@ It builds a complex object in steps,
 keeping the step-by-step assembly separate from the finished object.
 In *GoF Design Patterns* a *director* issues the steps to a builder through an abstract interface,
 so one construction process can produce different representations.
-The example in *GoF Design Patterns* is a document reader that hands each token to a converter,
-and the converter decides whether the result is ASCII text or TeX.
+The example in *GoF Design Patterns* is a document reader that hands each token to a converter.
+Each converter class produces one format
+(ASCII text, TeX, or an editable text widget),
+so configuring the reader with a different converter class changes the result.
 
 The builder most programmers meet is narrower,
 the one Joshua Bloch's *Effective Java* recommends.
-In Java and C++, a class with many optional settings needs a constructor for every useful combination,
-because those languages pass every argument by position.
+In Java, a class with many optional settings needs a constructor for every useful combination,
+because Java has neither keyword nor default arguments.
 That pile of constructors is the *telescoping constructor*.
 Translated into Python, this builder is the workaround:
 a companion class that collects settings one method call at a time.
@@ -1273,7 +1276,7 @@ is such a builder.
 It assembles a maze in three stages: creating rooms,
 connecting each room to its neighbors,
 then pairing the teleports that share a target letter.
-Each stage relies on the previous stage.
+The second and third stages each rely on the rooms the first stage builds.
 No list of keyword arguments can express that.
 The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
