@@ -726,7 +726,7 @@ a different design, a detail, or an equivalent alternative.
 
 Change the responder type to return a [`Result`](../../Chapters/42_Functional--Error_Handling.md#a-result-type),
 and make `announce()` a comprehension that keeps each result that is an `Err`.
-The adapter takes a `None`-returning callable and returns a responder that calls it and answers `Ok(None)`.
+The adapter wraps a `None`-returning callable in a responder that calls it and answers `Ok(None)`.
 
 <details>
 <summary>The shape</summary>
