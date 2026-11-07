@@ -21,6 +21,14 @@ def square(n: int) -> int:
 
 monitoring.use_tool_id(TOOL, "call counter")
 monitoring.register_callback(TOOL, PY_START, on_start)
+monitoring.set_events(TOOL, PY_START)
+answers = fib(10), square(4)
+monitoring.set_events(TOOL, NO_EVENTS)
+print(*answers)
+#: 55 16
+print(counts)
+#: Counter({'fib': 177, 'square': 1})
+counts.clear()
 for target in (fib, square):
     monitoring.set_local_events(TOOL, target.__code__,
                                 PY_START)

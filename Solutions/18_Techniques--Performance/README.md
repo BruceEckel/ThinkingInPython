@@ -572,6 +572,14 @@ def square(n: int) -> int:
 
 monitoring.use_tool_id(TOOL, "call counter")
 monitoring.register_callback(TOOL, PY_START, on_start)
+monitoring.set_events(TOOL, PY_START)
+answers = fib(10), square(4)
+monitoring.set_events(TOOL, NO_EVENTS)
+print(*answers)
+#: 55 16
+print(counts)
+#: Counter({'fib': 177, 'square': 1})
+counts.clear()
 for target in (fib, square):
     monitoring.set_local_events(TOOL, target.__code__,
                                 PY_START)
@@ -585,13 +593,15 @@ print(counts)
 #: Counter({'fib': 177, 'square': 1})
 ```
 
-With `set_events()` in place of the local attachment,
+With `set_events()` in place of the chapter's local attachment,
 the new entry is `'square': 1`.
 It is the only addition,
 because the interpreter reports `PY_START` when a Python code object starts running,
 and the module's own stack frame starts before the tool attaches.
 CPython implements `print()` in C, so it starts no Python stack frame.
 A program this small has no other candidates.
+The listing still calls `print()` after detaching,
+because a harness that captures stdout through Python code adds that code's functions to the global count.
 
 The two local attachments above produce the same `Counter`.
 That agreement is an artifact of the example's size.
@@ -1041,7 +1051,7 @@ The measured work runs in C, not in bytecode.
 The JIT compiles only the bytecode the interpreter runs,
 so it can speed up almost none of the time the listing reports.
 Moving work into C is also why the advice in [Write Idiomatic Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python)
-speeds a program up.
+speeds up a program.
 
 The program is too short to get hot.
 The JIT compiles a code path after the path has run enough times to cross a threshold,
