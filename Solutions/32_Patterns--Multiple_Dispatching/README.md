@@ -651,6 +651,9 @@ and the body starts at the first `next()`.
 Until then the counter stays empty.
 The solution's loop consumes all 100 pairs before it reads the count.
 
+The listing inlines `arena.py`'s `duel()` and the four-item `OUTCOME` table beside `random_pairs()`,
+because a solution runs in its own folder and cannot import the chapter's files.
+
 ```python
 # exercise_4.py
 import random
@@ -1036,12 +1039,13 @@ The match now follows inheritance.
 That change has three consequences.
 
 The lookup becomes a nested loop over two MROs instead of one probe,
-so a miss now takes as many probes as the product of the two depths.
+so a miss now runs a loop as long as the product of the two depths.
 For a table consulted once per duel, that time is negligible.
 In an inner loop, it matters.
 
 Order now decides the answer.
-`(TolerantPaper, TolerantRock)` and `(TolerantOrigami, TolerantItem)` can both match.
+If `OUTCOME` also held a `(TolerantOrigami, TolerantItem)` row,
+it and `(TolerantPaper, TolerantRock)` would both match `TolerantOrigami().compete(TolerantRock())`.
 The order in which the loops walk picks the one that wins.
 That rule lives in `compete()` instead of in the table.
 The exact version settles the question with one probe.
@@ -1049,7 +1053,8 @@ Either the pair is in the table or it is not.
 
 The tolerant version also gives up the `KeyError` that makes the exact version safe,
 for one kind of new type: a subclass of a concrete item.
-An `Origami(Paper)` whose rows you forgot to write silently inherits `Paper`'s answers and plays as paper.
+A `TolerantOrigami` with no rows of its own inherits `TolerantPaper`'s answers and plays as paper,
+as the listing's last line shows.
 A `Lizard(TolerantItem)` still fails fast,
 since every row's key names two concrete items,
 and `Lizard`'s ancestors are `TolerantItem`, `Item`, and `object`.
@@ -2128,7 +2133,7 @@ and the seeded meeting raises a `KeyError` for the missing `(Jargon, Schedule)`.
 The solution passes `strict=True` to both `zip()` calls,
 so the short row raises a `ValueError` when the module loads, before any duel.
 
-The grid holds in six lines the answers that exercise 8 spreads across 42 methods.
+The grid holds in six lines the 36 answers that exercise 8 spreads across 36 `eval_*()` methods.
 A seventh weapon adds an empty class, a row, and a column,
 where exercise 8 needs a method in every existing class and an eight-method class.
 [Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
