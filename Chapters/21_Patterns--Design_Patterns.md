@@ -153,7 +153,7 @@ The pattern exists because the language leaves that code for them to write.
 
 A language can supply that missing piece in two ways.
 Sometimes a language adds the feature,
-and the feature replaces the pattern^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan. A count for Python comes out differently. *Singleton* is one of the seven he leaves unchanged, but [*Singleton*](23_Patterns--Singleton.md)
+and the feature replaces the pattern^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan. A count for Python comes out differently. *Singleton* is outside his sixteen, but [*Singleton*](23_Patterns--Singleton.md)
 shows that a Python module already is one.].
 [*Iterator*](22_Patterns--Iterators.md#the-pattern-that-disappeared)
 is the clear case.
