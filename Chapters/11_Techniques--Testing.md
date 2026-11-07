@@ -206,7 +206,7 @@ When you do need one, a `breakpoint()` call,
 in the test or in the code it checks, pauses the run at that line in `pdb`.
 `breakpoint()` calls `sys.breakpointhook()`,
 which reads the `PYTHONBREAKPOINT` environment variable,
-so that variable can turn every `breakpoint()` off with `0` or specify another debugger in place of `pdb`.
+so that variable can turn off every `breakpoint()` with `0` or specify another debugger in place of `pdb`.
 
 `pytest -k overdraft` runs only the tests whose names contain "overdraft",
 `pytest -x` stops at the first failure,
@@ -356,7 +356,7 @@ def test_withdraw_leaves_expected_balance(
 The names in the string line up, in order, with the values in each tuple.
 
 `parametrize` is a *mark*, and three others appear in most existing suites.
-`@pytest.mark.skip` and `@pytest.mark.skipif` leave a test out,
+`@pytest.mark.skip` and `@pytest.mark.skipif` leave out a test,
 unconditionally or on a condition such as the platform.
 `@pytest.mark.xfail` records a known bug.
 The test still runs.
