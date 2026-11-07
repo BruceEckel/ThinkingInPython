@@ -384,9 +384,8 @@ def deep_sum(items: list[Nested]) -> int:
 
 your decorated `deep_sum()` raises `TypeError: unhashable type: 'list'` on `[1, [2, [3, 4], 5], 6]`,
 and you can say why.
-With your revised `Nested` alias,
-the cached `deep_sum()` returns `21` on the same nesting,
-and `uv run ty check` passes with no `# type: ignore`.
+You can also write the revised `Nested` alias and its matching parameter annotation,
+and say why a tuple works as a cache key where a list fails.
 
 <details>
 <summary>Solution</summary>
@@ -553,6 +552,11 @@ print(first == second)
 #: True
 print(*map("-".join, first))
 #: Gia-Eve Hal-Bo Di-Fi Ana-Cy
+shared = random.Random(0)
+one = next(group_rounds(students, 2, shared))
+two = next(group_rounds(students, 2, shared))
+print(one == two)
+#: False
 ```
 
 The `rng` parameter preserves determinism,

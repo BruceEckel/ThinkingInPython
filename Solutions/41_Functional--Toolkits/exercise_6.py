@@ -53,3 +53,8 @@ print(first == second)
 #: True
 print(*map("-".join, first))
 #: Gia-Eve Hal-Bo Di-Fi Ana-Cy
+shared = random.Random(0)
+one = next(group_rounds(students, 2, shared))
+two = next(group_rounds(students, 2, shared))
+print(one == two)
+#: False
