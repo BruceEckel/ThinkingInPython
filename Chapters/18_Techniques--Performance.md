@@ -585,13 +585,13 @@ applies to whatever code turns out to be hot, and speeds it up by percentages.
 pauses to compile on the first call, and speeds code up by multiples.
 Neither one changes a quadratic algorithm's growth rate.
 
-[PEP 836](https://peps.python.org/pep-0836/)
-sets the speedups the JIT must reach: 5% over the interpreter alone for 3.16,
+[PEP 836](https://peps.python.org/pep-0836/), withdrawn in October 2026,
+proposed two speedup targets for the JIT:
+5% over the interpreter alone for 3.16,
 then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#free-threading)
 by 3.17.
-The PEP calls that the minimum for continuing to develop the JIT inside CPython.
-Meeting it does not turn the JIT on by default.
-That step needs separate approval from the release manager.
+The PEP called those targets the minimum for continuing to develop the JIT inside CPython.
+Under the PEP, turning on the JIT by default was a separate step that needed the release manager's approval.
 
 ## Write Idiomatic Python
 
@@ -1254,7 +1254,8 @@ The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decor
 `cls` is `None` when you call the decorator with arguments.
 The two `@overload` declarations tell the checker which form it reads.
 The test is `cls is None` rather than `callable(cls)`,
-since a class is callable.
+for the reason that section gives:
+a stray positional argument such as `@record(False)` then fails at decoration instead of being silently ignored.
 
 A class decorated with `@record` behaves like any frozen data class,
 and its instances carry no `__dict__`:
@@ -1830,7 +1831,7 @@ The repository's `rust/README.md` explains how to build and run `fastcount` your
 `uv run tip rust-all` compiles both functions, installs the module,
 and runs the comparison in `demo.py`, printing your machine's own numbers.
 The main book build skips this step.
-Only `tip rust-all` needs the Rust toolchain.
+Only the `rust-*` tasks, such as `tip rust-all`, need the Rust toolchain.
 
 ## Concurrency
 

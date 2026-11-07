@@ -1028,7 +1028,7 @@ the comparison is two runs of the same file that differ in `PYTHON_JIT` alone.
 `tip` and `uv run` use the project's own interpreter, the `False False` build.
 Run the file with the `True False` build's `python`,
 from the chapter directory with `utils/` on the import path
-(`tip membership` prints those commands in your shell's syntax):
+(`tip membership` prints the `cd` and `PYTHONPATH` steps, in PowerShell syntax on Windows and POSIX syntax elsewhere):
 
     $ cd Examples/18_Techniques--Performance
     $ PYTHON_JIT=0 PYTHONPATH=../utils python membership.py --numbers
