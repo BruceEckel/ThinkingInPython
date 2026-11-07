@@ -1059,7 +1059,7 @@ so the clause for `GeneratorExit` wraps the whole statement.
 The exception leaves the inner `try` through its `finally` block,
 which prints `cleanup`.
 The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
-`close()` returns the value the generator returned while handling `GeneratorExit`,
+`close()` hands the driver the value the generator returned while handling `GeneratorExit`,
 so the driver prints `closed`,
 and the call returns the way an ordinary method call does.
 
@@ -1695,11 +1695,11 @@ task_runner([download(), index()])
 #: index: merge
 ```
 
-The `for` loop primes each `job` and pairs it with its first request.
+The `for` loop primes each job and pairs it with its first request.
 The `for` loop's `except` catches the `StopIteration` from a job that finishes before its first `yield`,
 and drops that job.
-When a `job` finishes, its `send()` raises `StopIteration`.
-The `continue` then skips the `append`, so that `job` leaves `ready`.
+When a job finishes in the `while` loop, its `send()` raises `StopIteration`.
+The `continue` then skips the `append`, and the job leaves `ready`.
 
 `index()` discards what it receives.
 It yields only to take turns.
