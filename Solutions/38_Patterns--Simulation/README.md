@@ -146,7 +146,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Running the Maze](../../Chapters/38_Patterns--Simulation.md#running-the-maze)
-shows `explore()` starting the exploration from one entry cell and recording what the rats claim in `blackboard.visited`.
+shows a run of `explore()` and the map of the cells in `blackboard.visited`.
 Build a set of every open cell in the `Maze` and subtract `visited` from it.
 To leave cells in the difference,
 draw a maze whose walls split the open cells into separate regions.
@@ -339,7 +339,7 @@ The classes come from the chapter, with six parts removed: rat numbers, logging,
 `render()`, the `Board` `Protocol`, the file loader,
 and the comment-line test in `from_text()`.
 The removals leave the exploration logic as the chapter wrote it.
-`claim()` keeps the chapter's body word for word.
+`claim()` keeps the chapter's code unchanged.
 `explore()` still opens a `TaskGroup` and lets `spawn()` add tasks to that group,
 because new rats keep arriving after the block begins.
 
@@ -397,7 +397,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Contention on a Loop](../../Chapters/38_Patterns--Simulation.md#contention-on-a-loop)
-shows two rats reaching one unclaimed cell,
+shows two rats reaching one cell from opposite directions,
 and [The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard)
 shows the `claim()` you are changing.
 Making `claim()` an `async def` means each caller must `await` it,
@@ -1275,7 +1275,8 @@ A zero field means a zero kick.
 `step()` scales each grain's random displacement by the amplitude under that grain,
 so `uniform(-kick, kick) * 0.0` comes to zero and leaves each grain where it is.
 The view shows neither chaos nor a figure because every grain stays where it started.
-It shows the initial random scatter, frozen.
+It shows the initial random scatter,
+frozen until the view switches to the next mode.
 
 Agitation reads `0.000` from the start,
 the same number a perfectly settled plate reports,
@@ -1427,7 +1428,7 @@ after 1200 steps `kick=0.005` still reads far above zero
 (the solution, with mode `(2, 3)` and `seed=42`, prints `0.38`),
 `kick=0.5` reads `0.00` like the default,
 and rendering the `kick=0.5` plate shows nearly every grain heaped in the corners at `(0, 0)` and `(1, 1)`,
-off the nodal lines.
+the two ends of the main diagonal, with the rest of the figure empty.
 
 <details>
 <summary>Solution</summary>
