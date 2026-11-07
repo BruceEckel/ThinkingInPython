@@ -7,7 +7,7 @@ from typing import override
 class TypedIterator[T](Iterator[T]):
     source: Iterator[object]
     expected: type[T]
-    # State a generator cannot expose
+    # State a generator keeps in a local
     accepted: int = field(default=0, init=False)
 
     @override

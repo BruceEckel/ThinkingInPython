@@ -902,7 +902,7 @@ the original `flatten()` raises a `RecursionError` on `[1, "ab", 2]`,
 your fixed version prints `[1, 'ab', 2]`,
 and `uv run ty check` passes on your file.
 A return type left as `Iterator[int]` draws `invalid-yield`.
-You can say which line of `flatten_loop()` changes.
+You can say which lines of `flatten_loop()` change.
 
 <details>
 <summary>Solution</summary>
@@ -965,7 +965,7 @@ The fix widens the base case rather than the recursive one.
 
 `flatten_loop()` takes the identical fix,
 since `flatten()` and `flatten_loop()` differ only in how they re-yield.
-The fix is the same `if isinstance(item, int | str)` test in the same place,
+The fix is the same `if isinstance(item, int | str)` test in the same place and the same `Iterator[int | str]` return type,
 and the `for x in flatten_loop(item)` branch stays as it is.
 The bug is in the test each version applies, not in the delegation,
 so `yield from` and `for x in flatten_loop(item)` fail alike.

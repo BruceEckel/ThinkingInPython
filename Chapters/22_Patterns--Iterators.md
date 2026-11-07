@@ -521,7 +521,8 @@ The hand-written loop drops that value.
 The hand-written loop forwards neither.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 uses all three channels: the yielded values, the return value, and `send()`.
-The same section shows `yield from` relaying `throw()` and `close()` to the innermost generator.
+[Through `yield from` to the Innermost Generator](45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator)
+shows `yield from` relaying `throw()` and `close()` to the innermost generator.
 
 `test_flatten()` runs `flatten()` and `flatten_loop()` over the same inputs and expects the same flat list from each:
 
@@ -574,7 +575,7 @@ print(list(takewhile(lambda s: s < 50,
 
 Each stage runs when `list()` pulls a value.
 `islice()` and `takewhile()` decide when to stop,
-so the infinite `count(1)` produces as many values as they pull.
+so the infinite `count(1)` produces a value each time the stage above it asks for one.
 
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
@@ -672,7 +673,7 @@ from typing import override
 class TypedIterator[T](Iterator[T]):
     source: Iterator[object]
     expected: type[T]
-    # State a generator cannot expose
+    # State a generator keeps in a local
     accepted: int = field(default=0, init=False)
 
     @override
@@ -690,7 +691,7 @@ class TypedIterator[T](Iterator[T]):
 so `TypedIterator` defines `__next__()` and inherits `__iter__()`.
 
 The `dataclass` decoration carries `eq=False`.
-A data class that generates `__eq__()` sets `__hash__` to `None`,
+A mutable data class that generates `__eq__()` sets `__hash__` to `None`,
 so such a wrapper, unlike a built-in iterator or a generator,
 cannot go in a set or serve as a dict key.
 Field-by-field comparison is also the wrong question to ask about an iterator.
@@ -739,8 +740,10 @@ expect(TypeError, list, typed([1, "two"], int))
 
 Use the class when the wrapper needs its own state or extra methods,
 such as `accepted` in `typed_iterator.py`, and use the generator otherwise.
-`typed_demo.py` reads `accepted` mid-stream,
-while a generator's local variables stay hidden from its caller.
+`typed_demo.py` reads `accepted` mid-stream.
+A generator keeps such a count in a local,
+which a caller reaches through `gi_frame.f_locals`,
+an introspection path rather than an interface.
 
 Either wrapper works with every function that takes an iterator,
 because every such function calls `iter()` and `next()`,
