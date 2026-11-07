@@ -37,7 +37,7 @@ every century year counts as common.
 and `test_feb_29_allowed_in_2000` fails.
 
 An `is_leap()` that tests divisibility by 4 alone passes all four tests,
-because 2000 is the one century year `Year` accepts.
+because the range `Year` accepts holds one century year, 2000.
 The solution still writes the full rule,
 because `Year`'s upper bound follows `date.today()`.
 Once 2100 arrives, `Year` will accept it, and 2100 is a common year.
