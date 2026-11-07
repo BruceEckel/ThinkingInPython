@@ -1910,8 +1910,8 @@ With `-> Responder` declared,
 it reports an `invalid-return-type` on `responds()`.
 
 The return value also separates `Broadcasting.respond()` from the chapter's `Broadcaster.connect()`.
-`connect()` appends and returns `None`,
-so `@thermometer.connect` above a `def` binds that name to `None`.
+`connect()` appends and returns `None`, so with `t` a `Broadcaster`,
+`@t.connect` above a `def` binds that name to `None`.
 `respond()` exists to return the function.
 
 The load-time form removes three of the runtime problems:
