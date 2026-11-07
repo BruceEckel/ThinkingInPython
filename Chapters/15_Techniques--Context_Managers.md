@@ -129,7 +129,7 @@ A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` builds such an object from a generator function.
 
-Every hand-written context manager class in this chapter writes `__init__()` out rather than using `@dataclass`,
+Every hand-written context manager class in this chapter that takes arguments writes `__init__()` out rather than using `@dataclass`,
 so the constructor sits in the listing beside the two protocol methods:
 
 ```python
@@ -1210,8 +1210,8 @@ Two borrowers each use one connection as if they held it alone.
 Guarding against a stale reference takes a wrapper that invalidates the borrower's handle on exit.
 The `Pool` skeleton leaves out that refinement along with the others.
 
-Each refinement in this section is a change inside `lease()`.
-The code that creates, validates, and invalidates items runs there,
+Each refinement in this section changes the pool and leaves the borrower's code as it is.
+The code that creates, validates, and invalidates items runs in `lease()`,
 before and after the `yield`, so every `with pool.lease()` stays the same.
 
 ## Choosing a Form
