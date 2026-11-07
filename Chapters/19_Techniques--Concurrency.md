@@ -578,7 +578,7 @@ asyncio.run(main())
 so all six are in flight together.
 
 The `tasks` dict holds the task objects so the loop after the block can read each outcome.
-The `TaskGroup` holds its own strong references until the block exits.
+The `TaskGroup` holds its own strong reference to each task until that task finishes.
 Those references matter because the event loop keeps only weak references to its tasks.
 A task that loses its last strong reference can silently disappear mid-execution.
 Outside a `TaskGroup`,
@@ -1050,9 +1050,9 @@ and solves it by injection.
 
 A module-level global is the obvious shortcut,
 and it fails as soon as two tasks overlap.
-`async_race.py` shows why.
-The last write replaces every earlier one.
-Each reader resumes to find another task's value.
+`async_race.py` shows why: the last write replaces every earlier one,
+so when a task stores its request ID in a global and then awaits,
+it can resume to find another task's value.
 
 A `ContextVar` has the convenience of a global.
 It holds a value per *context*.
@@ -1289,7 +1289,8 @@ It reuses a pool of workers instead of spawning one process per call,
 and returns results in input order by itself.
 It also shares its `submit()`/`map()`/`Future` interface with `ThreadPoolExecutor`,
 so switching between processes and threads is a one-line change,
-as [The GIL and Free Threading](#the-gil-and-free-threading) shows.
+as [One `Executor` Interface, Three Pools](#one-executor-interface-three-pools)
+shows.
 
 A pool fits work shaped like a function call: one call in, one result out.
 Use `multiprocessing` when the job is a different shape:
