@@ -1078,7 +1078,7 @@ which had succeeded.
 Unlike a `TaskGroup`,
 `gather()` leaves the other tasks running when the exception propagates,
 so `e` and `f` are still sleeping when `main()` returns.
-`asyncio.run()` then cancels the tasks that remain as it shuts the loop down,
+`asyncio.run()` then cancels the tasks that remain as it shuts down the loop,
 which is why the trace ends at the `gather raised` line.
 If `main()` goes on to other work,
 they run to completion in the background with no code awaiting their results.

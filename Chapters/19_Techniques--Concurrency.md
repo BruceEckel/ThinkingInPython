@@ -154,7 +154,7 @@ which picks the next task that is ready to run.
    the event loop finds other coroutines ready to run.
 3. `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
-   and shuts the loop down.
+   and shuts down the loop.
    A program calls `asyncio.run()` once, as its entry point.
    Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`.
    Inside an `async def`,
