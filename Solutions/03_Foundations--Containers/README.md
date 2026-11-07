@@ -699,7 +699,7 @@ to show the runtime exception.
 **Find the limit of immutability.**
 A `frozendict` freezes which object sits under each key,
 not what those objects contain.
-To hash `nested`, `hash()` must hash its `list` value,
+`hash(nested)` must hash its `list` value,
 and hashing a `list` raises a `TypeError`.
 The immutability is shallow,
 as it is for the `tuple` in `shallow_immutability.py`.
