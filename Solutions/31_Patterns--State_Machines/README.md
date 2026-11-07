@@ -174,7 +174,8 @@ shows the shape: a `State` record with a message and a stored `next`,
 mixed into an `Enum` and driven by the chapter's engine.
 Make the inputs a `StrEnum`,
 so each transition function can `match` on them and the trace prints them as words.
-Inline `state.py` and `state_machine.py`, since each solution stands alone.
+Inline `state.py` and `state_machine.py`,
+since the Solutions folder holds no copy of either.
 
 <details>
 <summary>The shape</summary>
@@ -740,7 +741,8 @@ The enum design makes the states visible and nameable:
 a caller can read `current_state`, print it,
 and compare it with `TrapState.HOLDING`.
 The generator keeps its state in its execution frame,
-where no caller can read it.
+which a caller reaches through `gi_frame.f_locals`,
+an introspection path rather than an interface.
 The whole machine reads as one loop.
 
 `trap_states.py` accepts any move in any state,
@@ -1437,7 +1439,8 @@ so the table and the classes stay as they are.
 
 Keep fix 2.
 A subclass is worth creating when the machine must treat the input differently.
-A nickel differs from a quarter only in a number the existing action reads.
+A nickel differs from a quarter in its field values,
+and the existing action reads the one that matters, `value`.
 The two fixes illustrate a general rule: under exact-type dispatch,
 a class is a dispatch key,
 so create one when you want a separate rule and not when you want a separate value.

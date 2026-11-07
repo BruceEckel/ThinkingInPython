@@ -490,7 +490,7 @@ The [event bus](27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-
 stores its handlers under the event class,
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting)
-reuse this engine's lookup.
+use the same exact-type dictionary lookup.
 
 `VendingMachine` holds the table, its conditions, and its actions:
 
