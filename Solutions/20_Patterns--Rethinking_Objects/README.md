@@ -319,8 +319,8 @@ def charge(item: Priced) -> float:
 <summary>Done when</summary>
 
 `uv run ty check` reports `invalid-argument-type` on `charge(package)`,
-ending in ``incompatible return types: `Weight` is not assignable to `Price` ``,
-with no other diagnostic in your file.
+with the reason ``incompatible return types:
+`Weight` is not assignable to `Price` ``, with no other diagnostic in your file.
 Running the file still prints `4.5`,
 and you can say what `Weight(2.5)` returns at runtime.
 

@@ -81,8 +81,8 @@ It cannot ensure that the override behaves the way the base class declares.
 In Python a separate type checker does that compiler's job,
 and it stops at the same place that compiler does.
 A type checker reads an override's signature and reports one that no longer fits,
-especially when [`@override`](07_Foundations--Classes.md#marking-overrides-with-override)
-marks the intent.
+and with [`@override`](07_Foundations--Classes.md#marking-overrides-with-override)
+it also reports an override whose base method has disappeared.
 No tool reads the behavior behind the signature,
 so a subclass can break the base class contract while matching that signature perfectly.
 The interpreter runs such code unchecked,
@@ -134,9 +134,10 @@ Substitutability is the part of polymorphism that no tool can ensure.
 A test catches the broken contract.
 If a test written against `Stack`'s contract also runs against `BoundedStack`,
 the test catches `fill()` failing on the third item.
-Two later tests use the same pattern to check other runtime guarantees:
+Three later tests use the same pattern to check other runtime guarantees:
 `test_plugged.py` confirms that a getter's copy holds,
-and `test_immutable.py` confirms that a frozen field refuses assignment.
+`test_immutable.py` confirms that a frozen field refuses assignment,
+and `test_newtype_boundary.py` confirms that `NewType` leaves the value an `int`.
 
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
@@ -405,7 +406,9 @@ and the call passes `p1` as the first argument.
 The dot fills in `self`.
 
 `distance()` has an advantage.
-It lives outside `Point`, so it can serve any type that has an `x` and a `y`.
+It lives outside `Point`,
+so once its parameters name a shape rather than `Point`,
+it can serve any type that has an `x` and a `y`.
 The method keeps an advantage of its own.
 Dot-completion on `p1.` lists every operation `Point` supports,
 so the method is discoverable.
