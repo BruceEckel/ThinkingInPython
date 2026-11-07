@@ -1,7 +1,7 @@
 # Generators
 
 > A generator is a *resumable function*: it can pause partway, hand out a value,
-> and continue when its caller sends one back.
+> and continue with its state intact when its caller sends one back.
 > An Effect system runs on that conversation.
 
 A function's position in its body is state.
