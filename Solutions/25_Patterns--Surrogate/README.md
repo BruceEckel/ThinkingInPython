@@ -795,6 +795,10 @@ class Full:
 
 class Lacking:
     def f(self) -> None: ...
+
+class Matching:
+    def f(self) -> None: ...
+    def g(self) -> None: ...
 ```
 
 <details>
@@ -842,6 +846,10 @@ class Full:
 class Lacking:
     def f(self) -> None: print("Lacking.f()")
 
+class Matching:
+    def f(self) -> None: print("Matching.f()")
+    def g(self) -> None: print("Matching.g()")
+
 s = Surrogate(Full())
 s.f()
 #: Full.f()
@@ -849,6 +857,9 @@ expect(TypeError, s.change_to, Lacking())
 #: [TypeError] missing: ['g']
 s.g()  # The old implementation is still in place
 #: Full.g()
+s.change_to(Matching())
+s.f()
+#: Matching.f()
 ```
 
 **List the reachable methods.**
@@ -857,6 +868,9 @@ the set a caller can reach through the surrogate's `__getattr__()`.
 
 **Refuse a narrower replacement.**
 `change_to()` compares the two sets and refuses the swap when the replacement drops a name the current implementation answers.
+`Matching` answers every name `Full` answers, so the last swap succeeds.
+The chapter's `test_state.py` swaps between two states that both define `name()`,
+so this `Surrogate` passes it.
 
 The type checker cannot make this decision.
 To make it, the checker would compare the type of the implementation the surrogate holds with the type of `new`.

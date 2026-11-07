@@ -31,6 +31,10 @@ class Full:
 class Lacking:
     def f(self) -> None: print("Lacking.f()")
 
+class Matching:
+    def f(self) -> None: print("Matching.f()")
+    def g(self) -> None: print("Matching.g()")
+
 s = Surrogate(Full())
 s.f()
 #: Full.f()
@@ -38,3 +42,6 @@ expect(TypeError, s.change_to, Lacking())
 #: [TypeError] missing: ['g']
 s.g()  # The old implementation is still in place
 #: Full.g()
+s.change_to(Matching())
+s.f()
+#: Matching.f()
