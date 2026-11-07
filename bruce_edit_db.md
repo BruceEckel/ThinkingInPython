@@ -2415,13 +2415,23 @@ Apart" -> "Distinguishing the Wrappers"). `tip sentence-shapes` lists
 the prose shape as `[PRT]` (`tools/sentence_shapes.py`, 2026-11-04).
 
 **Keep when.** The object is a pronoun or a one-word code span, which
-English puts before the particle ("carries it out", "looks `name` up").
+English puts before the particle ("carries it out", "looks `name` up";
+from the 2026-11-06 read of the rule's 58 sites: "leave the `Time()`
+out" in chapter 47, and "turns N806 off" in chapter 13, where the rule
+code is the one-word object).
 The particle opens a path or a measure and is not the verb's meaning
 ("leaves the amount up to you", "sends a request up to the event loop",
 "stops one level up", "passes the `Question` up and the answer down").
 The joined form has another meaning ("pass the error up", since "pass
-up" declines; "pass the tuple on"; "start the work over") or no joined
-form ("lets zero through", "leaves one student over").
+up" declines; "pass the tuple on"; "start the work over"; from the
+2026-11-06 read: "leaves the decorator off" in chapter 15, "leave the
+annotation off" in chapter 47, and "Ruff leaves those rules off by
+default" in Solutions 02, since "leave off" is to stop; "hands the
+dependency in" in Solutions 11, since "hand in" is to submit; "play a
+pair off" in chapter 32, since "play off" is a tiebreaker) or no joined
+form ("lets zero through", "leaves one student over"). That read moved
+51 of the 58 sites and kept these seven, which are the baseline's first
+`[PRT]` keeps.
 
 **Sightings.** 2, two chapters (promoted 2026-11-04; the heading
 sighting was C26).
