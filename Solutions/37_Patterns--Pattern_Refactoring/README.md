@@ -65,6 +65,9 @@ and you can say why its failure is correct.
 <details>
 <summary>Solution</summary>
 
+A solution runs in its own folder and cannot import the chapter's files,
+so the listing reproduces the result of the edit to `trash.py` in reduced form,
+with `Plastic` registered beside `Aluminum`.
 The listing bins a two-piece sample.
 On `plastic.dat`, the same binning yields the `Plastic: 9.00` total that `recycle_dict_plastic.py` prints.
 
@@ -525,6 +528,10 @@ and the sorting loop takes each bin's key from the piece.
 <details>
 <summary>Solution</summary>
 
+A solution runs in its own folder and cannot import the chapter's files,
+so the listing reproduces the result of the edit to `trash.py` and `trash.dat`,
+with `CrushedAluminum` derived from `Aluminum` and a `pieces` list in place of the data file.
+
 ```python
 # exercise_4.py
 from collections import defaultdict
@@ -704,6 +711,10 @@ and you can say what your file needed for `Paper` that `hazard()` gets from its 
 
 <details>
 <summary>Solution</summary>
+
+A solution runs in its own folder and cannot import the chapter's files,
+so the listing reproduces the result of the edit:
+`Plastic` defined beside a copy of `disposal_hazard.py`'s `hazard()` reduced to its `Aluminum` registration.
 
 ```python
 # exercise_5.py
