@@ -17,14 +17,18 @@ runs the checker on its own source to confirm that the core is pure.
 
 ## The Restriction
 
-The checker resolves a call by its name and by the written type of its receiver.
+The checker resolves a call by its name and by the type of its receiver,
+when the source writes that type out or makes it evident.
 A call it cannot resolve contributes an Effect named `Unknown` to the caller's row,
 instead of counting as pure.
-With that rule the tool stays small, and every unresolved call shows in a row.
+With that rule the tool stays small,
+and every unresolved call shows in a row or,
+for a function that declares its row,
+in the report that the body exceeds the declaration.
 A row that reads `Unknown` says the checker [could not resolve a call](#what-the-checker-resolves-and-what-it-cannot-see),
 and where.
 
-Of the roughly 6,600 calls in this book's chapter listings,
+Of the roughly 6,800 calls in this book's chapter listings,
 nearly four in five resolve by name alone: a built-in, an imported name,
 or a function or class defined in the same file.
 The largest remaining group is a method called on a local variable with no annotation.
@@ -636,9 +640,10 @@ and a plain assignment whose right side has an evident type.
 `parameters()` gives every other parameter `UNRESOLVED`,
 including a `*args` or `**kwargs` parameter,
 whose annotation gives the type of each item and not of the tuple or dictionary.
-`assigned()` also records every other name a body binds: a loop variable,
-a `with` or `except` target, a walrus target, a name inside a tuple target,
-a name a pattern captures, and a parameter of a nested function or a `lambda`.
+`assigned()` also records a name a body binds in any of these ways:
+a loop variable, a `with` or `except` target, a walrus target,
+a name inside a tuple target, a name a capture, `as`, or star pattern binds,
+and a parameter of a nested function or a `lambda`.
 A name bound in any of those ways gets `UNRESOLVED`,
 and so does a name that two assignments give different types.
 An annotation overrides `UNRESOLVED` in both cases.
@@ -697,7 +702,7 @@ The test file confirms that:
 - The first parameter of a method resolves to the class.
 - Receivers resolve five ways.
 - `marked()` reads both `performs()` and `hides()`.
-- Each way of binding a name shadows a built-in of that name.
+- Each binding `assigned()` records shadows a built-in of that name.
 - A syntax error comes back as an `Err`.
 
 ```python
@@ -1253,8 +1258,8 @@ That call is the callback problem of [Effect Tracking](A_Effect_Tracking.md#prop
 appearing in a class from this book.
 
 Reaching that output took four changes to the checker's own code.
-`imports_of()` called `a.name.split(".")` on a loop variable,
-which has no written type,
+`imports_of()` called `.split()` on `a.name`, an attribute,
+which the checker cannot type,
 so `top_of()` now takes the name as an annotated parameter.
 `body_row()` called `PURE.union()`, a method on an imported constant,
 and now calls `frozenset().union()`.
@@ -1286,7 +1291,8 @@ Here, in one place, is what the checker resolves:
 - A method called on a class, such as `dict.fromkeys()`
 - A class call, which performs what the class's `__init__()` performs when it defines one
 
-Every limit below produces `Unknown`, so each one appears in a row:
+Every limit below produces `Unknown`, so each one appears in a row or,
+for a function that declares its row, as a finding against the body row:
 
 - A call of a parameter, or of a local that holds a function
 - A call of a call's result, as in `dataclass(frozen=True)(cls)`
@@ -1353,9 +1359,16 @@ A production tool must remove each one:
   `p.with_suffix(".bak").write_text(text)` resolves to `pathlib.Path.with_suffix.write_text`,
   which the `with_*` pattern matches.
 - A call in a class body, in a decorator's arguments,
-  or in a parameter's default value.
+  or in a parameter's default value,
+  when the class or function sits at the top level or is a method.
   The checker collects calls from function bodies and from top-level statements,
   and these calls are in neither.
+  Inside a function's body, `ast.walk()` reaches a nested class or function,
+  so its calls count toward the enclosing function.
+- A name bound by a nested `def` or `class` statement,
+  or by a mapping pattern's `**name`.
+  `assigned()` passes over these bindings, so after `def str(): pass` in a body,
+  `str.upper()` resolves to `builtins.str.upper`, which the table calls pure.
 - A class call that runs `__new__()`, `__post_init__()`,
   or an inherited `__init__()`.
 - A declaration written with `typing.Annotated` or an `as` alias,
