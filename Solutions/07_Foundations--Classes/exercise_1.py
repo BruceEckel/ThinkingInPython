@@ -24,3 +24,5 @@ print(c.radius)
 #: 5.0
 expect(ValueError, c.shrink, -2)
 #: [ValueError] radius cannot be negative
+print(c.radius)
+#: 5.0

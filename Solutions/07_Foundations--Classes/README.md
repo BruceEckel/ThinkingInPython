@@ -86,6 +86,8 @@ print(c.radius)
 #: 5.0
 expect(ValueError, c.shrink, -2)
 #: [ValueError] radius cannot be negative
+print(c.radius)
+#: 5.0
 ```
 
 **Route the change through the setter.**
@@ -96,6 +98,8 @@ The existing validation then applies to every method that changes the radius thi
 **Confirm the setter rejects a negative result.**
 The setter rejects the computed `-2.5`,
 just as it rejects a direct `c.radius = -2.5`.
+The setter raises the `ValueError` before it assigns `self._radius`,
+so the radius stays at `5.0`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
