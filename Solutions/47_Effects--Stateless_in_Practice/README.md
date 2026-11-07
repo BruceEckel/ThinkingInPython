@@ -1451,7 +1451,7 @@ and `10` after the `30` goes through.
 **Prove the loop tries every price.**
 The test proves from both sides that `spree()` attempts all four prices.
 A `spree()` that makes a fifth `Get` request exhausts the script.
-`handle()` reads the `StopIteration` from `read()` as the end of the Effect,
+`handle()` treats the `StopIteration` from `read()` as the end of the Effect,
 the silent failure the chapter describes,
 so `run()` returns `None` and the first assertion fails on `None == 2`.
 A `spree()` that stops early leaves a balance unread,

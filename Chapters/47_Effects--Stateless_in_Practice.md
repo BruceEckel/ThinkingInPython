@@ -873,7 +873,7 @@ The body requests each dependency by its type and leaves the network, the files,
 and the printing to the implementations you supply.
 
 Calling `research()` returns a generator object.
-Its body runs when `run()` drives that generator.
+Its body executes when `run()` drives that generator.
 
 The three `@throws` functions are the pattern for bringing in ordinary code.
 `fetch()` and `look_up()` call ordinary methods rather than Effects,
@@ -1843,7 +1843,7 @@ The type checker enforces one restriction.
 A forked Effect must arrive fully supplied.
 `fork()`'s four overloads accept an Effect whose Ability channel holds `Never` or `Async`,
 and whose error channel holds `Never` or an exception type,
-because `fork()` runs the Effect with `run()` inside the worker.
+because `fork()` calls `run()` on the Effect inside the worker.
 If you decorate a function that still declares a `Need`, the checker rejects it,
 listing the overloads it failed to match.
 Supply first, then fork.
