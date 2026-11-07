@@ -1080,7 +1080,7 @@ the way a real database connection pool does.
 and the queues that coordinate them.
 
 That blocking is for threads.
-In an `asyncio` program a blocking `get()` blocks the whole event loop,
+In an `asyncio` program the queue's `get()` blocks the whole event loop,
 so an async pool holds an `asyncio.Queue`, awaits its `get()`,
 and builds `lease()` with `asynccontextmanager`.
 
