@@ -1357,7 +1357,7 @@ no class can combine two of them.
      proselint.Very exists to catch. -->
 <!-- vale proselint.Very = NO -->
 The `# type: ignore` comment appears because `ty` checks this rule statically.
-At check time, its `instance-layout-conflict` check reports the very `TypeError` this example exists to demonstrate at run time.
+At check time, its `instance-layout-conflict` rule reports the very `TypeError` this example exists to demonstrate at run time.
 The comment suppresses the diagnostic only because provoking that crash is educational.
 <!-- vale proselint.Very = YES -->
 
