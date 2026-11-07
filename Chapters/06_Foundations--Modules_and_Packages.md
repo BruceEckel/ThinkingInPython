@@ -699,7 +699,7 @@ The PEP also describes a third value, `none`, which makes every import eager,
 including the ones marked `lazy`.
 CPython removed it before the 3.15 release.
 
-Keep an import eager when you import a module for what its body does rather than for a name it defines.
+Keep an import eager when you need the module for what its body does rather than for a name it defines.
 A module that registers a [plugin class](26_Patterns--Factory.md#hazards-of-self-registration),
 installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,

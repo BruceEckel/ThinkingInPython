@@ -278,8 +278,9 @@ print("after both")
 ```
 
 Each `lazy import` binds the name and defers the load.
-The module's top-level code runs at the first use of that name, so use order,
-not declaration order, decides which module loads first.
+The module's top-level code runs at the first use of that name,
+so the order of use, not the order of declaration,
+decides which module loads first.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -419,7 +420,7 @@ But `sys.path[0]` is the directory of the script you ran, `a_package/`,
 so Python searches the `a_package/` directory for `a_package`.
 With the project root nowhere on the path,
 the search for a top-level package called `a_package` fails.
-The suggestion names `b_package`, the name on the path closest to `a_package`.
+The suggestion is `b_package`, the name on the path closest to `a_package`.
 
 `python -m a_package.module4` works with either form and fixes both problems at once.
 `-m` sets `sys.path[0]` to the current directory rather than the script's directory,
