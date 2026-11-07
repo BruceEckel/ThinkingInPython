@@ -464,7 +464,7 @@ the `__weakref__` slot along with it,
 so a `Slot` instance has no slot in which to list its weak references.
 `ref()`, `weakref.proxy()`,
 and `WeakValueDictionary` raise the same `TypeError` on a `Slot`,
-since CPython lists every weak reference to an object in that object's `__weakref__` slot.
+since a slotted class keeps the list of an instance's weak references in its `__weakref__` slot.
 
 `WeakSlot` lists `__weakref__` among its slots,
 so its instances accept weak references.

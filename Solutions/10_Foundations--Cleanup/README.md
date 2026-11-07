@@ -345,9 +345,9 @@ class Counter:
 <details>
 <summary>Done when</summary>
 
-your edited `weak_value.py` prints `3` four times,
-after each `pop()` and after `clear()`,
-and you can say which container holds the reference that keeps each `Counter` alive.
+your edited `weak_value.py` prints `3` four times: once before any `pop()`,
+after each `pop()`, and after `clear()`.
+You can say which container holds the reference that keeps each `Counter` alive.
 
 <details>
 <summary>Solution</summary>
@@ -506,8 +506,8 @@ so the finalizer registry now holds a reference to the `Connection` whose collec
 `del b` drops the program's last reference, but the registry still holds one,
 so the `Connection` survives.
 
-`B closed` prints only because `finalize()`'s `atexit` backstop runs every still-alive finalizer as the interpreter shuts down,
-the backstop the chapter describes.
+`B closed` prints only because `finalize()`'s `atexit` backstop runs every still-alive finalizer whose `atexit` flag is on
+(the default) as the interpreter shuts down, the backstop the chapter describes.
 Here it runs the callback for an object that `del b` should have destroyed.
 
 The chapter's `finalize(self, print, name, "closed")` avoids the trap by passing the pieces the callback needs rather than the `Connection`.
