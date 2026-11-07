@@ -217,9 +217,10 @@ def divide_and_report(a, b):
 <summary>Done when</summary>
 
 your run prints `finally always runs`,
-then a traceback ending in `TypeError: unsupported operand type(s) for /: 'int' and 'str'`,
+then a line from the caller's `except TypeError`, such as `escaped: TypeError`,
 with neither `caught:` nor `no exception` in the output.
-You can follow the traceback from your call down to the `/` in `checked_divide()`.
+Called at the top level, outside any `try`,
+the same call ends in a traceback whose last line is `TypeError: unsupported operand type(s) for /: 'int' and 'str'`.
 
 <details>
 <summary>Solution</summary>
@@ -507,7 +508,7 @@ The traceback reports the cause when one exists,
 so the context stays in its attribute and out of the report.
 
 `__context__` answers "what was the `except` block handling when `raise` ran,"
-and Python fills that attribute in automatically.
+and Python fills in that attribute automatically.
 `__cause__` answers "what do you, the author, say explains this,"
 and the `from` clause fills that one in.
 `from None` leaves `__cause__` as `None` and sets `__suppress_context__`,
