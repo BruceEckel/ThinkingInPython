@@ -1243,7 +1243,7 @@ a different design, a detail, or an equivalent alternative.
 > `Paths` is an iterator class, with no `yield` in it,
 > that produces the path lines `visit()` yields, in the same order,
 > and leaves out the counts.
-> Keep the walk's position in a list that serves as a stack.
+> Keep the walk's position in a list that you use as a stack.
 > Then say what `Paths` stores that `visit()` leaves to Python.
 
 <details>
@@ -1390,7 +1390,7 @@ print(prefixes(walk))
 ```
 
 **A stack entry is a call in progress.**
-A `Level` holds the two things one `visit()` call needs in order to continue:
+A `Level` holds the two things one `visit()` call needs to continue:
 the prefix `at`, and an iterator that keeps the call's place in its dictionary's items.
 `level()` takes the two arguments that `visit()` takes,
 so `[2]` pushes a level where `visit()` calls itself.

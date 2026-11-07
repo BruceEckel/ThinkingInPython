@@ -2217,5 +2217,5 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     `Paths` is an iterator class, with no `yield` in it,
     that produces the path lines `visit()` yields, in the same order,
     and leaves out the counts.
-    Keep the walk's position in a list that serves as a stack.
+    Keep the walk's position in a list that you use as a stack.
     Then say what `Paths` stores that `visit()` leaves to Python.

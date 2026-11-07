@@ -1351,7 +1351,7 @@ Solutions/44_Effects--Effect_Management/README.md	[BOUND] You supply the binding
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] You write the new helper and the one handler that binds CODE
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] Your CODE body is the division alone
 Solutions/45_Effects--Generators/README.md	[BOUND] **Keep the three channels apart
-Solutions/45_Effects--Generators/README.md	[BOUND] A CODE holds the two things one CODE call needs in order to continue
+Solutions/45_Effects--Generators/README.md	[BOUND] A CODE holds the two things one CODE call needs to continue
 Solutions/45_Effects--Generators/README.md	[BOUND] A send that supplies a collector's first value produces one line
 Solutions/45_Effects--Generators/README.md	[BOUND] After four lines, with the walk at CODE, CODE holds three levels
 Solutions/45_Effects--Generators/README.md	[BOUND] Annotating a Generator describes the three parameters of CODE
