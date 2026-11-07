@@ -101,7 +101,7 @@ print(flexible_args_and_returns(2))
 ```
 
 Every Python function returns a value.
-A function that finishes without a `return` returns `None`,
+A function that reaches the end of its body returns `None`,
 and so does a bare `return`.
 
 A `return` with several expressions produces a tuple,
