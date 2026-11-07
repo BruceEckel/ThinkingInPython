@@ -133,7 +133,7 @@ or the loop `else` technique that `nested_break.py` shows below.
 
 Python has no `do`/`while` statement.
 When the test belongs in the middle or at the bottom of the body,
-write `while True:` and `break` out:
+write out `while True:` and `break`:
 
 ```python
 # while_true.py
