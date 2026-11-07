@@ -1830,7 +1830,9 @@ so you rewrite its loop as a state machine:
 variables that hold the loop's locals and its position,
 and code that reads them on every call to find where to continue.
 
-Melvin Conway described that rewrite in 1963,
+### Conway's Switch
+
+Melvin Conway described the state-machine rewrite in 1963,
 in [a paper](https://www.melconway.com/Home/pdf/compiler.pdf)
 on the design of a one-pass COBOL compiler.
 His example is a subroutine, the "asterisk squasher,"
@@ -1926,6 +1928,8 @@ A generator suspended at `[1]` has a character waiting,
 so its position does the work of the switch.
 Conway's flowchart of the coroutine version has those two steps in a row:
 a write of the asterisk, then a write of the character after it.
+
+### Three Ways to Write the Producer
 
 PEP 255 added generators to Python 2.2 in 2001 so that a called function can hand a value to its caller and keep its position and its locals.
 The PEP's motivating example is the standard library's `tokenize()`,
@@ -2077,7 +2081,9 @@ with three differences:
 3. The generator cannot start an exchange.
    It runs when its driver resumes it, and it answers that driver alone.
 
-The PEP's authors wanted the useful part of a coroutine without the whole mechanism.
+### The Suspended Frame
+
+PEP 255's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
 alive and resumes it on the next call.
 Python discards a function's stack frame when the function returns.

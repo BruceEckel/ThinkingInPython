@@ -120,7 +120,6 @@ Chapters/43_Functional--Confidence.md	every run	`derandomize=True` seeds the sea
 Chapters/43_Functional--Confidence.md	every run	`random.seed(42)` makes the hand-written loop draw the same strings on every run.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes `interview()`'s body, which encounters `return` instead of another `yield`, so the generator returns its `Result`.
-Chapters/45_Effects--Generators.md	The next `next()`	The next `next()` links that frame back into the call stack.
 Chapters/45_Effects--Generators.md	The outer `except GeneratorExit`	The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
 Chapters/45_Effects--Generators.md	The outermost `visit()`	The outermost `visit()` returns the `Counter` for the whole garden to `census()`.
 Chapters/45_Effects--Generators.md	each pass	`async for` is an `await` in loop form: on each pass it awaits the generator's `__anext__()`.
@@ -133,7 +132,6 @@ Chapters/45_Effects--Generators.md	the inner `try`	The exception leaves the inne
 Chapters/45_Effects--Generators.md	the innermost `yield`	Every transition nests one generator deeper, and each `next()` passes through every level on its way to the innermost `yield`.
 Chapters/45_Effects--Generators.md	the innermost `yield`	Python raises `Failed` at the innermost `yield`, in the card step.
 Chapters/45_Effects--Generators.md	the last call	Conway calls that test "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call." A harder task, he notes, "would necessitate an absurd arrangement of switches."
-Chapters/45_Effects--Generators.md	the next call	The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function) alive and resumes it on the next call.
 Chapters/45_Effects--Generators.md	the outer `except GeneratorExit`	No `except` clause names `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
 Chapters/46_Effects--Stateless.md	both runs	The type checker accepts both runs alike, because both bindings have the same type.
 Chapters/46_Effects--Stateless.md	both runs	`greet()` runs the same body in both runs.
