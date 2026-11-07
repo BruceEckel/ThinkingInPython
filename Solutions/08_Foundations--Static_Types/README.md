@@ -408,6 +408,8 @@ The checker accepts any operation on an `Unknown` value,
 so every expression built on that value passes.
 `words.top().upper()` passes either way.
 With the default removed, so does `words.top().no_such_method()`.
+With `= str` in place, `ty` reports `unresolved-attribute` on that call:
+``Object of type `str` has no attribute `no_such_method` ``.
 
 A default turns a bare annotation that accepts every operation into one that checks each operation against `str`.
 So give a default to a class whose parameter is usually the same type.
@@ -642,6 +644,9 @@ and compare which values each test sends to which branch.
 # The shape of exercise_8.py
 def shout(text: str | None) -> str:
     ...
+
+def shout_strict(text: str | None) -> str:
+    ...
 ```
 
 <details>
@@ -663,12 +668,19 @@ def shout(text: str | None) -> str:
         return text.upper()
     return "(nothing)"
 
+def shout_strict(text: str | None) -> str:
+    if text is not None:
+        return text.upper()
+    return "(nothing)"
+
 print(shout("hi"))
 #: HI
 print(shout(None))
 #: (nothing)
 print(shout(""))  # The empty string is falsy
 #: (nothing)
+print(repr(shout_strict("")))
+#: ''
 ```
 
 **Narrow out the missing value.**
@@ -680,8 +692,10 @@ The type checker accepts either version, because truthiness narrows too.
 The change is in which values reach which branch.
 `is not None` tests one condition, whether the value is missing.
 `if text:` tests whether the value is missing or empty.
-The function now treats an empty string the same as a missing value,
+`shout()` now treats an empty string the same as a missing value,
 including one a caller passed on purpose.
+`shout_strict()` keeps the `is not None` test, so it returns the empty string,
+which `print()` shows as an empty line and `repr()` shows as `''`.
 
 Whether that matters depends on the caller.
 The type checker cannot tell you, because both versions are type-correct.
