@@ -553,11 +553,15 @@ def test_independent_hierarchies_have_separate_registries(
 ```
 
 `__init_subclass__()` runs for every subclass definition Python executes.
-The registries built on it fail in two ways that every self-registering design shares,
+The registries built on it share two hazards with every self-registering design,
 with or without `__init_subclass__()`.
 [Factory](26_Patterns--Factory.md#hazards-of-self-registration) covers both:
 a class in a module nobody imports stays out of the registry,
-and keying on `cls.__name__` lets two same-named classes overwrite each other.
+and the registry keeps every class it receives alive.
+A registry keyed on `cls.__name__` has a third hazard:
+two same-named classes overwrite each other.
+The sets in `init_subclass.py` hold the class objects,
+so two same-named classes both stay in them.
 
 Functions and classes carry two names.
 `__name__` is the bare name from the `def` or `class` header.
@@ -2190,7 +2194,9 @@ and `__repr__()` give `Fraggle` a constructor, equality,
 and a `repr()` that you did not write.
 
 Beyond those three, the output holds `Fraggle`'s fields and methods,
-two annotation entries, and the bookkeeping every class carries.
+two annotation entries, the data class bookkeeping
+(`__dataclass_fields__`, `__dataclass_params__`, `__match_args__`, `__replace__`, and `__hash__`),
+and the bookkeeping every class carries.
 
 The output also shows the deferred evaluation of PEP 649 at work on a class.
 `__annotate_func__` is the code that computes the annotations,

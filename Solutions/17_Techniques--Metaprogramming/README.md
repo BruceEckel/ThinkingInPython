@@ -151,7 +151,8 @@ class Point:
 <summary>Done when</summary>
 
 after `p.z = 9`, printing `p.__dict__` shows `'_z': 9` beside the `_x` and `_y` entries,
-and the `Field` class reads the same as in `set_name.py`.
+and the `Field` class matches the one in `set_name.py`,
+apart from its trace prints.
 
 <details>
 <summary>Solution</summary>
@@ -163,7 +164,7 @@ from typing import Any
 class Field:
     def __set_name__(self, owner: type, name: str) -> None:
         self.name = name
-        self.storage = "_" + name
+        self.storage = f"_{name}"
 
     def __get__(self, obj: Any,
                 owner: type | None = None) -> Any:
@@ -250,7 +251,7 @@ followed by `reusing CSingleton` on the second call.
 <summary>Solution</summary>
 
 The usual form in a metaclass is `super().__call__(*args, **kwargs)`.
-If you write it, the script still prints `True` and `False`,
+If you write it, the script prints the same lines,
 but `ty` reports `invalid-super-argument`.
 Under the annotation `cls: type[T]`,
 the type checker treats `cls` as some class `T`, not as a `Singleton`,
@@ -267,8 +268,11 @@ class Singleton(type):
     def __call__[T](
             cls: type[T], *args: Any, **kwargs: Any) -> T:
         if cls not in Singleton._instances:
+            print(f"building {cls.__name__}")
             Singleton._instances[cls] = type.__call__(
                 cls, *args, **kwargs)
+        else:
+            print(f"reusing {cls.__name__}")
         return Singleton._instances[cls]
 
 class ASingleton(metaclass=Singleton):
@@ -279,8 +283,11 @@ class CSingleton(metaclass=Singleton):
     pass
 
 a = ASingleton()
+#: building ASingleton
 c1 = CSingleton()
+#: building CSingleton
 c2 = CSingleton()
+#: reusing CSingleton
 print(c1 is c2)
 #: True
 print(c1 is a)
@@ -714,7 +721,7 @@ a different design, a detail, or an equivalent alternative.
 contrasts what each method can still change.
 Ask whether the class object exists yet when the metaclass `__init__()` begins.
 Then consider what `bases += (Tag,)` does to a parameter,
-and print `Demo.__bases__` to check your prediction.
+and print `Built.__bases__` to check your prediction.
 
 <details>
 <summary>The shape</summary>
@@ -727,12 +734,17 @@ class Tag:
     pass
 
 class Meta(type):
+    def __new__(mcls, name: str, bases: tuple[type, ...],
+                namespace: dict[str, Any]) -> type:
+        # Before creation: this change takes effect
+        ...
+
     def __init__(cls, name: str, bases: tuple[type, ...],
                  namespace: dict[str, Any]) -> None:
         # Rebinds a local name, nothing else
         ...
 
-class Demo(metaclass=Meta):
+class Built(metaclass=Meta):
     pass
 ```
 
@@ -746,8 +758,8 @@ and you can say what exists by the time the metaclass `__init__()` starts.
 <details>
 <summary>Solution</summary>
 
-The prediction: `Demo` builds cleanly,
-and `Demo.__bases__` holds `object` alone, so `Tag` stays out.
+The prediction: `Built` builds cleanly,
+and `Built.__bases__` holds `object` alone, so `Tag` stays out.
 
 ```python
 # exercise_8.py
@@ -757,19 +769,33 @@ class Tag:
     pass
 
 class Meta(type):
+    def __new__(mcls, name: str, bases: tuple[type, ...],
+                namespace: dict[str, Any]) -> type:
+        # Before creation: this change takes effect
+        namespace["added_in_new"] = 42
+        return super().__new__(mcls, name, bases, namespace)
+
     def __init__(cls, name: str, bases: tuple[type, ...],
                  namespace: dict[str, Any]) -> None:
         # Rebinds a local name, nothing else
         bases += (Tag,)
         super().__init__(name, bases, namespace)
+        # No effect: the class is already built
+        namespace["added_in_init"] = 99
+        # Effect: this modifies the finished class
+        setattr(cls, "patched_in_init", 3.14)
 
-class Demo(metaclass=Meta):
+class Built(metaclass=Meta):
     pass
 
-print(Demo.__bases__)
-#: (<class 'object'>,)
-print(Tag in Demo.__bases__)
-#: False
+for attr in ("added_in_new", "added_in_init",
+             "patched_in_init"):
+    print(attr, hasattr(Built, attr))
+#: added_in_new True
+#: added_in_init False
+#: patched_in_init True
+print("has Tag base:", Tag in Built.__bases__)
+#: has Tag base: False
 ```
 
 By the time `__init__()` runs, the class object is complete.
@@ -781,8 +807,8 @@ so `bases += (Tag,)` builds a new tuple and rebinds the local name `bases` to it
 Passing the longer tuple on to `type.__init__()` leaves the class as it was too,
 since `type.__init__()` checks its arguments and then ignores them.
 
-`new_vs_init.py` shows the same limit for the namespace.
-Its `__init__()` writes an `added_in_init` key into `namespace`.
+The `added_in_init` line shows the same limit for the namespace.
+`__init__()` writes that key into `namespace`.
 `hasattr()` then reports `False` for that attribute on the class.
 
 `__new__()` must make every decision that goes through the arguments: the name,
