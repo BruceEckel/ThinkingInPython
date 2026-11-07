@@ -58,7 +58,7 @@ Python programmers traditionally name the reference `self`,
 but you can use any identifier (though anything else probably confuses people).
 To refer to the object's attributes or its other methods,
 you must go through `self`.
-Here `show()` leaves the parameter out:
+Here `show()` leaves out the parameter:
 
 ```python
 # forgot_self.py
@@ -337,7 +337,7 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 Python runs the program either way.
 Reporting the mistake takes a separate tool.
 [Static Types](08_Foundations--Static_Types.md#the-type-checker-ty)
-sets that tool up.
+sets up that tool.
 
 At run time `@override` returns the same function object it received.
 Before returning the function,
