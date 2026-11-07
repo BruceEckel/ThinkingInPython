@@ -283,7 +283,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [A `NamedTuple` Cannot Validate Itself](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate)
-explains why the class body of a `NamedTuple` refuses a `__new__()`.
+shows that the class body of a `NamedTuple` refuses a `__new__()`.
 A subclass is free to define one,
 so put the check there and call `super().__new__()` afterward.
 Then find which method `copy.replace()` calls on a `NamedTuple`,

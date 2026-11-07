@@ -291,7 +291,7 @@ display_object(Messenger("iris", 12, 3.14))
 #:   None
 ```
 
-With its default, an empty `dunder` list,
+With its default, an empty `dunder` tuple,
 `display_object()` leaves out every dunder,
 including the generated `__init__()`, `__repr__()`, and `__eq__()`.
 
@@ -975,7 +975,7 @@ so a member answers every `str` method.
 Its `__str__()` is `str.__str__()`,
 so an f-string shows `info` rather than `Level.INFO`.
 A class that lists `(str, Enum)` as its bases keeps `Enum`'s `__str__()` and prints `Level.INFO`;
-ruff's `UP042` rewrites that form to `StrEnum`.
+ruff's `UP042` flags that form and offers `StrEnum` as an unsafe fix.
 `IntEnum` mixes `int` into `Enum`, so each member is an `int`.
 
 Mix in a type when the member is one of that type.
@@ -1224,7 +1224,7 @@ def test_the_check_cannot_move_inside() -> None:
 There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
 because a caller can call `Stars()` instead of the factory function.
-Every factory in [Factory](26_Patterns--Factory.md#hiding-the-concrete-classes)
+Every factory function in [Factory](26_Patterns--Factory.md#hiding-the-concrete-classes)
 shares that limit.
 
 `test_the_check_cannot_move_inside()` shows why the check cannot move inside the type.
@@ -1392,7 +1392,7 @@ freezing every attribute that the mutable base's methods assign.
 So `@dataclass` refuses the combination at class-definition time,
 before the first surprising assignment.
 Every validated type in this chapter carries `frozen=True`,
-so anything you derive from one must carry it too.
+so any data class you derive from one must carry it too.
 
 ## More Data Class Tools
 
