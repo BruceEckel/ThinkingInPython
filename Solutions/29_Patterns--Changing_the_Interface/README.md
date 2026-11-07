@@ -316,6 +316,9 @@ because Python lets any caller read a module attribute, underscore or not.
 The underscore marks them as private, so `from shop import *` skips them.
 
 **List what a caller can see.**
+`exercise_3.py` imports the whole module beside `start_car`,
+because `vars()` takes the module object.
+The call that starts the car goes through `start_car` alone.
 The listing prints the module's public names,
 the ones `from shop import *` binds.
 `record` appears because an import binds a name in the module too.
