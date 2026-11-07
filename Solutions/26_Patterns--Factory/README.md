@@ -1313,7 +1313,7 @@ def shape_name(n: int) -> Iterator[str]:
 
 `Shape.__subclasses__()` lists two classes while `list(all_subclasses(Shape))` lists three,
 `_Oval` among them.
-With the chapter's `random.seed(4)` and six draws,
+With the chapter's `random.seed(4)` and six random shapes,
 your demo prints `Oval.draw` at least once.
 You can say where `_Oval` sits relative to the classes `Shape.__subclasses__()` returns.
 
