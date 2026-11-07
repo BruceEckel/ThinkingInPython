@@ -812,7 +812,7 @@ the script still runs, and the printed list ends with `'total: None'`.
 and the `yield from` in `summarize()` delivers that `None` into `counted`.
 `ty` reports an `invalid-return-type` on the annotation,
 because `report()` declares a `Size` and, with no `return` statement,
-returns `None`.
+finishes with `None`.
 
 **Keep the strings and the count apart.**
 The strings and the count travel by different channels.
@@ -1394,7 +1394,7 @@ A `Level` holds the two things one `visit()` call needs to continue:
 the prefix `at`, and an iterator that keeps the call's place in its dictionary's items.
 `level()` takes the two arguments that `visit()` takes,
 so `[2]` pushes a level where `visit()` calls itself.
-`[1]` pops a level where a `visit()` call finishes its loop and returns,
+`[1]` pops a level where a `visit()` call finishes its loop,
 and `[3]` returns a line where `visit()` yields one.
 For `{"bed": {}, "ivy": Color.GREEN}`, `[2]` pushes a level for `bed`.
 The next pass finds that level empty and pops it at `[1]`.
