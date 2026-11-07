@@ -237,7 +237,8 @@ Without the guard, each worker re-runs the pool-building code,
 which fails in the worker with a `RuntimeError` and in the parent with `BrokenProcessPool`.
 [Concurrency](19_Techniques--Concurrency.md#parallelism)
 covers the pickling boundary and the guard,
-along with why CPU-bound work goes to processes rather than threads unless the interpreter is free-threaded.
+and [The GIL and Free Threading](19_Techniques--Concurrency.md#the-gil-and-free-threading)
+explains why CPU-bound work goes to processes rather than threads unless the interpreter is free-threaded.
 
 ## A Confidence Spectrum
 
