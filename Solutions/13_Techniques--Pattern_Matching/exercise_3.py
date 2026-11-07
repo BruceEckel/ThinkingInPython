@@ -19,3 +19,7 @@ print(handle({"type": "click", "x": 10, "y": 20}))
 #: Click at (10, 20)
 print(handle({"type": "key", "key": "Enter"}))
 #: Key Enter
+print(handle({"type": "scroll", "delta": 3}))
+#: Other event: scroll {'delta': 3}
+print(handle({"button": 1}))
+#: Unrecognized event: {'button': 1}
