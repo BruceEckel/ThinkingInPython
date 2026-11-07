@@ -704,6 +704,29 @@ def negatives(v: Vars) -> None:
     py("tools.negation_density", *prose_files(v), *v.words("ARGS"))
 
 
+@task("Survey word stutters (a word beside its own code span, a stem "
+      "repeated within three tokens), for the stutter pass")
+def stutter(v: Vars) -> None:
+    """Survey word stutters in prose (tools/word_stutter.py, 2026-11-07,
+    from chapter 45's "The next `next()`"). [CODE!] and [CODE] are a
+    prose word within three tokens of a code span holding the same
+    identifier ("without a `return` returns `None`"); [STEM~] and
+    [STEM=] are a stem repeated within three tokens in one sentence,
+    in two inflections ("returns ... returned") or the same form ("the
+    generator ... the generator"). A sentence boundary stops the
+    window, link text is hidden, and a pair joined by "and", "or",
+    "to", or a preposition is dropped. It prints every hit and keeps no
+    baseline: the book-wide sweep that day reworded 56 of 1,311, so
+    each hit is a judgment the `stutter` pass makes (the tenth pass of
+    `super-prose`), and most are the topic noun named again, a
+    deliberate parallel, or a function doing what its name says. Run
+    `tip stutter CH=NN` at the start of that pass. CH= picks one chapter
+    and its Solutions file; ARGS="--window 4" widens the gap;
+    ARGS=--calibrate runs the built-in examples.
+    """
+    py("tools.word_stutter", *prose_files(v), *v.words("ARGS"))
+
+
 @task("Report public class names that only their class uses "
       "(report-only; accept with `tip internal-names-accept`)")
 def internal_names(v: Vars) -> None:

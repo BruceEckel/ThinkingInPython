@@ -1,9 +1,9 @@
 ---
 name: super-prose
-description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The nine passes are literal, positive, straighten, cohesion, antecedents, ambiguity, activate, bruce-edit-apply, and elements-of-style, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/super-prose" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
+description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The ten passes are literal, positive, straighten, cohesion, antecedents, ambiguity, activate, bruce-edit-apply, elements-of-style, and stutter, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/super-prose" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
 ---
 
-# Super-prose: the nine prose passes as one request
+# Super-prose: the ten prose passes as one request
 
 `/super-prose 45` or `/super-prose 45 section "The Driver's Exception Channel"`
 means: apply every prose pass the project defines, over that scope,
@@ -16,7 +16,7 @@ which `tip rewrite` cannot.
 
 ## The order
 
-Load all nine skills with the `Skill` tool before touching the
+Load all ten skills with the `Skill` tool before touching the
 prose, then read the scope once and apply them together.
 The order is the order the skills' own boundary notes give:
 each pass hands the next one less to do.
@@ -37,6 +37,11 @@ each pass hands the next one less to do.
 8. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
 9. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
    mostly needless words and emphatic words at the end.
+10. `stutter`: a word beside its own code-span form ("The next
+    `next()`"), one verb said of two things in a sentence, a prose
+    noun and a code variable of one spelling naming different things.
+    It runs last because the nine passes above write new sentences,
+    and a rewrite can put a word beside its code span.
 
 ## Before the read
 
@@ -56,6 +61,10 @@ scope's line range:
 - `tip past-tense CH=NN ARGS=--survey` (for `activate`: `[PAST-SUB]`,
   and `[PERFECT]`, a present perfect in a time clause, "before the
   generator has yielded" -> "before the generator yields", C57)
+- `tip stutter CH=NN` (for `stutter`: `[CODE!]`, `[CODE]`, `[STEM~]`,
+  `[STEM=]`; no baseline, so every hit prints, and most are keeps:
+  the 2026-11-07 sweep reworded 56 of 1,311; run it again over the
+  scope after the other passes' edits, since they can create the shape)
 - `tip overclaims CH=NN ARGS=--survey` (for the claim check every
   pass makes: `[LEAD]`, a list lead-in that bounds every item above
   an item that exempts itself, "Each approach gives up one side's

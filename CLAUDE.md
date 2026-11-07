@@ -491,6 +491,26 @@ and the line `N paragraphs at >= 3 in F files` follow;
 `--top N` keeps the N densest paragraphs.
 The `positive` skill reads it per chapter (`tip negatives CH=NN`), and a
 listed paragraph is a candidate for that skill's test, not a fault.
+`tip stutter` (`tools/word_stutter.py`, 2026-11-07) is a third survey
+tool outside `tip prose`, with no baseline and no parse. It lists a
+prose word within three tokens of a code span holding the same
+identifier (`[CODE!]` adjacent, `[CODE]` further: "The next `next()`",
+"without a `return` returns `None`") and a stem repeated within three
+tokens in one sentence (`[STEM~]` two inflections, "returns ...
+returned"; `[STEM=]` one form, "the generator ... the generator").
+Bruce flagged the shape in chapter 45 that day ("The next `next()`
+links that frame back", now "The call that resumes the generator
+links"), and the book-wide sweep read 1,311 candidates in 93 files and
+reworded 56, so a hit is a judgment, not a fault: the keeps are the
+topic noun named again (his antecedents rule prefers it to a pronoun),
+a deliberate parallel, a function whose name is the verb it performs
+("`tg.cancel()` cancels every task"), a definition ("an empty set is
+`set()`"), and a plural beside its singular. The `stutter` skill
+(`.claude/skills/stutter/SKILL.md`) is the pass, the tenth in
+`super-prose`; it reads `tip stutter CH=NN` and rewords with words the
+passage already has, never a synonym for a technical term.
+`ARGS="--window 4"` widens the gap by one token, about a third more
+candidates.
 `tip italics` (`tools/italics.py`, 2026-10-23) lists italics that break
 the introduce-once rule: `[EMPHASIS]` a span of function words ("*is*",
 "defers *how*"), `[REPEAT]` a term italicized again in the same file,

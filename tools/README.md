@@ -1647,7 +1647,11 @@ hit is a question for an editing pass rather than a fault. A baselined
 check prints its survey rules under `ARGS=--survey` alone, each line
 marked `survey`, never written to the baseline and never counted in
 `N new`. `pointer_words.py` and `negation_density.py` are surveys
-through and through, with no baseline. `ARGS=--calibrate` shows whether a
+through and through, with no baseline; so is `word_stutter.py`
+(`tip stutter`, 2026-11-07), which needs no parse: it lists a prose
+word within three tokens of a code span holding the same identifier
+("The next `next()`") and a stem repeated within three tokens of
+itself in one sentence, for the `stutter` pass. `ARGS=--calibrate` shows whether a
 rule separates bad prose from good. It parses the `before` and `after`
 text of each record in `tools/data/edit_pairs.json` (sentences the author
 rewrote) and prints, per label, the pairs where the rule fires on the
