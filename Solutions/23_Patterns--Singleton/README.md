@@ -481,13 +481,17 @@ def primed() -> Settings:
 <summary>Done when</summary>
 
 with your lock inside `settings()`,
-`singleton_cached_race.py` still prints `True` for `distinct_objects(settings) > 1`,
+the check for more than one distinct `Settings` still prints `True`,
 and your lock-free version builds one object across eight threads,
 a count of `1`.
 You can name the step of a cached call that runs before your lock.
 
 <details>
 <summary>Solution</summary>
+
+A solution runs in its own folder and cannot import the chapter's files,
+so the listing copies `Settings` from `race_settings.py` and `settings()` from `singleton_cached_race.py`.
+It counts the distinct objects from eight threads with `pool.map()` in place of `distinct_objects()`.
 
 ```python
 # exercise_5.py
