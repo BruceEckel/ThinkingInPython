@@ -875,7 +875,7 @@ and the printing to the implementations you supply.
 Calling `research()` returns a generator object.
 Its body runs when `run()` drives that generator.
 
-The three `@throws` functions are the pattern for bringing ordinary code in.
+The three `@throws` functions are the pattern for bringing in ordinary code.
 `fetch()` and `look_up()` call ordinary methods rather than Effects,
 and the decorator lifts what they raise into the channel.
 `topic_of()` computes its answer from its argument and a module constant,
@@ -1228,7 +1228,7 @@ so `report()`'s declared type no longer matches and the type checker reports an 
 You decide whether to catch the newcomer or declare it.
 `catch_all()` absorbs it into the result union,
 so the guard must be code that reads the result:
-an annotation that writes the union out, as `outcome()`'s return type does,
+an annotation that writes out the union, as `outcome()`'s return type does,
 or a `match` that ends with `assert_never()`.
 Without such a guard,
 the new failure becomes a value that reaches the caller unexamined.
@@ -1646,7 +1646,7 @@ so `topic_of()` raises `NotInteresting` on every attempt, deterministically.
 `retry()` treats that failure like one worth retrying.
 Three attempts fetch the headline three times and collect three identical `NotInteresting` errors in the `RetryError`.
 Retry what can change between attempts,
-and let `catch()` take a deterministic failure out before it reaches `retry()`.
+and let `catch()` take out a deterministic failure before it reaches `retry()`.
 
 ### What Retry Does to the Signature
 
