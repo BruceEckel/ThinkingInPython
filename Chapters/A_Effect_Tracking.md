@@ -9,7 +9,7 @@ and then builds the carrier Python has today,
 the `Annotated` type from [PEP 593](https://peps.python.org/pep-0593/).
 The last part analyzes the tool that would check those annotations and shows how much of a type checker the tool would contain.
 [An Effect Checker](B_An_Effect_Checker.md)
-builds the part of that tool that works from names and written types.
+builds the part of that tool that works from names and from types the source writes out or makes evident.
 
 ## The Tracking Problem
 
@@ -236,7 +236,7 @@ Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-pro
 where the type checker reports the same mistake as an `invalid-yield` error.
 A row inside `Annotated` is a structured comment until a tool reads it.
 `greet()`'s row lists `Ask` and `Tell` because I typed them,
-and no tool compares them with the calls in its body.
+and `row()` reads them back without comparing them with the calls in its body.
 
 `shout()`'s empty row has a second reading.
 `quiet()` declares `performs()` with no arguments, which states that it is pure.
@@ -406,8 +406,9 @@ and each assumption creates its own problem:
 Dynamic code adds to the unknowns: `getattr(obj, name)()`,
 a decorator that returns a wrapper with a different row,
 a module-level `__getattr__()`, a function replaced at runtime by a test.
-A type checker infers `Any` or `Unknown` for most of the same constructs.
-The Effect tool would answer `Unknown` for them too.
+A type checker infers `Any` or `Unknown` for `getattr(obj, name)()` and for an untyped decorator,
+and it trusts the declared type of a function a test replaces.
+The Effect tool would answer `Unknown` for all four.
 Every row that includes `Unknown` would be incomplete.
 
 ### Find a Place to Run
