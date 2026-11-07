@@ -386,9 +386,9 @@ builds `Log` as an Ability alongside `Console`,
 and [Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface)
 shows how a `Protocol` replaces a concrete class.
 Declare `Log` with a `write()` method,
-and write a recording class for each protocol.
-Pass both instances to `supply()` in one call, run the Effect,
-and assert on each recorder's list.
+and write one recording class with the shape of both protocols.
+Pass its instance to `supply()` once for each protocol, in one call,
+run the Effect, and assert on the recorder's two lists.
 
 <details>
 <summary>Done when</summary>
@@ -487,7 +487,8 @@ Each wrapper names the role this instance fills.
 
 **Check the greeting and the log together.**
 One test holds both assertions because it supplies the whole environment.
-The test reads both recorders, with no capture of stdout and no temporary file.
+The test reads both of the recorder's lists,
+with no capture of stdout and no temporary file.
 Each `need()` yields a request that the supplied object answers,
 so the test chooses what printing and logging do.
 
@@ -744,8 +745,9 @@ and leaves `Need[Clock]` in place.
 
 `handle()` and the type checker are each right about what they describe.
 `isinstance()` cannot test a type argument.
-`Need[Clock]` and `Need[Console]` are the same runtime class,
-so at runtime the two look alike.
+`Need[Clock]` and `Need[Console]` are the same runtime class.
+The two requests differ in their `t` field, which `default()` prints,
+but `handle()`'s `isinstance(ability, Need)` test accepts both.
 The distinction lives in the annotation, where the type checker reads it.
 `handle()` matches on the annotation's origin, which erases the distinction.
 A handler like `default()` handles more than its type says.
@@ -824,8 +826,10 @@ The program looks like it worked and produced most of its output.
 The tools stay silent because the code follows every rule they check.
 Building a value and discarding it is legal Python,
 and `greet(name)`'s value is a generator like any other.
-[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
-and its exercise 4 show the same silence for a generator with no Effect in it.
+[Generators](../../Chapters/45_Effects--Generators.md#exercises)'s exercise 4 drops a `yield from` in a generator with no Effect in it.
+There `ty` reports an `invalid-assignment` on the annotated `profile: Result = interview()`.
+Once the exercise removes that annotation, `ty check` accepts the file,
+as it accepts the broken `audit_log.py`.
 The declared `Need[Console]` in the return type still holds,
 since a declaration says what the function may request, not what it must.
 The chapter warns about this deletion.
@@ -984,7 +988,9 @@ for builder in builders.values():
 **Run each stored Effect twice.**
 The second pass over `built` runs silently,
 and `run()` returns `None` for each entry.
-An Effect is a generator, and a generator runs once.
+Each Effect in `built` is a generator, and a generator runs once.
+The exceptions are a `success()` Effect, which replays its value,
+and a `memoize()` Effect, which hands a second `run()` its cached result.
 Resuming a finished generator raises `StopIteration` immediately,
 which `run()` reads as "already returned, with no value."
 So a spent Effect looks the same as one that succeeded and returned `None`,
@@ -1389,7 +1395,9 @@ Three implementations have six orderings, and one rule predicts them all.
 so the implementation that comes first answers the request.
 Two of the six orderings put `Terminal` first and send the greeting to the screen.
 The remaining four split evenly between `Capture` and the third implementation.
-All six orderings run cleanly.
+Every ordering supplies the same three implementations,
+each of which satisfies the request,
+so all six orderings find a match and run to completion.
 
 The fix splits the one structural check that all three objects match:
 

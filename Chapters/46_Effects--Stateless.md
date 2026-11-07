@@ -67,7 +67,7 @@ explains why that request must be a value of its own.
 
 Although you can write the full `Effect` signature each time,
 the library provides three aliases for the most common cases.
-Each one fills in `Never` for the type parameters it leaves out:
+Each one takes the type parameters it uses and leaves out the rest:
 
 | Alias | Meaning |
 |---|---|
@@ -75,6 +75,7 @@ Each one fills in `Never` for the type parameters it leaves out:
 | `Depend[A, R]` | Needs `A`, cannot fail, produces `R` |
 | `Try[E, R]` | Needs nothing, can fail with `E`, produces `R` |
 
+In `Success`, `Never` stands in for both `A` and `E`.
 `Never` is Python's *bottom type*:
 it has no values and is a subtype of every other type.
 
@@ -1157,9 +1158,10 @@ The `Console` is swappable.
 But DI relocates a [side cause](44_Effects--Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker does not validate the dependency.
 
-`dependency_injection.py` demonstrates one shape of DI, a service locator:
+`dependency_injection.py` uses a service locator,
+the usual alternative to injection:
 a body reads the container with `get(Console)`.
-Constructor injection is the stronger, more common shape,
+Constructor injection is the stronger, more common shape of DI,
 and frameworks such as FastAPI's `Depends` build on it.
 Constructor injection answers the complaint that the type checker does not validate the dependency.
 The dependency arrives as a parameter,
@@ -1380,9 +1382,9 @@ Freezing prevents rebinding `waited`.
 Its entire body is `return asyncio.run(run_async(effect))`.
 Building and tearing down that loop takes time,
 even for an Effect with no `Async` in it.
-On Windows, `run(success(42))` measured about 650 microseconds
-(about 75 on Linux),
-three to four orders of magnitude above a plain function call.
+On Windows, `run(success(42))` measured about 650 microseconds,
+more than four orders of magnitude above a plain function call.
+On Linux it measured about 75 microseconds.
 That is the cost behind ["a synchronous program calls it once, at the outermost edge"](#the-simplest-effect).
 `test_nailer.py` starts a loop once per parametrized case,
 which is fine for four rows and adds up over a much longer parametrized list.
@@ -1467,7 +1469,7 @@ info[revealed-type]: Revealed type
 The revealed type is `Try[KeyError, int]` with [the alias](#the-effect-type)
 expanded.
 The `Generator`'s first parameter carries [`A | E`](#the-effect-definition).
-`Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`.
+`Try` writes its `E` there and leaves `A` out, so that parameter is `KeyError`.
 
 `Try` carries the same idea as the [`Result` type](42_Functional--Error_Handling.md#a-result-type)
 in a different form.
@@ -1829,7 +1831,7 @@ two of which take a vocabulary of their own:
    and `supply()` answers it with an instance.
 2. A failure is an exception.
    `@throws` lifts it into the type, and `catch()` takes it back out as a value.
-3. The driver answers some Abilities on its own.
+3. The driver answers `Async` on its own and throws `MissingAbilityError` into the Effect for every other Ability.
    `Async` sits in the same channel as a `Need`,
    and `run()` answers it by awaiting the request's awaitable in the event loop it starts.
 
