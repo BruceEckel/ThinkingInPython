@@ -620,7 +620,8 @@ class Robot(Item):
 `world.py` imports `Item`, `Robot`, `Urge`, and `Wall` from `items.py`,
 so `from world import Room` here is circular.
 `TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
-so Python skips that import and the cycle exists for the checker alone.
+so Python skips that import.
+The cycle exists for the checker alone.
 Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`).
 Python evaluates an annotation only when something reads it,
 so no line of `items.py` looks `Room` up at runtime.
