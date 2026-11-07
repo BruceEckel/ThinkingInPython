@@ -875,7 +875,8 @@ class Counter:
 <details>
 <summary>Done when</summary>
 
-one call to the `repeat`-decorated method through an instance runs its body `times` times with that instance as `self`,
+one call to the `repeat`-decorated method through an instance runs its body as many times as `times` holds,
+with that instance as `self`,
 and your printout shows a `function` under one name and a `logged` instance under the other.
 You can say which of the two objects has `__get__()` and why that decides whether `self` binds.
 
