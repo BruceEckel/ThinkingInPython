@@ -428,7 +428,7 @@ unrelated to injection.
 so the class body's lookup of `__name__` falls through to the built-ins,
 and the class gets `__module__` set to `"builtins"`.
 `pickle.dumps()` on an instance then raises a `PicklingError`,
-because pickle looks the class up as `builtins.Start` and does not find it.
+because pickle looks up the class as `builtins.Start` and does not find it.
 `inspect.getsource()` raises a `TypeError`,
 because `inspect` treats the class as a built-in, compiled into the interpreter.
 
