@@ -370,7 +370,7 @@ To store a double-underscore name through `object.__setattr__()`,
 you write the mangled form in the string literal,
 `"_WriteProxy__implementation"`.
 The single underscore keeps the name as written.
-If the implementation has an `_implementation` of its own,
+If the implementation has an attribute also named `_implementation`,
 `p._implementation` finds the proxy's attribute,
 which hides the implementation's attribute.
 
@@ -642,7 +642,7 @@ print("calls:", p.calls)
 ```
 
 `counted` closes over `attr`, the implementation's bound method,
-so `self.calls` increments when code calls `counted`,
+so `self.calls` increments when `counted` runs,
 not when `__getattr__()` returns it.
 
 Normal lookup fails on every `p.f`,
