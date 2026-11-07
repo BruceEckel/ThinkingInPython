@@ -335,7 +335,7 @@ The timer most readers write first is a hand-rolled one:
 `time.time()` reads the wall clock,
 which can jump when the system corrects its time.
 One call is also one sample, with all of its interference.
-`timeit` times with `time.perf_counter()`,
+`timeit` uses `time.perf_counter()`,
 a high-resolution clock that moves forward steadily.
 When you write your own timing code, use that clock and repeat the run.
 
@@ -508,7 +508,7 @@ and 3.15 rebuilt much of it.
 The JIT counts how often each path through a program's bytecode runs,
 and once a path runs often enough, it compiles that path to machine code.
 Your code stays as you wrote it.
-The same file runs, and the interpreter runs its busiest paths as machine code.
+The interpreter runs the same file and executes its busiest paths as machine code.
 
 Your program runs that machine code only when three conditions hold:
 
