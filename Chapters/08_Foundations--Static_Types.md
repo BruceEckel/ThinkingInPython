@@ -807,8 +807,9 @@ so every signature that unpacks it accepts the same keywords.
 
 ## Hints Are Not Enforced at Run Time
 
-Type hints do not change what the program does.
-Python stores them and otherwise ignores them.
+Python enforces none of the hints.
+It stores them.
+Code that reads them acts on them, as `@dataclass` and validation libraries do.
 A wrongly typed value that gets past the type checker runs as it does in a program with no hints.
 Checking is a separate step you run, the same way you run tests.
 The hints are for the tools and for the reader.
@@ -909,7 +910,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `type Name = ...` | A name for a type, compound or scalar, e.g. `type Coord = tuple[int, int]`, see [The `type` Statement](#the-type-statement) |
-| `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any class, not just a built-in |
+| `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any ordinary class (not a `Protocol` or `TypedDict`), not just a built-in |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
 ### Constants and Class Variables
@@ -987,7 +988,9 @@ The abstract container types come from `collections.abc`.
 
 These decorators and directives exist for the type checker and the reader.
 At runtime most of them return their argument.
-Two act when a call reaches them: `assert_never()` raises an `AssertionError`,
+Three act when a call reaches them:
+`@overload` records the signature and returns a stub that raises `NotImplementedError`,
+`assert_never()` raises an `AssertionError`,
 and `reveal_type()` prints its argument's runtime type.
 
 Older code writes some of the constructs in these tables differently:
