@@ -89,15 +89,21 @@ two_rooms: Final[str] = """
 *********
 """
 
-async def main() -> None:
-    maze = Maze.from_text(two_rooms)
+async def find_unreached(text: str) -> set[Coord]:
+    maze = Maze.from_text(text)
     board = Blackboard(maze)
     await board.explore()
     all_open = {(x, y) for y in range(maze.height)
                 for x in range(maze.width)
                 if maze.is_open(x, y)}
-    unreached = all_open - board.visited
+    return all_open - board.visited
+
+async def main() -> None:
+    unreached = await find_unreached(two_rooms)
     print(len(unreached), min(unreached), max(unreached))
+    door = two_rooms.replace("*   *   *", "*       *", 1)
+    print(len(await find_unreached(door)))
 
 asyncio.run(main())
 #: 9 (5, 1) (7, 3)
+#: 0

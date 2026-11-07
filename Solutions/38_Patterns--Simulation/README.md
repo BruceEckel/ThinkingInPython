@@ -210,6 +210,9 @@ class Blackboard:
     async def explore(self) -> None:
         ...
 
+async def find_unreached(text: str) -> set[Coord]:
+    ...
+
 async def main() -> None:
     ...
 ```
@@ -217,9 +220,9 @@ async def main() -> None:
 <details>
 <summary>Done when</summary>
 
-your script prints a nonempty set of open cells,
-every printed cell lies in a region that walls separate from the cell `Maze.entry()` returns,
-and opening a doorway in that wall makes the printed set empty.
+your script reports a nonempty set of unreached open cells,
+every cell in the set lies in a region that walls separate from the cell `Maze.entry()` returns,
+and opening a doorway in that wall empties the set.
 You can say why every rat starts inside the entry's region.
 
 <details>
@@ -317,22 +320,32 @@ two_rooms: Final[str] = """
 *********
 """
 
-async def main() -> None:
-    maze = Maze.from_text(two_rooms)
+async def find_unreached(text: str) -> set[Coord]:
+    maze = Maze.from_text(text)
     board = Blackboard(maze)
     await board.explore()
     all_open = {(x, y) for y in range(maze.height)
                 for x in range(maze.width)
                 if maze.is_open(x, y)}
-    unreached = all_open - board.visited
+    return all_open - board.visited
+
+async def main() -> None:
+    unreached = await find_unreached(two_rooms)
     print(len(unreached), min(unreached), max(unreached))
+    door = two_rooms.replace("*   *   *", "*       *", 1)
+    print(len(await find_unreached(door)))
 
 asyncio.run(main())
 #: 9 (5, 1) (7, 3)
+#: 0
 ```
 
 The smallest and largest unreached cells, `(5, 1)` and `(7, 3)`,
 are the corners of the right room.
+`door` replaces the top row of both rooms with one open row,
+which cuts a doorway through the dividing wall at `(4, 1)`.
+The rats then pass into the right room and claim every open cell,
+which leaves the difference empty.
 
 **Reuse the chapter's classes.**
 The classes come from the chapter, with six parts removed: rat numbers, logging,
@@ -1426,8 +1439,9 @@ shows `render()`'s figure, which is the check that agitation cannot make.
 
 after 1200 steps `kick=0.005` still reads far above zero
 (the solution, with mode `(2, 3)` and `seed=42`, prints `0.38`),
-`kick=0.5` reads `0.00` like the default,
-and rendering the `kick=0.5` plate shows nearly every grain heaped in the corners at `(0, 0)` and `(1, 1)`,
+`kick=0.5` reads `0.00` like the default, and `plate.render()` after the loop,
+on the `kick=0.5` plate,
+shows nearly every grain heaped in the corners at `(0, 0)` and `(1, 1)`,
 the two ends of the main diagonal, with the rest of the figure empty.
 
 <details>
@@ -1471,7 +1485,8 @@ The spots that hold a grain best are the two corners where the main diagonal end
 At `(0, 0)` and `(1, 1)` the field is zero and also flat,
 so it stays weak over a whole patch,
 whereas along a nodal line it is weak only in a thin strip.
-Rendered, the run shows nearly every grain in those two corners and the nodal lines between them empty.
+After the loop, `plate` holds the `kick=0.5` run.
+Printing `plate.render()` shows nearly every grain in those two corners and the nodal lines between them empty.
 The low agitation is accurate.
 The sand has settled, in the wrong places.
 
