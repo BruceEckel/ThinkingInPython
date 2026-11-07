@@ -125,7 +125,7 @@ and which function reports an identity per thread.
 <details>
 <summary>Done when</summary>
 
-your `ThreadPoolExecutor` version prints the same counts as the process version for the same limits and reports one distinct process ID.
+your `ThreadPoolExecutor` version prints the counts `[1229, 2262, 3245, 4203]` for the limits `[10_000, 20_000, 30_000, 40_000]` and reports one distinct process ID.
 You can say why `os.getpid()` cannot tell the pool's workers apart.
 
 <details>
@@ -693,7 +693,7 @@ The signature `timeout() -> int` hides the dependency.
 **Make the hidden input a parameter.**
 The repair is the same for `stale()` and `timeout()`,
 and it is the one [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
-describes: pass the implementation in as a parameter.
+describes: pass in the implementation as a parameter.
 `stale_pure()` and `timeout_pure()` are now referentially transparent,
 and both are testable without a clock or a monkeypatched environment.
 The read of the real clock or the real `os.environ` moves out of the middle of the program into one line at its edge,
