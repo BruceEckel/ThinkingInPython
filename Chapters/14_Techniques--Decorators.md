@@ -1109,7 +1109,7 @@ The module gains one name, `fib_table`, holding the finished list.
 Treat `@lambda` as a curiosity and avoid it.
 A reader who sees `def fib_table()` expects a function and finds a list.
 
-Neither type checker types `fib_table` as the `list[int]` it holds.
+Neither type checker reports `fib_table` as the `list[int]` it holds.
 The lambda's parameter has no annotation,
 so `ty` reports `fib_table` as `Unknown`,
 where the generic `run_once` carries `T` through to `greeting`'s `str`.
