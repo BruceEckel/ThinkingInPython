@@ -150,10 +150,9 @@ print(lengths["GALAHAD"], "NI" in lengths)
 ```
 
 **Filter before building each entry.**
-The filter runs before the output expression, so it tests the original name,
-not the upper-cased key.
-That ordering matters when the output expression changes the length,
-as `name * 2` does.
+The filter tests `len(name)`, and `name` is the loop variable,
+so the filter sees the original name;
+the upper-cased key exists only in the output expression.
 
 **Keep one value per key.**
 Two names that upper-case to the same string collide.
@@ -339,7 +338,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
-shows `**d` inside a dictionary display,
+shows `**d` in the output expression of a dict comprehension,
 merging each `d` in the order the loop produces it.
 A repeated key keeps the value written last.
 A key keeps the position of its first insertion, which decides the print order.

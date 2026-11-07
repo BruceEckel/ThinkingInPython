@@ -258,7 +258,8 @@ because a dictionary keeps the last value it receives for a duplicate key.
 
 To keep both names, group instead of inverting.
 Grouping appends to lists that earlier elements created.
-A comprehension writes each entry fresh, so grouping takes a `for` loop.
+A comprehension writes each entry fresh, so grouping in one pass, by appending,
+takes a `for` loop.
 The loop walks `seat_of.items()` and appends each name to a [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
 keyed by seat, producing `{1: ['Arthur', 'Robin'], 2: ['Galahad']}`.
 
