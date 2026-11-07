@@ -260,7 +260,8 @@ in the style of [*Visitor*](33_Patterns--Visitor.md).
 `visit_` plus the node's class name,
 so a walker subclasses `ast.NodeVisitor` and defines one such method for each node class it handles.
 A `match` lists the node classes in its cases,
-so it chooses the code to run for each node class without a subclass of `ast.NodeVisitor`.
+so it chooses the code to run for each node class,
+the job a walker gives to an `ast.NodeVisitor` subclass.
 
 `dotted()` is the smallest of these matches.
 It is recursive, as the tree is.
