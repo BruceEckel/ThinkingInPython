@@ -21,7 +21,7 @@ through `__annotations__` or `annotationlib.get_annotations()`.
 Older code often begins with a `__future__` import of `annotations` (PEP 563),
 an earlier form of postponed evaluation that stores each annotation as a string.
 Deferred evaluation, the default since Python 3.14 (PEP 649), supersedes it,
-so the book's listings leave that import out.
+so the book's listings leave out that import.
 
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool.
@@ -58,7 +58,7 @@ Each is compatible with everything.
 so an `object` value carries the methods every class shares.
 The type checker rejects every operation beyond those methods.
 `Any` permits every operation,
-so it switches the checker off for that value rather than describing a wide set of values.
+so it switches off the checker for that value rather than describing a wide set of values.
 Choose `object` for a value you store or pass along untouched,
 and `Any` for one whose operations you would rather check yourself.
 
@@ -308,7 +308,7 @@ The two forms differ when the initializer says less than you mean.
 so the type checker accepts any value you put into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
 so the type checker enforces `list[str]`.
-Every other listing in this book writes the type out on `Final`.
+Every other listing in this book writes out the type on `Final`.
 
 ## Structural Typing with Protocols
 
