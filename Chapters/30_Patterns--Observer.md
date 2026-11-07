@@ -988,7 +988,7 @@ and no class attribute named `celsius`.
 `super().__init_subclass__(**kwargs)` lets each base above `Broadcasting` run its own `__init_subclass__()`.
 One of those bases is `Generic`, which `class Broadcasting[T]` adds,
 and its `__init_subclass__()` records that `Thermometer` takes no type parameter.
-If you leave the call out, the runtime accepts `Thermometer[int]`.
+If you leave out the call, the runtime accepts `Thermometer[int]`.
 
 `[1]` calls `dataclass(eq=False)`, which returns a decorator,
 and applies that decorator to `cls`.
@@ -1698,7 +1698,7 @@ interpreting the keys and displaying every model the keys touch.
 so a new kind of key means editing `View` or subclassing it.
 Either way, you change the class that holds the display code.
 
-Split the controller out when input handling varies on its own,
+Split out the controller when input handling varies on its own,
 when the same displays must work with more than one input scheme,
 or when interpreting input needs tests that run apart from the display code.
 

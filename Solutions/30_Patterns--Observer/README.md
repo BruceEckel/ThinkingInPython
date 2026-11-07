@@ -1759,7 +1759,7 @@ Pyright rejects `Thermometer.celsius.connect`.
 It reads the constructor's `self.celsius = celsius` as declaring an instance attribute of type `float` beside the descriptor,
 so it types the class access as `Notifying[float] | float` and reports that `float` has no `connect`.
 `ty` types the class access from the `__get__()` overload alone.
-A codebase on Pyright looks the descriptor up in `type(obj).__dict__`,
+A codebase on Pyright looks up the descriptor in `type(obj).__dict__`,
 which Pyright accepts.
 
 **Announce on assignment.**
