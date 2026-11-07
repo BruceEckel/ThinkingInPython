@@ -1,7 +1,7 @@
 # Generators
 
-> A generator is a *resumable function*: it can pause partway, ask for something,
-> and continue when the answer arrives.
+> A generator is a *resumable function*: it can pause partway, hand out a value,
+> and continue when its caller sends one back.
 > An Effect system runs on that conversation.
 
 A function's position in its body is state.
@@ -822,8 +822,7 @@ However deeply the delegations nest, the program has one driver.
 `drive()` answers it.
 The generator yields a `Question`, `drive()` looks it up,
 and the request stops there.
-`yield from` relays the request upward and passes the answer back down,
-both intact, so `drive()` does the lookup for a `Question` yielded at any depth.
+`yield from` relays the request upward and passes the answer back down.
 
 `drive()` and `yield from` also differ in what they do at `StopIteration`.
 Both catch it and both take `stop.value`,
@@ -1133,10 +1132,7 @@ The body rejects the value and raises `ValueError` at `[1]`.
 The `send()` call at `[2]` then raises that `ValueError` in the driver.
 `GEN_CLOSED` shows that the exception shut down the generator.
 
-`throw()` carries an exception from the driver down to the `yield`.
-A `raise` in the generator body carries an exception from the generator up to the `next()`,
-`send()`, or `throw()` call that resumed the generator.
-In both directions, the exception passes through a method call that the driver made on the generator object.
+In both directions, an exception passes through a method call that the driver made on the generator object.
 
 ### Stopping Early with `close()` {#stopping-early-with-close}
 
