@@ -303,7 +303,7 @@ The next subclass author might restore the usual order out of habit.
 The reliable repair changes the framework.
 Separate construction from starting,
 and have the client call `run()` on a fully built object.
-So `ApplicationFramework` drops its `__init__()`,
+So `ApplicationFramework` inherits its constructor from `object`,
 and the client calls `MyApp().run()`.
 
 ### Substitutability
@@ -446,7 +446,7 @@ Each of this chapter's four anchors guards against a different way of breaking t
   It raises a `TypeError` at an offending subclass's `class` statement,
   whether the subclass overrides `run()` or misspells a hook.
   This anchor holds at runtime,
-  whereas the type checker alone enforces `@final`.
+  whereas the type checker alone enforces a bare `@final`.
 - Discipline, via the Liskov Substitution Principle.
   The principle governs whether each step is a faithful substitute.
   `@abstractmethod` ensures that a required step exists.
