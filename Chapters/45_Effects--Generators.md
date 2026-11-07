@@ -19,11 +19,11 @@ driven by a `for` loop that takes one value at a time.
 Producing values is half of what a generator does.
 
 `yield` is an expression,
-so a generator can receive a value as well as hand one out,
+which means a generator can receive a value as well as hand one out,
 and it can return a final result when it finishes.
-Used that way, a generator is not a sequence but a conversation.
+Thus, a generator is not a sequence but a conversation.
 It yields a request, suspends, and continues when a caller sends the answer.
-A generator therefore has three *channels*:
+This gives a generator three *channels*:
 
 - Values go out through `yield`
 - Values come in through `send()`
@@ -34,6 +34,12 @@ This chapter covers:
 - The full three-channel annotation
 - The *driver* (the loop that runs such a conversation)
 - `yield from`, which composes generators that run under any driver
+- `throw()` and `close()`,
+  which raise an exception at a suspended generator's `yield`
+- Drivers with more to do: a state machine with one generator per state,
+  a scheduler that runs many generators, and the event loop behind `await`
+- Why a Python generator is half a coroutine,
+  and why the other half is the driver you write
 
 [Stateless](46_Effects--Stateless.md) builds an Effect system on these,
 but generators are useful on their own.
