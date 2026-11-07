@@ -318,7 +318,7 @@ Solutions/43_Functional--Confidence/README.md	[PAST] reported: Three consecutive
 Solutions/43_Functional--Confidence/README.md	[PAST] reported: With limits twenty times smaller, CODE, the same machine reported CODE on each of three runs.
 Solutions/44_Effects--Effect_Management/README.md	[PAST] read: Both read their arguments alone and leave everything outside themselves as it was.
 Solutions/45_Effects--Generators/README.md	[PAST] found: Under CODE a generator must return CODE, so CODE rejects CODE's CODE with an CODE: expected CODE, found CODE.
-Solutions/45_Effects--Generators/README.md	[PAST] stopped: The interview stopped after one question, before it built a CODE, and CODE is not a CODE in any case.
+Solutions/45_Effects--Generators/README.md	[PAST] stopped: The interview stopped after one answer, waiting at its second question, before it built a CODE, and CODE is not a CODE in any case.
 Solutions/45_Effects--Generators/README.md	[PAST] told: The type checker told you more.
 Solutions/45_Effects--Generators/README.md	[PAST] wrote: you wrote the full sequence of lines before running the modified CODE, and it matches the run line for line, including which sends print two lines and what CODE prints.
 Solutions/46_Effects--Stateless/README.md	[PAST-HEADING] declared: 2. An undeclared need, declared

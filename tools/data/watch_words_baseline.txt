@@ -550,7 +550,6 @@ Chapters/44_Effects--Effect_Management.md	promise: await its promise
 Chapters/44_Effects--Effect_Management.md	says nothing: CODE's signature says nothing about the exception
 Chapters/45_Effects--Generators.md	already: The Driver You Already Use states the result
 Chapters/45_Effects--Generators.md	by hand: "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand
-Chapters/45_Effects--Generators.md	could: so the driver's table needs an entry it could not have written before that answer arrived
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
 Chapters/45_Effects--Generators.md	manually: "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand
 Chapters/45_Effects--Generators.md	never: A CODE in the driver therefore propagates to the driver's callers and never reaches the generator's CODE and CODE clauses
@@ -895,7 +894,7 @@ Solutions/44_Effects--Effect_Management/README.md	price: CODE has no equivalent 
 Solutions/44_Effects--Effect_Management/README.md	prices: CODE receives a list of coroutines rather than prices
 Solutions/44_Effects--Effect_Management/README.md	prices: so a test that needs fake prices must inject CODE through every signature
 Solutions/45_Effects--Generators/README.md	contains no: CODE contains no CODE
-Solutions/45_Effects--Generators/README.md	holds no: The machine holds no CODE attribute and consults no table
+Solutions/45_Effects--Generators/README.md	holds no: The machine holds no CODE attribute and consults no transition table
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
 Solutions/45_Effects--Generators/README.md	want: So annotate a local whenever you want the checker to verify the type of the call that produces its value

@@ -294,8 +294,8 @@ Two iterators that raise the same exception type are a hazard for a driver that 
 The last two runs show that hazard.
 
 `None` is wrong twice over.
-The interview stopped after one question, before it built a `Result`,
-and `None` is not a `Result` in any case.
+The interview stopped after one answer, waiting at its second question,
+before it built a `Result`, and `None` is not a `Result` in any case.
 
 The type checker accepts `return stop.value` as a declared `Result`,
 because `StopIteration.value` has type `Any`.
@@ -909,9 +909,9 @@ but the type checker then applies `Answer | None` to every `yield` expression.
 The generator must handle a `None` at each `yield` whose value it uses as an `Answer`.
 That `None` exists only in the type,
 because the priming `None` arrives before the generator reaches its first `yield`.
-`interview()` puts what it receives into an f-string,
-which formats a `None` as readily as an `Answer`,
-so `interview()` passes the check either way.
+`interview()` binds each received value to a local annotated `Answer`,
+so under the wider `SendType` the type checker rejects all three assignments as `invalid-assignment`,
+and the generator would need a `None` test at each `yield`.
 Priming with `next()` keeps the `SendType` at `Answer`.
 The one call that cannot carry a value comes from the one function that cannot pass one.
 
@@ -1059,7 +1059,7 @@ for event in [Coin(25), Digit("1"), Digit("1"), Digit("1"),
 ```
 
 **Let position carry the state.**
-The machine holds no `state` attribute and consults no table.
+The machine holds no `state` attribute and consults no transition table.
 Where the generator pauses is the state.
 A pause in the coin loop means `COLLECTING`,
 and a pause after `yield "SELECTING"` means a first digit has arrived and the machine waits for a second.

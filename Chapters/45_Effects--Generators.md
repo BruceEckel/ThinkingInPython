@@ -420,8 +420,8 @@ print(drive(follow_up(), {
 #: Bob keeps a dog
 ```
 
-`Question(f"pet of {name}")` carries the `Answer` to `name`,
-so the driver's table needs an entry it could not have written before that answer arrived.
+`Question(f"pet of {name}")` carries the `Answer` to `name` into the next request,
+so the driver's table holds `pet of Alice` because the driver answers `name` with `Alice`.
 Under the second table the generator asks `pet of Bob`,
 because the answer to `name` changed.
 The driver still chooses every answer.
@@ -1413,7 +1413,7 @@ def holding() -> Machine:
                 return waiting()
 ```
 
-`Mouse` is the input enum from [Mousetrap States](31_Patterns--State_Machines.md#mousetrap-states).
+`Mouse` is the input enum from [Each State Decides](31_Patterns--State_Machines.md#each-state-decides).
 `Machine` is a recursive alias: a state yields its name, receives a `Mouse`,
 and returns the next state, or `None` to halt.
 The `type` statement evaluates its right side lazily,
@@ -1505,8 +1505,8 @@ For `MOVES`, this trace and the trace in `trap_states_demo.py` have the same lin
 Each entry message prints before the transition line that leads to it.
 The entry action runs inside `send()`, in the new state's body,
 and `run_all()` prints its line after `send()` returns.
-In `state_machine.py` the engine makes both `print()` calls and chooses their order;
-here each state's body runs its entry action.
+In `state_machine.py` the engine prints the transition line and then calls the new state's `run()`,
+so the engine chooses the order; here each state's body runs its entry action.
 
 The listing's second run shows a state that stays.
 `waiting()` matches `Mouse.APPEARS` alone,
@@ -1531,7 +1531,7 @@ A generator state keeps such a value in a local and passes it to the next state 
 so each state receives the data it needs and the machine object disappears.
 
 Exercise 8 writes the vending machine as one generator,
-with each state a loop inside a single generator body.
+with each state a position in a single generator body.
 That design suits a machine that is mostly a sequence.
 One generator per state suits a machine like the trap,
 whose transitions form a graph.
