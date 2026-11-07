@@ -367,11 +367,13 @@ from the newest entry back to the oldest.
 
 `collections.OrderedDict`, added in Python 3.1,
 kept insertion order before `dict` did.
-`dict` still lacks two `OrderedDict` features.
+`dict` still lacks three `OrderedDict` features.
 Two `OrderedDict`s compare equal when they hold the same entries in the same order,
 where `dict` equality ignores order.
 `move_to_end()` moves a key to either end,
 the step a least-recently-used cache takes each time it reads an entry.
+`popitem(last=False)` removes the oldest entry,
+where `dict.popitem()` removes the newest.
 
 `keys()`, `values()`, and `items()` each return a *view*:
 an object that reads the `dict`'s current contents each time you use it,

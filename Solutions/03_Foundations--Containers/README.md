@@ -510,6 +510,10 @@ then apply `b`," the same order `a.update(b)` has always used.
 
 Letting the right operand win makes `|` on dictionaries depend on operand order.
 `a | b` and `b | a` differ when the two dictionaries hold different values for a shared key.
+With this exercise's operands swapped,
+`{"c": 30, "d": 4} | counts` gives `{'c': 3, 'd': 4, 'a': 1, 'b': 2}`.
+`"c"` keeps `3`.
+The keys follow the left operand's order, so `"c"` and `"d"` come first.
 On sets, `a | b` and `b | a` are the same set.
 The two uses share one operator because both mean "combine,"
 but the set version alone commutes.
