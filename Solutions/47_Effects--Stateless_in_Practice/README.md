@@ -864,8 +864,8 @@ def research_and_report(
 <details>
 <summary>Done when</summary>
 
-`uv run ty check` passes on your Effect version and on `report()`,
-which has a branch for `TooLong`.
+`uv run ty check` passes on your Effect version,
+and your edit list includes the `case TooLong():` branch that `report()` needs.
 Taking `TooLong` back out of `research()`'s error parameter makes `ty` report `invalid-yield` at your new `yield from`.
 The type checker accepts your by-hand version whether or not it handles `TooLong`,
 and your edit list says which tool named each line.
@@ -911,7 +911,8 @@ def research() -> Effect[
 ```
 
 **Add and declare the failure.**
-`research.py` takes four edits, one of which the type checker names.
+The Effect version takes four edits, one of which the type checker names.
+`research_long.py` makes them in a copy of `research()` and imports the rest from `research.py`.
 `report()` needs three more.
 
 1. A new exception class, `TooLong`.
@@ -2218,7 +2219,7 @@ def run_season(casts: list[Cast]) -> None:
 <summary>Done when</summary>
 
 a caller annotated with your named shape accepts both factories, `ty` passes,
-and `play(Loud(), Kitty(), Weapon())` still type-checks and prints `and bats at the nasty weapon`.
+and `play(Loud(), Kitty(), Weapon())` still type-checks and prints `Kitty meets the nasty weapon`.
 Your fourth-actor count puts the most edits in `casts.py`, fewer in `quest.py`,
 two in `two_games.py`, and none in the named shape.
 
