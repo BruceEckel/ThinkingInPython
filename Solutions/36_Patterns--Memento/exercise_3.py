@@ -21,3 +21,5 @@ reconstructed = Drawing(
     data["title"], tuple(data["strokes"]))
 print(reconstructed == drawing)
 #: True
+print(hash(reconstructed) == hash(drawing))
+#: True

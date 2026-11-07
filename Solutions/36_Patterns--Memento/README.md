@@ -70,9 +70,13 @@ class Drawing:
 <summary>Done when</summary>
 
 in each version, your tests save or keep a state holding two strokes,
-call `erase()`, and assert that the earlier state and its `History` entry still have both strokes while the present has one.
+call `erase()`, and assert that the two-stroke state still has both strokes,
+in a `History` entry too, while the erased state has one.
 In the mutable version, drawing `a` and `b`, saving,
 and erasing leaves `['a']` in the sketch and `('a', 'b')` in the checkpoint.
+Its `History` test keeps the two-stroke memento in `history.present` through the `erase()`.
+In the frozen version, `history.past[0]` is the two-stroke `before`,
+and `history.present` holds the one-stroke `Drawing` that `erase()` returns.
 
 <details>
 <summary>Solution</summary>
@@ -426,7 +430,7 @@ since a `list` always compares unequal to a `tuple`.
 The `list` also makes the record unhashable.
 `hash()` raises a `TypeError`, `unhashable type: 'list'`.
 The solution converts the field back,
-so the rebuilt `Drawing` equals the original.
+so the rebuilt `Drawing` equals the original and hashes to the same value.
 
 ```python
 # exercise_3.py
@@ -451,6 +455,8 @@ print(type(data["strokes"]))
 reconstructed = Drawing(
     data["title"], tuple(data["strokes"]))
 print(reconstructed == drawing)
+#: True
+print(hash(reconstructed) == hash(drawing))
 #: True
 ```
 
