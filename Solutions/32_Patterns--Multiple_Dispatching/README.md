@@ -1637,7 +1637,7 @@ so `Jargon.eval_play()` returns `WIN` because play beats jargon.
 `battle()` starts the two dispatches.
 `a.get_weapon().compete(...)` resolves the first weapon's type.
 That class's `compete()` calls the `eval_*()` method named for it on the second weapon,
-and that second call resolves the second type.
+and that call resolves the second weapon's type.
 
 Six weapons take 42 methods:
 a `compete()` and six `eval_*()` methods in each class.
