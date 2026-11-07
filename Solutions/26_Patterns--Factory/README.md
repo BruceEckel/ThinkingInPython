@@ -1229,7 +1229,7 @@ so the `else` branch runs and produces a working factory.
 An expression in that string can name anything in the module's namespace,
 and can load any module through `__import__()`.
 
-**Look the name up as a key.**
+**Look up the name as a key.**
 `create_shape()` is the chapter's version,
 which looks `kind` up in a dictionary keyed on the same names.
 The string stays data,
@@ -1313,7 +1313,7 @@ def shape_name(n: int) -> Iterator[str]:
 
 `Shape.__subclasses__()` lists two classes while `list(all_subclasses(Shape))` lists three,
 `_Oval` among them.
-With the chapter's `random.seed(4)` and four draws,
+With the chapter's `random.seed(4)` and six draws,
 your demo prints `Oval.draw` at least once.
 You can say where `_Oval` sits relative to the classes `Shape.__subclasses__()` returns.
 
