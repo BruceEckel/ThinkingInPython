@@ -224,8 +224,10 @@ def make_map(size: int) -> str:
 
 your file prints one unshared-to-shared peak ratio per map size,
 and with the record `Tile` each ratio falls between about six and seven
-(the solution prints `6.2` at 50x50 and `6.9` at 200x200).
-A ratio well above that means one peak counted both builds.
+(the solution prints `6.2` at 50x50 and 100x100, and `6.9` at 200x200).
+If the unshared peak also counts the shared field,
+each ratio rises by 0.7 to 0.9 (`6.9`, `7.0`, and `7.8` in one run),
+so compare your ratios with the solution's size by size.
 
 <details>
 <summary>Solution</summary>
@@ -382,6 +384,10 @@ each cell gets its own `MutableTile`.
 so the test passes on code with one tile per cell.
 The test asserts on a different grass cell, `field[1][1]`,
 whose `walkable` turns `False` only when the cells share one `MutableTile`.
+
+A solution runs in its own folder, so `exercise_3.py` defines `MutableTile`,
+a `@dataclass` version of the chapter's `Tile`,
+rather than editing a copy of `tile_map.py`.
 
 ```python
 # exercise_3.py
@@ -894,7 +900,7 @@ def test_out_of_range_component_raises() -> None:
 **Validate before the pool lookup.**
 Every `Color` that `__new__()` pools or returns has in-range components.
 
-[Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
+[Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes the same *parse, don't validate* move with `__post_init__()`.
 Here the class validates in `__new__()`,
 because `__post_init__()` runs after `__new__()` has pooled the instance.

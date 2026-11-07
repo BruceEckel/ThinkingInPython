@@ -311,7 +311,7 @@ so a caller can see that construction goes through the factory rather than the c
 If you want callers to construct objects with an ordinary class call such as `Color(...)`,
 hide the pool inside `__new__()`.
 
-[*Singleton*](23_Patterns--Singleton.md#the-classic-implementations)
+[*Singleton*](23_Patterns--Singleton.md#one-instance-in-a-class-variable)
 builds and returns its one instance in `__new__()`.
 An interning `__new__()` stores each instance in a pool under its constructor arguments instead of a single constant key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
@@ -664,8 +664,8 @@ Dataframe libraries such as pandas and Polars offer categorical types.
 A column of a million country names stores small integer codes that index into a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
-In all three, memory grows with the number of distinct values,
-not with the number of uses.
+In all three, the pool grows with the number of distinct values,
+and each use adds a reference or a small code.
 When every instance of a type comes from the pool,
 you can write its equality checks as `is`.
 
