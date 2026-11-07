@@ -143,7 +143,7 @@ print(square.cache_info())
 
 Each miss runs the body and prints a `computing` line.
 A hit returns the stored result and skips the `print()`,
-the skipped side effect the `cache` section describes.
+the side effect the `cache` section describes.
 The single hit is the second `square(2)` (`[1]`),
 which returns the stored `4` because `2` is still in the cache.
 `1` was the first value computed, so the fourth miss, at `[2]`,
