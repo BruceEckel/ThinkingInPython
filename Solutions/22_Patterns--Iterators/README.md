@@ -779,8 +779,8 @@ class Peekable[T](Iterator[T]):
 <summary>Done when</summary>
 
 over `(x * 2 for x in [1, 2, 3])`, three calls to `peek()` print `2 2 2`,
-the next `next()` still returns `2`, `list()` of the rest gives `[4, 6]`,
-and `peek()` then reports the end.
+the `next()` that follows still returns `2`,
+`list()` of the rest gives `[4, 6]`, and `peek()` then reports the end.
 You can name the one piece of state your `Peekable` adds.
 
 <details>
