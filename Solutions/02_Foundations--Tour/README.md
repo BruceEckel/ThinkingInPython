@@ -66,7 +66,7 @@ a different design, a detail, or an equivalent alternative.
 
 [Booleans, None, and Truthiness](../../Chapters/02_Foundations--Tour.md#booleans-none-and-truthiness)
 lists which values `bool()` reports as false.
-Add the two dictionaries to the loop's list and write your predictions down first.
+Add the two dictionaries to the loop's list and write down your predictions first.
 Then ask whether the rule you see for lists and strings extends to a `dict`.
 
 <details>

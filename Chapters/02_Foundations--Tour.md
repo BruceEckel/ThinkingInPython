@@ -437,7 +437,7 @@ Examples often include Python-esque references.
 A triple-quoted string can span lines, and it keeps every newline it contains.
 That suits any block of literal text, such as an embedded template, a SQL query,
 or a chunk of HTML.
-You write the text out in full, line breaks and all.
+You write out the text in full, line breaks and all.
 
 The string also holds the newline right after the opening quotes and the one before the closing quotes.
 So each triple-quoted output in `strings.py` begins and ends with an empty `#:` line.
