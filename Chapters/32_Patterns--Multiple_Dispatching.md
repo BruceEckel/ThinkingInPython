@@ -207,7 +207,7 @@ Together the answers form a table spread across the classes.
 That table is hard to maintain.
 Changing who wins one pairing means editing two methods in two classes,
 and a new `Item` class needs a new method in every existing class.
-Writing the table out as data puts all nine answers in one place:
+Writing out the table as data puts all nine answers in one place:
 
 ```python
 # paper_scissors_rock_table.py
@@ -531,7 +531,7 @@ def test_versions_match_expected(module: ModuleType,
 ```
 
 `test_paper_scissors.py` imports the two modules, not their classes.
-`getattr(module, player)` looks the class up on the module `pytest` passed to `test_versions_match_expected()`,
+`getattr(module, player)` looks up the class on the module `pytest` passes to `test_versions_match_expected()`,
 so one dictionary of nine expected answers, `EXPECTED`,
 drives two independent sets of `Paper`, `Scissors`, and `Rock` classes.
 Iterating over `EXPECTED` yields its keys,
@@ -636,7 +636,7 @@ Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union.
 Typeshed can do that because it gives `NotImplemented` a type that inherits from `Any`.
 Returning the sentinel then satisfies any declared return type.
 
-Writing the union out, `Meters | NotImplementedType`,
+Writing out the union, `Meters | NotImplementedType`,
 makes `ty` reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
 Pyright and mypy accept the access,
