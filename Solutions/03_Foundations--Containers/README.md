@@ -217,7 +217,7 @@ and relate the message to what a `list` allows you to do after creation.
 <details>
 <summary>Done when</summary>
 
-your `except` clause catches a `TypeError` whose message is `cannot use 'list' as a set element (unhashable type: 'list')`,
+your `except` clause catches a `TypeError` whose message begins `cannot use 'list' as a set element` and ends `(unhashable type: 'list')`,
 and your explanation ties the hash a set computes at insertion to what a `list` lets you do after creation and a `frozenset` does not.
 
 <details>
