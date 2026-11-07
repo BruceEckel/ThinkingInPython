@@ -163,7 +163,7 @@ and the loop skips the observer after the one that detached,
 without raising an exception.
 
 With the copy, `detach()` changes `self._observers` while the loop reads the copied list.
-A `notify()` call therefore reaches every observer in `_observers` at the moment the call begins.
+`notify()` therefore calls every observer in `_observers` at the moment the call begins.
 If `detach()` removes an observer from `_observers` partway through a `notify()` call,
 the copy still holds that observer,
 so the observer receives the call's notification.
