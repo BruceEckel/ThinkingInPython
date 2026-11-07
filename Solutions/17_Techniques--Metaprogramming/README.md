@@ -12,7 +12,7 @@
 shows `__init_subclass__()` running once for every new subclass.
 Trace what `__init_subclass__()` adds and what it removes for `Yellow`,
 then for `Gold`.
-Write your predicted sets down before you run the listing.
+Write down your predicted sets before you run the listing.
 
 <details>
 <summary>The shape</summary>
@@ -959,7 +959,9 @@ while the spliced source defines a class named `X`.
 The injected statement runs before that lookup,
 so the lookup fails too late to stop it.
 
-Restoring the `if class_name not in cls.KNOWN_COMMANDS` check rejects the payload before `make_class()` builds the string,
+Restoring the `if class_name not in cls.KNOWN_COMMANDS` check rejects the payload before `make_class()` builds the string.
+The check raises a `ValueError` starting `Unknown command:`,
+as it does in the chapter's `commander.py`,
 so the injected code stops at the check, before `exec()`.
 
 Before you move on, name what separates your attempt from this one:
