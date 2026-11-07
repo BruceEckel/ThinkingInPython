@@ -361,7 +361,7 @@ On a new instance, that run fills in the fields,
 since `__new__()` builds a bare instance and leaves them to `__init__()`.
 On a pooled instance,
 the frozen record's `__init__()` assigns the same three components again through `object.__setattr__()`,
-so the object stays as it was.
+so the instance stays as it was.
 If a field has a `default_factory` or `__post_init__()` has a side effect,
 the re-run repeats that factory call or that side effect on a finished object.
 
