@@ -130,7 +130,7 @@ does the exception pass from callee to caller?
 If you write a function `a()` that calls a function `b()` that raises an exception,
 then `a()` raises that exception too, unless `a()` catches it.
 `a()`'s signature says nothing about the exception,
-but `a()` takes the exception on by calling `b()`.
+but `a()` takes on the exception by calling `b()`.
 An exception is therefore an Effect,
 alongside the side effect and the side cause.
 
@@ -498,7 +498,7 @@ before the bad value reaches `slope()`.
 Each is a hand-built version of something an EMS automates.
 
 Side effects and side causes also have a by-hand technique:
-pass the implementation in as a parameter.
+pass in the implementation as a parameter.
 Instead of calling the built-in `input()` and `print()`,
 `greet()` declares what it needs:
 
@@ -664,7 +664,7 @@ The `()` after the row is the return type: Koka's unit type,
 the counterpart of Python's `None`.
 
 The compiler infers the row from what the body calls
-(this listing writes the rows for `greet()` and `main()` out so you can see them).
+(this listing writes out the rows for `greet()` and `main()` so you can see them).
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
 Since the compiler computes each row from the calls in the body,
@@ -1119,7 +1119,7 @@ We build programs from other people's code,
 and we don't know what that code does.
 It might change something in the world.
 It might read from an unreliable source.
-It might fail and take the system down.
+It might fail and take down the system.
 You discover these behaviors by trusting documentation, reading source,
 and observing failures.
 Then you write compensating code.
