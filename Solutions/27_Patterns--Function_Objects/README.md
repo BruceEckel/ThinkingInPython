@@ -137,7 +137,8 @@ so the solution gives the list a `Protocol` that declares both operations.
 Written the way `command_pattern.py` writes it,
 the *GoF Design Patterns* shape is a base class with two `raise NotImplementedError` bodies.
 A base class makes sense when the commands share implementation.
-Each command here writes its own `__call__()` and `undo()`.
+The listing has one command class, `Deposit`,
+so a base class would have no implementation to share.
 
 **Remember what to reverse.**
 `Deposit` must also remember what it did, here the account and the amount,
@@ -575,6 +576,10 @@ You need a closure when the function has no parameter for the setting.
 `partial()` binds arguments.
 A closure's body can use the setting in any expression.
 
+The listing copies `first_root()` unchanged from `chain.py`,
+and `newton()` from `algorithms.py` with a `tolerance` parameter,
+because a solution runs in its own folder and cannot import the chapter's files.
+
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
 
@@ -877,7 +882,7 @@ Each one evaluates `n` while the loop is still running and stores the result.
 `partial(print, n)` evaluates the argument where it appears.
 `make(n)` gives each lambda its own `n` in its own function scope.
 
-Only `make(n)` keeps the value private.
+`make(n)` alone keeps the value out of the command's call signature and its public attributes.
 `lambda n=n:` exposes the value as a parameter a caller can override.
 `partial(print, n)` stores the value in the `partial` object's public `args` attribute,
 where `by_partial[0].args` is `(0,)`.

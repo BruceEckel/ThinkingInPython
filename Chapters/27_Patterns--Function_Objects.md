@@ -589,7 +589,7 @@ All three patterns share one shape:
 In every lane the call site stays the same short loop or call,
 and it depends on the signature alone.
 The patterns differ in how many of the chosen function objects the call site runs:
-all of them in turn, one per call, or the first that succeeds.
+all of them in turn, one per call, or each in order until one succeeds.
 That count, rather than a class structure, separates *Command*, *Strategy*,
 and *Chain of Responsibility* in Python.
 
