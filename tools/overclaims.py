@@ -30,10 +30,12 @@ that said "The list keeps both loops". It is a survey rule because
 the contradiction is a judgment: the scan sees only the shape, so
 the hits are a reading list (the first run over `Chapters/`, on
 2026-11-07, had eight hits and no contradiction). A `[LEAD]` hit
-prints only under `--survey`, marked `survey` instead of NEW or
-accepted, after the `[BOUND]` lines. It never enters the baseline,
-never counts toward `N new`, and is counted on a `K survey` line of
-its own.
+has a baseline of its own, `tools/data/overclaims_lead_baseline.txt`,
+separate from `[BOUND]`'s. `--survey` prints the hits not in it,
+marked `survey`, after the `[BOUND]` lines, and ends on `K survey,
+J judged`. `--survey-accept` adds them after a human read and drops
+stale entries, for the given files alone like `--accept`. A `[LEAD]`
+hit never enters `[BOUND]`'s baseline or the `N new` count.
 
 The check reads each paragraph's prose, joins its lines, and splits
 the text into clauses at `.`, `;`, `:`, `?`, and `!`, the way
@@ -57,6 +59,8 @@ entries, for the given files alone when paths are given.
     uv run python -m tools.overclaims --survey Chapters  # + LEAD
     uv run tip overclaims CH=45
     uv run tip overclaims-accept CH=45
+    uv run python -m tools.overclaims --survey-accept Chapters
+    uv run tip overclaims CH=45 ARGS=--survey-accept
 """
 
 import argparse
@@ -128,6 +132,21 @@ HEADER: Final = (
     "# before accepting.\n"
     "# See tools/overclaims.py.\n"
 )
+
+LEAD_BASELINE: Final = DATA_DIR / "overclaims_lead_baseline.txt"
+"""The judged `[LEAD]` keeps, apart from `[BOUND]`'s baseline."""
+LEAD_HEADER: Final = (
+    "# [LEAD] lead-ins a human read and judged keeps: the item does\n"
+    "# not contradict its lead-in. An entry is not an exemption from\n"
+    "# the rule.\n"
+    "# path<TAB>[LEAD] lead -> item, whitespace normalized, no line\n"
+    "# number, so a reflow leaves an entry alone and an edit to the\n"
+    "# lead-in or the item retires it. Rewritten by\n"
+    "# `tip overclaims ARGS=--survey-accept`; read the delta with\n"
+    "# `--survey` before accepting.\n"
+    "# See tools/overclaims.py.\n"
+)
+"""The comment header of the `[LEAD]` baseline file."""
 
 SENTENCE_END = re.compile(r"[.;:?!]+[\"')\]*_”’]*(?=\s|$)")
 LEAD_END = re.compile(r"[^.;?!]*:[\"')\]*_”’]*$")
@@ -212,11 +231,26 @@ def load_baseline(path: Path | None = None) -> set[str]:
     }
 
 
-def write_baseline(entries: set[str], path: Path | None = None) -> None:
+def write_baseline(entries: set[str], path: Path | None = None,
+                   header: str = HEADER) -> None:
     """The header plus the sorted entries, with LF line endings."""
     path = path or BASELINE
     body = "".join(f"{entry}\n" for entry in sorted(entries))
-    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+    path.write_text(header + body, encoding="utf-8", newline="\n")
+
+
+def lead_lines(unjudged: list[tuple[str, int, str]],
+               judged: list[tuple[str, int, str]],
+               stale: list[str], show_all: bool) -> None:
+    """Print the `[LEAD]` hits, judged ones only under `--all`."""
+    for shown, line, message in unjudged:
+        print(f"{'survey':8} {shown}:{line}: {message}")
+    if show_all:
+        for shown, line, message in judged:
+            print(f"{'accepted':8} {shown}:{line}: {message}")
+    for entry in stale:
+        shown, message = entry.split("\t", 1)
+        print(f"stale    {shown}: {message}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -232,8 +266,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="add the NEW hits to the baseline and drop "
                          "stale entries")
     ap.add_argument("--survey", action="store_true",
-                    help="also print the [LEAD] survey rule, "
-                         "never baselined")
+                    help="also print the [LEAD] survey rule's "
+                         "unjudged hits")
+    ap.add_argument("--survey-accept", action="store_true",
+                    help="add the unjudged [LEAD] hits to their own "
+                         "baseline and drop stale entries")
     args = ap.parse_args(argv)
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
@@ -246,6 +283,26 @@ def main(argv: list[str] | None = None) -> int:
     current = {key(shown, clause) for shown, _, clause in found}
     new = [(s, n, c) for s, n, c in found if key(s, c) not in baseline]
     stale = sorted(scope - current)
+    surveying = args.survey or args.survey_accept
+    leads = sorted(
+        {(display(f.path), f.line, f.message)
+         for p in paths for f in find_leads(Document.parse(p))}
+    ) if surveying else []
+    lead_baseline = load_baseline(LEAD_BASELINE)
+    lead_scope = {e for e in lead_baseline
+                  if e.split("\t", 1)[0] in shown_paths}
+    lead_current = {key(s, m) for s, _, m in leads}
+    unjudged = [h for h in leads
+                if key(h[0], h[2]) not in lead_baseline]
+    judged = [h for h in leads if key(h[0], h[2]) in lead_baseline]
+    lead_stale = sorted(lead_scope - lead_current)
+    if args.survey_accept:
+        added = {key(s, m) for s, _, m in unjudged}
+        write_baseline((lead_baseline - set(lead_stale)) | added,
+                       LEAD_BASELINE, LEAD_HEADER)
+        print(f"Lead baseline: added {len(added)}, dropped "
+              f"{len(lead_stale)} stale, in {display(LEAD_BASELINE)}")
+        return 0
     if args.accept:
         added = {key(s, c) for s, _, c in new}
         write_baseline((baseline - set(stale)) | added)
@@ -261,16 +318,13 @@ def main(argv: list[str] | None = None) -> int:
     for entry in stale:
         shown, clause = entry.split("\t", 1)
         print(f"stale    {shown}: {clause}")
-    survey = sorted(
-        {(display(f.path), f.line, f.message)
-         for p in paths for f in find_leads(Document.parse(p))}
-    ) if args.survey else []
-    for shown, line, message in survey:
-        print(f"{'survey':8} {shown}:{line}: {message}")
+    if surveying:
+        lead_lines(unjudged, judged, lead_stale, args.all)
     print(f"{len(new)} new, {len(found) - len(new)} accepted"
           + (f", {len(stale)} stale" if stale else ""))
-    if args.survey:
-        print(f"{len(survey)} survey")
+    if surveying:
+        print(f"{len(unjudged)} survey, {len(judged)} judged"
+              + (f", {len(lead_stale)} stale" if lead_stale else ""))
     return 1 if args.fail and new else 0
 
 

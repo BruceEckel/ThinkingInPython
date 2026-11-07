@@ -57,19 +57,81 @@ def test_exercise_lead_in_reads_its_nested_items() -> None:
     assert [line for line, _ in found] == [3]
 
 
-def test_survey_only_and_never_baselined(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
+@pytest.fixture
+def setup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+          ) -> tuple[Path, Path, Path]:
+    """A chapter file and tmp paths for both baselines."""
     path = tmp_path / "a.md"
     path.write_text(CHAPTER_45, encoding="utf-8")
     baseline = tmp_path / "baseline.txt"
+    lead = tmp_path / "lead_baseline.txt"
     monkeypatch.setattr(overclaims, "BASELINE", baseline)
+    monkeypatch.setattr(overclaims, "LEAD_BASELINE", lead)
+    return path, baseline, lead
+
+
+def test_survey_only_and_never_baselined(
+    setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path, baseline, lead = setup
     assert main([str(path)]) == 0
     assert "[LEAD]" not in capsys.readouterr().out
     assert main([str(path), "--survey"]) == 0
     out = capsys.readouterr().out
     assert "survey   " in out and "[LEAD]" in out
-    assert out.splitlines()[-1] == "1 survey"
+    assert out.splitlines()[-1] == "1 survey, 0 judged"
     assert main([str(path), "--accept"]) == 0
     assert "[LEAD]" not in baseline.read_text(encoding="utf-8")
+    assert not lead.exists()
+
+
+def test_survey_accept_judges_the_hit(
+    setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path, baseline, lead = setup
+    assert main([str(path), "--survey-accept"]) == 0
+    assert "added 1, dropped 0 stale" in capsys.readouterr().out
+    text = lead.read_text(encoding="utf-8")
+    assert text.startswith(overclaims.LEAD_HEADER)
+    assert len(overclaims.load_baseline(lead)) == 1
+    assert not baseline.exists()
+    assert main([str(path), "--survey"]) == 0
+    out = capsys.readouterr().out
+    assert "survey   " not in out
+    assert out.splitlines()[-1] == "0 survey, 1 judged"
+    assert main([str(path), "--survey", "--all"]) == 0
+    out = capsys.readouterr().out
+    assert any(line.startswith("accepted ") and "[LEAD]" in line
+               for line in out.splitlines())
+
+
+def test_edited_lead_in_retires_the_entry(
+    setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path, _, lead = setup
+    assert main([str(path), "--survey-accept"]) == 0
+    capsys.readouterr()
+    path.write_text(CHAPTER_45.replace("gives up", "drops"),
+                    encoding="utf-8")
+    assert main([str(path), "--survey"]) == 0
+    out = capsys.readouterr().out
+    assert "survey   " in out and "stale    " in out
+    assert out.splitlines()[-1] == "1 survey, 0 judged, 1 stale"
+    assert main([str(path), "--survey-accept"]) == 0
+    assert "dropped 1 stale" in capsys.readouterr().out
+    entries = overclaims.load_baseline(lead)
+    assert len(entries) == 1
+    assert all("drops" in e for e in entries)
+
+
+def test_default_run_prints_no_survey_line(
+    setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path, _, _ = setup
+    assert main([str(path)]) == 0
+    out = capsys.readouterr().out
+    assert "[LEAD]" not in out and "survey" not in out

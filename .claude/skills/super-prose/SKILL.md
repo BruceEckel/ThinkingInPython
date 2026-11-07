@@ -59,7 +59,9 @@ scope's line range:
 - `tip overclaims CH=NN ARGS=--survey` (for the claim check every
   pass makes: `[LEAD]`, a list lead-in that bounds every item above
   an item that exempts itself, "Each approach gives up one side's
-  loop:" over "The list keeps both loops", 2026-11-07)
+  loop:" over "The list keeps both loops", 2026-11-07; it prints
+  only lead-ins not yet judged, and a read keep goes into its own
+  baseline with `tip overclaims CH=NN ARGS=--survey-accept`)
 
 Read `deep_review_db.md` and the chapter's most recent
 `deep_review/~NN...` file for standing exemptions, and the Rules

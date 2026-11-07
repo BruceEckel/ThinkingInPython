@@ -501,9 +501,12 @@ def overclaims(v: Vars) -> None:
     picks one chapter and its Solutions file. Hits judged keeps live in
     tools/data/overclaims_baseline.txt, so the run prints only new
     ones; ARGS=--all lists every hit. ARGS=--survey adds the `[LEAD]`
-    survey rule, never baselined: a list lead-in that bounds every
-    item ("Each approach gives up one side's loop:") above an item
-    that exempts itself ("The list keeps both loops").
+    survey rule: a list lead-in that bounds every item ("Each
+    approach gives up one side's loop:") above an item that exempts
+    itself ("The list keeps both loops"). `[LEAD]` keeps its own
+    baseline, tools/data/overclaims_lead_baseline.txt, written by
+    ARGS=--survey-accept after a read, so the survey prints only
+    lead-ins not yet judged.
     """
     py("tools.overclaims", *prose_files(v), *v.words("ARGS"))
 
