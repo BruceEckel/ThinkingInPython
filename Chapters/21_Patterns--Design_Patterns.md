@@ -342,7 +342,7 @@ A `Callable` annotation is not a class.
 The `Protocol` and `Callable` rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
 In a language where every implementer must specify its interface,
 a pattern exists to build a declared interface.
-In a language that supplies the `Protocol` and `Callable` rungs,
+In a language with the `Protocol` and `Callable` rungs,
 those rungs supply the interface, so the pattern dissolves.
 
 ### A Pattern Moves an Edge

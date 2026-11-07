@@ -629,7 +629,7 @@ main("md")
 
 Here adding `MdWriter` edits one existing thing, the `case` that `main()` gains.
 `Report` and `Writer` keep their source.
-No writer lists `Writer` as a base.
+None of `PdfWriter`, `HtmlWriter`, and `MdWriter` lists `Writer` as a base.
 The type checker matches each class to the protocol when `main()` assigns an instance to `writer`.
 
 The count gives the answer:
