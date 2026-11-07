@@ -62,7 +62,8 @@ the script still runs and prints the same line.
 because `None` has no `val` attribute.
 In the chapter's version, the guard narrows `instance` to the inner class,
 so the type checker accepts the `append()` call after it.
-Once the class body binds the inner instance, `instance` always holds an object,
+Once the class body binds the inner object to `instance`,
+that class variable always holds an object,
 so the solution drops `None` from the annotation.
 
 ```python
@@ -180,7 +181,7 @@ If you give `pool()` a `size` parameter with a default of 2,
 `@cache` builds one pool for each way a caller writes the call.
 In that version, `pool()`, `pool(2)`,
 and `pool(size=2)` return three different pools.
-After two `acquire()` calls exhaust the pool from `pool()`,
+After two `pool().acquire()` calls lease both connections,
 `pool(2).acquire()` still lends a third connection.
 [When You Want a Class, Cache the Instance](../../Chapters/23_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)
 shows the same failure with `settings(env)`,
