@@ -560,7 +560,7 @@ A generic factory needs `register()`'s bound to name the factory's own type para
 The type checker rejects a bound that contains another type parameter.
 
 `register()` returns `type[S]`, the decorated class's own type,
-so the checker types the decorated name `Circle` as `type[Circle]`,
+so the checker sees the decorated name `Circle` as `type[Circle]`,
 not `type[Shape]`.
 
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
