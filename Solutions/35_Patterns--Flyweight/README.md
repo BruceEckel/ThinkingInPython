@@ -143,6 +143,11 @@ field = parse_map("""
 cells = [*row for row in field]
 print(len(cells), len({id(t) for t in cells}))
 #: 24 5
+grass = parse_map("...\n...\n...")
+print(walkable_neighbors(grass, 0, 0),
+      walkable_neighbors(grass, 0, 1),
+      walkable_neighbors(grass, 1, 1))
+#: 2 3 4
 ```
 
 **Name each new kind in both tables.**
@@ -155,6 +160,11 @@ The twenty-four cells refer to five distinct objects, one per kind
 (`grass`, `water`, `rock`, `door`, `tree`).
 The count stays at five however large the map grows,
 because `@cache` keys on the symbol alone.
+
+**Count the neighbors inside the grid.**
+The bounds test in `walkable_neighbors()` passes over the positions that fall off the map,
+so on the all-grass 3x3 map a corner cell counts two neighbors,
+an edge cell three, and the center four.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -368,9 +378,11 @@ def mutable_tile(symbol: str) -> MutableTile:
 <details>
 <summary>Done when</summary>
 
-your test passes with `@dataclass` on `Tile`,
+your test passes with `@dataclass` on the tile class
+(`MutableTile` in the solution),
 fails with a `FrozenInstanceError` at the assignment once `@record` is back,
-and also fails if you remove `@cache` from `tile()`.
+and also fails if you remove `@cache` from the factory
+(`mutable_tile()` in the solution).
 That last check shows the test detects sharing, not just the assignment it made.
 
 <details>
@@ -388,6 +400,7 @@ whose `walkable` turns `False` only when the cells share one `MutableTile`.
 A solution runs in its own folder, so `exercise_3.py` defines `MutableTile`,
 a `@dataclass` version of the chapter's `Tile`,
 rather than editing a copy of `tile_map.py`.
+Its factory, `mutable_tile()`, takes the place of `tile()`.
 
 ```python
 # exercise_3.py
@@ -616,6 +629,12 @@ promote(board, ("e", 4), Kind.QUEEN)
 queen = board[("e", 4)]
 print(queen.color, queen.kind)
 #: Color.WHITE Kind.QUEEN
+pawns = [board[(f, 2)] for f in "abcdfgh"]
+print(all(p.kind is Kind.PAWN for p in pawns))
+#: True
+move(board, ("e", 4), ("e", 7))  # Takes e7's pawn
+print(len(board), len({id(p) for p in board.values()}))
+#: 31 12
 ```
 
 **Share one piece per color and kind.**
@@ -634,6 +653,8 @@ The twelve `Piece` objects therefore remain however many captures follow.
 **Promote by switching flyweights.**
 A frozen `Piece` keeps its color and kind for life,
 so `promote()` changes what the square refers to.
+The seven other white pawns still refer to the shared pawn `Piece`,
+so each one still reports `Kind.PAWN`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -857,8 +878,13 @@ class Color:
             cls._pool[key] = super().__new__(cls)
         return cls._pool[key]
 
+print(Color(255, 255, 255))
+#: Color(red=255, green=255, blue=255)
+before = len(Color._pool)
 expect(ValueError, Color, 300, 0, 0)
 #: [ValueError] red=300 out of range 0-255
+print(before, len(Color._pool))
+#: 1 1
 ```
 
 ```python

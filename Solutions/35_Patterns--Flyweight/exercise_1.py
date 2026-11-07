@@ -57,3 +57,8 @@ field = parse_map("""
 cells = [*row for row in field]
 print(len(cells), len({id(t) for t in cells}))
 #: 24 5
+grass = parse_map("...\n...\n...")
+print(walkable_neighbors(grass, 0, 0),
+      walkable_neighbors(grass, 0, 1),
+      walkable_neighbors(grass, 1, 1))
+#: 2 3 4

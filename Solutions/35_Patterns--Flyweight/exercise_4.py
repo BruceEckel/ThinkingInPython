@@ -62,3 +62,9 @@ promote(board, ("e", 4), Kind.QUEEN)
 queen = board[("e", 4)]
 print(queen.color, queen.kind)
 #: Color.WHITE Kind.QUEEN
+pawns = [board[(f, 2)] for f in "abcdfgh"]
+print(all(p.kind is Kind.PAWN for p in pawns))
+#: True
+move(board, ("e", 4), ("e", 7))  # Takes e7's pawn
+print(len(board), len({id(p) for p in board.values()}))
+#: 31 12

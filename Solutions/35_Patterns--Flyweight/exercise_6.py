@@ -26,5 +26,10 @@ class Color:
             cls._pool[key] = super().__new__(cls)
         return cls._pool[key]
 
+print(Color(255, 255, 255))
+#: Color(red=255, green=255, blue=255)
+before = len(Color._pool)
 expect(ValueError, Color, 300, 0, 0)
 #: [ValueError] red=300 out of range 0-255
+print(before, len(Color._pool))
+#: 1 1
