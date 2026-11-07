@@ -2096,7 +2096,7 @@ At `yield`, Python unlinks the generator's execution frame from the call stack,
 so the frame stops being a stack frame.
 The execution frame lives on the heap inside the generator object,
 which exposes it as `gi_frame`, with its locals and position intact.
-The next `next()` links that frame back into the call stack.
+The call that resumes the generator links that frame back into the call stack.
 
 The PEP cites the "pleasant solutions" of three earlier languages:
 iterators in CLU and Sather, and generators in Ralph Griswold's Icon.
