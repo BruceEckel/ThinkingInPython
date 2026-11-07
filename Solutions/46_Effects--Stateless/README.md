@@ -386,7 +386,7 @@ builds `Log` as an Ability alongside `Console`,
 and [Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface)
 shows how a `Protocol` replaces a concrete class.
 Declare `Log` with a `write()` method,
-and write one recording class with the shape of both protocols.
+and define one recording class with the shape of both protocols.
 Pass its instance to `supply()` once for each protocol, in one call,
 run the Effect, and assert on the recorder's two lists.
 
