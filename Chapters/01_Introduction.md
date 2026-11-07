@@ -174,7 +174,8 @@ asks how much Effect tracking Python's `Annotated` type can express without a li
 and [An Effect Checker](B_An_Effect_Checker.md)
 builds a checker for those annotations.
 The checker works without type inference,
-resolving a call by its name and by the written type of its receiver.
+resolving a call by its name and by its receiver's type,
+where the source writes that type out or makes it evident.
 
 ## The Examples
 
@@ -223,6 +224,9 @@ When the book says to run a listing, use the short form.
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
 names a file in the repository's `rust/` directory, outside the Python build.
+Chapter 44's Koka, Flix, Scala,
+and TypeScript programs open with a `//` path comment,
+such as `// koka/greet.kk`, and live in the repository's `effects/` directory.
 
 `uv` and other tools make setup short.
 The repository's [README](https://github.com/BruceEckel/ThinkingInPython#setup)
@@ -272,8 +276,8 @@ because a pattern shows its value only in a program you build yourself.
 When a change breaks the code, read the traceback closely.
 It underlines the failing part of the line,
 down to the one operation in a long expression,
-and ends with a suggestion such as `Did you mean: 'count'?` when you misspell a name,
-an attribute, or a keyword argument.
+and ends with a suggestion when you misspell a name, an attribute,
+or a keyword argument, such as `Did you mean: 'count'?` for a name.
 
 Each chapter's Exercises section links to that chapter's solutions.
 On the website they are a page beside the chapter.
