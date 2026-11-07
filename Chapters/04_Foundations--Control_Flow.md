@@ -232,7 +232,7 @@ where a `return` is a syntax error.
 ### `range()`, `enumerate()`, and `zip()`
 
 `for` walks the items of any iterable.
-A loop over a list, a set, a dictionary,
+A loop over a list, a set, a dictionary (its keys),
 or a string hands you each element directly.
 Use `range()` for counting and `enumerate()` when you also need the index:
 
@@ -471,7 +471,7 @@ Check the argument and raise your own exception first when the report should nam
 
 The optional `else` runs when the `try` block reaches its end.
 The loop `else` has the same shape.
-It runs when the loop exhausts its iterable.
+It runs when the loop ends without a `break`.
 The `except` clauses catch exceptions raised in the `try` block alone.
 An exception from the follow-up work in the `else` propagates to the caller,
 past the handlers written for the `try` block's failure.

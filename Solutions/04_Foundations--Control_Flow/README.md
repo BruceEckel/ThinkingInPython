@@ -602,7 +602,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Mutating a Container While Looping](../../Chapters/04_Foundations--Control_Flow.md#mutating-a-container-while-looping)
+[Two List Traps](../../Chapters/03_Foundations--Containers.md#two-list-traps)
 explains how `remove()` shifts later items into slots the loop has passed.
 Walk the loop by index over `[2, 2, 1, 3]`,
 noting which item `remove()` deletes and which item moves into the current position.
