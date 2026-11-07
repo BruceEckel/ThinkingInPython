@@ -34,7 +34,7 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 
 The code at the end of `use_module.py` starts with an `if` clause that checks whether the standard variable `__name__` equals the string `"__main__"`.
 Any identifier that begins and ends with double underscores (a dunder)
-is one that Python itself sets or calls.
+is one that Python itself sets, calls, or reads.
 Python calls a class's dunder methods, for example,
 to apply the language's operators and built-in functions to its objects.
 [Classes](07_Foundations--Classes.md)
@@ -393,7 +393,7 @@ so the package's internal imports keep working after you rename the package.
 A dotless `from module1 import function1` looks for a top-level module named `module1` on the [search path](#pythonpath),
 the way `use_module.py` looks for `module`.
 `module1.py` sits inside `a_package`, so with the dotless import,
-`use_module4.py` stops with `ModuleNotFoundError: No module named 'module1'`.
+`use_module4.py` stops with a `ModuleNotFoundError` for `module1`.
 
 Two dots refer to the parent package,
 so `a_package/b_package/module3.py` can import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
