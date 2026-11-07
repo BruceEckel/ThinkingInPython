@@ -323,7 +323,7 @@ On a drawing with `n` strokes,
 `draw()` builds a new `Drawing` around a fresh tuple of `n + 1` pointers and reuses every existing string.
 
 Each `draw()` builds one such tuple.
-A caretaker that keeps every past state keeps every one of those tuples alive,
+A caretaker that stores every past state keeps every one of those tuples alive,
 as the `History` class in `history.py` does.
 When a field grows by one element per edit, the way `strokes` does,
 the `n`-th edit builds a tuple of `n` pointers,
