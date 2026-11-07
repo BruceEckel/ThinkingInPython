@@ -149,7 +149,7 @@ from dataclasses import dataclass
 
 @dataclass
 class B:
-    x: int = 100  # Constructor default, not class attribute
+    x: int = 100  # Becomes a constructor default
 
 b = B()
 b.x = -1
@@ -760,8 +760,10 @@ class SubCounted(Counted):
 
 `vars(Sub).get("total")` prints `None` before the first `Sub()`,
 then `2` and `3` after each call, while `Base.total` stays at `1`.
-With `Base.total += 1` as the increment,
-every `vars(Sub).get("total")` prints `None` and the two counts move together.
+For the second half, the solution defines a second pair of classes,
+`Counted` and `SubCounted`, rather than editing `Base`.
+With `Counted.total += 1` as the increment,
+every `vars(SubCounted).get("total")` prints `None` and the two counts move together.
 
 <details>
 <summary>Solution</summary>

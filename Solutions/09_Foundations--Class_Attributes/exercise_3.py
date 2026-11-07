@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class B:
-    x: int = 100  # Constructor default, not class attribute
+    x: int = 100  # Becomes a constructor default
 
 b = B()
 b.x = -1
