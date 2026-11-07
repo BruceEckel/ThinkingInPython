@@ -18,8 +18,9 @@ This is the shape *GoF Design Patterns* gives *Proxy*.
 Python does not need the shared base, but the base shows, in one class,
 the interface the surrogate shares with every implementation.
 
-A surrogate object receives an implementation and forwards all method calls to it.
-Code can therefore use a surrogate anywhere it uses an implementation.
+A surrogate object receives an implementation and forwards method calls to it.
+Code can therefore use a surrogate in most places it uses an implementation;
+the sections below show where the substitution breaks.
 The surrogate can refuse a call, delay creating the implementation,
 count or log the calls it forwards, or swap the implementation for another.
 Both *Proxy* and *State* use that indirection.
