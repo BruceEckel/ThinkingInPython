@@ -1429,7 +1429,7 @@ That release is why a thread pool helps with I/O-bound work.
 
 The next two examples, one for waiting and one for computing, share a harness.
 `compare()` runs a price function sequentially and threaded and confirms the two agree.
-Then it times each variant five times,
+Then it times each variant in five rounds,
 alternating between the two so a stray background load spike slows both,
 and keeps each variant's best with `min()`:
 

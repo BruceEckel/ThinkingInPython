@@ -1419,7 +1419,7 @@ outside the loop body.
 `for item in source:` is the `for` statement calling `source.__next__()`,
 and that call runs before control reaches the indented block.
 The `with lock:` inside the body therefore starts after `next()` has returned a number,
-and ends before the next `next()` begins.
+and ends before `for item in source:` calls `next()` again.
 Two threads can be inside `__next__()` at the same moment,
 read the same `next_number`, and return the same ticket,
 as they do without the lock.
