@@ -440,7 +440,7 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 
 **Declare the visitor's interface.**
 `Visits` specifies the one method `accept()` calls,
-so the parameter declares what `accept()` needs instead of accepting anything.
+so the parameter declares what `accept()` needs instead of admitting anything.
 A `Protocol` matches on structure,
 so `Bee` matches `Visits` through the `visit()` it inherits from `Pollinator`.
 Any class with a compatible `visit()` satisfies `Visits`,
