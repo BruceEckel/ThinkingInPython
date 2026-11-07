@@ -601,7 +601,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [An *Event Bus*: Handlers Keyed by Type](../../Chapters/27_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-looks handlers up by `type(event)` in a `defaultdict`.
+looks up handlers by `type(event)` in a `defaultdict`.
 Iterate over `type(event).__mro__` instead,
 and read each class's handlers with `.get()` so a lookup leaves the keys as they were.
 `unsubscribe()` removes a handler from its event type's list,
