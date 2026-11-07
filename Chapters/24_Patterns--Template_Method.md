@@ -441,7 +441,7 @@ Each of this chapter's four anchors guards against a different way of breaking t
   The loop lives in a function body, out of every caller's reach.
   This anchor works only when you can pass functions instead of subclassing.
 - The type checker, via `@final`.
-  It reports an overridden `run()` before the program runs.
+  It reports an overridden `run()` before the program starts.
 - The interpreter, via `__init_subclass__()`.
   It raises a `TypeError` at an offending subclass's `class` statement,
   whether the subclass overrides `run()` or misspells a hook.

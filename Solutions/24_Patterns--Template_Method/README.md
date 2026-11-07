@@ -432,7 +432,8 @@ a different design, a detail, or an equivalent alternative.
 
 [The Anchored Algorithm](../../Chapters/24_Patterns--Template_Method.md#the-anchored-algorithm)
 explains how `@final` marks `run()` as the part of the *Template Method* that stays the same.
-Override `run()` in a subclass, run the file, then run `ty` over it.
+Override `run()` in a subclass.
+Run the file, then run `ty` over it.
 Compare what Python and the type checker each report,
 and ask which of them reads the `@final` marker.
 A `# type: ignore` on the override keeps the listing in the build.
