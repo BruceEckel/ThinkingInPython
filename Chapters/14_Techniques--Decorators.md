@@ -618,8 +618,9 @@ so `__init__()` calls `update_wrapper(self, func)`.
 
 The `__name__: str` declaration tells the type checker about the attribute `update_wrapper()` sets,
 so `__call__()` can print `self.__name__`.
-In `tracer.py` the type checker reads `__name__` from `wrapper`'s type,
-because `wrapper` is a function and a function's type includes `__name__`.
+In `tracer.py` the type checker reads `__name__` from the type `@wraps(func)` gives `wrapper`,
+typeshed's `functools._Wrapped`,
+which declares `__name__: str` the way a function's type does.
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
 
@@ -837,7 +838,7 @@ so `5` fills `method`'s own `self` parameter and leaves nothing for `x`.
 The `TypeError` reports a missing `x`,
 while the real cause is a missing `__get__()`.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
-shows the full descriptor protocol,
+shows the descriptor protocol,
 including the `__get__()` that `logged` needs to work on methods.
 
 Because a function is a descriptor,
@@ -1269,8 +1270,8 @@ is a class decorator like `register`, except it mutates the class,
 adding a generated `__init__()`, `__repr__()`,
 and `__eq__()` to the same object it received.
 [`@functools.cache`](18_Techniques--Performance.md#caching)
-and `@functools.lru_cache` wrap a function the way `add_behavior` does,
-in a wrapper that holds `func` and calls it,
+and `@functools.lru_cache` wrap a function in a callable object that holds `func` and calls it,
+as `count_calls` does,
 storing results in a memo dictionary instead of printing around the call.
 
 The one piece of machinery left for later is the descriptor protocol that `@property`,
