@@ -209,7 +209,7 @@ Claiming one that another tool holds raises a `ValueError`,
 so a second tool gets an exception instead of silently replacing the first tool's callbacks.
 
 For an answer you need once rather than continuously,
-the callback can turn its event off:
+the callback can turn off its event:
 
 ```python
 # monitoring_coverage.py
