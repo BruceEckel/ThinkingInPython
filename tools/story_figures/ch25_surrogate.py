@@ -1,4 +1,4 @@
-"""Chapter 26, Surrogate: one call path, before and after a swap.
+"""Chapter 25, Surrogate: one call path, before and after a swap.
 
 Three frames of one layout, from `state_demo.py`: `run(surrogate)`
 calls `surrogate.f()`, and `Surrogate`, which defines no `f()`, forwards

@@ -1,4 +1,4 @@
-"""Chapter 27, Factory: four frames, from scattered creation to a registry.
+"""Chapter 26, Factory: four frames, from scattered creation to a registry.
 
 Frame 1 is the chapter's opening problem (`shapes_naive.py`): two call
 sites each name `Circle` and `Square`, `Triangle` joins the hierarchy,

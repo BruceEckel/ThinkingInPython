@@ -1,4 +1,4 @@
-"""Chapter 27, Factory: the Abstract Factories section's two runs.
+"""Chapter 26, Factory: the Abstract Factories section's two runs.
 
 The section's figure, placed before `abstract_factory_abc.py`, replaced
 a UML class diagram on 2026-09-29. The class diagram showed which class

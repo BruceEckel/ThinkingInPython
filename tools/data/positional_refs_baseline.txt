@@ -110,6 +110,7 @@ Chapters/41_Functional--Toolkits.md	the outer `list()`	`list(groupby(data))` the
 Chapters/41_Functional--Toolkits.md	the third `computing square`	`islice()` requests three values, so the third `computing square` line is the last.
 Chapters/42_Functional--Error_Handling.md	The `except` clause	The `except` clause that caught the exception returns it as a value, so every caller above that clause receives an `Err`, an ordinary return value.
 Chapters/42_Functional--Error_Handling.md	the first `Err`	In `combining.py`, the three steps take their inputs from `i` and `j` rather than from an earlier step's answer, so stopping at the first `Err` discards whatever the later steps would have found.
+Chapters/42_Functional--Error_Handling.md	the first `add_note()`	An exception from someone else's code may lack a `__notes__` attribute, since Python creates it on the first `add_note()` call, so read `__notes__` with `getattr(error, "__notes__", [])`.
 Chapters/42_Functional--Error_Handling.md	the first call	`add_note()` appends each note to a list, `__notes__`, which the first call creates.
 Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdraw(30)` evaluates to `70`, so substituting `70` for it ought to leave the result at `110`.
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `lru_cache` answers it with the stored `70`.

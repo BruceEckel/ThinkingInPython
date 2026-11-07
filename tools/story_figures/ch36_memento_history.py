@@ -15,7 +15,7 @@ Rows 0-4 follow `history_frozen.py`: `History(Drawing("Duck"))`, two
 their `#:` output. A state is shown by its strokes as `Drawing.__str__()`
 in `frozen_sketch.py` prints them, less the `Duck: ` title every state
 shares. Row 5 (an undo, then an edit drawing `scribble`) is in no
-listing, so its new state is dashed; `test_new_action_clears_redo` in
+listing, so its new state is dashed; `test_edit_after_undo_discards_redo` in
 `test_history.py` checks the same behavior with strings.
 """
 

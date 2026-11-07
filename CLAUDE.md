@@ -1070,7 +1070,7 @@ and how it was measured.
   value that was already right.
 - **Appendix B's `check_files.py` marker is a self-check, and the gate
   will rewrite it without complaint.** The listing runs the Effect
-  checker on six of its own files and on `utils/result.py`, and its
+  checker on seven of its own files and on `utils/result.py`, and its
   `#:` lines show rows for the three edge functions, their module, and
   `result.Ok.bind ['Unknown']`. The prose says every core function is
   absent from that output, which is the appendix's claim that the core

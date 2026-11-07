@@ -8,7 +8,7 @@
 # before accepting.
 # See tools/overclaims.py.
 Chapters/01_Introduction.md	[BOUND] Instead of a class that exists only to hold one method, Python has functions
-Chapters/01_Introduction.md	[BOUND] It underlines the failing part of the line, down to the one operation in a long expression, and ends with a suggestion such as CODE when you misspell a name, an attribute, or a keyword argument
+Chapters/01_Introduction.md	[BOUND] It underlines the failing part of the line, down to the one operation in a long expression, and ends with a suggestion when you misspell a name, an attribute, or a keyword argument, such as CODE for a name
 Chapters/01_Introduction.md	[BOUND] Output appears inside the listings as comments beginning with CODE, one line of output per marker
 Chapters/01_Introduction.md	[BOUND] The part ends by refactoring one problem through several designs, building simulations out of the pieces, and cataloging the classic patterns together with the ones the literature added later
 Chapters/01_Introduction.md	[BOUND] This is an intermediate-to-advanced book, which removes two constraints that introductory books follow
@@ -212,7 +212,6 @@ Chapters/17_Techniques--Metaprogramming.md	[BOUND] The CODE module adds two func
 Chapters/17_Techniques--Metaprogramming.md	[BOUND] The calls at CODE and CODE display the same class two ways
 Chapters/17_Techniques--Metaprogramming.md	[BOUND] The checker learns about a class from two sources alone
 Chapters/17_Techniques--Metaprogramming.md	[BOUND] The one hook missing from its trace is CODE, which runs later still, each time someone calls the finished class
-Chapters/17_Techniques--Metaprogramming.md	[BOUND] The registries built on it fail in two ways that every self-registering design shares, with or without CODE
 Chapters/17_Techniques--Metaprogramming.md	[BOUND] Three ways suppress the type checker's reports, from narrowest to broadest
 Chapters/18_Techniques--Performance.md	[BOUND] 3.11 alone measured 1.25x faster than 3.10 across the CODE suite, with gains from 10% to 60% depending on the workload
 Chapters/18_Techniques--Performance.md	[BOUND] 5% over the interpreter alone for 3.16, then 20% for the JIT combined with free threading by 3.17
@@ -376,7 +375,7 @@ Chapters/24_Patterns--Template_Method.md	[BOUND] If each step is independent, pa
 Chapters/24_Patterns--Template_Method.md	[BOUND] The decorator also works on a single method
 Chapters/24_Patterns--Template_Method.md	[BOUND] The loop and its two step slots stay the same in all three frames
 Chapters/24_Patterns--Template_Method.md	[BOUND] The output column shows that the lambdas print the same four lines as CODE
-Chapters/24_Patterns--Template_Method.md	[BOUND] This anchor holds at runtime, whereas the type checker alone enforces CODE
+Chapters/24_Patterns--Template_Method.md	[BOUND] This anchor holds at runtime, whereas the type checker alone enforces a bare CODE
 Chapters/24_Patterns--Template_Method.md	[BOUND] first reorder the two lines in CODE, then redesign CODE instead, so clients construct the object and then call CODE
 Chapters/25_Patterns--Surrogate.md	[BOUND] Building a CODE leaves the tally alone, so the CODE test and the CODE read leave it at three
 Chapters/25_Patterns--Surrogate.md	[BOUND] CODE passes the same CODE two implementations, CODE and CODE, each with a CODE and none of CODE's three methods
@@ -408,7 +407,7 @@ Chapters/26_Patterns--Factory.md	[BOUND] For a record, CODE is *Prototype* and *
 Chapters/26_Patterns--Factory.md	[BOUND] From then on a caller points at CODE alone, and CODE points at the class it finds
 Chapters/26_Patterns--Factory.md	[BOUND] Here it is a CODE, so the two classes conform by defining a matching CODE
 Chapters/26_Patterns--Factory.md	[BOUND] Python honors its underscore in two places
-Chapters/26_Patterns--Factory.md	[BOUND] Switching from one GUI to another then changes one place in the code, most likely via startup configuration
+Chapters/26_Patterns--Factory.md	[BOUND] Switching from one look and feel to another then changes one place in the code, most likely via startup configuration
 Chapters/26_Patterns--Factory.md	[BOUND] The builder most programmers meet is narrower, the one Joshua Bloch's *Effective Java* recommends
 Chapters/26_Patterns--Factory.md	[BOUND] The registry stores each class under CODE alone, so when two classes from different modules share a name, the second to register silently replaces the first
 Chapters/26_Patterns--Factory.md	[BOUND] The two call sites fail in different ways
@@ -514,7 +513,6 @@ Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Adding two instances of a 
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] CODE declares CODE alone, so each CODE and CODE parameter takes CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Changing who wins one pairing means editing two methods in two classes, and a new CODE class needs a new method in every existing class
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Declaring the four methods restores the checking, but the declaration repeats every class's method names
-Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Dry paper wraps the rock and wins, wet paper is too soggy and draws, whichever of the two calls CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Each win/lose/draw result depends on the two types alone, so a test creates two items, calls CODE, and compares the CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] For dispatch on one argument's type, CODE gives you open, per-type functions, as *Visitor* shows
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] It resolves CODE and runs CODE, the one method that the two dispatches together select
@@ -760,7 +758,6 @@ Chapters/46_Effects--Stateless.md	[BOUND] Both instances go through CODE, since 
 Chapters/46_Effects--Stateless.md	[BOUND] CODE accepts an Effect whose yield channel has narrowed to those two, which is all that remains once you supply every other Ability
 Chapters/46_Effects--Stateless.md	[BOUND] CODE alone moves an error out of the error channel and into the result
 Chapters/46_Effects--Stateless.md	[BOUND] CODE binds for one execution of one Effect, so two bindings for the same type can be live at once, as the screen and memory CODEs are in When Two Implementations Match
-Chapters/46_Effects--Stateless.md	[BOUND] CODE demonstrates one shape of DI, a service locator
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one decorator that gives a second CODE a result, and it caches rather than replays
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only CODE here
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only extra call in that test
@@ -871,7 +868,7 @@ Chapters/B_An_Effect_Checker.md	[BOUND] CODE handles the two shapes a resolvable
 Chapters/B_An_Effect_Checker.md	[BOUND] CODE is the one operation here that can fail
 Chapters/B_An_Effect_Checker.md	[BOUND] Here, in one place, is what the checker resolves
 Chapters/B_An_Effect_Checker.md	[BOUND] In CODE, the guard, CODE, compares a captured name with a parameter, which a pattern alone cannot do
-Chapters/B_An_Effect_Checker.md	[BOUND] Of the roughly 6,600 calls in this book's chapter listings, nearly four in five resolve by name alone
+Chapters/B_An_Effect_Checker.md	[BOUND] Of the roughly 6,800 calls in this book's chapter listings, nearly four in five resolve by name alone
 Chapters/B_An_Effect_Checker.md	[BOUND] Reaching that output took four changes to the checker's own code
 Chapters/B_An_Effect_Checker.md	[BOUND] The annotation also puts two pieces of metadata in one CODE
 Chapters/B_An_Effect_Checker.md	[BOUND] The declared row holds CODE alone, so The Check shows the checker reporting CODE as undeclared
@@ -1003,6 +1000,7 @@ Solutions/17_Techniques--Metaprogramming/README.md	[BOUND] CODE reports the same
 Solutions/17_Techniques--Metaprogramming/README.md	[BOUND] The CODE signature is the one from the chapter, and this solution keeps it rather than simplifying to CODE
 Solutions/17_Techniques--Metaprogramming/README.md	[BOUND] The CODE walk stays because it states the rule as written, "no final class anywhere above," in one line
 Solutions/17_Techniques--Metaprogramming/README.md	[BOUND] The three arguments are the name, the bases, and the namespace, the same three a CODE statement assembles for you
+Solutions/17_Techniques--Metaprogramming/README.md	[BOUND] after CODE, printing CODE shows CODE beside the CODE and CODE entries, and the CODE class matches the one in CODE, apart from its trace prints
 Solutions/18_Techniques--Performance/README.md	[BOUND] A program this small has no other candidates
 Solutions/18_Techniques--Performance/README.md	[BOUND] CODE attaches the same event to every Python code object in the process, so read the CODE for entries beyond your two functions
 Solutions/18_Techniques--Performance/README.md	[BOUND] CODE in the original measures the single worst case for a CODE scan
@@ -1124,6 +1122,7 @@ Solutions/26_Patterns--Factory/README.md	[BOUND] a CODE with one method per prod
 Solutions/26_Patterns--Factory/README.md	[BOUND] the factory object you pass is the one thing that differs
 Solutions/27_Patterns--Function_Objects/README.md	[BOUND] **Configure the finder two ways
 Solutions/27_Patterns--Function_Objects/README.md	[BOUND] A finder can have more than one way to fail, and each failing CODE states its own reason
+Solutions/27_Patterns--Function_Objects/README.md	[BOUND] CODE alone keeps the value out of the command's call signature and its public attributes
 Solutions/27_Patterns--Function_Objects/README.md	[BOUND] CODE describes one call, so the solution gives the list a CODE that declares both operations
 Solutions/27_Patterns--Function_Objects/README.md	[BOUND] CODE has one way to fail
 Solutions/27_Patterns--Function_Objects/README.md	[BOUND] CODE is the shorter of the two ways to configure the finder, and it works here because CODE has a CODE parameter that CODE can bind by keyword
@@ -1144,6 +1143,7 @@ Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] After it, CODE p
 Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] CODE makes Python call each one with the caller's arguments alone, even through an instance
 Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] CODE replaces the type, not the method, so warning on the type alone matches the replacement
 Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] Decorating the class moves the warning to the two operations that build something from the class
+Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] The call that starts the car goes through CODE alone
 Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] The caller uses one function
 Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] The caller's CODE then raises an CODE, because CODE is the wrapped object's one method
 Solutions/29_Patterns--Changing_the_Interface/README.md	[BOUND] The override breaks CODE, a caller written against CODE alone
@@ -1180,12 +1180,12 @@ Solutions/30_Patterns--Observer/README.md	[BOUND] a list of callables, one metho
 Solutions/30_Patterns--Observer/README.md	[BOUND] after you attach your responder, assigning CODE and then CODE calls it twice, first with CODE and then with CODE, and it reports the first alone
 Solutions/30_Patterns--Observer/README.md	[BOUND] one change reaches every connected responder once, in the order you connected them, each with the same value
 Solutions/30_Patterns--Observer/README.md	[BOUND] your script prints one line per size from 3 through 8
+Solutions/31_Patterns--State_Machines/README.md	[BOUND] A nickel differs from a quarter in its field values, and the existing action reads the one that matters, CODE
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] A single table keyed by CODE collects both dictionaries and makes the whole machine's behavior editable in one place
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] CODE holds eight CODE members, starting with CODE, and every adjacent pair is a move that makes sense after the one before it in CODE
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] CODE leaves the execution frame alive between one move and the next, so the variable survives with it, and the loop over CODE is the engine
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] Every decision in the machine is a condition on the one input type
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] Give CODE a CODE field and write two condition methods that compare it with a target and a band
-Solutions/31_Patterns--State_Machines/README.md	[BOUND] Inline CODE and CODE, since each solution stands alone
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] Reading the words from a file, one per line, takes one line of code
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] The "doors closing" state carries the two rules the exercise requires, and CODE tells them apart
 Solutions/31_Patterns--State_Machines/README.md	[BOUND] The CODE key holds the two rules the exercise requires, and CODE tells them apart
@@ -1214,7 +1214,6 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] The test in CODE n
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] The tolerant version also gives up the CODE that makes the exact version safe, for one kind of new type
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] The tolerant version walks both MROs and takes the first pair that has a row, so CODE finds CODE one step up on the left
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] When CODE is CODE, create a fresh CODE so the body has a single path
-Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] a dry CODE beats CODE, a wet CODE draws with CODE whichever of the two calls CODE, the other seven pairs return the chapter's answers, and CODE passes on your file
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] its opposite, three steps around the circle
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] your CODE prints one line per CODE call, and each line's wording comes from the calling inhabitant's type
 Solutions/33_Patterns--Visitor/README.md	[BOUND] A new operation requires one function plus a registration for each flower that differs
@@ -1375,7 +1374,7 @@ Solutions/46_Effects--Stateless/README.md	[BOUND] CODE reads the Ability from th
 Solutions/46_Effects--Stateless/README.md	[BOUND] Following the type checker until the program builds means one edit
 Solutions/46_Effects--Stateless/README.md	[BOUND] Now every caller has two options, the same two CODE's callers have
 Solutions/46_Effects--Stateless/README.md	[BOUND] One Effect, Many Environments shows CODE running CODE against a table of materials and nailers
-Solutions/46_Effects--Stateless/README.md	[BOUND] Pass both instances to CODE in one call, run the Effect, and assert on each recorder's list
+Solutions/46_Effects--Stateless/README.md	[BOUND] Pass its instance to CODE once for each protocol, in one call, run the Effect, and assert on the recorder's two lists
 Solutions/46_Effects--Stateless/README.md	[BOUND] The difference between the two cases is whether anything later uses the dropped value
 Solutions/46_Effects--Stateless/README.md	[BOUND] The discarded CODE ends at its statement, so the type checker evaluates that statement alone and accepts it
 Solutions/46_Effects--Stateless/README.md	[BOUND] The fix renames CODE to CODE, gives each method its own CODE, CODE and CODE, and splits CODE into one Effect per CODE
@@ -1389,6 +1388,7 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] **Leave the Effect
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Add a source class with the same two methods and place it in the tuple that CODE receives
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE asks for an instance of CODE, so its request consists of the type alone
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE gains a CODE, a member in CODE's CODE union, a CODE, and a line that uses the new actor, so four edits
+Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE holds its hours in its code, CODE in CODE, so the solution shortens the other four sources
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE is the only addition
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE needs two edits
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE takes four edits, one of which the type checker names
@@ -1404,5 +1404,6 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] The prediction is 
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] The rule that catches CODE is a reading rule about one line
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Then compare that diagnostic with the one CODE reports when CODE leaves a requirement unanswered
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Under the guard, the driver runs in the main process alone, so a worker loads CODE without running the driver
+Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] With the other four sources shortened, CODE raises a CODE for the first uncovered hour, with or without CODE around CODE, and you can say which function raises it and why that function sits outside the Effect
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Write the first signature with the new appliance alone and read which line the type checker reports
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Your review rule flags the CODE line in CODE and accepts a body that holds the CODE alone

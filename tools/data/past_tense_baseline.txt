@@ -57,6 +57,7 @@ Chapters/16_Techniques--Comprehensions.md	[PAST] had: Haskell had list comprehen
 Chapters/16_Techniques--Comprehensions.md	[PAST] originated: The idea originated in mathematical set-builder notation, and functional programming languages adopted it.
 Chapters/17_Techniques--Metaprogramming.md	[PAST] declared: CODE checks each value before storing it, so every attribute declared with one raises a CODE for a value of zero or less:
 Chapters/17_Techniques--Metaprogramming.md	[PAST] wrote: For the standard library, the checker's authors wrote those rules into the checker.
+Chapters/18_Techniques--Performance.md	[PAST] called: The PEP called those targets the minimum for continuing to develop the JIT inside CPython.
 Chapters/18_Techniques--Performance.md	[PAST] compiled: Rust offers something else: no warm-up call, no Numba dependency at runtime, and compiled code for functions
 Chapters/18_Techniques--Performance.md	[PAST] had capped: LLVM 19 had capped its tail-duplication pass, which collapsed the old interpreter's 332 dispatch jumps into 3, so the comparison was against a compiler regression rather than a fast interpreter.
 Chapters/18_Techniques--Performance.md	[PAST] included: Frozen blocks every attribute assignment, new fields included, so a frozen instance cannot gain attributes, the same restriction CODE gives you.
@@ -76,6 +77,7 @@ Chapters/18_Techniques--Performance.md	[PAST] ran: The callback ran for it once.
 Chapters/18_Techniques--Performance.md	[PAST] set: A million suits a microsecond snippet and is a long wait for anything slower, so always set CODE for a function you are timing for the first time.
 Chapters/18_Techniques--Performance.md	[PAST] tuned: An optimization tuned to toy input can behave badly in production.
 Chapters/18_Techniques--Performance.md	[PAST] was: LLVM 19 had capped its tail-duplication pass, which collapsed the old interpreter's 332 dispatch jumps into 3, so the comparison was against a compiler regression rather than a fast interpreter.
+Chapters/18_Techniques--Performance.md	[PAST] was: Under the PEP, turning on the JIT by default was a separate step that needed the release manager's approval.
 Chapters/18_Techniques--Performance.md	[PAST] was: With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
 Chapters/19_Techniques--Concurrency.md	[PAST] adopted: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency.
 Chapters/19_Techniques--Concurrency.md	[PAST] appeared: Attempts kept failing to meet it, so workarounds appeared.
@@ -147,7 +149,6 @@ Chapters/22_Patterns--Iterators.md	[PAST] found: On CODE it reports an CODE: exp
 Chapters/22_Patterns--Iterators.md	[PAST] read: *GoF Design Patterns* gives *Iterator* a class of its own, with separate methods to start a traversal, advance it, test whether it has finished, and read the current item.
 Chapters/23_Patterns--Singleton.md	[PAST] called: He called that design the *Borg*.^[From the television show *Star Trek: The Next Generation*.
 Chapters/23_Patterns--Singleton.md	[PAST] returned: Without the sleep, the cached version below returned one object in each of twenty trials.
-Chapters/23_Patterns--Singleton.md	[PAST] run: After decoration, CODE is CODE, so the same parentheses run CODE instead.
 Chapters/23_Patterns--Singleton.md	[PAST] run: For an ordinary class CODE, CODE is CODE, so the parentheses run CODE, the machinery that invokes CODE and then CODE.
 Chapters/23_Patterns--Singleton.md	[PAST] wrote: Martelli wrote CODE instead of CODE to allow that override.
 Chapters/24_Patterns--Template_Method.md	[PAST] read: In frame 3 the arrow labels read CODE and CODE, with no CODE.
@@ -210,7 +211,8 @@ Chapters/46_Effects--Stateless.md	[PAST] annotated: CODE reads its handler's par
 Chapters/46_Effects--Stateless.md	[PAST] came: My understanding of Effects came from work with Bill Frasure and James Ward as we created Effect Oriented Programming.
 Chapters/46_Effects--Stateless.md	[PAST] let: Other Effect systems let you describe the work once and decide later how many times to perform it.
 Chapters/46_Effects--Stateless.md	[PAST] made: People made the same complaint against Java's checked exceptions, where an exception added three levels down meant editing every signature above it.
-Chapters/46_Effects--Stateless.md	[PAST] measured: On Windows, CODE measured about 650 microseconds (about 75 on Linux), three to four orders of magnitude above a plain function call.
+Chapters/46_Effects--Stateless.md	[PAST] measured: On Linux it measured about 75 microseconds.
+Chapters/46_Effects--Stateless.md	[PAST] measured: On Windows, CODE measured about 650 microseconds, more than four orders of magnitude above a plain function call.
 Chapters/46_Effects--Stateless.md	[PAST] provided: The driver throws a failure back into the generator, so an ordinary CODE/CODE around a CODE catches it, provided no handler sits between CODE and that Effect.
 Chapters/46_Effects--Stateless.md	[PAST] read: Both read CODE, and neither names the CODE it uses.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] got: Python got one Effect tracked into its type system with CODE.
@@ -228,6 +230,7 @@ Chapters/B_An_Effect_Checker.md	[PAST] passed: A function passed as an argument.
 Chapters/B_An_Effect_Checker.md	[PAST] required: The tool required all four.
 Chapters/B_An_Effect_Checker.md	[PAST] took: Reaching that output took four changes to the checker's own code.
 Solutions/02_Foundations--Tour/README.md	[PAST] included: CODE always shows two digits after the decimal point, a trailing zero included.
+Solutions/02_Foundations--Tour/README.md	[PAST] renamed: each renamed CODE and CODE prints the same output as the original, CODE in the book's repository reports CODE on the camelCase names and accepts the uppercase ones, and you can say what each form tells a reader about whether the value changes.
 Solutions/03_Foundations--Containers/README.md	[PAST] stored: Reading CODE earlier stored that CODE under CODE.
 Solutions/04_Foundations--Control_Flow/README.md	[PAST] split: Call CODE on the CODE and split the result into lines.
 Solutions/05_Foundations--Functions/README.md	[PAST] arrived: If the output shows CODE, the dictionary arrived as one more positional argument.
@@ -277,7 +280,7 @@ Solutions/21_Patterns--Design_Patterns/README.md	[PAST] was: Removing CODE's COD
 Solutions/21_Patterns--Design_Patterns/README.md	[PAST] written: you have removed one piece, run the program and CODE, and written down what changed in the output and in the requirement the program meets.
 Solutions/22_Patterns--Iterators/README.md	[PAST] dropped: That stored item restores the CODE that GoF had and Python dropped.
 Solutions/22_Patterns--Iterators/README.md	[PAST] measured: ** One machine measured about 9,300 bytes at CODE of 100 and about 416,000 at CODE of 10,000.
-Solutions/23_Patterns--Singleton/README.md	[PAST] gone: your file prints the same accumulated CODE list and CODE that the chapter's CODE prints, and CODE passes on it with the sentinel and the guard gone.
+Solutions/23_Patterns--Singleton/README.md	[PAST] gone: your file prints the accumulated CODE list and CODE, as the chapter's CODE does, and CODE passes on it with the sentinel and the guard gone.
 Solutions/23_Patterns--Singleton/README.md	[PAST] included: The wrapper takes the lock on every call, cache hits included, because the cache lookup runs inside CODE, which the wrapper calls with the lock held.
 Solutions/23_Patterns--Singleton/README.md	[PAST] reached: You can say which name the assignment changes, and why the original mutation reached both names.
 Solutions/24_Patterns--Template_Method/README.md	[PAST-HEADING] customized: A file-processing framework, customized both ways
@@ -297,7 +300,7 @@ Solutions/30_Patterns--Observer/README.md	[PAST] let: String members also let CO
 Solutions/30_Patterns--Observer/README.md	[PAST] split: The six sizes split three ways.
 Solutions/31_Patterns--State_Machines/README.md	[PAST] blocked: closing the doors with the sensor blocked reopens them, and closing them again unblocked leaves the car idle, through two rules under one CODE key.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] ranked: Each CODE kind holds two of six weapon types, ranked around a cycle.
-Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] read: The CODE and CODE cells each read CODE from whichever item is the CODE.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] read: The CODE and CODE cells each read CODE from the item that is the CODE.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] reversed: CODE returns CODE, CODE, CODE, CODE against CODE, CODE, CODE, and CODE, each reversed duel returns the opposite result (a draw stays a draw), and you can state how many methods you added against exercise 1's seven rows.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] wrote: The method must put them back in the order the source wrote them.
 Solutions/35_Patterns--Flyweight/README.md	[PAST-HEADING] shared: 2. CODE, shared vs. unshared tiles

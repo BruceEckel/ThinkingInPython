@@ -55,7 +55,7 @@ Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PASSIVE] are known: It r
 Solutions/38_Patterns--Simulation/README.md	[PASSIVE] is eaten: on the chapter's CODE, your tour prints CODE, CODE is CODE at the end, and the search for food returns CODE once the last CODE is eaten, so the script reaches the walk to the CODE.
 Solutions/40_Functional--Foundations/README.md	[PASSIVE] are allowed: If you build CODE as CODE, the CODE call raises a CODE before you call the result: "trailing Placeholders are not allowed."
 Solutions/40_Functional--Foundations/README.md	[PASSIVE] is associated: Running the program raises an CODE at the first CODE call: "cannot access local variable 'count' where it is not associated with a value."
-Solutions/43_Functional--Confidence/README.md	[PASSIVE] is SIGN: ** CODE is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the Greek letter it resembles.
+Solutions/43_Functional--Confidence/README.md	[PASSIVE] is SIGN: ** CODE is U+00B5 MICRO SIGN, which Unicode inherited from Latin-1 and keeps separate from the Greek letter it resembles.
 Solutions/43_Functional--Confidence/README.md	[PASSIVE] is ordered: That sort's output is always ordered, so the invariant passes.
 Solutions/44_Effects--Effect_Management/README.md	[PASSIVE] was awaited: The CODE call raises a CODE for adding an CODE and a CODE, with a CODE that CODE was never awaited.
 Solutions/45_Effects--Generators/README.md	[PASSIVE] sits suspended: Without CODE, the call to CODE builds a generator object, and that object sits suspended before its first line.

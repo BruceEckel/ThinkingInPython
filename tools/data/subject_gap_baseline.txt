@@ -12,10 +12,9 @@ Chapters/02_Foundations--Tour.md	[cc,conj] CODE .. explain: Print CODE and CODE 
 Chapters/05_Foundations--Functions.md	[cc,relcl] function .. does: A function that finishes without a CODE returns CODE, and so does a bare CODE.
 Chapters/06_Foundations--Modules_and_Packages.md	[appos,cc,conj,prep] Windows .. name: Windows and macOS default to case-insensitive filesystems, so CODE and CODE name the same file there.
 Chapters/06_Foundations--Modules_and_Packages.md	[prep] CODE .. finds: Every later CODE of that name, from any file in the program, finds the module there and binds the same object.
-Chapters/06_Foundations--Modules_and_Packages.md	[relcl] identifier .. is: Any identifier that begins and ends with double underscores (a dunder) is one that Python itself sets or calls.
+Chapters/06_Foundations--Modules_and_Packages.md	[relcl] identifier .. is: Any identifier that begins and ends with double underscores (a dunder) is one that Python itself sets, calls, or reads.
 Chapters/07_Foundations--Classes.md	[appos,cc,conj] Print .. shows: Print a single CODE and a list of two of them, and confirm the list shows the same form for each element.
 Chapters/07_Foundations--Classes.md	[cc,conj,relcl] method .. be: A method that needs the class rather than an instance can be a CODE.
-Chapters/08_Foundations--Static_Types.md	[cc,ccomp,conj,punct] rejects .. accepts: Pyright rejects CODE misspelled as CODE with CODE, but CODE 0.0.91 accepts that call silently.
 Chapters/08_Foundations--Static_Types.md	[cc,conj,relcl] CODE .. gives: A CODE that returns an CODE, or that requires an argument, gives its class a different shape.
 Chapters/08_Foundations--Static_Types.md	[cc,conj] CODE .. silences: CODE and a bare CODE silence every diagnostic on their line, and CODE silences the one rule it names.
 Chapters/08_Foundations--Static_Types.md	[relcl] function .. takes: A function that validates or converts data against an arbitrary annotation takes a type expression as its argument.
@@ -45,7 +44,7 @@ Chapters/28_Patterns--Data_Transfer_Objects.md	[prep] CODE .. produce: When the 
 Chapters/29_Patterns--Changing_the_Interface.md	[appos] parameter .. raises: If an override renames a keyword-capable parameter, a call that passes the old name by keyword raises a CODE.
 Chapters/29_Patterns--Changing_the_Interface.md	[cc,conj] CODE .. look: CODE and CODE build the new instance without running CODE, then look up CODE on it.
 Chapters/30_Patterns--Observer.md	[cc,nummod,prep] exercise .. raised: Redo exercise 3 with each failure returned as a value instead of raised as an exception.
-Chapters/31_Patterns--State_Machines.md	[cc,dobj,prep] stores .. reuse: The event bus stores its handlers under the event class, and *Multiple Dispatching* and Pattern Refactoring reuse this engine's lookup.
+Chapters/31_Patterns--State_Machines.md	[cc,dobj,prep] stores .. use: The event bus stores its handlers under the event class, and *Multiple Dispatching* and Pattern Refactoring use the same exact-type dictionary lookup.
 Chapters/34_Patterns--Composite_and_Interpreter.md	[relcl] build .. alternates: A build that runs targets in parallel calls CODE once, then alternates CODE and CODE in place of CODE.
 Chapters/40_Functional--Foundations.md	[appos,relcl] functions .. requires: Five of the chapter's ideas work at once: a record for the value, CODE to state that CODE leaves its input unchanged, three pure functions, CODE to turn a two-argument predicate into the one-argument callable CODE requires, and CODE and CODE for the traversal.
 Chapters/40_Functional--Foundations.md	[conj] key .. is: Contents-based equality together with a stable hash is why a dictionary key, a cache entry, or a value shared across threads is normally a tuple or a record.

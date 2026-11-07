@@ -65,6 +65,7 @@ Chapters/07_Foundations--Classes.md	has no: The assignment in the constructor th
 Chapters/07_Foundations--Classes.md	have no: its instances have no CODE to hold the cached value
 Chapters/07_Foundations--Classes.md	only: and add CODE only when users see the output
 Chapters/07_Foundations--Classes.md	want: When you override a method but still want the base-class version
+Chapters/08_Foundations--Static_Types.md	enforces none of: Python enforces none of the hints
 Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
 Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
 Chapters/08_Foundations--Static_Types.md	has no: because CODE has no such method
@@ -488,6 +489,7 @@ Chapters/40_Functional--Foundations.md	only: and only the binding
 Chapters/40_Functional--Foundations.md	only: position is the only way to bind an argument
 Chapters/40_Functional--Foundations.md	only: so only readings between 20.0 and 30.0 Celsius reach the output
 Chapters/40_Functional--Foundations.md	share no: Python's immutable types share no structure
+Chapters/40_Functional--Foundations.md	shares no: A function that shares no mutable state is safe to run in parallel
 Chapters/40_Functional--Foundations.md	takes no: It also types the resulting callable as one that takes no arguments
 Chapters/40_Functional--Foundations.md	want: A closure fits when you want to configure behavior once
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
@@ -624,6 +626,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	names no: A CODE headline names no
 Chapters/47_Effects--Stateless_in_Practice.md	names what: CODE names what it takes
 Chapters/47_Effects--Stateless_in_Practice.md	never: This one never propagates
 Chapters/47_Effects--Stateless_in_Practice.md	never: and the driver never resumes the generator
+Chapters/47_Effects--Stateless_in_Practice.md	never: in code that compares the integer CODE returned with CODE and never sees the cell
 Chapters/47_Effects--Stateless_in_Practice.md	only: Add a wind turbine to CODE that is available only during a set windy stretch of the evening
 Chapters/47_Effects--Stateless_in_Practice.md	only: CODE comes from the only two schedule combinators the library has
 Chapters/47_Effects--Stateless_in_Practice.md	only: Stateless offers only the first of the three
@@ -652,7 +655,6 @@ Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
 Chapters/B_An_Effect_Checker.md	could: A row that reads CODE says the checker could not resolve a call
 Chapters/B_An_Effect_Checker.md	declares no: For a function that declares no row
 Chapters/B_An_Effect_Checker.md	has no: A built-in has no CODE and no CODE in which to store one
-Chapters/B_An_Effect_Checker.md	has no: which has no written type
 Chapters/B_An_Effect_Checker.md	is what: is what the checker resolves
 Chapters/B_An_Effect_Checker.md	itself: CODE declares itself pure and calls CODE
 Chapters/B_An_Effect_Checker.md	names the effects: A second piece of metadata names the Effects the function performs and leaves out of its declared row
@@ -689,7 +691,6 @@ Solutions/09_Foundations--Class_Attributes/README.md	has no: CODE's CODE has no 
 Solutions/09_Foundations--Class_Attributes/README.md	never: The checker accepts the declaration CODE and never checks that a method assigns CODE
 Solutions/10_Foundations--Cleanup/README.md	explicit: An Explicit CODE and a CODE Block describes when CODE calls CODE
 Solutions/10_Foundations--Cleanup/README.md	explicit: because the explicit CODE runs before the program has allocated enough objects to start an automatic pass
-Solutions/10_Foundations--Cleanup/README.md	only: CODE prints only because CODE's CODE backstop runs every still-alive finalizer as the interpreter shuts down
 Solutions/10_Foundations--Cleanup/README.md	only: Reference Cycles Delay Destruction shows CODE running only when CODE reclaims a cycle
 Solutions/10_Foundations--Cleanup/README.md	only: The CODE statement calls CODE only after CODE returns
 Solutions/10_Foundations--Cleanup/README.md	only: The CODE statement calls CODE only for a block it has entered
@@ -697,7 +698,6 @@ Solutions/10_Foundations--Cleanup/README.md	only: and it enters the block only a
 Solutions/11_Techniques--Testing/README.md	never: although CODE never touches the disk
 Solutions/11_Techniques--Testing/README.md	only: An injected test depends only on the shape of what it passes
 Solutions/11_Techniques--Testing/README.md	only: If you test only a positive balance
-Solutions/12_Techniques--Data_Classes_as_Types/README.md	itself: A CODE Cannot Validate Itself explains why the class body of a CODE refuses a CODE
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	itself: A CODE Cannot Validate Itself shows the same failure in its third test
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: If you keep only the CODE check
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	want: Subscript the factory when you want the checker to confirm the agreement
@@ -797,6 +797,7 @@ Solutions/27_Patterns--Function_Objects/README.md	declares no: Because CODE decl
 Solutions/27_Patterns--Function_Objects/README.md	has no: A silent CODE matches what CODE does with an event that has no handler
 Solutions/27_Patterns--Function_Objects/README.md	has no: You need a closure when the function has no parameter for the setting
 Solutions/27_Patterns--Function_Objects/README.md	has no: because an object of type CODE has no attribute CODE
+Solutions/27_Patterns--Function_Objects/README.md	have no: so a base class would have no implementation to share
 Solutions/27_Patterns--Function_Objects/README.md	never: A CODE is never a root
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	defines no: but CODE defines no CODE
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	has no: A bare tuple has no CODE attribute
@@ -819,9 +820,9 @@ Solutions/30_Patterns--Observer/README.md	needs no: so every one lies inside it 
 Solutions/30_Patterns--Observer/README.md	never: Class access is the part a validating descriptor never needs
 Solutions/30_Patterns--Observer/README.md	reaches nothing: CODE reaches nothing
 Solutions/31_Patterns--State_Machines/README.md	has no: A dictionary keyed on CODE has no wildcard
+Solutions/31_Patterns--State_Machines/README.md	holds no: since the Solutions folder holds no copy of either
 Solutions/31_Patterns--State_Machines/README.md	make no: and each CODE returns the current state on the moves that make no sense there
 Solutions/31_Patterns--State_Machines/README.md	never: Across repeated runs you never see CODE before an CODE
-Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a quarter only in a number the existing action reads
 Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate rule and not when you want a separate value
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count leaves each weapon an opposite that draws
@@ -837,6 +838,7 @@ Solutions/33_Patterns--Visitor/README.md	hold no: The CODE classes hold no state
 Solutions/33_Patterns--Visitor/README.md	inherits none: because CODE requires a CODE method and CODE inherits none
 Solutions/33_Patterns--Visitor/README.md	only: Only that one needs CODE and CODE
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	is what: The left operand is what the caller wrote first
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	offers no: after CODE declines and CODE offers no CODE to try
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A child gets parentheses only when its own operator binds more loosely than what the parent needs
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: where CODE yields only file paths
 Solutions/35_Patterns--Flyweight/README.md	has no: so the class still has no CODE
