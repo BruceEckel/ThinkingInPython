@@ -1366,7 +1366,7 @@ If you push an `Add` or `Mul` node's two children with no marker behind them,
 `values` collects the three leaves,
 and the function returns the last one it reached.
 The solution pushes an `Op` beneath each pair of children,
-so the combine runs once both values are on `values`.
+so the combine runs once `values` holds both operands.
 
 ```python
 # exercise_8.py
