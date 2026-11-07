@@ -294,7 +294,8 @@ For each `row`, the inner comprehension runs the full `col` loop and produces on
 The inner `for col` sits to the left of the outer `for row` but runs inside it.
 The output expression sits first but runs last, once per innermost iteration.
 
-Because the inner comprehension runs once per `row`, each row is a new list.
+Because the inner comprehension runs once per outer iteration,
+each row is a new list.
 `[[0] * SIZE] * SIZE` looks like a shorter start on the same matrix.
 Multiplying the outer list, however,
 [repeats one row object `SIZE` times](03_Foundations--Containers.md#two-list-traps),
