@@ -197,8 +197,8 @@ then name it as a parameter in two tests.
 <details>
 <summary>Done when</summary>
 
-both tests pass, and a third test that sets the account's `balance` to `-1` appears in the `pytest` report as `ERROR at teardown`,
-rather than as a failure, with your fixture's balance assertion as the cause.
+both tests pass, and the balance assertion sits after the `yield` in your fixture,
+so `pytest` runs it as teardown after each of the two tests finishes.
 
 <details>
 <summary>Solution</summary>
@@ -473,9 +473,9 @@ which works in the `with` block and answers `.read()` as a response does.
 **Replace the dependency by name.**
 Renaming `urlopen` to `fetch` in `ch11_weather.py` makes one test fail and leaves the other passing.
 `test_patched()` fails with `AttributeError: <module 'ch11_weather' from '...'> has no attribute 'urlopen'`,
-because `monkeypatch.setattr()` looks the name up by string and the string is now wrong.
+because `monkeypatch.setattr()` looks up the name by string and the string is now wrong.
 
-**Pass the dependency in.**
+**Pass in the dependency.**
 `test_injected()` still passes,
 because it hands the dependency in instead of naming it,
 and `current_temp_with()` calls the fetcher it receives.
