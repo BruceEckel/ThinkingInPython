@@ -746,6 +746,7 @@ Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three ch
 Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as its body, with a CODE, and leaves the two methods to Python
 Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
+Chapters/45_Effects--Generators.md	[BOUND] TypeScript types the three channels as CODE
 Chapters/45_Effects--Generators.md	[BOUND] Without generators, you have three ways to write such a producer in a single thread
 Chapters/45_Effects--Generators.md	[BOUND] Written as a generator, the squasher delivers a single asterisk and the character after it with two statements in a row
 Chapters/46_Effects--Stateless.md	[BOUND] A caller now has two options

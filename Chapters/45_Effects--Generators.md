@@ -2104,6 +2104,26 @@ Icon's `suspend` produces a value and leaves the procedure ready to produce anot
 CLU and Sather use the word `yield` for the same step inside an iterator,
 which hands one element at a time to a loop.
 
+Generators are now ordinary.
+JavaScript adopted Python's design first,
+in Mozilla's JavaScript 1.7 for Firefox 2 (2006):
+Python-inspired generators with `send()`, `throw()`, and `close()`.
+ES2015 made generators standard, with `yield*` for `yield from`.
+TypeScript types the three channels as `Generator<T, TReturn, TNext>`.
+PHP and Dart follow the same design,
+with delegation as `yield from` and `yield*`.
+The languages differ in where the suspended frame lives.
+Python keeps the execution frame on the heap.
+C# and Kotlin compile the body into a state-machine class,
+which holds a field per local and an integer for the suspension point in place of a frame.
+Ruby runs an external enumerator's block on a `Fiber`, a full coroutine.
+Go 1.23 reverses the protocol.
+The loop body becomes a `yield` function that the iterator calls once per value,
+so the iterator keeps its frame on the call stack while the body runs.
+CLU's iterators ran that way too,
+which is why CLU allowed an iterator only in a `for` loop:
+one stack holds both frames.
+
 ### The Restriction Behind the Driver
 
 PEP 255 kept the suspended frame and dropped a coroutine's ability to hand control to any other coroutine.
