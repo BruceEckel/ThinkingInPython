@@ -2120,9 +2120,11 @@ Ruby runs an external enumerator's block on a `Fiber`, a full coroutine.
 Go 1.23 reverses the protocol.
 The loop body becomes a `yield` function that the iterator calls once per value,
 so the iterator keeps its frame on the call stack while the body runs.
-CLU's iterators ran that way too,
-which is why CLU allowed an iterator only in a `for` loop:
-one stack holds both frames.
+CLU's iterators, designed in 1975, work the same way.[^clu-history]
+In CLU a `yield` calls the loop body,
+which returns to the iterator when it finishes.
+CLU allows an iterator only in a `for` statement,
+so that a program needs a single stack.
 
 ### The Restriction Behind the Driver
 
@@ -2251,3 +2253,13 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     and leaves out the counts.
     Keep the walk's position in a list that you use as a stack.
     Then say what `Paths` stores that `visit()` leaves to Python.
+
+[^clu-history]: Barbara Liskov,
+[A History of CLU](https://dspace.mit.edu/handle/1721.1/149734),
+    MIT Laboratory for Computer Science, 1992, section 3.10.
+    In CLU "a yield effectively calls the loop body,
+    which returns to the iterator when it is finished."
+    The limits on iterators exist
+    "so that CLU programs can make do with a single stack."
+    The iterator came from Alphard's generators,
+    which the CLU group saw at CMU in the summer of 1975.
