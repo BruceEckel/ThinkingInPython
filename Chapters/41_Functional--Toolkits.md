@@ -1036,7 +1036,7 @@ Each open sublist is a stack frame waiting for its `deep_sum()` call to return.
 
 Pair up participants for an activity across several rounds,
 and repeat a pairing only after every possible pairing has occurred once.
-A small program solves this scheduling problem by combining several of the chapter's tools:
+A small program approaches this scheduling problem by combining several of the chapter's tools:
 an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
 `combinations()` for the pairs inside a group,
