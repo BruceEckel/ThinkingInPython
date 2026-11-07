@@ -62,7 +62,7 @@ but the exception ends the comprehension before it produces the list.
 To keep the good results you must wrap each call in its own `try`.
 That repeats the handling at every call,
 the way [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
-repeats a range check in every function.
+must repeat a range check in every function that takes a rating.
 
 ## Return the Error as a Value
 
@@ -833,7 +833,8 @@ Typeshed declares `__notes__` on `Exception`'s base class, `BaseException`.
 `isinstance(result, Err)` narrows `result` to `Err[Exception]` too.
 
 Reading `error.__notes__` is safe here because `parse_field()` adds a note on every failure.
-An exception from someone else's code has a `__notes__` attribute only if something called `add_note()` on it,
+An exception from someone else's code may lack a `__notes__` attribute,
+since Python creates it on the first `add_note()` call,
 so read `__notes__` with `getattr(error, "__notes__", [])`.
 
 ## The returns Library

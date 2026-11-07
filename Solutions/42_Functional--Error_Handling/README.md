@@ -202,9 +202,9 @@ If `Ok` lacks the method, that call draws `unresolved-attribute`.
 If you give `map_error()` to `Err` alone,
 `Ok(5).map_error(prefix)` raises an `AttributeError`:
 `'Ok' object has no attribute 'map_error'`.
-On a value typed `Result[int, str]`,
+On a parameter annotated `Result[int, str]`,
 `ty` reports `unresolved-attribute` for every `map_error()` call,
-including one on a value that holds an `Err`,
+an `Err` argument included,
 because the `Ok` member of the union has no such method.
 The solution gives `Ok` a `map_error()` that returns `self`,
 so a chain can call the method on an `Ok` or an `Err`.
