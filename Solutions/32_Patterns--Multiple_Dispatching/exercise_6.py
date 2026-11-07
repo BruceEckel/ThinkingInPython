@@ -57,3 +57,14 @@ OUTCOME[TolerantRock, TolerantPaper] = Outcome.LOSE
 
 print(TolerantOrigami().compete(TolerantRock()))
 #: win
+print(TolerantRock().compete(TolerantOrigami()))
+#: lose
+
+class Lizard(TolerantItem):
+    pass
+
+try:
+    Lizard().compete(TolerantRock())
+except KeyError as e:
+    print(type(e).__name__, [c.__name__ for c in e.args[0]])
+#: KeyError ['Lizard', 'TolerantRock']

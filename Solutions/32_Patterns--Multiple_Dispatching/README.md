@@ -414,7 +414,7 @@ a different design, a detail, or an equivalent alternative.
 keeps one `EXPECTED` mapping and checks both implementations against it.
 Add the seven `Lizard` rows to that mapping,
 keyed on the player's and opponent's class names.
-A helper looks each class up by name with `getattr()` on the module it receives,
+A helper looks up each class by name with `getattr()` on the module it receives,
 so one mapping checks both versions.
 The test reports any disagreement as a failure.
 
@@ -461,16 +461,18 @@ def compete(module: ModuleType, player: Name,
 `uv run pytest` on your `test_paper_scissors.py`,
 run against your exercise 1 and exercise 2 versions, reports 32 passed:
 sixteen `EXPECTED` cases for each version.
+The solution's `exercise_3.py` runs the same checks as a script and prints `exercise_1 16 agree: True` and `exercise_2 16 agree: True`.
 
 <details>
 <summary>Solution</summary>
 
-If you add the seven rows to `EXPECTED` and leave the test importing the chapter's `paper_scissors_rock` and `paper_scissors_rock_table`,
+If you add the seven rows to `EXPECTED` and leave the chapter's `test_paper_scissors.py` importing the chapter's `paper_scissors_rock` and `paper_scissors_rock_table`,
 every `Lizard` case fails with an `AttributeError`: fourteen of the 32 cases,
 seven per module.
 The chapter modules define `Paper`, `Scissors`, and `Rock`,
 so `getattr()` raises `AttributeError` when it looks up `"Lizard"`.
-The solution points both imports at exercises 1 and 2.
+The solution points both imports at exercises 1 and 2,
+and runs the checks as a script with a loop in place of `pytest`.
 
 ```python
 # exercise_3.py
@@ -518,8 +520,7 @@ for module in (table, methods):
 ```
 
 **Check both versions against one mapping.**
-The test's helper, `compete()`,
-looks each class up by name on the module it receives,
+The helper, `compete()`, looks up each class by name on the module it receives,
 so one `EXPECTED` checks both sets of classes.
 
 **Compare across separate enumerations.**
@@ -537,9 +538,12 @@ The helper's return annotation loosens from `Outcome` to `str`,
 the base class that both modules' `Outcome` enumerations share,
 but the assertion still rejects a version that returns the bare string `"win"`.
 
+In the chapter's test,
 `test_versions_match_expected()` takes its cases from `EXPECTED`.
 `pytest` parametrizes it with the keys of that mapping,
 so the test reports sixteen cases per module where it reported nine.
+The loop in `exercise_3.py` walks those sixteen keys for each module and collects the pairs whose result differs from `EXPECTED`.
+An empty list prints `agree: True`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -942,6 +946,9 @@ class TolerantRock(TolerantItem):
     pass
 class TolerantOrigami(TolerantPaper):
     pass
+
+class Lizard(TolerantItem):
+    pass
 ```
 
 <details>
@@ -950,6 +957,10 @@ class TolerantOrigami(TolerantPaper):
 `Origami().compete(Rock())` first reproduces the `KeyError ['Origami', 'Rock']` line from `exact_match.py`.
 After your change it returns `win`, `Rock().compete(Origami())` returns `lose`,
 and a new direct subclass of `Item` with no rows still raises a `KeyError` at its first duel.
+The solution makes its change in `TolerantItem`,
+so its listing checks the change with `TolerantOrigami().compete(TolerantRock())` printing `win`,
+the reversed duel printing `lose`,
+and a `Lizard(TolerantItem)` with no rows raising a `KeyError`.
 
 <details>
 <summary>Solution</summary>
@@ -1019,6 +1030,17 @@ OUTCOME[TolerantRock, TolerantPaper] = Outcome.LOSE
 
 print(TolerantOrigami().compete(TolerantRock()))
 #: win
+print(TolerantRock().compete(TolerantOrigami()))
+#: lose
+
+class Lizard(TolerantItem):
+    pass
+
+try:
+    Lizard().compete(TolerantRock())
+except KeyError as e:
+    print(type(e).__name__, [c.__name__ for c in e.args[0]])
+#: KeyError ['Lizard', 'TolerantRock']
 ```
 
 **Reproduce the exact-match failure.**
@@ -1054,8 +1076,8 @@ Either the pair is in the table or it is not.
 The tolerant version also gives up the `KeyError` that makes the exact version safe,
 for one kind of new type: a subclass of a concrete item.
 A `TolerantOrigami` with no rows of its own inherits `TolerantPaper`'s answers and plays as paper,
-as the listing's last line shows.
-A `Lizard(TolerantItem)` still fails fast,
+as its `win` and `lose` show.
+The listing's `Lizard(TolerantItem)` still fails fast,
 since every row's key names two concrete items,
 and `Lizard`'s ancestors are `TolerantItem`, `Item`, and `object`.
 Tolerance lets you write fewer rows,
