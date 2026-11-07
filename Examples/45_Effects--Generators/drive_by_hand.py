@@ -4,16 +4,15 @@ from interview_generator import (Answer, Question,
                                  Result, interview)
 
 conversation = interview()
-question1: Question = next(conversation)
-print(f"{question1 = }")
-#: question1 = 'name'
-question2: Question = conversation.send(Answer("Alice"))
-print(f"{question2 = }")
-#: question2 = 'town'
-question3: Question = conversation.send(
-    Answer("Wonderland"))
-print(f"{question3 = }")
-#: question3 = 'friend'
+query1: Question = next(conversation)
+print(f"{query1 = }")
+#: query1 = 'name'
+query2: Question = conversation.send(Answer("Alice"))
+print(f"{query2 = }")
+#: query2 = 'town'
+query3: Question = conversation.send(Answer("Wonderland"))
+print(f"{query3 = }")
+#: query3 = 'friend'
 print(inspect.getgeneratorlocals(conversation))
 #: {'name': 'Alice', 'town': 'Wonderland'}
 try:
