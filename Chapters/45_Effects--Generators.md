@@ -41,8 +41,9 @@ This chapter covers:
 - Why a Python generator is half a coroutine,
   and why the other half is the driver you write
 
-[Stateless](46_Effects--Stateless.md) builds an Effect system on these,
-but generators are useful on their own.
+[Stateless](46_Effects--Stateless.md)
+builds an Effect system on the three channels, the driver, `yield from`,
+and `throw()`, but generators are useful on their own.
 
 ## Annotating a Generator
 
