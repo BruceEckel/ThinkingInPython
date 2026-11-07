@@ -127,12 +127,12 @@ Chapters/45_Effects--Generators.md	second run	In the second run, `drive()` sees 
 Chapters/45_Effects--Generators.md	second run	The listing's second run shows a state that stays.
 Chapters/45_Effects--Generators.md	the `for` loop	A yielded path such as `beds/pond/iris: blue` passes through every enclosing `visit()` and through `census()`, and reaches the `for` loop at the bottom of the listing.
 Chapters/45_Effects--Generators.md	the first `yield`	Code before the first `yield` is the state's entry action, the Moore shape, where the action belongs to the state.
-Chapters/45_Effects--Generators.md	the inner `try`	No `except` clause names `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
+Chapters/45_Effects--Generators.md	the inner `try`	No `except` clause specifies `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
 Chapters/45_Effects--Generators.md	the inner `try`	The exception leaves the inner `try` through its `finally` block, which prints `cleanup`.
 Chapters/45_Effects--Generators.md	the innermost `yield`	Every transition nests one generator deeper, and each `next()` passes through every level on its way to the innermost `yield`.
 Chapters/45_Effects--Generators.md	the innermost `yield`	Python raises `Failed` at the innermost `yield`, in the card step.
 Chapters/45_Effects--Generators.md	the last call	Conway calls that test "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call." A harder task, he notes, "would necessitate an absurd arrangement of switches."
-Chapters/45_Effects--Generators.md	the outer `except GeneratorExit`	No `except` clause names `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
+Chapters/45_Effects--Generators.md	the outer `except GeneratorExit`	No `except` clause specifies `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
 Chapters/46_Effects--Stateless.md	both runs	The type checker accepts both runs alike, because both bindings have the same type.
 Chapters/46_Effects--Stateless.md	both runs	`greet()` runs the same body in both runs.
 Chapters/46_Effects--Stateless.md	second run	Storing one in a registry to run later, handing the same one to two consumers, or keeping one around to retry after a failure---each of these returns `None` on the second run instead of raising an exception.

@@ -720,10 +720,11 @@ Chapters/44_Effects--Effect_Management.md	[BOUND] Three things pass from callee 
 Chapters/45_Effects--Generators.md	[BOUND] A CODE above CODE in CODE runs when the mouse is trapped and at no other time
 Chapters/45_Effects--Generators.md	[BOUND] A driver that holds the outermost generator stops and cleans up every generator beneath it with one call
 Chapters/45_Effects--Generators.md	[BOUND] A handler can do three things with a continuation
-Chapters/45_Effects--Generators.md	[BOUND] A pair of loops passing values in both directions resembles a queue like the ones in Coordinating Threads with Queues, with three differences
+Chapters/45_Effects--Generators.md	[BOUND] A pair of loops passing values in both directions resembles the queues in Coordinating Threads with Queues, with three differences
 Chapters/45_Effects--Generators.md	[BOUND] A suspended generator preserves two things
 Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator drops the return channel, so CODE takes two parameters where CODE takes three
 Chapters/45_Effects--Generators.md	[BOUND] An ordinary call keeps that state for the caller alone
+Chapters/45_Effects--Generators.md	[BOUND] CODE has the yield channel alone, so the type checker rejects CODE on anything annotated CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE leaves the machine in CODE, and the entry message prints once
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
@@ -732,10 +733,8 @@ Chapters/45_Effects--Generators.md	[BOUND] CODE takes the generator alone
 Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape, where the action belongs to the transition
 Chapters/45_Effects--Generators.md	[BOUND] Conway's flowchart of the coroutine version has those two steps in a row
 Chapters/45_Effects--Generators.md	[BOUND] Each CODE wraps one call that resumes the generator, CODE or CODE, because a CODE from either means the conversation finished
-Chapters/45_Effects--Generators.md	[BOUND] Here the question has two places to put code rather than two designs
-Chapters/45_Effects--Generators.md	[BOUND] In a single thread, Python had three ways to write such a producer
+Chapters/45_Effects--Generators.md	[BOUND] Here the choice is between two places in one function rather than between two designs
 Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
-Chapters/45_Effects--Generators.md	[BOUND] Its type has the yield channel alone, so the type checker rejects CODE on anything annotated CODE
 Chapters/45_Effects--Generators.md	[BOUND] One shape looks like a transition and is a delegation
 Chapters/45_Effects--Generators.md	[BOUND] Replace CODE's loop in CODE with the single line CODE and run CODE over the same CODE table
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
@@ -746,6 +745,7 @@ Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three ch
 Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as its body, with a CODE, and leaves the two methods to Python
 Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
+Chapters/45_Effects--Generators.md	[BOUND] Without generators, you have three ways to write such a producer in a single thread
 Chapters/45_Effects--Generators.md	[BOUND] Written as a generator, the squasher delivers a single asterisk and the character after it with two statements in a row
 Chapters/46_Effects--Stateless.md	[BOUND] A caller now has two options
 Chapters/46_Effects--Stateless.md	[BOUND] A channel empties in one of three ways, two of which take a vocabulary of their own
