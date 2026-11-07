@@ -726,7 +726,7 @@ The new exception replaces the original type.
 A caller who wants the original must read it from the new exception's `__cause__`,
 which `raise New(...) from e` sets, or from `__context__`,
 which Python sets when a handler raises an exception without `from`.
-`BaseException.add_note()`, added in Python 3.11,
+`BaseException.add_note()`, new in Python 3.11,
 adds context to the original exception instead of replacing it.
 It attaches a line that the traceback prints after the original message:
 
