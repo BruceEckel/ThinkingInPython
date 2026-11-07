@@ -46,7 +46,7 @@ class HVAC(StateMachine):
         return r.degrees > self.target + self.band
 
 hvac = HVAC()
-for degrees in [15, 17, 21, 30, 20]:
+for degrees in [15, 17, 21, 30, 20, 19]:
     hvac.handle(TemperatureReading(degrees))
     print(degrees, hvac.state.name)
 #: 15 HEATING
@@ -54,3 +54,4 @@ for degrees in [15, 17, 21, 30, 20]:
 #: 21 IDLE
 #: 30 COOLING
 #: 20 IDLE
+#: 19 IDLE

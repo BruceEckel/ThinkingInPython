@@ -580,7 +580,7 @@ print(" ".join(history))
 ```
 
 The per-state design (exercise 3) puts each state's rules with that state,
-and reads well when a state does more than look a word up.
+and reads well when a state does more than look up a word.
 The single-table design puts every rule for the whole machine in one dictionary,
 and is easier to audit and edit as a unit.
 The chapter's [Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
@@ -1203,7 +1203,7 @@ Moving that group's unconditional rule to the top sends every reading to that ru
 <summary>Solution</summary>
 
 If you put the unconditional rule to `HVACState.IDLE` first under `(IDLE, TemperatureReading)`,
-every reading prints `IDLE`, from `15 IDLE` to `20 IDLE`.
+every reading prints `IDLE`, from `15 IDLE` to `19 IDLE`.
 `handle()` takes the first rule whose condition passes,
 and a rule with no condition always passes,
 so the machine stops there and does not reach the `too_cold()` and `too_hot()` rules below it.
@@ -1259,7 +1259,7 @@ class HVAC(StateMachine):
         return r.degrees > self.target + self.band
 
 hvac = HVAC()
-for degrees in [15, 17, 21, 30, 20]:
+for degrees in [15, 17, 21, 30, 20, 19]:
     hvac.handle(TemperatureReading(degrees))
     print(degrees, hvac.state.name)
 #: 15 HEATING
@@ -1267,12 +1267,15 @@ for degrees in [15, 17, 21, 30, 20]:
 #: 21 IDLE
 #: 30 COOLING
 #: 20 IDLE
+#: 19 IDLE
 ```
 
 **Decide among three outcomes.**
 The `(IDLE, TemperatureReading)` key holds three rules,
 so a single reading leads to heating, cooling, or staying idle,
 and the two conditions decide which, as the exercise requires.
+The run sends three readings from idle, `15`, `30`, and `19`,
+and they lead to heating, cooling, and idle.
 
 **Run until back inside the band.**
 The running states carry their own two-rule groups.
