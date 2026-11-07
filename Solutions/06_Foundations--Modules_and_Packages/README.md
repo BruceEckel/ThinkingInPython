@@ -343,7 +343,7 @@ where the two names really are different files.
 Because the case rule is the same everywhere,
 an import whose case differs from its file fails on your own machine instead of in someone else's CI.
 
-Setting `PYTHONCASEOK` in the environment turns the check off on a case-insensitive platform,
+Setting `PYTHONCASEOK` in the environment turns off the check on a case-insensitive platform,
 so `import module` finds `Module.py`.
 Because Python alone reads that variable, its effect confirms that Python,
 not the filesystem, compares the names.

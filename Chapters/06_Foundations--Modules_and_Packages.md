@@ -132,7 +132,7 @@ app_settings.show()
 #: app_settings.debug is True
 ```
 
-`show()` prints the new value because it looks the name up in its own module every time it runs.
+`show()` prints the new value because it looks up the name in its own module every time it runs.
 Because the `debug` in `from_snapshot.py` is a separate binding that `from` set once,
 at import, it still holds `False`.
 
