@@ -227,7 +227,7 @@ or declare `Need[Console]` in its own return type,
 which puts the same choice to its callers.
 Those two are the only options, so the dependency stays visible.
 The requirement appears in the signature of every function between the one that uses the `Console` and the one that supplies it.
-The type checker reports an error at any of those functions that leaves the requirement out.
+The type checker reports an error at any of those functions that leaves out the requirement.
 
 If you fix the annotation but keep a caller that runs `greet_all()` with no environment,
 as `run(greet_all(["Alice", "Bob"]))` does,
@@ -666,7 +666,8 @@ makes `greeter.py`'s `greet()` print its greeting,
 and an Effect that also requests a second Ability runs to completion,
 with a `print()` in the handler showing it answered both requests.
 `ty` reports an `invalid-argument-type` at that second `run()`,
-naming the leftover `Need`.
+naming the leftover `Need`,
+until a `# type: ignore` on that line silences the report.
 
 <details>
 <summary>Solution</summary>
@@ -733,7 +734,8 @@ two for `Console` and one for `Clock`,
 although `default()` annotates its parameter `Need[Console]`.
 The type checker removes `Need[Console]` from the requirements and leaves `Need[Clock]` open,
 so the second `run()` needs a `# type: ignore`.
-Without that pragma, the type checker reports a leftover `Need[Clock]`.
+Without that pragma,
+the type checker reports an `invalid-argument-type` that names the leftover `Need[Clock]`.
 
 `handle()`'s `t = get_origin(t) or t` is the evidence.
 `handle()` reads the annotation, reduces `Need[Console]` to its origin, `Need`,
@@ -1382,7 +1384,8 @@ def to_log(name: str) -> Depend[Need[Recorder], None]:
 <details>
 <summary>Done when</summary>
 
-your six predictions match six runs with the third implementation added.
+your six predictions for `ambiguous_supply.py` with a third implementation match your six runs.
+`supply()` hands the request to the first argument that satisfies it.
 With separate `Protocol`s,
 handing `Terminal` to the recording Effect draws an `invalid-argument-type` that names the missing method,
 and you can name the case that two `Protocol`s still leave to argument order.
@@ -1390,7 +1393,8 @@ and you can name the case that two `Protocol`s still leave to argument order.
 <details>
 <summary>Solution</summary>
 
-Three implementations have six orderings, and one rule predicts them all.
+With a third implementation added to `ambiguous_supply.py`,
+the three implementations have six orderings, and one rule predicts them all.
 `supply()` scans its arguments and takes the first that satisfies the request,
 so the implementation that comes first answers the request.
 Two of the six orderings put `Terminal` first and send the greeting to the screen.
@@ -1452,7 +1456,7 @@ so each implementation satisfies one of them,
 and each Effect requests the `Protocol` it needs.
 
 That change turns the silent choice into a diagnostic.
-One more line at the end of the listing can hand `to_log()` a `Terminal` instead of a `Capture`.
+If you append a line to the listing that hands `to_log()` a `Terminal` instead of a `Capture`,
 `ty` rejects that line before the program runs:
 
 ```text
