@@ -539,7 +539,7 @@ Cache only answers whose inputs stay the same.
 By default, printing an object shows its class and its address,
 as in `<__main__.Point object at 0x7f2dd669cd70>`.
 That display identifies the object, not the value it holds.
-Two dunder methods control how an object displays.
+Two dunder methods control how `print()` and `repr()` display an object.
 `__str__()` is the readable form for users,
 while `__repr__()` is the unambiguous form for developers:
 
