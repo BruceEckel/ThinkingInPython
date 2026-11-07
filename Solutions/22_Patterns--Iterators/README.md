@@ -11,7 +11,7 @@
 [Generators](../../Chapters/22_Patterns--Iterators.md#generators)
 shows how a function containing `yield` returns an iterator.
 Write `evens()` the same way, then pass its result to `total()`.
-Any iterable works there, so `total()` works as written.
+`total()` accepts any iterable, so it works as written.
 
 <details>
 <summary>The shape</summary>
