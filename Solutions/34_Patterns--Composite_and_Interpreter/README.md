@@ -1490,7 +1490,7 @@ That walk reaches each `Add` before its children,
 but an `Add` combines its children's values after the children have produced them.
 The solution stacks the pending operation behind its children.
 `work += [Op.ADD, right, left]` puts `Op.ADD` deepest, so it comes off last,
-by which point the two values it needs are on `values`.
+by which point `values` holds its two operands.
 
 **Preserve operand order.**
 Pushing `right` before `left` makes `left` pop first.
