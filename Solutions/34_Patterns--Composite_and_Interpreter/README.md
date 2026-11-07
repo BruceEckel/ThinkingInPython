@@ -1144,7 +1144,7 @@ so `x + "a"` builds the ill-typed tree `Add(Var('x'), 'a')` from the other direc
 
 The two messages differ because each comes from a different source.
 `str` reports `"a" + x`, and Python's own fallback reports `x + "a"`,
-once both operands have declined.
+after `Var.__add__()` declines and `str` offers no `__radd__()` to try.
 
 **Declare the node each method builds.**
 Each method declares the type it really returns, `Add` or `Mul`,
