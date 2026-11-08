@@ -193,7 +193,7 @@ since the outcome depends on the two types alone.
 so each `opponent` and `caller` parameter takes `Any`.
 Those `Any` annotations turn off static checking.
 Classes that supply eight of the nine answers then pass the type checker.
-Python raises an `AttributeError` at the first duel that calls the ninth.
+With those classes, Python raises an `AttributeError` at the first duel that calls the missing method.
 A precise type needs a declaration of all four methods,
 either on `Item` as abstract methods or in a `Protocol`.
 Declaring the four methods restores the checking,
