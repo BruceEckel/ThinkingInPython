@@ -528,7 +528,7 @@ where each step needs the previous step's answer,
 as in `composing_with_bind.py` above.
 In `combining.py`, the three steps take their inputs from `i` and `j` rather than from an earlier step's answer,
 so stopping at the first `Err` discards whatever the later steps would have found.
-For `(1, 2)`, `func_b(2)` and `func_c(3)` fail too.
+For `(1, 2)`, `func_b(2)` and `func_c(3)` would fail too.
 The result reports `func_a(1)` alone (see exercise 3).
 The exception in `exceptions_lose_data.py` does the same.
 It ends the comprehension at `func_a(3)`, before `func_a(4)` runs.
@@ -704,12 +704,12 @@ so each returns a `Result` and `bind()` chains them.
 
 `compute()` returns a `Result`, a value the caller keeps after the call returns,
 so the dict comprehension collects all three results before `describe()` matches any of them.
-A raised exception ends the comprehension at the first failure.
+A `compute()` that raised an exception would end the comprehension at the first failure.
 
 The parentheses in `Err(ValueError())` do the type test.
 Written bare, `case Err(ValueError):` is a [capture](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares).
 It matches every `Err` and binds the error to a new local named `ValueError`,
-so `describe()` answers "Not a number" for a `ZeroDivisionError`.
+so a `describe()` written that way answers "Not a number" for a `ZeroDivisionError`.
 Python compiles that `case`, and the type checker accepts it.
 
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
