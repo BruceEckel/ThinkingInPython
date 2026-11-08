@@ -41,7 +41,7 @@ Chapters/15_Techniques--Context_Managers.md	the first `next()`	On 3.15 the wrapp
 Chapters/16_Techniques--Comprehensions.md	The `for` loop	The `for` loop runs after the context manager deletes the directory, and it reads the strings in `py_paths`, which outlive the directory.
 Chapters/16_Techniques--Comprehensions.md	The first clause	The first clause then iterates over that stale `row`.
 Chapters/16_Techniques--Comprehensions.md	The inner `for col`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
-Chapters/16_Techniques--Comprehensions.md	the next statement	A list comprehension evaluates its output expression for every element before the next statement runs, so it reads `factor` at creation.
+Chapters/16_Techniques--Comprehensions.md	the next statement	With brackets in place of the parentheses, the list comprehension evaluates its output expression for every element before the next statement runs, so it reads `factor` at creation.
 Chapters/16_Techniques--Comprehensions.md	the outer `e`	The `e` inside the brackets is a different name from the `e` outside them, so the outer `e` keeps its value.
 Chapters/16_Techniques--Comprehensions.md	the outer `for row`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
 Chapters/16_Techniques--Comprehensions.md	two passes	It needs two passes, one to size the result and one to fill it, so it converts its argument to a list first.

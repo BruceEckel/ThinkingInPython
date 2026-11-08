@@ -61,10 +61,11 @@ Chapters/06_Foundations--Modules_and_Packages.md	only: the way CODE is a keyword
 Chapters/07_Foundations--Classes.md	defines no: If a derived class defines no constructor
 Chapters/07_Foundations--Classes.md	has no: A method defined without CODE has no parameter to receive the reference
 Chapters/07_Foundations--Classes.md	has no: Reading one raises an CODE reporting that the property has no getter
-Chapters/07_Foundations--Classes.md	has no: The assignment in the constructor then raises an CODE reporting that the property CODE has no setter
+Chapters/07_Foundations--Classes.md	has no: the assignment in the constructor raises an CODE reporting that the property CODE has no setter
 Chapters/07_Foundations--Classes.md	have no: its instances have no CODE to hold the cached value
 Chapters/07_Foundations--Classes.md	only: and add CODE only when users see the output
 Chapters/07_Foundations--Classes.md	want: When you override a method but still want the base-class version
+Chapters/07_Foundations--Classes.md	whatever: whatever it inherits
 Chapters/08_Foundations--Static_Types.md	enforces none of: Python enforces none of the hints
 Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
 Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
@@ -170,7 +171,7 @@ Chapters/17_Techniques--Metaprogramming.md	already: so CODE receives the CODE at
 Chapters/17_Techniques--Metaprogramming.md	evaluates nothing: CODE evaluates nothing
 Chapters/17_Techniques--Metaprogramming.md	has no: CODE has no simpler substitute either
 Chapters/17_Techniques--Metaprogramming.md	has no: CODE's private CODE has no CODE key
-Chapters/17_Techniques--Metaprogramming.md	has no: The loop then has no CODE class for CODE to test
+Chapters/17_Techniques--Metaprogramming.md	has no: In that version the loop has no CODE class for CODE to test
 Chapters/17_Techniques--Metaprogramming.md	has no: or CODE when a built-in has no inspectable signature
 Chapters/17_Techniques--Metaprogramming.md	has no: so it has no such cell and names CODE instead
 Chapters/17_Techniques--Metaprogramming.md	hook: Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction
