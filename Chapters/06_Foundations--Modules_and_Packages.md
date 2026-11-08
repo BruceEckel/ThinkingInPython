@@ -81,7 +81,7 @@ and then runs the file's body to fill it.
 `sys.modules` is a dict keyed by dotted module name.
 Every later `import` of that name, from any file in the program,
 finds the module there and binds the same object.
-The `as second` clause binds that object under a second name
+The `as second` clause binds that object under another name
 ([covered next](#importing-names-with-from-and-as)),
 so `use_module` and `second` are one object.
 
