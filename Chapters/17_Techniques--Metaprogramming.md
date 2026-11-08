@@ -307,7 +307,7 @@ where `isinstance()` or a `match` class pattern can test it.
 
 Calling the base class, `Event(name, hour, minute)`, sets the same `action`,
 `hour`, and `minute` as a generated class does, but every entry shares one type.
-The loop then has no `RingBell` class for `isinstance()` to test.
+In that version the loop has no `RingBell` class for `isinstance()` to test.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
 
@@ -1090,7 +1090,8 @@ The rejected assignment leaves `_width` as it was,
 so `r.width` still reads the `3.0` the constructor stored.
 
 A `property` protects one attribute the same way,
-but `Rectangle` then carries the check twice, once per attribute.
+but a `Rectangle` written with properties carries the check twice,
+once per attribute.
 With a descriptor, one class holds the rule,
 and each attribute that needs it says `Positive()`.
 
@@ -1398,7 +1399,8 @@ and lookup on a `Sub` instance does not.
 The `AttributeError` comes from the metamethod rule at the start of [Intercepting Instance Creation](#intercepting-instance-creation).
 Lookup on a `Sub` instance searches `Sub` and its bases.
 `Mixin` sits among the bases of `HelperMeta`, outside that search.
-A `classmethod` defined in `Sub` works through both `Sub` and its instances.
+If `Sub` defines `helper()` as a `classmethod`,
+the method works through both `Sub` and its instances.
 
 A metaclass that needs a `dict` holds one in an attribute,
 as `Singleton._instances` does,
