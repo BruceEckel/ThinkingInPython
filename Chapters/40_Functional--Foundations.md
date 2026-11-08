@@ -114,7 +114,8 @@ print("ok")
 ```
 
 If you delete the reset at `[1]`, the assertion at `[2]` fails.
-`total` is still 5 from the first call, so the second call returns 10.
+Without the reset, `total` is still 5 from the first call,
+so the second call returns 10.
 The reset at `[1]` is the fixture the impure version needs.
 Purity removes it.
 
