@@ -508,8 +508,9 @@ Reading `c.total` falls back to that shared value.
 
 Writing the fix as `type(self).total += 1` also prints `2 2 2` here,
 because `type(self)` is `Counting` for both `c` and `d`.
-A subclass's first construction forks the counter the way `classvar_fork.py` forks it for `Sub`.
-Constructing an empty subclass twice after `c` and `d` leaves `Counting.total` at `2` and gives the subclass its own `total` of `4`.
+In that version a subclass's first construction forks the counter,
+the way `classvar_fork.py` forks it for `Sub`.
+Constructing an empty subclass twice after `c` and `d` would leave `Counting.total` at `2` and give the subclass its own `total` of `4`.
 Naming the class sends every write to one dictionary.
 
 Before you move on, name what separates your attempt from this one:
