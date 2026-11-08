@@ -286,7 +286,7 @@ Every test runs with the logger the module chose.
 
 A library EMS removes the forwarded parameters and the call-site edits,
 and keeps the signature edits.
-`format_greeting()` declares in its return type that it needs a `Log`,
+In that design, `format_greeting()` declares in its return type that it needs a `Log`,
 and so does every function on the path to `format_greeting()`.
 Their parameter lists and their call sites stay as they were.
 The type checker reports each declaration you miss.
