@@ -106,7 +106,11 @@ class Pass:
 # at. ambiguity follows antecedents: it tests every sentence that
 # counts, compares, coordinates, modifies, or limits for a second
 # reading, and it goes after the pointer pass because a pronoun just
-# replaced by its noun can be the noun the listing has two of.
+# replaced by its noun can be the noun the listing has two of. stutter
+# runs last of all, after bruce-edit-apply: every pass above it writes
+# new sentences, and a rewrite can put a word beside its own code span
+# ("without a `return` returns") or repeat a stem within three tokens,
+# so the pass that reads for that shape has to see the settled text.
 PASSES: tuple[Pass, ...] = (
     Pass(
         "elements-of-style",
@@ -167,6 +171,12 @@ PASSES: tuple[Pass, ...] = (
         "bruce-edit-apply",
         "bruce-edit-apply",
         "apply the promoted rules in bruce_edit_db.md",
+        default=True,
+    ),
+    Pass(
+        "stutter",
+        "stutter",
+        "one sound, one job: a word beside its own code span, a stem repeated within three tokens",
         default=True,
     ),
 )
@@ -230,6 +240,20 @@ and Opus 5.5 has not been measured on these passes. When reading its
 first runs, look for what Opus 5 did there: added "only"s, figurative
 flourishes, and splits of two-fact sentences that read fine as one.
 MODEL=claude-fable-5 still selects Fable for a run.
+
+2026-11-07: stutter joined as the last default pass, on the default
+model. The evidence is the book-wide sweep that day, not an A/B: 43
+Opus agents (edit-file-opus) read 1,311 `tip stutter` candidates in
+93 files against their listings and reworded 51, about 4%, which is
+the restraint the pass needs (its skill says a pass that rewrites a
+tenth of its hits has gone wrong). The session, on Fable, found two
+rewrites to touch up out of the 51: one put a figure where the
+original verb was literal ("reaches every observer" for "calls"), and
+one attached "without a subclass" to the wrong noun. Opus also left
+every `Done when:` criterion alone because the brief listed criteria
+among the keeps; the skill now says criteria are the pass's to edit.
+So read an Opus stutter diff for a figure of speech and a misattached
+modifier, and for a criterion it should have reworded.
 """
 
 # How many chapters run at once in parallel mode. Each is a live

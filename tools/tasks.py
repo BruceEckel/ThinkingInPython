@@ -861,15 +861,21 @@ def rewrite(v: Vars) -> None:
                                   paragraph, the news at the end
       antecedents        default  name what each this/it/which points at
                                   when two things could be meant
+      ambiguity          default  one reading per sentence: a count with
+                                  two units, a word with two senses, a
+                                  modifier with two heads
       readability        opt-in   remove AI-writing tells; its own rule
                                   is "only when asked", so it never runs
                                   unless you name it here
       bruce-edit-apply   default  apply the promoted rules in
                                   bruce_edit_db.md
+      stutter            default  a word beside its own code span, a stem
+                                  repeated within three tokens; last,
+                                  since the passes above write sentences
 
-    A bare `tip rewrite CH=25` runs the seven defaults. To add an opt-in
+    A bare `tip rewrite CH=25` runs the nine defaults. To add an opt-in
     pass to them: ARGS="--also activate". To run only the passes you
-    name: ARGS="--passes activate readability". To run all nine:
+    name: ARGS="--passes activate readability". To run all eleven:
     ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
     commands without running them.
 

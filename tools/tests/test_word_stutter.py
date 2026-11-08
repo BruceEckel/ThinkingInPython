@@ -59,6 +59,47 @@ def test_no_hit(text: str) -> None:
     assert not hits(text), hits(text)
 
 
+JOB = ("The `for` loop primes each `job` and pairs it with its first "
+       "request. When the job finishes, its `send()` raises "
+       "`StopIteration`. The job is then dropped.")
+
+
+def test_mixed_once_per_paragraph_at_first_occurrence() -> None:
+    found = hits(JOB)
+    assert [m.split("]")[0] for _, m in found] == ["[MIXED"]
+    assert found[0][1].startswith("[MIXED] job / `job`: ")
+    assert " | " in found[0][1]
+
+
+@pytest.mark.parametrize("text", [
+    # A class name beside its common noun is the book's idiom.
+    "Every `Shape` draws itself, so the loop asks each shape to draw.",
+    # A call or a dotted path is [CODE]'s business, not [MIXED]'s.
+    "The driver calls `send()`. The send carries the answer in.",
+    "`machine.state` is read later. The state is a record.",
+    # Stopwords, keywords, and short spellings never pair.
+    "`in` tests membership. The key is in the dict.",
+    "The `class` statement runs. Then the class exists.",
+    "A `match` tries each `case`. The first case that fits wins the match.",
+    "`id` is a builtin. Its id changes.",
+    # Two paragraphs are two scopes.
+    "The `job` is primed.\n\nThe job then runs.",
+])
+def test_mixed_quiet(text: str) -> None:
+    assert not [m for _, m in hits(text) if m.startswith("[MIXED]")], hits(text)
+
+
+def test_mixed_reads_a_shadowed_builtin() -> None:
+    text = "`next` and `action` are fields. The input decides the next state."
+    assert [m.split("]")[0] for _, m in hits(text)] == ["[MIXED"]
+
+
+def test_mixed_defers_to_a_code_pair() -> None:
+    text = "Each `job` is a job the driver owns. The job runs later."
+    found = [m.split("]")[0] for _, m in hits(text)]
+    assert found == ["[CODE"]
+
+
 def test_window_widens() -> None:
     text = ("`close()` returns the value the generator returned while "
             "handling `GeneratorExit`.")
@@ -98,4 +139,5 @@ def test_main_on_fixture(tmp_path: Path,
     assert main([str(f)]) == 0
     assert main([str(f), "--fail"]) == 1
     out = capsys.readouterr().out
-    assert "survey" in out and "1 stutter candidates (1 code, 0 stem)" in out
+    assert "survey" in out
+    assert "1 stutter candidates (1 code, 0 stem, 0 mixed)" in out

@@ -50,11 +50,21 @@ It keeps no baseline, so every hit prints every time.
 - `[STEM=]`: the same form twice ("the generator ... the generator"),
   mostly the topic noun named again, which the antecedents rule
   prefers to a pronoun; judge these from the context line.
+- `[MIXED]`: one spelling used as a prose word and as a lowercase
+  code span anywhere in one paragraph, the `job` shape, printed once
+  per paragraph with a snippet of each occurrence. A Python keyword
+  (`class` beside "the class") is skipped, a builtin a variable can
+  shadow (`next`) is not. Most hits name one thing in two fonts ("the
+  tolerance" beside `tolerance`), a keep; the first survey
+  (2026-11-07) read 177 and found five, each a verb beside a variable
+  of that spelling or an ordinal beside a name ("`announce()` calls
+  every responder ... `calls` shows that both assignments called",
+  "under a second name ... `second`").
 
 The scan is a floor.
-A sentence boundary stops its window, so the `job` paragraph above is
-invisible to it; a link's text is hidden; a pair joined by "and", "or",
-"to", "but", "than", or a preposition is dropped.
+A sentence boundary stops the `[CODE]` and `[STEM]` window; a link's
+text is hidden; a pair joined by "and", "or", "to", "but", "than", or
+a preposition is dropped.
 `ARGS="--window 4"` widens the gap by one token (the `close()` sentence
 needs it), at about a third more candidates.
 A same-shape stutter noticed while reading a paragraph is a hit.
@@ -97,6 +107,13 @@ A same-shape stutter noticed while reading a paragraph is a hit.
   times" became "as many times as `times` holds"; "six draws" beside
   `Oval.draw` became "six random shapes"); the criterion is prose the
   pass owns.
+- A verb and a variable of one spelling in one paragraph, the
+  `[MIXED]` finds: "`again` calls `cube_if_even()` in the filter ...,
+  then calls it again ... `calls` shows the order" (Solutions 16),
+  "`trace` prints the value ... but the trace reports the wrong
+  result" (chapter 14), and a collective noun that is also a member
+  of its own list ("The full set is `bool`, ..., `set`, and
+  `frozenset`", chapter 13).
 
 ## Keep when
 

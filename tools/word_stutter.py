@@ -15,7 +15,7 @@ files and reworded 56, so the shape is rare and most hits are keeps.
 This check is the `stutter` pass's mechanical prefilter
 (`.claude/skills/stutter/SKILL.md`), the tenth pass of `super-prose`.
 
-Two shapes, four labels:
+Three shapes, five labels:
 
 - `[CODE!]` and `[CODE]`: a prose word whose stem equals an identifier
   in a code span within WINDOW tokens of it ("the next `next()`", "a
@@ -31,6 +31,25 @@ Two shapes, four labels:
   rewording; `=` is the same form twice ("the generator ... the
   generator"), usually the topic noun named again, which the author's
   antecedents rule prefers to a pronoun.
+- `[MIXED]`: one spelling used both as a prose word and as a code span
+  anywhere in one paragraph, the chapter 45 `job` shape, where the
+  sentence boundary hides the pair from the window. The code span must
+  be a bare identifier that starts lowercase: a variable or a
+  parameter, so `job` beside "job" prints and `Shape` beside "shape",
+  the book's usual way of naming a class and its instances, does not;
+  a call (`send()`) or a dotted path is left to `[CODE]`, and a Python
+  keyword (`class` beside "the class", `return` beside "the return
+  value") is skipped, since the keyword beside the prose noun for its
+  construct is how the book talks about the construct and the first
+  survey's 87 such hits were all keeps. A builtin's name stays, since
+  a variable can shadow one (`next`, `input`). One line per spelling
+  per paragraph, at the first occurrence, with a snippet of each; a
+  paragraph whose `[CODE]` pair already covers the spelling prints no
+  second line. The 2026-11-07 survey over the book is in the
+  `MIXED_NOTES` string below: most hits name one thing in two fonts
+  ("the tolerance" beside `tolerance`), and the finds were a verb
+  beside a variable of that spelling ("`announce()` calls every
+  responder ... `calls` shows that both assignments called").
 
 The scan is mechanical. A sentence boundary stops the window, a link's
 text is hidden (its words repeat the target heading on purpose), and a
@@ -64,7 +83,7 @@ pass makes, and a baseline of 1,200 keeps would hide the next real one
 behind a re-keying on every edit.
 
 A line reads `survey   path:line: [TAG] word / word: context`, and the
-run ends with `N stutter candidates (C code, S stem)`. A run given
+run ends with `N stutter candidates (C code, S stem, M mixed)`. A run given
 paths reads only those files. `--window N` widens the gap: the
 `close()` sentence above has four tokens between its "returns" and
 "returned", which the default of three misses and `--window 4` lists,
@@ -77,6 +96,7 @@ at about a third more candidates over the book.
 """
 
 import argparse
+import keyword
 import re
 from collections.abc import Iterator
 from pathlib import Path
@@ -111,6 +131,10 @@ TOKEN: Final = re.compile(
     r"``[^`]+``|`[^`]+`|[A-Za-z][A-Za-z'’-]*|[.!?](?=[\s\"’”)]|$)")
 SIMPLE_CODE: Final = re.compile(r"^[A-Za-z_][\w.]*(\(\))?$")
 IDENT: Final = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+VARIABLE: Final = re.compile(r"^[a-z][A-Za-z0-9_]*$")
+"""A bare identifier starting lowercase: the code spans `[MIXED]` reads."""
+KEYWORDS: Final = frozenset(keyword.kwlist) | frozenset(keyword.softkwlist)
+"""Skipped by `[MIXED]`: `class` beside "the class" is how the book talks."""
 LINK_TOKEN: Final = "LINKTEXT"
 
 STOP: Final = frozenset("""
@@ -290,10 +314,43 @@ def pair(toks: list[Token], i: int, j: int) -> str | None:
     return None
 
 
+def snippet(toks: list[Token], i: int) -> str:
+    """Three tokens each side of token i, for a `[MIXED]` line."""
+    return " ".join(t.text for t in toks[max(0, i - 3):i + 4])
+
+
+def mixed(toks: list[Token], covered: set[str]) -> Iterator[tuple[int, str]]:
+    """`[MIXED]` hits for one paragraph: (token index, message).
+
+    A spelling that occurs both as a prose word and as a `VARIABLE` code
+    span, once per spelling, at its first occurrence; `covered` holds
+    the spellings a `[CODE]` pair in this paragraph already reported.
+    """
+    words: dict[str, int] = {}
+    spans: dict[str, int] = {}
+    for i, t in enumerate(toks):
+        if t.kind == "word":
+            s = surface(t.text)
+            if s not in STOP and len(s) >= 3:
+                words.setdefault(s, i)
+        elif t.kind == "code":
+            body = t.text.strip("`").strip()
+            if (VARIABLE.match(body) and body not in STOP
+                    and body not in KEYWORDS):
+                spans.setdefault(body, i)
+    for s in sorted(words.keys() & spans.keys()):
+        if s in covered:
+            continue
+        i, j = words[s], spans[s]
+        yield min(i, j), (f"[MIXED] {toks[i].text} / {toks[j].text}: "
+                          f"{snippet(toks, i)} | {snippet(toks, j)}")
+
+
 def find(doc: Document, window: int = WINDOW) -> Iterator[Finding]:
     """Every stutter candidate in `doc`, as `[TAG] a / b: context`."""
     for para in paragraphs(doc):
         toks = tokens(para)
+        covered: set[str] = set()
         for i, tok in enumerate(toks):
             if tok.kind in ("break", "link"):
                 continue
@@ -307,11 +364,16 @@ def find(doc: Document, window: int = WINDOW) -> Iterator[Finding]:
                 label = pair(toks, i, j)
                 if label is None:
                     continue
+                if label.startswith("CODE"):
+                    word = tok if tok.kind == "word" else other
+                    covered.add(surface(word.text))
                 yield Finding(
                     doc.path, tok.line,
                     f"[{label}] {tok.text} / {other.text}: "
                     f"{context(toks, i, j)}")
                 break
+        for k, message in mixed(toks, covered):
+            yield Finding(doc.path, toks[k].line, message)
 
 
 EXAMPLES: Final[tuple[tuple[str, bool, int], ...]] = (
@@ -326,6 +388,11 @@ EXAMPLES: Final[tuple[tuple[str, bool, int], ...]] = (
     ("The `for` loop primes each `job` and pairs it with its first "
      "request. When a `job` finishes, its `send()` raises "
      "`StopIteration`.", False, WINDOW),
+    ("The `for` loop primes each `job` and pairs it with its first "
+     "request. When the job finishes, its `send()` raises "
+     "`StopIteration`.", True, WINDOW),
+    ("Every `Shape` draws itself, so the loop asks each shape to draw.",
+     False, WINDOW),
     ("The call that resumes the generator links that frame back into "
      "the call stack.", False, WINDOW),
     ("The yield channel and the return channel end in different places.",
@@ -340,10 +407,46 @@ EXAMPLES: Final[tuple[tuple[str, bool, int], ...]] = (
 
 The `close()` sentence has four tokens between "returns" and
 "returned", so the default window misses it and `--window 4` finds it;
-the sweep's brief carried it as a worked example instead. The `job`
-paragraph does not fire because the two spellings sit in different
-sentences; that shape is the pass's to read. The topic-noun example
-fires as `[STEM=]`, the tier the pass mostly keeps.
+the sweep's brief carried it as a worked example instead. The first
+`job` paragraph is quiet: both of its `job`s are code spans. The
+second writes "the job" in prose a sentence after `job`, outside the
+window, and `[MIXED]` lists it. The `Shape` paragraph is quiet because
+`[MIXED]` reads lowercase identifiers. The topic-noun example fires as
+`[STEM=]`, the tier the pass mostly keeps.
+"""
+
+MIXED_NOTES = """
+2026-11-07, the first `[MIXED]` survey over the book, run after that
+day's sweep and with keywords still counted: 264 hits in 93 files,
+beside 900 from the other four labels. 146 were a Python keyword,
+builtin type, or module name beside the prose noun for its construct
+(`class` 29, `list` 20, `type` 13, `tuple` 8, `import` 8, `return`,
+`match`, and `case` 7 each), which the font and the book's convention
+sort for the reader; 118 were a variable, parameter, or field. The
+snippets of 25 showed the two spellings in different jobs, and a read
+of those paragraphs found five to reword:
+
+  ch06:84   "binds that object under a second name ... so
+            `use_module` and `second` are one object"
+  ch13:371  "The full set is `bool`, ..., `set`, and `frozenset`"
+  ch14:249  "`trace` prints the value `func` returns ... but the
+            trace reports the wrong result"
+  S16:563   "`again` calls `cube_if_even()` in the filter ..., then
+            calls it again in the output expression ... `calls`
+            shows the order"
+  S30:2130  "`announce()` calls every responder ... and `calls`
+            shows that both assignments called `report()`"
+
+The close keeps: a parameter named for what it selects (`dunder`
+beside "every dunder", `types` beside "the parameter types"), a verb
+beside a counter of that spelling ("If the pool held a connection"
+beside `held`), a name that states its own property ("The `deep`
+expression ... 2000 `Add` nodes deep"), and a generic noun that is
+also the listing's module name (chapter 06's `module`). The rest
+named one thing in two fonts. Skipping keywords dropped 87 hits and
+no find, to 177, so the label's yield is about three in a hundred,
+under the other labels' four; a chapter pass reads it in the same
+keep-biased frame.
 """
 
 
@@ -385,8 +488,9 @@ def main(argv: list[str] | None = None) -> int:
     for shown, line, text in found:
         print(f"survey   {shown}:{line}: {text}")
     code = sum(1 for _, _, t in found if t.startswith("[CODE"))
+    mix = sum(1 for _, _, t in found if t.startswith("[MIXED]"))
     print(f"{len(found)} stutter candidates ({code} code, "
-          f"{len(found) - code} stem)")
+          f"{len(found) - code - mix} stem, {mix} mixed)")
     return 1 if args.fail and found else 0
 
 

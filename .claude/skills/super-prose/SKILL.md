@@ -62,9 +62,11 @@ scope's line range:
   and `[PERFECT]`, a present perfect in a time clause, "before the
   generator has yielded" -> "before the generator yields", C57)
 - `tip stutter CH=NN` (for `stutter`: `[CODE!]`, `[CODE]`, `[STEM~]`,
-  `[STEM=]`; no baseline, so every hit prints, and most are keeps:
-  the 2026-11-07 sweep reworded 56 of 1,311; run it again over the
-  scope after the other passes' edits, since they can create the shape)
+  `[STEM=]`, and `[MIXED]`, one spelling in prose and in a code span
+  in one paragraph; no baseline, so every hit prints, and most are
+  keeps: the 2026-11-07 sweep reworded 56 of 1,311, and the `[MIXED]`
+  survey that day found 5 in 177; run it again over the scope after
+  the other passes' edits, since they can create the shape)
 - `tip overclaims CH=NN ARGS=--survey` (for the claim check every
   pass makes: `[LEAD]`, a list lead-in that bounds every item above
   an item that exempts itself, "Each approach gives up one side's

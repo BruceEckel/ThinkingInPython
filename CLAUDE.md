@@ -105,10 +105,12 @@ mechanical candidates come from `tip positional CH=NN ARGS=--survey`
 survey; shapes Bruce flags that its catalog lacks accrue in its
 "Accrued shapes" section.
 `/super-prose NN` (`.claude/skills/super-prose/SKILL.md`, 2026-11-02) runs all
-nine prose passes in the session, including `/activate`, over a
+ten prose passes in the session, including `/activate` and `/stutter`, over a
 chapter or one section (`/super-prose 45 section "<heading>"`), and
 commits; it is the in-session form of `tip rewrite`.
-`tip rewrite CH=NN` runs these six plus `elements-of-style` and `bruce-edit-apply` by
+`tip rewrite CH=NN` runs these six plus `elements-of-style`,
+`bruce-edit-apply`, and `stutter` (last, since the other passes write
+new sentences) by
 default; `tip rewrite ARGS=--list` shows the set and the model each
 pass runs on. Each pass can name its own model in `tools/rewrite.py`'s
 `PASSES`; `MODEL_NOTES` there records which model each
@@ -510,7 +512,15 @@ a deliberate parallel, a function whose name is the verb it performs
 `super-prose`; it reads `tip stutter CH=NN` and rewords with words the
 passage already has, never a synonym for a technical term.
 `ARGS="--window 4"` widens the gap by one token, about a third more
-candidates.
+candidates. A fifth label, `[MIXED]` (the same day), lists one
+spelling used as a prose word and as a lowercase code span anywhere
+in one paragraph, the chapter 45 `job` shape the window cannot see,
+once per paragraph; Python keywords are skipped (`class` beside "the
+class" is how the book talks), builtins a variable can shadow are
+not. Its first survey read 177 and found five, each a verb beside a
+variable of that spelling ("`announce()` calls every responder ...
+`calls` shows that both assignments called"), so it is read in the
+same keep-biased frame; `MIXED_NOTES` in the tool has the list.
 `tip italics` (`tools/italics.py`, 2026-10-23) lists italics that break
 the introduce-once rule: `[EMPHASIS]` a span of function words ("*is*",
 "defers *how*"), `[REPEAT]` a term italicized again in the same file,

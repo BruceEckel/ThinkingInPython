@@ -1247,7 +1247,7 @@ touched a listing or broke a link fails right there. The chain stops at the
 first failure.
 
 ```
-tip rewrite CH=25                        # the seven default passes (ARGS=--list shows them)
+tip rewrite CH=25                        # the nine default passes (ARGS=--list shows them)
 tip rewrite CH=25 ARGS=--list            # show the passes, run nothing
 tip rewrite CH=25 ARGS=--dry-run         # print the commands only
 tip rewrite CH=25 ARGS="--passes activate"
@@ -1255,7 +1255,8 @@ tip rewrite CH=25 ARGS=--all             # every pass, opt-in ones included
 ```
 
 The passes live in `PASSES` in the script, in run order (general rules
-first, Bruce's own captured practices last); adding a tool is appending an
+first, Bruce's own captured practices after them, and `stutter` last,
+since every earlier pass writes new sentences); adding a tool is appending an
 entry. A pass marked `default` runs on a bare `tip rewrite`; the rest are
 opt-in, so a skill whose rules say "only when explicitly asked"
 (`readability`) stays off until named here, which counts as the ask. Each
