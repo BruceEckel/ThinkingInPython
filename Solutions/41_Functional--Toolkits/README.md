@@ -69,7 +69,7 @@ Three of those choices are places to be wrong.
 **Protect the caller's list.**
 If you seed the stack with `items` instead of `list(items)`,
 `deep_sum()` still returns `21`, but afterward the caller's list prints as `[]`.
-The stack and the argument are one list,
+In that version the stack and the argument are one list,
 so every `pop()` removes an element from the caller's list.
 
 **Pick which item comes next.**
@@ -241,7 +241,7 @@ If you build the totals with a list comprehension,
 `[sum(b) for b in batched(source, n)]`, `ty` reports an `invalid-return-type`.
 A `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
 If you change the annotation to `list[int]` to match, the demo's call hangs.
-The comprehension sums batches from the infinite `count(1)` forever,
+The list comprehension sums batches from the infinite `count(1)` forever,
 so `islice()` waits forever for its argument.
 The solution's generator expression, by contrast,
 computes each total only when `islice()` requests it.

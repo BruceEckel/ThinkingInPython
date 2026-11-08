@@ -811,7 +811,8 @@ The second caution concerns memory.
 Each case drains `a` completely before touching `b`,
 so `tee()` stores the whole sequence.
 When one consumer runs far ahead of the other,
-`list()` collects the same values once, and both consumers read that one list.
+a `list()` call in place of `tee()` collects the same values once,
+and both consumers read that one list.
 `tee()` saves memory when the consumers stay roughly in step.
 
 [Iterators](22_Patterns--Iterators.md#what-tee-buffers)
