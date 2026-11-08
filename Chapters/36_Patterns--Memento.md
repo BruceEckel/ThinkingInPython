@@ -125,8 +125,8 @@ The copy's `strokes` is the same list as `sketch.strokes`,
 the alias from `aliased_snapshot.py` one level down.
 
 `save()`'s one-level copy is enough because a stroke is a string.
-An originator holding containers inside containers needs `copy.deepcopy()` in `save()`.
-Each save then [rebuilds the whole nested structure](#a-snapshot-is-not-a-reference).
+An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
+so each of its saves [rebuilds the whole nested structure](#a-snapshot-is-not-a-reference).
 
 The caretaker's side of the contract is to store `checkpoint` and return it,
 leaving `checkpoint.strokes` alone.
@@ -753,7 +753,7 @@ so the generated `repr()` raises `AttributeError`.
 These listings use `@record(slots=False)` so the loaded object has a `__dict__` to hold the ghost.
 A slotted record pickles its field values as a list in field order,
 and the load assigns that list to the current class's fields by position.
-When the deleted field is the last one, the load drops its value.
+When a slotted record's deleted field is the last one, the load drops its value.
 A field deleted from the middle shifts every later value into the wrong field.
 A `title`, `strokes`,
 `color` record that loses `strokes` loads the old strokes tuple as its `color`,

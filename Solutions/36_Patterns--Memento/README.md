@@ -984,7 +984,7 @@ so `restored.layer` finds `DrawingV2.layer` by ordinary attribute lookup while `
 With the field written `layer: list[str] = field(default_factory=list)`,
 the default disappears.
 A `default_factory` runs inside `__init__()`, which pickle skips,
-so the loaded object raises an `AttributeError` the first time anything reads `layer`.
+so in that version the loaded object raises an `AttributeError` the first time anything reads `layer`.
 
 **Skip the constructor on load.**
 Pickle skips every line of code the class runs at construction.
