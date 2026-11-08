@@ -35,7 +35,7 @@ Chapters/45_Effects--Generators.md	[PASSIVE] be factored: PEP 380 describes the 
 Chapters/45_Effects--Generators.md	[PASSIVE] is finished: In CLU "a yield effectively calls the loop body, which returns to the iterator when it is finished."
 Chapters/45_Effects--Generators.md	[PASSIVE] is paused: CODE is paused at its CODE expression, and CODE is paused at its CODE.
 Chapters/45_Effects--Generators.md	[PASSIVE] is suspended: The new generator is suspended before its first statement, so no CODE expression is waiting to receive a value.
-Chapters/45_Effects--Generators.md	[PASSIVE] is trapped: A CODE above CODE in CODE runs when the mouse is trapped and at no other time.
+Chapters/45_Effects--Generators.md	[PASSIVE] is trapped: A CODE added above CODE in CODE runs when the mouse is trapped and at no other time.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
 Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
 Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] 's named: When CODE gains a fourth error, CODE's named CODE leaves it in the channel, so CODE's declared type no longer matches and the type checker reports an error at the CODE.
