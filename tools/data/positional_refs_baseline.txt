@@ -98,9 +98,9 @@ Chapters/37_Patterns--Pattern_Refactoring.md	the first `Plastic:`	Without that `
 Chapters/37_Patterns--Pattern_Refactoring.md	the first call	When the default answer is wrong for an unregistered material, the *Visitor* chapter advises making the base function raise `NotImplementedError`, so a forgotten registration fails at the first call (see exercise 5).
 Chapters/38_Patterns--Simulation.md	each run	`groupby()`, with the same key, then walks the sorted list in one pass, yielding each run of matching letters, and `pair = list(group)` collects each run.
 Chapters/40_Functional--Foundations.md	second pass	Once a `list()` call or a `for` loop has consumed the iterator, a second pass over the same object finds it silently empty.
-Chapters/40_Functional--Foundations.md	the first call	`total` is still 5 from the first call, so the second call returns 10.
+Chapters/40_Functional--Foundations.md	the first call	Without the reset, `total` is still 5 from the first call, so the second call returns 10.
 Chapters/40_Functional--Foundations.md	the next call	`withdraw()` returns a different answer each time, because each call changes `balance` and the next call reads the new value.
-Chapters/40_Functional--Foundations.md	the second call	`total` is still 5 from the first call, so the second call returns 10.
+Chapters/40_Functional--Foundations.md	the second call	Without the reset, `total` is still 5 from the first call, so the second call returns 10.
 Chapters/41_Functional--Toolkits.md	Each round	Each round is a shuffle, then a greedy choice repeated until the pool is empty, in place of the circle method's rotation around a stationary player.
 Chapters/41_Functional--Toolkits.md	The last case	The last case asks for groups of five from a roster of two:
 Chapters/41_Functional--Toolkits.md	the final `1`	`dropwhile()` stops testing once the predicate fails, so it yields the final `1`.

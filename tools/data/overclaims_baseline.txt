@@ -1268,10 +1268,10 @@ Solutions/36_Patterns--Memento/README.md	[BOUND] Then write a test that draws af
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] CODE needs three lines to return the CODE that CODE gets from its base function
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] CODE parses four pieces and bins two
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] Each is a single function, like CODE
+Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] In the CODE version, the one registration that matches a CODE is the base method's registration, so the base method handles every call
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] The CODE class is the only new Python code
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] The CODE in CODE holds four cases, one per original material
 Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] The one edit to CODE is the filename, since the script hardcodes CODE
-Solutions/37_Patterns--Pattern_Refactoring/README.md	[BOUND] The one registration that matches a CODE is the base method's registration, so the base method handles every call
 Solutions/38_Patterns--Simulation/README.md	[BOUND] A coroutine yields control only at an CODE, so the two statements run as one atomic step
 Solutions/38_Patterns--Simulation/README.md	[BOUND] A perfect maze offers one path to each cell, so each cell has one rat approaching it
 Solutions/38_Patterns--Simulation/README.md	[BOUND] CODE above carries the one new line in CODE, CODE, so CODE holds the CODE class and the demo
