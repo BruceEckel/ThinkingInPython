@@ -633,8 +633,8 @@ In `@banner("quarterly")`, the call constructs the manager,
 which then decorates the function.
 Written bare, `@banner` passes the function `quarterly` as `title`,
 so the name `quarterly` holds a manager object rather than a function.
-Calling `quarterly()` then raises a `TypeError`.
-The type checker flags the decorator line.
+In that version, calling `quarterly()` raises a `TypeError`.
+The type checker flags the bare `@banner` line.
 
 Each call of the decorated function builds a fresh manager,
 so `quarterly()` can run any number of times, each with its own enter and exit.
