@@ -1169,7 +1169,7 @@ Solutions/30_Patterns--Observer/README.md	[BOUND] The 4x4 banded grid agrees for
 Solutions/30_Patterns--Observer/README.md	[BOUND] The design is the one The Pythonic *Observer* describes
 Solutions/30_Patterns--Observer/README.md	[BOUND] The load-time form also brings three problems that CODE avoids
 Solutions/30_Patterns--Observer/README.md	[BOUND] The model is the one from CODE, copied here so the solution runs on its own
-Solutions/30_Patterns--Observer/README.md	[BOUND] The one CODE line comes from the CODE assignment, and CODE shows that both assignments called CODE, including the one to CODE
+Solutions/30_Patterns--Observer/README.md	[BOUND] The one CODE line comes from the CODE assignment, and CODE shows that both assignments ran CODE, including the one to CODE
 Solutions/30_Patterns--Observer/README.md	[BOUND] The protocol here is the one from CODE, unchanged
 Solutions/30_Patterns--Observer/README.md	[BOUND] The six sizes split three ways
 Solutions/30_Patterns--Observer/README.md	[BOUND] The solution changes two places

@@ -2127,10 +2127,10 @@ which announces `"humidity"`,
 so the closure tells `Broadcasting` which field changed.
 
 **Filter in the responder.**
-`announce()` calls every responder for every field,
+`announce()` runs every responder for every field,
 as `WeatherStation.__setattr__()` does.
 The one `report:` line comes from the `celsius` assignment,
-and `calls` shows that both assignments called `report()`,
+and `calls` shows that both assignments ran `report()`,
 including the one to `humidity`.
 
 **Share one type across the fields.**
