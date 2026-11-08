@@ -830,7 +830,7 @@ and reports a missing method.
 A type parameter, `class Surrogate[T]`,
 lets the surrogate accept any implementation type,
 but the type checker infers `T` from the first implementation's class.
-`Surrogate(StateA())` is a `Surrogate[StateA]`,
+In that version, `Surrogate(StateA())` is a `Surrogate[StateA]`,
 so the checker rejects `change_to(StateB())`.
 With that surrogate, `state_demo.py` fails the same way.
 `ty` narrows `first` to `Implementation1` despite its `Behavior` declaration,
