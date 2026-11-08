@@ -826,11 +826,12 @@ both `Ok` and `Err` carry `@final`,
 in `describe_isinstance.py` and in `utils/result.py`.
 Without that decorator `ty` 0.0.95 allows for a class inheriting from both,
 so it keeps the intersection of the two as a possible type.
-The value in the `Ok` then comes back as `float | Unknown` rather than plain `float`.
+In that case the value in the `Ok` comes back as `float | Unknown` rather than plain `float`.
 Pyright and mypy do not build that intersection and report `float` with or without the decorator.
 
-Under `ty`, the `match` and the `isinstance()` tests lose that precision together.
-`result.answer` after a positive `isinstance()` and `answer` in `case Ok(answer)` read `float | Unknown` alike.
+Without the decorator,
+the `match` and the `isinstance()` tests lose that precision together under `ty`.
+In that version, `result.answer` after a positive `isinstance()` and `answer` in `case Ok(answer)` read `float | Unknown` alike.
 The exercise's comparison therefore comes out even at either precision.
 The decorator's effect is a more useful finding than a win for either version.
 
