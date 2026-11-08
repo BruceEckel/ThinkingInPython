@@ -1452,7 +1452,7 @@ You can rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
 `Hero` stays distinct, since it also declares `approach()`.
 But every hero then satisfies `Obstacle` as well as `Hero`.
 `play()` supplies the hero first,
-so the hero answers the request for an obstacle.
+so in that version the hero answers the request for an obstacle.
 When two Protocols have matching methods,
 argument order decides which request each implementation answers.
 That is the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match).

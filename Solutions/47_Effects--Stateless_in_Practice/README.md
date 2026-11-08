@@ -543,7 +543,7 @@ A failure is part of the Effect only if the Effect yields it as a value.
 A `raise` in code the driver calls is outside the description.
 
 Making a `Blackout` catchable means giving the Ability a failure type.
-The handler then returns a value rather than raising an exception,
+In that design the handler returns a value rather than raising an exception,
 and `plug()` declares the failure it can produce.
 
 Before you move on, name what separates your attempt from this one:
@@ -1451,7 +1451,7 @@ and `10` after the `30` goes through.
 **Prove the loop tries every price.**
 The test proves from both sides that `spree()` attempts all four prices.
 A `spree()` that makes a fifth `Get` request exhausts the script.
-`handle()` treats the `StopIteration` from `read()` as the end of the Effect,
+In that version `handle()` treats the `StopIteration` from `read()` as the end of the Effect,
 the silent failure the chapter describes,
 so `run()` returns `None` and the first assertion fails on `None == 2`.
 A `spree()` that stops early leaves a balance unread,
