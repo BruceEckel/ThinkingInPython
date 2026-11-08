@@ -538,7 +538,8 @@ so a release without one raises `RuntimeError: Lock is not acquired.` A semaphor
 so the same mistake lifts the count to two and silently admits a second holder.
 That second holder reintroduces the race the lock is there to prevent.
 `asyncio.BoundedSemaphore(1)` checks the count against its initial value,
-so the stray `release()` raises `ValueError: BoundedSemaphore released too many times`.
+so with it in place of `asyncio.Semaphore(1)`,
+the stray `release()` raises `ValueError: BoundedSemaphore released too many times`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -703,7 +704,7 @@ That reliability is luck rather than a guarantee.
 This run keeps every update because the interpreter places its switch points elsewhere.
 A function call between the read and the write restores a switch point inside the sequence,
 whether it is a blocking I/O call, a `print()`, or an innocuous-looking helper.
-The counter then loses updates again,
+With that call in place, the counter loses updates again,
 because the read-modify-write sequence is still not atomic.
 
 A free-threaded interpreter has no GIL,
@@ -1293,7 +1294,7 @@ and `t_seq > t_thr * target` is `False`.
 
 `InterpreterPoolExecutor` wins the same benchmark because each [subinterpreter](../../Chapters/19_Techniques--Concurrency.md#subinterpreters)
 has its own GIL.
-The work spreads across processors instead of time-slicing on one.
+In that pool the work spreads across processors instead of time-slicing on one.
 A free-threaded build reaches the same end by removing the GIL instead of multiplying it,
 so its ordinary threads run on several processors at once.
 
@@ -1618,7 +1619,7 @@ and Python raises `TypeError` at runtime.
 It submits the call to the executor the same way `submit()` does,
 but returns an `asyncio.Future` bound to the running loop,
 an awaitable that resolves when the executor's own future completes.
-The task suspends on the `asyncio.Future` like any other `await`.
+In the original listing the task suspends on the `asyncio.Future` like any other `await`.
 In the meantime the loop keeps running the other two tasks.
 
 The `TaskGroup` puts the wrapper around the `TypeError`.
