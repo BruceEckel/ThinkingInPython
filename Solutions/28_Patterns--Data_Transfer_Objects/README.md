@@ -199,7 +199,7 @@ and that object stays as mutable as it was.
 [`frozen=True`](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 is shallow the same way.
 Declaring `steps: tuple[str, ...]` fixes the silent `append()` and the `TypeError` at once.
-The contents freeze, and the `Recipe` becomes hashable.
+With that declaration the contents freeze, so the `Recipe` becomes hashable.
 One declaration fixing both is the clue that they are one problem.
 
 Before you move on, name what separates your attempt from this one:

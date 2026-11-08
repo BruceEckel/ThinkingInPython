@@ -240,8 +240,8 @@ print(f"{mean=} {count=}")
 ```
 
 A tuple version of `summarize()` annotates its return as `tuple[float, int]` and returns a bare tuple.
-Every caller must then remember that position 0 is the mean and position 1 is the count.
-No name in the code records that order.
+Every caller of that version must remember that position 0 is the mean and position 1 is the count.
+No name in the tuple version records that order.
 `Stats` names the fields,
 so a call site reads `result.mean` instead of `result[0]`.
 
