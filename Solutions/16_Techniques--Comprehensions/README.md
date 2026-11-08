@@ -560,9 +560,8 @@ print(calls)
 The output expression reads each result back from `y` instead of calling again.
 
 **A second call for each element that passes.**
-`again` calls `cube_if_even()` in the filter for all six values,
-then calls it again in the output expression for the three that pass.
-`calls` shows the order.
+`again` calls `cube_if_even()` in the filter for all six values and a second time in the output expression for the three that pass.
+`calls` records the order.
 `0`, `2`, and `4` each appear twice in a row,
 once for the filter and then once for the output expression.
 `1`, `3`, and `5` appear once,
