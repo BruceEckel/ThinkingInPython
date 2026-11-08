@@ -357,8 +357,8 @@ which lets Python destroy the object.
 The callback receives `name`, not the `Connection`,
 so the finalizer refers to the `Connection` through its weak reference alone.
 `finalize(self, self.close)` looks tidier, but it gives the callback the object.
-The bound method holds a strong reference to the object,
-so the object survives until the program ends.
+The bound method `self.close` holds a strong reference to the object,
+so in that version the `Connection` survives until the program ends.
 
 The `close()` at `[1]` runs the callback immediately.
 The second `close()`, at `[2]`, finds the finalizer dead and returns `None`.
@@ -532,8 +532,8 @@ and the weak reference's callback removes the instance's entry from the dictiona
 The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no cleanup call.
 
-A `dict` or `list` as the registry keeps every instance alive forever,
-so the count stays at its peak.
+If the registry were a `dict` or a `list`,
+it would keep every instance alive forever, so the count would stay at its peak.
 Because the `WeakValueDictionary` holds weak references,
 it removes each entry when Python destroys the entry's object.
 
