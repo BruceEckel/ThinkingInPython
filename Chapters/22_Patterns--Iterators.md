@@ -695,9 +695,9 @@ A mutable data class that generates `__eq__()` sets `__hash__` to `None`,
 so such a wrapper, unlike a built-in iterator or a generator,
 cannot go in a set or serve as a dict key.
 Field-by-field comparison is also the wrong question to ask about an iterator.
-Two wrappers over one source compare equal as soon as their counts agree,
+Two wrappers over one source would compare equal as soon as their counts agree,
 though each has delivered different items.
-Two wrappers over separate iterators of the same list compare unequal.
+Two wrappers over separate iterators of the same list would compare unequal.
 With `eq=False`, the wrapper keeps `object`'s identity-based `__eq__()` and `__hash__()`,
 as other iterators do.
 
