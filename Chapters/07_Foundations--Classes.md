@@ -259,7 +259,7 @@ C().show()  # A comes first in the MRO
 
 The bases appear in the order the `class` statement lists them.
 Writing `class C(B, A)` puts `B` first.
-`C().show()` then runs `B`'s version.
+In that order, `C().show()` runs `B`'s version.
 
 ### Calling the Base Constructor
 
@@ -436,7 +436,7 @@ so the getter comes first.
 The setter's `def` must also use the name `radius`.
 Under another name, such as `def set_radius(self, value)`,
 the new property binds to `set_radius`, while `radius` keeps the getter alone.
-The assignment in the constructor then raises an `AttributeError` reporting that the property `radius` has no setter.
+In that version, the assignment in the constructor raises an `AttributeError` reporting that the property `radius` has no setter.
 
 Because the class binds the name `radius` to the property,
 the value goes into a separate attribute, `_radius`.
@@ -639,7 +639,7 @@ print(type(r).__name__)
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
 so the alternative constructor returns an instance of that subclass.
 Writing `return Temperature(...)` hard-codes the class.
-`Reading.from_fahrenheit()` then returns a `Temperature`.
+In that version, `Reading.from_fahrenheit()` returns a `Temperature`.
 
 `is_freezing()` also works as a module-level function,
 and that is the usual choice.
