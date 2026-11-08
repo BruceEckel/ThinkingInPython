@@ -158,8 +158,8 @@ which encounters `return` instead of another `yield`,
 so the generator returns its `Result`.
 The caller receives that `return` as a `StopIteration`,
 and the `Result` arrives as the exception's `value`.
-A `for` loop treats `StopIteration` as the normal end of the loop,
-so it discards the exception and loses the return value.
+The listing catches `StopIteration` in a `try` statement because a `for` loop would discard the exception.
+A `for` loop treats `StopIteration` as the normal end of the loop and drops the `Result` along with the exception.
 
 ![Each channel carries one type, in one direction.](_images/generator_channels)
 
@@ -175,8 +175,10 @@ If the body raises a `StopIteration` of its own,
 Python converts it into a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)).
 As [Asking Consumes an Item](22_Patterns--Iterators.md#asking-consumes-an-item)
-shows, calling `next()` on an exhausted iterator raises `StopIteration`,
-so a `next()` call inside the body can trigger that conversion.
+shows, calling `next()` on an exhausted iterator raises `StopIteration`.
+When that call sits inside a generator body,
+the `StopIteration` it raises is the body's own,
+so the driver receives a `RuntimeError` rather than a finished generator.
 
 ## What a Suspended Generator Holds
 
