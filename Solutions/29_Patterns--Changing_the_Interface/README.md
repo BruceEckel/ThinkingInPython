@@ -508,7 +508,7 @@ and `WhatIUse2().op(what_i_want=WhatIHave())` prints `WhatIUse2.op() wraps it` t
 
 If you add a `/` to `WhatIUse2.op()` and keep the name `item`,
 the override rejects the keyword that every `WhatIUse` caller may pass.
-`ty` reports `invalid-method-override` because the parameter is positional-only,
+In that version, `ty` reports `invalid-method-override` because the parameter is positional-only,
 and `run(WhatIUse2())` raises a `TypeError` for the unexpected keyword `what_i_want`.
 The solution gives the parameter the base class's name,
 so the override accepts every call the base accepts.

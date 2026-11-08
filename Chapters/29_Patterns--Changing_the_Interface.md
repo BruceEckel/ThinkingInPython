@@ -178,7 +178,7 @@ The commented-out signature in `adapter_variations.py`,
 the case Approach 2 adds.
 If you use that signature in place of the union,
 the type checker rejects the override.
-A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts.
+In that version, a `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts.
 That refusal breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
 `ty` reports the rejection as `invalid-method-override`:
 
