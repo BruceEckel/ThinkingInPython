@@ -260,6 +260,8 @@ The shapes match because `async def` and generator functions both return an obje
 Calling `interview()` returns that object.
 `next()` and `send()` run the body, one `yield` at a time.
 
+### The Driver
+
 A driver function runs the generator from start to finish.
 It starts the generator body with `next()`,
 sends each answer back with `send()`,
@@ -299,15 +301,13 @@ def drive(conversation: Generator[Question, Answer, Result],
             return stop.value
 ```
 
-`show_state` adds the generator's state to each line of the trace.
-The default leaves it out,
-so an ordinary call shows the requests and the answers.
+`show_state=True` adds the generator's state to each line of the trace.
 
 The type checker verifies each `Question` the generator yields and each `Answer` that `drive()` sends.
-`StopIteration.value` has type `Any`,
+The built-in `StopIteration.value` has type `Any`,
 so the type checker cannot ensure that `drive()` returns a `Result`.
 
-Each `try` wraps one call that resumes the generator, `next()` or `send()`,
+Each `try` wraps a call that resumes the generator, `next()` or `send()`,
 because a `StopIteration` from either means the conversation finished.
 The `try` around the priming call catches a conversation that returns before it asks anything.
 Any other call that can raise `StopIteration` belongs outside both `try` blocks.
@@ -381,6 +381,8 @@ shows, a function looks up a module-level name when its body runs.
 The annotation is `Generator[str]` rather than `Iterator[str]`,
 because `inspect.getgeneratorstate()` takes a `Generator` and the type checker rejects an `Iterator` argument.
 
+### Why a Generator and Not a Coroutine
+
 Every answer `interview()` receives comes from its driver.
 Swapping `drive()`'s dictionary for a database, or for `input()`,
 changes `drive()` and leaves `interview()` as it is.
@@ -402,6 +404,8 @@ That separation of a request from its fulfillment is the core of an [Effect Mana
 `interview()` and `drive()` form an EMS in miniature.
 The generator declares requests.
 The driver interprets them.
+
+### A Request Built from an Answer
 
 `interview()` asks the same three questions no matter what answers it receives.
 A generator can build its next request from the answer it received:

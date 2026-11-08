@@ -729,10 +729,8 @@ Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE leav
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
 Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
-Chapters/45_Effects--Generators.md	[BOUND] CODE takes the generator alone
 Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape, where the action belongs to the transition
 Chapters/45_Effects--Generators.md	[BOUND] Conway's flowchart of the coroutine version has those two steps in a row
-Chapters/45_Effects--Generators.md	[BOUND] Each CODE wraps one call that resumes the generator, CODE or CODE, because a CODE from either means the conversation finished
 Chapters/45_Effects--Generators.md	[BOUND] Here the choice is between two places in one function rather than between two designs
 Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
 Chapters/45_Effects--Generators.md	[BOUND] One shape looks like a transition and is a delegation
