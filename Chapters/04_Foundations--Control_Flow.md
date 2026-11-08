@@ -224,7 +224,8 @@ so the inner `else` continues on each row and the outer `else` (`[4]`)
 prints `"not found"`.
 
 Both calls end at `[5]`, after both loops.
-A `return` at the match leaves both loops in one step and skips `[5]` along with them.
+With a `return` at the match in place of the `break` at `[1]`,
+the function leaves both loops in one step and skips `[5]` along with them.
 The `else` form keeps the function running past the search.
 It also works in loops at the top level of a module,
 where a `return` is a syntax error.

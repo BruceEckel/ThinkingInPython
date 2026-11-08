@@ -28,7 +28,6 @@ Chapters/03_Foundations--Containers.md	[BOUND] CODE collects on the left of the 
 Chapters/03_Foundations--Containers.md	[BOUND] Each CODE shifts the following elements one place to the left, and the loop then advances its index, so it steps over the element that moved into the vacated slot
 Chapters/03_Foundations--Containers.md	[BOUND] The container then keeps the same elements no matter which code holds it, so you can share a container of immutable elements, where a mutable one calls for a defensive copy
 Chapters/03_Foundations--Containers.md	[BOUND] a single expression that produces a new list, in place of a loop with CODE
-Chapters/04_Foundations--Control_Flow.md	[BOUND] A CODE at the match leaves both loops in one step and skips CODE along with them
 Chapters/04_Foundations--Control_Flow.md	[BOUND] A comprehension builds a list, dictionary, or set from an iterable in one expression, replacing a loop that builds up a result
 Chapters/04_Foundations--Control_Flow.md	[BOUND] An object becomes one by defining two methods, CODE and CODE
 Chapters/04_Foundations--Control_Flow.md	[BOUND] CODE replaces that newline with a space, so the numbers print on one line
@@ -39,6 +38,7 @@ Chapters/04_Foundations--Control_Flow.md	[BOUND] Its CODE block runs the convers
 Chapters/04_Foundations--Control_Flow.md	[BOUND] The *walrus operator* CODE assigns a value as part of an expression, so you can compute, name, and test a value in one place
 Chapters/04_Foundations--Control_Flow.md	[BOUND] The CODE clauses catch exceptions raised in the CODE block alone
 Chapters/04_Foundations--Control_Flow.md	[BOUND] With CODE, CODE checks the lengths during iteration, when one argument runs out while another still has items, so the listing consumes the CODE with CODE
+Chapters/04_Foundations--Control_Flow.md	[BOUND] With a CODE at the match in place of the CODE at CODE, the function leaves both loops in one step and skips CODE along with them
 Chapters/05_Foundations--Functions.md	[BOUND] A CODE is a small anonymous function you write as a single expression
 Chapters/05_Foundations--Functions.md	[BOUND] A function can also return a different type from one call to the next
 Chapters/05_Foundations--Functions.md	[BOUND] A mutable default therefore keeps the changes one call makes, and the next call sees them
