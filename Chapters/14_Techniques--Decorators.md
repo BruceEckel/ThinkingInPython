@@ -333,7 +333,7 @@ since it compares a function with an `int`.
 The message describes the failed comparison,
 so you must trace the comparison back to the missing parentheses.
 A `repeat` without that comparison fails silently.
-Python binds `greet` to `decorate`.
+In that version, Python binds `greet` to `decorate`.
 Calling `greet("Bob")` then runs `decorate("Bob")`,
 which wraps the string where it expects a function and returns the wrapper.
 The call runs silently.
@@ -1068,7 +1068,8 @@ if __name__ == "__main__":
 ```
 
 After decoration the name `greeting` refers to a `str`,
-so `greeting()` raises a `TypeError`, because a `str` is not callable.
+so a call to `greeting()` would raise a `TypeError`,
+because a `str` is not callable.
 
 `run_once` suits a value that needs one-time setup logic but stays constant afterward.
 For a value that a single expression computes,
@@ -1212,7 +1213,7 @@ where a price change means editing every class that includes that topping.
 
 A `Pizza` with a `toppings: list[Topping]` field solves the same combinatorial problem,
 with no wrapping and no `Protocol`.
-It sums the toppings' `add_cost` values and joins their names.
+In that design, the `Pizza` sums the toppings' `add_cost` values and joins their names.
 That list is the simpler design here, where a topping contributes data
 (a number and a name).
 The *Decorator* pattern becomes the simpler design when a topping needs behavior as well as data:
