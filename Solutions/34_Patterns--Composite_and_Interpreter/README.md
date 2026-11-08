@@ -1500,8 +1500,8 @@ That order matters for the subtraction and division a fuller language adds.
 `Op` is an enum rather than a string so the `match` stays exhaustive.
 `work` holds `Expr | Op`, and every member of both types has its own case,
 so `assert_never()` type-checks.
-A marker typed `str` leaves `case _` reachable.
-The type checker then rejects the `assert_never()` call.
+With a marker typed `str`, `case _` stays reachable,
+so the type checker rejects the `assert_never()` call.
 
 `sys.setrecursionlimit()` avoids the error for `evaluate()`,
 but it has three drawbacks.

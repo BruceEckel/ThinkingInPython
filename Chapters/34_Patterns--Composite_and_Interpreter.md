@@ -642,7 +642,7 @@ print(to_infix(simplify(messy)))
 `messy` writes `Num(2) + 3` rather than the plainer `2 + 3` on purpose.
 With `2 + 3`, both operands are plain `int`,
 so Python adds them to `5` before any node exists.
-`simplify()` receives `5 * x` with the fold already done.
+In that version `simplify()` receives `5 * x` with the fold already done.
 `2 + 3` shows the limit of using the host parser.
 An operator builds a node when either operand is a node,
 and does plain arithmetic otherwise.
@@ -663,9 +663,9 @@ reported when the module compiles rather than as an unbound name at runtime.
 
 Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
-A `case Add(Num(0), other)` at the top of the function tests the tree as the caller wrote it.
+A `case Add(Num(0), other)` at the top of the function would test the tree as the caller wrote it.
 In `(0 * y) + x`, the left child is still a `Mul` when that case tests it.
-The pattern does not match, so the expression keeps its zero.
+In that version the pattern does not match, so the expression keeps its zero.
 Simplifying both children first, then matching the results,
 applies the rule to the `Num(0)` the recursion just produced.
 That order lets the demo's `((1 * x) + (0 * y))` simplify to `x`.
