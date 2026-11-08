@@ -938,7 +938,7 @@ The import must stay an ordinary import.
 A `lazy import` defers the module body, and with it the two `class` statements,
 until the first use of `extra_shapes`.
 The demo mentions `extra_shapes` in the import alone,
-so the two classes stay out of the registry.
+so under a `lazy import` the two classes stay out of the registry.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1398,7 +1398,7 @@ so `Shape.__subclasses__()` lists `_Circle` and `_Square`, leaving `_Oval` out.
 The original `shape_name()` draws from that list,
 so every name it yields is `"Circle"` or `"Square"`.
 The new `case` in `factory()` works when you call `Shape.factory("Oval")`,
-but the demo never makes that call.
+but the original demo never makes that call.
 
 **Walk the whole hierarchy.**
 `all_subclasses()` walks depth first,

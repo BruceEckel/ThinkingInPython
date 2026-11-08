@@ -694,7 +694,7 @@ or when the caller keeps the factory to construct objects later.
 You can eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
 Dispatching through `eval()` is unnecessary,
 and it makes `create_shape()` worse.
-`create_shape()` then compiles and runs any string it receives,
+With `eval()`, `create_shape()` compiles and runs any string it receives,
 so a configuration file, a request,
 or a command line can hand it arbitrary code instead of a shape name.
 The dictionary lookup treats the string as a key.
