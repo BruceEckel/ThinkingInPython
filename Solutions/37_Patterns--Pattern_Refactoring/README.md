@@ -427,7 +427,8 @@ the loop prints "no special handling" for all five materials,
 `Aluminum` included, and the type checker accepts the class.
 `singledispatch` dispatches on the first argument,
 which in a method call is the `Sorter` instance.
-The one registration that matches a `Sorter` is the base method's registration,
+In the `@singledispatch` version,
+the one registration that matches a `Sorter` is the base method's registration,
 so the base method handles every call.
 
 **Route each piece by its type.**
@@ -769,7 +770,7 @@ expect(NotImplementedError, strict_hazard, Plastic(1.0))
 
 If you register `Aluminum` for `strict_hazard()` and skip `Paper`,
 `strict_hazard(Paper(1.0))` raises a `NotImplementedError` reading `no hazard rule for Paper`.
-The program stops before it reaches the plastic.
+In that version the program stops before it reaches the plastic.
 The strict base function raises an exception for every unregistered type,
 including a harmless one like `Paper`, whose answer is `"none"`.
 
