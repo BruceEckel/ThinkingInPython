@@ -920,7 +920,8 @@ checks the bare factory against the annotation and rejects a mismatched one.
 
 **Give the checker a return type.**
 `dict[str, Month]` is callable too, and its return type is concrete.
-The type checker therefore reports `field(default_factory=dict[int, int])` on this field as an error before the program runs.
+If you change `Subscripted`'s factory to `dict[int, int]`,
+the type checker therefore reports the `field()` call as an error before the program runs.
 
 The bare form is fine where a reader can see that the factory and the annotation agree.
 Subscript the factory when you want the checker to confirm the agreement.
