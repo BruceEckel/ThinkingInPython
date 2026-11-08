@@ -138,7 +138,7 @@ Test: is the sentence true of the listing on the page? If not, does a word in it
 Fix: the lightest frame that carries over: what it replaces ("With a `return` at the match in place of the `break` at `[1]`"),
 a condition ("If `__init__()` assigns `_value_`"), "In that version", a gerund subject, or a tie to the listing's choice ("because a `for` loop would discard the exception").
 Keep a general fact that holds for the listing too, and a continuation whose opener in the same paragraph is a real conditional.
-Rule R57 in `bruce_edit_db.md`.
+Rule R57 in `bruce_edit_db.md`; the `alternative` pass (`.claude/skills/alternative/SKILL.md`) owns the paragraph-by-paragraph read, so this pass takes only the sentence it meets while testing for a second reading.
 
 ## Boundaries
 

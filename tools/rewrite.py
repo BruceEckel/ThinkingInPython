@@ -106,9 +106,14 @@ class Pass:
 # at. ambiguity follows antecedents: it tests every sentence that
 # counts, compares, coordinates, modifies, or limits for a second
 # reading, and it goes after the pointer pass because a pronoun just
-# replaced by its noun can be the noun the listing has two of. stutter
-# runs last of all, after bruce-edit-apply: every pass above it writes
-# new sentences, and a rewrite can put a word beside its own code span
+# replaced by its noun can be the noun the listing has two of.
+# alternative follows bruce-edit-apply: it reads each post-listing
+# paragraph against its listing for a sentence describing the road not
+# taken in the walkthrough's own register, and a split or a reframed
+# sentence from the passes above can strand an alternative's
+# continuation from its opener, so it has to see the settled text. stutter
+# runs last of all: every pass above it writes new sentences (a frame
+# is new words), and a rewrite can put a word beside its own code span
 # ("without a `return` returns") or repeat a stem within three tokens,
 # so the pass that reads for that shape has to see the settled text.
 PASSES: tuple[Pass, ...] = (
@@ -171,6 +176,12 @@ PASSES: tuple[Pass, ...] = (
         "bruce-edit-apply",
         "bruce-edit-apply",
         "apply the promoted rules in bruce_edit_db.md",
+        default=True,
+    ),
+    Pass(
+        "alternative",
+        "alternative",
+        "the road not taken says so: an alternative inside a listing walkthrough gets a frame",
         default=True,
     ),
     Pass(
@@ -254,6 +265,19 @@ every `Done when:` criterion alone because the brief listed criteria
 among the keeps; the skill now says criteria are the pass's to edit.
 So read an Opus stutter diff for a figure of speech and a misattached
 modifier, and for a criterion it should have reworded.
+
+2026-11-08: alternative joined as a default pass, before stutter, on
+the default model. The evidence is again a sweep, not an A/B: 49
+Opus agents (edit-file-opus) read every post-listing paragraph in
+the book against its listing and framed 84 passages in 39 chapters,
+0 to 4 a chapter, nearly all of them the second sentence of an
+alternative whose opener was framed and whose continuation was not.
+Opus probed each alternative's claim under `uv run` before framing
+it and found one false claim that way (Solutions 30's `show(model)`
+fails `ty`). Two things to read an Opus alternative diff for: a
+frame put on a general fact that is true of the listing too, and a
+"would" that drifts into the sentences after the conditional, where
+the standing fact should be in the present.
 """
 
 # How many chapters run at once in parallel mode. Each is a live

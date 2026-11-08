@@ -2512,7 +2512,8 @@ the book-wide read that day (Opus agents, brief in
   agent, the continuation shape: "`C().show()` then runs `B`'s
   version." -> "In that order, `C().show()` runs `B`'s version."
 
-**Home.** ambiguity (catalog and Accrued shapes) |
+**Home.** alternative (its own pass, `.claude/skills/alternative/SKILL.md`)
+| ambiguity (catalog and Accrued shapes) |
 `tools/positional_refs.py` `survey alternative` | this file.
 
 ## Candidates

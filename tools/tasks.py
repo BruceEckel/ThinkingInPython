@@ -717,7 +717,7 @@ def stutter(v: Vars) -> None:
     window, link text is hidden, and a pair joined by "and", "or",
     "to", or a preposition is dropped. It prints every hit and keeps no
     baseline: the book-wide sweep that day reworded 56 of 1,311, so
-    each hit is a judgment the `stutter` pass makes (the tenth pass of
+    each hit is a judgment the `stutter` pass makes (the eleventh pass of
     `super-prose`), and most are the topic noun named again, a
     deliberate parallel, or a function doing what its name says. Run
     `tip stutter CH=NN` at the start of that pass. CH= picks one chapter
@@ -869,13 +869,17 @@ def rewrite(v: Vars) -> None:
                                   unless you name it here
       bruce-edit-apply   default  apply the promoted rules in
                                   bruce_edit_db.md
+      alternative        default  an alternative inside a listing
+                                  walkthrough gets a frame ("In that
+                                  version"); after the passes above,
+                                  which can strand one from its opener
       stutter            default  a word beside its own code span, a stem
                                   repeated within three tokens; last,
                                   since the passes above write sentences
 
-    A bare `tip rewrite CH=25` runs the nine defaults. To add an opt-in
+    A bare `tip rewrite CH=25` runs the ten defaults. To add an opt-in
     pass to them: ARGS="--also activate". To run only the passes you
-    name: ARGS="--passes activate readability". To run all eleven:
+    name: ARGS="--passes activate readability". To run all twelve:
     ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
     commands without running them.
 

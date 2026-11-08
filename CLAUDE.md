@@ -105,12 +105,14 @@ mechanical candidates come from `tip positional CH=NN ARGS=--survey`
 survey; shapes Bruce flags that its catalog lacks accrue in its
 "Accrued shapes" section.
 `/super-prose NN` (`.claude/skills/super-prose/SKILL.md`, 2026-11-02) runs all
-ten prose passes in the session, including `/activate` and `/stutter`, over a
+eleven prose passes in the session, including `/activate`,
+`/alternative` (2026-11-08, an alternative described in a listing
+walkthrough's own register gets a frame, R57), and `/stutter`, over a
 chapter or one section (`/super-prose 45 section "<heading>"`), and
 commits; it is the in-session form of `tip rewrite`.
 `tip rewrite CH=NN` runs these six plus `elements-of-style`,
-`bruce-edit-apply`, and `stutter` (last, since the other passes write
-new sentences) by
+`bruce-edit-apply`, `alternative`, and `stutter` (last, since the
+other passes write new sentences) by
 default; `tip rewrite ARGS=--list` shows the set and the model each
 pass runs on. Each pass can name its own model in `tools/rewrite.py`'s
 `PASSES`; `MODEL_NOTES` there records which model each
@@ -329,7 +331,9 @@ opener; the book-wide read that day (Opus agents, brief in
 `build/alt-2026-11-08/`) found most hits in the second sentence of
 an alternative, a framed opener and a bare continuation
 ("`C().show()` then runs `B`'s version"), which the `ambiguity`
-skill reads for by hand.
+skill reads for by hand; since the same day the `alternative` pass
+(`.claude/skills/alternative/SKILL.md`, the tenth of `super-prose`
+and a default `tip rewrite` pass) owns that read.
 `tip trailing` (`tools/trailing_tags.py`, 2026-10-18) lists two shapes
 Bruce marked in chapter 31, rules R32 and R35 in `bruce_edit_db.md`: a
 clause that ends on a comma, a participle, and a measure or place
@@ -523,7 +527,7 @@ topic noun named again (his antecedents rule prefers it to a pronoun),
 a deliberate parallel, a function whose name is the verb it performs
 ("`tg.cancel()` cancels every task"), a definition ("an empty set is
 `set()`"), and a plural beside its singular. The `stutter` skill
-(`.claude/skills/stutter/SKILL.md`) is the pass, the tenth in
+(`.claude/skills/stutter/SKILL.md`) is the pass, the eleventh in
 `super-prose`; it reads `tip stutter CH=NN` and rewords with words the
 passage already has, never a synonym for a technical term.
 `ARGS="--window 4"` widens the gap by one token, about a third more

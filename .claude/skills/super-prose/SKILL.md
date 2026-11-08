@@ -1,9 +1,9 @@
 ---
 name: super-prose
-description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The ten passes are literal, positive, straighten, cohesion, antecedents, ambiguity, activate, bruce-edit-apply, elements-of-style, and stutter, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/super-prose" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
+description: Run every prose pass over a chapter or one section of it, in order, and commit the result. The eleven passes are literal, positive, straighten, cohesion, antecedents, ambiguity, activate, bruce-edit-apply, elements-of-style, alternative, and stutter, each read from its own SKILL.md and applied in one read of the prose. Use when asked for "all the prose passes", "the prose reviews and corrections", or "/super-prose" on a chapter or a section. The argument names the chapter by number or name, optionally followed by `section "<heading>"`; no argument means the chapter whose editing pass is open.
 ---
 
-# Super-prose: the ten prose passes as one request
+# Super-prose: the eleven prose passes as one request
 
 `/super-prose 45` or `/super-prose 45 section "The Driver's Exception Channel"`
 means: apply every prose pass the project defines, over that scope,
@@ -16,7 +16,7 @@ which `tip rewrite` cannot.
 
 ## The order
 
-Load all ten skills with the `Skill` tool before touching the
+Load all eleven skills with the `Skill` tool before touching the
 prose, then read the scope once and apply them together.
 The order is the order the skills' own boundary notes give:
 each pass hands the next one less to do.
@@ -37,10 +37,19 @@ each pass hands the next one less to do.
 8. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
 9. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
    mostly needless words and emphatic words at the end.
-10. `stutter`: a word beside its own code-span form ("The next
+10. `alternative`: a sentence in a listing walkthrough that describes
+    the road not taken in the walkthrough's own register ("A `for`
+    loop treats `StopIteration` as the normal end of the loop" under
+    a `try`-driven listing; "`C().show()` then runs `B`'s version"
+    after a framed opener) gets the lightest frame that carries over
+    ("In that version", "If `__init__()` assigns `_value_`"), R57.
+    It runs after the passes above because a split or a reframed
+    sentence can strand an alternative's continuation from its
+    opener, and before `stutter`, since a frame is new words.
+11. `stutter`: a word beside its own code-span form ("The next
     `next()`"), one verb said of two things in a sentence, a prose
     noun and a code variable of one spelling naming different things.
-    It runs last because the nine passes above write new sentences,
+    It runs last because the ten passes above write new sentences,
     and a rewrite can put a word beside its code span.
 
 ## Before the read
@@ -51,7 +60,10 @@ scope's line range:
 - `tip negatives CH=NN` (for `positive`)
 - `tip pointers CH=NN` (for `antecedents`)
 - `tip positional CH=NN ARGS=--survey` (for `ambiguity`: `count+unit`,
-  the survey hits on `call` and `time`, `construct xN`, `ordinal+span`)
+  the survey hits on `call` and `time`, `construct xN`, `ordinal+span`;
+  for `alternative`: `survey alternative`, a sentence in a walkthrough
+  paragraph naming a construct the listing lacks with no marker word,
+  the opener shape only; the continuation shape is read by hand)
 - `tip sentence-shapes CH=NN ARGS=--survey` (for `straighten` and
   `cohesion`: `[AND]`, `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`,
   and the default `[PRT]`, a phrasal verb split around a noun phrase,
