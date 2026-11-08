@@ -251,7 +251,7 @@ That is correct for an ordinary function,
 whose body runs to completion inside the call,
 and wrong for a generator function or an `async def` function.
 Decorating a coroutine function succeeds, and so does calling it,
-but the trace reports the wrong result.
+but `trace` reports the wrong result.
 `func(*args, **kwargs)` returns a coroutine object immediately,
 before any of the coroutine's body runs,
 so `result` holds that coroutine object rather than the value the coroutine eventually produces.
