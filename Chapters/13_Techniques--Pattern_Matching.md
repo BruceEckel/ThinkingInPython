@@ -363,7 +363,7 @@ print(describe(3.5))
 Because a subclass matches, the order of the cases decides which body runs.
 `bool` is a subclass of `int`,
 so moving `case bool(b)` below `case int(n)` makes the `bool` case unreachable.
-`describe(True)` then returns `int True`.
+In the reordered version, `describe(True)` returns `int True`.
 
 In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
 Python special-cases a handful of built-ins this way,
