@@ -122,7 +122,7 @@ so the rat dead-ends on its second turn, the way it does against walls,
 and `run()` returns.
 If you call `next(self.claim_results)` without the `False` default,
 the fake works for the rat's first turn and fails on its second.
-The fifth `claim()` finds the script empty,
+In that version the fifth `claim()` finds the script empty,
 so `next()` raises a `StopIteration` inside the coroutine,
 and Python turns it into a `RuntimeError` ("coroutine raised StopIteration")
 that fails the test.
@@ -1006,7 +1006,7 @@ so the script reaches the walk to the `!`.
 
 If you keep the chapter's final `raise ValueError`,
 the food loop ends in a traceback.
-After the last meal, the search for more food raises `ValueError`,
+After the last meal, that version's search for more food raises `ValueError`,
 and the script stops before the walk to the `!` and before either `print()`.
 Returning `None` makes an empty search the loop's ordinary exit.
 

@@ -713,7 +713,7 @@ The loop skips it, because a maze character is one character long and never equa
 so a new item must inherit directly from `Item`.
 If you derive a class from `Food` to inherit its behavior,
 that class is a grandchild of `Item`.
-`Item.__subclasses__()` leaves it out,
+In that case `Item.__subclasses__()` leaves it out,
 so `item_factory()` falls through the loop to its last line and builds a `Teleport`.
 [Factory](26_Patterns--Factory.md#simple-factory-method)
 describes the recursion for deeper hierarchies,
