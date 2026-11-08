@@ -788,7 +788,7 @@ Solutions/26_Patterns--Factory/README.md	declares no: In the CODE version the co
 Solutions/26_Patterns--Factory/README.md	explicit: Explicit Registration with a Protocol registers classes with CODE
 Solutions/26_Patterns--Factory/README.md	itself: Each class registers itself
 Solutions/26_Patterns--Factory/README.md	never: The demo never uses the name CODE
-Solutions/26_Patterns--Factory/README.md	never: but the demo never makes that call
+Solutions/26_Patterns--Factory/README.md	never: but the original demo never makes that call
 Solutions/26_Patterns--Factory/README.md	never: so its body never runs
 Solutions/26_Patterns--Factory/README.md	only: That test works on a CODE only when it is CODE
 Solutions/26_Patterns--Factory/README.md	only: and only when something mutates them in place

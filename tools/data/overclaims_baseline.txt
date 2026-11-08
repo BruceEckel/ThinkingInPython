@@ -351,7 +351,7 @@ Chapters/22_Patterns--Iterators.md	[BOUND] The two calls differ in the argument 
 Chapters/22_Patterns--Iterators.md	[BOUND] This legacy path is the one case where a CODE loop accepts an object that fails an CODE annotation
 Chapters/22_Patterns--Iterators.md	[BOUND] Those four methods dissolved into two
 Chapters/22_Patterns--Iterators.md	[BOUND] Two methods make up the protocol
-Chapters/22_Patterns--Iterators.md	[BOUND] Two wrappers over one source compare equal as soon as their counts agree, though each has delivered different items
+Chapters/22_Patterns--Iterators.md	[BOUND] Two wrappers over one source would compare equal as soon as their counts agree, though each has delivered different items
 Chapters/22_Patterns--Iterators.md	[BOUND] Use CODE when two branches advance together, not when one finishes before the other starts
 Chapters/23_Patterns--Singleton.md	[BOUND] A module shares that state with every importer, so shared data alone is no reason to use *Borg*
 Chapters/23_Patterns--Singleton.md	[BOUND] Alex Martelli's *Borg* replaces the one object with many objects that share one set of state
@@ -1113,7 +1113,7 @@ Solutions/26_Patterns--Factory/README.md	[BOUND] If you leave out CODE, the tabl
 Solutions/26_Patterns--Factory/README.md	[BOUND] In CODE each factory matches the protocol by its methods alone, so constructing the factory is legal
 Solutions/26_Patterns--Factory/README.md	[BOUND] That line executes the first time something imports CODE, so that import is the one trigger for the registration
 Solutions/26_Patterns--Factory/README.md	[BOUND] The CODE comment is the one mark in the file that says the import is deliberate
-Solutions/26_Patterns--Factory/README.md	[BOUND] The demo mentions CODE in the import alone, so the two classes stay out of the registry
+Solutions/26_Patterns--Factory/README.md	[BOUND] The demo mentions CODE in the import alone, so under a CODE the two classes stay out of the registry
 Solutions/26_Patterns--Factory/README.md	[BOUND] The listing below shows the new shape alone
 Solutions/26_Patterns--Factory/README.md	[BOUND] The second assertion is the one worth writing
 Solutions/26_Patterns--Factory/README.md	[BOUND] The second assertion tests that spawn, the one CODE corrupts
