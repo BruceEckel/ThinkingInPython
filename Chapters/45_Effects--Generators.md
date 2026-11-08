@@ -183,20 +183,20 @@ so the driver receives a `RuntimeError` rather than a finished generator.
 ## What a Suspended Generator Holds
 
 A suspended generator preserves two things:
-its position in the body and every local variable.
+the `yield` at which its body stopped and every local variable.
 These outlive each `next()` or `send()` that resumes the generator.
-Resuming runs the body from that position, with every local variable intact.
+Resuming runs the body from that `yield`, with every local variable intact.
 In `drive_by_hand.py`,
 `inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
 After the body returns,
 `inspect.getgeneratorstate()` reports `GEN_CLOSED` and `inspect.getgeneratorlocals()` reports `{}`.
 Python releases the frame at `return`, and the locals with it.
-The position and the locals together are the generator's state.
+The `yield` and the locals together are the generator's state.
 
 A [closure](40_Functional--Foundations.md#closures)
 keeps its captured variables between calls,
 but each call runs its body from the top.
-The generator keeps its locals and its place in the body,
+The generator keeps its locals and the `yield` at which it stopped,
 so a loop or a branch in progress survives the suspension.
 The generator is an ordinary object,
 so that state lasts until the body finishes or the program drops its last reference to the generator.
