@@ -189,3 +189,52 @@ def test_survey_hits_print_only_under_survey(
     out = capsys.readouterr().out
     assert "survey   " in out and "'Each time'" in out
     assert out.strip().endswith("0 new, 0 accepted, 1 survey")
+
+
+TRY = ("```python\ntry:\n    conversation.send(x)\n"
+       "except StopIteration as stop:\n    result = stop.value\n```\n")
+WALK = TRY + "\nThat `send()` raises `StopIteration`.\n"
+
+
+def test_alternative_fires_on_an_unframed_construct() -> None:
+    text = WALK + ("A `for` loop treats `StopIteration` as the normal end "
+                   "of the loop, so it discards the exception.\n")
+    assert [(k, p) for _, k, p in hits(text)] == [
+        ("survey alternative", "A `for`")]
+
+
+def test_alternative_keyword_span_anywhere_in_the_sentence() -> None:
+    text = WALK + "The value is lost in a `for` loop at `[1]`.\n"
+    assert [(k, p) for _, k, p in hits(text)] == [
+        ("survey alternative", "`for`")]
+
+
+@pytest.mark.parametrize("tail", [
+    # A marker word frames the alternative.
+    "If a `for` loop drove it, the value is lost.\n",
+    "A `for` loop would discard the exception.\n",
+    "A `for` loop, by contrast, discards the exception.\n",
+    # The construct is in the listing.
+    "An `except` clause catches it.\n",
+    # A second mention after a framed introduction.
+    "A `for` loop would discard it. A `for` loop treats it as the end.\n",
+])
+def test_alternative_quiet(tail: str) -> None:
+    assert hits(WALK + tail) == []
+
+
+def test_alternative_needs_a_walkthrough_paragraph() -> None:
+    text = TRY + "\nA `for` loop treats `StopIteration` as the end.\n"
+    assert hits(text) == []
+
+
+def test_alternative_is_a_survey_rule(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text(WALK + "A `for` loop discards it.\n", encoding="utf-8")
+    assert main(["--fail"]) == 0
+    assert "alternative" not in capsys.readouterr().out
+    assert main(["--survey"]) == 0
+    out = capsys.readouterr().out
+    assert "[survey alternative] 'A `for`'" in out
+    assert out.strip().endswith("0 new, 0 accepted, 1 survey")

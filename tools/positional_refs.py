@@ -58,6 +58,35 @@ statement-like word (line, call, loop, print, return, ...):
    rule, `survey count+unit`: too common and too often right for a
    baseline, it prints under `--survey` only, marked `survey`, and is
    never counted as new. The `ambiguity` skill reads it per chapter.
+8. `survey alternative` (2026-11-08): a sentence in a walkthrough
+   paragraph that describes a construct the listing lacks, in the
+   plain present, with no word marking it as the road not taken.
+   Bruce read, under chapter 45's `drive_by_hand.py` (whose driver
+   is a `try` statement), "A `for` loop treats `StopIteration` as
+   the normal end of the loop, so it discards the exception" and
+   took it for the next step of the run: "describing an alternative
+   in the same place where the description of what's actually
+   happening is described". Two shapes match: a sentence opening
+   on an indefinite article and a code span ("A `for` loop", "An
+   `__init__()` that assigns `_value_`") whose identifier is absent
+   from the owning block's code, and a code span holding a Python
+   statement keyword (`ALT_KEYWORDS`) absent from that code. The
+   paragraph must be a walkthrough: an earlier sentence in it names
+   a code span the block does hold. A sentence carrying a marker
+   word (`ALT_MARKERS`: if, would, instead, rather, another, a
+   comparison or negation word, and so on) is quiet, since the
+   marker already tells the reader. The repair frames the
+   alternative ("With a `return` at the match in place of the
+   `break` at `[1]`", "If `__init__()` assigns `_value_`", "because
+   a `for` loop would discard the exception") and the keeps are a
+   general fact about a type that holds for the listing too, and an
+   alternative an earlier sentence in the paragraph introduced
+   ("The real mistake is catching too much. A bare `except:` ...").
+   The 2026-11-08 read over the book had 35 hits of this tightened
+   shape and 5 rewrites, so it is a survey rule, printed under
+   `--survey`, never baselined; the `ambiguity` skill reads it. A
+   sentence that cites a tag is still read for this rule, since the
+   chapter 04 find cited `[5]`.
 
 Deliberately not matched, so a human never reads them as hits: "the
 first argument" or "the first parameter" (a position in a call or
@@ -90,7 +119,7 @@ every other file's entries.
 
     uv run python -m tools.positional_refs          # new hits
     uv run python -m tools.positional_refs --all    # every hit
-    uv run python -m tools.positional_refs --survey # + call, time
+    uv run python -m tools.positional_refs --survey # + call, time, alternative
     uv run python -m tools.positional_refs --accept # judged keeps
     uv run python -m tools.positional_refs Chapters/30_*.md
     uv run tip positional CH=30
@@ -190,6 +219,22 @@ COUNT_UNIT: Final = count_unit(UNIT_SING, UNIT_PLUR)
 # call", "each time") for a baseline; they print under --survey only.
 SURVEY_UNIT: Final = count_unit(SURVEY_SING, SURVEY_PLUR)
 SURVEY_KIND: Final = "survey count+unit"
+ALT_KIND: Final = "survey alternative"
+ALT_MARKERS: Final = re.compile(
+    r"\b(?:if|would|could|might|were|had|unless|instead|otherwise|"
+    r"rather|contrast|compared?|comparison|alternative|another|"
+    r"other|whereas|unlike|differen\w*|versus|than|but|though|"
+    r"although|without|suppose|imagine|elsewhere|ordinary|usual\w*|"
+    r"normally|general\w*|typical\w*|most|some|many|not|no|never|"
+    r"cannot|version|same|also|too|still)\b", re.I)
+ALT_SUBJECT: Final = re.compile(
+    r"^An?\s+(?:[\w-]+\s+){0,2}(`[^`]+`)")
+ALT_KEYWORDS: Final = frozenset((
+    "for", "while", "if", "else", "elif", "try", "except", "finally",
+    "with", "return", "yield", "await", "async", "lambda", "class",
+    "def", "match", "case", "raise", "del", "global", "nonlocal",
+    "pass", "break", "continue", "import", "from", "assert",
+))
 BASELINE: Final = DATA_DIR / "positional_refs_baseline.txt"
 HEADER: Final = (
     "# Prose that points at a listing line by position or by a\n"
@@ -351,15 +396,78 @@ def sentence_hits(
             yield start, kind, m.group()
 
 
+def identifier(span: str) -> str:
+    """The bare name a code span refers to: `a.b()` and `b[0]` give `b`."""
+    body = span.strip("`").strip()
+    body = body.split("(")[0].split("[")[0].split(".")[-1]
+    return body.strip("*@")
+
+
+def block_code(block: Block) -> str:
+    """The block's code with the part after each line's first `#` dropped."""
+    return "\n".join(line.split("#", 1)[0] for line in block.lines)
+
+
+def in_code(name: str, code: str) -> bool:
+    """Does `name` occur in `code` as a whole word, not after a dot?"""
+    if not re.fullmatch(r"[A-Za-z_]\w*", name):
+        return True
+    return re.search(rf"(?<![\w.]){re.escape(name)}\b", code) is not None
+
+
+def names_a_listing_span(sentence: str, code: str) -> bool:
+    """Does a code span in the sentence name something the code holds?"""
+    return any(
+        re.fullmatch(r"[A-Za-z_]\w*", identifier(m.group()))
+        and in_code(identifier(m.group()), code)
+        for m in CODE_SPAN.finditer(sentence))
+
+
+def alternative_hit(
+    sentence: str, code: str, seen: set[str],
+) -> tuple[int, str] | None:
+    """(offset, phrase) when the sentence describes an unmarked alternative.
+
+    The caller has already checked that the paragraph is a walkthrough.
+    `seen` holds the identifiers earlier sentences of the paragraph
+    named in code spans: a construct an earlier sentence introduced,
+    marked or not, is not reported again.
+    """
+    s = sentence.strip()
+    lead = len(sentence) - len(sentence.lstrip())
+    if ALT_MARKERS.search(CODE_SPAN.sub(" x ", s)):
+        return None
+    if m := ALT_SUBJECT.match(s):
+        name = identifier(m.group(1))
+        if name not in seen and not in_code(name, code):
+            return lead, m.group(0)
+    for m in CODE_SPAN.finditer(s):
+        name = identifier(m.group())
+        if (name in ALT_KEYWORDS and name not in seen
+                and not in_code(name, code)):
+            return lead + m.start(), m.group()
+    return None
+
+
 def find(doc: Document) -> Iterator[Hit]:
     """A hit per positional reference in one document."""
     for block, paragraph in region_paragraphs(doc):
         text, lines = joined(paragraph)
         counts = keyword_counts(block)
+        code = block_code(block)
+        walkthrough = False
+        seen: set[str] = set()
         for start, sentence in sentences(text):
+            shown = " ".join(sentence.split())
+            if walkthrough and (
+                    alt := alternative_hit(sentence, code, seen)):
+                offset, phrase = alt
+                yield Hit(lines[start + offset], ALT_KIND, phrase, shown)
+            walkthrough = walkthrough or names_a_listing_span(sentence, code)
+            seen.update(identifier(m.group())
+                        for m in CODE_SPAN.finditer(sentence))
             if cites_a_tag(sentence):
                 continue
-            shown = " ".join(sentence.split())
             for offset, kind, phrase in sentence_hits(sentence, counts):
                 yield Hit(lines[start + offset], kind, phrase, shown)
 
@@ -391,7 +499,8 @@ def main(argv: list[str] | None = None) -> int:
                          "stale entries")
     ap.add_argument("--survey", action="store_true",
                     help="also print the survey hits (a count on "
-                         "`call` or `time`), which are never baselined")
+                         "`call` or `time`; an unmarked alternative in "
+                         "a walkthrough), which are never baselined")
     args = ap.parse_args(argv)
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
@@ -399,8 +508,10 @@ def main(argv: list[str] | None = None) -> int:
         ((display(p), h) for p in paths for h in find(Document.parse(p))),
         key=lambda item: (item[0], item[1].line, item[1].phrase),
     )
-    survey = [item for item in every if item[1].kind == SURVEY_KIND]
-    found = [item for item in every if item[1].kind != SURVEY_KIND]
+    survey = [item for item in every
+              if item[1].kind.startswith("survey")]
+    found = [item for item in every
+             if not item[1].kind.startswith("survey")]
     baseline = load_baseline(BASELINE)
     scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
     keys = [key(s, h.phrase, h.sentence) for s, h in found]
