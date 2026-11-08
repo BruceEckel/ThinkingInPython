@@ -306,7 +306,8 @@ You can say why that answer is right although the program made more `do()` calls
 
 If `can_undo()` reads a counter that `do()` increments and `undo()` decrements,
 it reports `True` once the bound has discarded a state the count still includes.
-In the demo it reports `True` after the two undos, with `_past` empty.
+With that counter, the demo's `can_undo()` reports `True` after the two undos,
+with `_past` empty.
 A third `undo()` then raises an `IndexError` from `pop()`.
 The solution keeps the chapter's `bool(self._past)`,
 which asks what the past holds now.
@@ -425,10 +426,10 @@ If you pass `data["strokes"]` to `Drawing` as `json.loads()` returns it,
 `json.loads()` returns `Any`,
 and an `Any` satisfies the declared `tuple[str, ...]`.
 The mismatch appears only when the program runs.
-`reconstructed == drawing` becomes `False`,
+In that version, `reconstructed == drawing` becomes `False`,
 since a `list` always compares unequal to a `tuple`.
-The `list` also makes the record unhashable.
-`hash()` raises a `TypeError`, `unhashable type: 'list'`.
+The `list` also makes the record unhashable, so `hash()` raises a `TypeError`,
+`unhashable type: 'list'`.
 The solution converts the field back,
 so the rebuilt `Drawing` equals the original and hashes to the same value.
 
@@ -628,7 +629,7 @@ and `goto(4)` raises an `IndexError` after which `present` is still `3`.
 
 If you leave out the range check, a jump too far raises an `IndexError` partway,
 after moving some states to `_future`.
-In the demo, `goto(4)` undoes three states before `pop()` fails,
+In that version, the demo's `goto(4)` undoes three states before `pop()` fails,
 and the present is `0` rather than `3`.
 The solution checks the distance before it moves anything,
 so a jump that raises an `IndexError` leaves the history where it was,
@@ -923,7 +924,8 @@ the load goes wrong twice.
 A slotted record's generated `__setstate__()` assigns the saved state to the fields by position.
 The old bytes hold a `__dict__`,
 so each field receives one of the `__dict__` keys.
-`restored.title` is `'title'`, and `restored.strokes` is `'strokes'`.
+In that version, `restored.title` is `'title'`,
+and `restored.strokes` is `'strokes'`.
 `layer` loses its default too.
 A slotted class keeps `layer` in a slot instead of as a class attribute,
 so reading `restored.layer` raises an `AttributeError`.
