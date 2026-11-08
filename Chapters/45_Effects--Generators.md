@@ -183,8 +183,10 @@ so the driver receives a `RuntimeError` rather than a finished generator.
 ## What a Suspended Generator Holds
 
 A suspended generator preserves two things:
-the `yield` at which its body stopped and every local variable.
-These outlive each `next()` or `send()` that resumes the generator.
+
+- Every local variable
+- The `yield` at which its body suspended
+
 Resuming runs the body from that `yield`, with every local variable intact.
 In `drive_by_hand.py`,
 `inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
