@@ -678,8 +678,8 @@ because "deliberately empty" and "forgotten" are the same code.
 Only the base class can record that difference.
 The base class can declare that a subclass must supply the step,
 by inheriting from `ABC` and marking `customize2()` with `@abstractmethod`.
-Then constructing `HalfDone` raises a `TypeError`.
-The type checker reports the construction before the program runs.
+With `customize2()` abstract, constructing `HalfDone` raises a `TypeError`,
+and the type checker reports the construction before the program runs.
 
 Exposing `Exploder`'s exception would take a declaration that Python lacks.
 For the type checker to catch `Exploder`,

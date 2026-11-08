@@ -210,8 +210,9 @@ The `__final__` check exists because a subclass that replaces `run()` moves the 
 and `@final` stops that replacement only when the type checker runs.
 
 The `__final__` check reads a flag rather than a method name.
-The same `__init_subclass__()` therefore protects a second `@final` instance method in `ApplicationFramework`.
-The `class` statement of a subclass that replaces that method raises the same `TypeError`.
+If `ApplicationFramework` gains a second `@final` instance method,
+the check protects that method too.
+In that version, the `class` statement of a subclass that replaces that method raises the same `TypeError`.
 
 The `__final__` check misses a `@final` on a `@property`,
 and a `@final` written above `@classmethod` or `@staticmethod`.
