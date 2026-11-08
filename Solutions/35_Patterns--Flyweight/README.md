@@ -469,7 +469,7 @@ def test_mutation_without_frozen_leaks_across_cells(
     assert field[1][1].walkable is False  # Bug: cell leaked
 ```
 
-If you restore `@record`, this test fails at its assignment.
+If you restore `@record`, this test fails at its assignment:
 `field[0][0].walkable = False` raises a `FrozenInstanceError`,
 because a record rejects assignment to every attribute.
 The bug depends on that assignment, so every cell can share one record safely.
