@@ -129,6 +129,7 @@ Chapters/20_Patterns--Rethinking_Objects.md	[PAST] kept: Simula kept standalone 
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] made: OOP made four promises: encapsulation, behavior bundled into the object as methods, reuse through inheritance, and polymorphism.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] named: It was a compiled, statically typed language, so the discipline later named the Liskov Substitution Principle (LSP) fit naturally.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] normalized: OOP also normalized the idea of types, which Data Classes as Types takes further.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] shared: A shallow copy of a list of CODEs protects the list and leaves the CODEs shared.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] slotted: CODE declares an empty CODE too, so the chain stays slotted from CODE up to CODE.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] took: *Smalltalk* took the other path.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] typed: A parameter typed CODE reintroduces that check everywhere the parameter appears.
