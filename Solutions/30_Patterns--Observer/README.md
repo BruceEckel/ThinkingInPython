@@ -1039,7 +1039,7 @@ and after a set number of rounds whoever owns the larger patch wins.
 
 `FloodGame` can also inherit from `Broadcaster[Grid]`, as `GridModel` does,
 and call `self.announce(self.grid)` at the end of a successful `select()`.
-`grid_view.py`'s existing view then repaints after every move.
+With that change, `grid_view.py`'s existing view repaints after every move.
 The drawing code stays as it is,
 but `show()`'s parameter annotation must change.
 That annotation specifies `GridModel`, which a `FloodGame` is not.
@@ -1384,8 +1384,8 @@ The tally therefore drops `skyblue` by one and raises `khaki` by one.
 The corner selection that follows has three cells inside the grid rather than five.
 
 Adding a third view means one more `connect()` call.
-`grid_view.py`'s `draw()` is such a view,
-and `show(model)` connects it beside `letters()` and `tally()`,
+`grid_view.py`'s `draw()` is such a view.
+Calling `show(model)` connects it beside `letters()` and `tally()`,
 so the window and the terminal report the same grid.
 `show()` ends in `root.mainloop()`,
 which runs the window's event loop until the window closes,

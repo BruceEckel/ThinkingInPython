@@ -1804,7 +1804,8 @@ Its code hides the link between the threshold and `display`.
 
 The alternative moves the comparison out of the thermometer and into `display`,
 the responder that the threshold serves.
-The setter announces every assignment, `log` appends every reading,
+In that version the setter announces every assignment,
+`log` appends every reading,
 and `display` stores the last value it drew and skips a reading close to it.
 The tolerance belongs to `display`.
 Every responder that filters by size writes the same comparison.
