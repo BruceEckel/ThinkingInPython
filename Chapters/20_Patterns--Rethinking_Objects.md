@@ -250,7 +250,7 @@ That sharing is safe here because the elements are immutable `int`s.
 which recursively copies everything the object references.
 A deep copy is the conservative choice when a field's own fields might be mutable.
 A shallow copy of a list of `Bob`s protects the list and leaves the `Bob`s shared.
-The caller's copy holds the same `Bob` objects as your list,
+In that case, the caller's copy holds the same `Bob` objects as your list,
 so the caller can change each one.
 
 A test confirms that the defensive copy holds:

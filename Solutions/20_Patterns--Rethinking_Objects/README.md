@@ -573,7 +573,7 @@ with the inferred type `Square & ~Rectangle & ~Circle`.
 If you end the `match` at the `Square` case,
 `ty check` still passes on the full listing,
 because the three cases cover the union.
-Commenting out the `Square` case then produces an `invalid-return-type` error.
+In that version, commenting out the `Square` case produces an `invalid-return-type` error.
 That error reports that `area()` can implicitly return `None`,
 and it names no shape.
 The solution keeps `assert_never()` so the report names the missing `Square`.
