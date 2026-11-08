@@ -484,7 +484,7 @@ print(grid)
 
 Before you add `"purple"` to `Color`, the call runs and stores the string,
 because the interpreter lets any value through a `Literal` annotation at run time.
-`ty check` reports:
+With the original `Color`, `ty check` reports:
 
 ```
 error[invalid-argument-type]: Argument to function `paint` is incorrect
