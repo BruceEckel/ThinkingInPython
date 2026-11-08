@@ -356,8 +356,8 @@ print(count)
 `+=` is an assignment too.
 If you drop the `global` from `writes_global()`,
 the compiler marks `count` local for the whole function.
-The read half of `count += 1` then looks up a local that has no value yet.
-A call to `writes_global()` raises an `UnboundLocalError`.
+The read half of `count += 1` then looks up a local that has no value yet,
+so a call to `writes_global()` raises an `UnboundLocalError`.
 `global` governs rebinding, not reading, so `read_only()` needs no declaration.
 
 `reads_later()` names `limit`, which the module binds after the `def`.

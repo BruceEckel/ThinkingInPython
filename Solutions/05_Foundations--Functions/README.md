@@ -163,7 +163,7 @@ The two calls ask for different things.
 With `default=None` as the sentinel,
 `get()` receives the same `None` in both calls,
 so the two calls look identical to it.
-`get()` must raise an exception for both or return `None` for both.
+That version of `get()` must raise an exception for both or return `None` for both.
 `MISSING` is a marker object reserved for the omitted argument,
 so `default is MISSING` identifies the call that omits `default`.
 
