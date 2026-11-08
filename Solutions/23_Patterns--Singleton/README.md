@@ -560,7 +560,7 @@ so you cannot add a lock there.
 You can put one around the cached call.
 An uncached wrapper function takes the lock,
 then calls the cached `settings()` while holding it.
-The lookup and the body then both run under one lock,
+In that version the lookup and the body both run under one lock,
 so eight racing first calls build one object.
 
 The wrapper takes the lock on every call, cache hits included,
