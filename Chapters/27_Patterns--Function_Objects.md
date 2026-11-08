@@ -693,8 +693,9 @@ such as `Closed`.
 The lookup uses `type(event)`, which matches the event's exact class.
 A subclass of `Deposit` published to this bus gets the empty default list from `.get()`,
 as `Closed` does.
-Walking `type(event).__mro__` and calling every handler along it gives a subclass event its parent's handlers.
-An event then runs the handlers registered for its own type and for every ancestor
+If `publish()` walks `type(event).__mro__` and calls every handler along it,
+a subclass event gets its parent's handlers.
+In that version, an event runs the handlers registered for its own type and for every ancestor
 (see exercise 5).
 
 The test file confirms that:
@@ -815,10 +816,10 @@ Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
 Python sets a class's slots when it creates the class,
 so `slots=True` makes `dataclass()` build a new class and return it.
-Registering `cls` puts the original class in `EVENTS`.
+If `event()` registers `cls`, it puts the original class in `EVENTS`.
 Every event is an instance of `built`.
-`publish()` then refuses every event.
-`@handler` refuses every handler class,
+In that version `publish()` refuses every event,
+and `@handler` refuses every handler class,
 because the annotation it reads evaluates to `built` (see exercise 7).
 
 A bank account's events and handlers are classes under the two decorators:
