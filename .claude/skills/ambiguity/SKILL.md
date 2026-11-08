@@ -57,6 +57,8 @@ most of the book's hits read one way.
 - `tip positional CH=NN ARGS=--survey`: `count+unit` is a count on an execution noun (run, round, attempt, pass, resumption, trace, exchange),
   the `survey count+unit` lines are the same shape on `call` and `time`,
   and `construct xN` and `ordinal+span` are definite or ordinal pointers at a listing that has several of the thing.
+  `survey alternative` (2026-11-08) is a sentence in a walkthrough paragraph that names a construct the listing lacks, with no marker word;
+  it sees the opener of an alternative, and the continuation shape below is read by hand.
 - `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]`.
 - `tip possessives CH=NN` and `tip stranded CH=NN`: an elided head noun, which the reader supplies from two candidates.
 - `tip pointers CH=NN`: `antecedents` reads these; take only what that pass left.
@@ -124,6 +126,20 @@ Fix: write the term.
 Test: substitute each sense.
 Fix: the connective with one sense ("after", "because", "during", "whereas", "one time").
 
+**An alternative in the walkthrough's register.**
+A paragraph narrates the listing, and a sentence in it says what a construct the listing lacks does, in the plain present with no marker:
+"A `for` loop treats `StopIteration` as the normal end of the loop, so it discards the exception" under a listing whose driver is a `try` statement (chapter 45, 2026-11-08).
+Two readings: the listing's next step, or the road not taken.
+The second sentence of an alternative is the usual site:
+the opener is framed ("Writing the fix as `type(self).total += 1`", "An `__init__()` that assigns `_value_`")
+and the continuation is bare ("`C().show()` then runs `B`'s version", "The lookup table then stays keyed by the tuples"),
+and the bare sentence often contradicts the listing's `#:` output.
+Test: is the sentence true of the listing on the page? If not, does a word in it, or an earlier sentence of the paragraph, say so?
+Fix: the lightest frame that carries over: what it replaces ("With a `return` at the match in place of the `break` at `[1]`"),
+a condition ("If `__init__()` assigns `_value_`"), "In that version", a gerund subject, or a tie to the listing's choice ("because a `for` loop would discard the exception").
+Keep a general fact that holds for the listing too, and a continuation whose opener in the same paragraph is a real conditional.
+Rule R57 in `bruce_edit_db.md`.
+
 ## Boundaries
 
 - **Readings that agree mean no change.**
@@ -161,3 +177,7 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
 - 2026-11-04, chapter 45: a count with two units.
   "In the first three runs the exception arrives in place of a value", over three generators and four tags.
   Added as the first shape and as `tip positional`'s `count+unit` rule.
+- 2026-11-08, chapter 45: an alternative in the walkthrough's register.
+  "A `for` loop treats `StopIteration` as the normal end of the loop, so it discards the exception and loses the return value", under `drive_by_hand.py`, whose driver is a `try` statement.
+  Added to the catalog, as R57, and as `tip positional`'s `survey alternative` rule;
+  the book-wide read that day (brief in `build/alt-2026-11-08/`) found most hits in the second sentence of an alternative, where the opener's frame had lapsed.

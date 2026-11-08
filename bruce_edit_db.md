@@ -2446,6 +2446,75 @@ sighting was C26).
 **Home.** straighten (Accrued patterns) | CLAUDE.md watch list |
 `tools/sentence_shapes.py` `[PRT]` | this file.
 
+### R57. An alternative inside a walkthrough says it is the road not taken
+
+**Test.** A paragraph that narrates a listing (its run, its output,
+its design) holds a sentence about a construct, call, or design the
+listing lacks, in the plain present, with nothing marking it: "A
+`for` loop treats `StopIteration` as the normal end of the loop, so it
+discards the exception" under a listing whose driver is a `try`
+statement. The reader takes it as the next step of the run and has to
+back up when it fails to match the listing. The second and later
+sentences of an alternative are the common site: the opener carries a
+frame ("Writing the fix as `type(self).total += 1`", "An `__init__()`
+that assigns `_value_`") and the continuation drops it ("`C().show()`
+then runs `B`'s version", "The lookup table then stays keyed by the
+tuples, so `Tile(".")` raises a `ValueError`"), and the continuation
+often contradicts the listing's own `#:` output. Frame it with the
+lightest marker that carries over: name what it replaces ("With a
+`return` at the match in place of the `break` at `[1]`"), a condition
+("If `__init__()` assigns `_value_`"), a frame for the continuation
+("In that version", "In that order"), a gerund subject ("Adding an
+`as` clause to the `with` line"), a tie to the listing's choice
+("because a `for` loop would discard the exception"), or a colon that
+attaches the consequence to the thing that produces it. Check the
+alternative's claim against a probe before framing it; a framed
+misdescription is worse than an unframed one. `tip positional
+ARGS=--survey` lists the opener shape as `survey alternative`
+(`tools/positional_refs.py`, 2026-11-08); the continuation shape is
+read by hand.
+
+**Keep when.** A general fact that holds for the listing too, in a
+paragraph that explains rather than narrates ("A `for` loop makes one
+`iter()` call, then calls `next()`" in the section that introduces
+`for`); an alternative an earlier sentence of the paragraph introduces
+as one ("The real mistake is catching too much. A bare `except:` ...
+catches the cancellation"), including a continuation under a
+conditional opener in a Solutions step ("If you leave out `return
+cls`, `announce` returns `None`. Python then binds `None` to
+`Point`"); a comparison paragraph whose subject is the difference;
+advice; a `Done when:` paragraph about the reader's own run.
+
+**Sightings.** 3 chapters the day it was named (promoted 2026-11-08);
+the book-wide read that day (Opus agents, brief in
+`build/alt-2026-11-08/`) reworded more, most of them continuations.
+- `45_Effects--Generators` 2026-11-08, was Claude-written, Bruce:
+  "this seems like it's continuing to describe what happens in the
+  code, but it's actually describing an alternative -- that's not
+  clear. I have regularly seen this pattern of describing an
+  alternative in the same place where the description of what's
+  actually happening is described, and I would like to fix this
+  everywhere":
+  "A `for` loop treats `StopIteration` as the normal end of the loop,
+  so it discards the exception and loses the return value." -> "The
+  listing catches `StopIteration` in a `try` statement because a
+  `for` loop would discard the exception. A `for` loop treats
+  `StopIteration` as the normal end of the loop and drops the `Result`
+  along with the exception."
+- `35_Patterns--Flyweight` 2026-11-08, was Claude-written, the
+  session's scan: "An `__init__()` that assigns `_value_` runs too
+  late. The lookup table behind `Tile(".")` then stays keyed by the
+  tuples, so `Tile(".")` raises a `ValueError`." -> "If `__init__()`
+  assigns `_value_`, the assignment comes too late. In that version
+  the lookup table behind `Tile(".")` keeps the tuples as its keys, so
+  `Tile(".")` raises a `ValueError`."
+- `07_Foundations--Classes` 2026-11-08, was Claude-written, an Opus
+  agent, the continuation shape: "`C().show()` then runs `B`'s
+  version." -> "In that order, `C().show()` runs `B`'s version."
+
+**Home.** ambiguity (catalog and Accrued shapes) |
+`tools/positional_refs.py` `survey alternative` | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different

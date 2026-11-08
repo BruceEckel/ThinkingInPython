@@ -315,6 +315,21 @@ tag is skipped. Its baseline was seeded from the 2026-10-07 tag sweep,
 which read every hit, so a new hit is a pointer to tag or a false
 positive to accept (an ordinal naming an argument, a version, a
 runtime call, output, or data).
+Since 2026-11-08 `tip positional ARGS=--survey` also lists `survey
+alternative`: a sentence in a walkthrough paragraph that describes
+a construct the listing lacks, in the plain present and with no
+marker word ("A `for` loop treats `StopIteration` as the normal end
+of the loop" under chapter 45's `try`-driven `drive_by_hand.py`;
+Bruce: "describing an alternative in the same place where the
+description of what's actually happening is described"). The
+repair frames it ("With a `return` at the match in place of the
+`break` at `[1]`", "If `__init__()` assigns `_value_`", "In that
+version"); rule R57 in `bruce_edit_db.md`. The scan sees the
+opener; the book-wide read that day (Opus agents, brief in
+`build/alt-2026-11-08/`) found most hits in the second sentence of
+an alternative, a framed opener and a bare continuation
+("`C().show()` then runs `B`'s version"), which the `ambiguity`
+skill reads for by hand.
 `tip trailing` (`tools/trailing_tags.py`, 2026-10-18) lists two shapes
 Bruce marked in chapter 31, rules R32 and R35 in `bruce_edit_db.md`: a
 clause that ends on a comma, a participle, and a measure or place
