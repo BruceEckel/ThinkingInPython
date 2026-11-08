@@ -673,8 +673,8 @@ so code that processes it afterward must guess which characters came from a valu
 `safe()` uses the same separation to check each value.
 `trouble` holds a single quote,
 so `safe(t"Hello, {trouble}")` raises a `ValueError` before any result exists.
-An f-string finishes assembling the result, quote and all,
-before any code can inspect the values.
+`safe()` takes a `Template` because an f-string finishes assembling the result,
+quote and all, before any code can inspect the values.
 
 Uppercasing and rejecting are small demonstrations.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
