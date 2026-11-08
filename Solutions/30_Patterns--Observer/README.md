@@ -1387,6 +1387,10 @@ Adding a third view means one more `connect()` call.
 `grid_view.py`'s `draw()` is such a view.
 Calling `show(model)` connects it beside `letters()` and `tally()`,
 so the window and the terminal report the same grid.
+The type checker rejects that call,
+because `show()`'s annotation names `grid_observer`'s `GridModel` and this file defines a `GridModel` of its own.
+The window still draws, since `show()` reads only `size`, `grid`, `connect()`,
+and `select()`, which both classes define.
 `show()` ends in `root.mainloop()`,
 which runs the window's event loop until the window closes,
 so call `show()` last.

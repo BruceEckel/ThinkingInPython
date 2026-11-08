@@ -425,13 +425,15 @@ Chapters/33_Patterns--Visitor.md	has no: Python has no method overloading
 Chapters/33_Patterns--Visitor.md	itself: *Multiple Dispatching* is the end in itself
 Chapters/33_Patterns--Visitor.md	only: CODE is the conventional placeholder for a name that exists only to satisfy CODE
 Chapters/33_Patterns--Visitor.md	only: Only mypy rejects it
-Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE receives CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
+Chapters/34_Patterns--Composite_and_Interpreter.md	already: In that version CODE receives CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
 Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: The alternative is an iterative walk with an explicit stack of pending nodes (see exercise 8)
 Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: which walks the same tree with an explicit stack and no recursion
 Chapters/34_Patterns--Composite_and_Interpreter.md	have no: and CODE have no special methods of their own
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
+Chapters/34_Patterns--Composite_and_Interpreter.md	whatever: and its meaning is whatever a function computes from it
+Chapters/34_Patterns--Composite_and_Interpreter.md	whatever: whatever its kind
 Chapters/34_Patterns--Composite_and_Interpreter.md	yields no: An empty directory has size 0 and yields no paths
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
 Chapters/35_Patterns--Flyweight.md	only: Only identity proves sharing
@@ -842,6 +844,9 @@ Solutions/34_Patterns--Composite_and_Interpreter/README.md	is what: The left ope
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	offers no: after CODE declines and CODE offers no CODE to try
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A child gets parentheses only when its own operator binds more loosely than what the parent needs
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: where CODE yields only file paths
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	whatever: The old CODE accepts anything and wraps whatever arrives in a CODE
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	whatever: Which node types exist is a fact about the operating system and about whatever the next version adds
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	whatever: whatever the limit says
 Solutions/35_Patterns--Flyweight/README.md	has no: so the class still has no CODE
 Solutions/35_Patterns--Flyweight/README.md	only: but only after CODE has pooled the instance
 Solutions/35_Patterns--Flyweight/README.md	only: whose CODE turns CODE only when the cells share one CODE
