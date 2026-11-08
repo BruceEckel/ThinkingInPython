@@ -694,13 +694,14 @@ print(list(gen))
 Because the output expression runs later,
 it reads `factor` when `list()` pulls the values rather than at creation.
 `list(gen)` returns `[10, 20, 30]` instead of `[2, 4, 6]`.
-A list comprehension evaluates its output expression for every element before the next statement runs,
+With brackets in place of the parentheses,
+the list comprehension evaluates its output expression for every element before the next statement runs,
 so it reads `factor` at creation.
 
 The gap between creation and consumption is also why `path_walk_comprehension.py` uses brackets.
 With parentheses, Python still evaluates the outermost iterable, `root.walk()`,
-at creation.
-The walking and the filtering run later, when a consumer pulls values.
+at creation, but the walking and the filtering run later,
+when a consumer pulls values.
 That consumer is `sorted()`,
 which runs after the `with` block exits and the context manager deletes the directory.
 `Path.walk()` then gets an `OSError` when it scans the deleted directory.
