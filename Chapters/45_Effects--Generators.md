@@ -160,8 +160,6 @@ The caller receives that `return` as a `StopIteration`,
 and the `Result` arrives as the exception's `value`.
 A `for` loop treats `StopIteration` as the normal end of the loop,
 so it discards the exception and loses the return value.
-To read the `ReturnType`, catch the exception yourself,
-as `drive_by_hand.py` does.
 
 ![Each channel carries one type, in one direction.](_images/generator_channels)
 
