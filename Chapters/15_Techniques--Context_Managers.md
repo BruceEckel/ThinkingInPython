@@ -413,7 +413,8 @@ which includes both its type and its arguments,
 where `exc_type.__name__` gives the type alone.
 
 `__enter__()` returns `None` because `expected_one` watches the block for an exception instead of handing it an object.
-An `as` clause works and binds `None`.
+Adding an `as` clause to the `with` line is legal,
+and the name it binds is `None`.
 
 ### The `expected` Manager
 
