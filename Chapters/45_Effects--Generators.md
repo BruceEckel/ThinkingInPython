@@ -247,12 +247,6 @@ The type checker is right to reject `interview().send(None)`.
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
 The `# type: ignore` silences that correct report so the listing can show the equivalence.
-The interpreter accepts `send(None)` as the priming call.
-The annotation covers that call too:
-`Answer` is the `SendType` for the priming `send()` as for every later one.
-A driver therefore primes with `next()`.
-The `SendType` governs `send()`'s argument.
-`next()` takes the generator alone.
 
 ## A Generator Waits for Its Driver {#a-generator-is-a-description}
 
