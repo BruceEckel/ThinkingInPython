@@ -1534,7 +1534,7 @@ Code before the first `yield` is the state's entry action, the Moore shape,
 where the action belongs to the state.
 Code before a `return` runs on that transition alone, the Mealy shape,
 where the action belongs to the transition.
-A `print("Door latched")` above `return holding()` in `trapping()` runs when the mouse is trapped and at no other time.
+A `print("Door latched")` added above `return holding()` in `trapping()` runs when the mouse is trapped and at no other time.
 The Moore shape and the Mealy shape both fit one function with no `action` field.
 
 A state's local variables are its data.
