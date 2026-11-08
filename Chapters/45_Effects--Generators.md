@@ -192,8 +192,8 @@ In `drive_by_hand.py`,
 `inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
 After the body returns,
 `inspect.getgeneratorstate()` reports `GEN_CLOSED` and `inspect.getgeneratorlocals()` reports `{}`.
-At `return`, Python discards the generator's [execution frame](05_Foundations--Functions.md#names-inside-a-function),
-the object that holds the body's locals, and the locals go with it.
+At `return`, Python discards the generator's [execution frame](05_Foundations--Functions.md#names-inside-a-function).
+The locals live in that frame, so they go with it.
 The `yield` and the locals together are the generator's state.
 
 A [closure](40_Functional--Foundations.md#closures)
