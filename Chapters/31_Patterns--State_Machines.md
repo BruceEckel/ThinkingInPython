@@ -592,8 +592,9 @@ If you write the list inline as the argument,
 the parameter's `Sequence[Rule[Any]]` becomes its expected type.
 That `Any` reaches into every `Rule(...)` and makes its `I` `Any`,
 so the checker accepts any method on any rule.
-The `Column`/`choose_row()` mismatch above then passes the checker.
-At runtime `choose_row()` stores a `Column` in `self.row`,
+In that version the `Column`/`choose_row()` mismatch above passes the checker.
+When the mismatched rule fires at runtime,
+`choose_row()` stores a `Column` in `self.row`,
 and `_slot()` then uses that column's `value` as the row index.
 
 Adding a state or an input is now a local change:
