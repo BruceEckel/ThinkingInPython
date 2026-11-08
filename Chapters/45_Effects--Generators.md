@@ -147,6 +147,10 @@ except StopIteration as stop:
     result: Result = stop.value
 print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
+print(inspect.getgeneratorstate(conversation))
+#: GEN_CLOSED
+print(inspect.getgeneratorlocals(conversation))
+#: {}
 ```
 
 The last `send()` resumes `interview()`'s body,
@@ -184,6 +188,9 @@ These outlive each `next()` or `send()` that resumes the generator.
 Resuming runs the body from that position, with every local variable intact.
 In `drive_by_hand.py`,
 `inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
+After the body returns,
+`inspect.getgeneratorstate()` reports `GEN_CLOSED` and `inspect.getgeneratorlocals()` reports `{}`.
+Python releases the frame at `return`, and the locals with it.
 The position and the locals together are the generator's state.
 
 A [closure](40_Functional--Foundations.md#closures)
@@ -192,7 +199,7 @@ but each call runs its body from the top.
 The generator keeps its locals and its place in the body,
 so a loop or a branch in progress survives the suspension.
 The generator is an ordinary object,
-so that state lasts as long as something holds a reference to the generator.
+so that state lasts until the body finishes or the program drops its last reference to the generator.
 
 The suspended generator is what [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 calls a continuation: the rest of the computation from the `yield` forward.

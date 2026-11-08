@@ -21,3 +21,7 @@ except StopIteration as stop:
     result: Result = stop.value
 print(f"{result = }")
 #: result = 'Alice of Wonderland, friend Rabbit'
+print(inspect.getgeneratorstate(conversation))
+#: GEN_CLOSED
+print(inspect.getgeneratorlocals(conversation))
+#: {}
