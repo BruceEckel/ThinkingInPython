@@ -232,7 +232,7 @@ The type checker reports an error at any of those functions that leaves out the 
 If you fix the annotation but keep a caller that runs `greet_all()` with no environment,
 as `run(greet_all(["Alice", "Bob"]))` does,
 `ty` reports an `invalid-argument-type` at that `run()` call.
-The run raises a `MissingAbilityError` before the first greeting prints.
+At runtime that call raises a `MissingAbilityError` before the first greeting prints.
 The solution therefore wraps `greet_all()` in `supply(Console())` before calling `run()`.
 
 Before you move on, name what separates your attempt from this one:
@@ -481,7 +481,8 @@ so a single `Recorder` can have that shape and the `Console` shape at once.
 **Supply one object under two types.**
 The two `as_type()` calls make one object answerable to two requests.
 `supply()` reads the Ability from each argument's declared type,
-so `supply(recorder, recorder)` builds a handler for `Need[Recorder]`,
+so without the wrappers,
+`supply(recorder, recorder)` builds a handler for `Need[Recorder]`,
 an Ability neither Effect requests.
 Each wrapper names the role this instance fills.
 
@@ -675,8 +676,8 @@ until a `# type: ignore` on that line silences the report.
 If you return `Console()` in place of `ability.t()`,
 `greet()` still prints its greeting,
 but `stamped()` fails with `AttributeError: 'Console' object has no attribute 'now'`.
-The handler answers the `Clock` request too, as it answers every `Need`,
-and hands that request a `Console`.
+In that version the handler answers the `Clock` request too,
+as it answers every `Need`, and hands that request a `Console`.
 The type checker accepts `return Console()`,
 since `default()` declares that it returns a `Console`.
 The solution calls `ability.t()`, which builds the class the request names,
