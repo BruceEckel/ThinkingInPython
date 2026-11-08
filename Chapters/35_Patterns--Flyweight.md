@@ -557,8 +557,8 @@ so `__new__()` must assign that name rather than a name of its own such as `_sym
 
 `__new__()`, not `__init__()`, must assign `_value_`.
 Enum reads `_value_` as soon as `__new__()` returns.
-An `__init__()` that assigns `_value_` runs too late.
-The lookup table behind `Tile(".")` then stays keyed by the tuples,
+If `__init__()` assigns `_value_`, the assignment comes too late.
+In that version the lookup table behind `Tile(".")` keeps the tuples as its keys,
 so `Tile(".")` raises a `ValueError`.
 With `_value_` set in `__new__()`, `Tile(".")` returns `Tile.GRASS`.
 
