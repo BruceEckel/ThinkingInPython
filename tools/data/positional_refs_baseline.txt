@@ -121,7 +121,7 @@ Chapters/43_Functional--Confidence.md	every run	`random.seed(42)` makes the hand
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes `interview()`'s body, which encounters `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	The outer `except GeneratorExit`	The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
-Chapters/45_Effects--Generators.md	The outermost `visit()`	The outermost `visit()` returns the `Counter` for the whole garden to `census()`.
+Chapters/45_Effects--Generators.md	The outermost `visit()`	The outermost `visit()` returns the `Counter` for the whole garden.
 Chapters/45_Effects--Generators.md	each pass	`async for` is an `await` in loop form: on each pass it awaits the generator's `__anext__()`.
 Chapters/45_Effects--Generators.md	second run	In the second run, `drive()` sees two requests instead of three.
 Chapters/45_Effects--Generators.md	second run	The listing's second run shows a state that stays.

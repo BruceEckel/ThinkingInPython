@@ -740,7 +740,7 @@ as `collect()`, because `yield from` passes both channels through to the driver.
 
 `g.send(2)` supplies `second`,
 so `collect("alpha")` finishes and the `yield from` at `[1]` completes.
-Before that `send(2)` returns,
+Inside the same `send()` call,
 `both()` continues to `[2]` and `collect("beta")` runs to its first prompt.
 One `send()` therefore ends one inner generator and produces the first prompt of the next,
 which is why `alpha got 1 and 2` and `beta needs a value` sit on adjacent output lines.
