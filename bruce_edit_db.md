@@ -2802,6 +2802,54 @@ cast chooses its actors.").
 **Home.** activate (Accrued patterns) | `tools/sentence_shapes.py`
 (`[CAUS]`) | this file.
 
+### R62. Code does not "draw" an exception or a diagnostic; its actor raises or reports it
+
+**Test.** "draws" (draw, drew, drawn) whose object is an exception, a
+diagnostic name, or a noun for one (a diagnostic, a finding, a type
+error, a warning): "A `yield` inside a `finally` clause draws the same
+`RuntimeError`", "passing it draws `invalid-argument-type`", "`fetch()`
+draws a finding". Bruce (2026-11-09, chapter 45): "'draws' is confusing
+-- produces?" Three faults sit in the one word. It is a figure: "draw"
+here means "attract", as in "draw criticism", while the reader's first
+sense is "sketch", and the book has about 400 literal sites of that
+sense (`draw()` on the shapes of chapters 08, 26, 32, and 36). It makes
+the offending code the subject and leaves the actor out: a `yield`
+raises no `RuntimeError`, `close()` does, and an assignment reports
+nothing, the type checker does (R55). And it replaces the verb the book
+has taught for the event: an exception is raised, a diagnostic is
+reported. A different verb makes the reader ask whether a different
+event is meant. Repair: name the actor and give it the taught verb,
+with the offending code as a condition, a place, or a gerund subject of
+its own clause: "If a generator yields inside a `finally` clause,
+`close()` raises a `RuntimeError` with the message shown for `stubborn()`"; "so the type checker reports
+`invalid-argument-type` when you pass it"; "the type checker reports
+`invalid-assignment` on that line". "Produces" is not the repair. It
+keeps the wrong subject, and in a chapter about generators a `yield`
+that "produces" a `RuntimeError` reads as yielding one. Where the code
+is the natural subject and the actor is obvious, "is" plus the
+diagnostic works: "A call that leaves out `width` is a
+`missing-argument` error".
+
+**Keep when.** The literal sense: a shape draws, a method draws a
+line, a figure is drawn. "Draws on" meaning uses. The idioms "draws a
+distinction", "draws a conclusion", and "draws the line", which the
+literal pass judges by its own test and which carry no hidden actor.
+None seen yet for the flagged sense.
+
+**Sightings.** 1 flag, made a rule at Bruce's call (2026-11-09). No
+book sweep yet: `tip watch-words` lists the remaining sites as NEW
+Tier 2 hits, about 30, nearly all a type-checker diagnostic (chapters
+08, 09, 12, 17, 40, 41, 46, 47, appendix B, and eleven Solutions
+files).
+- `45_Effects--Generators` 2026-11-09, was Claude-written: "A `yield`
+  inside a `finally` clause draws the same `RuntimeError`, `generator
+  ignored GeneratorExit`." -> "If a generator yields inside a
+  `finally` clause, `close()` raises a `RuntimeError` with the message
+  shown for `stubborn()`, `generator ignored GeneratorExit`."
+
+**Home.** CLAUDE.md watch list (Tier 2, "draws") | literal (Accrued
+patterns) | `tools/watch_words.py` | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -3759,6 +3807,14 @@ session's `same_survey2.py` and is the shape a survey rule would use.
 - `Solutions/43_Functional--Confidence`: "The same `[]`-returning
   function passes it too." -> "The `[]`-returning function passes it
   too." ("too" compares)
+- `45_Effects--Generators` 2026-11-09, Bruce on "the same
+  `RuntimeError`, `generator ignored GeneratorExit`": "same as what".
+  A second shape: the comparand exists (the run of `stubborn()` in the
+  listing above) but the sentence leaves it unnamed, and an appositive
+  after the noun reads as the second term. Repair: name the comparand.
+  "`close()` raises the same `RuntimeError`, `generator ignored
+  GeneratorExit`." -> "`close()` raises a `RuntimeError` with the
+  message shown for `stubborn()`, `generator ignored GeneratorExit`."
 
 **Home.** CLAUDE.md (a bullet before "Prefer the positive statement",
 2026-11-01) | `[SAME]` survey rule in `tools/sentence_shapes.py` (same

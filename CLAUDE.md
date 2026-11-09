@@ -294,6 +294,14 @@ states the thing's part ("To end a generator early, a driver calls `close()`") o
 the clause is ("The difference is how many places you edit") is a
 keep, and the check skips a `which`, `that`, `this`, `it`, or `what`
 before the copula, the connective forms.
+Since 2026-11-09 `draws` is Tier 2 as well (rule R62, Bruce: "'draws'
+is confusing" on chapter 45's "A `yield` inside a `finally` clause
+draws the same `RuntimeError`"), for one shape: draw, draws, drew, or
+drawn with a code span or a diagnostic noun as its object. The repair
+names the actor with the verb the book taught ("`close()` raises",
+"the type checker reports"). About 30 sites stay NEW for the chapter
+passes, with four literal hits ("draws `n` random pairs") to accept as
+they are read.
 Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
 object, `no X`, `none`, or `none of` ("runs none of the body", "raises
 no exception", "has no `__slots__`"), Bruce's "reversal of

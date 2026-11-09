@@ -273,3 +273,16 @@ and it becomes part of every future pass.
   how many places you edit") and a pronoun connective ("which is
   why"). R59 in `bruce_edit_db.md`; `is how` is Tier 2 in
   `tip watch-words`.
+- "A `yield` inside a `finally` clause draws the same `RuntimeError`"
+  becomes "If a generator yields inside a `finally` clause, `close()`
+  raises a `RuntimeError` with the message shown for `stubborn()`"
+  (2026-11-09, Bruce: "'draws' is
+  confusing"). "Draws" with an exception or a diagnostic as its object
+  is "attracts" in a book where `draw()` sketches shapes. It makes the
+  offending code the subject, hides the actor, and replaces the verb
+  the book taught. Name the actor with that verb: `close()` or Python
+  raises an exception, the type checker reports a diagnostic. The
+  offending code becomes the condition or the place ("on that line",
+  "when you pass it"). Never "produces" for a `yield`, which produces
+  values. Keep the literal sense and "draws a distinction". R62 in
+  `bruce_edit_db.md`; the shape is Tier 2 in `tip watch-words`.

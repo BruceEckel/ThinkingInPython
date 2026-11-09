@@ -1244,7 +1244,8 @@ expect(RuntimeError, s.close)
 #: [RuntimeError] generator ignored GeneratorExit
 ```
 
-A `yield` inside a `finally` clause draws the same `RuntimeError`,
+If a generator yields inside a `finally` clause,
+`close()` raises a `RuntimeError` with the message shown for `stubborn()`,
 `generator ignored GeneratorExit`.
 `GeneratorExit` passes through the `finally` clause on its way out of the generator.
 A `yield` there suspends the generator again before it can finish.

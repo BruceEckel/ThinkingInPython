@@ -69,7 +69,16 @@ and hides the verb that relates it to the clause. The repair makes the
 clause the main clause and states the thing's part ("To end a generator early, a driver calls `close()`") or gives the thing its verb. An
 abstraction whose content the clause is ("The difference is how many
 places you edit") is a keep, and a pronoun before the copula ("which
-is why", "That is why") is a connective the check skips. Tier 1 ("Consider rewriting") is a word with
+is why", "That is why") is a connective the check skips. `draws`
+joined Tier 2 on 2026-11-09 (rule R62, Bruce: "'draws' is confusing"
+on chapter 45's "A `yield` inside a `finally` clause draws the same
+`RuntimeError`"), for one shape: draw, draws, drew, or drawn with a
+code span or a diagnostic noun (diagnostic, finding, error, warning,
+exception) as its object. The figure means "attracts" in a book whose
+`draw()` sketches shapes, and it makes the offending code the subject
+where the actor raises or reports: "`close()` raises the same
+`RuntimeError`", "the type checker reports `invalid-yield`". A literal
+"draws `Circle`" matches too and is a baseline keep. Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -298,6 +307,13 @@ IS_HOW: Final = (
 """A thing as subject, then "is how/where/when/why" and a clause (R59):
 the copula and the wh-word stand in for the verb. A pronoun before the
 copula ("which is why", "That is why") is a connective and is skipped."""
+DRAWS: Final = (
+    r"(?:draws?|drew|drawn) (?:(?:an?|the|two|three|no) )?"
+    r"(?:same )?(?:\w+ )?"
+    r"(?:CODE|diagnostics?|findings?|errors?|warnings?|exceptions?)")
+"""Code that "draws" an exception or a diagnostic (R62): the figure
+hides the actor that raises or reports it. A code span is `CODE` here,
+so "draws `invalid-yield`" matches and "draws a circle" does not."""
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
@@ -360,6 +376,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"by hand"),
         (2, r"manually"),
         (2, IS_HOW),
+        (2, DRAWS),
         (2, r"explicit(?:ly)?"),
     ]
 )

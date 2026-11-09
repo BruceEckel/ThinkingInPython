@@ -73,7 +73,13 @@ scope's line range:
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the
   contrastive "However," is skipped; `ARGS="--tier 1"` adds the
-  negated subjects)
+  negated subjects; for `literal`: `draws` with an exception or a
+  diagnostic as its object, Tier 2 since 2026-11-09, "A `yield`
+  inside a `finally` clause draws the same `RuntimeError`" -> "If a
+  generator yields inside a `finally` clause, `close()` raises a
+  `RuntimeError` with the
+  message shown for `stubborn()`", the actor named with the verb the book
+  taught, raises or reports, R62)
 - `tip past-tense CH=NN ARGS=--survey` (for `activate`: `[PAST-SUB]`,
   and `[PERFECT]`, a present perfect in a time clause, "before the
   generator has yielded" -> "before the generator yields", C57)

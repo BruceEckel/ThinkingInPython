@@ -495,7 +495,8 @@ A reader must work backward from a `<generator object ...>` in a report to the m
 
 The runtime failure is quiet: no exception, an exit code of zero,
 and output that a log scraper accepts.
-A coroutine that nothing awaits draws a `RuntimeWarning` when Python reclaims it,
+When Python reclaims a coroutine that nothing awaits,
+it issues a `RuntimeWarning`,
 as [Concurrency](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics)
 shows.
 Python reclaims a generator that nothing drives, silently.
