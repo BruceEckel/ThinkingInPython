@@ -712,7 +712,7 @@ one for whitespace, one for underscores, and one to reject `"²"`.
 Those tests together are a second parser,
 written to predict what `int()` will do.
 That parser is right only where it repeats `int()`'s rules.
-`parse_int()` calls `int()` and catches the `ValueError`,
+The chapter's `parse_int()` calls `int()` and catches the `ValueError`,
 so it agrees with `int()` on every string, including strings you have not tried.
 
 Before you move on, name what separates your attempt from this one:

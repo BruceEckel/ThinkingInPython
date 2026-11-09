@@ -656,7 +656,7 @@ the message alone leaves you to infer it from the `left` count.
 
 The last input picks the sold-out slot again with a dime inserted,
 so both conditions are true.
-`too_expensive()` comes first in the `(State.SELECTING, Column)` list,
+`too_expensive()` comes first in `vending_machine.py`'s `(State.SELECTING, Column)` list,
 so the engine takes that rule and reports `COLLECTING`,
 as though more money would sell a sold-out item.
 If you swap the rule order, the same input reports `UNAVAILABLE`.

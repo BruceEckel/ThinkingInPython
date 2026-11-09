@@ -364,7 +364,19 @@ present (`d.pop(` answers `pop()`), builtins and a bare lowercase
 span are skipped. The first run had 68 hits and 3 rewrites; the
 keeps are a contrast with the previous listing, a name inside an
 imported module, a generated dunder, a type or placeholder, a
-cross-reference, and an absence that is the claim.
+cross-reference, and an absence that is the claim. `survey
+absent-subject`, the same day, reads the walkthrough below a
+listing for a sentence that opens on a call or CapWords span the
+listing, its lead-in, and the earlier walkthrough never name
+("`sequence()` with no steps returns before it yields anything"
+under `answering_proxy.py`; Bruce: "I don't see sequence() in the
+listing under discussion"). The repair adds the source
+("`sequence()` in `yield_from_arguments.py`", "`History.do()`",
+"`GameBuilder`, in `game.py` below"). The first run had 123 hits
+and 9 rewrites; the keeps are a library name as a known thing, a
+source the sentence already gives, a test named by name, a pipeline
+walkthrough naming its stages, and a Solutions paragraph reading
+across its exercise's listings.
 `tip trailing` (`tools/trailing_tags.py`, 2026-10-18) lists two shapes
 Bruce marked in chapter 31, rules R32 and R35 in `bruce_edit_db.md`: a
 clause that ends on a comma, a participle, and a measure or place

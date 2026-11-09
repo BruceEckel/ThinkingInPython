@@ -671,7 +671,7 @@ The value of `app_data()` is a side effect,
 so `@pytest.fixture(autouse=True)` applies the fixture to both tests in `test_storage.py`,
 whose parameter lists stay empty.
 
-`data_dir()` reads `APP_DATA` on every call,
+`data_dir()` in `storage.py` reads `APP_DATA` on every call,
 so the fixture's `monkeypatch.setenv()` changes the directory `data_dir()` returns.
 A version of `storage.py` with a module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` reads the variable once,
 at import time, before any fixture runs,

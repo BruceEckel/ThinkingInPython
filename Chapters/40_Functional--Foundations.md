@@ -470,8 +470,9 @@ A closure is the functional answer to "an object with one method and some stored
 `multiply()` reads `factor` rather than receiving it, yet stays pure.
 `factor` stays the same after capture,
 so the same argument always produces the same answer.
-`withdraw()` also reads a name from outside, but each call changes that name,
-the global `balance`, so each result depends on every call before it.
+`withdraw()` in `pure_functions.py` also reads a name from outside,
+but each call changes that name, the global `balance`,
+so each result depends on every call before it.
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.

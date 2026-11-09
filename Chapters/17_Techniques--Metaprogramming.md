@@ -392,7 +392,7 @@ and `namespace[class_name]` is an `object`.
 Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
 `cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
-`EventMakers` stores each class it builds.
+`EventMakers` in `greenhouse.py` stores each class it builds.
 `make_class()` builds a fresh class on every call.
 Calling `make_class("Start")` twice produces two distinct classes.
 

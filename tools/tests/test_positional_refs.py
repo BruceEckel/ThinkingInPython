@@ -342,3 +342,51 @@ def test_absent_name_is_a_survey_rule(
     assert main(["--survey"]) == 0
     out = capsys.readouterr().out
     assert "[survey absent-name] '`survey()`'" in out
+
+
+def subject_hits(text: str) -> list[str]:
+    doc = Document.from_text(text, Path("fixture.md"))
+    return [h.phrase for h in find(doc)
+            if h.kind == "survey absent-subject"]
+
+
+def walk(prose: str, lead: str = "", code: str = "x = 1\n") -> str:
+    head = f"{lead}\n\n" if lead else ""
+    return f"{head}```python\n# a.py\n{code}```\n\n{prose}\n"
+
+
+def test_absent_subject_opening_call() -> None:
+    text = walk("`absent()` returns early, so `next()` stops.")
+    assert subject_hits(text) == ["`absent()`"]
+
+
+def test_absent_subject_after_an_opener() -> None:
+    assert subject_hits(walk("Here, `absent()` returns.")) == [
+        "`absent()`"]
+    assert subject_hits(walk("At `[2]`, `Absent` returns.")) == [
+        "`Absent`"]
+    assert subject_hits(walk("`absent()`'s result is None.")) == [
+        "`absent()`"]
+
+
+def test_absent_subject_quiet_cases() -> None:
+    assert subject_hits(
+        walk("`absent()` returns.", code="def absent(): ...\n")) == []
+    assert subject_hits(
+        walk("`absent()` returns.", lead="`absent()` is new:")) == []
+    assert subject_hits(
+        walk("The `absent()` call is new. `absent()` returns.")) == []
+    assert subject_hits(walk("The driver calls `absent()`.")) == []
+    assert subject_hits(walk("`print()` shows it.")) == []
+    assert subject_hits(walk("Hint: `absent()` returns.")) == []
+
+
+def test_absent_subject_is_a_survey_rule(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text(walk("`absent()` returns."), encoding="utf-8")
+    assert main(["--fail"]) == 0
+    assert "absent-subject" not in capsys.readouterr().out
+    assert main(["--survey"]) == 0
+    out = capsys.readouterr().out
+    assert "[survey absent-subject] '`absent()`'" in out

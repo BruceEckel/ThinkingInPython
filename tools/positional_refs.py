@@ -144,6 +144,44 @@ statement-like word (line, call, loop, print, return, ...):
    cross-reference, an absence that is the claim ("with no `Meter`"),
    and a lead-in that introduces two listings at once.
 
+11. `survey absent-subject` (2026-11-09): a sentence in the prose
+   below a listing that opens on a call or CapWords code span naming
+   something the listing never mentions, when the paragraph has not
+   named it before and the listing's lead-in does not introduce it.
+   Chapter 45, under `answering_proxy.py`: "`sequence()` with no steps
+   returns before it yields anything, so `next(inner)` raises
+   `StopIteration`." `sequence()` is defined in
+   `yield_from_arguments.py`, two listings earlier, and nothing said
+   so. Bruce: "I don't see sequence() in the listing under
+   discussion". A walkthrough sentence that opens on a name the
+   listing lacks sends the reader to the wrong listing. The repair
+   names the listing the thing comes from, or states the general case
+   first and then the example (commit 682dd014). Rule 10 reads the
+   lead-in above a listing; this rule reads the walkthrough below it.
+   A sentence opens on a span when its first characters are the span,
+   after an optional opener from `SUBJECT_OPENERS` (or an "At `[n]`")
+   and a comma, and a trailing possessive is allowed. The span test,
+   the `COMMON_NAMES` skip, and the whole-file comparison for a
+   `(continued)` part are rule 10's, except that the listing is read
+   as its raw lines, so a name in a comment or a `#:` marker counts
+   (`GEN_CREATED` under a listing that prints it). The name must also
+   be absent from the listing's lead-in paragraph and from every
+   earlier sentence of the walkthrough, across its paragraphs, since
+   a paragraph that introduces a name covers the ones after it. A
+   paragraph that is the next listing's lead-in is skipped here (rule
+   10 reads it). One hit per sentence. A `Hint:` or `Done when:`
+   paragraph is skipped. A survey rule, printed under `--survey`,
+   never baselined; the reader judges each hit. The first book run
+   had 123 hits and 9 rewrites, each adding the source ("`data_dir()`
+   in `storage.py`", "`History.do()`", "`GameBuilder`, in `game.py`
+   below", "The chapter's `parse_int()`"). The keeps: a standard
+   library or framework name as a known thing (`ReadOnly`, `supply()`,
+   `copy.deepcopy()`), a name whose source the sentence or the
+   paragraph already gives ("`act()` in `value_patterns.py`", a
+   link), a test named by its own name, a pipeline walkthrough that
+   names the stages (`topic_of()` under `scenarios.py`), and a
+   Solutions paragraph reading across the exercise's own listings.
+
 Deliberately not matched, so a human never reads them as hits: "the
 first argument" or "the first parameter" (a position in a call or
 signature), "the first version", "the second form", "the first half"
@@ -279,6 +317,15 @@ SURVEY_KIND: Final = "survey count+unit"
 ALT_KIND: Final = "survey alternative"
 SELF_KIND: Final = "survey self-name"
 ABSENT_KIND: Final = "survey absent-name"
+ABSENT_SUBJECT_KIND: Final = "survey absent-subject"
+SUBJECT_OPENERS: Final = (
+    "Here", "Then", "There", "So", "Now", "Again", "Likewise",
+    "Instead", "Otherwise", "In practice", "In the second run",
+)
+SUBJECT_OPENING: Final = re.compile(
+    r"\s*(?:(?:" + "|".join(SUBJECT_OPENERS) + r"|At `\[[^`]*\]`),\s*)?"
+    r"(`[^`]+`)(?:'s)?")
+SKIPPED_PARAGRAPH: Final = re.compile(r"(?:Hint|Done when):")
 COMMON_NAMES: Final = frozenset(dir(builtins))
 CALL_SPAN: Final = re.compile(r"[A-Za-z_][\w.]*\(\)")
 CAP_SPAN: Final = re.compile(r"[A-Z]\w*")
@@ -598,22 +645,64 @@ def absent_name_hits(doc: Document) -> Iterator[Hit]:
                           m.group(), " ".join(sentence.split()))
 
 
+def absent_subject_hit(
+    sentence: str, code: str, before: str,
+) -> tuple[int, str] | None:
+    """(offset, span) when the sentence opens on a name nobody supplied.
+
+    `code` is the listing's code and `before` the text of the lead-in
+    and of the paragraph's earlier sentences.
+    """
+    m = SUBJECT_OPENING.match(sentence)
+    if m is None:
+        return None
+    body = m.group(1).strip("`").strip()
+    if not (CALL_SPAN.fullmatch(body) or CAP_SPAN.fullmatch(body)):
+        return None
+    name = identifier(body)
+    if (name in COMMON_NAMES or named_in_code(name, code)
+            or named_in_code(name, before)):
+        return None
+    return m.start(1), m.group(1)
+
+
 def find(doc: Document) -> Iterator[Hit]:
     """A hit per positional reference in one document."""
     yield from self_name_hits(doc)
     yield from absent_name_hits(doc)
+    # A paragraph that is the next listing's lead-in belongs to that
+    # listing (rule 10 reads it), not to the walkthrough above it.
+    lead_starts = {lead[0][0] for b in doc.blocks
+                   if (lead := lead_in(doc, b))}
+    # The names a listing's walkthrough has supplied so far, per
+    # listing: its lead-in, then each paragraph as it is read.
+    supplied: dict[int, str] = {}
     for block, paragraph in region_paragraphs(doc):
         text, lines = joined(paragraph)
         counts = keyword_counts(block)
         code = block_code(block)
         walkthrough = False
         seen: set[str] = set()
+        if block.open_at not in supplied:
+            supplied[block.open_at] = " ".join(
+                t for _, t in lead_in(doc, block))
+        # Raw lines, so a name in a comment or a `#:` marker counts.
+        raw = "\n".join("\n".join(b.lines) for b in doc.blocks
+                        if b.slug and b.slug == block.slug) or code
+        skipped = (SKIPPED_PARAGRAPH.match(text) is not None
+                   or paragraph[0][0] in lead_starts)
         for start, sentence in sentences(text):
             shown = " ".join(sentence.split())
             if walkthrough and (
                     alt := alternative_hit(sentence, code, seen)):
                 offset, phrase = alt
                 yield Hit(lines[start + offset], ALT_KIND, phrase, shown)
+            if not skipped and (sub := absent_subject_hit(
+                    sentence, raw,
+                    supplied[block.open_at] + " " + text[:start])):
+                offset, phrase = sub
+                yield Hit(lines[start + offset], ABSENT_SUBJECT_KIND,
+                          phrase, shown)
             walkthrough = walkthrough or names_a_listing_span(sentence, code)
             seen.update(identifier(m.group())
                         for m in CODE_SPAN.finditer(sentence))
@@ -621,6 +710,7 @@ def find(doc: Document) -> Iterator[Hit]:
                 continue
             for offset, kind, phrase in sentence_hits(sentence, counts):
                 yield Hit(lines[start + offset], kind, phrase, shown)
+        supplied[block.open_at] += " " + text
 
 
 def key(shown: str, phrase: str, sentence: str) -> str:
@@ -653,8 +743,9 @@ def main(argv: list[str] | None = None) -> int:
                          "`call` or `time`; an unmarked alternative in "
                          "a walkthrough; a lead-in that names its own "
                          "listing; a lead-in naming a function or "
-                         "class the listing lacks), which are never "
-                         "baselined")
+                         "class the listing lacks; a walkthrough "
+                         "sentence opening on a name the listing "
+                         "lacks), which are never baselined")
     args = ap.parse_args(argv)
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}

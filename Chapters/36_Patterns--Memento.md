@@ -458,7 +458,7 @@ print(history.redo())
 #: Duck: circle beak
 ```
 
-`do()` pushes the present onto the past and clears the future,
+`History.do()` pushes the present onto the past and clears the future,
 so an edit after an undo discards the undone states for good,
 as it does in editors.
 

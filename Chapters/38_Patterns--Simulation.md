@@ -344,7 +344,7 @@ asyncio.run(main())
 ```
 
 The log shows what the map cannot: the order of events.
-`__post_init__()` assigns each number at spawn time,
+`Rat.__post_init__()` assigns each number at spawn time,
 so the numbers follow spawn order.
 Each rat logs its line when it dead-ends, so the lines follow finish order.
 Rat 4 spawns fourth and finishes last,
@@ -637,7 +637,8 @@ so `rat.py` imports from the standard library alone.
 The declaration gives the type checker the attribute's type,
 `Room` rather than `Room | None`,
 so code that reads `room` skips the `None` check.
-`GameBuilder` creates the attribute by assigning `robot.room` when it places the robot.
+`GameBuilder`, in `game.py` below,
+creates the attribute by assigning `robot.room` when it places the robot.
 Reading `room` before then raises an `AttributeError`.
 The builder runs first, so every read comes afterward.
 
