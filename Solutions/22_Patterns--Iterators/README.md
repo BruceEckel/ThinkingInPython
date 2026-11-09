@@ -711,7 +711,7 @@ and neither names the protocol.
 Defining the protocol's four methods satisfies it.
 
 **Index a stored sequence.**
-`OverSequence` rewinds by setting `index` back to 0,
+To rewind, `OverSequence` sets `index` back to 0,
 because its `items` sequence holds every value.
 A caller can index that sequence repeatedly, in any order,
 and every value stays in place.
@@ -790,7 +790,7 @@ If you write `peek(it)` as `return next(it, DONE)` and call it on the demo's `(x
 `peek()` reports the `2` and consumes it.
 The following `next(it)` returns `4`.
 The type checker accepts that version,
-so you find the lost value only by running the program.
+so the lost value shows up only when you run the program.
 `Peekable` keeps the pulled item in a field,
 where `peek()` reads it any number of times and `__next__()` still returns it.
 
@@ -1114,8 +1114,8 @@ For a parsed log file, take the skipping version.
 A log is an append-only record that many processes write,
 so a malformed line is a routine event rather than a broken contract.
 One truncated line should leave the rest of the file readable.
-With `typed()`, the exception ends the generator,
-so the caller resumes by parsing the file again and somehow starting past the line that failed.
+With `typed()`, the exception ends the generator.
+To resume, the caller must parse the file again and somehow start past the line that failed.
 
 Skipping hides what it drops.
 A filter that quietly drops every line looks the same as an empty file.

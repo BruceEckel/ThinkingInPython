@@ -4,7 +4,8 @@
 > and some of those steps differ from one use to the next.
 > A *Template Method* sets the sequence and lets you supply the steps that vary.
 
-An application framework lets you build a new application by reusing its existing classes and overriding methods to customize behavior.
+To build a new application on an application framework,
+you reuse its existing classes and override methods to customize behavior.
 At the heart of a framework is the *Template Method* of *GoF Design Patterns*:
 a base-class method that drives the application by calling other base-class methods,
 some of which you override.
@@ -412,7 +413,7 @@ passing functions takes fewer lines and replaces the class hierarchy with one fu
 
 The subclass form also makes each step optional,
 since the base supplies the `...` default.
-The function form makes a step optional by giving its parameter a default.
+To make a step optional, the function form gives its parameter a default.
 With `lambda: None` as the default, the loop calls both steps on every pass.
 A `None` default would put a `None` test in the loop.
 `customize1` is a required parameter,

@@ -203,9 +203,8 @@ A closure's `repr` shows its function's name and a memory address.
 An undoable macro needs a second operation on each command, `undo()`.
 A command's type then has two members, `__call__()` and `undo()`,
 and a `Protocol` describes that type (see exercise 1).
-[*Memento*](36_Patterns--Memento.md#the-caretaker-a-generic-history)
-undoes the other way,
-by restoring a saved snapshot of the state instead of running an inverse.
+To undo, [*Memento*](36_Patterns--Memento.md#the-caretaker-a-generic-history)
+restores a saved snapshot of the state instead of running an inverse.
 
 ### The Late-Binding Trap
 

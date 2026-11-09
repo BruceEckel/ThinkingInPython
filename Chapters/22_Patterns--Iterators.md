@@ -150,7 +150,7 @@ Inside `total()`, `sum()` makes the same `iter()` and `next()` calls as the writ
 so `total()` stays the same for every new source.
 
 The third frame shows a limit of the protocol.
-A caller learns that the items have run out by asking for one more.
+To learn that the items have run out, a caller asks for one more.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
@@ -393,7 +393,7 @@ The listing leaves that call out, because every chapter listing must type-check.
 `Collection[T]` also rejects `Countdown`, which supports any number of passes.
 `Countdown` defines `__iter__()`,
 while a `Collection` also requires `__len__()` and `__contains__()`.
-A reiterable class passes `Collection[T]` by adding those two methods.
+To pass `Collection[T]`, a reiterable class adds those two methods.
 `collections.abc` has no protocol for "iterable more than once,"
 so `Collection[T]` is the closest annotation.
 

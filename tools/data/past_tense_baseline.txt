@@ -120,10 +120,11 @@ Chapters/20_Patterns--Rethinking_Objects.md	[PAST] added: Cardelli and Wegner ad
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] arose: Many of the design patterns in this part of the book arose to work around limitations of older object-oriented languages.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] backed: Newer languages backed away from inheritance.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] brought: C++ brought object-oriented programming and exceptions into the mainstream.
-Chapters/20_Patterns--Rethinking_Objects.md	[PAST] built: You built a program at runtime by finding the closest existing class and inheriting from it to add behavior.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] drew: *C++* drew from Simula.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] drew: *Java* drew from Smalltalk.
-Chapters/20_Patterns--Rethinking_Objects.md	[PAST] encouraged: Yet Java encouraged reusing code by inheriting implementation.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] encouraged: Yet Java encouraged inheriting implementation to reuse code.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] found: To build a program at runtime, you found the closest existing class and inherited from it to add behavior.
+Chapters/20_Patterns--Rethinking_Objects.md	[PAST] inherited: To build a program at runtime, you found the closest existing class and inherited from it to add behavior.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] kept: Simula kept standalone functions alongside its objects.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] made: OOP made four promises: encapsulation, behavior bundled into the object as methods, reuse through inheritance, and polymorphism.
 Chapters/20_Patterns--Rethinking_Objects.md	[PAST] named: It was a compiled, statically typed language, so the discipline later named the Liskov Substitution Principle (LSP) fit naturally.

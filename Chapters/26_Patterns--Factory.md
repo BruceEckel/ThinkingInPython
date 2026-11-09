@@ -92,8 +92,8 @@ A common *factory* creates every object instead of spreading creational code thr
 Your program must call this factory whenever it needs an object,
 so adding a new type changes the factory and leaves every call site as it was.
 
-Every object-oriented program creates objects,
-and you often extend such programs by adding new types.
+Every object-oriented program creates objects.
+To extend such a program, you often add new types.
 Thus, *Factory* might be the most common design pattern.
 
 This chapter covers the creational patterns of *GoF Design Patterns*:
@@ -681,7 +681,7 @@ for kind in ["Circle", "Square", "Circle"]:
 
 `ShapeMaker` is the interface the nested `Factory` classes share.
 Here it is a `Protocol`,
-so the two classes conform by defining a matching `create()`.
+so the two classes define a matching `create()` to conform to it.
 
 Python does not need a `Factory` class nested in every shape.
 `shape_factory_objects.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
@@ -692,7 +692,7 @@ A separate factory object is worth writing when it holds state, such as a pool,
 a cache, or loaded configuration,
 or when the caller keeps the factory to construct objects later.
 
-You can eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
+To eliminate `FACTORIES`, you can dispatch through `eval(f"_{kind}.Factory()")`.
 Dispatching through `eval()` is unnecessary,
 and it makes `create_shape()` worse.
 With `eval()`, `create_shape()` compiles and runs any string it receives,
@@ -885,8 +885,8 @@ At runtime, `make()` in `registry.py` raises the same `TypeError` on a `Shape` s
 and so does `Partial()` in [*Surrogate*](25_Patterns--Surrogate.md#proxy).
 
 A Protocol simplifies the *Abstract Factory*.
-The Protocol specifies the required methods,
-and a concrete class satisfies it by defining them.
+The Protocol specifies the required methods.
+To satisfy it, a concrete class defines them.
 Here, the concrete classes have no base class:
 
 ```python
@@ -970,7 +970,7 @@ and no concrete class inherits from an interface.
 ## Prototype
 
 The factories so far build each object from a class and some arguments.
-*Prototype* keeps one fully configured instance and makes new objects by copying it.
+*Prototype* keeps one fully configured instance and copies it to make new objects.
 Use *Prototype* when a ready-made instance is easier to clone than to construct,
 or when construction is slow and the instances share most of the setup.
 

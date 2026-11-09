@@ -36,7 +36,8 @@ fit naturally.
 Everything is an object, and you act on objects only by sending messages,
 always late-bound.
 Smalltalk was emphatically dynamic.
-You built a program at runtime by finding the closest existing class and inheriting from it to add behavior.
+To build a program at runtime,
+you found the closest existing class and inherited from it to add behavior.
 That style leaves substitutability up to each subclass's author.
 
 *C++* drew from Simula.
@@ -47,7 +48,7 @@ C++ brought object-oriented programming and exceptions into the mainstream.
 Everything lives inside a class,
 including code that works as a standalone function.
 Java is statically compiled, so substitutability matters.
-Yet Java encouraged reusing code by inheriting implementation.
+Yet Java encouraged inheriting implementation to reuse code.
 A subclass that inherits code to reuse it need not honor the base's contract.
 
 Newer languages backed away from inheritance.
@@ -812,7 +813,7 @@ Dynamic typing finds a missing method when the call runs.
 The type checker finds it before the program runs.
 
 An abstract base class is *nominal* (named),
-so a type joins by inheriting from it.
+so a type inherits from it to become a member.
 The subclass's own source declares membership.
 The base can carry shared implementation for its children.
 A protocol is structural, so it works with any type that has matching members,

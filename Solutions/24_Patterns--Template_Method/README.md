@@ -676,8 +676,8 @@ the base class declares that a subclass may skip this step.
 With that body, the omission looks to a checker like a deliberate choice,
 because "deliberately empty" and "forgotten" are the same code.
 Only the base class can record that difference.
-The base class can declare that a subclass must supply the step,
-by inheriting from `ABC` and marking `customize2()` with `@abstractmethod`.
+To declare that a subclass must supply the step,
+the base class can inherit from `ABC` and mark `customize2()` with `@abstractmethod`.
 With `customize2()` abstract, constructing `HalfDone` raises a `TypeError`,
 and the type checker reports the construction before the program runs.
 

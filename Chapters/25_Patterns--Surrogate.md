@@ -122,7 +122,7 @@ It also lets the type checker verify the `Proxy`'s `f()` and `g()` against the b
 
 A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 is the structural alternative.
-An implementation conforms by defining the methods the Protocol lists.
+To conform, an implementation defines the methods the Protocol lists.
 The type checker verifies the shape statically,
 and `@runtime_checkable` lets `isinstance()` check the shape at runtime:
 

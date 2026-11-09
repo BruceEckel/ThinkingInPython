@@ -1872,7 +1872,8 @@ from the same two objects.
 
 The second reason survives:
 a subclass that should override one combination and inherit the rest.
-`paper_scissors_rock_subclass.py`'s `DampPaper` gets its special case by overriding `compete()` and `eval_rock()`.
+To get its special case,
+`paper_scissors_rock_subclass.py`'s `DampPaper` overrides `compete()` and `eval_rock()`.
 In this version `Item` defines `compete()` once and the combinations live in the table,
 so a subclass that overrides `compete()` replaces every combination at once.
 Changing an existing cell changes that combination for every instance,

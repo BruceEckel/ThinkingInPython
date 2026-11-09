@@ -24,7 +24,7 @@ An adapter's only job is to produce the interface you need from the one you have
 In a common case, a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
-An adapter implements `f()` by calling `g()` and `h()`.
+To implement `f()`, an adapter calls `g()` and `h()`.
 The first version puts the adaptation in a class:
 
 ```python

@@ -187,7 +187,8 @@ which must branch on the argument's type.
 The visitors choose between those two methods.
 So `flower_visitors.py`'s primary hierarchy holds the operations the pattern exists to keep out of it.
 
-A Python visitor can keep the operations in its own methods by building the method name from the element's class,
+To keep the operations in its own methods,
+a Python visitor can build the method name from the element's class,
 as `ast.NodeVisitor` does.
 Its `visit()` calls `getattr(self, "visit_" + node.__class__.__name__, self.generic_visit)`,
 so a node class with no matching method falls back to `generic_visit()`.

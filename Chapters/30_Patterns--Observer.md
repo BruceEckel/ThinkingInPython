@@ -124,7 +124,7 @@ Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
 so an observer works from the value it receives.
 The *pull* model sends `subject` in place of the value.
-Each observer reads what it needs by calling back into the subject,
+To read what it needs, each observer calls back into the subject,
 here `subject.celsius`.
 With pull, each observer decides what it needs.
 
@@ -156,7 +156,7 @@ Until it does, the observers hold stale data.
 Inside `notify()`, copying `_observers` via `list(self._observers)` appears redundant.
 It is not.
 
-An observer may react to a notification by detaching.
+An observer may detach while handling a notification.
 If the `for` loop in `notify()` reads `self._observers` instead of a copy,
 a `detach()` shifts the remaining observers down one index,
 and the loop skips the observer after the one that detached,

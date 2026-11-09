@@ -832,7 +832,7 @@ def test_later_responder_runs_after_an_err() -> None:
 ```
 
 **Collect the failures as values.**
-Each responder reports a failure by returning an `Err`,
+To report a failure, each responder returns an `Err`,
 so `announce()` collects each `Err` with an `isinstance()` test.
 The caller receives the failures as an ordinary list and decides what to do with them,
 where exercise 3's caller must catch an `ExceptionGroup`.
@@ -1947,7 +1947,8 @@ The load-time form also brings three problems that `Broadcaster` avoids:
 - A responder registers only if Python imports its module.
   A responder in a module the program forgets to import stays out of the registry.
   The program runs on silently without it.
-  Django's documentation handles this by importing an app's signal handlers from its `AppConfig.ready()` method,
+  To guard against this,
+  Django's documentation recommends importing an app's signal handlers from its `AppConfig.ready()` method,
   which Django calls at startup.
 - Tests share the registry.
   A test that decorates a responder leaves that responder registered for every later test,

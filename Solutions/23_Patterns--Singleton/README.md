@@ -819,8 +819,8 @@ The chapter's listing inherits `object.__init__()` and does all its work in `__n
 There the first construction passes the `None` test and creates `val`.
 Every construction, the first included, appends its argument to `val`.
 
-A singleton that keeps an `__init__()` must make it safe to run repeatedly,
-for example by returning at once when `hasattr(self, "val")` is true.
+A singleton that keeps an `__init__()` must make it safe to run repeatedly.
+For example, the `__init__()` can return at once when `hasattr(self, "val")` is true.
 
 The metaclass form in [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation)
 runs `__init__()` once.

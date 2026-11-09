@@ -597,9 +597,9 @@ Each concrete factory produces a consistent family of products,
 here "all thick" or "all thin," and matches the `Protocol` by its structure.
 
 **Accept any factory.**
-`build_shapes()` accepts any object with those two methods,
-so you switch a whole family of shapes from thick to thin by passing a different factory object,
-not by editing every call site that creates a shape.
+`build_shapes()` accepts any object with those two methods.
+To switch a whole family of shapes from thick to thin,
+you pass a different factory object and leave every call site that creates a shape as it was.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -828,7 +828,7 @@ You can name the line that registers `Circle` and when it runs.
 
 If you add `import extra_shapes` to `registry_demo.py` without a `noqa` comment,
 `ruff check` reports it as `F401`, an unused import,
-and offers to fix it by removing the line.
+and offers a fix that removes the line.
 Running `ruff check --fix` deletes the import.
 The demo then prints `[]` and raises `KeyError: 'Circle'` at its first `make()` call.
 The solution keeps the import and marks it `# noqa: F401`,

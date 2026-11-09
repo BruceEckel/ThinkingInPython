@@ -336,7 +336,6 @@ Chapters/21_Patterns--Design_Patterns.md	[BOUND] When two pieces of code express
 Chapters/21_Patterns--Design_Patterns.md	[BOUND] With those three edges alone, six GoF patterns look like this
 Chapters/21_Patterns--Design_Patterns.md	[BOUND] how objects connect to other objects, arranged so that changes leave those connections alone
 Chapters/21_Patterns--Design_Patterns.md	[BOUND] what does one part of a program know about another
-Chapters/22_Patterns--Iterators.md	[BOUND] A reiterable class passes CODE by adding those two methods
 Chapters/22_Patterns--Iterators.md	[BOUND] CODE looks like a third way to walk data twice, but it saves memory over a list only when the two branches advance together
 Chapters/22_Patterns--Iterators.md	[BOUND] CODE runs forever on an infinite source, so drive the four methods yourself for 50,000 steps and report CODE
 Chapters/22_Patterns--Iterators.md	[BOUND] Fix the caller two ways
@@ -350,6 +349,7 @@ Chapters/22_Patterns--Iterators.md	[BOUND] The only way to find out whether the 
 Chapters/22_Patterns--Iterators.md	[BOUND] The two calls differ in the argument alone, so the CODE comes from the spent generator
 Chapters/22_Patterns--Iterators.md	[BOUND] This legacy path is the one case where a CODE loop accepts an object that fails an CODE annotation
 Chapters/22_Patterns--Iterators.md	[BOUND] Those four methods dissolved into two
+Chapters/22_Patterns--Iterators.md	[BOUND] To pass CODE, a reiterable class adds those two methods
 Chapters/22_Patterns--Iterators.md	[BOUND] Two methods make up the protocol
 Chapters/22_Patterns--Iterators.md	[BOUND] Two wrappers over one source would compare equal as soon as their counts agree, though each has delivered different items
 Chapters/22_Patterns--Iterators.md	[BOUND] Use CODE when two branches advance together, not when one finishes before the other starts
@@ -405,7 +405,7 @@ Chapters/26_Patterns--Factory.md	[BOUND] Every combination of settings is a sing
 Chapters/26_Patterns--Factory.md	[BOUND] Every factory so far keeps the choice in one place
 Chapters/26_Patterns--Factory.md	[BOUND] For a record, CODE is *Prototype* and *Builder* in one function, copying the configured state and changing the chosen fields in the copy
 Chapters/26_Patterns--Factory.md	[BOUND] From then on a caller points at CODE alone, and CODE points at the class it finds
-Chapters/26_Patterns--Factory.md	[BOUND] Here it is a CODE, so the two classes conform by defining a matching CODE
+Chapters/26_Patterns--Factory.md	[BOUND] Here it is a CODE, so the two classes define a matching CODE to conform to it
 Chapters/26_Patterns--Factory.md	[BOUND] Python honors its underscore in two places
 Chapters/26_Patterns--Factory.md	[BOUND] Switching from one look and feel to another then changes one place in the code, most likely via startup configuration
 Chapters/26_Patterns--Factory.md	[BOUND] The builder most programmers meet is narrower, the one Joshua Bloch's *Effective Java* recommends
@@ -1102,7 +1102,7 @@ Solutions/25_Patterns--Surrogate/README.md	[BOUND] Special Methods Bypass CODE e
 Solutions/25_Patterns--Surrogate/README.md	[BOUND] one shape that every implementation must meet
 Solutions/26_Patterns--Factory/README.md	[BOUND] A factory that should build leaf classes alone needs a further filter, CODE
 Solutions/26_Patterns--Factory/README.md	[BOUND] Beyond that, CODE edits one function, CODE, where the new CODE sits inside logic you must re-read
-Solutions/26_Patterns--Factory/README.md	[BOUND] CODE accepts any object with those two methods, so you switch a whole family of shapes from thick to thin by passing a different factory object, not by editing every call site that creates a shape
+Solutions/26_Patterns--Factory/README.md	[BOUND] CODE accepts any object with those two methods
 Solutions/26_Patterns--Factory/README.md	[BOUND] CODE appends to the one list both spawns share, so CODE becomes CODE and the assertion that it equals CODE fails
 Solutions/26_Patterns--Factory/README.md	[BOUND] CODE lists two classes while CODE lists three, CODE among them
 Solutions/26_Patterns--Factory/README.md	[BOUND] If you leave out CODE, the table still fills and the demo prints the same three lines
