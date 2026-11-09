@@ -432,7 +432,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Relaying Is Not Answering](../../Chapters/45_Effects--Generators.md#relaying-is-not-answering)
+[Relaying, Not Answering](../../Chapters/45_Effects--Generators.md#relaying-not-answering)
 shows `survey()` delegating to `interview()` with `yield from`.
 Without `yield from`, the call to `interview()` builds a generator object,
 and that object sits suspended before its first line.
@@ -1112,7 +1112,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Relaying Is Not Answering](../../Chapters/45_Effects--Generators.md#relaying-is-not-answering)
+[Relaying, Not Answering](../../Chapters/45_Effects--Generators.md#relaying-not-answering)
 contrasts `drive()`, which answers a request, with `yield from`,
 which relays it.
 `proxy()` answers from `known` in one branch and yields the request in the other,

@@ -793,7 +793,7 @@ so `drive()` sees the same `Question`s it saw in `interview_generator.py` and pr
 so `ask()` runs unchanged under any driver that answers `Question`s.
 A single loop at the edge of the program interprets requests yielded at any depth.
 
-### Relaying Is Not Answering
+### Relaying, Not Answering
 
 `drive()` and `yield from` both run a generator's body one `yield` at a time and both finish at `StopIteration`,
 so they are easy to confuse.
