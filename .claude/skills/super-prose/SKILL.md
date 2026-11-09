@@ -71,7 +71,10 @@ scope's line range:
   `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too,
   and `[SAME+NEW]`, a "same" on a noun the 30 lines above never use,
   "`safe()` uses the same separation" -> "`safe()` checks each value
-  while it is still separate from the literal text", R63)
+  while it is still separate from the literal text", R63; the survey
+  prints only the `[SAME+NEW]` hits not yet judged, and a read keep
+  goes into its own baseline with
+  `tip sentence-shapes CH=NN ARGS=--survey-accept`)
 - `tip watch-words CH=NN` (for `ambiguity`: `however`, Tier 2 since
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the
@@ -122,9 +125,17 @@ Bruce's "we" and his em-dashes stay.
    keep to accept; a `stale` entry paired with a `NEW` whose flagged
    word is unchanged is a re-keyed keep, accepted with the scoped
    `tip <check>-accept CH=NN`.
-3. Read `git diff Chapters/`: a changed `#:` marker means an edit
+3. The two survey rules with a judged list, `[SAME+NEW]` and `[LEAD]`:
+   run `tip sentence-shapes CH=NN ARGS=--survey` and
+   `tip overclaims CH=NN ARGS=--survey` again. A kept sentence the
+   pass edited prints as `survey` beside its `stale` entry, so reread
+   it. Then record the keeps with `ARGS=--survey-accept` on each. The
+   accept takes in every unjudged hit in the chapter and its Solutions
+   file, so a pass over one section reads the hits outside its
+   section before accepting.
+4. Read `git diff Chapters/`: a changed `#:` marker means an edit
    strayed into code.
-4. Commit the chapter and any baseline files together, one commit,
+5. Commit the chapter and any baseline files together, one commit,
    with the message listing the passes and what each changed
    (per [[commit-without-asking]], Bruce pushes).
 

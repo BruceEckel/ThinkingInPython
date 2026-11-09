@@ -2927,7 +2927,9 @@ was the passage's noun; three were untrue or stated their term only
 afterward. The 96 keeps are a summary noun for the sentence before
 ("Gradual typing faced the same problem", "uses the same technique")
 and "same" set against a stated difference ("the same answer by a
-different algorithm").
+different algorithm"). They are the first entries of the rule's own
+baseline, `tools/data/sentence_shapes_survey_baseline.txt`, so the
+survey prints only a hit not yet judged.
 - `44_Effects--Effect_Management`, one sentence after "this design":
   "Flix expresses the same model with different notation." -> "the
   same design"
@@ -2988,7 +2990,8 @@ different algorithm").
 
 **Home.** CLAUDE.md (the "same" bullet) | ambiguity (the comparison
 entry and Accrued shapes) | `[SAME]` (shape 5) and `[SAME+NEW]`
-(shape 6) in `tools/sentence_shapes.py` | this file.
+(shape 6, with a baseline of judged keeps) in
+`tools/sentence_shapes.py` | this file.
 
 ## Candidates
 

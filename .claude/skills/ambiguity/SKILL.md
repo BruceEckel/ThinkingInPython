@@ -62,6 +62,9 @@ most of the book's hits read one way.
 - `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[SAME+NEW]`, `[PAIR]`, `[TWO]`, and `[AND+REL]`.
   `[SAME+NEW]` (2026-11-09) is a "same" on a noun that no line in the 30 above uses, and it prints the noun (`[SAME+NEW] separation: ...`);
   ask "same as what?" and check that the passage called the thing by that noun.
+  The survey prints only the `[SAME+NEW]` hits not yet judged and ends on `K survey, J judged`.
+  After the read, `tip sentence-shapes CH=NN ARGS=--survey-accept` records the keeps in `tools/data/sentence_shapes_survey_baseline.txt`.
+  The accept takes in every unjudged hit in the chapter and its Solutions file, so a pass over one section reads the rest of that list first.
 - `tip possessives CH=NN` and `tip stranded CH=NN`: an elided head noun, which the reader supplies from two candidates.
 - `tip pointers CH=NN`: `antecedents` reads these; take only what that pass left.
 
@@ -205,3 +208,4 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   The first test became the `[SAME+NEW]` survey rule the same day. Its first run had 117 hits and 20 rewrites, most of them a second noun for a thing the passage had named:
   "the same generic caretaker" for `History`, "the same question" for a request, "the same model" one sentence after "this design", "the same guarantee" one sentence after "the rule".
   Use the passage's noun. The keeps are a summary noun for the sentence before ("Gradual typing faced the same problem").
+  The 96 keeps of that run are in the rule's baseline, so a pass reads only a sentence written or edited since.

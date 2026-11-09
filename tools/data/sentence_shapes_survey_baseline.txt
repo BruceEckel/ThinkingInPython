@@ -1,0 +1,108 @@
+# Survey hits a human read and judged keeps, for the survey rules
+# in JUDGED_SURVEY_RULES ([SAME+NEW]): the reader can name what
+# the "same" compares with. An entry is not an exemption from
+# the rule.
+# path<TAB>[RULE] noun: sentence, with whitespace normalized and
+# no line number, so a reflow leaves an entry alone and an edit
+# to the sentence retires it. An edit to the passage above the
+# sentence leaves the entry in place, so reread a kept sentence
+# when the text above it changes. Rewritten by
+# `tip sentence-shapes ARGS=--survey-accept`; read the delta with
+# `tip sentence-shapes ARGS=--survey` before accepting.
+# See tools/sentence_shapes.py.
+Chapters/02_Foundations--Tour.md	[SAME+NEW] expression: When every operand is truthy, CODE returns the last one, so the same expression on a nonempty list yields CODE.
+Chapters/06_Foundations--Modules_and_Packages.md	[SAME+NEW] messages: CODE, CODE, and CODE print the same loading messages, because CODE loads what CODE loads.
+Chapters/06_Foundations--Modules_and_Packages.md	[SAME+NEW] searches: CODE returns it, the same dict Python searches when it looks up a top-level name.
+Chapters/11_Techniques--Testing.md	[SAME+NEW] logic: When the same logic should run against several inputs, write one test and mark it with CODE, as CODE does.
+Chapters/12_Techniques--Data_Classes_as_Types.md	[SAME+NEW] call: The same call works from outside the class, so CODE stops an accidental assignment, not a caller determined to change the value.
+Chapters/14_Techniques--Decorators.md	[SAME+NEW] problem: A CODE with a CODE field solves the same combinatorial problem, with no wrapping and no CODE.
+Chapters/14_Techniques--Decorators.md	[SAME+NEW] signature: CODE reads as "a function whose parameters are CODE and whose result is CODE," and returning CODE declares that the wrapper has that same signature.
+Chapters/15_Techniques--Context_Managers.md	[SAME+NEW] object: Three tests check what the lease guarantees: the item leaves the pool and comes back, it also comes back when the block raises an exception, and the pool hands out the same object rather than a new one:
+Chapters/16_Techniques--Comprehensions.md	[SAME+NEW] syntax: A *generator expression* uses the same syntax with parentheses instead of brackets, and produces its values one at a time, on demand:
+Chapters/17_Techniques--Metaprogramming.md	[SAME+NEW] mistake: The static half of the check is ruff's report of the same mistake.
+Chapters/18_Techniques--Performance.md	[SAME+NEW] file: The interpreter runs the same file and executes its busiest paths as machine code.
+Chapters/18_Techniques--Performance.md	[SAME+NEW] floats: CODE compares an CODE against a CODE of the same floats.
+Chapters/18_Techniques--Performance.md	[SAME+NEW] immutability: CODE removes that CODE, so pairing it with CODE gives you the same immutability in a fraction of the space.
+Chapters/18_Techniques--Performance.md	[SAME+NEW] layout: CODE packs them into one contiguous block of C doubles, the same layout CODE uses in CODE.
+Chapters/18_Techniques--Performance.md	[SAME+NEW] question: You now have three ways to answer the same membership question: scan a CODE, binary-search a sorted CODE with CODE, or hash the value and check its bucket in a CODE.
+Chapters/18_Techniques--Performance.md	[SAME+NEW] subproblems: The classic demonstration is the naive recursive Fibonacci, which recomputes the same subproblems exponentially many times:
+Chapters/19_Techniques--Concurrency.md	[SAME+NEW] deadline: A CODE nested inside its CODE block falls under the same deadline:
+Chapters/19_Techniques--Concurrency.md	[SAME+NEW] problem: Testing meets the same problem with its CODE and CODE parameters, and solves it by injection.
+Chapters/19_Techniques--Concurrency.md	[SAME+NEW] work: Every number is present, so the output looks right until you notice the same work ran eight times.
+Chapters/22_Patterns--Iterators.md	[SAME+NEW] problem: It offers to rewrite CODE as CODE, the same problem with fewer characters.
+Chapters/22_Patterns--Iterators.md	[SAME+NEW] result: On finite data whose values stop matching for good, as the rising squares do, skipping and stopping give the same result.
+Chapters/22_Patterns--Iterators.md	[SAME+NEW] values: A CODE produces the same values on a second pass.
+Chapters/24_Patterns--Template_Method.md	[SAME+NEW] choice: You make the same choice between a class and a function when you write a *Strategy*.
+Chapters/25_Patterns--Surrogate.md	[SAME+NEW] data: Its CODE returns a second list over the same data and increments a reference count.
+Chapters/26_Patterns--Factory.md	[SAME+NEW] hazard: CODE in that chapter shows the same hazard.
+Chapters/26_Patterns--Factory.md	[SAME+NEW] omission: Self Registration leaves the same omission to runtime, where a subclass that lacks CODE registers, fails at construction, and gets no report from the checker.
+Chapters/29_Patterns--Changing_the_Interface.md	[SAME+NEW] lines: *Adapter* and *Façade* complete a family of wrappers with one shared structure: a front object forwards to something behind it, often through the same few lines of CODE.
+Chapters/33_Patterns--Visitor.md	[SAME+NEW] conclusion: Pattern Refactoring draws the same conclusion from its CODE example.
+Chapters/34_Patterns--Composite_and_Interpreter.md	[SAME+NEW] object: Sharing means the same object.
+Chapters/34_Patterns--Composite_and_Interpreter.md	[SAME+NEW] syntax: The same syntax does two opposite jobs: CODE after CODE is a pattern that tests for a CODE whose CODE equals 0, and CODE after CODE is a constructor call.
+Chapters/37_Patterns--Pattern_Refactoring.md	[SAME+NEW] distinction: *Multiple Dispatching* draws the same distinction between a table keyed by class and dispatch that follows inheritance.
+Chapters/39_Patterns--Pattern_Catalog.md	[SAME+NEW] problem: Many overlap, some solve the same problem in different ways, and several exist only to work around limits of a particular language.
+Chapters/41_Functional--Toolkits.md	[SAME+NEW] answer: CODE gives the same answer from two parallel iterables, one per parameter.
+Chapters/41_Functional--Toolkits.md	[SAME+NEW] choice: CODE under CODE offers the same choice.
+Chapters/41_Functional--Toolkits.md	[SAME+NEW] data: Splits one iterable into several independent iterators over the same data, so two consumers can each walk it once without collecting it into a list first.
+Chapters/41_Functional--Toolkits.md	[SAME+NEW] key: CODE on unsorted input silently returns the same key more than once.
+Chapters/41_Functional--Toolkits.md	[SAME+NEW] subproblem: More than one branch can reach the same subproblem, and a plain recursive function recomputes it every time.
+Chapters/42_Functional--Error_Handling.md	[SAME+NEW] value: Reading the CODE field returns the same value.
+Chapters/44_Effects--Effect_Management.md	[SAME+NEW] problem: Gradual typing faced the same problem, and took a decade.
+Chapters/46_Effects--Stateless.md	[SAME+NEW] driver: CODE is the same driver packaged as a coroutine, so you CODE it.
+Chapters/46_Effects--Stateless.md	[SAME+NEW] mistake: CODE resolves at runtime by scanning its arguments, so the same mistake produces a program that runs and hands each request to the instance that comes first in the argument list.
+Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] code: CODE draws from the source CODE hands it, so the second run prints a different trace from the same code.
+Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] function: A production handler that returns CODE runs the same function.
+Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] iteration: If you fork and wait inside a single loop, each CODE blocks on the task the same iteration just created, so the sleeps run one after another and take about five times as long.
+Chapters/A_Effect_Tracking.md	[SAME+NEW] limit: Effect Management finds the same limit in Stateless.
+Solutions/02_Foundations--Tour/README.md	[SAME+NEW] covers: Quoting is a harmless demonstration, but the same reasoning covers escaping a value before it enters SQL or HTML, where a wrong guess is a security hole rather than a typo.
+Solutions/03_Foundations--Containers/README.md	[SAME+NEW] arguments: ** CODE takes the same arguments CODE does: an iterable of two-item pairs, keyword arguments, or another mapping.
+Solutions/03_Foundations--Containers/README.md	[SAME+NEW] constructor: CODE feeds the same constructor from two parallel sequences, as CODE.
+Solutions/04_Foundations--Control_Flow/README.md	[SAME+NEW] element: At position 0 the loop sees CODE and CODE deletes the first equal item, which is that same position-0 element.
+Solutions/04_Foundations--Control_Flow/README.md	[SAME+NEW] one: The prediction is the "direct cause" line, the same one CODE produces.
+Solutions/05_Foundations--Functions/README.md	[SAME+NEW] distinction: The built-in CODE makes the same distinction.
+Solutions/05_Foundations--Functions/README.md	[SAME+NEW] list: Each call keeps appending to the same list.
+Solutions/05_Foundations--Functions/README.md	[SAME+NEW] parameter: ** CODE fills CODE by position, and the keyword CODE names the same parameter, so CODE gets two values.
+Solutions/07_Foundations--Classes/README.md	[SAME+NEW] rule: Python runs a base-class method only when an override calls it, the same rule Calling the Base Constructor shows for CODE.
+Solutions/08_Foundations--Static_Types/README.md	[SAME+NEW] answer: The same answer applies: test for the condition you mean.
+Solutions/08_Foundations--Static_Types/README.md	[SAME+NEW] argument: A CODE parameter refuses the same argument because CODE is invariant.
+Solutions/09_Foundations--Class_Attributes/README.md	[SAME+NEW] code: When one shared table is the intent, as in a registry of subclasses, the same code is correct.
+Solutions/16_Techniques--Comprehensions/README.md	[SAME+NEW] collide: Two names that upper-case to the same string collide.
+Solutions/17_Techniques--Metaprogramming/README.md	[SAME+NEW] limit: The CODE line shows the same limit for the namespace.
+Solutions/17_Techniques--Metaprogramming/README.md	[SAME+NEW] lines: If you write it, the script prints the same lines, but CODE reports CODE.
+Solutions/19_Techniques--Concurrency/README.md	[SAME+NEW] end: A free-threaded build reaches the same end by removing the GIL instead of multiplying it, so its ordinary threads run on several processors at once.
+Solutions/19_Techniques--Concurrency/README.md	[SAME+NEW] mistake: CODE checks for a matching acquire, so a release without one raises CODE A semaphore's count can climb past its starting value, so the same mistake lifts the count to two and silently admits a second holder.
+Solutions/20_Patterns--Rethinking_Objects/README.md	[SAME+NEW] steps: The same steps on your CODE version print CODE.
+Solutions/21_Patterns--Design_Patterns/README.md	[SAME+NEW] function: When the same function appears in three consecutive commits, the history shows the axis for you.
+Solutions/23_Patterns--Singleton/README.md	[SAME+NEW] dict: CODE creates a second name for the same dict in your module's namespace.
+Solutions/23_Patterns--Singleton/README.md	[SAME+NEW] failure: When You Want a Class, Cache the Instance shows the same failure with CODE, so the solution keeps CODE's signature empty and sets the size in its body.
+Solutions/23_Patterns--Singleton/README.md	[SAME+NEW] point: Martelli makes the same point in the article the chapter links: a subclass that needs state of its own declares it.
+Solutions/23_Patterns--Singleton/README.md	[SAME+NEW] technique: The chapter's CODE uses the same technique.
+Solutions/24_Patterns--Template_Method/README.md	[SAME+NEW] completes: Under your narrowed check the same class completes, while a subclass defining CODE still fails with CODE.
+Solutions/24_Patterns--Template_Method/README.md	[SAME+NEW] rule: *Singleton* applies the same rule in its eager creation: construction finishes before any code uses the object.
+Solutions/25_Patterns--Surrogate/README.md	[SAME+NEW] design: GoF's image proxy is the same design.
+Solutions/27_Patterns--Function_Objects/README.md	[SAME+NEW] code: The fine finder runs the same code with a tolerance of CODE and matches the true root to six places.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[SAME+NEW] value: CODE becomes CODE, the same value labeled by its position instead of its meaning.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[SAME+NEW] values: A CODE is a tuple with labels, so it works with any code that expects a tuple and compares equal to any tuple holding the same values.
+Solutions/29_Patterns--Changing_the_Interface/README.md	[SAME+NEW] decorator: The same decorator accepts a class.
+Solutions/30_Patterns--Observer/README.md	[SAME+NEW] job: Here that one keyword does the same job, because CODE runs the loop over the responders.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[SAME+NEW] rule: Every exercise that adds CODE uses the same rule: CODE beats Paper and Scissors, and loses to Rock.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[SAME+NEW] test: One duel has two orders, and each order has its own cell, so the CODE cell needs the same test.
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	[SAME+NEW] tree: CODE on a CODE fold of CODE through CODE raises a CODE, while your CODE returns CODE for the same tree and CODE for CODE with CODE at CODE.
+Solutions/35_Patterns--Flyweight/README.md	[SAME+NEW] condition: An CODE works under the same condition.
+Solutions/36_Patterns--Memento/README.md	[SAME+NEW] property: ** Using a CODE trimmed to what the test needs, the history test checks the same property for the states a CODE stores.
+Solutions/37_Patterns--Pattern_Refactoring/README.md	[SAME+NEW] job: When CODE holds only the dispatch, as here, the function in CODE is simpler and does the same job.
+Solutions/40_Functional--Foundations/README.md	[SAME+NEW] point: The chapter makes the same point about CODE.
+Solutions/41_Functional--Toolkits/README.md	[SAME+NEW] problem: ** CODE reports the same problem before the program runs.
+Solutions/43_Functional--Confidence/README.md	[SAME+NEW] answer: It computes the same answer by a different algorithm.
+Solutions/43_Functional--Confidence/README.md	[SAME+NEW] law: CODE breaks the same law by changing a string's length.
+Solutions/45_Effects--Generators/README.md	[SAME+NEW] observation: *GoF Design Patterns* makes the same observation about an iterator that the client advances over a recursive structure such as a *Composite*: the iterator "has to store a path" through the structure "to keep track of the current object."
+Solutions/46_Effects--Stateless/README.md	[SAME+NEW] arguments: So CODE decorates the function, calls it once per attempt, and hands back a function that takes the same arguments.
+Solutions/46_Effects--Stateless/README.md	[SAME+NEW] call: Supplying a real CODE is the same call with CODE in place of CODE, and the session reads:
+Solutions/46_Effects--Stateless/README.md	[SAME+NEW] choice: A caller can supply a CODE, which ends the requirement, or declare CODE in its own return type, which puts the same choice to its callers.
+Solutions/46_Effects--Stateless/README.md	[SAME+NEW] reasoning: The same reasoning explains CODE and CODE.
+Solutions/46_Effects--Stateless/README.md	[SAME+NEW] work: Retrying means running the same work more than once.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[SAME+NEW] character: ** CODE stays the same, character for character.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[SAME+NEW] exercise: Making each version fail with an undeclared type shows the same asymmetry exercise 2 finds.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[SAME+NEW] limit: The error side has the same limit:
+Solutions/47_Effects--Stateless_in_Practice/README.md	[SAME+NEW] pipeline: Composing a Program builds CODE from CODE steps, and The Success Path writes the same pipeline with ordinary calls.

@@ -30,13 +30,16 @@ check's header plus the sorted entries with LF endings on write.
 the stale ones to the files the run read. `print_rows()` prints the
 NEW (or, under `--all`, every) hit and the stale entries, and
 `print_summary()` the `N new, M accepted[, S stale]` line.
+`print_survey()` prints the survey rows and their count, `N survey`, or
+with a set of judged keys the unjudged rows and `K survey, J judged[, S
+stale]`.
 
 Command line. `build_arg_parser()` makes the parser every check shares
-(paths, `--fail`, `--all`, `--accept`, `--survey`, `--calibrate`, each
-optional where a check has no use for it, plus a `leading` hook for a
-check's own flags such as `--gap`), `parse_args()` parses it, and
-`run_calibrate()` wraps a calibration in the parser-unavailable
-handler.
+(paths, `--fail`, `--all`, `--accept`, `--survey`, `--survey-accept`,
+`--calibrate`, each optional where a check has no use for it, plus a
+`leading` hook for a check's own flags such as `--gap`), `parse_args()`
+parses it, and `run_calibrate()` wraps a calibration in the
+parser-unavailable handler.
 
 Run driver. `run()` is a baselined check's whole default run: read the
 files, call the check's finder, catch `ParserUnavailable` (it prints
@@ -46,6 +49,12 @@ the baseline, and either `--accept` or print. Survey hits print as
 `survey   path:line: message` after the report, never baselined and
 counted on a line of their own (`survey_last` picks whether that sits
 before or after the summary line, which the two users disagree on).
+A check that passes `survey_baseline` and `survey_header` also keeps a
+judged list for the survey rows that satisfy `is_judged`: `--survey`
+prints only the rows not in it and ends on `K survey, J judged`,
+`--survey --all` prints the judged rows too, and `--survey-accept`
+writes the unjudged rows to that file, drops stale entries for the
+files read, and leaves the default baseline alone.
 The check passes its `BASELINE` and `HEADER` constants in on every
 call, so a test that monkeypatches the module's `BASELINE` is honored.
 
@@ -221,11 +230,34 @@ def print_summary(found: list[Entry], new: list[Entry],
           + (f", {len(stale)} stale" if stale else ""))
 
 
-def print_survey(survey: list[Entry]) -> None:
-    """Each survey row, then the `N survey` count."""
+def print_survey(survey: list[Entry], judged: set[str] | None = None,
+                 stale: Sequence[str] = (), show_all: bool = False) -> None:
+    """Each survey row, then the count.
+
+    Without `judged` the rows print as `survey` and the count is
+    `N survey`. With `judged` (a set of baseline keys), a judged row is
+    hidden unless `show_all`, when it prints marked `judged`; the stale
+    entries follow the rows, and the count is `K survey, J judged`
+    with `, S stale` when there are stale entries.
+    """
+    if judged is None:
+        for shown, line, text in survey:
+            print(f"survey   {shown}:{line}: {text}")
+        print(f"{len(survey)} survey")
+        return
+    kept = 0
     for shown, line, text in survey:
-        print(f"survey   {shown}:{line}: {text}")
-    print(f"{len(survey)} survey")
+        if key(shown, text) in judged:
+            if show_all:
+                print(f"{'judged':8} {shown}:{line}: {text}")
+        else:
+            kept += 1
+            print(f"{'survey':8} {shown}:{line}: {text}")
+    for entry in stale:
+        shown, text = entry.split("\t", 1)
+        print(f"stale    {shown}: {text}")
+    print(f"{kept} survey, {len(survey) - kept} judged"
+          + (f", {len(stale)} stale" if stale else ""))
 
 
 # Command line
@@ -236,13 +268,14 @@ def build_arg_parser(
     baselined: bool = True, survey_help: str | None = None,
     calibrate_help: str | None = None,
     leading: Callable[[argparse.ArgumentParser], None] | None = None,
+    survey_accept_help: str | None = None,
 ) -> argparse.ArgumentParser:
     """The parser every check shares.
 
     Arguments in order: paths, whatever `leading` adds (a check's own
     flags), `--fail`, then for a baselined check `--all` and `--accept`,
-    then `--survey` when `survey_help` is given and `--calibrate` when
-    `calibrate_help` is.
+    then `--survey` when `survey_help` is given, `--survey-accept` when
+    `survey_accept_help` is, and `--calibrate` when `calibrate_help` is.
     """
     ap = argparse.ArgumentParser(
         description=description,
@@ -260,6 +293,9 @@ def build_arg_parser(
     if survey_help is not None:
         ap.add_argument("--survey", action="store_true",
                         help=survey_help)
+    if survey_accept_help is not None:
+        ap.add_argument("--survey-accept", action="store_true",
+                        help=survey_accept_help)
     if calibrate_help is not None:
         ap.add_argument("--calibrate", action="store_true",
                         help=calibrate_help)
@@ -302,12 +338,18 @@ def run(name: str, args: argparse.Namespace,
         find_docs: Callable[[list[Document]], Iterable[Finding]], *,
         baseline: Path, header: str,
         is_survey: Callable[[str], bool] | None = None,
-        survey_last: bool = False) -> int:
+        survey_last: bool = False,
+        survey_baseline: Path | None = None,
+        survey_header: str = "",
+        is_judged: Callable[[str], bool] | None = None) -> int:
     """A baselined check's default run; the exit code.
 
     `find_docs` is the check's finder with its parser (and any extra
     arguments) already bound. `is_survey` says which messages are survey
     hits; those print under `--survey` only, apart from the baseline.
+    With `survey_baseline`, the survey rows that satisfy `is_judged`
+    (all of them when it is None) are judged against that file, and
+    `--survey-accept` writes it with `survey_header`.
     """
     paths = prose_paths(args)
     shown_paths = {display(p) for p in paths}
@@ -322,6 +364,22 @@ def run(name: str, args: argparse.Namespace,
     found = [h for h in everything if not (is_survey and is_survey(h[2]))]
     accepted = load_baseline(baseline)
     new, stale = apply_baseline(found, accepted, shown_paths)
+    survey_judged: set[str] | None = None
+    survey_stale: list[str] = []
+    if survey_baseline is not None:
+        survey_judged = load_baseline(survey_baseline)
+        judgeable = [h for h in survey if is_judged is None
+                     or is_judged(h[2])]
+        unjudged, survey_stale = apply_baseline(
+            judgeable, survey_judged, shown_paths)
+        if getattr(args, "survey_accept", False):
+            added = {key(s, t) for s, _, t in unjudged}
+            write_baseline((survey_judged - set(survey_stale)) | added,
+                           survey_baseline, survey_header)
+            print(f"Survey baseline: added {len(added)}, dropped "
+                  f"{len(survey_stale)} stale, in "
+                  f"{display(survey_baseline)}")
+            return 0
     if args.accept:
         added = {key(s, t) for s, _, t in new}
         write_baseline((accepted - set(stale)) | added, baseline, header)
@@ -331,10 +389,10 @@ def run(name: str, args: argparse.Namespace,
     survey_on = getattr(args, "survey", False)
     print_rows(found, accepted, stale, args.all)
     if survey_on and not survey_last:
-        print_survey(survey)
+        print_survey(survey, survey_judged, survey_stale, args.all)
     print_summary(found, new, stale)
     if survey_on and survey_last:
-        print_survey(survey)
+        print_survey(survey, survey_judged, survey_stale, args.all)
     return 1 if args.fail and new else 0
 
 

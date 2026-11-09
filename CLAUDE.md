@@ -449,7 +449,7 @@ rule's "and" bullet; 11 of that day's 927 `[AND]` hits had it, 5
 were split, and the keeps are Done-when criteria. A
 colon after a count or a demonstrative ("three parts:", "this
 shape:") is skipped. The survey rules print only under `ARGS=--survey`
-and never enter the baseline: `[AND]`, an "and" that joins two clauses
+and never enter that baseline: `[AND]`, an "and" that joins two clauses
 with different subjects, `[COLON]`, a colon followed by an
 independent clause, and `[ADD]` (2026-10-28), an additive adverb
 ("also", "too", "as well", "likewise") in the root clause of a
@@ -518,8 +518,21 @@ or counted subject, and a "same" spread over repeats ("every time",
 uses the noun the passage used ("this design" before, so "the same
 design", not "the same model"). The first book-wide run had 117 hits
 and 20 rewrites; the keeps are a summary noun for the sentence before
-("faced the same problem"), so the `ambiguity` pass reads the list
-per chapter.
+("faced the same problem"). Since the same day `[SAME+NEW]` keeps a
+baseline of its own, `tools/data/sentence_shapes_survey_baseline.txt`,
+as `[LEAD]` does in `tip overclaims`: `--survey` prints the
+`[SAME+NEW]` hits not yet judged and ends on `K survey, J judged`,
+and `tip sentence-shapes CH=NN ARGS=--survey-accept` adds them after
+a read and drops stale entries, scoped by `CH=` like the other
+accepts. The first run's 96 keeps are in it, so the `ambiguity` pass
+reads only a sentence written or edited since. The accept takes in
+every unjudged hit in the chapter and its Solutions file, so a pass
+over one section reads the rest of that list before accepting. An
+entry is keyed by its sentence: an edit to the passage above a kept
+sentence leaves the entry in place, and `ARGS="--survey --all"` lists
+the judged ones, marked `judged`, for a reread after a passage is
+restructured. The other seven survey rules print every hit on every
+run.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds

@@ -29,6 +29,8 @@ from tools.tests.make_sentence_shapes_parses import recorded_parser
 @pytest.fixture(autouse=True)
 def cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(parsed_prose, "CACHE_DIR", tmp_path / "parses")
+    monkeypatch.setattr(sentence_shapes, "SURVEY_BASELINE",
+                        tmp_path / "survey.txt")
 
 
 def paragraph(source: str) -> Paragraph:
@@ -239,4 +241,89 @@ def test_survey_rules_print_only_under_survey(
     assert main([str(path), "--survey", "--fail"], recorded_parser) == 0
     out = capsys.readouterr().out
     assert "survey   " in out and "[AND] The handler nearest" in out
-    assert "1 survey" in out and "0 new, 0 accepted" in out
+    assert "1 survey, 0 judged" in out and "0 new, 0 accepted" in out
+
+
+SAME_A = ("The `hash()` failure is a second symptom of the same "
+          "shallowness.\n")
+SAME_B = ("`async`/`await` is the same machinery with a syntax that "
+          "marks a function as one the event loop resumes.\n")
+
+
+@pytest.fixture
+def same_setup(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> Path:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = tmp_path / "a.md"
+    path.write_text(SAME_A, encoding="utf-8")
+    return path
+
+
+def test_same_new_hits_are_judged_in_their_own_baseline(
+    same_setup: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = same_setup
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "survey   " in out and "[SAME+NEW] shallowness:" in out
+    assert "1 survey, 0 judged" in out
+    assert main([str(path), "--survey-accept"], recorded_parser) == 0
+    assert "added 1, dropped 0" in capsys.readouterr().out
+    text = sentence_shapes.SURVEY_BASELINE.read_text(encoding="utf-8")
+    assert text.startswith(sentence_shapes.SURVEY_HEADER)
+    assert len(sentence_shapes.load_baseline(
+        sentence_shapes.SURVEY_BASELINE)) == 1
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "[SAME+NEW]" not in out and "0 survey, 1 judged" in out
+    assert main([str(path), "--survey", "--all"], recorded_parser) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert any(line.startswith("judged   ") and "[SAME+NEW]" in line
+               for line in lines)
+
+
+def test_a_rewritten_same_new_sentence_retires_its_entry(
+    same_setup: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = same_setup
+    main([str(path), "--survey-accept"], recorded_parser)
+    capsys.readouterr()
+    path.write_text(SAME_B, encoding="utf-8")
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert any(line.startswith("survey   ") and "machinery:" in line
+               for line in out.splitlines())
+    assert any(line.startswith("stale    ") and "shallowness:" in line
+               for line in out.splitlines())
+    assert "1 survey, 0 judged, 1 stale" in out
+    assert main([str(path), "--survey-accept"], recorded_parser) == 0
+    assert "added 1, dropped 1 stale" in capsys.readouterr().out
+    entries = sentence_shapes.load_baseline(
+        sentence_shapes.SURVEY_BASELINE)
+    assert len(entries) == 1
+    assert "machinery:" in next(iter(entries))
+
+
+def test_other_survey_rules_stay_unjudged(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = tmp_path / "a.md"
+    path.write_text(HANDLER, encoding="utf-8")
+    assert main([str(path), "--survey-accept"], recorded_parser) == 0
+    assert "added 0, dropped 0" in capsys.readouterr().out
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "survey   " in out and "[AND] The handler nearest" in out
+    assert "1 survey, 0 judged" in out
+
+
+def test_default_run_prints_nothing_about_the_survey(
+    same_setup: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    main([str(same_setup), "--survey-accept"], recorded_parser)
+    capsys.readouterr()
+    assert main([str(same_setup)], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "survey" not in out and "judged" not in out
+    assert out.endswith("0 new, 0 accepted\n")

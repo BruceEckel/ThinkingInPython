@@ -229,6 +229,176 @@ def test_run_prints_survey_hits_apart(
                     else new + row + summary)
 
 
+SURVEY_HEADER = "# survey header\n"
+
+
+def test_survey_accept_flag_only_when_asked() -> None:
+    plain = build_arg_parser("doc", fail_help="f", survey_help="s")
+    with pytest.raises(SystemExit):
+        parse_args(plain, ["--survey-accept"])
+    ap = build_arg_parser("doc", fail_help="f", survey_help="s",
+                          survey_accept_help="sa")
+    assert parse_args(ap, ["--survey-accept"]).survey_accept
+    assert not parse_args(ap, []).survey_accept
+
+
+def test_print_survey_judged_forms(
+        capsys: pytest.CaptureFixture[str]) -> None:
+    rows = [("a.md", 1, "[S] one"), ("a.md", 2, "[S] two")]
+    judged = {key("a.md", "[S] one")}
+    print_survey(rows, judged)
+    assert capsys.readouterr().out == (
+        "survey   a.md:2: [S] two\n1 survey, 1 judged\n")
+    print_survey(rows, judged, show_all=True)
+    assert capsys.readouterr().out == (
+        "judged   a.md:1: [S] one\n"
+        "survey   a.md:2: [S] two\n1 survey, 1 judged\n")
+    print_survey(rows, set(), [key("a.md", "[S] gone")])
+    assert capsys.readouterr().out == (
+        "survey   a.md:1: [S] one\n"
+        "survey   a.md:2: [S] two\n"
+        "stale    a.md: [S] gone\n"
+        "2 survey, 0 judged, 1 stale\n")
+
+
+@pytest.fixture
+def survey_setup(tmp_path: Path) -> tuple[Path, Path, Path]:
+    prose = tmp_path / "a.md"
+    prose.write_text("Some prose.\n", encoding="utf-8")
+    return prose, tmp_path / "base.txt", tmp_path / "survey.txt"
+
+
+@pytest.mark.parametrize("survey_last", [False, True])
+def test_run_judges_survey_hits(
+    survey_setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str], survey_last: bool,
+) -> None:
+    prose, base, survey_base = survey_setup
+    shown = display(prose)
+    finder = fake_finder([(1, "[MAIN] a"), (2, "[SUB] b")])
+
+    def go(*extra: str) -> str:
+        ap = build_arg_parser("doc", fail_help="fail", survey_help="s",
+                              survey_accept_help="sa")
+        args = parse_args(ap, [str(prose), *extra])
+        code = run("t", args, finder, baseline=base, header=HEADER,
+                   is_survey=lambda m: m.startswith("[SUB]"),
+                   survey_last=survey_last, survey_baseline=survey_base,
+                   survey_header=SURVEY_HEADER)
+        assert code == 0
+        return capsys.readouterr().out
+
+    new = f"NEW      {shown}:1: [MAIN] a\n"
+    summary = "1 new, 0 accepted\n"
+    row = f"survey   {shown}:2: [SUB] b\n1 survey, 0 judged\n"
+    assert go("--survey") == (new + summary + row if survey_last
+                              else new + row + summary)
+    assert go("--survey-accept") == (
+        f"Survey baseline: added 1, dropped 0 stale, "
+        f"in {display(survey_base)}\n")
+    assert survey_base.read_text(encoding="utf-8").startswith(
+        SURVEY_HEADER)
+    assert load_baseline(survey_base) == {key(shown, "[SUB] b")}
+    assert not base.exists()
+    quiet = "0 survey, 1 judged\n"
+    assert go("--survey") == (new + summary + quiet if survey_last
+                              else new + quiet + summary)
+    judged = f"judged   {shown}:2: [SUB] b\n" + quiet
+    assert go("--survey", "--all") == (
+        new + summary + judged if survey_last
+        else new + judged + summary)
+
+
+def test_survey_accept_takes_only_judgeable_rows(
+    survey_setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    prose, base, survey_base = survey_setup
+    shown = display(prose)
+    finder = fake_finder([(1, "[ALT] x"), (2, "[SUB] y")])
+
+    def go(*extra: str) -> str:
+        ap = build_arg_parser("doc", fail_help="fail", survey_help="s",
+                              survey_accept_help="sa")
+        args = parse_args(ap, [str(prose), *extra])
+        run("t", args, finder, baseline=base, header=HEADER,
+            is_survey=lambda m: m.startswith(("[SUB]", "[ALT]")),
+            survey_baseline=survey_base, survey_header=SURVEY_HEADER,
+            is_judged=lambda m: m.startswith("[SUB]"))
+        return capsys.readouterr().out
+
+    assert "added 1," in go("--survey-accept")
+    assert load_baseline(survey_base) == {key(shown, "[SUB] y")}
+    out = go("--survey")
+    assert f"survey   {shown}:1: [ALT] x\n" in out
+    assert "[SUB]" not in out
+    assert out.endswith("1 survey, 1 judged\n0 new, 0 accepted\n")
+
+
+def test_stale_survey_entry_is_listed_then_dropped(
+    survey_setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    prose, base, survey_base = survey_setup
+    shown = display(prose)
+
+    def go(text: str, *extra: str) -> str:
+        finder = fake_finder([(1, text)])
+        ap = build_arg_parser("doc", fail_help="fail", survey_help="s",
+                              survey_accept_help="sa")
+        args = parse_args(ap, [str(prose), *extra])
+        run("t", args, finder, baseline=base, header=HEADER,
+            is_survey=lambda m: m.startswith("[SUB]"),
+            survey_baseline=survey_base, survey_header=SURVEY_HEADER)
+        return capsys.readouterr().out
+
+    go("[SUB] old", "--survey-accept")
+    out = go("[SUB] new", "--survey")
+    assert f"survey   {shown}:1: [SUB] new\n" in out
+    assert f"stale    {shown}: [SUB] old\n" in out
+    assert "1 survey, 0 judged, 1 stale\n" in out
+    assert "added 1, dropped 1 stale" in go("[SUB] new",
+                                            "--survey-accept")
+    assert load_baseline(survey_base) == {key(shown, "[SUB] new")}
+
+
+def test_survey_accept_keeps_unread_files_entries(
+    survey_setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    prose, base, survey_base = survey_setup
+    other = key("Chapters/b.md", "[SUB] other")
+    write_baseline({other}, survey_base, SURVEY_HEADER)
+    ap = build_arg_parser("doc", fail_help="fail", survey_help="s",
+                          survey_accept_help="sa")
+    args = parse_args(ap, [str(prose), "--survey-accept"])
+    run("t", args, fake_finder([(1, "[SUB] fresh")]), baseline=base,
+        header=HEADER, is_survey=lambda m: m.startswith("[SUB]"),
+        survey_baseline=survey_base, survey_header=SURVEY_HEADER)
+    capsys.readouterr()
+    assert load_baseline(survey_base) == {
+        other, key(display(prose), "[SUB] fresh")}
+
+
+def test_no_survey_flag_prints_nothing_about_the_survey(
+    survey_setup: tuple[Path, Path, Path],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    prose, base, survey_base = survey_setup
+    shown = display(prose)
+    write_baseline({key(shown, "[SUB] stale")}, survey_base,
+                   SURVEY_HEADER)
+    ap = build_arg_parser("doc", fail_help="fail", survey_help="s",
+                          survey_accept_help="sa")
+    args = parse_args(ap, [str(prose)])
+    run("t", args, fake_finder([(1, "[MAIN] a"), (2, "[SUB] b")]),
+        baseline=base, header=HEADER,
+        is_survey=lambda m: m.startswith("[SUB]"),
+        survey_baseline=survey_base, survey_header=SURVEY_HEADER)
+    assert capsys.readouterr().out == (
+        f"NEW      {shown}:1: [MAIN] a\n1 new, 0 accepted\n")
+
+
 def test_run_reports_an_unavailable_parser(
     tmp_path: Path, capsys: pytest.CaptureFixture[str],
 ) -> None:

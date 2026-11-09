@@ -252,7 +252,18 @@ technique") is often the plain way to say it. The first book-wide run
 had 117 hits and the read rewrote 20: a noun the passage had under
 another name ("the same generic caretaker" for `History`, "the same
 question" for a request), a "same" that was untrue ("the same limit"
-ahead of "both limits"), and a term stated only afterward.
+ahead of "both limits"), and a term stated only afterward. The other
+96 were keeps. Reprinted on every run, they would make a chapter pass
+reread all of them to find one written since, so `[SAME+NEW]` keeps a
+baseline of its own, `tools/data/sentence_shapes_survey_baseline.txt`
+(`SURVEY_BASELINE`, for the rules in `JUDGED_SURVEY_RULES`).
+`--survey` prints the `[SAME+NEW]` hits not in it and ends on `K
+survey, J judged`; `--survey --all` prints the judged ones too, marked
+`judged`; and `--survey-accept` adds the unjudged hits after a human
+read and drops stale entries, for the given files alone like
+`--accept`. An entry is keyed by its sentence, so an edit to the
+passage above a kept sentence leaves the entry in place: reread a kept
+sentence when the text above it changes.
 
 `[PRT]` (2026-11-04, from a sentence the author marked in chapter 45)
 is a phrasal verb split around a noun-phrase object: "the driver
@@ -293,7 +304,9 @@ other words. `[IMP]` fired on 2 before only, 0 both, and 1 after only,
 and the after-only one was an exercise sentence the parser misread.
 Survey rules print only under `--survey`, each line marked `survey`
 instead of NEW or accepted, after the default rules' lines. They never
-enter the baseline and never count toward `N new`. The intended use is
+enter the default rules' baseline and never count toward `N new`;
+`[SAME+NEW]` keeps a judged list of its own, described in its section
+above. The intended use is
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
 pass.
 
@@ -355,10 +368,12 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
     uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS
+    uv run python -m tools.sentence_shapes --survey-accept  # judged SAME+NEW keeps
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
     uv run tip sentence-shapes-accept
+    uv run tip sentence-shapes CH=31 ARGS=--survey-accept
 """
 
 import re
@@ -410,6 +425,23 @@ HEADER: Final = (
     "# `tip sentence-shapes` before accepting.\n"
     "# See tools/sentence_shapes.py.\n"
 )
+SURVEY_BASELINE: Final = DATA_DIR / "sentence_shapes_survey_baseline.txt"
+"""The judged survey keeps, apart from the default rules' baseline."""
+SURVEY_HEADER: Final = (
+    "# Survey hits a human read and judged keeps, for the survey rules\n"
+    "# in JUDGED_SURVEY_RULES ([SAME+NEW]): the reader can name what\n"
+    "# the \"same\" compares with. An entry is not an exemption from\n"
+    "# the rule.\n"
+    "# path<TAB>[RULE] noun: sentence, with whitespace normalized and\n"
+    "# no line number, so a reflow leaves an entry alone and an edit\n"
+    "# to the sentence retires it. An edit to the passage above the\n"
+    "# sentence leaves the entry in place, so reread a kept sentence\n"
+    "# when the text above it changes. Rewritten by\n"
+    "# `tip sentence-shapes ARGS=--survey-accept`; read the delta with\n"
+    "# `tip sentence-shapes ARGS=--survey` before accepting.\n"
+    "# See tools/sentence_shapes.py.\n"
+)
+"""The comment header of the survey baseline file."""
 BARE_PRONOUNS: Final = frozenset(
     "it they he she this that which who these those".split())
 SUBJECT_DEPS: Final = ("nsubj", "nsubjpass")
@@ -432,7 +464,9 @@ SURVEY_RULES: Final = {
     "SAME+NEW": "a same on a noun the passage above has not used",
     "CAUS": "a causative verb that demotes the actor to its object",
 }
-"""Printed only under `--survey`; never baselined."""
+"""Printed only under `--survey`; never in the default baseline."""
+JUDGED_SURVEY_RULES: Final = frozenset({"SAME+NEW"})
+"""The survey rules whose read hits are kept in `SURVEY_BASELINE`."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
 COUNT_WORDS: Final = frozenset(
     "both several twice two three four five six seven eight nine ten "
@@ -1525,8 +1559,10 @@ def calibrate(parser: Parser = parse) -> None:
 def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
     ap = build_arg_parser(
         __doc__, fail_help="exit 1 when any NEW sentence is found",
-        survey_help="also print the survey rules (AND, COLON), "
-                    "never baselined or counted",
+        survey_help="also print the survey rules, never counted as "
+                    "new; a judged [SAME+NEW] hit prints only with --all",
+        survey_accept_help="add the unjudged [SAME+NEW] hits to their "
+                           "own baseline and drop stale entries",
         calibrate_help="run the rules over tools/data/edit_pairs.json "
                        "and the built-in examples")
     args = parse_args(ap, argv)
@@ -1534,7 +1570,10 @@ def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
         return run_calibrate("sentence_shapes", calibrate, parser)
     return run("sentence_shapes", args, lambda docs: find(docs, parser),
                baseline=BASELINE, header=HEADER,
-               is_survey=lambda message: rule_of(message) in SURVEY_RULES)
+               is_survey=lambda message: rule_of(message) in SURVEY_RULES,
+               survey_baseline=SURVEY_BASELINE, survey_header=SURVEY_HEADER,
+               is_judged=lambda message: (
+                   rule_of(message) in JUDGED_SURVEY_RULES))
 
 
 if __name__ == "__main__":

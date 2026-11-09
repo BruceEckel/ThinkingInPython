@@ -560,8 +560,9 @@ def sentence_shapes(v: Vars) -> None:
     clause or a parenthetical, and [PRT] a phrasal verb's particle
     after a noun-phrase object ("carries the request out", which the
     style writes "carries out the request"; a pronoun object stays
-    before the particle). The survey rules, printed only under ARGS=--survey and never
-    baselined: [AND] an "and" joining two clauses with different
+    before the particle). The survey rules, printed only under
+    ARGS=--survey and kept out of that baseline: [AND] an "and"
+    joining two clauses with different
     subjects, [COLON] a colon followed by an independent clause, and
     [ADD] an additive adverb ("also", "too", "as well") in a sentence
     whose subject differs from the previous sentence's, where the
@@ -570,13 +571,17 @@ def sentence_shapes(v: Vars) -> None:
     Two more survey rules follow: [CAN] a modal "can" that hedges an
     event the sentence reports, and [SAME] a "same" with nothing to
     compare against ("the same `yield`" where the listing has one
-    `yield`, which "its `yield`" says).
+    `yield`, which "its `yield`" says). [SAME+NEW], a "same" on a
+    noun the 30 lines above never use, keeps a baseline of its own,
+    tools/data/sentence_shapes_survey_baseline.txt, written by
+    ARGS=--survey-accept after a read, so the survey prints only the
+    [SAME+NEW] sentences not yet judged.
     Run `tip sentence-shapes CH=31 ARGS=--survey` at the start of a
     chapter pass. It reports and never gates; `tip prose` runs it after
     the subject-gap scan. CH= picks one chapter and its Solutions file.
     Hits judged keeps live in tools/data/sentence_shapes_baseline.txt,
     so the run prints only new ones; ARGS=--all lists every default
-    hit, and ARGS=--calibrate runs all seven rules over
+    hit, and ARGS=--calibrate runs every rule over
     tools/data/edit_pairs.json and the built-in examples.
     """
     py("tools.sentence_shapes", *prose_files(v), *v.words("ARGS"))
