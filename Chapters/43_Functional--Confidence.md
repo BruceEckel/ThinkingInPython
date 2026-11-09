@@ -225,8 +225,8 @@ Sending the calls to a worker adds requirements.
 Each argument and each result pickles to cross the process boundary.
 The function pickles as its qualified name,
 so `count_primes()` must sit at the top level of a module a worker can import.
-A `lambda` or a [closure](40_Functional--Foundations.md#closures)
-fails with a `PicklingError`.
+Passing a `lambda` or a [closure](40_Functional--Foundations.md#closures)
+to `pool.map()` fails with a `PicklingError`.
 That rules out two shapes these chapters use often.
 By contrast, a `functools.partial` pickles as its wrapped function plus its bound arguments,
 so a `partial` of a top-level function carries to a worker the argument a closure captures.
