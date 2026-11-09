@@ -470,7 +470,7 @@ An interned string lives as long as a reference outside the pool holds it.
 *Flyweight* cuts the number of objects,
 and [`slots=True`](18_Techniques--Performance.md#slots)
 cuts the size of each one, so the two are worth combining when memory matters.
-`Tile` combines them by being a record.
+`Tile` in `tile_map.py` combines them by being a record.
 
 A weak reference needs a `__weakref__` slot,
 and a slotted class has one only if it declares it.
