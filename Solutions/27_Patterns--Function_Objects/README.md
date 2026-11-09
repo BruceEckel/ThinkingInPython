@@ -352,7 +352,8 @@ Python stores each function's name in its `__name__` attribute,
 so the report reads `finder.__name__` to say which handler ran,
 with no extra bookkeeping.
 
-Reading `finder.__name__` is why `chain` needs a `Protocol` here instead of an alias like the chapter's `RootFinder`.
+Because the report reads `finder.__name__`,
+`chain` needs a `Protocol` here instead of an alias like the chapter's `RootFinder`.
 If you annotate `chain` with a `Callable` type, as `RootFinder` is,
 the script runs and prints the same report,
 but `ty` reports `unresolved-attribute` on both reads of `finder.__name__`.

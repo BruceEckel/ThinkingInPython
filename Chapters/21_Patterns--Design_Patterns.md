@@ -78,7 +78,7 @@ tells you to measure at a realistic size rather than trust a small trial.
 Often, the most difficult part of developing an elegant and easy-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
 You look for the most important thing that changes,
-because that change is where most of your maintenance effort goes.
+because most of your maintenance effort goes into that change.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
 
@@ -198,8 +198,8 @@ Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.
 [Function Objects](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through three root-finding algorithms that a caller chooses between at runtime.
 
-A function with a `Callable` parameter can replace a pattern's interface and classes.
-That replacement is why the chapters ahead keep asking a question from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines):
+A function with a `Callable` parameter can replace a pattern's interface and classes,
+so the chapters ahead keep asking a question from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines):
 how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
 
@@ -313,8 +313,8 @@ so the question is how much of the other part a dependence reaches.
 Each rung is something the dependent part knows.
 A subclass knows its parent's internals: which methods call which,
 the attributes' names, what a `super()` call expects to find.
-A change to any of that can reach the subclass.
-That reach is why *GoF Design Patterns* repeats the saying that "inheritance breaks encapsulation."
+A change to any of that can reach the subclass,
+so *GoF Design Patterns* repeats the saying that "inheritance breaks encapsulation."
 A caller that writes `Circle(2)` knows a name and a constructor signature.
 A caller that writes `isinstance(s, Circle)` knows the name and tests an object's type against it.
 A caller written against an abstract base class knows a set of method names and signatures,

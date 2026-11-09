@@ -1580,7 +1580,7 @@ for char in "++-x":
 `key()` records the character in the history model and sends a request to the counter model,
 and each model pushes its new state to its display method.
 The wildcard case leaves the counter alone,
-which is why `"++-x"` displays four histories and three counts.
+so `"++-x"` displays four histories and three counts.
 
 Because `key()` writes to both models, `View` holds a field for each.
 `View` is also the one class that displays,

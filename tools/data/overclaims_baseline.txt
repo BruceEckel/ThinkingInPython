@@ -485,7 +485,7 @@ Chapters/30_Patterns--Observer.md	[BOUND] The model calls a view through the vie
 Chapters/30_Patterns--Observer.md	[BOUND] The subject's one use for an observer is to call it, and the subject decides which arguments every call receives
 Chapters/30_Patterns--Observer.md	[BOUND] The two function names are arbitrary
 Chapters/30_Patterns--Observer.md	[BOUND] The view alone uses the model's names
-Chapters/30_Patterns--Observer.md	[BOUND] The wildcard case leaves the counter alone, which is why CODE displays four histories and three counts
+Chapters/30_Patterns--Observer.md	[BOUND] The wildcard case leaves the counter alone, so CODE displays four histories and three counts
 Chapters/30_Patterns--Observer.md	[BOUND] This way, a document can have more than one way to view it, such as a plot and a table
 Chapters/30_Patterns--Observer.md	[BOUND] Those two names describe one change from its two ends
 Chapters/30_Patterns--Observer.md	[BOUND] Two kinds of arrow cross the boundary, in opposite directions

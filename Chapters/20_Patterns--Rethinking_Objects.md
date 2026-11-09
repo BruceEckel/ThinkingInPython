@@ -818,7 +818,7 @@ The base can carry shared implementation for its children.
 A protocol is structural, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
-That independence is why this chapter emphasizes protocols.
+This chapter emphasizes protocols because of that independence.
 
 The same independence hides membership.
 Nothing in a class's own source names the protocols it satisfies,

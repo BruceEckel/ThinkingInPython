@@ -1548,7 +1548,7 @@ and selecting it twice adds two.
 Selections commute, so a whole sequence of them reduces to a count per cell.
 The puzzle then becomes one linear system over the integers mod 3: `M v = b`.
 `M` records which cells each selection advances, `v` counts the selections,
-and `b` is how far each cell must advance to reach the target color.
+and `b` is the distance each cell must advance to reach the target color.
 `system()` builds `M` and `b` together, one row per cell,
 with `b` in the last column.
 

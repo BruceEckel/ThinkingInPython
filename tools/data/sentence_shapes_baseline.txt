@@ -20,7 +20,6 @@ Chapters/16_Techniques--Comprehensions.md	[PRT] Read a nested comprehension from
 Chapters/17_Techniques--Metaprogramming.md	[COLON+AND] The rest of CODE is presentation: how it formats what CODE reports, and which members it shows.
 Chapters/17_Techniques--Metaprogramming.md	[IMP] Using CODE directly, build a class CODE with a base of CODE, an attribute CODE, and a method CODE returning CODE.
 Chapters/18_Techniques--Performance.md	[PRT] The base gives every instance its CODE back, so slots on the subclass leave the CODE in place.
-Chapters/21_Patterns--Design_Patterns.md	[COLON+AND] That replacement is why the chapters ahead keep asking a question from Rethinking Objects: how much of each pattern's machinery does Python still need, and how much of it becomes functions, data, and protocols?
 Chapters/30_Patterns--Observer.md	[COLON+AND] CODE and CODE follow from the CODE methods that CODE and CODE call: CODE stores a callable a second time, and CODE takes out the first equal entry and raises a CODE when none matches.
 Chapters/32_Patterns--Multiple_Dispatching.md	[COLON+AND] Each CODE can randomly produce a CODE using CODE: a CODE uses CODE or CODE, an CODE uses CODE or CODE, and a CODE uses CODE or CODE.
 Chapters/32_Patterns--Multiple_Dispatching.md	[IMP] In CODE, give every CODE cell a CODE in place of its CODE, and have CODE call the cell it finds: CODE.

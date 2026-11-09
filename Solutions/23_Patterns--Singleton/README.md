@@ -409,8 +409,7 @@ But the sharing has ended.
 Each module now reads a different dict.
 
 **Silence the deliberate rebinding.**
-A linter does report the rebinding,
-which is why the listing carries `# noqa: F811`.
+A linter does report the rebinding, so the listing carries `# noqa: F811`.
 Ruff reads the assignment as redefining a name the module just imported,
 and flags it as an unused import followed by a shadowing binding.
 That rule exists because rebinding an imported name is far more often a mistake than an intention.

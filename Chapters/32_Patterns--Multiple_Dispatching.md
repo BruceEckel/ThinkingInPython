@@ -553,7 +553,7 @@ not the lookalike `NotImplementedError` exception.
 Returning `NotImplemented` tells the interpreter to try the other operand's reflected method next.
 The first call dispatches on `a`'s type, the reflected call on `b`'s type.
 That is double dispatching, built into the language.
-The reflected call is how a type written decades after `int` can sit to the right of an `int` in a sum.
+The reflected call lets a type written decades after `int` sit to the right of an `int` in a sum.
 
 Every binary arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,

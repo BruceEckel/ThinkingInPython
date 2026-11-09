@@ -850,7 +850,7 @@ Python skips the reflected form when both operands have the same type,
 so no call to `__rsub__()` receives two `Meters`.
 
 **Undo the swap.**
-The swap is where subtraction differs from addition.
+Subtraction differs from addition in the swap.
 Python calls `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
 so `self` is the right operand and `other` is the left one.
 The method must put them back in the order the source wrote them.
