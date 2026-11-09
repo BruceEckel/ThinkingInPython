@@ -355,7 +355,7 @@ Exactly one path connects any two of its open cells.
 So in the run above, whenever `claim()` rejects an open cell,
 a rat is testing a claimed cell: its own previous cell,
 or the parent's cell when a newly spawned rat tests its neighbors.
-Only a maze with a loop lets two rats try to claim the same new cell,
+Only in a maze with a loop can two rats try to claim the same new cell,
 the race that `claim()`'s atomicity resolves.
 
 ### Contention on a Loop
@@ -473,8 +473,8 @@ def test_rats_cover_every_reachable_cell() -> None:
 ### Watching the Pack
 
 The same `Blackboard` and `Rat` classes drive a GUI demonstration.
-`rats_view.py` lets the rats finish exploring,
-records the order in which they claimed cells,
+`rats_view.py` runs the exploration to its end,
+records the order in which the rats claimed cells,
 and replays that order on a `tkinter` canvas.
 The canvas shows the walls in gray,
 then each claimed cell turns green in that order,

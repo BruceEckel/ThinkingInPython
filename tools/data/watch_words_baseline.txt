@@ -440,7 +440,6 @@ Chapters/34_Patterns--Composite_and_Interpreter.md	yields no: An empty directory
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
 Chapters/35_Patterns--Flyweight.md	only: Only identity proves sharing
 Chapters/35_Patterns--Flyweight.md	only: but only a handful of tile kinds
-Chapters/35_Patterns--Flyweight.md	want: If you want callers to construct objects with an ordinary class call such as CODE
 Chapters/36_Patterns--Memento.md	cost: Two thousand edits held in a CODE cost about two million pointers
 Chapters/36_Patterns--Memento.md	cost: so CODE edits held in the history cost CODE pointers in total
 Chapters/36_Patterns--Memento.md	costs: The final CODE alone costs two thousand
@@ -470,7 +469,6 @@ Chapters/38_Patterns--Simulation.md	needs no: so the blackboard needs no lock
 Chapters/38_Patterns--Simulation.md	never: because a maze character is one character long and never equals CODE's empty CODE
 Chapters/38_Patterns--Simulation.md	only: Because CODE depends only on the CODE CODE
 Chapters/38_Patterns--Simulation.md	only: CODE is CODE only for a type checker reading the file and CODE at runtime
-Chapters/38_Patterns--Simulation.md	only: Only a maze with a loop lets two rats try to claim the same new cell
 Chapters/38_Patterns--Simulation.md	only: Only its shape matters here
 Chapters/38_Patterns--Simulation.md	only: The teleports are not shortcuts but the only way through
 Chapters/38_Patterns--Simulation.md	only: The third example gives you only half the outcome

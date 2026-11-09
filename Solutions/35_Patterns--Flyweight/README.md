@@ -948,8 +948,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[A Known Set: Enum](../../Chapters/35_Patterns--Flyweight.md#a-known-set-enum)
-lets the language hold the pool, so `Tile(symbol)` is the lookup.
+In [A Known Set: Enum](../../Chapters/35_Patterns--Flyweight.md#a-known-set-enum),
+the language holds the pool, so `Tile(symbol)` is the lookup.
 Move the spec table into the member values and delete `to_symbol()`.
 For the comparison, consider where each version reports a wrong symbol:
 a misspelled member, and a symbol that arrives as data.

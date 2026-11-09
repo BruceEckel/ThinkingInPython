@@ -507,8 +507,8 @@ The façade can rearrange both while every caller's code stays the same.
 The underscore is a convention,
 and `checkout._PriceEngine` resolves for anyone who types it.
 Mechanically, `from checkout import *` skips a name with a leading underscore.
-An [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
-list of the public names makes `from checkout import *` import exactly those names.
+With an [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
+list of the public names, `from checkout import *` imports exactly those names.
 A façade is an agreement about which names to call,
 not a restriction on the rest.
 

@@ -970,8 +970,9 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine)
-lets several rules share one `(state, input type)` key and tries them in order.
+In [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine),
+several rules can share one `(state, input type)` key.
+The engine tries them in order.
 Under the doors-closing state and a sensor input,
 put the obstruction condition on the first rule and leave the second rule unconditional.
 The condition is a method that reads the input, so the table stays data.

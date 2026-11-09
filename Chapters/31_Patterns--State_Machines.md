@@ -581,7 +581,7 @@ Each method declares the specific input type it handles,
 and those types differ from rule to rule.
 `Rule[I]` ties the input type to the methods on the same rule.
 Naming `Column` makes `I` `Column`,
-so the checker requires `clear()` and `too_expensive()` to accept a `Column`.
+so `clear()` and `too_expensive()` must accept a `Column`.
 If you pair `Column` with `choose_row()`, written for a `Row`,
 `ty` reports `invalid-argument-type` on that rule.
 `refund()` accepts `object`, so it pairs with any input type.

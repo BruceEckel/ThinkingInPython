@@ -618,8 +618,7 @@ Python raises `TypeError`.
 
 Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately.
-From inside `__add__()`,
-only a returned sentinel makes Python try the right operand's `__radd__()`.
+Python tries the right operand's `__radd__()` only when `__add__()` returns the sentinel.
 
 When both operands have the same type, Python tries `__add__()` alone,
 so `__add__()` resolves `Meters + Meters`.
@@ -635,9 +634,8 @@ Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union.
 Typeshed can do that because it gives `NotImplemented` a type that inherits from `Any`.
 Returning the sentinel then satisfies any declared return type.
 
-Writing out the union, `Meters | NotImplementedType`,
-makes `ty` reject `(Meters(1) + Meters(2)).n`,
-since the sentinel branch has no `n`.
+If you write out the union, `Meters | NotImplementedType`,
+`ty` rejects `(Meters(1) + Meters(2)).n`, since the sentinel branch has no `n`.
 Pyright and mypy accept the access,
 because that inheritance from `Any` makes any attribute access on the sentinel branch type-check.
 
@@ -649,8 +647,8 @@ An annotation that names it fits the rare direct call and misdescribes every sum
 Widening the return to `Any` tells the type checker that a sum can be any type and turns off checking for every caller.
 
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
-builds the expression system that opens this chapter,
-using `__add__()` and `__radd__()` to let Python's own parser assemble the tree.
+builds the expression system that opens this chapter.
+In that system, Python's own parser assembles the tree through `__add__()` and `__radd__()`.
 
 ## Turning One Unknown Type Into a Second Dispatch
 

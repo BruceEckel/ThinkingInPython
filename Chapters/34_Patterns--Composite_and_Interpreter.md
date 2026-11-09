@@ -661,14 +661,14 @@ in a `|` must bind the same set of names.
 Binding `left` in one alternative and `right` in the other is a `SyntaxError`,
 reported when the module compiles rather than as an unbound name at runtime.
 
-Matching the pair of simplified children, rather than the original node,
-lets the rules compose.
+The rules compose because `simplify()` matches the pair of simplified children,
+rather than the original node.
 A `case Add(Num(0), other)` at the top of the function would test the tree as the caller wrote it.
 In `(0 * y) + x`, the left child is still a `Mul` when that case tests it.
 In that version the pattern does not match, so the expression keeps its zero.
 Simplifying both children first, then matching the results,
 applies the rule to the `Num(0)` the recursion just produced.
-That order lets the demo's `((1 * x) + (0 * y))` simplify to `x`.
+With that order, the demo's `((1 * x) + (0 * y))` simplifies to `x`.
 
 A record freezes every field, so `simplify()` builds its result as a new tree.
 That tree shares unchanged subtrees with the original.
@@ -740,7 +740,7 @@ The alternative is an iterative walk with an explicit stack of pending nodes
 (see exercise 8).
 
 The walkers also assume that each node appears at one place in the tree.
-`expr.py` lets one node appear at several.
+In `expr.py`, one node can appear at several.
 After `s = x + 1`, the `Mul` that `s * s` builds holds the same `s` twice,
 so `evaluate()` walks `s` twice.
 A dependency graph shares nodes as a rule.

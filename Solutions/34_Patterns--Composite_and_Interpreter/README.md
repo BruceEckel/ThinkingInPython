@@ -193,8 +193,9 @@ If you follow the link,
 resolving `target` to its node and recursing into that node,
 `disk_usage(tree)` returns `10`.
 `disk_usage()` counts `a.txt` once as a file and again through `shortcut`.
-A link to an ancestor, such as `Symlink("up", "/root")`,
-makes `disk_usage()` recurse into that ancestor again and again until Python raises a `RecursionError`.
+If `disk_usage()` follows a link to an ancestor,
+such as `Symlink("up", "/root")`,
+it recurses into that ancestor again and again until Python raises a `RecursionError`.
 The solution shows the link as its own entry and counts it as zero bytes,
 so each operation visits every node once.
 
@@ -1152,7 +1153,7 @@ although it can also return `NotImplemented`.
 [*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice)
 explains the convention: typeshed gives the sentinel a type inheriting `Any`,
 so returning it satisfies any declared return type.
-The declaration also lets `(2 * x + 1).right` resolve for a caller.
+With the declaration, `(2 * x + 1).right` also resolves for a caller.
 
 `NotImplemented` adds a check at runtime, not at type-checking time.
 The type checker rejects `"a" + x` and `x + "a"` in the source it checks,
@@ -1493,7 +1494,7 @@ The solution stacks the pending operation behind its children.
 by which point `values` holds its two operands.
 
 **Preserve operand order.**
-Pushing `right` before `left` makes `left` pop first.
+`right` goes onto the stack before `left`, so `left` pops first.
 That order matters for the subtraction and division a fuller language adds.
 
 **Keep the match exhaustive.**
@@ -1658,7 +1659,7 @@ because the union it needs to extend is yours.
 At runtime, a `Symlink` falls through every case to `assert_never()`,
 which raises an `AssertionError`.
 The plugin's alternatives are to vendor a patched copy of your module or to persuade you to add the case.
-The open design lets a plugin define its node types in its own package.
+Under the open design, a plugin defines its node types in its own package.
 
 **Move the operation onto the classes.**
 The open design undoes [A *Composite* of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes),

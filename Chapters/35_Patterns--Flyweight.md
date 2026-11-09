@@ -43,7 +43,8 @@ The CPython build this book uses caches up to 1024,
 so the listing uses `100000` rather than `257` for the fresh object.
 
 The listing parses each value from a string because the compiler pools equal constants within one code object.
-With literals, `high, high2 = 100000, 100000` makes `high is high2` print `True`.
+With literals, as in `high, high2 = 100000, 100000`,
+`high is high2` prints `True`.
 That sharing comes from the pooling, not from the integer cache.
 Parsing at runtime builds the integer after compilation,
 so any sharing that remains comes from the cache.
@@ -308,7 +309,7 @@ whereas a cache that evicts an entry runs slower and returns equal results.
 
 A factory function like `tile()` has a visibly different name and call syntax,
 so a caller can see that construction goes through the factory rather than the class.
-If you want callers to construct objects with an ordinary class call such as `Color(...)`,
+If callers must construct objects with an ordinary class call such as `Color(...)`,
 hide the pool inside `__new__()`.
 
 [*Singleton*](23_Patterns--Singleton.md#one-instance-in-a-class-variable)
@@ -636,7 +637,7 @@ Second, can all the extrinsic state move out of the object?
 If a position, an owner, or a count must live inside,
 every use needs its own object, as `unshared_cells.py` shows.
 Third, can you freeze what remains?
-Sharing a mutable object lets one use's change appear in every use
+If uses share a mutable object, one use's change appears in every use
 (see exercise 3).
 
 When all three answers are yes, the remaining choice is among the four pools.

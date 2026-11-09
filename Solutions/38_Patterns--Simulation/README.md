@@ -503,8 +503,9 @@ the count of `True` returns equals `len(visited)` on every run,
 and the inserted `await` looks harmless.
 A perfect maze offers one path to each cell,
 so each cell has one rat approaching it.
-The solution uses the seven-by-nine maze from `test_rats_and_mazes.py`,
-whose loop lets two rats approach one cell from opposite directions.
+The solution uses the seven-by-nine maze from `test_rats_and_mazes.py`.
+That maze has a loop,
+so two rats can approach one cell from opposite directions.
 
 ```python
 # exercise_3.py
@@ -654,7 +655,8 @@ A coroutine yields control only at an `await`,
 so the two statements run as one atomic step.
 The event loop can hand control to another rat before the test or after the add,
 but not between them.
-Adding the `await` lets the event loop run another rat between the test and the add.
+With the `await` in place,
+the event loop can run another rat between the test and the add.
 That interleaving breaks the guarantee.
 
 Before you move on, name what separates your attempt from this one:
@@ -867,7 +869,8 @@ class Coin(Item):
 
 walking the robot over the `$` cells you placed prints that many coins,
 and `item_factory("$")` returns a `Coin`.
-With two `$` cells, deriving `Coin` from `Food` instead makes `item_factory("$")` return a `Teleport` and leaves the count at `0`.
+With two `$` cells, if you derive `Coin` from `Food` instead,
+`item_factory("$")` returns a `Teleport`, so the count stays at `0`.
 
 <details>
 <summary>Solution</summary>

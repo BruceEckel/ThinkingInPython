@@ -148,7 +148,7 @@ The alternative leaves the call to the client,
 the code that changes the subject.
 The client makes all its changes and then calls `notify()` once,
 so the observers receive one notification for the whole batch.
-That alternative requires every client to make the call.
+Under that alternative, every client must make the call.
 Until it does, the observers hold stale data.
 
 ### Why `notify()` Copies the List
@@ -735,7 +735,8 @@ and a lapsed listener is a connection that outlives the program's use of its res
 
 Decoupling and dynamism are separate properties.
 A decoupled broadcaster knows its responders only as callables.
-A dynamic broadcaster lets the set of responders change after the broadcaster exists.
+In a dynamic broadcaster,
+the set of responders can change after the broadcaster exists.
 A broadcaster that receives its responders at construction is decoupled but not dynamic:
 
 ```python
@@ -1745,7 +1746,8 @@ Each responder reads the attributes it needs from the thermometer and depends on
 Pull leaves the decision of which changes to announce with the thermometer.
 A responder's choice covers what it reads and which announcements prompt it to act.
 
-`weather_station.py` pushes a name-and-value pair for every assignment and lets each responder choose the changes it handles.
+`weather_station.py` pushes a name-and-value pair for every assignment.
+Each responder chooses the changes it handles.
 `celsius` and `humidity` share one channel,
 so every responder receives both kinds of change, along with the attribute name.
 

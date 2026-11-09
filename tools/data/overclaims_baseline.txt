@@ -557,7 +557,7 @@ Chapters/35_Patterns--Flyweight.md	[BOUND] CODE stores each object under its com
 Chapters/35_Patterns--Flyweight.md	[BOUND] Combine mechanisms when more than one requirement applies
 Chapters/35_Patterns--Flyweight.md	[BOUND] Fix it two ways
 Chapters/35_Patterns--Flyweight.md	[BOUND] For interned strings, equal means identical, so equal interned strings compare in one step
-Chapters/35_Patterns--Flyweight.md	[BOUND] Sharing a mutable object lets one use's change appear in every use (see exercise 3)
+Chapters/35_Patterns--Flyweight.md	[BOUND] If uses share a mutable object, one use's change appears in every use (see exercise 3)
 Chapters/35_Patterns--Flyweight.md	[BOUND] That leaves CODE as the boundary, the one function that takes a CODE and returns a CODE
 Chapters/35_Patterns--Flyweight.md	[BOUND] The factory CODE and the interning CODE differ in one guarantee
 Chapters/35_Patterns--Flyweight.md	[BOUND] The two grass cells differ in CODE alone, and that difference makes them different values
@@ -1152,7 +1152,6 @@ Solutions/30_Patterns--Observer/README.md	[BOUND] An observer that reads CODE mu
 Solutions/30_Patterns--Observer/README.md	[BOUND] CODE and CODE come from CODE unchanged, and CODE is the one function that differs
 Solutions/30_Patterns--Observer/README.md	[BOUND] CODE answers whether that system has a solution, which is all the question asks
 Solutions/30_Patterns--Observer/README.md	[BOUND] CODE reaches nothing, CODE reaches CODE alone, and 3x3, 4x4, 6x6, and 7x7 each reach all three colors
-Solutions/30_Patterns--Observer/README.md	[BOUND] CODE then lets a caller handle one kind of failure and re-raise the rest
 Solutions/30_Patterns--Observer/README.md	[BOUND] CODE types the class access from the CODE overload alone
 Solutions/30_Patterns--Observer/README.md	[BOUND] CODE, CODE, and CODE unchanged, and a CODE trimmed to the two methods this example calls
 Solutions/30_Patterns--Observer/README.md	[BOUND] Gaussian elimination mod 3 differs from the usual in two places
@@ -1174,6 +1173,7 @@ Solutions/30_Patterns--Observer/README.md	[BOUND] This version needs the failure
 Solutions/30_Patterns--Observer/README.md	[BOUND] Two pieces make every decorated CODE a registration
 Solutions/30_Patterns--Observer/README.md	[BOUND] Two places in the view involve a selection
 Solutions/30_Patterns--Observer/README.md	[BOUND] Two problems remain
+Solutions/30_Patterns--Observer/README.md	[BOUND] With CODE, a caller can handle one kind of failure and re-raise the rest
 Solutions/30_Patterns--Observer/README.md	[BOUND] a list of callables, one method that appends to it, and one that calls each entry with the same argument
 Solutions/30_Patterns--Observer/README.md	[BOUND] after you attach your responder, assigning CODE and then CODE calls it twice, first with CODE and then with CODE, and it reports the first alone
 Solutions/30_Patterns--Observer/README.md	[BOUND] one change reaches every connected responder once, in the order you connected them, each with the same value

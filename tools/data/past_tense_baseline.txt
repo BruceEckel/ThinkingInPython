@@ -297,7 +297,6 @@ Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] changed: The CODE 
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] checked: Freezing the data class makes that check final, since every field keeps the value CODE checked.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[PAST] wrote: your file prints CODE for CODE and CODE for CODE, you wrote both predictions down before running it, and you can explain each answer from the CODE each side carries.
 Solutions/30_Patterns--Observer/README.md	[PAST-HEADING] returned: 5. Failures returned as values
-Solutions/30_Patterns--Observer/README.md	[PAST] let: String members also let CODE pass a CODE to CODE.
 Solutions/30_Patterns--Observer/README.md	[PAST] split: The six sizes split three ways.
 Solutions/31_Patterns--State_Machines/README.md	[PAST] blocked: closing the doors with the sensor blocked reopens them, and closing them again unblocked leaves the car idle, through two rules under one CODE key.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[PAST] ranked: Each CODE kind holds two of six weapon types, ranked around a cycle.

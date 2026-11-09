@@ -312,7 +312,7 @@ print([name for name in vars(shop)
 **Hide the classes behind a function.**
 The caller uses one function.
 `shop._Engine` and `shop._FuelPump` still reach the classes,
-because Python lets any caller read a module attribute, underscore or not.
+because any caller can read a module attribute, underscore or not.
 The underscore marks them as private, so `from shop import *` skips them.
 
 **List what a caller can see.**
@@ -439,8 +439,8 @@ a different design, a detail, or an equivalent alternative.
 
 [What an Override May Change](../../Chapters/29_Patterns--Changing_the_Interface.md#what-an-override-may-change)
 explains which parts of a signature a subclass may alter.
-The `/` keeps a parameter's name out of the interface,
-so removing it lets callers pass the argument by name.
+The `/` keeps a parameter's name out of the interface, so if you remove it,
+callers can pass the argument by name.
 Call through a `WhatIUse` variable,
 so the checker verifies the call against the base class's signature.
 Then give the override the base parameter's name.

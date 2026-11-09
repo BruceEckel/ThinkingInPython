@@ -457,7 +457,7 @@ def test_later_responder_still_runs_after_a_failure(
 Catching bare `Exception` here is deliberate.
 `announce()` calls arbitrary callables,
 so its code cannot list the exceptions they raise.
-Catching `Exception` lets every other `BaseException` propagate,
+Every other `BaseException` propagates past `except Exception`,
 so a `KeyboardInterrupt` or an `asyncio.CancelledError` raised in a responder stops the notification instead of joining `failures`.
 
 **Record each failure.**
@@ -475,7 +475,7 @@ and the test's `pytest.raises(ExceptionGroup)` fails with `DID NOT RAISE`.
 **Report every failure together.**
 `ExceptionGroup` is the right container because more than one responder can fail on a single notification,
 and the caller needs every failure, not the first.
-`except*` then lets a caller handle one kind of failure and re-raise the rest.
+With `except*`, a caller can handle one kind of failure and re-raise the rest.
 A plain `except RuntimeError` misses the group,
 because the exception `announce()` raises is the `ExceptionGroup` itself.
 
@@ -660,8 +660,8 @@ because `gather()` runs the loop over the responders.
 
 If you leave out `return_exceptions=True`,
 `gather()` re-raises the first failure as a bare `RuntimeError`.
-`pytest.raises(ExceptionGroup)` lets that `RuntimeError` propagate,
-which fails the test.
+That `RuntimeError` propagates past `pytest.raises(ExceptionGroup)`,
+so the test fails.
 The demo still prints `1 [7]`,
 because `except*` wraps a bare exception in a group and `record()` finishes before `main()` resumes.
 A slower responder, though, keeps running as an orphan,
@@ -1043,7 +1043,7 @@ With that change, `grid_view.py`'s existing view repaints after every move.
 The drawing code stays as it is,
 but `show()`'s parameter annotation must change.
 That annotation specifies `GridModel`, which a `FloodGame` is not.
-Widening the annotation lets the same view draw either model.
+With a wider annotation, `show()` draws either model.
 The wider type can be a Protocol that declares `connect()`, `size`, `grid`,
 and `select()`.
 It can also be a base class that both models inherit,
@@ -1587,7 +1587,7 @@ so no sequence of selections turns that board one color.
 
 `Color` is a `StrEnum`,
 so its members are strings and go straight into `", ".join(reachable(size))`.
-String members also let `grid_view.py` pass a `Color` to `tkinter`.
+For the same reason, `grid_view.py` passes a `Color` to `tkinter`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -1742,7 +1742,8 @@ a descriptor keeps one per attribute.
 **Return the descriptor on class access.**
 Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`.
-Returning the descriptor there lets `Thermometer.celsius.connect()` call the descriptor's method.
+When `__get__()` returns the descriptor there,
+`Thermometer.celsius.connect()` calls the descriptor's method.
 
 If `__get__()` always returns the stored value,
 as a validating descriptor's `__get__()` does,

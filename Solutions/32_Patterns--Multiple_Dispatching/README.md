@@ -866,8 +866,8 @@ which returns `NotImplemented` for a `str`.
 With both sides declining, Python raises `TypeError`,
 whose message names both types.
 
-Returning `NotImplemented`, rather than raising an exception,
-lets Python report both operand types.
+When `__rsub__()` returns `NotImplemented` rather than raising an exception,
+Python reports both operand types.
 An exception raised inside `__rsub__()` carries the message `Meters` wrote,
 in place of Python's `unsupported operand type(s)` message,
 which names both types.
@@ -1214,7 +1214,8 @@ The design becomes double dispatch when `interact()`'s behavior must vary by `ot
 Exercise 8 adds that dependence.
 
 **Stage the meetings.**
-`Project` creates the inhabitants in `gather()` and makes neighbors interact in `meet()`.
+`Project` creates the inhabitants in `gather()`.
+`meet()` calls `interact()` on each pair of neighbors.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
