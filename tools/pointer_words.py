@@ -54,7 +54,9 @@ rewritten with "the" or the noun. A demonstrative pronoun is
 that call returns") reads as a noun on sight; and a span followed by a
 noun ("because this `NotInteresting` failure is deterministic")
 modifies that noun, which the reader sees next. None of the three is
-a `[SUB]` hit. The `hits()` function reports the shape for every
+a `[SUB]` hit. A possessive span counts too ("once this `Counter`'s
+owner stops"), since the reader still meets the span with no article
+or capital right after the closed phrase. The `hits()` function reports the shape for every
 sentence, whether or not the sentence opens with a pointer.
 
 A hit prints as `path:line: [THIS] This: <sentence>` or `path:line:
@@ -151,6 +153,7 @@ SUBORDINATORS: Final = frozenset({
     "before", "after", "once", "since", "when", "while", "until",
     "because", "if", "unless", "although", "though", "as"})
 VERB_POS: Final = frozenset({"VERB", "AUX"})
+TAIL_POS: Final = frozenset({"NOUN", "PROPN"})
 OPENS: Final = "(opens paragraph)"
 
 
@@ -238,16 +241,29 @@ def subordinated(sentence: Sentence) -> Iterator[tuple[Token, Token]]:
     `compound`, so the shape is found by position. A noun after the
     span ("because this `NotInteresting` failure is deterministic")
     makes the span a modifier of a noun the reader sees next, and is
-    no hit.
+    no hit. A possessive tail between the span and the verb (`'s` and
+    then one or more nouns or code spans, "once this `Counter`'s owner
+    stops") is allowed.
     """
     words = [t for t in sentence.tokens if not t.punct]
-    for before, after, span, verb in zip(
-            words, words[1:], words[2:], words[3:]):
-        if (before.text.lower() in SUBORDINATORS
-                and after.text.lower() in DEMONSTRATIVES
-                and after.dep == "det"
-                and span.text == "CODE"
-                and verb.pos in VERB_POS):
+    for i, before in enumerate(words):
+        if before.text.lower() not in SUBORDINATORS:
+            continue
+        if i + 2 >= len(words):
+            continue
+        after, span = words[i + 1], words[i + 2]
+        if (after.text.lower() not in DEMONSTRATIVES
+                or after.dep != "det" or span.text != "CODE"):
+            continue
+        j = i + 3
+        if j < len(words) and words[j].text == "'s":
+            k = j + 1
+            while k < len(words) and (
+                    words[k].pos in TAIL_POS or words[k].text == "CODE"):
+                k += 1
+            if k > j + 1:
+                j = k
+        if j < len(words) and words[j].pos in VERB_POS:
             yield before, after
 
 
@@ -314,6 +330,7 @@ EXAMPLES: Final[tuple[tuple[str, str], ...]] = (
      "line.", "SUB"),
     ("Before that call returns, `both()` continues to the next line.",
      "no hit"),
+    ("once this `Counter`'s owner stops, the count resets.", "SUB"),
 )
 """Calibration sentences and the result each should give."""
 

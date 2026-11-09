@@ -67,6 +67,9 @@ PROXY = "The proxy stores the level. "
     ("Before this CODE runs, nothing prints.",
      ["[SUB] Before this CODE: Before this CODE runs, nothing "
       "prints."]),
+    ("once this `Counter`'s owner stops, the count resets.",
+     ["[SUB] once this CODE: once this CODE's owner stops, the count "
+      "resets."]),
     ("Retrying is the wrong behavior because this `NotInteresting` "
      "failure is deterministic.", []),
 ])

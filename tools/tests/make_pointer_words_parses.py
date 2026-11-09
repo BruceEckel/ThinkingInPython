@@ -46,6 +46,7 @@ SOURCES: Final[tuple[str, ...]] = (
     "The driver calls `send()`. Before that `send()` returns, "
     "`both()` runs.",
     "Before this `yield` runs, nothing prints.",
+    "once this `Counter`'s owner stops, the count resets.",
     "Retrying is the wrong behavior because this `NotInteresting` "
     "failure is deterministic.",
 )

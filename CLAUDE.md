@@ -515,8 +515,10 @@ demonstrative determiner, a code span, and a verb ("Before that
 clause, since a code span carries no article or capital to open a noun
 phrase. The repair is "the", "its", or the noun ("the `next()` on the
 answers"); the book-wide run that day found three beyond chapter 45's
-and all four were rewritten, so there is no keep yet. A span followed
-by a noun ("this `NotInteresting` failure") is quiet by design.
+and all four were rewritten, so there is no keep yet. A possessive
+span counts too ("once this `Counter`'s owner stops"; the book has
+no site of that form). A span followed by a noun ("this
+`NotInteresting` failure") is quiet by design.
 `tip negatives` (`tools/negation_density.py`, 2026-10-19) is a second
 survey tool outside `tip prose`, with no baseline.
 It counts, per paragraph, the style rule's family of negatives: the

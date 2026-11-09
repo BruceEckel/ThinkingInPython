@@ -2135,6 +2135,142 @@
    }
   ]
  ],
+ "once this CODE's owner stops, the count resets.": [
+  [
+   {
+    "i": 0,
+    "text": "once",
+    "lemma": "once",
+    "pos": "SCONJ",
+    "tag": "IN",
+    "dep": "mark",
+    "head": 5,
+    "idx": 0,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 1,
+    "text": "this",
+    "lemma": "this",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 2,
+    "idx": 5,
+    "punct": false,
+    "morph": "Number=Sing|PronType=Dem"
+   },
+   {
+    "i": 2,
+    "text": "CODE",
+    "lemma": "code",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "poss",
+    "head": 4,
+    "idx": 10,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 3,
+    "text": "'s",
+    "lemma": "'s",
+    "pos": "PART",
+    "tag": "POS",
+    "dep": "case",
+    "head": 2,
+    "idx": 14,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 4,
+    "text": "owner",
+    "lemma": "owner",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 5,
+    "idx": 17,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 5,
+    "text": "stops",
+    "lemma": "stop",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "advcl",
+    "head": 9,
+    "idx": 23,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 6,
+    "text": ",",
+    "lemma": ",",
+    "pos": "PUNCT",
+    "tag": ",",
+    "dep": "punct",
+    "head": 5,
+    "idx": 28,
+    "punct": true,
+    "morph": "PunctType=Comm"
+   },
+   {
+    "i": 7,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 9,
+    "idx": 30,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 8,
+    "text": "count",
+    "lemma": "count",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "compound",
+    "head": 9,
+    "idx": 34,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 9,
+    "text": "resets",
+    "lemma": "reset",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 9,
+    "idx": 40,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 10,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 9,
+    "idx": 46,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
  "Retrying is the wrong behavior because this CODE failure is deterministic.": [
   [
    {
