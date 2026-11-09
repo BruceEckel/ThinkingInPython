@@ -196,3 +196,7 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   Rewrite when two candidates fit, when the term is further away than that, when a phrase after the noun poses as the term, or when nothing is compared:
   "`close()` raises a `RuntimeError` with the message shown for `stubborn()`".
   Keep a term in the sentence, a single adjacent candidate, and the idioms. Rule R63 in `bruce_edit_db.md`; the `[SAME]` survey lists only the nothing-compared shape, so read every "same" in the scope.
+  The read of the 42 close calls that day added two tests.
+  Was the noun after "same" introduced? "The same separation", "the same hazard", and "the same machinery" each named a thing the passage had described and never called that, so the repair says what the thing is.
+  Are the two things the same? "The same `Queue`" stood beside a listing that uses a `PriorityQueue`, and "the same guard" joined two different `isinstance()` tests; check the claim against the listing as for any other claim.
+  Two repairs joined the list: where the thing is no longer than the pointer, write the thing ("with `metaclass=Singleton`"), and where the second term is the sentence's own "each" or "every", put it before an appositive ("makes the same call on each element, `element.accept(visitor)`").

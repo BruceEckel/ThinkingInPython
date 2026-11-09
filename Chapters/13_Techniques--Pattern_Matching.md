@@ -683,8 +683,8 @@ so a `match` that must produce a value goes inside a function that returns from 
 Python has no `sealed` keyword.
 `assert_never()` plus the type checker fills that role.
 
-An `if`/`isinstance()` chain that ends with `assert_never()` gives the same exhaustiveness check,
-but a `match` names the subject once and binds fields as it tests the type.
+An `if`/`isinstance()` chain that ends with `assert_never()` gives the same exhaustiveness check as a `match`,
+but the `match` names the subject once and binds fields as it tests the type.
 `case Circle(radius)` in `area()` tests the type and binds `radius` in one pattern,
 where the chain tests `isinstance(shape, Circle)` and then reads `shape.radius`.
 

@@ -304,7 +304,11 @@ names the actor with the verb the book taught ("`close()` raises",
 random pairs"). The same sweep read all 1,370 "same" sites for rule
 R63 ("the same X" has a second term the reader can name, Bruce: "same
 as what") and rewrote about 30; no tool lists that shape, so the
-`ambiguity` pass reads every "same" in its scope.
+`ambiguity` pass reads every "same" in its scope. The agents' 42
+close-call keeps went on the Same Keeps page, and the session answered
+each one the same day: 22 more rewritten, 19 kept. That read added two
+tests to R63: the noun after "same" is one the passage has used, and
+the two things are in fact the same.
 Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
 object, `no X`, `none`, or `none of` ("runs none of the body", "raises
 no exception", "has no `__slots__`"), Bruce's "reversal of

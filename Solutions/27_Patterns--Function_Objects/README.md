@@ -355,7 +355,7 @@ with no extra bookkeeping.
 Because the report reads `finder.__name__`,
 `chain` needs a `Protocol` here instead of an alias like the chapter's `RootFinder`.
 If you annotate `chain` with a `Callable` type, as `RootFinder` is,
-the script runs and prints the same report,
+the script runs and prints the same output,
 but `ty` reports `unresolved-attribute` on both reads of `finder.__name__`.
 A `Callable` describes a call and declares no `__name__`.
 Pyright allows the reads, inferring the attributes of a function object.

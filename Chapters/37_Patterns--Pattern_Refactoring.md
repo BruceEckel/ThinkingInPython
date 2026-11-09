@@ -621,8 +621,8 @@ Python still has the expression problem,
 but each side is now an addition in one place instead of an edit spread across classes.
 
 `singledispatch` is for behavior that differs by type.
-The earlier `sum_value()` runs the same expression,
-`piece.weight * piece.value`, for every type, so it stays an ordinary function.
+The earlier `sum_value()` runs the same expression for every type,
+`piece.weight * piece.value`, so it stays an ordinary function.
 
 For an operation that belongs on an object and still varies by type,
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)

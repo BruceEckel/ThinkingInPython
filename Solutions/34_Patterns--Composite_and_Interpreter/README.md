@@ -1139,7 +1139,6 @@ The left operand is what the caller wrote first,
 and no method in this expression language accepts a `str`.
 
 **Guard the forward direction too.**
-The forward methods need the same guard for the same reason.
 The old `__add__()` passes the raw string through `wrap()`,
 so `x + "a"` builds the ill-typed tree `Add(Var('x'), 'a')` from the other direction.
 

@@ -2247,7 +2247,7 @@ reporting a cycle or a missing provider by name.
 Stateless has no equivalent, so you write the wiring at the edge yourself.
 The type checker verifies that a `supply()` call is complete but leaves the assembly of the graph to you.
 
-The operator set is small in the same way.
+The operator set is small.
 The library has `retry()` and `repeat()`.
 `Schedule` offers a regular interval and a repeat count,
 with no exponential backoff and no jitter.

@@ -480,7 +480,7 @@ because `monkeypatch.setattr()` looks up the name by string and the string is no
 because it hands the dependency in instead of naming it,
 and `current_temp_with()` calls the fetcher it receives.
 
-Exercise 4 draws the same lesson from the environment variable.
+In exercise 4, the patched test depends on the name of an environment variable.
 Here the dependency is a function.
 A patched test depends on the name of the function it replaces,
 in the module where that name lives.

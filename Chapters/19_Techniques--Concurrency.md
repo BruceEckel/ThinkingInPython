@@ -1411,7 +1411,7 @@ in Python or anywhere else, so adding cores alone is not a scaling strategy.
 Splitting into more, smaller tasks yields gains up to a point,
 since finer chunks even out the load across workers.
 Past that point, though,
-each additional task adds its slice of the same serial overhead:
+each additional task adds its slice of the serial overhead:
 one more chunk to pickle, one more result to collect.
 Once that added overhead outweighs the benefit of the smaller pieces,
 the curve flattens.
@@ -1896,7 +1896,7 @@ This listing's queue holds every job by the time `consume()` starts,
 so its first `get()` returns immediately.
 The same code runs unchanged whether the queue is empty or stocked.
 The [*Object Pool*](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-borrower)
-in Context Managers uses the same `Queue` as a throttle.
+in Context Managers uses a `Queue`'s blocking `get()` as a throttle.
 
 A consumer blocked in `get()` still needs a way to stop.
 `tasks.shutdown()` (3.13) answers that.

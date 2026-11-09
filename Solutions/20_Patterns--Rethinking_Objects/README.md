@@ -236,7 +236,7 @@ The assignment to `name` sets a field of `Bob`,
 so the `__setattr__()` that `frozen=True` generated for `Immutable` never runs.
 
 **Check hashability.**
-The `hash()` failure is a second symptom of the same shallowness.
+The `hash()` failure is a second symptom of the mutable `Bob`.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field values,
 so hashing an `Immutable` hashes its `Bob`.
 `Bob` is a mutable data class that compares by value.

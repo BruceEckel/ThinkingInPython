@@ -670,7 +670,7 @@ so `score` still prints as `92`.
 A finished f-string is a single `str` in which the values have merged into the literal text,
 so code that processes it afterward must guess which characters came from a value.
 
-`safe()` uses the same separation to check each value.
+`safe()` checks each value while it is still separate from the literal text.
 `trouble` holds a single quote,
 so `safe(t"Hello, {trouble}")` raises a `ValueError` before any result exists.
 `safe()` takes a `Template` because an f-string finishes assembling the result,

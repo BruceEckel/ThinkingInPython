@@ -92,7 +92,7 @@ Chapters/35_Patterns--Flyweight.md	each run	Its C implementation runs the lookup
 Chapters/35_Patterns--Flyweight.md	the first call	`@cache` stores each result under its argument, so every call with the same symbol returns the object the first call built.
 Chapters/36_Patterns--Memento.md	The final `Drawing`	The final `Drawing` alone costs two thousand.
 Chapters/36_Patterns--Memento.md	the line that	`restored.title` raises `AttributeError` when anything reads it, often far from the line that called `pickle.loads()`.
-Chapters/37_Patterns--Pattern_Refactoring.md	The earlier `sum_value()`	The earlier `sum_value()` runs the same expression, `piece.weight * piece.value`, for every type, so it stays an ordinary function.
+Chapters/37_Patterns--Pattern_Refactoring.md	The earlier `sum_value()`	The earlier `sum_value()` runs the same expression for every type, `piece.weight * piece.value`, so it stays an ordinary function.
 Chapters/37_Patterns--Pattern_Refactoring.md	several lines before	A `type` statement's right side evaluates lazily, so the alias can name `Trash` several lines before the `class` statement that defines it.
 Chapters/37_Patterns--Pattern_Refactoring.md	the first `Plastic:`	Without that `class` statement, `create()` raises a `KeyError` at the first `Plastic:` line, loudly, at parse time.
 Chapters/37_Patterns--Pattern_Refactoring.md	the first call	When the default answer is wrong for an unregistered material, the *Visitor* chapter advises making the base function raise `NotImplementedError`, so a forgotten registration fails at the first call (see exercise 5).

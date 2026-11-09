@@ -2877,12 +2877,23 @@ more than a sentence or an adjacent listing away; (3) a phrase after
 the noun, an appositive, a quoted message, or a code span, reads as the
 second term and is not; (4) the sentence opens a paragraph or follows a
 listing that has several X; (5) nothing is compared, C55's shape, where
-"same" is a pointer. Bruce (2026-11-09, chapter 45, on "raises the
+"same" is a pointer; (6) the noun after "same" was never introduced
+("the same separation", "the same hazard", "the same machinery"), so
+the reader has no first term to match; (7) the two things are not the
+same. "Same" is a claim, so check it against the listing: "the same
+`Queue`" beside a listing that uses a `PriorityQueue`, "the same guard"
+where the two tests differ, "small in the same way" as a thing that is
+absent. Bruce (2026-11-09, chapter 45, on "raises the
 same `RuntimeError`, `generator ignored GeneratorExit`"): "same as
 what". Repair: name the second term with words the passage has ("the
 message shown for `stubborn()`", "the `TypeError` that `parse()`
 raised", "as in `registry.py`", "as `bump()` does"), or, where identity
-is not the claim, write the pointer ("that", "its", "the").
+is not the claim, write the pointer ("that", "its", "the"). Where the
+thing is no longer than the pointer, write the thing ("with
+`metaclass=Singleton`", "the block's `ValueError`", "raises
+`Tripwire`"). Where the second term is the sentence's own "each" or
+"every", put it before an appositive ("makes the same call on each
+element, `element.accept(visitor)`").
 
 **Keep when.** The second term is in the sentence ("the same X as Y",
 "both use the same X", "the same X in both"). It is the one candidate
@@ -2899,9 +2910,34 @@ all 1,370 "same" sites and rewrote about 30, one in 45. By shape: a
 second term in another section or several sentences back (the most
 common), two candidates on the page, an appositive posing as the term,
 and nothing compared. The keeps: a term in the sentence, one adjacent
-candidate, the idioms, and an appositive that names the thing where
-"each" or "every" carries the comparison ("makes the same call,
-`element.accept(visitor)`, on each element").
+candidate, and the idioms. The agents listed 42 close-call keeps, and
+Bruce had the session answer "same as what?" on each (the Same Keeps
+page, 2026-11-09, the answers recorded on its cards): 22 rewritten, 19
+kept, and one gone with its sentence. That read found shapes 6 and 7.
+The 19 keeps: the term in the sentence or in the sentence before, a
+count that identifies the set ("the same four lines", "the same 36
+answers"), "same" set against a stated difference ("runs the same
+search with inputs it chooses"), and "the same way" straight after the
+way.
+- `02_Foundations--Tour`, a noun never introduced: "`safe()` uses the
+  same separation to check each value." -> "`safe()` checks each value
+  while it is still separate from the literal text."
+- `19_Techniques--Concurrency`, not the same thing (the listing uses a
+  `PriorityQueue`): "uses the same `Queue` as a throttle" -> "uses a
+  `Queue`'s blocking `get()` as a throttle"
+- `47_Effects--Stateless_in_Practice`, a comparison that does not hold:
+  "The operator set is small in the same way." -> "The operator set is
+  small."
+- `Solutions/17_Techniques--Metaprogramming`, the thing is shorter than
+  the pointer: "with the same `metaclass=` argument" -> "with
+  `metaclass=Singleton`"
+- `33_Patterns--Visitor`, "each" before the appositive: "makes the
+  same call, `element.accept(visitor)`, on each element" -> "makes the
+  same call on each element, `element.accept(visitor)`"
+- `Solutions/11_Techniques--Testing`, a term stated only afterward:
+  "Exercise 4 draws the same lesson from the environment variable." ->
+  "In exercise 4, the patched test depends on the name of an
+  environment variable."
 - `24_Patterns--Template_Method`, three `TypeError`s in the listing:
   "raises the same `TypeError`." -> "raises a `TypeError` with the
   message shown for `Hijack`, `overrides a @final method`."

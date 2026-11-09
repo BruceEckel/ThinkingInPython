@@ -608,7 +608,7 @@ and any class defining `__replace__()` all accept `copy.replace()`.
 ## Mementos That Outlive the Process
 
 A snapshot in memory disappears when the process ends.
-The same frozen value, serialized, becomes a saved game, a session file,
+Serialized, the snapshot becomes a saved game, a session file,
 or a crash-recovery point.
 The standard library's `pickle` turns almost any Python object into bytes and back:
 
@@ -725,7 +725,7 @@ The loaded object equals one built fresh from `SketchV1` and hashes the same.
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
 The deleted-field drift stays silent,
 and reading the deleted `title` returns stale data.
-Running the same reassignment backwards shows the deleted field:
+Reversing `pickle_drift.py`'s reassignment shows the deleted field:
 
 ```python
 # ghost_field.py

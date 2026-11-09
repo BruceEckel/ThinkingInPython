@@ -1036,10 +1036,10 @@ which a `partial` and a callable instance lack.
 Calling the wrapper around either of those two raises an `AttributeError`,
 while the wrappers around a function and a bound method run.
 
-The `# type: ignore` in `report` silences `ty`'s diagnostic for the same hazard.
 `ty` rejects `func.__name__`,
 since a `Callable` need not have a `__name__` attribute,
 though every function does.
+The `# type: ignore` in `report` silences that diagnostic.
 Pyright and mypy both accept the attribute here,
 because they give a `Callable` the attributes of a function object.
 `report` has no `wraps`, so `wrapper.__name__` is `wrapper`,

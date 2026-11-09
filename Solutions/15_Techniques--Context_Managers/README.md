@@ -717,7 +717,7 @@ and only then does the exception propagate out of the `with` statement to the `e
 That is the order `exit_on_error.py` shows for the class form: cleanup first,
 then propagation.
 
-In `no_finally.py` the same exception propagates out of the generator at a `yield` with no `try` around it,
+In `no_finally.py` the block's `ValueError` propagates out of the generator at a `yield` with no `try` around it,
 so the `print()` after the `yield` does not run.
 Apart from the function's name,
 the `finally` is the one difference between the two listings.

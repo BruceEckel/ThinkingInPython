@@ -352,7 +352,7 @@ underlies [the dictionary factory](26_Patterns--Factory.md#the-pythonic-factory-
 and the plugin registries that let you add features to a program from outside its core.
 
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
-replaces the same kind of `if`/`elif` chain with `match`.
+replaces a long `if`/`elif` chain with `match`.
 `match` and the table differ in one way that decides between them.
 A `match` is code, so adding an operator means editing the function,
 and the type checker checks each case's body.

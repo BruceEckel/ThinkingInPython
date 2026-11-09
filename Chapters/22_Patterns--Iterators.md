@@ -641,7 +641,7 @@ def test_islice_stops_after_its_count() -> None:
 In `test_the_if_clause_skips_but_never_stops()`,
 every value after `2` is 3 or more,
 yet the generator expression keeps pulling from `counter()` to find another match,
-until `counter()` raises the same `Tripwire`.
+until `counter()` raises `Tripwire`.
 
 Failing at 1,000 values models how a real program fails.
 A real program hangs, or it dies when it exhausts memory.

@@ -2201,7 +2201,8 @@ so you can compose a conversation from parts that never refer to their driver.
 
 An event loop is one such driver.
 `async`/`await` (PEP 492, Python 3.5, 2015)
-is the same machinery with a syntax that marks a function as one the event loop resumes.
+reuses the generator's implementation,
+with a syntax that marks a function as one the event loop resumes.
 `await` uses the implementation of `yield from`,
 so the second restriction holds for it.
 An `await` suspends the `async` function that contains it,

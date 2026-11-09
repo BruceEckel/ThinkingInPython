@@ -216,7 +216,7 @@ a different design, a detail, or an equivalent alternative.
 shows a metaclass `__call__()` that caches one instance per class.
 The cache is a dictionary keyed by the class,
 so each class that uses the metaclass gets its own entry.
-Add `CSingleton` with the same `metaclass=` argument and compare identities with `is`.
+Add `CSingleton` with `metaclass=Singleton` and compare identities with `is`.
 
 <details>
 <summary>The shape</summary>

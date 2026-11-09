@@ -406,8 +406,8 @@ if __name__ == "__main__":
 ```
 
 The recursion works because `Corsage` and `Flower` both define `accept()`.
-The loop in `Corsage.accept()` makes the same call, `element.accept(visitor)`,
-on each element, whether the element is a flower or another corsage.
+The loop in `Corsage.accept()` makes the same call on each element,
+`element.accept(visitor)`, whether the element is a flower or another corsage.
 The `Accepts` protocol declares that shared method,
 so the type checker reports an element that lacks `accept()`,
 such as `Corsage("rose")`, before the program runs.

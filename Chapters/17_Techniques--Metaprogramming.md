@@ -1690,8 +1690,7 @@ where both live.
 
 For an instance, the tag says whether the value lives on the class or on the object,
 the same rule `Stars.rating` demonstrates in [Class Attributes](09_Foundations--Class_Attributes.md#class-attributes-are-not-default-values).
-In that same chapter 12 comparison,
-`show(B())` in `class_with_defaults.py` tags `B.x` and `B.s`.
+`show(B())` in chapter 12's `class_with_defaults.py` tags `B.x` and `B.s`.
 `display_object(Messenger("iris", 12, 3.14))` in chapter 12 tags none,
 since `@dataclass` assigns every field straight onto the new instance.
 The tag comes from where the value lives,

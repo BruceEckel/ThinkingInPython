@@ -708,8 +708,8 @@ which runs after the `with` block exits and the context manager deletes the dire
 Its default, `on_error=None`, discards the error,
 so `sorted()` returns an empty list.
 
-A `lambda` created in a comprehension [reads its variables late](27_Patterns--Function_Objects.md#the-late-binding-trap)
-by the same mechanism.
+A `lambda` created in a comprehension [reads its variables late](27_Patterns--Function_Objects.md#the-late-binding-trap),
+as `gen` reads `factor` in `genexp_timing.py`.
 Its body runs when something calls it, not when the comprehension creates it.
 
 [Iterators](22_Patterns--Iterators.md#generators) explores generators further,
