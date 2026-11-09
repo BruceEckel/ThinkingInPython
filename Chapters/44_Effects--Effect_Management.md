@@ -452,8 +452,8 @@ Tracking supplies that knowledge.
 With it you know what a function does:
 whether it is safe to run in parallel with another,
 and what it does when you call it twice in a row.
-That knowledge lets you compose functions,
-and composition is how programs scale.
+That knowledge lets you compose functions.
+To scale a program, you compose small functions into larger ones.
 
 ### Tracking and Management
 

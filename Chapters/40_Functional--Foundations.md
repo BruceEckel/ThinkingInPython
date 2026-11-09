@@ -131,7 +131,8 @@ The tuple `([1], 2)` always holds that same list.
 Anyone can still append to the list.
 A tuple of strings, immutable all the way down, stays what you last read,
 whatever code ran in between.
-That guarantee is why removing shared mutable state is the practical core of the functional style.
+Because a deeply immutable value stays what you last read,
+removing shared mutable state is the practical core of the functional style.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -278,8 +279,9 @@ Python computes that hash from the fields, so every field must be hashable too.
 Hashing a frozen record that holds a `list` still raises a `TypeError`.
 `frozen_leaky.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates that failure.
-Contents-based equality together with a stable hash is why a dictionary key,
-a cache entry, or a value shared across threads is normally a tuple or a record.
+A dictionary key, a cache entry,
+or a value shared across threads is normally a tuple or a record,
+because those types combine contents-based equality with a stable hash.
 
 ## Functions as First-Class Objects
 

@@ -114,7 +114,7 @@ which here is the value the handler sent back.
 `prompt` is payload on the request, there for the handler to read,
 so the answer to an `Ask` is the value `scripted()` returns.
 A `Tell` is a one-way message,
-which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
+so `Tell` is `Ability[None]` and `capture()` returns `None`.
 
 `ask()` and `tell()` are accessors,
 small functions that each wrap one Ability and declare its answer type.
@@ -1212,7 +1212,7 @@ Both the runtime and the type checker accept either order.
 A handler passes error values to its caller unchanged,
 so `supply()`'s driver relays the failures to the catch either way.
 Under `ty` 0.0.95 both orders infer the same result type.
-The Ability channel is where the orders differ.
+The orders differ in the Ability channel.
 `supply(feed, book)(catch_all(research))` comes back with `Never` there,
 and `catch_all(supply(feed, book)(research))` with `Unknown`:
 the same two calls in the other order.
@@ -1663,9 +1663,9 @@ Under `reveal_type()`, `retried` is:
 
 `retry()` changes the signature in three visible ways.
 The error becomes `RetryError[Crashed]`,
-which is why the third run catches `RetryError` rather than `Crashed`.
+so the third run catches `RetryError` rather than `Crashed`.
 `Async` appears because waiting between attempts is asynchronous.
-And `Need[Time]` appears, which is why `supply()` gains a `Time()`.
+And `Need[Time]` appears, so `supply()` gains a `Time()`.
 Retrying needs a clock, and the signature says so.
 If you leave the `Time()` out, the type checker rejects the `run()` call.
 
@@ -2110,7 +2110,7 @@ info[revealed-type]: Revealed type
 `half` still needs an `Ask`, and `full` and `nested` have every Ability handled,
 so `run()` reports a handler left out of either form.
 `ask_tell_demo.py` binds `half` and `full` instead of nesting the calls,
-because a named intermediate is where you read the Ability that remains.
+because a named intermediate lets you read the Ability that remains.
 That is the information this library exists to give you.
 
 The order of the handlers changes what the checker reports.
@@ -2190,7 +2190,8 @@ and the generator body is syntax that hides the chaining.
 has the same two operations, with the chaining written as `bind()` calls.
 Stateless's documentation calls the library an algebraic effect system,
 and both descriptions are right.
-A monad plus handlers is how you build algebraic effects in a language with no native support for them.
+In a language with no native support for algebraic effects,
+you build them from a monad plus handlers.
 The monad is the mechanism that chains the steps,
 and the handlers are the interface.
 

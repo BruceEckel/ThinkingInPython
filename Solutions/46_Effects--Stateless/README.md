@@ -1003,7 +1003,8 @@ and nothing reports the difference.
 The stored value changes from a generator, which `run()` consumes once,
 to a function, which a caller can call each time it needs a fresh Effect.
 
-That difference is why `retry()` takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than one of type `Effect[...] -> Effect[...]`.
+Because a function can build a fresh Effect again and again,
+`retry()` takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than one of type `Effect[...] -> Effect[...]`.
 Retrying means running the same work more than once.
 An Effect supplies one run.
 By the time the first attempt fails,
@@ -1490,7 +1491,8 @@ brings the ambiguity back.
 Supplying `capture` and `audit` both through `as_type(Recorder)` leaves the choice to argument order,
 with no diagnostic.
 
-That limit is why [When Two Implementations Match](../../Chapters/46_Effects--Stateless.md#when-two-implementations-match)
+Because that ambiguity remains,
+[When Two Implementations Match](../../Chapters/46_Effects--Stateless.md#when-two-implementations-match)
 gives its advice in two halves.
 No type can enforce the second half, "supply one implementation per Ability."
 Because `supply()` resolves a request by scanning its arguments at runtime,

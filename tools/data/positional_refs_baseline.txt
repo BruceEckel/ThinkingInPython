@@ -149,7 +149,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	second run	`run_load()` draws from
 Chapters/47_Effects--Stateless_in_Practice.md	the inner loop	`draw()` returns `None` on success, so anything else in `failure` is the `Drained` that ends the inner loop.
 Chapters/47_Effects--Stateless_in_Practice.md	the last handler	`handle()` is `drive()` with a type lookup in place of the dictionary, `run()` is that loop applied after the last handler, and `supply()` is `handle()` prepackaged for `Need`: a handler whose answer to `Need[T]` is the supplied instance that is a `T`.
 Chapters/47_Effects--Stateless_in_Practice.md	the next line	The stop comes before the `need(Encyclopedia)` on the next line, and so before any call to `Library.article()`.
-Chapters/47_Effects--Stateless_in_Practice.md	third run	The error becomes `RetryError[Crashed]`, which is why the third run catches `RetryError` rather than `Crashed`.
+Chapters/47_Effects--Stateless_in_Practice.md	third run	The error becomes `RetryError[Crashed]`, so the third run catches `RetryError` rather than `Crashed`.
 Chapters/47_Effects--Stateless_in_Practice.md	third run	The third run counts them there, after the `match` narrows `outcome` from `str | RetryError` to the error.
 Chapters/47_Effects--Stateless_in_Practice.md	three attempts	The same schedule that governed three attempts now governs three repetitions of `save_user()`, and the tuple holds every result in order.
 Chapters/47_Effects--Stateless_in_Practice.md	three runs	Those three runs are claims about testability, so each one becomes a test.

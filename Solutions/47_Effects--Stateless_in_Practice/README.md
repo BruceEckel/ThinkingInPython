@@ -1761,7 +1761,7 @@ Pyright does infer the union from the body,
 so under Pyright the function changes its type every time `research()`'s error set changes.
 
 `ty` stops checking the correspondence between the annotation and the Effect.
-The annotation is where a human writes down which failures this program expects,
+In the annotation, a human writes down which failures this program expects,
 and the checker's job is to confirm that the Effect agrees.
 Once you delete the annotation,
 the type checker has one description instead of two,

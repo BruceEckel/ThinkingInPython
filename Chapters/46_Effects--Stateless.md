@@ -45,7 +45,7 @@ Those three parameters answer the three questions [Effect Management](44_Effects
 asked of an Effect signature:
 
 - `A` is what the computation needs, an *Ability*.
-- `E` is how it can fail.
+- `E` is its failure type.
 - `R` is what it produces.
 
 Stateless reuses the word Effect for the whole description a function returns.
@@ -133,7 +133,7 @@ such as a console, a file, or a network connection.
 
 ## Declaring a Dependency
 
-`Need` is how Stateless does dependency injection.
+Stateless does dependency injection with `Need`.
 A `Need` is a request for an instance,
 and code outside the requesting function answers it.
 `need(SomeClass)` is an Effect that produces an instance of `SomeClass` and leaves open what supplies that instance:
@@ -1215,8 +1215,8 @@ A pass-through function such as `greet_all()` still declares `Need[Log]` in its 
 Taking that Ability back out later changes every signature on the path a second time.
 People made the same complaint against [Java's checked exceptions](44_Effects--Effect_Management.md#catch-the-exception-you-expect),
 where an exception added three levels down meant editing every signature above it.
-That complaint is why [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
-compares the propagation to `async`.
+That complaint prompts [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
+to compare the propagation to `async`.
 
 ## Waiting on a Coroutine
 

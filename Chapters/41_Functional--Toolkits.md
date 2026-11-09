@@ -997,7 +997,8 @@ as `nested_sum.py` shows.
 Branching adds a problem of its own.
 More than one branch can reach the same subproblem,
 and a plain recursive function recomputes it every time.
-That recomputation is why the recursive `fib()` under [`cache`](#cache)
+To avoid recomputing shared subproblems,
+the recursive `fib()` under [`cache`](#cache)
 gets a decorator rather than a rewrite as a loop.
 The recursion states the definition, and the cache removes the repetition.
 

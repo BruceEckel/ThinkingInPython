@@ -1395,8 +1395,7 @@ The plate's own field subtracts one product from another,
 Each product separates on its own,
 but their difference does not factor into a function of `x` times a function of `y`.
 The difference is zero along the curves where the two products agree,
-which is why the original figures are diagonals, crosses,
-and rings rather than a grid.
+so the original figures are diagonals, crosses, and rings rather than a grid.
 The subtraction comes from the physics the chapter's formula approximates,
 a real plate with free edges rather than a membrane clamped all around its rim.
 

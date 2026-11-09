@@ -661,7 +661,7 @@ print(tally(), tally(), tally())
 `increment()` reads `step` the way `multiply()` reads `factor` in `multiplier()`,
 so Python finds `step` in the enclosing scope.
 `count` differs because `increment()` assigns it.
-Assignment is how Python decides a name is local.
+Python decides that a name is local when the function body assigns it.
 Without `nonlocal`, that assignment makes `count` a local of `increment()`,
 so `count += step` reads the local before it holds a value.
 
