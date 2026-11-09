@@ -567,7 +567,8 @@ An editor's undo is often narrower.
 Undo the strokes, but keep the rename.
 Because `History` stores and returns whole states and treats each one as opaque,
 the state must supply the partial restore.
-A state that defines `__replace__()` supplies it through `copy.replace()`:
+A state that defines `__replace__()` supplies it through `copy.replace()`.
+`Drawing` is a record, so `dataclass()` generates its `__replace__()`:
 
 ```python
 # partial_restore.py
