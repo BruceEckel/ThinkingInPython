@@ -170,8 +170,12 @@ statement-like word (line, call, loop, print, return, ...):
    a paragraph that introduces a name covers the ones after it. A
    paragraph that is the next listing's lead-in is skipped here (rule
    10 reads it). One hit per sentence. A `Hint:` or `Done when:`
-   paragraph is skipped. A survey rule, printed under `--survey`,
-   never baselined; the reader judges each hit. The first book run
+   paragraph is skipped, and so is the repaired form, a span followed
+   by "in" or "from" and a code span or a link (`SOURCED_OPENING`:
+   "`act()` in `value_patterns.py`", "`GameBuilder`, in `game.py`
+   below", "The chapter's `parse_int()`"), since the sentence gives
+   its source. A survey rule, printed under `--survey`, never
+   baselined; the reader judges each hit. The first book run
    had 123 hits and 9 rewrites, each adding the source ("`data_dir()`
    in `storage.py`", "`History.do()`", "`GameBuilder`, in `game.py`
    below", "The chapter's `parse_int()`"). The keeps: a standard
@@ -325,6 +329,12 @@ SUBJECT_OPENERS: Final = (
 SUBJECT_OPENING: Final = re.compile(
     r"\s*(?:(?:" + "|".join(SUBJECT_OPENERS) + r"|At `\[[^`]*\]`),\s*)?"
     r"(`[^`]+`)(?:'s)?")
+# The repaired form gives the source right after the span: "`act()` in
+# `value_patterns.py`", "`min_max()` in [Containers](...)", "`GameBuilder`,
+# in `game.py` below". Quiet.
+SOURCED_OPENING: Final = re.compile(
+    r"\s*(?:(?:" + "|".join(SUBJECT_OPENERS) + r"|At `\[[^`]*\]`),\s*)?"
+    r"`[^`]+`(?:'s)?,? (?:in|from) (?:the chapter's )?(?:`[^`]+`|\[)")
 SKIPPED_PARAGRAPH: Final = re.compile(r"(?:Hint|Done when):")
 COMMON_NAMES: Final = frozenset(dir(builtins))
 CALL_SPAN: Final = re.compile(r"[A-Za-z_][\w.]*\(\)")
@@ -654,7 +664,7 @@ def absent_subject_hit(
     and of the paragraph's earlier sentences.
     """
     m = SUBJECT_OPENING.match(sentence)
-    if m is None:
+    if m is None or SOURCED_OPENING.match(sentence):
         return None
     body = m.group(1).strip("`").strip()
     if not (CALL_SPAN.fullmatch(body) or CAP_SPAN.fullmatch(body)):

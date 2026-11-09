@@ -379,6 +379,14 @@ def test_absent_subject_quiet_cases() -> None:
     assert subject_hits(walk("The driver calls `absent()`.")) == []
     assert subject_hits(walk("`print()` shows it.")) == []
     assert subject_hits(walk("Hint: `absent()` returns.")) == []
+    # The repaired form names its source and is quiet.
+    assert subject_hits(walk("`absent()` in `other.py` returns.")) == []
+    assert subject_hits(
+        walk("`Absent`, in `other.py` below, returns.")) == []
+    assert subject_hits(
+        walk("`absent()` in [Link](other.md#x) returns.")) == []
+    assert subject_hits(
+        walk("The chapter's `absent()` returns.")) == []
 
 
 def test_absent_subject_is_a_survey_rule(
