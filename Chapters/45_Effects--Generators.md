@@ -1245,17 +1245,19 @@ expect(RuntimeError, s.close)
 ```
 
 If a generator yields inside a `finally` clause,
-`close()` raises a `RuntimeError` with the message shown for `stubborn()`,
-`generator ignored GeneratorExit`.
-`GeneratorExit` passes through the `finally` clause on its way out of the generator.
-A `yield` there suspends the generator again before it can finish.
+`close()` also raises a `RuntimeError` with the message `generator ignored GeneratorExit`.
+As `GeneratorExit` propagates out of that generator,
+Python runs the `finally` clause.
+The `yield` there suspends the generator again before it can finish.
+
 When the driver calls `close()`, the `RuntimeError` arrives in the driver,
-as above.
-When the garbage collector, not the driver, calls `close()`,
-the `RuntimeError` arrives in the collector,
-so Python prints it as an "Exception ignored" message and continues.
-A generator for a driver must therefore finish when `GeneratorExit` arrives:
-it cleans up and returns.
+as in `throw_and_close_gotcha.py`.
+When the garbage collector calls `close()`,
+the `RuntimeError` arrives in the collector.
+Python displays it as an "Exception ignored" message and continues.
+
+A generator for a driver must therefore finish when `GeneratorExit` arrives,
+by cleaning up and returning.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
@@ -1605,7 +1607,7 @@ The trampoline keeps the chain one level deep.
 and the loop takes up the next state at the same depth.
 [The Restriction Behind the Driver](#the-restriction-behind-the-driver)
 says why a driver exists.
-Exercise 9 puts the same shape, `return (yield from inner)`, into `proxy()`,
+Exercise 9 puts the shape at `[1]` into `proxy()` as `return (yield from inner)`,
 where it relays every request instead of answering one.
 
 ## Many Generators, One Driver
@@ -1822,8 +1824,8 @@ so `async for` must await what it returns.
 and the `async for` makes the rest.
 The loop ends when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
-The asynchronous generator `countdown()` writes the same loop as its body,
-with a `yield`, and leaves the two methods to Python.
+The asynchronous generator `countdown()` in `async_generator.py` computes `Countdown`'s sequence in a `while` loop with a `yield`,
+and leaves the two methods to Python.
 
 An asynchronous generator drops the return channel,
 so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
