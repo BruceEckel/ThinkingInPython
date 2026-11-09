@@ -1339,14 +1339,42 @@ in 17 files (additive).
 **Test.** A sentence that introduces the listing directly below it and
 points at that listing with "X below" ("`Repeat` below is ..."), with a
 demonstrative subject ("This thermometer announces ..."), or with a
-purpose clause ("To break the cycle, the setter returns early"). Write
-"Here, X ...".
+purpose clause ("To break the cycle, the setter returns early"), or
+names the listing by its filename ("In `x.py`, ...", "`x.py` gathers
+..."), which reads as a reference to some other listing (Bruce,
+chapter 45, 2026-11-09). Write "Here, X ...", or name the thing ("One
+module", "this solution", "the view"); the filename is on the
+listing's first line. `tip positional ARGS=--survey` lists the
+filename form as `survey self-name`.
 
 **Keep when.** The sentence states a general property rather than one
 of the adjacent listing (C16); "Here," belongs on a claim about that
-listing only.
+listing only. A filename the reader already has stays: a module a
+test needs before it is supplied (chapter 11's `palindrome.py`), a
+chapter file a solution revises (Solutions 26's `registry_demo.py`),
+a `(continued)` part ("complete `items.py`:"), and a generic name
+(`__init__.py`, `conftest.py`).
 
-**Sightings.** 4 (additive), 2 chapters
+**Sightings.** 10 (additive), 6 chapters
+- `45_Effects--Generators`, `32_Patterns--Multiple_Dispatching`,
+  `42_Functional--Error_Handling`, `38_Patterns--Simulation`,
+  `Solutions/35_Patterns--Flyweight` 2026-11-09 (`7177b735`), Bruce's
+  reading of chapter 45, six: "In `yield_from_nested.py`, a `yield
+  from` in `survey()` receives that `Result`:" -> "Here, a `yield
+  from` in `survey()` receives that `Result`:"; "`squasher_switch.py`
+  is that subroutine as an iterator class," -> "Here is that
+  subroutine as an iterator class,"; "In `radd_dispatch.py`, a
+  `Meters` record implements `__add__()` and `__radd__()`." -> "Here,
+  a `Meters` record implements `__add__()` and `__radd__()`.";
+  "`steps.py` gathers the three steps the rest of the chapter chains,
+  so a listing imports all three from one module." -> "One module
+  gathers the three steps the rest of the chapter chains, so a listing
+  imports all three from one place."; "The imports point one way, from
+  `maze_view.py` into the model's modules." -> "The imports point one
+  way, from the view into the model's modules."; "so `exercise_3.py`
+  defines `MutableTile`," -> "so this solution defines
+  `MutableTile`,". The book-wide scan kept eight, listed under Keep
+  when.
 - `27_Patterns--Function_Objects` 2026-09-16, was Claude-written:
   "`Repeat` below is a frozen data class" -> "Here, `Repeat` is a
   frozen data class"; "`Handler` below names their signature, not an
