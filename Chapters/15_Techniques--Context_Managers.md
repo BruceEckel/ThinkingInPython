@@ -579,7 +579,7 @@ The call at `[1]` names two types in a tuple and forwards `base=1` as a keyword,
 which `parse()` passes on to `int()`.
 The message from `[2]` is too long for one line, so it wraps.
 
-`aexpect()` is the `async` form,
+`aexpect()` in `utils/exceptions.py` is the `async` form,
 for a coroutine function whose failure is the demonstration.
 
 Where a demonstration needs several statements or an assignment in the guarded block,
@@ -924,7 +924,7 @@ Exiting a `nullcontext` leaves its object as it was,
 so the same `with` block closes the file in the `Path` branch and keeps `sys.stdout` and the caller's stream open,
 as the caller expects.
 
-`chdir()` is a class manager like `Trace`,
+`contextlib.chdir()` is a class manager like `Trace`,
 a few lines long in the standard library's source.
 Its `__enter__()` appends `os.getcwd()` to a list and calls `os.chdir()`.
 Its `__exit__()` pops the saved directory off the list and changes back to it.
@@ -1134,7 +1134,8 @@ If the pool held a connection for each of the eight threads,
 all eight would hold a lease together and the peak would be eight.
 
 `available()` is a snapshot for the demo, not a synchronization primitive.
-`Queue.qsize()` becomes approximate when more than one thread is borrowing,
+It returns `Queue.qsize()`.
+That count becomes approximate when more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
 
 ### Testing the Lease
