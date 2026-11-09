@@ -82,7 +82,8 @@ so it reports the gap at runtime, the first time someone asks it for a triangle.
 
 At edit time, the type checker accepts both functions.
 `kind: str` gives the type checker no list of the strings `export_svg()` should handle.
-An `Enum` for `kind` and an `assert_never()` wildcard [move that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching).
+If `kind` is an `Enum` and the wildcard calls `assert_never()`,
+that report [moves to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 An if-chain like `render()` has no wildcard, so it still gets no report.
 Either way, adding a type means editing every call site.
 
