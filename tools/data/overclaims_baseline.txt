@@ -767,7 +767,7 @@ Chapters/46_Effects--Stateless.md	[BOUND] Everything else is an Ability request
 Chapters/46_Effects--Stateless.md	[BOUND] Explain which of the two shapes CODE requires, and why it takes a schedule and returns a decorator of type CODE, rather than being an operation on an Effect
 Chapters/46_Effects--Stateless.md	[BOUND] Having no container has three consequences
 Chapters/46_Effects--Stateless.md	[BOUND] If you advance the CODE one step with CODE, CODE returns the CODE as a value instead of raising it
-Chapters/46_Effects--Stateless.md	[BOUND] If you remove it from CODE, CODE reports an CODE at CODE, since that CODE produces a CODE and the signature now declares CODE alone
+Chapters/46_Effects--Stateless.md	[BOUND] If you remove it from CODE, CODE reports an CODE at CODE, since the CODE produces a CODE and the signature now declares CODE alone
 Chapters/46_Effects--Stateless.md	[BOUND] It is an ordinary class whose one method is CODE
 Chapters/46_Effects--Stateless.md	[BOUND] It requests no CODE, so the CODE around it does one thing
 Chapters/46_Effects--Stateless.md	[BOUND] One rule covers both cases

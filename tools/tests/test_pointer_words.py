@@ -54,6 +54,21 @@ PROXY = "The proxy stores the level. "
     ("It stores the level.",
      ["[IT] it -> (opens paragraph): It stores the level."]),
     ("Hint: this is the fast path. It stores the level.", []),
+    ("Before that `send(2)` returns, `both()` continues to the next "
+     "line.",
+     ["[SUB] Before that CODE: Before that CODE returns, "
+      "CODE continues to the next line."]),
+    ("Before that call returns, `both()` continues to the next line.",
+     []),
+    ("The driver calls `send()`. Before that `send()` returns, "
+     "`both()` runs.",
+     ["[SUB] Before that CODE: Before that CODE returns, "
+      "CODE runs."]),
+    ("Before this CODE runs, nothing prints.",
+     ["[SUB] Before this CODE: Before this CODE runs, nothing "
+      "prints."]),
+    ("Retrying is the wrong behavior because this `NotInteresting` "
+     "failure is deterministic.", []),
 ])
 def test_messages(source: str, expected: list[str]) -> None:
     assert messages(source) == expected
@@ -90,7 +105,7 @@ def test_main_prints_every_hit_and_fails_on_request(
     assert main([str(path)], recorded_parser) == 0
     out = capsys.readouterr().out
     assert "survey   " in out and "[THIS] This: This is" in out
-    assert "1 pointer sentences (1 [THIS], 0 [IT])" in out
+    assert "1 pointer sentences (1 [THIS], 0 [IT], 0 [SUB])" in out
     assert main([str(path), "--fail"], recorded_parser) == 1
     capsys.readouterr()
     clean = tmp_path / "b.md"

@@ -508,7 +508,15 @@ opens its paragraph. The calibration found it fires on the author's
 rewrites about as often as on his originals ([THIS] 1 before-only, 0
 both, 2 after-only; [IT] 1, 0, 1, of 72 pairs). The `antecedents` skill
 reads its list per chapter (`tip pointers CH=NN`), and each hit is a
-judgment that pass makes.
+judgment that pass makes. `[SUB]` (2026-11-09) is a subordinator, a
+demonstrative determiner, a code span, and a verb ("Before that
+`send(2)` returns,", Bruce: "hard to parse"): the reader closes
+"Before that" as a phrase and meets "`send(2)` returns" as a stray
+clause, since a code span carries no article or capital to open a noun
+phrase. The repair is "the", "its", or the noun ("the `next()` on the
+answers"); the book-wide run that day found three beyond chapter 45's
+and all four were rewritten, so there is no keep yet. A span followed
+by a noun ("this `NotInteresting` failure") is quiet by design.
 `tip negatives` (`tools/negation_density.py`, 2026-10-19) is a second
 survey tool outside `tip prose`, with no baseline.
 It counts, per paragraph, the style rule's family of negatives: the

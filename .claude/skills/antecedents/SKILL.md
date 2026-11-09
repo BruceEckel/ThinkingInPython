@@ -31,7 +31,10 @@ Start a chapter with `tip pointers CH=NN`.
 Read its lines as mechanical candidates:
 a sentence-opening demonstrative pronoun,
 or "it" or "they" with two or more same-number nouns in the sentence before,
-named on the line.
+named on the line,
+or a subordinator plus a demonstrative determiner on a code span that is a clause's subject
+("Before that `send(2)` returns,", labeled `[SUB]`),
+which takes "the", "its", or the noun.
 A listed sentence is not a fault by itself.
 The test below decides.
 A count word is a pointer too ("the second run", "the first three runs"),

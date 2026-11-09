@@ -1576,5 +1576,711 @@
     "morph": "PunctType=Peri"
    }
   ]
+ ],
+ "Before that CODE returns, CODE continues to the next line.": [
+  [
+   {
+    "i": 0,
+    "text": "Before",
+    "lemma": "before",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "prep",
+    "head": 6,
+    "idx": 0,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 1,
+    "text": "that",
+    "lemma": "that",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 3,
+    "idx": 7,
+    "punct": false,
+    "morph": "Number=Sing|PronType=Dem"
+   },
+   {
+    "i": 2,
+    "text": "CODE",
+    "lemma": "code",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "compound",
+    "head": 3,
+    "idx": 12,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 3,
+    "text": "returns",
+    "lemma": "return",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "pobj",
+    "head": 0,
+    "idx": 17,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 4,
+    "text": ",",
+    "lemma": ",",
+    "pos": "PUNCT",
+    "tag": ",",
+    "dep": "punct",
+    "head": 6,
+    "idx": 24,
+    "punct": true,
+    "morph": "PunctType=Comm"
+   },
+   {
+    "i": 5,
+    "text": "CODE",
+    "lemma": "CODE",
+    "pos": "PROPN",
+    "tag": "NNP",
+    "dep": "nsubj",
+    "head": 6,
+    "idx": 26,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 6,
+    "text": "continues",
+    "lemma": "continue",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 6,
+    "idx": 31,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 7,
+    "text": "to",
+    "lemma": "to",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "prep",
+    "head": 6,
+    "idx": 41,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 8,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 10,
+    "idx": 44,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 9,
+    "text": "next",
+    "lemma": "next",
+    "pos": "ADJ",
+    "tag": "JJ",
+    "dep": "amod",
+    "head": 10,
+    "idx": 48,
+    "punct": false,
+    "morph": "Degree=Pos"
+   },
+   {
+    "i": 10,
+    "text": "line",
+    "lemma": "line",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "pobj",
+    "head": 7,
+    "idx": 53,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 11,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 6,
+    "idx": 57,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "Before that call returns, CODE continues to the next line.": [
+  [
+   {
+    "i": 0,
+    "text": "Before",
+    "lemma": "before",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "prep",
+    "head": 6,
+    "idx": 0,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 1,
+    "text": "that",
+    "lemma": "that",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 3,
+    "idx": 7,
+    "punct": false,
+    "morph": "Number=Sing|PronType=Dem"
+   },
+   {
+    "i": 2,
+    "text": "call",
+    "lemma": "call",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "compound",
+    "head": 3,
+    "idx": 12,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 3,
+    "text": "returns",
+    "lemma": "return",
+    "pos": "NOUN",
+    "tag": "NNS",
+    "dep": "pobj",
+    "head": 0,
+    "idx": 17,
+    "punct": false,
+    "morph": "Number=Plur"
+   },
+   {
+    "i": 4,
+    "text": ",",
+    "lemma": ",",
+    "pos": "PUNCT",
+    "tag": ",",
+    "dep": "punct",
+    "head": 6,
+    "idx": 24,
+    "punct": true,
+    "morph": "PunctType=Comm"
+   },
+   {
+    "i": 5,
+    "text": "CODE",
+    "lemma": "CODE",
+    "pos": "PROPN",
+    "tag": "NNP",
+    "dep": "nsubj",
+    "head": 6,
+    "idx": 26,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 6,
+    "text": "continues",
+    "lemma": "continue",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 6,
+    "idx": 31,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 7,
+    "text": "to",
+    "lemma": "to",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "prep",
+    "head": 6,
+    "idx": 41,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 8,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 10,
+    "idx": 44,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 9,
+    "text": "next",
+    "lemma": "next",
+    "pos": "ADJ",
+    "tag": "JJ",
+    "dep": "amod",
+    "head": 10,
+    "idx": 48,
+    "punct": false,
+    "morph": "Degree=Pos"
+   },
+   {
+    "i": 10,
+    "text": "line",
+    "lemma": "line",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "pobj",
+    "head": 7,
+    "idx": 53,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 11,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 6,
+    "idx": 57,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "The driver calls CODE. Before that CODE returns, CODE runs.": [
+  [
+   {
+    "i": 0,
+    "text": "The",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 1,
+    "text": "driver",
+    "lemma": "driver",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 2,
+    "idx": 4,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 2,
+    "text": "calls",
+    "lemma": "call",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 2,
+    "idx": 11,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 3,
+    "text": "CODE",
+    "lemma": "CODE",
+    "pos": "PROPN",
+    "tag": "NNP",
+    "dep": "dobj",
+    "head": 2,
+    "idx": 17,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 4,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 2,
+    "idx": 21,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "text": "Before",
+    "lemma": "before",
+    "pos": "ADP",
+    "tag": "IN",
+    "dep": "prep",
+    "head": 6,
+    "idx": 23,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 1,
+    "text": "that",
+    "lemma": "that",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 3,
+    "idx": 30,
+    "punct": false,
+    "morph": "Number=Sing|PronType=Dem"
+   },
+   {
+    "i": 2,
+    "text": "CODE",
+    "lemma": "code",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "compound",
+    "head": 3,
+    "idx": 35,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 3,
+    "text": "returns",
+    "lemma": "return",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "pobj",
+    "head": 0,
+    "idx": 40,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 4,
+    "text": ",",
+    "lemma": ",",
+    "pos": "PUNCT",
+    "tag": ",",
+    "dep": "punct",
+    "head": 6,
+    "idx": 47,
+    "punct": true,
+    "morph": "PunctType=Comm"
+   },
+   {
+    "i": 5,
+    "text": "CODE",
+    "lemma": "CODE",
+    "pos": "PROPN",
+    "tag": "NNP",
+    "dep": "nsubj",
+    "head": 6,
+    "idx": 49,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 6,
+    "text": "runs",
+    "lemma": "run",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 6,
+    "idx": 54,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 7,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 6,
+    "idx": 58,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "Before this CODE runs, nothing prints.": [
+  [
+   {
+    "i": 0,
+    "text": "Before",
+    "lemma": "before",
+    "pos": "SCONJ",
+    "tag": "IN",
+    "dep": "mark",
+    "head": 3,
+    "idx": 0,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 1,
+    "text": "this",
+    "lemma": "this",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 3,
+    "idx": 7,
+    "punct": false,
+    "morph": "Number=Sing|PronType=Dem"
+   },
+   {
+    "i": 2,
+    "text": "CODE",
+    "lemma": "code",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "compound",
+    "head": 3,
+    "idx": 12,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 3,
+    "text": "runs",
+    "lemma": "run",
+    "pos": "VERB",
+    "tag": "VBZ",
+    "dep": "advcl",
+    "head": 6,
+    "idx": 17,
+    "punct": false,
+    "morph": "Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 4,
+    "text": ",",
+    "lemma": ",",
+    "pos": "PUNCT",
+    "tag": ",",
+    "dep": "punct",
+    "head": 6,
+    "idx": 21,
+    "punct": true,
+    "morph": "PunctType=Comm"
+   },
+   {
+    "i": 5,
+    "text": "nothing",
+    "lemma": "nothing",
+    "pos": "PRON",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 6,
+    "idx": 23,
+    "punct": false,
+    "morph": "Number=Sing|PronType=Ind"
+   },
+   {
+    "i": 6,
+    "text": "prints",
+    "lemma": "print",
+    "pos": "NOUN",
+    "tag": "NNS",
+    "dep": "ROOT",
+    "head": 6,
+    "idx": 31,
+    "punct": false,
+    "morph": "Number=Plur"
+   },
+   {
+    "i": 7,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 6,
+    "idx": 37,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
+ ],
+ "Retrying is the wrong behavior because this CODE failure is deterministic.": [
+  [
+   {
+    "i": 0,
+    "text": "Retrying",
+    "lemma": "retrying",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 1,
+    "idx": 0,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 1,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "ROOT",
+    "head": 1,
+    "idx": 9,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 2,
+    "text": "the",
+    "lemma": "the",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 4,
+    "idx": 12,
+    "punct": false,
+    "morph": "Definite=Def|PronType=Art"
+   },
+   {
+    "i": 3,
+    "text": "wrong",
+    "lemma": "wrong",
+    "pos": "ADJ",
+    "tag": "JJ",
+    "dep": "amod",
+    "head": 4,
+    "idx": 16,
+    "punct": false,
+    "morph": "Degree=Pos"
+   },
+   {
+    "i": 4,
+    "text": "behavior",
+    "lemma": "behavior",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "attr",
+    "head": 1,
+    "idx": 22,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 5,
+    "text": "because",
+    "lemma": "because",
+    "pos": "SCONJ",
+    "tag": "IN",
+    "dep": "mark",
+    "head": 9,
+    "idx": 31,
+    "punct": false,
+    "morph": ""
+   },
+   {
+    "i": 6,
+    "text": "this",
+    "lemma": "this",
+    "pos": "DET",
+    "tag": "DT",
+    "dep": "det",
+    "head": 8,
+    "idx": 39,
+    "punct": false,
+    "morph": "Number=Sing|PronType=Dem"
+   },
+   {
+    "i": 7,
+    "text": "CODE",
+    "lemma": "code",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "compound",
+    "head": 8,
+    "idx": 44,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 8,
+    "text": "failure",
+    "lemma": "failure",
+    "pos": "NOUN",
+    "tag": "NN",
+    "dep": "nsubj",
+    "head": 9,
+    "idx": 49,
+    "punct": false,
+    "morph": "Number=Sing"
+   },
+   {
+    "i": 9,
+    "text": "is",
+    "lemma": "be",
+    "pos": "AUX",
+    "tag": "VBZ",
+    "dep": "advcl",
+    "head": 1,
+    "idx": 57,
+    "punct": false,
+    "morph": "Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin"
+   },
+   {
+    "i": 10,
+    "text": "deterministic",
+    "lemma": "deterministic",
+    "pos": "ADJ",
+    "tag": "JJ",
+    "dep": "acomp",
+    "head": 9,
+    "idx": 60,
+    "punct": false,
+    "morph": "Degree=Pos"
+   },
+   {
+    "i": 11,
+    "text": ".",
+    "lemma": ".",
+    "pos": "PUNCT",
+    "tag": ".",
+    "dep": "punct",
+    "head": 1,
+    "idx": 73,
+    "punct": true,
+    "morph": "PunctType=Peri"
+   }
+  ]
  ]
 }

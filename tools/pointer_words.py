@@ -22,7 +22,7 @@ coordinating conjunction (dep `advmod` or `cc`, or "then", "so", "but",
 is not a hit, and the cleft "It is X that" has an `expl` and is no hit
 (`expletives.py` has no cleft rule either; see its docstring).
 
-Two labels. `[THIS]`: the opening pronoun is a demonstrative. It is
+Three labels. `[THIS]`: the opening pronoun is a demonstrative. It is
 always a hit, since a sentence-opening demonstrative pronoun gets its
 noun. `[IT]`: the opening pronoun is "it" or "they". It is a hit when
 the previous sentence of the same paragraph holds two or more candidate
@@ -36,9 +36,31 @@ noun coordinated with one of those). Singular means a morph with
 `Number=Sing`, the placeholder `CODE`, or a `PROPN`; plural means
 `Number=Plur`. Distinct lowercase texts count once.
 
+`[SUB]` (2026-11-09) is a different shape and can fall anywhere in a
+sentence: a subordinating conjunction ("before", "after", "once",
+"since", "when", "while", "until", "because", "if", "unless",
+"although", "though", "as") followed directly by a demonstrative
+determiner, a code span, and a verb (spaCy reads the span as a
+`compound` of the verb, so the head of "that" is that verb, not the
+span). In "Before that `send(2)` returns, `both()` continues", the
+reader closes "Before that" as a prepositional phrase and then meets
+"`send(2)` returns" as a stray clause, since a code span carries no
+article or capital to signal that a noun phrase starts. Chapter 45
+had this sentence, rewritten as "Inside the same `send()` call,", and
+the first book-wide run found three more ("If that `next()` sits",
+"since that `yield from` produces", "after that `Bob` goes"), each
+rewritten with "the" or the noun. A demonstrative pronoun is
+`[THIS]`'s territory; a demonstrative before an ordinary noun ("before
+that call returns") reads as a noun on sight; and a span followed by a
+noun ("because this `NotInteresting` failure is deterministic")
+modifies that noun, which the reader sees next. None of the three is
+a `[SUB]` hit. The `hits()` function reports the shape for every
+sentence, whether or not the sentence opens with a pointer.
+
 A hit prints as `path:line: [THIS] This: <sentence>` or `path:line:
 [IT] it -> proxy, level: <sentence>`; a paragraph-opening "it" prints
-`it -> (opens paragraph)`. The line holds the sentence's first
+`it -> (opens paragraph)`. A `[SUB]` hit prints `[SUB] Before that
+CODE: <sentence>`. The line holds the sentence's first
 character.
 
 The shared reading rules: a paragraph whose text starts with `Hint:` or
@@ -67,7 +89,7 @@ pronoun whose target the sentence and the paragraph's topic make clear
 stays.
 
 A line reads `survey   path:line: message`, and the run ends with `N
-pointer sentences (T [THIS], U [IT])`. A run given paths reads only
+pointer sentences (T [THIS], U [IT], S [SUB])`. A run given paths reads only
 those files.
 
 `--calibrate` prints, against `tools/data/edit_pairs.json`, per label
@@ -115,6 +137,7 @@ from tools.stranded_prepositions import display
 LABELS: Final = {
     "THIS": "sentence opens with a demonstrative pronoun",
     "IT": "sentence opens with it/they and the target is ambiguous",
+    "SUB": "subordinator plus demonstrative determiner on a code span",
 }
 DEMONSTRATIVES: Final = frozenset({"this", "that", "these", "those"})
 POINTERS: Final = DEMONSTRATIVES | {"it", "they"}
@@ -124,13 +147,19 @@ LEADER_DEPS: Final = frozenset({"advmod", "cc"})
 PRONOUN_DEPS: Final = frozenset({"nsubj", "nsubjpass"})
 CANDIDATE_DEPS: Final = frozenset(
     {"nsubj", "nsubjpass", "dobj", "attr", "pobj", "appos"})
+SUBORDINATORS: Final = frozenset({
+    "before", "after", "once", "since", "when", "while", "until",
+    "because", "if", "unless", "although", "though", "as"})
+VERB_POS: Final = frozenset({"VERB", "AUX"})
 OPENS: Final = "(opens paragraph)"
 
 
 class Hit(NamedTuple):
     label: str
     pronoun: Token
+    """For `[SUB]`, the demonstrative determiner."""
     candidates: tuple[str, ...]
+    """For `[SUB]`, the one subordinator."""
     opens: bool
     sentence: Sentence
     index: int
@@ -199,12 +228,39 @@ def candidates(sentence: Sentence, plural: bool) -> list[str]:
     return found
 
 
+def subordinated(sentence: Sentence) -> Iterator[tuple[Token, Token]]:
+    """Each (subordinator, demonstrative) pair: "Before that `send()`".
+
+    The demonstrative follows the subordinator directly (punctuation
+    aside), has dep `det`, and is followed directly by a code span
+    and then a verb, so the span is the clause's subject. The parser
+    attaches the demonstrative to that verb and reads the span as its
+    `compound`, so the shape is found by position. A noun after the
+    span ("because this `NotInteresting` failure is deterministic")
+    makes the span a modifier of a noun the reader sees next, and is
+    no hit.
+    """
+    words = [t for t in sentence.tokens if not t.punct]
+    for before, after, span, verb in zip(
+            words, words[1:], words[2:], words[3:]):
+        if (before.text.lower() in SUBORDINATORS
+                and after.text.lower() in DEMONSTRATIVES
+                and after.dep == "det"
+                and span.text == "CODE"
+                and verb.pos in VERB_POS):
+            yield before, after
+
+
 def hits(paragraph: Paragraph) -> Iterator[Hit]:
-    """Each sentence of one paragraph that opens with a pointer."""
+    """Each sentence of one paragraph that opens with a pointer, and
+    each subordinator plus demonstrative on a code span."""
     if skipped(paragraph):
         return
     sentences = paragraph.sentences
     for index, sentence in enumerate(sentences):
+        for subordinator, demonstrative in subordinated(sentence):
+            yield Hit("SUB", demonstrative, (subordinator.text,), False,
+                      sentence, index)
         pronoun = opening_pronoun(sentence)
         if pronoun is None:
             continue
@@ -221,8 +277,12 @@ def hits(paragraph: Paragraph) -> Iterator[Hit]:
 
 
 def message(paragraph: Paragraph, hit: Hit) -> str:
-    """`[THIS] This: sentence` or `[IT] it -> a, b: sentence`."""
+    """`[THIS] This: sentence`, `[IT] it -> a, b: sentence`, or
+    `[SUB] Before that CODE: sentence`."""
     text = sentence_text(paragraph, hit.sentence)
+    if hit.label == "SUB":
+        [subordinator] = hit.candidates
+        return f"[SUB] {subordinator} {hit.pronoun.text} CODE: {text}"
     if hit.label == "THIS":
         return f"[THIS] {hit.pronoun.text}: {text}"
     shown = OPENS if hit.opens else ", ".join(hit.candidates)
@@ -250,6 +310,10 @@ EXAMPLES: Final[tuple[tuple[str, str], ...]] = (
     ("The function runs. It returns quickly.", "no hit"),
     ("The function returns a wrapper. It keeps the name.",
      "IT: function, wrapper"),
+    ("Before that `send(2)` returns, `both()` continues to the next "
+     "line.", "SUB"),
+    ("Before that call returns, `both()` continues to the next line.",
+     "no hit"),
 )
 """Calibration sentences and the result each should give."""
 
@@ -295,8 +359,9 @@ def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
     for shown, line, text in found:
         print(f"survey   {shown}:{line}: {text}")
     these = sum(1 for _, _, t in found if t.startswith("[THIS]"))
+    subs = sum(1 for _, _, t in found if t.startswith("[SUB]"))
     print(f"{len(found)} pointer sentences ({these} [THIS], "
-          f"{len(found) - these} [IT])")
+          f"{len(found) - these - subs} [IT], {subs} [SUB])")
     return 1 if args.fail and found else 0
 
 

@@ -313,7 +313,7 @@ The `try` around the priming call catches a conversation that returns before it 
 Any other call that can raise `StopIteration` belongs outside both `try` blocks.
 A driver that reads its answers from an iterator, for example,
 gets `StopIteration` from `next()` on the answers when they run out.
-If that `next()` sits inside one of the `try` blocks,
+If the `next()` on the answers sits inside one of the `try` blocks,
 the `except StopIteration` clause catches that exception as the end of the conversation,
 so the driver returns `None` as the result.
 
@@ -779,8 +779,8 @@ if __name__ == "__main__":
 ```
 
 `Answer` fills two of `ask()`'s three positions, in two roles.
-As the `SendType` it goes from the driver to the `yield` inside `ask()`.
-As the `ReturnType` it goes from `ask()` up to `interview()`,
+`Answer` as the `SendType` goes from the driver to the `yield` inside `ask()`.
+`Answer` as the `ReturnType` goes from `ask()` up to `interview()`,
 which binds it to `name`, `town`, or `friend`.
 
 This listing imports `drive()` unchanged.

@@ -756,7 +756,7 @@ and the check passes once you have fixed the last one.
 To see that, delete `| Need[Log]` from either annotation.
 If you remove it from `greet_all()`,
 `ty` reports an `invalid-yield` at `yield from greet_logged(name)`,
-since that `yield from` produces a `Need[Log]` and the signature now declares `Need[Console]` alone.
+since the `yield from` produces a `Need[Log]` and the signature now declares `Need[Console]` alone.
 
 The type checker covers dependencies passed as parameters too.
 If you forget the new argument at a call, `ty` reports a `missing-argument`.

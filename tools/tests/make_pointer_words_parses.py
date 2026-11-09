@@ -40,6 +40,14 @@ SOURCES: Final[tuple[str, ...]] = (
     "The proxy stores the level.\nIt never consults the\n"
     "implementation again.",
     "Some prose.",
+    "Before that `send(2)` returns, `both()` continues to the next "
+    "line.",
+    "Before that call returns, `both()` continues to the next line.",
+    "The driver calls `send()`. Before that `send()` returns, "
+    "`both()` runs.",
+    "Before this `yield` runs, nothing prints.",
+    "Retrying is the wrong behavior because this `NotInteresting` "
+    "failure is deterministic.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 
