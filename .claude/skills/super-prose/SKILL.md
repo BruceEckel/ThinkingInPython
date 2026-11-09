@@ -69,7 +69,11 @@ scope's line range:
   and the default `[PRT]`, a phrasal verb split around a noun phrase,
   "carries the request out" -> "carries out the request", R56;
   `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too)
-- `tip watch-words CH=NN ARGS="--tier 1"` (negated subjects)
+- `tip watch-words CH=NN` (for `ambiguity`: `however`, Tier 2 since
+  2026-11-08, the concessive "however many" that reads first as a
+  contrast and is a universal over a count or a manner, R58; the
+  contrastive "However," is skipped; `ARGS="--tier 1"` adds the
+  negated subjects)
 - `tip past-tense CH=NN ARGS=--survey` (for `activate`: `[PAST-SUB]`,
   and `[PERFECT]`, a present perfect in a time clause, "before the
   generator has yielded" -> "before the generator yields", C57)

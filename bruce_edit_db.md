@@ -2516,6 +2516,67 @@ the book-wide read that day (Opus agents, brief in
 | ambiguity (catalog and Accrued shapes) |
 `tools/positional_refs.py` `survey alternative` | this file.
 
+### R58. A concessive "however" states the independence instead
+
+**Test.** "however" followed by a quantity, degree, or manner word:
+"however many `next()` calls that takes", "however large `n` gets",
+"however the block finished", "However deeply the delegations nest".
+The reader meets the contrastive adverb ("However, ...") far more
+often, so a "however" after a comma or at a sentence start announces
+a contrast, and only the next word says it is the quantifier "no
+matter how". The clause is also R54's shape with "how" in place of
+"which": a universal claim that the outcome is the same across every
+count or manner. Repairs, in order of preference. Drop the clause
+where the verb already says the thing holds still: "stays the same
+however large `n` gets" is "stays the same as `n` grows", and "takes
+O(log n) each time, however many times you repeat it" is "every
+removal takes O(log n)". Name the range: "whether you then take 100
+items or one", "whether it covers one byte of the buffer or all of
+it", "slow or fast". State the independence: "at any depth of
+delegation", "on a map of any size", "in every interleaving of the
+tasks", "on every request". Name the options for the manner sense:
+"whether the block completed or raised an exception", "under either
+scheduling of the producers", "built by comprehension or by
+`append()`". Or say what the universal amounts to in the listing:
+"each cell goes to the first rat that reaches it", "every transition
+into that state shares it". "no matter how many" is the fallback, and
+still a universal.
+
+**Keep when.** The contrastive adverb, "However," and ", however,", is
+a different word and takes a comma; `tools/watch_words.py` skips a
+"however" followed by a comma or a period. No keep of the concessive
+sense yet: the 2026-11-08 sweep read all 39 sites in `Chapters/` and
+`Solutions/` and rewrote every one, and the two generated exercise
+quotes in `Solutions/` followed their chapters.
+
+**Sightings.** 1 flag, promoted on Bruce's request to a book sweep the
+same day (2026-11-08, "unclear usage of 'however'"): 39 sites, all
+rewritten in session.
+- `45_Effects--Generators` 2026-11-08, was Claude-written: "each
+  `yield from` stays with its target until that generator finishes,
+  however many `next()` calls that takes" -> "each `yield from` stays
+  with its target, through every `next()` call, until that generator
+  finishes"
+- `45_Effects--Generators`: "However deeply the delegations nest, the
+  program has one driver." -> "At any depth of delegation, the program
+  has one driver."
+- `03_Foundations--Containers`: "work that stays the same however
+  large `n` gets" -> "work that stays the same as `n` grows"
+- `15_Techniques--Context_Managers`: "Call the manager's `__exit__()`,
+  however the block finished." -> "Call the manager's `__exit__()`,
+  whether the block completed or raised an exception."
+- `38_Patterns--Simulation`: "so each cell goes to one rat, however
+  many reach it" -> "so each cell goes to the first rat that reaches
+  it"
+- `18_Techniques--Performance`: "A view's own size stays fixed however
+  much of the buffer it covers" -> "A view's own size stays the same
+  whether it covers one byte of the buffer or all of it" (the
+  hold-constant "fixed" went with it)
+
+**Home.** CLAUDE.md watch list (Tier 2, "however") | ambiguity
+(catalog, "A connective with two senses", and Accrued shapes) |
+`tools/watch_words.py` | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different

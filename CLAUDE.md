@@ -276,6 +276,15 @@ general"): a concessive "whatever the driver's reason" is a universal
 to test or a phrase to cut, and a free relative "whatever the caller
 supplies" is "the value the caller supplies"; its 66 sites stay NEW
 for the chapter passes.
+Since 2026-11-08 `however` is Tier 2 too (rule R58, Bruce: "unclear
+usage of 'however'" on chapter 45's "however many `next()` calls
+that takes"): the concessive sense reads first as the contrastive
+adverb, and it is R54's universal with "how" in place of "which",
+so the repair states the independence or names the range ("as `n`
+grows", "at any depth of delegation", "whether the block completed
+or raised an exception") or drops the clause where the verb already
+says the thing holds still. The sweep that day rewrote all 39 sites;
+the contrastive "However," with its comma is skipped by the check.
 Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
 object, `no X`, `none`, or `none of` ("runs none of the body", "raises
 no exception", "has no `__slots__`"), Bruce's "reversal of

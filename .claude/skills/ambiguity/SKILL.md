@@ -122,9 +122,14 @@ Fix: write the term.
 
 **A connective with two senses.**
 "once" (one time, or as soon as), "since" (because, or from the time), "as" (while, or because),
-"while" (during, or whereas), "then" (next, or therefore), "when" (whenever, or at the moment).
+"while" (during, or whereas), "then" (next, or therefore), "when" (whenever, or at the moment),
+"however" (nevertheless, or no matter how: "stays with its target until that generator finishes, however many `next()` calls that takes" reads as a contrast until "many" arrives; chapter 45, 2026-11-08).
 Test: substitute each sense.
 Fix: the connective with one sense ("after", "because", "during", "whereas", "one time").
+For the concessive "however", a universal over a count or a manner, state the independence or name the range
+("as `n` grows", "at any depth of delegation", "whether the block completed or raised an exception", "whether you then take 100 items or one"),
+or drop the clause where the verb already says the thing holds still; rule R58 in `bruce_edit_db.md`.
+`tip watch-words CH=NN` lists it as Tier 2 and skips the contrastive "However," with its comma.
 
 **An alternative in the walkthrough's register.**
 A paragraph narrates the listing, and a sentence in it says what a construct the listing lacks does, in the plain present with no marker:
@@ -181,3 +186,6 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   "A `for` loop treats `StopIteration` as the normal end of the loop, so it discards the exception and loses the return value", under `drive_by_hand.py`, whose driver is a `try` statement.
   Added to the catalog, as R57, and as `tip positional`'s `survey alternative` rule;
   the book-wide read that day (brief in `build/alt-2026-11-08/`) found most hits in the second sentence of an alternative, where the opener's frame had lapsed.
+- 2026-11-08, chapter 45: a concessive "however" read as the contrastive adverb.
+  "each `yield from` stays with its target until that generator finishes, however many `next()` calls that takes" (Bruce: "unclear usage of 'however'").
+  Added to the connective entry above, as R58, and as a Tier 2 watch word; the book sweep that day rewrote all 39 concessive sites.

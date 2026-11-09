@@ -50,7 +50,17 @@ a concessive "whatever the driver's reason" claims the outcome across
 every case, a universal to test or a phrase to cut, and a free relative
 "whatever the caller supplies" is R54's shape with a thing, "the value
 the caller supplies". Its 66 sites are read by the chapter passes, so
-they stay NEW until each is judged. Tier 1 ("Consider rewriting") is a word with
+they stay NEW until each is judged. `however` joined Tier 2 on
+2026-11-08 (rule R58, Bruce: "unclear usage of 'however'" on "however
+many `next()` calls that takes"): the concessive sense ("however
+many", "however large `n` gets", "however the block finished") reads
+first as the contrastive adverb, and it is R54's universal with "how"
+in place of "which", so the repair states the independence ("as `n`
+grows", "at any depth of delegation", "whether the block completed or
+raised an exception", "on every request") or drops the clause where
+the verb already says the thing stays the same. The contrastive
+"However," and ", however," are a different word and are skipped: a
+`however` followed by a comma or a period is literal. Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -312,6 +322,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"could"),
         (2, r"whichever"),
         (2, r"whatever"),
+        (2, r"however"),
         (2, r"even"),
         (2, r"honest(?:ly)?"),
         (2, r"buys?|bought"),
@@ -345,6 +356,7 @@ HOOK_NEAR: Final = ("pre-commit", "git", "sessionstart", "claude",
                     "hooks.py")
 HOOK_WINDOW: Final = 4
 HOOK_MODULE: Final = re.compile(r"\s+module\b", re.IGNORECASE)
+HOWEVER_CONTRAST: Final = re.compile(r"\s*[,.;]")
 
 
 def literal_even(text: str, m: re.Match[str]) -> bool:
@@ -361,6 +373,11 @@ def literal_hook(text: str, m: re.Match[str]) -> bool:
     after = text[m.end():].split()[:HOOK_WINDOW]
     near = " ".join(before + after).lower()
     return any(term in near for term in HOOK_NEAR)
+
+
+def literal_however(text: str, m: re.Match[str]) -> bool:
+    """Is this `however` the contrastive adverb ("However, ...")?"""
+    return HOWEVER_CONTRAST.match(text, m.end()) is not None
 
 
 def literal_no_subject(text: str, m: re.Match[str]) -> bool:
@@ -381,6 +398,8 @@ def literal(word: str, text: str, m: re.Match[str]) -> bool:
         return literal_even(text, m)
     if word in ("hook", "hooks"):
         return literal_hook(text, m)
+    if word == "however":
+        return literal_however(text, m)
     return False
 
 

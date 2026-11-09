@@ -73,6 +73,24 @@ def test_not_a_hit(text: str) -> None:
     assert hits(text) == []
 
 
+@pytest.mark.parametrize("text", [
+    "However, the cache keeps the module.",
+    "Often, however, you are still experimenting.",
+    "The expression, however,\nhas a value.",
+])
+def test_contrastive_however_is_not_a_hit(text: str) -> None:
+    assert hits(text) == []
+
+
+@pytest.mark.parametrize("text", [
+    "It stays with its target, however many calls that takes.",
+    "However deeply the delegations nest, there is one driver.",
+    "It prints the banner however the block ended.",
+])
+def test_concessive_however_is_tier_2(text: str) -> None:
+    assert [(h[1], h[2]) for h in hits(text)] == [(2, "however")]
+
+
 def test_even_intensifier_and_plain_hook_hit() -> None:
     assert [h[2] for h in hits("Even a decorator works.")] == ["even"]
     assert [h[2] for h in hits("A hook lets a plugin react.")] == ["hook"]
