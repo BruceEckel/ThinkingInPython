@@ -55,8 +55,7 @@ Chapters/46_Effects--Stateless.md	[advmod,cc,conj] one .. believes: Then declare
 Chapters/46_Effects--Stateless.md	[cc,conj,dobj,prep] Supply .. stays: Supply a scripted CODE in a test and a real one in a demo, and confirm CODE stays unchanged between them.
 Chapters/47_Effects--Stateless_in_Practice.md	[cc,conj,dobj,xcomp] Change .. stays: Change CODE to use a CODE instead of a CODE, and confirm CODE stays unchanged.
 Chapters/A_Effect_Tracking.md	[cc,relcl] Something .. rejects: **Something that compares the computed row with the declared one,** and rejects the program when they differ.
-Chapters/B_An_Effect_Checker.md	[acl,appos] CODE .. calls: CODE called CODE, a method on an imported constant, and now calls CODE.
-Chapters/B_An_Effect_Checker.md	[acl,appos] CODE .. tests: CODE called CODE, a method on a record's field, and now tests CODE in a pattern's guard.
+Chapters/B_An_Effect_Checker.md	[acl,appos,prep] CODE .. calls: CODE in CODE called CODE, a method on an imported constant, and now calls CODE.
 Chapters/B_An_Effect_Checker.md	[appos] resolution .. give: Name resolution, a table of the standard library, and a fixed point give every function in a program a row.
 Solutions/02_Foundations--Tour/README.md	[conj,prep] division .. is: C and Java truncate integer division toward zero, so their integer CODE is CODE and CODE is CODE.
 Solutions/07_Foundations--Classes/README.md	[advmod,cc,conj] CODE .. add: Define CODE first and print one object and a list, then add CODE and print both again.

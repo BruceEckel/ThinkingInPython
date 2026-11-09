@@ -161,7 +161,7 @@ because the checker reads the code as text instead of importing it.
 In source text, `performs(Ask)` is the name `Ask`.
 
 The test file confirms that the first matching pattern wins,
-that a name outside the table is `Unknown`,
+that a name outside the table gets `UNKNOWN`,
 and that `names()` reads class names:
 
 ```python
@@ -1259,12 +1259,13 @@ That call is the callback problem of [Effect Tracking](A_Effect_Tracking.md#prop
 appearing in a class from this book.
 
 Reaching that output took four changes to the checker's own code.
-`imports_of()` called `.split()` on `a.name`, an attribute,
+`imports_of()` in `call_names.py` called `.split()` on `a.name`, an attribute,
 which the checker cannot type,
 so `top_of()` now takes the name as an annotated parameter.
-`body_row()` called `PURE.union()`, a method on an imported constant,
-and now calls `frozenset().union()`.
-`type_of()` called `self.types.get()`, a method on a record's field,
+`body_row()` in `infer_rows.py` called `PURE.union()`,
+a method on an imported constant, and now calls `frozenset().union()`.
+`type_of()` in `call_names.py` called `self.types.get()`,
+a method on a record's field,
 and now tests `name in self.types` in a pattern's guard.
 `load()` called `path.read_text()` inside a comprehension,
 and now calls `read(path)`.
