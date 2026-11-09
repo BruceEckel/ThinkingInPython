@@ -290,8 +290,7 @@ the hand-waviness of 'is how'" on chapter 45's "`close()` is how a
 driver ends a generator early"): a thing as subject with "is how",
 "is where", "is when", or "is why" and a clause hides the verb that
 relates them, so the repair makes the clause the main clause and
-states the thing's part ("A driver ends a generator early by calling
-`close()`") or gives the thing its verb. An abstraction whose content
+states the thing's part ("To end a generator early, a driver calls `close()`") or gives the thing its verb. An abstraction whose content
 the clause is ("The difference is how many places you edit") is a
 keep, and the check skips a `which`, `that`, `this`, `it`, or `what`
 before the copula, the connective forms.

@@ -456,3 +456,14 @@ and it becomes part of every future pass.
   received") is a different question: ask whether the sentence reports
   standing behavior, and if so write the present ("moves to a new
   state", not "has moved").
+- "A driver ends a generator early by calling `close()`" becomes
+  "To end a generator early, a driver calls `close()`" (Bruce,
+  2026-11-09: "mine is more active and it also starts with the most
+  important thing"). A main verb that names an outcome with a "by
+  <gerund>" phrase for the action buries the one event the reader can
+  picture. Open with the purpose as an infinitive and make the action
+  the main clause; for a mechanism as subject, give it the action as
+  its verb and the outcome as a result clause ("`@cache` stores each
+  result, so a repeated call returns at once"). Keep a "by" phrase
+  that names an instrument, a criterion, or an agent ("sorts by key",
+  "is built by the decorator"). R60 in `bruce_edit_db.md`.

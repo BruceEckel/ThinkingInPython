@@ -66,8 +66,7 @@ hand-waviness of 'is how'" on chapter 45's "`close()` is how a driver
 ends a generator early"): a thing as subject, then "is how", "is
 where", "is when", or "is why" and a clause, states the thing's role
 and hides the verb that relates it to the clause. The repair makes the
-clause the main clause and states the thing's part ("A driver ends a
-generator early by calling `close()`") or gives the thing its verb. An
+clause the main clause and states the thing's part ("To end a generator early, a driver calls `close()`") or gives the thing its verb. An
 abstraction whose content the clause is ("The difference is how many
 places you edit") is a keep, and a pronoun before the copula ("which
 is why", "That is why") is a connective the check skips. Tier 1 ("Consider rewriting") is a word with

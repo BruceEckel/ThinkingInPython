@@ -1155,10 +1155,11 @@ In both directions, an exception passes through a method call that the driver ma
 
 ### Stopping Early with `close()` {#stopping-early-with-close}
 
-A driver ends a generator early by calling `close()`.
+To end a generator early, a driver calls `close()`.
 A generator paused at a `yield` still holds the resources it acquired before the pause:
 a file or a lock inside a `with` statement, a connection, a transaction.
-The common case is a driver that has the answer it needs before the generator yields its last value:
+Here is the typical case:
+a driver that has the answer it needs before the generator yields its last value:
 
 ```python
 # close_when_done.py
@@ -2151,7 +2152,7 @@ The suspended generator is the one-shot continuation that [What a Suspended Gene
 describes.
 PEP 255's restriction says who resumes it:
 the code that called `next()` or `send()`.
-That restriction calls for a driver: something must call `next()` and `send()`.
+That restriction requires a driver: something must call `next()` and `send()`.
 A generator cannot specify its driver, so you write it.
 
 In May 1999, two years before the PEP,

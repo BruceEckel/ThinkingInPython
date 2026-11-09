@@ -166,7 +166,14 @@ the steps" is about `run()`).
   dictionary lookup rather than an `isinstance()` test against each
   row." -> "The engine looks up rules by the exact `type(input_)`, so
   finding them takes one dictionary lookup rather than an
-  `isinstance()` test against each rule."
+  `isinstance()` test against each
+  rule."
+- `45_Effects--Generators` 2026-11-09, was Claude-written (a same-day
+  R59 repair): "That restriction calls for a driver: something must
+  call `next()` and `send()`." -> "That restriction requires a
+  driver: something must call `next()` and `send()`." Bruce: "'calls
+  for' ... confuses with the later 'call'". The idiom's word is the
+  chapter's term (a call resumes a generator), so the idiom goes.
 
 **Home.** this file only. Promoted at Bruce's call (2026-08-29).
 
@@ -2617,9 +2624,9 @@ mechanism out: "`close()` is how a driver ends a generator early" says
 that `close()` is involved and lets the reader supply the rest. Bruce
 (2026-11-09, chapter 45): "I don't like the hand-waviness of 'is how'.
 Is the mechanism, is the tool for, or something else that is more
-precise." Repair: make the clause the main clause and put the thing in
-a phrase that states its part ("A driver ends a generator early by
-calling `close()`"; "Most programs meet an exception group in a
+precise." Repair: lead with the purpose and make the action the verb (R60), or
+make the clause the main clause and put the thing in a phrase that
+states its part ("To end a generator early, a driver calls `close()`"; "Most programs meet an exception group in a
 `TaskGroup`"; "A new duplicate goes at `right`"), or give the thing its
 own verb ("`E` is its failure type"; "An assignment makes a name local
 to the function"; "Because the GIL is released during a wait, a thread
@@ -2638,11 +2645,45 @@ read by the antecedents pass, and stays unless "so" says the same.
 **Sightings.** 1 flag, promoted on Bruce's request to a book sweep the
 same day (2026-11-09).
 - `45_Effects--Generators` 2026-11-09, was Claude-written: "`close()`
-  is how a driver ends a generator early." -> "A driver ends a
-  generator early by calling `close()`."
+  is how a driver ends a generator early." -> "To end a generator early, a driver calls `close()`."
 
 **Home.** CLAUDE.md watch list (Tier 2, "is how") | literal (Accrued
 patterns) | `tools/watch_words.py` | this file.
+
+### R60. Lead with the purpose; make the action the verb
+
+**Test.** The main verb names an outcome, and a "by <gerund>" phrase
+names the action the subject takes to reach it: "A driver ends a
+generator early by calling `close()`". The action is the one event
+the reader can picture and the outcome is its purpose, yet the
+sentence subordinates the action into a gerund, states the outcome as
+the verb, and opens on the actor. Bruce's rewrite (2026-11-09, chapter
+45): "To end a generator early, a driver calls `close()`". "Notice
+that mine is more active and it also starts with the most important
+thing (ending a generator early rather than 'a driver')." Repair: open
+with the purpose as an infinitive and make the action the main clause:
+"To end a generator early, a driver calls `close()`"; "To isolate a
+database, a test passes a fake"; "To skip a value, the loop
+continues". For a mechanism as subject, where a purpose does not fit,
+give it the action as its verb and the outcome as a result clause:
+"`@cache` stores each result, so a repeated call returns at once".
+R59's first repair follows this rule.
+
+**Keep when.** The "by" phrase names an instrument, a criterion, or an
+agent rather than an action the subject takes ("sorts the list by
+key", "finds the item by index", "is built by the decorator"). The
+outcome is the sentence's news and the next sentence builds on it, so
+the method is incidental. The sentence narrates a run on the page
+("the test caught it by asserting on stdout") rather than a standing
+method.
+
+**Sightings.** 1, promoted at Bruce's call (2026-11-09).
+- `45_Effects--Generators` 2026-11-09, Bruce's hand on a Claude
+  rewrite: "A driver ends a generator early by calling `close()`."
+  -> "To end a generator early, a driver calls `close()`."
+
+**Home.** CLAUDE.md (dedicated bullet after "X is how Y") | activate
+(Accrued patterns) | this file.
 
 ## Candidates
 
