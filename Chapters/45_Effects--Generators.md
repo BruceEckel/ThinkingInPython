@@ -1248,9 +1248,10 @@ A `yield` inside a `finally` clause draws the same `RuntimeError`,
 because that clause runs as `GeneratorExit` propagates out.
 When the driver calls `close()`, the `RuntimeError` arrives in the driver,
 as above.
-When the garbage collector makes the `close()` call,
-the call comes from the collector rather than from code that can catch the exception,
-so Python prints the error as an "Exception ignored" message and continues.
+When the garbage collector calls `close()`,
+the `RuntimeError` arrives in the collector,
+which has no `except` clause for it,
+so Python prints it as an "Exception ignored" message and continues.
 A generator written for others to drive therefore lets `GeneratorExit` end it.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
