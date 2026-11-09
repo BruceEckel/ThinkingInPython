@@ -1211,7 +1211,7 @@ as `readings()` does by reaching the end of its body.
 shows the generator that yields instead.
 
 If the driver leaves the generator paused,
-Python calls `close()` when the garbage collector reclaims the generator,
+the garbage collector calls the same `close()` when it reclaims the generator,
 so the `finally` block runs eventually.
 Calling `close()` yourself runs the `finally` block at a point you choose.
 
@@ -1249,7 +1249,7 @@ A `yield` inside a `finally` clause draws the same `RuntimeError`,
 A `yield` there suspends the generator again before it can finish.
 When the driver calls `close()`, the `RuntimeError` arrives in the driver,
 as above.
-When the garbage collector calls `close()`,
+When the garbage collector, not the driver, calls `close()`,
 the `RuntimeError` arrives in the collector,
 so Python prints it as an "Exception ignored" message and continues.
 A generator for a driver must therefore finish when `GeneratorExit` arrives:
