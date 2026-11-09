@@ -432,7 +432,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
+[Relaying Is Not Answering](../../Chapters/45_Effects--Generators.md#relaying-is-not-answering)
 shows `survey()` delegating to `interview()` with `yield from`.
 Without `yield from`, the call to `interview()` builds a generator object,
 and that object sits suspended before its first line.
@@ -1112,7 +1112,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting)
+[Relaying Is Not Answering](../../Chapters/45_Effects--Generators.md#relaying-is-not-answering)
 contrasts `drive()`, which answers a request, with `yield from`,
 which relays it.
 `proxy()` answers from `known` in one branch and yields the request in the other,
@@ -1217,7 +1217,7 @@ with `inner`'s `Result` as the expression's value,
 and by then `drive()` has answered every request.
 `town` reaches `drive()`, which answers `Wonderland`,
 so the `Result` is the chapter's unproxied one.
-`yield from` composes; it does not interpret.
+`yield from` relays the request; `drive()` answers it.
 
 To answer one request and relay the rest,
 a generator must see each request before it goes up.

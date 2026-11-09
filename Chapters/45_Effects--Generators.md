@@ -453,7 +453,7 @@ reproduces the `ValueError` with several threads.
 It also shows `threading.synchronized_iterator()`,
 which wraps the generator function so that each generator it creates serializes the threads' calls.
 
-## `yield from` Composes Generators {#yield-from-composes-descriptions}
+## `yield from` Delegates to an Inner Generator {#yield-from-composes-descriptions}
 
 An EMS needs a request made deep inside a program to reach the driver at its edge.
 Generators provide that path because they nest.
@@ -792,7 +792,7 @@ so `drive()` sees the same `Question`s it saw in `interview_generator.py` and pr
 so `ask()` runs unchanged under any driver that answers `Question`s.
 A single loop at the edge of the program interprets requests yielded at any depth.
 
-### Composing Is Not Interpreting
+### Relaying Is Not Answering
 
 `drive()` and `yield from` both run a generator's body one `yield` at a time and both finish at `StopIteration`,
 so they are easy to confuse.
@@ -829,6 +829,12 @@ Each `yield from` passes the `Question` up and the `Answer` down unchanged,
 so the trace repeats the three request lines of `yield_from_delegates.py` before the new one.
 The `Result` goes one level up and stops,
 as the value of `survey()`'s `yield from`.
+
+`survey()` composes `interview()` and `ask()`.
+Both come from `yield_from_delegates.py` unchanged,
+and neither refers to `survey()` or to the driver.
+That is what the Effects chapters mean by composing:
+a conversation assembled from conversations written before it.
 
 The outermost generator still needs code that calls `next()` and `send()`,
 so the listing ends with a `drive()` call.
