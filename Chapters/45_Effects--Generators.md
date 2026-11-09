@@ -1211,9 +1211,11 @@ as `readings()` does by reaching the end of its body.
 [`close()`: The Generator Must Finish](#close-requires-the-generator-to-finish)
 shows the generator that yields instead.
 
-If the driver leaves the generator paused,
-the garbage collector calls the same `close()` when it reclaims the generator,
-so the `finally` block runs eventually.
+A driver that stops without calling `close()` leaves the generator paused.
+When Python's garbage collector reclaims a paused generator,
+it calls that generator's `close()` method.
+`GeneratorExit` arrives at the paused `yield` as it does at `[2]`,
+and the `finally` block runs at collection time.
 Calling `close()` yourself runs the `finally` block at a point you choose.
 
 A generator still at `GEN_CREATED`, before its first `next()`,
@@ -1252,7 +1254,7 @@ The `yield` there suspends the generator again before it can finish.
 
 When the driver calls `close()`, the `RuntimeError` arrives in the driver,
 as in `throw_and_close_gotcha.py`.
-When the garbage collector calls `close()`,
+When the garbage collector [calls `close()` on a paused generator it reclaims](#stopping-early-with-close),
 the `RuntimeError` arrives in the collector.
 Python displays it as an "Exception ignored" message and continues.
 
