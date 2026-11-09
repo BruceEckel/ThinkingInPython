@@ -1207,7 +1207,7 @@ The `finally` clause runs on every ending and turns off the sensor.
 
 A generator may catch `GeneratorExit` as long as it then finishes,
 as `readings()` does by reaching the end of its body.
-[`close()` Requires the Generator to Finish](#close-requires-the-generator-to-finish)
+[`close()`: The Generator Must Finish](#close-requires-the-generator-to-finish)
 shows the generator that yields instead.
 
 If the driver leaves the generator paused,
@@ -1220,7 +1220,7 @@ is outside every `try` statement.
 `close()` on it marks it `GEN_CLOSED` and skips the body,
 so closing `readings()` before its first `next()` leaves the sensor as it was.
 
-### `close()` Requires the Generator to Finish
+### `close()`: The Generator Must Finish {#close-requires-the-generator-to-finish}
 
 If a generator catches `GeneratorExit` and yields again instead of finishing,
 `close()` raises a `RuntimeError`:
