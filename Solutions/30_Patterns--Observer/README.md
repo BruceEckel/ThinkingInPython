@@ -1736,7 +1736,7 @@ so `celsius` and `humidity` derive different attribute names:
 `_celsius` and `_responders_celsius` for one,
 `_humidity` and `_responders_humidity` for the other.
 Two `Notifying` instances in one class therefore keep separate storage and separate responder lists.
-`Broadcaster` keeps one list for the whole object;
+The chapter's `Broadcaster` keeps one list for the whole object;
 a descriptor keeps one per attribute.
 
 **Return the descriptor on class access.**
