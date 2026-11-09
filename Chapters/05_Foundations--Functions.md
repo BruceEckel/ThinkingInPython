@@ -463,7 +463,7 @@ Because collecting and unpacking are inverses,
 a function can collect arguments beyond its named parameters and pass them on as they arrived.
 `trace()` has the standard shape of a wrapper:
 it accepts any call and forwards it.
-`expect()` has the same shape.
+`expect()` from `exceptions.py` has the same shape.
 It receives a function and the arguments for it, and makes the call.
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
