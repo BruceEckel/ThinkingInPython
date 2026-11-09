@@ -931,3 +931,12 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	price: Dropping the last p
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: the script runs out at the fourth price
 Solutions/47_Effects--Stateless_in_Practice/README.md	prices: The test proves from both sides that CODE attempts all four prices
+Chapters/08_Foundations--Static_Types.md	is when: so the question is when a hint is worth the words
+Chapters/19_Techniques--Concurrency.md	is how: The only difference between one run and another is how finely the listing splits the total work
+Chapters/21_Patterns--Design_Patterns.md	is how: so the question is how much of the other part a dependence reaches
+Chapters/30_Patterns--Observer.md	are how: The unknowns are how many times you select each cell
+Chapters/46_Effects--Stateless.md	is how: The difference is how many places you edit
+Chapters/A_Effect_Tracking.md	is where: The reason is where it puts the row
+Solutions/37_Patterns--Pattern_Refactoring/README.md	is where: What changes is where you define the operation
+Solutions/38_Patterns--Simulation/README.md	is where: The cause is where the factory searches
+Solutions/47_Effects--Stateless_in_Practice/README.md	is where: The difference is where inside CODE the failure arises

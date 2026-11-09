@@ -2643,9 +2643,37 @@ message", "which is how `list[int]` works at runtime") is a connective,
 read by the antecedents pass, and stays unless "so" says the same.
 
 **Sightings.** 1 flag, promoted on Bruce's request to a book sweep the
-same day (2026-11-09).
+same day (2026-11-09): 80 sites of "is/are how|where|when|why" in
+`Chapters/` and `Solutions/`, 50 rewritten (three Opus agents by chapter
+band, chapter 45 by hand), 30 kept. The keeps split by the two shapes
+above: nine abstractions whose content the clause is, accepted into
+the watch-words baseline, and the pronoun connectives, which the check
+skips; two "which is where" sites stayed because "so" did not fit.
 - `45_Effects--Generators` 2026-11-09, was Claude-written: "`close()`
-  is how a driver ends a generator early." -> "To end a generator early, a driver calls `close()`."
+  is how a driver ends a generator early." -> "To end a generator
+  early, a driver calls `close()`." (R60's form)
+- `46_Effects--Stateless`: "`Need` is how Stateless does dependency
+  injection." -> "Stateless does dependency injection with `Need`.";
+  "`E` is how it can fail." -> "`E` is its failure type."
+- `19_Techniques--Concurrency`: "`TaskGroup` is where most programs
+  meet an exception group" -> "Most programs meet an exception group
+  in a `TaskGroup`"; "A thread waiting on I/O releases the GIL. That
+  release is why a thread pool helps with I/O-bound work." -> "A
+  thread waiting on I/O releases the GIL, so a thread pool helps with
+  I/O-bound work."
+- `32_Patterns--Multiple_Dispatching`: "The reflected call is how a
+  type written decades after `int` can sit to the right of an `int` in
+  a sum." -> "The reflected call lets a type written decades after
+  `int` sit to the right of an `int` in a sum."
+- `Solutions/40_Functional--Foundations`: "Assignment is how Python
+  decides a name is local." -> "Python decides that a name is local
+  when the function body assigns it."
+- `Solutions/18_Techniques--Performance`: "`right` is where a new
+  duplicate goes, after the existing ones, and it is the wrong index
+  to read." -> "A new duplicate goes at `right`, after the existing
+  ones, but `right` is the wrong index to read."
+- Twenty-two "which is why" or "That <noun> is why" connectives became
+  "so" across the book, where "so" read the same.
 
 **Home.** CLAUDE.md watch list (Tier 2, "is how") | literal (Accrued
 patterns) | `tools/watch_words.py` | this file.
