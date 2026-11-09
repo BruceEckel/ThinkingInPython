@@ -262,3 +262,14 @@ and it becomes part of every future pass.
   "worth having" is awkward, and it is "a better choice", never
   "the better choice". Tier 3 in `tip watch-words` since that day,
   when the fourteen in the book were fixed.
+- "`close()` is how a driver ends a generator early" becomes
+  "A driver ends a generator early by calling `close()`" (2026-11-09,
+  Bruce: "I don't like the hand-waviness of 'is how'"). "X is how",
+  "is where", "is when", or "is why" with a thing as X hides the verb
+  that relates X to the clause: make the clause the main clause and
+  state X's part ("by calling `close()`", "in a `TaskGroup`", "at
+  `right`"), or give X its verb ("An assignment makes a name local").
+  Keep an abstraction whose content the clause is ("The difference is
+  how many places you edit") and a pronoun connective ("which is
+  why"). R59 in `bruce_edit_db.md`; `is how` is Tier 2 in
+  `tip watch-words`.

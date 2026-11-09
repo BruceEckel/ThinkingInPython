@@ -60,7 +60,17 @@ grows", "at any depth of delegation", "whether the block completed or
 raised an exception", "on every request") or drops the clause where
 the verb already says the thing stays the same. The contrastive
 "However," and ", however," are a different word and are skipped: a
-`however` followed by a comma or a period is literal. Tier 1 ("Consider rewriting") is a word with
+`however` followed by a comma or a period is literal. `is how`
+joined Tier 2 on 2026-11-09 (rule R59, Bruce: "I don't like the
+hand-waviness of 'is how'" on chapter 45's "`close()` is how a driver
+ends a generator early"): a thing as subject, then "is how", "is
+where", "is when", or "is why" and a clause, states the thing's role
+and hides the verb that relates it to the clause. The repair makes the
+clause the main clause and states the thing's part ("A driver ends a
+generator early by calling `close()`") or gives the thing its verb. An
+abstraction whose content the clause is ("The difference is how many
+places you edit") is a keep, and a pronoun before the copula ("which
+is why", "That is why") is a connective the check skips. Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -283,6 +293,12 @@ NO_SUBJECT_PREPOSITIONS: Final = frozenset((
 """Words before `no` that make it an object or a complement, not a
 subject (and the conjunctions, which hide the governing verb)."""
 NO_VERB_WORD: Final = re.compile(NO_VERBS, re.IGNORECASE)
+IS_HOW: Final = (
+    r"(?<!which )(?<!that )(?<!this )(?<!it )(?<!what )"
+    r"(?:is|are) (?:how|where|when|why)")
+"""A thing as subject, then "is how/where/when/why" and a clause (R59):
+the copula and the wh-word stand in for the verb. A pronoun before the
+copula ("which is why", "That is why") is a connective and is skipped."""
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
@@ -344,6 +360,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (1, NO_SUBJECT),
         (2, r"by hand"),
         (2, r"manually"),
+        (2, IS_HOW),
         (2, r"explicit(?:ly)?"),
     ]
 )

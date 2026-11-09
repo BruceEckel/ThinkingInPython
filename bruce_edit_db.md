@@ -2605,6 +2605,45 @@ rewritten in session.
 (catalog, "A connective with two senses", and Accrued shapes) |
 `tools/watch_words.py` | this file.
 
+### R59. "X is how Y" hides X's verb; write what X does
+
+**Test.** A sentence whose subject names a thing (a call, a type, a
+construct, a mechanism, or a nominalized action: "`close()`", "`Need`",
+"Assignment", "The reflected call", "That release") and whose predicate
+is "is how", "is where", "is when", or "is why" plus a clause. The
+copula and the wh-word stand in for the verb that relates the thing to
+the clause, so the sentence says the thing's role and leaves the
+mechanism out: "`close()` is how a driver ends a generator early" says
+that `close()` is involved and lets the reader supply the rest. Bruce
+(2026-11-09, chapter 45): "I don't like the hand-waviness of 'is how'.
+Is the mechanism, is the tool for, or something else that is more
+precise." Repair: make the clause the main clause and put the thing in
+a phrase that states its part ("A driver ends a generator early by
+calling `close()`"; "Most programs meet an exception group in a
+`TaskGroup`"; "A new duplicate goes at `right`"), or give the thing its
+own verb ("`E` is its failure type"; "An assignment makes a name local
+to the function"; "Because the GIL is released during a wait, a thread
+pool helps with I/O-bound work").
+
+**Keep when.** The subject is an abstraction whose content the
+wh-clause is: "the question is when a hint is worth the words", "The
+difference is how many places you edit", "The cause is where the
+factory searches", "What changes is where you define the operation".
+There the clause is an embedded question and no verb is hidden. A
+pronoun subject that points at the clause before ("That is why
+`doubled_ok()` uses `for`", "which is why the run still prints a
+message", "which is how `list[int]` works at runtime") is a connective,
+read by the antecedents pass, and stays unless "so" says the same.
+
+**Sightings.** 1 flag, promoted on Bruce's request to a book sweep the
+same day (2026-11-09).
+- `45_Effects--Generators` 2026-11-09, was Claude-written: "`close()`
+  is how a driver ends a generator early." -> "A driver ends a
+  generator early by calling `close()`."
+
+**Home.** CLAUDE.md watch list (Tier 2, "is how") | literal (Accrued
+patterns) | `tools/watch_words.py` | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
