@@ -225,7 +225,8 @@ The implementation side can keep its static check.
 A `__getattr__()` proxy can annotate it `Service`,
 as `proxy_interface.py`'s `Proxy` does.
 The type checker then verifies that the implementation you pass has the necessary methods.
-A `Protocol` on that parameter guards the implementation side structurally.
+If the annotation on that parameter is a `Protocol`,
+it guards the implementation side structurally.
 `proxy_protocol.py`'s `isinstance()` is the runtime half of that check.
 
 Calls on the proxy lose that check.
