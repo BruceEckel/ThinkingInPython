@@ -376,7 +376,7 @@ info: └── protocol member `total` is incompatible
 info:     └── incompatible return types: `Weight` is not assignable to `Price`
 ```
 
-The comment lets the listing pass the book's type check while the call still runs and prints `4.5`.
+With the comment, the listing passes the book's type check while the call still runs and prints `4.5`.
 
 **Give each meaning its own type.**
 The two `NewType` declarations make the two return types distinct,

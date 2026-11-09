@@ -135,7 +135,7 @@ The type checker then rejects a method that overrides nothing.
 That check depends on the decorator.
 If you leave `@override` off the misspelled method,
 the checker accepts it as a new method,
-because the typing rules let a subclass add any method.
+because under the typing rules a subclass can add any method.
 A runtime check rejects the misspelled method.
 `CheckedFramework` inherits from `ApplicationFramework` and adds that check.
 Its `__init_subclass__()` runs at each subclass's `class` statement,

@@ -456,8 +456,8 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Abstract Factories](../../Chapters/26_Patterns--Factory.md#abstract-factories)
-makes one factory object produce a matching family of products.
+In [Abstract Factories](../../Chapters/26_Patterns--Factory.md#abstract-factories),
+one factory object produces a matching family of products.
 Here the family is the set of shapes, and the variation is the style.
 Declare a `Protocol` with one creation method per shape,
 write one factory class for thick shapes and one for thin,
@@ -738,8 +738,8 @@ again: illegal values are unrepresentable.
 **Check before each change.**
 Placing the check in `topping()`, as `exercise_5.py` does,
 gives `PizzaBuilder` the same guarantee.
-Placing the check in `build()` lets the builder accept a fifth, sixth,
-or tenth `.topping()` call and silently accumulate an overlong list.
+With the check in `build()`, the builder accepts a fifth, sixth,
+or tenth `.topping()` call and silently accumulates an overlong list.
 That builder checks the count when `build()` runs,
 so a window opens between the fifth `.topping()` call and that `build()` call.
 During that window the builder's internal state violates the rule the finished `Pizza` must guarantee,

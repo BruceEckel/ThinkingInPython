@@ -438,7 +438,7 @@ Python then raises a `RecursionError` before any `AttributeError` can name the t
 
 The trap is specific to the fallback method.
 `__getattr__()` runs only when normal lookup fails,
-so any missing name it reads makes Python call `__getattr__()` again.
+so when it reads a missing name, Python calls `__getattr__()` again.
 
 The chapter's working version is safe because `__init__()` assigns `self._impl`,
 so normal lookup finds `_impl` on the instance and returns it.

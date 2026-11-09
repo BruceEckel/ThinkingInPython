@@ -204,7 +204,7 @@ Solutions/17_Techniques--Metaprogramming/README.md	the second `on_open`	Python s
 Solutions/17_Techniques--Metaprogramming/README.md	the second call	your edited `singleton.py` prints `True` for `c1 is c2` and `False` for `c1 is a`, and its trace shows `building CSingleton` once, followed by `reusing CSingleton` on the second call.
 Solutions/17_Techniques--Metaprogramming/README.md	three runs	That assignment drops the last reference to the first function, so Python frees the first function before any of the three runs.
 Solutions/18_Techniques--Performance/README.md	The last line	**Expose the inherited `__slots__`.** The last line shows why the subclass's `__dict__` is easy to miss.
-Solutions/18_Techniques--Performance/README.md	the first call	The cache lets that side effect run on the first call with a given argument and silently skips it on every repeat.
+Solutions/18_Techniques--Performance/README.md	the first call	The side effect runs on the first call with a given argument.
 Solutions/18_Techniques--Performance/README.md	two runs	On a `True False` build, the comparison is two runs of the same file that differ in `PYTHON_JIT` alone.
 Solutions/18_Techniques--Performance/README.md	two runs	On a python.org 3.15 build, the `--numbers` lines from the two runs differ by about as much as two runs under the same setting.
 Solutions/19_Techniques--Concurrency/README.md	every run	your edited `priority_queue.py` prints six tuples in the same order on every run, opening with `(1, 'alert')`, `(1, 'page oncall')`, `(1, 'zzz')` and closing with `(3, 'aaa')`, `(3, 'backup')`.

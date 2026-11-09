@@ -330,8 +330,8 @@ def make(name: str) -> Shape:
     return Shape.registry[name]()
 ```
 
-[`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
-lets each subclass register itself.
+With [`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses),
+each subclass registers itself.
 The two `class` statements fill `Shape.registry` on their own.
 
 `Shape` is an abstract base class rather than a `Protocol` because it registers subclasses through `__init_subclass__()`.
@@ -1037,7 +1037,7 @@ with no error to signal the sharing.
 
 `deepcopy()` copies everything it can reach, but it cannot copy an open file,
 a socket, or a lock.
-A prototype holding one makes `deepcopy()` raise a `TypeError`.
+For a prototype holding one, `deepcopy()` raises a `TypeError`.
 For a lock the message is `cannot pickle '_thread.lock' object`.
 The message names pickling because `deepcopy()` falls back on the pickle protocol for a type that has no copy rule of its own.
 Give such a class a `__deepcopy__()` that says what the copy holds:

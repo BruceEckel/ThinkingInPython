@@ -683,7 +683,7 @@ bus.publish(Closed("inactivity"))
 ```
 
 `subscribe()` indexes `self._handlers`,
-letting the `defaultdict` build each event type's list on first use.
+so the `defaultdict` builds each event type's list on first use.
 `publish()` reads with `.get(type(event), [])` instead of indexing,
 because indexing a `defaultdict` inserts an empty list as a side effect.
 Indexing leaves a stray entry behind for every published event type with no handler,
@@ -813,8 +813,8 @@ A class is callable, and calling it builds an instance.
 
 Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
-Python sets a class's slots when it creates the class,
-so `slots=True` makes `dataclass()` build a new class and return it.
+Python sets a class's slots when it creates the class, so under `slots=True`,
+`dataclass()` builds a new class and returns it.
 If `event()` registers `cls`, it puts the original class in `EVENTS`.
 Every event is an instance of `built`.
 In that version `publish()` refuses every event,

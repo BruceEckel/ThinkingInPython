@@ -321,7 +321,8 @@ A cache assumes its stored answer can stand in for a repeat call,
 because the same argument gives the same answer and computing that answer is all the call does.
 An impure function breaks that assumption.
 Each of its calls also prints, writes a file, or increments a counter.
-The cache lets that side effect run on the first call with a given argument and silently skips it on every repeat.
+The side effect runs on the first call with a given argument.
+On every repeat, the cache silently skips it.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

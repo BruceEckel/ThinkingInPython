@@ -600,7 +600,7 @@ class HalfDone(ApplicationFramework):
 <summary>Done when</summary>
 
 `uv run ty check` passes on your file;
-`run()` on the first subclass lets your exception propagate out of `run()`,
+your exception propagates out of `run()` on the first subclass,
 and `run()` on the second returns normally while printing evidence that `customize2()` never did its share.
 You can name a base-class change that makes the type checker report one subclass,
 and say why the type checker accepts the other.

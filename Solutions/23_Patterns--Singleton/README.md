@@ -171,8 +171,8 @@ def pool() -> ConnectionPool:
 
 two calls to your factory return the same pool,
 and with a pool of two a third request raises an exception while both connections are out.
-Releasing one makes the next request return that same connection,
-and releasing a connection twice raises an exception rather than adding it back.
+After you release one, the next request returns that same connection.
+Releasing a connection twice raises an exception rather than adding it back.
 
 <details>
 <summary>Solution</summary>
@@ -328,8 +328,8 @@ and the `__getattr__()` delegation.
 For real code, prefer the module,
 as [A Module Is Already a *Singleton*](../../Chapters/23_Patterns--Singleton.md#a-module-is-already-a-singleton)
 argues at the top of the chapter.
-The module is less code, lets the caller read the list as a module attribute,
-and still holds one list that every importer shares.
+The module is less code and still holds one list that every importer shares.
+A caller reads that list as a module attribute.
 The class-based versions are a better choice when the singleton must be a class:
 when it must satisfy an interface other code expects,
 or when it needs `__new__()`-level control over construction.

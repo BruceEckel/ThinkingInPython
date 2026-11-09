@@ -84,7 +84,7 @@ Another benefit of threads emerged when more CPUs became available on a single m
 Threads already distributed computing resources,
 so more CPUs simply meant more resources to distribute
 (of course, it wasn't quite that easy).
-Adapting the threading mechanism let threads also perform ad-hoc parallelism.
+With an adapted threading mechanism, threads also performed ad-hoc parallelism.
 Multiple CPUs could run multiple parts of a program simultaneously.
 
 Although threads serve these purposes, the OS is always at a disadvantage.
@@ -96,7 +96,7 @@ Knowing that, the OS could switch contexts faster.
 For the same reason,
 each thread reserves a stack large enough to serve virtually any program,
 although some tasks need a small fraction of that.
-Engineers learned tricks to make programs run faster despite these disadvantages,
+Engineers learned tricks that made programs faster despite these disadvantages,
 but these tricks made the resulting programs harder to create and maintain.
 
 *Asynchrony*, implemented with *coroutines*,
@@ -334,7 +334,7 @@ The event loop overlaps waiting, not computing.
 
 `asyncio.sleep()` in `io_price()` is not `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
-which lets all five `io_price()` tasks overlap.
+so all five `io_price()` tasks overlap.
 `time.sleep()` is a blocking call.
 It stops the whole thread,
 so a coroutine that calls it freezes every task in the program, not just itself:
@@ -440,8 +440,7 @@ The rule inside `async def` is to `await` instead of blocking.
 If you cannot rewrite a blocking call,
 for example a library function that reads a file or talks to a database,
 you can put it in a thread.
-`await asyncio.to_thread(blocking_call)` runs `blocking_call()` in a worker thread,
-allowing the event loop to keep running:
+`await asyncio.to_thread(blocking_call)` runs `blocking_call()` in a worker thread while the event loop keeps running:
 
 ```python
 # to_thread.py
@@ -618,7 +617,7 @@ so `task.exception()` returns the `ValueError` instead of raising it.
 Cancelling a task raises `asyncio.CancelledError` inside it,
 at the `await` that currently suspends it.
 That exception derives from `BaseException` rather than `Exception` so that a handler for ordinary errors lets it pass.
-Inside a task, a `try`/`except Exception` that logs and continues lets cancellation propagate,
+Inside a task, cancellation propagates past a `try`/`except Exception` that logs and continues,
 so the task still stops the way the group intended.
 The real mistake is catching too much.
 A bare `except:` or an `except BaseException:` around an `await` catches the cancellation and keeps the task running,
@@ -1033,8 +1032,8 @@ with CPU time spent and state visibly changing.
 A deadlock looks idle, with tasks suspended and waiting.
 In both cases, progress stops.
 
-The usual fix for a livelock is to break the symmetry,
-for example letting the task with the lower ID give way while the other proceeds.
+The usual fix for a livelock is to break the symmetry.
+For example, the task with the lower ID gives way while the other proceeds.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
@@ -1958,8 +1957,8 @@ The similar queue interfaces hide a difference in how they wait.
 `queue.Queue` and `multiprocessing.Queue` block the calling thread while they wait.
 `asyncio.Queue` suspends a task.
 As `blocking_the_loop.py` shows,
-a blocked thread freezes every task on an event loop,
-while a suspended task lets the rest keep running.
+a blocked thread freezes every task on an event loop.
+When a task suspends instead, the rest keep running.
 Match the queue to the concurrency model.
 
 ## Sharing an Iterator Between Threads {#sharing-an-iterator-between-threads}

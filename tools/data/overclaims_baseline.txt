@@ -363,7 +363,7 @@ Chapters/23_Patterns--Singleton.md	[BOUND] In CODE, remove the two lines of CODE
 Chapters/23_Patterns--Singleton.md	[BOUND] Its class blocks direct construction and hands out the sole instance through a class operation, CODE, which builds the object on the first call
 Chapters/23_Patterns--Singleton.md	[BOUND] One parameter turns "one singleton" into one singleton per argument value
 Chapters/23_Patterns--Singleton.md	[BOUND] Skipping one lock acquisition per call rarely justifies two details that must both stay right
-Chapters/23_Patterns--Singleton.md	[BOUND] The method's return type is whatever the inner object holds under each name, so CODE is the one annotation that fits every name and still lets the caller use the result
+Chapters/23_Patterns--Singleton.md	[BOUND] The method's return type is whatever the inner object holds under each name, so CODE is the one annotation that fits every name and still leaves the result usable
 Chapters/23_Patterns--Singleton.md	[BOUND] The second underscore has one effect
 Chapters/23_Patterns--Singleton.md	[BOUND] The three calls in the listing therefore build three objects for one environment
 Chapters/23_Patterns--Singleton.md	[BOUND] The three listings come down to three steps through CODE

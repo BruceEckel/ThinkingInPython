@@ -424,8 +424,9 @@ because `Report` specifies the `Writer` protocol,
 which the new writer satisfies.
 `main` still changes, since something must construct the new class.
 A [registry factory](26_Patterns--Factory.md#self-registration)
-removes that last change,
-by letting the new class register itself as its `class` statement runs.
+removes that last change.
+In a registry factory,
+the new class registers itself as its `class` statement runs.
 
 A change to a part can force an edit in every part with a heavy edge pointing at it.
 A pattern moves those edges,

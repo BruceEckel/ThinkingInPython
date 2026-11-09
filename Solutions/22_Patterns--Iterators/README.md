@@ -479,7 +479,8 @@ and use `pytest.raises()` to confirm the filter keeps asking.
 <summary>Done when</summary>
 
 `uv run pytest` passes your new test,
-and replacing `filter()` with `takewhile()` in it makes the test fail with `DID NOT RAISE Tripwire`.
+and with `takewhile()` in place of `filter()`,
+the test fails with `DID NOT RAISE Tripwire`.
 You can name the existing test in `test_endless.py` that fails the same way under that swap.
 
 <details>

@@ -283,7 +283,7 @@ asyncio.run(main())
 **Suspend before computing.**
 The peak is `5`, matching the I/O-bound case rather than the CPU-bound one.
 `mixed_price()` reaches its `await asyncio.sleep(0.05)` before the CPU-heavy loop,
-so all five coroutines suspend at that `await` and let their siblings start before any of them begins computing.
+so all five coroutines start and suspend at that `await` before any of them begins computing.
 All five are in flight, waiting, at once.
 
 **Count a suspended task as active.**
@@ -845,7 +845,7 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Structured Concurrency with `TaskGroup`](../../Chapters/19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
-shows a failing child causing the group to cancel its siblings.
+shows that when one child fails, the group cancels the others.
 Compare each task's delay with the moment `c` and `d` fail to decide which tasks are still running when cancellation starts.
 The group cancels the tasks still running,
 so consider what becomes of a task that has returned.

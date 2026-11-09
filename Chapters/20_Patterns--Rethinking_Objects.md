@@ -1147,7 +1147,7 @@ Sometimes a caller must notice absence,
 like a lookup that can fail or a required value that may be missing.
 In these cases, use `T | None`,
 or return [`Result`](42_Functional--Error_Handling.md#a-result-type),
-so the type checker requires callers to handle the missing case.
+so each caller must handle the missing case to satisfy the type checker.
 
 If every caller handles absence with the same neutral behavior,
 centralize that behavior in a null object.

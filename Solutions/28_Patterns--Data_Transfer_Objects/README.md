@@ -650,7 +650,7 @@ At runtime the unpacking `x, y = other` raises a `ValueError` for it.
 
 **Reuse the properties in `__repr__()`.**
 `tuple.__repr__()` prints `(4.0, 6.0)`.
-The override makes a `Point` name its type the way a `NamedTuple` does.
+With the override, a `Point` names its type the way a `NamedTuple` does.
 
 **What stays a tuple.**
 Slicing goes through `tuple.__getitem__()`, which the exercise leaves alone,

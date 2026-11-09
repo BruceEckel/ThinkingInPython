@@ -306,7 +306,6 @@ Chapters/21_Patterns--Design_Patterns.md	has no: the interface has no name and n
 Chapters/21_Patterns--Design_Patterns.md	has none: *Strategy* has none
 Chapters/21_Patterns--Design_Patterns.md	is how: so the question is how much of the other part a dependence reaches
 Chapters/21_Patterns--Design_Patterns.md	itself: A CODE renders itself through a writer
-Chapters/21_Patterns--Design_Patterns.md	itself: by letting the new class register itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	names the patterns: GoF's first chapter lists eight "common causes of redesign" and names the patterns that address each one
 Chapters/21_Patterns--Design_Patterns.md	only: *Once and once only*
 Chapters/21_Patterns--Design_Patterns.md	only: This listing shows only the shape
@@ -367,7 +366,6 @@ Chapters/26_Patterns--Factory.md	explicit: as Explicit Registration with a Proto
 Chapters/26_Patterns--Factory.md	has no: An if-chain like CODE has no wildcard
 Chapters/26_Patterns--Factory.md	has no: The message names pickling because CODE falls back on the pickle protocol for a type that has no copy rule of its own
 Chapters/26_Patterns--Factory.md	have no: the concrete classes have no base class
-Chapters/26_Patterns--Factory.md	itself: CODE lets each subclass register itself
 Chapters/26_Patterns--Factory.md	itself: a new CODE subclass can register itself with no edit to existing code
 Chapters/26_Patterns--Factory.md	never: An import written only to trigger registration never uses that name
 Chapters/26_Patterns--Factory.md	never: Code that calls through that interface never names the specific types you add

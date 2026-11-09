@@ -88,15 +88,15 @@ Chapters/19_Techniques--Concurrency.md	[PAST] had: Early machines had a single C
 Chapters/19_Techniques--Concurrency.md	[PAST] included: Both tasks wait forever, the event loop included, since the one task that can wake each of them is waiting too.
 Chapters/19_Techniques--Concurrency.md	[PAST] included: CODE is the newer, composable form, scoping the deadline over an entire block, CODE included, instead of one call.
 Chapters/19_Techniques--Concurrency.md	[PAST] kept: Single-threaded code kept nearly all its speed.
-Chapters/19_Techniques--Concurrency.md	[PAST] learned: Engineers learned tricks to make programs run faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
+Chapters/19_Techniques--Concurrency.md	[PAST] learned: Engineers learned tricks that made programs faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
 Chapters/19_Techniques--Concurrency.md	[PAST] left: Mapping every parallel task onto its own OS thread worked, but it left every scheduling decision to the OS and needed extra machinery (thread pools, pinning, tuning) to perform well.
-Chapters/19_Techniques--Concurrency.md	[PAST] let: Adapting the threading mechanism let threads also perform ad-hoc parallelism.
 Chapters/19_Techniques--Concurrency.md	[PAST] made: Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
-Chapters/19_Techniques--Concurrency.md	[PAST] made: Engineers learned tricks to make programs run faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
+Chapters/19_Techniques--Concurrency.md	[PAST] made: Engineers learned tricks that made programs faster despite these disadvantages, but these tricks made the resulting programs harder to create and maintain.
 Chapters/19_Techniques--Concurrency.md	[PAST] made: It made every count update, every dict and list mutation, and every existing extension safe at once.
 Chapters/19_Techniques--Concurrency.md	[PAST] made: That exposure also made reference counting part of the compiled binary interface.
 Chapters/19_Techniques--Concurrency.md	[PAST] meant: Threads already distributed computing resources, so more CPUs simply meant more resources to distribute (of course, it wasn't quite that easy).
 Chapters/19_Techniques--Concurrency.md	[PAST] needed: Mapping every parallel task onto its own OS thread worked, but it left every scheduling decision to the OS and needed extra machinery (thread pools, pinning, tuning) to perform well.
+Chapters/19_Techniques--Concurrency.md	[PAST] performed: With an adapted threading mechanism, threads also performed ad-hoc parallelism.
 Chapters/19_Techniques--Concurrency.md	[PAST] produced: Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
 Chapters/19_Techniques--Concurrency.md	[PAST] re: As it exits, it re-raises both failures wrapped in an exception group, since more than one task can fail at once.
 Chapters/19_Techniques--Concurrency.md	[PAST] re: The resulting CODE reaches the CODE, which cancels the slow task, its one child still running, and re-raises the cancellation as it exits.
