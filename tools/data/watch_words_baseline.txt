@@ -497,7 +497,6 @@ Chapters/40_Functional--Foundations.md	share no: Python's immutable types share 
 Chapters/40_Functional--Foundations.md	shares no: A function that shares no mutable state is safe to run in parallel
 Chapters/40_Functional--Foundations.md	takes no: It also types the resulting callable as one that takes no arguments
 Chapters/40_Functional--Foundations.md	want: A closure fits when you want to configure behavior once
-Chapters/40_Functional--Foundations.md	whatever: whatever code ran in between
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
 Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to schedule so that every pair meets exactly once
 Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pair into rounds in which each player appears exactly once
