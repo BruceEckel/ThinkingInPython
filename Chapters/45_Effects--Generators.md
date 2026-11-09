@@ -1244,6 +1244,7 @@ expect(RuntimeError, s.close)
 ```
 
 A `yield` inside a `finally` clause draws the same `RuntimeError`,
+`generator ignored GeneratorExit`,
 because that clause runs as `GeneratorExit` propagates out.
 When the driver calls `close()`, the `RuntimeError` arrives in the driver,
 as above.
