@@ -344,7 +344,7 @@ asyncio.run(main())
 ```
 
 The log shows what the map cannot: the order of events.
-`Rat.__post_init__()` assigns each number at spawn time,
+`Rat.__post_init__()` in `rat.py` assigns each number at spawn time,
 so the numbers follow spawn order.
 Each rat logs its line when it dead-ends, so the lines follow finish order.
 Rat 4 spawns fourth and finishes last,
