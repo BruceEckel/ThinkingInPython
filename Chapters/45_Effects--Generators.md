@@ -1218,6 +1218,12 @@ it calls that generator's `close()` method.
 and the `finally` block runs at collection time.
 Calling `close()` yourself runs the `finally` block at a point you choose.
 
+A second `close()` is safe.
+On a generator that is already `GEN_CLOSED`,
+`close()` returns `None` and leaves the generator as it is.
+The garbage collector closes a generator that is still paused,
+so a generator the driver closed has run its `finally` block once when the collector reclaims it.
+
 A generator still at `GEN_CREATED`, before its first `next()`,
 is outside every `try` statement.
 `close()` on it marks it `GEN_CLOSED` and skips the body,
