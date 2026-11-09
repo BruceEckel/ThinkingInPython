@@ -211,8 +211,8 @@ A [handler](44_Effects--Effect_Management.md#native-effect-management)
 can do three things with a continuation: resume it once, discard it,
 or resume it several times for a retry or a backtracking search.
 A generator's driver can do the first two.
-It resumes the continuation once with `send()`,
-and discards it by dropping the last reference to the generator.
+It resumes the continuation once with `send()`.
+To discard it, the driver drops the last reference to the generator.
 Resuming several times needs a separate copy of the suspended state for each resumption.
 Python cannot copy a generator.
 `copy.copy()` on a suspended generator raises `TypeError`.
@@ -1158,8 +1158,7 @@ In both directions, an exception passes through a method call that the driver ma
 To end a generator early, a driver calls `close()`.
 A generator paused at a `yield` still holds the resources it acquired before the pause:
 a file or a lock inside a `with` statement, a connection, a transaction.
-Here is the typical case:
-a driver that has the answer it needs before the generator yields its last value:
+Here we see the typical case of a driver that has the answer it needs before the generator yields its last value:
 
 ```python
 # close_when_done.py
@@ -1346,7 +1345,7 @@ expect(Failed, booking.throw, Failed("card declined"))
 
 Each step yields its command,
 then delegates to the steps after it inside a `try`.
-The driver reports the card's failure by calling `throw()`.
+To report the card's failure, the driver calls `throw()`.
 Python raises `Failed` at the innermost `yield`, in the card step.
 That `yield` comes before the card step's `try`,
 so the exception propagates out of the card step,
@@ -1557,7 +1556,7 @@ whose transitions form a graph.
 Chapter 31's `Enum` makes the states a closed set.
 Here the set is open: any function that returns a `Machine` is a state.
 `test_trap_states.py` iterates over `TrapState` and checks every state against every move;
-a test of the generator design reaches a state by driving the machine to it.
+to reach a state, a test of the generator design drives the machine to it.
 A machine whose states a test must enumerate belongs in chapter 31's table.
 
 The generator design has a second limit.
