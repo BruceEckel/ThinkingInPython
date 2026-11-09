@@ -326,7 +326,7 @@ A real module therefore either sets [`__all__`](../../Chapters/06_Foundations--M
 or imports the decorator under a private name,
 `from record import record as _record`, and writes `@_record`.
 
-`Facade` is a class used as a namespace,
+`Facade` in the chapter's `facade.py` is a class used as a namespace,
 and the module around it is a namespace too.
 `Facade.start_car()` and `shop.start_car()` read identically at the call site,
 but the class version adds a `class` statement and a `@staticmethod` on each function.
