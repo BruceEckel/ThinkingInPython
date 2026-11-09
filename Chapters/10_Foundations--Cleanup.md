@@ -133,7 +133,8 @@ Python prints a traceback to `sys.stderr`, labeled `Exception ignored`,
 and discards the exception.
 No caller can catch the `RuntimeError`, the exit status is still `0`,
 and a test asserting on stdout passes.
-In a `with` block, an exception from `close()` propagates to the caller.
+If the cleanup runs in a `with` block in place of `__del__()`,
+an exception from `close()` propagates to the caller.
 
 ## Reference Cycles Delay Destruction
 
@@ -462,7 +463,7 @@ finalize(WeakSlot("y"), print, "y", "closed")
 `__slots__` removes the instance `__dict__` and, by default,
 the `__weakref__` slot along with it,
 so a `Slot` instance has nowhere to list its weak references.
-`ref()`, `weakref.proxy()`,
+`weakref.ref()`, `weakref.proxy()`,
 and `WeakValueDictionary` raise the same `TypeError` on a `Slot`,
 since a slotted class keeps the list of an instance's weak references in its `__weakref__` slot.
 
