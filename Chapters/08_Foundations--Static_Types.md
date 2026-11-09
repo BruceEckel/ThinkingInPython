@@ -614,7 +614,8 @@ The type checker refuses the call, so the declaration `list[Circle]` stays true.
 A read-only container is safe to pass this way,
 so `Sequence[Shape]` accepts a `list[Circle]`.
 A `Sequence[Shape]` parameter declares that the function reads its argument and leaves it as it was.
-That declaration lets the function accept arguments that a `list[Shape]` parameter rejects.
+With that declaration,
+the function accepts arguments that a `list[Shape]` parameter rejects.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 
 ### Type Parameter Defaults {#type-parameter-defaults}

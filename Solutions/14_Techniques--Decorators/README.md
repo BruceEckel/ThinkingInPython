@@ -799,7 +799,7 @@ so the `wrapper` stack frame appears with or without `@wraps`.
 The final attempt meets two requirements at once.
 It returns `R` on success,
 so `wrapper()` has a return value on every path the type checker can see.
-It also lets the last exception propagate to the caller,
+On failure, the last exception propagates to the caller,
 since that attempt sits outside the `try`.
 
 **Retry after any ordinary failure.**

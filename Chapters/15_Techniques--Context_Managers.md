@@ -877,7 +877,7 @@ Choose these before writing your own `__enter__()` and `__exit__()`.
 A function might write to a path it opens, to a stream the caller hands it,
 or to standard output by default.
 When it finishes, the function should close the file it opened and leave the caller's stream and standard output open.
-`nullcontext` lets a single `with` block serve all three cases:
+With `nullcontext`, a single `with` block serves all three cases:
 
 ```python
 # nullcontext_demo.py
@@ -1180,7 +1180,7 @@ so a borrower facing an empty pool gets a `queue.Empty` exception instead of wai
 
 Those refinements all guard the pool's side.
 The borrower's side has a mistake.
-`Pool` lets a borrower keep a reference after the `with` block ends,
+A borrower can keep a reference after the `with` block ends,
 then use it after the pool has lent the object to another borrower.
 The pool hands out the same object again, not a copy,
 so a stale reference and the new borrower's object are one and the same:

@@ -437,7 +437,8 @@ a different design, a detail, or an equivalent alternative.
 
 [The Gap Between Creation and Consumption](../../Chapters/16_Techniques--Comprehensions.md#the-gap-between-creation-and-consumption)
 shows a generator expression delaying its work until a consumer pulls values.
-Square brackets make the comprehension run to completion at the line where it appears.
+With square brackets,
+the comprehension runs to completion at the line where it appears.
 Ask when the comprehension calls `source()` and when it reads `factor`,
 then compare with the print order.
 

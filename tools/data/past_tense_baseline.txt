@@ -24,7 +24,6 @@ Chapters/02_Foundations--Tour.md	[PAST] declared: In C++ or Java, a variable dec
 Chapters/02_Foundations--Tour.md	[PAST] indented: Blocks can nest, each one indented further than the block that contains it.
 Chapters/02_Foundations--Tour.md	[PAST] replaced: F-strings replaced them.
 Chapters/02_Foundations--Tour.md	[PAST] typed: Iterating over a CODE produces the pieces in order, each either a CODE the author typed or an CODE.
-Chapters/05_Foundations--Functions.md	[PAST] let: Keyword arguments let callers pass arguments by name, in any order.
 Chapters/06_Foundations--Modules_and_Packages.md	[PAST] let: Namespace packages let one package span several directories, such as separately installed distributions that each supply part of the package.
 Chapters/06_Foundations--Modules_and_Packages.md	[PAST] put: To make a directory a package, you put a special file named CODE in it.
 Chapters/06_Foundations--Modules_and_Packages.md	[PAST] read: Documentation tools read it to report a module's public names.

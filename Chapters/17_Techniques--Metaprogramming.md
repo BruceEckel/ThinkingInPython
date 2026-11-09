@@ -1305,7 +1305,8 @@ A misspelled attribute access on the result then passes the check.
 Under mypy `ASingleton()` has the type `ASingleton` with or without the `[T]`,
 because mypy ignores a metaclass `__call__()` return type.
 
-The `[T]` also forces the body to call `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
+The `[T]` has a second consequence:
+the body must call `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` drops `Singleton` from the type of `cls`.
 `ty` and mypy accept a zero-argument `super()` only when they can confirm that `cls` is a `Singleton`.
 Pyright accepts it without the check.
@@ -1463,10 +1464,10 @@ and arguably multiple inheritance, for cases that need them.
 Use a metaclass when you need to change the class object rather than react to its creation:
 
 - Adding methods to the class
-  (metamethods such as the `__call__()` in `singleton.py`, or the `__iter__()` that lets `EnumType` make `for c in Color` work).
+  (metamethods such as the `__call__()` in `singleton.py`, or the `__iter__()` on `EnumType` that `for c in Color` calls).
 - Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
 - Enforcing an invariant across a family of classes that shares no base class.
-  `__init_subclass__()` requires a common base to define it.
+  A common base must define `__init_subclass__()`.
   Such a family shares a metaclass.
 
 The first case gives the class object an `__iter__()`:
@@ -1697,7 +1698,8 @@ so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
 
 ### Reading Annotations Before Their Names Exist
 
-Deferred evaluation lets an annotation specify a class that the module defines later.
+Under deferred evaluation,
+an annotation can specify a class that the module defines later.
 Python evaluates an annotation when code first reads it,
 so a class can declare a field whose type appears further down the module.
 A metaprogram reads annotations early.

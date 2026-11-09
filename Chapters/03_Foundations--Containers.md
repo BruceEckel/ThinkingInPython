@@ -641,8 +641,8 @@ so nearly every measured listing in this book prints a comparison rather than a 
 The measurements behind the comparison go to `report()`,
 a small helper the book supplies.
 By default a measured listing prints the comparison alone.
-Running one with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
-makes `report()` print the measurements as well.
+When you run one with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine),
+`report()` prints the measurements as well.
 
 ## Specialized Containers
 

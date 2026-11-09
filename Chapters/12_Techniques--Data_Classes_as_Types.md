@@ -896,7 +896,7 @@ so `DAYS = nonmember((31, 28, ...))` puts the table inside `Month` and leaves tw
 
 The tests confirm that `Month(7)` finds `JULY` in a legal date,
 that a day past the end of its month raises `TypeFailure`,
-and that a month number outside the twelve makes `Month()` raise `ValueError`:
+and that `Month()` raises `ValueError` for a month number outside the twelve:
 
 ```python
 # test_birth_date.py
@@ -1427,7 +1427,7 @@ print(asdict(line))  # Recurses into the list of Points
 so every list and dict in the result is a new object rather than the one inside the instance.
 Changing the result leaves the original as it was.
 
-`KW_ONLY` forces callers to pass the fields after it by keyword:
+Callers must pass the fields after `KW_ONLY` by keyword:
 
 ```python
 # kw_only_config.py

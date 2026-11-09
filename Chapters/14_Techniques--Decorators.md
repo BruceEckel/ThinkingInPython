@@ -328,7 +328,7 @@ The nesting stops at two levels, matching the two nested `def`s in the source.
 Forgetting the parentheses is the common mistake here.
 `@repeat` without them calls `repeat(greet)`,
 passing the function where `repeat` expects `times`.
-The `times < 1` check makes that mistake raise a `TypeError` at decoration,
+The `times < 1` check then raises a `TypeError` at decoration,
 since it compares a function with an `int`.
 The message describes the failed comparison,
 so you must trace the comparison back to the missing parentheses.
@@ -1196,8 +1196,8 @@ Both the plain pizzas and the toppings satisfy the `Pizza` `Protocol` structural
 with no shared base class required.
 Satisfying a `Protocol` by shape alone is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 
-A read-only `@property` in a `Protocol` requires that reading the name produce the property's return type,
-and lets each class choose how.
+A read-only `@property` in a `Protocol` requires that reading the name produce the property's return type.
+Each class chooses how.
 `Margherita` supplies `cost` as a class attribute.
 `Topping` computes it in a property.
 Both read as a `float`, so both match.

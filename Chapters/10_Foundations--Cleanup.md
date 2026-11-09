@@ -538,7 +538,7 @@ it would keep every instance alive forever, so the count would stay at its peak.
 Because the `WeakValueDictionary` holds weak references,
 it removes each entry when Python destroys the entry's object.
 
-CPython's reference counting makes the count fall immediately.
+Under CPython's reference counting, the count falls immediately.
 On an implementation with a tracing collector, such as PyPy,
 the dictionary removes the entries when that collector runs,
 so the counts fall later.
@@ -578,7 +578,7 @@ The file's `__del__()` closes it and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
 On CPython `del f` is that moment.
 On an implementation that reclaims the file only when its collector runs,
-the `gc.collect()` call makes that collector run before the `print()`.
+that collector runs at the `gc.collect()` call, before the `print()`.
 
 The diagnostic backstop exists to report a file left open,
 not to replace `close()`.

@@ -166,7 +166,6 @@ Chapters/15_Techniques--Context_Managers.md	[BOUND] By the end of the chapter, b
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE adds two things to CODE
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE collects the three arguments into a tuple the method ignores
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE covers the common case of one call
-Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE lets a single CODE block serve all three cases
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE prints the exception's CODE, which includes both its type and its arguments, where CODE gives the type alone
 Chapters/15_Techniques--Context_Managers.md	[BOUND] CODE produces values alone, the shape that Iterators annotates CODE
 Chapters/15_Techniques--Context_Managers.md	[BOUND] In all four forms, the borrower's side contains two lines
@@ -179,6 +178,7 @@ Chapters/15_Techniques--Context_Managers.md	[BOUND] The message from CODE is too
 Chapters/15_Techniques--Context_Managers.md	[BOUND] The three parameters of CODE describe the exception that ended the block
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Two borrowers each use one connection as if they held it alone
 Chapters/15_Techniques--Context_Managers.md	[BOUND] When the managers are too long for one line, parentheses group them, and the managers still enter left to right and exit in reverse
+Chapters/15_Techniques--Context_Managers.md	[BOUND] With CODE, a single CODE block serves all three cases
 Chapters/15_Techniques--Context_Managers.md	[BOUND] Write a context manager CODE whose CODE suppresses CODE and lets everything else through, without using CODE
 Chapters/16_Techniques--Comprehensions.md	[BOUND] *Comprehensions* build one collection from another in a single expression
 Chapters/16_Techniques--Comprehensions.md	[BOUND] A set comprehension has the same four parts as a list comprehension, inside CODE instead of CODE

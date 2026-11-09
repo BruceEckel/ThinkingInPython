@@ -107,7 +107,7 @@ a different design, a detail, or an equivalent alternative.
 shows a factory called to create a missing value.
 The factory here is `int`,
 so ask what `int()` returns when called with no arguments.
-That default lets the loop add to a key before it exists.
+With that default, the loop can add to a key before it exists.
 
 <details>
 <summary>Done when</summary>
@@ -139,7 +139,7 @@ print(dict(counts))
 
 The `0` that `defaultdict(int)` supplies for a missing key comes from `int()`,
 which returns `0` when called with no arguments.
-That default lets `counts[kind] += 1` work with no "does this key exist yet" check.
+With that default, `counts[kind] += 1` works with no "does this key exist yet" check.
 In `defaultdict.py`,
 `defaultdict(list)` removes the same check from the grouping loop,
 with a fresh empty list as the default.

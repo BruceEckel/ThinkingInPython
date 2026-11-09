@@ -568,7 +568,7 @@ def rebinds():
 <details>
 <summary>Done when</summary>
 
-each edit makes its call raise an `UnboundLocalError` reading `cannot access local variable 'count' where it is not associated with a value`,
+after each edit, its call raises an `UnboundLocalError` reading `cannot access local variable 'count' where it is not associated with a value`,
 and `rebinds()` raises it before printing anything.
 You can name the line that makes `count` local in each function.
 

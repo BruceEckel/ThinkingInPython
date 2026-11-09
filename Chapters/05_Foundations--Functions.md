@@ -119,7 +119,7 @@ returns its pair the same way.
 ## Default Parameter Values
 
 Parameters can have default values.
-Keyword arguments let callers pass arguments by name, in any order.
+A caller passes keyword arguments by name, in any order.
 A call that names its arguments documents itself:
 
 ```python
