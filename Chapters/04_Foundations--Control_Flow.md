@@ -690,7 +690,7 @@ contrasts the close that `with` guarantees with leaving the close to Python's ga
 
 Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
-An object becomes one by defining two methods, `__enter__()` and `__exit__()`.
+To become one, an object defines two methods, `__enter__()` and `__exit__()`.
 `with` calls `__enter__()` at the top of the block.
 As control leaves the block, `with` calls `__exit__()`,
 which performs the cleanup.

@@ -45,7 +45,8 @@ The instance stays as it was.
 What creates these "class" objects?
 Other special objects, called *metaclasses*.
 The default metaclass is `type`, and it serves almost every class.
-You can customize how Python produces classes by running extra code or injecting members as it builds each class.
+To customize how Python produces classes,
+you can run extra code or inject members as it builds each class.
 That is metaclass programming.
 
 You have used metaclasses without writing one.

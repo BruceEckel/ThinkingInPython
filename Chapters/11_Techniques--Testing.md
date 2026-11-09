@@ -193,7 +193,7 @@ The `funded` fixture builds a prepared account for each test that names it as a 
 The `@` lines apply [decorators](14_Techniques--Decorators.md).
 Here they mark the functions for `pytest`.
 
-Run the test suite by typing `pytest` in the project directory.[^book-tests]
+To run the test suite, type `pytest` in the project directory.[^book-tests]
 `pytest` puts each test file's own directory at the front of [`sys.path`](06_Foundations--Modules_and_Packages.md#pythonpath),
 so `from account import Account` works with no packaging and no path setup,
 as long as `account.py` sits beside `test_account.py`.
@@ -494,7 +494,7 @@ and leave anything a test mutates at the default per-test scope.
 
 `preloaded`, the other fixture in `conftest.py`,
 shows that you can parametrize a fixture.
-`preloaded` receives `request`, a built-in fixture, by naming it as a parameter.
+To receive the built-in fixture `request`, `preloaded` names it as a parameter.
 `request.param` holds one value from `params` for each build.
 `pytest` builds `preloaded` once for each parameter value,
 so every test that requests it runs once per value,

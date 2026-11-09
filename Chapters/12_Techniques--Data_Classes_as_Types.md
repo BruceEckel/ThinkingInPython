@@ -582,7 +582,7 @@ def f2(s: Stars) -> Stars:
 
 `Stars` now constrains `number` to a set of values:
 the integers one through ten.
-Your code makes a `Stars` by calling the constructor,
+To make a `Stars`, your code calls the constructor,
 and the constructor refuses anything outside that set.
 (Copying and unpickling [skip the constructor](#copy-skips-the-constructor).)
 If you hold a `Stars`, it is legal.
@@ -1185,7 +1185,7 @@ A `NamedTuple` is the other immutable type,
 and it is tempting for a small type like `Stars`.
 `typing.NamedTuple` forbids overriding the methods that build an instance,
 so validation must live in a factory function beside the type.
-A caller can skip the check by calling the type instead of the factory:
+Calling the type instead of the factory skips the check:
 
 ```python
 # test_namedtuple_no_hook.py

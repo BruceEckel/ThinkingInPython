@@ -243,7 +243,7 @@ a different design, a detail, or an equivalent alternative.
 explains why a comprehension is for the collection it builds and a loop is for its side effects.
 Write a small function that does the printing and returns a value,
 then call it in the output expression.
-Decide the shape by asking whether anyone uses the resulting list.
+To decide the shape, ask whether anyone uses the resulting list.
 
 <details>
 <summary>The shape</summary>

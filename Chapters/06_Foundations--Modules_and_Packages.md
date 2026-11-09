@@ -307,7 +307,8 @@ print(module2.function2())
 #: function2 in module2 in a_package
 ```
 
-You can bring specific functions into the namespace by specifying both the package and the module:
+To bring specific functions into the namespace,
+specify both the package and the module:
 
 ```python
 # no_qualification.py

@@ -707,7 +707,7 @@ Python accepts `case FALLBACK:` because it is the last case,
 and rejects any case after it with a `SyntaxError`.
 
 **Compare through a dotted name.**
-The first fix gives the constant a dotted name by putting it in a namespace.
+To give the constant a dotted name, the first fix puts it in a namespace.
 `Defaults.FALLBACK` is a value pattern, so `dotted()` compares against it.
 Any dotted name works, including `Signal.CAUTION`.
 

@@ -104,7 +104,8 @@ moves the context switch out of the OS and into the program.
 Engineers no longer need tricks to work around the threading system.
 The programming language decides, based on its knowledge of the program,
 the smallest amount of data to include in the context switch.
-The programmer minimizes context switches by choosing where the code yields control.
+To minimize context switches,
+the programmer chooses where the code yields control.
 Moving that control into the program simplifies both writing the program and reasoning about it.
 
 Moving the context switch into the program was the first big shift.
@@ -2244,8 +2245,8 @@ or a process.
 
 An `Executor` and `asyncio` give their result-that-arrives-later the same name,
 and the shared name invites one specific mistake.
-`pool.submit()` hands back a `concurrent.futures.Future`,
-and you wait on it by calling `result()`, which blocks the calling thread.
+`pool.submit()` hands back a `concurrent.futures.Future`.
+To wait on it, you call `result()`, which blocks the calling thread.
 Awaiting that `Future` raises `TypeError: 'Future' object can't be awaited`.
 `asyncio` has its own `Future`, and `Task` is a subclass of it,
 so both are awaitable and neither blocks anything.

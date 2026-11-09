@@ -134,7 +134,7 @@ which lists the methods and attributes a function needs.
 A class matches a protocol by defining them, whatever it inherits.
 
 First import the base class the same way you import [any name from a module](06_Foundations--Modules_and_Packages.md#importing-names-with-from-and-as).
-Then inherit by listing the base class in parentheses after the name of the inheriting class.
+Then, to inherit, list the base class in parentheses after the name of the inheriting class.
 Python supports multiple inheritance, so you can list several classes.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#one-class-many-protocols)
 argues against multiple inheritance in favor of protocols.

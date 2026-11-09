@@ -1609,7 +1609,7 @@ At runtime the line raises a `TypeError` before any price comes back:
 `pool.submit()` returns a `concurrent.futures.Future`,
 the executor's own handle on a result a worker is still computing.
 The `Future`'s interface blocks.
-You wait by calling `result()`,
+To wait, you call `result()`,
 which stops the calling thread until the worker finishes.
 That future holds no reference to an event loop and defines no `__await__`.
 The type checker therefore reports the `await`,

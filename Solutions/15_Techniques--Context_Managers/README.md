@@ -12,7 +12,7 @@
 [The Protocol](../../Chapters/15_Techniques--Context_Managers.md#the-protocol)
 shows `__enter__()` running when the `with` begins and `__exit__()` when its body ends.
 A second `with` inside the body is a complete enter-and-exit pair that sits within the first.
-Write out the six lines by following which block must finish before the other can.
+To write out the six lines, follow which block must finish before the other can.
 
 <details>
 <summary>The shape</summary>
