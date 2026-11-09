@@ -578,7 +578,7 @@ A second run reports the identical counterexample,
 and reports it noticeably faster.
 Hypothesis writes each failing case into `.hypothesis/examples/` and replays that database before generating anything new.
 It therefore re-finds the failure you are in the middle of fixing instead of leaving it to chance.
-That replay makes the shrunk case behave like a regression test that Hypothesis wrote for you.
+With that replay, the shrunk case behaves like a regression test that Hypothesis wrote for you.
 The case keeps failing until you fix the bug.
 The first run after the fix replays the case once more, finds that it passes,
 and deletes it from the database.

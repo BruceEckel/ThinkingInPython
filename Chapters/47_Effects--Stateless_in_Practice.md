@@ -1743,8 +1743,8 @@ print(f"attempts: {db.attempts}")
 It wraps the Effect in an object that records the result.
 A repeat call with the same argument gets that object back from the cache.
 The object replays the recorded result instead of driving its spent generator.
-That wrapper exists because a generator runs once,
-which is the same fact that makes `retry()` decorate the function.
+That wrapper exists because a generator runs once.
+For the same reason, `retry()` decorates the function.
 
 Because the cache is an `lru_cache`, every argument must be hashable.
 An unhashable one, such as a `list`, raises a `TypeError` at the call.
@@ -2201,8 +2201,8 @@ and the driver resumes the Effect with that answer, once, always.
 A native handler receives the [continuation](44_Effects--Effect_Management.md#native-effect-management)
 and chooses what to do with it.
 Invoking it once gives you what Stateless has.
-Declining to invoke it makes the handled scope produce the handler's value,
-which is how an exception behaves.
+Declining to invoke it gives you exception behavior:
+the handled scope produces the handler's value.
 Invoking it repeatedly gives you backtracking and search.
 Stateless offers only the first of the three, one invocation:
 a *tail-resumptive* handler.

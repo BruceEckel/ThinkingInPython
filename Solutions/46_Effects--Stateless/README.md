@@ -1280,7 +1280,8 @@ widening `announce()`'s error parameter from `KeyError` to `KeyError | ValueErro
 `line: str` and `value: int` carry annotations by choice,
 not because the type checker requires them.
 `yield from` on a `@throws` function produces the declared success type,
-and specifying that type makes the type checker compare its inference with the annotation.
+and when you specify that type,
+the type checker compares its inference with the annotation.
 
 **Let `run()` raise each failure.**
 `Cyd` has a score, so the lookup succeeds and `format_score()` fails.

@@ -162,7 +162,7 @@ and still return the same answers.
 Shared state makes the answers depend on the schedule.
 Two parallel `withdraw()` calls can both read `balance` before either writes it back.
 The second write then overwrites the first, so `balance` records one withdrawal.
-A lock makes each call finish its read and write before the other call reads `balance`,
+With a lock, each call finishes its read and write before the other call reads `balance`,
 but the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it.
 With nothing shared, a lock has nothing to guard.

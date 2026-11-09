@@ -633,7 +633,7 @@ Chapters/40_Functional--Foundations.md	[BOUND] The name CODE exists inside CODE 
 Chapters/40_Functional--Foundations.md	[BOUND] The stub for CODE does not yet describe what CODE does at runtime, so CODE checks the three arguments in CODE against CODE's declared parameter types
 Chapters/40_Functional--Foundations.md	[BOUND] Use partial application when an API expects a function of one argument and you have a function of several
 Chapters/40_Functional--Foundations.md	[BOUND] When a value is immutable, two parts of a program can share one without coordinating, and any number of threads can read it at once
-Chapters/40_Functional--Foundations.md	[BOUND] When state must exist, a closure is one way to let exactly one function change it
+Chapters/40_Functional--Foundations.md	[BOUND] When state must exist, a closure is one way to give it a single writer
 Chapters/40_Functional--Foundations.md	[BOUND] You supply only the function each one calls on every element, the part that differs from one use to the next
 Chapters/41_Functional--Toolkits.md	[BOUND] A case study then puts several of the pieces to work on one problem
 Chapters/41_Functional--Toolkits.md	[BOUND] After CODE, use the returned iterators and leave the source alone
@@ -874,10 +874,10 @@ Chapters/B_An_Effect_Checker.md	[BOUND] The edge is the program that runs the ch
 Chapters/B_An_Effect_Checker.md	[BOUND] The last three cases are the limits
 Chapters/B_An_Effect_Checker.md	[BOUND] The last two functions turn findings and rows into text
 Chapters/B_An_Effect_Checker.md	[BOUND] The one CODE is CODE, which calls the function it receives
-Chapters/B_An_Effect_Checker.md	[BOUND] The walrus operator lets the CODE condition compute the next rows and compare them in one expression
 Chapters/B_An_Effect_Checker.md	[BOUND] Two functions that call each other make the recursion circular
 Chapters/B_An_Effect_Checker.md	[BOUND] Whole modules take one line each, which keeps the table short
 Chapters/B_An_Effect_Checker.md	[BOUND] With CODE alone, the table reads CODE as CODE, so CODE draws a finding
+Chapters/B_An_Effect_Checker.md	[BOUND] With the walrus operator, the CODE condition computes the next rows and compares them in one expression
 Chapters/B_An_Effect_Checker.md	[BOUND] a CODE over syntax-tree nodes, records for the data, a CODE for the one operation in the core that can fail, and a pure core with its Effects at the edge
 Solutions/02_Foundations--Tour/README.md	[BOUND] CODE evaluates to the single string CODE
 Solutions/02_Foundations--Tour/README.md	[BOUND] CODE is then a third name for the one list, so appending to CODE changes the list CODE names, as CODE did

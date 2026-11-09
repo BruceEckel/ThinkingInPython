@@ -778,8 +778,10 @@ so the library encodes Effect information into the return type of every function
 and the compiler's ordinary type checking tracks it from there.
 
 Encoding Effects into return types changes the mechanism.
-Instead of writing a computation and letting the compiler infer its Effects,
-you build a *description* of a computation, and execute the description later.
+In a native Effect language,
+the compiler infers the Effects of the computation you write.
+With a library, you build a *description* of a computation,
+and execute the description later.
 [ZIO](https://zio.dev/) is such a library, for Scala.
 Here is the greeting program again.
 In ZIO it is a description first and a run second:

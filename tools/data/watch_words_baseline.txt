@@ -70,6 +70,7 @@ Chapters/08_Foundations--Static_Types.md	enforces none of: Python enforces none 
 Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
 Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
 Chapters/08_Foundations--Static_Types.md	has no: because CODE has no such method
+Chapters/08_Foundations--Static_Types.md	is when: so the question is when a hint is worth the words
 Chapters/08_Foundations--Static_Types.md	names the rule: A diagnostic names the rule in brackets
 Chapters/08_Foundations--Static_Types.md	never: The Python runtime never acts on a type hint
 Chapters/08_Foundations--Static_Types.md	only: It is a keyword only at the start of this statement
@@ -239,6 +240,7 @@ Chapters/19_Techniques--Concurrency.md	has no: A real deadlock has no CODE
 Chapters/19_Techniques--Concurrency.md	has no: has no wait to interrupt
 Chapters/19_Techniques--Concurrency.md	have no: cancellable batches have no thread equivalent
 Chapters/19_Techniques--Concurrency.md	holds no: A coroutine holds no worker
+Chapters/19_Techniques--Concurrency.md	is how: The only difference between one run and another is how finely the listing splits the total work
 Chapters/19_Techniques--Concurrency.md	is what: and that is what you want
 Chapters/19_Techniques--Concurrency.md	itself: Loading an extension that has not declared itself thread-safe re-enables the GIL for the whole process and emits a warning
 Chapters/19_Techniques--Concurrency.md	itself: not just itself
@@ -302,6 +304,7 @@ Chapters/21_Patterns--Design_Patterns.md	already: but [*Singleton* shows that a 
 Chapters/21_Patterns--Design_Patterns.md	does it: and where does it put it
 Chapters/21_Patterns--Design_Patterns.md	has no: the interface has no name and no file of its own
 Chapters/21_Patterns--Design_Patterns.md	has none: *Strategy* has none
+Chapters/21_Patterns--Design_Patterns.md	is how: so the question is how much of the other part a dependence reaches
 Chapters/21_Patterns--Design_Patterns.md	itself: A CODE renders itself through a writer
 Chapters/21_Patterns--Design_Patterns.md	itself: by letting the new class register itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	names the patterns: GoF's first chapter lists eight "common causes of redesign" and names the patterns that address each one
@@ -391,6 +394,7 @@ Chapters/29_Patterns--Changing_the_Interface.md	only: The CODE in CODE makes its
 Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from a second file
 Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
+Chapters/30_Patterns--Observer.md	are how: The unknowns are how many times you select each cell
 Chapters/30_Patterns--Observer.md	has no: A CODE CODE has no list of responders
 Chapters/30_Patterns--Observer.md	has no: CODE has no CODE
 Chapters/30_Patterns--Observer.md	has no: a CODE has no CODE attribute
@@ -476,7 +480,6 @@ Chapters/38_Patterns--Simulation.md	only: and a plate of vibrating sand runs on 
 Chapters/38_Patterns--Simulation.md	say nothing: global order arising from local rules that say nothing about it
 Chapters/39_Patterns--Pattern_Catalog.md	only: and several exist only to work around limits of a particular language
 Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the preset ones
-Chapters/40_Functional--Foundations.md	exactly: a closure is one way to let exactly one function change it
 Chapters/40_Functional--Foundations.md	finds none: finds none
 Chapters/40_Functional--Foundations.md	has no: CODE's CODE has no comprehension equivalent
 Chapters/40_Functional--Foundations.md	has none: A pure function has none
@@ -494,6 +497,7 @@ Chapters/40_Functional--Foundations.md	share no: Python's immutable types share 
 Chapters/40_Functional--Foundations.md	shares no: A function that shares no mutable state is safe to run in parallel
 Chapters/40_Functional--Foundations.md	takes no: It also types the resulting callable as one that takes no arguments
 Chapters/40_Functional--Foundations.md	want: A closure fits when you want to configure behavior once
+Chapters/40_Functional--Foundations.md	whatever: whatever code ran in between
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
 Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to schedule so that every pair meets exactly once
 Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pair into rounds in which each player appears exactly once
@@ -579,6 +583,7 @@ Chapters/46_Effects--Stateless.md	has no: Stateless has no such registration
 Chapters/46_Effects--Stateless.md	has no: it has no values and is a subtype of every other type
 Chapters/46_Effects--Stateless.md	has no: so its Effect type has no dependency to declare
 Chapters/46_Effects--Stateless.md	having no: Having no container has three consequences
+Chapters/46_Effects--Stateless.md	is how: The difference is how many places you edit
 Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs
 Chapters/46_Effects--Stateless.md	mocks nothing: The test captures nothing from stdout and mocks nothing
@@ -650,6 +655,7 @@ Chapters/A_Effect_Tracking.md	declares no: CODE declares no exception
 Chapters/A_Effect_Tracking.md	declares nothing: so an empty list can mean either a function declared pure or one that declares nothing
 Chapters/A_Effect_Tracking.md	has no: which has no annotations
 Chapters/A_Effect_Tracking.md	have no: since they have no Python body to analyze
+Chapters/A_Effect_Tracking.md	is where: The reason is where it puts the row
 Chapters/A_Effect_Tracking.md	names an effect: The row names an Effect
 Chapters/A_Effect_Tracking.md	never: or never
 Chapters/A_Effect_Tracking.md	records no: OCaml 5 has handlers and records no row in a function's type
@@ -854,11 +860,13 @@ Solutions/35_Patterns--Flyweight/README.md	takes no: Each lookup is one CODE ind
 Solutions/36_Patterns--Memento/README.md	has no: so CODE finds CODE by ordinary attribute lookup while CODE has no CODE
 Solutions/36_Patterns--Memento/README.md	only: and pass it to CODE as the only change
 Solutions/37_Patterns--Pattern_Refactoring/README.md	defines no: because a record defines no ordering for CODE to use
+Solutions/37_Patterns--Pattern_Refactoring/README.md	is where: What changes is where you define the operation
 Solutions/37_Patterns--Pattern_Refactoring/README.md	itself: A subclass of CODE registers itself when its CODE statement runs
 Solutions/37_Patterns--Pattern_Refactoring/README.md	only: The CODE class is the only new Python code
 Solutions/37_Patterns--Pattern_Refactoring/README.md	only: When a calculation has the same form for every type and varies only in the numbers each type carries
 Solutions/38_Patterns--Simulation/README.md	exactly: so the difference is exactly CODE at every point on the plate
 Solutions/38_Patterns--Simulation/README.md	has no: The original CODE needs no lock because it has no CODE between the test and the add
+Solutions/38_Patterns--Simulation/README.md	is where: The cause is where the factory searches
 Solutions/38_Patterns--Simulation/README.md	itself: To see why the factory finds CODE by itself
 Solutions/38_Patterns--Simulation/README.md	needs no: The original CODE needs no lock because it has no CODE between the test and the add
 Solutions/38_Patterns--Simulation/README.md	never: so the summary statistic cannot tell "finished" from "never started
@@ -921,6 +929,7 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	already: because a functio
 Solutions/47_Effects--Stateless_in_Practice/README.md	contains no: or CODE that contains no CODE and whose body is more than a single CODE statement
 Solutions/47_Effects--Stateless_in_Practice/README.md	has no: hour 20 has no supplier
 Solutions/47_Effects--Stateless_in_Practice/README.md	has no: the request has no field to carry the range
+Solutions/47_Effects--Stateless_in_Practice/README.md	is where: The difference is where inside CODE the failure arises
 Solutions/47_Effects--Stateless_in_Practice/README.md	itself: whether the battery reports itself unavailable once exhausted
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: CODE cannot catch what never entered the channel
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: The driver never throws it into the suspended Effect
@@ -931,12 +940,3 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	price: Dropping the last p
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: the script runs out at the fourth price
 Solutions/47_Effects--Stateless_in_Practice/README.md	prices: The test proves from both sides that CODE attempts all four prices
-Chapters/08_Foundations--Static_Types.md	is when: so the question is when a hint is worth the words
-Chapters/19_Techniques--Concurrency.md	is how: The only difference between one run and another is how finely the listing splits the total work
-Chapters/21_Patterns--Design_Patterns.md	is how: so the question is how much of the other part a dependence reaches
-Chapters/30_Patterns--Observer.md	are how: The unknowns are how many times you select each cell
-Chapters/46_Effects--Stateless.md	is how: The difference is how many places you edit
-Chapters/A_Effect_Tracking.md	is where: The reason is where it puts the row
-Solutions/37_Patterns--Pattern_Refactoring/README.md	is where: What changes is where you define the operation
-Solutions/38_Patterns--Simulation/README.md	is where: The cause is where the factory searches
-Solutions/47_Effects--Stateless_in_Practice/README.md	is where: The difference is where inside CODE the failure arises

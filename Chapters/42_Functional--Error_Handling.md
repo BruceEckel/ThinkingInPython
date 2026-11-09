@@ -5,7 +5,7 @@
 > where the caller must deal with it.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
-makes a value carry a guarantee.
+builds a guarantee into a value.
 This chapter does the same for errors.
 The return value is either the answer or the failure, and its type says so.
 
@@ -225,7 +225,7 @@ before any `AttributeError` at runtime.
 `Result` is the same idea as in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#parse-dont-validate):
 put the meaning in the type.
 Python's simpler form is `int | None`.
-Both force the caller to unpack, but `None` says "no answer,"
+With either, the caller must unpack, but `None` says "no answer,"
 while an `Err` carries the reason for the failure.
 
 Use `| None` when the caller needs to know whether an answer exists,
@@ -241,8 +241,8 @@ one whose return type accounts for every outcome it can produce,
 success or failure.
 If the function raises an exception instead,
 the return type does not specify that outcome.
-Python lets a `Result`-returning function raise an exception as well,
-and the type checker accepts it.
+A `Result`-returning function can raise an exception as well,
+and both Python and the type checker accept the `raise`.
 Totality is therefore a discipline the function's author keeps.
 
 The caller's side has the same limit.
@@ -434,7 +434,7 @@ and an async container chains one whose computation is still running,
 all with the same `bind()`.
 
 One mistake to expect when you start chaining:
-`bind()` requires each step to return a `Result`.
+each step you pass to `bind()` must return a `Result`.
 If you pass it a plain function, say `.bind(str)`,
 the type checker rejects that call, because `str` returns a `str`,
 and `bind()` expects a `Result`.

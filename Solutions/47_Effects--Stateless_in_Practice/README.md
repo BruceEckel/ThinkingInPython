@@ -2299,7 +2299,8 @@ play(Loud(), Kitty(), Weapon())
 **Name the factory's shape.**
 The shared signature recovers the *Abstract Factory*'s interface.
 `run_season()` accepts any function that stages a scene,
-and its body gives each cast a narrator and lets the cast choose its actors.
+and its body gives each cast a narrator.
+Each cast chooses its actors.
 Independence from the family is the property the pattern exists to provide.
 Python provides that property,
 because a function is already an object with a type.

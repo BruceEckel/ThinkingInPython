@@ -442,7 +442,7 @@ as the type checker trusts a `cast()`.
 in the weakest form you can write without handlers.
 
 The annotation also puts two pieces of metadata in one `Annotated`.
-PEP 593 lets an `Annotated` carry any number of metadata objects after its type.
+Under PEP 593, an `Annotated` can carry any number of metadata objects after its type.
 `row()` from Appendix A keeps the `Performs` objects and passes over the `Hides` object.
 
 ```python
@@ -877,8 +877,8 @@ so a caller's row includes the declaration.
 Every other function gets the union of what its calls perform.
 
 `infer()` is the loop.
-The [walrus operator](04_Foundations--Control_Flow.md#the-walrus-operator)
-lets the `while` condition compute the next rows and compare them in one expression.
+With the [walrus operator](04_Foundations--Control_Flow.md#the-walrus-operator),
+the `while` condition computes the next rows and compares them in one expression.
 Each step can add members to a row and cannot remove one,
 and the vocabulary is finite, so the loop ends.
 

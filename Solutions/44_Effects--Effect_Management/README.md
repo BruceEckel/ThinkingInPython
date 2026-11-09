@@ -404,7 +404,8 @@ Reading `celsius` is a side cause for the same reason `withdraw()` reading `bala
 The value of `celsius` can change between calls,
 so the answer depends on earlier assignments to `celsius` rather than on arguments.
 
-The functional conversion makes the temperature source return each reading as a value.
+After the functional conversion,
+the temperature source returns each reading as a value.
 The caller folds new readings into the state it keeps.
 The chapter quotes the common name for that conversion,
 [pushing the Effects to the edges](../../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).

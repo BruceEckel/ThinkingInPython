@@ -83,7 +83,7 @@ take them in the same order.
 Because Koka computes a function's row from its body,
 most functions leave their row to inference.
 You write a row when you want a constraint,
-such as requiring that a function stay pure.
+such as a function that must stay pure.
 [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand)
 counts five signatures to edit when a helper four calls below `main()` needs a `Log` Effect.
 In Koka the same change leaves every inferred signature as it was.
@@ -372,7 +372,7 @@ answers every prompt with the same name.
 Inside that block the tool would remove `Ask` from the row.
 
 The subtraction is sound if the handler intercepts the Effect.
-Interception requires `ask()` to consult the installed handler instead of calling `input()`.
+For interception, `ask()` must consult the installed handler instead of calling `input()`.
 Consulting an installed handler takes a runtime mechanism,
 such as the `ContextVar` in [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
 Now the design has two halves, a static tool and a runtime library.

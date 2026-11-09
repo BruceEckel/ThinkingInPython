@@ -443,7 +443,7 @@ A [decorator](14_Techniques--Decorators.md) does that wrapping.
 When an inner function refers to a variable from the function that created it,
 Python keeps that variable alive.
 The inner function plus the captured variables is a *closure*.
-A closure lets a function carry state without a class:
+With a closure, a function carries state without a class:
 
 ```python
 # closures.py
@@ -508,8 +508,7 @@ Each call to `make_counter()` builds an independent counter with its own `count`
 `increment()` is impure on purpose, to contrast with `withdraw()`.
 `withdraw()` mutates a module-level name that any code can assign.
 `increment()` mutates a name that it alone can assign.
-When state must exist,
-a closure is one way to let exactly one function change it.
+When state must exist, a closure is one way to give it a single writer.
 
 A closure's privacy is stronger than the privacy of a leading underscore,
 and weaker than a guarantee.
@@ -520,7 +519,7 @@ Introspection reaches the variable through the function object.
 `inspect.getclosurevars(tally).nonlocals` reports `{'count': 3}`,
 and `tally.__closure__[0].cell_contents = 100` rewrites `count`.
 
-The `nonlocal` statement lets `increment()` assign to the captured variable.
+With the `nonlocal` statement, `increment()` assigns to the captured variable.
 Reading a captured name, as `multiply()` reads `factor`, needs no declaration.
 But any assignment to a name inside a function makes that name local.
 Without a declaration,

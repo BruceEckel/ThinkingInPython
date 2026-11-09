@@ -11,7 +11,7 @@
 <summary>Where to look</summary>
 
 [Recursion](../../Chapters/41_Functional--Toolkits.md#recursion)
-shows `deep_sum()` letting the call stack hold the sublists still to walk.
+shows how `deep_sum()` uses the call stack to hold the sublists still to walk.
 Replace that call stack with a list you manage: pop an item,
 add it to the total if it is an `int`,
 and otherwise push its elements back onto the list.
@@ -570,8 +570,8 @@ Determinism now holds per `Random` object, though.
 Two calls that share one `Random` get different schedules,
 because `shuffle()` advances that object's state.
 
-The `rng` parameter lets the caller choose the random source,
-which makes reproducibility the caller's responsibility.
+With the `rng` parameter,
+the caller chooses the random source and takes on responsibility for reproducibility.
 The `seed: int = 0` version accepts only an integer.
 A caller who needs two different schedules must pass two different integers.
 A caller cannot pass in a program-wide random stream for this function to share.
