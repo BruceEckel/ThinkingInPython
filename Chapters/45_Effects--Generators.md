@@ -743,7 +743,7 @@ so `collect("alpha")` finishes and the `yield from` at `[1]` completes.
 Inside the same `send()` call,
 `both()` continues to `[2]` and `collect("beta")` runs to its first prompt.
 One `send()` therefore ends one inner generator and produces the first prompt of the next,
-which is why `alpha got 1 and 2` and `beta needs a value` sit on adjacent output lines.
+so `alpha got 1 and 2` and `beta needs a value` sit on adjacent output lines.
 The `yield` at `[3]` gives `send(4)` a value to return.
 Without it, `send(4)` finishes `both()` and raises `StopIteration` in the loop.
 
@@ -983,13 +983,12 @@ Either way, the generator finishes,
 and `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
 `close()` then returns to the driver, and the driver's next statement runs.
 If the cleanup raises a different exception, the generator still closes,
-and that exception comes out of `close()` instead.
+and that exception comes out of `close()`.
 
 Why does the driver need methods to raise exceptions inside the generator,
 when Python has a `raise` statement?
 `raise` produces its exception in the function that executes it,
 and the exception then propagates up through that function's callers.
-
 While the driver runs, the generator waits at its `yield`, off the call stack.
 A `raise` in the driver therefore propagates to the driver's callers and never reaches the generator's `except` and `finally` clauses.
 `throw()` and `close()` resume the generator at its `yield`,
@@ -1063,7 +1062,7 @@ and `yield "ready"` raises `ValueError` instead of returning a value.
 The `except ValueError` clause catches it and yields `"recovered"`.
 The generator waits again, now at `yield "recovered"`.
 `throw()` returns that yielded value to the driver, as `next()` and `send()` do,
-which is why `print()` shows `recovered`.
+so `print()` shows `recovered`.
 
 At `[2]`, `g.close()` raises `GeneratorExit` at `yield "recovered"`.
 That `yield` sits inside the `except ValueError` handler.
@@ -1124,7 +1123,7 @@ Then the generator ends.
 
 `throw()` and `close()` deliver an exception from the driver into the generator.
 When the generator body raises an exception,
-the exception travels the other way and comes out of the `next()`, `send()`,
+the exception comes out of the `next()`, `send()`,
 or `throw()` call that resumed the generator:
 
 ```python
@@ -1156,7 +1155,7 @@ In both directions, an exception passes through a method call that the driver ma
 
 ### Stopping Early with `close()` {#stopping-early-with-close}
 
-`close()` is how a driver ends a generator early.
+A driver ends a generator early by calling `close()`.
 A generator paused at a `yield` still holds the resources it acquired before the pause:
 a file or a lock inside a `with` statement, a connection, a transaction.
 The common case is a driver that has the answer it needs before the generator yields its last value:
@@ -1770,7 +1769,7 @@ asyncio.run(main())
 `async for` is an `await` in loop form:
 on each pass it awaits the generator's `__anext__()`.
 Like any `await`, it belongs inside an `async def`,
-which is why both `async for` loops sit in `main()`.
+so both `async for` loops sit in `main()`.
 The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects its values through its own `__anext__()` calls.
 
 A class can supply that `__anext__()`,
@@ -1813,7 +1812,7 @@ asyncio.run(main())
 `AsyncIterator` supplies an `__aiter__()` that returns `self`,
 so the class writes `__anext__()` alone.
 `__anext__()` is a coroutine function,
-which is why `async for` must await what it returns.
+so `async for` must await what it returns.
 `main()` makes the first two `__anext__()` calls,
 and the `async for` makes the rest.
 The loop ends when `__anext__()` raises `StopAsyncIteration`,
@@ -2152,8 +2151,7 @@ The suspended generator is the one-shot continuation that [What a Suspended Gene
 describes.
 PEP 255's restriction says who resumes it:
 the code that called `next()` or `send()`.
-That restriction is why a driver exists.
-Something must call `next()` and `send()`.
+That restriction calls for a driver: something must call `next()` and `send()`.
 A generator cannot specify its driver, so you write it.
 
 In May 1999, two years before the PEP,
