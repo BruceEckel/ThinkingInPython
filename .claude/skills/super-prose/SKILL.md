@@ -68,7 +68,10 @@ scope's line range:
   `cohesion`: `[AND]`, `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`,
   and the default `[PRT]`, a phrasal verb split around a noun phrase,
   "carries the request out" -> "carries out the request", R56;
-  `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too)
+  `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too,
+  and `[SAME+NEW]`, a "same" on a noun the 30 lines above never use,
+  "`safe()` uses the same separation" -> "`safe()` checks each value
+  while it is still separate from the literal text", R63)
 - `tip watch-words CH=NN` (for `ambiguity`: `however`, Tier 2 since
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the

@@ -47,7 +47,7 @@ run the two calls in either order, or skip the second.
 The language has no way to mark `add()` as pure, so CPython runs both calls,
 left to right, and any cache is yours to add.
 
-The same substitution serves your reasoning as well as the machine's optimization.
+Referential transparency serves your reasoning as well as the machine's optimization.
 To reason about the code, you can replace a call with its value,
 as you do in algebra.
 That substitution lets you check parts of a program,

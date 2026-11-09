@@ -1140,7 +1140,7 @@ So when scopes nest,
 leaving an inner `with` block restores the value the outer one set.
 
 Before 3.14 you wrote `token = var.set(x)` and a matching `var.reset(token)` in a `finally`.
-The context manager now makes that same pair of calls for you.
+The context manager now makes that pair of calls for you.
 
 The `offloaded` line shows why the modern answer is `ContextVar` rather than `threading.local`.
 `threading.local` gives each thread its own value,

@@ -308,7 +308,8 @@ as what") and rewrote about 30; no tool lists that shape, so the
 close-call keeps went on the Same Keeps page, and the session answered
 each one the same day: 22 more rewritten, 19 kept. That read added two
 tests to R63: the noun after "same" is one the passage has used, and
-the two things are in fact the same.
+the two things are in fact the same. The first test is now the
+`[SAME+NEW]` survey rule in `tip sentence-shapes`.
 Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
 object, `no X`, `none`, or `none of` ("runs none of the body", "raises
 no exception", "has no `__slots__`"), Bruce's "reversal of
@@ -502,6 +503,23 @@ verb or modal ("`close()`: the generator must finish"); rule R61 in
 `bruce_edit_db.md`. The parse cannot tell a demoted actor from an
 incidental object ("makes the type checker report"), and the first
 run had 308 hits, so it is a survey rule the activate pass reads.
+The eighth survey rule is `[SAME+NEW]` (2026-11-09), a "same" on a
+noun the passage has not used ("`safe()` uses the same separation",
+where nothing above says "separation" or "separate"; rule R63's
+sixth test, from Bruce's "same as what"). It finds the noun "same"
+modifies in the parse and fires when no cognate of it appears in the
+30 source lines above, listings and headings included, or earlier in
+its own paragraph. A command, a code-span noun, the idiom and
+property nouns (way, time, reason, name), "in the same file", a
+second term attached to the noun ("as", a relative clause), a plural
+or counted subject, and a "same" spread over repeats ("every time",
+"on each element") are quiet by design. The hit names the noun
+(`[SAME+NEW] separation: ...`). The repair says what the thing is or
+uses the noun the passage used ("this design" before, so "the same
+design", not "the same model"). The first book-wide run had 117 hits
+and 20 rewrites; the keeps are a summary noun for the sentence before
+("faced the same problem"), so the `ambiguity` pass reads the list
+per chapter.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds
@@ -516,7 +534,7 @@ a parser misread ("up front").
 The author's own rewrites fire `[AND]` six times in
 the calibration, so the shape is a judgment made per sentence. Use
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
-pass. `ARGS=--calibrate` runs all seven rules over
+pass. `ARGS=--calibrate` runs every rule over
 `tools/data/edit_pairs.json` and the style rules' own examples.
 `tip passive` (`tools/passive_voice.py`, 2026-10-19) reads the same
 parse for passive clauses: a verb with a passive auxiliary and a passive

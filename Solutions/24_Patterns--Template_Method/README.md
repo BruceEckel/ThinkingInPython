@@ -16,9 +16,10 @@
 <details>
 <summary>Where to look</summary>
 
+[The Anchored Algorithm](../../Chapters/24_Patterns--Template_Method.md#the-anchored-algorithm)
+shows the subclass form.
 [Passing the Steps as Functions](../../Chapters/24_Patterns--Template_Method.md#passing-the-steps-as-functions)
-shows the same algorithm anchored in a function that takes the varying step as an argument.
-The subclass form is in [The Anchored Algorithm](../../Chapters/24_Patterns--Template_Method.md#the-anchored-algorithm).
+anchors the same algorithm in a function that takes the varying step as an argument.
 Put the shared loop (read each input, apply the step, write the output)
 in one `run()` and one function, and leave `process()` as the one open step.
 The search policy needs the word list,

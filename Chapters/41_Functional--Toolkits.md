@@ -265,7 +265,7 @@ shows.
 Copies a wrapped function's name and docstring onto its wrapper,
 so a tool that reads those attributes reports the original.
 `@wraps(func)` runs [`update_wrapper()`](14_Techniques--Decorators.md#decorators-as-classes).
-A decorator written as a class calls `update_wrapper()` in its `__init__()` to copy the same metadata onto its instance.
+A decorator written as a class calls `update_wrapper()` in its `__init__()` to copy those attributes onto its instance.
 
 ```python
 # functools_wraps.py

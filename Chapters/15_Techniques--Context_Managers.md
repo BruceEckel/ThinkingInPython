@@ -855,7 +855,7 @@ with expected(RuntimeError):
 so it registers nothing for `broken("c")`.
 The managers for `a` and `b` enter first,
 so the stack holds both exits and unwinds them in reverse.
-A comma-separated `with` follows the same rule.
+A comma-separated `with` unwinds the same way.
 
 ## The `contextlib` Toolkit
 

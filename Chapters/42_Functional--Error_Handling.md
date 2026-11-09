@@ -245,7 +245,7 @@ A `Result`-returning function can raise an exception as well,
 and both Python and the type checker accept the `raise`.
 Totality is therefore a discipline the function's author keeps.
 
-The caller's side has the same limit.
+The caller's side has a limit too.
 A statement that calls the function and discards the `Result` passes the checker.
 The type checker reports a read of the answer before narrowing,
 but noticing an ignored `Result` is up to you.

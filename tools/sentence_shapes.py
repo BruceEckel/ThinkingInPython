@@ -213,6 +213,47 @@ parse cannot tell an implied second term ("for the same reason
 The book-wide read that day covered 194 candidates and rewrote 6, so
 the keeps dominate and a baseline would be the whole list.
 
+`[SAME+NEW]` (2026-11-09, from the author's "same as what" on a
+chapter 45 sentence and the read of the close calls that followed) is
+a "same" on a noun the passage has not used: "CODE uses the same
+separation to check each value", where nothing above says
+"separation" or "separate". "Same" sends the reader back to match the
+noun against an earlier mention, and the search finds none, because
+the writer coined a noun for something the passage had described in
+other words ("the same hazard" for a missing attribute, "the same
+shallowness", "the same machinery"). The repair says what the thing
+is ("checks each value while it is still separate from the literal
+text") or uses the noun the passage did use ("this design" before,
+so "the same design", not "the same model"); rule R63's sixth test in
+`bruce_edit_db.md`. The rule (`same_new_noun()`) takes each "same"
+after a `SAME_DETERMINERS` word, finds the noun it modifies in the
+parse, and fires when no word in the `SAME_NEW_WINDOW` source lines
+above the "same" (prose, listings, and headings alike), and no word
+earlier in its own paragraph, is a `cognate()` of that noun: equal
+light stems, stems sharing five letters and all but two of the
+shorter one ("separate" answers "separation"), or an identifier that
+holds the noun (`singledispatch` answers "dispatch"). Quiet by
+design, each because the sentence supplies the second term: a command
+(an exercise or a step label); a noun that is a code span or has one
+before it; a `SAME_NEW_QUIET` noun (way, time, place, reason, and the
+property nouns of "of the same name"); a counted noun ("the same two
+files"); a `SAME_NEW_PLACES` preposition before the determiner ("in
+the same file", "a list with the same elements"); a second term
+attached to the noun, "as", "that", or "which" after it or a new
+noun phrase that opens a relative clause ("the same `cls` it
+received"); a subject that is plural, coordinated, or counted
+("Every responder writes the same comparison"); and a "same" spread
+over repeats or cases ("the same answer every time", "the same call
+on each element", a second "same" in the sentence). The hit names the
+noun: `[SAME+NEW] separation: ...`. It is a survey rule because the
+window is a line count, not the reader's memory, and a summary noun
+for the sentence before ("faced the same problem", "uses the same
+technique") is often the plain way to say it. The first book-wide run
+had 117 hits and the read rewrote 20: a noun the passage had under
+another name ("the same generic caretaker" for `History`, "the same
+question" for a request), a "same" that was untrue ("the same limit"
+ahead of "both limits"), and a term stated only afterward.
+
 `[PRT]` (2026-11-04, from a sentence the author marked in chapter 45)
 is a phrasal verb split around a noun-phrase object: "the driver
 carries the request out". The reader takes "carries the request" as a
@@ -242,8 +283,8 @@ takes one verb instead ("Distinguishing the Wrappers"), but headings
 are outside the paragraph reader, so the rule never sees one.
 
 Five rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-`[AND+REL]`, and `[PRT]`, judged against a baseline. Seven are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, and `[CAUS]`. The calibration shows why. `[AND]` fired on 7 before
+`[AND+REL]`, and `[PRT]`, judged against a baseline. Eight are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, and `[CAUS]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -285,7 +326,7 @@ the stale entries. A run given paths compares against those files' entries alone
 with paths adds and drops entries for those files and keeps
 every other file's entries.
 
-`--calibrate` checks all seven rules against `tools/data/edit_pairs.json`
+`--calibrate` checks every rule against `tools/data/edit_pairs.json`
 (the sentences the author rewrote, 72 records of `before`, `after`, and
 `fault`): each before and after text is parsed as a one-paragraph
 document, and each rule reports the pairs where it fires on the before
@@ -313,14 +354,15 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes           # new hits
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
-    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, CAUS
+    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
     uv run tip sentence-shapes-accept
 """
 
-from collections.abc import Iterator
+import re
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 from typing import Final
 from tools import parse_check
@@ -353,6 +395,7 @@ from tools.parsed_prose import (
 )
 from tools.report import Finding
 from tools.stranded_prepositions import clean, display  # noqa: F401
+from tools.word_stutter import same_stem, stem
 
 BASELINE: Final = DATA_DIR / "sentence_shapes_baseline.txt"
 HEADER: Final = (
@@ -386,6 +429,7 @@ SURVEY_RULES: Final = {
     "TWO": "two modified terms held across one comparison",
     "CAN": "a modal can where the sentence reports what happens",
     "SAME": "a same with nothing to compare against",
+    "SAME+NEW": "a same on a noun the passage above has not used",
     "CAUS": "a causative verb that demotes the actor to its object",
 }
 """Printed only under `--survey`; never baselined."""
@@ -459,6 +503,44 @@ SAME_SUBJECTS: Final = frozenset("it they he she we you i".split())
 (\"the same cls it received\"), which is the second term."""
 SAME_PUNCT: Final = frozenset(".,:;)")
 """Punctuation after \"same\" that makes it a predicate."""
+SAME_NEW_WINDOW: Final = 30
+"""Source lines above a \"same\" that count as its passage."""
+SAME_NEW_QUIET: Final = frozenset(
+    "way time place reason thing kind sort name type shape size "
+    "length order".split())
+"""Nouns after \"same\" that name no thing a passage could introduce:
+the idioms (\"the same way\") and the property nouns of \"of the same
+name\"."""
+SAME_NEW_TERMS: Final = frozenset({"as", "that", "which"})
+"""A word right after the noun that attaches the second term."""
+RECIPROCAL_WORDS: Final = frozenset(
+    "both each every all two three four several they these "
+    "those and or".split())
+"""Subject words that make the compared things the subject's own
+members (\"Every responder writes the same comparison\")."""
+SAME_NEW_SPREAD: Final = frozenset(
+    "every each both either any all twice again forever always "
+    "everywhere throughout".split())
+"""Words in the noun's own clause that spread \"same\" over repeats
+or members, which are then its second term (\"the same answer every
+time\", \"the same call on each element\")."""
+SAME_NEW_CASES: Final = frozenset({"whether", "regardless"})
+"""Words that name the cases a \"same\" holds across."""
+SAME_NEW_PLACES: Final = frozenset("in inside within at on with".split())
+"""Prepositions that make \"the same X\" a shared place or property
+(\"in the same file\", \"at the same depth\", \"a new list with the
+same elements\"), whose second term is the other thing in the
+sentence."""
+SUBJECT_STARTS: Final = frozenset({"DET", "PRON", "PROPN"})
+"""Parts of speech that open a new noun phrase right after a noun,
+the subject of a relative clause with its pronoun dropped; the CODE
+placeholder is a `PROPN`."""
+JOINING_WORDS: Final = frozenset({"and", "or", "both"})
+"""Words before \"same\" in its clause that join the things compared
+(\"skipping and stopping give the same result\")."""
+PASSAGE_WORD: Final = re.compile(r"[A-Za-z][a-z]+|[A-Z]+")
+"""A word of prose, or one part of an identifier (`to_query`,
+`PriorityQueue`)."""
 LIGHT_OBJECTS: Final = frozenset(
     "it them this that one you me us each both all some something "
     "anything nothing everything code".split())
@@ -554,6 +636,16 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("SAME", "Alternative constructors need `Self` for the same reason `bump()` does.", False),
     ("SAME", "`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.", False),
     ("SAME", "The code runs the same with or without them.", False),
+    ("SAME+NEW", "A finished f-string is a single `str` in which the values have merged into the literal text. `safe()` uses the same separation to check each value.", True),
+    ("SAME+NEW", "`safe()` checks each value while it is still separate from the literal text.", False),
+    ("SAME+NEW", "The `# type: ignore` in `report` silences `ty`'s diagnostic for the same hazard.", True),
+    ("SAME+NEW", "The `hash()` failure is a second symptom of the same shallowness.", True),
+    ("SAME+NEW", "`async`/`await` is the same machinery with a syntax that marks a function as one the event loop resumes.", True),
+    ("SAME+NEW", "A `Template` keeps each value separate from the literal text. `safe()` uses the same separation.", False),
+    ("SAME+NEW", "An `if`/`isinstance()` chain gives the same exhaustiveness check as a `match`.", False),
+    ("SAME+NEW", "Every responder that filters by size writes the same comparison.", False),
+    ("SAME+NEW", "A pure call returns the same answer every time.", False),
+    ("SAME+NEW", "`expect()`, in the same file, prints through `report()` too.", False),
     ("PRT", "A generator yields a request and waits while the driver carries the request out.", True),
     ("PRT", "A generator yields a request and waits while the driver carries out the request.", False),
     ("PRT", "The driver carries it out.", False),
@@ -1116,6 +1208,185 @@ def same_pointer(sentence: Sentence) -> bool:
     return False
 
 
+def cognate(noun: str, word: str) -> bool:
+    """Do two words share a stem, as \"separation\" and \"separate\" do?
+
+    Equal light stems (`word_stutter.stem()`), or stems that share
+    their first five letters and all but two letters of the shorter
+    stem, so \"except\" answers \"exception\" and \"over\" does not
+    answer \"overhead\". A noun of five letters or more inside a
+    longer word also counts, for an identifier that holds it
+    (\"dispatch\" in `singledispatch`).
+    """
+    a, b = stem(noun), stem(word)
+    if same_stem(a, b) or (len(a) >= 5 and a in b):
+        return True
+    shared = 0
+    for x, y in zip(a, b):
+        if x != y:
+            break
+        shared += 1
+    return shared >= 5 and shared >= min(len(a), len(b)) - 2
+
+
+def passage_words(text: str) -> set[str]:
+    """The lowercase words of the prose and code in `text`."""
+    return {w.lower() for w in PASSAGE_WORD.findall(text)}
+
+
+def clause_verb(tok: Token, sentence: Sentence) -> Token:
+    """The nearest verb at or above `tok`, or the root."""
+    toks = sentence.tokens
+    while tok.head != tok.i and tok.pos not in ("VERB", "AUX"):
+        tok = toks[tok.head]
+    return tok
+
+
+def clause_mate(tok: Token, verb: Token, sentence: Sentence) -> bool:
+    """Does `tok` hang under `verb` with no other verb between?"""
+    toks = sentence.tokens
+    while tok.head != tok.i:
+        tok = toks[tok.head]
+        if tok.i == verb.i:
+            return True
+        if tok.pos in ("VERB", "AUX"):
+            return False
+    return tok.i == verb.i
+
+
+def reciprocal_subject(verb: Token, sentence: Sentence) -> bool:
+    """Does the clause under `verb` speak of several things at once?
+
+    Its subject is plural, coordinated, or counted
+    (`RECIPROCAL_WORDS`), so a \"same\" in that clause compares the
+    subject's own members with each other.
+    """
+    toks = sentence.tokens
+    subject = subject_of(verb, sentence)
+    while subject is None and verb.dep == "conj" and verb.head != verb.i:
+        verb = toks[verb.head]  # "succeed and fail on the same inputs"
+        subject = subject_of(verb, sentence)
+    if subject is None:
+        return False
+    if subject.tag in ("NNS", "NNPS"):
+        return True
+    words = {toks[i].text.lower() for i in subtree(subject, sentence)}
+    return bool(words & RECIPROCAL_WORDS)
+
+
+def second_term_attached(noun: Token, sentence: Sentence) -> bool:
+    """Does the sentence give the noun's second term right after it?
+
+    \"The same X as Y\", \"the same X that ...\", and a relative
+    clause with its pronoun dropped, which starts a new noun phrase
+    right after the noun: a determiner, a pronoun, or a name (\"the
+    same `cls` it received\", \"the same guarantee the `Result` type
+    gives\", \"the same layout `array` uses\"). The test is the next
+    word's part of speech, since the parser often reads the clause's
+    verb as a noun (\"gives\", \"searches\") and marks no subject. A
+    preposition after the noun is not one, so \"the same machinery
+    with a syntax that marks ...\" stays a hit.
+    """
+    toks = sentence.tokens
+    after = toks[noun.i + 1] if noun.i + 1 < len(toks) else None
+    if after is None:
+        return False
+    if after.text.lower() in SAME_NEW_TERMS or after.pos in SUBJECT_STARTS:
+        return True
+    return any(c.dep == "relcl" for c in children(noun, sentence))
+
+
+def spread_over_cases(same: Token, verb: Token,
+                      sentence: Sentence) -> bool:
+    """Does the sentence spread this \"same\" over repeats or cases?
+
+    A second \"same\" (\"the same arguments produce the same
+    result\"), a `SAME_NEW_CASES` word or \"no matter\", a
+    `SAME_NEW_SPREAD` word in the noun's own clause, or a
+    `JOINING_WORDS` word in that clause before the \"same\".
+    """
+    toks = sentence.tokens
+    lows = [t.text.lower() for t in toks]
+    if sum(1 for t in toks if t.lemma.lower() == "same") > 1:
+        return True
+    if set(lows) & SAME_NEW_CASES or ("no", "matter") in zip(lows, lows[1:]):
+        return True
+    for t in toks:
+        low = t.text.lower()
+        if low in SAME_NEW_SPREAD and t.i != same.i:
+            if clause_mate(t, verb, sentence):
+                return True
+        if low in JOINING_WORDS and t.i < same.i:
+            if clause_mate(t, verb, sentence):
+                return True
+    return False
+
+
+def imperative(sentence: Sentence) -> bool:
+    """Is the sentence a command: a bare verb root with no subject?"""
+    root = root_of(sentence)
+    return (root is not None and root.tag == "VB"
+            and subject_of(root, sentence) is None)
+
+
+def same_new_noun(sentence: Sentence, paragraph: Paragraph,
+                  source: Sequence[str] = ()) -> Token | None:
+    """The noun after a \"same\" that the passage has not used, or None.
+
+    A \"same\" after a `SAME_DETERMINERS` word modifies a noun, and no
+    word in the `SAME_NEW_WINDOW` lines of `source` above the \"same\",
+    nor earlier in its own paragraph, is a `cognate()` of that noun:
+    \"uses the same separation\" where nothing above says \"separation\"
+    or \"separate\". `source` is the document's lines, listings and
+    headings included; without it the paragraph alone is the passage.
+    Quiet: a command (an exercise or a step label), a noun that is a
+    code span or has one before it (\"the same `Path` object\"), a
+    `SAME_NEW_QUIET` noun, a counted noun (\"the same two files\"), a
+    `SAME_NEW_PLACES` preposition before the determiner, a noun with
+    its second term attached (`second_term_attached()`), a
+    `reciprocal_subject()`, and a \"same\" the sentence spreads over
+    repeats or cases (`spread_over_cases()`).
+    """
+    if imperative(sentence):
+        return None
+    toks = sentence.tokens
+    for k, tok in enumerate(toks):
+        if tok.lemma.lower() != "same" or k == 0:
+            continue
+        if toks[k - 1].text.lower() not in SAME_DETERMINERS:
+            continue
+        if k >= 2 and toks[k - 2].text.lower() in SAME_NEW_PLACES:
+            continue
+        noun = toks[tok.head]
+        if noun.i <= k or noun.pos != "NOUN":
+            continue
+        if noun.text.startswith("CODE"):
+            continue
+        if noun.lemma.lower() in SAME_NEW_QUIET:
+            continue
+        between = toks[k + 1:noun.i]
+        if any(t.pos == "NUM" or t.text.startswith("CODE")
+               for t in between):
+            continue  # "the same two files", "the same `Path` object"
+        if second_term_attached(noun, sentence):
+            continue
+        verb = clause_verb(noun, sentence)
+        if reciprocal_subject(verb, sentence):
+            continue
+        if spread_over_cases(tok, verb, sentence):
+            continue
+        at = min(tok.idx, len(paragraph.lines) - 1)
+        line = paragraph.lines[at]
+        above = "\n".join(
+            source[max(0, line - 1 - SAME_NEW_WINDOW):line - 1])
+        before = paragraph.text[:tok.idx].replace("CODE", " ")
+        words = passage_words(above) | passage_words(before)
+        if any(cognate(noun.lemma, word) for word in words):
+            continue
+        return noun
+    return None
+
+
 def split_particle(sentence: Sentence) -> bool:
     """Does a phrasal verb's particle follow a noun-phrase object?
 
@@ -1155,8 +1426,13 @@ def split_particle(sentence: Sentence) -> bool:
     return False
 
 
-def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
-    """(rule, sentence) for each hit in one paragraph."""
+def shapes(paragraph: Paragraph, source: Sequence[str] = (),
+           ) -> Iterator[tuple[str, Sentence]]:
+    """(rule, sentence) for each hit in one paragraph.
+
+    `source` is the document's lines, which `[SAME+NEW]` reads above
+    the sentence; without it that rule sees the paragraph alone.
+    """
     if skipped(paragraph):
         return
     previous: Sentence | None = None
@@ -1181,6 +1457,8 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
             yield "CAN", sentence
         if same_pointer(sentence):
             yield "SAME", sentence
+        if same_new_noun(sentence, paragraph, source) is not None:
+            yield "SAME+NEW", sentence
         if causative(sentence) is not None:
             yield "CAUS", sentence
     for sentence in colon_units(paragraph):
@@ -1194,12 +1472,16 @@ def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
     for doc, paras in zip(docs, parsed(docs, parser), strict=True):
         for paragraph in paras:
             lines = paragraph.lines
-            for rule, sentence in shapes(paragraph):
+            for rule, sentence in shapes(paragraph, doc.lines):
                 line = lines[min(sentence.start, len(lines) - 1)]
                 detail = ""
                 found = causative(sentence) if rule == "CAUS" else None
                 if found is not None:
                     detail = " ".join(t.text for t in found) + ": "
+                noun = (same_new_noun(sentence, paragraph, doc.lines)
+                        if rule == "SAME+NEW" else None)
+                if noun is not None:
+                    detail = noun.text + ": "
                 yield Finding(doc.path, line, f"[{rule}] " + detail
                               + sentence_text(paragraph, sentence))
 

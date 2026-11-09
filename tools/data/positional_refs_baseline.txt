@@ -261,10 +261,10 @@ Solutions/43_Functional--Confidence/README.md	second run	A second run reports th
 Solutions/43_Functional--Confidence/README.md	three runs	With limits twenty times smaller, `[10_000, 20_000, 30_000, 40_000]`, the same machine reported `3` on each of three runs.
 Solutions/45_Effects--Generators/README.md	The third `send()`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	last two runs	**Test a short answer source.** The last two runs show that hazard.
-Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator waits before the first line of its body rather than at a `yield`, so Python discards the value handed to the first `send()`.
+Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator waits before the first line of its body rather than at a `yield`, so the first `send()` arrives before any `yield` expression is ready to receive a value.
 Solutions/45_Effects--Generators/README.md	the first `send()`	So at runtime the first `send()` accepts `None` alone, a value the `SendType` excludes.
 Solutions/45_Effects--Generators/README.md	the first call	An annotation cannot express "`None` for the first call, `Answer` afterward," because a single `SendType` covers every call.
-Solutions/45_Effects--Generators/README.md	the first line	A just-started generator waits before the first line of its body rather than at a `yield`, so Python discards the value handed to the first `send()`.
+Solutions/45_Effects--Generators/README.md	the first line	A just-started generator waits before the first line of its body rather than at a `yield`, so the first `send()` arrives before any `yield` expression is ready to receive a value.
 Solutions/45_Effects--Generators/README.md	the first line	The call `interview()` returns a generator object, suspended before the first line of its body.
 Solutions/45_Effects--Generators/README.md	the last `send()`	If you read the total as the result of the last `send()`, writing `total: Total = t.send(Amount(12))` with no `try`, the script prints the three prompts and then stops with `StopIteration: 42`.
 Solutions/45_Effects--Generators/README.md	the last `yield`	**Drive the conversation with `next()` and `send()`.** The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.

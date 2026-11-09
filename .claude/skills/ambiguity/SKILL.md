@@ -59,7 +59,9 @@ most of the book's hits read one way.
   and `construct xN` and `ordinal+span` are definite or ordinal pointers at a listing that has several of the thing.
   `survey alternative` (2026-11-08) is a sentence in a walkthrough paragraph that names a construct the listing lacks, with no marker word;
   it sees the opener of an alternative, and the continuation shape below is read by hand.
-- `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]`.
+- `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[SAME+NEW]`, `[PAIR]`, `[TWO]`, and `[AND+REL]`.
+  `[SAME+NEW]` (2026-11-09) is a "same" on a noun that no line in the 30 above uses, and it prints the noun (`[SAME+NEW] separation: ...`);
+  ask "same as what?" and check that the passage called the thing by that noun.
 - `tip possessives CH=NN` and `tip stranded CH=NN`: an elided head noun, which the reader supplies from two candidates.
 - `tip pointers CH=NN`: `antecedents` reads these; take only what that pass left.
 
@@ -200,3 +202,6 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   Was the noun after "same" introduced? "The same separation", "the same hazard", and "the same machinery" each named a thing the passage had described and never called that, so the repair says what the thing is.
   Are the two things the same? "The same `Queue`" stood beside a listing that uses a `PriorityQueue`, and "the same guard" joined two different `isinstance()` tests; check the claim against the listing as for any other claim.
   Two repairs joined the list: where the thing is no longer than the pointer, write the thing ("with `metaclass=Singleton`"), and where the second term is the sentence's own "each" or "every", put it before an appositive ("makes the same call on each element, `element.accept(visitor)`").
+  The first test became the `[SAME+NEW]` survey rule the same day. Its first run had 117 hits and 20 rewrites, most of them a second noun for a thing the passage had named:
+  "the same generic caretaker" for `History`, "the same question" for a request, "the same model" one sentence after "this design", "the same guarantee" one sentence after "the rule".
+  Use the passage's noun. The keeps are a summary noun for the sentence before ("Gradual typing faced the same problem").

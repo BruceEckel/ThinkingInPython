@@ -474,7 +474,7 @@ print(run(constant), run(constant))
 ```
 
 The `run()` at `[1]` exhausts the generator.
-The `run()` at `[2]` drives that same exhausted object and gets an immediate `StopIteration` whose value is `None`.
+The `run()` at `[2]` drives that exhausted generator and gets an immediate `StopIteration` whose value is `None`.
 Calling `bound("Bob")` builds a fresh description, and that one runs.
 A second `bound("Alice")` builds a fresh one too.
 

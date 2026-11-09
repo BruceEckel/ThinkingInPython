@@ -122,7 +122,7 @@ A call to `cheese()`, long after decoration finished,
 still calls the original `cheese` function through `func`.
 
 Decoration is a simple kind of [metaprogramming](17_Techniques--Metaprogramming.md).
-The same idea appears in design patterns as the [*Decorator* pattern](#the-decorator-pattern):
+The [*Decorator* pattern](#the-decorator-pattern) applies decoration to objects:
 wrap an object to add responsibilities to it,
 while keeping the wrapped object's interface.
 Code written for the wrapped object then works unchanged with the wrapper.

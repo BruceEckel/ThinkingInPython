@@ -433,8 +433,7 @@ so each listing shows one idea.
 A surrogate is not an instance of the implementation's class.
 Delegation forwards the methods, not the type.
 `isinstance()` checks only the proxy's own class.
-A `@runtime_checkable` `Protocol` gives the same answer.
-Since Python 3.12 the Protocol check uses `inspect.getattr_static()`,
+Since Python 3.12, the check against a `@runtime_checkable` `Protocol` uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries instead of running attribute lookup.
 That function bypasses `__getattr__()`,
 so a proxy that supplies every method through `__getattr__()` also fails the `isinstance()` check:

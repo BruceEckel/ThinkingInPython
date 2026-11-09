@@ -1293,7 +1293,8 @@ Five such threads take turns on one processor and finish in about the time five 
 `t_seq` and `t_thr` therefore come out close together,
 and `t_seq > t_thr * target` is `False`.
 
-`InterpreterPoolExecutor` wins the same benchmark because each [subinterpreter](../../Chapters/19_Techniques--Concurrency.md#subinterpreters)
+With `InterpreterPoolExecutor` that comparison is `True`,
+because each [subinterpreter](../../Chapters/19_Techniques--Concurrency.md#subinterpreters)
 has its own GIL.
 In that pool the work spreads across processors instead of time-slicing on one.
 A free-threaded build reaches the same end by removing the GIL instead of multiplying it,

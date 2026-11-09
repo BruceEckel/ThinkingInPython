@@ -116,7 +116,7 @@ If `__len__()` returns `self.start` alone,
 since `len()` rejects a negative length.
 So does `list(Countdown(-1))`,
 because `list()` calls `__len__()` to size its result.
-A `for` loop over the same object calls `__iter__()` alone,
+A `for` loop over `Countdown(-1)` calls `__iter__()` alone,
 so it runs zero times and ends normally.
 The solution returns `max(self.start, 0)`,
 so a negative `start` gives a length of 0, matching the empty iteration.

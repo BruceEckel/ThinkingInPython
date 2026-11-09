@@ -538,9 +538,9 @@ and the traceback ends with `grid.Blackout: 20`.
 The run is the same with or without the wrapper,
 so the solution drops it and uses `expect()` to show the `Blackout` arriving at `run()`.
 
-Exercise 2 draws the same distinction from the other side.
 A failure is part of the Effect only if the Effect yields it as a value.
 A `raise` in code the driver calls is outside the description.
+Exercise 2 draws that distinction from the other side.
 
 Making a `Blackout` catchable means giving the Ability a failure type.
 In that design the handler returns a value rather than raising an exception,

@@ -898,8 +898,7 @@ so priming with it type-checks for any generator.
 The mismatch is real rather than a type checker limitation.
 A generator's `SendType` describes what a suspended `yield` expression can receive.
 A just-started generator waits before the first line of its body rather than at a `yield`,
-so Python discards the value handed to the first `send()`.
-The runtime enforces the same rule.
+so the first `send()` arrives before any `yield` expression is ready to receive a value.
 Sending a non-`None` value to a fresh generator raises `TypeError: can't send non-None value to a just-started generator`.
 So at runtime the first `send()` accepts `None` alone,
 a value the `SendType` excludes.

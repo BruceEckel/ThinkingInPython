@@ -70,7 +70,7 @@ def rules(source: str) -> list[str]:
      "subclass of `Bar`.", []),
     ("Three tests check what the lease guarantees: the item leaves "
      "the pool, it comes back when the block raises an exception, and "
-     "the pool hands out the same object.", ["AND"]),
+     "the pool hands out the same object.", ["AND", "SAME+NEW"]),
     ("This technique is *dependency injection*: the caller hands the "
      "function its dependencies, and the function fetches nothing on "
      "its own.", ["AND", "COLON+AND"]),
@@ -112,10 +112,20 @@ def rules(source: str) -> list[str]:
     ("`drive()` is imported unchanged. The requests now come from `ask()`, one generator below `interview()`, and `yield from` passes each one up to the driver, so `drive()` sees the same `Question`s it saw in `interview_generator.py`.", []),
     ("Use a `set` rather than a `list` for membership tests.", []),
     ("At `[2]`, the same `yield` raises `GeneratorExit`.", ["SAME"]),
-    ("The same directory reaches pytest through `pythonpath` in `pyproject.toml`.", ["SAME"]),
+    ("The same directory reaches pytest through `pythonpath` in `pyproject.toml`.", ["SAME", "SAME+NEW"]),
     ("Alternative constructors need `Self` for the same reason `bump()` does.", []),
     ("`register()` returns the same `cls` it received, so the name `Espresso` refers to the original class.", []),
     ("The code runs the same with or without them.", []),
+    ("A finished f-string is a single `str` in which the values have merged into the literal text. `safe()` uses the same separation to check each value.", ["SAME+NEW"]),
+    ("A `Template` keeps each value separate from the literal text. `safe()` uses the same separation.", ["SAME"]),
+    ("The `# type: ignore` in `report` silences `ty`'s diagnostic for the same hazard.", ["SAME", "SAME+NEW"]),
+    ("The `hash()` failure is a second symptom of the same shallowness.", ["SAME+NEW"]),
+    ("`async`/`await` is the same machinery with a syntax that marks a function as one the event loop resumes.", ["SAME+NEW"]),
+    ("An `if`/`isinstance()` chain gives the same exhaustiveness check as a `match`.", []),
+    ("Every responder that filters by size writes the same comparison.", []),
+    ("A pure call returns the same answer every time.", []),
+    ("`expect()`, in the same file, prints through `report()` too.", ["SAME"]),
+    ("That rejection is the same guarantee the `Result` type gives in Error Handling.", []),
     ("A generator yields a request and waits while the driver carries the request out.", ["PRT"]),
     ("A generator yields a request and waits while the driver carries out the request.", []),
     ("The driver carries it out.", []),
@@ -168,7 +178,7 @@ def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
-        "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "CAUS"}
+        "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "SAME+NEW", "CAUS"}
 
 
 def test_main_reports_without_failing_and_accepts(

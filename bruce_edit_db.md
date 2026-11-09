@@ -2918,7 +2918,35 @@ The 19 keeps: the term in the sentence or in the sentence before, a
 count that identifies the set ("the same four lines", "the same 36
 answers"), "same" set against a stated difference ("runs the same
 search with inputs it chooses"), and "the same way" straight after the
-way.
+way. Test 6 became the `[SAME+NEW]` survey rule in
+`tools/sentence_shapes.py` the same day (a "same" whose noun has no
+cognate in the 30 source lines above). Its first book-wide run had
+117 hits, and the session's read rewrote 20. Most were a second noun
+for a thing the passage had named one sentence earlier, so the repair
+was the passage's noun; three were untrue or stated their term only
+afterward. The 96 keeps are a summary noun for the sentence before
+("Gradual typing faced the same problem", "uses the same technique")
+and "same" set against a stated difference ("the same answer by a
+different algorithm").
+- `44_Effects--Effect_Management`, one sentence after "this design":
+  "Flix expresses the same model with different notation." -> "the
+  same design"
+- `36_Patterns--Memento`, a role for a named thing (R52): "the same
+  generic caretaker holds mementos of the mutable `Sketch`" ->
+  "`History` holds mementos of the mutable `Sketch`"
+- `43_Functional--Confidence`, the section's own term: "The same
+  substitution serves your reasoning" -> "Referential transparency
+  serves your reasoning"
+- `42_Functional--Error_Handling`, untrue, since the lead-in two
+  sentences later says "both limits": "The caller's side has the same
+  limit." -> "The caller's side has a limit too."
+- `Solutions/47_Effects--Stateless_in_Practice`, a term stated only
+  afterward: "Exercise 2 draws the same distinction from the other
+  side." moved below the two sentences that state the distinction, as
+  "Exercise 2 draws that distinction from the other side."
+- `Solutions/19_Techniques--Concurrency`, a figure on a new noun:
+  "`InterpreterPoolExecutor` wins the same benchmark" -> "With
+  `InterpreterPoolExecutor` that comparison is `True`"
 - `02_Foundations--Tour`, a noun never introduced: "`safe()` uses the
   same separation to check each value." -> "`safe()` checks each value
   while it is still separate from the literal text."
@@ -2959,8 +2987,8 @@ way.
   `stubborn()`, `generator ignored GeneratorExit`."
 
 **Home.** CLAUDE.md (the "same" bullet) | ambiguity (the comparison
-entry and Accrued shapes) | `[SAME]` in `tools/sentence_shapes.py`
-(shape 5 only) | this file.
+entry and Accrued shapes) | `[SAME]` (shape 5) and `[SAME+NEW]`
+(shape 6) in `tools/sentence_shapes.py` | this file.
 
 ## Candidates
 

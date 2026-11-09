@@ -300,7 +300,7 @@ if __name__ == "__main__":
 The demo goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
 `frozen=True` enforces the rule at runtime,
 including in code that skips the type checker.
-A test confirms the same guarantee:
+A test confirms that rule:
 
 ```python
 # test_immutable.py

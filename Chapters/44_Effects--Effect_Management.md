@@ -395,7 +395,7 @@ Everything a pure function touches lives in its arguments, its local variables,
 and its return value,
 so the function is safe to run in parallel with any other code.
 
-The same guarantee makes testing trivial.
+Purity also makes testing trivial.
 Calling a pure function with the same arguments produces the same result every time.
 No side cause, side effect, or failure can surprise you.
 
@@ -712,7 +712,7 @@ which is how native systems express retries and backtracking as ordinary handler
 *Algebraic effects* is the name for this design:
 Effects declared as an interface, plus handlers that receive the continuation.
 
-[Flix](https://flix.dev/) expresses the same model with different notation.
+[Flix](https://flix.dev/) expresses the same design with different notation.
 The Effect row follows a backslash,
 and a handler receives the continuation as a named parameter:
 

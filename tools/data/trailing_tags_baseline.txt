@@ -54,7 +54,6 @@ Solutions/20_Patterns--Rethinking_Objects/README.md	[R32] CODE supplies the CODE
 Solutions/26_Patterns--Factory/README.md	[R32] CODE then prints CODE, the same list as CODE
 Solutions/29_Patterns--Changing_the_Interface/README.md	[R32] CODE is CODE from CODE, unchanged
 Solutions/30_Patterns--Observer/README.md	[R32] The protocol here is the one from CODE, unchanged
-Solutions/31_Patterns--State_Machines/README.md	[R35] The chapter's Table-Driven *State Machine* section makes the same trade-off over the per-state CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[R32] Sixteen entries cover the four types against each other (4 × 4), the same shape as the original nine (3 × 3)
 Solutions/41_Functional--Toolkits/README.md	[R32] On the list passed through CODE, the same diagnostic names the literal's inferred type
 Solutions/41_Functional--Toolkits/README.md	[R32] Passing the CODE is dependency injection applied to a source of nondeterminism, the same technique Random Numbers recommends for testing

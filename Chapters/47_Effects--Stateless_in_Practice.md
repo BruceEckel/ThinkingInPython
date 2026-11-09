@@ -430,7 +430,7 @@ They differ in whether midnight falls between the two requests.
 
 `crossing` follows the same pattern as `scripted` in `coin_toss.py`.
 It walks a scripted list, so it holds state between requests.
-That state lets it answer the same question two ways.
+That state lets it answer the same request two ways.
 A supplied instance answers every request the same way,
 and so do `frozen` and `tomorrow`, each reporting one moment on every request.
 

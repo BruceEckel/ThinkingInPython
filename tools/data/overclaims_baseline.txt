@@ -822,7 +822,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] Stateless establishes the 
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] Stateless provides no way to acquire a resource in one Effect and release it after a later Effect finishes
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] That restriction is the only one the checker enforces
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] That state can fail in one way, and the failure is silent
-Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] That state lets it answer the same question two ways
+Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] That state lets it answer the same request two ways
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] The accessor gives the request a name and keeps its answer type in one function
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] The difference between the two ways in is what the type checker verifies
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] The error channel you have seen has one way in and one way out
@@ -1061,7 +1061,7 @@ Solutions/21_Patterns--Design_Patterns/README.md	[BOUND] take one thing away and
 Solutions/21_Patterns--Design_Patterns/README.md	[BOUND] three edits in two parts against one edit in one part
 Solutions/21_Patterns--Design_Patterns/README.md	[BOUND] you have removed one piece, run the program and CODE, and written down what changed in the output and in the requirement the program meets
 Solutions/22_Patterns--Iterators/README.md	[BOUND] **Compare two gap widths
-Solutions/22_Patterns--Iterators/README.md	[BOUND] A CODE loop over the same object calls CODE alone, so it runs zero times and ends normally
+Solutions/22_Patterns--Iterators/README.md	[BOUND] A CODE loop over CODE calls CODE alone, so it runs zero times and ends normally
 Solutions/22_Patterns--Iterators/README.md	[BOUND] CODE adds one piece of state to a bare iterator
 Solutions/22_Patterns--Iterators/README.md	[BOUND] Defining the protocol's four methods satisfies it
 Solutions/22_Patterns--Iterators/README.md	[BOUND] Each CODE loop or CODE call gets a fresh generator from a fresh call to CODE, so iterating over CODE leaves CODE alone
