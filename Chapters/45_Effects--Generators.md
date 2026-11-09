@@ -949,8 +949,8 @@ and a `StopIteration` that propagates out of a generator's body becomes a `Runti
 `next(inner)` runs `inner`'s body up to its first `yield`.
 How much code runs before that point depends on the generator.
 A generator that opens with a `yield from` continues into its delegate and stops at the delegate's first `yield`.
-`sequence()` with no steps returns before it yields anything,
-so `next(inner)` raises `StopIteration`.
+A generator that returns before its first `yield` makes `next(inner)` raise `StopIteration`.
+`sequence()` in `yield_from_arguments.py` does that when its `steps` tuple is empty.
 
 In the second run, `drive()` sees two requests instead of three.
 The proxy answers `town` at `[1]`, so that request stops at the proxy,
