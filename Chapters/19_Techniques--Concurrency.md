@@ -850,7 +850,7 @@ asyncio.run(main())
 If another task holds the lock,
 a task that reaches `async with lock` suspends until the lock becomes available.
 One task at a time runs its read-modify-write,
-however often the event loop switches to another task in between.
+and any switch to another task in between finds the lock held.
 A `threading.Lock` repairs the threaded version of this race the same way.
 
 An `asyncio.Lock` orders tasks on one event loop.
@@ -1883,7 +1883,7 @@ Often one thread runs both,
 because the first producer finishes before the pool picks up the second.
 Either way, the order in which jobs enter the queue can vary with scheduling.
 Waiting for both producer futures before submitting the consumer guarantees every job is in the queue before `consume()` starts,
-so the drain still comes out in priority order however the pool scheduled the producers.
+so the drain still comes out in priority order under either scheduling of the producers.
 When two jobs share a priority,
 tuple comparison falls through to the second field, the description string.
 

@@ -361,7 +361,7 @@ That `pop(0)` shifts every remaining element.
 
 **Report what the past still holds.**
 A bounded history empties `_past` sooner: after at most `max_depth` undos,
-however many `do()` calls the program made.
+whether the program makes `max_depth` `do()` calls or a thousand.
 So `can_undo()` can report `False` while the program has made more `do()` calls than it has undone.
 Once the bound discards state `0`, the oldest state `undo()` can return is `1`,
 so `False` is the correct answer.

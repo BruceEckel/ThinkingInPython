@@ -314,7 +314,8 @@ print(grouped(["b", "a", "b"], str.upper))
 **Collect each item under its key.**
 A dictionary key exists once by construction,
 so `grouped()` returns one group per key, whatever the input's order.
-The two `"b"` entries go into the same list however far apart they arrive.
+The two `"b"` entries go into the same list,
+with any number of other entries between them.
 The caller passes the data as it comes, where `groupby()` needs it sorted first.
 
 If you wrap `groupby()` in a dictionary comprehension,

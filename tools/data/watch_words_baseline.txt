@@ -203,7 +203,7 @@ Chapters/18_Techniques--Performance.md	cost: How much does a hardware upgrade co
 Chapters/18_Techniques--Performance.md	cost: The size comparison shows the cost of boxing
 Chapters/18_Techniques--Performance.md	cost: so the conversion cost is small beside that work
 Chapters/18_Techniques--Performance.md	cost: so the same 100 extractions cost roughly O(n + 100 log n)
-Chapters/18_Techniques--Performance.md	costing: costing O(n log n) however few items you then take
+Chapters/18_Techniques--Performance.md	costing: costing O(n log n) whether you then take 100 items or one
 Chapters/18_Techniques--Performance.md	costs: Re-sorting after every insertion costs far more than one incremental CODE/CODE pair
 Chapters/18_Techniques--Performance.md	costs: because costs grow at different rates
 Chapters/18_Techniques--Performance.md	declare no: A class can inherit from one slotted base as long as its other bases declare no slots of their own
@@ -508,7 +508,7 @@ Chapters/41_Functional--Toolkits.md	never: because CODE never returns
 Chapters/41_Functional--Toolkits.md	only: *Lazy evaluation* computes a value only when something needs it
 Chapters/41_Functional--Toolkits.md	only: A perfect trio schedule exists only when the roster size leaves a remainder of 3 when divided by 6
 Chapters/41_Functional--Toolkits.md	only: CODE works correctly only for pure functions
-Chapters/41_Functional--Toolkits.md	only: and it holds only the few items in flight
+Chapters/41_Functional--Toolkits.md	only: and it holds only the few items in flight from a source of any length
 Chapters/41_Functional--Toolkits.md	only: built only from CODE pieces and a generator expression
 Chapters/41_Functional--Toolkits.md	only: pure functions only
 Chapters/41_Functional--Toolkits.md	only: since CODE groups only adjacent elements

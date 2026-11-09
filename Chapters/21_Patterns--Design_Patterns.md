@@ -105,7 +105,7 @@ You can make that change dynamically or statically.
 Another pattern that appears in *GoF Design Patterns* is the [*Iterator*](22_Patterns--Iterators.md).
 An iterator lets you hide the particular implementation of the container as you step through it.
 You can write generic code that operates on all the elements in a sequence,
-however that sequence stores them.
+whether the sequence holds them in an array, a linked list, or a tree.
 The code works with any object that produces an iterator.
 
 ## Pattern Evolution

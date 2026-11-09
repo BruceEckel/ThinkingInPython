@@ -888,7 +888,7 @@ That method is `__next__()`.
 ### Asking Consumes an Item
 
 A GoF iterator's `is_done()` reports whether the traversal has finished and leaves the position where it was,
-however often you call it.
+so a second call reports the same answer as the first.
 Python puts that test inside `__next__()`,
 so finding out whether the iterator has finished means requesting the next item.
 `__next__()` reports the end by raising `StopIteration`,

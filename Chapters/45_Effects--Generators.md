@@ -500,14 +500,15 @@ print(list(top()))
 #: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
 ```
 
-"To exhaustion" means each `yield from` stays with its target until that generator finishes,
-however many `next()` calls that takes.
+"To exhaustion" means each `yield from` stays with its target,
+through every `next()` call, until that generator finishes.
 Exhaustion is transitive.
 `top()`'s single `yield from` finishes when every generator beneath it finishes,
 so `list(top())` receives one flat sequence.
 
-Without `from`, a bare `yield one()` yields the generator object as a single value,
-so `list(outer())` shows `<generator object one at ...>` in place of `'only'`.
+If `outer()` wrote `yield one()` without `from`,
+it would yield the generator object as a single value,
+and `list(outer())` would show `<generator object one at ...>` in place of `'only'`.
 
 ### The Return Channel
 
@@ -838,7 +839,7 @@ a conversation assembled from conversations written before it.
 
 The outermost generator still needs code that calls `next()` and `send()`,
 so the listing ends with a `drive()` call.
-However deeply the delegations nest, the program has one driver.
+At any depth of delegation, the program has one driver.
 
 `drive()` and `yield from` differ in how they respond to a request.
 `drive()` answers it.

@@ -300,7 +300,7 @@ except KeyError as e:
 
 A dictionary probe compares keys by equality,
 so `(Origami, Rock)` and `(Paper, Rock)` are different keys,
-however closely the two classes relate.
+a subclass as separate a key as an unrelated class.
 The lookup ignores the [MRO](07_Foundations--Classes.md#method-resolution-order).
 
 ## One Type or Many

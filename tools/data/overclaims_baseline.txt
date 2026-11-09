@@ -51,7 +51,7 @@ Chapters/05_Foundations--Functions.md	[BOUND] Unlike the body of an anonymous fu
 Chapters/05_Foundations--Functions.md	[BOUND] With CODE, the call returns CODE for an empty CODE, so the empty case takes one argument instead of a CODE/CODE
 Chapters/05_Foundations--Functions.md	[BOUND] With the CODE sentinel, CODE tells the two cases apart
 Chapters/06_Foundations--Modules_and_Packages.md	[BOUND] Because every CODE of a module binds the one object cached in CODE, a module is also a shared single instance (*Singleton*)
-Chapters/06_Foundations--Modules_and_Packages.md	[BOUND] Import it three ways, using CODE, CODE, and CODE, and confirm the loading message prints once, however many of the three you use together
+Chapters/06_Foundations--Modules_and_Packages.md	[BOUND] Import it three ways, using CODE, CODE, and CODE, and confirm the loading message prints once in every combination of the three
 Chapters/06_Foundations--Modules_and_Packages.md	[BOUND] Importing the package alone leaves its submodules unloaded
 Chapters/06_Foundations--Modules_and_Packages.md	[BOUND] The guard therefore suits names that appear in annotations alone
 Chapters/06_Foundations--Modules_and_Packages.md	[BOUND] The list shows that CODE binds the one name CODE in this file
@@ -274,7 +274,7 @@ Chapters/19_Techniques--Concurrency.md	[BOUND] I/O-Bound vs CPU-Bound divides co
 Chapters/19_Techniques--Concurrency.md	[BOUND] If CODE called CODE instead of CODE, the two calls would set their timers a few microseconds apart, since each call reads the clock when it runs
 Chapters/19_Techniques--Concurrency.md	[BOUND] Immortality arrived in 3.12 for every build but matters most in the free-threaded one, since immortality removes the one atomic operation every thread otherwise contests
 Chapters/19_Techniques--Concurrency.md	[BOUND] On a free-threaded interpreter, threads alone are enough for CPU-bound work, and they share memory without a process pool's pickling between processes
-Chapters/19_Techniques--Concurrency.md	[BOUND] One task at a time runs its read-modify-write, however often the event loop switches to another task in between
+Chapters/19_Techniques--Concurrency.md	[BOUND] One task at a time runs its read-modify-write, and any switch to another task in between finds the lock held
 Chapters/19_Techniques--Concurrency.md	[BOUND] Subinterpreters run on the standard build, the one with the GIL
 Chapters/19_Techniques--Concurrency.md	[BOUND] That guarantee holds within the event loop's own thread alone
 Chapters/19_Techniques--Concurrency.md	[BOUND] The ceiling applies to any system that divides work across independent workers, in Python or anywhere else, so adding cores alone is not a scaling strategy
@@ -507,7 +507,6 @@ Chapters/31_Patterns--State_Machines.md	[BOUND] The four functions use CODE befo
 Chapters/31_Patterns--State_Machines.md	[BOUND] This is a *Moore machine*, where what a state does depends on the state alone
 Chapters/31_Patterns--State_Machines.md	[BOUND] the message alone leaves you to infer it from the CODE count
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] A CODE member equals its string, so a version that returns the bare string CODE passes the CODE alone
-Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] A dictionary probe compares keys by equality, so CODE and CODE are different keys, however closely the two classes relate
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] A precise type needs a declaration of all four methods, either on CODE as abstract methods or in a CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Adding two instances of a class that implements CODE alone raises a CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] CODE declares CODE alone, so each CODE and CODE parameter takes CODE
@@ -601,7 +600,7 @@ Chapters/38_Patterns--Simulation.md	[BOUND] Each rat logs one line, so the closi
 Chapters/38_Patterns--Simulation.md	[BOUND] Each rat's own path through the maze stays one CODE loop in CODE, instead of a stack of pending frontiers that one function pushes and pops
 Chapters/38_Patterns--Simulation.md	[BOUND] Exactly one path connects any two of its open cells
 Chapters/38_Patterns--Simulation.md	[BOUND] Factory counts CODE among the cases where *Builder* remains useful in Python, because construction here takes three ordered stages rather than a single call
-Chapters/38_Patterns--Simulation.md	[BOUND] It tests and marks a cell in one step with no CODE in between, so each cell goes to one rat, however many reach it
+Chapters/38_Patterns--Simulation.md	[BOUND] It tests and marks a cell in one step with no CODE in between, so each cell goes to the first rat that reaches it
 Chapters/38_Patterns--Simulation.md	[BOUND] One move is one chain
 Chapters/38_Patterns--Simulation.md	[BOUND] Random kicks alone carry them there
 Chapters/38_Patterns--Simulation.md	[BOUND] The cycle exists for the checker alone
@@ -1249,7 +1248,7 @@ Solutions/35_Patterns--Flyweight/README.md	[BOUND] Each store overwrites the one
 Solutions/35_Patterns--Flyweight/README.md	[BOUND] If you add CODE and CODE to CODE but leave CODE listing three kinds, the script still runs and prints CODE
 Solutions/35_Patterns--Flyweight/README.md	[BOUND] Like CODE's CODE, this CODE writes the CODE call in full, because a weak reference needs CODE, and CODE forwards CODE alone
 Solutions/35_Patterns--Flyweight/README.md	[BOUND] That option adds the CODE slot alone, so the class still has no CODE
-Solutions/35_Patterns--Flyweight/README.md	[BOUND] The count stays at five however large the map grows, because CODE keys on the symbol alone
+Solutions/35_Patterns--Flyweight/README.md	[BOUND] The count stays at five as the map grows, because CODE keys on the symbol alone
 Solutions/35_Patterns--Flyweight/README.md	[BOUND] The solution stops tracing after each build, so each peak measures that build's allocations alone
 Solutions/35_Patterns--Flyweight/README.md	[BOUND] your file prints the pool's length as CODE after building a fifty-color palette and CODE after CODE drops it, two requests for the same components return the same object (CODE prints CODE), and you can show with one line a guarantee of CODE that your version lacks
 Solutions/36_Patterns--Memento/README.md	[BOUND] **Take one field from the past

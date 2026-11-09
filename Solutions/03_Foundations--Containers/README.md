@@ -585,7 +585,7 @@ except ValueError as e:
 ```
 
 **Collect the remaining items.**
-A starred target collects however many items remain,
+A starred target collects the remaining items, zero or more,
 so one assignment reaches any of the three positions without an index.
 The star may appear anywhere in the target list,
 so `first, *middle, last = row` works.

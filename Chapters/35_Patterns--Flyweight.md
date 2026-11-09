@@ -186,7 +186,7 @@ print(field[3][5].label(3, 5))
 
 The twenty-four cells share three `Tile` objects.
 Because `@cache` returns the same `Tile` for the same symbol every time,
-the object count stays at the number of tile kinds however large the grid grows.
+the object count stays at the number of tile kinds as the grid grows.
 The listing shows the object count, not the memory behind it (see exercise 2).
 
 `[*row for row in field]` uses [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
@@ -677,8 +677,7 @@ Try each exercise before opening its [solution](../Solutions/35_Patterns--Flywei
     kinds to `tile_map.py`.
     Extend `Symbol` and `SPECS` to match,
     then write `walkable_neighbors(field, row, col)` returning the count of adjacent walkable cells.
-    Confirm the tile pool size still equals the number of kinds,
-    however large the map.
+    Confirm the tile pool size still equals the number of kinds on a map of any size.
 2.  Use `tracemalloc` to measure the memory `parse_map()` uses on a large map,
     first with every cell sharing its `Tile`,
     then with `@cache` removed from `tile()` so each cell gets a new one.

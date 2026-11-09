@@ -737,8 +737,8 @@ Adding a state is one row, one function,
 and a `case` in each existing function that leads to it.
 The design reads best when the transitions are obvious from the state's own name.
 
-A state's row holds its action, so the action appears once,
-however many transitions lead into that state.
+A state's row holds its action,
+so the action appears once and every transition into that state shares it.
 `chime()` sounds whenever the trap reaches `HOLDING`,
 and `HOLDING`'s row alone names it.
 That is the Moore shape: the action belongs to the state.

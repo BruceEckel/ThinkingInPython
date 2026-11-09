@@ -6,8 +6,7 @@
 > kinds to `tile_map.py`.
 > Extend `Symbol` and `SPECS` to match,
 > then write `walkable_neighbors(field, row, col)` returning the count of adjacent walkable cells.
-> Confirm the tile pool size still equals the number of kinds,
-> however large the map.
+> Confirm the tile pool size still equals the number of kinds on a map of any size.
 
 <details>
 <summary>Where to look</summary>
@@ -69,7 +68,7 @@ def walkable_neighbors(
 
 `uv run ty check` passes on your file
 (it reports `invalid-assignment` on `SPECS` while `Symbol` lags behind),
-a map using all five kinds prints five distinct tile objects however many cells it has,
+a map using all five kinds prints five distinct tile objects at any cell count,
 and on an all-grass 3x3 map `walkable_neighbors()` returns 2 at a corner,
 3 on an edge, and 4 in the center.
 
@@ -158,7 +157,7 @@ which still flags any key outside `Symbol`.
 **Confirm one tile per kind.**
 The twenty-four cells refer to five distinct objects, one per kind
 (`grass`, `water`, `rock`, `door`, `tree`).
-The count stays at five however large the map grows,
+The count stays at five as the map grows,
 because `@cache` keys on the symbol alone.
 
 **Count the neighbors inside the grid.**
@@ -648,7 +647,7 @@ The board's `dict` keeps the extrinsic position separate from the intrinsic colo
 Capturing leaves every `Piece` object alive.
 `@cache` keeps the captured piece's flyweight,
 which represents "a black knight" in the abstract rather than any particular knight on a square.
-The twelve `Piece` objects therefore remain however many captures follow.
+The twelve `Piece` objects therefore remain in place through every capture that follows.
 
 **Promote by switching flyweights.**
 A frozen `Piece` keeps its color and kind for life,

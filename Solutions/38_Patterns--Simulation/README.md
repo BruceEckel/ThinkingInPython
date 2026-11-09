@@ -378,8 +378,7 @@ yet the wall between the rooms separates each one from the entry.
 
 The first rat starts on the cell `Maze.entry()` returns,
 and every later rat starts on an open cell next to one that a rat occupies.
-The rats therefore stay inside the region of open cells joined to the entry,
-however many of them spawn.
+Every rat that spawns therefore stays inside the region of open cells joined to the entry.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

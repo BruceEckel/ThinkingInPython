@@ -1171,9 +1171,8 @@ if isinstance(outcome, RetryError):
 
 **Run out of attempts.**
 Retrying is the wrong behavior because this `NotInteresting` failure is deterministic.
-`WEATHER`'s headline is the same on every attempt,
-and `TOPICS` holds the same two topics,
-so `topic_of()` returns the same answer however many times it runs.
+`WEATHER`'s headline and `TOPICS`'s two topics are the same on every attempt,
+so `topic_of()` returns the same answer every time.
 `retry()` sleeps after every failed attempt, the last included,
 so the retry makes three fetches and three sleeps.
 It ends with the answer the first attempt produced.

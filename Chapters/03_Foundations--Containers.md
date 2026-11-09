@@ -624,7 +624,7 @@ print(large_gap > small_gap)  # The gap widens
 
 O(n) (read "order n") describes work that grows in proportion to `n`,
 the number of elements.
-O(1) describes work that stays the same however large `n` gets.
+O(1) describes work that stays the same as `n` grows.
 Searching the `list` is O(n) and searching the `set` is O(1),
 so the gap keeps widening as `n` grows.
 At ten times the size the `list` search takes roughly ten times as long,

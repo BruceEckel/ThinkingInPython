@@ -236,7 +236,7 @@ class Blackboard:
 
 `claim()` holds the rule on which the whole program depends.
 It tests and marks a cell in one step with no `await` in between,
-so each cell goes to one rat, however many reach it.
+so each cell goes to the first rat that reaches it.
 The missing `await`, not a lock, makes `claim()` atomic.
 The [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
 needs a suspension point inside the update,
@@ -425,7 +425,7 @@ A perfect maze like `amaze.txt` cannot produce it.
 
 ### Testing Full Coverage
 
-However the tasks interleave,
+In every interleaving of the tasks,
 the rats cover every cell reachable from the entry,
 because every claimed cell gets a rat,
 and that rat tests all four of its neighbors.

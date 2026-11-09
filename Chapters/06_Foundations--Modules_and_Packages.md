@@ -60,8 +60,8 @@ import use_module
 #: use_module body runs
 ```
 
-Python runs a module's top-level code once,
-however many times the program imports the module:
+Python runs a module's top-level code once, on the first import,
+and every later import reuses the loaded module:
 
 ```python
 # import_once.py
@@ -86,8 +86,8 @@ The `as second` clause binds that object under another name
 so `use_module` and `second` are one object.
 
 Because every later `import` finds the cached object in `sys.modules`,
-a running program keeps the module it loaded,
-however you edit the module's file afterward.
+a running program keeps the module it loaded.
+Editing the module's file afterward changes the file on disk and leaves the loaded module as it was.
 To load the edited file, restart the program,
 or call `importlib.reload(use_module)`,
 which re-runs the body into the existing module object.
@@ -722,8 +722,7 @@ Try each exercise before opening its [solution](../Solutions/06_Foundations--Mod
     Import it three ways, using `import a_package.module5`,
     `from a_package import module5`,
     and `from a_package.module5 import function5`,
-    and confirm the loading message prints once,
-    however many of the three you use together.
+    and confirm the loading message prints once in every combination of the three.
 2.  Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
     Import and call `function6()` from a script outside `a_package`,
     then rename `b_package` to `bPackage` (and rename it back afterward)

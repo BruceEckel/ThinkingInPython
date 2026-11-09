@@ -171,7 +171,8 @@ Python runs `with Trace("A") as t:` in five steps:
 2. Call the manager's `__enter__()`.
 3. Bind `__enter__()`'s return value to `t`.
 4. Run the block.
-5. Call the manager's `__exit__()`, however the block finished.
+5. Call the manager's `__exit__()`,
+   whether the block completed or raised an exception.
 
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation [`Self`](08_Foundations--Static_Types.md#the-self-type)
@@ -672,7 +673,7 @@ if __name__ == "__main__":
 
 Like `suppress` and `expected`,
 the class version of `banner` uses a lowercase name because you use it like a function.
-Its `__exit__()` prints the closing banner however the block ended,
+Its `__exit__()` prints the closing banner whether the block completed or raised an exception,
 so it takes the `*exc: object` form and returns `None`,
 which lets an exception from `quarterly()` propagate.
 

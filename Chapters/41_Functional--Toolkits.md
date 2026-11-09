@@ -478,7 +478,7 @@ print(list(map(pow, range(5), repeat(2))))
 The counted form replaces the list you would write as `["x"] * 3`.
 The infinite form is the reason to import `repeat()`.
 It supplies a constant argument for as many calls as `map()` makes,
-and it holds one object in memory however many calls receive it.
+and one object in memory serves them all.
 Here the output stops when `range(5)` runs out,
 because `map()` stops at its shortest input.
 
@@ -1213,7 +1213,7 @@ The seven rounds `pair_rounds.py` schedules then cover 22 of the 28 pairs instea
 An answer cached in round 0 therefore comes back unchanged in a later round,
 after the counts it summed have grown.
 Caching `met()` breaks the `cache` entry's rule: pure functions only.
-A function that reads mutable state is impure, however simple its body looks.
+A function that reads mutable state is impure, a one-line body included.
 
 The general version needs memory, where the circle method needs a round number.
 In the circle method, which pair sits where in round `r` follows from `r` alone.
@@ -1246,8 +1246,8 @@ the single element, or the last partial batch.
 The second rule is to stack the pieces,
 since most of them take an iterable and return an iterator.
 `islice(count(10, 2), 5)` in this chapter is two stages.
-A real pipeline is five or six, and it holds only the few items in flight,
-however long its source.
+A real pipeline is five or six,
+and it holds only the few items in flight from a source of any length.
 [Error Handling](42_Functional--Error_Handling.md)
 asks what such a pipeline does when one stage fails.
 A chain of pure functions leaves that question open.

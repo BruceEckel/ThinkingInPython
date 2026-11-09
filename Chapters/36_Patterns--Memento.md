@@ -66,7 +66,7 @@ But their elements are the same inner lists,
 so `todo[0].append("cheese")` changes the first element of `shallow` too.
 
 `copy.deepcopy()` takes time and memory proportional to the whole nested structure it rebuilds,
-however small the change.
+so a one-element change copies as much as a rewrite of every element.
 
 ## The Classic Memento
 

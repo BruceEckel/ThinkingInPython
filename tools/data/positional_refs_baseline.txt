@@ -284,7 +284,7 @@ Solutions/46_Effects--Stateless/README.md	the second `info`	In the second `info`
 Solutions/46_Effects--Stateless/README.md	the second `run()`	The type checker removes `Need[Console]` from the requirements and leaves `Need[Clock]` open, so the second `run()` needs a `# type: ignore`.
 Solutions/47_Effects--Stateless_in_Practice/README.md	The line that	**Lift the failure into the channel.** The line that restores the guarantee is `@throws(KeyError)`.
 Solutions/47_Effects--Stateless_in_Practice/README.md	both runs	Each call to `ticking()` builds a fresh handler with its own stored moment, so both runs in the listing start at 23:59:59.
-Solutions/47_Effects--Stateless_in_Practice/README.md	every attempt	`WEATHER`'s headline is the same on every attempt, and `TOPICS` holds the same two topics, so `topic_of()` returns the same answer however many times it runs.
+Solutions/47_Effects--Stateless_in_Practice/README.md	every attempt	`WEATHER`'s headline and `TOPICS`'s two topics are the same on every attempt, so `topic_of()` returns the same answer every time.
 Solutions/47_Effects--Stateless_in_Practice/README.md	first attempt	It ends with the answer the first attempt produced.
 Solutions/47_Effects--Stateless_in_Practice/README.md	the inner loop	Each time a draw fails, `run_load()` breaks out of the inner loop, leaves the `connected` block, and asks for another source.
 Solutions/47_Effects--Stateless_in_Practice/README.md	the last `Put`	The `Cell` version has one piece of state, so the next `Get` returns the value the last `Put` wrote.

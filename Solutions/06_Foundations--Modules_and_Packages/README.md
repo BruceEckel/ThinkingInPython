@@ -7,8 +7,7 @@
 > Import it three ways, using `import a_package.module5`,
 > `from a_package import module5`,
 > and `from a_package.module5 import function5`,
-> and confirm the loading message prints once,
-> however many of the three you use together.
+> and confirm the loading message prints once in every combination of the three.
 
 <details>
 <summary>Where to look</summary>

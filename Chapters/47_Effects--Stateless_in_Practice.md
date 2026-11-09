@@ -186,7 +186,7 @@ a handler whose answer to `Need[T]` is the supplied instance that is a `T`.
 
 Every handler so far gives the same answer at every request.
 `supply()` binds one instance for the whole run,
-and `scripted` returns `"Alice"` however many times `greet()` requests a name.
+and `scripted` returns `"Alice"` on every request `greet()` makes for a name.
 A handler is an ordinary function, so it can answer differently at each request.
 Answering differently at each request makes an unpredictable source testable.
 
@@ -432,8 +432,7 @@ They differ in whether midnight falls between the two requests.
 It walks a scripted list, so it holds state between requests.
 That state lets it answer the same question two ways.
 A supplied instance answers every request the same way,
-and so do `frozen` and `tomorrow`,
-each reporting one moment however often you ask.
+and so do `frozen` and `tomorrow`, each reporting one moment on every request.
 
 ### A Source Named in the Type
 

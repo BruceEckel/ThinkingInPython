@@ -297,8 +297,8 @@ The resulting list again holds the only references to those three objects.
 
 **Drop the loop variable's reference.**
 `del c` inside the loop unbinds the name `c` and leaves the list alone.
-However you build the list,
-it keeps its contents alive until interpreter shutdown.
+The list, built by comprehension or by `append()`,
+keeps its contents alive until interpreter shutdown.
 The `deleted` messages therefore appear there, as before,
 after `End of delete loop` has printed.
 

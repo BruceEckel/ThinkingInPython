@@ -843,7 +843,7 @@ That stored item restores the `current_item()` that GoF had and Python dropped.
 
 **Fill the buffer at construction.**
 `Peekable` pulls from the source before any caller asks for a value,
-so the constructor computes the first item, however slow,
+so the constructor computes the first item, slow or fast,
 whether or not anything uses it.
 A source that blocks on its first read blocks at construction.
 `OverStream` pulls early the same way.

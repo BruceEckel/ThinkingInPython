@@ -276,7 +276,7 @@ comparing each element until it finds a match or reaches the end.
 A `set` tests membership through hashing.
 `target in as_set` computes a hash of `target` and checks the bucket that hash selects.
 Scanning gets slower as the list grows.
-Hashing stays fast however many elements the set holds:
+Hashing stays fast as the set grows:
 
 ```python
 # membership.py
@@ -804,7 +804,7 @@ one per halving of the remaining range.
 Here that means about 17 comparisons against about 50,000, so the move from O(n)
 to O(log n) shows up as orders of magnitude rather than a modest improvement.
 Hashing is faster than `bisect` too,
-since it needs one hash and one equality check however large `as_set` grows.
+since it needs one hash and one equality check for an `as_set` of any size.
 One machine measured `bisect` at about 2,000 times faster than the scan,
 and hashing at about five times faster than `bisect`.
 
@@ -900,7 +900,7 @@ A `set` tells you whether a value is present in O(1),
 but it arranges its items by hash,
 so finding the smallest values still means scanning or sorting every item.
 A heap keeps the smallest item at index 0 as you push and pop,
-so removing it takes O(log n) each time, however many times you repeat it.
+so every removal takes O(log n).
 For "give me the 100 smallest," the heap's competitor is `sorted(data)[:100]`,
 not a scan, so the listing times the heap against `sorted()`:
 
@@ -938,7 +938,7 @@ print(f"heap beats sorted() by 1.5x+ on shuffled "
 ```
 
 `sorted(data)` orders every element up front, costing O(n log n)
-however few items you then take.
+whether you then take 100 items or one.
 `heapify()` takes O(n) once, then each `heappop()` takes O(log n),
 so the same 100 extractions cost roughly O(n + 100 log n).
 That total stays below sorting's O(n log n)
@@ -1484,7 +1484,7 @@ A `memoryview` over immutable `bytes` supports reading and slicing,
 but writing through it raises a `TypeError` regardless of whether anything else has it open.
 `memory_view.py` above writes through a view of a `bytearray`, which is mutable.
 
-A view's own size stays fixed however much of the buffer it covers:
+A view's own size stays the same whether it covers one byte of the buffer or all of it:
 
 ```python
 # memory_view_size.py
