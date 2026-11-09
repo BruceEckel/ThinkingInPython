@@ -455,8 +455,8 @@ and it handles the edge cases a hand-written version can get wrong:
 the empty iterable, the single element,
 and the point where two sequences run out at different lengths.
 
-Combine `itertools` functions the way you combine any small function,
-by passing one's output to the next.
+To combine `itertools` functions, pass one's output to the next,
+as you do with any small function.
 [Reusable Algorithms](22_Patterns--Iterators.md#reusable-algorithms)
 introduces several of these as stages in lazy pipelines.
 This section is the catalog.
@@ -1038,7 +1038,7 @@ Each open sublist is a stack frame waiting for its `deep_sum()` call to return.
 
 Pair up participants for an activity across several rounds,
 and repeat a pairing only after every possible pairing has occurred once.
-A small program approaches this scheduling problem by combining several of the chapter's tools:
+To schedule the rounds, a small program combines several of the chapter's tools:
 an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
 `combinations()` for the pairs inside a group,

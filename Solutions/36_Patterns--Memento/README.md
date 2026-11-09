@@ -18,8 +18,8 @@ shows a `Drawing` that returns a new state.
 In the mutable sketch,
 `erase()` pops from the list the way `draw()` appends to it.
 In the frozen one, build the new `Drawing` with `replace()` and a sliced tuple.
-Test each by saving first, erasing,
-then checking the earlier state still holds both strokes.
+To test each, save first, erase,
+then check that the earlier state still holds both strokes.
 
 <details>
 <summary>The shape</summary>

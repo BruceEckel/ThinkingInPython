@@ -479,7 +479,7 @@ and replays that order on a `tkinter` canvas.
 The canvas shows the walls in gray,
 then each claimed cell turns green in that order,
 so you watch the pack move through the maze from the entry outward.
-The view records the order by subclassing `Blackboard` and overriding `claim()`,
+To record the order, the view subclasses `Blackboard` and overrides `claim()`,
 so `blackboard.py` stays as written.
 The harness skips `rats_view.py`, like every windowed view in this book.
 
@@ -883,7 +883,7 @@ The movement code that runs afterward calls `interact()` on whatever item a room
 The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
 so its room gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
-`show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
+To draw the `R`, `show_maze()` checks which room the robot is in rather than reading an occupant.
 
 The demo, the tests, and the view all import the maze as one string, `MAZE`:
 
@@ -934,7 +934,8 @@ so the first route it finds to the `!` is a shortest one.
 It makes the same `doors.open(urge)` calls `Robot.move()` makes,
 so it works in rooms and the moves between them rather than in grid coordinates.
 
-`landing()` decides whether a door is passable by testing the occupant's type with `isinstance()`.
+To decide whether a door is passable,
+`landing()` tests the occupant's type with `isinstance()`.
 That test reproduces what `Room.enter()` gets from `interact()`.
 
 ```python

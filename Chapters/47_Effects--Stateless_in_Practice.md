@@ -1299,8 +1299,8 @@ The listing keeps the two apart.
 `Dough`, `Oven`, and `Toaster` are the leaves,
 so `supply()` binds one instance of each.
 The loaf is a product.
-`bread()` is an Effect that produces a loaf,
-so `toast()` obtains one by writing `yield from bread()` rather than by asking for a `Need[Bread]`.
+`bread()` is an Effect that produces a loaf, so to obtain one,
+`toast()` writes `yield from bread()` rather than asking for a `Need[Bread]`.
 The loaf stays out of `supply()`, because `bread()` bakes it later,
 while `run()` drives `toast()`.
 
@@ -1510,7 +1510,7 @@ whose purpose is families of matched products.
 because the class defines the pairing.
 `supply()` takes a flat list and checks each argument against one requested type,
 not against the others.
-You recover the matched set by writing it down in a function,
+To recover the matched set, you write it down in a function,
 as `kitties_and_puzzles()` does.
 The guarantee moves from a class hierarchy into a two-line function.
 

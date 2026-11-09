@@ -109,7 +109,7 @@ because each `Cell` holds one position.
 Every cell in the grid is a distinct value,
 so the map needs one object per cell.
 
-Sharing starts by moving out the position.
+To make the cells shareable, move the position out of them.
 The tile's symbol, name, and walkability are intrinsic.
 Every grass cell agrees on them,
 so they go in a [record](18_Techniques--Performance.md#record).

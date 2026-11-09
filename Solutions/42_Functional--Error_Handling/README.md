@@ -590,7 +590,8 @@ def report(result: Result[int, Exception]) -> None:
 a chain whose first load fails prints a note naming the first setting and its text,
 a chain whose second load fails prints the second setting's note,
 and no run prints a traceback.
-You can answer the question by pointing to the path a successful call takes through `load_setting()`.
+To answer the question,
+you can point to the path a successful call takes through `load_setting()`.
 
 <details>
 <summary>Solution</summary>

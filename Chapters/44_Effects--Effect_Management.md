@@ -136,7 +136,8 @@ alongside the side effect and the side cause.
 
 ## Converting Effectful to Pure
 
-You make `slope()` from `divide_by_zero_impurity.py` pure by transforming its exception Effect.
+To make `slope()` from `divide_by_zero_impurity.py` pure,
+you transform its exception Effect.
 
 ### Return a Result Type
 
@@ -220,7 +221,7 @@ before C++17 removed them,
 checked it at runtime and ended the program on an exception the list left out.
 Neither language infers the list from the functions a body calls,
 so an exception introduced three levels down means editing every signature above it.
-Programmers usually avoid that work by widening the specification until it permits every exception.
+To avoid that work, programmers usually widen the specification until it permits every exception.
 The specifications expose implementation details.
 Most people now count them a failure.
 C++11 reduced its version to a single bit:
@@ -935,8 +936,8 @@ and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
 A library works with the language's ordinary calls,
 which run as soon as you make them.
-It can delay the binding of `ask` to an implementation only by delaying the call itself,
-so it builds a description now and runs it later.
+To delay the binding of `ask` to an implementation,
+it must delay the call itself, so it builds a description now and runs it later.
 
 Deferring execution adds one question to every value you handle:
 is it a description or an action?
@@ -1092,8 +1093,8 @@ The solution moves that tracking into the language or the toolchain,
 and a generation later, nobody can imagine doing it by hand.
 
 Namespaces are an example.
-Early languages put every name in one global namespace,
-and the programmer prevented collisions by choosing distinct names.
+Early languages put every name in one global namespace.
+To prevent collisions, the programmer chose distinct names.
 Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
 The solution divided names among separate namespaces.
@@ -1120,8 +1121,8 @@ and we don't know what that code does.
 It might change something in the world.
 It might read from an unreliable source.
 It might fail and take down the system.
-You discover these behaviors by trusting documentation, reading source,
-and observing failures.
+To discover these behaviors, you trust documentation, read source,
+and observe failures.
 Then you write compensating code.
 This activity consumes an enormous part of professional programming,
 and it has been normal for so long that it goes unnoticed.

@@ -73,7 +73,6 @@ Solutions/34_Patterns--Composite_and_Interpreter/README.md	[conj,relcl] characte
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[relcl] CODE .. reads: The CODE that reads as an obstacle in the file system reads as the point here.
 Solutions/35_Patterns--Flyweight/README.md	[appos,relcl] threads .. run: Four threads that miss on the same cold key therefore all run the body.
 Solutions/36_Patterns--Memento/README.md	[cc,conj,relcl] Class .. shows: A Class That Changes After the Save shows CODE loading old bytes into a changed class, and A Deleted Field Leaves a Ghost shows what CODE writes into the instance.
-Solutions/36_Patterns--Memento/README.md	[npadvmod,prep] Test .. holds: Test each by saving first, erasing, then checking the earlier state still holds both strokes.
 Solutions/42_Functional--Error_Handling/README.md	[appos,cc,conj] prints .. is: for the input that CODE rejects, your run prints the CODE from CODE and the later step's trace line is missing, while every input that passes CODE still prints that line.
 Solutions/43_Functional--Confidence/README.md	[prep] answer .. is: By that rule, the answer for a roster of two and a size of five is one group of two.
 Solutions/45_Effects--Generators/README.md	[cc,conj,prep] definitions .. is: ** Three CODE definitions over CODE, CODE, and CODE keep the two integer channels apart, so transposing the CODE and the CODE is a type checker error.

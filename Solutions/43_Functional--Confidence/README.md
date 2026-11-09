@@ -813,7 +813,8 @@ because each `case` pattern destructures the `Err` and matches the error inside 
 
 The `return` at `[1]` is also weaker than the `match`'s `case Err(error)`.
 That `return` is a fallthrough rather than a branch stating what it matches,
-so a reader must deduce that `result` is an `Err` by ruling out the `Ok` branch above.
+so to deduce that `result` is an `Err`,
+a reader must rule out the `Ok` branch above.
 
 In the error branches,
 the `isinstance()` version narrows `result.error` to `ValueError` or `ZeroDivisionError`.

@@ -193,6 +193,7 @@ Chapters/43_Functional--Confidence.md	[PAST] bound: Each test checks a single in
 Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place leaves CODE as it was.
 Chapters/44_Effects--Effect_Management.md	[PAST] added: Each swap of an implementation, and each layer added around one, happens at the edge of the program.
 Chapters/44_Effects--Effect_Management.md	[PAST] checked: *checked exceptions*), while C++, before C++17 removed them, checked it at runtime and ended the program on an exception the list left out.
+Chapters/44_Effects--Effect_Management.md	[PAST] chose: To prevent collisions, the programmer chose distinct names.
 Chapters/44_Effects--Effect_Management.md	[PAST] committed: A team committed to Scala or TypeScript cannot use native Effects, so designers build *library* Effect systems on top of existing type systems.
 Chapters/44_Effects--Effect_Management.md	[PAST] declared: *Algebraic effects* is the name for this design: Effects declared as an interface, plus handlers that receive the continuation.
 Chapters/44_Effects--Effect_Management.md	[PAST] delayed: Native systems deliver tracking, interface separation, and delayed binding while the code runs eagerly, with no description trees and no interpreter.
@@ -201,7 +202,7 @@ Chapters/44_Effects--Effect_Management.md	[PAST] ended: *checked exceptions*), w
 Chapters/44_Effects--Effect_Management.md	[PAST] faced: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] followed: A perfectly pure computation, followed to its logical end, is a space heater with extra steps.
 Chapters/44_Effects--Effect_Management.md	[PAST] introduced: Neither language infers the list from the functions a body calls, so an exception introduced three levels down means editing every signature above it.
-Chapters/44_Effects--Effect_Management.md	[PAST] prevented: Early languages put every name in one global namespace, and the programmer prevented collisions by choosing distinct names.
+Chapters/44_Effects--Effect_Management.md	[PAST] read: To discover these behaviors, you trust documentation, read source, and observe failures.
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.

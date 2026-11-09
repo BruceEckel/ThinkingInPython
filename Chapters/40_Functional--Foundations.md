@@ -664,7 +664,7 @@ The type parameters matter at `[1]`.
 The type checker verifies that `label()` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
-You grow a composition by adding a stage.
+To grow a composition, you add a stage.
 Each stage is testable on its own.
 A larger behavior is a new named composition of existing stages.
 When a requirement changes, you insert or swap a single stage.
