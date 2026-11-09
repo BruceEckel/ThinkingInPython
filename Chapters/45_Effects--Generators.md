@@ -1250,7 +1250,6 @@ When the driver calls `close()`, the `RuntimeError` arrives in the driver,
 as above.
 When the garbage collector calls `close()`,
 the `RuntimeError` arrives in the collector,
-which has no `except` clause for it,
 so Python prints it as an "Exception ignored" message and continues.
 A generator written for others to drive therefore lets `GeneratorExit` end it.
 
