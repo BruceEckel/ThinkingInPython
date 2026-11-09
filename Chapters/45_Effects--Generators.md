@@ -896,8 +896,7 @@ and each `yield from` expression collects what its step returns.
 
 A generator that sits between `drive()` and `interview()` can do both:
 answer the requests it knows and relay the rest.
-`proxy()` has the same annotation as `interview()`, so `drive()` accepts either,
-and `survey()` can delegate to either with `yield from`:
+`proxy()` has the same annotation as `interview()`, so `drive()` accepts either:
 
 ```python
 # answering_proxy.py
