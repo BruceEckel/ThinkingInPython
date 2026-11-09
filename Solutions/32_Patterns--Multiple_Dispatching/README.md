@@ -1086,7 +1086,7 @@ That subclass is the new type most likely to receive an old type's answers by mi
 
 Which behavior you want depends on whether a subclass is a new competitor or a variation on an existing one.
 `Origami` is paper for the purposes of this game.
-A `WetPaper` that loses to everything is a new competitor.
+If you add a `WetPaper(Paper)` that loses to everything, it is a new competitor.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
