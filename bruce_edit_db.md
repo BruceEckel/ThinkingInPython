@@ -2777,6 +2777,11 @@ incidental object.
 - `45_Effects--Generators` 2026-11-09, heading, was Claude-written:
   "`close()` Requires the Generator to Finish" -> "`close()`: The
   Generator Must Finish"
+- `45_Effects--Generators` 2026-11-09, same section, was Claude-written
+  (Bruce: "weird and passive, the passivity makes it more complicated"):
+  "A generator written for others to drive therefore lets
+  `GeneratorExit` end it." -> "A generator for a driver must therefore
+  finish when `GeneratorExit` arrives: it cleans up and returns."
 
 **Home.** activate (Accrued patterns) | `tools/sentence_shapes.py`
 (`[CAUS]`) | this file.

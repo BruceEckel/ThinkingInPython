@@ -1252,7 +1252,8 @@ as above.
 When the garbage collector calls `close()`,
 the `RuntimeError` arrives in the collector,
 so Python prints it as an "Exception ignored" message and continues.
-A generator written for others to drive therefore lets `GeneratorExit` end it.
+A generator for a driver must therefore finish when `GeneratorExit` arrives:
+it cleans up and returns.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
